@@ -67,9 +67,9 @@ class Foundation_API PatternFormatter: public Formatter
 	///   * %M - message date/time minute (00 .. 59)
 	///   * %S - message date/time second (00 .. 59)
 	///   * %i - message date/time millisecond (000 .. 999)
-	///   * %c - message date/time centisecond (0 .. 9)
+	///   * %c - message date/time centisecond (00 .. 99)
 	///   * %F - message date/time fractional seconds/microseconds (000000 - 999999)
-	///   * %z - time zone differential in ISO 8601 format (Z or +NN.NN)
+	///   * %z - time zone differential in ISO 8601 format (Z or +NN:NN)
 	///   * %Z - time zone differential in RFC format (GMT or +NNNN)
 	///   * %L - convert time to local time (must be specified before any date/time specifier; does not itself output anything)
 	///   * %E - epoch time (UTC, seconds since midnight, January 1, 1970)
@@ -90,14 +90,14 @@ public:
 		/// Creates a PatternFormatter that uses the
 		/// given format pattern.
 
-	~PatternFormatter();
+	~PatternFormatter() override;
 		/// Destroys the PatternFormatter.
 
-	void format(const Message& msg, std::string& text);
+	void format(const Message& msg, std::string& text) override;
 		/// Formats the message according to the specified
 		/// format pattern and places the result in text.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given name to the given value.
 		///
 		/// The following properties are supported:
@@ -112,10 +112,19 @@ public:
 		/// If any other property name is given, a PropertyNotSupported
 		/// exception is thrown.
 
-	std::string getProperty(const std::string& name) const;
+	[[nodiscard]] std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name or
 		/// throws a PropertyNotSupported exception if the given
 		/// name is not recognized.
+
+	bool getLocalTime() const;
+		/// Returns true if timestamps are formatted in local time, false if in UTC.
+		/// Reflects the "times" property, which defaults to UTC.
+
+	bool isLocalTimeConfigured() const;
+		/// Returns true if the "times" property has been explicitly set, false if
+		/// still at its default. Lets callers distinguish an explicit "UTC" from an
+		/// unspecified default.
 
 	static const std::string PROP_PATTERN;
 	static const std::string PROP_TIMES;
@@ -133,7 +142,7 @@ private:
 		}
 
 		char key;
-		int length;
+		std::size_t length;
 		std::string property;
 		std::string prepend;
 	};
@@ -145,13 +154,18 @@ private:
 
 	void parsePriorityNames();
 
+	[[nodiscard]] static const char* extractBasename(const char* path);
+		/// Extracts the filename from a path without creating a Path object.
+
 	static const std::string DEFAULT_PRIORITY_NAMES;
 
 	std::vector<PatternAction> _patternActions;
 	bool _localTime;
+	bool _localTimeSet;
 	std::string _pattern;
 	std::string _priorityNames;
 	std::string _priorities[9];
+	static std::string _cachedNodeName;
 };
 
 

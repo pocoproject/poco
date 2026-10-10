@@ -21,8 +21,7 @@
 #include "Poco/Net/Session.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 Session::Session()
@@ -35,4 +34,4 @@ Session::~Session()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

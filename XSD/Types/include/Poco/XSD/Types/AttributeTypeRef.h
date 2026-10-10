@@ -1,0 +1,84 @@
+//
+// AttributeTypeRef.h
+//
+// Library: XSD/Types
+// Package: XSDAttributes
+// Module:  AttributeTypeRef
+//
+// Definition of the AttributeTypeRef class.
+//
+// Copyright (c) 2008-2012, Applied Informatics Software Engineering GmbH.
+// All rights reserved.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#ifndef XSDTypes_AttributeTypeRef_INCLUDED
+#define XSDTypes_AttributeTypeRef_INCLUDED
+
+
+#include "Poco/XSD/Types/XSDTypes.h"
+#include "Poco/XSD/Types/AbstractAttribute.h"
+#include "Poco/XSD/Types/QName.h"
+
+
+namespace Poco::XSD::Types {
+
+
+class XSDTypes_API AttributeTypeRef: public AbstractAttribute
+	/// A reference to an attribute type.
+{
+public:
+	using Ptr = AutoPtr<AttributeTypeRef>;
+
+	AttributeTypeRef(const std::string& id, 
+		const std::string& name, 
+		const std::string& nameSpace,
+		const QName& typeRef, 
+		const std::string& fixedValue, 
+		const std::string& defaultValue, 
+		bool qualifiedForm, 
+		AbstractAttribute::Usage use = AbstractAttribute::USE_OPTIONAL);
+		/// Creates the AttributeTypeRef.
+
+	~AttributeTypeRef() override;
+		/// Destroys the AttributeTypeRef.
+
+	// AbstractAttribute
+	[[nodiscard]] const std::string& nameSpace() const override;
+	[[nodiscard]] const std::string& defaultValue() const override;
+	[[nodiscard]] const std::string& fixedValue() const override;
+	[[nodiscard]] bool qualifiedForm() const override;
+	[[nodiscard]] const SimpleType* type() const override;
+	void fixup() override;
+	[[nodiscard]] AbstractAttribute::Usage usage() const override;
+	void accept(Visitor& v) const override;
+
+private:
+	AttributeTypeRef(const std::string& id, 
+		const std::string& name, 
+		const std::string& nameSpace,
+		const QName& typeRef, 
+		const SimpleType* pType,
+		const std::string& fixedValue, 
+		const std::string& defaultValue, 
+		bool qualifiedForm, 
+		AbstractAttribute::Usage use = AbstractAttribute::USE_OPTIONAL);
+
+	std::string _nameSpace;
+	QName _typeRef;
+	std::string _fixedValue;
+	std::string _defaultValue;
+	bool _qualifiedForm;
+	AbstractAttribute::Usage _use;
+	const SimpleType* _pType;
+
+	friend class TypesManager;
+};
+
+
+} // namespace Poco::XSD::Types
+
+
+#endif // XSDTypes_Attribute_INCLUDED

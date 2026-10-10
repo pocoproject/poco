@@ -17,9 +17,14 @@
 #include "Poco/Data/SessionFactory.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+#if POCO_DATA_SQL_SERVER_BIG_STRINGS
+	#pragma message ("MS SQLServer ODBC big string capability ENABLED")
+#else
+	#pragma message ("MS SQLServer ODBC big string capability DISABLED")
+#endif
+
+
+namespace Poco::Data::ODBC {
 
 
 const std::string Connector::KEY("ODBC");
@@ -61,4 +66,4 @@ void Connector::bindStringToLongVarChar(bool flag)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

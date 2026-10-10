@@ -15,18 +15,13 @@
 #include "Poco/Net/PartHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
-PartHandler::PartHandler()
-{
-}
+PartHandler::PartHandler() = default;
 
 
-PartHandler::~PartHandler()
-{
-}
+PartHandler::~PartHandler() = default;
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

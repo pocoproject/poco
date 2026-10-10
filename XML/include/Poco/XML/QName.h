@@ -26,8 +26,7 @@
 #include <iosfwd>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API QName
@@ -49,25 +48,25 @@ public:
 	QName& operator = (QName&& qname) noexcept;
 	void swap(QName& qname) noexcept;
 
-	const std::string& namespaceURI() const;
+	[[nodiscard]] const std::string& namespaceURI() const;
 		/// Returns the namespace URI part of the name.
 
-	const std::string& localName() const;
+	[[nodiscard]] const std::string& localName() const;
 		/// Returns the local part of the name.
 
-	const std::string& prefix() const;
+	[[nodiscard]] const std::string& prefix() const;
 		/// Returns the namespace prefix of the name.
 
-	std::string& namespaceURI();
+	[[nodiscard]] std::string& namespaceURI();
 		/// Returns the namespace URI part of the name.
 
-	std::string& localName();
+	[[nodiscard]] std::string& localName();
 		/// Returns the local part of the name.
 
-	std::string& prefix();
+	[[nodiscard]] std::string& prefix();
 		/// Returns the namespace prefix of the name.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns a printable representation in the [<namespace>#]<name> form.
 
 public:
@@ -124,25 +123,25 @@ inline std::string& QName::prefix()
 XML_API std::ostream& operator << (std::ostream&, const QName&);
 
 
-inline bool operator < (const QName& x, const QName& y)
+[[nodiscard]] inline bool operator < (const QName& x, const QName& y)
 {
 	return x._ns < y._ns || (x._ns == y._ns && x._name < y._name);
 }
 
 
-inline bool operator == (const QName& x, const QName& y)
+[[nodiscard]] inline bool operator == (const QName& x, const QName& y)
 {
 	return x._ns == y._ns && x._name == y._name;
 }
 
 
-inline bool operator != (const QName& x, const QName& y)
+[[nodiscard]] inline bool operator != (const QName& x, const QName& y)
 {
 	return !(x == y);
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_QName_INCLUDED

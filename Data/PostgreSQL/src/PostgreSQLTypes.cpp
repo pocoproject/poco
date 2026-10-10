@@ -15,9 +15,7 @@
 #include "Poco/Data/PostgreSQL/PostgreSQLTypes.h"
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID)
@@ -96,7 +94,7 @@ Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID)
 
 	//uuid
 	case UUIDOID:
-		cdt = Poco::Data::MetaColumn::FDT_BLOB;
+		cdt = Poco::Data::MetaColumn::FDT_UUID;
 		break;
 
 	// everything else is a string
@@ -109,4 +107,4 @@ Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID)
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

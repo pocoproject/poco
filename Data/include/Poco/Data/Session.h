@@ -22,15 +22,13 @@
 #include "Poco/Data/SessionImpl.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/StatementCreator.h"
-#include "Poco/Data/Binding.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Any.h"
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class StatementImpl;
@@ -159,23 +157,23 @@ class Data_API Session
 	/// For more information, see Transation class documentation.
 {
 public:
-	static const std::size_t LOGIN_TIMEOUT_DEFAULT = SessionImpl::LOGIN_TIMEOUT_DEFAULT;
-	static const Poco::UInt32 TRANSACTION_READ_UNCOMMITTED = 0x00000001L;
-	static const Poco::UInt32 TRANSACTION_READ_COMMITTED   = 0x00000002L;
-	static const Poco::UInt32 TRANSACTION_REPEATABLE_READ  = 0x00000004L;
-	static const Poco::UInt32 TRANSACTION_SERIALIZABLE     = 0x00000008L;
+	static constexpr std::size_t LOGIN_TIMEOUT_DEFAULT = SessionImpl::LOGIN_TIMEOUT_DEFAULT;
+	static constexpr Poco::UInt32 TRANSACTION_READ_UNCOMMITTED = 0x00000001L;
+	static constexpr Poco::UInt32 TRANSACTION_READ_COMMITTED   = 0x00000002L;
+	static constexpr Poco::UInt32 TRANSACTION_REPEATABLE_READ  = 0x00000004L;
+	static constexpr Poco::UInt32 TRANSACTION_SERIALIZABLE     = 0x00000008L;
 
 	Session(Poco::AutoPtr<SessionImpl> ptrImpl);
 		/// Creates the Session from SessionImpl.
 
 	Session(const std::string& connector,
 		const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
+		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a new session, using the given connector (which must have
 		/// been registered), and connectionString.
 
 	Session(const std::string& connection,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
+		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a new session, using the given connection (must be in
 		/// "connection:///connectionString" format).
 
@@ -204,6 +202,11 @@ public:
 		return (_statementCreator << t);
 	}
 
+	[[nodiscard]] const std::string& dbmsName() const;
+		/// Returns the DBMS name. The name must be set by the
+		/// implementation.
+		/// Defaults to "unknown".
+
 	SharedPtr<StatementImpl> createStatementImpl();
 		/// Creates a StatementImpl.
 
@@ -218,16 +221,16 @@ public:
 	void close();
 		/// Closes the session.
 
-	bool isConnected();
+	[[nodiscard]] bool isConnected() const;
 		/// Returns true iff session is connected, false otherwise.
 
 	void reconnect();
 		/// Closes the session and opens it.
 
-	bool isGood();
+	[[nodiscard]] bool isGood() const;
 		/// Returns true iff the session is good and can be used, false otherwise.
 
-	bool isAutocommit() const;
+	[[nodiscard]] bool isAutocommit() const;
 		/// Returns true iff the session is in autocommit mode, false otherwise.
 		/// If the session does not support autocommit, it is assumed not to
 		/// be in auto commit mode.
@@ -237,13 +240,13 @@ public:
 	void setLoginTimeout(std::size_t timeout);
 		/// Sets the session login timeout value.
 
-	std::size_t getLoginTimeout() const;
+	[[nodiscard]] std::size_t getLoginTimeout() const;
 		/// Returns the session login timeout value.
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout();
+	[[nodiscard]] std::size_t getConnectionTimeout();
 		/// Returns the session connection timeout value.
 
 	void begin();
@@ -262,38 +265,38 @@ public:
 		/// If `session` was in autocommit mode when the transaction started (begin() call),
 		/// it is switched back to autocommit mode.
 
-	bool canTransact();
+	[[nodiscard]] bool canTransact();
 		/// Returns true if session has transaction capabilities.
 
-	bool isTransaction();
+	[[nodiscard]] bool isTransaction();
 		/// Returns true iff a transaction is in progress, false otherwise.
 
 	void setTransactionIsolation(Poco::UInt32);
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation();
+	[[nodiscard]] Poco::UInt32 getTransactionIsolation();
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32 ti);
+	[[nodiscard]] bool hasTransactionIsolation(Poco::UInt32 ti);
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32 ti);
+	[[nodiscard]] bool isTransactionIsolation(Poco::UInt32 ti);
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
-	std::string connector() const;
+	[[nodiscard]] std::string connector() const;
 		/// Returns the connector name for this session.
 
-	std::string uri() const;
+	[[nodiscard]] std::string uri() const;
 		/// Returns the URI for this session.
 
-	static std::string uri(const std::string& connector,
+	[[nodiscard]] static std::string uri(const std::string& connector,
 		const std::string& connectionString);
 		/// Utility function that teturns the URI formatted from supplied
 		/// arguments as "connector:///connectionString".
 
-	bool hasFeature(const std::string& name) const;
+	[[nodiscard]] bool hasFeature(const std::string& name) const;
 		/// Returns true if session has the named feature.
 
 	void setFeature(const std::string& name, bool state);
@@ -305,7 +308,7 @@ public:
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
 
-	bool getFeature(const std::string& name) const;
+	[[nodiscard]] bool getFeature(const std::string& name) const;
 		/// Look up the state of a feature.
 		///
 		/// Features are a generic extension mechanism for session implementations.
@@ -314,7 +317,7 @@ public:
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
 
-	bool hasProperty(const std::string& name) const;
+	[[nodiscard]] bool hasProperty(const std::string& name) const;
 		/// Returns true if session has the named property.
 
 	void setProperty(const std::string& name, const Poco::Any& value);
@@ -326,7 +329,7 @@ public:
 		/// Throws a NotSupportedException if the requested property is
 		/// not supported by the underlying implementation.
 
-	Poco::Any getProperty(const std::string& name) const;
+	[[nodiscard]] Poco::Any getProperty(const std::string& name) const;
 		/// Look up the value of a property.
 		///
 		/// Properties are a generic extension mechanism for session implementations.
@@ -335,7 +338,7 @@ public:
 		/// Throws a NotSupportedException if the requested property is
 		/// not supported by the underlying implementation.
 
-	SessionImpl* impl();
+	[[nodiscard]] SessionImpl* impl();
 		/// Returns a pointer to the underlying SessionImpl.
 
 private:
@@ -350,6 +353,12 @@ private:
 //
 // inlines
 //
+
+inline const std::string& Session::dbmsName() const
+{
+	return _pImpl->dbmsName();
+}
+
 
 inline bool Session::isAutocommit() const
 {
@@ -375,7 +384,7 @@ inline void Session::close()
 }
 
 
-inline bool Session::isConnected()
+inline bool Session::isConnected() const
 {
 	return _pImpl->isConnected();
 }
@@ -387,7 +396,7 @@ inline void Session::reconnect()
 }
 
 
-inline bool Session::isGood()
+inline bool Session::isGood() const
 {
 	return _pImpl->isGood();
 }
@@ -519,7 +528,7 @@ inline void swap(Session& s1, Session& s2)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 namespace std

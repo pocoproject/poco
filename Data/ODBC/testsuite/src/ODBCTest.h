@@ -20,10 +20,12 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Exception.h"
+#include "Poco/UUID.h"
+#include "Poco/UUIDGenerator.h"
 #include "SQLExecutor.h"
 
 
-#define POCO_ODBC_TEST_DATABASE_SERVER "localhost"
+#define POCO_ODBC_TEST_DATABASE_SERVER "127.0.0.1"
 
 
 class ODBCTest: public CppUnit::TestCase
@@ -40,10 +42,10 @@ public:
 		std::string& rPwd,
 		std::string& rConnectString);
 
-	~ODBCTest();
+	~ODBCTest() override;
 
-	virtual void setUp();
-	virtual void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	virtual void testBareboneODBC() = 0;
 
@@ -83,6 +85,7 @@ public:
 	virtual void testLimitPrepare();
 	virtual void testLimitZero();
 	virtual void testPrepare();
+	virtual void testNullBulk();
 	virtual void testBulk();
 	virtual void testBulkPerformance();
 
@@ -132,7 +135,7 @@ public:
 
 	virtual void testStoredProcedure();
 	virtual void testStoredProcedureAny();
-	virtual void testStoredProcedureDynamicAny();
+	virtual void testStoredProcedureDynamicVar();
 
 	virtual void testStoredFunction();
 	virtual void testStoredFunctionAny();
@@ -159,6 +162,8 @@ public:
 	virtual void testTransaction();
 	virtual void testTransactor();
 	virtual void testNullable();
+	virtual void testStdOptional();
+	virtual void testStdTupleWithOptional();
 
 	virtual void testUnicode();
 	virtual void testEncoding();
@@ -166,10 +171,11 @@ public:
 	virtual void testReconnect();
 
 protected:
-	typedef Poco::Data::ODBC::Utility::DriverMap Drivers;
+	using Drivers = Poco::Data::ODBC::Utility::DriverMap;
 
 	virtual void dropObject(const std::string& type, const std::string& name);
 	virtual void recreateNullableTable();
+	virtual void recreateNullableStringTable();
 	virtual void recreatePersonTable();
 	virtual void recreatePersonTupleTable();
 	virtual void recreatePersonBLOBTable();
@@ -196,14 +202,16 @@ protected:
 		std::string& pwd,
 		std::string& dbConnString,
 		const std::string& db = "",
-		const std::string& dbEncoding = "");
+		const std::string& dbEncoding = "",
+		bool quiet = false);
 
 	static bool canConnect(const std::string& driver,
 		std::string& dsn,
 		std::string& uid,
 		std::string& pwd,
 		std::string& dbConnString,
-		const std::string& db = "");
+		const std::string& db = "",
+		bool quiet = false);
 
 	bool bindValue(int i);
 
@@ -219,7 +227,7 @@ protected:
 
 private:
 	static Drivers    _drivers;
-	static const bool _bindValues[8];
+	static constexpr bool _bindValues[8] = {true, true, true, false, false, true, false, false};
 	SessionPtr        _pSession;
 	ExecPtr           _pExecutor;
 	std::string&      _rDSN;
@@ -251,9 +259,9 @@ inline void ODBCTest::testStoredProcedureAny()
 }
 
 
-inline void ODBCTest::testStoredProcedureDynamicAny()
+inline void ODBCTest::testStoredProcedureDynamicVar()
 {
-	throw Poco::NotImplementedException("ODBCTest::testStoredProcedureDynamicAny()");
+	throw Poco::NotImplementedException("ODBCTest::testStoredProcedureDynamicVar()");
 }
 
 
@@ -284,6 +292,12 @@ inline void ODBCTest::dropObject(const std::string& type, const std::string& nam
 inline void ODBCTest::recreateNullableTable()
 {
 	throw Poco::NotImplementedException("ODBCTest::recreateNullableTable()");
+}
+
+
+inline void ODBCTest::recreateNullableStringTable()
+{
+	throw Poco::NotImplementedException("ODBCTest::recreateNullableStringTable()");
 }
 
 

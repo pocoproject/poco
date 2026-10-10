@@ -16,9 +16,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 CodeGenerator::CodeGenerator(const std::string& source, std::ostream& stream):
@@ -164,4 +162,4 @@ std::string CodeGenerator::fullClassName(const Class& clazz) const
 }
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler

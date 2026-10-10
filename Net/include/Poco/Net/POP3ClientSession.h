@@ -25,8 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class MessageHeader;
@@ -69,7 +68,7 @@ public:
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for socket read operations.
 
-	Poco::Timespan getTimeout() const;
+	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the timeout for socket read operations.
 
 	void login(const std::string& username, const std::string& password);
@@ -85,7 +84,7 @@ public:
 		/// Throws a POP3Exception in case of a POP3-specific error, or a
 		/// NetException in case of a general network communication failure.
 
-	int messageCount();
+	[[nodiscard]] int messageCount();
 		/// Sends a STAT command to determine the number of messages
 		/// available on the server and returns that number.
 		///
@@ -179,7 +178,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_POP3ClientSession_INCLUDED

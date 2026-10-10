@@ -31,6 +31,8 @@ public:
 	void testStreamOpenerPath();
 	void testStreamOpenerPathResolve();
 	void testRegisterUnregister();
+	void testRedirectToFileSchemeRejected();
+	void testRedirectToWebSchemeAllowed();
 
 	void setUp();
 	void tearDown();

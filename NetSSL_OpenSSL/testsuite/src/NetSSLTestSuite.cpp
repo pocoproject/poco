@@ -9,23 +9,28 @@
 
 
 #include "NetSSLTestSuite.h"
-
+#include "ContextTest.h"
+#include "SecureStreamSocketTestSuite.h"
 #include "HTTPSClientTestSuite.h"
 #include "TCPServerTestSuite.h"
 #include "HTTPSServerTestSuite.h"
 #include "WebSocketTestSuite.h"
 #include "FTPSClientTestSuite.h"
+#include "SecureSyslogTest.h"
 
 
 CppUnit::Test* NetSSLTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("OpenSSLTestSuite");
 
+	pSuite->addTest(ContextTest::suite());
+	pSuite->addTest(SecureStreamSocketTestSuite::suite());
 	pSuite->addTest(HTTPSClientTestSuite::suite());
 	pSuite->addTest(TCPServerTestSuite::suite());
 	pSuite->addTest(HTTPSServerTestSuite::suite());
 	pSuite->addTest(WebSocketTestSuite::suite());
 	pSuite->addTest(FTPSClientTestSuite::suite());
+	pSuite->addTest(SecureSyslogTest::suite());
 
 	return pSuite;
 }

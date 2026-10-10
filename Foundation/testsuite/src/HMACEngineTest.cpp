@@ -265,8 +265,8 @@ void HMACEngineTest::testHMAC_SHA2_384()
 	hmac6.update(data);
 	digest = DigestEngine::digestToHex(hmac6.digest());
 	assertTrue (digest == "4ece084485813e9088d2c63a041bc5b4"
-                  "4f9ef1012a2b588f3cd11f05033ac4c6"
-                  "0c2ef6ab4030fe8296248df163f44952");
+				  "4f9ef1012a2b588f3cd11f05033ac4c6"
+				  "0c2ef6ab4030fe8296248df163f44952");
 
 	key  = std::string(131, std::string::value_type(0xaa));
 	data = std::string("This is a test using a larger than block-size key "
@@ -353,9 +353,9 @@ void HMACEngineTest::testHMAC_SHA2_512()
 	hmac6.update(data);
 	digest = DigestEngine::digestToHex(hmac6.digest());
 	assertTrue (digest == "80b24263c7c1a3ebb71493c1dd7be8b4"
-                  "9b46d1f41b4aeec1121b013783f8f352"
-                  "6b56d037e05f2598bd0fd2215d6a1e52"
-                  "95e64f73f63f0aec8b915a985d786598");
+				  "9b46d1f41b4aeec1121b013783f8f352"
+				  "6b56d037e05f2598bd0fd2215d6a1e52"
+				  "95e64f73f63f0aec8b915a985d786598");
 
 	key  = std::string(131, std::string::value_type(0xaa));
 	data = std::string("This is a test using a larger than block-size key "

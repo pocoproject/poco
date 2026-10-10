@@ -1,0 +1,175 @@
+# http://www.cmake.org/Wiki/CMake_Useful_Variables :
+# CMAKE_BUILD_TYPE
+#    Choose the type of build. CMake has default flags for these:
+#
+#    * None (CMAKE_C_FLAGS or CMAKE_CXX_FLAGS used)
+#    * Debug (CMAKE_C_FLAGS_DEBUG or CMAKE_CXX_FLAGS_DEBUG)
+#    * Release (CMAKE_C_FLAGS_RELEASE or CMAKE_CXX_FLAGS_RELEASE)
+#    * RelWithDebInfo (CMAKE_C_FLAGS_RELWITHDEBINFO or CMAKE_CXX_FLAGS_RELWITHDEBINFO
+#    * MinSizeRel (CMAKE_C_FLAGS_MINSIZEREL or CMAKE_CXX_FLAGS_MINSIZEREL)
+
+# Setting CXX Flag /MD or /MT and POSTFIX values i.e MDd / MD / MTd / MT / d
+# using CMake variable CMAKE_MSVC_RUNTIME_LIBRARY.
+#
+# For visual studio the library naming is as following:
+#  Dynamic libraries:
+#   - PocoX.dll  for release library
+#   - PocoXd.dll for debug library
+#
+#  Static libraries:
+#   - PocoXmd.lib for /MD release build
+#   - PocoXtmt.lib for /MT release build
+#
+#   - PocoXmdd.lib for /MD debug build
+#   - PocoXmtd.lib for /MT debug build
+
+if(BUILD_SHARED_LIBS)
+	add_compile_definitions(POCO_DLL)
+else()
+	add_compile_definitions(POCO_STATIC)
+endif()
+
+if(MSVC)
+	if(POCO_MT)
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+		set(STATIC_POSTFIX "mt" CACHE STRING "Set static library postfix" FORCE)
+	else(POCO_MT)
+		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+		set(STATIC_POSTFIX "md" CACHE STRING "Set static library postfix" FORCE)
+	endif(POCO_MT)
+
+	message(STATUS "MSVC runtime library: ${CMAKE_MSVC_RUNTIME_LIBRARY}")
+
+	if(POCO_SANITIZE_ASAN)
+		message(WARNING "Use POCO_SANITIZEFLAGS instead of POCO_SANITIZE_ASAN")
+		add_compile_options("/fsanitize=address")
+	endif()
+
+else(MSVC)
+	# Other compilers then MSVC don't have a static STATIC_POSTFIX at the moment
+	set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
+
+	# Strip symbols from Release binaries. Apple's ld deprecated `-s`;
+	# `-Wl,-x` is its documented replacement and keeps dynamic exports.
+	# MSVC has no equivalent -- symbols live in the .pdb, not the binary.
+	if(APPLE)
+		add_link_options($<$<CONFIG:Release>:-Wl,-x>)
+	else()
+		add_link_options($<$<CONFIG:Release>:-s>)
+	endif()
+
+	# Dead-code stripping for macOS: Apple's -dead_strip works on Mach-O
+	# atoms without needing -ffunction-sections/-fdata-sections.
+	# Skipped in Debug builds to preserve symbols for debugging.
+	if(APPLE)
+		add_link_options($<$<NOT:$<CONFIG:Debug>>:-Wl,-dead_strip>)
+	endif()
+
+	# When hidden visibility is enabled, non-exported symbols are no longer
+	# linker roots. This allows the linker to discard unreferenced hidden
+	# symbols from shared libraries. Enable -ffunction-sections/-fdata-sections
+	# so each function gets its own section for fine-grained gc.
+	# Without hidden visibility this is net negative on ELF (section metadata
+	# overhead exceeds zero savings since all symbols are roots).
+	if(CMAKE_CXX_VISIBILITY_PRESET STREQUAL "hidden")
+		add_compile_options(-ffunction-sections -fdata-sections)
+		if(APPLE)
+			# -dead_strip already added above; section flags improve its
+			# granularity for hidden symbols.
+		else()
+			add_link_options($<$<NOT:$<CONFIG:Debug>>:-Wl,--gc-sections>)
+			# Identical Code Folding: merge functions with identical bodies.
+			# Requires gold or lld (not supported by BFD ld).
+			execute_process(COMMAND ${CMAKE_LINKER} --version OUTPUT_VARIABLE _linker_version ERROR_VARIABLE _linker_version)
+			if(_linker_version MATCHES "gold|LLD")
+				add_link_options($<$<NOT:$<CONFIG:Debug>>:-Wl,--icf=safe>)
+			endif()
+		endif()
+	endif()
+endif(MSVC)
+
+if (DEFINED POCO_SANITIZEFLAGS AND NOT "${POCO_SANITIZEFLAGS}" STREQUAL "")
+	# separate_arguments splits the space-separated string into individual
+	# tokens. Passing the raw variable to add_compile_options would treat a
+	# multi-flag value (e.g. "-fsanitize=undefined -fno-sanitize=vptr") as a
+	# single argument, which the compiler rejects; CMake only splits on ';'.
+	separate_arguments(_poco_san_flags UNIX_COMMAND "${POCO_SANITIZEFLAGS}")
+	message(STATUS "Using sanitize flags: ${_poco_san_flags}")
+	add_compile_options(${_poco_san_flags})
+	add_link_options(${_poco_san_flags})
+	unset(_poco_san_flags)
+endif()
+
+#################################################################################
+# Compiler warnings for Poco code only
+#################################################################################
+# This function enables additional compiler warnings for Poco C++ code.
+# It should be called from the root CMakeLists.txt AFTER add_subdirectory(dependencies)
+# to ensure third-party code is not affected.
+#
+# The function uses $<COMPILE_LANGUAGE:CXX> generator expressions to apply
+# warnings only to C++ files, providing an extra layer of protection since
+# bundled dependencies are mostly C code.
+#
+function(poco_enable_detailed_compiler_warnings)
+	if (NOT ENABLE_COMPILER_WARNINGS)
+		return()
+	endif()
+
+	message(STATUS "Enabling additional compiler warning flags for Poco C++ code only.")
+
+	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		# Clang and AppleClang
+		add_compile_options(
+			$<$<COMPILE_LANGUAGE:CXX>:-Wall>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wzero-as-null-pointer-constant>
+		)
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		# GCC
+		add_compile_options(
+			$<$<COMPILE_LANGUAGE:CXX>:-Wall>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wzero-as-null-pointer-constant>
+		)
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+		# Visual Studio
+		add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/W4>)
+	endif()
+endfunction(poco_enable_detailed_compiler_warnings)
+
+# Add a d postfix to the debug libraries
+if(BUILD_SHARED_LIBS)
+	set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)
+	set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "Set Release library postfix" FORCE)
+	set(CMAKE_MINSIZEREL_POSTFIX "" CACHE STRING "Set MinSizeRel library postfix" FORCE)
+	set(CMAKE_RELWITHDEBINFO_POSTFIX "" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+else(BUILD_SHARED_LIBS)
+	set(CMAKE_DEBUG_POSTFIX "${STATIC_POSTFIX}d" CACHE STRING "Set Debug library postfix" FORCE)
+	set(CMAKE_RELEASE_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set Release library postfix" FORCE)
+	set(CMAKE_MINSIZEREL_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set MinSizeRel library postfix" FORCE)
+	set(CMAKE_RELWITHDEBINFO_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
+endif()
+
+# Add a Poco executable that also carries the debug 'd' postfix.
+#
+# CMAKE_DEBUG_POSTFIX applies only to non-executable targets, so use this in
+# place of add_executable() to give Poco's own executables the 'd' postfix too.
+#
+# A macro, not a command override of add_executable(), so it does not leak into a
+# parent project that builds Poco via add_subdirectory(). Running in the caller's
+# scope also means the real add_executable() uses the call site's policies (e.g.
+# CMP0155 for C++20 module scanning) rather than this file's older policy scope.
+macro(poco_add_executable _name)
+	add_executable(${_name} ${ARGN})
+	set_target_properties(${_name} PROPERTIES DEBUG_POSTFIX "d")
+endmacro()
+
+# OS Detection
+include(CheckTypeSize)
+include(CheckAtomic)
+find_package(Cygwin)

@@ -30,7 +30,6 @@
 namespace Poco {
 
 
-EnvironmentImpl::StringMap EnvironmentImpl::_map;
 FastMutex EnvironmentImpl::_mutex;
 
 
@@ -50,7 +49,7 @@ bool EnvironmentImpl::hasImpl(const std::string& name)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	return getenv(name.c_str()) != 0;
+	return getenv(name.c_str()) != nullptr;
 }
 
 
@@ -58,11 +57,7 @@ void EnvironmentImpl::setImpl(const std::string& name, const std::string& value)
 {
 	FastMutex::ScopedLock lock(_mutex);
 
-	std::string var = name;
-	var.append("=");
-	var.append(value);
-	std::swap(_map[name], var);
-	if (putenv((char*) _map[name].c_str()))
+	if (setenv(name.c_str(), value.c_str(), 1))
 	{
 		std::string msg = "cannot set environment variable: ";
 		msg.append(name);
@@ -232,8 +227,8 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	int lastlen = 0;
 	int len = 100*sizeof(struct ifreq);
 	struct ifconf ifc;
-	char* buf = 0;
-	for (;;)
+	char* buf = nullptr;
+	while (true)
 	{
 		buf = new char[len];
 		ifc.ifc_len = len;

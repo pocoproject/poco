@@ -41,17 +41,12 @@ class PriorityEvent: public AbstractEvent <
 	/// an arbitrary manner.
 {
 public:
-	PriorityEvent()
-	{
-	}
+	PriorityEvent() = default;
 
-	~PriorityEvent()
-	{
-	}
+	~PriorityEvent() = default;
 
-private:
-	PriorityEvent(const PriorityEvent&);
-	PriorityEvent& operator = (const PriorityEvent&);
+	PriorityEvent(const PriorityEvent&) = delete;
+	PriorityEvent& operator=(const PriorityEvent&) = delete;
 };
 
 

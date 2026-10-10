@@ -51,22 +51,19 @@ public:
 	{
 	}
 
+	~AccessExpirationDecorator() = default;
 
-	~AccessExpirationDecorator()
-	{
-	}
-
-	const Poco::Timespan& getTimeout() const
+	[[nodiscard]] const Poco::Timespan& getTimeout() const
 	{
 		return _span;
 	}
 
-	const TArgs& value() const
+	[[nodiscard]] const TArgs& value() const
 	{
 		return _value;
 	}
 
-	TArgs& value()
+	[[nodiscard]] TArgs& value()
 	{
 		return _value;
 	}

@@ -26,8 +26,7 @@ using Poco::Base64Encoder;
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPBasicCredentials::SCHEME = "Basic";
@@ -66,13 +65,14 @@ HTTPBasicCredentials::HTTPBasicCredentials(const std::string& authInfo)
 
 HTTPBasicCredentials::~HTTPBasicCredentials()
 {
+	clear();
 }
 
 
 void HTTPBasicCredentials::clear()
 {
-	_username.clear();
-	_password.clear();
+	Poco::secureClear(_username);
+	Poco::secureClear(_password);
 }
 
 
@@ -112,7 +112,7 @@ void HTTPBasicCredentials::proxyAuthenticate(HTTPRequest& request) const
 
 void HTTPBasicCredentials::parseAuthInfo(const std::string& authInfo)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	std::istringstream istr(authInfo);
 	Base64Decoder decoder(istr);
@@ -131,4 +131,4 @@ void HTTPBasicCredentials::parseAuthInfo(const std::string& authInfo)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

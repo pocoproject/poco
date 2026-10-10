@@ -27,8 +27,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API Cipher: public Poco::RefCountedObject
@@ -39,7 +38,7 @@ class Crypto_API Cipher: public Poco::RefCountedObject
 	///     CipherFactory& factory = CipherFactory::defaultFactory();
 	///     // Creates a 256-bit AES cipher
 	///     Cipher* pCipher = factory.createCipher(CipherKey("aes-256"));
-	///     Cipher* pRSACipher = factory.createCipher(RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL));
+	///     Cipher* pRSACipher = factory.createCipher(RSAKey(RSAKey::KL_2048, RSAKey::EXP_SMALL));
 	///
 	/// Check the different Key constructors on how to initialize/create
 	/// a key. The above example auto-generates random keys.
@@ -98,7 +97,7 @@ public:
 	virtual ~Cipher();
 		/// Destroys the Cipher.
 
-	virtual const std::string& name() const = 0;
+	[[nodiscard]] virtual const std::string& name() const = 0;
 		/// Returns the name of the Cipher.
 
 	virtual CryptoTransform::Ptr createEncryptor() = 0;
@@ -107,10 +106,10 @@ public:
 	virtual CryptoTransform::Ptr createDecryptor() = 0;
 		/// Creates a decryptor object to be used with a CryptoStream.
 
-	virtual std::string encryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
+	[[nodiscard]] virtual std::string encryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
 		/// Directly encrypt a string and encode it using the given encoding.
 
-	virtual std::string decryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
+	[[nodiscard]] virtual std::string decryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
 		/// Directly decrypt a string that is encoded with the given encoding.
 
 	virtual void encrypt(std::istream& source, std::ostream& sink, Encoding encoding = ENC_NONE, bool padding = true);
@@ -129,7 +128,7 @@ private:
 };
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_Cipher_INCLUDED

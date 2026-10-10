@@ -16,14 +16,13 @@
 #include "Poco/JSON/TemplateCache.h"
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
-TemplateCache* TemplateCache::_pInstance = 0;
+TemplateCache* TemplateCache::_pInstance = nullptr;
 
 
-TemplateCache::TemplateCache(): _pLogger(0)
+TemplateCache::TemplateCache(): _pLogger(nullptr)
 {
 	setup();
 }
@@ -31,13 +30,13 @@ TemplateCache::TemplateCache(): _pLogger(0)
 
 TemplateCache::~TemplateCache()
 {
-	_pInstance = 0;
+	_pInstance = nullptr;
 }
 
 
 void TemplateCache::setup()
 {
-	poco_assert (_pInstance == 0);
+	poco_assert (_pInstance == nullptr);
 	_pInstance = this;
 }
 
@@ -61,7 +60,7 @@ Template::Ptr TemplateCache::getTemplate(const Path& path)
 
 	Template::Ptr tpl;
 
-	std::map<std::string, Template::Ptr>::iterator it = _cache.find(templatePathname);
+	auto it = _cache.find(templatePathname);
 	if (it == _cache.end())
 	{
 		if (templateFile.exists())
@@ -154,4 +153,4 @@ Path TemplateCache::resolvePath(const Path& path) const
 }
 
 
-} } // Poco::JSON
+} // namespace Poco::JSON

@@ -17,8 +17,7 @@
 #include "Poco/DOM/DOMException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString CDATASection::NODE_NAME = toXMLString("#cdata-section");
@@ -71,4 +70,4 @@ Node* CDATASection::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

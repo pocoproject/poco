@@ -18,6 +18,10 @@
 #define NetSSL_SecureSocketImpl_INCLUDED
 
 
+// Temporary debugging aid, to be removed
+// #define ENABLE_PRINT_STATE
+
+
 #include "Poco/Net/SocketImpl.h"
 #include "Poco/Net/NetSSL.h"
 #include "Poco/Net/Context.h"
@@ -25,7 +29,7 @@
 #include "Poco/Net/X509Certificate.h"
 #include "Poco/Buffer.h"
 #include <winsock2.h>
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <wincrypt.h>
 #include <schannel.h>
 #ifndef SECURITY_WIN32
@@ -35,8 +39,15 @@
 #include <sspi.h>
 
 
-namespace Poco {
-namespace Net {
+
+#ifdef ENABLE_PRINT_STATE
+#define PRINT_STATE(m) printState(m)
+#else
+#define PRINT_STATE(m)
+#endif
+
+
+namespace Poco::Net {
 
 
 class NetSSL_Win_API SecureSocketImpl
@@ -154,10 +165,11 @@ public:
 		/// number of connections that can be queued
 		/// for this socket.
 
-	void shutdown();
+	int shutdown();
 		/// Shuts down the connection by attempting
 		/// an orderly SSL shutdown, then actually
-		/// shutting down the TCP connection.
+		/// shutting down the TCP connection in the
+		/// send direction.
 
 	void close();
 		/// Close the socket.
@@ -183,7 +195,7 @@ public:
 	void setPeerHostName(const std::string& hostName);
 		/// Sets the peer host name for certificate validation purposes.
 
-	const std::string& getPeerHostName() const;
+	[[nodiscard]] const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 
 	void verifyPeerCertificate();
@@ -195,17 +207,25 @@ public:
 		/// Performs post-connect (or post-accept) peer certificate validation
 		/// using the given peer host name.
 
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the Context.
 
-	PCCERT_CONTEXT peerCertificate() const;
+	[[nodiscard]] PCCERT_CONTEXT peerCertificate() const;
 		/// Returns the peer certificate.
 
-	poco_socket_t sockfd();
+	[[nodiscard]] poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
 
-	int available() const;
-		/// Returns the number of bytes available in the buffer.
+	[[nodiscard]] int available() const;
+		/// Returns the number of bytes that a read gets without waiting
+		/// for the network: the decrypted data that is buffered, and the
+		/// records that have arrived in full.
+
+	[[nodiscard]] SocketImpl* socket();
+		/// Returns the underlying SocketImpl.
+		
+	[[nodiscard]] const SocketImpl* socket() const;
+		/// Returns the underlying SocketImpl.
 
 protected:
 	enum
@@ -218,59 +238,99 @@ protected:
 	{
 		ST_INITIAL = 0,
 		ST_CONNECTING,
-		ST_CLIENTHANDSHAKESTART,
-		ST_CLIENTHANDSHAKECONDREAD,
-		ST_CLIENTHANDSHAKEINCOMPLETE,
-		ST_CLIENTHANDSHAKEOK,
-		ST_CLIENTHANDSHAKEEXTERROR,
-		ST_CLIENTHANDSHAKECONTINUE,
-		ST_VERIFY,
+		ST_CLIENT_HSK_START,
+		ST_CLIENT_HSK_SEND_TOKEN,
+		ST_CLIENT_HSK_LOOP_INIT,
+		ST_CLIENT_HSK_LOOP_RECV,
+		ST_CLIENT_HSK_LOOP_PROCESS,
+		ST_CLIENT_HSK_LOOP_SEND,
+		ST_CLIENT_HSK_LOOP_DONE,
+		ST_CLIENT_HSK_SEND_FINAL,
+		ST_CLIENT_HSK_SEND_ERROR,
+		ST_CLIENT_HSK_END,
+		ST_CLIENT_VERIFY,
+		ST_ACCEPTING,
+		ST_SERVER_HSK_START,
+		ST_SERVER_HSK_LOOP_INIT,
+		ST_SERVER_HSK_LOOP_RECV,
+		ST_SERVER_HSK_LOOP_PROCESS,
+		ST_SERVER_HSK_LOOP_SEND,
+		ST_SERVER_HSK_LOOP_DONE,
+		ST_SERVER_HSK_END,
+		ST_SERVER_VERIFY,
 		ST_DONE,
-		ST_ERROR
+		ST_ERROR,
+		ST_MAX
+	};
+
+	enum TLSShutdown
+	{
+		TLS_SHUTDOWN_SENT = 1,
+		TLS_SHUTDOWN_RECEIVED = 2
 	};
 
 	int sendRawBytes(const void* buffer, int length, int flags = 0);
 	int receiveRawBytes(void* buffer, int length, int flags = 0);
-	void clientConnectVerify();
-	void sendInitialTokenOutBuffer();
-	void performServerHandshake();
-	bool serverHandshakeLoop(PCtxtHandle phContext, PCredHandle phCred, bool requireClientAuth, bool doInitialRead, bool newContext);
 	void clientVerifyCertificate(const std::string& hostName);
 	void verifyCertificateChainClient(PCCERT_CONTEXT pServerCert);
 	void serverVerifyCertificate();
-	LONG serverDisconnect(PCredHandle phCreds, CtxtHandle* phContext);
-	LONG clientDisconnect(PCredHandle phCreds, CtxtHandle* phContext);
-	bool loadSecurityLibrary();
-	void initClientContext();
-	void initServerContext();
+	int serverShutdown(PCredHandle phCreds, CtxtHandle* phContext);
+	int clientShutdown(PCredHandle phCreds, CtxtHandle* phContext);
 	PCCERT_CONTEXT loadCertificate(bool mustFindCertificate);
 	void initCommon();
 	void cleanup();
-	void performClientHandshake();
-	void performInitialClientHandshake();
-	SECURITY_STATUS performClientHandshakeLoop();
-	void performClientHandshakeLoopIncompleteMessage();
-	void performClientHandshakeLoopCondReceive();
-	void performClientHandshakeLoopReceive();
-	void performClientHandshakeLoopOK();
-	void performClientHandshakeLoopInit();
-	void performClientHandshakeExtraBuffer();
-	void performClientHandshakeSendOutBuffer();
-	void performClientHandshakeLoopContinueNeeded();
-	void performClientHandshakeLoopError();
-	void performClientHandshakeLoopExtError();
+
+	[[noreturn]] void stateIllegal();
+	[[noreturn]] void stateError();
+
+	void stateClientConnected();
+	void stateClientHandshakeStart();
+	void stateClientHandshakeSendToken();
+	void stateClientHandshakeLoopInit();
+	void stateClientHandshakeLoopRecv();
+	void stateClientHandshakeLoopProcess();
+	void stateClientHandshakeLoopSend();
+	void stateClientHandshakeLoopDone();
+	void stateClientHandshakeSendFinal();
+	void stateClientHandshakeSendError();
+	void stateClientHandshakeEnd();
+	void stateClientVerify();
+
+	void stateServerAccepted();
+	void stateServerHandshakeStart();
+	void stateServerHandshakeLoopInit();
+	void stateServerHandshakeLoopRecv();
+	void stateServerHandshakeLoopProcess();
+	void stateServerHandshakeLoopSend();
+	void stateServerHandshakeLoopDone();
+	void stateServerHandshakeEnd();
+	void stateServerVerify();
+
+	void sendOutSecBufferAndAdvanceState(State state);
+	void drainExtraBuffer();
+	[[nodiscard]] static int recordLength(const BYTE* pBuffer, int length);
+	[[nodiscard]] static bool bufferHasCompleteRecords(const BYTE* pBuffer, int length);
+
+	void initClientCredentials();
+	void initServerCredentials();
+	SECURITY_STATUS doHandshake();
+	int completeHandshake();
+
 	SECURITY_STATUS decodeMessage(BYTE* pBuffer, DWORD bufSize, AutoSecBufferDesc<4>& msg, SecBuffer*& pData, SecBuffer*& pExtra);
 	SECURITY_STATUS decodeBufferFull(BYTE* pBuffer, DWORD bufSize, char* pOutBuffer, int outLength, int& bytesDecoded);
-	void stateIllegal();
-	void stateConnected();
+
 	void acceptSSL();
 	void connectSSL(bool completeHandshake);
-	void completeHandshake();
-	static int lastError();
-	void stateMachine();
+	[[nodiscard]] static int lastError();
+	[[nodiscard]] bool stateMachine();
 	State getState() const;
 	void setState(State st);
-	static bool isLocalHost(const std::string& hostName);
+	[[nodiscard]] static int stateToReturnValue(State state);
+	[[nodiscard]] static bool isLocalHost(const std::string& hostName);
+
+#ifdef ENABLE_PRINT_STATE
+	void printState(const std::string& msg);
+#endif
 
 private:
 	SecureSocketImpl(const SecureSocketImpl&);
@@ -279,6 +339,7 @@ private:
 	Poco::AutoPtr<SocketImpl> _pSocket;
 	Context::Ptr   _pContext;
 	Mode           _mode;
+	int            _shutdownFlags;
 	std::string    _peerHostName;
 	bool           _useMachineStore;
 	bool           _clientAuthRequired;
@@ -294,8 +355,12 @@ private:
 
 	Poco::Buffer<BYTE> _overflowBuffer;
 	Poco::Buffer<BYTE> _sendBuffer;
+	DWORD _sendBufferOffset;
+	DWORD _sendBufferPending;
 	Poco::Buffer<BYTE> _recvBuffer;
 	DWORD _recvBufferOffset;
+	Poco::Buffer<BYTE> _extraBuffer;
+	DWORD _extraBufferOffset;
 	DWORD _ioBufferSize;
 
 	SecPkgContext_StreamSizes _streamSizes;
@@ -304,9 +369,7 @@ private:
 	SecBuffer _extraSecBuffer;
 	SECURITY_STATUS _securityStatus;
 	State _state;
-	DWORD _outFlags;
-	bool _needData;
-	bool _needHandshake;
+	bool _initServerContext = false;
 
 	friend class SecureStreamSocketImpl;
 	friend class StateMachine;
@@ -316,6 +379,18 @@ private:
 //
 // inlines
 //
+inline SocketImpl* SecureSocketImpl::socket()
+{
+	return _pSocket.get();
+}
+
+
+inline const SocketImpl* SecureSocketImpl::socket() const
+{
+	return _pSocket.get();
+}
+
+
 inline poco_socket_t SecureSocketImpl::sockfd()
 {
 	return _pSocket->sockfd();
@@ -337,6 +412,7 @@ inline SecureSocketImpl::State SecureSocketImpl::getState() const
 inline void SecureSocketImpl::setState(SecureSocketImpl::State st)
 {
 	_state = st;
+	PRINT_STATE("setState: ");
 }
 
 
@@ -358,7 +434,7 @@ inline int SecureSocketImpl::lastError()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureSocketImpl_INCLUDED

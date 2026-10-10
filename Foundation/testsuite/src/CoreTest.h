@@ -29,7 +29,9 @@ public:
 	void testBugcheck();
 	void testFPE();
 	void testEnvironment();
+	void testEnvironmentMultiThread();
 	void testBuffer();
+	void testBufferEmpty();
 	void testFIFOBufferChar();
 	void testFIFOBufferInt();
 	void testFIFOBufferEOFAndError();
@@ -37,6 +39,9 @@ public:
 	void testNullable();
 	void testAscii();
 	void testSrcLoc();
+	void testDemangle();
+	void testDemangleDot();
+	void testWarnMsg();
 
 	void setUp();
 	void tearDown();

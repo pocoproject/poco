@@ -7,7 +7,7 @@
 //
 // Definition of the Connection class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -18,16 +18,17 @@
 #define MongoDB_Connection_INCLUDED
 
 
+#include "Poco/MongoDB/MongoDB.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
-#include "Poco/Mutex.h"
-#include "Poco/MongoDB/RequestMessage.h"
-#include "Poco/MongoDB/ResponseMessage.h"
-#include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/Timespan.h"
+#include <string>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
+
+
+class OpMsgMessage;
 
 
 class MongoDB_API Connection
@@ -36,6 +37,17 @@ class MongoDB_API Connection
 	///
 	/// See https://docs.mongodb.com/manual/reference/mongodb-wire-protocol/
 	/// for more information on the wire protocol.
+	///
+	/// THREAD SAFETY:
+	/// This class is NOT thread-safe. A single Connection instance must not be
+	/// used concurrently from multiple threads without external synchronization.
+	/// Concurrent calls to sendRequest() will result in interleaved data on the
+	/// socket and corrupted responses.
+	///
+	/// For multi-threaded applications, use one of these patterns:
+	/// - Each thread has its own Connection instance
+	/// - Use ObjectPool<Connection> with PooledConnection for connection pooling
+	/// - Protect shared Connection with external mutex
 {
 public:
 	using Ptr = Poco::SharedPtr<Connection>;
@@ -87,7 +99,7 @@ public:
 	virtual ~Connection();
 		/// Destroys the Connection.
 
-	Poco::Net::SocketAddress address() const;
+	[[nodiscard]] Poco::Net::SocketAddress address() const;
 		/// Returns the address of the MongoDB server.
 
 	void connect(const std::string& hostAndPort);
@@ -104,12 +116,13 @@ public:
 		///
 		/// The following options are supported:
 		///
-		///   - ssl: If ssl=true is specified, a custom SocketFactory subclass creating
-		///     a SecureStreamSocket must be supplied.
+		///   - tls (or ssl, historical alias): If true, a custom SocketFactory
+		///     subclass creating a SecureStreamSocket must be supplied. "tls"
+		///     is the canonical option name since MongoDB 4.2; "ssl" remains
+		///     accepted as a synonym.
 		///   - connectTimeoutMS: Socket connection timeout in milliseconds.
 		///   - socketTimeoutMS: Socket send/receive timeout in milliseconds.
-		///   - authMechanism: Authentication mechanism. Only "SCRAM-SHA-1" (default)
-		///     and "MONGODB-CR" are supported.
+		///   - authMechanism: "SCRAM-SHA-256" (default) or "SCRAM-SHA-1".
 		///
 		/// Unknown options are silently ignored.
 		///
@@ -124,42 +137,57 @@ public:
 	void connect(const Poco::Net::SocketAddress& addrs);
 		/// Connects to the given MongoDB server.
 
+	void connect(const Poco::Net::SocketAddress& addrs, const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout = 0);
+		/// Connects to the given MongoDB server with the specified connect timeout.
+		/// If connectTimeout is non-zero, the connection attempt will be aborted
+		/// after the specified time.
+		/// If socketTimeout is non-zero, the send and receive timeouts on the socket
+		/// will be set after a successful connection.
+
 	void connect(const Poco::Net::StreamSocket& socket);
 		/// Connects using an already connected socket.
 
 	void disconnect();
 		/// Disconnects from the MongoDB server.
 
-	void sendRequest(RequestMessage& request);
-		/// Sends a request to the MongoDB server.
-		///
-		/// Used for one-way requests without a response.
-
-	void sendRequest(RequestMessage& request, ResponseMessage& response);
-		/// Sends a request to the MongoDB server and receives the response.
-		///
-		/// Use this when a response is expected: only a "query" or "getmore"
-		/// request will return a response.
+	[[nodiscard]] bool isConnected() const noexcept;
+		/// Returns true if the socket is open.
 
 	void sendRequest(OpMsgMessage& request, OpMsgMessage& response);
 		/// Sends a request to the MongoDB server and receives the response
-		/// using newer wire protocol with OP_MSG.
+		/// using OP_MSG wire protocol.
+		///
+		/// Throws IOException if the request cannot be sent.
+		///
+		/// The connection is closed if the request cannot be sent, or if the
+		/// response cannot be received or is malformed, so that the rest of it
+		/// is not read as the next response. It stays open when the response is
+		/// complete but holds an unsupported element type.
 
 	void sendRequest(OpMsgMessage& request);
-		/// Sends an unacknowledged request to the MongoDB server using newer
-		/// wire protocol with OP_MSG.
+		/// Sends an unacknowledged request to the MongoDB server using
+		/// OP_MSG wire protocol.
 		/// No response is sent by the server.
+		///
+		/// Throws IOException if the request cannot be sent; the connection is
+		/// closed in that case.
 
 	void readResponse(OpMsgMessage& response);
 		/// Reads additional response data when previous message's flag moreToCome
 		/// indicates that server will send more data.
 		/// NOTE: See comments in OpMsgCursor code.
+		///
+		/// The connection is closed if the response cannot be received or is
+		/// malformed, but not for an unsupported element type.
 
 
 protected:
 	void connect();
 
 private:
+	void writeRequest(OpMsgMessage& request);
+		/// Writes the request; closes the connection and throws IOException if it cannot be sent.
+
 	Poco::Net::SocketAddress _address;
 	Poco::Net::StreamSocket _socket;
 };
@@ -174,7 +202,13 @@ inline Net::SocketAddress Connection::address() const
 }
 
 
-} } // namespace Poco::MongoDB
+inline bool Connection::isConnected() const noexcept
+{
+	return !_socket.isNull() && _socket.impl()->initialized();
+}
+
+
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Connection_INCLUDED

@@ -15,8 +15,7 @@
 #include "Poco/Crypto/CryptoTransform.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 CryptoTransform::CryptoTransform()
@@ -35,4 +34,4 @@ int CryptoTransform::setPadding(int padding)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

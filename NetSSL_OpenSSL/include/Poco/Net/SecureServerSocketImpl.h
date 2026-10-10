@@ -24,8 +24,7 @@
 #include "Poco/Net/Context.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API SecureServerSocketImpl: public ServerSocketImpl
@@ -161,11 +160,11 @@ public:
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	bool secure() const;
+	[[nodiscard]] bool secure() const;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
 
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
 
 protected:
@@ -190,7 +189,7 @@ inline Context::Ptr SecureServerSocketImpl::context() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureServerSocketImpl_INCLUDED

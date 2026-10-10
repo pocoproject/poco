@@ -21,6 +21,7 @@
 
 
 using namespace Poco;
+using CppUnit::waitForCondition;
 
 
 struct IntVal
@@ -40,9 +41,12 @@ struct IntVal
 
 typedef AccessExpirationDecorator<int> DIntVal;
 
-#define DURSLEEP 250
-#define DURHALFSLEEP DURSLEEP / 2
-#define DURWAIT  300
+
+// Cache item expiration time in milliseconds
+#define EXPIRE_TIME 500
+
+// Maximum time to wait for a condition (must be > EXPIRE_TIME)
+#define MAX_WAIT_TIME 5000
 
 
 UniqueExpireCacheTest::UniqueExpireCacheTest(const std::string& name): CppUnit::TestCase(name)
@@ -58,9 +62,9 @@ UniqueExpireCacheTest::~UniqueExpireCacheTest()
 void UniqueExpireCacheTest::testClear()
 {
 	UniqueExpireCache<int, IntVal> aCache;
-	aCache.add(1, IntVal(2, DURSLEEP));
-	aCache.add(3, IntVal(4, DURSLEEP));
-	aCache.add(5, IntVal(6, DURSLEEP));
+	aCache.add(1, IntVal(2, EXPIRE_TIME));
+	aCache.add(3, IntVal(4, EXPIRE_TIME));
+	aCache.add(5, IntVal(6, EXPIRE_TIME));
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.has(3));
 	assertTrue (aCache.has(5));
@@ -77,9 +81,9 @@ void UniqueExpireCacheTest::testClear()
 void UniqueExpireCacheTest::testAccessClear()
 {
 	UniqueAccessExpireCache<int, DIntVal> aCache;
-	aCache.add(1, DIntVal(2, DURSLEEP));
-	aCache.add(3, DIntVal(4, DURSLEEP));
-	aCache.add(5, DIntVal(6, DURSLEEP));
+	aCache.add(1, DIntVal(2, EXPIRE_TIME));
+	aCache.add(3, DIntVal(4, EXPIRE_TIME));
+	aCache.add(5, DIntVal(6, EXPIRE_TIME));
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.has(3));
 	assertTrue (aCache.has(5));
@@ -96,26 +100,31 @@ void UniqueExpireCacheTest::testAccessClear()
 void UniqueExpireCacheTest::testAccessUpdate()
 {
 	UniqueAccessExpireCache<int, DIntVal> aCache;
-	aCache.add(1, DIntVal(2, DURSLEEP));
-	aCache.add(3, DIntVal(4, DURSLEEP));
-	aCache.add(5, DIntVal(6, DURSLEEP));
+	aCache.add(1, DIntVal(2, EXPIRE_TIME));
+	aCache.add(3, DIntVal(4, EXPIRE_TIME));
+	aCache.add(5, DIntVal(6, EXPIRE_TIME));
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.has(3));
 	assertTrue (aCache.has(5));
 	assertTrue (aCache.get(1)->value() == 2);
-	Thread::sleep(DURSLEEP/2);
-	assertTrue (aCache.get(1)->value() == 2);
-	Thread::sleep(DURSLEEP/2);
-	assertTrue (aCache.get(1)->value() == 2);
-	Thread::sleep(DURSLEEP/2);
-	assertTrue (aCache.get(1)->value() == 2);
-	assertTrue (!aCache.has(3));
-	assertTrue (!aCache.has(5));
-	Thread::sleep(DURSLEEP*2);
 
-	assertTrue (!aCache.has(1));
+	// Access item 1 repeatedly to refresh its expiration
+	Thread::sleep(EXPIRE_TIME / 4);
+	assertTrue (aCache.get(1)->value() == 2);
+	Thread::sleep(EXPIRE_TIME / 4);
+	assertTrue (aCache.get(1)->value() == 2);
+	Thread::sleep(EXPIRE_TIME / 4);
+	assertTrue (aCache.get(1)->value() == 2);
+
+	// Items 3 and 5 should have expired by now (not accessed)
+	assertTrue (waitForCondition([&]{ return !aCache.has(3); }, MAX_WAIT_TIME));
+	assertTrue (!aCache.has(5));
+
+	// Wait for item 1 to expire (stop accessing it)
+	assertTrue (waitForCondition([&]{ return !aCache.has(1); }, MAX_WAIT_TIME));
 	assertTrue (!aCache.has(3));
 	assertTrue (!aCache.has(5));
+
 	aCache.remove(666); //must work too
 }
 
@@ -142,22 +151,25 @@ void UniqueExpireCacheTest::testExpireN()
 	// 3-1 represents the cache sorted by age, elements get replaced at the end of the list
 	// 3-1|5 -> 5 gets removed
 	UniqueExpireCache<int, IntVal> aCache;
-	aCache.add(1, IntVal(2, DURSLEEP)); // 1
+	aCache.add(1, IntVal(2, EXPIRE_TIME)); // 1
 	assertTrue (aCache.has(1));
 	SharedPtr<IntVal> tmp = aCache.get(1);
 	assertTrue (!tmp.isNull());
 	assertTrue (tmp->value == 2);
-	Thread::sleep(DURWAIT);
-	assertTrue (!aCache.has(1));
+
+	// Wait for item 1 to expire
+	assertTrue (waitForCondition([&]{ return !aCache.has(1); }, MAX_WAIT_TIME));
 
 	// tmp must still be valid, access it
 	assertTrue (tmp->value == 2);
 	tmp = aCache.get(1);
 	assertTrue (tmp.isNull());
 
-	aCache.add(1, IntVal(2, DURSLEEP)); // 1
-	Thread::sleep(DURHALFSLEEP);
-	aCache.add(3, IntVal(4, DURSLEEP)); // 3-1
+	// Add item 1, wait a bit, then add item 3
+	// Item 1 should expire before item 3
+	aCache.add(1, IntVal(2, EXPIRE_TIME)); // 1
+	Thread::sleep(EXPIRE_TIME / 4); // Small delay so items have different expiration times
+	aCache.add(3, IntVal(4, EXPIRE_TIME)); // 3-1
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.has(3));
 	tmp = aCache.get(1);
@@ -165,16 +177,17 @@ void UniqueExpireCacheTest::testExpireN()
 	assertTrue (tmp->value == 2);
 	assertTrue (tmp2->value == 4);
 
-	Thread::sleep(DURHALFSLEEP+25); //3|1
-	assertTrue (!aCache.has(1));
+	// Wait for item 1 to expire (item 3 should still be valid)
+	assertTrue (waitForCondition([&]{ return !aCache.has(1); }, MAX_WAIT_TIME));
 	assertTrue (aCache.has(3));
-	assertTrue (tmp->value == 2); // 1-3
-	assertTrue (tmp2->value == 4); // 3-1
+	assertTrue (tmp->value == 2); // SharedPtr still valid
+	assertTrue (tmp2->value == 4);
 	tmp2 = aCache.get(3);
 	assertTrue (tmp2->value == 4);
-	Thread::sleep(DURHALFSLEEP+25); //3|1
-	assertTrue (!aCache.has(3));
-	assertTrue (tmp2->value == 4);
+
+	// Wait for item 3 to expire
+	assertTrue (waitForCondition([&]{ return !aCache.has(3); }, MAX_WAIT_TIME));
+	assertTrue (tmp2->value == 4); // SharedPtr still valid
 	tmp = aCache.get(1);
 	tmp2 = aCache.get(3);
 	assertTrue (!tmp);
@@ -192,10 +205,10 @@ void UniqueExpireCacheTest::testExpireN()
 void UniqueExpireCacheTest::testDuplicateAdd()
 {
 	UniqueExpireCache<int, IntVal> aCache;
-	aCache.add(1, IntVal(2, DURSLEEP)); // 1
+	aCache.add(1, IntVal(2, EXPIRE_TIME)); // 1
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.get(1)->value == 2);
-	aCache.add(1, IntVal(3, DURSLEEP));
+	aCache.add(1, IntVal(3, EXPIRE_TIME));
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.get(1)->value == 3);
 }
@@ -204,10 +217,10 @@ void UniqueExpireCacheTest::testDuplicateAdd()
 void UniqueExpireCacheTest::testAccessDuplicateAdd()
 {
 	UniqueAccessExpireCache<int, DIntVal> aCache;
-	aCache.add(1, DIntVal(2, DURSLEEP)); // 1
+	aCache.add(1, DIntVal(2, EXPIRE_TIME)); // 1
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.get(1)->value() == 2);
-	aCache.add(1, DIntVal(3, DURSLEEP));
+	aCache.add(1, DIntVal(3, EXPIRE_TIME));
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.get(1)->value() == 3);
 }
@@ -217,10 +230,10 @@ void UniqueExpireCacheTest::testExpirationDecorator()
 {
 	typedef ExpirationDecorator<int> ExpireInt;
 	UniqueExpireCache<int, ExpireInt> aCache;
-	aCache.add(1, ExpireInt(2, DURSLEEP)); // 1
+	aCache.add(1, ExpireInt(2, EXPIRE_TIME)); // 1
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.get(1)->value() == 2);
-	aCache.add(1, ExpireInt(3, DURSLEEP));
+	aCache.add(1, ExpireInt(3, EXPIRE_TIME));
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.get(1)->value() == 3);
 }

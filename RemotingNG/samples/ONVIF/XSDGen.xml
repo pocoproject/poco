@@ -1,0 +1,64 @@
+<AppConfig>
+	<XSDGen>
+		<options>
+			<namespaceInSourceFileNames>true</namespaceInSourceFileNames>
+			<namespaceInHeaderFileNames>false</namespaceInHeaderFileNames>
+			<alwaysUseOptional>false</alwaysUseOptional>
+			<generateAllBindings>true</generateAllBindings>
+			<useStdUtilities>false</useStdUtilities>
+			<inlineAllMethods>false</inlineAllMethods>
+			<amalgamateSources>true</amalgamateSources>
+		</options>
+		<default>
+			<include>include/ONVIF</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+			<alwaysInclude>ONVIF/ONVIF.h</alwaysInclude>
+			<library>ONVIF</library>
+		</default>
+		<schema targetNamespace="http://www.onvif.org/ver10/deviceIO/wsdl">
+			<include>include/ONVIF/DeviceIO</include>
+			<namespace>ONVIF::DeviceIO</namespace>
+		</schema>
+		<schema targetNamespace="http://www.onvif.org/ver10/device/wsdl">
+			<include>include/ONVIF/Device</include>
+			<namespace>ONVIF::Device</namespace>
+		</schema>
+		<schema targetNamespace="http://www.onvif.org/ver10/media/wsdl">
+		 	<include>include/ONVIF/Media</include>
+			<namespace>ONVIF::Media</namespace>
+		</schema>
+		<schema targetNamespace="http://www.onvif.org/ver10/schema">
+			<include>include/ONVIF</include>
+			<namespace>ONVIF</namespace>
+		</schema>
+		<schema targetNamespace="http://docs.oasis-open.org/wsn/b-2">
+			<include>include/OASIS/WSN/B2</include>
+			<namespace>OASIS::WSN::B2</namespace>
+		</schema>
+		<schema targetNamespace="http://docs.oasis-open.org/wsn/t-1">
+			<include>include/OASIS/WSN/T1</include>
+			<namespace>OASIS::WSN::T1</namespace>
+		</schema>
+		<schema targetNamespace="http://docs.oasis-open.org/wsrf/bf-2">
+			<include>include/OASIS/WSRF/BF2</include>
+			<namespace>OASIS::WSRF::BF2</namespace>
+		</schema>
+		<schema targetNamespace="http://www.w3.org/2003/05/soap-envelope">
+			<include>include/W3/SOAP/Envelope</include>
+			<namespace>W3::SOAP::Envelope</namespace>
+		</schema>
+		<schema targetNamespace="http://www.w3.org/2004/08/xop/include">
+			<include>include/W3/XOP</include>
+			<namespace>W3::XOP</namespace>
+		</schema>
+		<schema targetNamespace="http://www.w3.org/2005/05/xmlmime">
+			<include>include/W3/XMLMIME</include>
+			<namespace>W3::XMLMIME</namespace>
+		</schema>
+		<schema targetNamespace="http://www.w3.org/2005/08/addressing">
+			<include>include/W3/Addressing</include>
+			<namespace>W3::Addressing</namespace>
+		</schema>
+	</XSDGen>
+</AppConfig>

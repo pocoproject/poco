@@ -19,11 +19,14 @@
 
 
 using namespace Poco;
+using CppUnit::waitForCondition;
 
 
-#define DURSLEEP 250
-#define DURHALFSLEEP DURSLEEP / 2
-#define DURWAIT  300
+// Cache item expiration time in milliseconds
+#define EXPIRE_TIME 500
+
+// Maximum time to wait for a condition (must be > EXPIRE_TIME)
+#define MAX_WAIT_TIME 5000
 
 
 ExpireLRUCacheTest::ExpireLRUCacheTest(const std::string& name): CppUnit::TestCase(name)
@@ -38,7 +41,7 @@ ExpireLRUCacheTest::~ExpireLRUCacheTest()
 
 void ExpireLRUCacheTest::testClear()
 {
-	ExpireLRUCache<int, int> aCache(DURSLEEP);
+	ExpireLRUCache<int, int> aCache(EXPIRE_TIME);
 	aCache.add(1, 2);
 	aCache.add(3, 4);
 	aCache.add(5, 6);
@@ -72,22 +75,25 @@ void ExpireLRUCacheTest::testExpireN()
 {
 	// 3-1 represents the cache sorted by age, elements get replaced at the end of the list
 	// 3-1|5 -> 5 gets removed
-	ExpireLRUCache<int, int> aCache(3, DURSLEEP);
+	ExpireLRUCache<int, int> aCache(3, EXPIRE_TIME);
 	aCache.add(1, 2); // 1
 	assertTrue (aCache.has(1));
 	SharedPtr<int> tmp = aCache.get(1);
 	assertTrue (!tmp.isNull());
 	assertTrue (*tmp == 2);
-	Thread::sleep(DURWAIT);
-	assertTrue (!aCache.has(1));
+
+	// Wait for item 1 to expire
+	assertTrue (waitForCondition([&]{ return !aCache.has(1); }, MAX_WAIT_TIME));
 
 	// tmp must still be valid, access it
 	assertTrue (*tmp == 2);
 	tmp = aCache.get(1);
 	assertTrue (!tmp);
 
+	// Add item 1, wait a bit, then add item 3
+	// Item 1 should expire before item 3
 	aCache.add(1, 2); // 1
-	Thread::sleep(DURHALFSLEEP);
+	Thread::sleep(EXPIRE_TIME / 4); // Small delay so items have different expiration times
 	aCache.add(3, 4); // 3-1
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.has(3));
@@ -96,16 +102,17 @@ void ExpireLRUCacheTest::testExpireN()
 	assertTrue (*tmp == 2);
 	assertTrue (*tmp2 == 4);
 
-	Thread::sleep(DURHALFSLEEP+25); //3|1
-	assertTrue (!aCache.has(1));
+	// Wait for item 1 to expire (item 3 should still be valid)
+	assertTrue (waitForCondition([&]{ return !aCache.has(1); }, MAX_WAIT_TIME));
 	assertTrue (aCache.has(3));
-	assertTrue (*tmp == 2); // 1-3
-	assertTrue (*tmp2 == 4); // 3-1
+	assertTrue (*tmp == 2); // SharedPtr still valid
+	assertTrue (*tmp2 == 4);
 	tmp2 = aCache.get(3);
 	assertTrue (*tmp2 == 4);
-	Thread::sleep(DURHALFSLEEP+25); //3|1
-	assertTrue (!aCache.has(3));
-	assertTrue (*tmp2 == 4);
+
+	// Wait for item 3 to expire
+	assertTrue (waitForCondition([&]{ return !aCache.has(3); }, MAX_WAIT_TIME));
+	assertTrue (*tmp2 == 4); // SharedPtr still valid
 	tmp = aCache.get(1);
 	tmp2 = aCache.get(3);
 	assertTrue (!tmp);
@@ -124,15 +131,16 @@ void ExpireLRUCacheTest::testAccessExpireN()
 {
 	// 3-1 represents the cache sorted by age, elements get replaced at the end of the list
 	// 3-1|5 -> 5 gets removed
-	AccessExpireLRUCache<int, int> aCache(3, DURSLEEP);
+	AccessExpireLRUCache<int, int> aCache(3, EXPIRE_TIME);
 	aCache.add(1, 2); // 1
 	assertTrue (aCache.has(1));
 	SharedPtr<int> tmp = aCache.get(1);
 	assertTrue (!tmp.isNull());
 	assertTrue (*tmp == 2);
 	assertTrue (aCache.size() == 1);
-	Thread::sleep(DURWAIT);
-	assertTrue (aCache.size() == 0);
+
+	// Wait for item 1 to expire
+	assertTrue (waitForCondition([&]{ return aCache.size() == 0; }, MAX_WAIT_TIME));
 	assertTrue (!aCache.has(1));
 
 	// tmp must still be valid, access it
@@ -140,17 +148,21 @@ void ExpireLRUCacheTest::testAccessExpireN()
 	tmp = aCache.get(1);
 	assertTrue (!tmp);
 
+	// Add item 1, wait a bit, then add item 3
 	aCache.add(1, 2); // 1
-	Thread::sleep(DURHALFSLEEP);
+	Thread::sleep(EXPIRE_TIME / 4);
 	aCache.add(3, 4); // 3-1
 	assertTrue (aCache.has(1));
 	assertTrue (aCache.has(3));
 
-	Thread::sleep(DURHALFSLEEP+50); //3|1
-	assertTrue (!aCache.has(1));
+	// Wait for item 1 to expire
+	assertTrue (waitForCondition([&]{ return !aCache.has(1); }, MAX_WAIT_TIME));
 	assertTrue (*aCache.get(3) == 4);
-	Thread::sleep(DURHALFSLEEP+25); //3|1
+
+	// Access item 3 to refresh its expiration, then verify it's still accessible
+	Thread::sleep(EXPIRE_TIME / 4);
 	assertTrue (*aCache.get(3) == 4);
+
 	// removing illegal entries should work too
 	aCache.remove(666);
 
@@ -305,15 +317,15 @@ void ExpireLRUCacheTest::testDuplicateAdd()
 
 void ExpireLRUCacheTest::testAccessExpireGet()
 {
-	ExpireLRUCache<int, int> aCache(3, DURSLEEP);
+	ExpireLRUCache<int, int> aCache(3, EXPIRE_TIME);
 	aCache.add(1, 2); // 1
 	assertTrue (aCache.has(1));
 	SharedPtr<int> tmp = aCache.get(1);
 	assertTrue (!tmp.isNull());
 	assertTrue (*tmp == 2);
-	Thread::sleep(DURWAIT);
-	tmp = aCache.get(1);
-	assertTrue (tmp.isNull());
+
+	// Wait for item to expire
+	assertTrue (waitForCondition([&]{ return aCache.get(1).isNull(); }, MAX_WAIT_TIME));
 }
 
 

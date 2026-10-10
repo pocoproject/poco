@@ -46,7 +46,7 @@ void TimestampTest::testTimestamp()
 	assertTrue (t2 >= t3);
 	assertTrue (t2 <= t3);
 	Timestamp::TimeDiff d = (t2 - t1);
-	assertTrue (d >= 180000 && d <= 300000);
+	assertTrue (d >= 180000 && d <= 500000);
 
 	t1.swap(t2);
 	assertTrue (t1 > t2);

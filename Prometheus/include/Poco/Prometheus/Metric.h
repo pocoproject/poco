@@ -22,8 +22,7 @@
 #include "Poco/Prometheus/Registry.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Prometheus_API Metric: public Collector
@@ -40,13 +39,13 @@ public:
 		UNTYPED
 	};
 
-	Type type() const;
+	[[nodiscard]] Type type() const;
 		/// Returns the metric's type.
 
-	const std::string& help() const;
+	[[nodiscard]] const std::string& help() const;
 		/// Returns the metric's help text.
 
-	~Metric() = default;
+	~Metric();
 		/// Destroys the Metric.
 
 protected:
@@ -110,7 +109,7 @@ inline void Metric::setHelp(const std::string& help)
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Metric_INCLUDED

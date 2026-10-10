@@ -22,6 +22,12 @@
 #include "Poco/Exception.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
+#if defined(__linux__)
+#include <sched.h>
+#include <unistd.h>
+#elif defined(_WIN32)
+#include "Poco/UnWindows.h"
+#endif
 
 
 namespace Poco {
@@ -32,6 +38,11 @@ class MessageNotification: public Notification
 public:
 	MessageNotification(const Message& msg):
 		_msg(msg)
+	{
+	}
+
+	MessageNotification(Message&& msg):
+		_msg(std::move(msg))
 	{
 	}
 
@@ -73,14 +84,18 @@ AsyncChannel::~AsyncChannel()
 
 void AsyncChannel::setChannel(Channel::Ptr pChannel)
 {
-	FastMutex::ScopedLock lock(_channelMutex);
-
-	_pChannel = pChannel;
+	// The channel that is replaced is released when the mutex is free
+	// again: its destructor may log.
+	{
+		FastMutex::ScopedLock lock(_channelMutex);
+		_pChannel.swap(pChannel);
+	}
 }
 
 
 Channel::Ptr AsyncChannel::getChannel() const
 {
+	FastMutex::ScopedLock lock(_channelMutex);
 	return _pChannel;
 }
 
@@ -89,7 +104,7 @@ void AsyncChannel::open()
 {
 	FastMutex::ScopedLock lock(_threadMutex);
 
-	if (!_thread.isRunning()) _thread.start(*this);
+	if (!_closed && !_thread.isRunning()) _thread.start(*this);
 }
 
 
@@ -97,6 +112,8 @@ void AsyncChannel::close()
 {
 	if (!_closed.exchange(true))
 	{
+		FastMutex::ScopedLock lock(_threadMutex);
+
 		if (_thread.isRunning())
 		{
 			while (!_queue.empty()) Thread::sleep(100);
@@ -111,24 +128,39 @@ void AsyncChannel::close()
 }
 
 
-void AsyncChannel::log(const Message& msg)
+template <typename M>
+void AsyncChannel::logImpl(M&& msg)
 {
 	if (_closed) return;
-	if (_queueSize != 0 && _queue.size() >= _queueSize)
+	std::size_t qSize = _queueSize.load();
+	if (qSize != 0 && static_cast<std::size_t>(_queue.size()) >= qSize)
 	{
 		++_dropCount;
 		return;
 	}
 
-	if (_dropCount != 0)
+	std::size_t drop = _dropCount.exchange(0);
+	if (drop != 0)
 	{
-		_queue.enqueueNotification(new MessageNotification(Message(msg, Poco::format("Dropped %z messages.", _dropCount))));
-		_dropCount = 0;
+		_queue.enqueueNotification(new MessageNotification(Message(msg, Poco::format("Dropped %z messages.", drop))));
 	}
 
 	open();
+	if (_closed) return;
 
-	_queue.enqueueNotification(new MessageNotification(msg));
+	_queue.enqueueNotification(new MessageNotification(std::forward<M>(msg)));
+}
+
+
+void AsyncChannel::log(const Message& msg)
+{
+	logImpl(msg);
+}
+
+
+void AsyncChannel::log(Message&& msg)
+{
+	logImpl(std::move(msg));
 }
 
 
@@ -149,6 +181,10 @@ void AsyncChannel::setProperty(const std::string& name, const std::string& value
 		else
 			_queueSize = Poco::NumberParser::parseUnsigned(value);
 	}
+	else if (name == "enableCpuAffinity")
+	{
+		_enableCpuAffinity = (Poco::icompare(value, "true") == 0 || value == "1");
+	}
 	else
 	{
 		Channel::setProperty(name, value);
@@ -158,14 +194,37 @@ void AsyncChannel::setProperty(const std::string& name, const std::string& value
 
 void AsyncChannel::run()
 {
+	// Set CPU affinity if enabled (pin to last CPU core)
+	if (_enableCpuAffinity)
+	{
+#if defined(__linux__)
+		long num_cpus = sysconf(_SC_NPROCESSORS_ONLN);
+		if (num_cpus > 1)
+		{
+			cpu_set_t cpuset;
+			CPU_ZERO(&cpuset);
+			CPU_SET(num_cpus - 1, &cpuset);
+			sched_setaffinity(0, sizeof(cpu_set_t), &cpuset);
+		}
+#elif defined(_WIN32)
+		SYSTEM_INFO sysInfo;
+		GetSystemInfo(&sysInfo);
+		DWORD num_cpus = sysInfo.dwNumberOfProcessors;
+		if (num_cpus > 1)
+		{
+			SetThreadAffinityMask(GetCurrentThread(), static_cast<DWORD_PTR>(1) << (num_cpus - 1));
+		}
+#endif
+	}
+
 	AutoPtr<Notification> nf = _queue.waitDequeueNotification();
 	while (nf)
 	{
 		MessageNotification* pNf = dynamic_cast<MessageNotification*>(nf.get());
+		if (pNf)
 		{
-			FastMutex::ScopedLock lock(_channelMutex);
-
-			if (pNf && _pChannel) _pChannel->log(pNf->message());
+			Channel::Ptr pChannel = getChannel();
+			if (pChannel) pChannel->log(pNf->message());
 		}
 		nf = _queue.waitDequeueNotification();
 	}

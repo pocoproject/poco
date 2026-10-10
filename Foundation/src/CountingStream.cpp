@@ -19,8 +19,8 @@ namespace Poco {
 
 
 CountingStreamBuf::CountingStreamBuf():
-	_pIstr(0),
-	_pOstr(0),
+	_pIstr(nullptr),
+	_pOstr(nullptr),
 	_chars(0),
 	_lines(0),
 	_pos(0)
@@ -30,7 +30,7 @@ CountingStreamBuf::CountingStreamBuf():
 
 CountingStreamBuf::CountingStreamBuf(std::istream& istr):
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_chars(0),
 	_lines(0),
 	_pos(0)
@@ -39,7 +39,7 @@ CountingStreamBuf::CountingStreamBuf(std::istream& istr):
 
 
 CountingStreamBuf::CountingStreamBuf(std::ostream& ostr):
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_chars(0),
 	_lines(0),

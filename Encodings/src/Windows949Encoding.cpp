@@ -25,7 +25,7 @@ const char* Windows949Encoding::_names[] =
 	"cp949",
 	"CP949",
 	"ks_c_5601-1987",
-	NULL
+	nullptr
 };
 
 

@@ -16,8 +16,7 @@
 #include "Poco/Net/HTTPServerConnectionFactory.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPServer::HTTPServer(HTTPRequestHandlerFactory::Ptr pFactory, Poco::UInt16 portNumber, HTTPServerParams::Ptr pParams):
@@ -53,4 +52,4 @@ void HTTPServer::stopAll(bool abortCurrent)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -1,0 +1,1 @@
+<%@ page class="StringifyBufferedHandler" namespace="AI::Test" stringify="true" form="true" buffered="true" %><p>Hello, <%= form.get("name") %>!</p>

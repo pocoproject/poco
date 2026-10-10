@@ -15,8 +15,13 @@
 #include "Poco/Prometheus/Gauge.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
+
+
+GaugeSample::GaugeSample() = default;
+
+
+GaugeSample::~GaugeSample() = default;
 
 
 Gauge::Gauge(const std::string& name):
@@ -45,6 +50,9 @@ Gauge::Gauge(const std::string& name, const Params& params, Registry* pRegistry)
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
 }
+
+
+Gauge::~Gauge() = default;
 
 
 double Gauge::value() const
@@ -79,4 +87,4 @@ void Gauge::writeSample(Exporter& exporter, const std::vector<std::string>& labe
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

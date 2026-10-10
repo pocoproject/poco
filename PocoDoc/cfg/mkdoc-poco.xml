@@ -9,10 +9,20 @@
 				${PocoBuild}/*/*/include/Poco/*/*/*.h
 			</include>
 			<exclude>
-				*_*.h,
-				expat*.h,
-				zconf.h,
-				zlib.h,
+				*_POSIX.h
+				*_STD.h
+				*_UNIX.h
+				*_DEC.h
+				*_SUN.h
+				*_HPUX.h
+				*_VX.h
+				*_Android.h
+				*_QNX.h
+				*_UNIXODBC.h
+				*_DUMMY.h
+				*_C99.h
+				*_WIN32.h
+				${PocoBuild}/Util/include/Poco/Util/Units.h
 			</exclude>
 		</files>
 		<pages>
@@ -42,6 +52,7 @@
 				-DPOCO_NO_WINDOWS_H,
 				-DPOCO_NO_GCC_API_ATTRIBUTE,
 				-DPOCO_DOC,
+				-DPOCO_SILENCE_DEPRECATED,
 				-xc++
 			</options>
 			<path></path>
@@ -99,7 +110,7 @@
 		<loggers>
 			<root>
 				<channel>c1</channel>
-				<level>warning</level>
+				<level>debug</level>
 			</root>
 		</loggers>
 		<channels>

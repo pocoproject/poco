@@ -31,16 +31,15 @@
 #include "Poco/XML/NamePool.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString Document::NODE_NAME = toXMLString("#document");
 
 
 Document::Document(NamePool* pNamePool):
-	AbstractContainerNode(0),
-	_pDocumentType(0),
+	AbstractContainerNode(nullptr),
+	_pDocumentType(nullptr),
 	_eventSuspendLevel(0)
 {
 	if (pNamePool)
@@ -56,8 +55,8 @@ Document::Document(NamePool* pNamePool):
 
 
 Document::Document(unsigned long namePoolSize):
-	AbstractContainerNode(0),
-	_pDocumentType(0),
+	AbstractContainerNode(nullptr),
+	_pDocumentType(nullptr),
 	_pNamePool(new NamePool(namePoolSize)),
 	_eventSuspendLevel(0)
 {
@@ -65,7 +64,7 @@ Document::Document(unsigned long namePoolSize):
 
 
 Document::Document(DocumentType* pDocumentType, NamePool* pNamePool):
-	AbstractContainerNode(0),
+	AbstractContainerNode(nullptr),
 	_pDocumentType(pDocumentType),
 	_eventSuspendLevel(0)
 {
@@ -87,7 +86,7 @@ Document::Document(DocumentType* pDocumentType, NamePool* pNamePool):
 
 
 Document::Document(DocumentType* pDocumentType, unsigned long namePoolSize):
-	AbstractContainerNode(0),
+	AbstractContainerNode(nullptr),
 	_pDocumentType(pDocumentType),
 	_pNamePool(new NamePool(namePoolSize)),
 	_eventSuspendLevel(0)
@@ -145,11 +144,11 @@ Element* Document::documentElement() const
 	Node* pCur = firstChild();
 	while (pCur)
 	{
-		if (dynamic_cast<Element*>(pCur))
+		if (pCur->nodeType() == Node::ELEMENT_NODE)
 			return static_cast<Element*>(pCur);
 		pCur = pCur->nextSibling();
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -191,7 +190,7 @@ ProcessingInstruction* Document::createProcessingInstruction(const XMLString& ta
 
 Attr* Document::createAttribute(const XMLString& name) const
 {
-	return new Attr(const_cast<Document*>(this), 0, EMPTY_STRING, EMPTY_STRING, name, EMPTY_STRING);
+	return new Attr(const_cast<Document*>(this), nullptr, EMPTY_STRING, EMPTY_STRING, name, EMPTY_STRING);
 }
 
 
@@ -233,7 +232,7 @@ Element* Document::createElementNS(const XMLString& namespaceURI, const XMLStrin
 
 Attr* Document::createAttributeNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const
 {
-	return new Attr(const_cast<Document*>(this), 0, namespaceURI, Name::localName(qualifiedName), qualifiedName, EMPTY_STRING);
+	return new Attr(const_cast<Document*>(this), nullptr, namespaceURI, Name::localName(qualifiedName), qualifiedName, EMPTY_STRING);
 }
 
 
@@ -245,7 +244,7 @@ NodeList* Document::getElementsByTagNameNS(const XMLString& namespaceURI, const 
 
 Element* Document::getElementById(const XMLString& elementId) const
 {
-	return 0;
+	return nullptr;
 }
 
 
@@ -323,4 +322,4 @@ Element* Document::getElementByIdNS(const XMLString& elementId, const XMLString&
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

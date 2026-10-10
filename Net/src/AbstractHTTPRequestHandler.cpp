@@ -23,14 +23,13 @@
 using Poco::NumberFormatter;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 AbstractHTTPRequestHandler::AbstractHTTPRequestHandler():
-	_pRequest(0),
-	_pResponse(0),
-	_pForm(0)
+	_pRequest(nullptr),
+	_pResponse(nullptr),
+	_pForm(nullptr)
 {
 }
 
@@ -106,4 +105,4 @@ void AbstractHTTPRequestHandler::sendErrorResponse(HTTPResponse::HTTPStatus stat
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

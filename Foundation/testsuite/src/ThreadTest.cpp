@@ -43,8 +43,10 @@ public:
 		if (pThread)
 		{
 			_threadName = pThread->name();
+#ifndef POCO_NO_THREADNAME
 			auto *pThreadImpl = reinterpret_cast<Poco::ThreadImpl *>(pThread);
 			_osThreadName = pThreadImpl->getOSThreadNameImpl();
+#endif
 		}
 		_ran = true;
 		_event.wait();
@@ -60,10 +62,12 @@ public:
 		return _threadName;
 	}
 
+#ifndef POCO_NO_THREADNAME
 	const std::string& osThreadName() const
 	{
 		return _osThreadName;
 	}
+#endif
 
 	void notify()
 	{
@@ -80,7 +84,9 @@ public:
 private:
 	bool _ran;
 	std::string _threadName;
+#ifndef POCO_NO_THREADNAME
 	std::string _osThreadName;
+#endif
 	Event _event;
 };
 
@@ -122,6 +128,37 @@ private:
 };
 
 
+class JoinRunnable : public Runnable
+{
+public:
+	JoinRunnable() : _stop(false), _running(false)
+	{
+	}
+
+	void run()
+	{
+		_running = true;
+		while (!_stop)
+			Thread::sleep(100);
+		_running = false;
+	}
+
+	void stop()
+	{
+		_stop = true;
+	}
+
+	bool running() const
+	{
+		return _running;
+	}
+
+private:
+	std::atomic<bool> _stop;
+	std::atomic<bool> _running;
+};
+
+
 class TrySleepRunnable : public Runnable
 {
 public:
@@ -155,6 +192,63 @@ private:
 };
 
 
+class InterruptionRunnable : public Runnable
+{
+public:
+	virtual void run() override
+	{
+		_sleep = !Thread::trySleep(300000);
+		_interrupted = Thread::current()->isInterrupted();
+
+		try
+		{
+			Thread::current()->checkInterrupted();
+		}
+		catch (const Poco::ThreadInterruptedException&)
+		{
+			_exception = true;
+		}
+
+		// interrupt state should be cleared
+		if (!Thread::current()->isInterrupted())
+		{
+			_interruptCleared = true;
+		}
+
+		// interrupt state should be cleared
+		try
+		{
+			Thread::current()->checkInterrupted();
+			_exceptionCleared = true;
+		}
+		catch (const Poco::ThreadInterruptedException&)
+		{
+			_exceptionCleared = false;
+		}
+	}
+
+	bool isTestOK() const
+	{
+		if (_sleep &&
+			_interrupted &&
+			_exception &&
+			_interruptCleared &&
+			_exceptionCleared)
+		{
+			return true;
+		}
+		return false;
+	}
+
+private:
+	bool _sleep = false;
+	bool _interrupted = false;
+	bool _exception = false;
+	bool _interruptCleared = false;
+	bool _exceptionCleared = false;
+};
+
+
 ThreadTest::ThreadTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -178,7 +272,9 @@ void ThreadTest::testThread()
 	assertTrue (!thread.isRunning());
 	assertTrue (r.ran());
 	assertTrue (!r.threadName().empty());
+#ifndef POCO_NO_THREADNAME
 	assertTrue (!r.osThreadName().empty());
+#endif
 }
 
 
@@ -191,7 +287,9 @@ void ThreadTest::testNamedThread()
 	thread.join();
 	assertTrue (r.ran());
 	assertTrue (r.threadName() == "MyThread");
+#ifndef POCO_NO_THREADNAME
 	assertTrue (r.osThreadName() == r.threadName());
+#endif
 
 	// name len > POCO_MAX_THREAD_NAME_LEN
 	Thread thread2("0123456789aaaaaaaaaa9876543210");
@@ -200,7 +298,9 @@ void ThreadTest::testNamedThread()
 	r2.notify();
 	thread2.join();
 	assertTrue (r2.ran());
+#ifndef POCO_NO_THREADNAME
 	assertTrue (r2.osThreadName() == r2.threadName());
+#endif
 	assertTrue (r2.threadName().length() <= POCO_MAX_THREAD_NAME_LEN);
 	assertTrue (std::string(r2.threadName(), 0, 7) == "0123456");
 	assertTrue (std::string(r2.threadName(), r2.threadName().size() - 7) == "6543210");
@@ -268,7 +368,7 @@ void ThreadTest::testThreads()
 }
 
 
-void ThreadTest::testJoin()
+void ThreadTest::testTryJoin()
 {
 	Thread thread;
 	MyRunnable r;
@@ -280,6 +380,22 @@ void ThreadTest::testJoin()
 	r.notify();
 	assertTrue (thread.tryJoin(500));
 	assertTrue (!thread.isRunning());
+}
+
+
+void ThreadTest::testJoin()
+{
+	Thread thread;
+	JoinRunnable r;
+	assertTrue(!thread.isRunning());
+	thread.start(r);
+	Thread::sleep(200);
+	assertTrue(thread.isRunning());
+	assertTrue(!thread.tryJoin(100));
+	r.stop();
+	thread.join();
+	assertTrue(!thread.isRunning());
+	assertTrue(!r.running());
 }
 
 
@@ -307,25 +423,52 @@ void ThreadTest::testTrySleep()
 	assertTrue (!thread.isRunning());
 	assertTrue (r.counter() == 0);
 	thread.start(r);
-	assertTrue (thread.isRunning());
-	assertTrue (r.counter() == 0);
-	assertTrue (r.isSleepy());
-	Thread::sleep(100);
-	assertTrue (r.counter() == 0);
-	assertTrue (r.isSleepy());
-	thread.wakeUp(); Thread::sleep(10);
-	assertTrue (r.counter() == 1);
-	assertTrue (r.isSleepy());
-	Thread::sleep(100);
-	assertTrue (r.counter() == 1);
-	thread.wakeUp(); Thread::sleep(10);
-	assertTrue (r.counter() == 2);
-	assertTrue (r.isSleepy());
-	Thread::sleep(200);
-	assertTrue (r.counter() == 3);
-	assertTrue (!r.isSleepy());
-	assertTrue (!thread.isRunning());
+	auto waitForCounter = [&](int expected)
+	{
+		for (int i = 0; i < 500 && r.counter() < expected; ++i)
+			Thread::sleep(10);
+	};
+	auto waitNotRunning = [&]()
+	{
+		// run() returns immediately after the third counter increment,
+		// but Thread's internal state machine takes a few cycles to
+		// catch up; on Windows static-mt the gap is observable. Poll
+		// up to 5 s before reporting the thread as still running.
+		for (int i = 0; i < 500 && thread.isRunning(); ++i)
+			Thread::sleep(10);
+	};
+	try
+	{
+		assertTrue (thread.isRunning());
+		assertTrue (r.counter() == 0);
+		assertTrue (r.isSleepy());
+		Thread::sleep(100);
+		assertTrue (r.counter() == 0);
+		assertTrue (r.isSleepy());
+		thread.wakeUp();
+		waitForCounter(1);
+		assertTrue (r.counter() == 1);
+		assertTrue (r.isSleepy());
+		Thread::sleep(100);
+		assertTrue (r.counter() == 1);
+		thread.wakeUp();
+		waitForCounter(2);
+		assertTrue (r.counter() == 2);
+		assertTrue (r.isSleepy());
+		waitForCounter(3);
+		assertTrue (r.counter() == 3);
+		assertTrue (!r.isSleepy());
+		waitNotRunning();
+		assertTrue (!thread.isRunning());
+	}
+	catch (...)
+	{
+		thread.wakeUp();
+		thread.join();
+		throw;
+	}
 	thread.wakeUp();
+	assertTrue (thread.tryJoin(5000));
 	assertTrue (!thread.isRunning());
 }
 
@@ -494,6 +637,41 @@ void ThreadTest::testAffinity()
 }
 
 
+void ThreadTest::testInterrupt()
+{
+	Thread thread;
+
+	for (int i = 0; i < 2; i++)
+	{
+		InterruptionRunnable r;
+
+		thread.start(r);
+		Thread::sleep(200);
+		assertTrue (thread.isRunning());
+		assertTrue (!thread.tryJoin(100));
+
+		// interrupt
+		thread.interrupt();
+		thread.join();
+
+		// clear the interrupt state to re-use the thread
+		thread.clearInterrupt();
+		assertTrue (!thread.isInterrupted());
+
+		try
+		{
+			thread.checkInterrupted();
+		}
+		catch (const std::exception&)
+		{
+			assertTrue (false);
+		}
+
+		assertTrue (r.isTestOK());
+	}
+}
+
+
 void ThreadTest::setUp()
 {
 }
@@ -512,6 +690,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testNamedThread);
 	CppUnit_addTest(pSuite, ThreadTest, testCurrent);
 	CppUnit_addTest(pSuite, ThreadTest, testThreads);
+	CppUnit_addTest(pSuite, ThreadTest, testTryJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotRun);
@@ -523,6 +702,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
 	CppUnit_addTest(pSuite, ThreadTest, testSleep);
 	CppUnit_addTest(pSuite, ThreadTest, testAffinity);
+	CppUnit_addTest(pSuite, ThreadTest, testInterrupt);
 
 	return pSuite;
 }

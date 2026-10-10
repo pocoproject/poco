@@ -23,8 +23,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API EntityReference: public AbstractNode
@@ -50,15 +49,15 @@ class XML_API EntityReference: public AbstractNode
 {
 public:
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 protected:
 	EntityReference(Document* pOwnerDocument, const XMLString& name);
 	EntityReference(Document* pOwnerDocument, const EntityReference& ref);
 	~EntityReference();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	XMLString _name;
@@ -67,7 +66,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_EntityReference_INCLUDED

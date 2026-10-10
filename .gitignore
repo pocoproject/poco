@@ -43,8 +43,12 @@ config.build
 config.make
 
 # CLion #
-########
+#########
 .idea/
+
+# Qt Creator #
+#########
+build/Qt_*
 
 # CMake #
 ########
@@ -56,6 +60,7 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake_*
 cmake-build-*
+*Targets_installed.cmake
 
 # Packages #
 ############
@@ -170,3 +175,4 @@ node_modules
 # Debug files #
 ##############
 *.core
+

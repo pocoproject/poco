@@ -20,8 +20,10 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
+
+
+LabeledMetric::~LabeledMetric() = default;
 
 
 const std::vector<std::string> LabeledMetric::EMPTY_LABEL;
@@ -49,4 +51,4 @@ void LabeledMetric::setLabelNames(const std::vector<std::string>& labelNames)
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

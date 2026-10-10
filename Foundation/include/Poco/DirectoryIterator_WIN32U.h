@@ -34,8 +34,8 @@ public:
 	void duplicate();
 	void release();
 
-	const std::string& get() const;
-	const std::string& next();
+	[[nodiscard]] const std::string& get() const;
+	[[nodiscard]] const std::string& next();
 
 private:
 	HANDLE           _fh;

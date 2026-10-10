@@ -25,19 +25,16 @@
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/Column.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/Format.h"
-#include <sstream>
+
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
+
 #include <sqltypes.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ODBC_API ODBCStatementImpl: public Poco::Data::StatementImpl
@@ -47,52 +44,52 @@ public:
 	ODBCStatementImpl(SessionImpl& rSession);
 		/// Creates the ODBCStatementImpl.
 
-	~ODBCStatementImpl();
+	~ODBCStatementImpl() override;
 		/// Destroys the ODBCStatementImpl.
 
+	[[nodiscard]] std::string nativeSQL();
+		/// Returns the SQL string as modified by the driver.
+
 protected:
-	std::size_t columnsReturned() const;
+	[[nodiscard]] std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
 
-	int affectedRowCount() const;
+	[[nodiscard]] int affectedRowCount() const override;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert or update.
 
-	const MetaColumn& metaColumn(std::size_t pos) const;
+	[[nodiscard]] const MetaColumn& metaColumn(std::size_t pos) const override;
 		/// Returns column meta data.
 
-	bool hasNext();
+	[[nodiscard]] bool hasNext() override;
 		/// Returns true if a call to next() will return data.
 
-	std::size_t next();
+	[[nodiscard]] std::size_t next() override;
 		/// Retrieves the next row or set of rows from the resultset.
 		/// Returns the number of rows retrieved.
 		/// Will throw, if the resultset is empty.
 
-	bool canBind() const;
+	[[nodiscard]] bool canBind() const override;
 		/// Returns true if a valid statement is set and we can bind.
 
-	bool canCompile() const;
+	[[nodiscard]] bool canCompile() const override;
 		/// Returns true if another compile is possible.
 
-	void compileImpl();
+	void compileImpl() override;
 		/// Compiles the statement, doesn't bind yet.
 		/// Does nothing if the statement has already been compiled.
 
-	void bindImpl();
+	void bindImpl() override;
 		/// Binds all parameters and executes the statement.
 
-	AbstractExtraction::ExtractorPtr extractor();
+	[[nodiscard]] AbstractExtraction::ExtractorPtr extractor() override;
 		/// Returns the concrete extractor used by the statement.
 
-	AbstractBinding::BinderPtr binder();
+	[[nodiscard]] AbstractBinding::BinderPtr binder() override;
 		/// Returns the concrete binder used by the statement.
 
-	void execDirectImpl(const std::string& query);
+	void execDirectImpl(const std::string& query) override;
 		/// Execute query directly impl
-
-	std::string nativeSQL();
-		/// Returns the SQL string as modified by the driver.
 
 	void printErrors(std::ostream& os) const;
 		/// Print errors, if any.
@@ -119,7 +116,7 @@ private:
 	void makeInternalExtractors();
 		/// Creates internal extractors if none were supplied from the user.
 
-	bool isStoredProcedure() const;
+	[[nodiscard]] bool isStoredProcedure() const override;
 		/// Returns true if SQL is a stored procedure call.
 
 	void doPrepare();
@@ -129,13 +126,13 @@ private:
 		/// it is called upon the first check for data availability
 		/// (see hasNext() function).
 
-	bool hasData() const;
+	[[nodiscard]] bool hasData() const;
 		/// Returns true if statement returns data.
 
 	void makeStep();
 		/// Fetches the next row of data.
 
-	bool nextRowReady() const;
+	[[nodiscard]] bool nextRowReady() const;
 		/// Returns true if there is a row fetched but not yet extracted.
 
 	void putData();
@@ -213,7 +210,7 @@ inline bool ODBCStatementImpl::canCompile() const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif // Data_ODBC_ODBCStatementImpl_INCLUDED

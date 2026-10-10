@@ -7,7 +7,7 @@
 //
 // Definition of the TimerTaskAdapter class template.
 //
-// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -22,8 +22,7 @@
 #include "Poco/Util/TimerTask.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 template <class C>
@@ -34,6 +33,8 @@ class TimerTaskAdapter: public TimerTask
 {
 public:
 	typedef void (C::*Callback)(TimerTask&);
+
+	TimerTaskAdapter() = delete;
 
 	TimerTaskAdapter(C& object, Callback method): _pObject(&object), _method(method)
 		/// Creates the TimerTaskAdapter, using the given
@@ -50,20 +51,16 @@ public:
 	}
 
 protected:
-	~TimerTaskAdapter()
+	~TimerTaskAdapter() = default;
 		/// Destroys the TimerTaskAdapter.
-	{
-	}
 
 private:
-	TimerTaskAdapter();
-
 	C*       _pObject;
 	Callback _method;
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_TimerTaskAdapter_INCLUDED

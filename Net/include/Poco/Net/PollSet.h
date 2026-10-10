@@ -22,8 +22,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class PollSetImpl;
@@ -87,11 +86,19 @@ public:
 		///
 		/// shall result in the socket being monitored for write only.
 
-	bool has(const Socket& socket) const;
+	[[nodiscard]] bool has(const Socket& socket) const;
 		/// Returns true if socket is registered for polling.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true if no socket is registered for polling.
+
+	[[nodiscard]] std::size_t size() const;
+		/// Returns the number of sockets monitored.
+
+	POCO_DEPRECATED("Use size() instead")
+	[[nodiscard]] int count() const;
+		/// Returns the number of sockets monitored.
+		/// This method is deprecated. Use size() instead.
 
 	void clear();
 		/// Removes all sockets from the PollSet.
@@ -102,14 +109,12 @@ public:
 		/// Returns a PollMap containing the sockets that have had
 		/// their state changed.
 
-	int count() const;
-		/// Returns the number of sockets monitored.
-
 	void wakeUp();
 		/// Wakes up a waiting PollSet.
 		/// Any errors that occur during this call are ignored.
 		/// On platforms/implementations where this functionality
 		/// is not available, it does nothing.
+
 private:
 	PollSetImpl* _pImpl;
 
@@ -118,7 +123,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_PollSet_INCLUDED

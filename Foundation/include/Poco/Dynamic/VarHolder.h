@@ -42,20 +42,22 @@
 #include <typeinfo>
 #include <type_traits>
 #include <string_view>
-#undef min
-#undef max
 #include <limits>
 
 
+POCO_CHECK_MINMAX_MACROS
+
+
+// Throws RangeException with diagnostic info about the failed conversion.
+// Uses rangeExcCastStr() to safely show the cast value without undefined behavior.
 #define POCO_VAR_RANGE_EXCEPTION(str, from) \
 	throw RangeException(Poco::format("%v ((%s/%d) %s > (%s/%d) %s) @ %s.", \
 		std::string_view(#str), Poco::demangle<F>(), numValDigits(from), std::to_string(from), \
-		Poco::demangle<T>(), numTypeDigits<T>(), std::to_string(static_cast<T>(from)), \
+		Poco::demangle<T>(), numTypeDigits<T>(), rangeExcCastStr<F, T>(from), \
 		poco_src_loc))
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 class Var;
@@ -63,8 +65,7 @@ class Var;
 
 namespace Impl {
 
-
-bool Foundation_API isJSONString(const Var& any);
+[[nodiscard]] bool Foundation_API isJSONString(const Var& any);
 	/// Returns true for values that should be JSON-formatted as string.
 
 
@@ -131,12 +132,12 @@ class Foundation_API VarHolder
 	/// throw BadCastException.
 {
 public:
-	typedef Var ArrayValueType;
+	using ArrayValueType = Var;
 
 	virtual ~VarHolder();
 		/// Destroys the VarHolder.
 
-	virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = 0) const = 0;
+	[[nodiscard]] virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = nullptr) const = 0;
 		/// Implementation must implement this function to
 		/// deep-copy the VarHolder.
 		/// If small object optimization is enabled (i.e. if
@@ -144,7 +145,7 @@ public:
 		/// instantiated in-place if it's size is smaller
 		/// than POCO_SMALL_OBJECT_SIZE.
 
-	virtual const std::type_info& type() const = 0;
+	[[nodiscard]] virtual const std::type_info& type() const = 0;
 		/// Implementation must return the type information
 		/// (typeid) for the stored content.
 
@@ -240,66 +241,66 @@ public:
 	/// Throws BadCastException. Must be overridden in a type
 	/// specialization in order to support the conversion.
 
-	virtual bool isArray() const;
+	[[nodiscard]] virtual bool isArray() const;
 		/// Returns true.
 
-	virtual bool isVector() const;
+	[[nodiscard]] virtual bool isVector() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isList() const;
+	[[nodiscard]] virtual bool isList() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isDeque() const;
+	[[nodiscard]] virtual bool isDeque() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isStruct() const;
+	[[nodiscard]] virtual bool isStruct() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isOrdered() const;
+	[[nodiscard]] virtual bool isOrdered() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isInteger() const;
+	[[nodiscard]] virtual bool isInteger() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isSigned() const;
+	[[nodiscard]] virtual bool isSigned() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isNumeric() const;
+	[[nodiscard]] virtual bool isNumeric() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isBoolean() const;
+	[[nodiscard]] virtual bool isBoolean() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isString() const;
+	[[nodiscard]] virtual bool isString() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isDate() const;
+	[[nodiscard]] virtual bool isDate() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isTime() const;
+	[[nodiscard]] virtual bool isTime() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isDateTime() const;
+	[[nodiscard]] virtual bool isDateTime() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual bool isUUID() const;
+	[[nodiscard]] virtual bool isUUID() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	virtual std::size_t size() const;
+	[[nodiscard]] virtual std::size_t size() const;
 		/// Returns 1 iff Var is not empty or this function overridden.
 
 protected:
@@ -307,7 +308,7 @@ protected:
 		/// Creates the VarHolder.
 
 	template <typename T>
-	VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
+	[[nodiscard]] VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
 		/// Instantiates value holder wrapper.
 		///
 		/// Called from clone() member function of the implementation.
@@ -322,186 +323,224 @@ protected:
 		return pVarHolder->assign<VarHolderImpl<T>, T>(val);
 	}
 
-	template <typename F, typename T,
-		typename std::enable_if<(std::is_integral<F>::value && std::is_signed<F>::value) ||
-			std::is_floating_point<F>::value, F>::type* = nullptr,
-		typename std::enable_if<(std::is_integral<T>::value && std::is_signed<T>::value) ||
-			std::is_floating_point<F>::value, T>::type* = nullptr>
+	template <typename F, typename T>
 	static void convertToSmaller(const F& from, T& to)
-		/// Converts signed integral, as well as floating-point, values from
-		/// larger to smaller type. It checks the upper and lower bound and
-		/// if from value is within limits of type T (i.e. check calls do not throw),
-		/// it is converted.
+		/// Converts signed integral or floating-point values from larger to smaller type.
+		/// Checks bounds and precision loss where applicable.
 	{
-		if constexpr((std::is_integral<F>::value) && (std::is_floating_point<T>::value))
+		if constexpr (std::is_same_v<F, bool>)
 		{
-			if (isPrecisionLost<F, T>(from))
-				POCO_VAR_RANGE_EXCEPTION ("Lost precision", from);
+			// Boolean to floating-point: direct cast
+			to = static_cast<T>(from);
 		}
-		checkUpperLimit<F,T>(from);
-		checkLowerLimit<F,T>(from);
-		to = static_cast<T>(from);
+		else if constexpr (std::is_integral_v<F> && std::is_floating_point_v<T>)
+		{
+			// Integral to floating-point: check precision loss
+			if (isPrecisionLost<F, T>(from))
+				POCO_VAR_RANGE_EXCEPTION("Lost precision", from);
+			to = static_cast<T>(from);
+		}
+		else
+		{
+			// Signed integral/floating-point to smaller type: check bounds
+			checkUpperLimit<F, T>(from);
+			checkLowerLimit<F, T>(from);
+			to = static_cast<T>(from);
+		}
 	}
 
-	template <typename F, typename T,
-		typename std::enable_if<std::is_integral<F>::value && std::is_signed<T>::value, F>::type* = nullptr,
-		typename std::enable_if<std::is_floating_point<T>::value, T>::type* = nullptr>
-	static void convertToSmaller(const F& from, T& to)
-		/// Converts signed integral values from integral to floating-point type. Checks for
-		/// the loss of precision and if from value is within limits of type T (i.e. check calls do not throw),
-		/// it is converted.
-	{
-		if (isPrecisionLost<F, T>(from))
-			POCO_VAR_RANGE_EXCEPTION ("Lost precision", from);
-		to = static_cast<T>(from);
-	}
-
-	template <typename F, typename T,
-		typename std::enable_if<std::is_same<F, bool>::value>::type* = nullptr,
-		typename std::enable_if<std::is_floating_point<T>::value, T>::type* = nullptr>
-	static void convertToSmaller(const F& from, T& to)
-		/// Converts boolean values to floating-point type.
-	{
-		to = static_cast<T>(from);
-	}
-
-	template <typename F, typename T,
-		typename std::enable_if<std::is_integral<F>::value && !std::is_signed<F>::value, F>::type* = nullptr,
-		typename std::enable_if<(std::is_integral<T>::value && !std::is_signed<T>::value) || std::is_floating_point<T>::value, T>::type* = nullptr>
+	template <typename F, typename T>
 	static void convertToSmallerUnsigned(const F& from, T& to)
 		/// Converts unsigned integral data types from larger to smaller, as well as to floating-point, types.
-		/// Since lower limit is always 0 for unsigned types, only the upper limit is checked, thus
-		/// saving some cycles compared to the signed version of the function. If the
-		/// value to be converted is smaller than the maximum value for the target type,
-		/// the conversion is performed.
+		/// Since lower limit is always 0 for unsigned types, only the upper limit is checked.
 	{
-		checkUpperLimit<F,T>(from);
+		checkUpperLimit<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T,
-		typename std::enable_if<std::is_integral<F>::value && std::is_signed<F>::value, F>::type* = nullptr,
-		typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value, T>::type* = nullptr>
+	template <typename F, typename T>
 	static void convertSignedToUnsigned(const F& from, T& to)
 		/// Converts signed integral data types to unsigned data types.
 		/// Negative values can not be converted and if one is encountered, RangeException is thrown.
-		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
 		if (from < 0)
-			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
-		checkUpperLimit<std::make_unsigned_t<F>,T>(from);
+			POCO_VAR_RANGE_EXCEPTION("Value too small", from);
+		checkUpperLimit<std::make_unsigned_t<F>, T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true,
-		typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value, T>::type* = nullptr>
+	template <typename F, typename T>
 	static void convertSignedFloatToUnsigned(const F& from, T& to)
-		/// Converts floating point data types to unsigned integral data types. Negative values
-		/// can not be converted and if one is encountered, RangeException is thrown.
-		/// If upper limit is within the target data type limits, the conversion is performed.
+		/// Converts floating point data types to unsigned integral data types.
+		/// Negative values can not be converted and if one is encountered, RangeException is thrown.
 	{
 		if (from < 0)
-			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
-		checkUpperLimit<F,T>(from);
+			POCO_VAR_RANGE_EXCEPTION("Value too small", from);
+		checkUpperLimit<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T,
-		typename std::enable_if<std::is_integral<F>::value && !std::is_signed<F>::value, F>::type* = nullptr,
-		typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value, T>::type* = nullptr>
+	template <typename F, typename T>
 	static void convertUnsignedToSigned(const F& from, T& to)
 		/// Converts unsigned integral data types to signed integral data types.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
-		checkUpperLimit<F,T>(from);
+		checkUpperLimit<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
-	template <typename F, typename T,
-		std::enable_if_t<std::is_integral<F>::value, bool> = true,
-		std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-	static void convertToFP(F& from, T& to)
-		/// Converts unsigned integral data types to floating-point data types.
-		/// If the number of significant digits used for the integer vaue exceeds the number
-		/// of available digits in the floatinng-point destination (ie. if precision would be lost
+	template <typename F, typename T>
+	void convertToSigned(const F& from, T& to) const
+		/// Converts value to signed integer type T.
+	{
+		if constexpr (!std::is_signed_v<F>)
+			convertUnsignedToSigned(from, to);
+		else if constexpr (sizeof(F) <= sizeof(T))
+			to = static_cast<T>(from);
+		else
+			convertToSmaller(from, to);
+	}
+
+	template <typename F, typename T>
+	void convertToUnsigned(const F& from, T& to) const
+		/// Converts value to unsigned integer type T.
+	{
+		if constexpr (std::is_signed_v<F>)
+			convertSignedToUnsigned(from, to);
+		else if constexpr (sizeof(F) <= sizeof(T))
+			to = static_cast<T>(from);
+		else
+			convertToSmallerUnsigned(from, to);
+	}
+
+	template <typename F, typename T>
+	static void convertToFP(const F& from, T& to)
+		/// Converts integral data types to floating-point data types.
+		/// If the number of significant digits used for the integer value exceeds the number
+		/// of available digits in the floating-point destination (i.e. if precision would be lost
 		/// by casting the value), RangeException is thrown.
 	{
+		static_assert(std::is_integral_v<F> && std::is_floating_point_v<T>,
+			"convertToFP requires integral source and floating-point target");
 		if (isPrecisionLost<F, T>(from))
-			POCO_VAR_RANGE_EXCEPTION ("Lost precision", from);
+			POCO_VAR_RANGE_EXCEPTION("Lost precision", from);
 		to = static_cast<T>(from);
 	}
 
 private:
 
-	template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-	static constexpr int numValDigits(const T& value)
+	template <typename F, typename T>
+	[[nodiscard]] static std::string rangeExcCastStr(const F& from)
+		/// Returns a string representation of 'from' cast to the largest
+		/// integer type matching T's signedness. Used in range exception messages.
+		///
+		/// For integral F: safely casts to intmax_t/uintmax_t (always fits).
+		/// For floating-point F: returns "?" since the value might overflow
+		/// even 64-bit integers (e.g., 1e20 > UINT64_MAX).
+	{
+		if constexpr (std::is_integral_v<F>)
+		{
+			// Integral source always fits in std::intmax_t/std::uintmax_t
+			using LargestInt = std::conditional_t<std::is_signed_v<T>, std::intmax_t, std::uintmax_t>;
+			return std::to_string(static_cast<LargestInt>(from));
+		}
+		else
+		{
+			// Floating point might overflow even 64-bit integers
+			return "float ?"s;
+		}
+	}
+
+	template <typename T, std::enable_if_t<std::is_same_v<T, bool>, bool> = true>
+	[[nodiscard]] static constexpr int numValDigits(const T& value)
+	{
+		return 1;
+	}
+
+	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, bool> = true>
+	[[nodiscard]] static constexpr int numValDigits(const T& value)
+		/// Returns the number of binary digits (bits) needed to represent
+		/// the magnitude of the given integer value.
+		///
+		/// For signed types, computes the absolute value using unsigned
+		/// arithmetic to avoid undefined behavior when value equals the
+		/// minimum signed value (e.g., INT_MIN). The conversion to unsigned
+		/// is well-defined, and unsigned subtraction wraps safely:
+		///   U(0) - static_cast<U>(INT_MIN) == |INT_MIN|
 	{
 		using U = std::make_unsigned_t<T>;
 		if (value == 0) return 0;
+
+		// Get magnitude using unsigned arithmetic (avoids UB for INT_MIN).
+		// For negative values: U(0) - static_cast<U>(v) computes |v| safely.
+		U magnitude = (value < 0) ? U(0) - static_cast<U>(value) : static_cast<U>(value);
+
+		// Count bits by right-shifting until zero.
+		// Example: magnitude=5 (binary 101) -> shifts: 10, 1, 0 -> count=2
+		// The result is floor(log2(magnitude)), i.e., position of highest set bit.
 		int digitCount = 0;
-		U locVal = value; // to prevent sign preservation
-		while (locVal >>= 1) ++digitCount;
+		while (magnitude >>= 1) ++digitCount;
 		return digitCount;
 	}
 
-	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-	static constexpr int numValDigits(T value)
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	[[nodiscard]] static int numValDigits(T value)
+		/// Returns approximate number of binary digits for a floating point value.
+		/// Uses ilogb() to get the exponent, which represents the bit position
+		/// of the most significant bit. This avoids undefined behavior when
+		/// the value exceeds the range of any integer type.
 	{
-		return numValDigits<int64_t>(static_cast<int64_t>(value));
+		if (value == 0) return 0;
+		// ilogb returns the exponent of the floating point value,
+		// which corresponds to the position of the highest bit.
+		return std::ilogb(std::fabs(value));
 	}
 
-	template <typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-	static constexpr int numTypeDigits()
+	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	[[nodiscard]] static constexpr int numTypeDigits()
 	{
 		return std::numeric_limits<T>::digits;
 	}
 
-	template <typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-	static constexpr int numTypeDigits()
+	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+	[[nodiscard]] static constexpr int numTypeDigits()
 	{
 		return numValDigits(std::numeric_limits<T>::max());
 	}
 
 	template <typename F, typename T,
-		std::enable_if_t<std::is_integral<F>::value, bool> = true,
-		std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-	static bool isPrecisionLost(const F& from)
+		std::enable_if_t<std::is_integral_v<F>, bool> = true,
+		std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	[[nodiscard]] static bool isPrecisionLost(const F& from)
 		// Checks for loss of precision in integral -> floating point conversion.
 	{
 		return numValDigits(from) > numTypeDigits<T>();
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
+	template <typename F, typename T>
 	static void checkUpperLimit(const F& from)
+		/// Checks if 'from' exceeds the maximum value representable by type T.
 	{
 		if (from > static_cast<F>(std::numeric_limits<T>::max()))
-			POCO_VAR_RANGE_EXCEPTION ("Value too big", from);
+			POCO_VAR_RANGE_EXCEPTION("Value too big", from);
 	}
 
-	template <typename F, typename T, std::enable_if_t<std::is_integral<F>::value, bool> = true>
+	template <typename F, typename T>
 	static void checkLowerLimit(const F& from)
+		/// Checks if 'from' is below the minimum value representable by type T.
+		/// For floating-point target types, uses -max() since min() returns
+		/// the smallest positive normalized value, not the most negative.
 	{
-		if (from < static_cast<F>(std::numeric_limits<T>::min()))
-			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
-	}
-
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
-	static void checkUpperLimit(const F& from)
-	{
-		if ((from > static_cast<F>(std::numeric_limits<T>::max())))
-			POCO_VAR_RANGE_EXCEPTION ("Value too big", from);
-	}
-
-	template <typename F, typename T, std::enable_if_t<std::is_floating_point<F>::value, bool> = true>
-	static void checkLowerLimit(const F& from)
-	{
-		if constexpr(std::is_floating_point<T>::value)
+		if constexpr (std::is_floating_point_v<F> && std::is_floating_point_v<T>)
 		{
-			if (static_cast<F>(-std::numeric_limits<T>::max()) > from)
-				POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
+			if (from < static_cast<F>(-std::numeric_limits<T>::max()))
+				POCO_VAR_RANGE_EXCEPTION("Value too small", from);
 		}
-		else if (from < static_cast<F>(std::numeric_limits<T>::min()))
-			POCO_VAR_RANGE_EXCEPTION ("Value too small", from);
+		else
+		{
+			if (from < static_cast<F>(std::numeric_limits<T>::min()))
+				POCO_VAR_RANGE_EXCEPTION("Value too small", from);
+		}
 	}
 };
 
@@ -778,16 +817,299 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(T);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	void convert(Int8& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToSigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(Int16& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToSigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(Int32& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToSigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(Int64& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToSigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(UInt8& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(UInt16& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(UInt32& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(UInt64& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+#ifdef POCO_INT64_IS_LONG
+
+	void convert(long long& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToSigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(unsigned long long& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			convertToUnsigned(std::underlying_type_t<T>(_val), val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+#endif
+
+	void convert(bool& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			val = (std::underlying_type_t<T>(_val) != 0);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(float& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			val = static_cast<float>(_val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(double& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			val = static_cast<double>(_val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(char& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			val = static_cast<char>(_val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(std::string& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			val = NumberFormatter::format(std::underlying_type_t<T>(_val));
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	void convert(Poco::UTF16String& val) const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			std::string str = NumberFormatter::format(std::underlying_type_t<T>(_val));
+			Poco::UnicodeConverter::convert(str, val);
+		}
+		else
+		{
+			VarHolder::convert(val);
+		}
+	}
+
+	bool isArray() const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			return false;
+		}
+		else
+		{
+			return VarHolder::isArray();
+		}
+	}
+
+	bool isStruct() const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			return false;
+		}
+		else
+		{
+			return VarHolder::isStruct();
+		}
+	}
+
+	bool isInteger() const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			return std::numeric_limits<std::underlying_type_t<T>>::is_integer;
+		}
+		else
+		{
+			return VarHolder::isInteger();
+		}
+	}
+
+	bool isSigned() const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			return std::numeric_limits<std::underlying_type_t<T>>::is_signed;
+		}
+		else
+		{
+			return VarHolder::isSigned();
+		}
+	}
+
+	bool isNumeric() const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			return std::numeric_limits<std::underlying_type_t<T>>::is_specialized;
+		}
+		else
+		{
+			return VarHolder::isNumeric();
+		}
+	}
+
+	bool isBoolean() const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			return false;
+		}
+		else
+		{
+			return VarHolder::isBoolean();
+		}
+	}
+
+	bool isString() const override
+	{
+		if constexpr (std::is_enum_v<T>)
+		{
+			return false;
+		}
+		else
+		{
+			return VarHolder::isString();
+		}
+	}
+
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -798,10 +1120,6 @@ public:
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	T _val;
 };
 
@@ -814,101 +1132,103 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(Int8);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		val = static_cast<char>(_val);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(Poco::UTF16String& val) const
+	void convert(Poco::UTF16String& val) const override
 	{
-		std::string str = NumberFormatter::format(_val);
+		const std::string str = NumberFormatter::format(_val);
 		Poco::UnicodeConverter::convert(str, val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -918,46 +1238,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<Int8>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<Int8>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<Int8>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	Int8 _val;
 };
 
@@ -970,103 +1286,105 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(Int16);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(Poco::UTF16String& val) const
+	void convert(Poco::UTF16String& val) const override
 	{
-		std::string str = NumberFormatter::format(_val);
+		const std::string str = NumberFormatter::format(_val);
 		Poco::UnicodeConverter::convert(str, val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -1076,41 +1394,37 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<Int16>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<Int16>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<Int16>::is_specialized;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	Int16 _val;
 };
 
@@ -1123,97 +1437,99 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(Int32);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -1223,46 +1539,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<Int32>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<Int32>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<Int32>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	Int32 _val;
 };
 
@@ -1275,112 +1587,114 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(Int64);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime& dt) const
+	void convert(DateTime& dt) const override
 	{
 		dt = Timestamp(_val);
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime& ldt) const override
 	{
 		ldt = Timestamp(_val);
 	}
 
-	void convert(Timestamp& val) const
+	void convert(Timestamp& val) const override
 	{
 		val = Timestamp(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -1390,46 +1704,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<Int64>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<Int64>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<Int64>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	Int64 _val;
 };
 
@@ -1442,97 +1752,99 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(UInt8);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		val = static_cast<Int32>(_val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = static_cast<Int64>(_val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = _val;
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = static_cast<long long>(_val);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = _val;
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -1542,46 +1854,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<UInt8>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<UInt8>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<UInt8>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	UInt8 _val;
 };
 
@@ -1594,97 +1902,99 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(UInt16);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = static_cast<Int64>(_val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = _val;
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = static_cast<long long>(_val);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = _val;
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -1694,46 +2004,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<UInt16>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<UInt16>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<UInt16>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	UInt16 _val;
 };
 
@@ -1746,97 +2052,99 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(UInt32);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = _val;
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = _val;
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -1846,46 +2154,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<UInt32>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<UInt32>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<UInt32>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	UInt32 _val;
 };
 
@@ -1898,118 +2202,120 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(UInt64);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = _val;
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = _val;
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		convertToFP(_val, val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	void convert(DateTime& dt) const
+	void convert(DateTime& dt) const override
 	{
 		Int64 val;
 		convertUnsignedToSigned(_val, val);
 		dt = Timestamp(val);
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime& ldt) const override
 	{
 		Int64 val;
 		convertUnsignedToSigned(_val, val);
 		ldt = Timestamp(val);
 	}
 
-	void convert(Timestamp& val) const
+	void convert(Timestamp& val) const override
 	{
 		Int64 tmp;
 		convertUnsignedToSigned(_val, tmp);
 		val = Timestamp(tmp);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -2019,46 +2325,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<UInt64>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<UInt64>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<UInt64>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	UInt64 _val;
 };
 
@@ -2071,95 +2373,96 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(bool);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		val = static_cast<Int8>(_val ? 1 : 0);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		val = static_cast<Int16>(_val ? 1 : 0);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		val = static_cast<Int32>(_val ? 1 : 0);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = static_cast<Int64>(_val ? 1 : 0);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		val = static_cast<UInt8>(_val ? 1 : 0);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		val = static_cast<UInt16>(_val ? 1 : 0);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		val = static_cast<UInt32>(_val ? 1 : 0);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = static_cast<UInt64>(_val ? 1 : 0);
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = static_cast<long long>(_val ? 1 : 0);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = static_cast<unsigned long long>(_val ? 1 : 0);
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		val = (_val ? 1.0f : 0.0f);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		val = (_val ? 1.0 : 0.0);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		val = static_cast<char>(_val ? 1 : 0);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = (_val ? "true" : "false");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -2169,46 +2472,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<bool>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<bool>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<bool>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return true;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	bool _val;
 };
 
@@ -2221,98 +2520,100 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(float);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
-		val = !(_val <= std::numeric_limits<float>::min() &&
-			_val >= -1 * std::numeric_limits<float>::min());
+		val = _val > std::numeric_limits<float>::min() ||
+			_val < -1 * std::numeric_limits<float>::min();
 	}
 
-	void convert(float& val) const
-	{
-		val = _val;
-	}
-
-	void convert(double& val) const
+	void convert(float& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(char& val) const
+	void convert(double& val) const override
+	{
+		val = _val;
+	}
+
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -2322,46 +2623,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<float>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<float>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<float>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	float _val;
 };
 
@@ -2374,79 +2671,81 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(double);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		convertSignedFloatToUnsigned(_val, val);
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
-		val = !(_val <= std::numeric_limits<double>::min() &&
-			_val >= -1 * std::numeric_limits<double>::min());
+		val = _val > std::numeric_limits<double>::min() ||
+			_val < -1 * std::numeric_limits<double>::min();
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
-		double fMin = -1 * std::numeric_limits<float>::max();
-		double fMax = std::numeric_limits<float>::max();
+		const double fMin = -1 * std::numeric_limits<float>::max();
+		const double fMax = std::numeric_limits<float>::max();
 
 		if (_val < fMin) throw RangeException("Value too small.");
 		if (_val > fMax) throw RangeException("Value too large.");
@@ -2454,24 +2753,24 @@ public:
 		val = static_cast<float>(_val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -2481,46 +2780,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<double>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<double>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<double>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	double _val;
 };
 
@@ -2533,95 +2828,97 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(char);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		val = static_cast<Int8>(_val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		val = static_cast<UInt8>(_val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		val = static_cast<UInt8>(_val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = static_cast<UInt8>(_val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		val = static_cast<UInt8>(_val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		val = static_cast<UInt8>(_val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		val = static_cast<UInt8>(_val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = static_cast<UInt8>(_val);
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = static_cast<long long>(_val);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = static_cast<unsigned long long>(_val);
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != '\0');
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		val = static_cast<float>(_val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		val = static_cast<double>(_val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = std::string(1, _val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -2631,46 +2928,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<char>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<char>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<char>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	char _val;
 };
 
@@ -2687,74 +2980,76 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(std::string);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
-		int v = NumberParser::parse(_val);
+		const int v = NumberParser::parse(_val);
 		convertToSmaller(v, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
-		int v = NumberParser::parse(_val);
+		const int v = NumberParser::parse(_val);
 		convertToSmaller(v, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		val = NumberParser::parse(_val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = NumberParser::parse64(_val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
-		unsigned int v = NumberParser::parseUnsigned(_val);
+		const unsigned int v = NumberParser::parseUnsigned(_val);
 		convertToSmallerUnsigned(v, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
-		unsigned int v = NumberParser::parseUnsigned(_val);
+		const unsigned int v = NumberParser::parseUnsigned(_val);
 		convertToSmallerUnsigned(v, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		val = NumberParser::parseUnsigned(_val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = NumberParser::parseUnsigned64(_val);
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = NumberParser::parse64(_val);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = NumberParser::parseUnsigned64(_val);
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		if (_val.empty())
 		{
@@ -2768,18 +3063,18 @@ public:
 			(icompare(_val, VAL_FALSE) != 0));
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
-		double v = NumberParser::parseFloat(_val);
+		const double v = NumberParser::parseFloat(_val);
 		convertToSmaller(v, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		val = NumberParser::parseFloat(_val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		if (_val.empty())
 			val = '\0';
@@ -2787,24 +3082,24 @@ public:
 			val = _val[0];
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(Poco::UTF16String& val) const
+	void convert(Poco::UTF16String& val) const override
 	{
 		Poco::UnicodeConverter::convert(_val, val);
 	}
 
-	void convert(DateTime& val) const
+	void convert(DateTime& val) const override
 	{
 		int tzd = 0;
 		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, _val, val, tzd))
 			throw BadCastException("string -> DateTime");
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime& ldt) const override
 	{
 		int tzd = 0;
 		DateTime tmp;
@@ -2814,7 +3109,7 @@ public:
 		ldt = LocalDateTime(tzd, tmp, false);
 	}
 
-	void convert(Timestamp& ts) const
+	void convert(Timestamp& ts) const override
 	{
 		int tzd = 0;
 		DateTime tmp;
@@ -2824,12 +3119,12 @@ public:
 		ts = tmp.timestamp();
 	}
 
-	void convert(UUID& uuid) const
+	void convert(UUID& uuid) const override
 	{
 		uuid.parse(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -2839,12 +3134,12 @@ public:
 		return _val;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return true;
 	}
 
-	std::size_t size() const
+	std::size_t size() const override
 	{
 		return _val.length();
 	}
@@ -2864,10 +3159,6 @@ public:
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	std::string _val;
 };
 
@@ -2884,74 +3175,76 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(Poco::UTF16String);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
-		int v = NumberParser::parse(toStdString());
+		const int v = NumberParser::parse(toStdString());
 		convertToSmaller(v, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
-		int v = NumberParser::parse(toStdString());
+		const int v = NumberParser::parse(toStdString());
 		convertToSmaller(v, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		val = NumberParser::parse(toStdString());
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = NumberParser::parse64(toStdString());
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
-		unsigned int v = NumberParser::parseUnsigned(toStdString());
+		const unsigned int v = NumberParser::parseUnsigned(toStdString());
 		convertToSmallerUnsigned(v, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
-		unsigned int v = NumberParser::parseUnsigned(toStdString());
+		const unsigned int v = NumberParser::parseUnsigned(toStdString());
 		convertToSmallerUnsigned(v, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		val = NumberParser::parseUnsigned(toStdString());
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = NumberParser::parseUnsigned64(toStdString());
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = NumberParser::parse64(toStdString());
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = NumberParser::parseUnsigned64(toStdString());
 	}
 
 #endif
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		static const std::string VAL_FALSE("false");
 		static const std::string VAL_INT_FALSE("0");
@@ -2964,18 +3257,18 @@ public:
 			(icompare(str, VAL_FALSE) != 0));
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
-		double v = NumberParser::parseFloat(toStdString());
+		const double v = NumberParser::parseFloat(toStdString());
 		convertToSmaller(v, val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		val = NumberParser::parseFloat(toStdString());
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		if (_val.empty())
 			val = '\0';
@@ -2987,24 +3280,24 @@ public:
 		}
 	}
 
-	void convert(Poco::UTF16String& val) const
+	void convert(Poco::UTF16String& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		UnicodeConverter::convert(_val, val);
 	}
 
-	void convert(DateTime& val) const
+	void convert(DateTime& val) const override
 	{
 		int tzd = 0;
 		if (!DateTimeParser::tryParse(DateTimeFormat::ISO8601_FORMAT, toStdString(), val, tzd))
 			throw BadCastException("string -> DateTime");
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime& ldt) const override
 	{
 		int tzd = 0;
 		DateTime tmp;
@@ -3014,7 +3307,7 @@ public:
 		ldt = LocalDateTime(tzd, tmp, false);
 	}
 
-	void convert(Timestamp& ts) const
+	void convert(Timestamp& ts) const override
 	{
 		int tzd = 0;
 		DateTime tmp;
@@ -3024,7 +3317,7 @@ public:
 		ts = tmp.timestamp();
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3034,12 +3327,12 @@ public:
 		return _val;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return true;
 	}
 
-	std::size_t size() const
+	std::size_t size() const override
 	{
 		return _val.length();
 	}
@@ -3059,10 +3352,6 @@ public:
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	std::string toStdString() const
 	{
 		std::string str;
@@ -3085,83 +3374,85 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator = (const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(long);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		val = static_cast<Int32>(_val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = static_cast<Int64>(_val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		val = static_cast<float>(_val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		val = static_cast<double>(_val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3171,46 +3462,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<long>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<long>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<long>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	long _val;
 };
 
@@ -3223,83 +3510,85 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator = (const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(unsigned long);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = static_cast<UInt64>(_val);
 	}
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		val = static_cast<float>(_val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		val = static_cast<double>(_val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3309,46 +3598,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<unsigned long>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<unsigned long>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<unsigned long>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	unsigned long _val;
 };
 
@@ -3364,93 +3649,95 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(long long);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		convertToSmaller(_val, val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = static_cast<Int64>(_val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		convertSignedToUnsigned(_val, val);
 	}
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		val = static_cast<float>(_val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		val = static_cast<double>(_val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3460,46 +3747,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<long long>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<long long>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<long long>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	long long _val;
 };
 
@@ -3512,93 +3795,95 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(unsigned long long);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32& val) const override
 	{
 		convertToSmallerUnsigned(_val, val);
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = static_cast<UInt64>(_val);
 	}
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		convertUnsignedToSigned(_val, val);
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(bool& val) const
+	void convert(bool& val) const override
 	{
 		val = (_val != 0);
 	}
 
-	void convert(float& val) const
+	void convert(float& val) const override
 	{
 		val = static_cast<float>(_val);
 	}
 
-	void convert(double& val) const
+	void convert(double& val) const override
 	{
 		val = static_cast<double>(_val);
 	}
 
-	void convert(char& val) const
+	void convert(char& val) const override
 	{
 		UInt8 tmp;
 		convert(tmp);
 		val = static_cast<char>(tmp);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = NumberFormatter::format(_val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3608,46 +3893,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return std::numeric_limits<unsigned long long>::is_integer;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return std::numeric_limits<unsigned long long>::is_signed;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return std::numeric_limits<unsigned long long>::is_specialized;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	unsigned long long _val;
 };
 
@@ -3663,21 +3944,23 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(std::vector<T>);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		Impl::containerToJSON(_val, val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3687,12 +3970,12 @@ public:
 		return _val;
 	}
 
-	bool isVector() const
+	bool isVector() const override
 	{
 		return true;
 	}
 
-	std::size_t size() const
+	std::size_t size() const override
 	{
 		return _val.size();
 	}
@@ -3712,10 +3995,6 @@ public:
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	std::vector<T> _val;
 };
 
@@ -3728,21 +4007,23 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(std::list<T>);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		Impl::containerToJSON(_val, val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3752,12 +4033,12 @@ public:
 		return _val;
 	}
 
-	bool isList() const
+	bool isList() const override
 	{
 		return true;
 	}
 
-	std::size_t size() const
+	std::size_t size() const override
 	{
 		return _val.size();
 	}
@@ -3787,10 +4068,6 @@ public:
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	std::list<T> _val;
 };
 
@@ -3803,21 +4080,23 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(std::deque<T>);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		Impl::containerToJSON(_val, val);
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3827,12 +4106,12 @@ public:
 		return _val;
 	}
 
-	bool isDeque() const
+	bool isDeque() const override
 	{
 		return true;
 	}
 
-	std::size_t size() const
+	std::size_t size() const override
 	{
 		return _val.size();
 	}
@@ -3852,10 +4131,6 @@ public:
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	std::deque<T> _val;
 };
 
@@ -3868,75 +4143,77 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(DateTime);
 	}
 
-	void convert(Int8& /*val*/) const
+	void convert(Int8 & /*val*/) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16& /*val*/) const
+	void convert(Int16 & /*val*/) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int32& /*val*/) const
+	void convert(Int32 & /*val*/) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = _val.timestamp().epochMicroseconds();
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = _val.timestamp().epochMicroseconds();
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = _val.timestamp().epochMicroseconds();
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = _val.timestamp().epochMicroseconds();
 	}
 
 #endif
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = DateTimeFormatter::format(_val, Poco::DateTimeFormat::ISO8601_FORMAT);
 	}
 
-	void convert(DateTime& val) const
+	void convert(DateTime& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime &ldt) const override
 	{
 		ldt = _val.timestamp();
 	}
 
-	void convert(Timestamp& ts) const
+	void convert(Timestamp &ts) const override
 	{
 		ts = _val.timestamp();
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -3946,66 +4223,62 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
-	bool isDate() const
+	bool isDate() const override
 	{
 		return true;
 	}
 
-	bool isTime() const
+	bool isTime() const override
 	{
 		return true;
 	}
 
-	bool isDateTime() const
+	bool isDateTime() const override
 	{
 		return true;
 	}
 
-	bool isUUID() const
+	bool isUUID() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	DateTime _val;
 };
 
@@ -4018,60 +4291,61 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(LocalDateTime);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = _val.timestamp().epochMicroseconds();
 	}
 
-	void convert(UInt64& val) const
-	{
+	void convert(UInt64& val) const override {
 		val = _val.timestamp().epochMicroseconds();
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = _val.timestamp().epochMicroseconds();
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = _val.timestamp().epochMicroseconds();
 	}
 
 #endif
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = DateTimeFormatter::format(_val, Poco::DateTimeFormat::ISO8601_FORMAT);
 	}
 
-	void convert(DateTime& val) const
+	void convert(DateTime& val) const override
 	{
 		val = _val.timestamp();
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime &ldt) const override
 	{
 		ldt = _val;
 	}
 
-	void convert(Timestamp& ts) const
+	void convert(Timestamp &ts) const override
 	{
 		ts = _val.timestamp();
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -4081,66 +4355,62 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
-	bool isDate() const
+	bool isDate() const override
 	{
 		return true;
 	}
 
-	bool isTime() const
+	bool isTime() const override
 	{
 		return true;
 	}
 
-	bool isDateTime() const
+	bool isDateTime() const override
 	{
 		return true;
 	}
 
-	bool isUUID() const
+	bool isUUID() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	LocalDateTime _val;
 };
 
@@ -4153,60 +4423,62 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(Timestamp);
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64& val) const override
 	{
 		val = _val.epochMicroseconds();
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64& val) const override
 	{
 		val = _val.epochMicroseconds();
 	}
 
 #ifdef POCO_INT64_IS_LONG
 
-	void convert(long long& val) const
+	void convert(long long& val) const override
 	{
 		val = _val.epochMicroseconds();
 	}
 
-	void convert(unsigned long long& val) const
+	void convert(unsigned long long& val) const override
 	{
 		val = _val.epochMicroseconds();
 	}
 
 #endif
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = DateTimeFormatter::format(_val, Poco::DateTimeFormat::ISO8601_FORMAT);
 	}
 
-	void convert(DateTime& val) const
+	void convert(DateTime& val) const override
 	{
 		val = _val;
 	}
 
-	void convert(LocalDateTime& ldt) const
+	void convert(LocalDateTime &ldt) const override
 	{
 		ldt = _val;
 	}
 
-	void convert(Timestamp& ts) const
+	void convert(Timestamp &ts) const override
 	{
 		ts = _val;
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -4216,66 +4488,62 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
-	bool isDate() const
+	bool isDate() const override
 	{
 		return true;
 	}
 
-	bool isTime() const
+	bool isTime() const override
 	{
 		return true;
 	}
 
-	bool isDateTime() const
+	bool isDateTime() const override
 	{
 		return true;
 	}
 
-	bool isUUID() const
+	bool isUUID() const override
 	{
 		return false;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	Timestamp _val;
 };
 
@@ -4288,21 +4556,23 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	VarHolderImpl() = delete;
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
+
+	const std::type_info& type() const override
 	{
 		return typeid(UUID);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val = _val.toString();
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -4312,77 +4582,73 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isBoolean() const
+	bool isBoolean() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
-	bool isDate() const
+	bool isDate() const override
 	{
 		return false;
 	}
 
-	bool isTime() const
+	bool isTime() const override
 	{
 		return false;
 	}
 
-	bool isDateTime() const
+	bool isDateTime() const override
 	{
 		return false;
 	}
 
-	bool isUUID() const
+	bool isUUID() const override
 	{
 		return true;
 	}
 
 private:
-	VarHolderImpl();
-	VarHolderImpl(const VarHolderImpl&);
-	VarHolderImpl& operator = (const VarHolderImpl&);
-
 	Poco::UUID _val;
 };
 
 
-typedef std::vector<Var> Vector;
-typedef std::deque<Var>  Deque;
-typedef std::list<Var>   List;
-typedef Vector           Array;
+using Vector = std::vector<Var>;
+using Deque = std::deque<Var>;
+using List = std::list<Var>;
+using Array = Vector;
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic
 
 
 #endif // Foundation_VarHolder_INCLUDED

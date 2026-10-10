@@ -91,12 +91,12 @@ public:
 		///
 		/// Returns the previously registered handler.
 
-	static ErrorHandler* get();
+	[[nodiscard]] static ErrorHandler* get();
 		/// Returns a pointer to the currently registered
 		/// ErrorHandler.
 
 protected:
-	static ErrorHandler* defaultHandler();
+	[[nodiscard]] static ErrorHandler* defaultHandler();
 		/// Returns the default ErrorHandler.
 
 private:

@@ -24,7 +24,8 @@
             "${POCO_BASE}/MongoDB/include",
             "${POCO_BASE}/ApacheConnector/include",
             "${POCO_BASE}/Data/src",
-            "${POCO_BASE}/Data/DataTest/include"
+            "${POCO_BASE}/Data/DataTest/include",
+            "${POCO_BASE}/Trace/include"
         ]
     },
     "configurations": [
@@ -33,7 +34,8 @@
             "intelliSenseMode": "clang-x64",
             "includePath": [
                 "${pocoIncludePath}",
-                "/usr/local/opt/openssl@3/include"
+                "/usr/local/opt/openssl@3/include",
+                "/opt/homebrew/opt/openssl@3/include"
             ],
             "macFrameworkPath": [
                 "/System/Library/Frameworks"

@@ -20,6 +20,8 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/IOLock.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -30,20 +32,23 @@ class Foundation_API PipeImpl: public RefCountedObject
 	/// that do not support pipes.
 {
 public:
-	typedef int Handle;
+	using Handle = int;
 
 	PipeImpl();
-	~PipeImpl();
+	~PipeImpl() override;
 	int writeBytes(const void* buffer, int length);
 	int readBytes(void* buffer, int length);
-	Handle readHandle() const;
-	Handle writeHandle() const;
+	[[nodiscard]] Handle readHandle() const;
+	[[nodiscard]] Handle writeHandle() const;
+	void close();
 	void closeRead();
 	void closeWrite();
 
 private:
-	int _readfd;
-	int _writefd;
+	std::atomic<int> _readfd{-1};
+	std::atomic<int> _writefd{-1};
+	IOLock _readLock;
+	IOLock _writeLock;
 };
 
 

@@ -26,9 +26,9 @@
 //
 // The following block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the NetSSL_Win_EXPORTS
-// symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
-// NetSSL_Win_API functions as being imported from a DLL, wheras this DLL sees symbols
+// symbol defined on the command line. This symbol should not be defined on any project
+// that uses this DLL. This way any other project whose source files include this file sees
+// NetSSL_Win_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if (defined(_WIN32) || defined(__CYGWIN__)) && defined(POCO_DLL)
@@ -65,8 +65,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 void NetSSL_Win_API initializeSSL();
@@ -83,7 +82,7 @@ void NetSSL_Win_API uninitializeSSL();
 	/// shutting down the SSLManager.
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_NetSSL_INCLUDED

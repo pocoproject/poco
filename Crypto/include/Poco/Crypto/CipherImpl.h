@@ -25,8 +25,7 @@
 #include <openssl/evp.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class CipherImpl: public Cipher
@@ -39,13 +38,13 @@ public:
 	virtual ~CipherImpl();
 		/// Destroys the CipherImpl.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the name of the cipher.
 
-	CryptoTransform::Ptr createEncryptor();
+	[[nodiscard]] CryptoTransform::Ptr createEncryptor();
 		/// Creates an encryptor object.
 
-	CryptoTransform::Ptr createDecryptor();
+	[[nodiscard]] CryptoTransform::Ptr createDecryptor();
 		/// Creates a decryptor object.
 
 private:
@@ -63,7 +62,7 @@ inline const std::string& CipherImpl::name() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_CipherImpl_INCLUDED

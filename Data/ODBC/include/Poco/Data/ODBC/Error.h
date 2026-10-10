@@ -19,19 +19,16 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Format.h"
-#include <vector>
+
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqlext.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 template <typename H, SQLSMALLINT handleType>
@@ -41,8 +38,13 @@ class Error
 	/// as well as individual diagnostic records.
 {
 public:
-	explicit Error(const H& handle) : _diagnostics(handle)
+	explicit Error(const H& handle) : _pDiag(new Diagnostics<H, handleType>(handle))
 		/// Creates the Error.
+	{
+	}
+
+	Error(const Error& other) : Error(other.diagnostics().handle())
+		/// Creates the Error from another one.
 	{
 	}
 
@@ -51,19 +53,26 @@ public:
 	{
 	}
 
-	const Diagnostics<H, handleType>& diagnostics() const
+	Error& operator = (const Error& other)
+		/// Assigns another Error to this one.
+	{
+		_pDiag.reset(new Diagnostics<H, handleType>(other.diagnostics().handle()));
+		return *this;
+	}
+
+	[[nodiscard]] const Diagnostics<H, handleType>& diagnostics() const
 		/// Returns the associated diagnostics.
 	{
-		return _diagnostics;
+		return *_pDiag;
 	}
 
-	int count() const
+	[[nodiscard]] int count() const
 		/// Returns the count of diagnostic records.
 	{
-		return (int) _diagnostics.count();
+		return static_cast<int>(_pDiag->count());
 	}
 
-	std::string& toString(int index, std::string& str) const
+	[[nodiscard]] std::string& toString(int index, std::string& str) const
 		/// Generates the string for the diagnostic record.
 	{
 		if ((index < 0) || (index > (count() - 1)))
@@ -76,24 +85,24 @@ public:
 			"===========================\n"
 			"SQLSTATE = %s\nNative Error Code = %ld\n%s\n\n",
 			index + 1,
-			_diagnostics.sqlState(index),
-			_diagnostics.nativeError(index),
-			_diagnostics.message(index));
+			_pDiag->sqlState(index),
+			_pDiag->nativeError(index),
+			_pDiag->message(index));
 
 		str.append(s);
 
 		return str;
 	}
 
-	std::string toString() const
+	[[nodiscard]] std::string toString() const
 		/// Generates the string for the diagnostic record collection.
 	{
 		std::string str;
 
 		Poco::format(str,
 			"Connection:%s\nServer:%s\n",
-			_diagnostics.connectionName(),
-			_diagnostics.serverName());
+			_pDiag->connectionName(),
+			_pDiag->serverName());
 
 		std::string s;
 		for (int i = 0; i < count(); ++i)
@@ -108,17 +117,34 @@ public:
 private:
 	Error();
 
-	Diagnostics<H, handleType> _diagnostics;
+	std::unique_ptr<Diagnostics<H, handleType>> _pDiag;
 };
 
 
-typedef Error<SQLHENV, SQL_HANDLE_ENV> EnvironmentError;
-typedef Error<SQLHDBC, SQL_HANDLE_DBC> ConnectionError;
-typedef Error<SQLHSTMT, SQL_HANDLE_STMT> StatementError;
-typedef Error<SQLHSTMT, SQL_HANDLE_DESC> DescriptorError;
+// explicit instantiation definition
+#ifndef POCO_DOC
+
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
+extern template class Error<SQLHENV, SQL_HANDLE_ENV>;
+extern template class Error<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class Error<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class Error<SQLHDESC, SQL_HANDLE_DESC>;
+#else
+extern template class ODBC_API Error<SQLHENV, SQL_HANDLE_ENV>;
+extern template class ODBC_API Error<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class ODBC_API Error<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class ODBC_API Error<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
+
+#endif
+
+using EnvironmentError = Error<SQLHENV, SQL_HANDLE_ENV>;
+using ConnectionError = Error<SQLHDBC, SQL_HANDLE_DBC>;
+using StatementError = Error<SQLHSTMT, SQL_HANDLE_STMT>;
+using DescriptorError = Error<SQLHSTMT, SQL_HANDLE_DESC>;
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

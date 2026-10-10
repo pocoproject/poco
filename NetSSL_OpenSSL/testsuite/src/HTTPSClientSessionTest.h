@@ -24,6 +24,7 @@ public:
 	HTTPSClientSessionTest(const std::string& name);
 	~HTTPSClientSessionTest();
 
+	void testFromSocket();
 	void testGetSmall();
 	void testGetLarge();
 	void testHead();
@@ -39,7 +40,9 @@ public:
 	void testCachedSession();
 	void testUnknownContentLength();
 	void testServerAbort();
-
+	void testProxyConfig();
+	void testProxySetters();
+	void testStalledPeerTimeout();
 
 	void setUp();
 	void tearDown();

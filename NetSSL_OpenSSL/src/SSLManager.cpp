@@ -25,28 +25,24 @@
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/Delegate.h"
+#include "Poco/String.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
+#include <openssl/err.h>
 #include <openssl/ocsp.h>
 #include <openssl/tls1.h>
-#endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string SSLManager::CFG_PRIV_KEY_FILE("privateKeyFile");
 const std::string SSLManager::CFG_CERTIFICATE_FILE("certificateFile");
 const std::string SSLManager::CFG_CA_LOCATION("caConfig");
 const std::string SSLManager::CFG_VER_MODE("verificationMode");
-const Context::VerificationMode SSLManager::VAL_VER_MODE(Context::VERIFY_RELAXED);
 const std::string SSLManager::CFG_VER_DEPTH("verificationDepth");
-const int         SSLManager::VAL_VER_DEPTH(9);
 const std::string SSLManager::CFG_ENABLE_DEFAULT_CA("loadDefaultCAFile");
-const bool        SSLManager::VAL_ENABLE_DEFAULT_CA(true);
 const std::string SSLManager::CFG_CIPHER_LIST("cipherList");
 const std::string SSLManager::CFG_CYPHER_LIST("cypherList");
 const std::string SSLManager::VAL_CIPHER_LIST("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
@@ -62,6 +58,7 @@ const std::string SSLManager::CFG_SESSION_ID_CONTEXT("sessionIdContext");
 const std::string SSLManager::CFG_SESSION_CACHE_SIZE("sessionCacheSize");
 const std::string SSLManager::CFG_SESSION_TIMEOUT("sessionTimeout");
 const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
+const bool        SSLManager::VAL_EXTENDED_VERIFICATION(true);
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
@@ -69,16 +66,15 @@ const std::string SSLManager::CFG_REQUIRE_TLSV1_3("requireTLSv1_3");
 const std::string SSLManager::CFG_DISABLE_PROTOCOLS("disableProtocols");
 const std::string SSLManager::CFG_DH_PARAMS_FILE("dhParamsFile");
 const std::string SSLManager::CFG_ECDH_CURVE("ecdhCurve");
-#ifdef OPENSSL_FIPS
 const std::string SSLManager::CFG_FIPS_MODE("openSSL.fips");
-const bool        SSLManager::VAL_FIPS_MODE(false);
-#endif
 
 
 SSLManager::SSLManager():
 	_contextIndex(SSL_CTX_get_ex_new_index(0, nullptr, nullptr, nullptr, nullptr)),
 	_socketIndex(SSL_get_ex_new_index(0, nullptr, nullptr, nullptr, nullptr))
 {
+	if (_contextIndex < 0 || _socketIndex < 0)
+		throw SSLException("Cannot allocate an ex_data index", Utility::getLastError());
 }
 
 
@@ -92,6 +88,12 @@ SSLManager::~SSLManager()
 	{
 		poco_unexpected();
 	}
+}
+
+
+bool SSLManager::isFIPSEnabled()
+{
+	return Poco::Crypto::OpenSSLInitializer::isFIPSEnabled();
 }
 
 
@@ -221,6 +223,10 @@ int SSLManager::verifyCallback(bool server, int ok, X509_STORE_CTX* pStore)
 		poco_assert_dbg (pContext);
 
 		X509* pCert = X509_STORE_CTX_get_current_cert(pStore);
+		// Not every verification error has a certificate (e.g. a policy failure);
+		// the handlers require one, so the error cannot be offered to them.
+		if (pCert == nullptr) return 0;
+
 		X509Certificate x509(pCert, true);
 		int depth = X509_STORE_CTX_get_error_depth(pStore);
 		int err = X509_STORE_CTX_get_error(pStore);
@@ -264,8 +270,8 @@ int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, voi
 
 	strncpy(pBuf, (char *)(pwd.c_str()), size);
 	pBuf[size - 1] = '\0';
-	if (size > pwd.length())
-		size = (int) pwd.length();
+	if (static_cast<std::size_t>(size) > pwd.length())
+		size = static_cast<int>(pwd.length());
 
 	return size;
 }
@@ -273,8 +279,7 @@ int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, voi
 
 int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
-	const long OCSP_VALIDITY_LEEWAY = 5*60;
+	constexpr long OCSP_VALIDITY_LEEWAY = 5*60;
 
 	Poco::Net::Context* pContext = static_cast<Poco::Net::Context*>(arg);
 
@@ -305,7 +310,11 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		return 0;
 	}
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	X509* pPeerCert = SSL_get1_peer_certificate(pSSL);
+#else
 	X509* pPeerCert = SSL_get_peer_certificate(pSSL);
+#endif
 	if (!pPeerCert)
 	{
 		OCSP_BASICRESP_free(pBasicResp);
@@ -313,21 +322,32 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		return 0;
 	}
 
+	// The chain is supplied by the peer, and X509_check_issued() only matches
+	// names and key identifiers. Without also checking the signature an attacker
+	// can add a self-signed certificate carrying the real issuer's subject name
+	// and have the response accepted as if the genuine issuer had produced it.
 	X509* pPeerIssuerCert = nullptr;
 	STACK_OF(X509)* pCertChain = SSL_get_peer_cert_chain(pSSL);
-	unsigned certChainLen = sk_X509_num(pCertChain);
-	for (int i= 0; i < certChainLen ; i++)
+	// There is no chain for a resumed session, and sk_X509_num() returns -1 for
+	// a null stack.
+	const int certChainLen = (pCertChain != nullptr) ? sk_X509_num(pCertChain) : 0;
+	for (int i = 0; i < certChainLen; i++)
 	{
-		if (!pPeerIssuerCert)
+		X509* pIssuerCert = sk_X509_value(pCertChain, i);
+		if (X509_check_issued(pIssuerCert, pPeerCert) != X509_V_OK) continue;
+
+		EVP_PKEY* pIssuerKey = X509_get0_pubkey(pIssuerCert);
+		if (pIssuerKey != nullptr && X509_verify(pPeerCert, pIssuerKey) == 1)
 		{
-			X509* pIssuerCert = sk_X509_value(pCertChain, i);
-			if (X509_check_issued(pIssuerCert, pPeerCert) == X509_V_OK)
-			{
-				pPeerIssuerCert = pIssuerCert;
-				break;
-			}
+			pPeerIssuerCert = pIssuerCert;
+			break;
 		}
 	}
+	// Candidates that are not the issuer fail X509_verify() and leave entries on
+	// the thread error queue. SSL_get_error() consults it before the want-read
+	// and want-write states, so a later read would be reported as a fatal error.
+	ERR_clear_error();
+
 	if (!pPeerIssuerCert)
 	{
 		X509_free(pPeerCert);
@@ -350,7 +370,9 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 
 	X509_STORE* pStore = SSL_CTX_get_cert_store(SSL_get_SSL_CTX(pSSL));
 
-	int verifyStatus = OCSP_basic_verify(pBasicResp, pCerts, pStore, OCSP_TRUSTOTHER);
+	// No OCSP_TRUSTOTHER: the responder certificate has to chain to the store
+	// rather than being trusted just because the peer sent it.
+	int verifyStatus = OCSP_basic_verify(pBasicResp, pCerts, pStore, 0);
 
 	sk_X509_pop_free(pCerts, X509_free);
 
@@ -404,7 +426,6 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 
 	OCSP_BASICRESP_free(pBasicResp);
 	OCSP_RESPONSE_free(pOcspResp);
-#endif
 
 	return 1;
 }
@@ -419,13 +440,11 @@ void SSLManager::initDefaultContext(bool server)
 	initEvents(server);
 	Poco::Util::AbstractConfiguration& config = appConfig();
 
-#ifdef OPENSSL_FIPS
 	bool fipsEnabled = config.getBool(CFG_FIPS_MODE, VAL_FIPS_MODE);
 	if (fipsEnabled && !Poco::Crypto::OpenSSLInitializer::isFIPSEnabled())
 	{
 		Poco::Crypto::OpenSSLInitializer::enableFIPSMode(true);
 	}
-#endif
 
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 
@@ -451,6 +470,7 @@ void SSLManager::initDefaultContext(bool server)
 	params.loadDefaultCAs = config.getBool(prefix + CFG_ENABLE_DEFAULT_CA, VAL_ENABLE_DEFAULT_CA);
 	params.cipherList = config.getString(prefix + CFG_CIPHER_LIST, VAL_CIPHER_LIST);
 	params.cipherList = config.getString(prefix + CFG_CYPHER_LIST, params.cipherList); // for backwards compatibility
+	Poco::trimInPlace(params.cipherList);
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
 	bool requireTLSv1_1 = config.getBool(prefix + CFG_REQUIRE_TLSV1_1, false);
 	bool requireTLSv1_2 = config.getBool(prefix + CFG_REQUIRE_TLSV1_2, false);
@@ -533,7 +553,11 @@ void SSLManager::initDefaultContext(bool server)
 	{
 		_ptrDefaultClientContext->enableSessionCache(cacheSessions);
 	}
-	bool extendedVerification = config.getBool(prefix + CFG_EXTENDED_VERIFICATION, false);
+	// Extended verification matches the peer certificate against a host name.
+	// A server has no host name for its peer, so enabling it there would match
+	// the client certificate against the client's address and break mutual TLS.
+	const bool defaultExtendedVerification = server ? false : VAL_EXTENDED_VERIFICATION;
+	bool extendedVerification = config.getBool(prefix + CFG_EXTENDED_VERIFICATION, defaultExtendedVerification);
 	if (server)
 		_ptrDefaultServerContext->enableExtendedCertificateVerification(extendedVerification);
 	else
@@ -567,7 +591,7 @@ void SSLManager::initPassphraseHandler(bool server)
 
 	std::string className(config.getString(prefix + CFG_DELEGATE_HANDLER, VAL_DELEGATE_HANDLER));
 
-	const PrivateKeyFactory* pFactory = 0;
+	const PrivateKeyFactory* pFactory = nullptr;
 	if (privateKeyFactoryMgr().hasFactory(className))
 	{
 		pFactory = privateKeyFactoryMgr().getFactory(className);
@@ -594,7 +618,7 @@ void SSLManager::initCertificateHandler(bool server)
 
 	std::string className(config.getString(prefix+CFG_CERTIFICATE_HANDLER, VAL_CERTIFICATE_HANDLER));
 
-	const CertificateHandlerFactory* pFactory = 0;
+	const CertificateHandlerFactory* pFactory = nullptr;
 	if (certificateHandlerFactoryMgr().hasFactory(className))
 	{
 		pFactory = certificateHandlerFactoryMgr().getFactory(className);
@@ -640,4 +664,4 @@ void uninitializeSSL()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

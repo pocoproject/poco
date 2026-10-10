@@ -23,8 +23,7 @@
 #include "Poco/URIStreamFactory.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API HTTPSStreamFactory: public Poco::URIStreamFactory
@@ -77,7 +76,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPSStreamFactory_INCLUDED

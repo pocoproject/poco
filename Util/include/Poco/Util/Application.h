@@ -7,7 +7,7 @@
 //
 // Definition of the Application class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -35,8 +35,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class OptionSet;
@@ -127,7 +126,7 @@ public:
 	Application();
 		/// Creates the Application.
 
-	Application(int argc, char* argv[]);
+	Application(int argc, char** argv);
 		/// Creates the Application and calls init(argc, argv).
 
 	void addSubsystem(Subsystem* pSubsystem);
@@ -137,16 +136,19 @@ public:
 		///     Application::instance().addSubsystem(new MySubsystem);
 		/// is okay.
 
-	void init(int argc, char* argv[]);
+	void init(int argc, char** argv)
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,
 		/// "application.path", "application.name", etc.).
 		///
 		/// Note that as of release 1.3.7, init() no longer
 		/// calls initialize(). This is now called from run().
+	{
+		init(toArgs(argc, argv));
+	}
 
 #if defined(_WIN32)
-	void init(int argc, wchar_t* argv[]);
+	void init(int argc, wchar_t** argv)
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,
 		/// "application.path", "application.name", etc.).
@@ -156,6 +158,9 @@ public:
 		///
 		/// This Windows-specific version of init is used for passing
 		/// Unicode command line arguments from wmain().
+	{
+		init(toArgs(argc, argv));
+	}
 #endif
 
 	void init(const ArgVec& args);
@@ -219,14 +224,15 @@ public:
 		/// The configuration will be added to the application's
 		/// LayeredConfiguration with the given priority.
 
-	template <class C> C& getSubsystem() const;
+	template <class C>
+	[[nodiscard]] C& getSubsystem() const;
 		/// Returns a reference to the subsystem of the class
 		/// given as template argument.
 		///
 		/// Throws a NotFoundException if such a subsystem has
 		/// not been registered.
 
-	SubsystemVec& subsystems();
+	[[nodiscard]] SubsystemVec& subsystems();
 		/// Returns a reference to the subsystem list
 
 	virtual int run();
@@ -240,19 +246,31 @@ public:
 		/// will be propagated to the caller. If uninitialize() throws
 		/// an exception, the exception will be propagated to the caller.
 
-	std::string commandName() const;
+	void getApplicationPath(Poco::Path& path) const;
+		/// Sets the path argument to the file path of the application executable.
+
+	[[nodiscard]] Poco::Path getApplicationPath() const;
+		/// Returns the file path of the application executable.
+
+	void getApplicationDirectory(Poco::Path& dir) const;
+		/// Sets the path argument to the directory that contains the application executable.
+
+	[[nodiscard]] Poco::Path getApplicationDirectory() const;
+		/// Returns the directory that contains the application executable.
+
+	[[nodiscard]] std::string commandName() const;
 		/// Returns the command name used to invoke the application.
 
-	std::string commandPath() const;
+	[[nodiscard]] std::string commandPath() const;
 		/// Returns the full command path used to invoke the application.
 
-	LayeredConfiguration& config() const;
+	[[nodiscard]] LayeredConfiguration& config() const;
 		/// Returns the application's configuration reference.
 
-	LayeredConfiguration::Ptr configPtr() const;
+	[[nodiscard]] LayeredConfiguration::Ptr configPtr() const;
 		/// Returns the application's configuration smart pointer.
 
-	Poco::Logger& logger() const;
+	[[nodiscard]] Poco::Logger& logger() const;
 		/// Returns the application's logger.
 		///
 		/// Before the logging subsystem has been initialized, the
@@ -265,7 +283,7 @@ public:
 		/// "application.logger" configuration property. If that property
 		/// is not specified, the logger is "Application".
 
-	const ArgVec& argv() const;
+	[[nodiscard]] const ArgVec& argv() const;
 		/// Returns reference to vector of the application's arguments as
 		/// specified on the command line. If user overrides the
 		/// Application::main(const ArgVec&) function, it will receive
@@ -274,18 +292,21 @@ public:
 		/// full set of command line parameters as received in
 		/// main(argc, argv*).
 
-	const OptionSet& options() const;
+	[[nodiscard]] const OptionSet& options() const;
 		/// Returns the application's option set.
 
-	static Application& instance();
+	[[nodiscard]] static bool exists();
+		/// Returns true iff instance exists.
+
+	[[nodiscard]] static Application& instance();
 		/// Returns a reference to the Application singleton.
 		///
 		/// Throws a NullPointerException if no Application instance exists.
 
-	const Poco::Timestamp& startTime() const;
+	[[nodiscard]] const Poco::Timestamp& startTime() const;
 		/// Returns the application start time (UTC).
 
-	Poco::Timespan uptime() const;
+	[[nodiscard]] Poco::Timespan uptime() const;
 		/// Returns the application uptime.
 
 	void stopOptionsProcessing();
@@ -300,7 +321,15 @@ public:
 		/// help information has been encountered and no other things
 		/// besides displaying help shall be done.
 
-	static WindowSize windowSize();
+	void ignoreUnknownOptions();
+		/// Ignore unknown options. So that we can skip those options
+		/// we don't care about.
+		///
+		/// When your application command line has many options,
+		/// calling this function can help you handle only the options
+		/// you want to handle
+
+	[[nodiscard]] static WindowSize windowSize();
 		/// Returns the current window size of the console window,
 		/// if available.
 		///
@@ -309,31 +338,31 @@ public:
 		///
 		/// Returns zero width and height if the window size cannot be determined.
 
-	const char* name() const;
+	[[nodiscard]] const char* name() const override;
 
 protected:
-	void initialize(Application& self);
+	void initialize(Application& self) override;
 		/// Initializes the application and all registered subsystems.
 		/// Subsystems are always initialized in the exact same order
 		/// in which they have been registered.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	void uninitialize();
+	void uninitialize() override;
 		/// Uninitializes the application and all registered subsystems.
 		/// Subsystems are always uninitialized in reverse order in which
 		/// they have been initialized.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	void reinitialize(Application& self);
+	void reinitialize(Application& self) override;
 		/// Re-nitializes the application and all registered subsystems.
 		/// Subsystems are always reinitialized in the exact same order
 		/// in which they have been registered.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	virtual void defineOptions(OptionSet& options);
+	void defineOptions(OptionSet& options) override;
 		/// Called before command line processing begins.
 		/// If a subclass wants to support command line arguments,
 		/// it must override this method.
@@ -354,7 +383,7 @@ protected:
 	void setLogger(Poco::Logger& logger);
 		/// Sets the logger used by the application.
 
-	virtual int main(const std::vector<std::string>& args);
+	virtual int main(const ArgVec& args);
 		/// The application's main logic.
 		///
 		/// Unprocessed command line arguments are passed in args.
@@ -363,6 +392,12 @@ protected:
 		///
 		/// Returns an exit code which should be one of the values
 		/// from the ExitCode enumeration.
+
+	virtual bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
+		/// Find the application config file.
+		///
+		/// loadConfiguration will call this function to find config file,
+		/// you can override this function to find your own config file.
 
 	bool findFile(Poco::Path& path) const;
 		/// Searches for the file in path in the application directory.
@@ -379,20 +414,22 @@ protected:
 	void init();
 		/// Common initialization code.
 
-	~Application();
+	~Application() override;
 		/// Destroys the Application and deletes all registered subsystems.
+
+	[[nodiscard]] static ArgVec toArgs(int argc, char** argv);
+
+#if defined(_WIN32)
+	[[nodiscard]] static ArgVec toArgs(int argc, wchar_t** argv);
+#endif
 
 private:
 	void setup();
-	void setArgs(int argc, char* argv[]);
 	void setArgs(const ArgVec& args);
-	void getApplicationPath(Poco::Path& path) const;
 	void processOptions();
-	bool findAppConfigFile(const std::string& appName, const std::string& extension, Poco::Path& path) const;
-	bool findAppConfigFile(const Path& basePath, const std::string& appName, const std::string& extension, Poco::Path& path) const;
 
-	typedef LayeredConfiguration::Ptr ConfigPtr;
-	typedef Poco::Logger::Ptr LoggerPtr;
+	using ConfigPtr = LayeredConfiguration::Ptr;
+	using LoggerPtr = Poco::Logger::Ptr;
 
 	ConfigPtr       _pConfig;
 	SubsystemVec    _subsystems;
@@ -402,9 +439,10 @@ private:
 	ArgVec          _unprocessedArgs;
 	OptionSet       _options;
 	bool            _unixOptions;
-	Logger*           _pLogger;
+	Logger*         _pLogger;
 	Poco::Timestamp _startTime;
 	bool            _stopOptionsProcessing;
+	bool            _ignoreUnknownOptions;
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	std::string _workingDirAtLaunch;
@@ -413,9 +451,6 @@ private:
 	static Application* _pInstance;
 
 	friend class LoggingSubsystem;
-
-	Application(const Application&);
-	Application& operator = (const Application&);
 };
 
 
@@ -433,15 +468,50 @@ template <class C> C& Application::getSubsystem() const
 	throw Poco::NotFoundException("The subsystem has not been registered", typeid(C).name());
 }
 
+
 inline Application::SubsystemVec& Application::subsystems()
 {
 	return _subsystems;
 }
 
 
+inline void Application::setUnixOptions(bool flag)
+{
+	_unixOptions = flag;
+}
+
+
+inline void Application::stopOptionsProcessing()
+{
+	_stopOptionsProcessing = true;
+}
+
+
+inline void Application::ignoreUnknownOptions()
+{
+	_ignoreUnknownOptions = true;
+}
+
+
 inline bool Application::initialized() const
 {
 	return _initialized;
+}
+
+
+inline Poco::Path Application::getApplicationPath() const
+{
+	Poco::Path path;
+	getApplicationPath(path);
+	return path;
+}
+
+
+inline Poco::Path Application::getApplicationDirectory() const
+{
+	Poco::Path path;
+	getApplicationDirectory(path);
+	return path;
 }
 
 
@@ -476,6 +546,12 @@ inline const OptionSet& Application::options() const
 }
 
 
+inline bool Application::exists()
+{
+	return _pInstance != nullptr;
+}
+
+
 inline Application& Application::instance()
 {
 	poco_check_ptr (_pInstance);
@@ -492,13 +568,11 @@ inline const Poco::Timestamp& Application::startTime() const
 inline Poco::Timespan Application::uptime() const
 {
 	Poco::Timestamp now;
-	Poco::Timespan uptime = now - _startTime;
-
-	return uptime;
+	return now - _startTime;
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 //

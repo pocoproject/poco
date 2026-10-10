@@ -18,12 +18,11 @@
 #include "CppUnit/TestCase.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 class Session;
 
-} }
+} // namespace Poco::Data
 
 
 class SQLiteTest: public CppUnit::TestCase
@@ -100,14 +99,18 @@ public:
 	void testTupleVector9();
 	void testTuple10();
 	void testTupleVector10();
+	void testStdTuple();
 
 	void testDateTime();
+	void testDateTimeVariants();
 
 	void testUUID();
 
 	void testInternalExtraction();
 	void testPrimaryKeyConstraint();
+	void testOptional();
 	void testNullable();
+	void testNullableVector();
 	void testNulls();
 	void testRowIterator();
 	void testAsync();
@@ -132,19 +135,26 @@ public:
 	void testRollbackCallback();
 	void testNotifier();
 
-	void testSessionTransaction();
+	void testSessionTransactionReadCommitted();
+	void testSessionTransactionReadUncommitted();
+	void testSessionTransactionSerializable();
+	void testSessionTransactionRepeatableRead();
 	void testTransaction();
 	void testTransactor();
 
-	void testFTS3();
+	void testFTS();
+	void testVec();
 
 	void testIllegalFilePath();
 	void testTransactionTypeProperty();
 
+	void testRecordsetCopyMove();
+	void testAddBindingReuse();
+
 	void setUp();
 	void tearDown();
 
-	static void sqliteUpdateCallbackFn(void*, int, const char*, const char*, Poco::Int64);
+	static void sqliteUpdateCallbackFn(void*, int, const char*, const char*, long long);
 	static int sqliteCommitCallbackFn(void*);
 	static void sqliteRollbackCallbackFn(void*);
 

@@ -122,7 +122,7 @@ SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession,
 	CppUnit::TestCase(name),
 	_pSession(pSession),
 	_pEncSession(pEncSession),
-	_dataExecutor("Poco::Data SQL Executor", pSession, pEncSession)
+	_dataExecutor(name, pSession, pEncSession)
 {
 }
 
@@ -155,12 +155,12 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 	const std::string& blobPlaceholder)
 {
 	SQLRETURN rc;
-	SQLHENV henv = SQL_NULL_HENV;
-	SQLHDBC hdbc = SQL_NULL_HDBC;
-	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+	SQLHENV henv = POCO_ODBC_NULL_HENV;
+	SQLHDBC hdbc = POCO_ODBC_NULL_HDBC;
+	SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
 
 	// Environment begin
-	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+	rc = SQLAllocHandle(SQL_HANDLE_ENV, POCO_ODBC_NULL_HANDLE, &henv);
 	poco_odbc_check_env (rc, henv);
 	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
 	poco_odbc_check_env (rc, henv);
@@ -172,7 +172,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 		SQLCHAR connectOutput[1024] = {0};
 		SQLSMALLINT result;
 		rc = SQLDriverConnect(hdbc
-			, NULL
+			, nullptr
 			,(SQLCHAR*) dbConnString.c_str()
 			,(SQLSMALLINT) SQL_NTS
 			, connectOutput
@@ -307,7 +307,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				0,
 				(SQLPOINTER) &fourth,
 				0,
-				0);
+				nullptr);
 			poco_odbc_check_stmt (rc, hstmt);
 
 			rc = SQLBindParameter(hstmt,
@@ -319,7 +319,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				1,
 				(SQLPOINTER) &fifth,
 				0,
-				0);
+				nullptr);
 			poco_odbc_check_stmt (rc, hstmt);
 
 			if (dateTimeColSize == 0 || dateTimeDecDigits == -1)
@@ -354,7 +354,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				dateTimeDecDigits,
 				(SQLPOINTER) &sixth,
 				0,
-				0);
+				nullptr);
 			poco_odbc_check_stmt (rc, hstmt);
 
 			rc = SQLExecute(hstmt);
@@ -362,7 +362,7 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 
 			if (SQL_NEED_DATA == rc)
 			{
-				SQLPOINTER pParam = 0;
+				SQLPOINTER pParam = nullptr;
 				while (SQL_NEED_DATA == (rc = SQLParamData(hstmt, &pParam)))
 				{
 					SQLINTEGER dataSize = 0;
@@ -547,7 +547,8 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				}
 				else
 				{
-					assertTrue (59 == sixth.second);
+					// Some drivers round up (59), others truncate (58)
+					assertTrue (58 == sixth.second || 59 == sixth.second);
 				}
 			}
 
@@ -583,12 +584,12 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 	const std::string& procCreateString)
 {
 	SQLRETURN rc;
-	SQLHENV henv = SQL_NULL_HENV;
-	SQLHDBC hdbc = SQL_NULL_HDBC;
-	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+	SQLHENV henv = POCO_ODBC_NULL_HENV;
+	SQLHDBC hdbc = POCO_ODBC_NULL_HDBC;
+	SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
 
 	// Environment begin
-	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+	rc = SQLAllocHandle(SQL_HANDLE_ENV, POCO_ODBC_NULL_HANDLE, &henv);
 	poco_odbc_check_stmt (rc, hstmt);
 	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
 	poco_odbc_check_stmt (rc, hstmt);
@@ -600,7 +601,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 		SQLCHAR connectOutput[512] = {0};
 		SQLSMALLINT result;
 		rc = SQLDriverConnect(hdbc
-			, NULL
+			, nullptr
 			,(SQLCHAR*) dbConnString.c_str()
 			,(SQLSMALLINT) SQL_NTS
 			, connectOutput
@@ -770,7 +771,7 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 
 				assertTrue (one++ == chr[0]);
 				assertTrue (two++ == second);
-				assertTrue (three == third);
+				assertTrue (std::fabs(three - third) < 1e-6f);
 				three += 1.0;
 
 				++count;
@@ -805,12 +806,12 @@ void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
 	SQLExecutor::DataExtraction extractMode)
 {
 	SQLRETURN rc;
-	SQLHENV henv = SQL_NULL_HENV;
-	SQLHDBC hdbc = SQL_NULL_HDBC;
-	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+	SQLHENV henv = POCO_ODBC_NULL_HENV;
+	SQLHDBC hdbc = POCO_ODBC_NULL_HDBC;
+	SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
 
 	// Environment begin
-	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+	rc = SQLAllocHandle(SQL_HANDLE_ENV, POCO_ODBC_NULL_HANDLE, &henv);
 	poco_odbc_check_env(rc, henv);
 	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
 	poco_odbc_check_env(rc, henv);
@@ -822,7 +823,7 @@ void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
 	SQLCHAR connectOutput[1024] = { 0 };
 	SQLSMALLINT result;
 	rc = SQLDriverConnect(hdbc
-		, NULL
+		, nullptr
 		, (SQLCHAR*)dbConnString.c_str()
 		, (SQLSMALLINT)SQL_NTS
 		, connectOutput
@@ -944,14 +945,14 @@ void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
 
 		if (SQL_NEED_DATA == rc)
 		{
-			SQLPOINTER pParam = 0;
+			SQLPOINTER pParam = nullptr;
 			while (SQL_NEED_DATA == (rc = SQLParamData(hstmt, &pParam)))
 			{
 				if ((pParam != (SQLPOINTER)retVal) &&
 					(pParam != (SQLPOINTER)inParam) &&
 					(pParam != (SQLPOINTER)outParam))
 				{
-					fail("Parameter mismatch.");
+					failmsg("Parameter mismatch.");
 				}
 
 				assertTrue(0 != (SQLINTEGER)size);
@@ -986,8 +987,8 @@ void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
 void SQLExecutor::execute(const std::string& sql)
 {
 	try { session() << sql, now;  }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (sql); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (sql); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; failmsg (sql); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; failmsg (sql); }
 }
 
 
@@ -996,9 +997,9 @@ void SQLExecutor::connection(const std::string& connectString)
 	std::cout << connectString << std::endl;
 	Poco::Data::ODBC::Connection c;
 	try { _dataExecutor.connection(c, connectString); }
-	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail (connectString, __LINE__, __FILE__); }
-	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail (connectString, __LINE__, __FILE__); }
-	catch(Poco::Exception& se){ std::cout << se.displayText() << std::endl; fail (connectString, __LINE__, __FILE__); }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; failmsg (connectString); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; failmsg (connectString); }
+	catch(Poco::Exception& se){ std::cout << se.displayText() << std::endl; failmsg (connectString); }
 }
 
 
@@ -1020,7 +1021,7 @@ void SQLExecutor::session(const std::string& connectString, int timeout)
 	Poco::Any any = s.getProperty("handle");
 	assertTrue (typeid(SQLHDBC) == any.type());
 	SQLHDBC hdbc = Poco::AnyCast<SQLHDBC>(any);
-	assertTrue (SQL_NULL_HDBC != hdbc);
+	assertTrue (POCO_ODBC_NULL_HDBC != hdbc);
 	SQLRETURN rc = SQLDisconnect(hdbc);
 	assertTrue (!Utility::isError(rc));
 	assertTrue (!s.isConnected());
@@ -1047,7 +1048,7 @@ void SQLExecutor::notNulls(const std::vector<std::string>& sqlStates)
 	try
 	{
 		session() << "INSERT INTO NullTest (i,r,v) VALUES (?,?,?)", use(null), use(null), use(null), now;
-		fail ("must fail");
+		failmsg ("must failmsg");
 	} catch (StatementException& se)
 	{
 		//double check if we're failing for the right reason

@@ -15,8 +15,7 @@
 #include "Poco/Zip/ParseCallback.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 ParseCallback::ParseCallback()
@@ -29,4 +28,4 @@ ParseCallback::~ParseCallback()
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

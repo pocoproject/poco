@@ -5,7 +5,7 @@
 // Package: Application
 // Module:  LoggingSubsystem
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -16,24 +16,20 @@
 #include "Poco/Util/LoggingConfigurator.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Logger.h"
+#include "Poco/LoggingRegistry.h"
 
 
 using Poco::Logger;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
-LoggingSubsystem::LoggingSubsystem()
-{
-}
+LoggingSubsystem::LoggingSubsystem() = default;
 
 
-LoggingSubsystem::~LoggingSubsystem()
-{
-}
+LoggingSubsystem::~LoggingSubsystem() = default;
 
 
 const char* LoggingSubsystem::name() const
@@ -53,7 +49,9 @@ void LoggingSubsystem::initialize(Application& app)
 
 void LoggingSubsystem::uninitialize()
 {
+	Logger::shutdown();
+	LoggingRegistry::defaultRegistry().clear();
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

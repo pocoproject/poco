@@ -21,8 +21,7 @@ using Poco::BufferedBidirectionalStreamBuf;
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -47,15 +46,15 @@ SocketStreamBuf::~SocketStreamBuf()
 }
 
 
-int SocketStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize SocketStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
-	return _pImpl->receiveBytes(buffer, (int) length);
+	return _pImpl->receiveBytes(buffer, static_cast<int>(length));
 }
 
 
-int SocketStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize SocketStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
-	return _pImpl->sendBytes(buffer, (int) length);
+	return _pImpl->sendBytes(buffer, static_cast<int>(length));
 }
 
 
@@ -153,4 +152,4 @@ SocketStream::~SocketStream()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -21,8 +21,7 @@
 #include "Poco/Net/Net.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -83,13 +82,13 @@ public:
 	void setBearerToken(const std::string& bearerToken);
 		/// Sets the bearer token.
 
-	const std::string& getBearerToken() const;
+	[[nodiscard]] const std::string& getBearerToken() const;
 		/// Returns the bearer token.
 
 	void setScheme(const std::string& scheme);
 		/// Sets the Authorization header scheme.
 
-	const std::string& getScheme() const;
+	[[nodiscard]] const std::string& getScheme() const;
 		/// Returns the Authorization header scheme.
 
 	void authenticate(HTTPRequest& request);
@@ -126,7 +125,7 @@ inline const std::string& OAuth20Credentials::getScheme() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_OAuth20Credentials_INCLUDED

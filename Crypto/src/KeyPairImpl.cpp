@@ -16,8 +16,7 @@
 #include "Poco/Crypto/KeyPairImpl.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 KeyPairImpl::KeyPairImpl(const std::string& name, Type type):
@@ -32,4 +31,4 @@ KeyPairImpl::~KeyPairImpl()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

@@ -1,23 +1,14 @@
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
+if(POCO_DATA_NO_SQL_PARSER)
+	list(REMOVE_ITEM SRCS_G "${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryDB.cpp")
+	list(REMOVE_ITEM SRCS_G "${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryDBInspector.cpp")
+endif()
 POCO_SOURCES_AUTO(SQLITE_SRCS ${SRCS_G})
 
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SQLITE_SRCS ${HDRS_G})
-
-if(POCO_UNBUNDLED)
-	find_package(SQLite3 REQUIRED)
-else()
-	# sqlite3
-	POCO_SOURCES(SQLITE_SRCS sqlite3
-		src/sqlite3.c
-	)
-
-	POCO_HEADERS(SQLITE_SRCS sqlite3
-		src/sqlite3.h
-	)
-endif()
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
@@ -26,6 +17,25 @@ if(MSVC AND BUILD_SHARED_LIBS)
 endif()
 
 add_library(DataSQLite ${SQLITE_SRCS})
+if (POCO_UNBUNDLED)
+	target_link_libraries(DataSQLite PRIVATE SQLite::SQLite3)
+	target_compile_definitions(DataSQLite PUBLIC POCO_SQLITE_UNBUNDLED)
+else()
+	target_link_libraries(DataSQLite PRIVATE "$<BUILD_LOCAL_INTERFACE:SQLite::SQLite3>")
+endif()
+
+if(ENABLE_DATA_SQLITE_VEC)
+	target_link_libraries(DataSQLite PRIVATE "$<BUILD_LOCAL_INTERFACE:SQLiteVec::SQLiteVec>")
+	target_compile_definitions(DataSQLite PUBLIC POCO_ENABLE_SQLITE_VEC)
+endif()
+
+# The bundled sqlite3 object library carries SQLITE_ENABLE_FTS5 PUBLIC, but is
+# linked through $<BUILD_LOCAL_INTERFACE:...> PRIVATE, so the define would never
+# reach consumers (e.g. the testsuite's testFTS guard). Re-export it here, like
+# POCO_ENABLE_SQLITE_VEC above, so consumers can detect FTS5 availability.
+if(ENABLE_DATA_SQLITE_FTS5 AND NOT POCO_SQLITE_UNBUNDLED)
+	target_compile_definitions(DataSQLite PUBLIC SQLITE_ENABLE_FTS5)
+endif()
 
 add_library(Poco::DataSQLite ALIAS DataSQLite)
 set_target_properties(DataSQLite
@@ -42,26 +52,16 @@ target_include_directories(DataSQLite
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-if(POCO_UNBUNDLED)
-		target_link_libraries(DataSQLite PUBLIC SQLite::SQLite3)
-	target_compile_definitions(DataSQLite PUBLIC
-		POCO_UNBUNDLED
-		SQLITE_THREADSAFE=1
-)
-else()
-	target_compile_definitions(DataSQLite PRIVATE
-		SQLITE_THREADSAFE=1
-		SQLITE_DISABLE_LFS
-		SQLITE_OMIT_UTF16
-		SQLITE_OMIT_PROGRESS_CALLBACK
-		SQLITE_OMIT_COMPLETE
-		SQLITE_OMIT_TCL_VARIABLE
-		SQLITE_OMIT_DEPRECATED
+# MemoryDB.cpp #includes "SQLParser.h" / "sql/..." headers from the bundled
+# parser. Mirror Data/CMakeLists.txt's PRIVATE include of Data/SQLParser so
+# the cmake build resolves them the same way the gnu-make build does (via
+# Data/SQLite/Makefile's target_includes under the same SQL-parser guard).
+if(NOT POCO_DATA_NO_SQL_PARSER)
+	target_include_directories(DataSQLite
+		PRIVATE
+			${PROJECT_SOURCE_DIR}/Data/SQLParser/src
+			${PROJECT_SOURCE_DIR}/Data/SQLParser
 	)
-	option(ENABLE_DATA_SQLITE_FTS5 "Enable SQLite FTS5 Extension" OFF)
-	if(ENABLE_DATA_SQLITE_FTS5)
-		target_compile_definitions(DataSQLite PRIVATE SQLITE_ENABLE_FTS5)
-	endif()
 endif()
 
 POCO_INSTALL(DataSQLite)

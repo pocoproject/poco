@@ -26,8 +26,7 @@
 #include "Poco/Timespan.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPServerSession: public HTTPSession
@@ -42,16 +41,16 @@ public:
 	virtual ~HTTPServerSession();
 		/// Destroys the HTTPServerSession.
 
-	bool hasMoreRequests();
+	[[nodiscard]] bool hasMoreRequests();
 		/// Returns true if there are requests available.
 
-	bool canKeepAlive() const;
+	[[nodiscard]] bool canKeepAlive() const;
 		/// Returns true if the session can be kept alive.
 
-	SocketAddress clientAddress();
+	[[nodiscard]] SocketAddress clientAddress();
 		/// Returns the client's address.
 
-	SocketAddress serverAddress();
+	[[nodiscard]] SocketAddress serverAddress();
 		/// Returns the server's address.
 
 private:
@@ -70,7 +69,7 @@ inline bool HTTPServerSession::canKeepAlive() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerSession_INCLUDED

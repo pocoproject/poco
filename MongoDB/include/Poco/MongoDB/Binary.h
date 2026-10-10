@@ -7,7 +7,7 @@
 //
 // Definition of the Binary class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -20,16 +20,11 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
-#include "Poco/Base64Encoder.h"
 #include "Poco/Buffer.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/MemoryStream.h"
 #include "Poco/UUID.h"
-#include <sstream>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API Binary
@@ -40,6 +35,19 @@ class MongoDB_API Binary
 public:
 	using Ptr = SharedPtr<Binary>;
 
+	/// BSON Binary subtypes
+	enum Subtype
+	{
+		SUBTYPE_GENERIC      = 0x00,  /// Generic binary data
+		SUBTYPE_FUNCTION     = 0x01,  /// Function
+		SUBTYPE_BINARY_OLD   = 0x02,  /// Binary (Old)
+		SUBTYPE_UUID_OLD     = 0x03,  /// UUID (Old)
+		SUBTYPE_UUID         = 0x04,  /// UUID
+		SUBTYPE_MD5          = 0x05,  /// MD5
+		SUBTYPE_ENCRYPTED    = 0x06,  /// Encrypted BSON value
+		SUBTYPE_USER_DEFINED = 0x80   /// User defined (start of range)
+	};
+
 	Binary();
 		/// Creates an empty Binary with subtype 0.
 
@@ -49,31 +57,40 @@ public:
 	Binary(const UUID& uuid);
 		/// Creates a Binary containing an UUID.
 
+	Binary(const char* data, unsigned char subtype = 0);
+		/// Creates a Binary with the contents of the given C-string and the given subtype.
+
 	Binary(const std::string& data, unsigned char subtype = 0);
 		/// Creates a Binary with the contents of the given string and the given subtype.
 
-	Binary(const void* data, Poco::Int32 size, unsigned char subtype = 0);
+	Binary(const void* data, Poco::Int32 size, unsigned char subtype);
 		/// Creates a Binary with the contents of the given buffer and the given subtype.
 
 	virtual ~Binary();
 		/// Destroys the Binary.
 
+	const Buffer<unsigned char>& buffer() const;
+		/// Returns a reference to the internal buffer
+
 	Buffer<unsigned char>& buffer();
 		/// Returns a reference to the internal buffer
 
-	unsigned char subtype() const;
+	[[nodiscard]] unsigned char subtype() const;
 		/// Returns the subtype.
 
 	void subtype(unsigned char type);
 		/// Sets the subtype.
 
-	std::string toString(int indent = 0) const;
-		/// Returns the contents of the Binary as Base64-encoded string.
+	[[nodiscard]] std::string toString(int indent = 0) const;
+		/// Returns the contents of the Binary as a string.
+		/// For UUID subtype (SUBTYPE_UUID), returns a formatted UUID string
+		/// wrapped in UUID() (e.g., UUID("550e8400-e29b-41d4-a716-446655440000")).
+		/// For other subtypes, returns Base64-encoded data.
 
-	std::string toRawString() const;
+	[[nodiscard]] std::string toRawString() const;
 		/// Returns the raw content of the Binary as a string.
 
-	UUID uuid() const;
+	[[nodiscard]] UUID uuid() const;
 		/// Returns the UUID when the binary subtype is 0x04.
 		/// Otherwise, throws a Poco::BadCastException.
 
@@ -98,6 +115,12 @@ inline void Binary::subtype(unsigned char type)
 }
 
 
+inline const Buffer<unsigned char>& Binary::buffer() const
+{
+	return _buffer;
+}
+
+
 inline Buffer<unsigned char>& Binary::buffer()
 {
 	return _buffer;
@@ -106,7 +129,7 @@ inline Buffer<unsigned char>& Binary::buffer()
 
 inline std::string Binary::toRawString() const
 {
-	return std::string(reinterpret_cast<const char*>(_buffer.begin()), _buffer.size());
+	return {reinterpret_cast<const char*>(_buffer.begin()), _buffer.size()};
 }
 
 
@@ -119,37 +142,51 @@ struct ElementTraits<Binary::Ptr>
 
 	static std::string toString(const Binary::Ptr& value, int indent = 0)
 	{
-		return value.isNull() ? "" : value->toString();
+		return value.isNull() ? R"("<null>")" : value->toString();
 	}
 };
+
+
+inline Binary::Ptr BSONReader::readBinary(Int32& available)
+{
+	need(5, available, "binary header");
+	Int32 size = 0;
+	unsigned char subtype = 0;
+	_reader >> size >> subtype;
+	checkStream();
+	available -= 5;
+	if (size < 0)
+		throw DataFormatException("Invalid BSON binary size: " + std::to_string(size));
+	need(size, available, "binary");
+	Binary::Ptr binary = new Binary(size, subtype);
+	if (size > 0)
+	{
+		_reader.readRaw(reinterpret_cast<char*>(binary->buffer().begin()), size);
+		checkStream();
+	}
+	available -= size;
+	return binary;
+}
 
 
 template<>
 inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 {
-	Poco::Int32 size;
-	_reader >> size;
-
-	to->buffer().resize(size);
-
-	unsigned char subtype;
-	_reader >> subtype;
-	to->subtype(subtype);
-
-	_reader.readRaw((char*) to->buffer().begin(), size);
+	Int32 available = MAX_MESSAGE_SIZE_BYTES;
+	to = readBinary(available);
 }
 
 
 template<>
-inline void BSONWriter::write<Binary::Ptr>(Binary::Ptr& from)
+inline void BSONWriter::write<Binary::Ptr>(const Binary::Ptr& from)
 {
-	_writer << (Poco::Int32) from->buffer().size();
+	_writer << static_cast<Poco::Int32>(from->buffer().size());
 	_writer << from->subtype();
-	_writer.writeRaw((char*) from->buffer().begin(), from->buffer().size());
+	_writer.writeRaw(reinterpret_cast<const char*>(from->buffer().begin()), from->buffer().size());
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Binary_INCLUDED

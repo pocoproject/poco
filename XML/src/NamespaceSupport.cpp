@@ -16,8 +16,7 @@
 #include "Poco/XML/Name.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString NamespaceSupport::EMPTY_STRING;
@@ -184,4 +183,4 @@ void NamespaceSupport::reset()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

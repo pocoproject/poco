@@ -23,6 +23,8 @@ enum ExprType {
   kExprLiteralInterval,
   kExprStar,
   kExprParameter,
+  kExprParameterDollar,
+  kExprParameterNamed,
   kExprColumnRef,
   kExprFunctionRef,
   kExprOperator,
@@ -71,7 +73,15 @@ enum OperatorType {
   kOpNot,
   kOpUnaryMinus,
   kOpIsNull,
-  kOpExists
+  kOpExists,
+
+  // Oracle's legacy outer join marker, e.g. WHERE a.id (+) = b.id. Marks the
+  // operand it follows as the null-extended side of the join.
+  kOpOuterJoin,
+
+  // Oracle's PRIOR, used in the CONNECT BY clause of a hierarchical query to
+  // refer to the parent row, e.g. CONNECT BY PRIOR id = parent_id.
+  kOpPrior
 };
 
 enum DatetimeField {
@@ -133,6 +143,7 @@ struct SQLParser_API Expr {
   SelectStatement* select;
   char* name;
   char* table;
+  char* schema;
   char* alias;
   double fval;
   int64_t ival;
@@ -145,6 +156,11 @@ struct SQLParser_API Expr {
   bool distinct;
 
   WindowDescription* windowDescription;
+
+  // Set for ordered-set aggregates, e.g. LISTAGG(x, ',') WITHIN GROUP (ORDER BY y).
+  // Holds the WITHIN GROUP sort order, which is part of the aggregate itself and
+  // not a window frame - hence separate from windowDescription.
+  std::vector<OrderDescription*>* withinGroupOrder;
 
   // Convenience accessor methods.
 
@@ -200,11 +216,17 @@ struct SQLParser_API Expr {
 
   static Expr* makeFunctionRef(char* func_name, std::vector<Expr*>* exprList, bool distinct, WindowDescription* window);
 
+  static Expr* makeFunctionRef(char* func_name, char* schema, std::vector<Expr*>* exprList, bool distinct, WindowDescription* window);
+
   static Expr* makeArray(std::vector<Expr*>* exprList);
 
   static Expr* makeArrayIndex(Expr* expr, int64_t index);
 
   static Expr* makeParameter(int id);
+
+  static Expr* makeDollarParameter(int64_t n);
+
+  static Expr* makeNamedParameter(char* name);
 
   static Expr* makeSelect(SelectStatement* select);
 
@@ -229,7 +251,7 @@ struct SQLParser_API Expr {
     Expr zero = {type};               \
     var = (Expr*)malloc(sizeof *var); \
     *var = zero;                      \
-  } while (0);
+  } while (false);
 #undef ALLOC_EXPR
 
 }  // namespace hsql

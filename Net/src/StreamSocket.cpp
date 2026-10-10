@@ -24,8 +24,7 @@ using Poco::Mutex;
 using Poco::ScopedLock;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 StreamSocket::StreamSocket(): Socket(new StreamSocketImpl)
@@ -146,15 +145,15 @@ void StreamSocket::shutdownReceive()
 }
 
 
-void StreamSocket::shutdownSend()
+int StreamSocket::shutdownSend()
 {
-	impl()->shutdownSend();
+	return impl()->shutdownSend();
 }
 
 
-void StreamSocket::shutdown()
+int StreamSocket::shutdown()
 {
-	impl()->shutdown();
+	return impl()->shutdown();
 }
 
 
@@ -213,9 +212,11 @@ void StreamSocket::sendUrgent(unsigned char data)
 	impl()->sendUrgent(data);
 }
 
-Poco::Int64 StreamSocket::sendFile(FileInputStream &fileInputStream, Poco::UInt64 offset)
+
+std::streamsize StreamSocket::sendFile(Poco::FileInputStream& fileInputStream, std::streamoff offset, std::streamsize count)
 {
-	return impl()->sendFile(fileInputStream, offset);
+	return impl()->sendFile(fileInputStream, offset, count);
 }
 
-} } // namespace Poco::Net
+
+} // namespace Poco::Net

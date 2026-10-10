@@ -24,8 +24,7 @@
 #include "Poco/Net/ServerSocket.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Registry;
@@ -36,7 +35,7 @@ class Prometheus_API MetricsServer
 	/// requests, based on Poco::Net::HTTPServer.
 {
 public:
-	static const Poco::UInt16 DEFAULT_PORT; /// 9100
+	static constexpr Poco::UInt16 DEFAULT_PORT = 9100;
 	static const std::string DEFAULT_PATH;  /// "/metrics"
 
 	MetricsServer(Poco::UInt16 port = DEFAULT_PORT, const std::string& path = DEFAULT_PATH);
@@ -52,7 +51,7 @@ public:
 		/// on the server socket (which can be a properly configured Poco::Net::SecureServerSocket
 		/// to enable HTTPS), and the given path.
 
-	~MetricsServer() = default;
+	~MetricsServer();
 		/// Destroys the HTTPServer.
 
 	void start();
@@ -74,7 +73,7 @@ private:
 };
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_MetricsServer_INCLUDED

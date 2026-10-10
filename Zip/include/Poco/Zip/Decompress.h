@@ -22,11 +22,10 @@
 #include "Poco/Zip/ParseCallback.h"
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/Path.h"
-#include "Poco/FIFOEvent.h"
+#include "Poco/BasicEvent.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class ZipArchive;
@@ -39,10 +38,10 @@ public:
 	using ZipMapping = std::map<std::string, Poco::Path>;
 		/// Maps key of FileInfo entries to their local decompressed representation
 
-	Poco::FIFOEvent<std::pair<const ZipLocalFileHeader, const std::string>> EError;
+	Poco::BasicEvent<std::pair<const ZipLocalFileHeader, const std::string>> EError;
 		/// Thrown whenever an error is detected when handling a ZipLocalFileHeader entry. The string contains an error message
 
-	Poco::FIFOEvent<std::pair<const ZipLocalFileHeader, const Poco::Path>> EOk;
+	Poco::BasicEvent<std::pair<const ZipLocalFileHeader, const Poco::Path>> EOk;
 		/// Thrown whenever a file was successfully decompressed
 
 	Decompress(std::istream& in, const Poco::Path& outputDir, bool flattenDirs = false, bool keepIncompleteFiles = false);
@@ -52,16 +51,17 @@ public:
 		/// If flattenDirs is set to true, the directory structure of the zip file is not recreated.
 		/// Instead, all files are extracted into one single directory.
 
-	~Decompress();
+	~Decompress() override;
 		/// Destroys the Decompress.
 
-	ZipArchive decompressAllFiles();
+	ZipArchive decompressAllFiles(const bool checkConsistency = true);
 		/// Decompresses all files stored in the zip File. Can only be called once per Decompress object.
 		/// Use mapping to retrieve the location of the decompressed files
+		/// if checkConsistency is set to false, archive won't be checked for consistency before decompression
 
-	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr);
+	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr) override;
 
-	const ZipMapping& mapping() const;
+	[[nodiscard]] const ZipMapping& mapping() const;
 		/// A ZipMapping stores as key the full name of the ZipFileInfo/ZipLocalFileHeader and as value the decompressed file
 		/// If for a ZipFileInfo no mapping exists, there was an error during decompression and the entry is considered to be corrupt
 
@@ -86,7 +86,7 @@ inline const Decompress::ZipMapping& Decompress::mapping() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_Decompress_INCLUDED

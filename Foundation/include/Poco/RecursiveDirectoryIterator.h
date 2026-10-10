@@ -60,7 +60,7 @@ class RecursiveDirectoryIterator
 	/// parameter maxDepth (which sets the infinite depth by default).
 {
 public:
-	typedef RecursiveDirectoryIterator<TTravStr> MyType;
+	using MyType = RecursiveDirectoryIterator<TTravStr>;
 
 	enum
 	{
@@ -69,7 +69,7 @@ public:
 
 	RecursiveDirectoryIterator()
 		/// Creates the end iterator.
-		: _pImpl(0)
+		: _pImpl(nullptr)
 	{
 	}
 
@@ -111,25 +111,25 @@ public:
 			_pImpl->release();
 	}
 
-	const std::string& name() const
+	[[nodiscard]] const std::string& name() const
 		/// Returns the current filename.
 	{
 		return _path.getFileName();
 	}
 
-	const Poco::Path& path() const
+	[[nodiscard]] const Poco::Path& path() const
 		/// Returns the current path.
 	{
 		return _path;
 	}
 
-	UInt16 depth() const
+	[[nodiscard]] UInt16 depth() const
 		/// Depth of recursion (counting from 1).
 	{
 		return _pImpl->depth();
 	}
 
-	UInt16 maxDepth() const
+	[[nodiscard]] UInt16 maxDepth() const
 		/// Max depth of recursion (counting from 1).
 	{
 		return _pImpl->maxDepth();
@@ -217,7 +217,7 @@ public:
 	friend inline bool operator !=(const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b);
 
 private:
-	typedef RecursiveDirectoryIteratorImpl<TTravStr> ImplType;
+	using ImplType = RecursiveDirectoryIteratorImpl<TTravStr>;
 
 	ImplType* _pImpl;
 	Path _path;
@@ -228,14 +228,14 @@ private:
 //
 // friend comparsion operators
 //
-template<class T1, class T2>
-inline bool operator ==(const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)
+template <class T1, class T2>
+[[nodiscard]] inline bool operator == (const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)
 {
 	return a.path().toString() == b.path().toString();;
 }
 
-template<class T1, class T2>
-inline bool operator !=(const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)
+template <class T1, class T2>
+[[nodiscard]] inline bool operator != (const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)
 {
 	return a.path().toString() != b.path().toString();;
 }
@@ -244,9 +244,8 @@ inline bool operator !=(const RecursiveDirectoryIterator<T1>& a, const Recursive
 //
 // typedefs
 //
-typedef RecursiveDirectoryIterator<ChildrenFirstTraverse> SimpleRecursiveDirectoryIterator;
-typedef RecursiveDirectoryIterator<SiblingsFirstTraverse> SiblingsFirstRecursiveDirectoryIterator;
-
+using SimpleRecursiveDirectoryIterator = RecursiveDirectoryIterator<ChildrenFirstTraverse>;
+using SiblingsFirstRecursiveDirectoryIterator = RecursiveDirectoryIterator<SiblingsFirstTraverse>;
 
 } // namespace Poco
 

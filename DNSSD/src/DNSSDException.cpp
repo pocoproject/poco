@@ -18,11 +18,10 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 POCO_IMPLEMENT_EXCEPTION(DNSSDException, Poco::RuntimeException, "DNSSD Exception")
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

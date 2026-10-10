@@ -26,8 +26,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <class ServiceHandler, class SR>
@@ -45,14 +44,14 @@ class ParallelSocketAcceptor
 {
 public:
 	using ParallelReactor = Poco::Net::ParallelSocketReactor<SR>;
-	using Observer = Poco::Observer<ParallelSocketAcceptor, ReadableNotification>;
+	using Observer = Poco::NObserver<ParallelSocketAcceptor, ReadableNotification>;
 
 	explicit ParallelSocketAcceptor(ServerSocket& socket,
 		unsigned threads = Poco::Environment::processorCount(),
 		const std::string& threadName = ""):
 		_threadName(threadName),
 		_socket(socket),
-		_pReactor(0),
+		_pReactor(nullptr),
 		_threads(threads),
 		_next(0)
 		/// Creates a ParallelSocketAcceptor using the given ServerSocket,
@@ -93,6 +92,10 @@ public:
 		}
 	}
 
+	ParallelSocketAcceptor() = delete;
+	ParallelSocketAcceptor(const ParallelSocketAcceptor&) = delete;
+	ParallelSocketAcceptor& operator = (const ParallelSocketAcceptor&) = delete;
+
 	void setReactor(SocketReactor& reactor)
 		/// Sets the reactor for this acceptor.
 	{
@@ -130,17 +133,16 @@ public:
 		}
 	}
 
-	void onAccept(ReadableNotification* pNotification)
+	void onAccept(const AutoPtr<ReadableNotification>& pNotification)
 		/// Accepts connection and creates event handler.
 	{
-		pNotification->release();
 		StreamSocket sock = _socket.acceptConnection();
 		_pReactor->wakeUp();
-		createServiceHandler(sock);
+		(void) createServiceHandler(sock);
 	}
 
 protected:
-	typedef std::vector<typename ParallelReactor::Ptr> ReactorVec;
+	using ReactorVec = std::vector<typename ParallelReactor::Ptr>;
 
 	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
@@ -162,7 +164,7 @@ protected:
 		return new ServiceHandler(socket, *pReactor);
 	}
 
-	SocketReactor* reactor(const Socket& socket)
+	[[nodiscard]] SocketReactor* reactor(const Socket& socket)
 		/// Returns reactor where this socket is already registered
 		/// for polling, if found; otherwise returns null pointer.
 	{
@@ -172,10 +174,10 @@ protected:
 		{
 			if ((*it)->has(socket)) return it->get();
 		}
-		return 0;
+		return nullptr;
 	}
 
-	SocketReactor* reactor()
+	[[nodiscard]] SocketReactor* reactor()
 		/// Returns a pointer to the SocketReactor where
 		/// this SocketAcceptor is registered.
 		///
@@ -184,7 +186,7 @@ protected:
 		return _pReactor;
 	}
 
-	Socket& socket()
+	[[nodiscard]] Socket& socket()
 		/// Returns a reference to the SocketAcceptor's socket.
 	{
 		return _socket;
@@ -199,28 +201,25 @@ protected:
 			_reactors.push_back(new ParallelReactor(_threadName + "#" + std::to_string(i)));
 	}
 
-	ReactorVec& reactors()
+	[[nodiscard]] ReactorVec& reactors()
 		/// Returns reference to vector of reactors.
 	{
 		return _reactors;
 	}
 
-	SocketReactor* reactor(std::size_t idx)
+	[[nodiscard]] SocketReactor* reactor(std::size_t idx)
 		/// Returns reference to the reactor at position idx.
 	{
 		return _reactors.at(idx).get();
 	}
 
-	std::size_t next()
+	[[nodiscard]] std::size_t next()
 		/// Returns the next reactor index.
 	{
 		return _next;
 	}
 
 private:
-	ParallelSocketAcceptor();
-	ParallelSocketAcceptor(const ParallelSocketAcceptor&);
-	ParallelSocketAcceptor& operator = (const ParallelSocketAcceptor&);
 
 	std::string _threadName;
 		/// Name prefix of sub SocketReactor threads
@@ -232,7 +231,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ParallelSocketAcceptor_INCLUDED

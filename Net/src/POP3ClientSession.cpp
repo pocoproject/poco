@@ -28,8 +28,7 @@ using Poco::NumberFormatter;
 using Poco::StreamCopier;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class DialogStreamBuf: public Poco::UnbufferedStreamBuf
@@ -277,4 +276,4 @@ bool POP3ClientSession::isPositive(const std::string& response)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

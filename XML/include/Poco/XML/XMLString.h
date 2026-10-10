@@ -21,8 +21,7 @@
 #include "Poco/XML/XML.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 //
@@ -46,11 +45,11 @@ namespace XML {
 	using XMLChar = wchar_t;
 	using XMLString = std::wstring;
 
-	std::string fromXMLString(const XMLString& str);
+	[[nodiscard]] std::string fromXMLString(const XMLString& str);
 		/// Converts an XMLString into an UTF-8 encoded
 		/// string.
 
-	XMLString toXMLString(const std::string& str);
+	[[nodiscard]] XMLString toXMLString(const std::string& str);
 		/// Converts an UTF-8 encoded string into an
 		/// XMLString
 
@@ -66,12 +65,12 @@ namespace XML {
 	using XMLChar = char;
 	using XMLString = std::string;
 
-	inline const std::string& fromXMLString(const XMLString& str)
+	[[nodiscard]] inline const std::string& fromXMLString(const XMLString& str)
 	{
 		return str;
 	}
 
-	inline const XMLString& toXMLString(const std::string& str)
+	[[nodiscard]] inline const XMLString& toXMLString(const std::string& str)
 	{
 		return str;
 	}
@@ -81,7 +80,7 @@ namespace XML {
 #endif
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_XMLString_INCLUDED

@@ -21,8 +21,7 @@
 #include <deque>
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 Var::Var()
@@ -199,7 +198,7 @@ Var& Var::operator ++ ()
 }
 
 
-const Var Var::operator ++ (int)
+const Var Var::operator ++ ([[maybe_unused]] int n)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
@@ -219,7 +218,7 @@ Var& Var::operator -- ()
 }
 
 
-const Var Var::operator -- (int)
+const Var Var::operator -- ([[maybe_unused]] int n)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
@@ -622,11 +621,5 @@ std::string Var::toString(const Var& any)
 	return res;
 }
 
-/*
-Var& Var::structIndexOperator(VarHolderImpl<Struct<int>>* pStr, int n) const
-{
-	return pStr->operator[](n);
-}
-*/
+} // namespace Poco::Dynamic
 
-} } // namespace Poco::Dynamic

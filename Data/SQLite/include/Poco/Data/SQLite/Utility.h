@@ -34,9 +34,7 @@ extern "C"
 }
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Utility
@@ -56,6 +54,7 @@ public:
 
 	static const std::string SQLITE_DATE_FORMAT;
 	static const std::string SQLITE_TIME_FORMAT;
+	static const std::string SQLITE_DATETIME_FRAC_FORMAT;
 	typedef std::map<std::string, MetaColumn::ColumnDataType> TypeMap;
 
 	static const int THREAD_MODE_SINGLE;
@@ -66,19 +65,34 @@ public:
 	static const int OPERATION_DELETE;
 	static const int OPERATION_UPDATE;
 
-	static sqlite3* dbHandle(const Session& session);
+	[[nodiscard]] static sqlite3* dbHandle(const Session& session);
 		/// Returns native DB handle.
 
-	static std::string lastError(sqlite3* pDB);
+	static int setAttachedLimit(Session& session, int newVal);
+		/// Sets the per-connection limit on the number of databases that can
+		/// be attached simultaneously (SQLite's SQLITE_LIMIT_ATTACHED). Thin
+		/// wrapper over sqlite3_limit() so callers don't need the raw handle
+		/// or to pull <sqlite3.h> into their include path (and so the
+		/// underlying symbol doesn't need to be re-exported from
+		/// PocoDataSQLite on platforms whose static-lib link only sees
+		/// __declspec(dllexport) symbols).
+		///
+		/// Passing newVal < 0 leaves the limit unchanged and returns the
+		/// current value. The runtime limit cannot exceed
+		/// SQLITE_MAX_ATTACHED (compile-time constant, default 10, SQLite
+		/// hard ceiling 125); requests above the compile-time cap are
+		/// silently clamped to it by SQLite. Returns the previous value.
+
+	[[nodiscard]] static std::string lastError(sqlite3* pDB);
 		/// Retreives the last error code from sqlite and converts it to a string.
 
-	static std::string lastError(const Session& session);
+	[[nodiscard]] static std::string lastError(const Session& session);
 		/// Retreives the last error code from sqlite and converts it to a string.
 
 	static void throwException(sqlite3* pDB, int rc, const std::string& addErrMsg = std::string());
 		/// Throws for an error code the appropriate exception
 
-	static MetaColumn::ColumnDataType getColumnType(sqlite3_stmt* pStmt, std::size_t pos);
+	[[nodiscard]] static MetaColumn::ColumnDataType getColumnType(sqlite3_stmt* pStmt, std::size_t pos);
 		/// Returns column data type.
 
 	static bool fileToMemory(sqlite3* pInMemory, const std::string& fileName);
@@ -105,7 +119,7 @@ public:
 		///
 		/// Returns true if succesful.
 
-	static bool isThreadSafe();
+	[[nodiscard]] static bool isThreadSafe();
 		/// Returns true if SQLite was compiled in multi-thread or serialized mode.
 		/// See http://www.sqlite.org/c3ref/threadsafe.html for details.
 		///
@@ -117,11 +131,15 @@ public:
 		///
 		/// Returns true if succesful
 
-	static int getThreadMode();
+	[[nodiscard]] static int getThreadMode();
 		/// Returns the thread mode.
 
-	typedef void(*UpdateCallbackType)(void*, int, const char*, const char*, Poco::Int64);
-		/// Update callback function type.
+	typedef void(*UpdateCallbackType)(void*, int, const char*, const char*, long long);
+		/// Update callback function type. The row id parameter is long long to match
+		/// SQLite's sqlite3_int64 typedef exactly; calling the callback through a
+		/// function pointer of any other type (e.g. with Poco::Int64, which is long
+		/// on most 64-bit platforms) is undefined behavior even when the underlying
+		/// width agrees.
 
 	typedef int(*CommitCallbackType)(void*);
 		/// Commit callback function type.
@@ -148,7 +166,7 @@ public:
 		static CBMap retMap;
 		T* pRet = reinterpret_cast<T*>(eventHookRegister(pDB, callbackFn, pParam));
 
-		if (pRet == 0)
+		if (pRet == nullptr)
 		{
 			if (retMap.find(pDB) == retMap.end())
 			{
@@ -161,8 +179,8 @@ public:
 			CBMapItPair retMapRange = retMap.equal_range(pDB);
 			for (CBMapIt it = retMapRange.first; it != retMapRange.second; ++it)
 			{
-				poco_assert (it->second.first != 0);
-				if ((callbackFn == 0) && (*pRet == *it->second.second))
+				poco_assert (it->second.first != nullptr);
+				if ((callbackFn == nullptr) && (*pRet == *it->second.second))
 				{
 					retMap.erase(it);
 					return true;
@@ -208,8 +226,8 @@ private:
 		///
 		/// Column types are case-insensitive.
 
-	Utility(const Utility&);
-	Utility& operator = (const Utility&);
+	Utility(const Utility&) = delete;
+	Utility& operator = (const Utility&) = delete;
 
 	static void* eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam);
 	static void* eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam);
@@ -248,7 +266,7 @@ inline bool Utility::fileToMemory(const Session& session, const std::string& fil
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // SQLite_Utility_INCLUDED

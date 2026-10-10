@@ -22,8 +22,7 @@
 #include "Poco/CppParser/Decl.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API Variable: public Decl
@@ -44,23 +43,23 @@ public:
 	~Variable();
 		/// Destroys the Variable.
 
-	int flags() const;
+	[[nodiscard]] int flags() const;
 		/// Returns the variable's flags.
 
-	bool isPointer() const;
+	[[nodiscard]] bool isPointer() const;
 		/// Returns true iff the variable holds a pointer.
 
-	Symbol::Kind kind() const;
+	[[nodiscard]] Symbol::Kind kind() const;
 
-	const std::string& declType() const;
+	[[nodiscard]] const std::string& declType() const;
 		/// Returns the type of the parameter without const and & if present.
 		///
 		/// Example: a type const std::string& -> std::string, a type const std::string* returns std::string
 
-	bool isConst() const;
+	[[nodiscard]] bool isConst() const;
 		/// Returns true iff the variable is const.
 
-	bool isStatic() const;
+	[[nodiscard]] bool isStatic() const;
 		/// Returns true iff the variable is static.
 
 private:
@@ -103,7 +102,7 @@ inline const std::string& Variable::declType() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Variable_INCLUDED

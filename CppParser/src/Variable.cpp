@@ -17,8 +17,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 Variable::Variable(const std::string& decl, NameSpace* pNameSpace):
@@ -73,4 +72,4 @@ Symbol::Kind Variable::kind() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

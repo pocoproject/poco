@@ -29,8 +29,7 @@
 #include <openssl/ssl.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API X509Certificate
@@ -90,41 +89,47 @@ public:
 	~X509Certificate();
 		/// Destroys the X509Certificate.
 
-	long version() const;
+	[[nodiscard]] long version() const;
 		/// Returns the version of the certificate.
 
-	const std::string& serialNumber() const;
+	[[nodiscard]] const std::string& serialNumber() const;
 		/// Returns the certificate serial number as a
 		/// string in decimal encoding.
 
-	const std::string& issuerName() const;
+	[[nodiscard]] const std::string& issuerName() const;
 		/// Returns the certificate issuer's distinguished name.
 
-	std::string issuerName(NID nid) const;
+	[[nodiscard]] std::string issuerName(NID nid) const;
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate issuer's
-		/// distinguished name.
+		/// distinguished name, converted to UTF-8 if possible.
+		/// The value can contain NUL characters.
 
-	const std::string& subjectName() const;
+	[[nodiscard]] const std::string& subjectName() const;
 		/// Returns the certificate subject's distinguished name.
 
-	std::string subjectName(NID nid) const;
+	[[nodiscard]] std::string subjectName(NID nid) const;
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate subject's
-		/// distinguished name.
+		/// distinguished name, converted to UTF-8 if possible.
+		/// The value can contain NUL characters.
 
-	std::string commonName() const;
+	[[nodiscard]] std::string commonName() const;
 		/// Returns the common name stored in the certificate
-		/// subject's distinguished name.
+		/// subject's distinguished name, converted to UTF-8 if
+		/// possible. The value can contain NUL characters.
 
 	void extractNames(std::string& commonName, std::set<std::string>& domainNames) const;
 		/// Extracts the common name and the alias domain names from the
 		/// certificate.
+		///
+		/// Throws an OpenSSLException if the subjectAltName extension
+		/// is present more than once or cannot be decoded.
 
-	Poco::DateTime validFrom() const;
+	[[nodiscard]] Poco::DateTime validFrom() const;
 		/// Returns the date and time the certificate is valid from.
 
-	Poco::DateTime expiresOn() const;
+	[[nodiscard]] Poco::DateTime expiresOn() const;
 		/// Returns the date and time the certificate expires.
 
 	Poco::DigestEngine::Digest fingerprint(const std::string& algorithm = "SHA1") const;
@@ -140,7 +145,7 @@ public:
 		/// Writes the certificate to the file given by path.
 		/// The certificate is written in PEM format.
 
-	bool issuedBy(const X509Certificate& issuerCertificate) const;
+	[[nodiscard]] bool issuedBy(const X509Certificate& issuerCertificate) const;
 		/// Checks whether the certificate has been issued by
 		/// the issuer given by issuerCertificate. This can be
 		/// used to validate a certificate chain.
@@ -152,7 +157,7 @@ public:
 		/// Returns true if verification against the issuer certificate
 		/// was successful, false otherwise.
 
-	bool equals(const X509Certificate& otherCertificate) const;
+	[[nodiscard]] bool equals(const X509Certificate& otherCertificate) const;
 		/// Checks whether the certificate is equal to
 		/// the other certificate, by comparing the hashes
 		/// of both certificates.
@@ -160,15 +165,18 @@ public:
 		/// Returns true if both certificates are identical,
 		/// otherwise false.
 
-	const X509* certificate() const;
+	[[nodiscard]] const X509* certificate() const;
 		/// Returns the underlying OpenSSL certificate.
 
-	X509* dup() const;
+	[[nodiscard]] X509* dup() const;
 		/// Duplicates and returns the underlying OpenSSL certificate. Note that
 		/// the caller assumes responsibility for the lifecycle of the created
 		/// certificate.
+		///
+		/// Throws an OpenSSLException if the certificate cannot be duplicated.
+		/// Returns a null pointer for a certificate that has been moved from.
 
-	std::string signatureAlgorithm() const;
+	[[nodiscard]] std::string signatureAlgorithm() const;
 		/// Returns the certificate signature algorithm long name.
 
 	void print(std::ostream& out) const;
@@ -177,6 +185,9 @@ public:
 	static List readPEM(const std::string& pemFileName);
 		/// Reads and returns a list of certificates from
 		/// the specified PEM file.
+		///
+		/// Throws an OpenSSLException if the file contains no certificate
+		/// or an entry that cannot be read.
 
 	static void writePEM(const std::string& pemFileName, const List& list);
 		/// Writes the list of certificates to the specified PEM file.
@@ -194,11 +205,6 @@ protected:
 		/// Extracts issuer and subject name from the certificate.
 
 private:
-	enum
-	{
-		NAME_BUFFER_SIZE = 256
-	};
-
 	std::string _issuerName;
 	std::string _subjectName;
 	std::string _serialNumber;
@@ -245,13 +251,7 @@ inline const X509* X509Certificate::certificate() const
 }
 
 
-inline X509* X509Certificate::dup() const
-{
-	return X509_dup(_pCert);
-}
-
-
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_X509Certificate_INCLUDED

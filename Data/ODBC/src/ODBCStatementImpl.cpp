@@ -28,9 +28,7 @@
 using Poco::DataFormatException;
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 const std::string ODBCStatementImpl::INVALID_CURSOR_STATE = "24000";
@@ -92,7 +90,7 @@ void ODBCStatementImpl::compileImpl()
 	Binder::ParameterBinding bind = session().getFeature("autoBind") ?
 		Binder::PB_IMMEDIATE : Binder::PB_AT_EXEC;
 
-	const TypeInfo* pDT = 0;
+	const TypeInfo* pDT = nullptr;
 	try
 	{
 		Poco::Any dti = session().getProperty("dataTypeInfo");
@@ -194,7 +192,7 @@ void ODBCStatementImpl::doPrepare()
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
 		}
 
-		AbstractPreparation::Ptr pAP = 0;
+		AbstractPreparation::Ptr pAP = nullptr;
 		Poco::Data::AbstractPreparator::Ptr pP = _preparations[curDataSet];
 		for (std::size_t pos = 0; it != itEnd; ++it)
 		{
@@ -295,7 +293,7 @@ void ODBCStatementImpl::execDirectImpl(const std::string& query)
 
 void ODBCStatementImpl::putData()
 {
-	SQLPOINTER pParam = 0;
+	SQLPOINTER pParam = nullptr;
 	SQLINTEGER dataSize = 0;
 	SQLRETURN rc;
 
@@ -347,7 +345,7 @@ bool ODBCStatementImpl::hasNext()
 
 		if (!nextRowReady())
 		{
-			if (hasMoreDataSets()) activateNextDataSet();
+			if (hasMoreDataSets()) (void)activateNextDataSet();
 			else return false;
 
 			if (SQL_NO_DATA == SQLMoreResults(_stmt))
@@ -403,6 +401,7 @@ std::size_t ODBCStatementImpl::next()
 	if (nextRowReady())
 	{
 		Extractions& extracts = extractions();
+		poco_assert (extracts.size());
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
 		std::size_t prevCount = 0;
@@ -432,7 +431,7 @@ std::string ODBCStatementImpl::nativeSQL()
 
 	SQLINTEGER length = (SQLINTEGER) statement.size() * 2;
 
-	char* pNative = 0;
+	char* pNative = nullptr;
 	SQLINTEGER retlen = length;
 	do
 	{
@@ -483,7 +482,7 @@ void ODBCStatementImpl::fillColumns()
 	if (curDataSet >= _columnPtrs.size())
 		_columnPtrs.resize(curDataSet + 1);
 
-	for (int i = 0; i < colCount; ++i)
+	for (std::size_t i = 0; i < colCount; ++i)
 		_columnPtrs[curDataSet].push_back(new ODBCMetaColumn(_stmt, i));
 }
 
@@ -526,4 +525,4 @@ int ODBCStatementImpl::affectedRowCount() const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

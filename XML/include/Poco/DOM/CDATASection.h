@@ -22,8 +22,7 @@
 #include "Poco/DOM/Text.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API CDATASection: public Text
@@ -58,18 +57,18 @@ class XML_API CDATASection: public Text
 {
 public:
 	// Text
-	Text* splitText(unsigned long offset);
+	[[nodiscard]] Text* splitText(unsigned long offset);
 
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 protected:
 	CDATASection(Document* pOwnerDocument, const XMLString& data);
 	CDATASection(Document* pOwnerDocument, const CDATASection& sec);
 	~CDATASection();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;
@@ -78,7 +77,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_CDATASection_INCLUDED

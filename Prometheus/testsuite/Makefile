@@ -8,12 +8,13 @@ include $(POCO_BASE)/build/rules/global
 
 objects = \
 	Driver \
+	CallbackMetricTest \
 	CounterTest \
 	GaugeTest \
+	HistogramTest \
 	IntCounterTest \
 	IntGaugeTest \
-	CallbackMetricTest \
-	HistogramTest \
+	ProcessCollectorTest \
 	PrometheusTestSuite
 
 target         = testrunner

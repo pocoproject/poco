@@ -23,8 +23,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API EscapeHTMLStreamBuf: public Poco::UnbufferedStreamBuf
@@ -60,7 +59,7 @@ public:
 	~EscapeHTMLIOS();
 		/// Destroys the stream.
 
-	EscapeHTMLStreamBuf* rdbuf();
+	[[nodiscard]] EscapeHTMLStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
 protected:
@@ -83,7 +82,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_EscapeHTMLStream_INCLUDED

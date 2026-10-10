@@ -15,9 +15,9 @@
 #include "Poco/PDF/Outline.h"
 #include "Poco/PDF/PDFException.h"
 
+#include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 Outline::Outline(HPDF_Doc* pPDF, const HPDF_Outline& outline, const std::string& name):
@@ -26,19 +26,11 @@ Outline::Outline(HPDF_Doc* pPDF, const HPDF_Outline& outline, const std::string&
 	open();
 }
 
+Outline::~Outline() = default;
 
-Outline::~Outline()
-{
-}
+Outline::Outline(const Outline& other) = default;
 
-
-Outline::Outline(const Outline& other):
-	Resource<HPDF_Outline>(other)
-{
-}
-
-
-Outline& Outline::operator = (const Outline& outline)
+Outline& Outline::operator=(const Outline& outline)
 {
 	Outline tmp(outline);
 	swap(tmp);
@@ -46,4 +38,22 @@ Outline& Outline::operator = (const Outline& outline)
 }
 
 
-} } // namespace Poco::PDF
+void Outline::open()
+{
+	HPDF_Outline_SetOpened(handle(), HPDF_TRUE);
+}
+
+
+void Outline::close()
+{
+	HPDF_Outline_SetOpened(handle(), HPDF_FALSE);
+}
+
+
+void Outline::destination(const Destination& dest)
+{
+	HPDF_Outline_SetDestination(handle(), dest);
+}
+
+
+} // namespace Poco::PDF

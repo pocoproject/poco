@@ -89,8 +89,11 @@ void SharedMemoryTest::testCreateLarge()
 	}
 	catch (Poco::SystemException& ex)
 	{
-		// no memory, quite posible to happen
-		assertEqual(ERROR_NOT_ENOUGH_MEMORY, ex.code());
+		// Windows returns either ERROR_NOT_ENOUGH_MEMORY or
+		// ERROR_NO_SYSTEM_RESOURCES depending on which allocation tier
+		// rejects the request.
+		assertTrue(ex.code() == ERROR_NOT_ENOUGH_MEMORY ||
+		           ex.code() == ERROR_NO_SYSTEM_RESOURCES);
 	}
 #endif
 }

@@ -61,8 +61,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPAuthenticationParams::REALM("realm");
@@ -94,17 +93,15 @@ HTTPAuthenticationParams::HTTPAuthenticationParams(const HTTPResponse& response,
 }
 
 
+HTTPAuthenticationParams::HTTPAuthenticationParams(const HTTPAuthenticationParams& other) = default;
+
+
 HTTPAuthenticationParams::~HTTPAuthenticationParams()
 {
 }
 
 
-HTTPAuthenticationParams& HTTPAuthenticationParams::operator = (const HTTPAuthenticationParams& authParams)
-{
-	NameValueCollection::operator = (authParams);
-
-	return *this;
-}
+HTTPAuthenticationParams& HTTPAuthenticationParams::operator = (const HTTPAuthenticationParams& authParams) = default;
 
 
 void HTTPAuthenticationParams::fromAuthInfo(const std::string& authInfo)
@@ -325,4 +322,4 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

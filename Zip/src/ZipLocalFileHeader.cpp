@@ -21,11 +21,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Zip {
-
-
-const char ZipLocalFileHeader::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x03', '\x04'};
+namespace Poco::Zip {
 
 
 ZipLocalFileHeader::ZipLocalFileHeader(const Poco::Path& fileName,
@@ -45,7 +41,7 @@ ZipLocalFileHeader::ZipLocalFileHeader(const Poco::Path& fileName,
     _uncompressedSize(0)
 {
     std::memcpy(_rawHeader, HEADER, ZipCommon::HEADER_SIZE);
-    std::memset(_rawHeader+ZipCommon::HEADER_SIZE, 0, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+    std::memset(_rawHeader+ZipCommon::HEADER_SIZE, 0, static_cast<std::size_t>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
     setHostSystem(ZipCommon::HS_FAT);
     setEncryption(false);
     setExtraFieldSize(0);
@@ -127,10 +123,11 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     }
 
     // read the rest of the header
-    inp.read(_rawHeader + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+    inp.read(_rawHeader + ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
     poco_assert (_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED);
     poco_assert (getMajorVersionNumber() <= 4); // Allow for Zip64 version 4.5
-    poco_assert (ZipUtil::get16BitValue(_rawHeader, COMPR_METHOD_POS) < ZipCommon::CM_UNUSED);
+    // Note: compression method is not validated here to allow parsing archives with
+    // unsupported methods (BZIP2, LZMA, etc.). Validation happens at decompression time.
     parseDateTime();
     Poco::UInt16 len = getFileNameLength();
     if (len > 0)
@@ -155,33 +152,33 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 			Poco::Buffer<char> xtra(len);
 			inp.read(xtra.begin(), len);
 			_extraField = std::string(xtra.begin(), len);
+			// The field sizes come from the archive, so every read is bounded by
+			// the buffer that was actually read rather than by the declared size.
+			const char* const end = xtra.begin() + len;
 			char* ptr = xtra.begin();
-			while (ptr <= xtra.begin() + len - 4)
+			while (end - ptr >= ZipCommon::EXTRA_FIELD_HEADER_SIZE)
 			{
-				Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0);
-				ptr += 2;
-				Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0);
-				ptr += 2;
+				const Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0);
+				const Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 2);
+				ptr += ZipCommon::EXTRA_FIELD_HEADER_SIZE;
+				if (size > end - ptr) break;
 				if (id == ZipCommon::ZIP64_EXTRA_ID)
 				{
 					_forceZip64 = true;
-					if (size >= 8 && getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
+					char* field = ptr;
+					Poco::UInt16 remaining = size;
+					if (remaining >= ZipCommon::ZIP64_VALUE_SIZE && getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
 					{
-						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0));
-						size -= 8;
-						ptr += 8;
+						setUncompressedSize(ZipUtil::get64BitValue(field, 0));
+						field += ZipCommon::ZIP64_VALUE_SIZE;
+						remaining -= ZipCommon::ZIP64_VALUE_SIZE;
 					}
-					if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
+					if (remaining >= ZipCommon::ZIP64_VALUE_SIZE && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
 					{
-						setCompressedSize(ZipUtil::get64BitValue(ptr, 0));
-						size -= 8;
-						ptr += 8;
+						setCompressedSize(ZipUtil::get64BitValue(field, 0));
 					}
 				}
-				else
-				{
-					ptr += size;
-				}
+				ptr += size;
 			}
         }
     }
@@ -190,12 +187,10 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 
 bool ZipLocalFileHeader::searchCRCAndSizesAfterData() const
 {
-	if (getCompressionMethod() == ZipCommon::CM_STORE || getCompressionMethod() == ZipCommon::CM_DEFLATE)
-	{
-		// check bit 3
-		return ((ZipUtil::get16BitValue(_rawHeader, GENERAL_PURPOSE_POS) & 0x0008) != 0);
-	}
-	return false;
+	// Check bit 3 of general purpose flags for all compression methods.
+	// This flag indicates that CRC-32 and sizes are in a data descriptor
+	// after the compressed data, not in the local file header.
+	return ((ZipUtil::get16BitValue(_rawHeader, GENERAL_PURPOSE_POS) & 0x0008) != 0);
 }
 
 
@@ -260,4 +255,4 @@ std::string ZipLocalFileHeader::createHeader() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

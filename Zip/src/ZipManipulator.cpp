@@ -26,15 +26,14 @@
 #include "Poco/FileStream.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 ZipManipulator::ZipManipulator(const std::string& zipFile, bool backupOriginalFile):
 	_zipFile(zipFile),
 	_backupOriginalFile(backupOriginalFile),
 	_changes(),
-	_in(0)
+	_in(nullptr)
 {
 	Poco::FileInputStream in(zipFile);
 	_in = new ZipArchive(in);
@@ -168,4 +167,4 @@ ZipArchive ZipManipulator::compress(const std::string& outFile)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

@@ -376,6 +376,7 @@ void MessageHeaderTest::testNameLengthLimit()
 	}
 }
 
+
 void MessageHeaderTest::testValueLengthLimit()
 {
 	std::string s("name1: value1\r\n");
@@ -392,6 +393,19 @@ void MessageHeaderTest::testValueLengthLimit()
 	}
 }
 
+
+void MessageHeaderTest::testLongValue()
+{
+	std::string longValue(10000, 'x');
+	std::string s("long: " + longValue + "\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.setValueLengthLimit(10000);
+	mh.read(istr);
+	assertTrue (mh.get("long") == longValue);
+}
+
+
 void MessageHeaderTest::testDecodeWord()
 {
 	std::string coded("this is pure ASCII");
@@ -400,11 +414,19 @@ void MessageHeaderTest::testDecodeWord()
 
 	coded = "(=?ISO-8859-1?Q?a?= =?ISO-8859-1?Q?b?=)";
 	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
-	assertTrue (decoded == "(a b)");
+	assertTrue (decoded == "(ab)");
+
+	coded = "(=?ISO-8859-1?Q?a?= <0> =?ISO-8859-1?Q?b?=)";
+	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
+	assertTrue (decoded == "(a <0> b)");
 
 	coded = "Hello =?UTF-8?B?RnJhbmNpcw==?=, good bye";
 	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
 	assertTrue (decoded == "Hello Francis, good bye");
+
+	coded = "application/pdf; name=\"=?utf-8?Q?RUG_Regler-_und_Ger=C3=A4tebau_Gm?= =?utf-8?Q?bH_Angebot_Erneuerung_=C3=9CE.pdf?=\"";
+	decoded = MessageHeader::decodeWord(coded, "UTF-8");
+	assertTrue (decoded == "application/pdf; name=\"RUG Regler- und Gerätebau GmbH Angebot Erneuerung ÜE.pdf\"");
 }
 
 // Sample HTTP reuest header
@@ -430,10 +452,10 @@ void MessageHeaderTest::testAutoDecode()
 		MessageHeader mh;
 		mh.read(istr);
 
-		assertEquals(mh.get("X-Encoded-Header-A"), "(a b)");
+		assertEquals(mh.get("X-Encoded-Header-A"), "(ab)");
 		assertEquals(mh.get("X-Encoded-Header-B"), "Hello Francis, good bye");
 
-		assertEquals(mh.getDecoded("X-Encoded-Header-A"), "(a b)");
+		assertEquals(mh.getDecoded("X-Encoded-Header-A"), "(ab)");
 		assertEquals(mh.getDecoded("X-Encoded-Header-B"), "Hello Francis, good bye");
 	}
 	{
@@ -445,7 +467,7 @@ void MessageHeaderTest::testAutoDecode()
 		assertEquals(mh.get("X-Encoded-Header-A"), "(=?ISO-8859-1?Q?a?= =?ISO-8859-1?Q?b?=)");
 		assertEquals(mh.get("X-Encoded-Header-B"), "Hello =?UTF-8?B?RnJhbmNpcw==?=, good bye");
 
-		assertEquals(mh.getDecoded("X-Encoded-Header-A"), "(a b)");
+		assertEquals(mh.getDecoded("X-Encoded-Header-A"), "(ab)");
 		assertEquals(mh.getDecoded("X-Encoded-Header-B"), "Hello Francis, good bye");
 	}
 }
@@ -458,6 +480,23 @@ void MessageHeaderTest::setUp()
 
 void MessageHeaderTest::tearDown()
 {
+}
+
+
+void MessageHeaderTest::testNoDecodeFramingHeaders()
+{
+	// Auto-decoding must not reach the headers that decide the framing,
+	// otherwise an encoded word becomes "chunked" only after a front-end has
+	// already framed the message on the undecoded value.
+	std::string s("Subject: =?utf-8?B?Y2h1bmtlZA==?=\r\n"
+		"Transfer-Encoding: =?utf-8?B?Y2h1bmtlZA==?=\r\n"
+		"Content-Length: =?utf-8?B?MTA=?=\r\n\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.read(istr);
+	assertTrue (mh.get("Subject") == "chunked");
+	assertTrue (mh.get("Transfer-Encoding") == "=?utf-8?B?Y2h1bmtlZA==?=");
+	assertTrue (mh.get("Content-Length") == "=?utf-8?B?MTA=?=");
 }
 
 
@@ -481,7 +520,11 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitElements);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParameters);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimit);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testNameLengthLimit);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testValueLengthLimit);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testLongValue);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testNoDecodeFramingHeaders);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testAutoDecode);
 
 	return pSuite;

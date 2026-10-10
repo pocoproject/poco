@@ -69,39 +69,39 @@ public:
 	ThreadImpl();
 	~ThreadImpl();
 
-	TIDImpl tidImpl() const;
+	[[nodiscard]] TIDImpl tidImpl() const;
 	void setNameImpl(const std::string& threadName);
-	std::string getNameImpl() const;
-	std::string getOSThreadNameImpl();
+	[[nodiscard]] std::string getNameImpl() const;
+	[[nodiscard]] std::string getOSThreadNameImpl();
 		/// Returns the thread's name, expressed as an operating system
 		/// specific name value. Return empty string if thread is not running.
 		/// For test used only.
 	void setPriorityImpl(int prio);
-	int getPriorityImpl() const;
+	[[nodiscard]] int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = 0);
-	int getOSPriorityImpl() const;
-	static int getMinOSPriorityImpl(int policy);
-	static int getMaxOSPriorityImpl(int policy);
+	[[nodiscard]] int getOSPriorityImpl() const;
+	[[nodiscard]] static int getMinOSPriorityImpl(int policy);
+	[[nodiscard]] static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
-	int getStackSizeImpl() const;
+	[[nodiscard]] int getStackSizeImpl() const;
 	void startImpl(Runnable& target);
 	void startImpl(Callable target, void* pData = 0);
 
 	void joinImpl();
 	bool joinImpl(long milliseconds);
-	bool isRunningImpl() const;
+	[[nodiscard]] bool isRunningImpl() const;
 	static void yieldImpl();
-	static ThreadImpl* currentImpl();
-	static TIDImpl currentTidImpl();
-	static long currentOsTidImpl();
+	[[nodiscard]] static ThreadImpl* currentImpl();
+	[[nodiscard]] static TIDImpl currentTidImpl();
+	[[nodiscard]] static long currentOsTidImpl();
 	bool setAffinityImpl(int coreID);
-	int getAffinityImpl() const;
+	[[nodiscard]] int getAffinityImpl() const;
 
 protected:
 	static void runnableEntry(void* pThread, int, int, int, int, int, int, int, int, int);
 	static void callableEntry(void* pThread, int, int, int, int, int, int, int, int, int);
-	static int mapPrio(int prio);
-	static int reverseMapPrio(int osPrio);
+	[[nodiscard]] static int mapPrio(int prio);
+	[[nodiscard]] static int reverseMapPrio(int osPrio);
 
 	struct ThreadData: public RefCountedObject
 	{

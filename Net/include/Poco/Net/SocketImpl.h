@@ -24,6 +24,7 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/Timespan.h"
 #include "Poco/Buffer.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -58,7 +59,7 @@ public:
 		SELECT_ERROR = 4
 	};
 
-	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
+	[[nodiscard]] virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
 		/// Get the next completed connection from the
 		/// socket's completed connection queue.
 		///
@@ -170,12 +171,22 @@ public:
 	virtual void shutdownReceive();
 		/// Shuts down the receiving part of the socket connection.
 
-	virtual void shutdownSend();
+	virtual int shutdownSend();
 		/// Shuts down the sending part of the socket connection.
+		///
+		/// Returns 0 for a non-blocking socket. May return
+		/// a negative value for a non-blocking socket in case
+		/// of a TLS connection. In that case, the operation should
+		/// be retried once the underlying socket becomes writable.
 
-	virtual void shutdown();
+	virtual int shutdown();
 		/// Shuts down both the receiving and the sending part
 		/// of the socket connection.
+		///
+		/// Returns 0 for a non-blocking socket. May return
+		/// a negative value for a non-blocking socket in case
+		/// of a TLS connection. In that case, the operation should
+		/// be retried once the underlying socket becomes writable.
 
 	virtual int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through
@@ -277,11 +288,34 @@ public:
 		/// The preferred way for a socket to receive urgent data
 		/// is by enabling the SO_OOBINLINE option.
 
-	virtual int available();
+	virtual std::streamsize sendFile(Poco::FileInputStream& FileInputStream, std::streamoff offset = 0, std::streamsize count = 0);
+		/// Sends the contents of a file over the socket, using operating
+		/// system-specific APIs, if available. The socket must not have
+		/// been set to non-blocking.
+		///
+		/// If count is != 0, sends the given number of bytes, otherwise
+		/// sends all bytes, starting from the given offset.
+		///
+		/// On Linux, macOS and FreeBSD systems, the implementation
+		/// uses sendfile() or sendfile64().
+		/// On Windows, the implementation uses TransmitFile().
+		///
+		/// If neither sendfile() nor TransmitFile() is available,
+		/// or the socket is a secure one (secure() returne true),
+		/// falls back to reading the file block by block and calling sendBytes().
+		///
+		/// Returns the number of bytes sent, which should be the same
+		/// as count, unless count is 0.
+		///
+		/// Throws NetException (or a subclass) in case of any errors.
+		/// Also throws a NetException if the socket has been set to
+		/// non-blocking.
+
+	[[nodiscard]] virtual int available();
 		/// Returns the number of bytes available that can be read
 		/// without causing the socket to block.
 
-	virtual bool poll(const Poco::Timespan& timeout, int mode);
+	[[nodiscard]] virtual bool poll(const Poco::Timespan& timeout, int mode);
 		/// Determines the status of the socket, using a
 		/// call to select().
 		///
@@ -291,16 +325,16 @@ public:
 		/// Returns true if the next operation corresponding to
 		/// mode will not block, false otherwise.
 
-	Type type();
+	[[nodiscard]] Type type();
 		/// Returns the socket type.
 
-	virtual int getError();
+	[[nodiscard]] virtual int getError();
 		/// Returns the socket error.
 
 	virtual void setSendBufferSize(int size);
 		/// Sets the size of the send buffer.
 
-	virtual int getSendBufferSize();
+	[[nodiscard]] virtual int getSendBufferSize();
 		/// Returns the size of the send buffer.
 		///
 		/// The returned value may be different than the
@@ -310,7 +344,7 @@ public:
 	virtual void setReceiveBufferSize(int size);
 		/// Sets the size of the receive buffer.
 
-	virtual int getReceiveBufferSize();
+	[[nodiscard]] virtual int getReceiveBufferSize();
 		/// Returns the size of the receive buffer.
 		///
 		/// The returned value may be different than the
@@ -320,7 +354,7 @@ public:
 	virtual void setSendTimeout(const Poco::Timespan& timeout);
 		/// Sets the send timeout for the socket.
 
-	virtual Poco::Timespan getSendTimeout();
+	[[nodiscard]] virtual Poco::Timespan getSendTimeout();
 		/// Returns the send timeout for the socket.
 		///
 		/// The returned timeout may be different than the
@@ -333,17 +367,17 @@ public:
 		/// On systems that do not support SO_RCVTIMEO, a
 		/// workaround using poll() is provided.
 
-	virtual Poco::Timespan getReceiveTimeout();
+	[[nodiscard]] virtual Poco::Timespan getReceiveTimeout();
 		/// Returns the receive timeout for the socket.
 		///
 		/// The returned timeout may be different than the
 		/// timeout previously set with setReceiveTimeout(),
 		/// as the system is free to adjust the value.
 
-	virtual SocketAddress address();
+	[[nodiscard]] virtual SocketAddress address();
 		/// Returns the IP address and port number of the socket.
 
-	virtual SocketAddress peerAddress();
+	[[nodiscard]] virtual SocketAddress peerAddress();
 		/// Returns the IP address and port number of the peer socket.
 
 	void setOption(int level, int option, int value);
@@ -403,19 +437,25 @@ public:
 	void setNoDelay(bool flag);
 		/// Sets the value of the TCP_NODELAY socket option.
 
-	bool getNoDelay();
+	[[nodiscard]] bool getNoDelay();
 		/// Returns the value of the TCP_NODELAY socket option.
 
-	void setKeepAlive(bool flag);
-		/// Sets the value of the SO_KEEPALIVE socket option.
+	void setKeepAlive(bool flag, int idleSeconds = 0, int intervalSeconds = 0, int probeCount = 0);
+		/// Sets the value of the SO_KEEPALIVE socket option, and optionally the
+		/// per-socket probe timings (idle time before the first probe, interval
+		/// between probes, and number of unanswered probes before the connection
+		/// fails). Each timing is applied only when greater than zero; the rest
+		/// keep the system defaults. A timing this platform has no option for
+		/// is skipped; one the running system rejects throws an IOException.
+		/// See Socket::setKeepAlive.
 
-	bool getKeepAlive();
+	[[nodiscard]] bool getKeepAlive();
 		/// Returns the value of the SO_KEEPALIVE socket option.
 
 	void setReuseAddress(bool flag);
 		/// Sets the value of the SO_REUSEADDR socket option.
 
-	bool getReuseAddress();
+	[[nodiscard]] bool getReuseAddress();
 		/// Returns the value of the SO_REUSEADDR socket option.
 
 	void setReusePort(bool flag);
@@ -423,7 +463,7 @@ public:
 		/// Does nothing if the socket implementation does not
 		/// support SO_REUSEPORT.
 
-	bool getReusePort();
+	[[nodiscard]] bool getReusePort();
 		/// Returns the value of the SO_REUSEPORT socket option.
 		///
 		/// Returns false if the socket implementation does not
@@ -432,32 +472,32 @@ public:
 	void setOOBInline(bool flag);
 		/// Sets the value of the SO_OOBINLINE socket option.
 
-	bool getOOBInline();
+	[[nodiscard]] bool getOOBInline();
 		/// Returns the value of the SO_OOBINLINE socket option.
 
 	void setBroadcast(bool flag);
 		/// Sets the value of the SO_BROADCAST socket option.
 
-	bool getBroadcast();
+	[[nodiscard]] bool getBroadcast();
 		/// Returns the value of the SO_BROADCAST socket option.
 
 	virtual void setBlocking(bool flag);
 		/// Sets the socket in blocking mode if flag is true,
 		/// disables blocking mode if flag is false.
 
-	virtual bool getBlocking() const;
+	[[nodiscard]] virtual bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
 		/// This method will only work if the blocking modes of
 		/// the socket are changed via the setBlocking method!
 
-	virtual bool secure() const;
+	[[nodiscard]] virtual bool secure() const;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
 
-	int socketError();
+	[[nodiscard]] int socketError();
 		/// Returns the value of the SO_ERROR socket option.
 
-	poco_socket_t sockfd() const;
+	[[nodiscard]] poco_socket_t sockfd() const;
 		/// Returns the socket descriptor for the
 		/// underlying native socket.
 
@@ -475,13 +515,8 @@ public:
 		/// A wrapper for the fcntl system call.
 #endif
 
-	bool initialized() const;
+	[[nodiscard]] bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
-
-	Poco::Int64 sendFile(FileInputStream &FileInputStream, Poco::UInt64 offset = 0);
-		/// Sends file using system function
-		/// for posix systems - with sendfile[64](...)
-		/// for windows - with TransmitFile(...)
 
 protected:
 	SocketImpl();
@@ -523,7 +558,15 @@ protected:
 
 	void checkBrokenTimeout(SelectMode mode);
 
-	static int lastError();
+	std::streamsize sendFileNative(Poco::FileInputStream& FileInputStream, std::streamoff offset, std::streamsize count);
+		/// Implements sendFile() using an OS-specific API like
+		/// sendfile() or TransmitFile().
+
+	std::streamsize sendFileBlockwise(Poco::FileInputStream& FileInputStream, std::streamoff offset, std::streamsize count);
+		/// Implements sendFile() by reading the file blockwise and
+		/// calling sendBytes() for each block.
+
+	[[nodiscard]] static int lastError();
 		/// Returns the last error code.
 
 	static void error();
@@ -542,7 +585,7 @@ private:
 	SocketImpl(const SocketImpl&);
 	SocketImpl& operator = (const SocketImpl&);
 
-	poco_socket_t  _sockfd;
+	std::atomic<poco_socket_t>  _sockfd;
 	Poco::Timespan _recvTimeout;
 	Poco::Timespan _sndTimeout;
 	bool           _blocking;
@@ -570,13 +613,13 @@ inline SocketImpl::Type SocketImpl::type()
 
 inline poco_socket_t SocketImpl::sockfd() const
 {
-	return _sockfd;
+	return _sockfd.load();
 }
 
 
 inline bool SocketImpl::initialized() const
 {
-	return _sockfd != POCO_INVALID_SOCKET;
+	return _sockfd.load() != POCO_INVALID_SOCKET;
 }
 
 
@@ -600,7 +643,7 @@ inline bool SocketImpl::getBlocking() const
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	#pragma comment(lib, "mswsock.lib") 
-#endif 
+	#pragma comment(lib, "mswsock.lib")
+#endif
 
 #endif // Net_SocketImpl_INCLUDED

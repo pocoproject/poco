@@ -19,6 +19,8 @@
 
 
 #include "Poco/Foundation.h"
+#include <vector>
+#include <string>
 
 
 #if defined(hpux) || defined(_hpux)
@@ -93,26 +95,26 @@ public:
 	void unload();
 		/// Unloads a shared library.
 
-	bool isLoaded() const;
+	[[nodiscard]] bool isLoaded() const;
 		/// Returns true iff a library has been loaded.
 
-	bool hasSymbol(const std::string& name);
+	[[nodiscard]] bool hasSymbol(const std::string& name);
 		/// Returns true iff the loaded library contains
 		/// a symbol with the given name.
 
-	void* getSymbol(const std::string& name);
+	[[nodiscard]] void* getSymbol(const std::string& name);
 		/// Returns the address of the symbol with
 		/// the given name. For functions, this
 		/// is the entry point of the function.
 		/// Throws a NotFoundException if the symbol
 		/// does not exist.
 
-	const std::string& getPath() const;
+	[[nodiscard]] const std::string& getPath() const;
 		/// Returns the path of the library, as
 		/// specified in a call to load() or the
 		/// constructor.
 
-	static std::string suffix();
+	[[nodiscard]] static std::string suffix();
 		/// Returns the platform-specific filename suffix
 		/// for shared libraries (including the period).
 		/// In debug mode, the suffix also includes a
@@ -129,6 +131,19 @@ public:
 		/// Currently only supported on Windows, where it calls
 		/// SetDllDirectory(). On all other platforms, does not
 		/// do anything and returns false.
+
+	[[nodiscard]] static std::vector<std::string> findMissingDependencies(const std::string& path);
+		/// Parses the shared library at the given path and returns
+		/// a list of dependent libraries that cannot be found.
+		/// If the library itself whose dependencies are checked is not found,
+		/// it returns the library itself.
+		///
+		/// Useful for diagnosing why a library fails to load.
+		/// On Windows, parses the PE import table. On Linux, parses the
+		/// ELF dynamic section. On macOS, parses the Mach-O load commands.
+		///
+		/// Returns an empty vector if the file cannot be parsed or
+		/// on unsupported platforms.
 
 private:
 	SharedLibrary(const SharedLibrary&);

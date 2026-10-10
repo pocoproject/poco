@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  FilesystemConfiguration
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -27,19 +27,16 @@ using Poco::StringTokenizer;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
+
+
+FilesystemConfiguration::~FilesystemConfiguration() = default;
 
 
 FilesystemConfiguration::FilesystemConfiguration(const std::string& path):
 	_path(path)
 {
 	_path.makeDirectory();
-}
-
-
-FilesystemConfiguration::~FilesystemConfiguration()
-{
 }
 
 
@@ -125,4 +122,4 @@ Path FilesystemConfiguration::keyToPath(const std::string& key) const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

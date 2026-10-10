@@ -34,7 +34,7 @@ ApacheStreamBuf::~ApacheStreamBuf()
 }
 
 
-int ApacheStreamBuf::readFromDevice(char* buffer, std::streamsize len)
+std::streamsize ApacheStreamBuf::readFromDevice(char* buffer, std::streamsize len)
 {
 	if (_haveData)
 		return _pApacheRequest->readRequest(buffer, static_cast<int>(len));
@@ -43,7 +43,7 @@ int ApacheStreamBuf::readFromDevice(char* buffer, std::streamsize len)
 }
 
 
-int ApacheStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize ApacheStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	_pApacheRequest->writeResponse(buffer, length);
 	return length;

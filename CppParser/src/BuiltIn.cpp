@@ -17,8 +17,7 @@
 #include <cctype>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 BuiltIn::BuiltIn(const std::string& name, NameSpace* pNameSpace):
@@ -44,4 +43,4 @@ std::string BuiltIn::toString() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

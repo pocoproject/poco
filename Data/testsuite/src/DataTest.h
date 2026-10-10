@@ -29,6 +29,7 @@ public:
 
 	void testSession();
 	void testStatementFormatting();
+	void testStatementMoveAssignment();
 	void testFeatures();
 	void testProperties();
 	void testLOB();
@@ -40,12 +41,16 @@ public:
 	void testColumnList();
 	void testRow();
 	void testRowSort();
-	void testSimpleRowFormatter();;
+	void testSimpleRowFormatter();
 	void testJSONRowFormatter();
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
 	void testTranscode();
 	void testSQLParse();
+	void testSQLChannel();
+	void testNullableExtract();
+	void testTransactionAutoCommit();
+	void testExecuteDirectNotImplemented();
 
 	void setUp();
 	void tearDown();

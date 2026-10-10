@@ -18,8 +18,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 std::ostream& operator << (std::ostream &os, const Row& row)
@@ -30,7 +29,7 @@ std::ostream& operator << (std::ostream &os, const Row& row)
 
 
 Row::Row():
-	_pNames(0),
+	_pNames(nullptr),
 	_pSortMap(new SortMap),
 	_pFormatter(new SimpleRowFormatter)
 {
@@ -41,7 +40,7 @@ Row::Row(NameVecPtr pNames,
 	const RowFormatter::Ptr& pFormatter): _pNames(pNames)
 {
 	if (!_pNames) throw NullPointerException();
-	init(0, pFormatter);
+	init(nullptr, pFormatter);
 }
 
 
@@ -307,6 +306,7 @@ bool Row::operator < (const Row& other) const
 			if (_values[it->get<0>()].convert<double>() <
 				other._values[it->get<0>()].convert<double>())
 				return true;
+			// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 			else if (_values[it->get<0>()].convert<double>() !=
 				other._values[it->get<0>()].convert<double>())
 				return false;
@@ -366,4 +366,4 @@ void Row::formatNames() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

@@ -16,8 +16,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 EventException::EventException(int code):
@@ -62,4 +61,4 @@ Poco::Exception* EventException::clone() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

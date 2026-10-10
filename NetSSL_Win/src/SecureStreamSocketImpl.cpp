@@ -17,8 +17,7 @@
 #include "Poco/Thread.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SecureStreamSocketImpl::SecureStreamSocketImpl(Context::Ptr pContext):
@@ -149,14 +148,15 @@ void SecureStreamSocketImpl::shutdownReceive()
 }
 
 
-void SecureStreamSocketImpl::shutdownSend()
+int SecureStreamSocketImpl::shutdownSend()
 {
+	return _impl.shutdown();
 }
 
 
-void SecureStreamSocketImpl::shutdown()
+int SecureStreamSocketImpl::shutdown()
 {
-	_impl.shutdown();
+	return _impl.shutdown();
 }
 
 
@@ -168,7 +168,7 @@ bool SecureStreamSocketImpl::secure() const
 
 bool SecureStreamSocketImpl::havePeerCertificate() const
 {
-	return _impl.peerCertificate() != 0;
+	return _impl.peerCertificate() != nullptr;
 }
 
 
@@ -208,9 +208,32 @@ void SecureStreamSocketImpl::verifyPeerCertificate(const std::string& hostName)
 
 int SecureStreamSocketImpl::completeHandshake()
 {
-	_impl.completeHandshake();
-	return 0;
+	return _impl.completeHandshake();
 }
 
 
-} } // namespace Poco::Net
+void SecureStreamSocketImpl::setBlocking(bool flag)
+{
+	_impl.socket()->setBlocking(flag);
+}
+
+
+bool SecureStreamSocketImpl::getBlocking() const
+{
+	return _impl.socket()->getBlocking();
+}
+
+
+void SecureStreamSocketImpl::setRawOption(int level, int option, const void* value, poco_socklen_t length)
+{
+	_impl.socket()->setRawOption(level, option, value, length);
+}
+
+
+void SecureStreamSocketImpl::getRawOption(int level, int option, void* value, poco_socklen_t& length)
+{
+	_impl.socket()->getRawOption(level, option, value, length);
+}
+
+
+} // namespace Poco::Net

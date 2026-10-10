@@ -15,14 +15,13 @@
 #include "Poco/Data/AbstractExtraction.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 AbstractExtraction::AbstractExtraction(Poco::UInt32 limit,
 	Poco::UInt32 position,
 	bool bulk):
-	_pExtractor(0),
+	_pExtractor(nullptr),
 	_limit(limit),
 	_position(position),
 	_bulk(bulk),
@@ -37,4 +36,4 @@ AbstractExtraction::~AbstractExtraction()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

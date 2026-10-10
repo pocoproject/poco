@@ -40,6 +40,10 @@ class Foundation_API UUID
 	/// draft by Leach/Salz from February, 1998
 	/// (http://www.ics.uci.edu/~ejw/authoring/uuid-guid/draft-leach-uuids-guids-01.txt)
 	/// and also http://tools.ietf.org/html/draft-mealling-uuid-urn-05
+	///
+	/// Version 6 and 7 UUIDs are based on RFC 9562.
+	///
+	/// To generate a UUID, see UUIDGenerator.
 {
 public:
 	enum Version
@@ -48,8 +52,9 @@ public:
 		UUID_DCE_UID         = 0x02,
 		UUID_NAME_BASED      = 0x03,
 		UUID_RANDOM          = 0x04,
-		UUID_NAME_BASED_SHA1 = 0x05
-
+		UUID_NAME_BASED_SHA1 = 0x05,
+		UUID_TIME_BASED_V6   = 0x06,
+		UUID_TIME_BASED_V7   = 0x07
 	};
 
 	UUID();
@@ -76,13 +81,13 @@ public:
 	void parse(const std::string& uuid);
 		/// Parses the UUID from its string representation.
 
-	bool tryParse(const std::string& uuid);
+	[[nodiscard]] bool tryParse(const std::string& uuid);
 		/// Tries to interpret the given string as an UUID.
 		/// If the UUID is syntactically valid, assigns the
 		/// members and returns true. Otherwise leaves the
 		/// object unchanged and returns false.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns a string representation of the UUID consisting
 		/// of groups of hexadecimal digits separated by hyphens.
 
@@ -98,50 +103,50 @@ public:
 		/// The buffer need not be aligned.
 		/// There must have room for at least 16 bytes.
 
-	Version version() const;
+	[[nodiscard]] Version version() const;
 		/// Returns the version of the UUID.
 
-	int variant() const;
+	[[nodiscard]] int variant() const;
 		/// Returns the variant number of the UUID:
 		///   - 0 reserved for NCS backward compatibility
 		///   - 2 the Leach-Salz variant (used by this class)
 		///   - 6 reserved, Microsoft Corporation backward compatibility
 		///   - 7 reserved for future definition
 
-	bool operator == (const UUID& uuid) const;
-	bool operator != (const UUID& uuid) const;
-	bool operator <  (const UUID& uuid) const;
-	bool operator <= (const UUID& uuid) const;
-	bool operator >  (const UUID& uuid) const;
-	bool operator >= (const UUID& uuid) const;
+	[[nodiscard]] bool operator == (const UUID& uuid) const;
+	[[nodiscard]] bool operator != (const UUID& uuid) const;
+	[[nodiscard]] bool operator <  (const UUID& uuid) const;
+	[[nodiscard]] bool operator <= (const UUID& uuid) const;
+	[[nodiscard]] bool operator >  (const UUID& uuid) const;
+	[[nodiscard]] bool operator >= (const UUID& uuid) const;
 
-	bool isNull() const;
+	[[nodiscard]] bool isNull() const;
 		/// Returns true iff the UUID is nil (in other words,
 		/// consists of all zeros).
 
-	static const UUID& null();
+	[[nodiscard]] static const UUID& null();
 		/// Returns a null/nil UUID.
 
-	static const UUID& dns();
+	[[nodiscard]] static const UUID& dns();
 		/// Returns the namespace identifier for the DNS namespace.
 
-	static const UUID& uri();
+	[[nodiscard]] static const UUID& uri();
 		/// Returns the namespace identifier for the URI (former URL) namespace.
 
-	static const UUID& oid();
+	[[nodiscard]] static const UUID& oid();
 		/// Returns the namespace identifier for the OID namespace.
 
-	static const UUID& x500();
+	[[nodiscard]] static const UUID& x500();
 		/// Returns the namespace identifier for the X500 namespace.
 
 protected:
-	UUID(UInt32 timeLow, UInt32 timeMid, UInt32 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]);
+	UUID(UInt32 timeLow, UInt16 timeMid, UInt16 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]);
 	UUID(const char* bytes, Version version);
-	int compare(const UUID& uuid) const;
+	[[nodiscard]] int compare(const UUID& uuid) const;
 	static void appendHex(std::string& str, UInt8 n);
 	static void appendHex(std::string& str, UInt16 n);
 	static void appendHex(std::string& str, UInt32 n);
-	static Int16 nibble(char hex);
+	[[nodiscard]] static Int16 nibble(char hex);
 	void fromNetwork();
 	void toNetwork();
 

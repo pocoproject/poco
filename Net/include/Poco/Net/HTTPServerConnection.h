@@ -24,10 +24,10 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Mutex.h"
+#include <atomic>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPServerSession;
@@ -54,12 +54,12 @@ protected:
 private:
 	HTTPServerParams::Ptr          _pParams;
 	HTTPRequestHandlerFactory::Ptr _pFactory;
-	bool _stopped;
+	std::atomic<bool> _stopped;
 	Poco::FastMutex _mutex;
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerConnection_INCLUDED

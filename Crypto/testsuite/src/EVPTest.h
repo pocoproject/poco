@@ -33,17 +33,24 @@ public:
 	void testECEVPSaveLoadStreamNoPass();
 	void testECEVPSaveLoadFile();
 	void testECEVPSaveLoadFileNoPass();
+	void testECEVPLoadKeyWrongPassword();
 
 	void testRSAEVPKeyFromX509();
 	void testRSAEVPKeyFromPKCS12();
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
 	void testRSAEVPKeyByLength();
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	void testECEVPKeyByLength();
 	void testEVPKeyByModulus();
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
+	void testCompareDifferentKeyTypes();
+	void testKeyFromCertificateUnknownAlgorithm();
+	void testSaveCannotCreateFile();
+	void testSaveFlushFailure();
+	void testECKeyFromCertificate();
+	void testRSAKeyFromECCertificate();
+	void testRSAKeyFromECPKCS12();
 
 	void setUp();
 	void tearDown();

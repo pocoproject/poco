@@ -22,8 +22,7 @@
 #include "Poco/Net/PartHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API NullPartHandler: public PartHandler
@@ -41,7 +40,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_NullPartHandler_INCLUDED

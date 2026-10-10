@@ -23,8 +23,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 class ActiveRecordLib_API Context: public Poco::RefCountedObject
@@ -39,13 +38,13 @@ public:
 	Context(const std::string& connector, const std::string& connectionString);
 		/// Creates the Context from a connector name and connection string.
 
-	~Context() = default;
+	~Context();
 		/// Destroys the Context.
 
-	Poco::Data::Session& session();
+	[[nodiscard]] Poco::Data::Session& session();
 		/// Returns the database session.
 
-	StatementPlaceholderProvider::Ptr statementPlaceholderProvider() const;
+	[[nodiscard]] StatementPlaceholderProvider::Ptr statementPlaceholderProvider() const;
 		/// Returns a new StatementPlaceholderProvider.
 
 private:
@@ -68,7 +67,7 @@ inline Poco::Data::Session& Context::session()
 }
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord
 
 
 #endif // ActiveRecord_Context_INCLUDED

@@ -18,9 +18,7 @@
 #include "Poco/Any.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 class Preparator: public Poco::Data::AbstractPreparator
@@ -109,7 +107,7 @@ public:
 };
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test
 
 
 #endif // Data_Test_Preparator_INCLUDED

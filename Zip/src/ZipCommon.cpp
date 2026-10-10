@@ -16,8 +16,7 @@
 #include "Poco/Path.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 bool ZipCommon::isValidPath(const std::string& path)
@@ -53,4 +52,4 @@ bool ZipCommon::isValidPath(const std::string& path)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  ConfigurationMapper
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -15,8 +15,10 @@
 #include "Poco/Util/ConfigurationMapper.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
+
+
+ConfigurationMapper::~ConfigurationMapper() = default;
 
 
 ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration::Ptr pConfig):
@@ -28,11 +30,6 @@ ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const st
 
 	if (!_fromPrefix.empty()) _fromPrefix += '.';
 	if (!_toPrefix.empty()) _toPrefix += '.';
-}
-
-
-ConfigurationMapper::~ConfigurationMapper()
-{
 }
 
 
@@ -95,4 +92,4 @@ std::string ConfigurationMapper::translateKey(const std::string& key) const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

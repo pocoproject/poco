@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2008-2021 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this document so long as this copyright notice, license and disclaimer are retained with all copies of the document. No license is granted to modify this document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE; OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT.  THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO, INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:trp="http://www.onvif.org/ver10/replay/wsdl" targetNamespace="http://www.onvif.org/ver10/replay/wsdl">
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/replay/wsdl" xmlns:tt="http://www.onvif.org/ver10/schema" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="21.06">
+			<xs:import namespace="http://www.onvif.org/ver10/schema" schemaLocation="../ver10/schema/onvif.xsd"/>
+			<!--  Message Request/Responses elements  -->
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="trp:Capabilities">
+							<xs:annotation>
+								<xs:documentation>The capabilities for the replay service is returned in the Capabilities element.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:complexType name="Capabilities">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>	 <!-- first Vendor then ONVIF -->
+				</xs:sequence>
+				<xs:attribute name="ReversePlayback" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicator that the Device supports reverse playback as defined in the ONVIF Streaming Specification. </xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="SessionTimeoutRange" type="tt:FloatList">
+					<xs:annotation>
+						<xs:documentation>The list contains two elements defining the minimum and maximum valid values supported as session timeout in seconds. </xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="RTP_RTSP_TCP" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates support for RTP/RTSP/TCP.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="RTSPWebSocketUri" type="xs:anyURI">
+					<xs:annotation>
+						<xs:documentation>If playback streaming over WebSocket is supported, this shall return the RTSP WebSocket URI as described in Streaming Specification Section 5.1.1.5.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="trp:Capabilities"/>
+			<!--===============================-->
+			<xs:element name="GetReplayUri">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="StreamSetup" type="tt:StreamSetup">
+							<xs:annotation>
+								<xs:documentation>Specifies the connection parameters to be used for the stream. The URI that is returned may depend on these parameters.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="RecordingToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The identifier of the recording to be streamed.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetReplayUriResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Uri" type="xs:anyURI">
+							<xs:annotation>
+								<xs:documentation>The URI to which the client should connect in order to stream the recording.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetReplayConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:ReplayConfiguration">
+							<xs:annotation>
+								<xs:documentation>Description of the new replay configuration parameters.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetReplayConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetReplayConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetReplayConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:ReplayConfiguration">
+							<xs:annotation>
+								<xs:documentation>The current replay configuration parameters.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="trp:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="trp:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetReplayUriRequest">
+		<wsdl:part name="parameters" element="trp:GetReplayUri"/>
+	</wsdl:message>
+	<wsdl:message name="GetReplayUriResponse">
+		<wsdl:part name="parameters" element="trp:GetReplayUriResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetReplayConfigurationRequest">
+		<wsdl:part name="parameters" element="trp:SetReplayConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="SetReplayConfigurationResponse">
+		<wsdl:part name="parameters" element="trp:SetReplayConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetReplayConfigurationRequest">
+		<wsdl:part name="parameters" element="trp:GetReplayConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="GetReplayConfigurationResponse">
+		<wsdl:part name="parameters" element="trp:GetReplayConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="ReplayPort">
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>Returns the capabilities of the replay service. The result is returned in a typed answer.</wsdl:documentation>
+			<wsdl:input message="trp:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="trp:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetReplayUri">
+			<wsdl:documentation>
+				Requests a URI that can be used to initiate playback of a recorded stream
+				using RTSP as the control protocol. The URI is valid only as it is
+				specified in the response.
+				A device supporting the Replay Service shall support the GetReplayUri command.
+			</wsdl:documentation>
+			<wsdl:input message="trp:GetReplayUriRequest"/>
+			<wsdl:output message="trp:GetReplayUriResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetReplayConfiguration">
+			<wsdl:documentation>
+				Returns the current configuration of the replay service.
+				This operation is mandatory.
+			</wsdl:documentation>
+			<wsdl:input message="trp:GetReplayConfigurationRequest"/>
+			<wsdl:output message="trp:GetReplayConfigurationResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetReplayConfiguration">
+			<wsdl:documentation>
+				Changes the current configuration of the replay service.
+				This operation is mandatory.
+			</wsdl:documentation>
+			<wsdl:input message="trp:SetReplayConfigurationRequest"/>
+			<wsdl:output message="trp:SetReplayConfigurationResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="ReplayBinding" type="trp:ReplayPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/replay/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetReplayUri">
+			<soap:operation soapAction="http://www.onvif.org/ver10/replay/wsdl/GetReplayUri"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetReplayConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/replay/wsdl/GetReplayConfiguration"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetReplayConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/replay/wsdl/SetReplayConfiguration"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+</wsdl:definitions>

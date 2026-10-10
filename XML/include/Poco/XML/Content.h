@@ -21,8 +21,7 @@
 #define XML_Content_INCLUDED
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 struct Content
@@ -47,7 +46,7 @@ struct Content
 	{
 	}
 
-	operator value() const
+	[[nodiscard]] operator value() const
 	{
 		return _v;
 	}
@@ -57,7 +56,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_Content_INCLUDED

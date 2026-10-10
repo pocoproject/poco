@@ -15,6 +15,7 @@
 #include "Poco/File_VX.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include "Poco/Path.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -62,6 +63,31 @@ void FileImpl::setPathImpl(const std::string& path)
 }
 
 
+std::string FileImpl::getExecutablePathImpl() const
+{
+	if (_path.empty()) return {};
+
+	if (_path.find('/') != std::string::npos)
+	{
+		Path p(_path);
+		p.makeAbsolute();
+		std::string absPath = p.toString();
+
+		// Optimized: check existence and executability in one stat() call
+		// VxWorks has no permission bits; any regular file is potentially executable
+		struct stat st;
+		if (::stat(const_cast<char*>(absPath.c_str()), &st) == 0 && S_ISREG(st.st_mode))
+			return absPath;
+		return {};
+	}
+
+	std::string found = findInPath(_path);
+	if (!found.empty() && !canExecuteImpl(found))
+		return {};
+	return found;
+}
+
+
 bool FileImpl::existsImpl() const
 {
 	poco_assert (!_path.empty());
@@ -87,9 +113,13 @@ bool FileImpl::canWriteImpl() const
 }
 
 
-bool FileImpl::canExecuteImpl() const
+bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
-	return false;
+	poco_assert (!absolutePath.empty());
+
+	// VxWorks has no permission bits; any regular file is potentially executable.
+	struct stat st;
+	return ::stat(const_cast<char*>(absolutePath.c_str()), &st) == 0 && S_ISREG(st.st_mode);
 }
 
 
@@ -98,8 +128,10 @@ bool FileImpl::isFileImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(const_cast<char*>(_path.c_str()), &st) == 0)
+	if (::stat(const_cast<char*>(_path.c_str()), &st) == 0)
 		return S_ISREG(st.st_mode);
+	else if (errno == ENOENT)
+		return false;
 	else
 		handleLastErrorImpl(_path);
 	return false;
@@ -111,8 +143,10 @@ bool FileImpl::isDirectoryImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(const_cast<char*>(_path.c_str()), &st) == 0)
+	if (::stat(const_cast<char*>(_path.c_str()), &st) == 0)
 		return S_ISDIR(st.st_mode);
+	else if (errno == ENOENT)
+		return false;
 	else
 		handleLastErrorImpl(_path);
 	return false;
@@ -130,8 +164,10 @@ bool FileImpl::isDeviceImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(const_cast<char*>(_path.c_str()), &st) == 0)
+	if (::stat(const_cast<char*>(_path.c_str()), &st) == 0)
 		return S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode);
+	else if (errno == ENOENT)
+		return false;
 	else
 		handleLastErrorImpl(_path);
 	return false;
@@ -315,10 +351,14 @@ void FileImpl::removeImpl()
 }
 
 
-bool FileImpl::createFileImpl()
+bool FileImpl::createFileImpl(bool createDirectories)
 {
 	poco_assert (!_path.empty());
 
+	if(createDirectories) {
+		Path p(_path);
+		p.makeDirectory();
+	}
 	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
 	{

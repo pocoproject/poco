@@ -22,6 +22,8 @@
 #include "Poco/Channel.h"
 #include "Poco/Formatter.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Mutex.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -52,8 +54,15 @@ public:
 		/// Sets the Formatter used to format the messages
 		/// before they are passed on. If null, the message
 		/// is passed on unmodified.
+		///
+		/// The formatter and the destination channel can be
+		/// replaced while other threads log. A message that is
+		/// on its way keeps the ones it started with, as one
+		/// pair. The channel lets go of those at once if no
+		/// thread is logging, and otherwise as soon as the
+		/// messages that were on their way are through.
 
-	Formatter::Ptr getFormatter() const;
+	[[nodiscard]] Formatter::Ptr getFormatter() const;
 		/// Returns the Formatter used to format messages,
 		/// which may be null.
 
@@ -61,16 +70,16 @@ public:
 		/// Sets the destination channel to which the formatted
 		/// messages are passed on.
 
-	Channel::Ptr getChannel() const;
+	[[nodiscard]] Channel::Ptr getChannel() const;
 		/// Returns the channel to which the formatted
 		/// messages are passed on.
 
-	void log(const Message& msg);
+	void log(const Message &msg) override;
 		/// Formats the given Message using the Formatter and
 		/// passes the formatted message on to the destination
 		/// Channel.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets or changes a configuration property.
 		///
 		/// Only the "channel" and "formatter" properties are supported, which allow
@@ -79,18 +88,40 @@ public:
 		///
 		/// Unsupported properties are passed to the attached Channel.
 
-	void open();
+	void open() override;
 		/// Opens the attached channel.
 
-	void close();
+	void close() override;
 		/// Closes the attached channel.
 
 protected:
-	~FormattingChannel();
+	~FormattingChannel() override;
 
 private:
-	Formatter::Ptr _pFormatter;
-	Channel::Ptr   _pChannel;
+	struct Parts: public RefCountedObject
+		/// The formatter and the destination channel of one moment.
+		/// A thread that logs loads them as one, and a message that
+		/// is on its way keeps both.
+	{
+		Parts(Formatter::Ptr pFormatter, Channel::Ptr pChannel);
+
+		Formatter::Ptr pFormatter;
+		Channel::Ptr   pChannel;
+
+	protected:
+		~Parts() override = default;
+	};
+
+	using PartsPtr = AutoPtr<Parts>;
+
+	PartsPtr _pParts;
+		/// The current parts, for getFormatter() and getChannel().
+
+	std::atomic<Parts*> _pCurrentParts;
+		/// The current parts for the threads that log, which load them
+		/// without the mutex and without counting a reference.
+
+	mutable FastMutex _mutex;
 };
 
 

@@ -20,9 +20,7 @@
 namespace Poco {
 
 
-PriorityNotificationQueue::PriorityNotificationQueue()
-{
-}
+PriorityNotificationQueue::PriorityNotificationQueue() = default;
 
 
 PriorityNotificationQueue::~PriorityNotificationQueue()
@@ -67,7 +65,7 @@ Notification* PriorityNotificationQueue::dequeueNotification()
 Notification* PriorityNotificationQueue::waitDequeueNotification()
 {
 	Notification::Ptr pNf;
-	WaitInfo* pWI = 0;
+	WaitInfo* pWI = nullptr;
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
@@ -85,7 +83,7 @@ Notification* PriorityNotificationQueue::waitDequeueNotification()
 Notification* PriorityNotificationQueue::waitDequeueNotification(long milliseconds)
 {
 	Notification::Ptr pNf;
-	WaitInfo* pWI = 0;
+	WaitInfo* pWI = nullptr;
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
@@ -101,7 +99,7 @@ Notification* PriorityNotificationQueue::waitDequeueNotification(long millisecon
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = pWI->pNf;
-		for (WaitQueue::iterator it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
+		for (auto it = _waitQueue.begin(); it != _waitQueue.end(); ++it)
 		{
 			if (*it == pWI)
 			{
@@ -169,7 +167,7 @@ bool PriorityNotificationQueue::hasIdleThreads() const
 Notification::Ptr PriorityNotificationQueue::dequeueOne()
 {
 	Notification::Ptr pNf;
-	NfQueue::iterator it = _nfQueue.begin();
+	auto it = _nfQueue.begin();
 	if (it != _nfQueue.end())
 	{
 		pNf = it->second;

@@ -23,8 +23,7 @@
 #include "Poco/Zip/ZipCommon.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API Add: public ZipOperation
@@ -45,7 +44,7 @@ private:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_Add_INCLUDED

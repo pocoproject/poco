@@ -5,7 +5,7 @@
 // Package: Options
 // Module:  RegExpValidator
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -22,17 +22,14 @@
 using Poco::format;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
+
+
+RegExpValidator::~RegExpValidator() = default;
 
 
 RegExpValidator::RegExpValidator(const std::string& regexp):
 	_regexp(regexp)
-{
-}
-
-
-RegExpValidator::~RegExpValidator()
 {
 }
 
@@ -44,4 +41,4 @@ void RegExpValidator::validate(const Option& option, const std::string& value)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

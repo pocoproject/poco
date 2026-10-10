@@ -3,7 +3,7 @@
 //
 
 
-#if defined(__clang__) || defined (__GNUC__)
+#if (defined(__clang__) || defined(__GNUC__)) && !defined(_MSC_VER)
 	#define HAVE_CXXABI_H
 #endif
 

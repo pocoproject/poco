@@ -22,9 +22,7 @@
 #include "Poco/Data/Connector.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ODBC_API Connector: public Poco::Data::Connector
@@ -37,14 +35,14 @@ public:
 	Connector();
 		/// Creates the Connector.
 
-	~Connector();
+	~Connector() override;
 		/// Destroys the Connector.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const override;
 		/// Returns the name associated with this connector.
 
-	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
-		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT);
+	[[nodiscard]] Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
+		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT) override;
 		/// Creates a ODBC SessionImpl object and initializes it with the given connectionString.
 
 	static void registerConnector();
@@ -66,7 +64,7 @@ public:
 		/// This setting should not be changed after the first Session has
 		/// been created.
 
-	static bool stringBoundToLongVarChar();
+	[[nodiscard]] static bool stringBoundToLongVarChar();
 		/// Returns true if std::string is bound to SQL_LONGVARCHAR,
 		/// otherwise false (bound to SQL_VARCHAR).
 
@@ -90,7 +88,7 @@ inline bool Connector::stringBoundToLongVarChar()
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif // Data_ODBC_Connector_INCLUDED

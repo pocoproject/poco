@@ -17,8 +17,7 @@
 #include <cctype>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 TypeDef::TypeDef(const std::string& decl, NameSpace* pNameSpace):
@@ -88,4 +87,4 @@ std::string TypeAlias::baseType() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

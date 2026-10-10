@@ -21,7 +21,7 @@ namespace Poco {
 
 
 TextIterator::TextIterator():
-	_pEncoding(0)
+	_pEncoding(nullptr)
 {
 }
 
@@ -43,7 +43,7 @@ TextIterator::TextIterator(const std::string::const_iterator& begin, const std::
 
 
 TextIterator::TextIterator(const std::string& str):
-	_pEncoding(0),
+	_pEncoding(nullptr),
 	_it(str.end()),
 	_end(str.end())
 {
@@ -51,7 +51,7 @@ TextIterator::TextIterator(const std::string& str):
 
 
 TextIterator::TextIterator(const std::string::const_iterator& end):
-	_pEncoding(0),
+	_pEncoding(nullptr),
 	_it(end),
 	_end(end)
 {
@@ -99,6 +99,7 @@ int TextIterator::operator * () const
 
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
 	unsigned char* p = buffer;
+	unsigned char* pend = p + TextEncoding::MAX_SEQUENCE_LENGTH;
 
 	if (it != _end)
 		*p++ = *it++;
@@ -112,6 +113,7 @@ int TextIterator::operator * () const
 	{
 		while (read < -n && it != _end)
 		{
+			poco_assert(p != pend);
 			*p++ = *it++;
 			read++;
 		}

@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2008-2010 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this document so long as this copyright notice, license and disclaimer are retained with all copies of the document. No license is granted to modify this document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE; OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT.  THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO, INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tls="http://www.onvif.org/ver10/display/wsdl" targetNamespace="http://www.onvif.org/ver10/display/wsdl">
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/display/wsdl" xmlns:tt="http://www.onvif.org/ver10/schema" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="2.1.1">
+			<xs:import namespace="http://www.onvif.org/ver10/schema" schemaLocation="../ver10/schema/onvif.xsd"/>
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="tls:Capabilities">
+							<xs:annotation>
+								<xs:documentation>The capabilities for the display service is returned in the Capabilities element.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:complexType name="Capabilities">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="FixedLayout" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indication that the SetLayout command supports only predefined layouts.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="tls:Capabilities"/>
+			<!--===============================-->
+			<xs:element name="GetLayout">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoOutput" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Video Output whose Layout is requested</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetLayoutResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Layout" type="tt:Layout">
+							<xs:annotation>
+								<xs:documentation>Current layout of the video output.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetLayout">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoOutput" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Video Output whose Layout shall be changed.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Layout" type="tt:Layout">
+							<xs:annotation>
+								<xs:documentation>Layout to be set</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetLayoutResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDisplayOptions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoOutput" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Video Output whose options are requested</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDisplayOptionsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="LayoutOptions" type="tt:LayoutOptions" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>The LayoutOptions describe the fixed and predefined layouts of a device. If the device does
+not offer fixed layouts and allows setting the layout free this element is empty.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="CodingCapabilities" type="tt:CodingCapabilities">
+							<xs:annotation>
+								<xs:documentation>decoding and encoding capabilities of the device</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetPaneConfigurations">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoOutput" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Reference Token of the Video Output whose Pane Configurations are requested</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetPaneConfigurationsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="PaneConfiguration" type="tt:PaneConfiguration" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Contains a list of defined Panes of the specified VideoOutput. Each VideoOutput has at least one PaneConfiguration.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetPaneConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoOutput" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Reference Token of the Video Output the requested pane belongs to</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Pane" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Reference Token of the Pane whose Configuration is requested</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetPaneConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="PaneConfiguration" type="tt:PaneConfiguration">
+							<xs:annotation>
+								<xs:documentation>returns the configuration of the requested pane.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetPaneConfigurations">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoOutput" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the video output whose panes to set.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="PaneConfiguration" type="tt:PaneConfiguration" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Pane Configuration to be set.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetPaneConfigurationsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetPaneConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoOutput" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the video output whose panes to set.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="PaneConfiguration" type="tt:PaneConfiguration">
+							<xs:annotation>
+								<xs:documentation>Pane Configuration to be set.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetPaneConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreatePaneConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoOutput" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the video output where the pane shall be created.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="PaneConfiguration" type="tt:PaneConfiguration">
+							<xs:annotation>
+								<xs:documentation>Configuration of the pane to be created.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreatePaneConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="PaneToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the new pane configuration.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeletePaneConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoOutput" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the video output where the pane shall be deleted.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="PaneToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the pane to be deleted.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeletePaneConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="tls:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="tls:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetLayoutRequest">
+		<wsdl:part name="parameters" element="tls:GetLayout"/>
+	</wsdl:message>
+	<wsdl:message name="GetLayoutResponse">
+		<wsdl:part name="parameters" element="tls:GetLayoutResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetLayoutRequest">
+		<wsdl:part name="parameters" element="tls:SetLayout"/>
+	</wsdl:message>
+	<wsdl:message name="SetLayoutResponse">
+		<wsdl:part name="parameters" element="tls:SetLayoutResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetDisplayOptionsRequest">
+		<wsdl:part name="parameters" element="tls:GetDisplayOptions"/>
+	</wsdl:message>
+	<wsdl:message name="GetDisplayOptionsResponse">
+		<wsdl:part name="parameters" element="tls:GetDisplayOptionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetPaneConfigurationsRequest">
+		<wsdl:part name="parameters" element="tls:GetPaneConfigurations"/>
+	</wsdl:message>
+	<wsdl:message name="GetPaneConfigurationsResponse">
+		<wsdl:part name="parameters" element="tls:GetPaneConfigurationsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetPaneConfigurationRequest">
+		<wsdl:part name="parameters" element="tls:GetPaneConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="GetPaneConfigurationResponse">
+		<wsdl:part name="parameters" element="tls:GetPaneConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetPaneConfigurationsRequest">
+		<wsdl:part name="parameters" element="tls:SetPaneConfigurations"/>
+	</wsdl:message>
+	<wsdl:message name="SetPaneConfigurationsResponse">
+		<wsdl:part name="parameters" element="tls:SetPaneConfigurationsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetPaneConfigurationRequest">
+		<wsdl:part name="parameters" element="tls:SetPaneConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="SetPaneConfigurationResponse">
+		<wsdl:part name="parameters" element="tls:SetPaneConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="CreatePaneConfigurationRequest">
+		<wsdl:part name="parameters" element="tls:CreatePaneConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="CreatePaneConfigurationResponse">
+		<wsdl:part name="parameters" element="tls:CreatePaneConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="DeletePaneConfigurationRequest">
+		<wsdl:part name="parameters" element="tls:DeletePaneConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="DeletePaneConfigurationResponse">
+		<wsdl:part name="parameters" element="tls:DeletePaneConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="DisplayPort">
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>Returns the capabilities of the display service. The result is returned in a typed answer.</wsdl:documentation>
+			<wsdl:input message="tls:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="tls:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetLayout">
+			<wsdl:documentation>Return the current layout of a video output. The Layout assigns a pane configuration to a certain area of the display. The layout settings
+directly affect a specific video output. The layout consists of a list of PaneConfigurations and
+their associated display areas.</wsdl:documentation>
+			<wsdl:input message="tls:GetLayoutRequest"/>
+			<wsdl:output message="tls:GetLayoutResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetLayout">
+			<wsdl:documentation>Change the layout of a display (e.g. change from
+single view to split screen view).The Layout assigns a pane configuration to a certain area of the display. The layout settings
+directly affect a specific video output. The layout consists of a list of PaneConfigurations and
+their associated display areas.<br/>
+A device implementation shall be tolerant against rounding errors when matching a layout against its fixed set of layouts by accepting differences of at least one percent.
+</wsdl:documentation>
+			<wsdl:input message="tls:SetLayoutRequest"/>
+			<wsdl:output message="tls:SetLayoutResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetDisplayOptions">
+			<wsdl:documentation>The Display Options contain the supported layouts (LayoutOptions) and the decoding and
+encoding capabilities (CodingCapabilities) of the device. The GetDisplayOptions command
+returns both, Layout and Coding Capabilities, of a VideoOutput.</wsdl:documentation>
+			<wsdl:input message="tls:GetDisplayOptionsRequest"/>
+			<wsdl:output message="tls:GetDisplayOptionsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetPaneConfigurations">
+			<wsdl:documentation>List all currently defined panes of a device for a specified video output
+(regardless if this pane is visible at a moment). A Pane is a display area on the monitor that is attached to a video output. A pane has a
+PaneConfiguration that describes which entities are associated with the pane. A client has to configure the pane according to the connection to be established by setting the
+AudioOutput and/or AudioSourceToken. If a Token is not set, the corresponding session will
+not be established.</wsdl:documentation>
+			<wsdl:input message="tls:GetPaneConfigurationsRequest"/>
+			<wsdl:output message="tls:GetPaneConfigurationsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetPaneConfiguration">
+			<wsdl:documentation>Retrieve the pane configuration for a pane token.</wsdl:documentation>
+			<wsdl:input message="tls:GetPaneConfigurationRequest"/>
+			<wsdl:output message="tls:GetPaneConfigurationResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetPaneConfigurations">
+			<wsdl:documentation>Modify one or more configurations of the specified video output. 
+			This method will only modify the provided configurations and leave the others unchanged. 
+			Use <a href="#op.DeletePaneConfiguration">DeletePaneConfiguration</a> to remove pane configurations.</wsdl:documentation>
+			<wsdl:input message="tls:SetPaneConfigurationsRequest"/>
+			<wsdl:output message="tls:SetPaneConfigurationsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetPaneConfiguration">
+			<wsdl:documentation>This command changes the configuration of the specified pane (tbd)</wsdl:documentation>
+			<wsdl:input message="tls:SetPaneConfigurationRequest"/>
+			<wsdl:output message="tls:SetPaneConfigurationResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="CreatePaneConfiguration">
+			<wsdl:documentation>Create a new pane configuration describing the streaming and coding settings for a display area.<br/>
+				This optional method is only supported by devices that signal support of dynamic pane creation via their capabilities.<br/>
+				The content of the Token field may be ignored by the device.
+			</wsdl:documentation>
+			<wsdl:input message="tls:CreatePaneConfigurationRequest"/>
+			<wsdl:output message="tls:CreatePaneConfigurationResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeletePaneConfiguration">
+			<wsdl:documentation>Delete a pane configuration. A service must respond with an error if the pane configuration
+				is in use by the current layout.<br/>
+				This optional method is only supported by devices that signal support of dynamic pane creation via their capabilities. 
+			</wsdl:documentation>
+			<wsdl:input message="tls:DeletePaneConfigurationRequest"/>
+			<wsdl:output message="tls:DeletePaneConfigurationResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="DisplayBinding" type="tls:DisplayPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetLayout">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/GetLayout"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetLayout">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/SetLayout"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetDisplayOptions">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/GetDisplayOptions"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetPaneConfigurations">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/GetPaneConfigurations"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetPaneConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/GetPaneConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetPaneConfigurations">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/SetPaneConfigurations"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetPaneConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/SetPaneConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="CreatePaneConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/CreatePaneConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DeletePaneConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/display/wsdl/DeletePaneConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+</wsdl:definitions>

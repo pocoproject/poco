@@ -173,9 +173,9 @@ void XMLWriterTest::testDTDNotation()
 	writer.startDocument();
 	writer.startDTD("test", "", "");
 	std::string systemId("quicktime");
-	writer.notationDecl("mov", 0, &systemId);
+	writer.notationDecl("mov", nullptr, &systemId);
 	std::string publicId("-//W3C//NOTATION XML 1.0//EN");
-	writer.notationDecl("xml", &publicId, 0);
+	writer.notationDecl("xml", &publicId, nullptr);
 	writer.endDTD();
 	writer.startElement("", "", "foo");
 	writer.endElement("", "", "foo");
@@ -198,9 +198,9 @@ void XMLWriterTest::testDTDEntity()
 	writer.startDocument();
 	writer.startDTD("test", "", "");
 	std::string systemId("quicktime");
-	writer.notationDecl("mov", 0, &systemId);
+	writer.notationDecl("mov", nullptr, &systemId);
 	std::string publicId("-//W3C//NOTATION XML 1.0//EN");
-	writer.unparsedEntityDecl("movie", 0, "movie.mov", "mov");
+	writer.unparsedEntityDecl("movie", nullptr, "movie.mov", "mov");
 	writer.endDTD();
 	writer.startElement("", "", "foo");
 	writer.endElement("", "", "foo");

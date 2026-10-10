@@ -23,8 +23,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API DocumentFragment: public AbstractContainerNode
@@ -61,15 +60,15 @@ class XML_API DocumentFragment: public AbstractContainerNode
 {
 public:
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 protected:
 	DocumentFragment(Document* pOwnerDocument);
 	DocumentFragment(Document* pOwnerDocument, const DocumentFragment& fragment);
 	~DocumentFragment();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;
@@ -78,7 +77,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_DocumentFragment_INCLUDED

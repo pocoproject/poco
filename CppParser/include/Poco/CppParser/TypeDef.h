@@ -22,8 +22,7 @@
 #include "Poco/CppParser/Decl.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API TypeDef: public Decl
@@ -36,9 +35,9 @@ public:
 	~TypeDef();
 		/// Destroys the TypeDef.
 
-	Symbol::Kind kind() const;
+	[[nodiscard]] Symbol::Kind kind() const;
 
-	std::string baseType() const;
+	[[nodiscard]] std::string baseType() const;
 		/// Returns the underlying base type.
 };
 
@@ -53,14 +52,14 @@ public:
 	~TypeAlias();
 		/// Destroys the TypeAlias.
 
-	Symbol::Kind kind() const;
+	[[nodiscard]] Symbol::Kind kind() const;
 
-	std::string baseType() const;
+	[[nodiscard]] std::string baseType() const;
 		/// Returns the underlying base type.
 };
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_TypeDef_INCLUDED

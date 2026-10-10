@@ -17,8 +17,7 @@
 #include <iostream>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 PrintHandler::PrintHandler(unsigned indent, int options):
@@ -41,9 +40,7 @@ PrintHandler::PrintHandler(std::ostream& out, unsigned indent, int options):
 }
 
 
-PrintHandler::~PrintHandler()
-{
-}
+PrintHandler::~PrintHandler() = default;
 
 
 void PrintHandler::reset()
@@ -212,4 +209,4 @@ void PrintHandler::arrayValue()
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

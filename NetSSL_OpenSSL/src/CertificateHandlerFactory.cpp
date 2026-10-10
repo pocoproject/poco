@@ -16,8 +16,7 @@
 #include "Poco/Net/SSLManager.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 CertificateHandlerFactory::CertificateHandlerFactory()
@@ -41,4 +40,4 @@ CertificateHandlerFactoryRegistrar::~CertificateHandlerFactoryRegistrar()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

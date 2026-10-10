@@ -22,8 +22,7 @@
 #include "Poco/Net/NameValueCollection.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -49,6 +48,9 @@ public:
 
 	HTTPAuthenticationParams(const HTTPResponse& response, const std::string& header = WWW_AUTHENTICATE);
 		/// See fromResponse() documentation.
+
+	HTTPAuthenticationParams(const HTTPAuthenticationParams& authParams);
+		/// Creates a HTTPAuthenticationParams by copying another one.
 
 	virtual ~HTTPAuthenticationParams();
 		/// Destroys the HTTPAuthenticationParams.
@@ -81,13 +83,13 @@ public:
 	void setRealm(const std::string& realm);
 		/// Sets the "realm" parameter to the provided string.
 
-	const std::string& getRealm() const;
+	[[nodiscard]] const std::string& getRealm() const;
 		/// Returns value of the "realm" parameter.
 		///
 		/// Throws NotFoundException is there is no "realm" set in the
 		/// HTTPAuthenticationParams.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Formats the HTTPAuthenticationParams for inclusion in HTTP
 		/// request or response authentication header.
 
@@ -101,7 +103,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPAuthenticationParams_INCLUDED

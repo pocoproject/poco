@@ -26,8 +26,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPSession;
@@ -46,8 +45,8 @@ public:
 	void close();
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length);
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
 
 private:
 	HTTPSession&    _session;
@@ -64,7 +63,7 @@ class Net_API HTTPChunkedIOS: public virtual std::ios
 public:
 	HTTPChunkedIOS(HTTPSession& session, HTTPChunkedStreamBuf::openmode mode, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedIOS();
-	HTTPChunkedStreamBuf* rdbuf();
+	[[nodiscard]] HTTPChunkedStreamBuf* rdbuf();
 
 protected:
 	HTTPChunkedStreamBuf _buf;
@@ -101,7 +100,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPChunkedStream_INCLUDED

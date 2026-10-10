@@ -16,26 +16,25 @@
 #include "Poco/SAX/SAXException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 XMLFilterImpl::XMLFilterImpl():
-	_pParent(0),
-	_pEntityResolver(0),
-	_pDTDHandler(0),
-	_pContentHandler(0),
-	_pErrorHandler(0)
+	_pParent(nullptr),
+	_pEntityResolver(nullptr),
+	_pDTDHandler(nullptr),
+	_pContentHandler(nullptr),
+	_pErrorHandler(nullptr)
 {
 }
 
 
 XMLFilterImpl::XMLFilterImpl(XMLReader* pParent):
 	_pParent(pParent),
-	_pEntityResolver(0),
-	_pDTDHandler(0),
-	_pContentHandler(0),
-	_pErrorHandler(0)
+	_pEntityResolver(nullptr),
+	_pDTDHandler(nullptr),
+	_pContentHandler(nullptr),
+	_pErrorHandler(nullptr)
 {
 }
 
@@ -176,7 +175,7 @@ InputSource* XMLFilterImpl::resolveEntity(const XMLString* publicId, const XMLSt
 	if (_pEntityResolver)
 		return _pEntityResolver->resolveEntity(publicId, systemId);
 	else
-		return 0;
+		return nullptr;
 }
 
 
@@ -236,6 +235,7 @@ void XMLFilterImpl::endElement(const XMLString& uri, const XMLString& localName,
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void XMLFilterImpl::characters(const XMLChar ch[], int start, int length)
 {
 	if (_pContentHandler)
@@ -243,6 +243,7 @@ void XMLFilterImpl::characters(const XMLChar ch[], int start, int length)
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void XMLFilterImpl::ignorableWhitespace(const XMLChar ch[], int start, int length)
 {
 	if (_pContentHandler)
@@ -310,4 +311,4 @@ void XMLFilterImpl::setupParse()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

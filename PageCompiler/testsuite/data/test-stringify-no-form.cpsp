@@ -1,0 +1,3 @@
+<%@ page class="StringifyHandlerNoForm" namespace="AI::Test" stringify="true" form="false" %><%%
+	(void)request;
+%><p>Hello, World!</p>

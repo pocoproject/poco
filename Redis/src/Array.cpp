@@ -1,5 +1,5 @@
 //
-// Array.h
+// Array.cpp
 //
 // Library: Redis
 // Package: Redis
@@ -17,8 +17,7 @@
 #include "Poco/Redis/Array.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 Array::Array()
@@ -37,6 +36,12 @@ Array::~Array()
 }
 
 
+Array& Array::operator=(const Array&) = default;
+
+
+Array& Array::operator=(Array&&) = default;
+
+
 Array& Array::addRedisType(RedisType::Ptr value)
 {
 	checkNull();
@@ -53,7 +58,7 @@ int Array::getType(size_t pos) const
 
 	if (pos >= _elements.value().size()) throw InvalidArgumentException();
 
-	RedisType::Ptr element = _elements.value().at(pos);
+	const RedisType::Ptr element = _elements.value().at(pos);
 	return element->type();
 }
 
@@ -64,4 +69,4 @@ std::string Array::toString() const
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

@@ -21,45 +21,61 @@
 // Assertions //
 ////////////////
 
-#define ASSERT(cond) ASSERT_TRUE(cond);
+#define ASSERT(cond) ASSERT_TRUE(cond)
 
-#define ASSERT_TRUE(cond) \
-  if (!(cond)) throw mt::AssertFailedException(#cond, __FILE__, __LINE__);
+#define ASSERT_TRUE(cond)                                         \
+  do {                                                            \
+    if (!(cond)) {                                                \
+      throw mt::AssertFailedException(#cond, __FILE__, __LINE__); \
+    }                                                             \
+  } while (false)
 
-#define ASSERT_FALSE(cond) \
-  if (cond) throw mt::AssertFailedException(#cond, __FILE__, __LINE__);
+#define ASSERT_FALSE(cond)                                        \
+  do {                                                            \
+    if (cond) {                                                   \
+      throw mt::AssertFailedException(#cond, __FILE__, __LINE__); \
+    }                                                             \
+  } while (false)
 
-#define ASSERT_NULL(value) ASSERT_TRUE(value == NULL);
+#define ASSERT_NULL(value) ASSERT_TRUE(value == NULL)
 
-#define ASSERT_NOTNULL(value) ASSERT_TRUE(value != NULL);
+#define ASSERT_NOTNULL(value) ASSERT_TRUE(value != NULL)
 
-#define ASSERT_STREQ(a, b)                                             \
-  if (std::string(a).compare(std::string(b)) != 0) {                   \
-    printf("%s{    info} %s", mt::yellow(), mt::def());                \
-    std::cout << "Actual values: " << a << " != " << b << std::endl;   \
-    throw mt::AssertFailedException(#a " == " #b, __FILE__, __LINE__); \
-  }
+#define ASSERT_STREQ(a, b)                                               \
+  do {                                                                   \
+    if (std::string(a).compare(std::string(b)) != 0) {                   \
+      printf("%s{    info} %s", mt::yellow(), mt::def());                \
+      std::cout << "Actual values: " << a << " != " << b << std::endl;   \
+      throw mt::AssertFailedException(#a " == " #b, __FILE__, __LINE__); \
+    }                                                                    \
+  } while (false)
 
-#define ASSERT_STRNEQ(a, b)                                            \
-  if (std::string(a).compare(std::string(b)) != = 0) {                 \
-    printf("%s{    info} %s", mt::yellow(), mt::def());                \
-    std::cout << "Actual values: " << a << " == " << b << std::endl;   \
-    throw mt::AssertFailedException(#a " != " #b, __FILE__, __LINE__); \
-  }
+#define ASSERT_STRNEQ(a, b)                                              \
+  do {                                                                   \
+    if (std::string(a).compare(std::string(b)) == 0) {                   \
+      printf("%s{    info} %s", mt::yellow(), mt::def());                \
+      std::cout << "Actual values: " << a << " == " << b << std::endl;   \
+      throw mt::AssertFailedException(#a " != " #b, __FILE__, __LINE__); \
+    }                                                                    \
+  } while (false)
 
-#define ASSERT_EQ(a, b)                                              \
-  if (a != b) {                                                      \
-    printf("%s{    info} %s", mt::yellow(), mt::def());              \
-    std::cout << "Actual values: " << a << " != " << b << std::endl; \
-  }                                                                  \
-  ASSERT(a == b);
+#define ASSERT_EQ(a, b)                                                \
+  do {                                                                 \
+    if (a != b) {                                                      \
+      printf("%s{    info} %s", mt::yellow(), mt::def());              \
+      std::cout << "Actual values: " << a << " != " << b << std::endl; \
+    }                                                                  \
+    ASSERT(a == b);                                                    \
+  } while (false)
 
-#define ASSERT_NEQ(a, b)                                             \
-  if (a == b) {                                                      \
-    printf("%s{    info} %s", mt::yellow(), mt::def());              \
-    std::cout << "Actual values: " << a << " == " << b << std::endl; \
-  }                                                                  \
-  ASSERT(a != b);
+#define ASSERT_NEQ(a, b)                                               \
+  do {                                                                 \
+    if (a == b) {                                                      \
+      printf("%s{    info} %s", mt::yellow(), mt::def());              \
+      std::cout << "Actual values: " << a << " == " << b << std::endl; \
+    }                                                                  \
+    ASSERT(a != b);                                                    \
+  } while (false)
 
 ////////////////
 // Unit Tests //
@@ -102,7 +118,7 @@ inline void printFailed(const char* message, FILE* file = stdout) {
 class AssertFailedException : public std::exception {
  public:
   AssertFailedException(std::string description, std::string filepath, int line)
-      : std::exception(), description_(description), filepath_(filepath), line_(line){};
+      : std::exception(), description_(description), filepath_(filepath), line_(line) {};
 
   virtual const char* what() const throw() { return description_.c_str(); }
 

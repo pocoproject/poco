@@ -19,16 +19,13 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Format.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 POCO_DECLARE_EXCEPTION(ODBC_API, ODBCException, Poco::Data::DataException)
@@ -89,37 +86,37 @@ public:
 		return *this;
 	}
 
-	const char* name() const noexcept
+	[[nodiscard]] const char* name() const noexcept
 		/// Returns the name of the exception
 	{
 		return "ODBC handle exception";
 	}
 
-	const char* className() const noexcept
+	[[nodiscard]] const char* className() const noexcept
 		/// Returns the HandleException class name.
 	{
 		return typeid(*this).name();
 	}
 
-	Poco::Exception* clone() const
+	[[nodiscard]] Poco::Exception* clone() const
 		/// Clones the HandleException
 	{
 		return new HandleException(*this);
 	}
 
-	void rethrow() const
+	[[noreturn]] void rethrow() const
 		/// Re-throws the HandleException.
 	{
 		throw *this;
 	}
 
-	const Diagnostics<H, handleType>& diagnostics() const
+	[[nodiscard]] const Diagnostics<H, handleType>& diagnostics() const
 		/// Returns error diagnostics.
 	{
 		return _error.diagnostics();
 	}
 
-	std::string toString() const
+	[[nodiscard]] std::string toString() const
 		/// Returns the formatted error diagnostics for the handle.
 	{
 		return Poco::format("ODBC Error: %s\n===================\n%s\n",
@@ -127,7 +124,7 @@ public:
 			_error.toString());
 	}
 
-	static std::string errorString(const H& handle)
+	[[nodiscard]] static std::string errorString(const H& handle)
 		/// Returns the error diagnostics string for the handle.
 	{
 		return Error<H, handleType>(handle).toString();
@@ -138,13 +135,31 @@ private:
 };
 
 
+// explicit instantiation definition
+#ifndef POCO_DOC
+
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
+extern template class HandleException<SQLHENV, SQL_HANDLE_ENV>;
+extern template class HandleException<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class HandleException<SQLHDESC, SQL_HANDLE_DESC>;
+#else
+extern template class ODBC_API HandleException<SQLHENV, SQL_HANDLE_ENV>;
+extern template class ODBC_API HandleException<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class ODBC_API HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class ODBC_API HandleException<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
+
+#endif
+
+
 using EnvironmentException = HandleException<SQLHENV, SQL_HANDLE_ENV>;
 using ConnectionException = HandleException<SQLHDBC, SQL_HANDLE_DBC>;
 using StatementException = HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
 using DescriptorException = HandleException<SQLHDESC, SQL_HANDLE_DESC>;
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

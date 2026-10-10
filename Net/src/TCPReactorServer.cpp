@@ -1,0 +1,112 @@
+#include "Poco/Net/TCPReactorServer.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/TCPServerParams.h"
+#include "Poco/ThreadPool.h"
+
+namespace Poco::Net {
+
+
+
+TCPReactorServer::TCPReactorServer(int port, TCPServerParams::Ptr pParams)
+	: TCPReactorServer(SocketAddress(static_cast<Poco::UInt16>(port)), pParams)
+{
+}
+
+
+TCPReactorServer::TCPReactorServer(const SocketAddress& address, TCPServerParams::Ptr pParams)
+	: _threadPool("TCPRA", pParams->getAcceptorNum()),
+	  _reactors(pParams->getAcceptorNum()),
+	  _pParams(pParams),
+	  _port(address.port()),
+	  _stopped(false)
+{
+	for (auto& reactor : _reactors)
+	{
+		ServerSocket socket(address);
+		_sockets.push_back(socket);
+		if (_sockets.size() == 1)
+		{
+			_port = socket.address().port();
+		}
+		auto acceptor = std::make_shared<TCPReactorAcceptor>(socket, reactor, _pParams);
+		_acceptors.push_back(acceptor);
+	}
+}
+
+TCPReactorServer::TCPReactorServer(const ServerSocket& socket, TCPServerParams::Ptr pParams)
+	: _threadPool("TCPRA", 1),
+	  _reactors(1),
+	  _pParams(pParams),
+	  _port(socket.address().port()),
+	  _stopped(false)
+{
+	_sockets.push_back(socket);
+	_acceptors.push_back(std::make_shared<TCPReactorAcceptor>(_sockets.back(), _reactors.front(), _pParams));
+}
+
+TCPReactorServer::~TCPReactorServer()
+{
+	stop();
+}
+
+void TCPReactorServer::start()
+{
+	for (auto& reactor : _reactors)
+	{
+		_threadPool.start(reactor);
+	}
+}
+
+void TCPReactorServer::setRecvMessageCallback(const RecvMessageCallback& cb)
+{
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->setRecvMessageCallback(cb);
+	}
+}
+
+void TCPReactorServer::setCloseCallback(const CloseCallback& cb)
+{
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->setCloseCallback(cb);
+	}
+}
+
+void TCPReactorServer::setAcceptCallback(const AcceptCallback& cb)
+{
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->setAcceptCallback(cb);
+	}
+}
+
+void TCPReactorServer::setTimeoutCallback(const TimeoutCallback& cb)
+{
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->setTimeoutCallback(cb);
+	}
+}
+
+void TCPReactorServer::stop()
+{
+	if (_stopped.exchange(true))
+	{
+		return;
+	}
+	// Stop accepting first: a connection accepted after a worker reactor has
+	// dispatched its shutdown notification would never be closed.
+	for (auto& reactor : _reactors)
+	{
+		reactor.stop();
+	}
+	_threadPool.joinAll();
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->stop();
+	}
+}
+
+} // namespace Poco::Net
+

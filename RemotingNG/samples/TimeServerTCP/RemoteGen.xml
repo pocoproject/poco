@@ -1,0 +1,20 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				../TimeServerTCP/include/TimeService.h
+			</include>
+			<include-paths>
+				${POCO_BASE}/Util/include
+				include
+			</include-paths>
+		</files>
+		<output>
+			<include>include</include>
+			<src>src</src>
+			<copyright>Copyright (c) 2006-2020, Applied Informatics Software Engineering GmbH.</copyright>
+			<mode>server</mode>
+			<timestamps>false</timestamps>
+		</output>
+	</RemoteGen>
+</AppConfig>

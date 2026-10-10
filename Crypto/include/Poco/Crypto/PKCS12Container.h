@@ -28,8 +28,7 @@
 #include <openssl/pkcs12.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API PKCS12Container
@@ -60,31 +59,31 @@ public:
 	~PKCS12Container();
 		/// Destroys the PKCS12Container.
 
-	bool hasKey() const;
+	[[nodiscard]] bool hasKey() const;
 		/// Returns true if container contains the key.
 
-	EVPPKey getKey() const;
+	[[nodiscard]] EVPPKey getKey() const;
 		/// Return key as openssl EVP_PKEY wrapper object.
 
-	bool hasX509Certificate() const;
+	[[nodiscard]] bool hasX509Certificate() const;
 		/// Returns true if container has X509 certificate.
 
-	const X509Certificate& getX509Certificate() const;
+	[[nodiscard]] const X509Certificate& getX509Certificate() const;
 		/// Returns the X509 certificate.
 		/// Throws NotFoundException if there is no certificate.
 
-	const CAList& getCACerts() const;
+	[[nodiscard]] const CAList& getCACerts() const;
 		/// Returns the list of CA certificates in this container.
 
-	const std::string& getFriendlyName() const;
+	[[nodiscard]] const std::string& getFriendlyName() const;
 		/// Returns the friendly name of the certificate bag.
 
-	const CANameList& getFriendlyNamesCA() const;
+	[[nodiscard]] const CANameList& getFriendlyNamesCA() const;
 		/// Returns a list of CA certificates friendly names.
 
 private:
 	void load(PKCS12* pPKCS12, const std::string& password = "");
-	std::string extractFriendlyName(X509* pCert);
+	[[nodiscard]] std::string extractFriendlyName(X509* pCert);
 
 	using CertPtr = std::unique_ptr<X509Certificate>;
 
@@ -103,7 +102,7 @@ private:
 
 inline bool PKCS12Container::hasX509Certificate() const
 {
-	return _pX509Cert.get() != 0;
+	return _pX509Cert.get() != nullptr;
 }
 
 
@@ -135,7 +134,7 @@ inline const PKCS12Container::CANameList& PKCS12Container::getFriendlyNamesCA() 
 
 inline bool PKCS12Container::hasKey() const
 {
-	return _pKey != 0;
+	return _pKey != nullptr;
 }
 
 
@@ -145,7 +144,7 @@ inline EVPPKey PKCS12Container::getKey() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_PKCS12Container_INCLUDED

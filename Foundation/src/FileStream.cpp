@@ -13,7 +13,6 @@
 
 
 #include "Poco/FileStream.h"
-#include "Poco/Exception.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "FileStream_WIN32.cpp"
 #else
@@ -32,6 +31,20 @@ FileIOS::FileIOS()
 
 FileIOS::~FileIOS()
 {
+}
+
+
+void FileIOS::open(const std::string& path, std::ios::openmode mode)
+{
+	clear();
+	_buf.open(path, mode);
+}
+
+
+void FileIOS::openHandle(NativeHandle handle, std::ios::openmode mode)
+{
+	clear();
+	_buf.openHandle(handle, mode);
 }
 
 
@@ -77,7 +90,7 @@ FileInputStream::FileInputStream():
 FileInputStream::FileInputStream(const std::string& path, std::ios::openmode mode):
 	std::istream(&_buf)
 {
-	open(path, mode | std::ios::in);
+	open(path, mode);
 }
 
 
@@ -88,8 +101,7 @@ FileInputStream::~FileInputStream()
 
 void FileInputStream::open(const std::string& path, std::ios::openmode mode)
 {
-	clear();
-	_buf.open(path, mode | std::ios::in);
+	FileIOS::open(path, mode | std::ios::in);
 }
 
 
@@ -102,7 +114,7 @@ FileOutputStream::FileOutputStream():
 FileOutputStream::FileOutputStream(const std::string& path, std::ios::openmode mode):
 	std::ostream(&_buf)
 {
-	open(path, mode | std::ios::out);
+	open(path, mode);
 }
 
 
@@ -113,8 +125,7 @@ FileOutputStream::~FileOutputStream()
 
 void FileOutputStream::open(const std::string& path, std::ios::openmode mode)
 {
-	clear();
-	_buf.open(path, mode | std::ios::out);
+	FileIOS::open(path, mode | std::ios::out);
 }
 
 
@@ -138,8 +149,7 @@ FileStream::~FileStream()
 
 void FileStream::open(const std::string& path, std::ios::openmode mode)
 {
-	clear();
-	_buf.open(path, mode);
+	FileIOS::open(path, mode);
 }
 
 

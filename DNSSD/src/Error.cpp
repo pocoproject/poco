@@ -17,8 +17,7 @@
 #include "Poco/DNSSD/Error.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 Error::Error():
@@ -41,4 +40,4 @@ Error::~Error()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

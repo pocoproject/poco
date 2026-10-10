@@ -1,0 +1,21 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				include/CheckVat/CheckVatService.h
+			</include>
+			<include-paths>
+				include
+			</include-paths>
+		</files>
+		<output>
+			<mode>client</mode>
+			<namespace>CheckVat</namespace>
+			<include>include/CheckVat</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+			<flatIncludes>false</flatIncludes>
+			<timestamps>false</timestamps>
+		</output>
+	</RemoteGen>
+</AppConfig>

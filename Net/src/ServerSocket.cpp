@@ -20,8 +20,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 ServerSocket::ServerSocket(): Socket(new ServerSocketImpl)
@@ -163,4 +162,4 @@ StreamSocket ServerSocket::acceptConnection()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -25,11 +25,10 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
-template<typename T>
+template <typename T>
 class Preparation: public AbstractPreparation
 	/// Class for calling the appropriate AbstractPreparator method.
 {
@@ -42,12 +41,10 @@ public:
 	{
 	}
 
-	~Preparation()
+	~Preparation() override = default;
 		/// Destroys the Preparation.
-	{
-	}
 
-	void prepare()
+	void prepare() override
 		/// Prepares data.
 	{
 		auto pPrep = preparation();
@@ -75,12 +72,10 @@ public:
 	{
 	}
 
-	~Preparation()
+	~Preparation() override = default;
 		/// Destroys the Preparation.
-	{
-	}
 
-	void prepare()
+	void prepare() override
 		/// Prepares data.
 	{
 		TypeHandler<std::vector<T>>::prepare(_pos, _val, preparation());
@@ -107,12 +102,10 @@ public:
 	{
 	}
 
-	~Preparation()
+	~Preparation() override = default;
 		/// Destroys the Preparation.
-	{
-	}
 
-	void prepare()
+	void prepare() override
 		/// Prepares data.
 	{
 		TypeHandler<std::deque<T>>::prepare(_pos, _val, preparation());
@@ -139,12 +132,10 @@ public:
 	{
 	}
 
-	~Preparation()
+	~Preparation() override = default;
 		/// Destroys the Preparation.
-	{
-	}
 
-	void prepare()
+	void prepare() override
 		/// Prepares data.
 	{
 		TypeHandler<std::list<T>>::prepare(_pos, _val, preparation());
@@ -156,7 +147,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Preparation_INCLUDED

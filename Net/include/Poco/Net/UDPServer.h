@@ -29,8 +29,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <std::size_t S = POCO_UDP_BUF_SIZE,
@@ -70,14 +69,14 @@ public:
 		_thread.join();
 	}
 
-	Poco::UInt16 port() const
+	[[nodiscard]] Poco::UInt16 port() const
 		/// Returns the port the server is
 		/// listening on.
 	{
 		return _poller.port();
 	}
 
-	Poco::Net::SocketAddress address() const
+	[[nodiscard]] Poco::Net::SocketAddress address() const
 		/// Returns the address of the server.
 	{
 		return _poller.address();
@@ -100,7 +99,7 @@ using UDPServer = UDPServerImpl<POCO_UDP_BUF_SIZE, SingleSocketPoller<POCO_UDP_B
 using UDPMultiServer = UDPServerImpl<POCO_UDP_BUF_SIZE, MultiSocketPoller<POCO_UDP_BUF_SIZE>>;
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_UDPServer_INCLUDED

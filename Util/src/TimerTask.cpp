@@ -15,8 +15,7 @@
 #include "Poco/Util/TimerTask.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 TimerTask::TimerTask():
@@ -37,4 +36,4 @@ void TimerTask::cancel()
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

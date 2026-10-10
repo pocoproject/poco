@@ -22,8 +22,7 @@
 #include "Poco/Crypto/KeyPairImpl.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class X509Certificate;
@@ -44,7 +43,7 @@ public:
 		KT_EC = KeyPairImpl::KT_EC_IMPL
 	};
 
-	explicit KeyPair(KeyPairImpl::Ptr pKeyPairImpl = 0);
+	explicit KeyPair(KeyPairImpl::Ptr pKeyPairImpl = nullptr);
 		/// Extracts the RSA public key from the given certificate.
 
 	KeyPair(const KeyPair& other);
@@ -62,7 +61,7 @@ public:
 	virtual ~KeyPair();
 		/// Destroys the KeyPair.
 
-	virtual int size() const;
+	[[nodiscard]] virtual int size() const;
 		/// Returns the RSA modulus size.
 
 	virtual void save(const std::string& publicKeyPairFile,
@@ -74,20 +73,20 @@ public:
 		/// is not exported.
 
 	virtual void save(std::ostream* pPublicKeyPairStream,
-		std::ostream* pPrivateKeyPairStream = 0,
+		std::ostream* pPrivateKeyPairStream = nullptr,
 		const std::string& privateKeyPairPassphrase = "") const;
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
-	KeyPairImpl::Ptr impl() const;
+	[[nodiscard]] KeyPairImpl::Ptr impl() const;
 		/// Returns the impl object.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns key pair name
 
-	Type type() const;
+	[[nodiscard]] Type type() const;
 		/// Returns key pair type
 
 private:
@@ -138,7 +137,7 @@ inline KeyPair::Type KeyPair::type() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_KeyPair_INCLUDED

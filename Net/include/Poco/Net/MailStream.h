@@ -24,8 +24,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API MailStreamBuf: public Poco::UnbufferedStreamBuf
@@ -58,13 +57,14 @@ public:
 protected:
 	int readFromDevice();
 	int writeToDevice(char c);
-	int readOne();
+	[[nodiscard]] int readOne();
 
 private:
 	enum State
 	{
 		ST_DATA,
 		ST_CR,
+		ST_LF,
 		ST_CR_LF,
 		ST_CR_LF_DOT,
 		ST_CR_LF_DOT_DOT,
@@ -101,7 +101,7 @@ public:
 		/// Writes the terminating period, followed by
 		/// CR-LF.
 
-	MailStreamBuf* rdbuf();
+	[[nodiscard]] MailStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
 protected:
@@ -140,7 +140,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MailStream_INCLUDED

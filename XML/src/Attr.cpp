@@ -17,8 +17,7 @@
 #include "Poco/XML/NamePool.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 Attr::Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified):
@@ -56,7 +55,7 @@ void Attr::setValue(const XMLString& value)
 
 Node* Attr::parentNode() const
 {
-	return 0;
+	return nullptr;
 }
 
 
@@ -72,7 +71,7 @@ Node* Attr::previousSibling() const
 		}
 		return pSibling;
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -130,4 +129,4 @@ Node* Attr::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -24,8 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -60,16 +59,16 @@ public:
 	void setUsername(const std::string& username);
 		/// Sets the username.
 
-	const std::string& getUsername() const;
+	[[nodiscard]] const std::string& getUsername() const;
 		/// Returns the username.
 
 	void setPassword(const std::string& password);
 		/// Sets the password.
 
-	const std::string& getPassword() const;
+	[[nodiscard]] const std::string& getPassword() const;
 		/// Returns the password.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true if both username and password are empty, otherwise false.
 
 	void authenticate(HTTPRequest& request, const HTTPResponse& response);
@@ -108,22 +107,22 @@ public:
 		/// Updates internal state and adds proxy authentication information to
 		/// the given HTTPRequest.
 
-	bool verifyAuthInfo(const HTTPRequest& request) const;
+	[[nodiscard]] bool verifyAuthInfo(const HTTPRequest& request) const;
 		/// Verifies the digest authentication information in the given HTTPRequest
 		/// by recomputing the response and comparing it with what's in the request.
 		///
 		/// Note: This method creates a HTTPAuthenticationParams object from the request
 		/// and calls verifyAuthParams() with request and params.
 
-	bool verifyAuthParams(const HTTPRequest& request, const HTTPAuthenticationParams& params) const;
+	[[nodiscard]] bool verifyAuthParams(const HTTPRequest& request, const HTTPAuthenticationParams& params) const;
 		/// Verifies the digest authentication information in the given HTTPRequest
 		/// and HTTPAuthenticationParams by recomputing the response and comparing
 		/// it with what's in the request.
 
-	bool isAlgorithmSupported(const std::string& algorithm) const;
+	[[nodiscard]] bool isAlgorithmSupported(const std::string& algorithm) const;
 		/// Check if digest algorithm is supported
 
-	static std::string createNonce();
+	[[nodiscard]] static std::string createNonce();
 		/// Creates a random nonce string.
 
 	static const std::string SCHEME;
@@ -195,7 +194,7 @@ inline bool HTTPDigestCredentials::empty() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPDigestCredentials_INCLUDED

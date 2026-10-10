@@ -10,13 +10,24 @@
 
 #include "MongoDBTestSuite.h"
 #include "MongoDBTest.h"
+#include "BSONTest.h"
+#include "ReplicaSetTest.h"
+#include "ReplicaSetConnectionTest.h"
 
 
 CppUnit::Test* MongoDBTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MongoDBTestSuite");
 
-	pSuite->addTest(MongoDBTest::suite());
+	pSuite->addTest(BSONTest::suite());
+	pSuite->addTest(ReplicaSetTest::suite());
+	pSuite->addTest(ReplicaSetConnectionTest::suite());
+
+	CppUnit::Test* mongoTests = MongoDBTest::suite();
+	if (mongoTests != nullptr)
+	{
+		pSuite->addTest(mongoTests);
+	}
 
 	return pSuite;
 }

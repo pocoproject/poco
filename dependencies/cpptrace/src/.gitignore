@@ -1,0 +1,57 @@
+# Symlinks created by the Makefile prebuild step to flatten
+# subdirectory sources for the make-based build system.
+# These are not part of the upstream cpptrace distribution.
+
+# binary/
+elf.cpp
+mach-o.cpp
+module_base.cpp
+object.cpp
+pe.cpp
+safe_dl.cpp
+
+# demangle/
+demangle_with_cxxabi.cpp
+demangle_with_nothing.cpp
+demangle_with_winapi.cpp
+
+# jit/
+jit_objects.cpp
+
+# platform/
+dbghelp_utils.cpp
+memory_mapping.cpp
+
+# snippets/
+snippet.cpp
+
+# symbols/
+symbols_core.cpp
+symbols_with_addr2line.cpp
+symbols_with_dbghelp.cpp
+symbols_with_dl.cpp
+symbols_with_libbacktrace.cpp
+symbols_with_libdwarf.cpp
+symbols_with_nothing.cpp
+
+# symbols/dwarf/
+debug_map_resolver.cpp
+dwarf_options.cpp
+dwarf_resolver.cpp
+
+# unwind/
+unwind_with_dbghelp.cpp
+unwind_with_execinfo.cpp
+unwind_with_libunwind.cpp
+unwind_with_nothing.cpp
+unwind_with_unwind.cpp
+unwind_with_winapi.cpp
+
+# utils/ (individual files to avoid ignoring real src/utils.cpp)
+error.cpp
+file.cpp
+memory_file_view.cpp
+microfmt.cpp
+replace_all.cpp
+string_view.cpp
+utils_detail.cpp

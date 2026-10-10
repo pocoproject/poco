@@ -11,11 +11,7 @@
 #include "TestPlugin.h"
 
 
-TestPlugin::TestPlugin()
-{
-}
+TestPlugin::TestPlugin() = default;
 
 
-TestPlugin::~TestPlugin()
-{
-}
+TestPlugin::~TestPlugin() = default;

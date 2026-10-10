@@ -16,8 +16,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 MailRecipient::MailRecipient():
@@ -91,4 +90,4 @@ void MailRecipient::setRealName(const std::string& realName)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

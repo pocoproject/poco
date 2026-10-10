@@ -21,8 +21,7 @@
 #include <memory>
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 class ActiveRecordLib_API StatementPlaceholderProvider
@@ -31,7 +30,8 @@ public:
 	using Ptr = std::unique_ptr<StatementPlaceholderProvider>;
 
 	virtual void reset() = 0;
-	virtual std::string next() = 0;
+
+	[[nodiscard]] virtual std::string next() = 0;
 
 	virtual ~StatementPlaceholderProvider();
 };
@@ -41,7 +41,8 @@ class ActiveRecordLib_API DefaultStatementPlaceholderProvider: public StatementP
 {
 public:
 	void reset();
-	std::string next();
+
+	[[nodiscard]] std::string next();
 };
 
 
@@ -49,14 +50,15 @@ class ActiveRecordLib_API PostgresStatementPlaceholderProvider: public Statement
 {
 public:
 	void reset();
-	std::string next();
+
+	[[nodiscard]] std::string next();
 
 private:
 	int _n = 1;
 };
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord
 
 
 #endif // ActiveRecord_StatementPlaceholderProvider_INCLUDED

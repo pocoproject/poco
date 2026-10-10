@@ -15,9 +15,7 @@
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
 #include <cstring> 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 PostgreSQLException::PostgreSQLException(const std::string& aMessage):
@@ -28,12 +26,12 @@ PostgreSQLException::PostgreSQLException(const std::string& aMessage):
 PostgreSQLException::PostgreSQLException(const std::string& aMessage,const char* pAnSqlState):
 	Poco::Data::DataException(std::string("[PostgreSQL]: ") + aMessage)
 {
-        // handle anSqlState
-        if (pAnSqlState == nullptr) _sqlState[0] = '\0';
+		// handle anSqlState
+		if (pAnSqlState == nullptr) _sqlState[0] = '\0';
 	else
 	{
 		strncpy(_sqlState,pAnSqlState,5);
-                _sqlState[5] = '\0';
+				_sqlState[5] = '\0';
 	}
 	
 }
@@ -89,4 +87,4 @@ StatementException::StatementException(const std::string& aMessage,const char* p
 
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

@@ -18,25 +18,16 @@
 #include "Poco/String.h"
 #include <cstdlib>
 #include <cstring>
-#if defined(POCO_UNBUNDLED)
 #include <sqlite3.h>
-#else
-#include "sqlite3.h"
-#endif
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
-
-
-const int SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = -1;
+namespace Poco::Data::SQLite {
 
 
 SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB):
 	StatementImpl(rSession),
 	_pDB(pDB),
-	_pStmt(0),
+	_pStmt(nullptr),
 	_stepCalled(false),
 	_nextResponse(0),
 	_affectedRowCount(POCO_SQLITE_INV_ROW_CNT),
@@ -70,14 +61,14 @@ void SQLiteStatementImpl::compileImpl()
 
 	std::string statement(toString());
 
-	sqlite3_stmt* pStmt = 0;
+	sqlite3_stmt* pStmt = nullptr;
 	const char* pSql = _pLeftover ? _pLeftover->c_str() : statement.c_str();
 
 	if (0 == std::strlen(pSql))
 		throw InvalidSQLStatementException("Empty statements are illegal");
 
 	int rc = SQLITE_OK;
-	const char* pLeftover = 0;
+	const char* pLeftover = nullptr;
 	bool queryFound = false;
 
 	do
@@ -86,8 +77,8 @@ void SQLiteStatementImpl::compileImpl()
 		if (rc != SQLITE_OK)
 		{
 			if (pStmt) sqlite3_finalize(pStmt);
-			pStmt = 0;
-			std::string errMsg = sqlite3_errmsg(_pDB);
+			pStmt = nullptr;
+			std::string errMsg = Utility::lastError(_pDB);
 			Utility::throwException(_pDB, rc, errMsg);
 		}
 		else if (rc == SQLITE_OK && pStmt)
@@ -129,7 +120,7 @@ void SQLiteStatementImpl::compileImpl()
 		//during previous step, switch to the next set if there is one provided
 		if (hasMoreDataSets())
 		{
-			activateNextDataSet();
+			(void)activateNextDataSet();
 			_isExtracted = false;
 		}
 	}
@@ -153,11 +144,11 @@ void SQLiteStatementImpl::bindImpl()
 {
 	_stepCalled = false;
 	_nextResponse = 0;
-	if (_pStmt == 0) return;
+	if (_pStmt == nullptr) return;
 
 	sqlite3_reset(_pStmt);
 
-	int paramCount = sqlite3_bind_parameter_count(_pStmt);
+	std::size_t paramCount = static_cast<std::size_t>(sqlite3_bind_parameter_count(_pStmt));
 	if (0 == paramCount)
 	{
 		_canBind = false;
@@ -221,9 +212,9 @@ void SQLiteStatementImpl::clear()
 	if (_pStmt)
 	{
 		sqlite3_finalize(_pStmt);
-		_pStmt=0;
+		_pStmt=nullptr;
 	}
-	_pLeftover = 0;
+	_pLeftover = nullptr;
 }
 
 
@@ -233,7 +224,7 @@ bool SQLiteStatementImpl::hasNext()
 		return (_nextResponse == SQLITE_ROW);
 
 	// _pStmt is allowed to be null for conditional SQL statements
-	if (_pStmt == 0)
+	if (_pStmt == nullptr)
 	{
 		_stepCalled   = true;
 		_nextResponse = SQLITE_DONE;
@@ -244,8 +235,18 @@ bool SQLiteStatementImpl::hasNext()
 	_nextResponse = sqlite3_step(_pStmt);
 
 	if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
-	if (!sqlite3_stmt_readonly(_pStmt))
-		_affectedRowCount += sqlite3_changes(_pDB);
+	{
+		// sqlite3_stmt_readonly and sqlite3_changes read Vdbe / connection
+		// state that another thread can be writing under the db mutex (e.g.
+		// ATTACH on the same connection calls sqlite3ExpirePreparedStatements,
+		// which writes Vdbe flags packed into the same word that holds
+		// readOnly). sqlite3_step itself takes the db mutex internally and
+		// releases it before returning; without re-acquiring it here, TSan
+		// (correctly) reports a data race on those Vdbe bytes.
+		Utility::SQLiteMutex m(_pDB);
+		if (!sqlite3_stmt_readonly(_pStmt))
+			_affectedRowCount += sqlite3_changes(_pDB);
+	}
 
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
 		Utility::throwException(_pDB, _nextResponse);
@@ -260,7 +261,7 @@ std::size_t SQLiteStatementImpl::next()
 {
 	if (SQLITE_ROW == _nextResponse)
 	{
-		poco_assert (columnsReturned() == sqlite3_column_count(_pStmt));
+		poco_assert (columnsReturned() == static_cast<std::size_t>(sqlite3_column_count(_pStmt)));
 
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
@@ -301,7 +302,7 @@ std::size_t SQLiteStatementImpl::columnsReturned() const
 const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 {
 	std::size_t curDataSet = currentDataSet();
-	poco_assert (pos >= 0 && pos <= _columns[curDataSet].size());
+	poco_assert (pos <= _columns[curDataSet].size());
 	return _columns[curDataSet][pos];
 }
 
@@ -309,8 +310,17 @@ const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 int SQLiteStatementImpl::affectedRowCount() const
 {
 	if (_affectedRowCount != POCO_SQLITE_INV_ROW_CNT) return _affectedRowCount;
-	return _pStmt == 0 || sqlite3_stmt_readonly(_pStmt) ? 0 : sqlite3_changes(_pDB);
+	if (_pStmt == nullptr) return 0;
+	// Same race pattern as the SQLiteMutex wrap in hasNext: sqlite3_stmt_readonly
+	// and sqlite3_changes are bare reads of Vdbe / connection state that another
+	// thread can be writing under the db mutex (e.g. ATTACH calling
+	// sqlite3ExpirePreparedStatements). The cached fast-path above usually wins;
+	// this branch only runs in the narrow window between compile and the first
+	// hasNext, but the race is real when it does. Match the hasNext lock so the
+	// pattern is uniform.
+	Utility::SQLiteMutex m(_pDB);
+	return sqlite3_stmt_readonly(_pStmt) ? 0 : sqlite3_changes(_pDB);
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

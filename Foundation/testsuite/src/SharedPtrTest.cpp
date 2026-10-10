@@ -149,10 +149,10 @@ void SharedPtrTest::testSharedPtr()
 	assertTrue (!(ptr4 != ptr2));
 
 	assertTrue (TestObject::count() == 2);
-	ptr1 = 0;
-	ptr2 = 0;
-	ptr3 = 0;
-	ptr4 = 0;
+	ptr1 = nullptr;
+	ptr2 = nullptr;
+	ptr3 = nullptr;
+	ptr4 = nullptr;
 	assertTrue (TestObject::count() == 0);
 
 	{
@@ -180,7 +180,7 @@ void SharedPtrTest::testImplicitCast()
 	assertTrue (TestObject::count() == 0);
 	SharedPtr<TestObject> ptr1 = new DerivedObject("test", 666);
 	assertTrue (TestObject::count() == 1);
-	ptr1 = 0;
+	ptr1 = nullptr;
 	assertTrue (TestObject::count() == 0);
 }
 
@@ -189,14 +189,14 @@ void SharedPtrTest::testExplicitCast()
 {
 	SharedPtr<TestObject> ptr1 = new DerivedObject("test", 666);
 	SharedPtr<DerivedObject> ptr2 = ptr1.cast<DerivedObject>();
-	assertTrue (ptr2.get() != 0);
+	assertTrue (ptr2.get() != nullptr);
 
 	// cast the other way round must fail
 	ptr1 = new TestObject("test");
 	assertTrue (TestObject::count() == 2);
 	ptr2 = ptr1.cast<DerivedObject>();
 	assertTrue (TestObject::count() == 1);
-	assertTrue (ptr2.get() == 0);
+	assertTrue (ptr2.get() == nullptr);
 }
 
 

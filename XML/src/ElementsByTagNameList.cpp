@@ -18,8 +18,7 @@
 #include <climits>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 ElementsByTagNameList::ElementsByTagNameList(const Node* pParent, const XMLString& name):
@@ -62,7 +61,7 @@ namespace
 
 Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) const
 {
-	if (!pParent) return 0;
+	if (!pParent) return nullptr;
 
 	// preorder search
 	Node* pCur = pParent->firstChild();
@@ -77,13 +76,15 @@ Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) cons
 		if (pNode) return pNode;
 		pCur = pCur->nextSibling();
 	}
-	return pCur;
+	return nullptr;
 }
 
 
 void ElementsByTagNameList::autoRelease()
 {
-	_pParent->ownerDocument()->autoReleasePool().add(this);
+	auto* pOwner = _pParent->ownerDocument();
+	if (pOwner != nullptr)
+		pOwner->autoReleasePool().add(this);
 }
 
 
@@ -123,7 +124,7 @@ unsigned long ElementsByTagNameListNS::length() const
 
 Node* ElementsByTagNameListNS::find(const Node* pParent, unsigned long index) const
 {
-	if (!pParent) return 0;
+	if (!pParent) return nullptr;
 
 	// preorder search
 	Node* pCur = pParent->firstChild();
@@ -138,14 +139,16 @@ Node* ElementsByTagNameListNS::find(const Node* pParent, unsigned long index) co
 		if (pNode) return pNode;
 		pCur = pCur->nextSibling();
 	}
-	return pCur;
+	return nullptr;
 }
 
 
 void ElementsByTagNameListNS::autoRelease()
 {
-	_pParent->ownerDocument()->autoReleasePool().add(this);
+	auto* pOwner = _pParent->ownerDocument();
+	if (pOwner != nullptr)
+		pOwner->autoReleasePool().add(this);
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

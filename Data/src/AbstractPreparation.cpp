@@ -15,8 +15,7 @@
 #include "Poco/Data/AbstractPreparation.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 AbstractPreparation::AbstractPreparation(PreparatorPtr pPreparator):
@@ -31,4 +30,4 @@ AbstractPreparation::~AbstractPreparation()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

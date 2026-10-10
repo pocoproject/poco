@@ -18,8 +18,7 @@
 #include "Poco/NumberFormatter.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 Command::Command(const std::string& command): Array()
@@ -36,6 +35,12 @@ Command::Command(const Command& copy): Array(copy)
 Command::~Command()
 {
 }
+
+
+Command& Command::operator=(const Command&) = default;
+
+
+Command& Command::operator=(Command&&) = default;
 
 
 Command Command::append(const std::string& key, const std::string& value)
@@ -83,7 +88,7 @@ Command Command::decr(const std::string& key, Int64 by)
 	Command cmd(by == 0 ? "DECR" : "DECRBY");
 
 	cmd << key;
-	if ( by > 0 ) cmd << NumberFormatter::format(by);
+	if (by != 0) cmd << NumberFormatter::format(by);
 
 	return cmd;
 }
@@ -219,14 +224,14 @@ Command Command::hmget(const std::string& hash, const StringVec& fields)
 }
 
 
-Command Command::hmset(const std::string& hash, std::map<std::string, std::string>& fields)
+Command Command::hmset(const std::string& hash, const std::map<std::string, std::string>& fields)
 {
 	Command cmd("HMSET");
 
 	cmd << hash;
-	for(std::map<std::string, std::string>::const_iterator it = fields.begin(); it != fields.end(); ++it)
+	for (const auto& [key, value] : fields)
 	{
-		cmd << it->first << it->second;
+		cmd << key << value;
 	}
 
 	return cmd;
@@ -284,7 +289,7 @@ Command Command::incr(const std::string& key, Int64 by)
 	Command cmd(by == 0 ? "INCR" : "INCRBY");
 
 	cmd << key;
-	if ( by > 0 ) cmd << NumberFormatter::format(by);
+	if (by != 0) cmd << NumberFormatter::format(by);
 
 	return cmd;
 }
@@ -403,9 +408,9 @@ Command Command::mset(const std::map<std::string, std::string>& keyvalues, bool 
 {
 	Command cmd(create ? "MSET" : "MSETNX");
 
-	for(std::map<std::string, std::string>::const_iterator it = keyvalues.begin(); it != keyvalues.end(); ++it)
+	for (const auto& [key, value] : keyvalues)
 	{
-		cmd << it->first << it->second;
+		cmd << key << value;
 	}
 
 	return cmd;
@@ -484,11 +489,13 @@ Command Command::sdiffstore(const std::string& set, const StringVec& sets)
 
 Command Command::set(const std::string& key, const std::string& value, bool overwrite, const Poco::Timespan& expireTime, bool create)
 {
+	poco_assert_msg(overwrite || create, "overwrite=false and create=false are mutually exclusive (NX + XX)");
+
 	Command cmd("SET");
 
 	cmd << key << value;
-	if (! overwrite) cmd << "NX";
-	if (! create) cmd << "XX";
+	if (!overwrite) cmd << "NX";
+	if (!create) cmd << "XX";
 	if (expireTime.totalMicroseconds() > 0) cmd << "PX" << NumberFormatter::format(expireTime.totalMilliseconds());
 
 	return cmd;
@@ -763,4 +770,4 @@ Command Command::auth(const std::string& username, const std::string& password)
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

@@ -36,7 +36,8 @@ public:
 	~PostgreSQLTest();
 
 	void testConnectNoDB();
-	void testFailedConnect();
+	void testFailedConnectParams();
+	void testFailedConnectURI();
 	void testPostgreSQLOIDs();
 	void testBarebonePostgreSQL();
 
@@ -76,6 +77,7 @@ public:
 	void testSingleSelect();
 	void testEmptyDB();
 	void testDateTime();
+	void testDateTimeVariants();
 	void testBLOB();
 	void testBLOBStmt();
 	void testCLOBStmt();
@@ -95,7 +97,9 @@ public:
 
 	void testNullableInt();
 	void testNullableString();
+	void testOptionalString();
 	void testTupleWithNullable();
+	void testStdTupleWithOptional();
 
 	void testBinarySimpleAccess();
 	void testBinaryComplexType();
@@ -113,7 +117,7 @@ public:
 	void testSessionTransactionNoAutoCommit();
 	void testTransaction();
 	void testReconnect();
-
+    void testTransactionWithReconnect();
 	void testSqlState();
 
 	void setUp();

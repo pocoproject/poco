@@ -15,8 +15,7 @@
 #include "Poco/Data/ArchiveStrategy.h"
 #include "Poco/Ascii.h"
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 using namespace Keywords;
@@ -145,4 +144,4 @@ void ArchiveByAgeStrategy::setThreshold(const std::string& age)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

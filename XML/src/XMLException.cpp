@@ -19,11 +19,10 @@
 using Poco::RuntimeException;
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 POCO_IMPLEMENT_EXCEPTION(XMLException, RuntimeException, "XML Exception")
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

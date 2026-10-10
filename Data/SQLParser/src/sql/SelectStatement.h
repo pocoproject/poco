@@ -7,6 +7,7 @@
 
 namespace hsql {
 enum OrderType { kOrderAsc, kOrderDesc };
+enum NullOrdering { Undefined, First, Last };
 
 enum SetType { kSetUnion, kSetIntersect, kSetExcept };
 
@@ -15,11 +16,12 @@ enum RowLockWaitPolicy { NoWait, SkipLocked, None };
 
 // Description of the order by clause within a select statement.
 struct SQLParser_API OrderDescription {
-  OrderDescription(OrderType type, Expr* expr);
+  OrderDescription(OrderType type, Expr* expr, NullOrdering null_ordering);
   virtual ~OrderDescription();
 
   OrderType type;
   Expr* expr;
+  NullOrdering null_ordering;
 };
 
 // Description of the limit clause within a select statement.
@@ -74,6 +76,13 @@ struct SQLParser_API SelectStatement : SQLStatement {
   bool selectDistinct;
   std::vector<Expr*>* selectList;
   Expr* whereClause;
+
+  // Oracle hierarchical query clauses, e.g.
+  // START WITH id = 1 CONNECT BY PRIOR id = parent_id. Both are null for a
+  // statement that is not hierarchical.
+  Expr* startWith;
+  Expr* connectBy;
+
   GroupByDescription* groupBy;
 
   // Note that a SetOperation is always connected to a

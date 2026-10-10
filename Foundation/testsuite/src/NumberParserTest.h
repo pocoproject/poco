@@ -18,9 +18,10 @@
 #include "CppUnit/TestCase.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
-#undef max
-#undef min
 #include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 class NumberParserTest: public CppUnit::TestCase
 {

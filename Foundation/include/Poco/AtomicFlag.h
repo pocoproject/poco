@@ -70,7 +70,12 @@ public:
 	~AtomicFlag() = default;
 		/// Destroys AtomicFlag.
 
-	bool set();
+	AtomicFlag(const AtomicFlag&) = delete;
+	AtomicFlag& operator = (const AtomicFlag&) = delete;
+	AtomicFlag(AtomicFlag&&) = delete;
+	AtomicFlag& operator = (AtomicFlag&&) = delete;
+
+	[[nodiscard]] bool set();
 		/// Sets the flag to true and returns previously
 		/// held value.
 
@@ -82,11 +87,6 @@ public:
 		/// held value.
 
 private:
-	AtomicFlag(const AtomicFlag&) = delete;
-	AtomicFlag& operator = (const AtomicFlag&) = delete;
-	AtomicFlag(AtomicFlag&&) = delete;
-	AtomicFlag& operator = (AtomicFlag&&) = delete;
-
 	std::atomic_flag _flag = ATOMIC_FLAG_INIT;
 };
 

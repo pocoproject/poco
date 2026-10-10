@@ -16,8 +16,7 @@
 #include "Poco/Net/SSLManager.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 PrivateKeyFactory::PrivateKeyFactory()
@@ -41,4 +40,4 @@ PrivateKeyFactoryRegistrar::~PrivateKeyFactoryRegistrar()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

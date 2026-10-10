@@ -23,8 +23,7 @@
 #include <list>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Event;
@@ -86,12 +85,18 @@ private:
 
 	typedef std::list<EventListenerItem> EventListenerList;
 
+	void removeDeadListeners();
+		/// Removes all entries with null listeners from the list.
+		/// Only performs cleanup when called from the outermost dispatch
+		/// (i.e., _inDispatch == 1), to avoid invalidating iterators
+		/// of any enclosing dispatch loop.
+
 	int               _inDispatch;
 	EventListenerList _listeners;
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_EventDispatcher_INCLUDED

@@ -15,8 +15,7 @@
 #include "Poco/Net/SocketNotification.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SocketNotification::SocketNotification(SocketReactor* pReactor):
@@ -114,4 +113,4 @@ ShutdownNotification::~ShutdownNotification()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

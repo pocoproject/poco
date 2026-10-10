@@ -28,9 +28,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Notifier
@@ -63,9 +61,9 @@ public:
 	Event rollback;
 
 	// Event types.
-	static const EnabledEventType SQLITE_NOTIFY_UPDATE   = 1;
-	static const EnabledEventType SQLITE_NOTIFY_COMMIT   = 2;
-	static const EnabledEventType SQLITE_NOTIFY_ROLLBACK = 4;
+	static constexpr EnabledEventType SQLITE_NOTIFY_UPDATE   = 1;
+	static constexpr EnabledEventType SQLITE_NOTIFY_COMMIT   = 2;
+	static constexpr EnabledEventType SQLITE_NOTIFY_ROLLBACK = 4;
 
 	Notifier(const Session& session,
 		EnabledEventType enabled = SQLITE_NOTIFY_UPDATE | SQLITE_NOTIFY_COMMIT | SQLITE_NOTIFY_ROLLBACK);
@@ -85,7 +83,7 @@ public:
 	bool disableUpdate();
 		/// Disables update callbacks.
 
-	bool updateEnabled() const;
+	[[nodiscard]] bool updateEnabled() const;
 		/// Returns true if update callbacks are enabled, false otherwise.
 
 	bool enableCommit();
@@ -94,7 +92,7 @@ public:
 	bool disableCommit();
 		/// Disables commit callbacks.
 
-	bool commitEnabled() const;
+	[[nodiscard]] bool commitEnabled() const;
 		/// Returns true if update callbacks are enabled, false otherwise.
 
 	bool enableRollback();
@@ -103,7 +101,7 @@ public:
 	bool disableRollback();
 		/// Disables rollback callbacks.
 
-	bool rollbackEnabled() const;
+	[[nodiscard]] bool rollbackEnabled() const;
 		/// Returns true if rollback callbacks are enabled, false otherwise.
 
 	bool enableAll();
@@ -112,7 +110,7 @@ public:
 	bool disableAll();
 		/// Disables all callbacks.
 
-	static void sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, Poco::Int64 row);
+	static void sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, long long row);
 		/// Update callback event dispatcher. Determines the type of the event, updates the row number
 		/// and triggers the event.
 
@@ -125,23 +123,23 @@ public:
 	static void sqliteRollbackCallbackFn(void* pVal);
 		/// Rollback callback event dispatcher.
 
-	bool operator == (const Notifier& other) const;
+	[[nodiscard]] bool operator == (const Notifier& other) const;
 		/// Equality operator. Compares value, row and database handles and
 		/// returns true iff all are equal.
 
-	const std::string& getTable() const;
+	[[nodiscard]] const std::string& getTable() const;
 		/// Returns the table name.
 
 	void setTable(const std::string& table);
 		/// Sets the row number.
 
-	Poco::Int64 getRow() const;
+	[[nodiscard]] Poco::Int64 getRow() const;
 		/// Returns the row number.
 
 	void setRow(Poco::Int64 row);
 		/// Sets the row number.
 
-	const Poco::Dynamic::Var& getValue() const;
+	[[nodiscard]] const Poco::Dynamic::Var& getValue() const;
 		/// Returns the value.
 
 	template <typename T>
@@ -152,9 +150,9 @@ public:
 	}
 
 private:
-	Notifier();
-	Notifier(const Notifier&);
-	Notifier& operator=(const Notifier&);
+	Notifier() = delete;
+	Notifier(const Notifier&) = delete;
+	Notifier& operator=(const Notifier&) = delete;
 
 	const Session&     _session;
 	std::string        _table;
@@ -208,7 +206,7 @@ inline const Poco::Dynamic::Var& Notifier::getValue() const
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // SQLite_Notifier_INCLUDED

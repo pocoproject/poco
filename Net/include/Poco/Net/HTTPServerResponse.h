@@ -24,8 +24,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPServerSession;
@@ -105,12 +104,12 @@ public:
 		/// and sets the "WWW-Authenticate" header field
 		/// according to the given realm.
 
-	virtual bool sent() const = 0;
+	[[nodiscard]] virtual bool sent() const = 0;
 		/// Returns true if the response (header) has been sent.
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerResponse_INCLUDED

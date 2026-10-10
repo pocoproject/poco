@@ -17,20 +17,13 @@
 #include "Poco/Net/DatagramSocketImpl.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-#ifdef POCO_OS_FAMILY_WINDOWS
-#ifdef max
-#undef max
-#endif // max
-#endif // POCO_OS_FAMILY_WINDOWS
-#include <limits>
 
 
 using Poco::Exception;
 using Poco::ErrorHandler;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -59,7 +52,7 @@ public:
 	{
 		auto pch = SocketProactor::PERMANENT_COMPLETION_HANDLER;
 		Poco::Timestamp expires = (ms != pch) ? Timestamp() + (ms * 1000) : Timestamp(pch);
-		if (pos == -1 || (pos + 1) > _funcList.size())
+		if (pos == -1 || static_cast<std::size_t>(pos + 1) > _funcList.size())
 		{
 			ScopedLock lock(_mutex);
 			_funcList.push_back({std::move(ch), expires});
@@ -225,9 +218,6 @@ private:
 // SocketProactor
 //
 
-const Timestamp::TimeDiff SocketProactor::PERMANENT_COMPLETION_HANDLER =
-	std::numeric_limits<Timestamp::TimeDiff>::max();
-
 
 SocketProactor::SocketProactor(bool worker):
 	_isRunning(false),
@@ -297,6 +287,11 @@ int SocketProactor::poll(int* pHandled)
 		auto end = sm.end();
 		for (; it != end; ++it)
 		{
+			if (it->second & PollSet::POLL_ERROR)
+			{
+				Socket sock = it->first;
+				handled += error(sock);
+			}
 			if (it->second & PollSet::POLL_READ)
 			{
 				Socket sock = it->first;
@@ -308,11 +303,6 @@ int SocketProactor::poll(int* pHandled)
 				Socket sock = it->first;
 				if (hasHandlers(_writeHandlers, static_cast<int>(sock.impl()->sockfd())))
 					handled += send(sock);
-			}
-			if (it->second & PollSet::POLL_ERROR)
-			{
-				Socket sock = it->first;
-				handled += error(sock);
 			}
 		}
 	}
@@ -533,6 +523,15 @@ void SocketProactor::send(SocketImpl& sock, IOHandlerIt& it)
 		{
 			err = Socket::lastError();
 		}
+		if (n == 0 && err == 0)
+		{
+			// TCP never completes a non-empty send with zero bytes;
+			// this means the socket is in an error state (e.g. refused
+			// non-blocking connect) -- read SO_ERROR for the real code.
+			unsigned soErr = 0;
+			sock.getOption(SOL_SOCKET, SO_ERROR, soErr);
+			err = soErr;
+		}
 		enqueueIONotification(std::move((*it)->_onCompletion), n, err);
 	}
 	else
@@ -559,7 +558,8 @@ int SocketProactor::receive(Socket& sock)
 	auto end = handlers.end();
 	for (; it != end;)
 	{
-		if ((avail = sock.available()))
+		avail = sock.available();
+		if (avail > 0)
 		{
 			if (sock.isDatagram())
 				receiveFrom(*sock.impl(), it, avail);
@@ -588,7 +588,7 @@ void SocketProactor::receiveFrom(SocketImpl& sock, IOHandlerIt& it, int availabl
 	SocketAddress *pAddr = (*it)->_pAddr;
 	SocketAddress addr = *pAddr;
 	poco_check_ptr(pBuf);
-	if (pBuf->size() < available) pBuf->resize(available);
+	if (pBuf->size() < static_cast<std::size_t>(available)) pBuf->resize(available);
 	int n = 0, err = 0;
 	try
 	{
@@ -606,7 +606,7 @@ void SocketProactor::receive(SocketImpl& sock, IOHandlerIt& it, int available)
 {
 	Buffer *pBuf = (*it)->_pBuf;
 	poco_check_ptr(pBuf);
-	if (pBuf->size() < available) pBuf->resize(available);
+	if (pBuf->size() < static_cast<std::size_t>(available)) pBuf->resize(available);
 	int n = 0, err = 0;
 	try
 	{
@@ -806,4 +806,4 @@ void SocketProactor::deleteHandler(IOHandlerList& handlers, IOHandlerList::itera
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

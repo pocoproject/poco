@@ -23,11 +23,10 @@
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
-#include "Poco/Observer.h"
+#include "Poco/NObserver.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <class ServiceHandler>
@@ -68,11 +67,11 @@ class SocketAcceptor
 	/// if special steps are necessary to create a ServiceHandler object.
 {
 public:
-	using Observer = Poco::Observer<SocketAcceptor, ReadableNotification>;
+	using Observer = Poco::NObserver<SocketAcceptor, ReadableNotification>;
 
 	explicit SocketAcceptor(ServerSocket& socket):
 		_socket(socket),
-		_pReactor(0)
+		_pReactor(nullptr)
 		/// Creates a SocketAcceptor, using the given ServerSocket.
 	{
 	}
@@ -101,6 +100,10 @@ public:
 			poco_unexpected();
 		}
 	}
+
+	SocketAcceptor() = delete;
+	SocketAcceptor(const SocketAcceptor&) = delete;
+	SocketAcceptor& operator = (const SocketAcceptor&) = delete;
 
 	void setReactor(SocketReactor& reactor)
 		/// Sets the reactor for this acceptor.
@@ -142,13 +145,17 @@ public:
 		}
 	}
 
-	void onAccept(ReadableNotification* pNotification)
+	virtual void onAccept(const AutoPtr<ReadableNotification>& pNotification)
 		/// Accepts connection and creates event handler.
+		///
+		/// Subclasses can override this method, e.g. to contain exceptions
+		/// thrown by the accept path; an escaping exception is re-dispatched
+		/// by the SocketReactor as an ErrorNotification broadcast to all
+		/// registered handlers.
 	{
-		pNotification->release();
 		StreamSocket sock = _socket.acceptConnection();
 		_pReactor->wakeUp();
-		createServiceHandler(sock);
+		(void) createServiceHandler(sock);
 	}
 
 protected:
@@ -160,7 +167,7 @@ protected:
 		return new ServiceHandler(socket, *_pReactor);
 	}
 
-	SocketReactor* reactor()
+	[[nodiscard]] SocketReactor* reactor()
 		/// Returns a pointer to the SocketReactor where
 		/// this SocketAcceptor is registered.
 		///
@@ -169,23 +176,20 @@ protected:
 		return _pReactor;
 	}
 
-	Socket& socket()
+	[[nodiscard]] Socket& socket()
 		/// Returns a reference to the SocketAcceptor's socket.
 	{
 		return _socket;
 	}
 
 private:
-	SocketAcceptor();
-	SocketAcceptor(const SocketAcceptor&);
-	SocketAcceptor& operator = (const SocketAcceptor&);
 
 	ServerSocket   _socket;
 	SocketReactor* _pReactor;
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketAcceptor_INCLUDED

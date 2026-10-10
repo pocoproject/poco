@@ -34,6 +34,8 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Thread.h"
+#include "Poco/Timestamp.h"
+#include "DialogServer.h"
 #include "HTTPSTestServer.h"
 #include <iostream>
 #include <sstream>
@@ -85,6 +87,23 @@ HTTPSClientSessionTest::HTTPSClientSessionTest(const std::string& name): CppUnit
 
 HTTPSClientSessionTest::~HTTPSClientSessionTest()
 {
+}
+
+
+void HTTPSClientSessionTest::testFromSocket()
+{
+	HTTPSTestServer srv;
+	SecureStreamSocket sss("localhost");
+	HTTPSClientSession s(sss, "127.0.0.1", srv.port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response.getContentType() == "text/plain");
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 }
 
 
@@ -298,7 +317,7 @@ void HTTPSClientSessionTest::testMultipleSSLInit()
 				Context::VerificationMode::VERIFY_STRICT, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
 			)
 		);
-		SSLManager::instance().initializeClient(0, ptrCert, context);
+		SSLManager::instance().initializeClient(nullptr, ptrCert, context);
 	};
 
 	auto deinitSSL = []()
@@ -458,6 +477,7 @@ void HTTPSClientSessionTest::testUnknownContentLength()
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 }
 
+
 void HTTPSClientSessionTest::testServerAbort()
 {
 	HTTPSTestServer srv;
@@ -471,8 +491,64 @@ void HTTPSClientSessionTest::testServerAbort()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
-	assertTrue ( dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
-	         s.networkException()) != NULL );
+	assertTrue (dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
+			 s.networkException()) != nullptr );
+}
+
+
+void HTTPSClientSessionTest::testProxyConfig()
+{
+	HTTPSClientSession s("www.example.com");
+	assertTrue (s.isProxyTunnel() == true);
+	assertTrue (s.getProxyProtocol() == "http");
+	assertTrue (s.getProxyHost().empty());
+}
+
+
+void HTTPSClientSessionTest::testProxySetters()
+{
+	HTTPSClientSession s("www.example.com");
+
+	s.setProxy("proxy.example.com", 3128, "https", false);
+	assertTrue (s.getProxyHost() == "proxy.example.com");
+	assertTrue (s.getProxyPort() == 3128);
+	assertTrue (s.getProxyProtocol() == "https");
+	assertTrue (s.isProxyTunnel() == false);
+
+	s.setProxyTunnel(true);
+	assertTrue (s.isProxyTunnel() == true);
+
+	s.setProxyTunnel(false);
+	assertTrue (s.isProxyTunnel() == false);
+}
+
+
+void HTTPSClientSessionTest::testStalledPeerTimeout()
+{
+	// DialogServer accepts the connection and, with no response queued, never writes a byte,
+	// so the TLS handshake never receives a ServerHello. connectSSL() runs that handshake with
+	// the socket timeout set to the connection timeout, so it has to fail there; leaving the
+	// session looking connected makes the first request pay a receive timeout on top of it.
+	DialogServer srv;
+	const Poco::Timespan connectTimeout(1, 0);
+	const Poco::Timespan requestTimeout(5, 0);
+
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setTimeout(connectTimeout, requestTimeout, requestTimeout);
+
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
+	Poco::Timestamp tsStart;
+	try
+	{
+		s.sendRequest(request);
+		HTTPResponse response;
+		s.receiveResponse(response);
+		fail("a peer that never answers must not produce a response");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	assertTrue (tsStart.elapsed() < (connectTimeout + requestTimeout).totalMicroseconds());
 }
 
 
@@ -490,6 +566,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPSClientSessionTest");
 
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testFromSocket);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetSmall);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetLarge);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHead);
@@ -505,6 +582,9 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testUnknownContentLength);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbort);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxyConfig);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxySetters);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testStalledPeerTimeout);
 
 	return pSuite;
 }

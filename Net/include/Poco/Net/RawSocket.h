@@ -22,8 +22,7 @@
 #include "Poco/Net/Socket.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API RawSocket: public Socket
@@ -57,7 +56,7 @@ public:
 		/// Creates the RawSocket with the SocketImpl
 		/// from another socket.
 
-	~RawSocket();
+	~RawSocket() override;
 		/// Destroys the RawSocket.
 
 	RawSocket& operator = (const Socket& socket);
@@ -168,7 +167,7 @@ public:
 		/// Setting this flag allows sending datagrams to
 		/// the broadcast address.
 
-	bool getBroadcast() const;
+	[[nodiscard]] bool getBroadcast() const;
 		/// Returns the value of the SO_BROADCAST socket option.
 
 protected:
@@ -196,7 +195,7 @@ inline bool RawSocket::getBroadcast() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_RawSocket_INCLUDED

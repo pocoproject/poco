@@ -23,23 +23,22 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Prometheus_API CounterSample
 {
 public:
-	CounterSample() = default;
+	CounterSample();
 		/// Creates the CounterSample.
 
-	~CounterSample() = default;
+	~CounterSample();
 		/// Destroys the CounterSample.
 
-	double value() const;
+	[[nodiscard]] double value() const;
 		/// Returns the counter's current value.
 
-	Poco::Timestamp timestamp() const;
+	[[nodiscard]] Poco::Timestamp timestamp() const;
 		/// Returns the sample's timestamp, which in this
 		/// implementation is always 0.
 
@@ -100,7 +99,7 @@ public:
 		/// Creates a Counter with the given name and params, and
 		/// registers it with the given registry (if not nullptr).
 
-	~Counter() = default;
+	~Counter();
 		/// Destroys the Counter.
 
 	using LabeledMetric::help;
@@ -117,7 +116,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the Counter.
 
-	double value() const;
+	[[nodiscard]] double value() const;
 		/// Returns the counter's current value.
 		///
 		/// Can only be used if no labels have been defined.
@@ -185,7 +184,7 @@ inline void Counter::inc(double v)
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Counter_INCLUDED

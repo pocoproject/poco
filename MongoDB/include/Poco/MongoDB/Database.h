@@ -7,7 +7,7 @@
 //
 // Definition of the Database class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -21,16 +21,11 @@
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/Document.h"
-#include "Poco/MongoDB/QueryRequest.h"
-#include "Poco/MongoDB/InsertRequest.h"
-#include "Poco/MongoDB/UpdateRequest.h"
-#include "Poco/MongoDB/DeleteRequest.h"
-
 #include "Poco/MongoDB/OpMsgMessage.h"
 #include "Poco/MongoDB/OpMsgCursor.h"
 
-namespace Poco {
-namespace MongoDB {
+
+namespace Poco::MongoDB {
 
 
 class MongoDB_API Database
@@ -39,97 +34,147 @@ class MongoDB_API Database
 	/// the database.
 {
 public:
+
+	enum IndexOptions {
+		INDEX_UNIQUE        = 1 << 0,
+			///< For new indexes with conditional-inclusion semantics, prefer
+			///< partialFilterExpression (see createIndex with extraOptions)
+			///< over INDEX_SPARSE.
+		INDEX_SPARSE        = 1 << 1,
+		INDEX_BACKGROUND POCO_DEPRECATED("Deprecated since MongoDB 4.2; index builds are online by default") = 1 << 2,
+			///< Hybrid online index builds since 4.2; no longer forwarded to the server.
+		INDEX_HIDDEN        = 1 << 3
+			///< Hide the index from the query planner (since MongoDB 4.4).
+	};
+
+	using FieldIndex = std::tuple<std::string, bool>;
+		/// name of the field to index, ascending order (true), descending order (false)
+
+	using IndexedFields = std::vector<FieldIndex>;
+		/// Vector of fields to create index on
+
 	explicit Database(const std::string& name);
 		/// Creates a Database for the database with the given name.
 
 	virtual ~Database();
 		/// Destroys the Database.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Database name
 
-	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA1);
+	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA256);
 		/// Authenticates against the database using the given connection,
-		/// username and password, as well as authentication method.
+		/// username and password, and authentication method:
 		///
-		/// "MONGODB-CR" (default prior to MongoDB 3.0) and
-		/// "SCRAM-SHA-1" (default starting in 3.0) are the only supported
-		/// authentication methods.
+		///   - "SCRAM-SHA-256" (MongoDB 4.0+)
+		///   - "SCRAM-SHA-1"   (MongoDB 3.0+)
 		///
-		/// Returns true if authentication was successful, otherwise false.
+		/// MONGODB-CR is not supported (requires the legacy wire protocol).
 		///
-		/// May throw a Poco::ProtocolException if authentication fails for a reason other than
-		/// invalid credentials.
+		/// SCRAM-SHA-256 accepts ASCII passwords only; SASLprep (RFC 4013)
+		/// is not implemented. Non-ASCII throws Poco::NotImplementedException.
+		///
+		/// Returns true on success, false on invalid credentials. Throws
+		/// Poco::ProtocolException on other failures.
 
-	Document::Ptr queryBuildInfo(Connection& connection) const;
-			/// Queries server build info (all wire protocols)
+	[[nodiscard]] Document::Ptr queryBuildInfo(Connection& connection) const;
+		/// Queries server build info using OP_MSG protocol.
 
-	Document::Ptr queryServerHello(Connection& connection) const;
-			/// Queries hello response from server (all wire protocols)
+	[[nodiscard]] Document::Ptr queryServerHello(Connection& connection) const;
+		/// Queries hello response from server using OP_MSG protocol.
 
-	Int64 count(Connection& connection, const std::string& collectionName) const;
-		/// Sends a count request for the given collection to MongoDB. (old wire protocol)
+	[[nodiscard]] Int64 count(Connection& connection, const std::string& collectionName) const;
+		/// Counts documents in the given collection using the aggregation
+		/// framework ([{$count: "n"}]) over OP_MSG. Aggregation-based counting
+		/// is preferred over the legacy "count" command because it is part of
+		/// the Stable API v1 (since MongoDB 5.0), is accurate on sharded
+		/// clusters (the legacy command can over-report due to orphaned
+		/// documents), and is permitted in multi-document transactions.
 		///
 		/// If the command fails, -1 is returned.
 
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCommand() const;
-		/// Creates a QueryRequest for a command. (old wire protocol)
+	[[nodiscard]] SharedPtr<OpMsgMessage> createOpMsgMessage(const std::string& collectionName) const;
+		/// Creates OpMsgMessage for the given collection.
 
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createCountRequest(const std::string& collectionName) const;
-		/// Creates a QueryRequest to count the given collection.
-		/// The collectionname must not contain the database name. (old wire protocol)
+	[[nodiscard]] SharedPtr<OpMsgMessage> createOpMsgMessage() const;
+		/// Creates OpMsgMessage for database commands that do not require collection as an argument.
 
-	Poco::SharedPtr<Poco::MongoDB::DeleteRequest> createDeleteRequest(const std::string& collectionName) const;
-		/// Creates a DeleteRequest to delete documents in the given collection.
-		/// The collectionname must not contain the database name. (old wire protocol)
+	[[nodiscard]] SharedPtr<OpMsgCursor> createOpMsgCursor(const std::string& collectionName) const;
+		/// Creates OpMsgCursor for the given collection.
 
-	Poco::SharedPtr<Poco::MongoDB::InsertRequest> createInsertRequest(const std::string& collectionName) const;
-		/// Creates an InsertRequest to insert new documents in the given collection.
-		/// The collectionname must not contain the database name. (old wire protocol)
-
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> createQueryRequest(const std::string& collectionName) const;
-		/// Creates a QueryRequest. (old wire protocol)
-		/// The collectionname must not contain the database name.
-
-	Poco::SharedPtr<Poco::MongoDB::UpdateRequest> createUpdateRequest(const std::string& collectionName) const;
-		/// Creates an UpdateRequest. (old wire protocol)
-		/// The collectionname must not contain the database name.
-
-	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage(const std::string& collectionName) const;
-		/// Creates OpMsgMessage. (new wire protocol)
-
-	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> createOpMsgMessage() const;
-		/// Creates OpMsgMessage for database commands that do not require collection as an argument. (new wire protocol)
-
-	Poco::SharedPtr<Poco::MongoDB::OpMsgCursor> createOpMsgCursor(const std::string& collectionName) const;
-		/// Creates OpMsgCursor. (new wire protocol)
-
-	Poco::MongoDB::Document::Ptr ensureIndex(Connection& connection,
+	Document::Ptr createIndex(
+		Connection& connection,
 		const std::string& collection,
+		const IndexedFields& indexedFields,
+		const std::string &indexName,
+		unsigned long options = 0,
+		int expirationSeconds = 0,
+		int version = 0);
+		/// Creates an index. The document returned is the response body.
+		/// For more info look at the createIndex information on the MongoDB
+		/// website. (new wire protocol)
+		///
+		/// Leave version at 0 to use the server default (v=2 since MongoDB 3.4).
+		/// Setting v=1 is only for compatibility with pre-3.4 servers and is
+		/// incompatible with text, wildcard, and several other modern index
+		/// types.
+
+	Document::Ptr createIndex(
+		Connection& connection,
+		const std::string& collection,
+		const IndexedFields& indexedFields,
 		const std::string& indexName,
-		Poco::MongoDB::Document::Ptr keys,
-		bool unique = false,
-		bool background = false,
-		int version = 0,
-		int ttl = 0);
-		/// Creates an index. The document returned is the result of a getLastError call.
-		/// For more info look at the ensureIndex information on the MongoDB website. (old wire protocol)
+		Document::Ptr extraOptions,
+		unsigned long options = 0,
+		int expirationSeconds = 0,
+		int version = 0);
+		/// Creates an index, allowing arbitrary additional fields in the
+		/// per-index spec via extraOptions. Every element of extraOptions
+		/// is added to the index spec document on top of the fields derived
+		/// from indexedFields, indexName, options, expirationSeconds and
+		/// version. Typical keys to pass in extraOptions include:
+		///
+		///   - "partialFilterExpression" (Document): partial indexes,
+		///     MongoDB 3.2+. Preferred over INDEX_SPARSE for new code.
+		///   - "collation" (Document): per-index collation, MongoDB 3.4+.
+		///   - "wildcardProjection" (Document): wildcard / compound-wildcard
+		///     indexes (the wildcard field itself is specified as "$**" or
+		///     "path.$**" in indexedFields).
+		///   - "weights", "default_language", "language_override" (text indexes).
+		///   - "2dsphereIndexVersion", "bits", "min", "max" (geo indexes).
+		///
+		/// The document returned is the createIndexes response body.
 
-	Document::Ptr getLastErrorDoc(Connection& connection) const;
-		/// Sends the getLastError command to the database and returns the error document.
-		/// (old wire protocol)
+	Document::Ptr dropIndex(
+		Connection& connection,
+		const std::string& collection,
+		const std::string& indexName);
+		/// Drops the index with the given name from the collection. Passing "*"
+		/// drops all indexes except the _id index; prefer dropAllIndexes() for
+		/// that. The document returned is the dropIndexes response body.
+		/// (new wire protocol)
 
-	std::string getLastError(Connection& connection) const;
-		/// Sends the getLastError command to the database and returns the err element
-		/// from the error document. When err is null, an empty string is returned.
-		/// (old wire protocol)
+	Document::Ptr dropIndex(
+		Connection& connection,
+		const std::string& collection,
+		const IndexedFields& indexedFields);
+		/// Drops the index matching the given key specification (the same
+		/// IndexedFields form accepted by createIndex). The document returned
+		/// is the dropIndexes response body. (new wire protocol)
 
-	static const std::string AUTH_MONGODB_CR;
-		/// Default authentication mechanism prior to MongoDB 3.0.
+	Document::Ptr dropAllIndexes(
+		Connection& connection,
+		const std::string& collection);
+		/// Drops all indexes on the collection except the _id index (and, on a
+		/// sharded collection, the shard key index). The document returned is
+		/// the dropIndexes response body. (new wire protocol)
 
 	static const std::string AUTH_SCRAM_SHA1;
-		/// Default authentication mechanism for MongoDB 3.0.
-	
+		/// SCRAM-SHA-1 authentication mechanism (MongoDB 3.0+).
+
+	static const std::string AUTH_SCRAM_SHA256;
+		/// SCRAM-SHA-256 authentication mechanism (MongoDB 4.0+).
+
 	enum WireVersion
 		/// Wire version as reported by the command hello.
 		/// See details in MongoDB github, repository specifications.
@@ -145,15 +190,25 @@ public:
 		VER_42		= 8,
 		VER_44		= 9,
 		VER_50		= 13,
-		VER_51		= 14, ///< First wire version that supports only OP_MSG
+		VER_51		= 14, ///< First wire version that supports *only* OP_MSG
 		VER_52		= 15,
 		VER_53		= 16,
-		VER_60		= 17
+		VER_60		= 17,
+		VER_61		= 18,
+		VER_62		= 19,
+		VER_70		= 21,
+		VER_71		= 22,
+		VER_72		= 23,
+		VER_73		= 24,
+		VER_80		= 25
 	};
 
 protected:
-	bool authCR(Connection& connection, const std::string& username, const std::string& password);
 	bool authSCRAM(Connection& connection, const std::string& username, const std::string& password);
+		/// Performs SCRAM-SHA-1 authentication.
+
+	bool authSCRAM256(Connection& connection, const std::string& username, const std::string& password);
+		/// Performs SCRAM-SHA-256 authentication. ASCII passwords only.
 
 private:
 	std::string _dbname;
@@ -169,64 +224,29 @@ inline const std::string& Database::name() const
 }
 
 
-inline Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCommand() const
-{
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> cmd = createQueryRequest("$cmd");
-	cmd->setNumberToReturn(1);
-	return cmd;
-}
-
-
-inline Poco::SharedPtr<Poco::MongoDB::DeleteRequest>
-Database::createDeleteRequest(const std::string& collectionName) const
-{
-	return new Poco::MongoDB::DeleteRequest(_dbname + '.' + collectionName);
-}
-
-
-inline Poco::SharedPtr<Poco::MongoDB::InsertRequest>
-Database::createInsertRequest(const std::string& collectionName) const
-{
-	return new Poco::MongoDB::InsertRequest(_dbname + '.' + collectionName);
-}
-
-
-inline Poco::SharedPtr<Poco::MongoDB::QueryRequest>
-Database::createQueryRequest(const std::string& collectionName) const
-{
-	return new Poco::MongoDB::QueryRequest(_dbname + '.' + collectionName);
-}
-
-
-inline Poco::SharedPtr<Poco::MongoDB::UpdateRequest>
-Database::createUpdateRequest(const std::string& collectionName) const
-{
-	return new Poco::MongoDB::UpdateRequest(_dbname + '.' + collectionName);
-}
-
-// -- New wire protocol commands
-
-inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
+inline SharedPtr<OpMsgMessage>
 Database::createOpMsgMessage(const std::string& collectionName) const
 {
-	return new Poco::MongoDB::OpMsgMessage(_dbname, collectionName);
+	return new OpMsgMessage(_dbname, collectionName);
 }
 
-inline Poco::SharedPtr<Poco::MongoDB::OpMsgMessage>
+
+inline SharedPtr<OpMsgMessage>
 Database::createOpMsgMessage() const
 {
 	// Collection name for database commands is not needed.
 	return createOpMsgMessage("");
 }
 
-inline Poco::SharedPtr<Poco::MongoDB::OpMsgCursor>
+
+inline SharedPtr<OpMsgCursor>
 Database::createOpMsgCursor(const std::string& collectionName) const
 {
-	return new Poco::MongoDB::OpMsgCursor(_dbname, collectionName);
+	return new OpMsgCursor(_dbname, collectionName);
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Database_INCLUDED

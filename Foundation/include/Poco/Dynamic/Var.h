@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Format.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Types.h"
 #include "Poco/OrderedMap.h"
 #include "Poco/OrderedSet.h"
 #include "Poco/Dynamic/VarHolder.h"
@@ -30,8 +31,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 template <typename K, typename M, typename S>
@@ -107,16 +107,16 @@ public:
 	void swap(Var& other);
 		/// Swaps the content of the this Var with the other Var.
 
-	ConstIterator begin() const;
+	[[nodiscard]] ConstIterator begin() const;
 		/// Returns the const Var iterator.
 
-	ConstIterator end() const;
+	[[nodiscard]] ConstIterator end() const;
 		/// Returns the const Var iterator.
 
-	Iterator begin();
+	[[nodiscard]] Iterator begin();
 		/// Returns the Var iterator.
 
-	Iterator end();
+	[[nodiscard]] Iterator end();
 		/// Returns the Var iterator.
 
 	template <typename T>
@@ -143,7 +143,7 @@ public:
 	}
 
 	template <typename T>
-	T convert() const
+	[[nodiscard]] T convert() const
 		/// Invoke this method to perform a safe conversion.
 		///
 		/// Example usage:
@@ -169,7 +169,7 @@ public:
 	}
 
 	template <typename T>
-	operator T () const
+	[[nodiscard]] operator T () const
 		/// Safe conversion operator for implicit type
 		/// conversions. If the requested type T is same as the
 		/// type being held, the operation performed is direct
@@ -185,20 +185,18 @@ public:
 		VarHolder* pHolder = content();
 
 		if (!pHolder)
-				throw InvalidAccessException("Can not convert empty value.");
+			throw InvalidAccessException("Can not convert empty value.");
 
 		if (typeid(T) == pHolder->type())
 			return extract<T>();
-		else
-		{
-			T result;
-			pHolder->convert(result);
-			return result;
-		}
+
+		T result;
+		pHolder->convert(result);
+		return result;
 	}
 
 	template <typename T>
-	const T& extract() const
+	[[nodiscard]] const T& extract() const
 		/// Returns a const reference to the actual value.
 		///
 		/// Must be instantiated with the exact type of
@@ -208,17 +206,18 @@ public:
 	{
 		VarHolder* pHolder = content();
 
-		if (pHolder && pHolder->type() == typeid(T))
+		if ( (pHolder != nullptr) && pHolder->type() == typeid(T))
 		{
-			VarHolderImpl<T>* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
+			auto* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
 			return pHolderImpl->value();
 		}
-		else if (!pHolder)
+
+		if (!pHolder)
 			throw InvalidAccessException("Can not extract empty value.");
 		else
 			throw BadCastException(Poco::format("Can not convert %s to %s.",
-				std::string(pHolder->type().name()),
-				std::string(typeid(T).name())));
+				Poco::demangle(pHolder->type().name()),
+				Poco::demangle<T>()));
 	}
 
 	template <typename T>
@@ -230,7 +229,7 @@ public:
 		return *this;
 	}
 
-	bool operator ! () const;
+	[[nodiscard]] bool operator ! () const;
 		/// Logical NOT operator.
 
 	Var& operator = (const Var& other);
@@ -335,264 +334,264 @@ public:
 		/// Division assignment operator specialization for Var
 
 	template <typename T>
-	bool operator == (const T& other) const
+	[[nodiscard]] bool operator == (const T& other) const
 		/// Equality operator
 	{
 		if (isEmpty()) return false;
 		return convert<T>() == other;
 	}
 
-	bool operator == (const char* other) const;
+	[[nodiscard]] bool operator == (const char* other) const;
 		/// Equality operator overload for const char*
 
-	bool operator == (const Var& other) const;
+	[[nodiscard]] bool operator == (const Var& other) const;
 		/// Equality operator overload for Var
 
 	template <typename T>
-	bool operator != (const T& other) const
+	[[nodiscard]] bool operator != (const T& other) const
 		/// Inequality operator
 	{
 		if (isEmpty()) return true;
 		return convert<T>() != other;
 	}
 
-	bool operator != (const Var& other) const;
+	[[nodiscard]] bool operator != (const Var& other) const;
 		/// Inequality operator overload for Var
 
-	bool operator != (const char* other) const;
+	[[nodiscard]] bool operator != (const char* other) const;
 		/// Inequality operator overload for const char*
 
 	template <typename T>
-	bool operator < (const T& other) const
+	[[nodiscard]] bool operator < (const T& other) const
 		/// Less than operator
 	{
 		if (isEmpty()) return false;
 		return convert<T>() < other;
 	}
 
-	bool operator < (const Var& other) const;
+	[[nodiscard]] bool operator < (const Var& other) const;
 		/// Less than operator overload for Var
 
 	template <typename T>
-	bool operator <= (const T& other) const
+	[[nodiscard]] bool operator <= (const T& other) const
 		/// Less than or equal operator
 	{
 		if (isEmpty()) return false;
 		return convert<T>() <= other;
 	}
 
-	bool operator <= (const Var& other) const;
+	[[nodiscard]] bool operator <= (const Var& other) const;
 		/// Less than or equal operator overload for Var
 
 	template <typename T>
-	bool operator > (const T& other) const
+	[[nodiscard]] bool operator > (const T& other) const
 		/// Greater than operator
 	{
 		if (isEmpty()) return false;
 		return convert<T>() > other;
 	}
 
-	bool operator > (const Var& other) const;
+	[[nodiscard]] bool operator > (const Var& other) const;
 		/// Greater than operator overload for Var
 
 	template <typename T>
-	bool operator >= (const T& other) const
+	[[nodiscard]] bool operator >= (const T& other) const
 		/// Greater than or equal operator
 	{
 		if (isEmpty()) return false;
 		return convert<T>() >= other;
 	}
 
-	bool operator >= (const Var& other) const;
+	[[nodiscard]] bool operator >= (const Var& other) const;
 		/// Greater than or equal operator overload for Var
 
 	template <typename T>
-	bool operator || (const T& other) const
+	[[nodiscard]] bool operator || (const T& other) const
 		/// Logical OR operator
 	{
 		if (isEmpty()) return false;
 		return convert<bool>() || other;
 	}
 
-	bool operator || (const Var& other) const;
+	[[nodiscard]] bool operator || (const Var& other) const;
 		/// Logical OR operator operator overload for Var
 
 	template <typename T>
-	bool operator && (const T& other) const
+	[[nodiscard]] bool operator && (const T& other) const
 		/// Logical AND operator.
 	{
 		if (isEmpty()) return false;
 		return convert<bool>() && other;
 	}
 
-	bool operator && (const Var& other) const;
+	[[nodiscard]] bool operator && (const Var& other) const;
 		/// Logical AND operator operator overload for Var.
 
-	bool isArray() const;
+	[[nodiscard]] bool isArray() const;
 		/// Returns true if Var is an array.
 
-	bool isVector() const;
+	[[nodiscard]] bool isVector() const;
 		/// Returns true if Var represents a vector.
 
-	bool isList() const;
+	[[nodiscard]] bool isList() const;
 		/// Returns true if Var represents a list.
 
-	bool isDeque() const;
+	[[nodiscard]] bool isDeque() const;
 		/// Returns true if Var represents a deque.
 
-	bool isStruct() const;
+	[[nodiscard]] bool isStruct() const;
 		/// Returns true if Var represents a struct.
 
-	bool isOrdered() const;
+	[[nodiscard]] bool isOrdered() const;
 		/// Returns true if Var represents an ordered struct,
 		/// false if struct is sorted.
 
-	char& at(std::size_t n);
+	[[nodiscard]] char& at(std::size_t n);
 		/// Returns character at position n. This function only works with
 		/// Var containing a std::string.
 
 
 	template <typename T>
-	Var& operator [] (const T& n)
+	[[nodiscard]] Var& operator [] (const T& n)
 	{
 		return getAt(n);
 	}
 
 	template <typename T>
-	const Var& operator [] (const T& n) const
+	[[nodiscard]] const Var& operator [] (const T& n) const
 	{
 		return const_cast<Var*>(this)->getAt(n);
 	}
 
-	Var& operator [] (const std::string& name);
+	[[nodiscard]] Var& operator [] (const std::string& name);
 		/// Index operator by name, only use on Vars where isStruct
 		/// returns true! In all other cases InvalidAccessException is thrown.
 
-	const Var& operator [] (const std::string& name) const;
+	[[nodiscard]] const Var& operator [] (const std::string& name) const;
 		/// Index operator by name, only use on Vars where isStruct
 		/// returns true! In all other cases InvalidAccessException is thrown.
 
-	const std::type_info& type() const;
+	[[nodiscard]] const std::type_info& type() const;
 		/// Returns the type information of the stored content.
 
-	std::string typeName(bool demangle = true) const;
+	[[nodiscard]] std::string typeName(bool demangle = true) const;
 		/// Returns the type name of the stored content.
 		/// If demangling is available and emangle is true,
 		/// the returnsed string will be demangled.
 
-	//@ deprecated
+	POCO_DEPRECATED("Use clear() instead")
 	void empty();
 		/// Empties Var.
-		/// This function is deprecated and will be removed.
 		/// Please use clear().
 
 	void clear();
 		/// Empties Var.
 
-	bool isEmpty() const;
+	[[nodiscard]] bool isEmpty() const;
 		/// Returns true if empty.
 
-	bool isInteger() const;
+	[[nodiscard]] bool isInteger() const;
 		/// Returns true if stored value is integer.
 
-	bool isSigned() const;
+	[[nodiscard]] bool isSigned() const;
 		/// Returns true if stored value is signed.
 
-	bool isNumeric() const;
+	[[nodiscard]] bool isNumeric() const;
 		/// Returns true if stored value is numeric.
 		/// Returns false for numeric strings (e.g. "123" is string, not number)
 
-	bool isBoolean() const;
+	[[nodiscard]] bool isBoolean() const;
 		/// Returns true if stored value is boolean.
 		/// Returns false for boolean strings (e.g. "true" is string, not number)
 
-	bool isString() const;
+	[[nodiscard]] bool isString() const;
 		/// Returns true if stored value is std::string.
 
-	bool isDate() const;
+	[[nodiscard]] bool isDate() const;
 		/// Returns true if stored value represents a date.
 
-	bool isTime() const;
+	[[nodiscard]] bool isTime() const;
 		/// Returns true if stored value represents time or date/time.
 
-	bool isDateTime() const;
+	[[nodiscard]] bool isDateTime() const;
 		/// Returns true if stored value represents a date/time.
 
-	bool isUUID() const;
+	[[nodiscard]] bool isUUID() const;
 		/// Returns true if stored value is a Poco::UUID.
 
-	std::size_t size() const;
+	[[nodiscard]] std::size_t size() const;
 		/// Returns the size of this Var.
 		/// This function returns 0 when Var is empty, 1 for POD or the size (i.e. length)
 		/// for held container.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns the stored value as string.
 
-	static Var parse(const std::string& val);
+	[[nodiscard]] static Var parse(const std::string& val);
 		/// Parses the string which must be in JSON format
 
-	static std::string toString(const Var& var);
+	[[nodiscard]] static std::string toString(const Var& var);
 		/// Converts the Var to a string in JSON format. Note that toString(const Var&) will return
 		/// a different result than Var::convert<std::string>() and Var::toString()!
 
 private:
-	Var& getAt(std::size_t n);
-	Var& getAt(const std::string& n);
+	[[nodiscard]] Var& getAt(std::size_t n);
+	[[nodiscard]] Var& getAt(const std::string& n);
 
-	static Var parse(const std::string& val, std::string::size_type& offset);
+	[[nodiscard]] static Var parse(const std::string& val, std::string::size_type& offset);
 		/// Parses the string which must be in JSON format
 
-	static Var parseObject(const std::string& val, std::string::size_type& pos);
-	static Var parseArray(const std::string& val, std::string::size_type& pos);
-	static std::string parseString(const std::string& val, std::string::size_type& pos);
-	static std::string parseJSONString(const std::string& val, std::string::size_type& pos);
+	[[nodiscard]] static Var parseObject(const std::string& val, std::string::size_type& pos);
+	[[nodiscard]] static Var parseArray(const std::string& val, std::string::size_type& pos);
+	[[nodiscard]] static std::string parseString(const std::string& val, std::string::size_type& pos);
+	[[nodiscard]] static std::string parseJSONString(const std::string& val, std::string::size_type& pos);
 	static void skipWhiteSpace(const std::string& val, std::string::size_type& pos);
 
 	template <typename T>
-	T add(const Var& other) const
+	[[nodiscard]] T add(const Var& other) const
 	{
 		return convert<T>() + other.convert<T>();
 	}
 
 	template <typename T>
-	T subtract(const Var& other) const
+	[[nodiscard]] T subtract(const Var& other) const
 	{
 		return convert<T>() - other.convert<T>();
 	}
 
 	template <typename T>
-	T multiply(const Var& other) const
+	[[nodiscard]] T multiply(const Var& other) const
 	{
 		return convert<T>() * other.convert<T>();
 	}
 
 	template <typename T>
-	T divide(const Var& other) const
+	[[nodiscard]] T divide(const Var& other) const
 	{
 		return convert<T>() / other.convert<T>();
 	}
 
 	template <typename T, typename E>
-	VarHolderImpl<T>* holderImpl(const std::string errorMessage = "") const
+	[[nodiscard]] VarHolderImpl<T>* holderImpl(const std::string errorMessage = "") const
 	{
 		VarHolder* pHolder = content();
 
 		if (pHolder && pHolder->type() == typeid(T))
 			return static_cast<VarHolderImpl<T>*>(pHolder);
-		else if (!pHolder)
+
+		if (pHolder == nullptr)
 			throw InvalidAccessException("Can not access empty value.");
 		else
 			throw E(errorMessage);
 	}
 
 	template <typename T, typename N>
-	Var& structIndexOperator(T* pStr, N n) const
+	[[nodiscard]] Var& structIndexOperator(T* pStr, N n) const
 	{
 		return pStr->operator[](n);
 	}
 
-	VarHolder* content() const
+	[[nodiscard]] VarHolder* content() const
 	{
 		return _placeholder.content();
 	}
@@ -625,7 +624,7 @@ private:
 
 inline void Var::construct(const char* value)
 {
-	std::string val(value);
+	const std::string val(value);
 	_placeholder.assign<VarHolderImpl<std::string>, std::string>(val);
 }
 
@@ -633,7 +632,7 @@ inline void Var::construct(const char* value)
 inline void Var::construct(const Var& other)
 {
 	if (!other.isEmpty())
-		other.content()->clone(&_placeholder);
+		(void) other.content()->clone(&_placeholder);
 }
 
 
@@ -647,7 +646,7 @@ inline void Var::swap(Var& other)
 	}
 	else
 	{
-		Var tmp(*this);
+		const Var tmp(*this);
 		try
 		{
 			construct(other);
@@ -662,42 +661,46 @@ inline void Var::swap(Var& other)
 }
 
 
+
 inline const std::type_info& Var::type() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->type() : typeid(void);
+	return (pHolder != nullptr) ? pHolder->type() : typeid(void);
 }
 
 
 inline std::string Var::typeName(bool demangle) const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? demangle ? Poco::demangle(pHolder->type().name()) : pHolder->type().name() : std::string();
+	return (pHolder != nullptr) ? demangle ? Poco::demangle(pHolder->type().name()) : pHolder->type().name() : std::string();
 }
 
 
 inline Var::ConstIterator Var::begin() const
 {
-	if (size() == 0) return ConstIterator(const_cast<Var*>(this), true);
+	if (size() == 0) return {const_cast<Var*>(this), true};
 
-	return ConstIterator(const_cast<Var*>(this), false);
+	return {const_cast<Var*>(this), false};
 }
+
 
 inline Var::ConstIterator Var::end() const
 {
-	return ConstIterator(const_cast<Var*>(this), true);
+	return {const_cast<Var*>(this), true};
 }
+
 
 inline Var::Iterator Var::begin()
 {
-	if (size() == 0) return Iterator(const_cast<Var*>(this), true);
+	if (size() == 0) return {const_cast<Var*>(this), true};
 
-	return Iterator(const_cast<Var*>(this), false);
+	return {const_cast<Var*>(this), false};
 }
+
 
 inline Var::Iterator Var::end()
 {
-	return Iterator(this, true);
+	return {this, true};
 }
 
 
@@ -733,7 +736,7 @@ inline bool Var::operator ! () const
 
 inline bool Var::isEmpty() const
 {
-	return 0 == content();
+	return nullptr == content();
 }
 
 
@@ -742,112 +745,112 @@ inline bool Var::isArray() const
 	if (isEmpty() || isString()) return false;
 
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isArray() : false;
+	return (pHolder != nullptr) ? pHolder->isArray() : false;
 }
 
 
 inline bool Var::isVector() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isVector() : false;
+	return (pHolder != nullptr) ? pHolder->isVector() : false;
 }
 
 
 inline bool Var::isList() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isList() : false;
+	return (pHolder != nullptr) ? pHolder->isList() : false;
 }
 
 
 inline bool Var::isDeque() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isDeque() : false;
+	return (pHolder != nullptr) ? pHolder->isDeque() : false;
 }
 
 
 inline bool Var::isStruct() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isStruct() : false;
+	return (pHolder != nullptr) ? pHolder->isStruct() : false;
 }
 
 
 inline bool Var::isOrdered() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isOrdered() : false;
+	return (pHolder != nullptr) ? pHolder->isOrdered() : false;
 }
 
 
 inline bool Var::isInteger() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isInteger() : false;
+	return (pHolder != nullptr) ? pHolder->isInteger() : false;
 }
 
 
 inline bool Var::isSigned() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isSigned() : false;
+	return (pHolder != nullptr) ? pHolder->isSigned() : false;
 }
 
 
 inline bool Var::isNumeric() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isNumeric() : false;
+	return (pHolder != nullptr) ? pHolder->isNumeric() : false;
 }
 
 
 inline bool Var::isBoolean() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isBoolean() : false;
+	return (pHolder != nullptr) ? pHolder->isBoolean() : false;
 }
 
 
 inline bool Var::isString() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isString() : false;
+	return (pHolder != nullptr) ? pHolder->isString() : false;
 }
 
 
 inline bool Var::isDate() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isDate() : false;
+	return (pHolder != nullptr) ? pHolder->isDate() : false;
 }
 
 
 inline bool Var::isTime() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isTime() : false;
+	return (pHolder != nullptr) ? pHolder->isTime() : false;
 }
 
 
 inline bool Var::isDateTime() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isDateTime() : false;
+	return (pHolder != nullptr) ? pHolder->isDateTime() : false;
 }
 
 
 inline bool Var::isUUID() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isUUID() : false;
+	return (pHolder != nullptr) ? pHolder->isUUID() : false;
 }
 
 
 inline std::size_t Var::size() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->size() : 0;
+	return (pHolder != nullptr) ? pHolder->size() : 0;
 }
 
 
@@ -858,7 +861,7 @@ inline std::size_t Var::size() const
 inline const Var operator + (const char* other, const Var& da)
 	/// Addition operator for adding Var to const char*
 {
-	std::string tmp = other;
+	const std::string tmp = other;
 	return tmp + da.convert<std::string>();
 }
 
@@ -1859,6 +1862,7 @@ inline bool operator == (const float& other, const Var& da)
 	/// Equality operator for comparing Var with float
 {
 	if (da.isEmpty()) return false;
+	// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 	return other == da.convert<float>();
 }
 
@@ -1867,6 +1871,7 @@ inline bool operator != (const float& other, const Var& da)
 	/// Inequality operator for comparing Var with float
 {
 	if (da.isEmpty()) return true;
+	// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 	return other != da.convert<float>();
 }
 
@@ -1963,6 +1968,7 @@ inline bool operator == (const double& other, const Var& da)
 	/// Equality operator for comparing Var with double
 {
 	if (da.isEmpty()) return false;
+	// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 	return other == da.convert<double>();
 }
 
@@ -1971,6 +1977,7 @@ inline bool operator != (const double& other, const Var& da)
 	/// Inequality operator for comparing Var with double
 {
 	if (da.isEmpty()) return true;
+	// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 	return other != da.convert<double>();
 }
 
@@ -2285,11 +2292,13 @@ inline bool operator >= (const unsigned long& other, const Var& da)
 #endif // POCO_INT64_IS_LONG
 
 
-} // namespace Dynamic
+} // namespace Poco::Dynamic
 
 
-//@ deprecated
-typedef Dynamic::Var DynamicAny;
+namespace Poco {
+
+
+using DynamicAny POCO_DEPRECATED("Replace with Poco::Dynamic::Var") = Dynamic::Var;
 
 
 } // namespace Poco

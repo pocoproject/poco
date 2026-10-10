@@ -1,0 +1,1792 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2010-2021 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this
+document so long as this copyright notice, license and disclaimer are
+retained with all copies of the document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND
+THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE;
+OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS,
+COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE
+FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS
+DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES
+HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES
+WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR
+DISTRIBUTION OF THIS DOCUMENT.
+THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO,
+INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS
+AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN
+CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions name="DoorControlService" targetNamespace="http://www.onvif.org/ver10/doorcontrol/wsdl"
+				  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+				  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/"
+				  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  xmlns:tdc="http://www.onvif.org/ver10/doorcontrol/wsdl"
+>
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/doorcontrol/wsdl"
+				   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				   xmlns:pt="http://www.onvif.org/ver10/pacs"
+				   xmlns:tdc="http://www.onvif.org/ver10/doorcontrol/wsdl"
+				   elementFormDefault="qualified"
+				   version="21.06">
+			<xs:import namespace="http://www.onvif.org/ver10/pacs" schemaLocation="types.xsd"/>
+			<!--====== types ======-->
+			<xs:complexType name="ServiceCapabilities">
+				<xs:annotation>
+					<xs:documentation>
+						ServiceCapabilities structure reflects optional functionality of a service.
+						The information is static and does not change during device operation.
+						The following capabilities are available:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:attribute name="MaxLimit" type="xs:unsignedInt" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							The maximum number of entries returned by a single Get&lt;Entity&gt;List or
+							Get&lt;Entity&gt; request. The device shall never return more than this number of entities
+							in a single response.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaxDoors" type="xs:unsignedInt" default="10">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates the maximum number of doors supported by the device.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="ClientSuppliedTokenSupported" type="xs:boolean" default="false">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates that the client is allowed to supply the token when creating doors.
+							To enable the use of the command SetDoor, the value must be set to true.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="DoorManagementSupported" type="xs:boolean" default="false">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates that the client can perform CRUD operations (create, read, update and delete)
+							on doors. To enable the use of the commands GetDoors, GetDoorList, CreateDoor, ModifyDoor
+							and DeleteDoor, the value must be set to true.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="tdc:ServiceCapabilities"/>
+			<!--===============================-->
+			<xs:complexType name="DoorInfoBase">
+				<xs:annotation>
+					<xs:documentation>
+						Used as extension base.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="pt:DataEntity">
+						<xs:sequence>
+							<xs:element name="Name" type="pt:Name">
+								<xs:annotation>
+									<xs:documentation>A user readable name. It shall be up to 64 characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Description" type="pt:Description" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>A user readable description. It shall be up to 1024 characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="DoorInfo">
+				<xs:annotation>
+					<xs:documentation>
+						The DoorInfo type represents the Door as a physical object.
+						The structure contains information and capabilities of a specific door instance.
+						An ONVIF compliant device shall provide the following fields for each Door instance:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="tdc:DoorInfoBase">
+						<xs:sequence>
+							<xs:element name="Capabilities" type="tdc:DoorCapabilities">
+								<xs:annotation>
+									<xs:documentation>The capabilities of the Door.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+						</xs:sequence>
+						<xs:anyAttribute processContents="lax"/>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+
+
+			<!--===============================-->
+			<xs:complexType name="Door">
+				<xs:annotation>
+					<xs:documentation>
+						The door structure shall include all properties of the DoorInfo structure and also a timings
+						structure.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="tdc:DoorInfoBase">
+						<xs:sequence>
+							<xs:element name="Capabilities" type="tdc:DoorCapabilities">
+								<xs:annotation>
+									<xs:documentation>The capabilities of the Door.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="DoorType" type="pt:Name">
+								<xs:annotation>
+									<xs:documentation>
+										The type of door. Is of type text. Can be either one of the following reserved
+										ONVIF types: "pt:Door", "pt:ManTrap", "pt:Turnstile", "pt:RevolvingDoor",
+										"pt:Barrier", or a custom defined type.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Timings" type="tdc:Timings">
+								<xs:annotation>
+									<xs:documentation>
+										A structure defining times such as how long the door is unlocked when
+										accessed, extended grant time, etc.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Extension" type="tdc:DoorExtension" minOccurs="0"/>
+						</xs:sequence>
+						<xs:anyAttribute processContents="lax"/>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<xs:complexType name="DoorExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+
+
+			<!--===============================-->
+			<xs:complexType name="Timings">
+				<xs:annotation>
+					<xs:documentation>
+						A structure defining times such as how long the door is unlocked when accessed,
+						extended grant time, etc.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="ReleaseTime" type="xs:duration">
+						<xs:annotation>
+							<xs:documentation>
+								When access is granted (door mode becomes Accessed), the latch is unlocked.
+								ReleaseTime is the time from when the latch is unlocked until it is
+								relocked again (unless the door is physically opened).
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="OpenTime" type="xs:duration">
+						<xs:annotation>
+							<xs:documentation>
+								The time from when the door is physically opened until the door is set in the
+								DoorOpenTooLong alarm state.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ExtendedReleaseTime" type="xs:duration" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Some individuals need extra time to open the door before the latch relocks.
+								If supported, ExtendedReleaseTime shall be added to ReleaseTime if UseExtendedTime
+								is set to true in the AccessDoor command.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DelayTimeBeforeRelock" type="xs:duration" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								If the door is physically opened after access is granted,
+								then DelayTimeBeforeRelock is the time from when the door is physically
+								opened until the latch goes back to locked state.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ExtendedOpenTime" type="xs:duration" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Some individuals need extra time to pass through the door. If supported,
+								ExtendedOpenTime shall be added to OpenTime if UseExtendedTime is set to true
+								in the AccessDoor command.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="PreAlarmTime" type="xs:duration" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Before a DoorOpenTooLong alarm state is generated, a signal will sound to indicate
+								that the door must be closed. PreAlarmTime defines how long before DoorOpenTooLong
+								the warning signal shall sound.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tdc:TimingsExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:complexType name="TimingsExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+
+
+			<!--===============================-->
+			<xs:complexType name="DoorCapabilities">
+				<xs:annotation>
+					<xs:documentation>
+						DoorCapabilities reflect optional functionality of a particular physical entity.
+						Different door instances may have different set of capabilities.
+						This information may change during device operation, e.g. if hardware settings are changed.
+						The following capabilities are available:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:attribute name="Access" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates whether or not this Door instance supports AccessDoor command to
+							perform momentary access.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="AccessTimingOverride" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance supports overriding configured timing in the
+							AccessDoor command.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Lock" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance supports LockDoor command to lock the
+							door.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Unlock" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance supports UnlockDoor command to unlock the
+							door.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Block" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance supports BlockDoor command to block the
+							door.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="DoubleLock" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance supports DoubleLockDoor command to lock
+							multiple locks on the door.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="LockDown" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance supports LockDown (and LockDownRelease)
+							commands to lock the door and put it in LockedDown mode.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="LockOpen" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance supports LockOpen (and LockOpenRelease)
+							commands to unlock the door and put it in LockedOpen mode.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="DoorMonitor" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance has a DoorMonitor and supports the
+							DoorPhysicalState event.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="LockMonitor" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance has a LockMonitor and supports the
+							LockPhysicalState event.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="DoubleLockMonitor" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance has a DoubleLockMonitor and supports the
+							DoubleLockPhysicalState event.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Alarm" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance supports door alarm and the DoorAlarm
+							event.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Tamper" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance has a Tamper detector and supports the
+							DoorTamper event.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Fault" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that this Door instance supports door fault and the DoorFault
+							event.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+
+
+			<!--===============================-->
+			<xs:complexType name="DoorState">
+				<xs:annotation>
+					<xs:documentation>
+						The DoorState structure contains current aggregate runtime status of Door.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="DoorPhysicalState" type="tdc:DoorPhysicalState" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Physical state of the Door; it is of type DoorPhysicalState. A device that
+								signals support for DoorMonitor capability for a particular door instance shall provide
+								this field.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="LockPhysicalState" type="tdc:LockPhysicalState" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Physical state of the Lock; it is of type LockPhysicalState. A device that
+								signals support for LockMonitor capability for a particular door instance shall provide
+								this field.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DoubleLockPhysicalState" type="tdc:LockPhysicalState" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Physical state of the DoubleLock; it is of type LockPhysicalState. A
+								device that signals support for DoubleLockMonitor capability for a particular door
+								instance shall provide this field.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Alarm" type="tdc:DoorAlarmState" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Alarm state of the door; it is of type DoorAlarmState. A device that
+								signals support for Alarm capability for a particular door instance shall provide this
+								field.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Tamper" type="tdc:DoorTamper" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Tampering state of the door; it is of type DoorTamper. A device that
+								signals support for Tamper capability for a particular door instance shall provide this
+								field.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Fault" type="tdc:DoorFault" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Fault information for door; it is of type DoorFault. A device that signals
+								support for Fault capability for a particular door instance shall provide this field.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DoorMode" type="tdc:DoorMode">
+						<xs:annotation>
+							<xs:documentation>
+								The logical operating mode of the door; it is of type DoorMode. An ONVIF
+								compatible device shall report current operating mode in this field.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>				
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+
+
+			<!--===============================-->
+			<xs:simpleType name="DoorPhysicalState">
+				<xs:annotation>
+					<xs:documentation>
+						The physical state of a Door.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Unknown">
+						<xs:annotation>
+							<xs:documentation>Value is currently unknown (possibly due to initialization or monitors not
+								giving a conclusive result).
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Open">
+						<xs:annotation>
+							<xs:documentation>Door is open.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Closed">
+						<xs:annotation>
+							<xs:documentation>Door is closed.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Fault">
+						<xs:annotation>
+							<xs:documentation>Door monitor fault is detected.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:simpleType name="LockPhysicalState">
+				<xs:annotation>
+					<xs:documentation>
+						The physical state of a Lock (including Double Lock).
+					</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Unknown">
+						<xs:annotation>
+							<xs:documentation>Value is currently not known.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Locked">
+						<xs:annotation>
+							<xs:documentation>Lock is activated.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Unlocked">
+						<xs:annotation>
+							<xs:documentation>Lock is not activated.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Fault">
+						<xs:annotation>
+							<xs:documentation>Lock fault is detected.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:simpleType name="DoorAlarmState">
+				<xs:annotation>
+					<xs:documentation>
+						Describes the state of a Door with regard to alarms.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Normal">
+						<xs:annotation>
+							<xs:documentation>No alarm.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="DoorForcedOpen">
+						<xs:annotation>
+							<xs:documentation>Door is forced open.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="DoorOpenTooLong">
+						<xs:annotation>
+							<xs:documentation>Door is held open too long.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:complexType name="DoorTamper">
+				<xs:annotation>
+					<xs:documentation>
+						Tampering information for a Door.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Reason" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Optional field; Details describing tampering state change (e.g., reason,
+								place and time).
+								NOTE: All fields (including this one) which are designed to give
+								end-user prompts can be localized to the customer's native language.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="State" type="tdc:DoorTamperState">
+						<xs:annotation>
+							<xs:documentation>State of the tamper detector; it is of type DoorTamperState.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:simpleType name="DoorTamperState">
+				<xs:annotation>
+					<xs:documentation>
+						Describes the state of a Tamper detector.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Unknown">
+						<xs:annotation>
+							<xs:documentation>Value is currently not known.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="NotInTamper">
+						<xs:annotation>
+							<xs:documentation>No tampering is detected.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="TamperDetected">
+						<xs:annotation>
+							<xs:documentation>Tampering is detected.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:complexType name="DoorFault">
+				<xs:annotation>
+					<xs:documentation>
+						Fault information for a Door.
+						This can be extended with optional attributes in the future.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Reason" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Optional reason for fault.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="State" type="tdc:DoorFaultState">
+						<xs:annotation>
+							<xs:documentation>Overall fault state for the door; it is of type DoorFaultState. If there
+								are any faults, the value shall be: FaultDetected. Details of the detected fault shall
+								be found in the Reason field, and/or the various DoorState fields and/or in extensions
+								to this structure.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:simpleType name="DoorFaultState">
+				<xs:annotation>
+					<xs:documentation>
+						Describes the state of a Door fault.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Unknown">
+						<xs:annotation>
+							<xs:documentation>Fault state is unknown.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="NotInFault">
+						<xs:annotation>
+							<xs:documentation>No fault is detected.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="FaultDetected">
+						<xs:annotation>
+							<xs:documentation>Fault is detected.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:simpleType name="DoorMode">
+				<xs:annotation>
+					<xs:documentation>
+						The DoorMode describe the mode of operation from a logical perspective. 
+						Setting a door mode reflects the intent to set a door in a physical state.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Unknown">
+						<xs:annotation>
+							<xs:documentation>The mode of operation is unknown.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Locked">
+						<xs:annotation>
+							<xs:documentation>
+								The intention is to set the door to a physical locked state. 
+								In this mode the device shall provide momentary access using the AccessDoor 
+								method if supported by the door instance.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Unlocked">
+						<xs:annotation>
+							<xs:documentation>
+								The intention is to set the door to a physical unlocked state. 
+								Alarms related to door timing operations such as open too long 
+								or forced open are masked in this mode.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Accessed">
+						<xs:annotation>
+							<xs:documentation>
+								The intention is to momentary set the door to a physical unlocked state. 
+								After a predefined time the device shall revert the door to its previous mode. 
+								Alarms related to timing operations such as door forced open are masked in this mode.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Blocked">
+						<xs:annotation>
+							<xs:documentation>
+								The intention is to set the door to a physical locked state and the 
+								device shall not allow AccessDoor requests, i.e. it is not possible 
+								for the door to go to the accessed mode. 
+								All other requests to change the door mode are allowed.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="LockedDown">
+						<xs:annotation>
+							<xs:documentation>
+								The intention is to set the door to a physical locked state and the device 
+								shall only allow the LockDownReleaseDoor request. 
+								All other requests to change the door mode are not allowed.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="LockedOpen">
+						<xs:annotation>
+							<xs:documentation>
+								The intention is to set the door to a physical unlocked state and the 
+								device shall only allow the LockOpenReleaseDoor request. 
+								All other requests to change the door mode are not allowed.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="DoubleLocked">
+						<xs:annotation>
+							<xs:documentation>
+								The intention is to set the door with multiple locks to a physical double locked state. 
+								If the door does not support double locking the devices shall 
+								treat this as a normal locked mode. 
+								When changing to an unlocked mode from the double locked mode, the physical state 
+								of the door may first go to locked state before unlocking.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:complexType name="AccessDoorExtension">
+				<xs:annotation>
+					<xs:documentation>
+						Extension for the AccessDoor command.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<!--  Message Request / Response elements  -->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="tdc:ServiceCapabilities">
+							<xs:annotation>
+								<xs:documentation>The capability response message contains the requested DoorControl
+									service capabilities using a hierarchical XML capability structure.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDoorInfoList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If Limit is omitted or if the
+									value of Limit is higher than what the device supports, then the device shall
+									return its maximum amount of entries.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDoorInfoListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="DoorInfo" type="tdc:DoorInfo" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of DoorInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDoorInfo">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of DoorInfo items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDoorInfoResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="DoorInfo" type="tdc:DoorInfo" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of DoorInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+
+			<!--===============================-->
+			<xs:element name="GetDoorList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If not specified, less than one
+									or higher than what the device supports, the number of items is determined by the
+									device.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDoorListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Door" type="tdc:Door" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of Door items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDoors">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of Door items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDoorsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Door" type="tdc:Door" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of Door items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+
+			<!--===============================-->
+			<xs:element name="CreateDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Door" type="tdc:Door">
+							<xs:annotation>
+								<xs:documentation>Door item to create</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreateDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of created Door item</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Door" type="tdc:Door">
+							<xs:annotation>
+								<xs:documentation>The Door item to create or modify</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Door" type="tdc:Door">
+							<xs:annotation>
+								<xs:documentation>The details of the door</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The Token of the door to delete.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+
+			<!--===============================-->
+			<xs:element name="GetDoorState">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to get the state for.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetDoorStateResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="DoorState" type="tdc:DoorState">
+							<xs:annotation>
+								<xs:documentation>The state of the door.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="AccessDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to control.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="UseExtendedTime" type="xs:boolean" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Optional - Indicates that the configured extended time should be
+									used.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="AccessTime" type="xs:duration" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Optional - overrides ReleaseTime if specified.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="OpenTooLongTime" type="xs:duration" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Optional - overrides OpenTime if specified.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="PreAlarmTime" type="xs:duration" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Optional - overrides PreAlarmTime if specified.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Extension" type="tdc:AccessDoorExtension" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Future extension.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="AccessDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to control.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="UnlockDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to control.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="UnlockDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="BlockDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to control.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="BlockDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockDownDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to control.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockDownDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockDownReleaseDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to control.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockDownReleaseDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockOpenDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to control.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockOpenDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockOpenReleaseDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to control.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="LockOpenReleaseDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DoubleLockDoor">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Door instance to control.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DoubleLockDoorResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+		</xs:schema>
+	</wsdl:types>
+
+
+	<!--===============================-->
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="tdc:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="tdc:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetDoorInfoListRequest">
+		<wsdl:part name="parameters" element="tdc:GetDoorInfoList"/>
+	</wsdl:message>
+	<wsdl:message name="GetDoorInfoListResponse">
+		<wsdl:part name="parameters" element="tdc:GetDoorInfoListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetDoorInfoRequest">
+		<wsdl:part name="parameters" element="tdc:GetDoorInfo"/>
+	</wsdl:message>
+	<wsdl:message name="GetDoorInfoResponse">
+		<wsdl:part name="parameters" element="tdc:GetDoorInfoResponse"/>
+	</wsdl:message>
+
+	<!--===============================-->
+	<wsdl:message name="GetDoorListRequest">
+		<wsdl:part name="parameters" element="tdc:GetDoorList"/>
+	</wsdl:message>
+	<wsdl:message name="GetDoorListResponse">
+		<wsdl:part name="parameters" element="tdc:GetDoorListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetDoorsRequest">
+		<wsdl:part name="parameters" element="tdc:GetDoors"/>
+	</wsdl:message>
+	<wsdl:message name="GetDoorsResponse">
+		<wsdl:part name="parameters" element="tdc:GetDoorsResponse"/>
+	</wsdl:message>
+
+
+	<!--===============================-->
+	<wsdl:message name="CreateDoorRequest">
+		<wsdl:part name="parameters" element="tdc:CreateDoor"/>
+	</wsdl:message>
+	<wsdl:message name="CreateDoorResponse">
+		<wsdl:part name="parameters" element="tdc:CreateDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="SetDoorRequest">
+		<wsdl:part name="parameters" element="tdc:SetDoor"/>
+	</wsdl:message>
+	<wsdl:message name="SetDoorResponse">
+		<wsdl:part name="parameters" element="tdc:SetDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="ModifyDoorRequest">
+		<wsdl:part name="parameters" element="tdc:ModifyDoor"/>
+	</wsdl:message>
+	<wsdl:message name="ModifyDoorResponse">
+		<wsdl:part name="parameters" element="tdc:ModifyDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="DeleteDoorRequest">
+		<wsdl:part name="parameters" element="tdc:DeleteDoor"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteDoorResponse">
+		<wsdl:part name="parameters" element="tdc:DeleteDoorResponse"/>
+	</wsdl:message>
+
+
+	<!--===============================-->
+	<wsdl:message name="GetDoorStateRequest">
+		<wsdl:part name="parameters" element="tdc:GetDoorState"/>
+	</wsdl:message>
+	<wsdl:message name="GetDoorStateResponse">
+		<wsdl:part name="parameters" element="tdc:GetDoorStateResponse"/>
+	</wsdl:message>
+
+
+	<!--===============================-->
+	<wsdl:message name="AccessDoorRequest">
+		<wsdl:part name="parameters" element="tdc:AccessDoor"/>
+	</wsdl:message>
+	<wsdl:message name="AccessDoorResponse">
+		<wsdl:part name="parameters" element="tdc:AccessDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="LockDoorRequest">
+		<wsdl:part name="parameters" element="tdc:LockDoor"/>
+	</wsdl:message>
+	<wsdl:message name="LockDoorResponse">
+		<wsdl:part name="parameters" element="tdc:LockDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="UnlockDoorRequest">
+		<wsdl:part name="parameters" element="tdc:UnlockDoor"/>
+	</wsdl:message>
+	<wsdl:message name="UnlockDoorResponse">
+		<wsdl:part name="parameters" element="tdc:UnlockDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="BlockDoorRequest">
+		<wsdl:part name="parameters" element="tdc:BlockDoor"/>
+	</wsdl:message>
+	<wsdl:message name="BlockDoorResponse">
+		<wsdl:part name="parameters" element="tdc:BlockDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="LockDownDoorRequest">
+		<wsdl:part name="parameters" element="tdc:LockDownDoor"/>
+	</wsdl:message>
+	<wsdl:message name="LockDownDoorResponse">
+		<wsdl:part name="parameters" element="tdc:LockDownDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="LockDownReleaseDoorRequest">
+		<wsdl:part name="parameters" element="tdc:LockDownReleaseDoor"/>
+	</wsdl:message>
+	<wsdl:message name="LockDownReleaseDoorResponse">
+		<wsdl:part name="parameters" element="tdc:LockDownReleaseDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="LockOpenDoorRequest">
+		<wsdl:part name="parameters" element="tdc:LockOpenDoor"/>
+	</wsdl:message>
+	<wsdl:message name="LockOpenDoorResponse">
+		<wsdl:part name="parameters" element="tdc:LockOpenDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="LockOpenReleaseDoorRequest">
+		<wsdl:part name="parameters" element="tdc:LockOpenReleaseDoor"/>
+	</wsdl:message>
+	<wsdl:message name="LockOpenReleaseDoorResponse">
+		<wsdl:part name="parameters" element="tdc:LockOpenReleaseDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="DoubleLockDoorRequest">
+		<wsdl:part name="parameters" element="tdc:DoubleLockDoor"/>
+	</wsdl:message>
+	<wsdl:message name="DoubleLockDoorResponse">
+		<wsdl:part name="parameters" element="tdc:DoubleLockDoorResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--====== Faults messages ========-->
+	<wsdl:portType name="DoorControlPort">
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>
+				This operation returns the capabilities of the service.
+				An ONVIF compliant device which provides the Door Control service shall implement this method.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="tdc:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="GetDoorInfoList">
+			<wsdl:documentation>
+				This operation requests a list of all DoorInfo items provided by the device.
+				An ONVIF compliant device that provides Door Control service shall implement
+				this method.
+				A call to this method shall return a StartReference when not all data is returned and more data is
+				available.
+				The reference shall be valid for retrieving the next set of data.
+				The number of items returned shall not be greater than Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:GetDoorInfoListRequest"/>
+			<wsdl:output message="tdc:GetDoorInfoListResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetDoorInfo">
+			<wsdl:documentation>
+				This operation requests a list of DoorInfo items matching the given tokens.
+				An ONVIF-compliant device that provides Door Control service shall implement this method.
+				The device shall ignore tokens it cannot resolve and shall return an empty list
+				if there are no items matching specified tokens.
+				If the number of requested items is greater than MaxLimit, a TooManyItems fault shall be returned.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:GetDoorInfoRequest"/>
+			<wsdl:output message="tdc:GetDoorInfoResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="GetDoorList">
+			<wsdl:documentation>
+				This operation requests a list of all Door items provided by the device.
+				A call to this method shall return a StartReference when not all data is returned and more data is
+				available. The reference shall be valid for retrieving the next set of data.
+				Please refer to section 4.8.3 in [Access Control Service Specification] for more details.
+				The number of items returned shall not be greater than the Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:GetDoorListRequest"/>
+			<wsdl:output message="tdc:GetDoorListResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetDoors">
+			<wsdl:documentation>
+				This operation requests a list of Door items matching the given tokens.
+				The device shall ignore tokens it cannot resolve and shall return an empty list if there are no items
+				matching specified tokens. The device shall not return a fault in this case.
+				If the number of requested items is greater than MaxLimit, a TooManyItems fault shall be returned.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:GetDoorsRequest"/>
+			<wsdl:output message="tdc:GetDoorsResponse"/>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="CreateDoor">
+			<wsdl:documentation>
+				This operation creates the specified door in the device.
+				The token field of the Door structure shall be empty and the device shall allocate a token for
+				the door. The allocated token shall be returned in the response.
+				If the client sends any value in the token field, the device shall return
+				InvalidArgVal as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:CreateDoorRequest"/>
+			<wsdl:output message="tdc:CreateDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetDoor">
+			<wsdl:documentation>
+				This method is used to synchronize a door in a client with the device.
+				If a door with the specified token does not exist in the device, the door is created.
+				If a door with the specified token exists, then the door is modified.
+				A call to this method takes a door structure as input parameter. The token field of the Door
+				structure shall not be empty.
+				A device that signals support for the ClientSuppliedTokenSupported capability shall
+				implement this command.
+				If no token was specified in the request, the device shall return InvalidArgs as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:SetDoorRequest"/>
+			<wsdl:output message="tdc:SetDoorResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="ModifyDoor">
+			<wsdl:documentation>
+				This operation modifies the specified door.
+				The token of the door to modify is specified in the token field of the Door structure and shall
+				not be empty. All other fields in the structure shall overwrite the fields in the specified door.
+				If no token was specified in the request, the device shall return InvalidArgs as a generic fault code.				
+			</wsdl:documentation>
+			<wsdl:input message="tdc:ModifyDoorRequest"/>
+			<wsdl:output message="tdc:ModifyDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteDoor">
+			<wsdl:documentation>
+				This operation deletes the specified door.
+				If it is associated with one or more entities some devices may not be able to delete the door,
+				and consequently a ReferenceInUse fault shall be generated.
+				If no token was specified in the request, the device shall return InvalidArgs as a generic fault code.				
+			</wsdl:documentation>
+			<wsdl:input message="tdc:DeleteDoorRequest"/>
+			<wsdl:output message="tdc:DeleteDoorResponse"/>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="GetDoorState">
+			<wsdl:documentation>
+				This operation requests the state of a Door specified by the Token.
+				A device implementing the Door Control service shall be capable of reporting
+				the status of a door using a DoorState structure available from the
+				GetDoorState command.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:GetDoorStateRequest"/>
+			<wsdl:output message="tdc:GetDoorStateResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="AccessDoor">
+			<wsdl:documentation>
+				This operation allows momentarily accessing a Door.
+				It invokes the functionality typically used when a card holder presents a
+				card to a card reader at the door and is granted access.
+				The DoorMode shall change to Accessed state. Please refer to Accessed mode in section [DoorMode] for
+				more details.
+				The Door shall remain accessible for the defined time. When the time span
+				elapses, the DoorMode shall change back to its previous state.
+				If the request cannot be fulfilled, a Failure fault shall be returned.
+				Please refer to section [DoorMode] for details about Door Modes restrictions.
+				A device that signals support for Access capability for a particular Door
+				instance shall implement this method. A device that signals support for
+				AccessTimingOverride capability for a particular Door instance shall also
+				provide optional timing parameters (AccessTime, OpenTooLongTime and
+				PreAlarmTime) when performing AccessDoor command.
+				The device shall take the best effort approach for parameters not supported,
+				it must fallback to preconfigured time or limit the time to the closest
+				supported time if the specified time is out of range.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:AccessDoorRequest"/>
+			<wsdl:output message="tdc:AccessDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="LockDoor">
+			<wsdl:documentation>
+				This operation allows locking a Door.
+				The DoorMode shall change to Locked state.
+				Please refer to Locked mode in section [DoorMode] for more details.
+				A device that signals support for Lock capability for a particular Door
+				instance shall implement this method.
+				If the request cannot be fulfilled, a Failure fault shall be returned.
+				Please refer to section [DoorMode] for more details about Door Modes restrictions.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:LockDoorRequest"/>
+			<wsdl:output message="tdc:LockDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="UnlockDoor">
+			<wsdl:documentation>
+				This operation allows unlocking a Door.
+				The DoorMode shall change to Unlocked state.
+				Please refer to Unlocked mode in section [DoorMode] for more details.
+				A device that signals support for Unlock capability for a particular Door
+				instance shall implement this method.
+				If the request cannot be fulfilled, a Failure fault shall be returned.
+				Please refer to section [DoorMode] for more details about Door Modes restrictions.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:UnlockDoorRequest"/>
+			<wsdl:output message="tdc:UnlockDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="BlockDoor">
+			<wsdl:documentation>
+				This operation allows blocking a Door and preventing momentary access (AccessDoor command).
+				The DoorMode shall change to Blocked state.
+				Please refer to Blocked mode in section [DoorMode] for more details.
+				A device that signals support for Block capability for a particular Door
+				instance shall implement this method.
+				If the request cannot be fulfilled, a Failure fault shall be returned.
+				Please refer to section [DoorMode] for more details about Door Modes restrictions.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:BlockDoorRequest"/>
+			<wsdl:output message="tdc:BlockDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="LockDownDoor">
+			<wsdl:documentation>
+				This operation allows locking and preventing other actions until a LockDownRelease command is invoked.
+				The DoorMode shall change to LockedDown state.
+				Please refer to LockedDown mode in section [DoorMode] for more details.
+				The device shall ignore other door control commands until a LockDownRelease command is performed.
+				A device that signals support for LockDown capability for a particular Door
+				instance shall implement this method.
+				If a device supports DoubleLock capability for a particular Door instance,
+				that operation may be engaged as well.
+				If the request cannot be fulfilled, a Failure fault shall be returned.
+				Please refer to section [DoorMode] for more details about Door Modes restrictions.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:LockDownDoorRequest"/>
+			<wsdl:output message="tdc:LockDownDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="LockDownReleaseDoor">
+			<wsdl:documentation>
+				This operation allows releasing the LockedDown state of a Door.
+				The DoorMode shall change back to its previous/next state.
+				It is not defined what the previous/next state shall be, but typically - Locked.
+				This method shall only succeed if the current DoorMode is LockedDown.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:LockDownReleaseDoorRequest"/>
+			<wsdl:output message="tdc:LockDownReleaseDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="LockOpenDoor">
+			<wsdl:documentation>
+				This operation allows unlocking a Door and preventing other actions until LockOpenRelease method is
+				invoked.
+				The DoorMode shall change to LockedOpen state.
+				Please refer to LockedOpen mode in section [DoorMode] for more details.
+				The device shall ignore other door control commands until a LockOpenRelease command is performed.
+				A device that signals support for LockOpen capability for a particular Door instance shall implement
+				this method.
+				If the request cannot be fulfilled, a Failure fault shall be returned.
+				Please refer to section [DoorMode] for more details about Door Modes restrictions.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:LockOpenDoorRequest"/>
+			<wsdl:output message="tdc:LockOpenDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="LockOpenReleaseDoor">
+			<wsdl:documentation>
+				This operation allows releasing the LockedOpen state of a Door.
+				The DoorMode shall change state from the LockedOpen state back to its previous/next state.
+				It is not defined what the previous/next state shall be, but typically - Unlocked.
+				A device that signals support for LockOpen capability for a particular Door instance shall support
+				this command.
+				This method shall only succeed if the current DoorMode is LockedOpen.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:LockOpenReleaseDoorRequest"/>
+			<wsdl:output message="tdc:LockOpenReleaseDoorResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DoubleLockDoor">
+			<wsdl:documentation>
+				This operation is used for securely locking a Door.
+				A call to this method shall change DoorMode state to DoubleLocked.
+				Please refer to DoubleLocked mode in section [DoorMode] for more details.
+				A device that signals support for DoubleLock capability for a particular
+				Door instance shall implement this method. Otherwise this method can be
+				performed as a standard Lock operation (see [LockDoor command]).
+				If the door has an extra lock that shall be locked as well.
+				If the request cannot be fulfilled, a Failure fault shall be returned.
+			</wsdl:documentation>
+			<wsdl:input message="tdc:DoubleLockDoorRequest"/>
+			<wsdl:output message="tdc:DoubleLockDoorResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<!--===============================-->
+	<wsdl:binding name="DoorControlBinding" type="tdc:DoorControlPort">
+		<wsdl:documentation>
+			Copyright (c) 2010-2013 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+			<br/>
+
+
+		</wsdl:documentation>
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<!--===============================-->
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetDoorInfoList">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/GetDoorInfoList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetDoorInfo">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/GetDoorInfo"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetDoorList">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/GetDoorList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetDoors">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/GetDoors"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="CreateDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/CreateDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="SetDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/SetDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="ModifyDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/ModifyDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="DeleteDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/DeleteDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetDoorState">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/GetDoorState"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="AccessDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/AccessDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="LockDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/LockDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="UnlockDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/UnlockDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="BlockDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/BlockDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="LockDownDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/LockDownDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="LockDownReleaseDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/LockDownReleaseDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="LockOpenDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/LockOpenDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="LockOpenReleaseDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/LockOpenReleaseDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="DoubleLockDoor">
+			<soap:operation soapAction="http://www.onvif.org/ver10/doorcontrol/wsdl/DoubleLockDoor"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+	</wsdl:binding>
+</wsdl:definitions>

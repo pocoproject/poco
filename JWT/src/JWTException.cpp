@@ -19,8 +19,7 @@
 using Poco::Exception;
 
 
-namespace Poco {
-namespace JWT {
+namespace Poco::JWT {
 
 
 POCO_IMPLEMENT_EXCEPTION(JWTException, Exception, "JWT Exception")
@@ -32,4 +31,4 @@ POCO_IMPLEMENT_EXCEPTION(SignatureVerificationException, SignatureException, "JW
 POCO_IMPLEMENT_EXCEPTION(SignatureGenerationException, SignatureException, "JWT signature generation failed")
 
 
-} } // namespace Poco::JWT
+} // namespace Poco::JWT

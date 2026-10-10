@@ -14,6 +14,9 @@
 #include "Poco/CppParser/Utility.h"
 #include "Poco/CppParser/Symbol.h"
 #include "Poco/CppParser/CppToken.h"
+#include "Poco/CppParser/Parser.h"
+#include "Poco/CppParser/Struct.h"
+#include "Poco/CppParser/Function.h"
 #include <sstream>
 #include <iostream>
 
@@ -22,18 +25,21 @@ using namespace Poco::CppParser;
 
 
 std::string linker("cl");
-std::string options("/I \"C:\\Program Files\\Microsoft Visual Studio 8\\VC\\INCLUDE\", "
-				"/I \"C:\\Program Files\\Microsoft Visual Studio 8\\VC\\PlatformSDK\\include\", "
-				"/I \"p:\\poco\\Foundation\\include\", "
-				"/I \"p:\\poco\\XML\\include\", "
-				"/I \"p:\\poco\\Util\\include\", "
-				"/I \"p:\\poco\\Net\\include\", "
-				"/D \"WIN32\", "
-				"/D \"_DEBUG\", "
-				"/D \"_WINDOWS\", "
-				"/D \"_MBCS\", "
-				"/C, /P, /TP");
-std::string path("C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\IDE;C:\\Program Files\\Microsoft Visual Studio 8\\VC\\BIN;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools;C:\\Program Files\\Microsoft Visual Studio 8\\Common7\\Tools\\bin");
+std::string options(R"(/I "C:\Program Files\Microsoft Visual Studio 8\VC\INCLUDE", )"
+	R"(/I "C:\Program Files\Microsoft Visual Studio 8\VC\PlatformSDK\include", )"
+	R"(/I "p:\poco\Foundation\include", )"
+	R"(/I "p:\poco\XML\include", )"
+	R"(/I "p:\poco\Util\include", )"
+	R"(/I "p:\poco\Net\include", )"
+	R"(/D "WIN32", )"
+	R"(/D "_DEBUG", )"
+	R"(/D "_WINDOWS", )"
+	R"(/D "_MBCS", )"
+	"/C, /P, /TP");
+std::string path(R"(C:\Program Files\Microsoft Visual Studio 8\Common7\IDE;)"
+	R"(C:\Program Files\Microsoft Visual Studio 8\VC\BIN;)"
+	R"(C:\Program Files\Microsoft Visual Studio 8\Common7\Tools;)"
+	R"(C:\Program Files\Microsoft Visual Studio 8\Common7\Tools\bin)");
 
 
 CppParserTest::CppParserTest(const std::string& name): CppUnit::TestCase(name)
@@ -212,6 +218,384 @@ void CppParserTest::testNumberLiteral(const std::string& literal)
 }
 
 
+void CppParserTest::testRawStringLiteral(const std::string& prefix, const std::string& rawLiteral)
+{
+	// Raw string literals are consumed by IdentifierToken::finish() when the
+	// identifier matches a raw string prefix (R, u8R, uR, UR, LR) and is
+	// immediately followed by '"'.
+	std::string full = prefix + rawLiteral;
+	IdentifierToken tok;
+
+	std::istringstream istr(full);
+	assertTrue (tok.start(istr.get(), istr));
+	tok.finish(istr);
+	assertEquals (tok.tokenString(), full);
+}
+
+
+void CppParserTest::testStringSuffix(const std::string& literal, const std::string& expected)
+{
+	StringLiteralToken tok;
+
+	std::istringstream istr(literal);
+	assertTrue (tok.start(istr.get(), istr));
+	tok.finish(istr);
+	assertEquals (tok.tokenString(), expected);
+}
+
+
+void CppParserTest::parseString(const std::string& code, NameSpace::SymbolTable& st)
+{
+	// The parser expects preprocessed input with #line directives that
+	// indicate which file the code belongs to.  Without a matching
+	// directive the parser considers itself "not in file" and skips
+	// all tokens.  We prepend a #line directive matching the filename
+	// given to the Parser constructor.
+	std::string input = "#line 1 \"test.h\"\n" + code;
+	std::istringstream istr(input);
+	Parser parser(st, "test.h", istr);
+	parser.parse();
+}
+
+
+void CppParserTest::testTokenizerRawStrings()
+{
+	// Simplest raw string — the pattern that broke ObjectId.h
+	testRawStringLiteral("R", R"---("(")")---");
+
+	// Raw string with content
+	testRawStringLiteral("R", R"---("(hello world)")---");
+
+	// Custom delimiter
+	testRawStringLiteral("R", R"("---(content)---")");
+
+	// All prefix variants
+	testRawStringLiteral("u8R", R"---("(text)")---");
+	testRawStringLiteral("uR", R"---("(text)")---");
+	testRawStringLiteral("UR", R"---("(text)")---");
+	testRawStringLiteral("LR", R"---("(text)")---");
+
+	// Content with special characters
+	testRawStringLiteral("R", "\"(line1\nline2)\"");  // keep: \n must be a real newline char
+	testRawStringLiteral("R", R"---("(has "quotes" inside)")---");
+
+	// Empty content
+	testRawStringLiteral("R", R"---("()")---");
+}
+
+
+void CppParserTest::testTokenizerStringSuffixes()
+{
+	// C++14 std::string literal suffix
+	testStringSuffix(R"("hello"s)", R"("hello"s)");
+
+	// C++17 std::string_view literal suffix
+	testStringSuffix(R"("hello"sv)", R"("hello"sv)");
+
+	// User-defined literal suffix
+	testStringSuffix(R"("hello"_mylit)", R"("hello"_mylit)");
+
+	// No suffix — unchanged behavior
+	testStringSuffix(R"("hello" )", R"("hello")");
+}
+
+
+void CppParserTest::testParseStaticAssert()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(static_assert(sizeof(int) >= 4, "int too small");)", st);
+	// static_assert should be skipped without adding symbols
+	assertTrue (st.empty());
+}
+
+
+void CppParserTest::testParseAlignas()
+{
+	// alignas on a member variable — this is the pattern from MPSCQueue.h
+	// that caused the original infinite loop.  parseVarFunc() must consume
+	// the alignas(...) prefix without misinterpreting it as a function call.
+	NameSpace::SymbolTable st;
+	parseString(R"(
+struct CacheLine
+{
+    alignas(64) int data;
+};
+)", st);
+	// The parser must not hang on alignas(...) and must find the struct
+	assertTrue (st.find("CacheLine") != st.end());
+}
+
+
+void CppParserTest::testParseNoexceptExpr()
+{
+	NameSpace::SymbolTable st;
+	parseString("void func() noexcept(true);\n", st);
+	assertTrue (st.find("func") != st.end());
+
+	Symbol* pSym = st.find("func")->second;
+	Function* pFunc = dynamic_cast<Function*>(pSym);
+	assertTrue (pFunc != nullptr);
+	assertTrue (pFunc->flags() & Function::FN_NOEXCEPT);
+}
+
+
+void CppParserTest::testParseDeleteDefault()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+class Foo
+{
+public:
+    Foo() = default;
+    Foo(const Foo&) = delete;
+};
+)", st);
+	assertTrue (st.find("Foo") != st.end());
+
+	Symbol* pSym = st.find("Foo")->second;
+	Struct* pClass = dynamic_cast<Struct*>(pSym);
+	assertTrue (pClass != nullptr);
+
+	// Find the default constructor and deleted copy constructor
+	bool foundDefault = false;
+	bool foundDeleted = false;
+	for (auto it = pClass->begin(); it != pClass->end(); ++it)
+	{
+		Function* pFunc = dynamic_cast<Function*>(it->second);
+		if (pFunc && pFunc->name() == "Foo")
+		{
+			if (pFunc->isDefault())
+				foundDefault = true;
+			if (pFunc->isDeleted())
+				foundDeleted = true;
+		}
+	}
+	assertTrue (foundDefault);
+	assertTrue (foundDeleted);
+}
+
+
+void CppParserTest::testParseAnonymousNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace
+{
+    int hidden = 42;
+}
+)", st);
+	// Anonymous namespace contents should be skipped — no symbols added
+	assertTrue (st.empty());
+}
+
+
+void CppParserTest::testParseFriendInline()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+class Foo
+{
+public:
+    friend bool operator==(const Foo& a, const Foo& b) { return true; }
+    int value() const;
+};
+)", st);
+	assertTrue (st.find("Foo") != st.end());
+
+	Symbol* pSym = st.find("Foo")->second;
+	Struct* pClass = dynamic_cast<Struct*>(pSym);
+	assertTrue (pClass != nullptr);
+
+	// The member function after the friend declaration should be visible
+	bool foundValue = false;
+	for (auto it = pClass->begin(); it != pClass->end(); ++it)
+	{
+		if (it->second->name() == "value")
+			foundValue = true;
+	}
+	assertTrue (foundValue);
+}
+
+
+void CppParserTest::testParseNestedNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace A::B::C
+{
+    class Foo
+    {
+    public:
+        void bar();
+    };
+}
+)", st);
+	
+	// Check that namespace A exists
+	assertTrue (st.find("A") != st.end());
+	Symbol* pSymA = st.find("A")->second;
+	NameSpace* pNSA = dynamic_cast<NameSpace*>(pSymA);
+	assertTrue (pNSA != nullptr);
+	
+	// Check that namespace B exists within A
+	Symbol* pSymB = pNSA->lookup("B");
+	assertTrue (pSymB != nullptr);
+	NameSpace* pNSB = dynamic_cast<NameSpace*>(pSymB);
+	assertTrue (pNSB != nullptr);
+	
+	// Check that namespace C exists within B
+	Symbol* pSymC = pNSB->lookup("C");
+	assertTrue (pSymC != nullptr);
+	NameSpace* pNSC = dynamic_cast<NameSpace*>(pSymC);
+	assertTrue (pNSC != nullptr);
+	
+	// Check that class Foo exists within C
+	Symbol* pSymFoo = pNSC->lookup("Foo");
+	assertTrue (pSymFoo != nullptr);
+	Struct* pFoo = dynamic_cast<Struct*>(pSymFoo);
+	assertTrue (pFoo != nullptr);
+	
+	// Check the full name
+	assertTrue (pFoo->fullName() == "A::B::C::Foo");
+}
+
+
+void CppParserTest::testParseInlineNestedNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace A::inline B::C
+{
+    void func();
+}
+)", st);
+	
+	// Check that namespace A exists
+	assertTrue (st.find("A") != st.end());
+	Symbol* pSymA = st.find("A")->second;
+	NameSpace* pNSA = dynamic_cast<NameSpace*>(pSymA);
+	assertTrue (pNSA != nullptr);
+	assertTrue (!pNSA->isInline());
+	
+	// Check that namespace B exists within A and is inline
+	Symbol* pSymB = pNSA->lookup("B");
+	assertTrue (pSymB != nullptr);
+	NameSpace* pNSB = dynamic_cast<NameSpace*>(pSymB);
+	assertTrue (pNSB != nullptr);
+	assertTrue (pNSB->isInline());
+	
+	// Check that namespace C exists within B and is not inline
+	Symbol* pSymC = pNSB->lookup("C");
+	assertTrue (pSymC != nullptr);
+	NameSpace* pNSC = dynamic_cast<NameSpace*>(pSymC);
+	assertTrue (pNSC != nullptr);
+	assertTrue (!pNSC->isInline());
+	
+	// Check that func exists within C
+	Symbol* pSymFunc = pNSC->lookup("func");
+	assertTrue (pSymFunc != nullptr);
+	assertTrue (pSymFunc->fullName() == "A::B::C::func");
+}
+
+
+void CppParserTest::testParseRepeatedNestedNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace A::B
+{
+	class X {};
+}
+namespace A::B
+{
+	class Y {};
+}
+)", st);
+
+	assertTrue (st.find("A") != st.end());
+	NameSpace* pNSA = dynamic_cast<NameSpace*>(st.find("A")->second);
+	assertTrue (pNSA != nullptr);
+
+	NameSpace* pNSB = dynamic_cast<NameSpace*>(pNSA->lookup("B"));
+	assertTrue (pNSB != nullptr);
+
+	Symbol* pSymX = pNSB->lookup("X");
+	assertTrue (pSymX != nullptr);
+	Struct* pX = dynamic_cast<Struct*>(pSymX);
+	assertTrue (pX != nullptr);
+
+	Symbol* pSymY = pNSB->lookup("Y");
+	assertTrue (pSymY != nullptr);
+	Struct* pY = dynamic_cast<Struct*>(pSymY);
+	assertTrue (pY != nullptr);
+
+	assertTrue (pX->fullName() == "A::B::X");
+	assertTrue (pY->fullName() == "A::B::Y");
+}
+
+
+void CppParserTest::testParseSingleNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace Solo
+{
+	class Only {};
+}
+)", st);
+
+	assertTrue (st.find("Solo") != st.end());
+	NameSpace* pNSSolo = dynamic_cast<NameSpace*>(st.find("Solo")->second);
+	assertTrue (pNSSolo != nullptr);
+
+	Symbol* pSymOnly = pNSSolo->lookup("Only");
+	assertTrue (pSymOnly != nullptr);
+	Struct* pOnly = dynamic_cast<Struct*>(pSymOnly);
+	assertTrue (pOnly != nullptr);
+	assertTrue (pOnly->fullName() == "Solo::Only");
+}
+
+
+void CppParserTest::testParseDeepNestedNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace A::B::C::D::E
+{
+	class Deep {};
+}
+class GlobalAfter {};
+)", st);
+
+	assertTrue (st.find("A") != st.end());
+	NameSpace* pNSA = dynamic_cast<NameSpace*>(st.find("A")->second);
+	assertTrue (pNSA != nullptr);
+
+	NameSpace* pNSB = dynamic_cast<NameSpace*>(pNSA->lookup("B"));
+	assertTrue (pNSB != nullptr);
+	NameSpace* pNSC = dynamic_cast<NameSpace*>(pNSB->lookup("C"));
+	assertTrue (pNSC != nullptr);
+	NameSpace* pNSD = dynamic_cast<NameSpace*>(pNSC->lookup("D"));
+	assertTrue (pNSD != nullptr);
+	NameSpace* pNSE = dynamic_cast<NameSpace*>(pNSD->lookup("E"));
+	assertTrue (pNSE != nullptr);
+
+	Symbol* pSymDeep = pNSE->lookup("Deep");
+	assertTrue (pSymDeep != nullptr);
+	Struct* pDeep = dynamic_cast<Struct*>(pSymDeep);
+	assertTrue (pDeep != nullptr);
+	assertTrue (pDeep->fullName() == "A::B::C::D::E::Deep");
+
+	// Verify parser state after namespace pop loop by checking a following global symbol.
+	assertTrue (st.find("GlobalAfter") != st.end());
+	Symbol* pSymGlobalAfter = st.find("GlobalAfter")->second;
+	assertTrue (pSymGlobalAfter != nullptr);
+	Struct* pGlobalAfter = dynamic_cast<Struct*>(pSymGlobalAfter);
+	assertTrue (pGlobalAfter != nullptr);
+	assertTrue (pGlobalAfter->fullName() == "GlobalAfter");
+}
+
+
 void CppParserTest::setUp()
 {
 }
@@ -229,6 +613,19 @@ CppUnit::Test* CppParserTest::suite()
 	CppUnit_addTest(pSuite, CppParserTest, testParseDir);
 	CppUnit_addTest(pSuite, CppParserTest, testExtractName);
 	CppUnit_addTest(pSuite, CppParserTest, testNumberLiterals);
+	CppUnit_addTest(pSuite, CppParserTest, testTokenizerRawStrings);
+	CppUnit_addTest(pSuite, CppParserTest, testTokenizerStringSuffixes);
+	CppUnit_addTest(pSuite, CppParserTest, testParseStaticAssert);
+	CppUnit_addTest(pSuite, CppParserTest, testParseAlignas);
+	CppUnit_addTest(pSuite, CppParserTest, testParseNoexceptExpr);
+	CppUnit_addTest(pSuite, CppParserTest, testParseDeleteDefault);
+	CppUnit_addTest(pSuite, CppParserTest, testParseAnonymousNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseFriendInline);
+	CppUnit_addTest(pSuite, CppParserTest, testParseNestedNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseInlineNestedNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseRepeatedNestedNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseSingleNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseDeepNestedNamespace);
 
 	return pSuite;
 }

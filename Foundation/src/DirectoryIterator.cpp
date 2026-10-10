@@ -25,7 +25,7 @@
 namespace Poco {
 
 
-DirectoryIterator::DirectoryIterator(): _pImpl(0)
+DirectoryIterator::DirectoryIterator(): _pImpl(nullptr)
 {
 }
 

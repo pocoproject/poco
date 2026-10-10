@@ -51,7 +51,7 @@ class TestCaller: public TestCase
 {
 	REFERENCEOBJECT (TestCaller)
 
-	typedef void (Fixture::*TestMethod)();
+	using TestMethod = void (Fixture::*)();
 
 public:
 	TestCaller(const std::string& name, TestMethod test, Test::Type testType = Test::Normal):
@@ -62,19 +62,19 @@ public:
 	}
 
 protected:
-	void runTest()
+	void runTest() override
 	{
 		(_fixture.get()->*_test)();
 	}
 
-	void setUp()
+	void setUp() override
 	{
 		if (!setup().empty())
 			_fixture.get()->addSetup(setup());
 		_fixture.get()->setUp();
 	}
 
-	void tearDown()
+	void tearDown() override
 	{
 		_fixture.get()->tearDown();
 	}

@@ -24,12 +24,16 @@
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
 #include "Poco/Debugger.h"
-#include "Poco/Exception.h"
+#include "Poco/Types.h"
+#include <atomic>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <vector>
-#include <cstring>
 
+using namespace std::string_literals;
 
 using Poco::Bugcheck;
 using Poco::Exception;
@@ -103,6 +107,20 @@ struct Large
 	Large() : i(1), j(2), k(3), l(4) { }
 	long i,j,k;
 	const long l;
+};
+
+
+enum TestEnum
+{
+	TEST_VALUE_ONE,
+	TEST_VALUE_TWO
+};
+
+
+union TestUnion
+{
+	int intVal;
+	float floatVal;
 };
 
 
@@ -196,50 +214,167 @@ void CoreTest::testEnvironment()
 	{
 	}
 
-	std::cout << "OS Name:         " << Environment::osName() << std::endl;
-	std::cout << "OS Display Name: " << Environment::osDisplayName() << std::endl;
-	std::cout << "OS Version:      " << Environment::osVersion() << std::endl;
-	std::cout << "OS Architecture: " << Environment::osArchitecture() << std::endl;
-	std::cout << "Node Name:       " << Environment::nodeName() << std::endl;
-	std::cout << "Node ID:         " << Environment::nodeId() << std::endl;
-	std::cout << "Number of CPUs:  " << Environment::processorCount() << std::endl;
+	std::string osName = Environment::osName();
+	std::string osDisplayName = Environment::osDisplayName();
+	std::string osVersion = Environment::osVersion();
+	std::string osArch = Environment::osArchitecture();
+	std::string nodeName = Environment::nodeName();
+	std::string nodeId = Environment::nodeId();
+	unsigned int cpuCount = Environment::processorCount();
+
+	std::cout << "OS Name:         " << osName << std::endl;
+	std::cout << "OS Display Name: " << osDisplayName << std::endl;
+	std::cout << "OS Version:      " << osVersion << std::endl;
+	std::cout << "OS Architecture: " << osArch << std::endl;
+	std::cout << "Node Name:       " << nodeName << std::endl;
+	std::cout << "Node ID:         " << nodeId << std::endl;
+	std::cout << "Number of CPUs:  " << cpuCount << std::endl;
+
+	// Basic validation
+	assertTrue (!osName.empty());
+	assertTrue (!osDisplayName.empty());
+	assertTrue (!osVersion.empty());
+	assertTrue (!osArch.empty());
+	assertTrue (!nodeName.empty());
+	assertTrue (cpuCount > 0);
+
+#if defined(_WIN32)
+	// Windows-specific validation
+	// osName returns "Windows NT" for all modern Windows versions
+	assertTrue (osName == "Windows NT" || osName == "Unknown");
+	// osDisplayName returns specific version like "Windows 10", "Windows 11", etc.
+	assertTrue (osDisplayName.find("Windows") != std::string::npos || osDisplayName == "Unknown");
+#elif defined(__linux__)
+	assertTrue (osName == "Linux");
+#elif defined(__APPLE__)
+	assertTrue (osName == "Darwin");
+#endif
+}
+
+
+void CoreTest::testEnvironmentMultiThread()
+{
+	// Stress test for concurrent environment variable access.
+	// Tests thread safety of Poco::Environment get()/set() across threads.
+
+	const int numWriters = 4;
+	const int numReaders = 4;
+	const int iterations = 200;
+	std::atomic<bool> failed{false};
+	std::atomic<int> readCount{0};
+	std::atomic<bool> stop{false};
+
+	std::vector<std::thread> threads;
+
+	// Writer threads - use Poco::Environment::set()
+	for (int id = 0; id < numWriters; ++id)
+	{
+		threads.emplace_back([id, &failed, &stop]()
+		{
+			std::string name = "POCO_MT_TEST_" + std::to_string(id);
+			for (int i = 0; i < iterations && !failed && !stop; ++i)
+			{
+				try
+				{
+					std::string value = "val_" + std::to_string(id) + "_" + std::to_string(i);
+					Environment::set(name, value);
+				}
+				catch (...)
+				{
+					failed = true;
+				}
+			}
+		});
+	}
+
+	// Reader threads - use Poco::Environment::get() which serializes with set()
+	// via the internal mutex. Raw getenv() concurrent with setenv() is a known
+	// POSIX data race on the environment variable array that cannot be fixed at
+	// library level.
+	for (int id = 0; id < numReaders; ++id)
+	{
+		threads.emplace_back([&failed, &readCount, &stop]()
+		{
+			for (int i = 0; i < iterations && !failed && !stop; ++i)
+			{
+				for (int v = 0; v < numWriters && !failed; ++v)
+				{
+					std::string name = "POCO_MT_TEST_" + std::to_string(v);
+					try
+					{
+						std::string val = Environment::get(name);
+						++readCount;
+						if (val.empty()) failed = true;
+					}
+					catch (Poco::NotFoundException&)
+					{
+						// Variable not yet set by writer thread
+					}
+					catch (...)
+					{
+						failed = true;
+					}
+				}
+			}
+		});
+	}
+
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+
+	assertFalse(failed.load());
+	assertTrue(readCount.load() > 0);
+
+	std::cout << "Environment multi-thread test: " << readCount.load() << " native reads" << std::endl;
 }
 
 
 void CoreTest::testBuffer()
 {
-	std::size_t s = 10;
+	std::size_t const s = 10;
 	Buffer<int> b(s);
 	assertTrue (b.size() == s);
 	assertTrue (b.sizeBytes() == s * sizeof(int));
 	assertTrue (b.capacity() == s);
 	assertTrue (b.capacityBytes() == s * sizeof(int));
 	std::vector<int> v;
-	for (int i = 0; i < s; ++i)
-		v.push_back(i);
+	for (std::size_t i = 0; i < s; ++i)
+	{
+		v.push_back(static_cast<int>(i));
+	}
 
-	std::memcpy(b.begin(), &v[0], sizeof(int) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
 
 	assertTrue (s == b.size());
-	for (int i = 0; i < s; ++i)
-		assertTrue (b[i] == i);
+	for (std::size_t i = 0; i < s; ++i)
+	{
+		assertTrue (b[i] == static_cast<int>(i));
+	}
 
 	b.resize(s/2);
-	for (int i = 0; i < s/2; ++i)
-		assertTrue (b[i] == i);
+	for (std::size_t i = 0; i < s/2; ++i)
+	{
+		assertTrue (b[i] == static_cast<int>(i));
+	}
 
 	assertTrue (b.size() == s/2);
 	assertTrue (b.capacity() == s);
 
 	b.resize(s*2);
 	v.clear();
-	for (int i = 0; i < s*2; ++i)
-		v.push_back(i);
+	for (std::size_t i = 0; i < s*2; ++i)
+	{
+		v.push_back(static_cast<int>(i));
+	}
 
-	std::memcpy(b.begin(), &v[0], sizeof(int) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
 
-	for (int i = 0; i < s*2; ++i)
-		assertTrue (b[i] == i);
+	for (std::size_t i = 0; i < s*2; ++i)
+	{
+		assertTrue (b[i] == static_cast<int>(i));
+	}
 
 	assertTrue (b.size() == s*2);
 	assertTrue (b.capacity() == s*2);
@@ -317,6 +452,52 @@ void CoreTest::testBuffer()
 }
 
 
+void CoreTest::testBufferEmpty()
+{
+	// An empty buffer owns no storage; no operation on it may touch memory.
+	Buffer<char> b(0);
+	assertTrue (b.empty());
+	assertTrue (b.size() == 0);
+	assertTrue (b.capacity() == 0);
+	assertTrue (b.begin() == nullptr);
+	assertTrue (b.begin() == b.end());
+
+	b.clear();
+	b.assign("x", 0);
+	b.append("x", 0);
+	b.resize(0);
+	b.setCapacity(0);
+	assertTrue (b.empty());
+	assertTrue (b.capacity() == 0);
+	assertTrue (b.begin() == nullptr);
+
+	Buffer<char> c(b);
+	assertTrue (c.empty());
+	assertTrue (c == b);
+	c = b;
+	assertTrue (c.empty());
+	assertTrue (c == b);
+
+	// A wrapper around no memory behaves the same.
+	Buffer<char> d(static_cast<char*>(nullptr), 0);
+	assertTrue (d.empty());
+	d.clear();
+	assertTrue (d == b);
+
+	// A buffer with capacity but no used elements is not cleared past its size.
+	Buffer<char> e(4);
+	e.resize(0);
+	assertTrue (e.empty());
+	assertTrue (e.capacity() == 4);
+	e.clear();
+	e.append("ab", 2);
+	assertTrue (e.size() == 2);
+	assertTrue ( !std::memcmp(e.begin(), "ab", 2) );
+	e.clear();
+	assertTrue (e[0] == 0 && e[1] == 0);
+}
+
+
 void CoreTest::testFIFOBufferEOFAndError()
 {
 	typedef FIFOBuffer::Type T;
@@ -335,7 +516,7 @@ void CoreTest::testFIFOBufferEOFAndError()
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
 
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	assertTrue (0 == _notToReadable);
 	assertTrue (0 == _readableToNot);
 	assertTrue (10 == f.write(b));
@@ -441,7 +622,7 @@ void CoreTest::testFIFOBufferChar()
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
 
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	assertTrue (0 == _notToReadable);
 	assertTrue (0 == _readableToNot);
 	f.write(b);
@@ -471,7 +652,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue ('7' == f[2]);
 	assertTrue ('8' == f[3]);
 	assertTrue ('9' == f[4]);
-	try { T POCO_UNUSED i = f[10]; fail ("must fail"); }
+	try { (void) f[10]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	v.clear();
@@ -479,7 +660,7 @@ void CoreTest::testFIFOBufferChar()
 		v.push_back(c);
 
 	b.resize(10);
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	f.write(b);
 	assertTrue (20 == f.size());
 	assertTrue (15 == f.used());
@@ -499,7 +680,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue ('h' == f[12]);
 	assertTrue ('i' == f[13]);
 	assertTrue ('j' == f[14]);
-	try { T POCO_UNUSED i = f[15]; fail ("must fail"); }
+	try { (void) f[15]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	f.read(b, 10);
@@ -511,7 +692,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue ('h' == f[2]);
 	assertTrue ('i' == f[3]);
 	assertTrue ('j' == f[4]);
-	try { T POCO_UNUSED i = f[5]; fail ("must fail"); }
+	try { (void) f[5]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	assertTrue (1 == _notToReadable);
@@ -527,7 +708,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue (5 == b.size());
 	assertTrue (20 == f.size());
 	assertTrue (0 == f.used());
-	try { T POCO_UNUSED i = f[0]; fail ("must fail"); }
+	try { (void) f[0]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 	assertTrue (f.isEmpty());
 
@@ -689,7 +870,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue (1 == _notToWritable);
 	assertTrue (1 == _writableToNot);
 
-	const char arr[3] = {'4', '5', '6' };
+	const char arr[4] = {'4', '5', '6', '7' };
 	try
 	{
 		f.copy(&arr[0], 8);
@@ -772,7 +953,7 @@ void CoreTest::testFIFOBufferInt()
 	for (T c = 0; c < 10; ++c)
 		v.push_back(c);
 
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	f.write(b);
 	assertTrue (20 == f.size());
 	assertTrue (10 == f.used());
@@ -798,7 +979,7 @@ void CoreTest::testFIFOBufferInt()
 	assertTrue (7 == f[2]);
 	assertTrue (8 == f[3]);
 	assertTrue (9 == f[4]);
-	try { T POCO_UNUSED i = f[10]; fail ("must fail"); }
+	try { (void) f[10]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	v.clear();
@@ -806,7 +987,7 @@ void CoreTest::testFIFOBufferInt()
 		v.push_back(c);
 
 	b.resize(10);
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	f.write(b);
 	assertTrue (20 == f.size());
 	assertTrue (15 == f.used());
@@ -826,7 +1007,7 @@ void CoreTest::testFIFOBufferInt()
 	assertTrue (17 == f[12]);
 	assertTrue (18 == f[13]);
 	assertTrue (19 == f[14]);
-	try { T POCO_UNUSED i = f[15]; fail ("must fail"); }
+	try { (void) f[15]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	f.read(b, 10);
@@ -838,14 +1019,14 @@ void CoreTest::testFIFOBufferInt()
 	assertTrue (17 == f[2]);
 	assertTrue (18 == f[3]);
 	assertTrue (19 == f[4]);
-	try { T POCO_UNUSED i = f[5]; fail ("must fail"); }
+	try { (void) f[5]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	f.read(b, 6);
 	assertTrue (5 == b.size());
 	assertTrue (20 == f.size());
 	assertTrue (0 == f.used());
-	try { T POCO_UNUSED i = f[0]; fail ("must fail"); }
+	try { (void) f[0]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	assertTrue (f.isEmpty());
@@ -966,7 +1147,7 @@ void CoreTest::testNullable()
 
 	assertTrue (i == 1);
 	assertTrue (f == 1.5);
-	assertTrue (s == "abc");
+	assertTrue (s == "abc"s);
 
 	i.clear();
 	f.clear();
@@ -988,7 +1169,7 @@ void CoreTest::testNullable()
 
 	try
 	{
-		int POCO_UNUSED tmp = n1.value();
+		(void) n1.value();
 		fail("null value, must throw");
 	}
 	catch (Poco::NullValueException&)
@@ -1035,7 +1216,7 @@ void CoreTest::testNullable()
 	assertTrue (n2 != n1);
 	assertTrue (n1 > n2);
 
-	NullType nd{};
+	const auto nd {std::nullopt};
 	assertTrue (n1 != nd);
 	assertTrue (nd != n1);
 	n1.clear();
@@ -1126,6 +1307,68 @@ void CoreTest::testSrcLoc()
 }
 
 
+void CoreTest::testDemangle()
+{
+#if defined(POCO_HAVE_CXXABI_H) || defined(_MSC_VER)
+	// Test demangle with template type
+	std::string name = Poco::demangle<int>();
+	assertEqual ("int", name);
+
+	// Test demangle with const char* (typeid name)
+	std::string intName = Poco::demangle(typeid(int).name());
+	assertEqual ("int", intName);
+
+	// Test demangle with instance
+	int value = 42;
+	std::string instanceName = Poco::demangle(value);
+	assertEqual ("int", instanceName);
+
+	// Test demangle with nested namespace type (class)
+	// MSVC returns "class Poco::AtomicCounter" - prefix should be stripped
+	std::string nestedName = Poco::demangle<Poco::AtomicCounter>();
+	assertEqual ("Poco::AtomicCounter", nestedName);
+
+	// Test demangle with struct type
+	// MSVC returns "struct Parent" - prefix should be stripped
+	std::string structName = Poco::demangle<Parent>();
+	assertEqual ("Parent", structName);
+
+	// Test demangle with enum type
+	// MSVC returns "enum TestEnum" - prefix should be stripped
+	std::string enumName = Poco::demangle<TestEnum>();
+	assertEqual ("TestEnum", enumName);
+
+	// Test demangle with union type
+	// MSVC returns "union TestUnion" - prefix should be stripped
+	std::string unionName = Poco::demangle<TestUnion>();
+	assertEqual ("TestUnion", unionName);
+#endif
+}
+
+
+void CoreTest::testDemangleDot()
+{
+#if defined(POCO_HAVE_CXXABI_H) || defined(_MSC_VER)
+	// Test demangleDot with template type
+	std::string typeName = Poco::demangleDot<Poco::AtomicCounter>();
+	assertEqual ("Poco.AtomicCounter", typeName);
+
+	// Test demangleDot with instance
+	Poco::AtomicCounter ac;
+	std::string instanceName = Poco::demangleDot(ac);
+	assertEqual ("Poco.AtomicCounter", instanceName);
+#endif
+}
+
+
+void CoreTest::testWarnMsg()
+{
+	// warnmsg() reports a warning and lets the test continue; only failmsg() aborts it.
+	warnmsg("expected warning from CoreTest::testWarnMsg()");
+	assertTrue (true);
+}
+
+
 void CoreTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1162,7 +1405,9 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testFixedLength);
 	CppUnit_addTest(pSuite, CoreTest, testBugcheck);
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
+	CppUnit_addTest(pSuite, CoreTest, testEnvironmentMultiThread);
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
+	CppUnit_addTest(pSuite, CoreTest, testBufferEmpty);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferChar);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferInt);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferEOFAndError);
@@ -1170,6 +1415,9 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
 	CppUnit_addTest(pSuite, CoreTest, testSrcLoc);
+	CppUnit_addTest(pSuite, CoreTest, testDemangle);
+	CppUnit_addTest(pSuite, CoreTest, testDemangleDot);
+	CppUnit_addTest(pSuite, CoreTest, testWarnMsg);
 
 	return pSuite;
 }

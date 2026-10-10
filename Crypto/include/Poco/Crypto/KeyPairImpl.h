@@ -27,8 +27,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API KeyPairImpl: public Poco::RefCountedObject
@@ -50,7 +49,7 @@ public:
 	virtual ~KeyPairImpl();
 		/// Destroys the KeyPairImpl.
 
-	virtual int size() const = 0;
+	[[nodiscard]] virtual int size() const = 0;
 		/// Returns the key size.
 
 	virtual void save(const std::string& publicKeyFile,
@@ -62,17 +61,17 @@ public:
 		/// is not exported.
 
 	virtual void save(std::ostream* pPublicKeyStream,
-		std::ostream* pPrivateKeyStream = 0,
+		std::ostream* pPrivateKeyStream = nullptr,
 		const std::string& privateKeyPassphrase = "") const = 0;
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns key pair name
 
-	Type type() const;
+	[[nodiscard]] Type type() const;
 		/// Returns key pair type
 
 private:
@@ -101,7 +100,7 @@ inline KeyPairImpl::Type KeyPairImpl::type() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_KeyPairImplImpl_INCLUDED

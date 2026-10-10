@@ -14,6 +14,8 @@
 #include "NamedEventTest.h"
 #include "SharedMemoryTest.h"
 #include "ProcessRunnerTest.h"
+#include "FileStreamRWLockTest.h"
+#include "PipeTest.h"
 
 
 CppUnit::Test* ProcessesTestSuite::suite()
@@ -25,6 +27,8 @@ CppUnit::Test* ProcessesTestSuite::suite()
 	pSuite->addTest(NamedEventTest::suite());
 	pSuite->addTest(SharedMemoryTest::suite());
 	pSuite->addTest(ProcessRunnerTest::suite());
+	pSuite->addTest(FileStreamRWLockTest::suite());
+	pSuite->addTest(PipeTest::suite());
 
 	return pSuite;
 }

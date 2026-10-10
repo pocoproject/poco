@@ -15,8 +15,7 @@
 #include "Poco/Data/MetaColumn.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 MetaColumn::MetaColumn():
@@ -103,4 +102,4 @@ void MetaColumn::swap(MetaColumn& other) noexcept
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

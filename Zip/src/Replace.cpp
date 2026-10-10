@@ -16,8 +16,7 @@
 #include "Poco/Zip/Compress.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 Replace::Replace(const ZipLocalFileHeader& hdr, const std::string& localPath):
@@ -34,4 +33,4 @@ void Replace::execute(Compress& c, std::istream& input)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

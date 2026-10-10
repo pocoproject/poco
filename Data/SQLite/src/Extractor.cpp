@@ -19,21 +19,51 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTimeParser.h"
+#include "Poco/DateTimeFormat.h"
 #include "Poco/Exception.h"
-#if defined(POCO_UNBUNDLED)
+#include "Poco/Debugger.h"
 #include <sqlite3.h>
-#else
-#include "sqlite3.h"
-#endif
 #include <cstdlib>
+#include <functional>
+#include <initializer_list>
 
 
 using Poco::DateTimeParser;
+using Poco::DateTimeFormat;
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
+
+
+namespace {
+
+
+/// Tries to parse str as a date/time using all SQLite-supported formats
+/// (see https://www.sqlite.org/lang_datefunc.html), in order:
+/// primary format, datetime (space-separated), ISO 8601 datetime,
+/// datetime with fractional seconds (space-separated), ISO 8601 with
+/// fractional seconds.
+inline bool tryParseSQLiteDateTime(
+	const std::string& str,
+	const std::string& primaryFormat,
+	DateTime& dt,
+	int& tzd)
+{
+	for (const auto& fmt : {
+		std::cref(primaryFormat),
+		std::cref(DateTimeFormat::SORTABLE_FORMAT),
+		std::cref(DateTimeFormat::ISO8601_FORMAT),
+		std::cref(Utility::SQLITE_DATETIME_FRAC_FORMAT),
+		std::cref(DateTimeFormat::ISO8601_FRAC_FORMAT)})
+	{
+		if (DateTimeParser::tryParse(fmt.get(), str, dt, tzd))
+			return true;
+	}
+	return false;
+}
+
+
+} // namespace
 
 
 Extractor::Extractor(sqlite3_stmt* pStmt):
@@ -47,45 +77,33 @@ Extractor::~Extractor()
 }
 
 
+int Extractor::columnBytes(sqlite3_stmt* pStmt, int pos)
+{
+	return sqlite3_column_bytes(pStmt, pos);
+}
+
+
+const void* Extractor::columnBlobPtr(sqlite3_stmt* pStmt, int pos)
+{
+	return sqlite3_column_blob(pStmt, pos);
+}
+
+
 bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::Int64& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int64, pos, val);
 }
-
-
-#ifndef POCO_INT64_IS_LONG
-bool Extractor::extract(std::size_t pos, long& val)
-{
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
-}
-
-
-bool Extractor::extract(std::size_t pos, unsigned long& val)
-{
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
-}
-#endif
 
 
 bool Extractor::extract(std::size_t pos, double& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_double(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_double, pos, val);
 }
 
 
@@ -101,59 +119,51 @@ bool Extractor::extract(std::size_t pos, std::string& val)
 }
 
 
+bool Extractor::extract(std::size_t pos, UTF16String& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
 bool Extractor::extract(std::size_t pos, Poco::Int8& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::UInt8& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::Int16& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::UInt16& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::UInt32& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, Poco::UInt64& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int64(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int64, pos, val);
 }
 
 
 bool Extractor::extract(std::size_t pos, bool& val)
 {
-	if (isNull(pos)) return false;
-	val = (0 != sqlite3_column_int(_pStmt, (int) pos));
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
@@ -167,9 +177,7 @@ bool Extractor::extract(std::size_t pos, float& val)
 
 bool Extractor::extract(std::size_t pos, char& val)
 {
-	if (isNull(pos)) return false;
-	val = sqlite3_column_int(_pStmt, (int) pos);
-	return true;
+	return extract(sqlite3_column_int, pos, val);
 }
 
 
@@ -178,9 +186,11 @@ bool Extractor::extract(std::size_t pos, Date& val)
 	if (isNull(pos)) return false;
 	std::string str;
 	extract(pos, str);
-	int tzd;
-	DateTime dt = DateTimeParser::parse(Utility::SQLITE_DATE_FORMAT, str, tzd);
-	val = dt;
+	int tzd = 0;
+	DateTime dt;
+	if (!tryParseSQLiteDateTime(str, Utility::SQLITE_DATE_FORMAT, dt, tzd))
+		throw SyntaxException("Invalid date string: " + str);
+	val.assign(dt.year(), dt.month(), dt.day());
 	return true;
 }
 
@@ -190,9 +200,13 @@ bool Extractor::extract(std::size_t pos, Time& val)
 	if (isNull(pos)) return false;
 	std::string str;
 	extract(pos, str);
-	int tzd;
-	DateTime dt = DateTimeParser::parse(Utility::SQLITE_TIME_FORMAT, str, tzd);
-	val = dt;
+	int tzd = 0;
+	DateTime dt;
+	if (!tryParseSQLiteDateTime(str, Utility::SQLITE_TIME_FORMAT, dt, tzd))
+		throw SyntaxException("Invalid time string: " + str);
+	// Note: Poco::Data::Time does not support fractional seconds;
+	// sub-second precision is lost here.
+	val.assign(dt.hour(), dt.minute(), dt.second());
 	return true;
 }
 
@@ -224,9 +238,300 @@ bool Extractor::extract(std::size_t pos, Poco::Any& val)
 }
 
 
-bool Extractor::extract(std::size_t pos, Poco::DynamicAny& val)
+bool Extractor::extract(std::size_t pos, Dynamic::Var& val)
 {
 	return extractImpl(pos, val);
+}
+
+
+// Nullable
+bool Extractor::extract(std::size_t pos, Nullable<Poco::Int32>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Poco::Int64>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+#ifndef POCO_INT64_IS_LONG
+
+bool Extractor::extract(std::size_t pos, long& val)
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, unsigned long& val)
+{
+	if (isNull(pos)) return false;
+	val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<long>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<long>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<long>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<unsigned long>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<unsigned long>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<unsigned long>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<long>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<unsigned long>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+#endif // POCO_INT64_IS_LONG
+
+
+bool Extractor::extract(std::size_t pos, Nullable<double>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_double(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<std::string>& val)
+{
+	if (isNull(pos)) val.clear();
+	else
+	{
+		const char *pBuf = reinterpret_cast<const char*>(sqlite3_column_text(_pStmt, (int) pos));
+		if (!pBuf) val = ""s;
+		else val = pBuf;
+	}
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<UTF16String>& val)
+{
+	throw NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Poco::Int8>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Poco::UInt8>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Poco::Int16>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Poco::UInt16>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Poco::UInt32>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Poco::UInt64>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int64(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<bool>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = (0 != sqlite3_column_int(_pStmt, (int) pos));
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<float>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = static_cast<float>(sqlite3_column_double(_pStmt, (int) pos));
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<char>& val)
+{
+	if (isNull(pos)) val.clear();
+	else val = sqlite3_column_int(_pStmt, (int) pos);
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Date>& val)
+{
+	if (isNull(pos)) val.clear();
+	else
+	{
+		Date d;
+		extract(pos, d);
+		val = d;
+	}
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Time>& val)
+{
+	if (isNull(pos)) val.clear();
+	else
+	{
+		Time t;
+		extract(pos, t);
+		val = t;
+	}
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<DateTime>& val)
+{
+	if (isNull(pos)) val.clear();
+	else
+	{
+		std::string dt;
+		extract(pos, dt);
+		int tzd;
+		if (val.isNull()) val = DateTime();
+		DateTimeParser::parse(dt, val.value(), tzd);
+	}
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<UUID>& val)
+{
+	if (isNull(pos)) val.clear();
+	else
+	{
+		std::string str;
+		extract(pos, str);
+		if (val.isNull()) val = UUID();
+		val.value().parse(str);
+	}
+	return true;
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Poco::Any>& val)
+{
+	if (isNull(pos))
+	{
+		val.clear();
+		return true;
+	}
+	if (val.isNull()) val = Poco::Any();
+	return extractImpl(pos, val.value());
+}
+
+
+bool Extractor::extract(std::size_t pos, Nullable<Dynamic::Var>& val)
+{
+	if (isNull(pos))
+	{
+		val.clear();
+		return true;
+	}
+	if (val.isNull()) val = Dynamic::Var();
+	return extractImpl(pos, val.value());
+}
+
+
+inline bool Extractor::extract(std::size_t pos, Nullable<Poco::Data::BLOB>& val)
+{
+	if (isNull(pos))
+	{
+		val.clear();
+		return true;
+	}
+	if (val.isNull()) val = Poco::Data::BLOB();
+	return extractLOB<Poco::Data::BLOB::ValueType>(pos, val.value());
+}
+
+
+inline bool Extractor::extract(std::size_t pos, Nullable<Poco::Data::CLOB>& val)
+{
+	if (isNull(pos))
+	{
+		val.clear();
+		return true;
+	}
+	if (val.isNull()) val = Poco::Data::CLOB();
+	return extractLOB<Poco::Data::CLOB::ValueType>(pos, val.value());
 }
 
 
@@ -245,4 +550,401 @@ bool Extractor::isNull(std::size_t pos, std::size_t)
 }
 
 
-} } } // namespace Poco::Data::SQLite
+// Containers
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Int8>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Int8>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Int8>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt8>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt8>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::UInt8>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Int16>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Int16>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Int16>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt16>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt16>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::UInt16>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Int32>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Int32>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Int32>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt32>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt32>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::UInt32>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Int64>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Int64>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Int64>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::UInt64>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::UInt64>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::UInt64>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<bool>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<bool>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<bool>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<char>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<char>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<char>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<std::string>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<std::string>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<std::string>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<UTF16String>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<UTF16String>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<UTF16String>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<float>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<float>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<float>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<double>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<double>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<double>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::Date>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::Date>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Data::Date>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::Time>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::Time>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Data::Time>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::BLOB>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::BLOB>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Data::BLOB>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Data::CLOB>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Data::CLOB>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Data::CLOB>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::DateTime>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::DateTime>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::DateTime>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::UUID>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::UUID>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::UUID>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Any>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Any>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Any>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::vector<Poco::Dynamic::Var>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::deque<Poco::Dynamic::Var>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+bool Extractor::extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val)
+{
+	throw Poco::NotImplementedException(poco_src_loc);
+}
+
+
+} // namespace Poco::Data::SQLite

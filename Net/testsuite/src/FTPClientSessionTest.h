@@ -18,12 +18,12 @@
 #include "CppUnit/TestCase.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 class FTPClientSession;
+class DialogSocket;
 
-} }
+} // namespace Poco::Net
 
 class DialogServer;
 
@@ -38,6 +38,10 @@ public:
 	void testLogin3();
 	void testLoginFailed1();
 	void testLoginFailed2();
+	void testWelcomeMessageRead();
+	void testWelcomeMessageNotRead();
+	void testConstructorFailureClosesSocket1();
+	void testConstructorFailureClosesSocket2();
 	void testCommands();
 	void testDownloadPORT();
 	void testDownloadEPRT();
@@ -53,6 +57,7 @@ public:
 
 private:
 	void login(DialogServer& server, Poco::Net::FTPClientSession& session);
+	void assertConnectionClosed(Poco::Net::DialogSocket& peer);
 };
 
 

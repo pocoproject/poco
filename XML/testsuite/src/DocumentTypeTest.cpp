@@ -43,7 +43,7 @@ void DocumentTypeTest::testDocumentType()
 {
 	AutoPtr<DocumentType> pDoctype = DOMImplementation::instance().createDocumentType("test", "public", "system");
 
-	assertTrue (pDoctype->ownerDocument() == 0);
+	assertTrue (pDoctype->ownerDocument() == nullptr);
 	assertTrue (pDoctype->name() == "test");
 	assertTrue (pDoctype->publicId() == "public");
 	assertTrue (pDoctype->systemId() == "system");

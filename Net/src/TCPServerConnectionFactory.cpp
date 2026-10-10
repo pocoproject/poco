@@ -15,11 +15,11 @@
 #include "Poco/Net/TCPServerConnectionFactory.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
-TCPServerConnectionFactory::TCPServerConnectionFactory()
+TCPServerConnectionFactory::TCPServerConnectionFactory():
+	_stopped(false)
 {
 }
 
@@ -29,4 +29,4 @@ TCPServerConnectionFactory::~TCPServerConnectionFactory()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

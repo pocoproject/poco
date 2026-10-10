@@ -64,9 +64,9 @@ class Foundation_API NullPurgeStrategy : public PurgeStrategy
 {
 public:
 	NullPurgeStrategy();
-	~NullPurgeStrategy();
+	~NullPurgeStrategy() override;
 
-	void purge(const std::string& path);
+	void purge(const std::string& path) override;
 };
 
 
@@ -76,9 +76,9 @@ class Foundation_API PurgeByAgeStrategy: public PurgeStrategy
 {
 public:
 	PurgeByAgeStrategy(const Timespan& age);
-	~PurgeByAgeStrategy();
+	~PurgeByAgeStrategy() override;
 
-	void purge(const std::string& path);
+	void purge(const std::string& path) override;
 
 private:
 	Timespan _age;
@@ -91,13 +91,13 @@ class Foundation_API PurgeByCountStrategy: public PurgeStrategy
 	/// based on their age, with oldest files deleted first.
 {
 public:
-	PurgeByCountStrategy(int count);
-	~PurgeByCountStrategy();
+	PurgeByCountStrategy(std::size_t count);
+	~PurgeByCountStrategy() override;
 
-	void purge(const std::string& path);
+	void purge(const std::string& path) override;
 
 private:
-	int _count;
+	std::size_t _count;
 };
 
 

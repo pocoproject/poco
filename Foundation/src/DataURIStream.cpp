@@ -1,4 +1,4 @@
-﻿//
+//
 // DataURIStream.cpp
 //
 // Library: Foundation

@@ -18,6 +18,7 @@
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/MultipartReader.h"
+#include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NullPartHandler.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NullStream.h"
@@ -37,13 +38,11 @@ using Poco::URI;
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTMLForm::ENCODING_URL           = "application/x-www-form-urlencoded";
 const std::string HTMLForm::ENCODING_MULTIPART     = "multipart/form-data";
-const int         HTMLForm::UNKNOWN_CONTENT_LENGTH = -1;
 
 
 class HTMLFormCountingOutputStream: public CountingOutputStream
@@ -219,9 +218,8 @@ void HTMLForm::prepareSubmit(HTTPRequest& request, int options)
 		{
 			_boundary = MultipartWriter::createBoundary();
 			std::string ct(_encoding);
-			ct.append("; boundary=\"");
-			ct.append(_boundary);
-			ct.append("\"");
+			ct.append("; boundary=");
+			MessageHeader::quote(_boundary, ct);
 			request.setContentType(ct);
 		}
 		if (request.getVersion() == HTTPMessage::HTTP_1_0)
@@ -234,9 +232,9 @@ void HTMLForm::prepareSubmit(HTTPRequest& request, int options)
 			request.setChunkedTransferEncoding(true);
 		}
 		if (!request.getChunkedTransferEncoding() && !request.hasContentLength())
- 		{
- 			request.setContentLength(calculateContentLength());
- 		}
+		{
+			request.setContentLength(calculateContentLength());
+		}
 	}
 	else
 	{
@@ -289,7 +287,7 @@ void HTMLForm::write(std::ostream& ostr)
 
 void HTMLForm::readUrl(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	int fields = 0;
 	int ch = istr.get();
@@ -341,7 +339,7 @@ void HTMLForm::readUrl(std::istream& istr)
 
 void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	int fields = 0;
 	MultipartReader reader(istr, _boundary);
@@ -368,15 +366,15 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 		{
 			std::string name = params["name"];
 			std::string value;
-			std::istream& istr = reader.stream();
-			int ch = istr.get();
+			std::istream& partStream = reader.stream();
+			int ch = partStream.get();
 			while (ch != eof)
 			{
 				if (value.size() < _valueLengthLimit)
 					value += (char) ch;
 				else
 					throw HTMLFormException("Field value too long");
-				ch = istr.get();
+				ch = partStream.get();
 			}
 			add(name, value);
 		}
@@ -457,12 +455,10 @@ void HTMLForm::setFieldLimit(int limit)
 }
 
 
-void HTMLForm::setValueLengthLimit(int limit)
+void HTMLForm::setValueLengthLimit(std::size_t limit)
 {
-	poco_assert (limit >= 0);
-
 	_valueLengthLimit = limit;
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

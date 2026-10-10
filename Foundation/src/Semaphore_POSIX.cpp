@@ -58,7 +58,7 @@ SemaphoreImpl::SemaphoreImpl(int n, int max): _n(n), _max(max)
 	// if the mutex has never been used.
 	std::memset(&_mutex, 0, sizeof(_mutex));
 #endif
-	if (pthread_mutex_init(&_mutex, NULL))
+	if (pthread_mutex_init(&_mutex, nullptr))
 		throw SystemException("cannot create semaphore (mutex)");
 
 #if defined(POCO_HAVE_MONOTONIC_PTHREAD_COND_TIMEDWAIT)
@@ -69,11 +69,11 @@ SemaphoreImpl::SemaphoreImpl(int n, int max): _n(n), _max(max)
 		throw SystemException("cannot create semaphore (condition attribute)");
 	}
 	if (pthread_condattr_setclock(&attr, CLOCK_MONOTONIC))
-    {
+	{
 		pthread_condattr_destroy(&attr);
 		pthread_mutex_destroy(&_mutex);
 		throw SystemException("cannot create semaphore (condition attribute clock)");
-    }
+	}
 	if (pthread_cond_init(&_cond, &attr))
 	{
 		pthread_condattr_destroy(&attr);
@@ -82,7 +82,7 @@ SemaphoreImpl::SemaphoreImpl(int n, int max): _n(n), _max(max)
 	}
 	pthread_condattr_destroy(&attr);
 #else
-	if (pthread_cond_init(&_cond, NULL))
+	if (pthread_cond_init(&_cond, nullptr))
 	{
 		pthread_mutex_destroy(&_mutex);
 		throw SystemException("cannot create semaphore (condition)");
@@ -140,7 +140,7 @@ bool SemaphoreImpl::waitImpl(long milliseconds)
 	}
 #else
 	struct timeval tv;
-	gettimeofday(&tv, NULL);
+	gettimeofday(&tv, nullptr);
 	abstime.tv_sec  = tv.tv_sec + milliseconds / 1000;
 	abstime.tv_nsec = tv.tv_usec*1000 + (milliseconds % 1000)*1000000;
 	if (abstime.tv_nsec >= 1000000000)

@@ -20,8 +20,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 HistogramSample::HistogramSample(const std::vector<double>& bucketBounds):
@@ -29,6 +28,9 @@ HistogramSample::HistogramSample(const std::vector<double>& bucketBounds):
 	_bucketCounts(bucketBounds.size(), 0)
 {
 }
+
+
+HistogramSample::~HistogramSample() = default;
 
 
 void HistogramSample::observe(double value)
@@ -82,6 +84,9 @@ Histogram::Histogram(const std::string& name, const Params& params, Registry* pR
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
 }
+
+
+Histogram::~Histogram() = default;
 
 
 Histogram& Histogram::buckets(const std::vector<double>& bucketBounds)
@@ -148,4 +153,4 @@ void Histogram::exportTo(Exporter& exporter) const
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

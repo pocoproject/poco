@@ -22,8 +22,7 @@ using Poco::DateTime;
 using Poco::Dynamic::Var;
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Time::Time()
@@ -100,14 +99,13 @@ Time& Time::operator = (const Var& var)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #ifdef __GNUC__
 // only needed for g++ (see comment in Time::operator = above)
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 using Poco::Data::Time;
@@ -133,7 +131,7 @@ Var::operator Time () const
 }
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic
 
 
 #endif // __GNUC__

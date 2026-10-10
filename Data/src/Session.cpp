@@ -19,8 +19,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Session::Session(Poco::AutoPtr<SessionImpl> pImpl):
@@ -33,9 +32,9 @@ Session::Session(Poco::AutoPtr<SessionImpl> pImpl):
 
 Session::Session(const std::string& connector,
 	const std::string& connectionString,
-	std::size_t timeout)
+	std::size_t loginTimeout)
 {
-	Session newSession(SessionFactory::instance().create(connector, connectionString, timeout));
+	Session newSession(SessionFactory::instance().create(connector, connectionString, loginTimeout));
 	swap(newSession);
 }
 
@@ -129,4 +128,4 @@ void Session::rollback()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

@@ -16,12 +16,11 @@
 #include "Poco/SAX/SAXException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 WhitespaceFilter::WhitespaceFilter():
-	_pLexicalHandler(0),
+	_pLexicalHandler(nullptr),
 	_filter(true)
 {
 }
@@ -29,7 +28,7 @@ WhitespaceFilter::WhitespaceFilter():
 
 WhitespaceFilter::WhitespaceFilter(XMLReader* pReader):
 	XMLFilterImpl(pReader),
-	_pLexicalHandler(0),
+	_pLexicalHandler(nullptr),
 	_filter(true)
 {
 }
@@ -100,6 +99,7 @@ void WhitespaceFilter::endElement(const XMLString& uri, const XMLString& localNa
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void WhitespaceFilter::characters(const XMLChar ch[], int start, int length)
 {
 	if (_filter)
@@ -128,6 +128,7 @@ void WhitespaceFilter::characters(const XMLChar ch[], int start, int length)
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void WhitespaceFilter::ignorableWhitespace(const XMLChar ch[], int start, int length)
 {
 	// the handler name already says that this data can be ignored
@@ -192,6 +193,7 @@ void WhitespaceFilter::endCDATA()
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void WhitespaceFilter::comment(const XMLChar ch[], int start, int length)
 {
 	if (_pLexicalHandler)
@@ -209,4 +211,4 @@ void WhitespaceFilter::setupParse()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

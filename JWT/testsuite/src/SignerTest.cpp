@@ -255,7 +255,7 @@ void SignerTest::testSignRS256()
 	token.setIssuedAt(Poco::Timestamp::fromEpochTime(1516239022));
 
 	std::istringstream privateKeyStream(RSA_PRIVATE_KEY);
-	Poco::SharedPtr<Poco::Crypto::RSAKey> pKey = new Poco::Crypto::RSAKey(0, &privateKeyStream);
+	Poco::SharedPtr<Poco::Crypto::RSAKey> pKey = new Poco::Crypto::RSAKey(nullptr, &privateKeyStream);
 
 	Signer signer(pKey);
 	std::string jwt = signer.sign(token, Signer::ALGO_RS256);
@@ -273,7 +273,7 @@ void SignerTest::testSignRS384()
 	token.setIssuedAt(Poco::Timestamp::fromEpochTime(1516239022));
 
 	std::istringstream privateKeyStream(RSA_PRIVATE_KEY);
-	Poco::SharedPtr<Poco::Crypto::RSAKey> pKey = new Poco::Crypto::RSAKey(0, &privateKeyStream);
+	Poco::SharedPtr<Poco::Crypto::RSAKey> pKey = new Poco::Crypto::RSAKey(nullptr, &privateKeyStream);
 
 	Signer signer(pKey);
 	std::string jwt = signer.sign(token, Signer::ALGO_RS384);
@@ -291,7 +291,7 @@ void SignerTest::testSignRS512()
 	token.setIssuedAt(Poco::Timestamp::fromEpochTime(1516239022));
 
 	std::istringstream privateKeyStream(RSA_PRIVATE_KEY);
-	Poco::SharedPtr<Poco::Crypto::RSAKey> pKey = new Poco::Crypto::RSAKey(0, &privateKeyStream);
+	Poco::SharedPtr<Poco::Crypto::RSAKey> pKey = new Poco::Crypto::RSAKey(nullptr, &privateKeyStream);
 
 	Signer signer(pKey);
 	std::string jwt = signer.sign(token, Signer::ALGO_RS512);
@@ -390,7 +390,7 @@ void SignerTest::testSignVerifyES256()
 	token.setIssuedAt(Poco::Timestamp::fromEpochTime(1516239022));
 
 	std::istringstream privateKeyStream(ECDSA_PRIVATE_KEY);
-	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(0, &privateKeyStream);
+	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(nullptr, &privateKeyStream);
 
 	Signer signer(pKey);
 	std::string jwt = signer.sign(token, Signer::ALGO_ES256);
@@ -454,7 +454,7 @@ void SignerTest::testSignVerifyES384()
 	token.setIssuedAt(Poco::Timestamp::fromEpochTime(1516239022));
 
 	std::istringstream privateKeyStream(ECDSA_PRIVATE_KEY);
-	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(0, &privateKeyStream);
+	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(nullptr, &privateKeyStream);
 
 	Signer signer(pKey);
 	std::string jwt = signer.sign(token, Signer::ALGO_ES384);
@@ -518,7 +518,7 @@ void SignerTest::testSignVerifyES512()
 	token.setIssuedAt(Poco::Timestamp::fromEpochTime(1516239022));
 
 	std::istringstream privateKeyStream(ECDSA_PRIVATE_KEY);
-	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(0, &privateKeyStream);
+	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(nullptr, &privateKeyStream);
 
 	Signer signer(pKey);
 	std::string jwt = signer.sign(token, Signer::ALGO_ES512);

@@ -23,6 +23,7 @@
 #include "Poco/MemoryStream.h"
 #include <vector>
 #include <istream>
+#include <memory>
 
 
 namespace Poco {
@@ -58,6 +59,8 @@ public:
 		///
 		/// Strings will be converted from the specified encoding
 		/// to the currently set global encoding (see Poco::TextEncoding::global()).
+		/// A copy of the BinaryReader reads from the same stream and
+		/// shares the converter.
 
 	~BinaryReader();
 		/// Destroys the BinaryReader.
@@ -113,6 +116,7 @@ public:
 
 	void readRaw(std::streamsize length, std::string& value);
 		/// Reads length bytes of raw data into value.
+		/// If the stream ends earlier, value contains the bytes that were read.
 
 	void readRaw(char* buffer, std::streamsize length);
 		/// Reads length bytes of raw data into buffer.
@@ -126,35 +130,36 @@ public:
 		/// A byte-order mark is a 16-bit integer with a value of 0xFEFF,
 		/// written in host byte order.
 
-	bool good();
+	[[nodiscard]] bool good();
 		/// Returns _istr.good();
 
-	bool fail();
+	[[nodiscard]] bool fail();
 		/// Returns _istr.fail();
 
-	bool bad();
+	[[nodiscard]] bool bad();
 		/// Returns _istr.bad();
 
-	bool eof();
+	[[nodiscard]] bool eof();
 		/// Returns _istr.eof();
 
-	std::istream& stream() const;
+	[[nodiscard]] std::istream& stream() const;
 		/// Returns the underlying stream.
 
-	StreamByteOrder byteOrder() const;
+	[[nodiscard]] StreamByteOrder byteOrder() const;
 		/// Returns the byte-order used by the reader, which is
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
 
 	void setExceptions(std::ios_base::iostate st = (std::istream::failbit | std::istream::badbit));
 		/// Sets the stream to throw exception on specified state (default failbit and badbit);
 
-	std::streamsize available() const;
+	[[nodiscard]] std::streamsize available() const;
 		/// Returns the number of available bytes in the stream.
 
 private:
 	std::istream&  _istr;
 	bool           _flipBytes;
-	TextConverter* _pTextConverter;
+	std::shared_ptr<TextConverter> _pTextConverter;
+		/// Shared, so that a copy of the reader does not delete it a second time.
 };
 
 
@@ -177,21 +182,19 @@ public:
 	{
 	}
 
-	~BasicMemoryBinaryReader()
-	{
-	}
+	~BasicMemoryBinaryReader() = default;
 
-	const Buffer<T>& data() const
+	[[nodiscard]] const Buffer<T>& data() const
 	{
 		return _data;
 	}
 
-	const MemoryInputStream& stream() const
+	[[nodiscard]] const MemoryInputStream& stream() const
 	{
 		return _istr;
 	}
 
-	MemoryInputStream& stream()
+	[[nodiscard]] MemoryInputStream& stream()
 	{
 		return _istr;
 	}
@@ -201,9 +204,7 @@ private:
 	MemoryInputStream _istr;
 };
 
-
-typedef BasicMemoryBinaryReader<char> MemoryBinaryReader;
-
+using MemoryBinaryReader = BasicMemoryBinaryReader<char>;
 
 //
 // inlines

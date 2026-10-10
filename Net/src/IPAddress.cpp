@@ -39,18 +39,7 @@ using Poco::Net::Impl::IPv6AddressImpl;
 #endif
 
 
-namespace Poco {
-namespace Net {
-
-
-#if !defined(_MSC_VER) || defined(__STDC__)
-// Go home MSVC, you're drunk...
-// See http://stackoverflow.com/questions/5899857/multiple-definition-error-for-static-const-class-members
-const IPAddress::Family IPAddress::IPv4;
-#if defined(POCO_HAVE_IPv6)
-const IPAddress::Family IPAddress::IPv6;
-#endif
-#endif
+namespace Poco::Net {
 
 
 IPAddress::IPAddress()
@@ -144,7 +133,7 @@ IPAddress::IPAddress(const std::string& addr, Family family)
 
 
 IPAddress::IPAddress(const void* addr, poco_socklen_t length)
-	: _pImpl(0)
+	: _pImpl(nullptr)
 {
 	if (length == sizeof(struct in_addr))
 		newIPv4(addr);
@@ -192,7 +181,7 @@ IPAddress::IPAddress(unsigned prefix, Family family)
 
 #if defined(_WIN32)
 IPAddress::IPAddress(const SOCKET_ADDRESS& socket_address)
-	: _pImpl(0)
+	: _pImpl(nullptr)
 {
 	ADDRESS_FAMILY family = socket_address.lpSockaddr->sa_family;
 	if (family == AF_INET)
@@ -363,20 +352,20 @@ bool IPAddress::operator == (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
-    {
+	{
 #if defined(POCO_HAVE_IPv6)
-        if ( scope() != a.scope() )
-            return false;
+		if ( scope() != a.scope() )
+			return false;
 #endif
 		return std::memcmp(addr(), a.addr(), l1) == 0;
-    }
+	}
 	else return false;
 }
 
 
 bool IPAddress::operator != (const IPAddress& a) const
 {
-    return !(*this == a);
+	return !(*this == a);
 }
 
 
@@ -385,32 +374,32 @@ bool IPAddress::operator < (const IPAddress& a) const
 	poco_socklen_t l1 = length();
 	poco_socklen_t l2 = a.length();
 	if (l1 == l2)
-    {
+	{
 #if defined(POCO_HAVE_IPv6)
-        if ( scope() != a.scope() )
-            return scope() < a.scope();
+		if ( scope() != a.scope() )
+			return scope() < a.scope();
 #endif
 		return std::memcmp(addr(), a.addr(), l1) < 0;
-    }
+	}
 	else return l1 < l2;
 }
 
 
 bool IPAddress::operator <= (const IPAddress& a) const
 {
-    return !(a < *this);
+	return !(a < *this);
 }
 
 
 bool IPAddress::operator > (const IPAddress& a) const
 {
-    return a < *this;
+	return a < *this;
 }
 
 
 bool IPAddress::operator >= (const IPAddress& a) const
 {
-    return !(*this < a);
+	return !(*this < a);
 }
 
 
@@ -564,6 +553,7 @@ std::string IPAddress::trimIPv6(const std::string& v6Addr)
 	if ((dblColOcc > 1) ||
 		(std::count(v6addr.begin(), v6addr.end(), ':') > 8) ||
 		(v6addr.find(":::") != std::string::npos) ||
+		// CodeQL [cpp/constant-comparison]: intentional IPv6 validation — checks for trailing single colon
 		((len >= 2) && ((v6addr[len-1] == ':') && v6addr[len-2] != ':')))
 	{
 		return v6addr;
@@ -582,6 +572,7 @@ IPAddress IPAddress::parse(const std::string& addr)
 bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 {
 	IPv4AddressImpl impl4(IPv4AddressImpl::parse(addr));
+	// CodeQL [cpp/auth-bypass]: IP address parsing, not authentication
 	if (impl4 != IPv4AddressImpl() || trim(addr) == "0.0.0.0")
 	{
 		result.newIPv4(impl4.addr());
@@ -652,7 +643,7 @@ std::vector<unsigned char> IPAddress::toBytes() const
 {
 	std::size_t sz = 0;
 	std::vector<unsigned char> bytes;
-	const void* ptr = 0;
+	const void* ptr = nullptr;
 	switch (family())
 	{
 		case IPv4:
@@ -700,5 +691,5 @@ std::ostream& operator << (std::ostream& ostr, const Poco::Net::IPAddress& addr)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 

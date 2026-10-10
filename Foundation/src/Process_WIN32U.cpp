@@ -85,7 +85,7 @@ void ProcessHandleImpl::closeHandle()
 	if (_hProcess)
 	{
 		CloseHandle(_hProcess);
-		_hProcess = NULL;
+		_hProcess = nullptr;
 	}
 }
 
@@ -153,6 +153,30 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 		time.LowPart = ftUser.dwLowDateTime;
 		time.HighPart = ftUser.dwHighDateTime;
 		userTime = long(time.QuadPart / 10000000L);
+	}
+	else
+	{
+		userTime = kernelTime = -1;
+	}
+}
+
+
+void ProcessImpl::timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime)
+{
+	FILETIME ftCreation;
+	FILETIME ftExit;
+	FILETIME ftKernel;
+	FILETIME ftUser;
+
+	if (GetProcessTimes(GetCurrentProcess(), &ftCreation, &ftExit, &ftKernel, &ftUser) != 0)
+	{
+		ULARGE_INTEGER time;
+		time.LowPart = ftKernel.dwLowDateTime;
+		time.HighPart = ftKernel.dwHighDateTime;
+		kernelTime = Poco::Int64(time.QuadPart/10);
+		time.LowPart = ftUser.dwLowDateTime;
+		time.HighPart = ftUser.dwHighDateTime;
+		userTime = Poco::Int64(time.QuadPart/10);
 	}
 	else
 	{
@@ -256,12 +280,12 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	STARTUPINFOW startupInfo;
 	GetStartupInfoW(&startupInfo); // take defaults from current process
 	startupInfo.cb = sizeof(STARTUPINFOW);
-	startupInfo.lpReserved = NULL;
-	startupInfo.lpDesktop = NULL;
-	startupInfo.lpTitle = NULL;
+	startupInfo.lpReserved = nullptr;
+	startupInfo.lpDesktop = nullptr;
+	startupInfo.lpTitle = nullptr;
 	startupInfo.dwFlags = STARTF_FORCEOFFFEEDBACK;
 	startupInfo.cbReserved2 = 0;
-	startupInfo.lpReserved2 = NULL;
+	startupInfo.lpReserved2 = nullptr;
 
 	HANDLE hProc = GetCurrentProcess();
 	bool mustInheritHandles = false;
@@ -282,8 +306,8 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	}
 	if (options & PROCESS_CLOSE_STDIN)
 	{
-		HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
-		if (hStdIn) CloseHandle(hStdIn);
+		if (startupInfo.hStdInput) CloseHandle(startupInfo.hStdInput);
+		startupInfo.hStdInput = 0;
 	}
 
 	// outPipe may be the same as errPipe, so we duplicate first and close later.
@@ -316,16 +340,16 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		startupInfo.hStdError = 0;
 	}
 	if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
-	if (options & PROCESS_CLOSE_STDOUT) 
+	if (options & PROCESS_CLOSE_STDOUT)
 	{
-		HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-		if (hStdOut) CloseHandle(hStdOut);
+		if (startupInfo.hStdOutput) CloseHandle(startupInfo.hStdOutput);
+		startupInfo.hStdOutput = 0;
 	}
 	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
-	if (options & PROCESS_CLOSE_STDERR) 
+	if (options & PROCESS_CLOSE_STDERR)
 	{
-		HANDLE hStdErr = GetStdHandle(STD_ERROR_HANDLE);
-		if (hStdErr) CloseHandle(hStdErr);
+		if (startupInfo.hStdError) CloseHandle(startupInfo.hStdError);
+		startupInfo.hStdError = 0;
 	}
 
 	if (mustInheritHandles)
@@ -351,8 +375,8 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	BOOL rc = CreateProcessW(
 		applicationName,
 		const_cast<wchar_t*>(ucommandLine.c_str()),
-		NULL, // processAttributes
-		NULL, // threadAttributes
+		nullptr, // processAttributes
+		nullptr, // threadAttributes
 		mustInheritHandles,
 		creationFlags,
 		(LPVOID)pEnv,

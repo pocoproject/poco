@@ -23,14 +23,13 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 POCO_DECLARE_EXCEPTION(Redis_API, RedisException, Exception)
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_Exception_INCLUDED

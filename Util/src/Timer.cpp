@@ -5,7 +5,7 @@
 // Package: Timer
 // Module:  Timer
 //
-// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -21,8 +21,7 @@
 using Poco::ErrorHandler;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class TimerNotification: public Poco::Notification
@@ -33,9 +32,7 @@ public:
 	{
 	}
 
-	~TimerNotification()
-	{
-	}
+	~TimerNotification() = default;
 
 	virtual bool execute() = 0;
 
@@ -57,11 +54,9 @@ public:
 	{
 	}
 
-	~StopNotification()
-	{
-	}
+	~StopNotification() = default;
 
-	bool execute()
+	bool execute() override
 	{
 		queue().clear();
 		return false;
@@ -77,11 +72,9 @@ public:
 	{
 	}
 
-	~CancelNotification()
-	{
-	}
+	~CancelNotification() = default;
 
-	bool execute()
+	bool execute() override
 	{
 		// Check if there's a StopNotification pending.
 		int numberOfPendingTasks = queue().size();
@@ -129,16 +122,14 @@ public:
 	{
 	}
 
-	~TaskNotification()
-	{
-	}
+	~TaskNotification() = default;
 
 	TimerTask::Ptr task()
 	{
 		return _pTask;
 	}
 
-	bool execute()
+	bool execute() override
 	{
 		if (!_pTask->isCancelled())
 		{
@@ -177,11 +168,9 @@ public:
 	{
 	}
 
-	~PeriodicTaskNotification()
-	{
-	}
+	~PeriodicTaskNotification() = default;
 
-	bool execute()
+	bool execute() override
 	{
 		TaskNotification::execute();
 
@@ -212,11 +201,9 @@ public:
 	{
 	}
 
-	~FixedRateTaskNotification()
-	{
-	}
+	~FixedRateTaskNotification() = default;
 
-	bool execute()
+	bool execute() override
 	{
 		TaskNotification::execute();
 
@@ -357,4 +344,4 @@ void Timer::validateTask(const TimerTask::Ptr& pTask)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

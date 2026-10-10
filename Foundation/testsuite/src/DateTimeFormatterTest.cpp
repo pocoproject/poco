@@ -183,7 +183,34 @@ void DateTimeFormatterTest::testCustom()
 	DateTime dt(2005, 1, 8, 12, 30, 00, 250);
 
 	std::string str = DateTimeFormatter::format(dt, "%w/%W/%b/%B/%d/%e/%f/%m/%n/%o/%y/%Y/%H/%h/%a/%A/%M/%S/%i/%c/%z/%Z/%%");
-	assertTrue (str == "Sat/Saturday/Jan/January/08/8/ 8/01/1/ 1/05/2005/12/12/pm/PM/30/00/250/2/Z/GMT/%");
+	assertTrue (str == "Sat/Saturday/Jan/January/08/8/ 8/01/1/ 1/05/2005/12/12/pm/PM/30/00/250/25/Z/GMT/%");
+}
+
+
+void DateTimeFormatterTest::testFractionalSpecifiers()
+{
+	// %c is a zero-padded centisecond (millisecond / 10) in the range 00..99,
+	// matching the documentation in DateTimeFormatter.h. See issue #3949 --
+	// previously %c was emitting a single-digit decisecond (millisecond / 100).
+	DateTime dt(2005, 1, 8, 12, 30, 0, 0);
+	assertTrue (DateTimeFormatter::format(dt, "%i") == "000");
+	assertTrue (DateTimeFormatter::format(dt, "%c") == "00");
+	assertTrue (DateTimeFormatter::format(dt, "%F") == "000000");
+
+	DateTime dtLow(2005, 1, 8, 12, 30, 0, 5);
+	assertTrue (DateTimeFormatter::format(dtLow, "%i") == "005");
+	assertTrue (DateTimeFormatter::format(dtLow, "%c") == "00");
+	assertTrue (DateTimeFormatter::format(dtLow, "%F") == "005000");
+
+	DateTime dtMid(2005, 1, 8, 12, 30, 0, 250);
+	assertTrue (DateTimeFormatter::format(dtMid, "%i") == "250");
+	assertTrue (DateTimeFormatter::format(dtMid, "%c") == "25");
+	assertTrue (DateTimeFormatter::format(dtMid, "%F") == "250000");
+
+	DateTime dtMax(2005, 1, 8, 12, 30, 0, 999, 999);
+	assertTrue (DateTimeFormatter::format(dtMax, "%i") == "999");
+	assertTrue (DateTimeFormatter::format(dtMax, "%c") == "99");
+	assertTrue (DateTimeFormatter::format(dtMax, "%F") == "999999");
 }
 
 
@@ -240,6 +267,7 @@ CppUnit::Test* DateTimeFormatterTest::suite()
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testASCTIME);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testSORTABLE);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testCustom);
+	CppUnit_addTest(pSuite, DateTimeFormatterTest, testFractionalSpecifiers);
 	CppUnit_addTest(pSuite, DateTimeFormatterTest, testTimespan);
 
 	return pSuite;

@@ -68,7 +68,7 @@ void Debugger::message(const std::string& msg)
 }
 
 
-void Debugger::message(const std::string& msg, const char* file, int line)
+void Debugger::message(const std::string& msg, const char* file, LineNumber line)
 {
 #if defined(_DEBUG)
 	std::ostringstream str;
@@ -109,7 +109,7 @@ void Debugger::enter(const std::string& msg)
 }
 
 
-void Debugger::enter(const std::string& msg, const char* file, int line)
+void Debugger::enter(const std::string& msg, const char* file, LineNumber line)
 {
 #if defined(_DEBUG)
 	message(msg, file, line);
@@ -118,7 +118,7 @@ void Debugger::enter(const std::string& msg, const char* file, int line)
 }
 
 
-void Debugger::enter(const char* file, int line)
+void Debugger::enter(const char* file, LineNumber line)
 {
 #if defined(_DEBUG)
 	message("BREAK", file, line);

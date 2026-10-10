@@ -17,9 +17,7 @@
 #include <mysql/mysql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 StatementExecutor::StatementExecutor(MYSQL* mysql)
@@ -76,7 +74,7 @@ void StatementExecutor::bindParams(MYSQL_BIND* params, std::size_t count)
 		throw StatementException("Statement is not compiled yet");
 
 	if (count != mysql_stmt_param_count(_pHandle))
-		throw StatementException("wrong bind parameters count", 0, _query);
+		throw StatementException("wrong bind parameters count", nullptr, _query);
 
 	if (count == 0) return;
 
@@ -151,4 +149,4 @@ int StatementExecutor::getAffectedRowCount() const
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

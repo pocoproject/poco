@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../../../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2008-2022 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this document so long as this copyright notice, license and disclaimer are retained with all copies of the document. No license is granted to modify this document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE; OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT.  THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO, INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tup="http://www.onvif.org/ver10/uplink/wsdl" targetNamespace="http://www.onvif.org/ver10/uplink/wsdl">
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/uplink/wsdl" xmlns:tt="http://www.onvif.org/ver10/schema" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="22.06">
+			<xs:import namespace="http://www.onvif.org/ver10/schema" schemaLocation="../../schema/onvif.xsd"/>
+			<!--  Message Request/Responses elements  -->
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="tup:Capabilities">
+							<xs:annotation>
+								<xs:documentation>The capabilities for the uplink service is returned in the Capabilities element.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:complexType name="Capabilities">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>	 <!-- first Vendor then ONVIF -->
+				</xs:sequence>
+				<xs:attribute name="MaxUplinks" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>Maximum number of uplink connections that can be configured.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="tup:Capabilities"/>
+			<!--===============================-->
+			<xs:simpleType name="ConnectionStatus">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Offline"></xs:enumeration>
+					<xs:enumeration value="Connecting"></xs:enumeration>
+					<xs:enumeration value="Connected"></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:complexType name="Configuration">
+				<xs:sequence>
+					<xs:element name="RemoteAddress" type="xs:anyURI">
+						<xs:annotation><xs:documentation>Uniform resource locator by which the remote client can be reached.</xs:documentation></xs:annotation>
+					</xs:element>
+					<xs:element name="CertificateID" type="xs:string">
+						<xs:annotation><xs:documentation>ID of the certificate to be used for client authentication.</xs:documentation></xs:annotation>
+					</xs:element>
+					<xs:element name="UserLevel" type="xs:string">
+						<xs:annotation><xs:documentation>Authorization level that will be assigned to the uplink connection.</xs:documentation></xs:annotation>
+					</xs:element>
+					<xs:element name="Status" type="xs:string" minOccurs="0">
+						<xs:annotation><xs:documentation>Current connection status (see tup:ConnectionStatus for possible values).</xs:documentation></xs:annotation>
+					</xs:element>
+					<xs:element name="CertPathValidationPolicyID" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation> CertPathValidationPolicyID used to validate the uplink server certificate. If CertPathValidationPolicyID is not configured, uplink server certificate shall not be validated. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>	 <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:element name="GetUplinks">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetUplinksResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tup:Configuration" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of configured uplinks.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetUplink">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tup:Configuration">
+							<xs:annotation>
+								<xs:documentation>SConfiguration to be added or modified.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetUplinkResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DeleteUplink">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="RemoteAddress" type="xs:anyURI">
+							<xs:annotation><xs:documentation>Uniform resource locator of the configuration to be deleted.</xs:documentation></xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DeleteUplinkResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="tup:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="tup:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetUplinksRequest">
+		<wsdl:part name="parameters" element="tup:GetUplinks"/>
+	</wsdl:message>
+	<wsdl:message name="GetUplinksResponse">
+		<wsdl:part name="parameters" element="tup:GetUplinksResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetUplinkRequest">
+		<wsdl:part name="parameters" element="tup:SetUplink"/>
+	</wsdl:message>
+	<wsdl:message name="SetUplinkResponse">
+		<wsdl:part name="parameters" element="tup:SetUplinkResponse"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteUplinkRequest">
+		<wsdl:part name="parameters" element="tup:DeleteUplink"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteUplinkResponse">
+		<wsdl:part name="parameters" element="tup:DeleteUplinkResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="UplinkPort">
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>Returns the capabilities of the uplink service.</wsdl:documentation>
+			<wsdl:input message="tup:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="tup:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetUplinks">
+			<wsdl:documentation>
+				A device supporting uplinks shall support this command to retrieve the configured uplink configurations. 
+				The Status field shall signal whether a connection is Offline, Connecting or Online.
+			</wsdl:documentation>
+			<wsdl:input message="tup:GetUplinksRequest"/>
+			<wsdl:output message="tup:GetUplinksResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetUplink">
+			<wsdl:documentation>
+				A device supporting uplinks shall support this command to add or modify an uplink configuration. 
+				The Status property of the UplinkConfiguration shall be ignored by the device. A device shall 
+				use the field RemoteAddress to decide whether to update an existing entry or create a new entry.
+			</wsdl:documentation>
+			<wsdl:input message="tup:SetUplinkRequest"/>
+			<wsdl:output message="tup:SetUplinkResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteUplink">
+			<wsdl:documentation>
+				A device supporting uplinks shall support this command to remove an uplink configuration.
+			</wsdl:documentation>
+			<wsdl:input message="tup:DeleteUplinkRequest"/>
+			<wsdl:output message="tup:DeleteUplinkResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="UplinkBinding" type="tup:UplinkPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/uplink/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetUplinks">
+			<soap:operation soapAction="http://www.onvif.org/ver10/uplink/wsdl/GetUplinks"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetUplink">
+			<soap:operation soapAction="http://www.onvif.org/ver10/uplink/wsdl/SetUplink"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteUplink">
+			<soap:operation soapAction="http://www.onvif.org/ver10/uplink/wsdl/DeleteUplink"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+</wsdl:definitions>

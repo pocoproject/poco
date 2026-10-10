@@ -20,8 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Tuple.h"
-#include "Poco/TypeList.h"
-#include "Poco/DynamicAny.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Format.h"
 
@@ -29,7 +28,7 @@
 namespace Poco {
 
 
-template<class T0,
+template <class T0,
 	class T1 = NullTypeList,
 	class T2 = NullTypeList,
 	class T3 = NullTypeList,
@@ -71,12 +70,12 @@ template<class T0,
 	class T39 = NullTypeList>
 struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,T39>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36, T37, T38, T39>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36, T37, T38, T39>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -130,7 +129,7 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
 		typename TypeWrapper<T38>::CONSTTYPE& t38 = POCO_TYPEWRAPPER_DEFAULTVALUE(T38),
 		typename TypeWrapper<T39>::CONSTTYPE& t39 = POCO_TYPEWRAPPER_DEFAULTVALUE(T39)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36,t37,t38,t39),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -265,17 +264,17 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
 		const std::string& n39 = "N1",
 		typename TypeWrapper<T39>::CONSTTYPE& t39 = POCO_TYPEWRAPPER_DEFAULTVALUE(T39)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36,t37,t38,t39),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34,n35,n36,n37,n38,n39);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -329,30 +328,30 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -365,7 +364,7 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -373,17 +372,17 @@ struct NamedTuple: public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T1
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -485,7 +484,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -527,12 +526,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,T38>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36, T37, T38>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36, T37, T38>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -585,7 +584,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T37>::CONSTTYPE& t37 = POCO_TYPEWRAPPER_DEFAULTVALUE(T37),
 		typename TypeWrapper<T38>::CONSTTYPE& t38 = POCO_TYPEWRAPPER_DEFAULTVALUE(T38)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36,t37,t38),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -717,17 +716,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n38 = "M1",
 		typename TypeWrapper<T38>::CONSTTYPE& t38 = POCO_TYPEWRAPPER_DEFAULTVALUE(T38)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36,t37,t38),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34,n35,n36,n37,n38);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -780,30 +779,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -816,7 +815,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -824,17 +823,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -934,7 +933,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -975,12 +974,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,T37>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36, T37>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36, T37>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -1032,7 +1031,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T36>::CONSTTYPE& t36 = POCO_TYPEWRAPPER_DEFAULTVALUE(T36),
 		typename TypeWrapper<T37>::CONSTTYPE& t37 = POCO_TYPEWRAPPER_DEFAULTVALUE(T37)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36,t37),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -1161,17 +1160,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n37 = "L1",
 		typename TypeWrapper<T37>::CONSTTYPE& t37 = POCO_TYPEWRAPPER_DEFAULTVALUE(T37)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36,t37),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34,n35,n36,n37);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -1223,30 +1222,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -1259,7 +1258,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -1267,17 +1266,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -1375,7 +1374,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -1415,12 +1414,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,T36>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -1471,7 +1470,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T35>::CONSTTYPE& t35 = POCO_TYPEWRAPPER_DEFAULTVALUE(T35),
 		typename TypeWrapper<T36>::CONSTTYPE& t36 = POCO_TYPEWRAPPER_DEFAULTVALUE(T36)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -1597,17 +1596,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n36 = "K1",
 		typename TypeWrapper<T36>::CONSTTYPE& t36 = POCO_TYPEWRAPPER_DEFAULTVALUE(T36)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34,n35,n36);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -1658,30 +1657,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -1694,7 +1693,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -1702,17 +1701,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -1808,7 +1807,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -1847,12 +1846,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,T35>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -1902,7 +1901,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T34>::CONSTTYPE& t34 = POCO_TYPEWRAPPER_DEFAULTVALUE(T34),
 		typename TypeWrapper<T35>::CONSTTYPE& t35 = POCO_TYPEWRAPPER_DEFAULTVALUE(T35)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -2025,17 +2024,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n35 = "J1",
 		typename TypeWrapper<T35>::CONSTTYPE& t35 = POCO_TYPEWRAPPER_DEFAULTVALUE(T35)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34,n35);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -2085,30 +2084,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -2121,7 +2120,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -2129,17 +2128,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -2233,7 +2232,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -2271,12 +2270,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,T34>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -2325,7 +2324,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T33>::CONSTTYPE& t33 = POCO_TYPEWRAPPER_DEFAULTVALUE(T33),
 		typename TypeWrapper<T34>::CONSTTYPE& t34 = POCO_TYPEWRAPPER_DEFAULTVALUE(T34)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -2445,17 +2444,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n34 = "I1",
 		typename TypeWrapper<T34>::CONSTTYPE& t34 = POCO_TYPEWRAPPER_DEFAULTVALUE(T34)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -2504,30 +2503,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -2540,7 +2539,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -2548,17 +2547,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -2650,7 +2649,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -2687,12 +2686,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,T33>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -2740,7 +2739,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T32>::CONSTTYPE& t32 = POCO_TYPEWRAPPER_DEFAULTVALUE(T32),
 		typename TypeWrapper<T33>::CONSTTYPE& t33 = POCO_TYPEWRAPPER_DEFAULTVALUE(T33)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -2857,17 +2856,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n33 = "H1",
 		typename TypeWrapper<T33>::CONSTTYPE& t33 = POCO_TYPEWRAPPER_DEFAULTVALUE(T33)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -2915,30 +2914,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -2951,7 +2950,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -2959,17 +2958,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -3059,7 +3058,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -3095,12 +3094,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,T32>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -3147,7 +3146,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T31>::CONSTTYPE& t31 = POCO_TYPEWRAPPER_DEFAULTVALUE(T31),
 		typename TypeWrapper<T32>::CONSTTYPE& t32 = POCO_TYPEWRAPPER_DEFAULTVALUE(T32)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -3261,17 +3260,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n32 = "G1",
 		typename TypeWrapper<T32>::CONSTTYPE& t32 = POCO_TYPEWRAPPER_DEFAULTVALUE(T32)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -3318,30 +3317,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -3354,7 +3353,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -3362,17 +3361,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -3460,7 +3459,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -3495,12 +3494,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,T31>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -3546,7 +3545,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T30>::CONSTTYPE& t30 = POCO_TYPEWRAPPER_DEFAULTVALUE(T30),
 		typename TypeWrapper<T31>::CONSTTYPE& t31 = POCO_TYPEWRAPPER_DEFAULTVALUE(T31)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -3657,17 +3656,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n31 = "F1",
 		typename TypeWrapper<T31>::CONSTTYPE& t31 = POCO_TYPEWRAPPER_DEFAULTVALUE(T31)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -3713,30 +3712,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -3749,7 +3748,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -3757,17 +3756,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -3853,7 +3852,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -3887,12 +3886,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,T30>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -3937,7 +3936,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T29>::CONSTTYPE& t29 = POCO_TYPEWRAPPER_DEFAULTVALUE(T29),
 		typename TypeWrapper<T30>::CONSTTYPE& t30 = POCO_TYPEWRAPPER_DEFAULTVALUE(T30)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -4045,17 +4044,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n30 = "E1",
 		typename TypeWrapper<T30>::CONSTTYPE& t30 = POCO_TYPEWRAPPER_DEFAULTVALUE(T30)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -4100,30 +4099,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -4136,7 +4135,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -4144,17 +4143,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -4238,7 +4237,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -4271,12 +4270,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,T29>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -4320,7 +4319,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T28>::CONSTTYPE& t28 = POCO_TYPEWRAPPER_DEFAULTVALUE(T28),
 		typename TypeWrapper<T29>::CONSTTYPE& t29 = POCO_TYPEWRAPPER_DEFAULTVALUE(T29)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -4425,17 +4424,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n29 = "D1",
 		typename TypeWrapper<T29>::CONSTTYPE& t29 = POCO_TYPEWRAPPER_DEFAULTVALUE(T29)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -4479,30 +4478,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -4515,7 +4514,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -4523,17 +4522,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -4615,7 +4614,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -4647,12 +4646,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,T28>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -4695,7 +4694,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T27>::CONSTTYPE& t27 = POCO_TYPEWRAPPER_DEFAULTVALUE(T27),
 		typename TypeWrapper<T28>::CONSTTYPE& t28 = POCO_TYPEWRAPPER_DEFAULTVALUE(T28)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -4797,17 +4796,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n28 = "C1",
 		typename TypeWrapper<T28>::CONSTTYPE& t28 = POCO_TYPEWRAPPER_DEFAULTVALUE(T28)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -4850,30 +4849,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -4886,7 +4885,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -4894,17 +4893,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -4984,7 +4983,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -5015,12 +5014,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,T27>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -5062,7 +5061,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T26>::CONSTTYPE& t26 = POCO_TYPEWRAPPER_DEFAULTVALUE(T26),
 		typename TypeWrapper<T27>::CONSTTYPE& t27 = POCO_TYPEWRAPPER_DEFAULTVALUE(T27)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -5161,17 +5160,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n27 = "B1",
 		typename TypeWrapper<T27>::CONSTTYPE& t27 = POCO_TYPEWRAPPER_DEFAULTVALUE(T27)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -5213,30 +5212,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -5249,7 +5248,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -5257,17 +5256,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -5345,7 +5344,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -5375,12 +5374,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,T26>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -5421,7 +5420,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T25>::CONSTTYPE& t25 = POCO_TYPEWRAPPER_DEFAULTVALUE(T25),
 		typename TypeWrapper<T26>::CONSTTYPE& t26 = POCO_TYPEWRAPPER_DEFAULTVALUE(T26)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -5517,17 +5516,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n26 = "A1",
 		typename TypeWrapper<T26>::CONSTTYPE& t26 = POCO_TYPEWRAPPER_DEFAULTVALUE(T26)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -5568,30 +5567,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -5604,7 +5603,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -5612,17 +5611,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -5698,7 +5697,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -5727,12 +5726,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,T25>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -5772,7 +5771,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T24>::CONSTTYPE& t24 = POCO_TYPEWRAPPER_DEFAULTVALUE(T24),
 		typename TypeWrapper<T25>::CONSTTYPE& t25 = POCO_TYPEWRAPPER_DEFAULTVALUE(T25)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -5865,17 +5864,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n25 = "Z",
 		typename TypeWrapper<T25>::CONSTTYPE& t25 = POCO_TYPEWRAPPER_DEFAULTVALUE(T25)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -5915,30 +5914,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -5951,7 +5950,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -5959,17 +5958,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -6043,7 +6042,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -6071,12 +6070,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,T24>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -6115,7 +6114,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T23>::CONSTTYPE& t23 = POCO_TYPEWRAPPER_DEFAULTVALUE(T23),
 		typename TypeWrapper<T24>::CONSTTYPE& t24 = POCO_TYPEWRAPPER_DEFAULTVALUE(T24)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -6205,17 +6204,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n24 = "Y",
 		typename TypeWrapper<T24>::CONSTTYPE& t24 = POCO_TYPEWRAPPER_DEFAULTVALUE(T24)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -6254,30 +6253,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -6290,7 +6289,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -6298,17 +6297,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -6380,7 +6379,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -6407,12 +6406,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,T23>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -6450,7 +6449,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T22>::CONSTTYPE& t22 = POCO_TYPEWRAPPER_DEFAULTVALUE(T22),
 		typename TypeWrapper<T23>::CONSTTYPE& t23 = POCO_TYPEWRAPPER_DEFAULTVALUE(T23)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -6537,17 +6536,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n23 = "X",
 		typename TypeWrapper<T23>::CONSTTYPE& t23 = POCO_TYPEWRAPPER_DEFAULTVALUE(T23)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -6585,30 +6584,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -6621,7 +6620,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -6629,17 +6628,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -6709,7 +6708,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -6735,12 +6734,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,T22>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -6777,7 +6776,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T21>::CONSTTYPE& t21 = POCO_TYPEWRAPPER_DEFAULTVALUE(T21),
 		typename TypeWrapper<T22>::CONSTTYPE& t22 = POCO_TYPEWRAPPER_DEFAULTVALUE(T22)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -6861,17 +6860,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n22 = "W",
 		typename TypeWrapper<T22>::CONSTTYPE& t22 = POCO_TYPEWRAPPER_DEFAULTVALUE(T22)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -6908,30 +6907,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -6944,7 +6943,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -6952,17 +6951,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -7030,7 +7029,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -7055,12 +7054,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,T21>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -7096,7 +7095,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T20>::CONSTTYPE& t20 = POCO_TYPEWRAPPER_DEFAULTVALUE(T20),
 		typename TypeWrapper<T21>::CONSTTYPE& t21 = POCO_TYPEWRAPPER_DEFAULTVALUE(T21)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -7177,17 +7176,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n21 = "V",
 		typename TypeWrapper<T21>::CONSTTYPE& t21 = POCO_TYPEWRAPPER_DEFAULTVALUE(T21)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -7223,30 +7222,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -7259,7 +7258,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -7267,17 +7266,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -7343,7 +7342,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -7367,12 +7366,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,T20>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -7407,7 +7406,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T19>::CONSTTYPE& t19 = POCO_TYPEWRAPPER_DEFAULTVALUE(T19),
 		typename TypeWrapper<T20>::CONSTTYPE& t20 = POCO_TYPEWRAPPER_DEFAULTVALUE(T20)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -7485,17 +7484,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n20 = "U",
 		typename TypeWrapper<T20>::CONSTTYPE& t20 = POCO_TYPEWRAPPER_DEFAULTVALUE(T20)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -7530,30 +7529,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -7566,7 +7565,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -7574,17 +7573,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -7648,7 +7647,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -7671,12 +7670,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,T19>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -7710,7 +7709,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T18>::CONSTTYPE& t18 = POCO_TYPEWRAPPER_DEFAULTVALUE(T18),
 		typename TypeWrapper<T19>::CONSTTYPE& t19 = POCO_TYPEWRAPPER_DEFAULTVALUE(T19)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -7785,17 +7784,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n19 = "T",
 		typename TypeWrapper<T19>::CONSTTYPE& t19 = POCO_TYPEWRAPPER_DEFAULTVALUE(T19)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -7829,30 +7828,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -7865,7 +7864,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -7873,17 +7872,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -7945,7 +7944,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -7967,12 +7966,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,T18>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -8005,7 +8004,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17),
 		typename TypeWrapper<T18>::CONSTTYPE& t18 = POCO_TYPEWRAPPER_DEFAULTVALUE(T18)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -8077,17 +8076,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n18 = "S",
 		typename TypeWrapper<T18>::CONSTTYPE& t18 = POCO_TYPEWRAPPER_DEFAULTVALUE(T18)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -8120,30 +8119,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -8156,7 +8155,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -8164,17 +8163,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -8234,7 +8233,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -8255,12 +8254,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -8292,7 +8291,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16),
 		typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -8361,17 +8360,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		const std::string& n17 = "R",
 		typename TypeWrapper<T17>::CONSTTYPE& t17 = POCO_TYPEWRAPPER_DEFAULTVALUE(T17)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -8403,30 +8402,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -8439,7 +8438,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -8447,17 +8446,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,T17,
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -8515,7 +8514,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -8535,12 +8534,12 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16>::Type Type;
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>::Type;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -8571,7 +8570,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
 		typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15),
 		typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -8637,17 +8636,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
 		const std::string& n16 = "Q",
 		typename TypeWrapper<T16>::CONSTTYPE& t16 = POCO_TYPEWRAPPER_DEFAULTVALUE(T16)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -8678,30 +8677,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -8714,7 +8713,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -8722,17 +8721,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,T16,Null
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -8788,7 +8787,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -8807,13 +8806,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -8843,7 +8842,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
 		typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14),
 		typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -8906,17 +8905,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
 		const std::string& n15 = "P",
 		typename TypeWrapper<T15>::CONSTTYPE& t15 = POCO_TYPEWRAPPER_DEFAULTVALUE(T15)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -8946,30 +8945,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -8982,7 +8981,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -8990,17 +8989,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,T15,NullType
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -9054,7 +9053,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -9072,13 +9071,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -9107,7 +9106,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
 		typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13),
 		typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -9167,17 +9166,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
 		const std::string& n14 = "O",
 		typename TypeWrapper<T14>::CONSTTYPE& t14 = POCO_TYPEWRAPPER_DEFAULTVALUE(T14)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -9206,30 +9205,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -9242,7 +9241,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -9250,17 +9249,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14,NullTypeList
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -9312,7 +9311,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -9329,13 +9328,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -9363,7 +9362,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
 		typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12),
 		typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -9420,17 +9419,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
 		const std::string& n13 = "N",
 		typename TypeWrapper<T13>::CONSTTYPE& t13 = POCO_TYPEWRAPPER_DEFAULTVALUE(T13)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -9458,30 +9457,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -9494,7 +9493,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -9502,17 +9501,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -9562,7 +9561,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -9578,13 +9577,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -9611,7 +9610,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
 		typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11),
 		typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -9664,17 +9663,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
 		typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11),
 		const std::string& n12 = "M",
 		typename TypeWrapper<T12>::CONSTTYPE& t12 = POCO_TYPEWRAPPER_DEFAULTVALUE(T12)):
-	TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12), _pNames(0)
+	TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12), _pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -9701,30 +9700,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -9737,7 +9736,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -9745,17 +9744,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -9803,7 +9802,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -9818,13 +9817,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -9850,7 +9849,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
 		typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10),
 		typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -9901,17 +9900,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
 		const std::string& n11 = "L",
 		typename TypeWrapper<T11>::CONSTTYPE& t11 = POCO_TYPEWRAPPER_DEFAULTVALUE(T11)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -9937,30 +9936,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -9973,7 +9972,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -9981,17 +9980,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -10037,7 +10036,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -10051,13 +10050,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -10082,7 +10081,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
 		typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9),
 		typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -10129,17 +10128,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
 		typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9),
 		const std::string& n10 = "K",
 		typename TypeWrapper<T10>::CONSTTYPE& t10 = POCO_TYPEWRAPPER_DEFAULTVALUE(T10)):
-	TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10), _pNames(0)
+	TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,t10), _pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -10164,30 +10163,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -10200,7 +10199,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -10208,17 +10207,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -10262,7 +10261,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -10275,13 +10274,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8, T9>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -10305,7 +10304,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
 		typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8),
 		typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -10350,17 +10349,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
 		const std::string& n9 = "J",
 		typename TypeWrapper<T9>::CONSTTYPE& t9 = POCO_TYPEWRAPPER_DEFAULTVALUE(T9)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8,t9),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8,n9);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -10384,30 +10383,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -10420,7 +10419,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -10428,17 +10427,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,T9,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -10480,7 +10479,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -10492,13 +10491,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7,T8>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7, T8>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -10521,7 +10520,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
 		typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7),
 		typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -10563,17 +10562,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
 		const std::string& n8 = "I",
 		typename TypeWrapper<T8>::CONSTTYPE& t8 = POCO_TYPEWRAPPER_DEFAULTVALUE(T8)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7,t8),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7,n8);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -10596,30 +10595,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -10632,7 +10631,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -10640,17 +10639,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,T8,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -10690,7 +10689,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -10701,13 +10700,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6,T7>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6,T7> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6,T7>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6, T7>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6, T7>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -10729,7 +10728,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
 		typename TypeWrapper<T6>::CONSTTYPE& t6 = POCO_TYPEWRAPPER_DEFAULTVALUE(T6),
 		typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -10768,17 +10767,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
 		const std::string& n7 = "H",
 		typename TypeWrapper<T7>::CONSTTYPE& t7 = POCO_TYPEWRAPPER_DEFAULTVALUE(T7)):
 		TupleType(t0,t1,t2,t3,t4,t5,t6,t7),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6,n7);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -10800,30 +10799,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -10836,7 +10835,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -10844,17 +10843,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,T7,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -10892,7 +10891,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -10902,13 +10901,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5,T6>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5,T6> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5,T6>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5, T6>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5, T6>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -10928,7 +10927,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,NullTypeList>:
 		typename TypeWrapper<T4>::CONSTTYPE& t4 = POCO_TYPEWRAPPER_DEFAULTVALUE(T4),
 		typename TypeWrapper<T5>::CONSTTYPE& t5 = POCO_TYPEWRAPPER_DEFAULTVALUE(T5),
 		typename TypeWrapper<T6>::CONSTTYPE& t6 = POCO_TYPEWRAPPER_DEFAULTVALUE(T6)):
-	TupleType(t0,t1,t2,t3,t4,t5,t6), _pNames(0)
+	TupleType(t0,t1,t2,t3,t4,t5,t6), _pNames(nullptr)
 	{
 		init();
 	}
@@ -10963,17 +10962,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,NullTypeList>:
 		typename TypeWrapper<T5>::CONSTTYPE& t5 = POCO_TYPEWRAPPER_DEFAULTVALUE(T5),
 		const std::string& n6 = "G",
 		typename TypeWrapper<T6>::CONSTTYPE& t6 = POCO_TYPEWRAPPER_DEFAULTVALUE(T6)):
-	TupleType(t0,t1,t2,t3,t4,t5,t6), _pNames(0)
+	TupleType(t0,t1,t2,t3,t4,t5,t6), _pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5,n6);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -10994,30 +10993,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -11030,7 +11029,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -11038,17 +11037,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,T6,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -11084,7 +11083,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -11093,13 +11092,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,T5,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4,T5>
 {
-	typedef Tuple<T0,T1,T2,T3,T4,T5> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4,T5>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4, T5>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4, T5>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -11118,7 +11117,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,NullTypeList>:
 		typename TypeWrapper<T3>::CONSTTYPE& t3 = POCO_TYPEWRAPPER_DEFAULTVALUE(T3),
 		typename TypeWrapper<T4>::CONSTTYPE& t4 = POCO_TYPEWRAPPER_DEFAULTVALUE(T4),
 		typename TypeWrapper<T5>::CONSTTYPE& t5 = POCO_TYPEWRAPPER_DEFAULTVALUE(T5)):
-	TupleType(t0,t1,t2,t3,t4,t5), _pNames(0)
+	TupleType(t0,t1,t2,t3,t4,t5), _pNames(nullptr)
 	{
 		init();
 	}
@@ -11150,17 +11149,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,NullTypeList>:
 		typename TypeWrapper<T4>::CONSTTYPE& t4 = POCO_TYPEWRAPPER_DEFAULTVALUE(T4),
 		const std::string& n5 = "F",
 		typename TypeWrapper<T5>::CONSTTYPE& t5 = POCO_TYPEWRAPPER_DEFAULTVALUE(T5)):
-	TupleType(t0,t1,t2,t3,t4,t5), _pNames(0)
+	TupleType(t0,t1,t2,t3,t4,t5), _pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4,n5);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -11180,30 +11179,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -11216,7 +11215,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -11224,17 +11223,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,T5,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -11268,7 +11267,7 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3,
@@ -11276,13 +11275,13 @@ template<class T0,
 struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
 	public Tuple<T0,T1,T2,T3,T4>
 {
-	typedef Tuple<T0,T1,T2,T3,T4> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3,T4>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3, T4>;
+	using Type = typename Tuple<T0, T1, T2, T3, T4>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -11301,7 +11300,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
 		typename TypeWrapper<T3>::CONSTTYPE& t3 = POCO_TYPEWRAPPER_DEFAULTVALUE(T3),
 		typename TypeWrapper<T4>::CONSTTYPE& t4 = POCO_TYPEWRAPPER_DEFAULTVALUE(T4)):
 		TupleType(t0,t1,t2,t3,t4),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -11331,17 +11330,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
 		const std::string& n4 = "E",
 		typename TypeWrapper<T4>::CONSTTYPE& t4 = POCO_TYPEWRAPPER_DEFAULTVALUE(T4)):
 		TupleType(t0,t1,t2,t3,t4),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2,n3,n4);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -11360,30 +11359,30 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -11396,7 +11395,7 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -11404,17 +11403,17 @@ struct NamedTuple<T0,T1,T2,T3,T4,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -11446,20 +11445,20 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2,
 	class T3>
 struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
 	public Tuple<T0,T1,T2,T3>
 {
-	typedef Tuple<T0,T1,T2,T3> TupleType;
-	typedef typename Tuple<T0,T1,T2,T3>::Type Type;
+	using TupleType = Tuple<T0, T1, T2, T3>;
+	using Type = typename Tuple<T0, T1, T2, T3>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -11477,7 +11476,7 @@ struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
 		typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2),
 		typename TypeWrapper<T3>::CONSTTYPE& t3 = POCO_TYPEWRAPPER_DEFAULTVALUE(T3)):
 		TupleType(t0,t1,t2,t3),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -11503,17 +11502,17 @@ struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
 		typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2),
 		const std::string& n3 = "D",
 		typename TypeWrapper<T3>::CONSTTYPE& t3 = POCO_TYPEWRAPPER_DEFAULTVALUE(T3)):
-	TupleType(t0,t1,t2,t3), _pNames(0)
+	TupleType(t0,t1,t2,t3), _pNames(nullptr)
 	{
 		init(n0,n1,n2,n3);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -11531,30 +11530,30 @@ struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -11567,7 +11566,7 @@ struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -11575,17 +11574,17 @@ struct NamedTuple<T0,T1,T2,T3,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -11615,19 +11614,19 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1,
 	class T2>
 struct NamedTuple<T0,T1,T2,NullTypeList>:
 	public Tuple<T0,T1,T2>
 {
-	typedef Tuple<T0,T1,T2> TupleType;
-	typedef typename Tuple<T0,T1,T2>::Type Type;
+	using TupleType = Tuple<T0, T1, T2>;
+	using Type = typename Tuple<T0, T1, T2>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -11644,7 +11643,7 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
 		typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1),
 		typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2)):
 		TupleType(t0,t1,t2),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -11668,17 +11667,17 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
 		const std::string& n2 = "C",
 		typename TypeWrapper<T2>::CONSTTYPE& t2 = POCO_TYPEWRAPPER_DEFAULTVALUE(T2)):
 		TupleType(t0,t1,t2),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1,n2);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -11695,30 +11694,30 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -11731,7 +11730,7 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -11739,17 +11738,17 @@ struct NamedTuple<T0,T1,T2,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -11777,18 +11776,18 @@ private:
 };
 
 
-template<class T0,
+template <class T0,
 	class T1>
 struct NamedTuple<T0,T1,NullTypeList>:
 	public Tuple<T0,T1>
 {
-	typedef Tuple<T0,T1> TupleType;
-	typedef typename Tuple<T0,T1>::Type Type;
+	using TupleType = Tuple<T0, T1>;
+	using Type = typename Tuple<T0, T1>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -11804,7 +11803,7 @@ struct NamedTuple<T0,T1,NullTypeList>:
 	NamedTuple(typename TypeWrapper<T0>::CONSTTYPE& t0,
 		typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1)):
 		TupleType(t0,t1),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -11825,17 +11824,17 @@ struct NamedTuple<T0,T1,NullTypeList>:
 		const std::string& n1 = "B",
 		typename TypeWrapper<T1>::CONSTTYPE& t1 = POCO_TYPEWRAPPER_DEFAULTVALUE(T1)):
 		TupleType(t0,t1),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0,n1);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -11851,30 +11850,30 @@ struct NamedTuple<T0,T1,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -11887,7 +11886,7 @@ struct NamedTuple<T0,T1,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -11895,17 +11894,17 @@ struct NamedTuple<T0,T1,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);
@@ -11931,17 +11930,17 @@ private:
 };
 
 
-template<class T0>
+template <class T0>
 struct NamedTuple<T0,NullTypeList>:
 	public Tuple<T0>
 {
-	typedef Tuple<T0> TupleType;
-	typedef typename Tuple<T0>::Type Type;
+	using TupleType = Tuple<T0>;
+	using Type = typename Tuple<T0>::Type;
 
-	typedef std::vector<std::string> NameVec;
-	typedef SharedPtr<NameVec> NameVecPtr;
+	using NameVec = std::vector<std::string>;
+	using NameVecPtr = SharedPtr<NameVec>;
 
-	NamedTuple(): _pNames(0)
+	NamedTuple(): _pNames(nullptr)
 	{
 		init();
 	}
@@ -11956,7 +11955,7 @@ struct NamedTuple<T0,NullTypeList>:
 
 	NamedTuple(typename TypeWrapper<T0>::CONSTTYPE& t0):
 		TupleType(t0),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init();
 	}
@@ -11973,17 +11972,17 @@ struct NamedTuple<T0,NullTypeList>:
 
 	NamedTuple(const std::string& n0, typename TypeWrapper<T0>::CONSTTYPE& t0):
 		TupleType(t0),
-		_pNames(0)
+		_pNames(nullptr)
 	{
 		init(n0);
 	}
 
-	const DynamicAny get(const std::string& name) const
+	[[nodiscard]] const Dynamic::Var get(const std::string& name) const
 	{
 		NameVec::const_iterator it = _pNames->begin();
 		NameVec::const_iterator itEnd = _pNames->end();
 
-		for(std::size_t counter = 0; it != itEnd; ++it, ++counter)
+		for (std::size_t counter = 0; it != itEnd; ++it, ++counter)
 		{
 			if (name == *it)
 			{
@@ -11998,30 +11997,30 @@ struct NamedTuple<T0,NullTypeList>:
 		throw NotFoundException("Name not found: " + name);
 	}
 
-	const DynamicAny operator [] (const std::string& name) const
+	[[nodiscard]] const Dynamic::Var operator [] (const std::string& name) const
 	{
 		return get(name);
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::ConstHeadType& get() const
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::ConstHeadType& get() const
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
-	typename TypeGetter<N, Type>::HeadType& get()
+	template <int N>
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return TupleType::template get<N>();
 	}
 
-	template<int N>
+	template <int N>
 	void set(typename TypeGetter<N, Type>::ConstHeadType& val)
 	{
 		return TupleType::template set<N>(val);
 	}
 
-	const NameVecPtr& names()
+	[[nodiscard]] const NameVecPtr& names()
 	{
 		return _pNames;
 	}
@@ -12034,7 +12033,7 @@ struct NamedTuple<T0,NullTypeList>:
 		(*_pNames)[index] = name;
 	}
 
-	const std::string& getName(std::size_t index)
+	[[nodiscard]] const std::string& getName(std::size_t index)
 	{
 		if (index >= _pNames->size())
 			throw InvalidArgumentException(format("Invalid index: %z", index));
@@ -12042,17 +12041,17 @@ struct NamedTuple<T0,NullTypeList>:
 		return (*_pNames)[index];
 	}
 
-	bool operator == (const NamedTuple& other) const
+	[[nodiscard]] bool operator == (const NamedTuple& other) const
 	{
 		return TupleType(*this) == TupleType(other) && _pNames == other._pNames;
 	}
 
-	bool operator != (const NamedTuple& other) const
+	[[nodiscard]] bool operator != (const NamedTuple& other) const
 	{
 		return !(*this == other);
 	}
 
-	bool operator < (const NamedTuple& other) const
+	[[nodiscard]] bool operator < (const NamedTuple& other) const
 	{
 		TupleType th(*this);
 		TupleType oth(other);

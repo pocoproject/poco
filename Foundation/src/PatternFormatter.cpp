@@ -33,9 +33,11 @@ const std::string PatternFormatter::PROP_PATTERN = "pattern";
 const std::string PatternFormatter::PROP_TIMES   = "times";
 const std::string PatternFormatter::PROP_PRIORITY_NAMES = "priorityNames";
 const std::string PatternFormatter::DEFAULT_PRIORITY_NAMES = "Fatal,Critical,Error,Warning,Notice,Information,Debug,Trace";
+std::string PatternFormatter::_cachedNodeName;
 
 PatternFormatter::PatternFormatter():
 	_localTime(false),
+	_localTimeSet(false),
 	_priorityNames(DEFAULT_PRIORITY_NAMES)
 {
 	parsePriorityNames();
@@ -44,6 +46,7 @@ PatternFormatter::PatternFormatter():
 
 PatternFormatter::PatternFormatter(const std::string& format):
 	_localTime(false),
+	_localTimeSet(false),
 	_pattern(format),
 	_priorityNames(DEFAULT_PRIORITY_NAMES)
 {
@@ -59,6 +62,7 @@ PatternFormatter::~PatternFormatter()
 
 void PatternFormatter::format(const Message& msg, std::string& text)
 {
+	text.reserve(text.size() + 128);
 	Timestamp timestamp = msg.getTime();
 	bool localTime = _localTime;
 	if (localTime)
@@ -81,9 +85,13 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'T': text.append(msg.getThread()); break;
 		case 'I': NumberFormatter::append(text, msg.getTid()); break;
 		case 'J': NumberFormatter::append(text, msg.getOsTid()); break;
-		case 'N': text.append(Environment::nodeName()); break;
+		case 'N':
+			if (_cachedNodeName.empty())
+				_cachedNodeName = Environment::nodeName();
+			text.append(_cachedNodeName);
+			break;
 		case 'U': text.append(msg.getSourceFile() ? msg.getSourceFile() : ""); break;
-		case 'O': text.append(msg.getSourceFile() ? Path(msg.getSourceFile()).getFileName() : ""); break;
+		case 'O': text.append(extractBasename(msg.getSourceFile())); break;
 		case 'u': NumberFormatter::append(text, msg.getSourceLine()); break;
 		case 'w': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()], 0, 3); break;
 		case 'W': text.append(DateTimeFormat::WEEKDAY_NAMES[dateTime.dayOfWeek()]); break;
@@ -104,7 +112,7 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'M': NumberFormatter::append0(text, dateTime.minute(), 2); break;
 		case 'S': NumberFormatter::append0(text, dateTime.second(), 2); break;
 		case 'i': NumberFormatter::append0(text, dateTime.millisecond(), 3); break;
-		case 'c': NumberFormatter::append(text, dateTime.millisecond()/100); break;
+		case 'c': NumberFormatter::append0(text, dateTime.millisecond()/10, 2); break;
 		case 'F': NumberFormatter::append0(text, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); break;
 		case 'z': text.append(DateTimeFormatter::tzdISO(localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
 		case 'Z': text.append(DateTimeFormatter::tzdRFC(localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
@@ -176,7 +184,7 @@ void PatternFormatter::parsePattern()
 						if (it == end) --it;
 						try
 						{
-							act.length = NumberParser::parse(number);
+							act.length = static_cast<std::size_t>(NumberParser::parse(number));
 						}
 						catch (...)
 						{
@@ -209,6 +217,7 @@ void PatternFormatter::setProperty(const std::string& name, const std::string& v
 	else if (name == PROP_TIMES)
 	{
 		_localTime = (value == "local");
+		_localTimeSet = true;
 	}
 	else if (name == PROP_PRIORITY_NAMES)
 	{
@@ -235,6 +244,18 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 }
 
 
+bool PatternFormatter::getLocalTime() const
+{
+	return _localTime;
+}
+
+
+bool PatternFormatter::isLocalTimeConfigured() const
+{
+	return _localTimeSet;
+}
+
+
 void PatternFormatter::parsePriorityNames()
 {
 	StringTokenizer st(_priorityNames, ",;", StringTokenizer::TOK_TRIM);
@@ -253,6 +274,21 @@ const std::string& PatternFormatter::getPriorityName(int prio)
 {
 	poco_assert (1 <= prio && prio <= 8);
 	return _priorities[prio];
+}
+
+
+const char* PatternFormatter::extractBasename(const char* path)
+{
+	if (!path || !*path) return "";
+
+	const char sep = Path::separator();
+	const char* basename = path;
+	for (const char* p = path; *p; ++p)
+	{
+		if (*p == sep || *p == '/')
+			basename = p + 1;
+	}
+	return basename;
 }
 
 

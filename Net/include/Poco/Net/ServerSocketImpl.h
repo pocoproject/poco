@@ -22,8 +22,7 @@
 #include "Poco/Net/SocketImpl.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ServerSocketImpl: public SocketImpl
@@ -34,12 +33,12 @@ public:
 		/// Creates the ServerSocketImpl.
 
 protected:
-	virtual ~ServerSocketImpl();
+	~ServerSocketImpl() override;
 		/// Destroys the ServerSocketImpl.
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ServerSocketImpl_INCLUDED

@@ -28,9 +28,9 @@
 //
 // The following block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the DNSSD_EXPORTS
-// symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
-// DNSSD_API functions as being imported from a DLL, wheras this DLL sees symbols
+// symbol defined on the command line. This symbol should not be defined on any project
+// that uses this DLL. This way any other project whose source files include this file sees
+// DNSSD_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
@@ -43,7 +43,11 @@
 
 
 #if !defined(DNSSD_API)
-	#define DNSSD_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define DNSSD_API __attribute__ ((visibility ("default")))
+	#else
+		#define DNSSD_API
+	#endif
 #endif
 
 
@@ -77,8 +81,7 @@
 #endif
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 enum HandleType
@@ -121,43 +124,43 @@ public:
 	{
 	}
 
-	int subtype() const
+	[[nodiscard]] int subtype() const
 	{
 		return _subtype;
 	}
 
 	template <typename T>
-	T cast() const
+	[[nodiscard]] T cast() const
 	{
 		return reinterpret_cast<T>(_h);
 	}
 
-	bool operator == (const OpaqueHandle& other) const
+	[[nodiscard]] bool operator == (const OpaqueHandle& other) const
 	{
 		return _h == other._h;
 	}
 
-	bool operator != (const OpaqueHandle& other) const
+	[[nodiscard]] bool operator != (const OpaqueHandle& other) const
 	{
 		return _h != other._h;
 	}
 
-	bool operator <= (const OpaqueHandle& other) const
+	[[nodiscard]] bool operator <= (const OpaqueHandle& other) const
 	{
 		return _h <= other._h;
 	}
 
-	bool operator < (const OpaqueHandle& other) const
+	[[nodiscard]] bool operator < (const OpaqueHandle& other) const
 	{
 		return _h < other._h;
 	}
 
-	bool operator >= (const OpaqueHandle& other) const
+	[[nodiscard]] bool operator >= (const OpaqueHandle& other) const
 	{
 		return _h >= other._h;
 	}
 
-	bool operator > (const OpaqueHandle& other) const
+	[[nodiscard]] bool operator > (const OpaqueHandle& other) const
 	{
 		return _h > other._h;
 	}
@@ -167,12 +170,12 @@ public:
 		_h = Invalid;
 	}
 
-	bool isValid() const
+	[[nodiscard]] bool isValid() const
 	{
 		return _h != Invalid;
 	}
 
-	bool isNull() const
+	[[nodiscard]] bool isNull() const
 	{
 		return _h == Invalid;
 	}
@@ -188,7 +191,7 @@ typedef OpaqueHandle<Poco::IntPtr, SD_RECORD_HANDLE, 0> RecordHandle;
 typedef OpaqueHandle<Poco::IntPtr, SD_BROWSE_HANDLE, 0> BrowseHandle;
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_DNSSD_INCLUDED

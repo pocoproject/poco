@@ -22,8 +22,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Node;
@@ -126,7 +125,7 @@ public:
 			/// over the document tree.
 	};
 
-	virtual short acceptNode(Node* node) = 0;
+	[[nodiscard]] virtual short acceptNode(Node* node) = 0;
 		/// Test whether a specified node is visible in the logical view of a TreeWalker
 		/// or NodeIterator. This function will be called by the implementation of TreeWalker
 		/// and NodeIterator; it is not normally called directly from user code. (Though
@@ -140,7 +139,7 @@ protected:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_NodeFilter_INCLUDED

@@ -1,33 +1,19 @@
 #include "statements.h"
+
+#include <stdint.h>
+
 #include "AlterStatement.h"
+#include "ImportExportOptions.h"
 
 namespace hsql {
-
-// KeyConstraints
-TableConstraint::TableConstraint(ConstraintType type, std::vector<char*>* columnNames)
-    : type(type), columnNames(columnNames) {}
-
-TableConstraint::~TableConstraint() {
-  for (char* def : *columnNames) {
-    free(def);
-  }
-  delete columnNames;
-}
-
-// ColumnDefinition
-ColumnDefinition::ColumnDefinition(char* name, ColumnType type, std::unordered_set<ConstraintType>* column_constraints)
-    : column_constraints(column_constraints), name(name), type(type), nullable(true) {}
-
-ColumnDefinition::~ColumnDefinition() {
-  free(name);
-  delete column_constraints;
-}
 
 ColumnType::ColumnType(DataType data_type, int64_t length, int64_t precision, int64_t scale)
     : data_type(data_type), length(length), precision(precision), scale(scale) {}
 
 bool operator==(const ColumnType& lhs, const ColumnType& rhs) {
-  if (lhs.data_type != rhs.data_type) return false;
+  if (lhs.data_type != rhs.data_type) {
+    return false;
+  }
   return lhs.length == rhs.length && lhs.precision == rhs.precision && lhs.scale == rhs.scale;
 }
 
@@ -133,10 +119,12 @@ TransactionStatement::TransactionStatement(TransactionCommand command)
 TransactionStatement::~TransactionStatement() {}
 
 // ExecuteStatement
-ExecuteStatement::ExecuteStatement() : SQLStatement(kStmtExecute), name(nullptr), parameters(nullptr) {}
+ExecuteStatement::ExecuteStatement()
+    : SQLStatement(kStmtExecute), name(nullptr), parameters(nullptr), returnValue(nullptr) {}
 
 ExecuteStatement::~ExecuteStatement() {
   free(name);
+  delete returnValue;
 
   if (parameters) {
     for (Expr* param : *parameters) {
@@ -148,13 +136,61 @@ ExecuteStatement::~ExecuteStatement() {
 
 // ExportStatement
 ExportStatement::ExportStatement(ImportType type)
-    : SQLStatement(kStmtExport), type(type), filePath(nullptr), schema(nullptr), tableName(nullptr), select(nullptr) {}
+    : SQLStatement(kStmtExport),
+      type(type),
+      filePath(nullptr),
+      schema(nullptr),
+      tableName(nullptr),
+      select(nullptr),
+      encoding(nullptr),
+      csv_options(nullptr) {}
 
 ExportStatement::~ExportStatement() {
   free(filePath);
   free(schema);
   free(tableName);
   delete select;
+  free(encoding);
+  delete csv_options;
+}
+
+CsvOptions::CsvOptions() : delimiter(nullptr), null(nullptr), quote(nullptr) {}
+CsvOptions::~CsvOptions() {
+  free(delimiter);
+  free(null);
+  free(quote);
+}
+
+bool CsvOptions::accept_csv_option(std::pair<CsvOptionType, char*>* option) {
+  switch (option->first) {
+    case CsvOptionType::Delimiter:
+      if (delimiter != nullptr) {
+        return false;
+      }
+      delimiter = option->second;
+      break;
+    case CsvOptionType::Null:
+      if (null != nullptr) {
+        return false;
+      }
+      null = option->second;
+      break;
+    case CsvOptionType::Quote:
+      if (quote != nullptr) {
+        return false;
+      }
+      quote = option->second;
+      break;
+  }
+
+  return true;
+}
+
+ImportExportOptions::ImportExportOptions() : format(kImportAuto), encoding(nullptr), csv_options(nullptr) {}
+
+ImportExportOptions::~ImportExportOptions() {
+  free(encoding);
+  delete csv_options;
 }
 
 // ImportStatement
@@ -164,13 +200,17 @@ ImportStatement::ImportStatement(ImportType type)
       filePath(nullptr),
       schema(nullptr),
       tableName(nullptr),
-      whereClause(nullptr) {}
+      whereClause(nullptr),
+      encoding(nullptr),
+      csv_options(nullptr) {}
 
 ImportStatement::~ImportStatement() {
   free(filePath);
   free(schema);
   free(tableName);
   delete whereClause;
+  free(encoding);
+  delete csv_options;
 }
 
 // InsertStatement
@@ -214,7 +254,8 @@ ShowStatement::~ShowStatement() {
 // SelectStatement.h
 
 // OrderDescription
-OrderDescription::OrderDescription(OrderType type, Expr* expr) : type(type), expr(expr) {}
+OrderDescription::OrderDescription(OrderType type, Expr* expr, NullOrdering null_ordering)
+    : type(type), expr(expr), null_ordering(null_ordering) {}
 
 OrderDescription::~OrderDescription() { delete expr; }
 
@@ -252,6 +293,8 @@ SelectStatement::SelectStatement()
       selectDistinct(false),
       selectList(nullptr),
       whereClause(nullptr),
+      startWith(nullptr),
+      connectBy(nullptr),
       groupBy(nullptr),
       setOperations(nullptr),
       order(nullptr),
@@ -262,6 +305,8 @@ SelectStatement::SelectStatement()
 SelectStatement::~SelectStatement() {
   delete fromTable;
   delete whereClause;
+  delete startWith;
+  delete connectBy;
   delete groupBy;
   delete limit;
 
@@ -340,7 +385,15 @@ Alias::~Alias() {
 
 // TableRef
 TableRef::TableRef(TableRefType type)
-    : type(type), schema(nullptr), name(nullptr), alias(nullptr), select(nullptr), list(nullptr), join(nullptr) {}
+    : type(type),
+      schema(nullptr),
+      name(nullptr),
+      alias(nullptr),
+      select(nullptr),
+      list(nullptr),
+      join(nullptr),
+      func(nullptr),
+      values(nullptr) {}
 
 TableRef::~TableRef() {
   free(schema);
@@ -349,6 +402,14 @@ TableRef::~TableRef() {
   delete select;
   delete join;
   delete alias;
+  delete func;
+
+  if (values) {
+    for (Expr* row : *values) {
+      delete row;
+    }
+    delete values;
+  }
 
   if (list) {
     for (TableRef* table : *list) {
@@ -368,12 +429,20 @@ const char* TableRef::getName() const {
 }
 
 // JoinDefinition
-JoinDefinition::JoinDefinition() : left(nullptr), right(nullptr), condition(nullptr), type(kJoinInner) {}
+JoinDefinition::JoinDefinition()
+    : left(nullptr), right(nullptr), condition(nullptr), namedColumns(nullptr), type(kJoinInner) {}
 
 JoinDefinition::~JoinDefinition() {
   delete left;
   delete right;
   delete condition;
+
+  if (namedColumns) {
+    for (auto* column : *namedColumns) {
+      free(column);
+    }
+    delete namedColumns;
+  }
 }
 
 SetOperation::SetOperation() : nestedSelectStatement(nullptr), resultOrder(nullptr), resultLimit(nullptr) {}

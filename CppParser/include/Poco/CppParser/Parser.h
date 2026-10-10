@@ -26,8 +26,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class Enum;
@@ -81,20 +80,22 @@ protected:
 	const Poco::Token* parseBaseClassList(const Poco::Token* pNext, Struct* pClass);
 	const Poco::Token* parseClassMembers(const Poco::Token* pNext, Struct* pClass);
 	const Poco::Token* parseAccess(const Poco::Token* pNext);
+	const Poco::Token* parseStaticAssert(const Poco::Token* pNext);
 	const Poco::Token* parseIdentifier(const Poco::Token* pNext, std::string& id);
 	const Poco::Token* parseAttributes(const Poco::Token* pNext, std::string& attrs);
+	const Poco::Token* parseParenthesized(const Poco::Token* pNext, std::string& decl);
 
 	void addSymbol(Symbol* pSymbol, int lineNumber, bool addGST = true);
 	void pushNameSpace(NameSpace* pNameSpace, int lineNumber, bool addGST = true);
 	void popNameSpace();
 	NameSpace* currentNameSpace() const;
 
-	static bool isIdentifier(const Poco::Token* pToken);
-	static bool isOperator(const Poco::Token* pToken, int kind);
-	static bool isKeyword(const Poco::Token* pToken, int kind);
-	static bool isEOF(const Poco::Token* pToken);
+	[[nodiscard]] static bool isIdentifier(const Poco::Token* pToken);
+	[[nodiscard]] static bool isOperator(const Poco::Token* pToken, int kind);
+	[[nodiscard]] static bool isKeyword(const Poco::Token* pToken, int kind);
+	[[nodiscard]] static bool isEOF(const Poco::Token* pToken);
 	static void expectOperator(const Poco::Token* pToken, int kind, const std::string& msg);
-	static void syntaxError(const std::string& msg);
+	[[noreturn]] static void syntaxError(const std::string& msg);
 	static void append(std::string& decl, const std::string& token);
 	static void append(std::string& decl, const Poco::Token* pToken);
 
@@ -122,7 +123,7 @@ private:
 };
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Parser_INCLUDED

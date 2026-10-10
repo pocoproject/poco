@@ -23,15 +23,14 @@
 #include "Poco/Crypto/RSAKeyImpl.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class X509Certificate;
 class PKCS12Container;
 
+//class [[deprecated]] RSAKey;
 
-//@ deprecated
 class Crypto_API RSAKey: public KeyPair
 	/// This class stores an RSA key pair, consisting
 	/// of private and public key. Storage of the private
@@ -81,7 +80,7 @@ public:
 		/// OpenSSL will auto-create the public key from the private key.
 
 	RSAKey(std::istream* pPublicKeyStream,
-		std::istream* pPrivateKeyStream = 0,
+		std::istream* pPrivateKeyStream = nullptr,
 		const std::string& privateKeyPassphrase = "");
 		/// Creates the RSAKey, by reading public and private key from the given streams and
 		/// using the given passphrase for the private key.
@@ -106,16 +105,16 @@ public:
 	RSAKey& operator = (RSAKey&& other) noexcept;
 		/// Move assignment.
 
-	RSAKeyImpl::ByteVec modulus() const;
+	[[nodiscard]] RSAKeyImpl::ByteVec modulus() const;
 		/// Returns the RSA modulus.
 
-	RSAKeyImpl::ByteVec encryptionExponent() const;
+	[[nodiscard]] RSAKeyImpl::ByteVec encryptionExponent() const;
 		/// Returns the RSA encryption exponent.
 
-	RSAKeyImpl::ByteVec decryptionExponent() const;
+	[[nodiscard]] RSAKeyImpl::ByteVec decryptionExponent() const;
 		/// Returns the RSA decryption exponent.
 
-	RSAKeyImpl::Ptr impl() const;
+	[[nodiscard]] RSAKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
 };
 
@@ -129,7 +128,7 @@ inline RSAKeyImpl::Ptr RSAKey::impl() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_RSAKey_INCLUDED

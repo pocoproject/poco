@@ -18,6 +18,7 @@
 #define Net_SocketDefs_INCLUDED
 
 
+#include "Poco/Config.h"
 #include <vector>
 
 
@@ -32,8 +33,9 @@
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 	#include <ws2def.h>
+	#include <mstcpip.h> // TCP_KEEPIDLE, TCP_KEEPINTVL, TCP_KEEPCNT
 	#if !defined (POCO_NET_NO_UNIX_SOCKET)
-		#if (__cplusplus >= 201703L)
+		#if POCO_HAVE_CPP17_COMPILER
 			#if __has_include(<afunix.h>)
 				#include <afunix.h>
 				#define POCO_HAS_UNIX_SOCKET
@@ -364,8 +366,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -376,7 +377,7 @@ namespace Net {
 
 typedef std::vector<SocketBuf> SocketBufVec;
 
-inline int SocketBufVecSize(const SocketBufVec& sbv)
+[[nodiscard]] inline int SocketBufVecSize(const SocketBufVec& sbv)
 	/// Returns total length of all SocketBufs in the vector.
 {
 	std::size_t sz = 0;
@@ -414,7 +415,7 @@ struct AddressFamily
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketDefs_INCLUDED

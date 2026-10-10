@@ -5,7 +5,7 @@
 // Package: Options
 // Module:  OptionProcessor
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -18,8 +18,10 @@
 #include "Poco/Util/OptionException.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
+
+
+OptionProcessor::~OptionProcessor() = default;
 
 
 OptionProcessor::OptionProcessor(const OptionSet& options):
@@ -27,17 +29,6 @@ OptionProcessor::OptionProcessor(const OptionSet& options):
 	_unixStyle(true),
 	_ignore(false)
 {
-}
-
-
-OptionProcessor::~OptionProcessor()
-{
-}
-
-
-void OptionProcessor::setUnixStyle(bool flag)
-{
-	_unixStyle = flag;
 }
 
 
@@ -156,4 +147,4 @@ bool OptionProcessor::processCommon(const std::string& optionStr, bool isShort, 
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

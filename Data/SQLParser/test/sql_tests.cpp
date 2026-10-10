@@ -9,10 +9,10 @@
 
 #include "sql_asserts.h"
 
-using namespace hsql;
+namespace hsql {
 
 TEST(DeleteStatementTest) {
-  SQLParserResult result;
+  auto result = SQLParserResult{};
   SQLParser::parse("DELETE FROM students WHERE grade > 2.0;", &result);
 
   ASSERT(result.isValid());
@@ -28,7 +28,7 @@ TEST(DeleteStatementTest) {
 }
 
 TEST(CreateStatementTest) {
-  SQLParserResult result;
+  auto result = SQLParserResult{};
   SQLParser::parse(
       "CREATE TABLE dummy_table ("
       "  c_bigint BIGINT, "
@@ -176,8 +176,70 @@ TEST(CreateStatementTest) {
   ASSERT_STREQ(stmt->tableConstraints->at(0)->columnNames->at(1), "c_int");
 }
 
+TEST(CreateStatementForeignKeyTest) {
+  auto result = SQLParserResult{};
+  SQLParser::parse(
+      "CREATE TABLE foo (a int, b int REFERENCES bar.baz (x)); "
+      "CREATE TABLE foo (a int, b int, FOREIGN KEY (a, b) REFERENCES bar.baz (x, y)); "
+      "CREATE TABLE foo (a int, b int, FOREIGN KEY (b) REFERENCES baz)",
+      &result);
+  ASSERT(result.isValid());
+  ASSERT_EQ(result.size(), 3);
+  ASSERT_EQ(result.getStatement(0)->type(), kStmtCreate);
+  const auto* stmt = (const CreateStatement*)result.getStatement(0);
+  // We focus on the correct parsing of the FKs here. The remaining functionality is tested in CreateStatementTest.
+  ASSERT_EQ(stmt->type, kCreateTable);
+  ASSERT_TRUE(stmt->tableConstraints->empty());
+  ASSERT_TRUE(stmt->columns);
+  ASSERT_EQ(stmt->columns->size(), 2);
+  ASSERT_TRUE(stmt->columns->at(1));
+  ASSERT_STREQ(stmt->columns->at(1)->name, "b");
+  ASSERT_TRUE(stmt->columns->at(1)->references);
+  ASSERT_EQ(stmt->columns->at(1)->references->size(), 1);
+  ASSERT_STREQ(stmt->columns->at(1)->references->at(0)->schema, "bar");
+  ASSERT_STREQ(stmt->columns->at(1)->references->at(0)->table, "baz");
+  ASSERT_TRUE(stmt->columns->at(1)->references->at(0)->columns);
+  ASSERT_EQ(stmt->columns->at(1)->references->at(0)->columns->size(), 1);
+  ASSERT_STREQ(stmt->columns->at(1)->references->at(0)->columns->at(0), "x");
+
+  ASSERT_EQ(result.getStatement(1)->type(), kStmtCreate);
+  stmt = (const CreateStatement*)result.getStatement(1);
+  ASSERT_EQ(stmt->type, kCreateTable);
+  ASSERT_TRUE(stmt->tableConstraints);
+  ASSERT_EQ(stmt->tableConstraints->size(), 1);
+  ASSERT_EQ(stmt->tableConstraints->at(0)->type, ConstraintType::ForeignKey);
+  const auto* foreign_key = (const ForeignKeyConstraint*)stmt->tableConstraints->at(0);
+  ASSERT_TRUE(foreign_key->columnNames);
+  ASSERT_EQ(foreign_key->columnNames->size(), 2);
+  ASSERT_STREQ(foreign_key->columnNames->at(0), "a");
+  ASSERT_STREQ(foreign_key->columnNames->at(1), "b");
+  ASSERT_TRUE(foreign_key->references);
+  ASSERT_STREQ(foreign_key->references->schema, "bar");
+  ASSERT_STREQ(foreign_key->references->table, "baz");
+  ASSERT_TRUE(foreign_key->references->columns);
+  ASSERT_EQ(foreign_key->references->columns->size(), 2);
+  ASSERT_STREQ(foreign_key->references->columns->at(0), "x");
+  ASSERT_STREQ(foreign_key->references->columns->at(1), "y");
+
+  ASSERT_EQ(result.getStatement(2)->type(), kStmtCreate);
+  stmt = (const CreateStatement*)result.getStatement(2);
+  ASSERT_EQ(stmt->type, kCreateTable);
+  ASSERT_TRUE(stmt->tableConstraints);
+  ASSERT_EQ(stmt->tableConstraints->size(), 1);
+  ASSERT_EQ(stmt->tableConstraints->at(0)->type, ConstraintType::ForeignKey);
+  foreign_key = (const ForeignKeyConstraint*)stmt->tableConstraints->at(0);
+  ASSERT_TRUE(foreign_key->columnNames);
+  printf("%zu\n", foreign_key->columnNames->size());
+  ASSERT_EQ(foreign_key->columnNames->size(), 1);
+  ASSERT_STREQ(foreign_key->columnNames->at(0), "b");
+  ASSERT_TRUE(foreign_key->references);
+  ASSERT_FALSE(foreign_key->references->schema);
+  ASSERT_STREQ(foreign_key->references->table, "baz");
+  ASSERT_FALSE(foreign_key->references->columns);
+}
+
 TEST(CreateAsSelectStatementTest) {
-  SQLParserResult result;
+  auto result = SQLParserResult{};
   SQLParser::parse("CREATE TABLE students_2 AS SELECT student_number, grade FROM students", &result);
 
   ASSERT(result.isValid());
@@ -196,7 +258,7 @@ TEST(CreateAsSelectStatementTest) {
 }
 
 TEST(UpdateStatementTest) {
-  SQLParserResult result;
+  auto result = SQLParserResult{};
   SQLParser::parse("UPDATE students SET grade = 5.0, name = 'test' WHERE name = 'Max O''Mustermann';", &result);
 
   ASSERT(result.isValid());
@@ -224,15 +286,49 @@ TEST(UpdateStatementTest) {
 }
 
 TEST(InsertStatementTest) {
-  TEST_PARSE_SINGLE_SQL("INSERT INTO students VALUES ('Max Mustermann', 12345, 'Musterhausen', 2.0)", kStmtInsert,
-                        InsertStatement, result, stmt);
+  TEST_PARSE_SINGLE_SQL(
+      "INSERT INTO students VALUES ('Max Mustermann', 12345, 'Musterhausen', 2.0, -1, 1 month, "
+      " CAST('2000-02-02' AS DATE), - INTERVAL '3 seconds', DATE '2000-02-02', FALSE, NULL)",
+      kStmtInsert, InsertStatement, result, stmt);
 
-  ASSERT_EQ(stmt->values->size(), 4);
-  // TODO
+  ASSERT_EQ(stmt->values->size(), 11);
+  ASSERT_EQ(stmt->values->at(0)->type, kExprLiteralString);
+  ASSERT_STREQ(stmt->values->at(0)->name, "Max Mustermann");
+  ASSERT_EQ(stmt->values->at(1)->type, kExprLiteralInt);
+  ASSERT_EQ(stmt->values->at(1)->ival, 12345);
+  ASSERT_EQ(stmt->values->at(2)->type, kExprLiteralString);
+  ASSERT_STREQ(stmt->values->at(2)->name, "Musterhausen");
+  ASSERT_EQ(stmt->values->at(3)->type, kExprLiteralFloat);
+  ASSERT_EQ(stmt->values->at(3)->fval, 2.0);
+  ASSERT_EQ(stmt->values->at(4)->type, kExprOperator);
+  ASSERT_EQ(stmt->values->at(4)->opType, kOpUnaryMinus);
+  ASSERT(stmt->values->at(4)->expr);
+  ASSERT_EQ(stmt->values->at(4)->expr->type, kExprLiteralInt);
+  ASSERT_EQ(stmt->values->at(4)->expr->ival, 1);
+  ASSERT_EQ(stmt->values->at(5)->type, kExprLiteralInterval);
+  ASSERT_EQ(stmt->values->at(5)->ival, 1);
+  ASSERT_EQ(stmt->values->at(5)->datetimeField, kDatetimeMonth);
+  ASSERT_EQ(stmt->values->at(6)->type, kExprCast);
+  ASSERT_EQ(stmt->values->at(6)->columnType, ColumnType{DataType::DATE});
+  ASSERT(stmt->values->at(6)->expr);
+  ASSERT_EQ(stmt->values->at(6)->expr->type, kExprLiteralString);
+  ASSERT_STREQ(stmt->values->at(6)->expr->name, "2000-02-02");
+  ASSERT_EQ(stmt->values->at(7)->type, kExprOperator);
+  ASSERT_EQ(stmt->values->at(7)->opType, kOpUnaryMinus);
+  ASSERT(stmt->values->at(7)->expr);
+  ASSERT_EQ(stmt->values->at(7)->expr->type, kExprLiteralInterval);
+  ASSERT_EQ(stmt->values->at(7)->expr->ival, 3);
+  ASSERT_EQ(stmt->values->at(7)->expr->datetimeField, kDatetimeSecond);
+  ASSERT_EQ(stmt->values->at(8)->type, kExprLiteralDate);
+  ASSERT_STREQ(stmt->values->at(8)->name, "2000-02-02");
+  ASSERT_EQ(stmt->values->at(9)->type, kExprLiteralInt);
+  ASSERT_EQ(stmt->values->at(9)->ival, 0);
+  ASSERT_TRUE(stmt->values->at(9)->isBoolLiteral);
+  ASSERT_EQ(stmt->values->at(10)->type, kExprLiteralNull);
 }
 
 TEST(AlterStatementDropActionTest) {
-  SQLParserResult result;
+  auto result = SQLParserResult{};
   SQLParser::parse("ALTER TABLE mytable DROP COLUMN IF EXISTS mycolumn", &result);
 
   ASSERT(result.isValid());
@@ -244,12 +340,12 @@ TEST(AlterStatementDropActionTest) {
 
   auto dropAction = (const DropColumnAction*)stmt->action;
 
-  ASSERT_EQ(dropAction->type, hsql::ActionType::DropColumn);
+  ASSERT_EQ(dropAction->type, ActionType::DropColumn);
   ASSERT_STREQ(dropAction->columnName, "mycolumn");
 }
 
 TEST(CreateIndexStatementTest) {
-  SQLParserResult result;
+  auto result = SQLParserResult{};
   SQLParser::parse("CREATE INDEX myindex ON myTable (col1);", &result);
 
   ASSERT(result.isValid());
@@ -264,7 +360,7 @@ TEST(CreateIndexStatementTest) {
 }
 
 TEST(CreateIndexStatementIfNotExistsTest) {
-  SQLParserResult result;
+  auto result = SQLParserResult{};
   SQLParser::parse("CREATE INDEX IF NOT EXISTS myindex ON myTable (col1, col2);", &result);
 
   ASSERT(result.isValid());
@@ -279,7 +375,7 @@ TEST(CreateIndexStatementIfNotExistsTest) {
 }
 
 TEST(DropIndexTest) {
-  SQLParserResult result;
+  auto result = SQLParserResult{};
   SQLParser::parse("DROP INDEX myindex", &result);
 
   ASSERT(result.isValid());
@@ -291,7 +387,7 @@ TEST(DropIndexTest) {
 }
 
 TEST(DropIndexIfExistsTest) {
-  SQLParserResult result;
+  auto result = SQLParserResult{};
   SQLParser::parse("DROP INDEX IF EXISTS myindex", &result);
 
   ASSERT(result.isValid());
@@ -366,18 +462,27 @@ TEST(ImportStatementTest) {
   ASSERT_NOTNULL(stmt->tableName);
   ASSERT_STREQ(stmt->tableName, "students");
   ASSERT_STREQ(stmt->filePath, "students_file");
+  ASSERT_NULL(stmt->encoding);
 }
 
 TEST(CopyStatementTest) {
-  TEST_PARSE_SINGLE_SQL("COPY students FROM 'students_file' WITH FORMAT BINARY;", kStmtImport, ImportStatement,
-                        import_result, import_stmt);
+  TEST_PARSE_SINGLE_SQL("COPY students FROM 'students_file' WITH (FORMAT CSV, DELIMITER '|', NULL '', QUOTE '\"');",
+                        kStmtImport, ImportStatement, import_result, import_stmt);
 
-  ASSERT_EQ(import_stmt->type, kImportBinary);
+  ASSERT_EQ(import_stmt->type, kImportCSV);
   ASSERT_NOTNULL(import_stmt->tableName);
   ASSERT_STREQ(import_stmt->tableName, "students");
   ASSERT_NOTNULL(import_stmt->filePath);
   ASSERT_STREQ(import_stmt->filePath, "students_file");
   ASSERT_NULL(import_stmt->whereClause);
+  ASSERT_NULL(import_stmt->encoding);
+  ASSERT_NOTNULL(import_stmt->csv_options);
+  ASSERT_NOTNULL(import_stmt->csv_options->delimiter);
+  ASSERT_STREQ(import_stmt->csv_options->delimiter, "|");
+  ASSERT_NOTNULL(import_stmt->csv_options->null);
+  ASSERT_STREQ(import_stmt->csv_options->null, "");
+  ASSERT_NOTNULL(import_stmt->csv_options->quote);
+  ASSERT_STREQ(import_stmt->csv_options->quote, "\"");
 
   TEST_PARSE_SINGLE_SQL("COPY students FROM 'students_file' WHERE lastname = 'Potter';", kStmtImport, ImportStatement,
                         import_filter_result, import_filter_stmt);
@@ -393,24 +498,31 @@ TEST(CopyStatementTest) {
   ASSERT_STREQ(import_filter_stmt->whereClause->expr->name, "lastname");
   ASSERT_EQ(import_filter_stmt->whereClause->expr2->type, kExprLiteralString);
   ASSERT_STREQ(import_filter_stmt->whereClause->expr2->name, "Potter");
+  ASSERT_NULL(import_filter_stmt->encoding);
+  ASSERT_NULL(import_filter_stmt->csv_options);
 
-  TEST_PARSE_SINGLE_SQL("COPY students TO 'students_file' WITH FORMAT CSV;", kStmtExport, ExportStatement,
-                        export_table_result, export_table_stmt);
+  TEST_PARSE_SINGLE_SQL("COPY students TO 'students_file' WITH (ENCODING 'FSST', FORMAT BINARY);", kStmtExport,
+                        ExportStatement, export_table_result, export_table_stmt);
 
-  ASSERT_EQ(export_table_stmt->type, kImportCSV);
+  ASSERT_EQ(export_table_stmt->type, kImportBinary);
   ASSERT_NOTNULL(export_table_stmt->tableName);
   ASSERT_STREQ(export_table_stmt->tableName, "students");
   ASSERT_NOTNULL(export_table_stmt->filePath);
   ASSERT_STREQ(export_table_stmt->filePath, "students_file");
   ASSERT_NULL(export_table_stmt->select);
+  ASSERT_STREQ(export_table_stmt->encoding, "FSST");
+  ASSERT_NULL(export_table_stmt->csv_options);
 
-  TEST_PARSE_SINGLE_SQL("COPY (SELECT firstname, lastname FROM students) TO 'students_file';", kStmtExport,
-                        ExportStatement, export_select_result, export_select_stmt);
+  TEST_PARSE_SINGLE_SQL(
+      "COPY (SELECT firstname, lastname FROM students) TO 'students_file' WITH (ENCODING 'Dictionary');", kStmtExport,
+      ExportStatement, export_select_result, export_select_stmt);
 
   ASSERT_EQ(export_select_stmt->type, kImportAuto);
   ASSERT_NULL(export_select_stmt->tableName);
   ASSERT_NOTNULL(export_select_stmt->filePath);
   ASSERT_STREQ(export_select_stmt->filePath, "students_file");
+  ASSERT_STREQ(export_select_stmt->encoding, "Dictionary");
+  ASSERT_NULL(export_select_stmt->csv_options);
 
   ASSERT_NOTNULL(export_select_stmt->select);
   const auto& select_stmt = export_select_stmt->select;
@@ -426,8 +538,8 @@ TEST(CopyStatementTest) {
 }
 
 SQLParserResult parse_and_move(std::string query) {
-  hsql::SQLParserResult result;
-  hsql::SQLParser::parse(query, &result);
+  auto result = SQLParserResult{};
+  SQLParser::parse(query, &result);
   // Moves on return.
   return result;
 }
@@ -438,12 +550,12 @@ SQLParserResult move_in_and_back(SQLParserResult res) {
 }
 
 TEST(MoveSQLResultTest) {
-  SQLParserResult res = parse_and_move("SELECT * FROM test;");
+  auto res = parse_and_move("SELECT * FROM test;");
   ASSERT(res.isValid());
   ASSERT_EQ(1, res.size());
 
   // Moved around.
-  SQLParserResult new_res = move_in_and_back(std::move(res));
+  auto new_res = move_in_and_back(std::move(res));
 
   // Original object should be invalid.
   ASSERT_FALSE(res.isValid());
@@ -634,7 +746,7 @@ TEST(NestedSetOperationsWithMultipleWithClauses) {
 }
 
 TEST(WrongOrderByStatementTest) {
-  SQLParserResult res = parse_and_move("SELECT * FROM students ORDER BY name INTERSECT SELECT grade FROM students_2;");
+  auto res = parse_and_move("SELECT * FROM students ORDER BY name INTERSECT SELECT grade FROM students_2;");
   ASSERT_FALSE(res.isValid());
 }
 
@@ -675,5 +787,36 @@ TEST(CastAsType) {
   ASSERT_EQ(stmt->selectList->front()->columnType.data_type, DataType::VARCHAR);
   ASSERT_EQ(stmt->selectList->front()->columnType.length, 8);
 }
+
+TEST(OdbcCallEscapeTest) {
+  // ODBC procedure call escape. The optional "? =" is the driver's return value
+  // marker and carries nothing the statement needs, so both forms produce the
+  // same ExecuteStatement an EXECUTE would.
+  TEST_PARSE_SQL_QUERY(
+      "{? = call some_proc(?, 'a', 1)};"
+      "{call some_proc(?)};"
+      "{ ? = call [mydb].[dbo].[some_proc]('a') };",
+      result, 3);
+
+  ASSERT_EQ(result.getStatement(0)->type(), kStmtExecute);
+  auto stmt = (ExecuteStatement*)result.getStatement(0);
+  ASSERT_STREQ(stmt->name, "some_proc");
+  ASSERT_NOTNULL(stmt->parameters);
+  ASSERT_EQ(stmt->parameters->size(), 3);
+
+  ASSERT_EQ(result.getStatement(1)->type(), kStmtExecute);
+  ASSERT_STREQ(((ExecuteStatement*)result.getStatement(1))->name, "some_proc");
+
+  // A qualified procedure name is kept whole.
+  ASSERT_EQ(result.getStatement(2)->type(), kStmtExecute);
+  ASSERT_STREQ(((ExecuteStatement*)result.getStatement(2))->name, "mydb.dbo.some_proc");
+
+  // Plain EXECUTE is unchanged.
+  TEST_PARSE_SQL_QUERY("EXECUTE some_proc(1, 2);", execResult, 1);
+  ASSERT_EQ(execResult.getStatement(0)->type(), kStmtExecute);
+  ASSERT_STREQ(((ExecuteStatement*)execResult.getStatement(0))->name, "some_proc");
+}
+
+}  // namespace hsql
 
 TEST_MAIN();

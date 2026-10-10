@@ -29,8 +29,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <class T>
@@ -49,34 +48,34 @@ public:
 			throw BindingException("Zero size containers not allowed.");
 	}
 
-	~BulkBinding()
+	~BulkBinding() override
 		/// Destroys the BulkBinding.
 	{
 	}
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return 1;
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _val.size();
 	}
 
-	bool canBind() const
+	[[nodiscard]] bool canBind() const override
 	{
 		return !_bound;
 	}
 
-	void bind(std::size_t pos)
+	void bind(std::size_t pos) override
 	{
 		poco_assert_dbg(!getBinder().isNull());
 		TypeHandler<T>::bind(pos, _val, getBinder(), getDirection());
 		_bound = true;
 	}
 
-	void reset ()
+	void reset() override
 	{
 		_bound = false;
 		getBinder()->reset();
@@ -92,7 +91,7 @@ namespace Keywords {
 
 
 template <typename T>
-AbstractBinding::Ptr use(const std::vector<T>& t, BulkFnType, const std::string& name = "")
+[[nodiscard]] AbstractBinding::Ptr use(const std::vector<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
 	return new BulkBinding<std::vector<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -100,7 +99,7 @@ AbstractBinding::Ptr use(const std::vector<T>& t, BulkFnType, const std::string&
 
 
 template <typename T>
-AbstractBinding::Ptr in(const std::vector<T>& t, BulkFnType, const std::string& name = "")
+[[nodiscard]] AbstractBinding::Ptr in(const std::vector<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
 	return new BulkBinding<std::vector<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -108,7 +107,7 @@ AbstractBinding::Ptr in(const std::vector<T>& t, BulkFnType, const std::string& 
 
 
 template <typename T>
-AbstractBinding::Ptr use(const std::deque<T>& t, BulkFnType, const std::string& name = "")
+[[nodiscard]] AbstractBinding::Ptr use(const std::deque<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::deque.
 {
 	return new BulkBinding<std::deque<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -116,7 +115,7 @@ AbstractBinding::Ptr use(const std::deque<T>& t, BulkFnType, const std::string& 
 
 
 template <typename T>
-AbstractBinding::Ptr in(const std::deque<T>& t, BulkFnType, const std::string& name = "")
+[[nodiscard]] AbstractBinding::Ptr in(const std::deque<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::deque.
 {
 	return new BulkBinding<std::deque<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -124,7 +123,7 @@ AbstractBinding::Ptr in(const std::deque<T>& t, BulkFnType, const std::string& n
 
 
 template <typename T>
-AbstractBinding::Ptr use(const std::list<T>& t, BulkFnType, const std::string& name = "")
+[[nodiscard]] AbstractBinding::Ptr use(const std::list<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::list.
 {
 	return new BulkBinding<std::list<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -132,7 +131,7 @@ AbstractBinding::Ptr use(const std::list<T>& t, BulkFnType, const std::string& n
 
 
 template <typename T>
-AbstractBinding::Ptr in(const std::list<T>& t, BulkFnType, const std::string& name = "")
+[[nodiscard]] AbstractBinding::Ptr in(const std::list<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::list.
 {
 	return new BulkBinding<std::list<T>>(t, static_cast<Poco::UInt32>(t.size()), name);
@@ -142,7 +141,7 @@ AbstractBinding::Ptr in(const std::list<T>& t, BulkFnType, const std::string& na
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_BulkBinding_INCLUDED

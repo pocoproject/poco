@@ -10,13 +10,17 @@
 
 #include "EVPTest.h"
 #include "PKCS12ContainerTest.h"
+#include "ErrorQueueCleaner.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/ECKey.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/PKCS12Container.h"
+#include "Poco/Crypto/CryptoException.h"
 #include "Poco/TemporaryFile.h"
+#include "Poco/File.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/MemoryStream.h"
@@ -28,6 +32,38 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include <openssl/err.h>
+#include <openssl/bio.h>
+#include <openssl/pkcs12.h>
+
+
+namespace {
+
+// Helper to construct EVPPKey from RSAKey or ECKey.
+// On OpenSSL 3.0+, uses getEVPPKey() to avoid deprecated template constructor.
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+inline Poco::Crypto::EVPPKey evpPKeyFromKey(const Poco::Crypto::RSAKey& key)
+{
+	return Poco::Crypto::EVPPKey(key.impl()->getEVPPKey());
+}
+
+inline Poco::Crypto::EVPPKey evpPKeyFromKey(const Poco::Crypto::ECKey& key)
+{
+	return Poco::Crypto::EVPPKey(key.impl()->getEVPPKey());
+}
+#else
+inline Poco::Crypto::EVPPKey evpPKeyFromKey(Poco::Crypto::RSAKey& key)
+{
+	return Poco::Crypto::EVPPKey(&key);
+}
+
+inline Poco::Crypto::EVPPKey evpPKeyFromKey(Poco::Crypto::ECKey& key)
+{
+	return Poco::Crypto::EVPPKey(&key);
+}
+#endif
+
+} // namespace
 
 
 using namespace Poco::Crypto;
@@ -87,6 +123,46 @@ static const std::string anyPemRSA(
 );
 
 
+static const std::string ecKeyPem(
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg5CvDo2repnprlgOd\n"
+	"IgfpJvJxhOtTN52gxVgGjMWb4EahRANCAARjbG62l9X71ypzvbNCmzZnEuQyh2E4\n"
+	"YeRrBplNWmqG8iwnnZj1t8HodYfV4aOj0ujWBVlxzhTF9X9A5e3hYWyJ\n"
+	"-----END PRIVATE KEY-----\n"
+);
+
+
+static const std::string ecCertPem(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBhjCCASugAwIBAgIUJpL1rpVCYk3IpNxp0F3zbMadYGYwCgYIKoZIzj0EAwIw\n"
+	"FzEVMBMGA1UEAwwMcG9jby1lYy10ZXN0MCAXDTI2MDkyMTExMzcxNVoYDzIxMjYw\n"
+	"ODI4MTEzNzE1WjAXMRUwEwYDVQQDDAxwb2NvLWVjLXRlc3QwWTATBgcqhkjOPQIB\n"
+	"BggqhkjOPQMBBwNCAARjbG62l9X71ypzvbNCmzZnEuQyh2E4YeRrBplNWmqG8iwn\n"
+	"nZj1t8HodYfV4aOj0ujWBVlxzhTF9X9A5e3hYWyJo1MwUTAdBgNVHQ4EFgQUpiUG\n"
+	"fVoHGsCTyrTKF7ITNAx1c70wHwYDVR0jBBgwFoAUpiUGfVoHGsCTyrTKF7ITNAx1\n"
+	"c70wDwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNJADBGAiEAwm3XNpSxHnIq\n"
+	"FApUJd61qx0b1waJGBT42tmG46dKJaECIQCTVtHffgGO1kbFiZOKVRAWi0iqc4AJ\n"
+	"3bbrr05RmDfyBg==\n"
+	"-----END CERTIFICATE-----\n"
+);
+
+
+// ecCertPem with the SubjectPublicKeyInfo algorithm OID changed to the unassigned 1.2.840.10045.2.99.
+static const std::string ecCertUnknownAlgPem(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBhjCCASugAwIBAgIUJpL1rpVCYk3IpNxp0F3zbMadYGYwCgYIKoZIzj0EAwIw\n"
+	"FzEVMBMGA1UEAwwMcG9jby1lYy10ZXN0MCAXDTI2MDkyMTExMzcxNVoYDzIxMjYw\n"
+	"ODI4MTEzNzE1WjAXMRUwEwYDVQQDDAxwb2NvLWVjLXRlc3QwWTATBgcqhkjOPQJj\n"
+	"BggqhkjOPQMBBwNCAARjbG62l9X71ypzvbNCmzZnEuQyh2E4YeRrBplNWmqG8iwn\n"
+	"nZj1t8HodYfV4aOj0ujWBVlxzhTF9X9A5e3hYWyJo1MwUTAdBgNVHQ4EFgQUpiUG\n"
+	"fVoHGsCTyrTKF7ITNAx1c70wHwYDVR0jBBgwFoAUpiUGfVoHGsCTyrTKF7ITNAx1\n"
+	"c70wDwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNJADBGAiEAwm3XNpSxHnIq\n"
+	"FApUJd61qx0b1waJGBT42tmG46dKJaECIQCTVtHffgGO1kbFiZOKVRAWi0iqc4AJ\n"
+	"3bbrr05RmDfyBg==\n"
+	"-----END CERTIFICATE-----\n"
+);
+
+
 EVPTest::EVPTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -103,8 +179,8 @@ void EVPTest::testRSAEVPPKey()
 	{
 		std::unique_ptr<RSAKey> key(new RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL));
 		assertTrue(key->type() == Poco::Crypto::KeyPair::KT_RSA);
-		// construct EVPPKey from RSAKey*
-		EVPPKey* pKey = new EVPPKey(key.get());
+		// construct EVPPKey from RSAKey
+		EVPPKey* pKey = new EVPPKey(evpPKeyFromKey(*key));
 		// EVPPKey increments reference count, so freeing the original must be ok
 		key.reset();
 
@@ -117,13 +193,13 @@ void EVPTest::testRSAEVPPKey()
 		key.reset(new RSAKey(*pKey));
 		delete pKey;
 		assertTrue(key->type() == Poco::Crypto::KeyPair::KT_RSA);
-		// construct EVPPKey from RSAKey*
-		pKey = new EVPPKey(key.get());
+		// construct EVPPKey from RSAKey
+		pKey = new EVPPKey(evpPKeyFromKey(*key));
 		assertTrue (pKey->type() == EVP_PKEY_RSA);
 
 		BIO* bioPriv1 = BIO_new(BIO_s_mem());
 		BIO* bioPub1 = BIO_new(BIO_s_mem());
-		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, NULL, NULL, 0, 0, NULL));
+		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, nullptr, nullptr, 0, nullptr, nullptr));
 		assertTrue (0 != PEM_write_bio_PUBKEY(bioPub1, *pKey));
 		char* pPrivData1;
 		long sizePriv1 = BIO_get_mem_data(bioPriv1, &pPrivData1);
@@ -138,7 +214,7 @@ void EVPTest::testRSAEVPPKey()
 
 		BIO* bioPriv2 = BIO_new(BIO_s_mem());
 		BIO* bioPub2 = BIO_new(BIO_s_mem());
-		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, NULL, NULL, 0, 0, NULL));
+		assertTrue ( 0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, nullptr, nullptr, 0, nullptr, nullptr));
 		assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey));
 		char* pPrivData2;
 		long sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
@@ -158,7 +234,7 @@ void EVPTest::testRSAEVPPKey()
 		assertTrue (evpPKey2.type() == EVP_PKEY_RSA);
 		bioPriv2 = BIO_new(BIO_s_mem());
 		bioPub2 = BIO_new(BIO_s_mem());
-		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
+		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, nullptr, nullptr, 0, nullptr, nullptr));
 		assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey2));
 		sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 		sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
@@ -176,7 +252,7 @@ void EVPTest::testRSAEVPPKey()
 		assertTrue (evpPKey3.type() == EVP_PKEY_RSA);
 		bioPriv2 = BIO_new(BIO_s_mem());
 		bioPub2 = BIO_new(BIO_s_mem());
-		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
+		assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, nullptr, nullptr, 0, nullptr, nullptr));
 		assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey3));
 		sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 		sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
@@ -202,7 +278,7 @@ void EVPTest::testRSAEVPPKey()
 void EVPTest::testRSAEVPSaveLoadStream()
 {
 	RSAKey rsaKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
-	EVPPKey key(&rsaKey);
+	EVPPKey key(evpPKeyFromKey(rsaKey));
 	std::ostringstream strPub;
 	std::ostringstream strPriv;
 	key.save(&strPub, &strPriv, "testpwd");
@@ -217,7 +293,7 @@ void EVPTest::testRSAEVPSaveLoadStream()
 	assertTrue (key == key2);
 	assertTrue (!(key != key2));
 	RSAKey rsaKeyNE(RSAKey::KL_1024, RSAKey::EXP_LARGE);
-	EVPPKey keyNE(&rsaKeyNE);
+	EVPPKey keyNE(evpPKeyFromKey(rsaKeyNE));
 	assertTrue (key != keyNE);
 	assertTrue (!(key == keyNE));
 	assertTrue (key2 != keyNE);;
@@ -229,7 +305,7 @@ void EVPTest::testRSAEVPSaveLoadStream()
 	assertTrue (strPub2.str() == pubKey);
 
 	std::istringstream iPriv2(strPriv2.str());
-	EVPPKey key3(0, &iPriv2,  "testpwd");
+	EVPPKey key3(nullptr, &iPriv2, "testpwd");
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	assertTrue (strPub3.str() == pubKey);
@@ -239,7 +315,7 @@ void EVPTest::testRSAEVPSaveLoadStream()
 void EVPTest::testRSAEVPSaveLoadStreamNoPass()
 {
 	RSAKey rsaKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
-	EVPPKey key(&rsaKey);
+	EVPPKey key(evpPKeyFromKey(rsaKey));
 	std::ostringstream strPub;
 	std::ostringstream strPriv;
 	key.save(&strPub, &strPriv);
@@ -254,14 +330,14 @@ void EVPTest::testRSAEVPSaveLoadStreamNoPass()
 	assertTrue (key == key2);
 	assertTrue (!(key != key2));
 	RSAKey rsaKeyNE(RSAKey::KL_1024, RSAKey::EXP_LARGE);
-	EVPPKey keyNE(&rsaKeyNE);
+	EVPPKey keyNE(evpPKeyFromKey(rsaKeyNE));
 	assertTrue (key != keyNE);
 	assertTrue (!(key == keyNE));
 	assertTrue (key2 != keyNE);;
 	assertTrue (!(key2 == keyNE));
 
 	std::istringstream iPriv2(privKey);
-	EVPPKey key3(0, &iPriv2);
+	EVPPKey key3(nullptr, &iPriv2);
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
@@ -277,7 +353,7 @@ void EVPTest::testECEVPPKey()
 		if (!curveName.empty())
 		{
 			EVPPKey* pKey = new EVPPKey(curveName);
-			assertTrue (pKey != 0);
+			assertTrue(pKey != nullptr);
 			assertTrue (!pKey->isSupported(0));
 			assertTrue (!pKey->isSupported(-1));
 			assertTrue (pKey->isSupported(pKey->type()));
@@ -285,7 +361,7 @@ void EVPTest::testECEVPPKey()
 
 			BIO* bioPriv1 = BIO_new(BIO_s_mem());
 			BIO* bioPub1 = BIO_new(BIO_s_mem());
-			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, NULL, NULL, 0, 0, NULL));
+			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv1, *pKey, nullptr, nullptr, 0, nullptr, nullptr));
 			assertTrue (0 != PEM_write_bio_PUBKEY(bioPub1, *pKey));
 			char* pPrivData1;
 			long sizePriv1 = BIO_get_mem_data(bioPriv1, &pPrivData1);
@@ -300,7 +376,7 @@ void EVPTest::testECEVPPKey()
 
 			BIO* bioPriv2 = BIO_new(BIO_s_mem());
 			BIO* bioPub2 = BIO_new(BIO_s_mem());
-			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, NULL, NULL, 0, 0, NULL));
+			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey, nullptr, nullptr, 0, nullptr, nullptr));
 			assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey));
 			char* pPrivData2;
 			long sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
@@ -320,7 +396,7 @@ void EVPTest::testECEVPPKey()
 			assertTrue (evpPKey2.type() == EVP_PKEY_EC);
 			bioPriv2 = BIO_new(BIO_s_mem());
 			bioPub2 = BIO_new(BIO_s_mem());
-			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey2, NULL, NULL, 0, 0, NULL));
+			assertTrue (0 != PEM_write_bio_PrivateKey( bioPriv2, evpPKey2, nullptr, nullptr, 0, nullptr, nullptr));
 			assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey2));
 			sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 			sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
@@ -338,7 +414,7 @@ void EVPTest::testECEVPPKey()
 			assertTrue (evpPKey3.type() == EVP_PKEY_EC);
 			bioPriv2 = BIO_new(BIO_s_mem());
 			bioPub2 = BIO_new(BIO_s_mem());
-			assertTrue (0 != PEM_write_bio_PrivateKey(bioPriv2, evpPKey3, NULL, NULL, 0, 0, NULL));
+			assertTrue(0 != PEM_write_bio_PrivateKey( bioPriv2, evpPKey3, nullptr, nullptr, 0, nullptr, nullptr));
 			assertTrue (0 != PEM_write_bio_PUBKEY(bioPub2, evpPKey3));
 			sizePriv2 = BIO_get_mem_data(bioPriv2, &pPrivData2);
 			sizePub2 = BIO_get_mem_data(bioPub2, &pPubData2);
@@ -390,7 +466,7 @@ void EVPTest::testECEVPSaveLoadStream()
 			assertTrue (key == key2);
 			assertTrue (!(key != key2));
 			ECKey ecKeyNE(curveName);
-			EVPPKey keyNE(&ecKeyNE);
+			EVPPKey keyNE(evpPKeyFromKey(ecKeyNE));
 			assertTrue (key != keyNE);
 			assertTrue (!(key == keyNE));
 			assertTrue (key2 != keyNE);
@@ -402,7 +478,7 @@ void EVPTest::testECEVPSaveLoadStream()
 			assertTrue (strPub2.str() == pubKey);
 
 			std::istringstream iPriv2(strPriv2.str());
-			EVPPKey key3(0, &iPriv2,  "testpwd");
+			EVPPKey key3(nullptr, &iPriv2, "testpwd");
 			std::ostringstream strPub3;
 			key3.save(&strPub3);
 			std::string pubFromPrivate = strPub3.str();
@@ -445,7 +521,7 @@ void EVPTest::testECEVPSaveLoadStreamNoPass()
 			assertTrue (key == key2);
 			assertTrue (!(key != key2));
 			ECKey ecKeyNE(curveName);
-			EVPPKey keyNE(&ecKeyNE);
+			EVPPKey keyNE(evpPKeyFromKey(ecKeyNE));
 			assertTrue (key != keyNE);
 			assertTrue (!(key == keyNE));
 			assertTrue (key2 != keyNE);
@@ -458,7 +534,7 @@ void EVPTest::testECEVPSaveLoadStreamNoPass()
 			assertTrue (strPriv2.str() == privKey);
 
 			std::istringstream iPriv2(privKey);
-			EVPPKey key3(0, &iPriv2);
+			EVPPKey key3(nullptr, &iPriv2);
 			std::ostringstream strPub3;
 			key3.save(&strPub3);
 			std::string pubFromPrivate = strPub3.str();
@@ -502,7 +578,7 @@ void EVPTest::testECEVPSaveLoadFile()
 			assertTrue (key == key2);
 			assertTrue (!(key != key2));
 			ECKey ecKeyNE(curveName);
-			EVPPKey keyNE(&ecKeyNE);
+			EVPPKey keyNE(evpPKeyFromKey(ecKeyNE));
 			assertTrue (key != keyNE);
 			assertTrue (!(key == keyNE));
 			assertTrue (key2 != keyNE);
@@ -571,13 +647,60 @@ void EVPTest::testECEVPSaveLoadFileNoPass()
 }
 
 
+void EVPTest::testECEVPLoadKeyWrongPassword()
+{
+	// Test for issue #4627: Loading a password-protected key with empty password
+	// should throw an exception, not prompt stdin.
+	try
+	{
+		std::string curveName = ECKey::getCurveName();
+		if (!curveName.empty())
+		{
+			EVPPKey key(curveName);
+			TemporaryFile filePub;
+			TemporaryFile filePriv;
+			key.save(filePub.path(), filePriv.path(), "testpwd");
+
+			// Try to load with empty password - should throw, not prompt stdin
+			try
+			{
+				EVPPKey keyBadPass("", filePriv.path(), "");
+				fail("Loading password-protected key with empty password should throw");
+			}
+			catch (const Poco::Exception&)
+			{
+				// Expected - key requires password but none provided
+			}
+
+			// Try to load with wrong password - should also throw
+			try
+			{
+				EVPPKey keyBadPass("", filePriv.path(), "wrongpwd");
+				fail("Loading password-protected key with wrong password should throw");
+			}
+			catch (const Poco::Exception&)
+			{
+				// Expected - wrong password
+			}
+		}
+		else
+			std::cerr << "No elliptic curves found!" << std::endl;
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
+}
+
+
 void EVPTest::testRSAEVPKeyFromX509()
 {
 	std::istringstream str(anyPemRSA);
 	X509Certificate cert(str);
 	EVPPKey publicKey(cert);
 	std::istringstream str2(anyPemRSA);
-	EVPPKey privateKey(0, &str2, "test");
+	EVPPKey privateKey(nullptr, &str2, "test");
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(publicKey);
 	Cipher::Ptr pCipher2 = CipherFactory::defaultFactory().createCipher(privateKey);
 	std::string val("lets do some encryption");
@@ -602,8 +725,6 @@ void EVPTest::testRSAEVPKeyFromPKCS12()
 	assertTrue (dec == val);
 }
 
-
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
 
 void EVPTest::testRSAEVPKeyByLength()
 {
@@ -631,7 +752,7 @@ void EVPTest::testRSAEVPKeyByLength()
 		assertTrue (!(key2 == keyNE));
 
 		std::istringstream iPriv2(privKey);
-		EVPPKey key3(0, &iPriv2);
+		EVPPKey key3(nullptr, &iPriv2);
 		std::ostringstream strPub3;
 		key3.save(&strPub3);
 		std::string pubFromPrivate = strPub3.str();
@@ -644,7 +765,7 @@ void EVPTest::testRSAEVPKeyByLength()
 	}
 }
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 void EVPTest::testECEVPKeyByLength()
 {
@@ -672,7 +793,7 @@ void EVPTest::testECEVPKeyByLength()
 		assertTrue (!(key2 == keyNE));
 
 		std::istringstream iPriv2(privKey);
-		EVPPKey key3(0, &iPriv2);
+		EVPPKey key3(nullptr, &iPriv2);
 		std::ostringstream strPub3;
 		key3.save(&strPub3);
 		std::string pubFromPrivate = strPub3.str();
@@ -689,10 +810,10 @@ void EVPTest::testEVPKeyByModulus()
 {
 	std::string e = "AQAB";
 	std::string n = "ylJgMkU_bDwCLzMlo47igdZ-AC8oUbtGJUOUHnuJdjflpim7FOxw0zXYf9m0tzND0Bt1y7MPyVtf-3rwInvdgi65CZEJ3kt5PE0g6trPbvyW6hJcVeOsQvSErj33mY6RsjndLhNE-RY36G8o603au64lTOYSb9HjzzRFo4F_faEgQ02jpEYkLIWwf7PboExDbd6NGMV0uume8YA6eB3z5BwfMMHyRZA0FcIzj6F0V-hDqBaJkWegpJsukgpfO7JDKaU5rlor7j6CdbfLaWorYTCUH3F-bXZ1ojBe0wHRGEgEZBNa46A3clgNohQuuNzf4K12NFGnEl_TIFRcLm6M0Q";
-        try
+	try
 	{
 		unsigned long exponent = 0;
-		if ((e == "AQAB") || (e == "AAEAAQ")) 
+		if ((e == "AQAB") || (e == "AAEAAQ"))
 		{
 			exponent = RSA_F4; //Poco::Crypto::RSAKey::Exponent::EXP_LARGE
 		}
@@ -715,11 +836,191 @@ void EVPTest::testEVPKeyByModulus()
 	{
 		std::cerr << ex.displayText() << std::endl;
 		throw;
-	}	
+	}
 }
 
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
+
+void EVPTest::testCompareDifferentKeyTypes()
+{
+	ErrorQueueCleaner cleaner;
+
+	EVPPKey rsa(EVP_PKEY_RSA, 2048);
+	EVPPKey ec(EVP_PKEY_EC, NID_X9_62_prime256v1);
+
+	ERR_clear_error();
+	assertTrue (!(rsa == ec));
+	assertTrue (rsa != ec);
+	assertTrue (ERR_peek_error() == 0);
+
+	// An error queued before the comparison belongs to the caller and must survive it.
+	const unsigned char junk[] = { 0xFF };
+	const unsigned char* p = junk;
+	assertTrue (d2i_X509(nullptr, &p, 1) == nullptr);
+	const unsigned long pending = ERR_peek_last_error();
+	assertTrue (pending != 0);
+	assertTrue (!(rsa == ec));
+	assertTrue (ERR_peek_last_error() == pending);
+}
+
+
+void EVPTest::testKeyFromCertificateUnknownAlgorithm()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream str(ecCertUnknownAlgPem);
+	X509Certificate cert(str);
+
+	ERR_clear_error();
+	try
+	{
+		EVPPKey key(cert);
+		fail("EVPPKey from a certificate with an unknown key algorithm must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		RSAKey key(cert);
+		fail("RSAKey from a certificate with an unknown key algorithm must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		ECKey key(cert);
+		fail("ECKey from a certificate with an unknown key algorithm must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testSaveCannotCreateFile()
+{
+	ErrorQueueCleaner cleaner;
+
+	EVPPKey key(EVP_PKEY_EC, NID_X9_62_prime256v1);
+	TemporaryFile tmp;
+	const std::string path = tmp.path() + "/key.pem";
+
+	ERR_clear_error();
+	try
+	{
+		key.save(path);
+		fail("Saving the public key into a non-existent directory must throw");
+	}
+	catch (const Poco::CreateFileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		key.save("", path);
+		fail("Saving the private key into a non-existent directory must throw");
+	}
+	catch (const Poco::CreateFileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testSaveFlushFailure()
+{
+	// /dev/full accepts the write and fails the flush; it exists on Linux only.
+	if (!Poco::File("/dev/full").exists()) return;
+
+	ErrorQueueCleaner cleaner;
+
+	EVPPKey key(EVP_PKEY_EC, NID_X9_62_prime256v1);
+
+	ERR_clear_error();
+	try
+	{
+		key.save("/dev/full");
+		fail("Saving the public key to a full device must throw");
+	}
+	catch (const Poco::FileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		key.save("", "/dev/full");
+		fail("Saving the private key to a full device must throw");
+	}
+	catch (const Poco::FileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testECKeyFromCertificate()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream str(ecCertPem);
+	X509Certificate cert(str);
+
+	ERR_clear_error();
+	ECKey key(cert);
+	assertTrue (key.size() == 256);
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testRSAKeyFromECCertificate()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream str(ecCertPem);
+	X509Certificate cert(str);
+
+	ERR_clear_error();
+	try
+	{
+		RSAKey key(cert);
+		fail("RSAKey from an EC certificate must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testRSAKeyFromECPKCS12()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream keyStream(ecKeyPem);
+	EVPPKey ecKey(nullptr, &keyStream);
+	std::istringstream certStream(ecCertPem);
+	X509Certificate ecCert(certStream);
+
+	std::unique_ptr<PKCS12, decltype(&PKCS12_free)> pPKCS12(PKCS12_create("pass", "ec", static_cast<EVP_PKEY*>(ecKey),
+		const_cast<X509*>(ecCert.certificate()), nullptr, 0, 0, 0, 0, 0), PKCS12_free);
+	assertTrue (pPKCS12 != nullptr);
+	std::unique_ptr<BIO, decltype(&BIO_free)> pBIO(BIO_new(BIO_s_mem()), BIO_free);
+	assertTrue (pBIO != nullptr);
+	assertTrue (i2d_PKCS12_bio(pBIO.get(), pPKCS12.get()) == 1);
+	char* pData = nullptr;
+	const long size = BIO_get_mem_data(pBIO.get(), &pData);
+	assertTrue (size > 0);
+	std::istringstream p12Stream(std::string(pData, static_cast<std::size_t>(size)));
+	PKCS12Container cont(p12Stream, "pass");
+	assertTrue (cont.hasKey());
+
+	ERR_clear_error();
+	try
+	{
+		RSAKey key(cont);
+		fail("RSAKey from a container with an EC key must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
 
 
 void EVPTest::setUp()
@@ -744,15 +1045,21 @@ CppUnit::Test* EVPTest::suite()
 	CppUnit_addTest(pSuite, EVPTest, testECEVPSaveLoadStreamNoPass);
 	CppUnit_addTest(pSuite, EVPTest, testECEVPSaveLoadFile);
 	CppUnit_addTest(pSuite, EVPTest, testECEVPSaveLoadFileNoPass);
+	CppUnit_addTest(pSuite, EVPTest, testECEVPLoadKeyWrongPassword);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromX509);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromPKCS12);
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyByLength);
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	CppUnit_addTest(pSuite, EVPTest, testECEVPKeyByLength);
 	CppUnit_addTest(pSuite, EVPTest, testEVPKeyByModulus);
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	CppUnit_addTest(pSuite, EVPTest, testCompareDifferentKeyTypes);
+	CppUnit_addTest(pSuite, EVPTest, testKeyFromCertificateUnknownAlgorithm);
+	CppUnit_addTest(pSuite, EVPTest, testSaveCannotCreateFile);
+	CppUnit_addTest(pSuite, EVPTest, testSaveFlushFailure);
+	CppUnit_addTest(pSuite, EVPTest, testECKeyFromCertificate);
+	CppUnit_addTest(pSuite, EVPTest, testRSAKeyFromECCertificate);
+	CppUnit_addTest(pSuite, EVPTest, testRSAKeyFromECPKCS12);
 
 	return pSuite;
 }

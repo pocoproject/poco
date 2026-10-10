@@ -31,13 +31,13 @@ class CppUnit_API TestDecorator: public Test
 public:
 	TestDecorator(Test* test);
 
-	virtual ~TestDecorator();
+	~TestDecorator() override;
 
-	int countTestCases() const;
+	[[nodiscard]] int countTestCases() const override;
 
-	void run(TestResult* result, const Test::Callback& callback = nullptr);
+	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const override;
 
 protected:
 	Test* _test;

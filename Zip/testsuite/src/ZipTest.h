@@ -29,6 +29,7 @@ public:
 	void testDecompressSingleFile();
 	void testDecompressSingleFileInDir();
 	void testDecompress();
+	void testDecompressConsistency();
 	void testDecompressFlat();
 	void testDecompressVuln();
 	void testDecompressFlatVuln();
@@ -36,11 +37,12 @@ public:
 	void testCrcAndSizeAfterDataWithArchive();
 	void testCrcAndSizeAfterDataEncapsulated();
 
-	static const Poco::UInt64 KB = 1024;
-	static const Poco::UInt64 MB = 1024*KB;
+	static constexpr Poco::UInt64 KB = 1024;
+	static constexpr Poco::UInt64 MB = 1024*KB;
 	void verifyDataFile(const std::string& path, Poco::UInt64 size);
 	void testDecompressZip64();
 	void testValidPath();
+	void testMalformedZip64();
 
 	void setUp();
 	void tearDown();

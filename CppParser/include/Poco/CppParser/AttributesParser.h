@@ -23,8 +23,7 @@
 #include "Poco/CppParser/Attributes.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API AttributesParser
@@ -63,10 +62,11 @@ protected:
 	const Poco::Token* parseComplexAttribute(const Token* pNext, const std::string& id);
 	const Poco::Token* parseIdentifier(const Poco::Token* pNext, std::string& id);
 	const Poco::Token* next();
-	static bool isIdentifier(const Poco::Token* pToken);
-	static bool isOperator(const Poco::Token* pToken, int kind);
-	static bool isLiteral(const Poco::Token* pToken);
-	static bool isEOF(const Poco::Token* pToken);
+
+	[[nodiscard]] static bool isIdentifier(const Poco::Token* pToken);
+	[[nodiscard]] static bool isOperator(const Poco::Token* pToken, int kind);
+	[[nodiscard]] static bool isLiteral(const Poco::Token* pToken);
+	[[nodiscard]] static bool isEOF(const Poco::Token* pToken);
 
 private:
 	Attributes& _attrs;
@@ -108,7 +108,7 @@ inline bool AttributesParser::isLiteral(const Poco::Token* pToken)
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_AttributesParser_INCLUDED

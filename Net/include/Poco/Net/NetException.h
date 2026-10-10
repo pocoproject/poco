@@ -22,8 +22,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 POCO_DECLARE_EXCEPTION(Net_API, NetException, Poco::IOException)
@@ -55,7 +54,7 @@ POCO_DECLARE_EXCEPTION(Net_API, UnsupportedFamilyException, NetException)
 POCO_DECLARE_EXCEPTION(Net_API, AddressFamilyMismatchException, NetException)
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_NetException_INCLUDED

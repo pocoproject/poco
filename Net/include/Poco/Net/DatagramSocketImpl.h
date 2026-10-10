@@ -22,8 +22,7 @@
 #include "Poco/Net/SocketImpl.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API DatagramSocketImpl: public SocketImpl
@@ -43,13 +42,13 @@ public:
 		/// Creates a StreamSocketImpl using the given native socket.
 
 protected:
-	void init(int af);
+	void init(int af) override;
 
-	~DatagramSocketImpl();
+	~DatagramSocketImpl() override;
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_DatagramSocketImpl_INCLUDED

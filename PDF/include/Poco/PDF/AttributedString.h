@@ -8,12 +8,10 @@
 
 
 #include "Poco/PDF/PDF.h"
-#include "Poco/PDF/Font.h"
 #include "Poco/Dynamic/Var.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API AttributedString
@@ -47,10 +45,10 @@ public:
 	AttributedString(const std::string& str, Alignment align = ALIGN_LEFT, int style = (int)STYLE_PLAIN);
 	AttributedString& operator=(const std::string&);
 	AttributedString& operator=(const char*);
-	operator const std::string&();
+	[[nodiscard]] operator const std::string&();
 
 	void setAttribute(int attr, const Poco::Dynamic::Var& value);
-	Poco::Dynamic::Var getAttribute(int attr);
+	[[nodiscard]] Poco::Dynamic::Var getAttribute(int attr);
 	void clearAttribute(int attr);
 
 private:
@@ -62,31 +60,7 @@ private:
 };
 
 
-//
-// inlines
-//
-
-inline AttributedString& AttributedString::operator=(const std::string& content)
-{
-	_content = content;
-	return *this;
-}
-
-
-inline AttributedString& AttributedString::operator=(const char* content)
-{
-	_content = content;
-	return *this;
-}
-
-
-inline AttributedString::operator const std::string&()
-{
-	return _content;
-}
-
-
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_AttributedString_INCLUDED

@@ -9,16 +9,20 @@
 
 
 #include "RSATest.h"
+#include "ErrorQueueCleaner.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Crypto/RSADigestEngine.h"
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
 #include <sstream>
 #include <fstream>
+#include <openssl/err.h>
 
 
 using namespace Poco::Crypto;
@@ -101,7 +105,7 @@ void RSATest::testNewKeys()
 	RSAKey key2(&iPub, &iPriv, "testpwd");
 
 	std::istringstream iPriv2(privKey);
-	RSAKey key3(0, &iPriv2,  "testpwd");
+	RSAKey key3(nullptr, &iPriv2,  "testpwd");
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
@@ -124,7 +128,7 @@ void RSATest::testNewKeysNoPassphrase()
 	RSAKey key2(&iPub, &iPriv);
 
 	std::istringstream iPriv2(privKey);
-	RSAKey key3(0, &iPriv2);
+	RSAKey key3(nullptr, &iPriv2);
 	std::ostringstream strPub3;
 	key3.save(&strPub3);
 	std::string pubFromPrivate = strPub3.str();
@@ -219,17 +223,17 @@ void RSATest::testRSACipher()
 	strPub.close();
 	strPriv.close();
 
-    Poco::Crypto::RSAKey encryptKey(pubKeyFile);
+	Poco::Crypto::RSAKey encryptKey(pubKeyFile);
 	Poco::Crypto::RSAKey decryptKey(pubKeyFile, privKeyFile);
 
-    Poco::Crypto::CipherFactory factory;
-    auto iengine = factory.createCipher(encryptKey);
-    auto oengine = factory.createCipher(decryptKey);
+	Poco::Crypto::CipherFactory factory;
+	auto iengine = factory.createCipher(encryptKey);
+	auto oengine = factory.createCipher(decryptKey);
 
-    std::string ss = "test_str";
-    auto enc = iengine->encryptString(ss);
-    auto dec = oengine->decryptString(enc);
-    assertEqual (ss, dec);
+	std::string ss = "test_str";
+	auto enc = iengine->encryptString(ss);
+	auto dec = oengine->decryptString(enc);
+	assertEqual (ss, dec);
 
 	delete iengine;
 	delete oengine;
@@ -269,7 +273,7 @@ void RSATest::testCertificate()
 	X509Certificate cert(str);
 	RSAKey publicKey(cert);
 	std::istringstream str2(anyPem);
-	RSAKey privateKey(0, &str2, "test");
+	RSAKey privateKey(nullptr, &str2, "test");
 	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(publicKey);
 	Cipher::Ptr pCipher2 = CipherFactory::defaultFactory().createCipher(privateKey);
 	std::string val("lets do some encryption");
@@ -277,6 +281,186 @@ void RSATest::testCertificate()
 	std::string enc = pCipher->encryptString(val);
 	std::string dec = pCipher2->decryptString(enc);
 	assertTrue (dec == val);
+}
+
+
+void RSATest::testPublicKeyDecryptionExponent()
+{
+	std::istringstream str(anyPem);
+	X509Certificate cert(str);
+	RSAKey pub(cert);
+	assertTrue (pub.decryptionExponent().empty());
+	assertTrue (!pub.modulus().empty());
+
+	std::istringstream str2(anyPem);
+	RSAKey priv(nullptr, &str2, "test");
+	assertTrue (!priv.decryptionExponent().empty());
+}
+
+
+void RSATest::testGenerateInvalidKeyLength()
+{
+	ErrorQueueCleaner cleaner;
+
+	ERR_clear_error();
+	try
+	{
+		RSAKey key(static_cast<RSAKey::KeyLength>(100), RSAKey::EXP_LARGE);
+		fail("Generating a key of an invalid length must throw");
+	}
+	catch (const Poco::Exception&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void RSATest::testLoadSubjectPublicKeyInfo()
+{
+	ErrorQueueCleaner cleaner;
+
+	EVPPKey evp(EVP_PKEY_RSA, 2048);
+	std::ostringstream pub;
+	evp.save(&pub);
+
+	ERR_clear_error();
+	std::istringstream in(pub.str());
+	RSAKey key(&in);
+	assertTrue (key.size() == 256);
+	assertTrue (ERR_peek_error() == 0);
+
+	Poco::TemporaryFile file;
+	evp.save(file.path());
+
+	ERR_clear_error();
+	RSAKey key2(file.path());
+	assertTrue (key2.size() == 256);
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void RSATest::testLoadMissingFile()
+{
+	ErrorQueueCleaner cleaner;
+
+	ERR_clear_error();
+	try
+	{
+		Poco::TemporaryFile tmp;
+		RSAKey key(tmp.path() + "/key.pem");
+		fail("Loading a public key from a non-existent file must throw");
+	}
+	catch (const Poco::IOException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void RSATest::testSaveCannotCreateFile()
+{
+	ErrorQueueCleaner cleaner;
+
+	RSAKey key(RSAKey::KL_2048, RSAKey::EXP_LARGE);
+	Poco::TemporaryFile tmp;
+	const std::string path = tmp.path() + "/key.pem";
+
+	ERR_clear_error();
+	try
+	{
+		key.save(path);
+		fail("Saving the public key into a non-existent directory must throw");
+	}
+	catch (const Poco::CreateFileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		key.save("", path);
+		fail("Saving the private key into a non-existent directory must throw");
+	}
+	catch (const Poco::CreateFileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void RSATest::testSaveFlushFailure()
+{
+	// /dev/full accepts the write and fails the flush; it exists on Linux only.
+	if (!Poco::File("/dev/full").exists()) return;
+
+	ErrorQueueCleaner cleaner;
+
+	RSAKey key(RSAKey::KL_2048, RSAKey::EXP_LARGE);
+
+	ERR_clear_error();
+	try
+	{
+		key.save("/dev/full");
+		fail("Saving the public key to a full device must throw");
+	}
+	catch (const Poco::FileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		key.save("", "/dev/full");
+		fail("Saving the private key to a full device must throw");
+	}
+	catch (const Poco::FileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void RSATest::testLoadInvalidKey()
+{
+	ErrorQueueCleaner cleaner;
+
+	const std::string garbage("not a key\n");
+
+	// The exception type differs between the two implementations: Poco::FileException
+	// on OpenSSL 1.1.1, Poco::Crypto::OpenSSLException on OpenSSL 3.0 and later.
+	ERR_clear_error();
+	try
+	{
+		std::istringstream str(garbage);
+		RSAKey key(&str);
+		fail("Loading a public key from garbage must throw");
+	}
+	catch (const Poco::Exception&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		std::istringstream str(garbage);
+		RSAKey key(nullptr, &str);
+		fail("Loading a private key from garbage must throw");
+	}
+	catch (const Poco::Exception&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	Poco::TemporaryFile file;
+	{
+		std::ofstream ostr(file.path().c_str());
+		ostr << garbage;
+	}
+
+	ERR_clear_error();
+	try
+	{
+		RSAKey key(file.path());
+		fail("Loading a public key from a file with garbage must throw");
+	}
+	catch (const Poco::Exception&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		RSAKey key("", file.path());
+		fail("Loading a private key from a file with garbage must throw");
+	}
+	catch (const Poco::Exception&) {}
+	assertTrue (ERR_peek_error() == 0);
 }
 
 
@@ -302,6 +486,13 @@ CppUnit::Test* RSATest::suite()
 	CppUnit_addTest(pSuite, RSATest, testRSACipher);
 	CppUnit_addTest(pSuite, RSATest, testRSACipherLarge);
 	CppUnit_addTest(pSuite, RSATest, testCertificate);
+	CppUnit_addTest(pSuite, RSATest, testPublicKeyDecryptionExponent);
+	CppUnit_addTest(pSuite, RSATest, testGenerateInvalidKeyLength);
+	CppUnit_addTest(pSuite, RSATest, testLoadSubjectPublicKeyInfo);
+	CppUnit_addTest(pSuite, RSATest, testLoadMissingFile);
+	CppUnit_addTest(pSuite, RSATest, testSaveCannotCreateFile);
+	CppUnit_addTest(pSuite, RSATest, testSaveFlushFailure);
+	CppUnit_addTest(pSuite, RSATest, testLoadInvalidKey);
 
 	return pSuite;
 }

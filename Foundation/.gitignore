@@ -1,0 +1,32 @@
+# Build-time symlinks to bundled libraries (zlib, pcre2, utf8proc)
+# Created by prebuild step in Makefile when POCO_UNBUNDLED is not set
+src/adler32.c
+src/compress.c
+src/config.h
+src/crc32.c
+src/crc32.h
+src/deflate.c
+src/deflate.h
+src/gzguts.h
+src/infback.c
+src/inffast.c
+src/inffast.h
+src/inffixed.h
+src/inflate.c
+src/inflate.h
+src/inftrees.c
+src/inftrees.h
+src/trees.c
+src/trees.h
+src/zconf.h
+src/zlib.h
+src/zutil.c
+src/zutil.h
+src/pcre2.h
+src/pcre2_*.c
+src/pcre2_*.h
+src/pcre2posix.c
+src/pcre2posix.h
+src/utf8proc.c
+src/utf8proc.h
+src/utf8proc_data.c

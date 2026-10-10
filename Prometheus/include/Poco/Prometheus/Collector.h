@@ -22,8 +22,7 @@
 #include "Poco/Prometheus/Registry.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Exporter;
@@ -46,13 +45,13 @@ class Prometheus_API Collector
 	/// during the run time of the process.
 {
 public:
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the metric's name.
 
 	virtual void exportTo(Exporter& exporter) const = 0;
 		/// Writes the given Metric to the Exporter.
 
-	virtual ~Collector() = default;
+	virtual ~Collector();
 		/// Destroys the Collector.
 
 protected:
@@ -70,7 +69,7 @@ protected:
 		/// The name must be a valid metric name and match the regular
 		/// expression [a-zA-Z_:][a-zA-Z0-9_:]*.
 
-	static const std::string& validateName(const std::string& name);
+	[[nodiscard]] static const std::string& validateName(const std::string& name);
 
 private:
 	const std::string _name;
@@ -108,7 +107,7 @@ inline const std::string& Collector::name() const
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Collector_INCLUDED

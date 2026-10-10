@@ -31,11 +31,10 @@ using Poco::UInt16;
 using Poco::Int32;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
-ICMPPacket::ICMPPacket(IPAddress::Family family, int dataSize):_pImpl(0)
+ICMPPacket::ICMPPacket(IPAddress::Family family, int dataSize):_pImpl(nullptr)
 {
 	if (family == IPAddress::IPv4)
 		_pImpl = new ICMPv4PacketImpl(dataSize);
@@ -107,4 +106,4 @@ std::string ICMPPacket::typeDescription(int typeId)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

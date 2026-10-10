@@ -19,8 +19,7 @@
 #include "Poco/XML/Name.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString NamespaceStrategy::NOTHING;
@@ -192,4 +191,4 @@ void NamespacePrefixesStrategy::endElement(const XMLChar* name, ContentHandler* 
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

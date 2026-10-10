@@ -20,8 +20,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 DatagramSocket::DatagramSocket(): Socket(new DatagramSocketImpl)
@@ -205,4 +204,4 @@ int DatagramSocket::receiveFrom(SocketBufVec& buffers, struct sockaddr** ppSA, p
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

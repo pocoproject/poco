@@ -20,8 +20,7 @@ using Poco::UnbufferedStreamBuf;
 using Poco::NumberFormatter;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 QuotedPrintableEncoderBuf::QuotedPrintableEncoderBuf(std::ostream& ostr):
@@ -147,4 +146,4 @@ QuotedPrintableEncoder::~QuotedPrintableEncoder()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

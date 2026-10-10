@@ -14,12 +14,14 @@
 #include "Poco/SAX/SAXParser.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/SAX/EntityResolver.h"
+#include "Poco/SAX/DefaultHandler.h"
 #include "Poco/SAX/SAXException.h"
 #include "Poco/SAX/WhitespaceFilter.h"
 #include "Poco/XML/XMLWriter.h"
 #include "Poco/Latin9Encoding.h"
 #include "Poco/FileStream.h"
 #include <sstream>
+#include <stdexcept>
 
 
 using Poco::XML::SAXParser;
@@ -28,8 +30,11 @@ using Poco::XML::XMLReader;
 using Poco::XML::InputSource;
 using Poco::XML::EntityResolver;
 using Poco::XML::XMLString;
+using Poco::XML::XMLException;
 using Poco::XML::SAXParseException;
 using Poco::XML::WhitespaceFilter;
+using Poco::XML::DefaultHandler;
+using Poco::XML::Attributes;
 
 
 class TestEntityResolver: public EntityResolver
@@ -51,7 +56,7 @@ public:
 			pIS->setSystemId(systemId);
 			return pIS;
 		}
-		return 0;
+		return nullptr;
 	}
 
 	void releaseInputSource(InputSource* pSource)
@@ -59,6 +64,68 @@ public:
 		delete pSource->getByteStream();
 		delete pSource;
 	}
+};
+
+
+class RecordingEntityResolver: public EntityResolver
+	/// Resolves every entity to content that must never reach the document.
+{
+public:
+	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId)
+	{
+		++calls;
+		std::istringstream* istr = new std::istringstream(systemId == "leak.ent" ? "<!ENTITY leak \"LEAKED\">" : "LEAKED");
+		InputSource* pIS = new InputSource(*istr);
+		pIS->setSystemId(systemId);
+		return pIS;
+	}
+
+	void releaseInputSource(InputSource* pSource)
+	{
+		delete pSource->getByteStream();
+		delete pSource;
+	}
+
+	int calls = 0;
+};
+
+
+class ThrowingHandler: public DefaultHandler
+{
+public:
+	enum Kind
+	{
+		THROW_STD,
+		THROW_XML
+	};
+
+	ThrowingHandler(Kind kind): _kind(kind)
+	{
+	}
+
+	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attrList)
+	{
+		if (_kind == THROW_STD)
+			throw std::runtime_error("handler failure");
+		else
+			throw XMLException("handler failure");
+	}
+
+	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname)
+	{
+		++endElementCalls;
+	}
+
+	void endPrefixMapping(const XMLString& prefix)
+	{
+		++endPrefixMappingCalls;
+	}
+
+	int endElementCalls = 0;
+	int endPrefixMappingCalls = 0;
+
+private:
+	Kind _kind;
 };
 
 
@@ -136,6 +203,36 @@ void SAXParserTest::testInternalEntity()
 }
 
 
+void SAXParserTest::testBillionLaughsProtection()
+{
+	// Expands to ~40 kB from ~300 bytes of source. The default expat threshold
+	// (8 MiB) never fires for a document this small, so reaching the limit below
+	// proves the explicitly configured limits were actually handed to expat.
+	const std::string bomb(
+		"<?xml version='1.0'?>"
+		"<!DOCTYPE root ["
+		"<!ENTITY a '0123456789012345678901234567890123456789'>"
+		"<!ENTITY b '&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;'>"
+		"<!ENTITY c '&b;&b;&b;&b;&b;&b;&b;&b;&b;&b;'>"
+		"<!ENTITY d '&c;&c;&c;&c;&c;&c;&c;&c;&c;&c;'>"
+		"]>"
+		"<root>&d;</root>");
+
+	SAXParser parser;
+	parser.setProperty(SAXParser::PROPERTY_BLA_MAXIMUM_AMPLIFICATION, std::string("1.5"));
+	parser.setProperty(SAXParser::PROPERTY_BLA_ACTIVATION_THRESHOLD, std::string("64"));
+
+	try
+	{
+		parse(parser, XMLWriter::CANONICAL, bomb);
+		fail("entity expansion beyond the amplification limit must be rejected");
+	}
+	catch (XMLException&)
+	{
+	}
+}
+
+
 void SAXParserTest::testNotation()
 {
 	SAXParser parser;
@@ -164,6 +261,33 @@ void SAXParserTest::testExternalParsed()
 	parser.setFeature(XMLReader::FEATURE_EXTERNAL_GENERAL_ENTITIES, true);
 	std::string xml = parse(parser, XMLWriter::CANONICAL, EXTERNAL_PARSED);
 	assertTrue (xml == "<!DOCTYPE test><sample>\n\t<elem>\n\tAn external entity.\n</elem>\n\n</sample>");
+}
+
+
+void SAXParserTest::testExternalEntitiesDisabledByDefault()
+{
+	// A resolver is set, so only the disabled features keep its content out.
+	RecordingEntityResolver resolver;
+
+	SAXParser generalParser;
+	generalParser.setEntityResolver(&resolver);
+	try
+	{
+		parse(generalParser, XMLWriter::CANONICAL,
+			"<!DOCTYPE test [<!ENTITY ext SYSTEM \"leak.xml\">]><sample>&ext;</sample>");
+		fail("external general entity must be refused");
+	}
+	catch (SAXParseException&)
+	{
+	}
+
+	SAXParser parameterParser;
+	parameterParser.setEntityResolver(&resolver);
+	std::string xml = parse(parameterParser, XMLWriter::CANONICAL,
+		"<!DOCTYPE test [<!ENTITY % ext SYSTEM \"leak.ent\"> %ext;]><sample>&leak;</sample>");
+	assertTrue (xml.find("LEAKED") == std::string::npos);
+
+	assertTrue (resolver.calls == 0);
 }
 
 
@@ -313,6 +437,53 @@ void SAXParserTest::testParsePartialReads()
 }
 
 
+void SAXParserTest::testContentHandlerThrows()
+{
+	SAXParser parser;
+
+	ThrowingHandler stdHandler(ThrowingHandler::THROW_STD);
+	parser.setContentHandler(&stdHandler);
+	try
+	{
+		parser.parseString("<root/>");
+		fail("must throw");
+	}
+	catch (const std::runtime_error& exc)
+	{
+		assertTrue (std::string(exc.what()) == "handler failure");
+	}
+	assertTrue (stdHandler.endElementCalls == 0);
+
+	ThrowingHandler xmlHandler(ThrowingHandler::THROW_XML);
+	parser.setContentHandler(&xmlHandler);
+	try
+	{
+		parser.parseString("<root/>");
+		fail("must throw");
+	}
+	catch (const SAXParseException&)
+	{
+	}
+	assertTrue (xmlHandler.endElementCalls == 0);
+
+	ThrowingHandler nsHandler(ThrowingHandler::THROW_XML);
+	parser.setContentHandler(&nsHandler);
+	try
+	{
+		parser.parseString("<root xmlns:a=\"urn:a\"/>");
+		fail("must throw");
+	}
+	catch (const SAXParseException&)
+	{
+	}
+	assertTrue (nsHandler.endElementCalls == 0);
+	assertTrue (nsHandler.endPrefixMappingCalls == 0);
+
+	parser.setContentHandler(nullptr);
+	parser.parseString(SIMPLE1);
+}
+
+
 void SAXParserTest::setUp()
 {
 }
@@ -363,9 +534,11 @@ CppUnit::Test* SAXParserTest::suite()
 	CppUnit_addTest(pSuite, SAXParserTest, testPI);
 	CppUnit_addTest(pSuite, SAXParserTest, testDTD);
 	CppUnit_addTest(pSuite, SAXParserTest, testInternalEntity);
+	CppUnit_addTest(pSuite, SAXParserTest, testBillionLaughsProtection);
 	CppUnit_addTest(pSuite, SAXParserTest, testNotation);
 	CppUnit_addTest(pSuite, SAXParserTest, testExternalUnparsed);
 	CppUnit_addTest(pSuite, SAXParserTest, testExternalParsed);
+	CppUnit_addTest(pSuite, SAXParserTest, testExternalEntitiesDisabledByDefault);
 	CppUnit_addTest(pSuite, SAXParserTest, testDefaultNamespace);
 	CppUnit_addTest(pSuite, SAXParserTest, testNamespaces);
 	CppUnit_addTest(pSuite, SAXParserTest, testNamespacesNoPrefixes);
@@ -378,6 +551,7 @@ CppUnit::Test* SAXParserTest::suite()
 	CppUnit_addTest(pSuite, SAXParserTest, testCharacters);
 	CppUnit_addTest(pSuite, SAXParserTest, testParseMemory);
 	CppUnit_addTest(pSuite, SAXParserTest, testParsePartialReads);
+	CppUnit_addTest(pSuite, SAXParserTest, testContentHandlerThrows);
 
 	return pSuite;
 }

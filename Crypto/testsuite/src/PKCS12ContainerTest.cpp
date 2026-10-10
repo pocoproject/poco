@@ -9,11 +9,13 @@
 
 
 #include "PKCS12ContainerTest.h"
+#include "ErrorQueueCleaner.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/KeyPairImpl.h"
+#include "Poco/Crypto/CryptoException.h"
 #include "Poco/Environment.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
@@ -21,6 +23,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <openssl/err.h>
 
 
 
@@ -319,6 +322,92 @@ void PKCS12ContainerTest::testPEMReadWrite()
 }
 
 
+void PKCS12ContainerTest::testPEMReadCorrupt()
+{
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+
+	const X509Certificate::List certs = X509Certificate::readPEM(getTestFilesPath("certs-only", "pem"));
+	assertTrue (certs.size() == 5);
+	assertTrue (ERR_peek_error() == 0);
+
+	const std::string corruptEntries[] =
+	{
+		"-----BEGIN CERTIFICATE-----\nAAAA\n-----END CERTIFICATE-----\n", // not a certificate
+		"-----BEGIN CERTIFICATE-----\nMIIB\n" // no end line
+	};
+	for (const auto& entry: corruptEntries)
+	{
+		TemporaryFile tmpFile;
+		X509Certificate::writePEM(tmpFile.path(), certs);
+		std::ofstream ostr(tmpFile.path(), std::ios::app);
+		ostr << entry;
+		ostr.close();
+		try
+		{
+			X509Certificate::readPEM(tmpFile.path());
+			fail("corrupt entry after valid certificates - must throw");
+		}
+		catch (OpenSSLException&)
+		{
+		}
+		assertTrue (ERR_peek_error() == 0);
+	}
+}
+
+
+void PKCS12ContainerTest::testIssuedBy()
+{
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+
+	const X509Certificate::List chain = X509Certificate::readPEM(getTestFilesPath("full", "pem"));
+	assertTrue (chain.size() == 3);
+	assertTrue (chain[0].issuedBy(chain[1]));
+	assertTrue (chain[1].issuedBy(chain[2]));
+	assertTrue (chain[2].issuedBy(chain[2]));
+	assertTrue (ERR_peek_error() == 0);
+	assertFalse (chain[0].issuedBy(chain[2]));
+	assertFalse (chain[1].issuedBy(chain[0]));
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void PKCS12ContainerTest::testPEMWriteDeviceFull()
+{
+#if POCO_OS == POCO_OS_LINUX
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+
+	// Every write to /dev/full fails with ENOSPC; other platforms have no such device.
+	const std::string deviceFull("/dev/full");
+	if (!File(deviceFull).exists()) return;
+
+	const X509Certificate::List certs = X509Certificate::readPEM(getTestFilesPath("certs-only", "pem"));
+	const X509Certificate::List oneCert(1, certs[0]);
+	try
+	{
+		X509Certificate::writePEM(deviceFull, oneCert);
+		fail("nothing can be written - must throw");
+	}
+	catch (OpenSSLException&)
+	{
+	}
+	assertTrue (ERR_peek_error() == 0);
+
+	try
+	{
+		certs[0].save(deviceFull);
+		fail("nothing can be written - must throw");
+	}
+	catch (Poco::WriteFileException&)
+	{
+	}
+	assertTrue (ERR_peek_error() == 0);
+#endif
+}
+
+
 void PKCS12ContainerTest::setUp()
 {
 }
@@ -361,6 +450,9 @@ CppUnit::Test* PKCS12ContainerTest::suite()
 	CppUnit_addTest(pSuite, PKCS12ContainerTest, testFullPKCS12);
 	CppUnit_addTest(pSuite, PKCS12ContainerTest, testCertsOnlyPKCS12);
 	CppUnit_addTest(pSuite, PKCS12ContainerTest, testPEMReadWrite);
+	CppUnit_addTest(pSuite, PKCS12ContainerTest, testPEMReadCorrupt);
+	CppUnit_addTest(pSuite, PKCS12ContainerTest, testIssuedBy);
+	CppUnit_addTest(pSuite, PKCS12ContainerTest, testPEMWriteDeviceFull);
 
 	return pSuite;
 }

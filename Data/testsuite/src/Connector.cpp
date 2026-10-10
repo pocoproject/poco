@@ -13,9 +13,7 @@
 #include "Poco/Data/SessionFactory.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 const std::string Connector::KEY("test");
@@ -50,4 +48,4 @@ void Connector::removeFromFactory()
 }
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test

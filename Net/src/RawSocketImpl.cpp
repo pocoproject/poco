@@ -19,8 +19,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 RawSocketImpl::RawSocketImpl()
@@ -66,4 +65,4 @@ void RawSocketImpl::init2(int af, int proto)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

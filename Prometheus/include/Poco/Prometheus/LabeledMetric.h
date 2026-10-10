@@ -22,8 +22,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Prometheus_API LabeledMetric: public Metric
@@ -52,10 +51,10 @@ protected:
 	void setLabelNames(const std::vector<std::string>& labelNames);
 		/// Sets the metric's label names.
 
-	virtual ~LabeledMetric() = default;
+	virtual ~LabeledMetric();
 		/// Destroys the LabeledMetric.
 
-	static const std::string& validateLabelName(const std::string& name);
+	[[nodiscard]] static const std::string& validateLabelName(const std::string& name);
 		/// Validates the given name against the regular expression
 		/// defining a valid label name ([a-zA-Z_:][a-zA-Z0-9_:]*).
 
@@ -89,7 +88,7 @@ inline const std::vector<std::string>& LabeledMetric::labelNames() const
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Metric_INCLUDED

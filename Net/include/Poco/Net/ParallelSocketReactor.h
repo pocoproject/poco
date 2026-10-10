@@ -38,8 +38,7 @@ using Poco::AutoPtr;
 using Poco::Thread;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <class SR>
@@ -88,7 +87,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ParallelSocketReactor_INCLUDED

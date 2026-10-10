@@ -22,9 +22,7 @@
 #include <avahi-common/error.h>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Avahi {
+namespace Poco::DNSSD::Avahi {
 
 
 extern "C" int avahiPollFunc(struct pollfd *ufds, unsigned int nfds, int timeout, void *userdata)
@@ -66,8 +64,8 @@ extern "C" void onGroupStateChange(AvahiEntryGroup* avahiGroup, AvahiEntryGroupS
 AvahiResponderImpl::AvahiResponderImpl(Poco::DNSSD::DNSSDResponder& owner):
 	_owner(owner),
 	_browser(*this),
-	_avahiPoll(0),
-	_avahiClient(0),
+	_avahiPoll(nullptr),
+	_avahiClient(nullptr),
 	_running(false),
 	_nextRecordId(1)
 {
@@ -299,8 +297,8 @@ void AvahiResponderImpl::setupEntryGroup(AvahiEntryGroup* avahiGroup, const Serv
 		}
 		std::string name(service.name());
 		if (name.empty()) name = avahi_client_get_host_name(_avahiClient);
-		const char* domain = service.domain().empty() ? 0 : service.domain().c_str();
-		const char* host = service.host().empty() ? 0 : service.host().c_str();
+		const char* domain = service.domain().empty() ? nullptr : service.domain().c_str();
+		const char* host = service.host().empty() ? nullptr : service.host().c_str();
 
 		int error = rename ? AVAHI_ERR_COLLISION : avahi_entry_group_add_service_strlst(
 			avahiGroup,
@@ -390,7 +388,7 @@ void AvahiResponderImpl::setupEntryGroup(AvahiEntryGroup* avahiGroup, const Serv
 
 AvahiStringList* AvahiResponderImpl::createTXTRecord(const Service::Properties& properties)
 {
-	AvahiStringList* avahiList = 0;
+	AvahiStringList* avahiList = nullptr;
 	Service::Properties::ConstIterator itVers = properties.find("txtvers");
 	Service::Properties::ConstIterator itEnd = properties.end();
 	std::string entry;
@@ -399,7 +397,7 @@ AvahiStringList* AvahiResponderImpl::createTXTRecord(const Service::Properties& 
 		std::string entry(itVers->first);
 		entry += '=';
 		entry += itVers->second;
-		avahiList = avahi_string_list_new(entry.c_str(), NULL);
+		avahiList = avahi_string_list_new(entry.c_str(), nullptr);
 	}
 
 	Service::Properties::ConstIterator it = properties.begin();
@@ -409,7 +407,11 @@ AvahiStringList* AvahiResponderImpl::createTXTRecord(const Service::Properties& 
 		{
 			if (avahiList)
 			{
-				avahiList = avahi_string_list_add_pair_arbitrary(avahiList, it->first.c_str(), reinterpret_cast<const uint8_t*>(it->second.empty() ? NULL : it->second.c_str()), it->second.size());
+				avahiList = avahi_string_list_add_pair_arbitrary(
+					avahiList, it->first.c_str(), reinterpret_cast<const uint8_t*>(it->second.empty() ?
+					nullptr :
+					it->second.c_str()), it->second.size()
+				);
 			}
 			else
 			{
@@ -419,7 +421,7 @@ AvahiStringList* AvahiResponderImpl::createTXTRecord(const Service::Properties& 
 					entry += '=';
 					entry += it->second;
 				}
-				avahiList = avahi_string_list_new(entry.c_str(), NULL);
+				avahiList = avahi_string_list_new(entry.c_str(), nullptr);
 			}
 		}
 	}
@@ -485,11 +487,10 @@ void AvahiResponderImpl::reregisterServices()
 }
 
 
-} } } // namespace Poco::DNSSD::Avahi
+} // namespace Poco::DNSSD::Avahi
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 namespace
@@ -510,5 +511,5 @@ void uninitializeDNSSD()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 

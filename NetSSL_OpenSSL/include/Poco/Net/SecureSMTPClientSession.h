@@ -23,8 +23,7 @@
 #include "Poco/Net/Context.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API SecureSMTPClientSession: public SMTPClientSession
@@ -87,7 +86,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SecureSMTPClientSession_INCLUDED

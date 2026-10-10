@@ -20,18 +20,13 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
-#include <algorithm>
+#include <optional>
 #include <iostream>
 
 
 namespace Poco {
 
-
-enum NullType
-{
-	NULL_GENERIC = 0
-};
-
+using NullType = std::nullopt_t;
 
 template <typename C>
 class Nullable
@@ -58,88 +53,70 @@ class Nullable
 	/// default construction.
 {
 public:
-	Nullable():
-		/// Creates an empty Nullable.
-		_value(),
-		_isNull(true),
-		_null()
-	{
-	}
+	using Type = C;
 
-	Nullable(const NullType&):
+	Nullable() = default;
 		/// Creates an empty Nullable.
-		_value(),
-		_isNull(true),
-		_null()
+
+	Nullable(const NullType&)
+		/// Creates an empty Nullable.
 	{
 	}
 
 	Nullable(const C& value):
 		/// Creates a Nullable with the given value.
-		_value(value),
-		_isNull(false),
-		_null()
+		_optional(value)
 	{
 	}
 
 	Nullable(C&& value):
 		/// Creates a Nullable by moving the given value.
-		_value(std::forward<C>(value)),
-		_isNull(false),
-		_null()
+		_optional(std::forward<C>(value))
 	{
 	}
 
 	Nullable(const Nullable& other):
 		/// Creates a Nullable by copying another one.
-		_value(other._value),
-		_isNull(other._isNull),
-		_null()
+		_optional(other._optional)
 	{
 	}
 
 	Nullable(Nullable&& other) noexcept:
 		/// Creates a Nullable by moving another one.
-		_value(std::move(other._value)),
-		_isNull(other._isNull),
-		_null()
+		_optional(std::move(other._optional))
 	{
-		other._isNull = true;
+		other._optional.reset();
 	}
 
-	~Nullable()
+	~Nullable() = default;
 		/// Destroys the Nullable.
-	{
-	}
 
 	Nullable& assign(const C& value)
 		/// Assigns a value to the Nullable.
 	{
-		_value  = value;
-		_isNull = false;
+		_optional.emplace(value);
 		return *this;
 	}
 
 	Nullable& assign(C&& value)
 		/// Assigns a value to the Nullable.
 	{
-		_value  = std::move(value);
-		_isNull = false;
+		_optional.emplace(std::move(value));
 		return *this;
 	}
 
 	Nullable& assign(const Nullable& other)
 		/// Assigns another Nullable.
 	{
-		Nullable tmp(other);
-		swap(tmp);
+		if (&other != this)
+			_optional = other._optional;
 		return *this;
 	}
 
 	Nullable& assign(NullType)
 		/// Sets value to null.
 	{
-		_isNull = true;
+		_optional.reset();
 		return *this;
 	}
 
@@ -164,78 +141,68 @@ public:
 	Nullable& operator = (Nullable&& other) noexcept
 		/// Moves another Nullable.
 	{
-		_isNull = other._isNull;
-		_value = std::move(other._value);
-		other._isNull = true;
+		_optional = std::move(other._optional);
 		return *this;
 	}
 
 	Nullable& operator = (NullType)
-		/// Assigns another Nullable.
+		/// Assigns NullType.
 	{
-		_isNull = true;
+		_optional.reset();
 		return *this;
 	}
 
 	void swap(Nullable& other) noexcept
 		/// Swaps this Nullable with other.
 	{
-		std::swap(_value, other._value);
-		std::swap(_isNull, other._isNull);
+		std::swap(_optional, other._optional);
 	}
 
-	bool operator == (const Nullable<C>& other) const
+	[[nodiscard]] bool operator == (const Nullable<C>& other) const
 		/// Compares two Nullables for equality
 	{
-		return (_isNull && other._isNull) || (_isNull == other._isNull && _value == other._value);
+		return _optional == other._optional;
 	}
 
-	bool operator == (const C& value) const
+	[[nodiscard]] bool operator == (const C& value) const
 		/// Compares Nullable with value for equality
 	{
-		return (!_isNull && _value == value);
+		return (_optional.has_value() && _optional.value() == value);
 	}
 
-	bool operator == (const NullType&) const
+	[[nodiscard]] bool operator == (const NullType&) const
 		/// Compares Nullable with NullData for equality
 	{
-		return _isNull;
+		return !_optional.has_value();
 	}
 
-	bool operator != (const C& value) const
+	[[nodiscard]] bool operator != (const C& value) const
 		/// Compares Nullable with value for non equality
 	{
 		return !(*this == value);
 	}
 
-	bool operator != (const Nullable<C>& other) const
+	[[nodiscard]] bool operator != (const Nullable<C>& other) const
 		/// Compares two Nullables for non equality
 	{
 		return !(*this == other);
 	}
 
-	bool operator != (const NullType&) const
+	[[nodiscard]] bool operator != (const NullType&) const
 		/// Compares with NullData for non equality
 	{
-		return !_isNull;
+		return _optional.has_value();
 	}
 
-	bool operator < (const Nullable<C>& other) const
+	[[nodiscard]] bool operator < (const Nullable<C>& other) const
 		/// Compares two Nullable objects. Return true if this object's
 		/// value is smaler than the other object's value.
 		/// Null value is smaller than a non-null value.
 	{
-		if (_isNull && other._isNull) return false;
-
-		if (!_isNull && !other._isNull)
-			return (_value < other._value);
-
-		if (_isNull && !other._isNull) return true;
-
-		return false;
+		return _optional < other._optional;
 	}
 
-	bool operator > (const Nullable<C>& other) const
+	[[nodiscard]] bool operator > (const Nullable<C>& other) const
 		/// Compares two Nullable objects. Return true if this object's
 		/// value is greater than the other object's value.
 		/// A non-null value is greater than a null value.
@@ -243,69 +210,71 @@ public:
 		return !(*this == other) && !(*this < other);
 	}
 
-	C& value()
+	[[nodiscard]] C& value()
 		/// Returns the Nullable's value.
 		///
 		/// Throws a NullValueException if the Nullable is empty.
 	{
-		if (!_isNull)
-			return _value;
+		if (_optional.has_value())
+			return _optional.value();
 		else
 			throw NullValueException();
 	}
 
-	const C& value() const
+	[[nodiscard]] const C& value() const
 		/// Returns the Nullable's value.
 		///
 		/// Throws a NullValueException if the Nullable is empty.
 	{
-		if (!_isNull)
-			return _value;
+		if (_optional.has_value())
+			return _optional.value();
 		else
 			throw NullValueException();
 	}
 
-	const C& value(const C& deflt) const
+	[[nodiscard]] const C& value(const C& deflt) const
 		/// Returns the Nullable's value, or the
 		/// given default value if the Nullable is empty.
 	{
-		return _isNull ? deflt : _value;
+		if (_optional.has_value())
+			return _optional.value();
+
+		return deflt;
 	}
 
-	operator C& ()
+	[[nodiscard]] explicit operator C& ()
 		/// Get reference to the value
 	{
 		return value();
 	}
 
-	operator const C& () const
+	[[nodiscard]] explicit operator const C& () const
 		/// Get const reference to the value
 	{
 		return value();
 	}
 
-	operator NullType& ()
+	[[nodiscard]] operator const NullType& () const
 		/// Get reference to the value
 	{
 		return _null;
 	}
 
-	bool isNull() const
+	[[nodiscard]] bool isNull() const
 		/// Returns true if the Nullable is empty.
 	{
-		return _isNull;
+		return !_optional.has_value();
 	}
 
 	void clear()
 		/// Clears the Nullable.
 	{
-		_isNull = true;
+		_optional.reset();
 	}
 
 private:
-	C        _value;
-	bool     _isNull;
-	NullType _null;
+	std::optional<C> _optional;
+	static constexpr NullType _null {std::nullopt};
 };
 
 
@@ -325,7 +294,7 @@ std::ostream& operator<<(std::ostream& out, const Nullable<C>& obj)
 
 
 template <typename C>
-bool operator == (const NullType&, const Nullable<C>& n)
+[[nodiscard]] bool operator == (const NullType&, const Nullable<C>& n)
 	/// Returns true if this Nullable is null.
 {
 	return n.isNull();
@@ -333,7 +302,7 @@ bool operator == (const NullType&, const Nullable<C>& n)
 
 
 template <typename C>
-bool operator != (const C& c, const Nullable<C>& n)
+[[nodiscard]] bool operator != (const C& c, const Nullable<C>& n)
 	/// Compares Nullable with value for non equality
 {
 	return !(n == c);
@@ -341,7 +310,7 @@ bool operator != (const C& c, const Nullable<C>& n)
 
 
 template <typename C>
-bool operator == (const C& c, const Nullable<C>& n)
+[[nodiscard]] bool operator == (const C& c, const Nullable<C>& n)
 	/// Compares Nullable with NullData for equality
 {
 	return (n == c);
@@ -349,7 +318,7 @@ bool operator == (const C& c, const Nullable<C>& n)
 
 
 template <typename C>
-bool operator != (const NullType&, const Nullable<C>& n)
+[[nodiscard]] bool operator != (const NullType&, const Nullable<C>& n)
 	/// Returns true if this Nullable is not null.
 {
 	return !n.isNull();

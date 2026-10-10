@@ -10,7 +10,8 @@ include ODBC.make
 
 objects = Binder ConnectionHandle Connector EnvironmentHandle \
 	Extractor ODBCException ODBCMetaColumn ODBCStatementImpl \
-	Parameter Preparator SessionImpl TypeInfo Unicode Utility
+	Parameter Preparator SessionImpl TypeInfo Unicode Utility \
+	Diagnostics Error 
 
 target_includes = $(POCO_BASE)/Data/testsuite/include
 

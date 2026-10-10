@@ -26,6 +26,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Condition.h"
 #include <atomic>
+#include <functional>
 
 
 namespace Poco {
@@ -42,13 +43,15 @@ class Foundation_API ArchiveStrategy
 	/// using the gzip file format.
 {
 public:
+	using PurgeCallback = std::function<void()>;
+
 	ArchiveStrategy();
 	virtual ~ArchiveStrategy();
 
-	virtual LogFile* open(LogFile* pFile) = 0;
+	[[nodiscard]] virtual LogFile* open(LogFile* pFile) = 0;
 		/// Open a new log file and return it.
 
-	virtual LogFile* archive(LogFile* pFile) = 0;
+	[[nodiscard]] virtual LogFile* archive(LogFile* pFile) = 0;
 		/// Renames the given log file for archiving
 		/// and creates and returns a new log file.
 		/// The given LogFile object is deleted.
@@ -58,9 +61,13 @@ public:
 	void compress(bool flag = true);
 		/// Enables or disables compression of archived files.
 
+	void setPurgeCallback(PurgeCallback callback);
+		/// Sets a callback to be invoked after compression completes.
+		/// Used by FileChannel to trigger purging at the right time.
+
 protected:
 	void moveFile(const std::string& oldName, const std::string& newName);
-	bool exists(const std::string& name);
+	[[nodiscard]] bool exists(const std::string& name);
 
 	Poco::FastMutex _rotateMutex;
 
@@ -79,6 +86,9 @@ private:
 
 	std::atomic<bool> _compress;
 	std::atomic<ArchiveCompressor*> _pCompressor;
+
+protected:
+	PurgeCallback _purgeCallback;
 };
 
 
@@ -89,10 +99,10 @@ class Foundation_API ArchiveByNumberStrategy: public ArchiveStrategy
 {
 public:
 	ArchiveByNumberStrategy();
-	~ArchiveByNumberStrategy();
+	~ArchiveByNumberStrategy() override;
 
-	LogFile* open(LogFile* pFile);
-	LogFile* archive(LogFile* pFile);
+	[[nodiscard]] LogFile* open(LogFile *pFile) override;
+	[[nodiscard]] LogFile* archive(LogFile *pFile) override;
 };
 
 
@@ -102,24 +112,25 @@ class ArchiveByTimestampStrategy: public ArchiveStrategy
 	/// log files.
 {
 public:
-	ArchiveByTimestampStrategy()
-	{
-	}
+	ArchiveByTimestampStrategy() = default;
 
-	~ArchiveByTimestampStrategy()
-	{
-	}
+	~ArchiveByTimestampStrategy() override = default;
 
-	LogFile* open(LogFile* pFile)
+	[[nodiscard]] LogFile* open(LogFile* pFile) override
 	{
 		return pFile;
 	}
 
-	LogFile* archive(LogFile* pFile)
-		/// Archives the file by appending the current timestamp to the
-		/// file name. If the new file name exists, additionally a monotonic
-		/// increasing number is appended to the log file name.
+	[[nodiscard]] LogFile* archive(LogFile* pFile) override
+	/// Archives the file by appending the current timestamp to the
+	/// file name. If the new file name exists, additionally a monotonic
+	/// increasing number is appended to the log file name.
 	{
+		FastMutex::ScopedLock l(_rotateMutex);
+
+		while (_compressingCount > 0)
+			_compressingComplete.wait(_rotateMutex, 1000);
+
 		std::string path = pFile->path();
 		delete pFile;
 		std::string archPath = path;
@@ -128,6 +139,11 @@ public:
 
 		if (exists(archPath)) archiveByNumber(archPath);
 		else moveFile(path, archPath);
+
+		// If no compression was started, invoke purge callback now.
+		// Otherwise, it will be invoked when compression completes.
+		if (_compressingCount == 0 && _purgeCallback)
+			_purgeCallback();
 
 		return new LogFile(path);
 	}

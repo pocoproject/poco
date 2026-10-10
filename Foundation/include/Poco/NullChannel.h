@@ -40,13 +40,13 @@ public:
 	NullChannel();
 		/// Creates the NullChannel.
 
-	~NullChannel();
+	~NullChannel() override;
 		/// Destroys the NullChannel.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Does nothing.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Ignores both name and value.
 };
 

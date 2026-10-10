@@ -23,15 +23,14 @@
 #include "Poco/Zip/ZipUtil.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API ZipArchiveInfo
 	/// A ZipArchiveInfo stores central directory info
 {
 public:
-	static const char HEADER[ZipCommon::HEADER_SIZE];
+	static constexpr char HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x05', '\x06'};
 
 	ZipArchiveInfo();
 		/// Default constructor, everything set to zero or empty
@@ -43,25 +42,25 @@ public:
 	~ZipArchiveInfo();
 		/// Destroys the ZipArchiveInfo.
 
-	Poco::UInt16 getDiskNumber() const;
+	[[nodiscard]] Poco::UInt16 getDiskNumber() const;
 		/// Get the number of the disk where this header can be found
 
-	Poco::UInt16 getFirstDiskForDirectoryHeader() const;
+	[[nodiscard]] Poco::UInt16 getFirstDiskForDirectoryHeader() const;
 		/// Returns the number of the disk that contains the start of the directory header
 
-	Poco::UInt16 getNumberOfEntries() const;
+	[[nodiscard]] Poco::UInt16 getNumberOfEntries() const;
 		/// Returns the number of entries on this disk
 
-	Poco::UInt16 getTotalNumberOfEntries() const;
+	[[nodiscard]] Poco::UInt16 getTotalNumberOfEntries() const;
 		/// Returns the total number of entries on all disks
 
-	Poco::UInt32 getCentralDirectorySize() const;
+	[[nodiscard]] Poco::UInt32 getCentralDirectorySize() const;
 		/// Returns the size of the central directory in bytes
 
-	std::streamoff getHeaderOffset() const;
+	[[nodiscard]] std::streamoff getHeaderOffset() const;
 		/// Returns the offset of the header in relation to the begin of this disk
 
-	const std::string& getZipComment() const;
+	[[nodiscard]] const std::string& getZipComment() const;
 		/// Returns the (optional) Zip Comment
 
 	void setZipComment(const std::string& comment);
@@ -94,7 +93,7 @@ private:
 	enum
 	{
 		HEADER_POS = 0,
-		NUMBEROFTHISDISK_POS = HEADER_POS + ZipCommon::HEADER_SIZE,
+		NUMBEROFTHISDISK_POS = HEADER_POS + static_cast<int>(ZipCommon::HEADER_SIZE),
 		NUMBEROFTHISDISK_SIZE = 2,
 		NUMBEROFCENTRALDIRDISK_POS = NUMBEROFTHISDISK_POS + NUMBEROFTHISDISK_SIZE,
 		NUMBEROFCENTRALDIRDISK_SIZE = 2,
@@ -121,8 +120,8 @@ class Zip_API ZipArchiveInfo64
 	/// A ZipArchiveInfo64 stores central directory info
 {
 public:
-	static const char HEADER[ZipCommon::HEADER_SIZE];
-	static const char LOCATOR_HEADER[ZipCommon::HEADER_SIZE];
+	static constexpr char HEADER[ZipCommon::HEADER_SIZE]         = {'\x50', '\x4b', '\x06', '\x06'};
+	static constexpr char LOCATOR_HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x06', '\x07'};
 
 	ZipArchiveInfo64();
 		/// Default constructor, everything set to zero or empty
@@ -134,31 +133,31 @@ public:
 	~ZipArchiveInfo64();
 		/// Destroys the ZipArchiveInfo64.
 
-	void getVersionMadeBy(int& major, int& minor);
+	[[nodiscard]] Poco::UInt16 getVersionMadeBy() const;
 		/// The ZIP version used to create the file
 
-	void getRequiredVersion(int& major, int& minor);
+	[[nodiscard]] Poco::UInt16 getRequiredVersion() const;
 		/// The minimum version required to extract the data
 
-	Poco::UInt32 getDiskNumber() const;
+	[[nodiscard]] Poco::UInt32 getDiskNumber() const;
 		/// Get the number of the disk where this header can be found
 
-	Poco::UInt32 getFirstDiskForDirectoryHeader() const;
+	[[nodiscard]] Poco::UInt32 getFirstDiskForDirectoryHeader() const;
 		/// Returns the number of the disk that contains the start of the directory header
 
-	Poco::UInt64 getNumberOfEntries() const;
+	[[nodiscard]] Poco::UInt64 getNumberOfEntries() const;
 		/// Returns the number of entries on this disk
 
-	Poco::UInt64 getTotalNumberOfEntries() const;
+	[[nodiscard]] Poco::UInt64 getTotalNumberOfEntries() const;
 		/// Returns the total number of entries on all disks
 
-	Poco::UInt64 getCentralDirectorySize() const;
+	[[nodiscard]] Poco::UInt64 getCentralDirectorySize() const;
 		/// Returns the size of the central directory in bytes
 
-	std::streamoff getCentralDirectoryOffset() const;
+	[[nodiscard]] std::streamoff getCentralDirectoryOffset() const;
 		/// Returns the offset of the central directory from beginning of first disk
 
-	std::streamoff getHeaderOffset() const;
+	[[nodiscard]] std::streamoff getHeaderOffset() const;
 		/// Returns the offset of the header in relation to the begin of this disk
 
 	void setNumberOfEntries(Poco::UInt64 val);
@@ -179,7 +178,7 @@ public:
 	void setTotalNumberOfDisks(Poco::UInt32 val);
 		/// Sets the offset of the central directory from beginning of first disk
 
-	std::string createHeader() const;
+	[[nodiscard]] std::string createHeader() const;
 		/// Creates a header
 
 private:
@@ -190,7 +189,7 @@ private:
 	enum
 	{
 		HEADER_POS = 0,
-		RECORDSIZE_POS = HEADER_POS + ZipCommon::HEADER_SIZE,
+		RECORDSIZE_POS = HEADER_POS + static_cast<int>(ZipCommon::HEADER_SIZE),
 		RECORDSIZE_SIZE = 8,
 		VERSIONMADEBY_POS = RECORDSIZE_POS + RECORDSIZE_SIZE,
 		VERSIONMADEBY_SIZE = 2,
@@ -211,7 +210,7 @@ private:
 		FULL_HEADER_SIZE = 56,
 
 		LOCATOR_HEADER_POS = 0,
-		NUMBEROFENDOFCENTRALDIRDISK_POS = LOCATOR_HEADER_POS + ZipCommon::HEADER_SIZE,
+		NUMBEROFENDOFCENTRALDIRDISK_POS = LOCATOR_HEADER_POS + static_cast<int>(ZipCommon::HEADER_SIZE),
 		NUMBEROFENDOFCENTRALDIRDISK_SIZE = 4,
 		ENDOFCENTRALDIROFFSET_POS = NUMBEROFENDOFCENTRALDIRDISK_POS + NUMBEROFENDOFCENTRALDIRDISK_SIZE,
 		ENDOFCENTRALDIROFFSET_SIZE = 8,
@@ -232,6 +231,15 @@ private:
 // inlines
 //
 
+inline Poco::UInt16 ZipArchiveInfo64::getVersionMadeBy() const
+{
+	return ZipUtil::get16BitValue(_rawInfo, VERSIONMADEBY_POS);
+}
+
+inline Poco::UInt16 ZipArchiveInfo64::getRequiredVersion() const
+{
+	return ZipUtil::get16BitValue(_rawInfo, VERSION_NEEDED_POS);
+}
 
 inline Poco::UInt16 ZipArchiveInfo::getDiskNumber() const
 {
@@ -399,7 +407,7 @@ inline void ZipArchiveInfo64::setTotalNumberOfDisks(Poco::UInt32 val)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipArchiveInfo_INCLUDED

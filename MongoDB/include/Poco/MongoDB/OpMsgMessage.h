@@ -7,7 +7,7 @@
 //
 // Definition of the OpMsgMessage class.
 //
-// Copyright (c) 2022, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2022-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -24,12 +24,16 @@
 
 #include <string>
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API OpMsgMessage: public Message
 	/// This class represents a request/response (OP_MSG) to send requests and receive responses to/from MongoDB.
+	///
+	/// THREAD SAFETY:
+	/// This class is NOT thread-safe. OpMsgMessage instances must not be accessed
+	/// concurrently from multiple threads without external synchronization.
+	/// Each thread should use its own message instances.
 {
 public:
 
@@ -42,12 +46,18 @@ public:
 	static const std::string CMD_UPDATE;
 	static const std::string CMD_FIND;
 	static const std::string CMD_FIND_AND_MODIFY;
-	static const std::string CMD_GET_MORE;
+	static const std::string CMD_BULK_WRITE;
+		/// Since MongoDB 8.0. Name constant only: the type-1 payload sections
+		/// (ops/nsInfo) are not wired into commandIdentifier(), so callers must
+		/// build the command body manually.
 
 	// Aggregation
 	static const std::string CMD_AGGREGATE;
 	static const std::string CMD_COUNT;
+		/// Legacy command; outside Stable API v1 since MongoDB 5.0.
+		/// Prefer aggregation $count (see Database::count).
 	static const std::string CMD_DISTINCT;
+	POCO_DEPRECATED("Deprecated since MongoDB 5.0; use the aggregation pipeline with $accumulator / $function / $out / $merge instead.")
 	static const std::string CMD_MAP_REDUCE;
 
 	// Replication and administration 
@@ -57,17 +67,34 @@ public:
 
 	static const std::string CMD_CREATE;
 	static const std::string CMD_CREATE_INDEXES;
+	static const std::string CMD_DROP_INDEXES;
 	static const std::string CMD_DROP;
 	static const std::string CMD_DROP_DATABASE;
 	static const std::string CMD_KILL_CURSORS;
 	static const std::string CMD_LIST_DATABASES;
 	static const std::string CMD_LIST_INDEXES;
+	static const std::string CMD_LIST_COLLECTIONS;
+	static const std::string CMD_RENAME_COLLECTION;
+	static const std::string CMD_COLL_MOD;
+	static const std::string CMD_GET_PARAMETER;
+	static const std::string CMD_SET_PARAMETER;
 
 	// Diagnostic
 	static const std::string CMD_BUILD_INFO;
+	POCO_DEPRECATED("Deprecated since MongoDB 6.2; use the $collStats aggregation stage instead.")
 	static const std::string CMD_COLL_STATS;
 	static const std::string CMD_DB_STATS;
 	static const std::string CMD_HOST_INFO;
+	static const std::string CMD_PING;
+	static const std::string CMD_SERVER_STATUS;
+	static const std::string CMD_CONNECTION_STATUS;
+	static const std::string CMD_EXPLAIN;
+	static const std::string CMD_LIST_COMMANDS;
+	static const std::string CMD_GET_LOG;
+
+	// Authentication
+	static const std::string CMD_SASL_START;
+	static const std::string CMD_SASL_CONTINUE;
 
 
 	enum Flags : UInt32
@@ -91,41 +118,38 @@ public:
 
 	virtual ~OpMsgMessage();
 
-	const std::string& databaseName() const;
+	[[nodiscard]] const std::string& databaseName() const;
 
-	const std::string& collectionName() const;	
+	[[nodiscard]] const std::string& collectionName() const;
 
 	void setCommandName(const std::string& command);
 		/// Sets the command name and clears the command document
 
-	void setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize = -1);
-		/// Sets the command "getMore" for the cursor id with batch size (if it is not negative).
-
-	const std::string& commandName() const;
+	[[nodiscard]] const std::string& commandName() const;
 		/// Current command name.
 
 	void setAcknowledgedRequest(bool ack);
-		/// Set false to create request that does not return response. 
+		/// Set false to create request that does not return response.
 		/// It has effect only for commands that write or delete documents.
 		/// Default is true (request returns acknowledge response).
 
-	bool acknowledgedRequest() const;
+	[[nodiscard]] bool acknowledgedRequest() const;
 
-	UInt32 flags() const;
+	[[nodiscard]] UInt32 flags() const;
 
 	Document& body();
 		/// Access to body document.
 		/// Additional query arguments shall be added after setting the command name.
 
-	const Document& body() const;
+	[[nodiscard]] const Document& body() const;
 
 	Document::Vector& documents();
 		/// Documents prepared for request or retrieved in response.
 
-	const Document::Vector& documents() const;
+	[[nodiscard]] const Document::Vector& documents() const;
 		/// Documents prepared for request or retrieved in response.
 
-	bool responseOk() const;
+	[[nodiscard]] bool responseOk() const;
 		/// Reads "ok" status from the response message.
 
 	void clear();
@@ -133,17 +157,33 @@ public:
 
 	void send(std::ostream& ostr);
 		/// Writes the request to stream.
+		///
+		/// Throws InvalidArgumentException, before anything is written, if the
+		/// message exceeds MAX_MESSAGE_SIZE_BYTES, a document of the document
+		/// sequence exceeds BSON_MAX_DOCUMENT_SIZE + 16 KiB, nesting is too deep,
+		/// a name contains a null character or MSG_CHECKSUM_PRESENT is set, which
+		/// is not supported, and RangeException for a BSONTimestamp outside
+		/// 1970-2106. Other limits are left to the server.
 
 	void read(std::istream& istr);
-		/// Reads the response from the stream.
+		/// Reads the response from the stream. The message is cleared first, so
+		/// that a reused message never holds parts of two responses. The message
+		/// must carry an OP_MSG opcode and exactly one body section.
+		///
+		/// Only bounds are checked (see Document::read); documents may exceed
+		/// BSON_MAX_DOCUMENT_SIZE, as the server returns larger ones. Throws
+		/// DataFormatException if a check fails, NotImplementedException for an
+		/// unsupported element type, and IOException if the stream ends early.
 
 private:
 
-	enum PayloadType : UInt8
-	{
-		PAYLOAD_TYPE_0	= 0,
-		PAYLOAD_TYPE_1	= 1
-	};
+	// Only used by the cursor
+	static const std::string CMD_GET_MORE;
+
+	friend class OpMsgCursor;
+
+	void setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize = -1);
+		/// Sets the command "getMore" for the cursor id with batch size (if it is not negative).
 
 	std::string			_databaseName;
 	std::string			_collectionName;
@@ -157,7 +197,7 @@ private:
 };
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_OpMsgMessage_INCLUDED

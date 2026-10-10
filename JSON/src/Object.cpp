@@ -14,7 +14,6 @@
 
 #include "Poco/JSON/Object.h"
 #include <iostream>
-#include <sstream>
 
 
 using Poco::Dynamic::Var;
@@ -23,32 +22,34 @@ using Poco::Dynamic::Var;
 // have known instance of the pointer to be used with VarHolder when
 // compiling with -fvisibility=hidden
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(JSON_EXPORTS)
 template class JSON_API Poco::SharedPtr<Poco::JSON::Object>;
 #else
 template class Poco::SharedPtr<Poco::JSON::Object>;
 #endif
 
-namespace Poco {
-
-namespace JSON {
+namespace Poco::JSON {
 
 
 Object::Object(int options):
 	_preserveInsOrder((options & Poco::JSON_PRESERVE_KEY_ORDER) != 0),
 	_escapeUnicode((options & Poco::JSON_ESCAPE_UNICODE) != 0),
 	_lowercaseHex((options & Poco::JSON_LOWERCASE_HEX) != 0),
-	_modified(false)
+	_structModified(false),
+	_ordStructModified(false)
 {
 }
 
 
-Object::Object(const Object& other) : _values(other._values),
+Object::Object(const Object& other) :
+	_values(other._values),
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
 	_lowercaseHex(other._lowercaseHex),
-	_pStruct(!other._modified ? other._pStruct : 0),
-	_modified(other._modified)
+	_pStruct(!other._structModified ? other._pStruct : nullptr),
+	_pOrdStruct(!other._ordStructModified ? other._pOrdStruct : nullptr),
+	_structModified(other._structModified),
+	_ordStructModified(other._ordStructModified)
 {
 	syncKeys(other._keys);
 }
@@ -62,14 +63,13 @@ Object::Object(Object&& other) noexcept:
 	_lowercaseHex(other._lowercaseHex),
 	_pStruct(std::move(other._pStruct)),
 	_pOrdStruct(std::move(other._pOrdStruct)),
-	_modified(other._modified)
+	_structModified(other._structModified),
+	_ordStructModified(other._ordStructModified)
 {
 }
 
 
-Object::~Object()
-{
-}
+Object::~Object() = default;
 
 
 Object &Object::operator = (const Object &other)
@@ -81,8 +81,10 @@ Object &Object::operator = (const Object &other)
 		_preserveInsOrder = other._preserveInsOrder;
 		_escapeUnicode = other._escapeUnicode;
 		_lowercaseHex = other._lowercaseHex;
-		_pStruct = !other._modified ? other._pStruct : 0;
-		_modified = other._modified;
+		_pStruct = !other._structModified ? other._pStruct : nullptr;
+		_pOrdStruct = !other._ordStructModified ? other._pOrdStruct : nullptr;
+		_structModified = other._structModified;
+		_ordStructModified = other._ordStructModified;
 	}
 	return *this;
 }
@@ -97,7 +99,8 @@ Object& Object::operator = (Object&& other) noexcept
 	_lowercaseHex = other._lowercaseHex;
 	_pStruct = std::move(other._pStruct);
 	_pOrdStruct = std::move(other._pOrdStruct);
-	_modified = other._modified;
+	_structModified = other._structModified;
+	_ordStructModified = other._ordStructModified;
 
 	return *this;
 }
@@ -108,11 +111,10 @@ void Object::syncKeys(const KeyList& keys)
 	if(_preserveInsOrder)
 	{
 		// update iterators in _keys to point to copied _values
-		for(KeyList::const_iterator it = keys.begin(); it != keys.end(); ++it)
-		{
-			ValueMap::const_iterator itv = _values.find((*it)->first);
-			poco_assert (itv != _values.end());
-			_keys.push_back(itv);
+		for (const auto& key : keys) {
+			auto itv = _values.find(key->first);
+			poco_assert(itv != _values.end());
+			_keys.emplace_back(itv);
 		}
 	}
 }
@@ -120,37 +122,37 @@ void Object::syncKeys(const KeyList& keys)
 
 Var Object::get(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	auto it = _values.find(key);
 	if (it != _values.end())
 	{
 		return it->second;
 	}
 
-	return Var();
+	return {};
 }
 
 
 Array::Ptr Object::getArray(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	auto it = _values.find(key);
 	if ((it != _values.end()) && (it->second.type() == typeid(Array::Ptr)))
 	{
 		return it->second.extract<Array::Ptr>();
 	}
 
-	return 0;
+	return nullptr;
 }
 
 
 Object::Ptr Object::getObject(const std::string& key) const
 {
-	ValueMap::const_iterator it = _values.find(key);
+	auto it = _values.find(key);
 	if ((it != _values.end()) && (it->second.type() == typeid(Object::Ptr)))
 	{
 		return it->second.extract<Object::Ptr>();
 	}
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -159,16 +161,14 @@ void Object::getNames(NameList& names) const
 	names.clear();
 	if (_preserveInsOrder)
 	{
-		for(KeyList::const_iterator it = _keys.begin(); it != _keys.end(); ++it)
-		{
-			names.push_back((*it)->first);
+		for (const auto& _key : _keys) {
+			names.push_back(_key->first);
 		}
 	}
 	else
 	{
-		for(ValueMap::const_iterator it = _values.begin(); it != _values.end(); ++it)
-		{
-			names.push_back(it->first);
+		for (const auto& _value : _values) {
+			names.push_back(_value.first);
 		}
 	}
 }
@@ -184,7 +184,7 @@ Object::NameList Object::getNames() const
 
 void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 {
-	if (step < 0) step = indent;
+	if (step < 0) step = static_cast<int>(indent);
 
 	if (!_preserveInsOrder)
 		doStringify(_values, out, indent, step);
@@ -195,8 +195,8 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 
 const std::string& Object::getKey(KeyList::const_iterator& iter) const
 {
-	ValueMap::const_iterator it = _values.begin();
-	ValueMap::const_iterator end = _values.end();
+	auto it = _values.begin();
+	auto end = _values.end();
 	for (; it != end; ++it)
 	{
 		if (it == *iter) return it->first;
@@ -212,15 +212,16 @@ Object& Object::set(const std::string& key, const Dynamic::Var& value)
 	if (!ret.second) ret.first->second = value;
 	if (_preserveInsOrder)
 	{
-		KeyList::iterator it = _keys.begin();
-		KeyList::iterator end = _keys.end();
+		auto it = _keys.begin();
+		const auto end = _keys.end();
 		for (; it != end; ++it)
 		{
 			if (key == (*it)->first) return *this;
 		}
-		_keys.push_back(ret.first);
+		_keys.emplace_back(ret.first);
 	}
-	_modified = true;
+	_structModified = true;
+	_ordStructModified = true;
 	return *this;
 }
 
@@ -236,37 +237,16 @@ Poco::OrderedDynamicStruct Object::makeOrderedStruct(const Object::Ptr& obj)
 	return makeStructImpl<Poco::OrderedDynamicStruct>(obj);
 }
 
-/*
-void Object::resetOrdDynStruct() const
-{
-	if (!_pOrdStruct)
-		_pOrdStruct = new Poco::OrderedDynamicStruct;
-	else
-		_pOrdStruct->clear();
-}
-*/
-
-
-/*
-void Object::resetDynStruct() const
-{
-	if (!_pStruct)
-		_pStruct = new Poco::DynamicStruct;
-	else
-		_pStruct->clear();
-}*/
-
-
 Object::operator const Poco::DynamicStruct& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynStruct(_pStruct);
 	}
-	else if (_modified)
+	else if (_structModified)
 	{
-		ValueMap::const_iterator it = _values.begin();
-		ValueMap::const_iterator end = _values.end();
+		auto it = _values.begin();
+		const auto end = _values.end();
 		resetDynStruct(_pStruct);
 		for (; it != end; ++it)
 		{
@@ -283,6 +263,7 @@ Object::operator const Poco::DynamicStruct& () const
 				_pStruct->insert(it->first, it->second);
 			}
 		}
+		_structModified = false;
 	}
 
 	return *_pStruct;
@@ -291,16 +272,16 @@ Object::operator const Poco::DynamicStruct& () const
 
 Object::operator const Poco::OrderedDynamicStruct& () const
 {
-	if (!_values.size())
+	if (_values.empty())
 	{
 		resetDynStruct(_pOrdStruct);
 	}
-	else if (_modified)
+	else if (_ordStructModified)
 	{
 		if (_preserveInsOrder)
 		{
-			KeyList::const_iterator it = _keys.begin();
-			KeyList::const_iterator end = _keys.end();
+			auto it = _keys.begin();
+			const auto end = _keys.end();
 			resetDynStruct(_pOrdStruct);
 			for (; it != end; ++it)
 			{
@@ -320,8 +301,8 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 		}
 		else
 		{
-			ValueMap::const_iterator it = _values.begin();
-			ValueMap::const_iterator end = _values.end();
+			auto it = _values.begin();
+			const auto end = _values.end();
 			resetDynStruct(_pOrdStruct);
 			for (; it != end; ++it)
 			{
@@ -339,6 +320,7 @@ Object::operator const Poco::OrderedDynamicStruct& () const
 				}
 			}
 		}
+		_ordStructModified = false;
 	}
 
 	return *_pOrdStruct;
@@ -349,9 +331,11 @@ void Object::clear()
 {
 	_values.clear();
 	_keys.clear();
-	_pStruct = 0;
-	_modified = true;
+	_pStruct = nullptr;
+	_pOrdStruct = nullptr;
+	_structModified = true;
+	_ordStructModified = true;
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

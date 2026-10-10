@@ -33,11 +33,11 @@ public:
 	TaskNotification(Task* pTask);
 		/// Creates the TaskNotification.
 
-	Task* task() const;
+	[[nodiscard]] Task* task() const;
 		/// Returns the subject of the notification.
 
 protected:
-	virtual ~TaskNotification();
+	~TaskNotification() override;
 		/// Destroys the TaskNotification.
 
 private:
@@ -53,7 +53,7 @@ public:
 	TaskStartedNotification(Task* pTask);
 
 protected:
-	~TaskStartedNotification();
+	~TaskStartedNotification() override;
 };
 
 
@@ -65,7 +65,7 @@ public:
 	TaskCancelledNotification(Task* pTask);
 
 protected:
-	~TaskCancelledNotification();
+	~TaskCancelledNotification() override;
 };
 
 
@@ -77,7 +77,7 @@ public:
 	TaskFinishedNotification(Task* pTask);
 
 protected:
-	~TaskFinishedNotification();
+	~TaskFinishedNotification() override;
 };
 
 
@@ -88,10 +88,10 @@ class Foundation_API TaskFailedNotification: public TaskNotification
 public:
 	TaskFailedNotification(Task* pTask, const Exception& exc);
 
-	const Exception& reason() const;
+	[[nodiscard]] const Exception& reason() const;
 
 protected:
-	~TaskFailedNotification();
+	~TaskFailedNotification() override;
 
 private:
 	Exception* _pException;
@@ -105,10 +105,10 @@ class Foundation_API TaskProgressNotification: public TaskNotification
 public:
 	TaskProgressNotification(Task* pTask, float progress);
 
-	float progress() const;
+	[[nodiscard]] float progress() const;
 
 protected:
-	~TaskProgressNotification();
+	~TaskProgressNotification() override;
 
 private:
 	float _progress;
@@ -130,13 +130,13 @@ public:
 	{
 	}
 
-	const C& custom() const
+	[[nodiscard]] const C& custom() const
 	{
 		return _custom;
 	}
 
 protected:
-	~TaskCustomNotification(){};
+	~TaskCustomNotification() override = default;
 
 private:
 	C _custom;

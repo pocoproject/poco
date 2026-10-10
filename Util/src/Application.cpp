@@ -5,7 +5,7 @@
 // Package: Application
 // Module:  Application
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -27,6 +27,7 @@
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionProcessor.h"
 #include "Poco/Util/Validator.h"
+#include "Poco/Util/OptionException.h"
 #include "Poco/Environment.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
@@ -37,8 +38,8 @@
 #include "Poco/AutoPtr.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/UnWindows.h"
-#endif
-#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+#include "Poco/UnicodeConverter.h"
+#elif defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
 #include <stdio.h>
 #include <sys/ioctl.h>
@@ -47,7 +48,6 @@
 #include <termios.h>
 #endif
 #endif
-#include "Poco/UnicodeConverter.h"
 
 
 using Poco::Logger;
@@ -64,11 +64,10 @@ using Poco::icompare;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
-Application* Application::_pInstance = 0;
+Application* Application::_pInstance = nullptr;
 
 
 Application::Application():
@@ -76,33 +75,31 @@ Application::Application():
 	_initialized(false),
 	_unixOptions(true),
 	_pLogger(&Logger::get("ApplicationStartup"s)),
-	_stopOptionsProcessing(false)
+	_stopOptionsProcessing(false),
+	_ignoreUnknownOptions(false)
 {
 	setup();
 }
 
 
-Application::Application(int argc, char* argv[]):
-	_pConfig(new LayeredConfiguration),
-	_initialized(false),
-	_unixOptions(true),
-	_pLogger(&Logger::get("ApplicationStartup"s)),
-	_stopOptionsProcessing(false)
+Application::Application(int argc, char** argv):
+    Application()
 {
-	setup();
+	// CodeQL [cpp/virtual-call-in-ctor]: init() chain calls virtual defineOptions(),
+	// but only Application::defineOptions() runs here (derived vtable not yet constructed)
 	init(argc, argv);
 }
 
 
 Application::~Application()
 {
-	_pInstance = 0;
+	_pInstance = nullptr;
 }
 
 
 void Application::setup()
 {
-	poco_assert (_pInstance == 0);
+	poco_assert (_pInstance == nullptr);
 
 	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false);
 	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true);
@@ -119,6 +116,7 @@ void Application::setup()
 	setUnixOptions(false);
 #endif
 
+	// CodeQL [cpp/local-address-stored]: singleton pattern; instance lifetime is process-scoped
 	_pInstance = this;
 
 	AutoPtr<ConsoleChannel> pCC = new ConsoleChannel;
@@ -134,28 +132,6 @@ void Application::addSubsystem(Subsystem* pSubsystem)
 }
 
 
-void Application::init(int argc, char* argv[])
-{
-	setArgs(argc, argv);
-	init();
-}
-
-
-#if defined(_WIN32)
-void Application::init(int argc, wchar_t* argv[])
-{
-	std::vector<std::string> args;
-	for (int i = 0; i < argc; ++i)
-	{
-		std::string arg;
-		Poco::UnicodeConverter::toUTF8(argv[i], arg);
-		args.push_back(arg);
-	}
-	init(args);
-}
-#endif
-
-
 void Application::init(const ArgVec& args)
 {
 	setArgs(args);
@@ -165,8 +141,7 @@ void Application::init(const ArgVec& args)
 
 void Application::init()
 {
-	Path appPath;
-	getApplicationPath(appPath);
+	Path appPath = getApplicationPath();
 	_pConfig->setString("application.path"s, appPath.toString());
 	_pConfig->setString("application.name"s, appPath.getFileName());
 	_pConfig->setString("application.baseName"s, appPath.getBaseName());
@@ -200,7 +175,8 @@ void Application::uninitialize()
 {
 	if (_initialized)
 	{
-		for (SubsystemVec::reverse_iterator it = _subsystems.rbegin(); it != _subsystems.rend(); ++it)
+		// uninitialize subsystems in reverse order
+		for (auto it = _subsystems.rbegin(); it != _subsystems.rend(); ++it)
 		{
 			_pLogger->debug("Uninitializing subsystem: "s + (*it)->name());
 			(*it)->uninitialize();
@@ -220,21 +196,14 @@ void Application::reinitialize(Application& self)
 }
 
 
-void Application::setUnixOptions(bool flag)
-{
-	_unixOptions = flag;
-}
-
-
 int Application::loadConfiguration(int priority)
 {
 	int n = 0;
-	Path appPath;
-	getApplicationPath(appPath);
+	Path appPath = getApplicationPath();
 	Path confPath;
 	if (findAppConfigFile(appPath.getBaseName(), "properties"s, confPath))
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString(), _pConfig.get()), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
@@ -276,7 +245,7 @@ void Application::loadConfiguration(const std::string& path, int priority)
 	std::string ext = confPath.getExtension();
 	if (icompare(ext, "properties") == 0)
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString(), _pConfig.get()), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
@@ -324,30 +293,24 @@ std::string Application::commandPath() const
 }
 
 
-void Application::stopOptionsProcessing()
-{
-	_stopOptionsProcessing = true;
-}
-
-
 Application::WindowSize Application::windowSize()
 {
 	WindowSize size{0, 0};
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-    if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
-    {
-    	size.width  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
-    	size.height = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
-    }
+	if (GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi))
+	{
+		size.width  = csbi.srWindow.Right  - csbi.srWindow.Left + 1;
+		size.height = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
+	}
 #elif defined(POCO_OS_FAMILY_UNIX)
 	struct winsize winsz;
-    if (ioctl(0, TIOCGWINSZ , &winsz) != -1)
-    {
-    	size.width  = winsz.ws_col;
-    	size.height = winsz.ws_row;
-    }
+	if (ioctl(0, TIOCGWINSZ , &winsz) != -1)
+	{
+		size.width  = winsz.ws_col;
+		size.height = winsz.ws_row;
+	}
 #endif
 
 	return size;
@@ -388,30 +351,44 @@ int Application::main(const ArgVec& args)
 }
 
 
-void Application::setArgs(int argc, char* argv[])
+Application::ArgVec Application::toArgs(int argc, char* argv[])
 {
-	_command = argv[0];
-	_pConfig->setInt("application.argc"s, argc);
-	_unprocessedArgs.reserve(argc);
-	std::string argvKey = "application.argv[";
+	ArgVec args;
+	args.reserve(argc);
 	for (int i = 0; i < argc; ++i)
 	{
-		std::string arg(argv[i]);
-		_pConfig->setString(argvKey + NumberFormatter::format(i) + "]", arg);
-		_unprocessedArgs.push_back(arg);
+		args.push_back(std::string(argv[i]));
 	}
+	return args;
 }
+
+
+#if defined(_WIN32)
+Application::ArgVec Application::toArgs(int argc, wchar_t* argv[])
+{
+	ArgVec args;
+	args.reserve(argc);
+	for (int i = 0; i < argc; ++i)
+	{
+		std::string arg;
+		Poco::UnicodeConverter::toUTF8(argv[i], arg);
+		args.push_back(arg);
+	}
+	return args;
+}
+#endif
 
 
 void Application::setArgs(const ArgVec& args)
 {
 	poco_assert (!args.empty());
 
+	_argv = args;
 	_command = args[0];
+	_unprocessedArgs.assign(args.begin() + 1, args.end());
 	_pConfig->setInt("application.argc"s, (int) args.size());
-	_unprocessedArgs = args;
 	std::string argvKey = "application.argv[";
-	for (int i = 0; i < args.size(); ++i)
+	for (std::size_t i = 0; i < args.size(); ++i)
 	{
 		_pConfig->setString(argvKey + NumberFormatter::format(i) + "]", args[i]);
 	}
@@ -423,14 +400,25 @@ void Application::processOptions()
 	defineOptions(_options);
 	OptionProcessor processor(_options);
 	processor.setUnixStyle(_unixOptions);
-	_argv = _unprocessedArgs;
-	_unprocessedArgs.erase(_unprocessedArgs.begin());
-	ArgVec::iterator it = _unprocessedArgs.begin();
-	while (it != _unprocessedArgs.end() && !_stopOptionsProcessing)
+	for (auto it = _unprocessedArgs.begin(); it != _unprocessedArgs.end() && !_stopOptionsProcessing; )
 	{
 		std::string name;
 		std::string value;
-		if (processor.process(*it, name, value))
+		bool success = false;
+
+		if (_ignoreUnknownOptions)
+		{
+			try
+			{
+				success = processor.process(*it, name, value);
+			} catch (Poco::Util::UnknownOptionException&) { }
+		}
+		else
+		{
+			success = processor.process(*it, name, value);
+		}
+
+		if (success)
 		{
 			if (!name.empty()) // "--" option to end options processing or deferred argument
 			{
@@ -438,10 +426,15 @@ void Application::processOptions()
 			}
 			it = _unprocessedArgs.erase(it);
 		}
-		else ++it;
+		else
+		{
+			++it;
+		}
 	}
 	if (!_stopOptionsProcessing)
+	{
 		processor.checkRequired();
+	}
 }
 
 
@@ -469,7 +462,7 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 	}
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 		wchar_t path[1024];
-		int n = GetModuleFileNameW(0, path, sizeof(path)/sizeof(wchar_t));
+		int n = GetModuleFileNameW(nullptr, path, sizeof(path)/sizeof(wchar_t));
 		if (n > 0)
 		{
 			std::string p;
@@ -483,13 +476,19 @@ void Application::getApplicationPath(Poco::Path& appPath) const
 }
 
 
+void Application::getApplicationDirectory(Poco::Path& dir) const
+{
+	Path appPath;
+	getApplicationPath(appPath);
+	dir = appPath.parent();
+}
+
+
 bool Application::findFile(Poco::Path& path) const
 {
 	if (path.isAbsolute()) return true;
 
-	Path appPath;
-	getApplicationPath(appPath);
-	Path base = appPath.parent();
+	Path base = getApplicationDirectory();
 	do
 	{
 		Path p(base, path);
@@ -511,29 +510,6 @@ bool Application::findAppConfigFile(const std::string& appName, const std::strin
 	poco_assert (!appName.empty());
 
 	Path p(appName);
-	p.setExtension(extension);
-	bool found = findFile(p);
-	if (!found)
-	{
-#if defined(_DEBUG)
-		if (appName[appName.length() - 1] == 'd')
-		{
-			p.setBaseName(appName.substr(0, appName.length() - 1));
-			found = findFile(p);
-		}
-#endif
-	}
-	if (found)
-		path = p;
-	return found;
-}
-
-
-bool Application::findAppConfigFile(const Path& basePath, const std::string& appName, const std::string& extension, Path& path) const
-{
-	poco_assert (!appName.empty());
-
-	Path p(basePath,appName);
 	p.setExtension(extension);
 	bool found = findFile(p);
 	if (!found)
@@ -587,4 +563,4 @@ void Application::setLogger(Logger& logger)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

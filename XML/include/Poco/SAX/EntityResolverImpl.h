@@ -24,8 +24,7 @@
 #include "Poco/URIStreamOpener.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API EntityResolverImpl: public EntityResolver
@@ -72,7 +71,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_EntityResolverImpl_INCLUDED

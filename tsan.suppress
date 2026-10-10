@@ -23,3 +23,11 @@ race:ActiveDispatcherTest
 race:ArchiveStrategy::moveFile
 
 race:ThreadTest::testNotJoin
+
+# Pipe close races with blocked read()/write() on the same fd.
+# This is the standard POSIX mechanism for unblocking pipe IO:
+# close the other end to trigger EPIPE/EOF. The blocked syscall
+# holds a kernel reference to the file description, so it
+# completes safely after close() removes the fd from the table.
+# See close(2) and PipeImpl::close() for details.
+race:PipeImpl::close

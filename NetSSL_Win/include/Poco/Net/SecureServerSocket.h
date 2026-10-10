@@ -23,8 +23,7 @@
 #include "Poco/Net/Context.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API SecureServerSocket: public ServerSocket
@@ -125,12 +124,12 @@ public:
 		/// sendBytes(), receiveBytes() or completeHandshake()
 		/// is called on the returned SecureStreamSocket.
 
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureServerSocket_INCLUDED

@@ -28,8 +28,7 @@
 #include "Poco/Net/NetworkInterface.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API MulticastSocket: public DatagramSocket
@@ -67,7 +66,7 @@ public:
 		/// a DatagramSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
-	~MulticastSocket();
+	~MulticastSocket() override;
 		/// Destroys the DatagramSocket.
 
 	MulticastSocket& operator = (const Socket& socket);
@@ -86,7 +85,7 @@ public:
 		/// This is done by setting the IP_MULTICAST_IF/IPV6_MULTICAST_IF
 		/// socket option.
 
-	NetworkInterface getInterface() const;
+	[[nodiscard]] NetworkInterface getInterface() const;
 		/// Returns the interface used for sending multicast packets.
 
 	void setLoopback(bool flag);
@@ -95,7 +94,7 @@ public:
 		/// Sets the value of the IP_MULTICAST_LOOP/IPV6_MULTICAST_LOOP
 		/// socket option.
 
-	bool getLoopback() const;
+	[[nodiscard]] bool getLoopback() const;
 		/// Returns true iff loopback for multicast packets is enabled,
 		/// false otherwise.
 
@@ -105,7 +104,7 @@ public:
 		/// Sets the value of the IP_MULTICAST_TTL/IPV6_MULTICAST_HOPS
 		/// socket option.
 
-	unsigned getTimeToLive() const;
+	[[nodiscard]] unsigned int getTimeToLive() const;
 		/// Returns the TTL/hop limit for outgoing packets.
 
 	void joinGroup(const IPAddress& groupAddress);
@@ -121,12 +120,12 @@ public:
 		/// Leaves the specified multicast group at the given interface.
 
 private:
-	static NetworkInterface findFirstInterface(const IPAddress& groupAddress);
+	[[nodiscard]] static NetworkInterface findFirstInterface(const IPAddress& groupAddress);
 		/// Returns first multicast-eligible network interface.
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // POCO_NET_HAS_INTERFACE

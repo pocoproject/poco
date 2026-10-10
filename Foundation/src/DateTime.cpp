@@ -30,27 +30,25 @@ DateTime::DateTime()
 	_utcTime = now.utcTime();
 	computeGregorian(julianDay());
 	computeDaytime();
+	checkValid();
 }
 
 
 DateTime::DateTime(const tm& tmStruct):
-	_year(tmStruct.tm_year + 1900),
-	_month(tmStruct.tm_mon + 1),
-	_day(tmStruct.tm_mday),
-	_hour(tmStruct.tm_hour),
-	_minute(tmStruct.tm_min),
-	_second(tmStruct.tm_sec),
+	// Note: Member variables are short to minimize memory footprint.
+	// All valid DateTime values fit within short range; inputs are validated by checkValid().
+	_year(static_cast<short>(tmStruct.tm_year + 1900)),
+	_month(static_cast<short>(tmStruct.tm_mon + 1)),
+	_day(static_cast<short>(tmStruct.tm_mday)),
+	_hour(static_cast<short>(tmStruct.tm_hour)),
+	_minute(static_cast<short>(tmStruct.tm_min)),
+	_second(static_cast<short>(tmStruct.tm_sec)),
 	_millisecond(0),
 	_microsecond(0)
 {
-	poco_assert (_year >= 0 && _year <= 9999);
-	poco_assert (_month >= 1 && _month <= 12);
-	poco_assert (_day >= 1 && _day <= daysOfMonth(_year, _month));
-	poco_assert (_hour >= 0 && _hour <= 23);
-	poco_assert (_minute >= 0 && _minute <= 59);
-	poco_assert (_second >= 0 && _second <= 60);
-
-	_utcTime = toUtcTime(toJulianDay(_year, _month, _day)) + 10*(_hour*Timespan::HOURS + _minute*Timespan::MINUTES + _second*Timespan::SECONDS);
+	checkValid();
+	_utcTime = toUtcTime(toJulianDay(_year, _month, _day)) +
+		10*(_hour*Timespan::HOURS + _minute*Timespan::MINUTES + _second*Timespan::SECONDS);
 }
 
 
@@ -59,41 +57,24 @@ DateTime::DateTime(const Timestamp& timestamp):
 {
 	computeGregorian(julianDay());
 	computeDaytime();
+	checkValid();
 }
 
 
 DateTime::DateTime(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond):
-	_year(year),
-	_month(month),
-	_day(day),
-	_hour(hour),
-	_minute(minute),
-	_second(second),
-	_millisecond(millisecond),
-	_microsecond(microsecond)
+	_year(static_cast<short>(year)),
+	_month(static_cast<short>(month)),
+	_day(static_cast<short>(day)),
+	_hour(static_cast<short>(hour)),
+	_minute(static_cast<short>(minute)),
+	_second(static_cast<short>(second)),
+	_millisecond(static_cast<short>(millisecond)),
+	_microsecond(static_cast<short>(microsecond))
 {
-	if (isValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond))
-	{
-		_utcTime = toUtcTime(toJulianDay(year, month, day)) +
+	checkValid();
+	_utcTime = toUtcTime(toJulianDay(year, month, day)) +
 			10 * (hour*Timespan::HOURS + minute*Timespan::MINUTES + second*Timespan::SECONDS +
 				  millisecond*Timespan::MILLISECONDS + microsecond);
-	}
-	else
-	{
-		throw Poco::InvalidArgumentException(Poco::format("Date time is %d-%d-%dT%d:%d:%d.%d.%d\n"
-			"Valid values:\n"
-			"0 <= year <= 9999\n"
-			"1 <= month <= 12\n"
-			"1 <= day <=  %d\n"
-			"0 <= hour <= 23\n"
-			"0 <= minute <= 59\n"
-			"0 <= second <= 59\n"
-			"0 <= millisecond <= 999\n"
-			"0 <= microsecond <= 999",
-			_year, _month, _day, _hour, _minute,
-			_second, _millisecond, _microsecond,
-			daysOfMonth(_year, _month)));
-	}
 }
 
 
@@ -101,6 +82,7 @@ DateTime::DateTime(double julianDay):
 	_utcTime(toUtcTime(julianDay))
 {
 	computeGregorian(julianDay);
+	checkValid();
 }
 
 
@@ -109,6 +91,7 @@ DateTime::DateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff):
 {
 	computeGregorian(julianDay());
 	computeDaytime();
+	checkValid();
 }
 
 
@@ -154,6 +137,7 @@ DateTime& DateTime::operator = (const Timestamp& timestamp)
 	_utcTime = timestamp.utcTime();
 	computeGregorian(julianDay());
 	computeDaytime();
+	checkValid();
 	return *this;
 }
 
@@ -162,30 +146,23 @@ DateTime& DateTime::operator = (double julianDay)
 {
 	_utcTime = toUtcTime(julianDay);
 	computeGregorian(julianDay);
+	checkValid();
 	return *this;
 }
 
 
 DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond)
 {
-	poco_assert (year >= 0 && year <= 9999);
-	poco_assert (month >= 1 && month <= 12);
-	poco_assert (day >= 1 && day <= daysOfMonth(year, month));
-	poco_assert (hour >= 0 && hour <= 23);
-	poco_assert (minute >= 0 && minute <= 59);
-	poco_assert (second >= 0 && second <= 60); // allow leap seconds
-	poco_assert (millisecond >= 0 && millisecond <= 999);
-	poco_assert (microsecond >= 0 && microsecond <= 999);
-
 	_utcTime     = toUtcTime(toJulianDay(year, month, day)) + 10*(hour*Timespan::HOURS + minute*Timespan::MINUTES + second*Timespan::SECONDS + millisecond*Timespan::MILLISECONDS + microsecond);
-	_year        = year;
-	_month       = month;
-	_day         = day;
-	_hour        = hour;
-	_minute      = minute;
-	_second      = second;
-	_millisecond = millisecond;
-	_microsecond = microsecond;
+	_year        = static_cast<short>(year);
+	_month       = static_cast<short>(month);
+	_day         = static_cast<short>(day);
+	_hour        = static_cast<short>(hour);
+	_minute      = static_cast<short>(minute);
+	_second      = static_cast<short>(second);
+	_millisecond = static_cast<short>(millisecond);
+	_microsecond = static_cast<short>(microsecond);
+	checkValid();
 
 	return *this;
 }
@@ -223,21 +200,39 @@ int DateTime::dayOfYear() const
 
 int DateTime::daysOfMonth(int year, int month)
 {
-	poco_assert (month >= 1 && month <= 12);
-
 	static int daysOfMonthTable[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	if (month == 2 && isLeapYear(year))
 		return 29;
-	else
-		return daysOfMonthTable[month];
+	else if (month < 1 || month > 12)
+		return 0;
+	return daysOfMonthTable[month];
+}
+
+
+void DateTime::checkValid()
+{
+	if (!isValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond))
+		throw Poco::InvalidArgumentException(Poco::format("Date time is %hd-%hd-%hdT%hd:%hd:%hd.%hd.%hd\n"
+				"Valid values:\n"
+				"-4713 <= year <= 9999\n"
+				"1 <= month <= 12\n"
+				"1 <= day <=  %d\n"
+				"0 <= hour <= 23\n"
+				"0 <= minute <= 59\n"
+				"0 <= second <= 60\n"
+				"0 <= millisecond <= 999\n"
+				"0 <= microsecond <= 999",
+				_year, _month, _day, _hour, _minute,
+				_second, _millisecond, _microsecond,
+				daysOfMonth(_year, _month)));
 }
 
 
 bool DateTime::isValid(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond)
 {
 	return
-		(year >= 0 && year <= 9999) &&
+		(year >= -4713 && year <= 9999) &&
 		(month >= 1 && month <= 12) &&
 		(day >= 1 && day <= daysOfMonth(year, month)) &&
 		(hour >= 0 && hour <= 23) &&
@@ -294,6 +289,7 @@ DateTime& DateTime::operator += (const Timespan& span)
 	_utcTime += span.totalMicroseconds()*10;
 	computeGregorian(julianDay());
 	computeDaytime();
+	checkValid();
 	return *this;
 }
 
@@ -303,6 +299,7 @@ DateTime& DateTime::operator -= (const Timespan& span)
 	_utcTime -= span.totalMicroseconds()*10;
 	computeGregorian(julianDay());
 	computeDaytime();
+	checkValid();
 	return *this;
 }
 
@@ -378,7 +375,7 @@ void DateTime::normalize()
 
 	if (_day > daysOfMonth(_year, _month))
 	{
-		_day -= daysOfMonth(_year, _month);
+		_day = static_cast<short>(_day - daysOfMonth(_year, _month));
 		if (++_month > 12)
 		{
 			++_year;
@@ -421,14 +418,6 @@ void DateTime::computeGregorian(double julianDay)
 	_microsecond = short(r + 0.5);
 
 	normalize();
-
-	poco_assert_dbg (_month >= 1 && _month <= 12);
-	poco_assert_dbg (_day >= 1 && _day <= daysOfMonth(_year, _month));
-	poco_assert_dbg (_hour >= 0 && _hour <= 23);
-	poco_assert_dbg (_minute >= 0 && _minute <= 59);
-	poco_assert_dbg (_second >= 0 && _second <= 59);
-	poco_assert_dbg (_millisecond >= 0 && _millisecond <= 999);
-	poco_assert_dbg (_microsecond >= 0 && _microsecond <= 999);
 }
 
 
@@ -456,7 +445,7 @@ void DateTime::computeDaytime()
 				_month = 12;
 				_year--;
 			}
-			_day = daysOfMonth(_year, _month);
+			_day = static_cast<short>(daysOfMonth(_year, _month));
 		}
 	}
 	else if (hour == 0 && _hour == 23)
@@ -473,11 +462,11 @@ void DateTime::computeDaytime()
 			_day = 1;
 		}
 	}
-	_hour        = hour;
-	_minute      = span.minutes();
-	_second      = span.seconds();
-	_millisecond = span.milliseconds();
-	_microsecond = span.microseconds();
+	_hour        = static_cast<short>(hour);
+	_minute      = static_cast<short>(span.minutes());
+	_second      = static_cast<short>(span.seconds());
+	_millisecond = static_cast<short>(span.milliseconds());
+	_microsecond = static_cast<short>(span.microseconds());
 }
 
 

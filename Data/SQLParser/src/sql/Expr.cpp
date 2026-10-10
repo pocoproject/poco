@@ -1,6 +1,9 @@
 #include "Expr.h"
+
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "SelectStatement.h"
 
 namespace hsql {
@@ -46,6 +49,7 @@ Expr::Expr(ExprType type)
       select(nullptr),
       name(nullptr),
       table(nullptr),
+      schema(nullptr),
       alias(nullptr),
       fval(0),
       ival(0),
@@ -55,7 +59,8 @@ Expr::Expr(ExprType type)
       isBoolLiteral(false),
       opType(kOpNone),
       distinct(false),
-      windowDescription(nullptr) {}
+      windowDescription(nullptr),
+      withinGroupOrder(nullptr) {}
 
 Expr::~Expr() {
   delete expr;
@@ -63,8 +68,16 @@ Expr::~Expr() {
   delete select;
   delete windowDescription;
 
+  if (withinGroupOrder) {
+    for (OrderDescription* orderDescription : *withinGroupOrder) {
+      delete orderDescription;
+    }
+    delete withinGroupOrder;
+  }
+
   free(name);
   free(table);
+  free(schema);
   free(alias);
 
   if (exprList) {
@@ -216,6 +229,16 @@ Expr* Expr::makeFunctionRef(char* func_name, std::vector<Expr*>* exprList, bool 
   return e;
 }
 
+Expr* Expr::makeFunctionRef(char* func_name, char* schema, std::vector<Expr*>* exprList, bool distinct, WindowDescription* window) {
+  Expr* e = new Expr(kExprFunctionRef);
+  e->name = func_name;
+  e->schema = schema;
+  e->exprList = exprList;
+  e->distinct = distinct;
+  e->windowDescription = window;
+  return e;
+}
+
 Expr* Expr::makeArray(std::vector<Expr*>* exprList) {
   Expr* e = new Expr(kExprArray);
   e->exprList = exprList;
@@ -232,6 +255,18 @@ Expr* Expr::makeArrayIndex(Expr* expr, int64_t index) {
 Expr* Expr::makeParameter(int id) {
   Expr* e = new Expr(kExprParameter);
   e->ival = id;
+  return e;
+}
+
+Expr* Expr::makeDollarParameter(int64_t n) {
+  Expr* e = new Expr(kExprParameterDollar);
+  e->ival = n;
+  return e;
+}
+
+Expr* Expr::makeNamedParameter(char* name) {
+  Expr* e = new Expr(kExprParameterNamed);
+  e->name = name;
   return e;
 }
 
@@ -284,6 +319,7 @@ bool Expr::isType(ExprType exprType) const { return exprType == type; }
 
 bool Expr::isLiteral() const {
   return isType(kExprLiteralInt) || isType(kExprLiteralFloat) || isType(kExprLiteralString) || isType(kExprParameter) ||
+         isType(kExprParameterDollar) || isType(kExprParameterNamed) ||
          isType(kExprLiteralNull) || isType(kExprLiteralDate) || isType(kExprLiteralInterval);
 }
 
@@ -298,18 +334,18 @@ const char* Expr::getName() const {
     return name;
 }
 
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning(disable : 4996)
+#endif
 char* substr(const char* source, int from, int to) {
   int len = to - from;
   char* copy = (char*)malloc(len + 1);
   ;
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(disable : 4996)
-#endif
   strncpy(copy, source + from, len);
   copy[len] = '\0';
   return copy;
+}
 #if defined(_WIN32) || defined(_WIN64)
 #pragma warning(default : 4996)
 #endif
-}
 }  // namespace hsql

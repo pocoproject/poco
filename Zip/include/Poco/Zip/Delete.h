@@ -23,8 +23,7 @@
 #include "Poco/Zip/ZipLocalFileHeader.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API Delete: public ZipOperation
@@ -42,7 +41,7 @@ private:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_Delete_INCLUDED

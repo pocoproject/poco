@@ -20,16 +20,14 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString DOMParser::FEATURE_FILTER_WHITESPACE = toXMLString("http://www.appinf.com/features/no-whitespace-in-element-content");
 
 
 DOMParser::DOMParser(NamePool* pNamePool):
-	_pNamePool(pNamePool),
-	_filterWhitespace(false)
+	_pNamePool(pNamePool)
 {
 	if (_pNamePool) _pNamePool->duplicate();
 	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
@@ -38,8 +36,7 @@ DOMParser::DOMParser(NamePool* pNamePool):
 
 
 DOMParser::DOMParser(unsigned long namePoolSize):
-	_pNamePool(new NamePool(namePoolSize)),
-	_filterWhitespace(false)
+	_pNamePool(new NamePool(namePoolSize))
 {
 	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACES, true);
 	_saxParser.setFeature(XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
@@ -93,12 +90,12 @@ Document* DOMParser::parse(const XMLString& uri)
 	if (_filterWhitespace)
 	{
 		WhitespaceFilter filter(&_saxParser);
-		DOMBuilder builder(filter, _pNamePool);
+		DOMBuilder builder(filter, _pNamePool, _maxElementDepth);
 		return builder.parse(uri);
 	}
 	else
 	{
-		DOMBuilder builder(_saxParser, _pNamePool);
+		DOMBuilder builder(_saxParser, _pNamePool, _maxElementDepth);
 		return builder.parse(uri);
 	}
 }
@@ -109,12 +106,12 @@ Document* DOMParser::parse(InputSource* pInputSource)
 	if (_filterWhitespace)
 	{
 		WhitespaceFilter filter(&_saxParser);
-		DOMBuilder builder(filter, _pNamePool);
+		DOMBuilder builder(filter, _pNamePool, _maxElementDepth);
 		return builder.parse(pInputSource);
 	}
 	else
 	{
-		DOMBuilder builder(_saxParser, _pNamePool);
+		DOMBuilder builder(_saxParser, _pNamePool, _maxElementDepth);
 		return builder.parse(pInputSource);
 	}
 }
@@ -131,12 +128,12 @@ Document* DOMParser::parseMemory(const char* xml, std::size_t size)
 	if (_filterWhitespace)
 	{
 		WhitespaceFilter filter(&_saxParser);
-		DOMBuilder builder(filter, _pNamePool);
+		DOMBuilder builder(filter, _pNamePool, _maxElementDepth);
 		return builder.parseMemoryNP(xml, size);
 	}
 	else
 	{
-		DOMBuilder builder(_saxParser, _pNamePool);
+		DOMBuilder builder(_saxParser, _pNamePool, _maxElementDepth);
 		return builder.parseMemoryNP(xml, size);
 	}
 }
@@ -154,4 +151,16 @@ void DOMParser::setEntityResolver(EntityResolver* pEntityResolver)
 }
 
 
-} } // namespace Poco::XML
+void DOMParser::setMaxElementDepth(std::size_t limit)
+{
+	_maxElementDepth = limit;
+}
+
+
+std::size_t DOMParser::getMaxElementDepth() const
+{
+	return _maxElementDepth;
+}
+
+
+} // namespace Poco::XML

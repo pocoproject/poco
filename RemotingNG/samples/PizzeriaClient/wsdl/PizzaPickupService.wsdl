@@ -1,0 +1,438 @@
+<definitions name="PizzaPickupService" targetNamespace="http://www.appinf.com/webservices/PizzaDeliveryService/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:remoting="http://www.appinf.com/remoting" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ts="http://www.appinf.com/webservices/PizzaDeliveryService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wts="http://www.appinf.com/webservices/PizzaDeliveryService/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<types>
+		<xsd:schema targetNamespace="http://www.appinf.com/remoting">
+			<xsd:element name="Exception" type="remoting:Exception"/>
+			<xsd:complexType name="Exception">
+				<xsd:sequence>
+					<xsd:element name="Type" type="xsd:string"/>
+					<xsd:element name="Message" type="xsd:string"/>
+					<xsd:element name="Code" type="xsd:int"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:schema>
+		<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.appinf.com/webservices/PizzaDeliveryService/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:complexType name="Pizza">
+				<xsd:sequence>
+					<xsd:element name="basePrice" type="xsd:unsignedInt"/>
+					<xsd:element name="details" type="ts:PizzaDetails"/>
+					<xsd:element name="name" type="xsd:string"/>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="toppings" type="ts:ExtTopping"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="PizzaDetails">
+				<xsd:sequence>
+					<xsd:element name="calories" type="xsd:double"/>
+					<xsd:element name="carboHydrates" type="xsd:double"/>
+					<xsd:element name="percentFat" type="xsd:double"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ExtTopping">
+				<xsd:complexContent>
+					<xsd:extension base="ts:Topping">
+						<xsd:sequence>
+							<xsd:element name="addInfo" type="xsd:string"/>
+						</xsd:sequence>
+					</xsd:extension>
+				</xsd:complexContent>
+			</xsd:complexType>
+			<xsd:complexType name="Topping">
+				<xsd:sequence>
+					<xsd:element name="name" type="xsd:string"/>
+					<xsd:element name="price" type="xsd:unsignedInt"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="DeliveryAddress">
+				<xsd:sequence>
+					<xsd:element name="cityName" type="xsd:string"/>
+					<xsd:element name="details" type="ts:DeliveryAddressDetails"/>
+					<xsd:element name="houseNo" type="xsd:short"/>
+					<xsd:element name="state" type="xsd:string"/>
+					<xsd:element name="streetName" type="xsd:string"/>
+					<xsd:element name="personName" type="xsd:string"/>
+					<xsd:element name="phoneNo" type="xsd:string"/>
+					<xsd:element name="zip" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="DeliveryAddressDetails">
+				<xsd:sequence>
+					<xsd:element name="milesAway" type="xsd:double"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="orderRequest">
+				<xsd:sequence>
+					<xsd:element name="deliverTo" type="ts:DeliveryAddress"/>
+					<xsd:element name="pizza" type="ts:Pizza"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="orderReply">
+				<xsd:sequence>
+					<xsd:element name="return" type="xsd:dateTime"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="orderForSelfPickupRequest">
+				<xsd:sequence>
+					<xsd:element name="phoneNumber" type="xsd:string"/>
+					<xsd:element name="pizza" type="ts:Pizza"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="orderForSelfPickupReply">
+				<xsd:sequence>
+					<xsd:element name="return" type="xsd:dateTime"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="getAnyPizzaRequest"/>
+			<xsd:complexType name="getAnyPizzaReply">
+				<xsd:sequence>
+					<xsd:element name="return" type="ts:Pizza"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="getMostPopularToppingRequest"/>
+			<xsd:complexType name="getMostPopularToppingReply">
+				<xsd:sequence>
+					<xsd:element name="return" type="ts:ExtTopping"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="getPizzaNamesRequest"/>
+			<xsd:complexType name="getPizzaNamesReply">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="return" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="getPizzasRequest"/>
+			<xsd:complexType name="getPizzasReply">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="return" type="ts:Pizza"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="getToppingsRequest"/>
+			<xsd:complexType name="getToppingsReply">
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" name="return" type="ts:ExtTopping"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="getWaitTimeRequest"/>
+			<xsd:complexType name="getWaitTimeReply">
+				<xsd:sequence>
+					<xsd:element name="return" type="xsd:long"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="getAnyPizza" type="ts:getAnyPizzaRequest"/>
+			<xsd:element name="getAnyPizzaReply" type="ts:getAnyPizzaReply"/>
+			<xsd:element name="getMostPopularTopping" type="ts:getMostPopularToppingRequest"/>
+			<xsd:element name="getMostPopularToppingReply" type="ts:getMostPopularToppingReply"/>
+			<xsd:element name="getPizzaNames" type="ts:getPizzaNamesRequest"/>
+			<xsd:element name="getPizzaNamesReply" type="ts:getPizzaNamesReply"/>
+			<xsd:element name="getPizzas" type="ts:getPizzasRequest"/>
+			<xsd:element name="getPizzasReply" type="ts:getPizzasReply"/>
+			<xsd:element name="getToppings" type="ts:getToppingsRequest"/>
+			<xsd:element name="getToppingsReply" type="ts:getToppingsReply"/>
+			<xsd:element name="getWaitTime" type="ts:getWaitTimeRequest"/>
+			<xsd:element name="getWaitTimeReply" type="ts:getWaitTimeReply"/>
+			<xsd:element name="order" type="ts:orderRequest"/>
+			<xsd:element name="orderForSelfPickup" type="ts:orderForSelfPickupRequest"/>
+			<xsd:element name="orderForSelfPickupReply" type="ts:orderForSelfPickupReply"/>
+			<xsd:element name="orderReply" type="ts:orderReply"/>
+		</xsd:schema>
+	</types>
+	<message name="ExceptionFaultMsg">
+		<part element="remoting:Exception" name="fault"/>
+	</message>
+	<message name="orderRequestMsg">
+		<part element="ts:order" name="parameters"/>
+	</message>
+	<message name="orderReplyMsg">
+		<part element="ts:orderReply" name="parameters"/>
+	</message>
+	<message name="orderForSelfPickupRequestMsg">
+		<part element="ts:orderForSelfPickup" name="parameters"/>
+	</message>
+	<message name="orderForSelfPickupReplyMsg">
+		<part element="ts:orderForSelfPickupReply" name="parameters"/>
+	</message>
+	<message name="getAnyPizzaRequestMsg">
+		<part element="ts:getAnyPizza" name="parameters"/>
+	</message>
+	<message name="getAnyPizzaReplyMsg">
+		<part element="ts:getAnyPizzaReply" name="parameters"/>
+	</message>
+	<message name="getMostPopularToppingRequestMsg">
+		<part element="ts:getMostPopularTopping" name="parameters"/>
+	</message>
+	<message name="getMostPopularToppingReplyMsg">
+		<part element="ts:getMostPopularToppingReply" name="parameters"/>
+	</message>
+	<message name="getPizzaNamesRequestMsg">
+		<part element="ts:getPizzaNames" name="parameters"/>
+	</message>
+	<message name="getPizzaNamesReplyMsg">
+		<part element="ts:getPizzaNamesReply" name="parameters"/>
+	</message>
+	<message name="getPizzasRequestMsg">
+		<part element="ts:getPizzas" name="parameters"/>
+	</message>
+	<message name="getPizzasReplyMsg">
+		<part element="ts:getPizzasReply" name="parameters"/>
+	</message>
+	<message name="getToppingsRequestMsg">
+		<part element="ts:getToppings" name="parameters"/>
+	</message>
+	<message name="getToppingsReplyMsg">
+		<part element="ts:getToppingsReply" name="parameters"/>
+	</message>
+	<message name="getWaitTimeRequestMsg">
+		<part element="ts:getWaitTime" name="parameters"/>
+	</message>
+	<message name="getWaitTimeReplyMsg">
+		<part element="ts:getWaitTimeReply" name="parameters"/>
+	</message>
+	<portType name="PizzaPickupService">
+		<operation name="order">
+			<input message="wts:orderRequestMsg"/>
+			<output message="wts:orderReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+		<operation name="orderForSelfPickup">
+			<input message="wts:orderForSelfPickupRequestMsg"/>
+			<output message="wts:orderForSelfPickupReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+		<operation name="getAnyPizza">
+			<input message="wts:getAnyPizzaRequestMsg"/>
+			<output message="wts:getAnyPizzaReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+		<operation name="getMostPopularTopping">
+			<input message="wts:getMostPopularToppingRequestMsg"/>
+			<output message="wts:getMostPopularToppingReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+		<operation name="getPizzaNames">
+			<input message="wts:getPizzaNamesRequestMsg"/>
+			<output message="wts:getPizzaNamesReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+		<operation name="getPizzas">
+			<input message="wts:getPizzasRequestMsg"/>
+			<output message="wts:getPizzasReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+		<operation name="getToppings">
+			<input message="wts:getToppingsRequestMsg"/>
+			<output message="wts:getToppingsReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+		<operation name="getWaitTime">
+			<input message="wts:getWaitTimeRequestMsg"/>
+			<output message="wts:getWaitTimeReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+	</portType>
+	<binding name="PizzaPickupServiceSoapBinding" type="wts:PizzaPickupService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="order">
+			<soap:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/order" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="orderForSelfPickup">
+			<soap:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/orderForSelfPickup" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getAnyPizza">
+			<soap:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getAnyPizza" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getMostPopularTopping">
+			<soap:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getMostPopularTopping" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getPizzaNames">
+			<soap:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getPizzaNames" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getPizzas">
+			<soap:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getPizzas" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getToppings">
+			<soap:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getToppings" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getWaitTime">
+			<soap:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getWaitTime" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+	</binding>
+	<binding name="PizzaPickupServiceSoap12Binding" type="wts:PizzaPickupService">
+		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="order">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/order" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="orderForSelfPickup">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/orderForSelfPickup" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getAnyPizza">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getAnyPizza" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getMostPopularTopping">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getMostPopularTopping" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getPizzaNames">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getPizzaNames" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getPizzas">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getPizzas" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getToppings">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getToppings" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="getWaitTime">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/PizzaDeliveryService/getWaitTime" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+	</binding>
+	<service name="PizzaPickupService">
+		<port binding="wts:PizzaPickupServiceSoapBinding" name="PizzaPickupService">
+			<soap:address location="http://localhost:8080/soap/PizzaPickupService/ThePizzeria"/>
+		</port>
+	</service>
+	<service name="PizzaPickupService12">
+		<port binding="wts:PizzaPickupServiceSoap12Binding" name="PizzaPickupService12">
+			<soap12:address location="http://localhost:8080/soap/PizzaPickupService/ThePizzeria"/>
+		</port>
+	</service>
+</definitions>

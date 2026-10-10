@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2008-2010 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this document so long as this copyright notice, license and disclaimer are retained with all copies of the document. No license is granted to modify this document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE; OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT.  THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO, INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tad="http://www.onvif.org/ver10/analyticsdevice/wsdl" targetNamespace="http://www.onvif.org/ver10/analyticsdevice/wsdl">
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/analyticsdevice/wsdl" xmlns:tt="http://www.onvif.org/ver10/schema" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="2.1.1">
+			<xs:import namespace="http://www.onvif.org/ver10/schema" schemaLocation="../ver10/schema/onvif.xsd"/>
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="tad:Capabilities">
+							<xs:annotation>
+								<xs:documentation>The capabilities for the analytics device service is returned in the Capabilities element.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:complexType name="Capabilities">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="tad:Capabilities"/>
+			<!--===============================-->
+			<xs:element name="DeleteAnalyticsEngineControl">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConfigurationToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Analytics Engine Control configuration to be deleted.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DeleteAnalyticsEngineControlResponse">
+				<xs:complexType>
+					<xs:sequence>
+						</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CreateAnalyticsEngineInputs">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngineInput" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Settings of the configurations to be created.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ForcePersistence" type="xs:boolean" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CreateAnalyticsEngineInputsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngineInput" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Configurations containing token generated.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CreateAnalyticsEngineControl">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngineControl">
+							<xs:annotation>
+								<xs:documentation>Settings of the Analytics Engine Control configuration to be created. Mode shall be set to "idle".</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CreateAnalyticsEngineControlResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngineInput" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Configuration containing token generated.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetAnalyticsEngineControl">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngineControl">
+							<xs:annotation>
+								<xs:documentation>Contains the modified Analytics Engine Control configuration.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ForcePersistence" type="xs:boolean"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetAnalyticsEngineControlResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngineControl">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConfigurationToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the requested AnalyticsEngineControl configuration.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngineControlResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngineControl">
+							<xs:annotation>
+								<xs:documentation>Configuration of the AnalyticsEngineControl.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngineControls">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngineControlsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AnalyticsEngineControls" type="tt:AnalyticsEngineControl" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of available AnalyticsEngineControl configurations.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngine">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConfigurationToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the requested AnalyticsEngine configuration.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngineResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngine">
+							<xs:annotation>
+								<xs:documentation>Configuration of the AnalyticsEngine.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngines">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEnginesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngine" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of available AnalyticsEngine configurations.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetVideoAnalyticsConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:VideoAnalyticsConfiguration">
+							<xs:annotation>
+								<xs:documentation>Contains the modified video analytics configuration. The configuration shall exist in the device.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ForcePersistence" type="xs:boolean"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetVideoAnalyticsConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetAnalyticsEngineInput">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngineInput">
+							<xs:annotation>
+								<xs:documentation>Contains the modified Analytics Engine Input configuration. The configuration shall exist in the device.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="ForcePersistence" type="xs:boolean"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetAnalyticsEngineInputResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngineInput">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConfigurationToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the requested AnalyticsEngineInput configuration.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngineInputResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngineInput">
+							<xs:annotation>
+								<xs:documentation>Configuration of the AnalyticsEngineInput.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngineInputs">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsEngineInputsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:AnalyticsEngineInput" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of available AnalyticsEngineInput configurations.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsDeviceStreamUri">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="StreamSetup" type="tt:StreamSetup">
+							<xs:annotation>
+								<xs:documentation>Configuration of the URI requested.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="AnalyticsEngineControlToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the AnalyticsEngineControl whose URI is requested.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsDeviceStreamUriResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Uri" type="xs:anyURI">
+							<xs:annotation>
+								<xs:documentation>Streaming URI.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetVideoAnalyticsConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConfigurationToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the VideoAnalyticsConfiguration requested.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetVideoAnalyticsConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:VideoAnalyticsConfiguration">
+							<xs:annotation>
+								<xs:documentation>Settings of the VideoAnalyticsConfiguration.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DeleteAnalyticsEngineInputs">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConfigurationToken" type="tt:ReferenceToken" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>LIst of tokens of Analytics Engine Input configurations to be deleted.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DeleteAnalyticsEngineInputsResponse">
+				<xs:complexType>
+					<xs:sequence>
+			        </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsState">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AnalyticsEngineControlToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the AnalyticsEngineControl whose state information is requested.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetAnalyticsStateResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="State" type="tt:AnalyticsStateInformation">
+							<xs:annotation>
+								<xs:documentation>Current status information.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+		<!--===============================-->
+	</wsdl:types>
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="tad:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="tad:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteAnalyticsEngineControlRequest">
+		<wsdl:part name="parameters" element="tad:DeleteAnalyticsEngineControl"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteAnalyticsEngineControlResponse">
+		<wsdl:part name="parameters" element="tad:DeleteAnalyticsEngineControlResponse"/>
+	</wsdl:message>
+	<wsdl:message name="CreateAnalyticsEngineControlRequest">
+		<wsdl:part name="parameters" element="tad:CreateAnalyticsEngineControl"/>
+	</wsdl:message>
+	<wsdl:message name="CreateAnalyticsEngineControlResponse">
+		<wsdl:part name="parameters" element="tad:CreateAnalyticsEngineControlResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetAnalyticsEngineControlRequest">
+		<wsdl:part name="parameters" element="tad:SetAnalyticsEngineControl"/>
+	</wsdl:message>
+	<wsdl:message name="SetAnalyticsEngineControlResponse">
+		<wsdl:part name="parameters" element="tad:SetAnalyticsEngineControlResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineControlRequest">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngineControl"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineControlResponse">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngineControlResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineControlsRequest">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngineControls"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineControlsResponse">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngineControlsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineRequest">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngine"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineResponse">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngineResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEnginesRequest">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngines"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEnginesResponse">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEnginesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetVideoAnalyticsConfigurationRequest">
+		<wsdl:part name="parameters" element="tad:SetVideoAnalyticsConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="SetVideoAnalyticsConfigurationResponse">
+		<wsdl:part name="parameters" element="tad:SetVideoAnalyticsConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetAnalyticsEngineInputRequest">
+		<wsdl:part name="parameters" element="tad:SetAnalyticsEngineInput"/>
+	</wsdl:message>
+	<wsdl:message name="SetAnalyticsEngineInputResponse">
+		<wsdl:part name="parameters" element="tad:SetAnalyticsEngineInputResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineInputRequest">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngineInput"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineInputResponse">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngineInputResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineInputsRequest">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngineInputs"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsEngineInputsResponse">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsEngineInputsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsDeviceStreamUriRequest">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsDeviceStreamUri"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsDeviceStreamUriResponse">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsDeviceStreamUriResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetVideoAnalyticsConfigurationRequest">
+		<wsdl:part name="parameters" element="tad:GetVideoAnalyticsConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="GetVideoAnalyticsConfigurationResponse">
+		<wsdl:part name="parameters" element="tad:GetVideoAnalyticsConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="CreateAnalyticsEngineInputsRequest">
+		<wsdl:part name="parameters" element="tad:CreateAnalyticsEngineInputs"/>
+	</wsdl:message>
+	<wsdl:message name="CreateAnalyticsEngineInputsResponse">
+		<wsdl:part name="parameters" element="tad:CreateAnalyticsEngineInputsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteAnalyticsEngineInputsRequest">
+		<wsdl:part name="parameters" element="tad:DeleteAnalyticsEngineInputs"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteAnalyticsEngineInputsResponse">
+		<wsdl:part name="parameters" element="tad:DeleteAnalyticsEngineInputsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsStateRequest">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsState"/>
+	</wsdl:message>
+	<wsdl:message name="GetAnalyticsStateResponse">
+		<wsdl:part name="parameters" element="tad:GetAnalyticsStateResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="AnalyticsDevicePort">
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>Returns the capabilities of the analytics device service. The result is returned in a typed answer.</wsdl:documentation>
+			<wsdl:input message="tad:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="tad:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAnalyticsEngineControl">
+			<wsdl:documentation>DeleteAnalyticsEngineControl shall delete a control object .</wsdl:documentation>
+			<wsdl:input message="tad:DeleteAnalyticsEngineControlRequest"/>
+			<wsdl:output message="tad:DeleteAnalyticsEngineControlResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="CreateAnalyticsEngineControl">
+			<wsdl:documentation>CreateAnalyticsEngineControl shall create a new control object.</wsdl:documentation>
+			<wsdl:input message="tad:CreateAnalyticsEngineControlRequest"/>
+			<wsdl:output message="tad:CreateAnalyticsEngineControlResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetAnalyticsEngineControl">
+			<wsdl:documentation>This command modifies the AnalyticsEngineControl configuration.</wsdl:documentation>
+			<wsdl:input message="tad:SetAnalyticsEngineControlRequest"/>
+			<wsdl:output message="tad:SetAnalyticsEngineControlResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngineControl">
+			<wsdl:documentation>The GetAnalyticsEngineControl command fetches the analytics engine control if the analytics engine control token is known.</wsdl:documentation>
+			<wsdl:input message="tad:GetAnalyticsEngineControlRequest"/>
+			<wsdl:output message="tad:GetAnalyticsEngineControlResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngineControls">
+			<wsdl:documentation>This operation lists all available analytics engine controls for the device.</wsdl:documentation>
+			<wsdl:input message="tad:GetAnalyticsEngineControlsRequest"/>
+			<wsdl:output message="tad:GetAnalyticsEngineControlsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngine">
+			<wsdl:documentation>The GetAnalyticsEngine command fetches the analytics engine configuration if the token is known.</wsdl:documentation>
+			<wsdl:input message="tad:GetAnalyticsEngineRequest"/>
+			<wsdl:output message="tad:GetAnalyticsEngineResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngines">
+			<wsdl:documentation>This operation lists all available analytics engine configurations for the device.</wsdl:documentation>
+			<wsdl:input message="tad:GetAnalyticsEnginesRequest"/>
+			<wsdl:output message="tad:GetAnalyticsEnginesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetVideoAnalyticsConfiguration">
+			<wsdl:documentation>A video analytics configuration is modified using this command.</wsdl:documentation>
+			<wsdl:input message="tad:SetVideoAnalyticsConfigurationRequest"/>
+			<wsdl:output message="tad:SetVideoAnalyticsConfigurationResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetAnalyticsEngineInput">
+			<wsdl:documentation>This command modifies the analytics engine input configuration.</wsdl:documentation>
+			<wsdl:input message="tad:SetAnalyticsEngineInputRequest"/>
+			<wsdl:output message="tad:SetAnalyticsEngineInputResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngineInput">
+			<wsdl:documentation>The GetAnalyticsEngineInput command fetches the input configuration if the analytics engine input configuration token is known.</wsdl:documentation>
+			<wsdl:input message="tad:GetAnalyticsEngineInputRequest"/>
+			<wsdl:output message="tad:GetAnalyticsEngineInputResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngineInputs">
+			<wsdl:documentation>This operation lists all available analytics engine input configurations for the device.</wsdl:documentation>
+			<wsdl:input message="tad:GetAnalyticsEngineInputsRequest"/>
+			<wsdl:output message="tad:GetAnalyticsEngineInputsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsDeviceStreamUri">
+			<wsdl:documentation>This operation requests a URI that can be used to initiate a live stream using RTSP as the control protocol if the token of the AnalyticsEngineControl is known.</wsdl:documentation>
+			<wsdl:input message="tad:GetAnalyticsDeviceStreamUriRequest"/>
+			<wsdl:output message="tad:GetAnalyticsDeviceStreamUriResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetVideoAnalyticsConfiguration">
+			<wsdl:documentation>The GetVideoAnalyticsConfiguration command fetches the video analytics configuration if the video analytics configuration token is known.</wsdl:documentation>
+			<wsdl:input message="tad:GetVideoAnalyticsConfigurationRequest"/>
+			<wsdl:output message="tad:GetVideoAnalyticsConfigurationResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="CreateAnalyticsEngineInputs">
+			<wsdl:documentation>This command generates one or more analytics engine input configurations.</wsdl:documentation>
+			<wsdl:input message="tad:CreateAnalyticsEngineInputsRequest"/>
+			<wsdl:output message="tad:CreateAnalyticsEngineInputsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAnalyticsEngineInputs">
+			<wsdl:documentation>This command deletes analytics engine input configurations if the tokens are known.</wsdl:documentation>
+			<wsdl:input message="tad:DeleteAnalyticsEngineInputsRequest"/>
+			<wsdl:output message="tad:DeleteAnalyticsEngineInputsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsState">
+			<wsdl:documentation>GetAnalyticsState returns status information of the referenced AnalyticsEngineControl object.</wsdl:documentation>
+			<wsdl:input message="tad:GetAnalyticsStateRequest"/>
+			<wsdl:output message="tad:GetAnalyticsStateResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="AnalyticsDeviceBinding" type="tad:AnalyticsDevicePort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAnalyticsEngineControl">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/DeleteAnalyticsEngineControl"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="CreateAnalyticsEngineControl">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/CreateAnalyticsEngineControl"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetAnalyticsEngineControl">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/SetAnalyticsEngineControl"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngineControl">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetAnalyticsEngineControl"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngineControls">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetAnalyticsEngineControls"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngine">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetAnalyticsEngine"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngines">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetAnalyticsEngines"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetVideoAnalyticsConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/SetVideoAnalyticsConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetAnalyticsEngineInput">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/SetAnalyticsEngineInput"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngineInput">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetAnalyticsEngineInput"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsEngineInputs">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetAnalyticsEngineInputs"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsDeviceStreamUri">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetAnalyticsDeviceStreamUri"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetVideoAnalyticsConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetVideoAnalyticsConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="CreateAnalyticsEngineInputs">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/CreateAnalyticsEngineInputs"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAnalyticsEngineInputs">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/DeleteAnalyticsEngineInputs"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAnalyticsState">
+			<soap:operation soapAction="http://www.onvif.org/ver10/analyticsdevice/wsdl/GetAnalyticsState"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+</wsdl:definitions>

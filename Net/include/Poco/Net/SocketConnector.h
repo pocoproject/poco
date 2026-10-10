@@ -27,8 +27,7 @@
 #include "Poco/Observer.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <class ServiceHandler>
@@ -74,14 +73,14 @@ class SocketConnector
 {
 public:
 	explicit SocketConnector(const SocketAddress& address):
-		_pReactor(0)
+		_pReactor(nullptr)
 		/// Creates a SocketConnector, using the given Socket.
 	{
 		_socket.connectNB(address);
 	}
 
 	SocketConnector(const SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
-		_pReactor(0)
+		_pReactor(nullptr)
 		/// Creates an connector, using the given ServerSocket.
 		/// The SocketConnector registers itself with the given SocketReactor.
 	{
@@ -102,6 +101,10 @@ public:
 		}
 	}
 
+	SocketConnector() = delete;
+	SocketConnector(const SocketConnector&) = delete;
+	SocketConnector& operator = (const SocketConnector&) = delete;
+
 	virtual void registerConnector(SocketReactor& reactor)
 		/// Registers the SocketConnector with a SocketReactor.
 		///
@@ -110,10 +113,11 @@ public:
 		///
 		/// The overriding method must call the baseclass implementation first.
 	{
+		// CodeQL [cpp/local-address-stored]: reactor lifetime managed by caller; outlives connector by design
 		_pReactor = &reactor;
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
+		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
+		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
+		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
 	}
 
 	virtual void unregisterConnector()
@@ -126,39 +130,36 @@ public:
 	{
 		if (_pReactor)
 		{
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
+			_pReactor->removeEventHandler(_socket, Poco::NObserver<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
+			_pReactor->removeEventHandler(_socket, Poco::NObserver<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
+			_pReactor->removeEventHandler(_socket, Poco::NObserver<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
 		}
 	}
 
-	void onReadable(ReadableNotification* pNotification)
+	void onReadable(const AutoPtr<ReadableNotification>& pNotification)
 	{
 		unregisterConnector();
-		pNotification->release();
 		int err = _socket.impl()->socketError(); 
 		if (err) onError(err);
 		else onConnect();
 	}
 
-	void onWritable(WritableNotification* pNotification)
+	void onWritable(const AutoPtr<WritableNotification>& pNotification)
 	{
 		unregisterConnector();
-		pNotification->release();
 		onConnect();
 	}
 
-	void onError(ErrorNotification* pNotification)
+	void onError(const AutoPtr<ErrorNotification>& pNotification)
 	{
 		unregisterConnector();
-		pNotification->release();
 		onError(_socket.impl()->socketError());
 	}
 
 	void onConnect()
 	{
 		_socket.setBlocking(true);
-		createServiceHandler();
+		(void) createServiceHandler();
 	}
 
 protected:
@@ -177,7 +178,7 @@ protected:
 	{
 	}
 
-	SocketReactor* reactor()
+	[[nodiscard]] SocketReactor* reactor()
 		/// Returns a pointer to the SocketReactor where
 		/// this SocketConnector is registered.
 		///
@@ -186,23 +187,20 @@ protected:
 		return _pReactor;
 	}
 
-	StreamSocket& socket()
+	[[nodiscard]] StreamSocket& socket()
 		/// Returns a reference to the SocketConnector's socket.
 	{
 		return _socket;
 	}
 
 private:
-	SocketConnector();
-	SocketConnector(const SocketConnector&);
-	SocketConnector& operator = (const SocketConnector&);
 
 	StreamSocket   _socket;
 	SocketReactor* _pReactor;
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketConnector_INCLUDED

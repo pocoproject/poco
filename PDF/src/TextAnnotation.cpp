@@ -13,11 +13,10 @@
 
 
 #include "Poco/PDF/TextAnnotation.h"
-#include "Poco/PDF/PDFException.h"
 
+#include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 TextAnnotation::TextAnnotation(HPDF_Doc* pPDF,
@@ -35,4 +34,22 @@ TextAnnotation::~TextAnnotation()
 }
 
 
-} } // namespace Poco::PDF
+void TextAnnotation::open()
+{
+	HPDF_TextAnnot_SetOpened(handle(), HPDF_TRUE);
+}
+
+
+void TextAnnotation::close()
+{
+	HPDF_TextAnnot_SetOpened(handle(), HPDF_FALSE);
+}
+
+
+void TextAnnotation::icon(IconType iconType)
+{
+	HPDF_TextAnnot_SetIcon(handle(), static_cast<HPDF_AnnotIcon>(iconType));
+}
+
+
+} // namespace Poco::PDF

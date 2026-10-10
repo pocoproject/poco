@@ -18,8 +18,7 @@
 #include "Poco/DOM/DOMException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DTDMap::DTDMap(const DocumentType* pDocumentType, unsigned short type):
@@ -92,7 +91,7 @@ unsigned long DTDMap::length() const
 
 Node* DTDMap::getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const
 {
-	return 0;
+	return nullptr;
 }
 
 
@@ -110,8 +109,10 @@ Node* DTDMap::removeNamedItemNS(const XMLString& namespaceURI, const XMLString& 
 
 void DTDMap::autoRelease()
 {
-	_pDocumentType->ownerDocument()->autoReleasePool().add(this);
+	auto* pOwner = _pDocumentType->ownerDocument();
+	if (pOwner != nullptr)
+		pOwner->autoReleasePool().add(this);
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

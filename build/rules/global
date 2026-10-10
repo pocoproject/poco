@@ -14,9 +14,11 @@
 # POCO_TARGET_OSARCH: Target system architecture (forr cross builds)
 #
 
+ifndef POCO_ENABLE_TRACE
 target := $(strip $(target))
 target_version := $(strip $(target_version))
 target_libs := $(strip $(target_libs))
+endif
 
 #
 # Check for POCO_BASE
@@ -328,7 +330,7 @@ OBJPATH_DEBUG_SHARED   = $(OBJPATH)/debug_shared$(OSARCH_POSTFIX)
 #
 # Build Include directory List
 #
-INCLUDE = -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR)) $(foreach p,$(POCO_ADD_INCLUDE),-I$(p))
+INCLUDE = -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR)) $(foreach p,$(POCO_ADD_INCLUDE),-I$(p)) -I$(POCO_BASE)/dependencies/tessil/include
 
 #
 # Build Library Directory List
@@ -338,12 +340,20 @@ LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY) $(MACCHINA_LIBRARY) $(foreach p,$(POCO_AD
 #
 # Strip Command definition
 #
+ifndef POCO_ENABLE_TRACE
+ifeq ($(strip $(SANITIZEFLAGS)),)
 ifeq ($(strip $(STRIP)),)
 STRIPCMD =
 else
 STRIPCMD = $(STRIP) $@$(BINEXT)
 endif
-
+else
+# sanitizer build: keep symbols so suppressions resolve and stacks symbolize
+STRIPCMD =
+endif
+else
+STRIPCMD =
+endif
 #
 # Make CC and CXX environment vars
 #

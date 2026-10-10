@@ -27,8 +27,7 @@
 #include "Poco/BasicEvent.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 class DNSSDBrowser;
@@ -118,7 +117,7 @@ public:
 	~DNSSDResponder();
 		/// Destroys the DNSSDResponder.
 
-	DNSSDBrowser& browser();
+	[[nodiscard]] DNSSDBrowser& browser();
 		/// Returns the DNSServiceBrowser, which is used to
 		/// discover and resolve services and domains.
 
@@ -187,7 +186,7 @@ private:
 };
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_DNSSDResponder_INCLUDED

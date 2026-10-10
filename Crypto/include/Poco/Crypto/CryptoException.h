@@ -23,14 +23,17 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 POCO_DECLARE_EXCEPTION(Crypto_API, CryptoException, Poco::Exception)
 
 
 class Crypto_API OpenSSLException : public CryptoException
+	/// An exception class for errors reported by OpenSSL.
+	///
+	/// The constructors append the pending errors of the OpenSSL error
+	/// queue to the message and leave the queue empty.
 {
 public:
 	OpenSSLException(int code = 0);
@@ -40,17 +43,17 @@ public:
 	OpenSSLException(const OpenSSLException& exc);
 	~OpenSSLException() noexcept;
 	OpenSSLException& operator = (const OpenSSLException& exc);
-	const char* name() const noexcept;
-	const char* className() const noexcept;
-	Poco::Exception* clone() const;
-	void rethrow() const;
+	[[nodiscard]] const char* name() const noexcept;
+	[[nodiscard]] const char* className() const noexcept;
+	[[nodiscard]] Poco::Exception* clone() const;
+	[[noreturn]] void rethrow() const;
 
 private:
 	void setExtMessage();
 };
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_CryptoException_INCLUDED

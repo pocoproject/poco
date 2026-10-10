@@ -52,7 +52,7 @@ public:
 	TemporaryFile(const std::string& tempDir);
 		/// Creates the TemporaryFile using the given directory.
 
-	~TemporaryFile();
+	~TemporaryFile() override;
 		/// Destroys the TemporaryFile and
 		/// deletes the corresponding file on
 		/// disk unless keep() or keepUntilExit()
@@ -71,7 +71,7 @@ public:
 		/// Registers the given file for deletion
 		/// at process termination.
 
-	static std::string tempName(const std::string& tempDir = "");
+	[[nodiscard]] static std::string tempName(const std::string& tempDir = "");
 		/// Returns a unique path name for a temporary
 		/// file in the system's scratch directory (see Path::temp())
 		/// if tempDir is empty or in the directory specified in tempDir

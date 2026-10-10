@@ -42,8 +42,7 @@ struct ip_mreq
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 MulticastSocket::MulticastSocket()
@@ -282,7 +281,7 @@ void MulticastSocket::leaveGroup(const IPAddress& groupAddress, const NetworkInt
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // POCO_NET_HAS_INTERFACE

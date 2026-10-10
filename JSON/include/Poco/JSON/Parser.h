@@ -20,17 +20,12 @@
 
 #include "Poco/JSON/JSON.h"
 #include "Poco/JSON/ParserImpl.h"
-#include "Poco/JSON/Object.h"
-#include "Poco/JSON/Array.h"
 #include "Poco/JSON/ParseHandler.h"
-#include "Poco/JSON/JSONException.h"
-#include "Poco/UTF8Encoding.h"
 #include "Poco/Dynamic/Var.h"
 #include <string>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class JSON_API Parser: private ParserImpl
@@ -68,7 +63,7 @@ public:
 	Parser(const Handler::Ptr& pHandler = new ParseHandler);
 		/// Creates JSON Parser, using the given Handler and buffer size.
 
-	virtual ~Parser();
+	~Parser() override;
 		/// Destroys JSON Parser.
 
 	void reset();
@@ -81,7 +76,7 @@ public:
 		/// before passing the JSON on to the parser. This will impact performance,
 		/// especially when reading from a std::istream.
 
-	bool getAllowComments() const;
+	[[nodiscard]] bool getAllowComments() const;
 		/// Returns true if comments are allowed, false otherwise.
 		///
 		/// By default, comments are not allowed.
@@ -95,7 +90,7 @@ public:
 		/// before passing the JSON on to the parser. This will impact performance,
 		/// especially when reading from a std::istream.
 
-	bool getAllowNullByte() const;
+	[[nodiscard]] bool getAllowNullByte() const;
 		/// Returns true if null byte is allowed, false otherwise.
 		///
 		/// By default, null bytes are allowed.
@@ -107,7 +102,7 @@ public:
 		/// may result in a stack overflow when parsing a (malicious)
 		/// JSON document.
 
-	std::size_t getDepth() const;
+	[[nodiscard]] std::size_t getDepth() const;
 		/// Returns the allowed JSON depth.
 
 	Dynamic::Var parse(const std::string& json);
@@ -119,14 +114,14 @@ public:
 	void setHandler(const Handler::Ptr& pHandler);
 		/// Set the Handler.
 
-	const Handler::Ptr& getHandler();
+	[[nodiscard]] const Handler::Ptr& getHandler();
 		/// Returns the Handler.
 
-	Dynamic::Var asVar() const;
-		/// Returns the result of parsing;
+	[[nodiscard]] Dynamic::Var asVar() const;
+		/// Returns the result of parsing
 
-	Dynamic::Var result() const;
-		/// Returns the result of parsing as Dynamic::Var;
+	[[nodiscard]] Dynamic::Var result() const;
+		/// Returns the result of parsing as Dynamic::Var
 
 private:
 	Parser(const Parser&);
@@ -209,7 +204,7 @@ inline Dynamic::Var Parser::parse(std::istream& in)
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_JSONParser_INCLUDED

@@ -12,6 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/DateTimeParser.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTime.h"
 #include "Poco/Timestamp.h"
@@ -20,6 +21,7 @@
 
 using Poco::DateTime;
 using Poco::DateTimeFormat;
+using Poco::DateTimeFormatter;
 using Poco::DateTimeParser;
 using Poco::Timestamp;
 using Poco::SyntaxException;
@@ -47,17 +49,17 @@ void DateTimeParserTest::testISO8601()
 	assertTrue (dt.minute() == 30);
 	assertTrue (dt.second() == 0);
 	assertTrue (tzd == 0);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12.30:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-00-08T12:30:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T12:30:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T33:30:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T12:80:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T12:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-0012:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00X12:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "200501-00T12:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-0100T12:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005_01+00T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12.30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-00-08T12:30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-00T12:30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T33:30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12:80:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-0812:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08X12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "200501-08T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-0108T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005_01+08T12:30:90Z", tzd);
 
 	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12:30:00+01:00", tzd);
 	assertTrue (dt.year() == 2005);
@@ -177,6 +179,7 @@ void DateTimeParserTest::testISO8601Frac()
 	assertTrue (dt.microsecond() == 0);
 	assertTrue (tzd == 0);
 	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.1J", tzd);
+	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.Z", tzd);
 
 	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12:30:00.123+01:00", tzd);
 	assertTrue (dt.year() == 2005);
@@ -592,7 +595,7 @@ void DateTimeParserTest::testCustom()
 
 	try
 	{
-		DateTimeParser::parse("%h:%M %a", "", tzd);
+		(void) DateTimeParser::parse("%h:%M %a", "", tzd);
 		fail ("must fail");
 	}
 	catch (SyntaxException&)
@@ -601,7 +604,7 @@ void DateTimeParserTest::testCustom()
 
 	try
 	{
-		DateTimeParser::parse("", "12:30 PM", tzd);
+		(void) DateTimeParser::parse("", "12:30 PM", tzd);
 		fail ("must fail");
 	}
 	catch (SyntaxException&)
@@ -610,12 +613,91 @@ void DateTimeParserTest::testCustom()
 
 	try
 	{
-		DateTimeParser::parse("", "", tzd);
+		(void) DateTimeParser::parse("", "", tzd);
 		fail ("must fail");
 	}
 	catch (SyntaxException&)
 	{
 	}
+
+	// bad year (not a number)
+	testBad("%y", "YY", tzd);
+
+	// bad year (number too big)
+	testBad("%r", "123456789101112131415", tzd);
+
+	// check that an invalid millisecond is detected with a custom format
+	testBad("T%H:%M:%s %z", "T12:30:00.Z", tzd);
+
+	// Issue #5030: trailing garbage should be rejected
+	dt = DateTimeParser::parse("%H:%M", "13:13", tzd);
+	assertTrue (dt.hour() == 13);
+	assertTrue (dt.minute() == 13);
+
+	testBad("%H:%M", "xxx", tzd);
+	testBad("%H:%M", "12345", tzd);  // trailing '5' is garbage
+	testBad("????", "12345", tzd);   // invalid format
+}
+
+
+void DateTimeParserTest::testISO8601FracSeconds()
+{
+	// ISO8601_FORMAT uses %S which silently discards a well-formed fractional-second
+	// suffix so that the trailing %z can still reach the timezone designator.
+	int tzd;
+
+	// Dot-separated fractional seconds with negative timezone offset
+	DateTime dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19.120-04:00", tzd);
+	assertTrue (dt.year()   == 2013);
+	assertTrue (dt.month()  == 10);
+	assertTrue (dt.day()    == 7);
+	assertTrue (dt.hour()   == 8);
+	assertTrue (dt.minute() == 23);
+	assertTrue (dt.second() == 19);
+	assertTrue (tzd == -4*3600);
+
+	// Comma-separated fractional seconds (ISO 8601 allows ',' as the decimal sign)
+	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19,120-04:00", tzd);
+	assertTrue (dt.year()   == 2013);
+	assertTrue (dt.month()  == 10);
+	assertTrue (dt.day()    == 7);
+	assertTrue (dt.hour()   == 8);
+	assertTrue (dt.minute() == 23);
+	assertTrue (dt.second() == 19);
+	assertTrue (tzd == -4*3600);
+
+	// A bare decimal point not followed by any digit must be rejected
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19.-04:00", tzd);
+}
+
+
+void DateTimeParserTest::testFractionalSpecifiers()
+{
+	// %c is now a two-digit centisecond (millisecond / 10) rather than a
+	// single-digit decisecond (millisecond / 100). Round-trip every value
+	// against DateTimeFormatter to ensure parser and formatter agree --
+	// see issue #3949.
+	int tzd = 0;
+
+	// Parse "00" -> 0 ms, "25" -> 250 ms, "99" -> 990 ms.
+	DateTime dt = DateTimeParser::parse("%H:%M:%S.%c", "12:30:00.00", tzd);
+	assertTrue (dt.millisecond() == 0);
+
+	dt = DateTimeParser::parse("%H:%M:%S.%c", "12:30:00.25", tzd);
+	assertTrue (dt.millisecond() == 250);
+
+	dt = DateTimeParser::parse("%H:%M:%S.%c", "12:30:00.99", tzd);
+	assertTrue (dt.millisecond() == 990);
+
+	// Format-then-parse round trip.
+	DateTime original(2005, 1, 8, 12, 30, 0, 250);
+	std::string formatted = DateTimeFormatter::format(original, "%H:%M:%S.%c");
+	assertTrue (formatted == "12:30:00.25");
+	dt = DateTimeParser::parse("%H:%M:%S.%c", formatted, tzd);
+	assertTrue (dt.hour() == 12);
+	assertTrue (dt.minute() == 30);
+	assertTrue (dt.second() == 0);
+	assertTrue (dt.millisecond() == 250);
 }
 
 
@@ -898,6 +980,8 @@ CppUnit::Test* DateTimeParserTest::suite()
 	CppUnit_addTest(pSuite, DateTimeParserTest, testASCTIME);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testSORTABLE);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testCustom);
+	CppUnit_addTest(pSuite, DateTimeParserTest, testISO8601FracSeconds);
+	CppUnit_addTest(pSuite, DateTimeParserTest, testFractionalSpecifiers);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testGuess);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testCleanup);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testParseMonth);

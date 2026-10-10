@@ -27,8 +27,7 @@ using Poco::NumberFormatter;
 using Poco::IllegalStateException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPSClientSession::HTTPSClientSession():
@@ -188,4 +187,4 @@ Session::Ptr HTTPSClientSession::sslSession()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

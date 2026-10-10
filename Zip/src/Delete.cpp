@@ -15,8 +15,7 @@
 #include "Poco/Zip/Delete.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 Delete::Delete(const ZipLocalFileHeader& hdr):
@@ -31,4 +30,4 @@ void Delete::execute(Compress& c, std::istream& input)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

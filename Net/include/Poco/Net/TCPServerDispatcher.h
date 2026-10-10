@@ -29,8 +29,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API TCPServerDispatcher: public Poco::Runnable
@@ -62,28 +61,28 @@ public:
 	void stop();
 		/// Stops the dispatcher.
 
-	int currentThreads() const;
+	[[nodiscard]] int currentThreads() const;
 		/// Returns the number of currently used threads.
 
-	int maxThreads() const;
+	[[nodiscard]] int maxThreads() const;
 		/// Returns the maximum number of threads available.
 
-	int totalConnections() const;
+	[[nodiscard]] Int64 totalConnections() const;
 		/// Returns the total number of handled connections.
 
-	int currentConnections() const;
+	[[nodiscard]] int currentConnections() const;
 		/// Returns the number of currently handled connections.
 
-	int maxConcurrentConnections() const;
+	[[nodiscard]] int maxConcurrentConnections() const;
 		/// Returns the maximum number of concurrently handled connections.
 
-	int queuedConnections() const;
+	[[nodiscard]] int queuedConnections() const;
 		/// Returns the number of queued connections.
 
-	int refusedConnections() const;
+	[[nodiscard]] int refusedConnections() const;
 		/// Returns the number of refused connections.
 
-	const TCPServerParams& params() const;
+	[[nodiscard]] const TCPServerParams& params() const;
 		/// Returns a const reference to the TCPServerParam object.
 
 protected:
@@ -103,12 +102,12 @@ private:
 
 	std::atomic<int> _rc;
 	TCPServerParams::Ptr _pParams;
-	std::atomic<int>  _currentThreads;
-	std::atomic<int>  _totalConnections;
-	std::atomic<int>  _currentConnections;
-	std::atomic<int>  _maxConcurrentConnections;
-	std::atomic<int>  _refusedConnections;
-	std::atomic<bool> _stopped;
+	std::atomic<int>   _currentThreads;
+	std::atomic<Int64> _totalConnections;
+	std::atomic<int>   _currentConnections;
+	std::atomic<int>   _maxConcurrentConnections;
+	std::atomic<int>   _refusedConnections;
+	std::atomic<bool>  _stopped;
 	Poco::NotificationQueue         _queue;
 	TCPServerConnectionFactory::Ptr _pConnectionFactory;
 	Poco::ThreadPool&               _threadPool;
@@ -125,7 +124,7 @@ inline const TCPServerParams& TCPServerDispatcher::params() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_TCPServerDispatcher_INCLUDED

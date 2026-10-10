@@ -1,9 +1,0 @@
-POCO C++ Libraries Windows CE Platform Notes
-AAAIntroduction
-
-!!!Introduction
-
-Starting with release 1.4.0 the POCO C++ Libraries cannot be used on Windows CE
-platform anymore. The reason for this is that POCO has moved to support C++17.
-Windows CE does not support C++17 anymore. Also as C++17 needs Visual Studio
-2017 it also does not support Windows CE anymore.

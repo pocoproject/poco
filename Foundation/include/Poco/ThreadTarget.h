@@ -53,17 +53,17 @@ class Foundation_API ThreadTarget: public Runnable
 	///    thr.start(ra);
 {
 public:
-	typedef void (*Callback)();
+	using Callback = void (*)();
 
 	ThreadTarget(Callback method);
 
 	ThreadTarget(const ThreadTarget& te);
 
-	~ThreadTarget();
+	~ThreadTarget() override;
 
 	ThreadTarget& operator = (const ThreadTarget& te);
 
-	void run();
+	void run() override;
 
 private:
 	ThreadTarget();

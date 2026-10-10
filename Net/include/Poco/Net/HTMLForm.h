@@ -25,8 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -91,7 +90,7 @@ public:
 		/// Encoding must be either "application/x-www-form-urlencoded"
 		/// (which is the default) or "multipart/form-data".
 
-	const std::string& getEncoding() const;
+	[[nodiscard]] const std::string& getEncoding() const;
 		/// Returns the encoding used for posting the form.
 
 	void addPart(const std::string& name, PartSource* pSource);
@@ -163,7 +162,7 @@ public:
 		/// degrades performance, as the request content must be generated
 		/// twice, first to determine its size, then to actually send it.
 
-	std::streamsize calculateContentLength();
+	[[nodiscard]] std::streamsize calculateContentLength();
 		/// Calculate the content length for the form.
 		/// May be UNKNOWN_CONTENT_LENGTH if not possible
 		/// to calculate
@@ -176,11 +175,11 @@ public:
 		/// Writes the form data to the given output stream,
 		/// using the specified encoding.
 
-	const std::string& boundary() const;
+	[[nodiscard]] const std::string& boundary() const;
 		/// Returns the MIME boundary used for writing
 		/// multipart form data.
 
-	int getFieldLimit() const;
+	[[nodiscard]] int getFieldLimit() const;
 		/// Returns the maximum number of header fields
 		/// allowed.
 		///
@@ -194,17 +193,17 @@ public:
 		///
 		/// The default limit is 100.
 
-	void setValueLengthLimit(int limit);
+	void setValueLengthLimit(std::size_t limit);
 		/// Sets the maximum size for form field values
 		/// stored as strings.
 
-	int getValueLengthLimit() const;
+	[[nodiscard]] std::size_t getValueLengthLimit() const;
 		/// Returns the maximum size for form field values
 		/// stored as strings.
 
 	static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
 	static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
-	static const int         UNKNOWN_CONTENT_LENGTH;
+	static constexpr int     UNKNOWN_CONTENT_LENGTH = -1;
 
 protected:
 	void readUrl(std::istream& istr);
@@ -232,7 +231,7 @@ private:
 	typedef std::vector<Part> PartVec;
 
 	int         _fieldLimit;
-	int         _valueLengthLimit;
+	std::size_t _valueLengthLimit;
 	std::string _encoding;
 	std::string _boundary;
 	PartVec     _parts;
@@ -260,13 +259,13 @@ inline int HTMLForm::getFieldLimit() const
 }
 
 
-inline int HTMLForm::getValueLengthLimit() const
+inline std::size_t HTMLForm::getValueLengthLimit() const
 {
 	return _valueLengthLimit;
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTMLForm_INCLUDED

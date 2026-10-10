@@ -2,7 +2,7 @@
 // Archive.h
 //
 // Library: SevenZip
-// Package: Archive
+// Package: SevenZip
 // Module:  Archive
 //
 // Definition of the Archive class.
@@ -25,8 +25,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace SevenZip {
+namespace Poco::SevenZip {
 
 
 class ArchiveImpl;
@@ -69,17 +68,17 @@ public:
 	~Archive();
 		/// Destroys the Archive.
 
-	const std::string& path() const;
+	[[nodiscard]] const std::string& path() const;
 		/// Returns the path of the archive in the filesystem.
 
-	std::size_t size() const;
+	[[nodiscard]] std::size_t size() const;
 		/// Returns the number of entries in the archive.
 
-	ConstIterator begin() const;
+	[[nodiscard]] ConstIterator begin() const;
 		/// Returns an iterator for iterating over the
 		/// file or directory entries in the archive.
 
-	ConstIterator end() const;
+	[[nodiscard]] ConstIterator end() const;
 		/// Returns the end iterator.
 
 	void extract(const std::string& destPath);
@@ -91,7 +90,7 @@ public:
 		/// Progress and errors for single entries will be reported
 		/// via the extracted and failed events.
 
-	std::string extract(const ArchiveEntry& entry, const std::string& destPath);
+	[[nodiscard]] std::string extract(const ArchiveEntry& entry, const std::string& destPath);
 		/// Extracts a specific entry to the given path.
 		///
 		/// Directories will be created as necessary. File attributes
@@ -113,7 +112,7 @@ private:
 //
 
 
-} } // namespace Poco::SevenZip
+} // namespace Poco::SevenZip
 
 
 #endif // SevenZip_ArchiveEntry_INCLUDED

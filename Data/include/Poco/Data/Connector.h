@@ -23,8 +23,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Connector
@@ -41,16 +40,16 @@ public:
 	virtual ~Connector();
 		/// Destroys the Connector.
 
-	virtual const std::string& name() const = 0;
+	[[nodiscard]] virtual const std::string& name() const = 0;
 		/// Returns the name associated with this connector.
 
-	virtual Poco::AutoPtr<SessionImpl> createSession(const std::string& connectionString,
+	[[nodiscard]] virtual Poco::AutoPtr<SessionImpl> createSession(const std::string& connectionString,
 		std::size_t timeout = SessionImpl::LOGIN_TIMEOUT_DEFAULT) = 0;
 		/// Create a SessionImpl object and initialize it with the given connectionString.
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Connector_INCLUDED

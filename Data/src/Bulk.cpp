@@ -15,8 +15,7 @@
 #include "Poco/Data/Bulk.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Bulk::Bulk(const Limit& limit): _limit(limit.value(), false, false)
@@ -34,4 +33,4 @@ Bulk::~Bulk()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

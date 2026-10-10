@@ -7,7 +7,7 @@
 //
 // Definition of the ConfigurationMapper class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -22,8 +22,7 @@
 #include "Poco/Util/AbstractConfiguration.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API ConfigurationMapper: public AbstractConfiguration
@@ -68,27 +67,27 @@ public:
 		/// Creates the ConfigurationMapper. The ConfigurationMapper
 		/// retains (shared) ownership of the passed configuration.
 
-protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
+	ConfigurationMapper(const ConfigurationMapper&) = delete;
+	ConfigurationMapper& operator = (const ConfigurationMapper&) = delete;
 
-	std::string translateKey(const std::string& key) const;
+protected:
+	[[nodiscard]] bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
+
+	[[nodiscard]] std::string translateKey(const std::string& key) const;
 
 	~ConfigurationMapper();
 
 private:
-	ConfigurationMapper(const ConfigurationMapper&);
-	ConfigurationMapper& operator = (const ConfigurationMapper&);
-
 	std::string _fromPrefix;
 	std::string _toPrefix;
 	AbstractConfiguration::Ptr _pConfig;
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_ConfigurationMapper_INCLUDED

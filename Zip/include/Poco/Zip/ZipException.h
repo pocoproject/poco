@@ -22,15 +22,14 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 POCO_DECLARE_EXCEPTION(Zip_API, ZipException, Poco::RuntimeException)
 POCO_DECLARE_EXCEPTION(Zip_API, ZipManipulationException, ZipException)
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipException_INCLUDED

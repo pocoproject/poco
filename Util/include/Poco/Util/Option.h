@@ -7,7 +7,7 @@
 //
 // Definition of the Option class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,8 +23,7 @@
 #include "Poco/Util/AbstractConfiguration.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Application;
@@ -147,52 +146,52 @@ public:
 		/// The Option takes ownership of the Validator and
 		/// deletes it when it's no longer needed.
 
-	const std::string& shortName() const;
+	[[nodiscard]] const std::string& shortName() const;
 		/// Returns the short name of the option.
 
-	const std::string& fullName() const;
+	[[nodiscard]] const std::string& fullName() const;
 		/// Returns the full name of the option.
 
-	const std::string& description() const;
+	[[nodiscard]] const std::string& description() const;
 		/// Returns the description of the option.
 
-	bool required() const;
+	[[nodiscard]] bool required() const;
 		/// Returns true if the option is required, false if not.
 
-	bool repeatable() const;
+	[[nodiscard]] bool repeatable() const;
 		/// Returns true if the option can be specified more than
 		/// once, or false if at most once.
 
-	bool takesArgument() const;
+	[[nodiscard]] bool takesArgument() const;
 		/// Returns true if the options takes an (optional) argument.
 
-	bool argumentRequired() const;
+	[[nodiscard]] bool argumentRequired() const;
 		/// Returns true if the argument is required.
 
-	const std::string& argumentName() const;
+	[[nodiscard]] const std::string& argumentName() const;
 		/// Returns the argument name, if specified.
 
-	const std::string& group() const;
+	[[nodiscard]] const std::string& group() const;
 		/// Returns the option group the option is part of,
 		/// or an empty string, if the option is not part of
 		/// a group.
 
-	const std::string& binding() const;
+	[[nodiscard]] const std::string& binding() const;
 		/// Returns the property name the option is bound to,
 		/// or an empty string in case it is not bound.
 
-	AbstractOptionCallback* callback() const;
+	[[nodiscard]] AbstractOptionCallback* callback() const;
 		/// Returns a pointer to the callback method for the option,
 		/// or NULL if no callback has been specified.
 
-	Validator* validator() const;
+	[[nodiscard]] Validator* validator() const;
 		/// Returns the option's Validator, if one has been specified,
 		/// or NULL otherwise.
 
-	AbstractConfiguration::Ptr config() const;
+	[[nodiscard]] AbstractConfiguration::Ptr config() const;
 		/// Returns the configuration, if specified, or NULL otherwise.
 
-	bool matchesShort(const std::string& option) const;
+	[[nodiscard]] bool matchesShort(const std::string& option) const;
 		/// Returns true if the given option string matches the
 		/// short name.
 		///
@@ -201,14 +200,14 @@ public:
 		/// or the option string must partially match the full
 		/// name (case insensitive).
 
-	bool matchesFull(const std::string& option) const;
+	[[nodiscard]] bool matchesFull(const std::string& option) const;
 		/// Returns true if the given option string matches the
 		/// full name.
 		///
 		/// The option string must match the full
 		/// name (case insensitive).
 
-	bool matchesPartial(const std::string& option) const;
+	[[nodiscard]] bool matchesPartial(const std::string& option) const;
 		/// Returns true if the given option string partially matches the
 		/// full name.
 		///
@@ -231,14 +230,14 @@ private:
 	std::string _shortName;
 	std::string _fullName;
 	std::string _description;
-	bool        _required;
-	bool        _repeatable;
+	bool        _required{false};
+	bool        _repeatable{false};
 	std::string _argName;
-	bool        _argRequired;
+	bool        _argRequired{false};
 	std::string _group;
 	std::string _binding;
-	Validator*  _pValidator;
-	AbstractOptionCallback* _pCallback;
+	Validator*  _pValidator{nullptr};
+	AbstractOptionCallback* _pCallback{nullptr};
 	AbstractConfiguration::Ptr _pConfig;
 };
 
@@ -326,7 +325,7 @@ inline AbstractConfiguration::Ptr Option::config() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_Option_INCLUDED

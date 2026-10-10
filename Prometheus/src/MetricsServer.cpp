@@ -23,8 +23,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class NotFoundRequestHandler: public Poco::Net::HTTPRequestHandler
@@ -71,7 +70,6 @@ private:
 };
 
 
-const Poco::UInt16 MetricsServer::DEFAULT_PORT{9100};
 const std::string MetricsServer::DEFAULT_PATH{"/metrics"s};
 
 
@@ -91,6 +89,9 @@ MetricsServer::MetricsServer(const Registry& registry, Poco::Net::ServerSocket& 
 	_httpServer(new MetricsRequestHandlerFactory(registry, path), socket, pServerParams)
 {
 }
+
+
+MetricsServer::~MetricsServer() = default;
 
 
 void MetricsServer::start()
@@ -115,4 +116,4 @@ Poco::Net::HTTPServerParams::Ptr MetricsServer::defaultParams()
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

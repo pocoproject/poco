@@ -70,7 +70,7 @@ class Foundation_API SimpleFileChannel: public Channel
 	/// The flush property specifies whether each log message is flushed
 	/// immediately to the log file (which may hurt application performance,
 	/// but ensures that everything is in the log in case of a system crash),
-	//  or whether it's allowed to stay in the system's file buffer for some time.
+	/// or whether it's allowed to stay in the system's file buffer for some time.
 	/// Valid values are:
 	///
 	///   * true:   Every message is immediately flushed to the log file (default).
@@ -86,16 +86,16 @@ public:
 	SimpleFileChannel(const std::string& path);
 		/// Creates the FileChannel for a file with the given path.
 
-	void open();
+	void open() override;
 		/// Opens the FileChannel and creates the log file if necessary.
 
-	void close();
+	void close() override;
 		/// Closes the FileChannel.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Logs the given message to the file.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given name.
 		///
 		/// The following properties are supported:
@@ -107,21 +107,21 @@ public:
 		///                    flushed to the log file. See the SimpleFileChannel
 		///                    class for details.
 
-	std::string getProperty(const std::string& name) const;
+	[[nodiscard]] std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 		/// See setProperty() for a description of the supported
 		/// properties.
 
-	Timestamp creationDate() const;
+	[[nodiscard]] Timestamp creationDate() const;
 		/// Returns the log file's creation date.
 
-	UInt64 size() const;
+	[[nodiscard]] UInt64 size() const;
 		/// Returns the log file's current size in bytes.
 
-	const std::string& path() const;
+	[[nodiscard]] const std::string& path() const;
 		/// Returns the log file's primary path.
 
-	const std::string& secondaryPath() const;
+	[[nodiscard]] const std::string& secondaryPath() const;
 		/// Returns the log file's secondary path.
 
 	static const std::string PROP_PATH;
@@ -130,7 +130,7 @@ public:
 	static const std::string PROP_FLUSH;
 
 protected:
-	~SimpleFileChannel();
+	~SimpleFileChannel() override;
 	void setRotation(const std::string& rotation);
 	void setFlush(const std::string& flush);
 	void rotate();

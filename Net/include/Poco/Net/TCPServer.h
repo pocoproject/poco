@@ -30,8 +30,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class TCPServerDispatcher;
@@ -108,7 +107,7 @@ class Net_API TCPServer: public Poco::Runnable
 	/// Already served connections, however, will continue being served.
 {
 public:
-	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 portNumber = 0, TCPServerParams::Ptr pParams = 0);
+	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::UInt16 portNumber = 0, TCPServerParams::Ptr pParams = nullptr);
 		/// Creates the TCPServer, with ServerSocket listening on the given port.
 		/// Default port is zero, allowing any available port. The port number
 		/// can be queried through TCPServer::port() member.
@@ -122,7 +121,7 @@ public:
 		///
 		/// New threads are taken from the default thread pool.
 
-	TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
+	TCPServer(TCPServerConnectionFactory::Ptr pFactory, const ServerSocket& socket, TCPServerParams::Ptr pParams = nullptr);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
 		/// The server takes ownership of the TCPServerConnectionFactory
@@ -134,7 +133,7 @@ public:
 		///
 		/// New threads are taken from the default thread pool.
 
-	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams = 0);
+	TCPServer(TCPServerConnectionFactory::Ptr pFactory, Poco::ThreadPool& threadPool, const ServerSocket& socket, TCPServerParams::Ptr pParams = nullptr);
 		/// Creates the TCPServer, using the given ServerSocket.
 		///
 		/// The server takes ownership of the TCPServerConnectionFactory
@@ -149,7 +148,7 @@ public:
 	virtual ~TCPServer();
 		/// Destroys the TCPServer and its TCPServerConnectionFactory.
 
-	const TCPServerParams& params() const;
+	[[nodiscard]] const TCPServerParams& params() const;
 		/// Returns a const reference to the TCPServerParam object
 		/// used by the server's TCPServerDispatcher.
 
@@ -169,31 +168,31 @@ public:
 		///
 		/// Once the server has been stopped, it cannot be restarted.
 
-	int currentThreads() const;
+	[[nodiscard]] int currentThreads() const;
 		/// Returns the number of currently used connection threads.
 
-	int maxThreads() const;
+	[[nodiscard]] int maxThreads() const;
 		/// Returns the maximum number of threads available.
 
-	int totalConnections() const;
+	[[nodiscard]] Int64 totalConnections() const;
 		/// Returns the total number of handled connections.
 
-	int currentConnections() const;
+	[[nodiscard]] int currentConnections() const;
 		/// Returns the number of currently handled connections.
 
-	int maxConcurrentConnections() const;
+	[[nodiscard]] int maxConcurrentConnections() const;
 		/// Returns the maximum number of concurrently handled connections.
 
-	int queuedConnections() const;
+	[[nodiscard]] int queuedConnections() const;
 		/// Returns the number of queued connections.
 
-	int refusedConnections() const;
+	[[nodiscard]] int refusedConnections() const;
 		/// Returns the number of refused connections.
 
-	const ServerSocket& socket() const;
+	[[nodiscard]] const ServerSocket& socket() const;
 		/// Returns the underlying server socket.
 
-	Poco::UInt16 port() const;
+	[[nodiscard]] Poco::UInt16 port() const;
 		/// Returns the port the server socket listens on.
 
 	void setConnectionFilter(const TCPServerConnectionFilter::Ptr& pFilter);
@@ -253,7 +252,7 @@ inline TCPServerConnectionFilter::Ptr TCPServer::getConnectionFilter() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_TCPServer_INCLUDED

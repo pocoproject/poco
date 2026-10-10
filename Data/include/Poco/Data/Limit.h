@@ -21,8 +21,7 @@
 #include "Poco/Data/Data.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Limit
@@ -48,19 +47,19 @@ public:
 	~Limit();
 		/// Destroys the Limit.
 
-	SizeT value() const;
+	[[nodiscard]] SizeT value() const;
 		/// Returns the value of the limit
 
-	bool isHardLimit() const;
+	[[nodiscard]] bool isHardLimit() const;
 		/// Returns true if the limit is a hard limit.
 
-	bool isLowerLimit() const;
+	[[nodiscard]] bool isLowerLimit() const;
 		/// Returns true if the limit is a lower limit, otherwise it is an upperLimit
 
-	bool operator == (const Limit& other) const;
+	[[nodiscard]] bool operator == (const Limit& other) const;
 		/// Equality operator.
 
-	bool operator != (const Limit& other) const;
+	[[nodiscard]] bool operator != (const Limit& other) const;
 		/// Inequality operator.
 
 private:
@@ -107,7 +106,7 @@ inline bool Limit::operator != (const Limit& other) const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Limit_INCLUDED

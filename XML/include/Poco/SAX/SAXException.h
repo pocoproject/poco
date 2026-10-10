@@ -23,8 +23,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 POCO_DECLARE_EXCEPTION(XML_API, SAXException, XMLException)
@@ -104,29 +103,29 @@ public:
 	SAXParseException& operator = (const SAXParseException& exc);
 		/// Assignment operator.
 
-	const char* name() const noexcept;
+	[[nodiscard]] const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	const char* className() const noexcept;
+	[[nodiscard]] const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	Poco::Exception* clone() const;
+	[[nodiscard]] Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
 
-	void rethrow() const;
+	[[noreturn]] void rethrow() const;
 		/// (Re)Throws the exception.
 
-	const XMLString& getPublicId() const;
+	[[nodiscard]] const XMLString& getPublicId() const;
 		/// Get the public identifier of the entity where the exception occurred.
 
-	const XMLString& getSystemId() const;
+	[[nodiscard]] const XMLString& getSystemId() const;
 		/// Get the system identifier of the entity where the exception occurred.
 
-	int getLineNumber() const;
+	[[nodiscard]] int getLineNumber() const;
 		/// The line number of the end of the text where the exception occurred.
 		/// The first line is line 1.
 
-	int getColumnNumber() const;
+	[[nodiscard]] int getColumnNumber() const;
 		/// The column number of the end of the text where the exception occurred.
 		/// The first column in a line is position 1.
 
@@ -170,7 +169,7 @@ inline int SAXParseException::getColumnNumber() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_SAXException_INCLUDED

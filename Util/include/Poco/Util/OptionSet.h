@@ -7,7 +7,7 @@
 //
 // Definition of the OptionSet class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,8 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API OptionSet
@@ -49,7 +48,7 @@ public:
 	void addOption(const Option& option);
 		/// Adds an option to the collection.
 
-	bool hasOption(const std::string& name, bool matchShort = false) const;
+	[[nodiscard]] bool hasOption(const std::string& name, bool matchShort = false) const;
 		/// Returns a true iff an option with the given name exists.
 		///
 		/// The given name can either be a fully specified short name,
@@ -59,7 +58,7 @@ public:
 		/// option. Comparison case sensitive for the short name and
 		/// not case sensitive for the full name.
 
-	const Option& getOption(const std::string& name, bool matchShort = false) const;
+	[[nodiscard]] const Option& getOption(const std::string& name, bool matchShort = false) const;
 		/// Returns a reference to the option with the given name.
 		///
 		/// The given name can either be a fully specified short name,
@@ -67,22 +66,28 @@ public:
 		/// The name must either match the short or full name of an
 		/// option. Comparison case sensitive for the short name and
 		/// not case sensitive for the full name.
-		/// Throws a NotFoundException if no matching option has been found.
-		/// Throws an UnknownOptionException if a partial full name matches
+		/// Throws a UnknownOptionException if no matching option has been found.
+		/// Throws an AmbiguousOptionException if a partial full name matches
 		/// more than one option.
 
-	Iterator begin() const;
+	[[nodiscard]] Iterator begin() const
 		/// Supports iterating over all options.
+	{
+		return _options.begin();
+	}
 
-	Iterator end() const;
+	[[nodiscard]] Iterator end() const
 		/// Supports iterating over all options.
+	{
+		return _options.end();
+	}
 
 private:
 	OptionVec _options;
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_OptionSet_INCLUDED

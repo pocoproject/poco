@@ -16,8 +16,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 POCO_IMPLEMENT_EXCEPTION(SSLException, NetException, "SSL Exception")
@@ -29,4 +28,4 @@ POCO_IMPLEMENT_EXCEPTION(CertificateValidationException, CertificateException, "
 POCO_IMPLEMENT_EXCEPTION(SSLConnectionUnexpectedlyClosedException, SSLException, "SSL connection unexpectedly closed")
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

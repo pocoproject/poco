@@ -15,8 +15,7 @@
 #include "Poco/SAX/XMLReader.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString XMLReader::FEATURE_VALIDATION                  = toXMLString("http://xml.org/sax/features/validation");
@@ -34,4 +33,4 @@ XMLReader::~XMLReader()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

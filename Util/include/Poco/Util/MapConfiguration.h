@@ -7,7 +7,7 @@
 //
 // Definition of the MapConfiguration class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,8 +23,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API MapConfiguration: public AbstractConfiguration
@@ -34,6 +33,9 @@ public:
 	MapConfiguration();
 		/// Creates an empty MapConfiguration.
 
+	~MapConfiguration();
+		/// Destroyes the MapConfiguration.
+
 	void copyTo(AbstractConfiguration& config);
 		/// Copies all configuration properties to the given configuration.
 
@@ -41,24 +43,30 @@ public:
 		/// Clears the configuration.
 
 protected:
-	typedef std::map<std::string, std::string> StringMap;
-	typedef StringMap::const_iterator iterator;
+	using StringMap = std::map<std::string, std::string>;
+	using iterator = StringMap::const_iterator;
 
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
-	~MapConfiguration();
+	[[nodiscard]] bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
 
-	iterator begin() const;
-	iterator end() const;
+	[[nodiscard]] iterator begin() const
+	{
+		return _map.begin();
+	}
+
+	[[nodiscard]] iterator end() const
+	{
+		return _map.end();
+	}
 
 private:
 	StringMap _map;
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_MapConfiguration_INCLUDED

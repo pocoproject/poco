@@ -17,12 +17,21 @@
 #ifndef Foundation_NamedEvent_UNIX_INCLUDED
 #define Foundation_NamedEvent_UNIX_INCLUDED
 
-
 #include "Poco/Foundation.h"
+
+#include <Poco/Platform.h>
+
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
-#include <semaphore.h>
+	#define POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES 1
+	#define POCO_NAMED_EVENT_USE_SYS_V_SEMAPHORES 0
+#else
+	#define POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES 0
+	#define POCO_NAMED_EVENT_USE_SYS_V_SEMAPHORES 1
 #endif
 
+#if POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
+	#include <semaphore.h>
+#endif
 
 namespace Poco {
 
@@ -39,10 +48,11 @@ private:
 	std::string getFileName();
 
 	std::string _name;
-#if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)
-	sem_t* _sem;
+#if POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
+	::sem_t* _sem;
 #else
 	int _semid;  // semaphore id
+	bool _createdId; // semaphore id was created with this instance
 #endif
 };
 

@@ -16,6 +16,9 @@
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include "Poco/Error.h"
+#include "Poco/Path.h"
+#include "Poco/Environment.h"
+#include "Poco/StringTokenizer.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -34,12 +37,16 @@
 #include <stdio.h>
 #include <utime.h>
 #include <cstring>
+#include <vector>
+#if POCO_OS == POCO_OS_MAC_OS_X
+#include <membership.h>
+#endif
 
 #if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
-#define STATFSFN statvfs
+#define STATFSFN ::statvfs
 #define STATFSSTRUCT statvfs
 #else
-#define STATFSFN statfs
+#define STATFSFN ::statfs
 #define STATFSSTRUCT statfs
 #endif
 
@@ -80,12 +87,137 @@ void FileImpl::setPathImpl(const std::string& path)
 }
 
 
+std::string FileImpl::getExecutablePathImpl() const
+{
+	if (_path.empty()) return {};
+
+	if (_path.find('/') != std::string::npos)
+	{
+		Path p(_path);
+		p.makeAbsolute();
+		std::string absPath = p.toString();
+		return canExecuteImpl(absPath) ? absPath : std::string();
+	}
+
+	// Bare name — search CWD then PATH, requiring regular executable file.
+	// Cannot use findInPath() here because it returns the first existing
+	// entry (including directories) with no way to continue searching.
+	{
+		Path curPath(Path::current());
+		curPath.append(_path);
+		curPath.makeAbsolute();
+		std::string absPath = curPath.toString();
+		if (canExecuteImpl(absPath))
+			return absPath;
+	}
+
+	for (const auto& dir : getPathDirectories())
+	{
+		try
+		{
+			Path candidate(dir);
+			candidate.append(_path);
+			candidate.makeAbsolute();
+			std::string absPath = candidate.toString();
+			if (canExecuteImpl(absPath))
+				return absPath;
+		}
+		catch (const Poco::PathSyntaxException&) {}
+	}
+	return {};
+}
+
+
 bool FileImpl::existsImpl() const
 {
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	return stat(_path.c_str(), &st) == 0;
+	return ::stat(_path.c_str(), &st) == 0;
+}
+
+
+namespace
+{
+	bool isGroupMember(gid_t gid)
+		/// Returns true if the effective user belongs to gid, counting supplementary
+		/// groups. Mirrors the kernel's access(2) order: the process credential list
+		/// is consulted first, a directory-service resolver (where one exists) only
+		/// on a miss.
+	{
+		if (gid == ::getegid()) return true;
+
+		// A permission query must not disturb the caller's errno.
+		const int savedErrno = errno;
+		bool member = false;
+
+		enum { INLINE_GROUPS = 64 };
+		gid_t inlineGroups[INLINE_GROUPS];
+
+		// getgroups() reports a group set that grew between the sizing call and the
+		// fetch as EINVAL. Retry once; losing the race twice means the set is
+		// churning and the query gives up, treating the gid as not held.
+		for (int attempt = 0; attempt < 2; ++attempt)
+		{
+			const int count = ::getgroups(0, nullptr);
+			if (count <= 0) break;
+
+			gid_t* groups = inlineGroups;
+			std::vector<gid_t> heapGroups;
+			if (count > INLINE_GROUPS)
+			{
+				heapGroups.resize(count);
+				groups = heapGroups.data();
+			}
+
+			const int actualCount = ::getgroups(count, groups);
+			if (actualCount >= 0)
+			{
+				member = std::find(groups, groups + actualCount, gid) != groups + actualCount;
+				break;
+			}
+			if (errno != EINVAL) break;
+		}
+
+#if POCO_OS == POCO_OS_MAC_OS_X
+		// The credential list getgroups() returns is capped at NGROUPS_MAX (16) on
+		// Darwin and omits nested directory-service memberships, so a miss there is
+		// not final. Ask the membership resolver, as the kernel itself does after a
+		// credential miss.
+		if (!member)
+		{
+			uuid_t userUuid;
+			uuid_t groupUuid;
+			int isMember = 0;
+			if (::mbr_uid_to_uuid(::geteuid(), userUuid) == 0
+				&& ::mbr_gid_to_uuid(gid, groupUuid) == 0
+				&& ::mbr_check_membership(userUuid, groupUuid, &isMember) == 0)
+			{
+				member = isMember != 0;
+			}
+		}
+#endif
+
+		errno = savedErrno;
+		return member;
+	}
+
+
+	bool accessAllowed(const struct stat& st, mode_t usrBit, mode_t grpBit, mode_t othBit)
+		/// Applies the mode bits the way the kernel does for a non-root caller:
+		/// exactly one of the owner, group and other classes answers, with the group
+		/// class selected by membership in the file's group. The membership query is
+		/// skipped when it cannot change the outcome.
+	{
+		if (st.st_uid == ::geteuid())
+			return (st.st_mode & usrBit) != 0;
+		else if (((st.st_mode & grpBit) != 0) == ((st.st_mode & othBit) != 0))
+			return (st.st_mode & othBit) != 0;
+		else if (isGroupMember(st.st_gid))
+			return (st.st_mode & grpBit) != 0;
+		else
+			return (st.st_mode & othBit) != 0;
+	}
 }
 
 
@@ -94,16 +226,16 @@ bool FileImpl::canReadImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == geteuid())
-			return (st.st_mode & S_IRUSR) != 0;
-		else if (st.st_gid == getegid())
-			return (st.st_mode & S_IRGRP) != 0;
-		else
-			return (st.st_mode & S_IROTH) != 0 || geteuid() == 0;
+		if (::geteuid() == 0)
+			return true;
+		return accessAllowed(st, S_IRUSR, S_IRGRP, S_IROTH);
 	}
-	else handleLastErrorImpl(_path);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
+	else
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -113,36 +245,31 @@ bool FileImpl::canWriteImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == geteuid())
-			return (st.st_mode & S_IWUSR) != 0;
-		else if (st.st_gid == getegid())
-			return (st.st_mode & S_IWGRP) != 0;
-		else
-			return (st.st_mode & S_IWOTH) != 0 || geteuid() == 0;
+		if (::geteuid() == 0)
+			return true;
+		return accessAllowed(st, S_IWUSR, S_IWGRP, S_IWOTH);
 	}
-	else handleLastErrorImpl(_path);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
+	else
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
 
-bool FileImpl::canExecuteImpl() const
+bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
-	poco_assert (!_path.empty());
+	poco_assert (!absolutePath.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
-	{
-		if (st.st_uid == geteuid() || geteuid() == 0)
-			return (st.st_mode & S_IXUSR) != 0;
-		else if (st.st_gid == getegid())
-			return (st.st_mode & S_IXGRP) != 0;
-		else
-			return (st.st_mode & S_IXOTH) != 0;
-	}
-	else handleLastErrorImpl(_path);
-	return false;
+	if (::stat(absolutePath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
+		return false;
+
+	if (::geteuid() == 0)
+		return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0;
+	return accessAllowed(st, S_IXUSR, S_IXGRP, S_IXOTH);
 }
 
 
@@ -151,10 +278,12 @@ bool FileImpl::isFileImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 		return S_ISREG(st.st_mode);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
 	else
-		handleLastErrorImpl(_path);
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -164,10 +293,12 @@ bool FileImpl::isDirectoryImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 		return S_ISDIR(st.st_mode);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
 	else
-		handleLastErrorImpl(_path);
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -177,10 +308,12 @@ bool FileImpl::isLinkImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (lstat(_path.c_str(), &st) == 0)
+	if (::lstat(_path.c_str(), &st) == 0)
 		return S_ISLNK(st.st_mode);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
 	else
-		handleLastErrorImpl(_path);
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -190,10 +323,12 @@ bool FileImpl::isDeviceImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 		return S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
 	else
-		handleLastErrorImpl(_path);
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -282,7 +417,7 @@ FileImpl::FileSizeImpl FileImpl::getSizeImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 		return st.st_size;
 	else
 		handleLastErrorImpl(_path);
@@ -294,7 +429,7 @@ void FileImpl::setSizeImpl(FileSizeImpl size)
 {
 	poco_assert (!_path.empty());
 
-	if (truncate(_path.c_str(), size) != 0)
+	if (::truncate(_path.c_str(), size) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -304,7 +439,7 @@ void FileImpl::setWriteableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0)
+	if (::stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
@@ -316,7 +451,7 @@ void FileImpl::setWriteableImpl(bool flag)
 		mode_t wmask = S_IWUSR | S_IWGRP | S_IWOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0)
+	if (::chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -326,7 +461,7 @@ void FileImpl::setExecutableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0)
+	if (::stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
@@ -342,7 +477,7 @@ void FileImpl::setExecutableImpl(bool flag)
 		mode_t wmask = S_IXUSR | S_IXGRP | S_IXOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0)
+	if (::chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -351,36 +486,36 @@ void FileImpl::copyToImpl(const std::string& path, int options) const
 {
 	poco_assert (!_path.empty());
 
-	int sd = open(_path.c_str(), O_RDONLY);
+	int sd = ::open(_path.c_str(), O_RDONLY);
 	if (sd == -1) handleLastErrorImpl(_path);
 
 	struct stat st;
-	if (fstat(sd, &st) != 0)
+	if (::fstat(sd, &st) != 0)
 	{
 		int err = errno;
-		close(sd);
+		::close(sd);
 		handleLastErrorImpl(err, _path);
 	}
 	const long blockSize = st.st_blksize;
 	int dd;
 	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
-		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_EXCL | O_WRONLY, st.st_mode);
+		dd = ::open(path.c_str(), O_CREAT | O_TRUNC | O_EXCL | O_WRONLY, st.st_mode);
 	} else {
-		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
+		dd = ::open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
 	}
 	if (dd == -1)
 	{
 		int err = errno;
-		close(sd);
+		::close(sd);
 		handleLastErrorImpl(err, path);
 	}
 	Buffer<char> buffer(blockSize);
 	try
 	{
 		int n;
-		while ((n = read(sd, buffer.begin(), blockSize)) > 0)
+		while ((n = ::read(sd, buffer.begin(), blockSize)) > 0)
 		{
-			if (write(dd, buffer.begin(), n) != n)
+			if (::write(dd, buffer.begin(), n) != n)
 				handleLastErrorImpl(path);
 		}
 		if (n < 0)
@@ -390,18 +525,18 @@ void FileImpl::copyToImpl(const std::string& path, int options) const
 	}
 	catch (...)
 	{
-		close(sd);
-		close(dd);
+		::close(sd);
+		::close(dd);
 		throw;
 	}
-	close(sd);
-	if (fsync(dd) != 0)
+	::close(sd);
+	if (::fsync(dd) != 0)
 	{
 		int err = errno;
-		close(dd);
+		::close(dd);
 		handleLastErrorImpl(err, path);
 	}
-	if (close(dd) != 0)
+	if (::close(dd) != 0)
 	{
 		handleLastErrorImpl(path);
 	}
@@ -414,10 +549,10 @@ void FileImpl::renameToImpl(const std::string& path, int options)
 
 	struct stat st;
 
-	if (stat(path.c_str(), &st) == 0 && (options & OPT_FAIL_ON_OVERWRITE_IMPL))
+	if (::stat(path.c_str(), &st) == 0 && (options & OPT_FAIL_ON_OVERWRITE_IMPL))
 		throw FileExistsException(path, EEXIST);
 
-	if (rename(_path.c_str(), path.c_str()) != 0)
+	if (::rename(_path.c_str(), path.c_str()) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -428,12 +563,12 @@ void FileImpl::linkToImpl(const std::string& path, int type) const
 
 	if (type == 0)
 	{
-		if (link(_path.c_str(), path.c_str()) != 0)
+		if (::link(_path.c_str(), path.c_str()) != 0)
 			handleLastErrorImpl(_path);
 	}
 	else
 	{
-		if (symlink(_path.c_str(), path.c_str()) != 0)
+		if (::symlink(_path.c_str(), path.c_str()) != 0)
 			handleLastErrorImpl(_path);
 	}
 }
@@ -445,21 +580,26 @@ void FileImpl::removeImpl()
 
 	int rc;
 	if (!isLinkImpl() && isDirectoryImpl())
-		rc = rmdir(_path.c_str());
+		rc = ::rmdir(_path.c_str());
 	else
-		rc = unlink(_path.c_str());
+		rc = ::unlink(_path.c_str());
 	if (rc) handleLastErrorImpl(_path);
 }
 
 
-bool FileImpl::createFileImpl()
+bool FileImpl::createFileImpl(bool createDirectories)
 {
 	poco_assert (!_path.empty());
 
-	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	if(createDirectories) {
+		Path p(_path);
+		p.makeDirectory();
+	}
+
+	int n = ::open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
 	{
-		close(n);
+		::close(n);
 		return true;
 	}
 	if (n == -1 && errno == EEXIST)
@@ -476,7 +616,7 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0)
+	if (::mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0)
 		handleLastErrorImpl(_path);
 	return true;
 }

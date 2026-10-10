@@ -16,8 +16,15 @@
 
 #include "Poco/Foundation.h"
 
+#include <string>
 
-class TestPlugin
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+	#define PLUGIN_EXPORT __attribute__((visibility("default")))
+#else
+#define PLUGIN_EXPORT
+#endif
+
+class PLUGIN_EXPORT TestPlugin
 {
 public:
 	TestPlugin();

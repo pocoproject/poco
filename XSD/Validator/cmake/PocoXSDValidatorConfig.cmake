@@ -1,0 +1,6 @@
+include(CMakeFindDependencyMacro)
+find_dependency(PocoFoundation)
+if(NOT @BUILD_SHARED_LIBS@)
+	find_dependency(LibXml2)
+endif()
+include("${CMAKE_CURRENT_LIST_DIR}/PocoXSDValidatorTargets.cmake")

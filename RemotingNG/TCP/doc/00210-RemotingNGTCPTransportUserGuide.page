@@ -1,0 +1,443 @@
+Remoting NG TCP Transport User Guide
+Remoting NG
+
+!!!Introduction
+
+The TCP Transport is a very efficient Transport implementation, based
+on TCP (or SSL/TLS) sockets and a compact, binary message serialization format
+based on Poco::BinaryWriter. To further reduce the amount of data sent over
+the network, the serialized data can optionally be compressed using the
+deflate algorithm.
+This makes the Binary Transport well suited for distributed applications
+built entirely in C++, using Remoting NG, where interoperability with
+other middleware technologies is not required.
+
+
+!!!Basic TCP Transport Usage
+
+!!Server Usage
+
+To use the TCP Transport in a server, the following four steps must
+be performed:
+
+   1. Create an instance of Poco::RemotingNG::TCP::Listener,
+   2. Optionally configure the listener (e.g., to change timeouts, etc.),
+   3. Register the Listener with the ORB, and
+   4. Register the individual objects with the ORB.
+
+Following is an example code fragment for setting up a TCP Transport listener,
+and registering a service object for use with the listener.
+
+    Poco::RemotingNG::TCP::Listener::Ptr pListener = new Poco::RemotingNG::TCP::Listener("localhost:9999");
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(pListener);
+
+    st::string uri = Sample::TimeServiceServerHelper::registerObject(
+        new Sample::TimeService, 
+        "TheTimeService", 
+        listener
+    );
+----
+
+Please see the Poco::RemotingNG::TCP::Listener class documentation for detailed information
+about how to setup and configure the listener.
+
+
+!!Client Usage
+
+To use the TCP Transport in a client, the following two steps
+must be performed:
+
+  1. Register the Poco::RemotingNG::TCP::TransportFactory with the ORB, and
+  2. Retrieve the interface (proxy) object using the helper class.
+
+Following is an example code fragment for setting up a TCP Transport,
+and registering a service object for use with the transport.
+
+    Poco::RemotingNG::TCP::TransportFactory::registerFactory();
+    Sample::ITimeService::Ptr pTimeService = MyProject::MyClassHelper::find(
+        "remoting.tcp://localhost:9999/tcp/TimeService/TheTimeService");
+    );
+----
+
+The TCP Transport uses the "remoting.tcp" URI scheme for identifying service objects.
+
+
+!Configuring The Client Transport
+
+To configure the client transport (e.g., to enable compression), the TCP Transport object must
+be obtained from the proxy. This is done in two steps. First, the interface
+pointer obtained from the client helper must be casted to a proxy:
+
+    Poco::RemotingNG::Proxy::Ptr pProxy = pTimeService.cast<Poco::RemotingNG::Proxy>();
+----
+
+Second, the Transport object can be obtained from the proxy:
+
+    Poco::RemotingNG::TCP::Transport& trans = static_cast<Poco::RemotingNG::TCP::Transport&>(pProxy->remoting__transport());
+----
+
+Now that we have access to the Transport object, we can configure it:
+
+    trans.setTimeout(Poco::Timespan(10, 0));
+    trans.enableCompression(true);
+----
+
+Configuration should be done before the first method is invoked over the proxy.
+
+Please see the Poco::RemotingNG::TCP::Transport class documentation for more
+information regarding configuration options.
+
+
+!The ConnectionManager
+
+The socket connections used by the TCP Transport are managed by a
+Poco::RemotingNG::TCP::ConnectionManager instance.
+Unless otherwise specified, by passing a specific ConnectionManager
+instance to the constructor, the Poco::RemotingNG::TCP::TransportFactory
+uses the default ConnectionManager instance (see Poco::RemotingNG::TCP::ConnectionManager::defaultManager()).
+
+A custom ConnectionManager instance must be setup if secure sockets should be used.
+In this case, a ConnectionManager instance must be created with custom
+Poco::RemotingNG::TCP::SocketFactory instance.
+
+The ConnectionManager is also used to change the idle timeout of connections.
+The default idle timeout is one minute. This can be changed with a call
+to Poco::RemotingNG::TCP::ConnectionManager::setIdleTimeout(), passing
+a Poco::Timespan timeout value.
+
+
+!!Performance Considerations
+
+On the server side, the TCP Transport Listener uses a Poco::Net::TCPServer
+for handling incoming requests. Each client application maintains a
+single socket connection to the server, and the socket connection is usually kept
+open for the entire lifetime of the application. The connection is shared
+by all the client's proxy objects connected to the same server. It will be
+created the first time a proxy needs to send a request to the server.
+The underlying frame-based network protocol ensures
+that the connection is shared between all proxies in a fair way. 
+The connection uses an idle timer, so if the connection has not been
+used for a certain time, it will be automatically closed. The next time
+a proxy sends a request to the server, the connection will be re-opened again.
+
+The same client-initiated connection is also used by the server to deliver event messages
+to the client. This allows the server to deliver events even to clients behind
+a NAT router or firewall.
+
+The performance of the TCP Transport is best when no namespaces are 
+used and all remote method parameters are scalar.
+While the TCP Transport will ignore namespaces and element/attribute distinction, 
+it will still be informed of them by de-/serializers which costs time. 
+Also, the generated code will be more compact when namespaces are not used.
+
+
+!!Serialization Pitfalls
+
+Since the binary serialization format does not include type information, some
+care must be taken that only types with the same physical representation
+on both the client and the server are used. This mostly affects types with
+different physical representation on 32-bit and 64-bit systems. Examples
+are types like <[long]> or <[std::size_t]>. Such types should be avoided in remote
+interfaces. Fixed-size integer types, such as Poco::Int32 provide a safer
+alternative. 
+
+
+!!!Authentication and Authorization
+
+The TCP Transport supports two authentication methods out of the box: 
+Plain and SCRAM-SHA-1. 
+
+The Plain authentication mechanism, implemented in the
+Poco::RemotingNG::TCP::PlainClientAuthenticator class, simply transfers
+all attributes of the Poco::RemotingNG::Credentials object passed to the
+Transport on to the server. On the server-side, a suitable application-provided
+Poco::RemotingNG::Authenticator subclass must validate these credentials.
+Since credentials are transmitted in clear text, this mechanism should only be
+used over a secure TLS connection.
+
+The SCRAM-SHA-1 (Salted Challenge Response Authentication Mechanism with SHA-1) 
+authentication mechanism, implemented in the Poco::RemotingNG::TCP::SCRAMClientAuthenticator 
+class, is a highly secure multi-step challenge-response authentication mechanism.
+It uses the PBKDF2 algorithm from the Public-Key Cryptography Standards (PKCS)
+and has the following features:
+
+    - The password is never transmitted in plain text, only a hash of the
+      password is transmitted from client to server.
+    - The server does not need to store the passwords in plain text (or
+      encrypted); salted hashes of the passwords are sufficient.
+    - The protocol allows for authenticating the client against the server
+      and also authenticating the server against the client.
+
+In order to enable authentication between a client
+and a server, the following steps must be performed:
+
+  - On the client, a Poco::RemotingNG::ClientAuthenticator instance must
+    be registered with the Transport. Furthermore, valid Credentials must be
+    passed to the Transport.
+  - On the server side, a Poco::RemotingNG::Authenticator instance must
+    be registered with the Listener. If authorization is also required,
+    a Poco::RemotingNG::Authorizer instance must be registered
+    with the Listener as well.
+
+Generally, suitable Poco::RemotingNG::Authenticator and Poco::RemotingNG::Authorizer 
+implementations must be provided by the application, as Remoting NG has no built
+in user credentials and permissions database.
+
+
+!!Plain Authentication
+
+The following examples show how to enable Plain authentication with the TCP Transport.
+
+!Client
+
+To enable Plain authentication on the client, a Poco::RemotingNG::TCP::PlainClientAuthenticator
+must be registered with the Transport, and Credentials must be supplied.
+
+    Poco::RemotingNG::Proxy::Ptr pProxy = pService.cast<Poco::RemotingNG::Proxy>();
+    Poco::RemotingNG::TCP::Transport& trans = static_cast<Poco::RemotingNG::TCP::Transport&>(pProxy->remoting__transport());
+    
+    trans.setAuthenticator(new Poco::RemotingNG::TCP::PlainClientAuthenticator);
+    
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+    trans.setCredentials(creds);
+----
+
+!Server
+
+To enable Plain authentication on the server, a Poco::RemotingNG::Authenticator
+must be registered with the Listener.
+
+    Poco::RemotingNG::TCP::Listener::Ptr pListener = new Poco::RemotingNG::TCP::Listener("localhost:9999");
+    pListener->setAuthenticator(new SimpleAuthenticator);
+----
+
+The <[SimpleAuthenticator]> class referenced in the example must be provided by the
+application. A very simplistic implementation could look like this:
+
+    using Poco::RemotingNG::AuthenticateResult;
+    using Poco::RemotingNG::Credentials;
+    
+    class SimpleAuthenticator: public Poco::RemotingNG::Authenticator
+    {
+    public:
+        AuthenticateResult authenticate(const Credentials& creds, Poco::UInt32 /*conversationID*/)
+        {
+            std::string username = creds.getAttribute(Credentials::ATTR_USERNAME, "");
+            std::string password = creds.getAttribute(Credentials::ATTR_PASSWORD, "");
+        
+            if (username == "user" && password == "s3cr3t")
+                return AuthenticateResult(AuthenticateResult::AUTH_DONE, creds);
+            else
+                return AuthenticateResult(AuthenticateResult::AUTH_FAILED);
+        }
+    };
+----
+
+A typical implementation would look up the username in a database and compare a hash
+of the provided password with the one stored in the database.
+
+
+!!SCRAM-SHA-1 Authentication
+
+The following examples show how to enable SCRAM-SHA-1 authentication with the TCP Transport.
+
+!Client
+
+To enable SCRAM-SHA-1 authentication on the client, a Poco::RemotingNG::TCP::SCRAMClientAuthenticator
+must be registered with the Transport, and Credentials must be supplied.
+
+    Poco::RemotingNG::Proxy::Ptr pProxy = pService.cast<Poco::RemotingNG::Proxy>();
+    Poco::RemotingNG::TCP::Transport& trans = static_cast<Poco::RemotingNG::TCP::Transport&>(pProxy->remoting__transport());
+    
+    trans.setAuthenticator(new Poco::RemotingNG::TCP::SCRAMClientAuthenticator);
+    
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+    trans.setCredentials(creds);
+----
+
+!Server
+
+To enable SCRAM-SHA-1 authentication on the server, a Poco::RemotingNG::TCP::SCRAMAuthenticator
+subclass must be provided and registered with the Listener.
+
+    Poco::RemotingNG::TCP::Listener::Ptr pListener = new Poco::RemotingNG::TCP::Listener("localhost:9999");
+    pListener->setAuthenticator(new MySCRAMAuthenticator);
+----
+
+The <[MySCRAMAuthenticator]> class referenced in the example must be provided by the
+application. It must implement two virtual methods defined by Poco::RemotingNG::TCP::SCRAMAuthenticator:
+
+  - hashForUser(): Returns the PBKDF2-hashed password for the given user.
+  - saltForUser(): Returns the salt for hashing the given user's password, 
+    as well as the number of iterations for the PBKDF2 algorithm.
+
+See the Poco::RemotingNG::TCP::SCRAMAuthenticator class documentation for more information.
+
+Note that passwords must be hashed in a specific way for use with Poco::RemotingNG::TCP::SCRAMAuthenticator.
+The following code sample shows how to hash a password. The resulting has can be stored
+in a database and must be returned by Poco::RemotingNG::TCP::SCRAMAuthenticator::hashForUser().
+
+In the first step, a MD5 hash of the password is generated, salted with a fixed string.
+
+    Poco::MD5Engine md5;
+    md5.update(username);
+    md5.update(std::string(":poco:"));
+    md5.update(password);
+    std::string hashedPassword = SCRAMAuthenticator::digestToHexString(md5);
+----
+
+In the second step, the MD5 hash is again hashed with the PBKDF2 algorithm.
+
+    int iterations;
+    std::string salt = saltForUser(username, iterations);
+    
+    Poco::PBKDF2Engine<Poco::HMACEngine<Poco::SHA1Engine> > pbkdf2(salt, iterations, 20);
+    pbkdf2.update(hashedPassword);
+    return SCRAMAuthenticator::digestToBinaryString(pbkdf2);
+----
+
+
+!!!Using The TCP Transport With TLS
+
+The TCP Transport normally uses a plain TCP socket connection between the
+client and the server. To make the TCP Transport use a secure
+TLS socket connection, the following steps must be performed.
+
+
+!!TLS On The Server Side
+
+On the server side, the listener must be created using a
+Poco::Net::SecureServerSocket.
+
+    Poco::Net::SecureServerSocket serverSocket(10001);
+    Poco::RemotingNG::TCP::Listener::Ptr pListener = new Poco::RemotingNG::TCP::Listener("localhost:10001", serverSocket, 0);
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(pListener);
+
+    st::string uri = Sample::TimeServiceServerHelper::registerObject(
+        new Sample::TimeService, 
+        "TheTimeService", 
+        listener
+    );
+----
+
+
+!!TLS On The Client Side
+
+On the client side, a Poco::RemotingNG::TCP::ConnectionManager must be created 
+with a user-supplied socket factory (Poco::RemotingNG::TCP::SocketFactory) that,
+depending on the actual protocol used, creates either a 
+Poco::Net::StreamSocket, or a Poco::Net::SecureStreamSocket.
+A simple implementation is shown below:
+
+    class SecureSocketFactory: public Poco::RemotingNG::TCP::SocketFactory
+    {
+    public:
+        Poco::Net::StreamSocket createSocket(const Poco::URI& uri)
+        {
+            Poco::Net::SocketAddress addr(uri.getHost(), uri.getPort());
+            if (uri.getScheme() == "remoting.tcps")
+                return Poco::Net::SecureStreamSocket(addr);
+            else
+                return Poco::Net::StreamSocket(addr);
+        }
+    };
+----
+
+Our own ConnectionManager instance using the SecureSocketFactory is then
+passed used to register the TransportFactory.
+
+
+    Poco::RemotingNG::TCP::ConnectionManager connMgr(new SecureSocketFactory);    
+    Poco::RemotingNG::TCP::TransportFactory::registerFactory(connMgr);
+----
+
+The proxy using a secure connection can then be obtained by passing
+a "remoting.tcps"-scheme URI to the client helper:
+
+    Sample::ITimeService::Ptr pTimeService = MyProject::MyClassHelper::find(
+        "remoting.tcps://localhost:10001/tcp/TimeService/TheTimeService");
+    );
+----
+
+
+!!!Using The TCP Transport With Unix Domain Sockets
+
+While not specifically designed for that purpose, the TCP transport can be
+used with Unix domain sockets. However, due to the nature of Unix domain sockets,
+a few caveats have to be taken into account. It must also be noted that Unix
+domain sockets do not use the TCP protocol, even if the transport is still called
+TCP.
+
+!!End Point URI
+
+The end point address of a server using Unix domain sockets is the path of
+the socket file. This brings an interesting issue with URIs used by Remoting, as the
+path portion of a Remoting URI is used for identifying the object. In order to
+distinguish the socket file path from the object path, the socket path will be
+URI-encoded and treated as URI authority. In practical terms this means that
+for the URI, each slash in the socket path will be replaced with "%2F". Furthermore,
+to distinguish a socket path from a domain name, a socket path must always be 
+absolute and begin with a slash. The URI scheme used for Unix domain sockets
+is "remoting.unix". An example for such a URI is
+<*remoting.unix://%2Ftmp%2FTimeServer.sock/tcp/Services.TimeService/TheClock*>.
+The path of the socket file in this URI is <*/tmp/TimeServer.sock*>.
+
+!!Socket File
+
+The socket file created by the operating system when binding the server socket
+will not be deleted when the socket is closed or the server application crashes.
+Therefore, before creating the Listener, it must be checked whether the socket file 
+already exists. If so, it should be removed before creating the Listener.
+
+Therefore, the typical sequence when creating a Listener using a Unix domain socket is:
+
+    // delete socket file if it already exists
+    Poco::File socketFile("/tmp/TimeServer.sock");
+    if (socketFile.exists()) socketFile.remove();
+
+    // create Listener using local socket address
+    Poco::RemotingNG::TCP::Listener::Ptr pListener = new Poco::RemotingNG::TCP::Listener(socketFile.path());
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(pListener);
+----
+
+!!Receiving Events
+
+One major aspect where Unix domain sockets differ in behavior from TCP sockets is that
+a client socket has no useful socket address unless it has been explicitly bound to
+a file. The TCP transport does not support binding client sockets, and even if it
+would support this, the application would have to manually manage socket files for all
+its client connections.
+
+As a workaround, the client can set up a regular Listener using a server socket to
+receive events. Instead of using the default Listener, which would receive event
+notifications on the same socket connection that is used for sending requests to the
+server, the regular Listener is used. This means that, before sending the first 
+event to the client, the server will have to open a socket connection to the
+client's event listener server socket. Unlike with TCP sockets, this is not an issue
+as both client and server are always on the same machine and not firewalls or NAT
+issues could prevent that.
+
+A single event Listener can be used for all events received by the client from 
+different servers. It's also possible to make this Listener the default Listener,
+which will be returned by a call to Poco::RemotingNG::TCP::Listener::defaultListener().
+This means that existing code using the defaultListener() method does not have to
+be changed. It is not necessary to register the event Listener with the ORB, by 
+calling Poco::RemotingNG::ORB::registerListener(). However, the event Listener must
+be explicitly started, by calling its <[start()]> method.
+
+The typical sequence for setting up an event Listener is as follows:
+
+    // delete socket file if it already exists
+    Poco::File socketFile("/tmp/TimeClient.sock");
+    if (socketFile.exists()) socketFile.remove();
+
+    Poco::RemotingNG::TCP::Listener::Ptr pListener = new Poco::RemotingNG::TCP::Listener(socketFile.path());
+    pListener->start();
+    pListener->makeDefaultListener();
+----
+
+

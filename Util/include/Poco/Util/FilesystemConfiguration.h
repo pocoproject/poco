@@ -7,7 +7,7 @@
 //
 // Definition of the FilesystemConfiguration class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,8 +23,7 @@
 #include "Poco/Path.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API FilesystemConfiguration: public AbstractConfiguration
@@ -75,11 +74,13 @@ public:
 		/// directory and all its subdirectories and files.
 
 protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
-	Poco::Path keyToPath(const std::string& key) const;
+	[[nodiscard]] bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
+
+	[[nodiscard]] Poco::Path keyToPath(const std::string& key) const;
+
 	~FilesystemConfiguration();
 
 private:
@@ -87,7 +88,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_FilesystemConfiguration_INCLUDED

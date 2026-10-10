@@ -1,0 +1,30 @@
+From: Some One <some.one@example.org>
+To: Someone Else <someone.else@example.org>
+Subject: =?MacChineseTrad?B?T2zpcg==?=
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary=zxnrbl
+
+This is the preamble.
+--zxnrbl
+Content-Type: multipart/alternative; boundary=xyzzy
+
+This is the nested preamble.
+--xyzzy
+Content-Type: text/plain
+
+Hello!
+--xyzzy
+Content-Type: text/html
+
+<p>Hello!</p>
+--xyzzy--
+This is the nested epilogue.
+--zxnrbl
+Content-Type: text/plain
+Content-Disposition: attachment; filename="attachment.txt"
+
+This is the attachment.
+--zxnrbl--
+This is the epilogue.
+
+

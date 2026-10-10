@@ -22,8 +22,7 @@
 #include "Poco/DOM/Node.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class AbstractNode;
@@ -74,7 +73,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // #include "Poco/XML/XML.h"

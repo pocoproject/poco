@@ -40,13 +40,13 @@ public:
 		/// If flush is true, the text will be immediately
 		/// flushed to the file.
 
-	UInt64 size() const;
+	[[nodiscard]] UInt64 size() const;
 		/// Returns the current size in bytes of the log file.
 
-	Timestamp creationDate() const;
+	[[nodiscard]] Timestamp creationDate() const;
 		/// Returns the date and time the log file was created.
 
-	const std::string& path() const;
+	[[nodiscard]] const std::string& path() const;
 		/// Returns the path given in the constructor.
 
 private:

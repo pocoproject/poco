@@ -18,8 +18,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string OAuth20Credentials::SCHEME = "Bearer";
@@ -102,4 +101,4 @@ void OAuth20Credentials::extractBearerToken(const HTTPRequest& request)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

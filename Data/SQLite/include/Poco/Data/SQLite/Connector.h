@@ -22,9 +22,7 @@
 #include "Poco/Data/Connector.h"
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Connector: public Poco::Data::Connector
@@ -37,14 +35,14 @@ public:
 	Connector();
 		/// Creates the Connector.
 
-	~Connector();
+	~Connector() override;
 		/// Destroys the Connector.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const override;
 		/// Returns the name associated with this connector.
 
-	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
-		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT);
+	[[nodiscard]] Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
+		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT) override;
 		/// Creates a SQLite SessionImpl object and initializes it with the given connectionString.
 
 	static void registerConnector();
@@ -73,7 +71,7 @@ inline const std::string& Connector::name() const
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // Data_SQLite_Connector_INCLUDED

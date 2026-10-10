@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  IniFileConfiguration
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -31,13 +31,13 @@ using Poco::trim;
 using Poco::Path;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
-IniFileConfiguration::IniFileConfiguration()
-{
-}
+IniFileConfiguration::IniFileConfiguration() = default;
+
+
+IniFileConfiguration::~IniFileConfiguration() = default;
 
 
 IniFileConfiguration::IniFileConfiguration(std::istream& istr)
@@ -49,11 +49,6 @@ IniFileConfiguration::IniFileConfiguration(std::istream& istr)
 IniFileConfiguration::IniFileConfiguration(const std::string& path)
 {
 	load(path);
-}
-
-
-IniFileConfiguration::~IniFileConfiguration()
-{
 }
 
 
@@ -154,7 +149,7 @@ bool IniFileConfiguration::ICompare::operator () (const std::string& s1, const s
 
 void IniFileConfiguration::parseLine(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	int c = istr.get();
 	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();
@@ -190,7 +185,7 @@ void IniFileConfiguration::parseLine(std::istream& istr)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // POCO_UTIL_NO_INIFILECONFIGURATION

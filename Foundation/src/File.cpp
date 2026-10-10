@@ -15,6 +15,58 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/DirectoryIterator.h"
+#include "Poco/Environment.h"
+#include "Poco/StringTokenizer.h"
+#include <mutex>
+
+
+namespace Poco {
+// Forward declaration so platform Impl files can call it.
+std::string findInPath(const std::string& name);
+}
+
+
+namespace {
+
+/// Return cached PATH directories as a vector of strings.
+/// Cache is refreshed if the PATH environment variable changes.
+/// Thread-safe: uses mutex to protect cache updates.
+std::vector<std::string> getPathDirectories()
+{
+	using Poco::Environment;
+	using Poco::Path;
+	using Poco::StringTokenizer;
+
+	static std::mutex mutex;
+	static std::string cachedPath;
+	static std::vector<std::string> cachedDirs;
+
+	std::lock_guard<std::mutex> lock(mutex);
+
+	const std::string currentPath = Environment::get("PATH", "");
+
+	if (currentPath != cachedPath)
+	{
+		cachedPath = currentPath;
+		cachedDirs.clear();
+
+		if (!currentPath.empty())
+		{
+			const std::string pathSeparator(1, Path::pathSeparator());
+			const StringTokenizer st(currentPath, pathSeparator,
+				StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+
+			for (const auto& dir : st)
+			{
+				cachedDirs.push_back(dir);
+			}
+		}
+	}
+
+	return cachedDirs;
+}
+
+} // anonymous namespace
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -28,6 +80,39 @@
 
 
 namespace Poco {
+
+
+std::string findInPath(const std::string& name)
+{
+	Path curPath(Path::current());
+	curPath.append(name);
+	if (File(curPath).exists())
+	{
+		curPath.makeAbsolute();
+		return curPath.toString();
+	}
+
+	const std::vector<std::string> dirs = getPathDirectories();
+	if (dirs.empty()) return {};
+
+	for (const auto& dir : dirs)
+	{
+		try
+		{
+			Path candidate(dir);
+			candidate.append(name);
+			candidate.makeAbsolute();
+			if (File(candidate).exists())
+				return candidate.toString();
+		}
+		catch (const Poco::PathSyntaxException&)
+		{
+			// shield against bad PATH environment entries
+		}
+	}
+
+	return {};
+}
 
 
 File::File()
@@ -95,9 +180,36 @@ void File::swap(File& file) noexcept
 }
 
 
+std::string File::absolutePath() const
+{
+	if (path().empty())
+		return {};
+
+	Path p(path());
+	p.makeAbsolute();
+	return p.toString();
+}
+
+
+std::string File::getExecutablePath() const
+{
+	return getExecutablePathImpl();
+}
+
+
 bool File::exists() const
 {
+	if (path().empty()) return false;
 	return existsImpl();
+}
+
+
+bool File::existsAnywhere() const
+{
+	if (path().empty()) return false;
+	if (existsImpl()) return true;
+	if (Path(path()).isAbsolute()) return false;
+	return !findInPath(path()).empty();
 }
 
 
@@ -115,7 +227,10 @@ bool File::canWrite() const
 
 bool File::canExecute() const
 {
-	return canExecuteImpl();
+	const std::string execPath = getExecutablePathImpl();
+	if (execPath.empty())
+		return false;
+	return canExecuteImpl(execPath);
 }
 
 

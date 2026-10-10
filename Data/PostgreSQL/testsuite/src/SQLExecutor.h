@@ -87,6 +87,7 @@ public:
 	void dateTime();
 	void date();
 	void time();
+	void dateTimeVariants();
 	void unsignedInts();
 	void floats();
 	void doubles();
@@ -103,6 +104,9 @@ public:
 
 
 	void reconnect();
+
+	void stdOptional();
+	void stdTupleWithOptional();
 
 private:
 	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);

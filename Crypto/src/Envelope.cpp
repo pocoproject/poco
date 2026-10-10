@@ -14,8 +14,7 @@
 
 #include "Poco/Crypto/Envelope.h"
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 Envelope::Envelope(int cipherNID): _pCipher(EVP_get_cipherbynid(cipherNID)),
@@ -23,12 +22,8 @@ Envelope::Envelope(int cipherNID): _pCipher(EVP_get_cipherbynid(cipherNID)),
 {
 	poco_check_ptr(_pCipher);
 	poco_check_ptr(_pCtx);
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 	if (1 != EVP_CIPHER_CTX_reset(_pCtx))
 		handleErrors(std::string("Envelope():EVP_CIPHER_CTX_reset()"));
-#else
-	EVP_CIPHER_CTX_init(_pCtx);
-#endif
 	_iv.resize(ivSize(), 0);
 }
 
@@ -57,22 +52,29 @@ Envelope::~Envelope()
 
 void Envelope::addKey(const EVPPKey& key)
 {
-	EVP_PKEY* pKey;
-	_pubKeys.push_back(EVPPKey::duplicate((const EVP_PKEY*)key, &pKey));
-	_encKeys.emplace_back(EVP_PKEY_size(_pubKeys.back()));
+	EVP_PKEY* pKey = nullptr;
+	EVPPKey::duplicate((const EVP_PKEY*)key, &pKey);
+	const int keySize = EVP_PKEY_size(pKey);
+	if (keySize <= 0)
+	{
+		EVP_PKEY_free(pKey);
+		handleErrors(std::string("Envelope::addKey():EVP_PKEY_size()"));
+	}
+	_pubKeys.push_back(pKey);
+	_encKeys.emplace_back(keySize);
 }
 
 
 const Envelope::ByteVec& Envelope::seal(const ByteVec& plainData)
 {
-	std::vector<Byte*> pEncKeys(_encKeys.size(), 0);
+	std::vector<Byte *> pEncKeys(_encKeys.size(), nullptr);
 	std::vector<int> encKeysSizes(_encKeys.size(), 0);
-	int i = 0;
+	std::size_t i = 0;
 	for (const auto& k : _encKeys)
 		pEncKeys[i++] = new Byte[k.size()];
 
 	int noOfKeys = static_cast<int>(_pubKeys.size());
-	if (_encKeys.size() != EVP_SealInit(_pCtx, _pCipher, &pEncKeys[0], &encKeysSizes[0], &_iv[0], &_pubKeys[0], noOfKeys))
+	if (static_cast<int>(_encKeys.size()) != EVP_SealInit(_pCtx, _pCipher, &pEncKeys[0], &encKeysSizes[0], &_iv[0], &_pubKeys[0], noOfKeys))
 	{
 		i = 0;
 		for (; i < _encKeys.size(); ++i) delete [] pEncKeys[i];
@@ -81,7 +83,7 @@ const Envelope::ByteVec& Envelope::seal(const ByteVec& plainData)
 	i = 0;
 	for (auto& k : _encKeys)
 	{
-		if (encKeysSizes[i] != k.size())
+		if (static_cast<std::size_t>(encKeysSizes[i]) != k.size())
 			k.resize(encKeysSizes[i]);
 		std::memcpy(&k[0], pEncKeys[i], encKeysSizes[i]);
 		++i;
@@ -92,17 +94,17 @@ const Envelope::ByteVec& Envelope::seal(const ByteVec& plainData)
 
 	int cipherTextLen = 0, len = 0;
 	int plainDataSize = static_cast<int>(plainData.size());
-    _encContent.resize(plainDataSize + blockSize());
+	_encContent.resize(plainDataSize + blockSize());
 	if (1 != EVP_SealUpdate(_pCtx, &_encContent[0], &len, &plainData[0], plainDataSize))
 		handleErrors(std::string("Envelope::seal():EVP_SealUpdate()"));
-	
+
 	cipherTextLen = len;
-	poco_assert (cipherTextLen < _encContent.size());
+	poco_assert (static_cast<std::size_t>(cipherTextLen) < _encContent.size());
 
 	if(1 != EVP_SealFinal(_pCtx, &_encContent[len], &len))
 		handleErrors(std::string("Envelope::seal():EVP_SealFinal()"));
 	cipherTextLen += len;
-	poco_assert (cipherTextLen <= _encContent.size());
+	poco_assert (static_cast<std::size_t>(cipherTextLen) <= _encContent.size());
 	_encContent.resize(cipherTextLen);
 
 	return _encContent;
@@ -153,10 +155,10 @@ void Envelope::handleErrors(std::string&& msg)
 	while ((err = ERR_get_error()))
 	{
 		if (!msg.empty()) msg.append("\n");
-		msg.append(ERR_error_string(err, 0));
+		msg.append(ERR_error_string(err, nullptr));
 	}
 	throw CryptoException(msg);
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

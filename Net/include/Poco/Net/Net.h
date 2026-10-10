@@ -26,9 +26,9 @@
 //
 // The following block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the Net_EXPORTS
-// symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
-// Net_API functions as being imported from a DLL, wheras this DLL sees symbols
+// symbol defined on the command line. This symbol should not be defined on any project
+// that uses this DLL. This way any other project whose source files include this file sees
+// Net_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
@@ -75,8 +75,7 @@
 #endif // POCO_NET_NO_UNIX_SOCKET, POCO_HAVE_UNIX_SOCKET
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 void Net_API initializeNetwork();
@@ -89,12 +88,12 @@ void Net_API uninitializeNetwork();
 	/// (Windows only, no-op elsewhere)
 
 
-std::string htmlize(const std::string& str);
+std::string Net_API htmlize(const std::string& str);
 	/// Returns a copy of html with reserved HTML
 	/// characters (<, >, ", &) propery escaped.
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 //
@@ -103,22 +102,49 @@ std::string htmlize(const std::string& str);
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
 
-extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
+extern "C" const struct NetworkInitializer Net_API pocoNetworkInitializer;
 
-#if defined(POCO_COMPILER_MINGW)
+// clang-cl defines BOTH __clang__ and _MSC_VER and supports the MSVC linker
+// pragmas (/include:, /export). The `static void*` reference trick below
+// misbehaves under clang-cl: /O2 strips it in static builds, and in shared
+// builds it references the bare symbol of a __declspec(dllimport) variable (the
+// consumer only has __imp_pocoNetworkInitializer), so the initializer is never
+// linked and WSAStartup never runs. Route clang-cl to the pragma path (like
+// MSVC); keep the symbol trick only for GNU-mode clang and MinGW, which lack
+// those pragmas.
+#if defined(POCO_COMPILER_MINGW) || (defined(__clang__) && !defined(_MSC_VER))
 	#define POCO_NET_FORCE_SYMBOL(x) static void *__ ## x ## _fp = (void*)&x;
 #elif defined(Net_EXPORTS)
-	#if defined(_WIN64)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
-	#elif defined(_WIN32)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
-	#endif
-#else  // !Net_EXPORTS
+	// Building Net itself: Net_API (dllexport) on pocoNetworkInitializer above
+	// already places it in the DLL export table. Force-reference it with /include:
+	// rather than a second /export: -- a redundant /export: triggers LNK4197
+	// (export specified multiple times). /include: keeps /OPT:REF from stripping
+	// the initializer without re-exporting it.
 	#if defined(_WIN64)
 		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
 	#elif defined(_WIN32)
 		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
 	#endif
+#else  // !Net_EXPORTS
+	#if !defined(POCO_NETWORK_INITIALIZER_INCLUDE_PATH)
+		#if defined(POCO_DLL)
+			// A DLL consumer references the initializer as its import-address
+			// symbol __imp_<name>; force that so the import (and thus the DLL's
+			// load-time WSAStartup) is pulled in.
+			#if defined(_WIN64)
+				#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:__imp_"
+			#elif defined(_WIN32)
+				#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:__imp__"
+			#endif
+		#else
+			#if defined(_WIN64)
+				#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:"
+			#elif defined(_WIN32)
+				#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:_"
+			#endif
+		#endif
+	#endif
+	#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, POCO_NETWORK_INITIALIZER_INCLUDE_PATH#s))
 #endif // Net_EXPORTS
 
 POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)

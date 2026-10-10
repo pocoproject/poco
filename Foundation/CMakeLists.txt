@@ -2,6 +2,11 @@
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 
+# FastLogger requires Quill - exclude if not enabled
+if(NOT ENABLE_FASTLOGGER)
+	list(FILTER SRCS EXCLUDE REGEX ".*FastLogger\\.cpp$")
+endif()
+
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SRCS ${HDRS_G})
@@ -27,69 +32,73 @@ POCO_MESSAGES(SRCS Logging src/pocomsg.mc)
 # If POCO_UNBUNDLED is enabled we try to find the required packages
 # The configuration will fail if the packages are not found
 if(POCO_UNBUNDLED)
-	find_package(PCRE2 REQUIRED)
-	find_package(ZLIB REQUIRED)
 
-	#HACK: Unicode.cpp requires functions from these files. The can't be taken from the library
-	POCO_SOURCES(SRCS RegExp
-		src/pcre2_ucd.c
-		src/pcre2_tables.c
-	)
+	# pcre2 source files are linked with Foundation when shared library pcre2 is linked.
+	# When linking pcre2 as static library the symbols are accessible.
+	# CONFIG-mode packages (e.g. Conan, vcpkg) may expose Pcre2::Pcre2 as an
+	# INTERFACE_LIBRARY aggregator; the PCRE2_STATIC compile definition is the
+	# canonical marker that the underlying build is static.
+	get_target_property(_PCRE2TYPE Pcre2::Pcre2 TYPE)
+	if("${_PCRE2TYPE}" STREQUAL "SHARED_LIBRARY")
+		# HACK: Unicode.cpp requires functions from these files.
+		# They can't be used directly from the library
+		POCO_SOURCES(SRCS RegExp ${EMBEDDED_PCRE2_SOURCES} )
+	elseif ("${_PCRE2TYPE}" STREQUAL "STATIC_LIBRARY")
+		message(STATUS "PCRE2: linking static library.")
+	elseif("${_PCRE2TYPE}" STREQUAL "INTERFACE_LIBRARY" OR "${_PCRE2TYPE}" STREQUAL "UNKNOWN_LIBRARY")
+		get_target_property(_PCRE2DEFS Pcre2::Pcre2 INTERFACE_COMPILE_DEFINITIONS)
+		if(_PCRE2DEFS MATCHES "PCRE2_STATIC")
+			message(STATUS "PCRE2: linking ${_PCRE2TYPE} (PCRE2_STATIC set).")
+		else()
+			message(STATUS "PCRE2: ${_PCRE2TYPE} without PCRE2_STATIC; embedding internal sources.")
+			POCO_SOURCES(SRCS RegExp ${EMBEDDED_PCRE2_SOURCES})
+		endif()
+		unset(_PCRE2DEFS)
+	else()
+		message(WARNING "PCRE2: unknown library type: ${_PCRE2TYPE}")
+	endif()
 
-else()
-	# pcre2
-	POCO_SOURCES(SRCS pcre2
-		src/pcre2_auto_possess.c
-		src/pcre2_chartables.c
-		src/pcre2_compile.c
-		src/pcre2_config.c
-		src/pcre2_context.c
-		src/pcre2_convert.c
-		src/pcre2_dfa_match.c
-		src/pcre2_error.c
-		src/pcre2_extuni.c
-		src/pcre2_find_bracket.c
-		src/pcre2_jit_compile.c
-		src/pcre2_maketables.c
-		src/pcre2_match.c
-		src/pcre2_match_data.c
-		src/pcre2_newline.c
-		src/pcre2_ord2utf.c
-		src/pcre2_pattern_info.c
-		src/pcre2_script_run.c
-		src/pcre2_serialize.c
-		src/pcre2_string_utils.c
-		src/pcre2_study.c
-		src/pcre2_substitute.c
-		src/pcre2_substring.c
-		src/pcre2_tables.c
-		src/pcre2_ucd.c
-		src/pcre2_valid_utf.c
-		src/pcre2_xclass.c
-	)
-
-	# zlib
-	POCO_HEADERS(SRCS zlib
-		include/Poco/zconf.h
-		include/Poco/zlib.h
-		)
-
-	POCO_SOURCES(SRCS zlib
-		src/adler32.c
-		src/compress.c
-		src/crc32.c
-		src/deflate.c
-		src/infback.c
-		src/inffast.c
-		src/inflate.c
-		src/inftrees.c
-		src/trees.c
-		src/zutil.c
-	)
+	unset(_PCRE2TYPE)
 endif(POCO_UNBUNDLED)
 
-
 add_library(Foundation ${SRCS})
+if (POCO_UNBUNDLED)
+	target_link_libraries(Foundation PRIVATE ZLIB::ZLIB Pcre2::Pcre2 Utf8Proc::Utf8Proc)
+	# Only Unicode.cpp and the embedded tables need pcre2's internal headers;
+	# RegularExpression.cpp must see the system pcre2.h it links against.
+	set_source_files_properties(src/Unicode.cpp ${EMBEDDED_PCRE2_SOURCES}
+		PROPERTIES INCLUDE_DIRECTORIES "${EMBEDDED_PCRE2_INCLUDE}")
+	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED PRIVATE HAVE_CONFIG_H)
+else()
+	# BUILD_LOCAL_INTERFACE is used to ensure that the dependent libraries are used
+	# only in the build process and are not exported.
+	# See also:
+	# https://discourse.cmake.org/t/cmake-error-install-export-projecttargets-includes-target-xxx-which-requires-target-yyy-that-is-not-in-any-export-set/7344/2
+	# https://cmake.org/cmake/help/latest/release/3.26.html#generator-expressions
+	target_link_libraries(
+		Foundation
+		PRIVATE
+			"$<BUILD_LOCAL_INTERFACE:ZLIB::ZLIB>"
+			"$<BUILD_LOCAL_INTERFACE:Pcre2::Pcre2>"
+			"$<BUILD_LOCAL_INTERFACE:Utf8Proc::Utf8Proc>"
+	)
+	target_compile_definitions(Foundation PUBLIC UTF8PROC_STATIC)
+endif()
+
+target_link_libraries(Foundation PRIVATE "$<BUILD_LOCAL_INTERFACE:V8::DoubleConversion>")
+target_link_libraries(Foundation PUBLIC "$<BUILD_LOCAL_INTERFACE:Tessil::OrderedMap>")
+
+# FastLogger support (requires Quill)
+if(ENABLE_FASTLOGGER)
+	# Quill is header-only, use BUILD_LOCAL_INTERFACE to avoid export issues
+	# The quill headers are needed at build time but don't need to be exported
+	target_link_libraries(Foundation PUBLIC "$<BUILD_LOCAL_INTERFACE:quill::quill>")
+	target_compile_definitions(Foundation PUBLIC POCO_ENABLE_FASTLOGGER)
+else()
+	# Prevent Config.h from auto-enabling FastLogger
+	target_compile_definitions(Foundation PUBLIC POCO_NO_FASTLOGGER)
+endif()
+
 add_library(Poco::Foundation ALIAS Foundation)
 set_target_properties(Foundation
 	PROPERTIES
@@ -98,10 +107,17 @@ set_target_properties(Foundation
 	DEFINE_SYMBOL Foundation_EXPORTS
 )
 
-if(POCO_UNBUNDLED)
-	target_link_libraries(Foundation PUBLIC Pcre2::Pcre2 ZLIB::ZLIB)
-	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED)
-endif(POCO_UNBUNDLED)
+if (NOT POCO_SOO)
+	target_compile_definitions(Foundation PUBLIC POCO_NO_SOO)
+endif()
+
+# Selects MutexImpl in Mutex.h, so it must reach consumers of the installed
+# headers as well; otherwise they disagree with the library about Mutex.
+if (POCO_ENABLE_STD_MUTEX)
+	target_compile_definitions(Foundation PUBLIC POCO_ENABLE_STD_MUTEX)
+endif()
+
+target_compile_definitions(Foundation PUBLIC POCO_CMAKE)
 
 target_include_directories(Foundation
 	PUBLIC
@@ -113,24 +129,39 @@ target_include_directories(Foundation
 target_compile_definitions(Foundation
 	PUBLIC
 		$<$<CONFIG:Debug>:_DEBUG>
-		$<$<BOOL:${DISABLE_CPP14}>:POCO_DISABLE_CPP14>
-		$<$<NOT:$<BOOL:${DISABLE_CPP14}>>:POCO_ENABLE_CPP14>
-		$<$<BOOL:${DISABLE_CPP11}>:POCO_DISABLE_CPP11>
-		$<$<NOT:$<BOOL:${DISABLE_CPP11}>>:POCO_ENABLE_CPP11>
+		$<$<BOOL:${POCO_ENABLE_CPP20}>:POCO_ENABLE_CPP20>
 )
 target_compile_features(Foundation
 	PUBLIC
 		$<$<NOT:$<BOOL:${DISABLE_CPP11}>>:cxx_defaulted_move_initializers>
 )
-if(NOT DISABLE_CPP14 AND CMAKE_VERSION VERSION_GREATER "3.8")
-	target_compile_features(Foundation PUBLIC cxx_std_14)
+
+#
+# Set target C++ standard compile features for exported target.
+#
+target_compile_features(Foundation PUBLIC cxx_std_17)
+if (POCO_ENABLE_CPP20)
+	target_compile_features(Foundation PUBLIC cxx_std_20)
+endif()
+
+if (POCO_ENABLE_CPP20 AND NOT EMSCRIPTEN)
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 20.0)
+			# Some C++20 features must be enabled explicitly in clang
+			target_compile_options(Foundation PUBLIC -fexperimental-library)
+		endif ()
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+		if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0)
+			# Some C++20 features must be enabled explicitly in clang
+			target_compile_options(Foundation PUBLIC -fexperimental-library)
+		endif ()
+	endif()
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
-	target_compile_definitions(Foundation
-		PUBLIC
-			POCO_STATIC
-	)
+	# The define must be set here to be included in the generated CMake files
+	# and properly detect build in the installed files.
+	target_compile_definitions(Foundation PUBLIC POCO_STATIC)
 endif()
 
 if(WIN32)
@@ -158,15 +189,21 @@ else()
 				target_compile_definitions(Foundation PUBLIC POCO_HAVE_FD_POLL)
 				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
 			elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "AIX"  OR "${CMAKE_SYSTEM_NAME}" STREQUAL "GNU")
+				set(THREADS_PREFER_PTHREAD_FLAG ON)
+				find_package(Threads REQUIRED)
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_POLL)
-				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+				target_link_libraries(Foundation PUBLIC ${CMAKE_DL_LIBS} rt Threads::Threads)
 			else()
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_EPOLL)
-				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt ${Poco_ATOMIC_LIBRARIES})
 			endif()
 		endif(APPLE)
 	endif(UNIX AND NOT ANDROID)
 endif(CYGWIN)
+
+if(ENABLE_TRACE)
+	target_link_libraries(Foundation PRIVATE "$<BUILD_LOCAL_INTERFACE:cpptrace::cpptrace>")
+endif()
 
 if(CMAKE_SYSTEM MATCHES "SunOS")
 	target_compile_definitions(Foundation
@@ -189,7 +226,7 @@ if(MINGW)
 			_WIN32
 			MINGW32
 			WINVER=0x500
-			ODBCVER=0x0300
+			ODBCVER=0x0350
 			POCO_THREAD_STACK_SIZE
 	)
 endif()
@@ -198,6 +235,16 @@ endif()
 if(${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 	target_compile_definitions(Foundation PUBLIC _BSD_SOURCE)
 	target_compile_options(Foundation PUBLIC -library=stlport4)
+endif()
+
+# AIX
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "AIX")
+	target_compile_definitions(Foundation PUBLIC POCO_NO_THREADNAME)
+endif()
+
+# Emscripten currently doesn't support thread names
+if(EMSCRIPTEN)
+	target_compile_definitions(Foundation PUBLIC POCO_NO_THREADNAME)
 endif()
 
 # iOS
@@ -235,4 +282,8 @@ if(ENABLE_TESTS)
 		set_property(TARGET Foundation PROPERTY POSITION_INDEPENDENT_CODE ON) # This is needed to build TestLibrary.so as shared.
 	endif()
 	add_subdirectory(testsuite)
+endif()
+
+if(ENABLE_FUZZING)
+	add_subdirectory(fuzzing)
 endif()

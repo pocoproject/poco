@@ -15,6 +15,8 @@ objects = \
 	HTTPRequestTest MessageHeaderTest NetTestSuite UDPEchoServer \
 	HTTPResponseTest MessagesTestSuite NetworkInterfaceTest \
 	HTTPServerTest MulticastEchoServer SocketAddressTest \
+	HTTPReactorServerSessionTest HTTPReactorServerTest HTTPReactorServerTestSuite \
+	TCPReactorServerTest \
 	HTTPCookieTest HTTPCredentialsTest HTMLFormTest HTMLTestSuite \
 	MediaTypeTest QuotedPrintableTest DialogSocketTest \
 	HTTPClientTestSuite FTPClientTestSuite FTPClientSessionTest \

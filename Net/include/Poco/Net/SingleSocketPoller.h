@@ -24,8 +24,7 @@
 #include "Poco/Net/PollSet.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <std::size_t S = POCO_UDP_BUF_SIZE>
@@ -56,14 +55,14 @@ public:
 	{
 	}
 
-	Poco::UInt16 port() const
+	[[nodiscard]] Poco::UInt16 port() const
 		/// Returns the port the socket is
 		/// listening on.
 	{
 		return _socket.address().port();
 	}
 
-	Poco::Net::SocketAddress address() const
+	[[nodiscard]] Poco::Net::SocketAddress address() const
 		/// Returns the address of the server.
 	{
 		return _socket.address();
@@ -85,7 +84,7 @@ public:
 		_reader.stopHandler();
 	}
 
-	bool done() const
+	[[nodiscard]] bool done() const
 		/// Returns true if handler is done.
 	{
 		return _reader.handlerDone();
@@ -98,7 +97,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SingleSocketPoller_INCLUDED

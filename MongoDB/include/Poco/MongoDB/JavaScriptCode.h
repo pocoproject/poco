@@ -7,7 +7,7 @@
 //
 // Definition of the JavaScriptCode class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -25,8 +25,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API JavaScriptCode
@@ -44,7 +43,7 @@ public:
 	void setCode(const std::string& code);
 		/// Sets the JavaScript code.
 
-	std::string getCode() const;
+	[[nodiscard]] std::string getCode() const;
 		/// Returns the JavaScript code.
 
 private:
@@ -76,7 +75,8 @@ struct ElementTraits<JavaScriptCode::Ptr>
 
 	static std::string toString(const JavaScriptCode::Ptr& value, int indent = 0)
 	{
-		return value.isNull() ? "" : value->getCode();
+		if (value.isNull()) return R"("<null>")";
+		return ElementTraits<std::string>::toString(value->getCode(), indent);
 	}
 };
 
@@ -84,22 +84,22 @@ struct ElementTraits<JavaScriptCode::Ptr>
 template<>
 inline void BSONReader::read<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& to)
 {
-	std::string code;
-	BSONReader(_reader).read(code);
+	Int32 available = MAX_MESSAGE_SIZE_BYTES;
+	const std::string code = readString(available);
 	to = new JavaScriptCode();
 	to->setCode(code);
 }
 
 
 template<>
-inline void BSONWriter::write<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& from)
+inline void BSONWriter::write<JavaScriptCode::Ptr>(const JavaScriptCode::Ptr& from)
 {
 	std::string code = from->getCode();
 	BSONWriter(_writer).write(code);
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_JavaScriptCode_INCLUDED

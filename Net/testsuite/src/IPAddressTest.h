@@ -39,6 +39,7 @@ public:
 	void testPrefixLen();
 	void testOperators();
 	void testByteOrderMacros();
+	void testScoped();
 
 	void setUp();
 	void tearDown();

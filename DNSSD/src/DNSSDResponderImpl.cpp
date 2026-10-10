@@ -17,8 +17,7 @@
 #include "Poco/DNSSD/DNSSDResponderImpl.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 DNSSDResponderImpl::DNSSDResponderImpl()
@@ -36,4 +35,4 @@ DNSSDResponderImplFactory::~DNSSDResponderImplFactory()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

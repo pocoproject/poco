@@ -35,3 +35,7 @@ POCO_GENERATE_PACKAGE(JWT)
 if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
+
+if(ENABLE_FUZZING)
+	add_subdirectory(fuzzing)
+endif()

@@ -24,8 +24,7 @@
 #include "Poco/BasicEvent.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API NTPClient
@@ -58,7 +57,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_NTPClient_INCLUDED

@@ -13,16 +13,13 @@
 #ifndef SQLExecutor_INCLUDED
 #define SQLExecutor_INCLUDED
 
-
-#include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Utility.h"
+#include "CppUnit/TestCase.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/BulkBinding.h"
 #include "Poco/Data/Test/SQLExecutor.h"
 #include "Poco/NumberFormatter.h"
-#include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <iostream>
 
@@ -88,8 +85,10 @@ public:
 		DE_BOUND
 	};
 
-	SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession = 0);
-	~SQLExecutor();
+	SQLExecutor(const std::string& name,
+				Poco::Data::Session* pSession,
+				Poco::Data::Session* pEncSession = nullptr);
+	~SQLExecutor() override;
 
 	void execute(const std::string& sql);
 		/// Execute a query.
@@ -159,6 +158,8 @@ public:
 	void limitZero();
 	void prepare();
 
+	void nullBulk(const std::string& blobPlaceholder="?");
+
 	template <typename C1, typename C2, typename C3, typename C4, typename C5, typename C6>
 	void doBulkWithBool(Poco::UInt32 size, const std::string& blobPlaceholder="?")
 	{
@@ -172,7 +173,7 @@ public:
 		C5 dateTimes(size);
 		C6 bools;
 
-		for (int i = 0; i < size; ++i)
+		for (Poco::UInt32 i = 0; i < size; ++i)
 		{
 			ints.push_back(i);
 			strings.push_back(std::string("xyz" + Poco::NumberFormatter::format(i)));
@@ -314,7 +315,7 @@ public:
 		C4 floats;
 		C5 dateTimes(size);
 
-		for (int i = 0; i < size; ++i)
+		for (Poco::UInt32 i = 0; i < size; ++i)
 		{
 			ints.push_back(i);
 			strings.push_back(std::string("xyz" + Poco::NumberFormatter::format(i)));
@@ -521,6 +522,8 @@ public:
 	void transaction(const std::string& connect, bool readUncommitted = true);
 	void transactor();
 	void nullable();
+	void stdOptional();
+	void stdTupleWithOptional();
 
 	void unicode(const std::string& dbConnString);
 	void encoding(const std::string& dbConnString);
@@ -720,6 +723,12 @@ inline void SQLExecutor::prepare()
 }
 
 
+inline void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
+{
+	_dataExecutor.nullBulk(blobPlaceholder);
+}
+
+
 inline void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 {
 	_dataExecutor.doBulkPerformance(size);
@@ -895,7 +904,7 @@ inline void SQLExecutor::internalExtraction()
 
 inline void SQLExecutor::filter(const std::string& query, const std::string& intFldName)
 {
-	_dataExecutor.filter();
+	_dataExecutor.filter(query, intFldName);
 }
 
 
@@ -1010,6 +1019,18 @@ inline void SQLExecutor::transactor()
 inline void SQLExecutor::nullable()
 {
 	_dataExecutor.nullable();
+}
+
+
+inline void SQLExecutor::stdOptional()
+{
+	_dataExecutor.stdOptional();
+}
+
+
+inline void SQLExecutor::stdTupleWithOptional()
+{
+	_dataExecutor.stdTupleWithOptional();
 }
 
 

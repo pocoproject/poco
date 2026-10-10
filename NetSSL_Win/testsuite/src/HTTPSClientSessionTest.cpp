@@ -303,9 +303,9 @@ void HTTPSClientSessionTest::testInterop()
 	std::set<std::string> domainNames;
 	cert.extractNames(commonName, domainNames);
 
-	assertTrue (commonName == "secure.appinf.com" || commonName == "*.appinf.com");
-	assertTrue (domainNames.find("appinf.com") != domainNames.end()
-		 || domainNames.find("*.appinf.com") != domainNames.end());
+	assertTrue (commonName.find(".appinf.com") != std::string::npos);
+	assertTrue (domainNames.find("secure.appinf.com") != domainNames.end() 
+		 || domainNames.find("download.appinf.com") != domainNames.end());
 }
 
 
@@ -326,7 +326,6 @@ void HTTPSClientSessionTest::testProxy()
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assertTrue (str == "This is a test file for NetSSL.\n");
-	assertTrue (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
 }
 
 

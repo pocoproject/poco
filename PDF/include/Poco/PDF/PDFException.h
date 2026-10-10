@@ -19,14 +19,14 @@
 
 
 #include "Poco/PDF/PDF.h"
+#include "Poco/PDF/Declarations.h"
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
-void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data);
+[[noreturn]] void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data);
 	/// HARU library error handler function.
 	/// Throws appropriate exception.
 
@@ -35,7 +35,7 @@ POCO_DECLARE_EXCEPTION(PDF_API, PDFException, Poco::RuntimeException)
 POCO_DECLARE_EXCEPTION(PDF_API, PDFCreateException, PDFException)
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_PDFException_INCLUDED

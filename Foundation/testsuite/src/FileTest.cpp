@@ -16,9 +16,30 @@
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
+#include "Poco/Environment.h"
 #include <fstream>
 #include <set>
-
+#include <atomic>
+#include <vector>
+#include <thread>
+#include <chrono>
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+#if !defined(POCO_VXWORKS)
+#include <dirent.h>
+#endif
+#if POCO_OS == POCO_OS_LINUX
+#include <sys/xattr.h>
+#elif POCO_OS == POCO_OS_MAC_OS_X
+#include <sys/acl.h>
+#endif
+#endif
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include <Windows.h>
+#include <direct.h>
+#endif
 
 using Poco::File;
 using Poco::TemporaryFile;
@@ -26,6 +47,116 @@ using Poco::Path;
 using Poco::Exception;
 using Poco::Timestamp;
 using Poco::Thread;
+
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+namespace {
+
+
+bool kernelGrants(const std::string& path, int what)
+	/// Asks the kernel the question canRead()/canWrite()/canExecute() answer.
+	/// faccessat(AT_EACCESS) checks the effective IDs like the implementation;
+	/// plain access(2) would check the real IDs instead.
+{
+#if defined(AT_EACCESS)
+	return ::faccessat(AT_FDCWD, path.c_str(), what, AT_EACCESS) == 0;
+#else
+	return ::access(path.c_str(), what) == 0;
+#endif
+}
+
+
+bool hasExtendedAcl(const std::string& path)
+	/// The kernel honors ACLs, the mode-bit model cannot, so ACL-carrying files
+	/// are unusable as comparison fixtures.
+{
+#if POCO_OS == POCO_OS_LINUX
+	return ::getxattr(path.c_str(), "system.posix_acl_access", nullptr, 0) >= 0;
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	acl_t acl = ::acl_get_file(path.c_str(), ACL_TYPE_EXTENDED);
+	if (acl != nullptr)
+	{
+		::acl_free(acl);
+		return true;
+	}
+	return false;
+#else
+	return false;
+#endif
+}
+
+
+bool comparableFixture(const std::string& path, struct stat& st)
+	/// A fixture usable for kernel comparison: a regular, ACL-free file owned by
+	/// another user. Only such a file reaches the non-owner branches of the
+	/// permission checks -- for a file the caller owns, the owner branch answers
+	/// first, and a test cannot create a file owned by someone else without
+	/// privilege.
+{
+	if (::lstat(path.c_str(), &st) != 0) return false;
+	if (!S_ISREG(st.st_mode)) return false;
+	if (st.st_uid == ::geteuid()) return false;
+	return !hasExtendedAcl(path);
+}
+
+
+gid_t findSupplementaryGroup()
+	/// Returns a supplementary group of the effective user other than the
+	/// effective GID, or 0 when there is none (0 doubles as the not-found
+	/// sentinel, which is safe: testing membership of gid 0 is uninteresting).
+{
+	int count = ::getgroups(0, nullptr);
+	if (count <= 0) return 0;
+
+	std::vector<gid_t> groups(count);
+	count = ::getgroups(count, groups.data());
+
+	for (int i = 0; i < count; ++i)
+	{
+		if (groups[i] != ::getegid() && groups[i] != 0) return groups[i];
+	}
+	return 0;
+}
+
+
+std::string findUnownedFileInGroup(gid_t group)
+	/// Best-effort search for a comparison fixture whose group is group and whose
+	/// group bits differ from its other bits for read or write: only such a mode
+	/// makes the permission checks consult group membership at all (equal bits
+	/// short-circuit). Returns an empty string when the machine has none.
+{
+	static const char* dirs[] = { "/var/log", "/usr/bin", "/usr/sbin", "/etc", "/usr/lib" };
+
+	for (std::size_t d = 0; d < sizeof(dirs) / sizeof(dirs[0]); ++d)
+	{
+		DIR* dir = ::opendir(dirs[d]);
+		if (!dir) continue;
+
+		int examined = 0;
+		struct dirent* entry;
+		while ((entry = ::readdir(dir)) != nullptr && examined < 512)
+		{
+			++examined;
+			const std::string path = std::string(dirs[d]) + "/" + entry->d_name;
+
+			struct stat st;
+			if (!comparableFixture(path, st)) continue;
+			if (st.st_gid != group) continue;
+			const bool rAsym = ((st.st_mode & S_IRGRP) != 0) != ((st.st_mode & S_IROTH) != 0);
+			const bool wAsym = ((st.st_mode & S_IWGRP) != 0) != ((st.st_mode & S_IWOTH) != 0);
+			if (!rAsym && !wAsym) continue;
+
+			::closedir(dir);
+			return path;
+		}
+		::closedir(dir);
+	}
+	return std::string();
+}
+
+
+} // namespace
+#endif
 
 
 FileTest::FileTest(const std::string& name): CppUnit::TestCase(name)
@@ -43,9 +174,17 @@ void FileTest::testFileAttributes1()
 	File f("testfile.dat");
 	assertTrue (!f.exists());
 
+	assertFalse (f.canRead());
+	assertFalse (f.canWrite());
+	assertFalse (f.isFile());
+	assertFalse (f.isDirectory());
+	assertFalse (f.isLink());
+	assertFalse (f.isDevice());
+	assertFalse (f.isHidden());
+
 	try
 	{
-		bool POCO_UNUSED flag = f.canRead();
+		(void) f.created();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -54,43 +193,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		bool POCO_UNUSED flag = f.canWrite();
-		failmsg("file does not exist - must throw exception");
-	}
-	catch (Exception&)
-	{
-	}
-
-	try
-	{
-		bool POCO_UNUSED flag = f.isFile();
-		failmsg("file does not exist - must throw exception");
-	}
-	catch (Exception&)
-	{
-	}
-
-	try
-	{
-		bool POCO_UNUSED flag = f.isDirectory();
-		failmsg("file does not exist - must throw exception");
-	}
-	catch (Exception&)
-	{
-	}
-
-	try
-	{
-		Timestamp POCO_UNUSED ts = f.created();
-		failmsg("file does not exist - must throw exception");
-	}
-	catch (Exception&)
-	{
-	}
-
-	try
-	{
-		Timestamp POCO_UNUSED ts = f.getLastModified();
+		(void) f.getLastModified();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -109,7 +212,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		File::FileSize POCO_UNUSED fs = f.getSize();
+		(void) f.getSize();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -192,6 +295,58 @@ void FileTest::testCreateFile()
 }
 
 
+void FileTest::testExists()
+{
+	assertFalse (File("").exists());
+	{
+		File f("testfile.dat");
+		(void) f.createFile();
+		assertTrue (f.exists());
+		assertFalse (f.canExecute());
+	}
+
+	{
+		File f("/testfile.dat");
+		assertFalse (f.exists());
+		assertFalse (f.canExecute());
+	}
+
+	{
+#if defined(POCO_OS_FAMILY_UNIX)
+		File f("echo");
+		File f2("/dev/null");
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+		std::string buffer(MAX_PATH, 0);
+		UINT r = GetSystemDirectoryA(buffer.data(), static_cast<UINT>(buffer.size()));
+		if (r)
+		{
+			Path p(buffer);
+			p.makeDirectory().makeAbsolute().makeParent();
+			buffer = p.toString();
+			buffer.append("win.ini");
+		}
+		else
+		{
+			buffer = R"(c:\windows\win.ini)";
+		}
+		File f("cmd.exe");
+		File f2(buffer);
+
+		File f3("cmd");
+		assertTrue (f3.canExecute());
+		File f4("cmd-nonexistent");
+		assertFalse (f4.canExecute());
+#endif
+		assertFalse (f.exists());
+		assertFalse (f.getExecutablePath().empty());
+		assertTrue (f.canExecute());
+
+		assertTrue (f2.exists());
+		assertFalse (f2.canExecute());
+	}
+}
+
+
 void FileTest::testFileAttributes2()
 {
 	TemporaryFile f;
@@ -210,7 +365,14 @@ void FileTest::testFileAttributes2()
 	assertTrue (tsm - ts >= -2000000 && tsm - ts <= 2000000);
 
 	f.setWriteable(false);
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	// Root writes regardless of the mode bits, so the read-only expectation
+	// only holds for ordinary users.
+	if (::geteuid() != 0)
+		assertTrue (!f.canWrite());
+#else
 	assertTrue (!f.canWrite());
+#endif
 	assertTrue (f.canRead());
 
 	f.setReadOnly(false);
@@ -229,7 +391,7 @@ void FileTest::testFileAttributes3()
 #if POCO_OS==POCO_OS_CYGWIN
 	File f("/dev/tty");
 #else
- 	File f("/dev/null");
+	File f("/dev/null");
 #endif
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	File f("CON");
@@ -239,6 +401,84 @@ void FileTest::testFileAttributes3()
 	assertTrue (!f.isFile());
 	assertTrue (!f.isDirectory());
 }
+
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+void FileTest::testPermissionsMatchAccess()
+{
+	// faccessat(AT_EACCESS) is the kernel answering exactly the question
+	// canRead(), canWrite() and canExecute() ask, so the test compares each
+	// result against it. Every mode below is asserted in whichever direction the
+	// kernel decides, so both a wrongly granted and a wrongly denied permission
+	// fail here.
+	//
+	// Root is excluded from the whole test: the mode model cannot see capability
+	// restrictions (containers without CAP_DAC_OVERRIDE), fakeroot fakes
+	// geteuid() without fooling the kernel, and root X_OK semantics are
+	// platform-defined.
+	if (::geteuid() == 0) return;
+
+	TemporaryFile tf;
+	assertTrue (tf.createFile());
+	const std::string path = tf.path();
+
+	// On a noexec mount the kernel denies X_OK regardless of the mode bits,
+	// so the X_OK comparison is only meaningful when the kernel can grant it.
+	assertTrue (::chmod(path.c_str(), 0700) == 0);
+	const bool execComparable = kernelGrants(path, X_OK);
+
+	static const mode_t modes[] =
+	{
+		0000, 0400, 0200, 0100, 0040, 0020, 0010, 0004, 0002, 0001,
+		0600, 0060, 0006, 0604, 0640, 0064, 0046, 0620, 0602, 0700, 0644, 0755
+	};
+
+	for (std::size_t i = 0; i < sizeof(modes) / sizeof(modes[0]); ++i)
+	{
+		assertTrue (::chmod(path.c_str(), modes[i]) == 0);
+
+		File f(path);
+		loop_1_assert (modes[i], kernelGrants(path, R_OK) == f.canRead());
+		loop_1_assert (modes[i], kernelGrants(path, W_OK) == f.canWrite());
+		if (execComparable)
+			loop_1_assert (modes[i], kernelGrants(path, X_OK) == f.canExecute());
+	}
+
+	// Restore something deletable for TemporaryFile's cleanup.
+	::chmod(path.c_str(), 0600);
+
+	// Non-owned fixtures reach the non-owner branches. Well-known system files
+	// cover the group/other classes deterministically where they exist; the
+	// search below additionally looks for a file with asymmetric group/other
+	// bits whose group the caller holds, which drives the membership query
+	// itself. Whatever the machine cannot supply is skipped rather than faked.
+	static const char* wellKnown[] =
+	{
+		"/etc/passwd", "/etc/sudoers", "/etc/shadow", "/etc/master.passwd", "/var/log/syslog"
+	};
+
+	for (std::size_t i = 0; i < sizeof(wellKnown) / sizeof(wellKnown[0]); ++i)
+	{
+		const std::string p(wellKnown[i]);
+		struct stat st;
+		if (!comparableFixture(p, st)) continue;
+
+		File f(p);
+		loop_1_assert (static_cast<int>(i), kernelGrants(p, R_OK) == f.canRead());
+		loop_1_assert (static_cast<int>(i), kernelGrants(p, W_OK) == f.canWrite());
+	}
+
+	const gid_t group = findSupplementaryGroup();
+	if (group == 0) return;
+
+	const std::string unowned = findUnownedFileInGroup(group);
+	if (unowned.empty()) return;
+
+	File f(unowned);
+	assertTrue (kernelGrants(unowned, R_OK) == f.canRead());
+	assertTrue (kernelGrants(unowned, W_OK) == f.canWrite());
+}
+#endif
 
 
 void FileTest::testCompare()
@@ -273,10 +513,17 @@ void FileTest::testRootDir()
 	File f2("c:/");
 	File f3("c:\\");
 	File f4("\\");
+	File f5("c:");
+	File f6("\\\\?\\c:");
+	File f7("\\\\?\\c:\\");
+
 	assertTrue (f1.exists());
 	assertTrue (f2.exists());
 	assertTrue (f3.exists());
 	assertTrue (f4.exists());
+	assertTrue (f5.exists());
+	assertTrue (f6.exists());
+	assertTrue (f7.exists());
 #else
 	File f1("/");
 	assertTrue (f1.exists());
@@ -327,11 +574,11 @@ void FileTest::testDirectory()
 	assertTrue (files.empty());
 
 	File f = Path("testdir/file1", Path::PATH_UNIX);
-	f.createFile();
+	(void) f.createFile();
 	f = Path("testdir/file2", Path::PATH_UNIX);
-	f.createFile();
+	(void) f.createFile();
 	f = Path("testdir/file3", Path::PATH_UNIX);
-	f.createFile();
+	(void) f.createFile();
 
 	d.list(files);
 	assertTrue (files.size() == 3);
@@ -366,7 +613,14 @@ void FileTest::testCopy()
 	TemporaryFile f2;
 	f1.setReadOnly().copyTo(f2.path());
 	assertTrue (f2.exists());
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	// Root writes regardless of the mode bits, so the read-only expectation
+	// only holds for ordinary users.
+	if (::geteuid() != 0)
+		assertTrue (!f2.canWrite());
+#else
 	assertTrue (!f2.canWrite());
+#endif
 	assertTrue (f1.getSize() == f2.getSize());
 	f1.setWriteable().remove();
 }
@@ -380,7 +634,7 @@ void FileTest::testCopyFailIfDestinationFileExists()
 
 	File f1("testfile.dat");
 	TemporaryFile f2;
-	f2.createFile();
+	(void) f2.createFile();
 	try {
 		f1.setReadOnly().copyTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
 		failmsg("file exist - must throw exception");
@@ -414,7 +668,7 @@ void FileTest::testMoveFailIfDestinationFileExists() {
 
 	File f1("testfile.dat");
 	TemporaryFile f2;
-	f2.createFile();
+	(void) f2.createFile();
 	try {
 		f1.moveTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
 		failmsg("file exist - must throw exception");
@@ -559,7 +813,7 @@ void FileTest::testRenameFailIfExists() {
 
 	File f1("testfile.dat");
 	File f2("testfile2.dat");
-	f2.createFile();
+	(void) f2.createFile();
 
 	try {
 		f1.renameTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
@@ -600,6 +854,31 @@ void FileTest::testLongPath()
 #endif
 }
 
+
+void FileTest::testLongPathUNC()
+{
+#if defined(_WIN32)
+	// The extended-length prefix must not change how a UNC path is
+	// interpreted: a path below and a path above the limit fail the same way.
+	const std::string prefix("\\\\nohost.invalid\\share\\");
+	for (std::size_t len: {std::size_t(MAX_PATH - 12), std::size_t(MAX_PATH - 11)})
+	{
+		const std::string path = prefix + std::string(len - prefix.size(), 'a');
+		try
+		{
+			Poco::File(path).exists();
+		}
+		catch (const Poco::PathSyntaxException&)
+		{
+			failmsg("UNC path converted to an invalid extended-length path");
+		}
+		catch (const Poco::Exception&)
+		{
+		}
+	}
+#endif
+}
+
 void FileTest::testUnixFileExtension()
 {
 	std::string filePath1 = "/a/b/c/.notextension";
@@ -629,6 +908,186 @@ void FileTest::testTemporaryFile()
 }
 
 
+void FileTest::testGetExecutablePathNonExistent()
+{
+	// Non-existent bare command returns empty
+	File f("myexecutable_nonexistent_xyz");
+	assertTrue (f.getExecutablePath().empty());
+
+	// Non-existent absolute path returns empty
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	File f2(R"(C:\path\to\myexecutable_nonexistent)");
+#else
+	File f2("/usr/bin/myexecutable_nonexistent_xyz");
+#endif
+	assertTrue (f2.getExecutablePath().empty());
+}
+
+
+void FileTest::testGetExecutablePathResolve()
+{
+	// Real executable bare name resolves to absolute path
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	File f("hostname");
+	std::string execPath = f.getExecutablePath();
+	if (!execPath.empty())
+	{
+		Path p(execPath);
+		assertTrue (p.isAbsolute());
+		assertTrue (File(execPath).canExecute());
+	}
+#else
+	File f("ls");
+	std::string execPath = f.getExecutablePath();
+	assertFalse (execPath.empty());
+	// Should be an absolute path (e.g. /bin/ls or /usr/bin/ls)
+	assertTrue (execPath[0] == '/');
+	assertTrue (f.canExecute());
+#endif
+}
+
+
+void FileTest::testGetExecutablePathAbsolute()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	// Real executable absolute path resolves to itself
+	std::string lsPath = File("ls").getExecutablePath();
+	assertFalse (lsPath.empty());
+	File f(lsPath);
+	std::string execPath = f.getExecutablePath();
+	assertEqual (lsPath, execPath);
+#endif
+}
+
+
+void FileTest::testGetExecutablePathNonExecutable()
+{
+	// Non-executable file returns empty
+#if defined(POCO_OS_FAMILY_UNIX)
+	TemporaryFile tmp;
+	(void) tmp.createFile();
+	chmod(tmp.path().c_str(), 0644);
+	File f(tmp.path());
+	assertTrue (f.getExecutablePath().empty());
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+	// A temp file without PATHEXT extension is not executable
+	TemporaryFile tmp;
+	tmp.createFile();
+	File f(tmp.path());
+	assertTrue (f.getExecutablePath().empty());
+#endif
+}
+
+
+void FileTest::testGetExecutablePathEmpty()
+{
+	File f("");
+	assertTrue (f.getExecutablePath().empty());
+}
+
+
+void FileTest::testGetExecutablePathDirectory()
+{
+	// Directory returns empty (not a regular file)
+	File f(Path::temp());
+	assertTrue (f.getExecutablePath().empty());
+}
+
+
+void FileTest::testGetExecutablePathDirectoryShadow()
+{
+	// A directory in CWD with the same name as an executable on PATH
+	// must not shadow the real executable.
+#if defined(POCO_OS_FAMILY_UNIX)
+	std::string exeName("ls");
+#else
+	std::string exeName("hostname");
+#endif
+
+	std::string realPath = File(exeName).getExecutablePath();
+	if (realPath.empty()) return; // skip if exe not found on this system
+
+	std::string savedCwd = Path::current();
+	std::string tmpDir = TemporaryFile::tempName() + Path::separator();
+	File(tmpDir).createDirectories();
+	// Create a directory named like the executable in CWD
+	File(tmpDir + exeName).createDirectories();
+
+	try
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		_chdir(tmpDir.c_str());
+#else
+		chdir(tmpDir.c_str());
+#endif
+		std::string resolved = File(exeName).getExecutablePath();
+		assertFalse (resolved.empty());
+		assertEqual (realPath, resolved);
+	}
+	catch (...)
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		_chdir(savedCwd.c_str());
+#else
+		chdir(savedCwd.c_str());
+#endif
+		File(tmpDir).remove(true);
+		throw;
+	}
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	_chdir(savedCwd.c_str());
+#else
+	chdir(savedCwd.c_str());
+#endif
+	File(tmpDir).remove(true);
+}
+
+
+void FileTest::testGetExecutablePathRelative()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	// Relative path with separator resolves to absolute
+	std::string lsPath = File("ls").getExecutablePath();
+	assertFalse (lsPath.empty());
+	TemporaryFile tmpDir;
+	tmpDir.createDirectories();
+	std::string linkPath = tmpDir.path() + "/myls";
+	symlink(lsPath.c_str(), linkPath.c_str());
+	File f(linkPath);
+	std::string execPath = f.getExecutablePath();
+	assertFalse (execPath.empty());
+	Path p(execPath);
+	assertTrue (p.isAbsolute());
+	assertTrue (File(execPath).canExecute());
+#endif
+
+	// Non-existent relative path with separator returns empty
+#if defined(POCO_OS_FAMILY_UNIX)
+	File f2("./nonexistent_xyz_12345");
+	assertTrue (f2.getExecutablePath().empty());
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+	File f2(R"(.\nonexistent_xyz_12345)");
+	assertTrue (f2.getExecutablePath().empty());
+#endif
+}
+
+
+void FileTest::testGetExecutablePathPATHEXT()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// Command without extension resolves via PATHEXT
+	File f("cmd");
+	std::string execPath = f.getExecutablePath();
+	if (!execPath.empty())
+	{
+		Path p(execPath);
+		assertTrue (p.isAbsolute());
+		assertTrue (File(execPath).canExecute());
+	}
+#endif
+}
+
+
 void FileTest::setUp()
 {
 	File f("testfile.dat");
@@ -655,11 +1114,119 @@ void FileTest::tearDown()
 }
 
 
+#if defined(POCO_OS_FAMILY_UNIX)
+void FileTest::testGetExecutablePathThreadSafety()
+{
+	// Test thread safety of PATH caching implementation (POSIX only)
+	// Four threads: 2 calling getExecutablePath(), 2 modifying PATH
+
+	std::vector<std::thread> threads;
+	std::atomic<int> errorCount(0);
+	std::atomic<bool> stopFlag(false);
+
+	// Save original PATH
+	std::string originalPath = Poco::Environment::get("PATH", "");
+
+	auto execThreadFunc = [&errorCount, &stopFlag]()
+	{
+		try
+		{
+			for (int i = 0; i < 500 && !stopFlag.load(); ++i)
+			{
+				// Test executable lookup in PATH
+				File f("ls");
+				std::string path = f.getExecutablePath();
+				if (path.empty())
+				{
+					errorCount++;
+					break;
+				}
+
+				// Verify it's absolute
+				if (path[0] != '/')
+				{
+					errorCount++;
+					break;
+				}
+
+				// Verify canExecute consistency
+				if (!f.canExecute())
+				{
+					errorCount++;
+					break;
+				}
+
+				// Test another executable
+				File f2("sh");
+				std::string path2 = f2.getExecutablePath();
+				if (!path2.empty() && !f2.canExecute())
+				{
+					errorCount++;
+					break;
+				}
+			}
+		}
+		catch (...)
+		{
+			errorCount++;
+		}
+	};
+
+	auto pathModifyThreadFunc = [&errorCount, &stopFlag, &originalPath]()
+	{
+		try
+		{
+			for (int i = 0; i < 200 && !stopFlag.load(); ++i)
+			{
+				// Modify PATH to trigger cache invalidation
+				if (i % 2 == 0)
+					Poco::Environment::set("PATH", originalPath + ":/tmp");
+				else
+					Poco::Environment::set("PATH", originalPath);
+
+				// Small delay to let other threads run
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+		}
+		catch (...)
+		{
+			errorCount++;
+		}
+	};
+
+	// Launch 2 threads that call getExecutablePath()
+	for (int i = 0; i < 2; ++i)
+	{
+		threads.emplace_back(execThreadFunc);
+	}
+
+	// Launch 2 threads that modify PATH
+	for (int i = 0; i < 2; ++i)
+	{
+		threads.emplace_back(pathModifyThreadFunc);
+	}
+
+	// Wait for all threads to complete
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+
+	// Restore original PATH
+	Poco::Environment::set("PATH", originalPath);
+
+	// Verify no errors occurred
+	assertEqual(0, errorCount.load());
+}
+#endif
+
+
 CppUnit::Test* FileTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileTest");
 
 	CppUnit_addTest(pSuite, FileTest, testCreateFile);
+	CppUnit_addTest(pSuite, FileTest, testExists);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes1);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes2);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes3);
@@ -677,8 +1244,24 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testRenameFailIfExists);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
+	CppUnit_addTest(pSuite, FileTest, testLongPathUNC);
 	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
 	CppUnit_addTest(pSuite, FileTest, testTemporaryFile);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathNonExistent);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathResolve);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathAbsolute);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathNonExecutable);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathEmpty);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathDirectory);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathDirectoryShadow);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathRelative);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathPATHEXT);
+#if defined(POCO_OS_FAMILY_UNIX)
+#if !defined(POCO_VXWORKS)
+	CppUnit_addTest(pSuite, FileTest, testPermissionsMatchAccess);
+#endif
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathThreadSafety);
+#endif
 
 	return pSuite;
 }

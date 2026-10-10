@@ -25,8 +25,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class SocketStream;
@@ -68,6 +67,17 @@ public:
 		/// Creates an FTPClientSession using the given
 		/// connected socket for the control connection.
 		///
+		/// If readWelcomeMessage is true (the default), the welcome reply
+		/// sent by the server on connect is read from the socket and made
+		/// available through welcomeMessage().
+		///
+		/// Pass false only if the welcome reply has already been read from
+		/// the socket. The session then considers the server ready and sends
+		/// the next command without waiting for a reply. Passing false while
+		/// the welcome reply is still pending desynchronizes the session,
+		/// because that reply is then taken as the response to the next
+		/// command sent.
+		///
 		/// Passive mode will be used for data transfers.
 
 	FTPClientSession(const std::string& host, Poco::UInt16 port = FTP_PORT,
@@ -85,7 +95,7 @@ public:
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for socket operations.
 
-	Poco::Timespan getTimeout() const;
+	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the timeout for socket operations.
 
 	void setPassive(bool flag, bool useRFC1738 = true);
@@ -96,7 +106,7 @@ public:
 		/// for switching to passive mode. The same applies to
 		/// EPRT and PORT for active connections.
 
-	bool getPassive() const;
+	[[nodiscard]] bool getPassive() const;
 		/// Returns true iff passive mode is enabled for this connection.
 
 	virtual void open(const std::string& host, Poco::UInt16 port, const std::string& username = "", const std::string& password = "");
@@ -124,7 +134,7 @@ public:
 		/// Throws a FTPException in case of a FTP-specific error, or a
 		/// NetException in case of a general network communication failure.
 
-	std::string systemType();
+	[[nodiscard]] std::string systemType();
 		/// Returns the system type of the FTP server.
 		///
 		/// Sends a SYST command to the server and returns the result.
@@ -138,7 +148,7 @@ public:
 		/// Throws a FTPException in case of a FTP-specific error, or a
 		/// NetException in case of a general network communication failure.
 
-	FileType getFileType() const;
+	[[nodiscard]] FileType getFileType() const;
 		/// Returns the file type for transferring files.
 
 	void setWorkingDirectory(const std::string& path);
@@ -150,7 +160,7 @@ public:
 		/// Throws a FTPException in case of a FTP-specific error, or a
 		/// NetException in case of a general network communication failure.
 
-	std::string getWorkingDirectory();
+	[[nodiscard]] std::string getWorkingDirectory();
 		/// Returns the current working directory on the server.
 		///
 		/// Throws a FTPException in case of a FTP-specific error, or a
@@ -296,20 +306,29 @@ public:
 		/// Sends the given command verbatim to the server
 		/// and waits for a response.
 
-	bool isOpen() const;
+	[[nodiscard]] bool isOpen() const;
 		/// Returns true if the connection with FTP server is opened.
 
-	bool isLoggedIn() const;
+	[[nodiscard]] bool isLoggedIn() const;
 		/// Returns true if the session is logged in.
 
-	bool isSecure() const;
+	[[nodiscard]] bool isSecure() const;
 		/// Returns true if the session is FTPS.
 
-	const std::string& welcomeMessage();
+	[[nodiscard]] const std::string& welcomeMessage();
 		/// Returns the welcome message.
+		///
+		/// Empty if the session was created with readWelcomeMessage
+		/// set to false, as the welcome reply is then read by the caller.
 
 protected:
 	virtual void receiveServerReadyReply();
+		/// Reads the welcome reply sent by the server on connect and
+		/// marks the server ready.
+		///
+		/// Does nothing if the server is already marked ready, which is
+		/// the case after the reply has been read once, and after
+		/// construction with readWelcomeMessage set to false.
 
 	enum StatusClass
 	{
@@ -325,15 +344,15 @@ protected:
 		DEFAULT_TIMEOUT = 30000000 // 30 seconds default timeout for socket operations
 	};
 
-	const std::string& getHost() const;
+	[[nodiscard]] const std::string& getHost() const;
 		/// Returns the host name
 
-	static bool isPositivePreliminary(int status);
-	static bool isPositiveCompletion(int status);
-	static bool isPositiveIntermediate(int status);
-	static bool isTransientNegative(int status);
-	static bool isPermanentNegative(int status);
-	std::string extractPath(const std::string& response);
+	[[nodiscard]] static bool isPositivePreliminary(int status);
+	[[nodiscard]] static bool isPositiveCompletion(int status);
+	[[nodiscard]] static bool isPositiveIntermediate(int status);
+	[[nodiscard]] static bool isTransientNegative(int status);
+	[[nodiscard]] static bool isPermanentNegative(int status);
+	[[nodiscard]] std::string extractPath(const std::string& response);
 	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
 	StreamSocket activeDataConnection(const std::string& command, const std::string& arg);
 	StreamSocket passiveDataConnection(const std::string& command, const std::string& arg);
@@ -403,7 +422,7 @@ inline bool FTPClientSession::isPermanentNegative(int status)
 
 inline bool FTPClientSession::isOpen() const
 {
-	return _pControlSocket != 0;
+	return _pControlSocket != nullptr;
 }
 
 
@@ -430,7 +449,7 @@ inline const std::string& FTPClientSession::getHost() const
 	return _host;
 }
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_FTPClientSession_INCLUDED

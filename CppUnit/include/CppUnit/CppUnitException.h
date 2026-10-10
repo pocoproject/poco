@@ -21,31 +21,31 @@ class CppUnit_API CppUnitException: public std::exception
 {
 public:
 	CppUnitException(const std::string& message = "",
-	                 long lineNumber = CPPUNIT_UNKNOWNLINENUMBER,
-	                 const std::string& fileName = CPPUNIT_UNKNOWNFILENAME);
+					 long lineNumber = CPPUNIT_UNKNOWNLINENUMBER,
+					 const std::string& fileName = CPPUNIT_UNKNOWNFILENAME);
 	CppUnitException(const std::string& message,
-	                 long lineNumber,
-	                 long data1lineNumber,
-	                 const std::string& fileName);
+					 long lineNumber,
+					 long data1lineNumber,
+					 const std::string& fileName);
 	CppUnitException(const std::string& message,
-	                 long lineNumber,
-	                 long data1lineNumber,
-	                 long data2lineNumber,
-	                 const std::string& fileName);
+					 long lineNumber,
+					 long data1lineNumber,
+					 long data2lineNumber,
+					 const std::string& fileName);
 	CppUnitException(const CppUnitException& other);
-	virtual ~CppUnitException() noexcept;
+	~CppUnitException() noexcept override;
 
 	CppUnitException& operator = (const CppUnitException& other);
 
-	const char* what() const noexcept;
+	[[nodiscard]] const char* what() const noexcept override;
 
-	long lineNumber() const;
-	long data1LineNumber() const;
-	long data2LineNumber() const;
-	const std::string& fileName() const;
+	[[nodiscard]] long lineNumber() const;
+	[[nodiscard]] long data1LineNumber() const;
+	[[nodiscard]] long data2LineNumber() const;
+	[[nodiscard]] const std::string& fileName() const;
 
 	static const std::string CPPUNIT_UNKNOWNFILENAME;
-	static const int CPPUNIT_UNKNOWNLINENUMBER;
+	static constexpr int CPPUNIT_UNKNOWNLINENUMBER = -1;
 
 private:
 	std::string _message;
@@ -58,11 +58,11 @@ private:
 
 inline CppUnitException::CppUnitException(const CppUnitException& other): exception (other)
 {
-    _message         = other._message;
-    _lineNumber      = other._lineNumber;
-    _data1lineNumber = other._data1lineNumber;
-    _data2lineNumber = other._data2lineNumber;
-    _fileName        = other._fileName;
+	_message         = other._message;
+	_lineNumber      = other._lineNumber;
+	_data1lineNumber = other._data1lineNumber;
+	_data2lineNumber = other._data2lineNumber;
+	_fileName        = other._fileName;
 }
 
 
@@ -90,15 +90,15 @@ inline CppUnitException& CppUnitException::operator = (const CppUnitException& o
 {
 	exception::operator= (other);
 
-    if (&other != this)
-    {
-        _message    = other._message;
-        _lineNumber = other._lineNumber;
-        _data1lineNumber = other._data1lineNumber;
-        _data2lineNumber = other._data2lineNumber;
-        _fileName   = other._fileName;
-    }
-    return *this;
+	if (&other != this)
+	{
+		_message    = other._message;
+		_lineNumber = other._lineNumber;
+		_data1lineNumber = other._data1lineNumber;
+		_data2lineNumber = other._data2lineNumber;
+		_fileName   = other._fileName;
+	}
+	return *this;
 }
 
 

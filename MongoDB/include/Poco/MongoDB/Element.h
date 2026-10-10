@@ -7,7 +7,7 @@
 //
 // Definition of the Element class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -20,23 +20,23 @@
 
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
-#include "Poco/SharedPtr.h"
-#include "Poco/Timestamp.h"
-#include "Poco/Nullable.h"
-#include "Poco/NumberFormatter.h"
+#include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/UTF8String.h"
-#include "Poco/MongoDB/MongoDB.h"
+#include "Poco/Exception.h"
 #include "Poco/MongoDB/BSONReader.h"
 #include "Poco/MongoDB/BSONWriter.h"
+#include "Poco/MongoDB/MongoDB.h"
+#include "Poco/Nullable.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/SharedPtr.h"
+#include "Poco/Timestamp.h"
+#include <cstdio>
+#include <limits>
 #include <string>
-#include <sstream>
-#include <iomanip>
-#include <list>
+#include <utility>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API Element
@@ -48,21 +48,24 @@ public:
 	explicit Element(const std::string& name);
 		/// Creates the Element with the given name.
 
+	explicit Element(std::string&& name);
+		/// Creates the Element with the given name (move semantics).
+
 	virtual ~Element();
 		/// Destructor
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const noexcept;
 		/// Returns the name of the element.
 
-	virtual std::string toString(int indent = 0) const = 0;
+	[[nodiscard]] virtual std::string toString(int indent = 0) const = 0;
 		/// Returns a string representation of the element.
 
-	virtual int type() const = 0;
+	[[nodiscard]] virtual int type() const noexcept = 0;
 		/// Returns the MongoDB type of the element.
 
 private:
 	virtual void read(BinaryReader& reader) = 0;
-	virtual void write(BinaryWriter& writer) = 0;
+	virtual void write(BinaryWriter& writer) const = 0;
 
 	friend class Document;
 	std::string _name;
@@ -72,13 +75,10 @@ private:
 //
 // inlines
 //
-inline const std::string& Element::name() const
+inline const std::string& Element::name() const noexcept
 {
 	return _name;
 }
-
-
-using ElementSet = std::list<Element::Ptr>;
 
 
 template<typename T>
@@ -111,51 +111,76 @@ struct ElementTraits<std::string>
 
 	static std::string toString(const std::string& value, int indent = 0)
 	{
-		std::ostringstream oss;
-
-		oss << '"';
-
-		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+		// Fast path: check if escaping is needed at all
+		bool needsEscaping = false;
+		for (char c : value)
 		{
-			switch (*it)
+			if (c == '"' || c == '\\' || c == '\b' || c == '\f' ||
+			    c == '\n' || c == '\r' || c == '\t' || (c > 0 && c <= 0x1F))
 			{
-			case '"':
-				oss << "\\\"";
+				needsEscaping = true;
 				break;
-			case '\\':
-				oss << "\\\\";
-				break;
-			case '\b':
-				oss << "\\b";
-				break;
-			case '\f':
-				oss << "\\f";
-				break;
-			case '\n':
-				oss << "\\n";
-				break;
-			case '\r':
-				oss << "\\r";
-				break;
-			case '\t':
-				oss << "\\t";
-				break;
-			default:
-				{
-					if ( *it > 0 && *it <= 0x1F )
-					{
-						oss << "\\u" << std::hex << std::uppercase << std::setfill('0') << std::setw(4) << static_cast<int>(*it);
-					}
-					else
-					{
-						oss << *it;
-					}
-					break;
-				}
 			}
 		}
-		oss << '"';
-		return oss.str();
+
+		// Fast path: no escaping needed - just wrap in quotes
+		if (!needsEscaping)
+		{
+			std::string result;
+			result.reserve(value.size() + 2);
+			result += '"';
+			result += value;
+			result += '"';
+			return result;
+		}
+
+		// Slow path: escaping needed
+		std::string result;
+		result.reserve(value.size() * 2 + 2);  // Pessimistic estimate
+		result += '"';
+
+		for (char c : value)
+		{
+			switch (c)
+			{
+			case '"':
+				result += "\\\"";
+				break;
+			case '\\':
+				result += "\\\\";
+				break;
+			case '\b':
+				result += "\\b";
+				break;
+			case '\f':
+				result += "\\f";
+				break;
+			case '\n':
+				result += "\\n";
+				break;
+			case '\r':
+				result += "\\r";
+				break;
+			case '\t':
+				result += "\\t";
+				break;
+			default:
+				if (c > 0 && c <= 0x1F)
+				{
+					// Unicode escape sequence
+					char buf[7];  // "\uXXXX" + null terminator
+					std::snprintf(buf, sizeof(buf), "\\u%04X", static_cast<unsigned char>(c));
+					result += buf;
+				}
+				else
+				{
+					result += c;
+				}
+				break;
+			}
+		}
+		result += '"';
+		return result;
 	}
 };
 
@@ -163,18 +188,18 @@ struct ElementTraits<std::string>
 template<>
 inline void BSONReader::read<std::string>(std::string& to)
 {
-	Poco::Int32 size;
-	_reader >> size;
-	_reader.readRaw(size, to);
-	to.erase(to.end() - 1); // remove terminating 0
+	Int32 available = MAX_MESSAGE_SIZE_BYTES;
+	to = readString(available);
 }
 
 
 template<>
-inline void BSONWriter::write<std::string>(std::string& from)
+inline void BSONWriter::write<std::string>(const std::string& from)
 {
-	_writer << (Poco::Int32) (from.length() + 1);
-	writeCString(from);
+	// Unlike a cstring, a string may contain null characters: its length is written first.
+	_writer << static_cast<Poco::Int32>(from.length() + 1);
+	_writer.writeRaw(from);
+	_writer << static_cast<unsigned char>(0x00);
 }
 
 
@@ -202,7 +227,7 @@ inline void BSONReader::read<bool>(bool& to)
 
 
 template<>
-inline void BSONWriter::write<bool>(bool& from)
+inline void BSONWriter::write<bool>(const bool& from)
 {
 	unsigned char b = from ? 0x01 : 0x00;
 	_writer << b;
@@ -234,9 +259,10 @@ struct ElementTraits<Timestamp>
 	static std::string toString(const Timestamp& value, int indent = 0)
 	{
 		std::string result;
-		result.append(1, '"');
-		result.append(DateTimeFormatter::format(value, "%Y-%m-%dT%H:%M:%s%z"));
-		result.append(1, '"');
+		result.reserve(32);  // Pre-allocate for typical timestamp string length
+		result += '"';
+		result += DateTimeFormatter::format(value, "%Y-%m-%dT%H:%M:%s%z");
+		result += '"';
 		return result;
 	}
 };
@@ -245,15 +271,23 @@ struct ElementTraits<Timestamp>
 template<>
 inline void BSONReader::read<Timestamp>(Timestamp& to)
 {
-	Poco::Int64 value;
+	Poco::Int64 value = 0;
 	_reader >> value;
-	to = Timestamp::fromEpochTime(static_cast<std::time_t>(value / 1000));
-	to += (value % 1000 * 1000);
+	// Milliseconds, clamped to the range DateTime accepts, so that formatting a
+	// parsed document cannot fail.
+	static const Timestamp::TimeVal minTime = DateTime(-4713, 1, 1).timestamp().epochMicroseconds();
+	static const Timestamp::TimeVal maxTime = DateTime(9999, 12, 31, 23, 59, 59, 999, 999).timestamp().epochMicroseconds();
+	if (value > maxTime / 1000)
+		to = Timestamp(maxTime);
+	else if (value < minTime / 1000)
+		to = Timestamp(minTime);
+	else
+		to = Timestamp(value * 1000);
 }
 
 
 template<>
-inline void BSONWriter::write<Timestamp>(Timestamp& from)
+inline void BSONWriter::write<Timestamp>(const Timestamp& from)
 {
 	_writer << (from.epochMicroseconds() / 1000);
 }
@@ -283,7 +317,7 @@ inline void BSONReader::read<NullValue>(NullValue& to)
 
 
 template<>
-inline void BSONWriter::write<NullValue>(NullValue& from)
+inline void BSONWriter::write<NullValue>(const NullValue& from)
 {
 }
 
@@ -296,7 +330,7 @@ struct BSONTimestamp
 
 
 // BSON Timestamp
-// spec: int64
+// spec: uint64, increment in the low 32 bits, seconds since the epoch in the high 32 bits
 template<>
 struct ElementTraits<BSONTimestamp>
 {
@@ -305,34 +339,37 @@ struct ElementTraits<BSONTimestamp>
 	static std::string toString(const BSONTimestamp& value, int indent = 0)
 	{
 		std::string result;
-		result.append(1, '"');
-		result.append(DateTimeFormatter::format(value.ts, "%Y-%m-%dT%H:%M:%s%z"));
-		result.append(1, ' ');
-		result.append(NumberFormatter::format(value.inc));
-		result.append(1, '"');
+		result.reserve(48);  // Pre-allocate for timestamp + space + increment + quotes
+		result += '"';
+		result += DateTimeFormatter::format(value.ts, "%Y-%m-%dT%H:%M:%s%z");
+		result += ' ';
+		result += NumberFormatter::format(value.inc);
+		result += '"';
 		return result;
 	}
 };
 
 
+// Not Timestamp::fromEpochTime()/epochTime(): the seconds are unsigned 32-bit,
+// which std::time_t cannot hold where it is a signed 32-bit type.
 template<>
 inline void BSONReader::read<BSONTimestamp>(BSONTimestamp& to)
 {
-	Poco::Int64 value;
+	Poco::UInt64 value = 0;
 	_reader >> value;
-	to.inc = value & 0xffffffff;
-	value >>= 32;
-	to.ts = Timestamp::fromEpochTime(static_cast<std::time_t>(value));
+	to.inc = static_cast<Poco::Int32>(value & 0xFFFFFFFF);
+	to.ts = Timestamp(static_cast<Timestamp::TimeVal>(value >> 32) * Timestamp::resolution());
 }
 
 
 template<>
-inline void BSONWriter::write<BSONTimestamp>(BSONTimestamp& from)
+inline void BSONWriter::write<BSONTimestamp>(const BSONTimestamp& from)
 {
-	Poco::Int64 value = from.ts.epochMicroseconds() / 1000;
-	value <<= 32;
-	value += from.inc;
-	_writer << value;
+	const Timestamp::TimeVal time = from.ts.epochMicroseconds();
+	if (time < 0 || time / Timestamp::resolution() > std::numeric_limits<Poco::UInt32>::max())
+		throw Poco::RangeException("BSON timestamp must be between 1970-01-01T00:00:00Z and 2106-02-07T06:28:15Z");
+	const auto seconds = static_cast<Poco::UInt64>(time / Timestamp::resolution());
+	_writer << ((seconds << 32) | static_cast<Poco::UInt32>(from.inc));
 }
 
 
@@ -360,34 +397,38 @@ public:
 	{
 	}
 
-	virtual ~ConcreteElement()
+	ConcreteElement(std::string&& name, T&& init):
+		Element(std::move(name)),
+		_value(std::move(init))
 	{
 	}
 
+	~ConcreteElement() override = default;
 
-	T value() const
+
+	const T& value() const noexcept
 	{
 		return _value;
 	}
 
 
-	std::string toString(int indent = 0) const
+	[[nodiscard]] std::string toString(int indent = 0) const override
 	{
 		return ElementTraits<T>::toString(_value, indent);
 	}
 
 
-	int type() const
+	[[nodiscard]] int type() const noexcept override
 	{
 		return ElementTraits<T>::TypeId;
 	}
 
-	void read(BinaryReader& reader)
+	void read(BinaryReader& reader) override
 	{
 		BSONReader(reader).read(_value);
 	}
 
-	void write(BinaryWriter& writer)
+	void write(BinaryWriter& writer) const override
 	{
 		BSONWriter(writer).write(_value);
 	}
@@ -397,7 +438,7 @@ private:
 };
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Element_INCLUDED

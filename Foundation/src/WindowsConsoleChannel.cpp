@@ -46,14 +46,14 @@ void WindowsConsoleChannel::log(const Message& msg)
 	if (_isFile)
 	{
 		DWORD written;
-		WriteFile(_hConsole, text.data(), static_cast<DWORD>(text.size()), &written, NULL);
+		WriteFile(_hConsole, text.data(), static_cast<DWORD>(text.size()), &written, nullptr);
 	}
 	else
 	{
 		std::wstring utext;
 		UnicodeConverter::toUTF16(text, utext);
 		DWORD written;
-		WriteConsoleW(_hConsole, utext.data(), static_cast<DWORD>(utext.size()), &written, NULL);
+		WriteConsoleW(_hConsole, utext.data(), static_cast<DWORD>(utext.size()), &written, nullptr);
 	}
 }
 
@@ -92,14 +92,14 @@ void WindowsColorConsoleChannel::log(const Message& msg)
 	if (_isFile)
 	{
 		DWORD written;
-		WriteFile(_hConsole, text.data(), static_cast<DWORD>(text.size()), &written, NULL);
+		WriteFile(_hConsole, text.data(), static_cast<DWORD>(text.size()), &written, nullptr);
 	}
 	else
 	{
 		std::wstring utext;
 		UnicodeConverter::toUTF16(text, utext);
 		DWORD written;
-		WriteConsoleW(_hConsole, utext.data(), static_cast<DWORD>(utext.size()), &written, NULL);
+		WriteConsoleW(_hConsole, utext.data(), static_cast<DWORD>(utext.size()), &written, nullptr);
 	}
 
 	if (_enableColors && !_isFile)

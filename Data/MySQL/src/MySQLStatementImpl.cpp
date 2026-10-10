@@ -15,9 +15,7 @@
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) :
@@ -85,14 +83,12 @@ std::size_t MySQLStatementImpl::next()
 	if (!hasNext())
 		throw StatementException("No data received");
 
-	Poco::Data::AbstractExtractionVec::iterator it = extractions().begin();
-	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
 	std::size_t pos = 0;
 
-	for (; it != itEnd; ++it)
+	for (auto& ex: extractions())
 	{
-		(*it)->extract(pos);
-		pos += (*it)->numOfColumnsHandled();
+	    ex->extract(pos);
+		pos += ex->numOfColumnsHandled();
 	}
 
 	_hasNext = NEXT_DONTKNOW;
@@ -139,16 +135,14 @@ void MySQLStatementImpl::compileImpl()
 
 void MySQLStatementImpl::bindImpl()
 {
-	Poco::Data::AbstractBindingVec& binds = bindings();
-	std::size_t pos = 0;
-	Poco::Data::AbstractBindingVec::iterator it = binds.begin();
-	Poco::Data::AbstractBindingVec::iterator itEnd = binds.end();
-	for (; it != itEnd && (*it)->canBind(); ++it)
-	{
-		(*it)->bind(pos);
-		pos += (*it)->numOfColumnsHandled();
-	}
-
+    std::size_t pos = 0;
+    for (auto& b: bindings())
+    {
+        if (!b->canBind())
+            break;
+        b->bind(pos);
+        pos += b->numOfColumnsHandled();
+    }
 	_stmt.bindParams(_pBinder->getBindArray(), _pBinder->size());
 	try
 	{
@@ -176,4 +170,4 @@ Poco::Data::AbstractBinder::Ptr MySQLStatementImpl::binder()
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

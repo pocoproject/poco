@@ -18,8 +18,7 @@
 using Poco::MemoryPool;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 MemoryPool HTTPBufferAllocator::_pool(HTTPBufferAllocator::BUFFER_SIZE, 16);
@@ -41,4 +40,4 @@ void HTTPBufferAllocator::deallocate(char* ptr, std::streamsize size)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

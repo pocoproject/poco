@@ -21,8 +21,7 @@
 #include "Poco/Net/NetSSL.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API PrivateKeyPassphraseHandler
@@ -62,7 +61,7 @@ public:
 	virtual void onPrivateKeyRequested(const void* pSender, std::string& privateKey) = 0;
 		/// Returns the requested private key in the parameter privateKey.
 
-	bool serverSide() const;
+	[[nodiscard]] bool serverSide() const;
 
 private:
 	bool _serverSide;
@@ -78,7 +77,7 @@ inline bool PrivateKeyPassphraseHandler::serverSide() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_PrivateKeyPassphraseHandler_INCLUDED

@@ -22,8 +22,7 @@
 #include "Poco/DOM/NodeList.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API ChildNodesList: public NodeList
@@ -31,8 +30,8 @@ class XML_API ChildNodesList: public NodeList
 	// by Node::getChildNodes().
 {
 public:
-	Node* item(unsigned long index) const;
-	unsigned long length() const;
+	[[nodiscard]] Node* item(unsigned long index) const;
+	[[nodiscard]] unsigned long length() const;
 
 	void autoRelease();
 
@@ -49,7 +48,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_ChildNodesList_INCLUDED

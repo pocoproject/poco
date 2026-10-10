@@ -13,8 +13,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API XMLTemplate
@@ -36,7 +35,7 @@ private:
 };
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_DocumentTemplate_INCLUDED

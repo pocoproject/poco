@@ -21,8 +21,7 @@
 #include "Poco/Net/NetSSL.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class PrivateKeyPassphraseHandler;
@@ -42,7 +41,7 @@ public:
 	virtual ~PrivateKeyFactory();
 		/// Destroys the PrivateKeyFactory.
 
-	virtual PrivateKeyPassphraseHandler* create(bool onServer) const = 0;
+	[[nodiscard]] virtual PrivateKeyPassphraseHandler* create(bool onServer) const = 0;
 		/// Creates a new PrivateKeyPassphraseHandler
 };
 
@@ -76,14 +75,14 @@ public:
 	{
 	}
 
-	PrivateKeyPassphraseHandler* create(bool server) const
+	[[nodiscard]] PrivateKeyPassphraseHandler* create(bool server) const
 	{
 		return new T(server);
 	}
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 // DEPRECATED: register the factory directly at the FactoryMgr:

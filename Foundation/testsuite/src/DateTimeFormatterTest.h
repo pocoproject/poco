@@ -35,6 +35,7 @@ public:
 	void testASCTIME();
 	void testSORTABLE();
 	void testCustom();
+	void testFractionalSpecifiers();
 	void testTimespan();
 
 	void setUp();

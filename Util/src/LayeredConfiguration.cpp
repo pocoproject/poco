@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  LayeredConfiguration
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -21,18 +21,13 @@ using Poco::AutoPtr;
 using Poco::RuntimeException;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
-LayeredConfiguration::LayeredConfiguration()
-{
-}
+LayeredConfiguration::LayeredConfiguration() = default;
 
 
-LayeredConfiguration::~LayeredConfiguration()
-{
-}
+LayeredConfiguration::~LayeredConfiguration() = default;
 
 
 void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig)
@@ -110,7 +105,7 @@ AbstractConfiguration::Ptr LayeredConfiguration::find(const std::string& label) 
 	{
 		if (conf.label == label) return conf.pConfig;
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -188,4 +183,4 @@ int LayeredConfiguration::highest() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

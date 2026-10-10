@@ -26,6 +26,19 @@ public:
 
 	void testLoad();
 	void testSave();
+	void testInclude();
+	void testOptionalInclude();
+	void testOptionalIncludeCompat();
+	void testOptionalIncludeSavePreserving();
+	void testSavePreserving();
+	void testSaveRemovesLastIncludedKey();
+	void testSaveRemovesRootKey();
+	void testSaveRemovedFilesRetryAfterFailure();
+	void testSavePreservingMultiLine();
+	void testClearResetsProvenance();
+	void testGetSourceFilesCoversAllKeys();
+	void testIncludeManagement();
+	void testNoCircularReference();
 
 	void setUp();
 	void tearDown();

@@ -26,8 +26,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class ParseCallback;
@@ -52,17 +51,20 @@ public:
 	~ZipArchive();
 		/// Destroys the ZipArchive.
 
-	FileInfos::const_iterator fileInfoBegin() const;
+	void checkConsistency();
+		/// Check archive's consistency
 
-	FileInfos::const_iterator fileInfoEnd() const;
+	[[nodiscard]] FileInfos::const_iterator fileInfoBegin() const;
 
-	FileHeaders::const_iterator findHeader(const std::string& fileName) const;
+	[[nodiscard]] FileInfos::const_iterator fileInfoEnd() const;
 
-	FileHeaders::const_iterator headerBegin() const;
+	[[nodiscard]] FileHeaders::const_iterator findHeader(const std::string& fileName) const;
 
-	FileHeaders::const_iterator headerEnd() const;
+	[[nodiscard]] FileHeaders::const_iterator headerBegin() const;
 
-	const std::string& getZipComment() const;
+	[[nodiscard]] FileHeaders::const_iterator headerEnd() const;
+
+	[[nodiscard]] const std::string& getZipComment() const;
 
 private:
 	void parse(std::istream& in, ParseCallback& pc);
@@ -115,7 +117,7 @@ inline ZipArchive::FileHeaders::const_iterator ZipArchive::headerEnd() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipArchive_INCLUDED

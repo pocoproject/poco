@@ -35,7 +35,7 @@ class SingletonHolder
 {
 public:
 	SingletonHolder():
-		_pS(0)
+		_pS(nullptr)
 		/// Creates the SingletonHolder.
 	{
 	}
@@ -47,7 +47,7 @@ public:
 		delete _pS;
 	}
 
-	S* get()
+	[[nodiscard]] S* get()
 		/// Returns a pointer to the singleton object
 		/// hold by the SingletonHolder. The first call
 		/// to get will create the singleton.

@@ -28,8 +28,7 @@ using Poco::UnbufferedStreamBuf;
 using Poco::Path;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class FTPStreamBuf: public UnbufferedStreamBuf
@@ -110,7 +109,7 @@ FTPPasswordProvider::~FTPPasswordProvider()
 
 
 std::string          FTPStreamFactory::_anonymousPassword("poco@localhost");
-FTPPasswordProvider* FTPStreamFactory::_pPasswordProvider(0);
+FTPPasswordProvider* FTPStreamFactory::_pPasswordProvider(nullptr);
 
 
 FTPStreamFactory::FTPStreamFactory()
@@ -240,4 +239,4 @@ void FTPStreamFactory::unregisterFactory()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

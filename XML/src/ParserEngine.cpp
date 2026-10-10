@@ -5,14 +5,14 @@
 // Package: XML
 // Module:  ParserEngine
 //
-// Copyright (c) 2004-2007, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2026, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
 
-#include "Poco/XML/ParserEngine.h"
+#include "ParserEngine.h"
 #include "Poco/XML/NamespaceStrategy.h"
 #include "Poco/XML/XMLException.h"
 #include "Poco/SAX/EntityResolver.h"
@@ -27,6 +27,7 @@
 #include "Poco/SAX/LocatorImpl.h"
 #include "Poco/SAX/SAXException.h"
 #include "Poco/URI.h"
+#include <algorithm>
 #include <cstring>
 
 
@@ -34,8 +35,7 @@ using Poco::URI;
 using Poco::TextEncoding;
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class ContextLocator: public Locator
@@ -62,6 +62,11 @@ public:
 		return _systemId;
 	}
 
+	XML_Parser parser() const
+	{
+		return _parser;
+	}
+
 	int getLineNumber() const
 	{
 		return XML_GetCurrentLineNumber(_parser);
@@ -79,25 +84,24 @@ private:
 };
 
 
-const int ParserEngine::PARSE_BUFFER_SIZE = 4096;
 const XMLString ParserEngine::EMPTY_STRING;
 
 
 ParserEngine::ParserEngine():
-	_parser(0),
-	_pBuffer(0),
+	_parser(nullptr),
+	_pBuffer(nullptr),
 	_encodingSpecified(false),
 	_expandInternalEntities(true),
 	_externalGeneralEntities(false),
 	_externalParameterEntities(false),
 	_enablePartialReads(false),
 	_pNamespaceStrategy(new NoNamespacesStrategy()),
-	_pEntityResolver(0),
-	_pDTDHandler(0),
-	_pDeclHandler(0),
-	_pContentHandler(0),
-	_pLexicalHandler(0),
-	_pErrorHandler(0),
+	_pEntityResolver(nullptr),
+	_pDTDHandler(nullptr),
+	_pDeclHandler(nullptr),
+	_pContentHandler(nullptr),
+	_pLexicalHandler(nullptr),
+	_pErrorHandler(nullptr),
 	_maximumAmplificationFactor(0.0),
 	_activationThresholdBytes(0)
 {
@@ -105,8 +109,8 @@ ParserEngine::ParserEngine():
 
 
 ParserEngine::ParserEngine(const XMLString& encoding):
-	_parser(0),
-	_pBuffer(0),
+	_parser(nullptr),
+	_pBuffer(nullptr),
 	_encodingSpecified(true),
 	_encoding(encoding),
 	_expandInternalEntities(true),
@@ -114,12 +118,12 @@ ParserEngine::ParserEngine(const XMLString& encoding):
 	_externalParameterEntities(false),
 	_enablePartialReads(false),
 	_pNamespaceStrategy(new NoNamespacesStrategy()),
-	_pEntityResolver(0),
-	_pDTDHandler(0),
-	_pDeclHandler(0),
-	_pContentHandler(0),
-	_pLexicalHandler(0),
-	_pErrorHandler(0),
+	_pEntityResolver(nullptr),
+	_pDTDHandler(nullptr),
+	_pDeclHandler(nullptr),
+	_pContentHandler(nullptr),
+	_pLexicalHandler(nullptr),
+	_pErrorHandler(nullptr),
 	_maximumAmplificationFactor(0.0),
 	_activationThresholdBytes(0)
 {
@@ -147,6 +151,7 @@ void ParserEngine::addEncoding(const XMLString& name, TextEncoding* pEncoding)
 	poco_check_ptr (pEncoding);
 
 	if (_encodings.find(name) == _encodings.end())
+		// CodeQL [cpp/local-address-stored]: encoding lifetime managed by caller (SAX registration pattern)
 		_encodings[name] = pEncoding;
 	else
 		throw XMLException("Encoding already defined");
@@ -182,30 +187,35 @@ void ParserEngine::setExternalParameterEntities(bool flag)
 
 void ParserEngine::setEntityResolver(EntityResolver* pResolver)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pEntityResolver = pResolver;
 }
 
 
 void ParserEngine::setDTDHandler(DTDHandler* pDTDHandler)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pDTDHandler = pDTDHandler;
 }
 
 
 void ParserEngine::setDeclHandler(DeclHandler* pDeclHandler)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pDeclHandler = pDeclHandler;
 }
 
 
 void ParserEngine::setContentHandler(ContentHandler* pContentHandler)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pContentHandler = pContentHandler;
 }
 
 
 void ParserEngine::setLexicalHandler(LexicalHandler* pLexicalHandler)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pLexicalHandler = pLexicalHandler;
 }
 
@@ -262,13 +272,13 @@ void ParserEngine::parse(const char* pBuffer, std::size_t size)
 	std::size_t processed = 0;
 	while (processed < size)
 	{
-		const int bufferSize = processed + PARSE_BUFFER_SIZE < size ? PARSE_BUFFER_SIZE : static_cast<int>(size - processed);
-		if (!XML_Parse(_parser, pBuffer + processed, bufferSize, 0))
-			handleError(XML_GetErrorCode(_parser));
+		const int bufferSize = static_cast<int>(std::min(static_cast<std::size_t>(PARSE_BUFFER_SIZE), size - processed));
+		if (!XML_Parse(_parser, pBuffer + processed, bufferSize, 0) || _exception)
+			checkError(_parser);
 		processed += bufferSize;
 	}
-	if (!XML_Parse(_parser, pBuffer+processed, 0, 1))
-		handleError(XML_GetErrorCode(_parser));
+	if (!XML_Parse(_parser, pBuffer+processed, 0, 1) || _exception)
+		checkError(_parser);
 	if (_pContentHandler) _pContentHandler->endDocument();
 	popContext();
 }
@@ -279,15 +289,15 @@ void ParserEngine::parseByteInputStream(XMLByteInputStream& istr)
 	std::streamsize n = readBytes(istr, _pBuffer, PARSE_BUFFER_SIZE);
 	while (n > 0)
 	{
-		if (!XML_Parse(_parser, _pBuffer, static_cast<int>(n), 0))
-			handleError(XML_GetErrorCode(_parser));
+		if (!XML_Parse(_parser, _pBuffer, static_cast<int>(n), 0) || _exception)
+			checkError(_parser);
 		if (istr.good())
 			n = readBytes(istr, _pBuffer, PARSE_BUFFER_SIZE);
 		else
 			n = 0;
 	}
-	if (!XML_Parse(_parser, _pBuffer, 0, 1))
-		handleError(XML_GetErrorCode(_parser));
+	if (!XML_Parse(_parser, _pBuffer, 0, 1) || _exception)
+		checkError(_parser);
 }
 
 
@@ -296,15 +306,15 @@ void ParserEngine::parseCharInputStream(XMLCharInputStream& istr)
 	std::streamsize n = readChars(istr, reinterpret_cast<XMLChar*>(_pBuffer), PARSE_BUFFER_SIZE/sizeof(XMLChar));
 	while (n > 0)
 	{
-		if (!XML_Parse(_parser, _pBuffer, static_cast<int>(n*sizeof(XMLChar)), 0))
-			handleError(XML_GetErrorCode(_parser));
+		if (!XML_Parse(_parser, _pBuffer, static_cast<int>(n*sizeof(XMLChar)), 0) || _exception)
+			checkError(_parser);
 		if (istr.good())
 			n = readChars(istr, reinterpret_cast<XMLChar*>(_pBuffer), PARSE_BUFFER_SIZE/sizeof(XMLChar));
 		else
 			n = 0;
 	}
-	if (!XML_Parse(_parser, _pBuffer, 0, 1))
-		handleError(XML_GetErrorCode(_parser));
+	if (!XML_Parse(_parser, _pBuffer, 0, 1) || _exception)
+		checkError(_parser);
 }
 
 
@@ -328,15 +338,15 @@ void ParserEngine::parseExternalByteInputStream(XML_Parser extParser, XMLByteInp
 		std::streamsize n = readBytes(istr, pBuffer, PARSE_BUFFER_SIZE);
 		while (n > 0)
 		{
-			if (!XML_Parse(extParser, pBuffer, static_cast<int>(n), 0))
-				handleError(XML_GetErrorCode(extParser));
+			if (!XML_Parse(extParser, pBuffer, static_cast<int>(n), 0) || _exception)
+				checkError(extParser);
 			if (istr.good())
 				n = readBytes(istr, pBuffer, PARSE_BUFFER_SIZE);
 			else
 				n = 0;
 		}
-		if (!XML_Parse(extParser, pBuffer, 0, 1))
-			handleError(XML_GetErrorCode(extParser));
+		if (!XML_Parse(extParser, pBuffer, 0, 1) || _exception)
+			checkError(extParser);
 	}
 	catch (...)
 	{
@@ -355,15 +365,15 @@ void ParserEngine::parseExternalCharInputStream(XML_Parser extParser, XMLCharInp
 		std::streamsize n = readChars(istr, pBuffer, PARSE_BUFFER_SIZE/sizeof(XMLChar));
 		while (n > 0)
 		{
-			if (!XML_Parse(extParser, reinterpret_cast<char*>(pBuffer), static_cast<int>(n*sizeof(XMLChar)), 0))
-				handleError(XML_GetErrorCode(extParser));
+			if (!XML_Parse(extParser, reinterpret_cast<char*>(pBuffer), static_cast<int>(n*sizeof(XMLChar)), 0) || _exception)
+				checkError(extParser);
 			if (istr.good())
 				n = readChars(istr, pBuffer, static_cast<int>(PARSE_BUFFER_SIZE/sizeof(XMLChar)));
 			else
 				n = 0;
 		}
-		if (!XML_Parse(extParser, reinterpret_cast<char*>(pBuffer), 0, 1))
-			handleError(XML_GetErrorCode(extParser));
+		if (!XML_Parse(extParser, reinterpret_cast<char*>(pBuffer), 0, 1) || _exception)
+			checkError(extParser);
 	}
 	catch (...)
 	{
@@ -453,8 +463,16 @@ const Locator& ParserEngine::locator() const
 }
 
 
+XML_Parser ParserEngine::currentParser() const
+{
+	return _context.empty() ? _parser : _context.back()->parser();
+}
+
+
 void ParserEngine::init()
 {
+	_exception = nullptr;
+
 	if (_parser)
 		XML_ParserFree(_parser);
 
@@ -463,7 +481,7 @@ void ParserEngine::init()
 
 	if (dynamic_cast<NoNamespacePrefixesStrategy*>(_pNamespaceStrategy))
 	{
-		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : 0, '\t');
+		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : nullptr, '\t');
 		if (_parser)
 		{
 			XML_SetNamespaceDeclHandler(_parser, handleStartNamespaceDecl, handleEndNamespaceDecl);
@@ -471,7 +489,7 @@ void ParserEngine::init()
 	}
 	else if (dynamic_cast<NamespacePrefixesStrategy*>(_pNamespaceStrategy))
 	{
-		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : 0, '\t');
+		_parser = XML_ParserCreateNS(_encodingSpecified ? _encoding.c_str() : nullptr, '\t');
 		if (_parser)
 		{
 			XML_SetReturnNSTriplet(_parser, 1);
@@ -480,7 +498,7 @@ void ParserEngine::init()
 	}
 	else
 	{
-		_parser = XML_ParserCreate(_encodingSpecified ? _encoding.c_str() : 0);
+		_parser = XML_ParserCreate(_encodingSpecified ? _encoding.c_str() : nullptr);
 	}
 
 	if (!_parser) throw XMLException("Cannot create Expat parser");
@@ -504,7 +522,8 @@ void ParserEngine::init()
 	XML_SetParamEntityParsing(_parser, _externalParameterEntities ? XML_PARAM_ENTITY_PARSING_ALWAYS : XML_PARAM_ENTITY_PARSING_NEVER);
 	XML_SetUnknownEncodingHandler(_parser, handleUnknownEncoding, this);
 
-#if defined(XML_DTD) && (XML_MAJOR_VERSION > 2 || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 4))
+#if (defined(XML_DTD) || (defined(XML_GE) && XML_GE == 1)) && \
+	(XML_MAJOR_VERSION > 2 || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 4))
 	if (_maximumAmplificationFactor > 1.0)
 	{
 		XML_SetBillionLaughsAttackProtectionMaximumAmplification(_parser, _maximumAmplificationFactor);
@@ -633,6 +652,34 @@ void ParserEngine::handleError(int errorNo)
 }
 
 
+void ParserEngine::checkError(XML_Parser parser)
+{
+	if (_exception)
+	{
+		std::exception_ptr ex = _exception;
+		_exception = nullptr;
+		std::rethrow_exception(ex);
+	}
+	handleError(XML_GetErrorCode(parser));
+}
+
+
+void ParserEngine::abortParse(XML_Parser parser, std::exception_ptr ex)
+{
+	// Capture the exception rather than letting it unwind through Expat's
+	// C call stack: Expat (>= 2.8.2) tracks a handler-call-depth counter
+	// that is incremented before and decremented after every callback
+	// invocation, and refuses to free (XML_ParserFree() becomes a no-op)
+	// a parser it believes is still inside a handler call. A C++ exception
+	// propagating out of a handler skips the decrement, which would
+	// otherwise permanently leak the parser (and everything it owns).
+	// XML_StopParser() is Expat's own supported way of aborting a parse
+	// from within a handler.
+	_exception = ex;
+	XML_StopParser(parser, XML_FALSE);
+}
+
+
 void ParserEngine::pushContext(XML_Parser parser, InputSource* pInputSource)
 {
 	ContextLocator* pLocator = new ContextLocator(parser, pInputSource->getPublicId(), pInputSource->getSystemId());
@@ -661,6 +708,10 @@ void ParserEngine::resetContext()
 void ParserEngine::handleStartElement(void* userData, const XML_Char* name, const XML_Char** atts)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	// After abortParse(), Expat still delivers the rest of the current token
+	// (the end tag of an empty element and its namespace undeclarations);
+	// the handle*() callbacks ignore them.
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
 	{
@@ -670,7 +721,11 @@ void ParserEngine::handleStartElement(void* userData, const XML_Char* name, cons
 		}
 		catch (XMLException& exc)
 		{
-			throw SAXParseException(exc.message(), pThis->locator());
+			pThis->abortParse(pThis->currentParser(), std::make_exception_ptr(SAXParseException(exc.message(), pThis->locator())));
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
 		}
 	}
 }
@@ -679,6 +734,7 @@ void ParserEngine::handleStartElement(void* userData, const XML_Char* name, cons
 void ParserEngine::handleEndElement(void* userData, const XML_Char* name)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
 	{
@@ -688,7 +744,11 @@ void ParserEngine::handleEndElement(void* userData, const XML_Char* name)
 		}
 		catch (XMLException& exc)
 		{
-			throw SAXParseException(exc.message(), pThis->locator());
+			pThis->abortParse(pThis->currentParser(), std::make_exception_ptr(SAXParseException(exc.message(), pThis->locator())));
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
 		}
 	}
 }
@@ -697,18 +757,38 @@ void ParserEngine::handleEndElement(void* userData, const XML_Char* name)
 void ParserEngine::handleCharacterData(void* userData, const XML_Char* s, int len)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
-		pThis->_pContentHandler->characters(s, 0, len);
+	{
+		try
+		{
+			pThis->_pContentHandler->characters(s, 0, len);
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 void ParserEngine::handleProcessingInstruction(void* userData, const XML_Char* target, const XML_Char* data)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
-		pThis->_pContentHandler->processingInstruction(target, data);
+	{
+		try
+		{
+			pThis->_pContentHandler->processingInstruction(target, data);
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
@@ -720,76 +800,103 @@ void ParserEngine::handleDefault(void* userData, const XML_Char* s, int len)
 void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId, const XML_Char* notationName)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
 	if (pThis->_pDTDHandler)
-		pThis->_pDTDHandler->unparsedEntityDecl(entityName, publicId ? &pubId : 0, systemId, notationName);
+	{
+		try
+		{
+			pThis->_pDTDHandler->unparsedEntityDecl(entityName, publicId ? &pubId : nullptr, systemId, notationName);
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
 	XMLString sysId;
 	if (systemId) sysId.assign(systemId);
 	if (pThis->_pDTDHandler)
-		pThis->_pDTDHandler->notationDecl(notationName, publicId ? &pubId : 0, systemId ? &sysId : 0);
+	{
+		try
+		{
+			pThis->_pDTDHandler->notationDecl(notationName, publicId ? &pubId : nullptr, systemId ? &sysId : nullptr);
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* context, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(XML_GetUserData(parser));
+	if (pThis->_exception) return XML_STATUS_ERROR;
 
 	if (!context && !pThis->_externalParameterEntities) return XML_STATUS_ERROR;
 	if (context && !pThis->_externalGeneralEntities) return XML_STATUS_ERROR;
 
-	InputSource* pInputSource = 0;
-	EntityResolver* pEntityResolver = 0;
+	InputSource* pInputSource = nullptr;
+	EntityResolver* pEntityResolver = nullptr;
 	EntityResolverImpl defaultResolver;
+	XML_Parser extParser = nullptr;
 
-	XMLString sysId(systemId);
-	XMLString pubId;
-	if (publicId) pubId.assign(publicId);
-
-	URI uri(fromXMLString(pThis->_context.back()->getSystemId()));
-	uri.resolve(fromXMLString(sysId));
-
-	if (pThis->_pEntityResolver)
+	try
 	{
-		pEntityResolver = pThis->_pEntityResolver;
-		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : 0, toXMLString(uri.toString()));
-	}
-	if (!pInputSource && pThis->_externalGeneralEntities)
-	{
-		pEntityResolver = &defaultResolver;
-		pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : 0, toXMLString(uri.toString()));
-	}
+		XMLString sysId(systemId);
+		XMLString pubId;
+		if (publicId) pubId.assign(publicId);
 
-	if (pInputSource)
-	{
-		XML_Parser extParser = XML_ExternalEntityParserCreate(pThis->_parser, context, 0);
-		if (!extParser) throw XMLException("Cannot create external entity parser");
+		URI uri(fromXMLString(pThis->_context.back()->getSystemId()));
+		uri.resolve(fromXMLString(sysId));
 
-		try
+		if (pThis->_pEntityResolver)
 		{
-			pThis->parseExternal(extParser, pInputSource);
+			pEntityResolver = pThis->_pEntityResolver;
+			pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : nullptr, toXMLString(uri.toString()));
 		}
-		catch (XMLException&)
+		if (!pInputSource && pThis->_externalGeneralEntities)
 		{
+			pEntityResolver = &defaultResolver;
+			pInputSource = pEntityResolver->resolveEntity(publicId ? &pubId : nullptr, toXMLString(uri.toString()));
+		}
+
+		if (pInputSource)
+		{
+			extParser = XML_ExternalEntityParserCreate(pThis->_parser, context, nullptr);
+			if (!extParser) throw XMLException("Cannot create external entity parser");
+
+			pThis->parseExternal(extParser, pInputSource);
+
 			pEntityResolver->releaseInputSource(pInputSource);
 			XML_ParserFree(extParser);
-			throw;
+			return XML_STATUS_OK;
 		}
-		pEntityResolver->releaseInputSource(pInputSource);
-		XML_ParserFree(extParser);
-		return XML_STATUS_OK;
+		else return XML_STATUS_ERROR;
 	}
-	else return XML_STATUS_ERROR;
+	catch (...)
+	{
+		// Do NOT let the exception unwind through Expat's C call stack (see
+		// abortParse()); release resources here and stop the *outer* parser
+		// (the one currently invoking this handler) gracefully instead.
+		if (pInputSource && pEntityResolver) pEntityResolver->releaseInputSource(pInputSource);
+		if (extParser) XML_ParserFree(extParser);
+		pThis->abortParse(parser, std::current_exception());
+		return XML_STATUS_ERROR;
+	}
 }
 
 
@@ -797,89 +904,154 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(encodingHandlerData);
 
-	XMLString encoding(name);
-	TextEncoding* knownEncoding = 0;
-
-	EncodingMap::const_iterator it = pThis->_encodings.find(encoding);
-	if (it != pThis->_encodings.end())
-		knownEncoding = it->second;
-	else
-		knownEncoding = Poco::TextEncoding::find(fromXMLString(encoding));
-
-	if (knownEncoding)
+	try
 	{
-		const TextEncoding::CharacterMap& map = knownEncoding->characterMap();
-		for (int i = 0; i < 256; ++i)
-			info->map[i] = map[i];
+		XMLString encoding(name);
+		TextEncoding* knownEncoding = nullptr;
 
-		info->data    = knownEncoding;
-		info->convert = &ParserEngine::convert;
-		info->release = 0;
-		return XML_STATUS_OK;
+		EncodingMap::const_iterator it = pThis->_encodings.find(encoding);
+		if (it != pThis->_encodings.end())
+			knownEncoding = it->second;
+		else
+			knownEncoding = Poco::TextEncoding::find(fromXMLString(encoding));
+
+		if (knownEncoding)
+		{
+			const TextEncoding::CharacterMap& map = knownEncoding->characterMap();
+			for (int i = 0; i < 256; ++i)
+				info->map[i] = map[i];
+
+			info->data    = knownEncoding;
+			info->convert = &ParserEngine::convert;
+			info->release = nullptr;
+			return XML_STATUS_OK;
+		}
+		else return XML_STATUS_ERROR;
 	}
-	else return XML_STATUS_ERROR;
+	catch (...)
+	{
+		pThis->abortParse(pThis->currentParser(), std::current_exception());
+		return XML_STATUS_ERROR;
+	}
 }
 
 
 void ParserEngine::handleComment(void* userData, const XML_Char* data)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
+	if (pThis->_pLexicalHandler)
+	{
+		try
+		{
 #if defined(XML_UNICODE_WCHAR_T)
-	if (pThis->_pLexicalHandler)
-		pThis->_pLexicalHandler->comment(data, 0, (int) std::wcslen(data));
+			pThis->_pLexicalHandler->comment(data, 0, (int) std::wcslen(data));
 #else
-	if (pThis->_pLexicalHandler)
-		pThis->_pLexicalHandler->comment(data, 0, (int) std::strlen(data));
+			pThis->_pLexicalHandler->comment(data, 0, (int) std::strlen(data));
 #endif
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 void ParserEngine::handleStartCdataSection(void* userData)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pLexicalHandler)
-		pThis->_pLexicalHandler->startCDATA();
+	{
+		try
+		{
+			pThis->_pLexicalHandler->startCDATA();
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 void ParserEngine::handleEndCdataSection(void* userData)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pLexicalHandler)
-		pThis->_pLexicalHandler->endCDATA();
+	{
+		try
+		{
+			pThis->_pLexicalHandler->endCDATA();
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 void ParserEngine::handleStartNamespaceDecl(void* userData, const XML_Char* prefix, const XML_Char* uri)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
-		pThis->_pContentHandler->startPrefixMapping((prefix ? XMLString(prefix) : EMPTY_STRING), (uri ? XMLString(uri) : EMPTY_STRING));
+	{
+		try
+		{
+			pThis->_pContentHandler->startPrefixMapping((prefix ? XMLString(prefix) : EMPTY_STRING), (uri ? XMLString(uri) : EMPTY_STRING));
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 void ParserEngine::handleEndNamespaceDecl(void* userData, const XML_Char* prefix)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
-		pThis->_pContentHandler->endPrefixMapping(prefix ? XMLString(prefix) : EMPTY_STRING);
+	{
+		try
+		{
+			pThis->_pContentHandler->endPrefixMapping(prefix ? XMLString(prefix) : EMPTY_STRING);
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctypeName, const XML_Char *systemId, const XML_Char* publicId, int hasInternalSubset)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pLexicalHandler)
 	{
-		XMLString sysId = systemId ? XMLString(systemId) : EMPTY_STRING;
-		XMLString pubId = publicId ? XMLString(publicId) : EMPTY_STRING;
-		pThis->_pLexicalHandler->startDTD(doctypeName, pubId, sysId);
+		try
+		{
+			XMLString sysId = systemId ? XMLString(systemId) : EMPTY_STRING;
+			XMLString pubId = publicId ? XMLString(publicId) : EMPTY_STRING;
+			pThis->_pLexicalHandler->startDTD(doctypeName, pubId, sysId);
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
 	}
 }
 
@@ -887,9 +1059,19 @@ void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctyp
 void ParserEngine::handleEndDoctypeDecl(void* userData)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pLexicalHandler)
-		pThis->_pLexicalHandler->endDTD();
+	{
+		try
+		{
+			pThis->_pLexicalHandler->endDTD();
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
@@ -906,30 +1088,60 @@ void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, 
 void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
 	if (pThis->_pDeclHandler)
-		pThis->_pDeclHandler->externalEntityDecl(entityName, publicId ? &pubId : 0, systemId);
+	{
+		try
+		{
+			pThis->_pDeclHandler->externalEntityDecl(entityName, publicId ? &pubId : nullptr, systemId);
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 void ParserEngine::handleInternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* replacementText, int replacementTextLength)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	XMLString replText(replacementText, replacementTextLength);
 	if (pThis->_pDeclHandler)
-		pThis->_pDeclHandler->internalEntityDecl(entityName, replText);
+	{
+		try
+		{
+			pThis->_pDeclHandler->internalEntityDecl(entityName, replText);
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
 void ParserEngine::handleSkippedEntity(void* userData, const XML_Char* entityName, int isParameterEntity)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
-		pThis->_pContentHandler->skippedEntity(entityName);
+	{
+		try
+		{
+			pThis->_pContentHandler->skippedEntity(entityName);
+		}
+		catch (...)
+		{
+			pThis->abortParse(pThis->currentParser(), std::current_exception());
+		}
+	}
 }
 
 
@@ -940,4 +1152,4 @@ int ParserEngine::convert(void* data, const char* s)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -7,7 +7,7 @@
 //
 // Definition of the Timer class.
 //
-// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -25,8 +25,7 @@
 #include "Poco/Runnable.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API Timer: protected Poco::Runnable
@@ -60,6 +59,10 @@ public:
 	explicit Timer(Poco::Thread::Priority priority);
 		/// Creates the Timer, using a timer thread with
 		/// the given priority.
+
+	Timer(const Timer&) = delete;
+
+	Timer& operator = (const Timer&) = delete;
 
 	~Timer();
 		/// Destroys the Timer, cancelling all pending tasks.
@@ -159,11 +162,14 @@ public:
 		/// If task execution takes longer than the given interval,
 		/// further executions are delayed.
 
-	bool idle() const;
+	[[nodiscard]] bool idle() const;
 		/// Returns true if the task queue is empty, otherwise false.
 
+	[[nodiscard]] std::size_t taskCount() const;
+		/// Returns the number of tasks currently scheduled in the timer.
+
 	template <typename Fn>
-	static TimerTask::Ptr func(const Fn& fn)
+	[[nodiscard]] static TimerTask::Ptr func(const Fn& fn)
 		/// Helper function template to use a functor or lambda
 		/// with Timer::schedule() and Timer::scheduleAtFixedRate().
 	{
@@ -171,7 +177,7 @@ public:
 	}
 
 	template <typename Fn>
-	static TimerTask::Ptr func(Fn&& fn)
+	[[nodiscard]] static TimerTask::Ptr func(Fn&& fn)
 		/// Helper function template to use a functor or lambda
 		/// with Timer::schedule() and Timer::scheduleAtFixedRate().
 	{
@@ -183,9 +189,6 @@ protected:
 	static void validateTask(const TimerTask::Ptr& pTask);
 
 private:
-	Timer(const Timer&);
-	Timer& operator = (const Timer&);
-
 	Poco::TimedNotificationQueue _queue;
 	Poco::Thread _thread;
 };
@@ -200,7 +203,13 @@ inline bool Timer::idle() const
 }
 
 
-} } // namespace Poco::Util
+inline std::size_t Timer::taskCount() const
+{
+	return _queue.size();
+}
+
+
+} // namespace Poco::Util
 
 
 #endif // Util_Timer_INCLUDED

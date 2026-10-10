@@ -23,7 +23,7 @@
 
 namespace
 {
-	void throwError()
+	[[noreturn]] void throwError()
 	{
 		unsigned long err;
 		std::string msg;
@@ -32,7 +32,7 @@ namespace
 		{
 			if (!msg.empty())
 				msg.append("; ");
-			msg.append(ERR_error_string(err, 0));
+			msg.append(ERR_error_string(err, nullptr));
 		}
 
 		throw Poco::IOException(msg);
@@ -40,8 +40,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 CipherKeyImpl::CipherKeyImpl(const std::string& name,
@@ -49,14 +48,14 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	const std::string& salt,
 	int iterationCount,
 	const std::string& digest):
-	_pCipher(0),
-	_pDigest(0),
+	_pCipher(nullptr),
+	_pDigest(nullptr),
 	_name(name),
 	_key(),
 	_iv()
 {
-	// dummy access to Cipherfactory so that the EVP lib is initilaized
-	CipherFactory::defaultFactory();
+	// dummy access to Cipherfactory so that the EVP lib is initialized
+	(void)CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
 	if (!_pCipher)
@@ -65,7 +64,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_pDigest = EVP_get_digestbyname(digest.c_str());
 
 	if (!_pDigest)
-		throw Poco::NotFoundException("Digest " + name + " was not found");
+		throw Poco::NotFoundException("Digest " + digest + " was not found");
 
 	_key = ByteVec(keySize());
 	_iv = ByteVec(ivSize());
@@ -76,14 +75,14 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	const ByteVec& key,
 	const ByteVec& iv):
-	_pCipher(0),
-	_pDigest(0),
+	_pCipher(nullptr),
+	_pDigest(nullptr),
 	_name(name),
 	_key(key),
 	_iv(iv)
 {
 	// dummy access to Cipherfactory so that the EVP lib is initialized
-	CipherFactory::defaultFactory();
+	(void)CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
 	if (!_pCipher)
@@ -92,14 +91,14 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 
 
 CipherKeyImpl::CipherKeyImpl(const std::string& name):
-	_pCipher(0),
-	_pDigest(0),
+	_pCipher(nullptr),
+	_pDigest(nullptr),
 	_name(name),
 	_key(),
 	_iv()
 {
-	// dummy access to Cipherfactory so that the EVP lib is initilaized
-	CipherFactory::defaultFactory();
+	// dummy access to Cipherfactory so that the EVP lib is initialized
+	(void)CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
 	if (!_pCipher)
@@ -134,7 +133,6 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 	case EVP_CIPH_OFB_MODE:
 		return MODE_OFB;
 
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 	case EVP_CIPH_CTR_MODE:
 		return MODE_CTR;
 
@@ -143,7 +141,6 @@ CipherKeyImpl::Mode CipherKeyImpl::mode() const
 
 	case EVP_CIPH_CCM_MODE:
 		return MODE_CCM;
-#endif
 	}
 	throw Poco::IllegalStateException("Unexpected value of EVP_CIPHER_mode()");
 }
@@ -168,7 +165,7 @@ void CipherKeyImpl::getRandomBytes(ByteVec& vec, std::size_t count)
 	vec.clear();
 	vec.reserve(count);
 
-	for (int i = 0; i < count; ++i)
+	for (std::size_t i = 0; i < count; ++i)
 		vec.push_back(static_cast<unsigned char>(random.get()));
 }
 
@@ -198,7 +195,7 @@ void CipherKeyImpl::generateKey(
 	int keySize = EVP_BytesToKey(
 		_pCipher,
 		_pDigest ? _pDigest : EVP_md5(),
-		(salt.empty() ? 0 : saltBytes),
+		(salt.empty() ? nullptr : saltBytes),
 		reinterpret_cast<const unsigned char*>(password.data()),
 		static_cast<int>(password.size()),
 		iterationCount,
@@ -242,4 +239,4 @@ void CipherKeyImpl::setIV(const ByteVec& iv)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

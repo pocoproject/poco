@@ -25,8 +25,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class RedisStreamBuf: public BufferedStreamBuf
@@ -39,18 +38,15 @@ public:
 	~RedisStreamBuf();
 		/// Destructor
 
-	std::string readLine();
+	[[nodiscard]] std::string readLine();
 		/// Reads a line from Redis (until \r\n is encountered).
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length);
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum
-	{
-		STREAM_BUFFER_SIZE = 1024
-	};
+	static constexpr int STREAM_BUFFER_SIZE = 1024;
 
 	Net::StreamSocket& _redis;
 };
@@ -67,7 +63,7 @@ public:
 		///
 		/// Flushes the buffer, but does not close the socket.
 
-	RedisStreamBuf* rdbuf();
+	[[nodiscard]] RedisStreamBuf* rdbuf();
 		/// Returns a pointer to the internal RedisStreamBuf.
 
 	void close();
@@ -102,13 +98,13 @@ public:
 	~RedisInputStream();
 		/// Destroys the RedisInputStream.
 
-	std::string getline();
+	[[nodiscard]] std::string getline();
 		/// Redis uses \r\n as delimiter. This getline version removes
 		/// the \r from the result.
 };
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_RedisStream_INCLUDED

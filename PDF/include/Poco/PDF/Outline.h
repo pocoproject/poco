@@ -23,15 +23,14 @@
 #include "Poco/PDF/Destination.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API Outline: public Resource<HPDF_Outline>
 	/// A Outline represents a PDF outline resource.
 {
 public:
-	typedef HPDF_Outline Type;
+	using Type = HPDF_Outline;
 
 	Outline(HPDF_Doc* pPDF, const HPDF_Outline& outline, const std::string& name = "");
 		/// Creates the outline.
@@ -39,7 +38,7 @@ public:
 	Outline(const Outline& other);
 		/// Copy creates the resource.
 
-	~Outline();
+	~Outline() override;
 		/// Destroys the outline.
 
 	Outline& operator = (const Outline& resource);
@@ -56,29 +55,7 @@ public:
 };
 
 
-//
-// inlines
-//
-
-inline void Outline::open()
-{
-	HPDF_Outline_SetOpened(handle(), HPDF_TRUE);
-}
-
-
-inline void Outline::close()
-{
-	HPDF_Outline_SetOpened(handle(), HPDF_FALSE);
-}
-
-
-inline void Outline::destination(const Destination& dest)
-{
-	HPDF_Outline_SetDestination(handle(), dest);
-}
-
-
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Outline_INCLUDED

@@ -18,14 +18,13 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 DialogSocket::DialogSocket():
-	_pBuffer(0),
-	_pNext(0),
-	_pEnd(0)
+	_pBuffer(nullptr),
+	_pNext(nullptr),
+	_pEnd(nullptr)
 {
 	allocBuffer();
 }
@@ -33,9 +32,9 @@ DialogSocket::DialogSocket():
 
 DialogSocket::DialogSocket(const SocketAddress& address):
 	StreamSocket(address),
-	_pBuffer(0),
-	_pNext(0),
-	_pEnd(0)
+	_pBuffer(nullptr),
+	_pNext(nullptr),
+	_pEnd(nullptr)
 {
 	allocBuffer();
 }
@@ -43,9 +42,9 @@ DialogSocket::DialogSocket(const SocketAddress& address):
 
 DialogSocket::DialogSocket(const Socket& socket):
 	StreamSocket(socket),
-	_pBuffer(0),
-	_pNext(0),
-	_pEnd(0)
+	_pBuffer(nullptr),
+	_pNext(nullptr),
+	_pEnd(nullptr)
 {
 	allocBuffer();
 }
@@ -53,9 +52,9 @@ DialogSocket::DialogSocket(const Socket& socket):
 
 DialogSocket::DialogSocket(const DialogSocket& socket):
 	StreamSocket(socket),
-	_pBuffer(0),
-	_pNext(0),
-	_pEnd(0)
+	_pBuffer(nullptr),
+	_pNext(nullptr),
+	_pEnd(nullptr)
 {
 	allocBuffer();
 }
@@ -249,7 +248,7 @@ bool DialogSocket::receiveLine(std::string& line, std::size_t lineLengthLimit)
 		ch = get();
 	}
 	if (ch == '\r' && peek() == '\n')
-		get();
+		(void) get();
 	else if (ch == EOF_CHAR)
 		return false;
 	return true;
@@ -292,4 +291,4 @@ int DialogSocket::receiveRawBytes(void* buffer, int length)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

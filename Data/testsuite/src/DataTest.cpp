@@ -14,12 +14,14 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionFactory.h"
+#include "Poco/Data/Transaction.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/LOBStream.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/Data/Column.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
+#include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SimpleRowFormatter.h"
 #include "Poco/Data/JSONRowFormatter.h"
 #include "Poco/Data/DataException.h"
@@ -27,12 +29,19 @@
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/DateTime.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Types.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Data/DynamicLOB.h"
 #include "Poco/Data/DynamicDateTime.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/Exception.h"
+#include "Poco/DirectoryIterator.h"
+#include "Poco/Glob.h"
+#include "Poco/File.h"
+#include "Poco/Path.h"
+#include "Poco/Nullable.h"
+#include <string>
 #include <cstring>
 #include <sstream>
 #include <iomanip>
@@ -40,46 +49,10 @@
 
 
 using namespace Poco;
+using Poco::Dynamic::Var;
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
-
-
-using Poco::BinaryReader;
-using Poco::BinaryWriter;
-using Poco::UInt32;
-using Poco::Int64;
-using Poco::UInt64;
-using Poco::DateTime;
-using Poco::Latin1Encoding;
-using Poco::Dynamic::Var;
-using Poco::InvalidAccessException;
-using Poco::IllegalStateException;
-using Poco::RangeException;
-using Poco::NotFoundException;
-using Poco::InvalidArgumentException;
-using Poco::NotImplementedException;
-using Poco::Data::Session;
-using Poco::Data::SessionFactory;
-using Poco::Data::Statement;
-using Poco::Data::NotSupportedException;
-using Poco::Data::CLOB;
-using Poco::Data::CLOBInputStream;
-using Poco::Data::CLOBOutputStream;
-using Poco::Data::MetaColumn;
-using Poco::Data::Column;
-using Poco::Data::Row;
-using Poco::Data::RowFormatter;
-using Poco::Data::SimpleRowFormatter;
-using Poco::Data::JSONRowFormatter;
-using Poco::Data::Date;
-using Poco::Data::Time;
-using Poco::Data::AbstractExtractor;
-using Poco::Data::AbstractExtraction;
-using Poco::Data::AbstractExtractionVec;
-using Poco::Data::AbstractExtractionVecVec;
-using Poco::Data::AbstractBinding;
-using Poco::Data::AbstractBindingVec;
-using Poco::Data::NotConnectedException;
+using namespace std::string_literals;
 
 
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
@@ -101,6 +74,7 @@ void DataTest::testSession()
 	assertTrue (sess.connector() == sess.impl()->connectorName());
 	assertTrue ("cs" == sess.impl()->connectionString());
 	assertTrue ("test:///cs" == sess.uri());
+	assertTrue ("Test" == sess.dbmsName());
 
 	assertTrue (sess.getLoginTimeout() == Session::LOGIN_TIMEOUT_DEFAULT);
 	sess.setLoginTimeout(123);
@@ -176,6 +150,25 @@ void DataTest::testStatementFormatting()
 		"'",'a',"'",-1, 1u, 1.5, "42", now);
 
 	assertTrue ("SELECT 'a',-1,1,1.500000,42 FROM Person WHERE Name LIKE 'Simp%'" == stmt.toString());
+}
+
+
+void DataTest::testStatementMoveAssignment()
+{
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	Statement source = (sess << "SELEC * FROM Person");
+	source.parse();
+	const std::string parseError = source.parseError();
+#ifndef POCO_DATA_NO_SQL_PARSER
+	assertTrue (!parseError.empty());
+#endif
+
+	Statement target(sess);
+	target = std::move(source);
+	assertTrue (target.toString() == "SELEC * FROM Person");
+	assertTrue (target.parseError() == parseError);
+	assertTrue (source.parseError().empty());
 }
 
 
@@ -383,7 +376,7 @@ void DataTest::testCLOB()
 	blobChrStr = CLOB(sss);
 	assertTrue (blobChrStr == blobNumStr);
 
-    std::string xyz = "xyz";
+	std::string xyz = "xyz";
 	vLOB = xyz;
 	blobChrStr = sss = vLOB.convert<std::string>();
 	assertTrue (0 == std::strncmp(xyz.c_str(), blobChrStr.rawContent(), blobChrStr.size()));
@@ -575,7 +568,7 @@ void DataTest::testColumnVector()
 
 	try
 	{
-		POCO_UNUSED int i; i = c[100];
+		(void) c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -678,7 +671,7 @@ void DataTest::testColumnVectorBool()
 
 	try
 	{
-		POCO_UNUSED bool b; b = c[100];
+		(void) c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -754,7 +747,7 @@ void DataTest::testColumnDeque()
 
 	try
 	{
-		POCO_UNUSED int i; i = c[100];
+		(void) c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -871,7 +864,7 @@ void DataTest::testColumnList()
 
 	try
 	{
-		POCO_UNUSED int i; i = c[100];
+		(void) c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -978,13 +971,13 @@ void DataTest::testRow()
 
 	try
 	{
-		POCO_UNUSED int i; i = row[5].convert<int>();
+		(void) row[5].convert<int>();
 		fail ("must fail");
 	}catch (RangeException&) {}
 
 	try
 	{
-		POCO_UNUSED int i; i = row["a bad name"].convert<int>();
+		(void) row["a bad name"].convert<int>();
 		fail ("must fail");
 	}catch (NotFoundException&) {}
 
@@ -1192,7 +1185,6 @@ void DataTest::testRowSort()
 
 	testRowStrictWeak(row10, row9, row8);
 
-
 	Row row11;
 	row11.append("0", 2.5);
 	row11.append("1", 2.5);
@@ -1302,6 +1294,13 @@ void DataTest::testJSONRowFormatter()
 	assertTrue(row1.namesToString() == "");
 	assertTrue(row1.valuesToString() == "{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");
 	assertTrue(row1.valuesToString() == ",{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");
+
+	Row row2;
+	row2.append("date", Date(2007, 3, 13));
+	row2.append("time", Time(8, 12, 15));
+	row2.setFormatter(new JSONRowFormatter(JSONRowFormatter::JSON_FMT_MODE_FULL));
+	(void) row2.namesToString();
+	assertTrue(row2.valuesToString() == "{\"date\":\"2007/03/13\",\"time\":\"08:12:15\"}");
 }
 
 
@@ -1421,6 +1420,11 @@ void DataTest::testDateAndTime()
 	Var vTime = t;
 	t1 = vTime;
 	assertTrue (t == t1);
+
+	assertTrue (vDate.isDate());
+	assertFalse (vDate.isTime());
+	assertTrue (vTime.isTime());
+	assertFalse (vTime.isDate());
 }
 
 
@@ -1570,6 +1574,183 @@ void DataTest::testSQLParse()
 }
 
 
+void DataTest::testSQLChannel()
+{
+	AutoPtr<SQLChannel> pChannel = new SQLChannel();
+	const std::string dir = pChannel->getProperty("directory");
+	Stopwatch sw; sw.start();
+	while (!pChannel->isRunning())
+	{
+		Thread::sleep(10);
+		if (sw.elapsedSeconds() > 3)
+			fail("SQLChannel timed out");
+	}
+
+	Glob g("*.log.sql");
+	if (File(dir).exists())
+	{
+		{
+			DirectoryIterator it(dir);
+			const DirectoryIterator end;
+			while (it != end)
+			{
+				if (g.match(it->path()))
+				{
+					File(it->path()).remove();
+				}
+				++it;
+			}
+		}
+	}
+
+	assertEqual(int(SQLChannel::DEFAULT_FLUSH_SECONDS), NumberParser::parse(pChannel->getProperty("flush")));
+
+	constexpr int mcount{10};
+	constexpr int batch{3};
+	pChannel->setProperty("minBatch", std::to_string(batch));
+	constexpr int flush{1};
+	pChannel->setProperty("flush", std::to_string(flush));
+	assertEqual(flush, NumberParser::parse(pChannel->getProperty("flush")));
+	assertTrue(pChannel->getProperty("times") == "UTC");
+	pChannel->setProperty("times", "local");
+	assertTrue(pChannel->getProperty("times") == "local");
+	pChannel->setProperty("times", "UTC");
+	assertTrue(pChannel->getProperty("times") == "UTC");
+	for (int i = 0; i < mcount; i++)
+	{
+		Message msgInfA("InformationSource", Poco::format("%d Informational sync message", i), Message::PRIO_INFORMATION);
+		pChannel->log(msgInfA);
+	}
+	Thread::sleep(2000*flush); // give it time to flush
+	auto logged = pChannel->logged();
+	assertEqual(mcount, logged);
+	pChannel.reset();
+
+	int count = 0;
+	DirectoryIterator it(dir);
+	const DirectoryIterator end;
+	while (it != end)
+	{
+		if (g.match(it->path()))
+		{
+			++count;
+			File(it->path()).remove();
+		}
+		++it;
+	}
+	assertEqual(count, (mcount / batch) + (mcount % batch));
+}
+
+
+void DataTest::testNullableExtract()
+{
+	Poco::Data::Test::Extractor ext;
+	Poco::Nullable<Poco::Int32> ni;
+	assertTrue (ni.isNull());
+	assertTrue (ext.extract(0, ni));
+	assertFalse (ni.isNull());
+	assertEqual (ni.value(), 1);
+}
+
+
+void DataTest::testTransactionAutoCommit()
+{
+	// Transaction must work on an auto-commit session: it disables auto-commit for
+	// the duration (so a real SessionImpl::begin() does not throw "Session in auto
+	// commit mode") and restores it on commit(), rollback() AND destruction — the
+	// last path being what keeps a pooled session from being handed back in
+	// manual-commit mode. Uses the no-op Test connector, so no server is involved.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	// --- auto-commit ON: Transaction disables it for the txn, then restores it ---
+	sess.setFeature("autoCommit", true);
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// commit() restores auto-commit
+	{
+		Transaction trans(sess);
+		assertTrue (sess.isTransaction());
+		assertTrue (!sess.getFeature("autoCommit"));
+		trans.commit();
+		assertTrue (!sess.isTransaction());
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// rollback() restores auto-commit
+	{
+		Transaction trans(sess);
+		assertTrue (!sess.getFeature("autoCommit"));
+		trans.rollback();
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// destruction without commit/rollback rolls back AND restores auto-commit
+	{
+		Transaction trans(sess);
+		assertTrue (sess.isTransaction());
+		assertTrue (!sess.getFeature("autoCommit"));
+	}
+	assertTrue (!sess.isTransaction());
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// --- begin() failure must restore auto-commit (regression) ---
+	// The Transaction ctor unwinds on a failed begin(), so its destructor never runs;
+	// begin() itself must restore the feature, else a pooled session is handed back in
+	// manual-commit mode.
+	{
+		bool threw = false;
+		sess.setFeature("throwOnBegin", true);
+		try { Transaction trans(sess); }
+		catch (Poco::Exception&) { threw = true; }
+		sess.setFeature("throwOnBegin", false);
+		assertTrue (threw);
+		assertTrue (!sess.isTransaction());
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// --- auto-commit OFF: Transaction must leave the feature untouched ---
+	sess.setFeature("autoCommit", false);
+	{
+		Transaction trans(sess);
+		assertTrue (!sess.getFeature("autoCommit"));
+		trans.commit();
+		assertTrue (!sess.getFeature("autoCommit"));
+	}
+	assertTrue (!sess.getFeature("autoCommit"));
+
+	// --- dtor restores auto-commit even if rollback() throws (regression) ---
+	sess.setFeature("autoCommit", true);
+	{
+		Transaction trans(sess);
+		assertTrue (!sess.getFeature("autoCommit"));
+		sess.setFeature("throwOnRollback", true);
+	} // dtor: rollback() throws (swallowed) and auto-commit is still restored
+	sess.setFeature("throwOnRollback", false);
+	assertTrue (sess.getFeature("autoCommit"));
+}
+
+
+void DataTest::testExecuteDirectNotImplemented()
+{
+	// The Test connector does not override StatementImpl::execDirectImpl(); a
+	// backend without direct execution must report that instead of silently
+	// doing nothing with the query.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	Statement stmt(sess);
+	try
+	{
+		stmt.executeDirect("SELECT 1");
+		failmsg("executeDirect() must throw NotImplementedException");
+	}
+	catch (NotImplementedException&)
+	{
+	}
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1586,6 +1767,7 @@ CppUnit::Test* DataTest::suite()
 
 	CppUnit_addTest(pSuite, DataTest, testSession);
 	CppUnit_addTest(pSuite, DataTest, testStatementFormatting);
+	CppUnit_addTest(pSuite, DataTest, testStatementMoveAssignment);
 	CppUnit_addTest(pSuite, DataTest, testFeatures);
 	CppUnit_addTest(pSuite, DataTest, testProperties);
 	CppUnit_addTest(pSuite, DataTest, testLOB);
@@ -1603,6 +1785,10 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
 	CppUnit_addTest(pSuite, DataTest, testTranscode);
 	CppUnit_addTest(pSuite, DataTest, testSQLParse);
+	CppUnit_addTest(pSuite, DataTest, testSQLChannel);
+	CppUnit_addTest(pSuite, DataTest, testNullableExtract);
+	CppUnit_addTest(pSuite, DataTest, testTransactionAutoCommit);
+	CppUnit_addTest(pSuite, DataTest, testExecuteDirectNotImplemented);
 
 	return pSuite;
 }

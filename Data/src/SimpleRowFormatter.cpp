@@ -17,8 +17,7 @@
 #include <iomanip>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 SimpleRowFormatter::SimpleRowFormatter(std::streamsize columnWidth, std::streamsize spacing):
@@ -110,4 +109,4 @@ std::string& SimpleRowFormatter::formatValues(const ValueVec& vals, std::string&
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

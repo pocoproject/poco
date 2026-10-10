@@ -7,7 +7,7 @@
 //
 // Definition of the TimerTask class.
 //
-// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -26,8 +26,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API TimerTask: public Poco::RefCountedObject, public Poco::Runnable
@@ -43,6 +42,10 @@ public:
 	TimerTask();
 		/// Creates the TimerTask.
 
+	TimerTask(const TimerTask&) = delete;
+
+	TimerTask& operator = (const TimerTask&) = delete;
+
 	void cancel();
 		/// Cancels the execution of the timer.
 		/// If the task has been scheduled for one-time execution and has
@@ -54,11 +57,11 @@ public:
 		/// Warning: A TimerTask that has been cancelled must not be scheduled again.
 		/// An attempt to do so results in a Poco::Util::IllegalStateException being thrown.
 
-	bool isCancelled() const;
+	[[nodiscard]] bool isCancelled() const;
 		/// Returns true iff the TimerTask has been cancelled by a call
 		/// to cancel().
 
-	Poco::Timestamp lastExecution() const;
+	[[nodiscard]] Poco::Timestamp lastExecution() const;
 		/// Returns the time of the last execution of the timer task.
 		///
 		/// Returns 0 if the timer has never been executed.
@@ -67,13 +70,10 @@ public:
 		/// Updates the last execution of the timer task.
 
 protected:
-	~TimerTask();
+	~TimerTask() override;
 		/// Destroys the TimerTask.
 
 private:
-	TimerTask(const TimerTask&);
-	TimerTask& operator = (const TimerTask&);
-
 	Poco::Timestamp _lastExecution;
 	std::atomic<bool> _isCancelled;
 	mutable FastMutex _mutex;
@@ -129,7 +129,7 @@ inline void TimerTask::updateLastExecution()
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_TimerTask_INCLUDED

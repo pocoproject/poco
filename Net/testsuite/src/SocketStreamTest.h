@@ -27,7 +27,9 @@ public:
 	void testStreamEcho();
 	void testLargeStreamEcho();
 	void testEOF();
+#ifdef POCO_HAVE_SENDFILE
 	void testSendFile();
+#endif
 
 	void setUp();
 	void tearDown();

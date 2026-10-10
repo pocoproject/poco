@@ -74,36 +74,36 @@ public:
 		/// Builds the token by reading and appending
 		/// the remaining characters from istr.
 
-	virtual Class tokenClass() const;
+	[[nodiscard]] virtual Class tokenClass() const;
 		/// Returns the kind of the token.
 
-	const std::string& tokenString() const;
+	[[nodiscard]] const std::string& tokenString() const;
 		/// Returns the token's raw string.
 
-	virtual std::string asString() const;
+	[[nodiscard]] virtual std::string asString() const;
 		/// Returns a string representation of the token.
 
 #if defined(POCO_HAVE_INT64)
-	virtual Int64 asInteger64() const;
-        /// Returns a 64-bit integer representation of the token.
+	[[nodiscard]] virtual Int64 asInteger64() const;
+		/// Returns a 64-bit integer representation of the token.
 
-	virtual UInt64 asUnsignedInteger64() const;
-        /// Returns an unsigned 64-bit integer representation of the token.
+	[[nodiscard]] virtual UInt64 asUnsignedInteger64() const;
+		/// Returns an unsigned 64-bit integer representation of the token.
 #endif
 
-	virtual int asInteger() const;
+	[[nodiscard]] virtual int asInteger() const;
 		/// Returns an integer representation of the token.
 
-	virtual unsigned asUnsignedInteger() const;
+	[[nodiscard]] virtual unsigned int asUnsignedInteger() const;
 		/// Returns an unsigned integer representation of the token.
 
-	virtual double asFloat() const;
+	[[nodiscard]] virtual double asFloat() const;
 		/// Returns a floating-point representation of the token.
 
-	virtual char asChar() const;
+	[[nodiscard]] virtual char asChar() const;
 		/// Returns a char representation of the token.
 
-	bool is(Class tokenClass) const;
+	[[nodiscard]] bool is(Class tokenClass) const;
 		/// Returns true iff the token has the given class.
 
 protected:
@@ -122,8 +122,8 @@ class Foundation_API InvalidToken: public Token
 {
 public:
 	InvalidToken();
-	~InvalidToken();
-	Class tokenClass() const;
+	~InvalidToken() override;
+	[[nodiscard]] Class tokenClass() const override;
 };
 
 
@@ -133,8 +133,8 @@ class Foundation_API EOFToken: public Token
 {
 public:
 	EOFToken();
-	~EOFToken();
-	Class tokenClass() const;
+	~EOFToken() override;
+	[[nodiscard]] Class tokenClass() const override;
 };
 
 
@@ -144,10 +144,10 @@ class Foundation_API WhitespaceToken: public Token
 {
 public:
 	WhitespaceToken();
-	~WhitespaceToken();
-	Class tokenClass() const;
-	bool start(char c, std::istream& istr);
-	void finish(std::istream& istr);
+	~WhitespaceToken() override;
+	[[nodiscard]] Class tokenClass() const override;
+	bool start(char c, std::istream& istr) override;
+	void finish(std::istream& istr) override;
 };
 
 

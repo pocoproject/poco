@@ -17,8 +17,7 @@
 #include "Poco/DNSSD/Record.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 Record::Record():
@@ -26,7 +25,7 @@ Record::Record():
 	_type(0),
 	_clazz(0),
 	_length(0),
-	_data(0),
+	_data(nullptr),
 	_ttl(0)
 {
 }
@@ -61,4 +60,4 @@ Record::~Record()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

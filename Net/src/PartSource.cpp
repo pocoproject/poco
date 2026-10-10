@@ -15,11 +15,7 @@
 #include "Poco/Net/PartSource.h"
 
 
-namespace Poco {
-namespace Net {
-
-
-const int         PartSource::UNKNOWN_CONTENT_LENGTH     = -1;
+namespace Poco::Net {
 
 
 PartSource::PartSource():
@@ -55,4 +51,4 @@ std::streamsize PartSource::getContentLength() const
 	return UNKNOWN_CONTENT_LENGTH;
 }
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

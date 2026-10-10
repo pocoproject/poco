@@ -17,17 +17,15 @@
 #include <map>
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 struct Property
 {
-	static const char CARD_ZERO_OR_ONE  = '?';
-	static const char CARD_ONE          = '1';
-	static const char CARD_ZERO_OR_MORE = '*';
-	static const char CARD_ONE_OR_MORE  = '+';
+	static constexpr char CARD_ZERO_OR_ONE  = '?';
+	static constexpr char CARD_ONE          = '1';
+	static constexpr char CARD_ZERO_OR_MORE = '*';
+	static constexpr char CARD_ONE_OR_MORE  = '+';
 
 	std::string name;
 	std::string column;
@@ -54,7 +52,7 @@ struct Class
 using ClassMap = std::map<std::string, Class>;
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler
 
 
 #endif // ActiveRecordCompiler_Types_INCLUDED

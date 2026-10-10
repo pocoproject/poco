@@ -1,0 +1,15 @@
+#
+# Makefile
+#
+# Makefile for TestLibraryMissingDeps
+#
+
+include $(POCO_BASE)/build/rules/global
+
+objects = TestLibraryMissingDeps
+
+target         = TestLibraryMissingDeps
+target_version = 1
+target_libs    = PocoFoundation NonExistentLibrary
+
+include $(POCO_BASE)/build/rules/dylib

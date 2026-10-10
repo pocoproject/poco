@@ -26,8 +26,7 @@ using Poco::IOException;
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int dataSize, int ttl):
@@ -111,7 +110,7 @@ int ICMPEventArgs::received() const
 
 void ICMPEventArgs::setError(int index, const std::string& text)
 {
-	if (index >= _errors.size())
+	if (static_cast<std::size_t>(index) >= _errors.size())
 		throw InvalidArgumentException("Supplied index exceeds vector capacity.");
 
 	_errors[index] = text;
@@ -131,7 +130,7 @@ const std::string& ICMPEventArgs::error(int index) const
 
 void ICMPEventArgs::setReplyTime(int index, int time)
 {
-	if (index >= _rtt.size())
+	if (static_cast<std::size_t>(index) >= _rtt.size())
 		throw InvalidArgumentException("Supplied index exceeds array capacity.");
 	_rtt[index] = time;
 }
@@ -143,7 +142,7 @@ int ICMPEventArgs::replyTime(int index) const
 		throw InvalidArgumentException("Supplied index exceeds array capacity.");
 
 	if (-1 == index) index = _sent - 1;
-	poco_assert (index < _rtt.size());
+	poco_assert (static_cast<std::size_t>(index) < _rtt.size());
 	int ret = _rtt[index];
 	return (ret < 0) ? 0 : ret;
 }
@@ -198,4 +197,4 @@ int ICMPEventArgs::maxRTT() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

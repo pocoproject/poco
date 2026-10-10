@@ -23,10 +23,10 @@
 #include "Poco/Timespan.h"
 #include "Poco/Thread.h"
 #include "Poco/AutoPtr.h"
+#include <cstddef>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API TCPServerParams: public Poco::RefCountedObject
@@ -52,7 +52,7 @@ public:
 		///
 		/// The default idle time is 10 seconds;
 
-	const Poco::Timespan& getThreadIdleTime() const;
+	[[nodiscard]] const Poco::Timespan& getThreadIdleTime() const;
 		/// Returns the maximum thread idle time.
 
 	void setMaxQueued(int count);
@@ -64,7 +64,7 @@ public:
 		///
 		/// The default number is 64.
 
-	int getMaxQueued() const;
+	[[nodiscard]] int getMaxQueued() const;
 		/// Returns the maximum number of queued connections.
 
 	void setMaxThreads(int count);
@@ -80,7 +80,7 @@ public:
 		/// must at least have the capacity for the given
 		/// number of threads.
 
-	int getMaxThreads() const;
+	[[nodiscard]] int getMaxThreads() const;
 		/// Returns the maximum number of simultaneous threads
 		/// available for this TCPServerDispatcher.
 
@@ -88,9 +88,87 @@ public:
 		/// Sets the priority of TCP server threads
 		/// created by TCPServer.
 
-	Poco::Thread::Priority getThreadPriority() const;
+	[[nodiscard]] Poco::Thread::Priority getThreadPriority() const;
 		/// Returns the priority of TCP server threads
 		/// created by TCPServer.
+	//reactor
+	[[nodiscard]] bool getReactorMode() const;
+		/// Returns the reactor mode.
+		///
+		/// If true, use reactor mode, else use thread pool mode.
+	void setReactorMode(bool reactorMode);
+		/// Sets the reactor mode.
+		///
+		/// If true, use reactor mode, else use thread pool mode.
+	[[nodiscard]] int getAcceptorNum() const;
+		/// Returns the number of acceptors.
+
+	void setAcceptorNum(int acceptorNum);
+		/// Sets the number of acceptors.
+		///
+		/// The number of acceptors must be greater than 0.
+		/// The default is 1.
+
+	[[nodiscard]] bool getUseSelfReactor() const;
+		/// Returns true if acceptor's self reactor is used.
+		
+	void setUseSelfReactor(bool useSelfReactor);
+		/// Sets the acceptor's self reactor.
+		///
+		/// If true, use acceptor's self reactor, else create {_maxThreads} threads to use
+
+	const Poco::Timespan& getSendTimeout() const;
+		/// Returns the send timeout applied to accepted connections in reactor
+		/// mode. Zero (the default) means no timeout.
+
+	void setSendTimeout(const Poco::Timespan& timeout);
+		/// Sets a send timeout on accepted connections (reactor mode only).
+		///
+		/// In reactor mode HTTP handlers write the response on the reactor
+		/// thread over a blocking socket. Without a send timeout a client that
+		/// stops reading (suspended laptop, zero TCP window) blocks that thread
+		/// forever, permanently wedging the worker reactor and every connection
+		/// multiplexed onto it. A non-zero send timeout turns that into a
+		/// TimeoutException that closes the stuck connection instead.
+		///
+		/// Zero (the default) preserves the historical no-timeout behavior.
+
+	[[nodiscard]] std::size_t getMaxPendingRequestSize() const;
+		/// Returns the maximum size of a not yet completely received request,
+		/// in bytes.
+
+	void setMaxPendingRequestSize(std::size_t size);
+		/// Sets the maximum number of bytes buffered per connection while a
+		/// request is still incomplete; a connection exceeding it is closed.
+		/// Default 10 MB, 0 disables the limit. Reactor mode only.
+		///
+		/// The same buffer holds the request body, so the limit must cover the
+		/// largest body the server is expected to accept.
+
+	[[nodiscard]] bool getNonBlocking() const;
+		/// Returns true if the sockets of accepted connections are made
+		/// non-blocking in reactor mode.
+
+	void setNonBlocking(bool nonBlocking);
+		/// Makes the sockets of accepted connections non-blocking (reactor
+		/// mode only).
+		///
+		/// A blocking connection is read once each time its socket becomes
+		/// readable, and again for what a secure socket has taken from the
+		/// network and not yet handed out, since that is not signalled as
+		/// readable again. A handshake or a record that has not arrived in
+		/// full makes a blocking read wait, with every other connection of
+		/// the reactor waiting behind it. A non-blocking connection is read
+		/// as long as there is something to read, up to 16 reads of 4 KB
+		/// for one event and whatever a secure socket holds, and a read
+		/// that cannot be completed returns to the reactor at once.
+		///
+		/// A read callback that writes to the connection must then be
+		/// prepared for sendBytes() to take less than it was given. The
+		/// request handlers of HTTPReactorServer are not, so this is not
+		/// for HTTPReactorServer.
+		///
+		/// Default false.
 
 protected:
 	virtual ~TCPServerParams();
@@ -101,6 +179,13 @@ private:
 	int _maxThreads;
 	int _maxQueued;
 	Poco::Thread::Priority _threadPriority;
+
+	bool _reactorMode;
+	int _acceptorNum;
+	bool _useSelfReactor;
+	Poco::Timespan _sendTimeout;
+	std::size_t _maxPendingRequestSize;
+	bool _nonBlocking;
 };
 
 
@@ -131,7 +216,43 @@ inline Poco::Thread::Priority TCPServerParams::getThreadPriority() const
 }
 
 
-} } // namespace Poco::Net
+inline const Poco::Timespan& TCPServerParams::getSendTimeout() const
+{
+	return _sendTimeout;
+}
+
+
+inline void TCPServerParams::setSendTimeout(const Poco::Timespan& timeout)
+{
+	_sendTimeout = timeout;
+}
+
+
+inline std::size_t TCPServerParams::getMaxPendingRequestSize() const
+{
+	return _maxPendingRequestSize;
+}
+
+
+inline void TCPServerParams::setMaxPendingRequestSize(std::size_t size)
+{
+	_maxPendingRequestSize = size;
+}
+
+
+inline bool TCPServerParams::getNonBlocking() const
+{
+	return _nonBlocking;
+}
+
+
+inline void TCPServerParams::setNonBlocking(bool nonBlocking)
+{
+	_nonBlocking = nonBlocking;
+}
+
+
+} // namespace Poco::Net
 
 
 #endif // Net_TCPServerParams_INCLUDED

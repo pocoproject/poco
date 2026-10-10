@@ -21,8 +21,7 @@
 #include "Poco/Redis/Type.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API Error
@@ -35,10 +34,10 @@ public:
 	Error(const std::string& message);
 		/// Creates an Error with the given message.
 
-	virtual ~Error();
+	~Error();
 		/// Destroys the Error.
 
-	const std::string& getMessage() const;
+	[[nodiscard]] const std::string& getMessage() const;
 		/// Returns the error message.
 
 	void setMessage(const std::string& message);
@@ -66,12 +65,12 @@ inline void Error::setMessage(const std::string& message)
 }
 
 
-template<>
+template <>
 struct RedisTypeTraits<Error>
 {
 	enum { TypeId = RedisType::REDIS_ERROR };
 
-	static const char marker = '-';
+	static constexpr char marker = '-';
 
 	static std::string toString(const Error& value)
 	{
@@ -85,7 +84,7 @@ struct RedisTypeTraits<Error>
 };
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_Error_INCLUDED

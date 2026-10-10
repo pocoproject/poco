@@ -22,8 +22,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API MetaColumn
@@ -81,27 +80,27 @@ public:
 	void swap(MetaColumn& other) noexcept;
 		/// Swaps the contents with another instance.
 
-	~MetaColumn();
+	virtual ~MetaColumn();
 		/// Destroys the MetaColumn.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns column name.
 
-	std::size_t length() const;
+	[[nodiscard]] std::size_t length() const;
 		/// Returns column maximum length.
 
-	std::size_t precision() const;
+	[[nodiscard]] std::size_t precision() const;
 		/// Returns column precision.
 		/// Valid for floating point fields only
 		/// (zero for other data types).
 
-	std::size_t position() const;
+	[[nodiscard]] std::size_t position() const;
 		/// Returns column position.
 
-	ColumnDataType type() const;
+	[[nodiscard]] ColumnDataType type() const;
 		/// Returns column type.
 
-	bool isNullable() const;
+	[[nodiscard]] bool isNullable() const;
 		/// Returns true if column allows null values, false otherwise.
 
 protected:
@@ -199,7 +198,7 @@ inline void MetaColumn::setNullable(bool nullable)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_MetaColumn_INCLUDED

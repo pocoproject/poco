@@ -13,11 +13,9 @@
 
 
 #include "Poco/PDF/LinkAnnotation.h"
-#include "Poco/PDF/PDFException.h"
+#include <hpdf.h>
 
-
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 LinkAnnotation::LinkAnnotation(HPDF_Doc* pPDF,
@@ -27,10 +25,19 @@ LinkAnnotation::LinkAnnotation(HPDF_Doc* pPDF,
 {
 }
 
+LinkAnnotation::~LinkAnnotation() = default;
 
-LinkAnnotation::~LinkAnnotation()
+void LinkAnnotation::setHighlight(Highlight mode)
 {
+	HPDF_LinkAnnot_SetHighlightMode(handle(),
+									static_cast<HPDF_AnnotHighlightMode>(mode));
+}
+
+void LinkAnnotation::setBorderStyle(float width, Poco::UInt32 dashOn, Poco::UInt32 dashOff)
+{
+	HPDF_LinkAnnot_SetBorderStyle(handle(), width, dashOn, dashOff);
 }
 
 
-} } // namespace Poco::PDF
+
+} // namespace Poco::PDF

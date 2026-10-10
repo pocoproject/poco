@@ -25,7 +25,7 @@ namespace Poco {
 
 
 template <class M>
-class ScopedUnlock
+class [[nodiscard]] ScopedUnlock
 	/// A class that simplifies thread synchronization
 	/// with a mutex.
 	/// The constructor accepts a Mutex and unlocks it.
@@ -49,12 +49,12 @@ public:
 		}
 	}
 
+	ScopedUnlock() = delete;
+	ScopedUnlock(const ScopedUnlock&) = delete;
+	ScopedUnlock& operator=(const ScopedUnlock&) = delete;
+
 private:
 	M& _mutex;
-
-	ScopedUnlock();
-	ScopedUnlock(const ScopedUnlock&);
-	ScopedUnlock& operator = (const ScopedUnlock&);
 };
 
 

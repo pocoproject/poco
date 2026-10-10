@@ -1,0 +1,571 @@
+Remoting NG REST Transport User Guide
+Remoting NG
+
+!!!Introduction
+
+The REST Transport is a HTTP-based Transport implementation,
+enabling RESTful web services.
+
+The REST transport supports the following features:
+
+  - HTTP compression (GZIP content transfer encoding) for requests and responses.
+  - HTTP authentication (basic or digest; digest is supported on client only)
+  - CORS ([[http://www.w3.org/TR/cors/ Cross-Origin Resource Sharing]])
+  - HTTPS
+  - Passing parameters in request/response body (JSON and raw), query, form, resource path and
+    HTTP request/response headers.
+
+
+!!!Defining RESTful Interfaces
+
+Defining RESTful interfaces with C++ classes is different from defining interfaces
+for other transports such as SOAP, JSON-RPC or TCP. The main difference is that
+method names are directly mapped to HTTP request method names (GET, POST, PATCH, PUT,
+DELETE). Therefore, only the following method names may be used:
+
+  - `get`
+  - `post`
+  - `patch`
+  - `put`
+  - `delete_` (note the trailing underscore)
+
+When defining RESTful interfaces, it's best to think in terms of <*collections*> and
+<*resources*>, and to define <*endpoints*> for both. Typically, a collection will be
+used to create new resources, and to obtain a list of existing resources of a given
+type or class. For that purpose, <[post()]> and <[get()]> methods are used.
+Resource endpoints are used to obtain details of a specific resource or object, make changes
+to the resource, or delete it, using <[get()]>, <[patch()]> (or <[put()]>) and <[delete_()]>
+methods.
+
+
+!!Parameters
+
+Parameters can be passed in:
+
+  - request/response body, using JSON or raw format
+  - query strings
+  - form data in request body
+  - request path
+  - HTTP request/response headers
+
+Non-scalar values (<[struct]> and objects, <[std::vector]> and other collection types)
+can only be passed in request or response body, using JSON format.
+There may at most be one parameter in the request and response body.
+Scalar values can be passed in any part of the request or response. The location
+and format of parameters is specified using REST-specific Remoting NG attributes.
+Multiple parameters can be passed in query strings, form data, request path or
+request/response headers.
+
+
+!!REST-specific Remoting NG Attributes
+
+!consumes
+Specifies the MIME content type (<[Content-Type]> HTTP header) of the request body.
+  * level: method
+  * type: string
+  * default: "application/json" or "application/x-www-form-urlencoded"
+
+!exclusiveMax
+If `exclusiveMax` is `true`, the parameter or variable value must be strictly less than the value,
+specified with `max`. Otherwise the value must be less than or equal to this value.
+The attribute will be reflected in a generated OpenAPI document as `exclusiveMaximum` validation keyword.
+  * level: parameter/variable
+  * type: boolean
+
+!exclusiveMin
+If `exclusiveMin` is `true`, the parameter or variable value must be strictly greater than the value,
+specified with `min`. Otherwise the value must be greater than or equal to this value.
+The attribute will be reflected in a generated OpenAPI document as `exclusiveMinimum` validation keyword.
+  * level: parameter/variable
+  * type: boolean
+
+!format
+Describes the format of a parameter passed in the request or response body.
+  * level: parameter
+  * type: string
+  * default: "json"
+
+Valid values are:
+  * raw: The parameter is passed as a string or raw binary data. Can only be used
+    for simple types, e.g. std::string and std::vector<char>.
+    This is useful for passing raw binary data as a std::string or std::vector<char> in
+    the request or response body. If specified, an appropriate content type should
+    also be specified using the <[consumes]> or <[produces]> attribute.
+  * binary: same as "raw".
+  * json: The parameter is formatted as JSON. Can be used for simple and complex types.
+
+Example:
+    //@ $file={in=path}
+    //@ return={in=body, format=raw}
+    //@ produces="text/plain"
+    std::string get(const std::string& file);
+----
+
+!in
+Defines the location of a parameter.
+  * level: parameter
+  * type: string
+  * default: "body"
+
+Valid values are:
+  * path: The parameter is passed as part of the URI path. A <[path]> attribute
+    must also be specified for the method or object, containing a corresponding
+    place holder for the parameter (<[{name}]>).
+  * query: The parameter is a passed as URI query parameter.
+  * form: The parameter is passed in the request body, using form encoding
+    (content type "application/x-www-form-urlencoded").
+  * header: The parameters is passed as HTTP request or response header.
+  * body: The parameter is passed in the request or response body (raw string or JSON-formatted).
+
+Example:
+    //@ $file={in=path}
+    //@ return={in=body, format=raw}
+    //@ produces="text/plain"
+    std::string get(const std::string& file);
+----
+
+!max
+Specifies the maximum allowed value for a numeric parameter or variable.
+If `exclusiveMax` is `true`, the value must be strictly less than this value,
+otherwise the value must be less than or equal to this value.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `maximum` validation keyword.
+  * level: parameter/variable
+  * type: number
+
+Example:
+    //@ path="/api/1.0/orders/{orderNo}/items/{itemNo}"
+    //@ $orderNo={in=path, min=1}
+    //@ $itemNo={in=path, min=1, max=999}
+    Item get(int orderNo, int itemNo);
+----
+
+!maxItems
+Specifies the maximum number of elements in a vector or set.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `maxItems` validation keyword.
+  * level: parameter/variable
+  * type: integer
+
+!maxLength
+Specifies the maximum allowed length for a string variable or parameter.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `maxLength` validation keyword.
+  * level: parameter/variable
+  * type: integer
+
+!min
+Specifies the minimum allowed value for a numeric parameter or variable.
+If `exclusiveMin` is `true`, the value must be strictly greater than this value,
+otherwise the value must be greater than or equal to this value.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `minimum` validation keyword.
+  * level: parameter/variable
+  * type: number
+
+!minItems
+Specifies the minimum number of elements in a vector or set.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `minItems` validation keyword.
+  * level: parameter/variable
+  * type: integer
+
+!minLength
+Specifies the minimum allowed length for a string variable or parameter.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `minLength` validation keyword.
+  * level: parameter/variable
+  * type: integer
+
+!multipleOf
+If specified, the variable or parameter value must be a multiple of the
+specified value.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `multipleOf` validation keyword.
+  * level: parameter/variable
+  * type: number
+
+!path
+Specifies the path template used for extracting parameters
+passed within the request URI.
+  * level: class/method
+  * type: string
+
+The location of parameters within the path is indicated by putting the parameter
+name in curly brackets.
+
+Example:
+    //@ path="/api/1.0/orders/{orderNo}/items/{itemNo}"
+    //@ $orderNo={in=path}
+    //@ $itemNo={in=path}
+    Item get(int orderNo, int itemNo);
+----
+
+!pattern
+Specifies a regular expression to validate a string parameter or variable.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `pattern` validation keyword.
+  * level: parameter/variable
+  * type: string (regular expression)
+
+!produces
+Specifies the MIME content type of the response body.
+  * level: method
+  * type: string
+  * default: "application/json"
+
+
+!!Resource Paths
+
+The default Remoting NG resource path (/rest/<*class*>/<*object*>) is not really well
+suited for RESTful web service endpoints. Therefore, every endpoint class should
+specify a proper path with the <[path]> attribute. The path can contain parameter
+placeholders in the form of a parameter name enclosed in curly brackets.
+Resource paths specified on an endpoint object using the <[path]> attribute will
+automatically be registered as alias paths with the ORB when the respective
+RemoteObject is registered.
+
+
+!!Error Responses
+
+REST methods can report errors and failures by throwing an exception.
+An exception in a REST method will cause the HTTP response to have a
+4xx or 5xx status code. Furthermore, the response content will be the
+following JSON document:
+
+    {
+        "error":  "<exceptionName>",
+        "detail": "<exceptionMessage>",
+        "code":   <exceptionCode>
+    }
+----
+
+A REST method can also set the HTTP status code explicitly, by throwing a
+Poco::Net::HTTPException and specifying the HTTP status code in the
+constructor of the Poco::Net::HTTPException. Example:
+
+    throw Poco::Net::HTTPException("You are not authorized to access this resource", 403);
+----
+
+The following exceptions will cause the HTTP response status code to be set to a
+special value. All other exceptions will result in a generic 500 "Internal Server Error".
+
+    Exception                                        HTTP Status
+    ------------------------------------------------------------------------
+    Poco::Net::HTTPException                         (given exception code)
+    Poco::RemotingNG::MethodNotFoundException        405 Method Not Allowed
+    Poco::RemotingNG::AuthenticationFailedException  401 Unauthorized
+    Poco::RemotingNG::NoPermissionException          403 Forbidden
+    Poco::NoPermissionException                      403 Forbidden
+    Poco::NotFoundException                          404 Not Found
+    Poco::ExistsException                            409 Conflict
+    Poco::InvalidArgumentException                   400 Bad Request
+    Poco::NotImplementedException                    501 Not Implemented
+----
+
+On the client side, errors resulting from a HTTP response with a status code >= 400
+are reported via Poco::RemotingNG::REST::RESTServerException, which is a subclass
+of Poco::RemotingNG::RemoteException. If the error response contains JSON content,
+the content is available via the `content()` member function as a Poco::RemotingNG::REST::JSValue.
+
+Furthermore, the value of root-level JSON properties named `error` and `detail`, if present, is
+available via the convenience methods `error()` and `detail()` and the HTTP response
+status code and reason is available via `status()` and `reason()`.
+
+!!!Basic REST Transport Usage
+
+!!Server Usage
+
+To use the REST Transport in a server, the following three steps must
+be performed:
+
+   1. Register the Poco::RemotingNG::REST::TransportFactory with the ORB,
+   2. Optionally configure the listener (e.g., to enable CORS),
+   3. Register the Listener with the ORB, and finally,
+   4. Register the individual objects with the ORB.
+
+Following is an example code fragment for setting up a REST Listener,
+configuring it to enable CORS (from any origin),
+and registering a service object for use with the listener.
+
+    Poco::RemotingNG::REST::Listener::Ptr pListener = new Poco::RemotingNG::REST::Listener("localhost:8080");
+    pListener->enableCORS(true);
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(pListener);
+
+    st::string uri = Sample::TimeEndpointServerHelper::registerObject(
+        new Sample::TimeEndpoint,
+        "TheTime",
+        listener
+    );
+----
+
+Please see the Poco::RemotingNG::REST::Listener class documentation for detailed information
+about how to setup and configure the listener.
+
+
+!!Client Usage
+
+To use the REST Transport in a client, the following two steps
+must be performed:
+
+  1. Register the Poco::RemotingNG::REST::TransportFactory with the ORB, and
+  2. Retrieve the interface (proxy) object using the helper class.
+
+Following is an example code fragment for setting up a REST Transport,
+and obtaining a Proxy object for invoking methods on the service object.
+
+    Poco::RemotingNG::REST::TransportFactory::registerFactory();
+    Sample::ITimeEndpoint::Ptr pTimeEndpoint = MyProject::MyClassHelper::find(
+        "http://localhost:8080/rest/TimeEndpoint/TheTime");
+    );
+----
+
+
+!Configuring The Client Transport
+
+To configure the client transport (e.g., to ,
+enable HTTP compression, or HTTP authentication), the Transport object must
+be obtained from the proxy. This is done in two steps. First, the interface
+pointer obtained from the client helper must be casted to a proxy:
+
+    Poco::RemotingNG::Proxy::Ptr pProxy = pTimeEndpoint.cast<Poco::RemotingNG::Proxy>();
+----
+
+Second, the Transport object can be obtained from the proxy:
+
+    Poco::RemotingNG::REST::Transport& trans = static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport());
+----
+
+These two casts can also be put into a utility function <[transportFromInterface()]>:
+
+    template <class I>
+    Poco::RemotingNG::REST::Transport& transportFromInterface(Poco::AutoPtr<I> pInterface)
+    {
+        Poco::RemotingNG::Proxy::Ptr pProxy = pInterface.template cast<Poco::RemotingNG::Proxy>();
+        if (pProxy)
+        {
+            return static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport());
+        }
+        else throw Poco::BadCastException();
+    }
+----
+
+Using the <[transportFromInterface()]> function, we can write:
+
+    Poco::RemotingNG::REST::Transport& trans = transportFromInterface(pTimeEndpoint);
+----
+
+
+Now that we have access to the Transport object, we can configure it:
+
+    trans.enableCompression(true);
+----
+
+Configuration should be done before the first method is invoked over the proxy.
+
+Please see the Poco::RemotingNG::REST::Transport class documentation for other
+configuration options, including timeouts and user-agent string.
+
+
+!HTTP and OAuth 2 Authentication
+
+The REST Transport supports HTTP Basic and Digest authentication, as well as
+OAuth 2.0 authentication using a bearer token. To enable authentication
+for a proxy object, first obtain the Transport object as shown in the previous section.
+
+HTTP Basic Authentication can then be enabled with:
+
+    trans.setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_BASIC);
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute("username", "user");
+    creds.setAttribute("password", "s3cr3t");
+    trans.setCredentials(creds);
+----
+
+To enable HTTP Digest Authentication:
+
+    trans.setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_DIGEST);
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute("username", "user");
+    creds.setAttribute("password", "s3cr3t");
+    trans.setCredentials(creds);
+    trans.enableChunkedTransferEncoding(false);
+----
+
+Please note that chunked transfer encoding must be disabled in order to use HTTP Digest
+Authentication.
+
+It is also possible to enable both Basic and Digest authentication and use whatever
+the server requests:
+
+    trans.setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_ANY);
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute("username", "user");
+    creds.setAttribute("password", "s3cr3t");
+    trans.setCredentials(creds);
+    trans.enableChunkedTransferEncoding(false);
+----
+
+To enable OAuth 2 authentication using a bearer token:
+
+    trans.setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_BEARER);
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute("token", "bearertoken");
+    trans.setCredentials(creds);
+----
+
+Note: Obtaining the bearer token is outside the scope of the Remoting REST framework.
+This will usually be done by implementing the OAuth 2.0 authorization flow in a web
+application.
+
+
+!Cookies
+
+The REST Transport supports HTTP cookies. Any cookies sent by the server through
+a HTTP response will be sent back to the server with subsequent HTTP requests.
+The lifetime (maximum age) of cookies, if set, will be honored, and expired cookies
+will not be sent back to the server.
+
+Cookies are mostly useful for session-based authentication. The cookies stored
+in a Transport object can be obtained and shared with a different Transport
+object. This is useful if a REST server uses session cookies for authentication
+and the same session needs to be used by multiple proxy instances.
+
+Cookies are stored in a Poco::RemotingNG::REST::CookieStore object. A pointer
+(Poco::RemotingNG::REST::CookieStore::Ptr) to this object can be obtained
+by calling Poco::RemotingNG::REST::Transport::getCookieStore(). The cookie
+store can then be shared with a different Transport by calling
+Poco::RemotingNG::REST::Transport::setCookieStore().
+
+
+!!Text Encoding Considerations
+
+All strings used in remote interfaces must be properly UTF-8 encoded
+when using the REST transport. Encoding errors may lead to failures
+when parsing REST request or response messages.
+
+
+!!!Using The REST Transport With HTTPS
+
+The REST transport normally uses a plain, unencrypted HTTP
+connection between the client and the server. To make the REST Transport use a secure
+HTTPS connection, the following steps must be performed.
+
+
+!!HTTPS On The Server Side
+
+On the server side, the listener must be created using a
+Poco::Net::SecureServerSocket.
+
+    Poco::Net::SecureServerSocket serverSocket(8443);
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(
+        new Poco::RemotingNG::REST::Listener("localhost:8443", serverSocket)
+    );
+    std::string uri = MyProject::MyClassHelper::registerObject(
+        new MyProject::MyClass,
+        "MyObject",
+        listener
+    );
+----
+
+
+!!HTTPS On The Client Side
+
+On the client side, the REST transport uses a private
+Poco::Net::HTTPSessionFactory object to create
+the Poco::Net::HTTPClientSession for talking to the server.
+So, all that needs to be done to enable HTTPS on the
+client is to register the Poco::Net::HTTPSSessionInstantiator
+with the session factory. Then, a https URI can be used to
+access the web service.
+
+    Poco::RemotingNG::REST::Transport::httpSessionFactory().registerProtocol(
+        "https",
+        new Poco::Net::HTTPSSessionInstantiator
+    );
+
+    Poco::RemotingNG::REST::TransportFactory::registerFactory();
+
+    MyProject::IMyClass::Ptr pObj = MyProject::MyClassHelper::find(
+        "https://localhost:8443/rest/MyClass/TheObject"
+    );
+----
+
+
+!!!Generating OpenAPI (Swagger) Documents
+
+The <*RemoteGenNG*> tool supports the creation of [[https://www.openapis.org OpenAPI]]
+specifications (also known as Swagger documents).
+The OpenAPI specification is a broadly adopted industry standard
+for describing RESTful APIs. Version 3.0 of the specification is supported.
+
+An OpenAPI specification document can be used to generate documentation
+for an API, or to generate client and server code for implementing the API with
+different programming languages and libraries.
+
+In order to enable generation of an OpenAPI document, a few elements must be
+added to the <*RemoteGenNG*> configuration file. Most OpenAPI-related
+elements are optional, but three elements must be provided:
+
+  - <*output/openAPI/path*>: This setting specifies the path and file name of the OpenAPI
+    specification file. This setting will also enable generation of the OpenAPI
+    specification file.
+  - <*output/openAPI/info/title*>: This setting specifies the title of the API,
+    which is a required part of an OpenAPI document.
+  - <*output/openAPI/server/url*>: This setting specifies the URL of the
+    server providing the API.
+
+Please refer to the [[00200-RemotingNGUserGuide.html Remoting NG User Guide]] for a
+list of all supported configuration elements.
+
+Here is an example <*openAPI*> fragment:
+
+    <openAPI>
+        <path>openapi/api.json</path>
+        <info>
+            <title>Sample REST API</title>
+            <description>An example for a RESTful API.</description>
+            <version>1.0.0</version>
+            <contact>
+                <name>Applied Informatics Software Engineering GmbH</name>
+                <url>https://pocoproject.org/pro/</url>
+            </contact>
+        </info>
+        <server>
+            <url>http://localhost:8080/</url>
+        </server>
+    </openAPI>
+----
+
+OpenAPI documents can only be generated for services that follow the RESTful
+style required by the RemotingNG REST Transport.
+
+Limited support for JSON schema validation keywords in the generated OpenAPI is
+provided via RemotingNG attributes. Following table shows the supported attributes,
+and the corresponding validation keyword:
+
+    Attribute           Validation Keyword      Type
+    --------------------------------------------------------------
+    max                 maximum                 number
+    min                 minimum                 number
+    exclusiveMax        exclusiveMaximum        boolean
+    exclusiveMin        exclusiveMinimum        boolean
+    multipleOf          multipleOf              number
+    maxItems            maxItems                integer
+    minItems            minItems                integer
+    maxLength           maxLength               integer
+    minLength           minLength               integer
+    pattern             pattern                 regular expression
+----
+
+Note that no actual validation is performed by the generated code.
+The attributes are only provided for documentation purposes, and
+for generating the OpenAPI document.

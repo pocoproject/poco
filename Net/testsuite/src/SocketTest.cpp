@@ -15,6 +15,9 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/TCPServerConnection.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Net/TCPServer.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
 #include "Poco/Stopwatch.h"
@@ -22,7 +25,10 @@
 #include "Poco/FIFOBuffer.h"
 #include "Poco/Delegate.h"
 #include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
 #include "Poco/Path.h"
+#include "Poco/Thread.h"
 #include <iostream>
 
 
@@ -31,6 +37,9 @@ using Poco::Net::StreamSocket;
 using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::ConnectionRefusedException;
+using Poco::Net::TCPServerConnection;
+using Poco::Net::TCPServerConnectionFactoryImpl;
+using Poco::Net::TCPServer;
 using Poco::Timespan;
 using Poco::Stopwatch;
 using Poco::TimeoutException;
@@ -40,6 +49,58 @@ using Poco::FIFOBuffer;
 using Poco::Path;
 using Poco::File;
 using Poco::delegate;
+
+
+namespace
+{
+	class CopyToStringConnection: public TCPServerConnection
+	{
+	public:
+		CopyToStringConnection(const StreamSocket& s): 
+			TCPServerConnection(s)
+		{
+		}
+
+		void run()
+		{
+			{
+				Poco::FastMutex::ScopedLock lock(_mutex);
+				_data.clear();
+			}
+			StreamSocket& ss = socket();
+			try
+			{
+				char buffer[256];
+				int n = ss.receiveBytes(buffer, sizeof(buffer));
+				while (n > 0)
+				{
+					{
+						Poco::FastMutex::ScopedLock lock(_mutex);
+						_data.append(buffer, n);
+					}
+					n = ss.receiveBytes(buffer, sizeof(buffer));
+				}
+			}
+			catch (Poco::Exception& exc)
+			{
+				std::cerr << "CopyToStringConnection: " << exc.displayText() << std::endl;
+			}
+		}
+
+		static const std::string data()
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _data;
+		}
+
+	private:
+		static Poco::FastMutex _mutex;
+		static std::string _data;
+	};
+
+	Poco::FastMutex CopyToStringConnection::_mutex;
+	std::string CopyToStringConnection::_data;
+}
 
 
 SocketTest::SocketTest(const std::string& name): CppUnit::TestCase(name)
@@ -63,6 +124,27 @@ void SocketTest::testEcho()
 	n = ss.receiveBytes(buffer, sizeof(buffer));
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
+	ss.close();
+}
+
+
+void SocketTest::testPeek()
+{
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	int n = ss.sendBytes("hello, world!", 13);
+	assertTrue (n == 13);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, 5, MSG_PEEK);
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+	n = ss.receiveBytes(buffer, sizeof(buffer), MSG_PEEK);
+	assertTrue (n == 13);
+	assertTrue (std::string(buffer, n) == "hello, world!");
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 13);
+	assertTrue (std::string(buffer, n) == "hello, world!");
 	ss.close();
 }
 
@@ -435,6 +517,132 @@ void SocketTest::testOptions()
 }
 
 
+void SocketTest::testOptionsAfterShutdown()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+
+	// A connection that its peer has reset, and one that this side has
+	// shut down: an option set then is not a wrong option. A system may
+	// say that the connection is gone; none may blame the argument.
+	StreamSocket reset(server.address());
+	{
+		StreamSocket accepted = server.acceptConnection();
+		accepted.setLinger(true, 0);
+	}
+	assertTrue (reset.poll(Timespan(10, 0), Socket::SELECT_READ | Socket::SELECT_ERROR));
+
+	StreamSocket shutDown(server.address());
+	StreamSocket accepted = server.acceptConnection();
+	shutDown.shutdown();
+
+	auto setOptions = [this](StreamSocket& socket)
+	{
+		try
+		{
+			socket.setReceiveTimeout(Timespan(1, 0));
+			socket.setSendTimeout(Timespan(1, 0));
+			socket.setNoDelay(true);
+			socket.setKeepAlive(true);
+		}
+		catch (InvalidArgumentException&)
+		{
+			fail("the options are valid - must not throw InvalidArgumentException");
+		}
+		catch (Poco::IOException&)
+		{
+		}
+	};
+	setOptions(reset);
+	setOptions(shutDown);
+
+	// a wrong argument on a live socket is still reported
+	try
+	{
+		int value = 0;
+		accepted.impl()->setRawOption(SOL_SOCKET, SO_RCVBUF, &value, 1);
+		fail("an option value of the wrong length - must throw");
+	}
+	catch (Poco::Exception&)
+	{
+	}
+}
+
+
+void SocketTest::testKeepAliveParams()
+{
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+
+	// The idle time is TCP_KEEPIDLE everywhere except macOS and iOS, which
+	// spell it TCP_KEEPALIVE. Read it back through the same name it was set by.
+#if defined(TCP_KEEPIDLE)
+	const int idleOption = TCP_KEEPIDLE;
+#elif defined(TCP_KEEPALIVE)
+	const int idleOption = TCP_KEEPALIVE;
+#endif
+
+#if defined(TCP_KEEPIDLE) || defined(TCP_KEEPALIVE)
+	// Enable before reading the baseline: not every stack reports the keepalive
+	// timings on a socket whose SO_KEEPALIVE is still off.
+	ss.setKeepAlive(true);
+	assertTrue (ss.getKeepAlive());
+
+	int sysIdle = 0;
+	ss.getOption(IPPROTO_TCP, idleOption, sysIdle);
+
+	// Asking again without timings must leave the system settings alone.
+	ss.setKeepAlive(true);
+	assertTrue (ss.getKeepAlive());
+	int idle = 0;
+	ss.getOption(IPPROTO_TCP, idleOption, idle);
+	assertTrue (idle == sysIdle);
+
+	// A short idle time so a peer that disappears without a FIN or RST is
+	// noticed in seconds instead of the two hours the system defaults to.
+	ss.setKeepAlive(true, 5, 1, 2);
+	assertTrue (ss.getKeepAlive());
+	ss.getOption(IPPROTO_TCP, idleOption, idle);
+	assertTrue (idle == 5);
+
+#if defined(TCP_KEEPINTVL)
+	int interval = 0;
+	ss.getOption(IPPROTO_TCP, TCP_KEEPINTVL, interval);
+	assertTrue (interval == 1);
+#endif
+
+#if defined(TCP_KEEPCNT)
+	int probes = 0;
+	ss.getOption(IPPROTO_TCP, TCP_KEEPCNT, probes);
+	assertTrue (probes == 2);
+#endif
+
+	// Zero means "keep what is there", so the short idle time must survive a
+	// call that only re-enables the option.
+	ss.setKeepAlive(true, 0, 0, 0);
+	ss.getOption(IPPROTO_TCP, idleOption, idle);
+	assertTrue (idle == 5);
+
+	// Timings are only meaningful while keepalive is on; turning it off must
+	// not fail, and turning it back on must still accept new timings.
+	ss.setKeepAlive(false);
+	assertTrue (!ss.getKeepAlive());
+	ss.setKeepAlive(true, 7);
+	ss.getOption(IPPROTO_TCP, idleOption, idle);
+	assertTrue (idle == 7);
+#else
+	// Nothing to read back on a platform without the per-socket knobs, but the
+	// timings must be skipped rather than refused: the call still succeeds and
+	// still enables the option.
+	ss.setKeepAlive(true, 5, 1, 2);
+	assertTrue (ss.getKeepAlive());
+#endif
+
+	ss.close();
+}
+
+#if defined(POCO_TEST_DEPRECATED)
+
 void SocketTest::testSelect()
 {
 	Timespan timeout(250000);
@@ -536,6 +744,7 @@ void SocketTest::testSelect3()
 	assertTrue (rc == 0);
 }
 
+#endif
 
 void SocketTest::testEchoUnixLocal()
 {
@@ -644,6 +853,121 @@ void SocketTest::testUseFd()
 }
 
 
+void SocketTest::testSendFile()
+{
+	ServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();	
+
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string sentData = "Hello, world!";
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	ostr.write(sentData.data(), sentData.size());
+	ostr.close();
+	
+	Poco::FileInputStream istr(file.path());
+	std::streamsize n = ss.sendFile(istr);
+	assertTrue (n == file.getSize());
+
+	istr.close();
+	ss.close();
+
+	Poco::Thread::sleep(200);
+	while (srv.currentConnections() > 0) 
+	{
+		Poco::Thread::sleep(100);
+	}
+	srv.stop();
+
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
+
+
+void SocketTest::testSendFileLarge()
+{
+	ServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();	
+
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string sentData;
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	std::string data("0123456789abcdef");
+	for (int i = 0; i < 10000; i++)
+	{
+		ostr.write(data.data(), data.size());
+		sentData += data;
+	}
+	ostr.close();
+	
+	Poco::FileInputStream istr(file.path());
+	std::streamsize n = ss.sendFile(istr);
+	assertTrue (n == file.getSize());
+	
+	istr.close();
+	ss.close();
+
+	Poco::Thread::sleep(200);
+	while (srv.currentConnections() > 0) 
+	{
+		Poco::Thread::sleep(100);
+	}
+	srv.stop();
+
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
+
+
+void SocketTest::testSendFileRange()
+{
+	ServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();	
+
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string sentData;
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	std::string data("0123456789abcdef");
+	for (int i = 0; i < 1024; i++)
+	{
+		ostr.write(data.data(), data.size());
+		sentData += data;
+	}
+	ostr.close();
+	
+	const std::streamoff offset = 4000;
+	const std::streamsize count = 10000;
+
+	Poco::FileInputStream istr(file.path());
+	std::streamsize n = ss.sendFile(istr, offset, count);
+	assertTrue (n == count);
+
+	istr.close();
+	ss.close();
+
+	Poco::Thread::sleep(200);
+	while (srv.currentConnections() > 0) 
+	{
+		Poco::Thread::sleep(100);
+	}
+	srv.stop();
+
+	assertTrue (CopyToStringConnection::data() == sentData.substr(offset, count));
+}
+
+
 void SocketTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -677,6 +1001,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SocketTest");
 
 	CppUnit_addTest(pSuite, SocketTest, testEcho);
+	CppUnit_addTest(pSuite, SocketTest, testPeek);
 	CppUnit_addTest(pSuite, SocketTest, testMoveStreamSocket);
 	CppUnit_addTest(pSuite, SocketTest, testPoll);
 	CppUnit_addTest(pSuite, SocketTest, testAvailable);
@@ -690,12 +1015,21 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testBufferSize);
 	CppUnit_addTest(pSuite, SocketTest, testOptions);
+	CppUnit_addTest(pSuite, SocketTest, testOptionsAfterShutdown);
+	CppUnit_addTest(pSuite, SocketTest, testKeepAliveParams);
+
+#if defined(POCO_TEST_DEPRECATED)
 	CppUnit_addTest(pSuite, SocketTest, testSelect);
 	CppUnit_addTest(pSuite, SocketTest, testSelect2);
 	CppUnit_addTest(pSuite, SocketTest, testSelect3);
+#endif
+
 	CppUnit_addTest(pSuite, SocketTest, testEchoUnixLocal);
 	CppUnit_addTest(pSuite, SocketTest, testUnixLocalAbstract);
 	CppUnit_addTest(pSuite, SocketTest, testUseFd);
+	CppUnit_addTest(pSuite, SocketTest, testSendFile);
+	CppUnit_addTest(pSuite, SocketTest, testSendFileLarge);
+	CppUnit_addTest(pSuite, SocketTest, testSendFileRange);
 
 	return pSuite;
 }

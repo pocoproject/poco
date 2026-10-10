@@ -25,8 +25,14 @@ public:
 	~Base32Test();
 
 	void testEncoder();
+	void testEncoderHex();
+	void testEncoderCrockford();
 	void testDecoder();
+	void testDecoderHex();
+	void testDecoderCrockford();
 	void testEncodeDecode();
+	void testEncodeDecodeHex();
+	void testEncodeDecodeCrockford();
 
 	void setUp();
 	void tearDown();

@@ -22,8 +22,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Registry;
@@ -60,7 +59,7 @@ public:
 		/// Creates a IntGauge with the given name and help text (via params), and
 		/// registers it with the given registry (if not nullptr).
 
-	~IntGauge() = default;
+	~IntGauge();
 		/// Destroys the IntGauge.
 
 	using Metric::help;
@@ -70,7 +69,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the IntGauge.
 
-	Sample value() const;
+	[[nodiscard]] Sample value() const;
 		/// Returns the IntGauge's current value.
 
 	void inc();
@@ -180,7 +179,7 @@ inline void IntGauge::setToCurrentTime()
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_IntGauge_INCLUDED

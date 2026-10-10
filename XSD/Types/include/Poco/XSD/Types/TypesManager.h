@@ -1,0 +1,233 @@
+//
+// TypesManager.h
+//
+// Library: XSD/Types
+// Package: XSDTypes
+// Module:  TypesManager
+//
+// Definition of the TypesManager class.
+//
+// Copyright (c) 2008-2012, Applied Informatics Software Engineering GmbH.
+// All rights reserved.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#ifndef XSDTypes_TypesManager_INCLUDED
+#define XSDTypes_TypesManager_INCLUDED
+
+
+#include "Poco/XSD/Types/XSDTypes.h"
+#include "Poco/XSD/Types/Schema.h"
+#include "Poco/XSD/Types/Definitions.h"
+#include "Poco/URI.h"
+#include "Poco/Mutex.h"
+#include "Poco/SingletonHolder.h"
+#include <map>
+
+
+namespace Poco::XSD::Types {
+
+
+class XSDTypes_API TypesManager
+	/// TypesManager manages all known schemas with types and exported elements.
+	///
+	/// TypesManager is process-wide and not synchronized as a whole, so the Parser and
+	/// the Types model must be used from one thread at a time.
+{
+public:
+	static const std::string XSD_NAMESPACE;
+	static const std::string XSD_NAMESPACE1998;
+	static const std::string XSD_TYPE_ANYTYPE;
+	static const std::string XSD_TYPE_ANYSIMPLETYPE;
+	static const std::string XSD_TYPE_STRING;
+	static const std::string XSD_TYPE_BOOLEAN;
+	static const std::string XSD_TYPE_DECIMAL;
+	static const std::string XSD_TYPE_FLOAT;
+	static const std::string XSD_TYPE_DOUBLE;
+	static const std::string XSD_TYPE_DURATION;
+	static const std::string XSD_TYPE_DATETIME;
+	static const std::string XSD_TYPE_TIME;
+	static const std::string XSD_TYPE_DATE;
+	static const std::string XSD_TYPE_GYEARMONTH;
+	static const std::string XSD_TYPE_GYEAR;
+	static const std::string XSD_TYPE_GMONTHDAY;
+	static const std::string XSD_TYPE_GDAY;
+	static const std::string XSD_TYPE_GMONTH;
+	static const std::string XSD_TYPE_HEX_BINARY;
+	static const std::string XSD_TYPE_BASE64BINARY;
+	static const std::string XSD_TYPE_ANYURI;
+	static const std::string XSD_TYPE_QNAME;
+	static const std::string XSD_TYPE_NOTATION;
+	static const std::string XSD_TYPE_NORMALIZEDSTRING;
+	static const std::string XSD_TYPE_INTEGER;
+	static const std::string XSD_TYPE_TOKEN;
+	static const std::string XSD_TYPE_NONPOSITIVEINTEGER;
+	static const std::string XSD_TYPE_LONG;
+	static const std::string XSD_TYPE_NONNEGATIVEINTEGER;
+	static const std::string XSD_TYPE_LANGUAGE;
+	static const std::string XSD_TYPE_NAME;
+	static const std::string XSD_TYPE_NMTOKEN;
+	static const std::string XSD_TYPE_NEGATIVEINTEGER;
+	static const std::string XSD_TYPE_INT;
+	static const std::string XSD_TYPE_UNSIGNEDLONG;
+	static const std::string XSD_TYPE_POSITIVEINTEGER;
+	static const std::string XSD_TYPE_NCNAME;
+	static const std::string XSD_TYPE_NMTOKENS;
+	static const std::string XSD_TYPE_SHORT;
+	static const std::string XSD_TYPE_UNSIGNEDINT;
+	static const std::string XSD_TYPE_ID;
+	static const std::string XSD_TYPE_IDREF;
+	static const std::string XSD_TYPE_ENTITY;
+	static const std::string XSD_TYPE_BYTE;
+	static const std::string XSD_TYPE_UNSIGNEDSHORT;
+	static const std::string XSD_TYPE_IDREFS;
+	static const std::string XSD_TYPE_ENTITIES;
+	static const std::string XSD_TYPE_UNSIGNEDBYTE;
+
+	using Schemas = std::map<std::string, Schema::Ptr>;
+		/// Maps a namespace to a XML Schema file
+
+	using Definitionss = std::map<std::string, Definitions::Ptr>;
+		/// Maps a namespace to a WSDL file
+
+	TypesManager(const TypesManager&) = delete;
+	TypesManager& operator=(const TypesManager&) = delete;
+
+	[[nodiscard]] static TypesManager& instance();
+		/// Returns the TypesManager singleton.
+		
+	void fixupSchemas();
+		/// Fixes up all loaded schemas.
+		/// Must be called after all schemas have been loaded to
+		/// resolve dependencies.
+
+	[[nodiscard]] bool hasSchema(const std::string& ns) const;
+		/// Checks if a schema with the given namespace exists.
+
+	[[nodiscard]] bool hasDefinitions(const std::string& ns) const;
+		/// Checks if a WSDL with the given namespace exists.
+
+	[[nodiscard]] bool hasSchemaLocation(const Poco::URI& uri) const;
+		/// Returns true if from the given URI a schema was loaded.
+
+	void addSchema(Schema::Ptr pSchema, const Poco::URI& schemaLocation);
+		/// Will fail if a schema with the same namespace exists and conflicts with the new one.
+		/// Ignores schemas that reference the builtin schemas.
+		
+	void completeSchema(Schema::Ptr pSchema);
+		/// Merges the declarations and imports of the parsed schema document pSchema into
+		/// the schema registered for its target namespace, if that is a different object,
+		/// and redirects the location entries that refer to pSchema to the registered schema.
+		/// The Parser calls it after every successfully parsed document, because addSchema()
+		/// registers a schema before its content is parsed.
+
+	void removeSchema(const Schema::Ptr& pSchema);
+		/// Removes every namespace and location entry that refers to pSchema.
+		/// The Parser calls it for the schemas of a document that failed to parse.
+
+	void addDefinitions(Definitions::Ptr pDefinitions);
+		/// Adds a WSDL document.
+
+	void removeDefinitions(const Definitions::Ptr& pDefinitions);
+		/// Removes every namespace entry that refers to pDefinitions.
+		/// The Parser calls it for the definitions of a document that failed to parse.
+
+	[[nodiscard]] Schema::Ptr findSchema(const std::string& ns);
+		/// Returns the Schema for the given target namespace
+		/// or a null pointer if no schema exists for the given target namespace.
+
+	[[nodiscard]] Schema::Ptr findSchema(const Poco::URI& schemaLocation);
+		/// Returns the Schema for the given target namespace
+		/// or a null pointer if no schema exists for the given target namespace.
+
+	[[nodiscard]] Schema& getSchema(const std::string& ns);
+		/// Returns the Schema for the given target namespace.
+		/// Throws a Poco::NotFoundException if no schema has been defined for the
+		/// given target namespace.
+	
+	[[nodiscard]] Definitions::Ptr findDefinitions(const std::string& ns);
+		/// Returns the WSDL Definitions for the given target namespace
+		/// or a null pointer if no definitions exist for the given target namespace.
+
+	[[nodiscard]] Definitions& getDefinitions(const std::string& ns);
+		/// Returns the WSDL Definitions for the given target namespace.
+		/// Throws a Poco::NotFoundException if no WSDL has been defined for the
+		/// given target namespace.
+		
+	[[nodiscard]] const Definitionss& getDefinitions() const;
+		/// Returns all known WSDL definitions.
+
+	[[nodiscard]] const Schemas& getSchemas() const;
+		/// Returns all known schemas.
+
+	bool eraseSchema(const std::string& ns);
+		/// Deletes the schema for the given namespace and every location entry
+		/// that refers to it. Returns true if the schema was found and erased.
+
+	[[nodiscard]] const Type* getType(const QName& ref) const;
+		/// Returns a type for the given QName or null if not found.
+
+	[[nodiscard]] const Element* getElement(const QName& ref) const;
+		/// Returns an element for the given QName or null if not found.
+
+	[[nodiscard]] const AbstractAttribute* getAttribute(const QName& ref) const;
+		/// Returns an attribute for the given QName or null if not found.
+
+	[[nodiscard]] const AbstractAttributeGroup* getAttributeGroup(const QName& ref) const;
+		/// Returns an attribute group for the given QName or null if not found.
+
+	[[nodiscard]] const Group* getGroup(const QName& ref) const;
+		/// Returns an attribute group for the given QName or null if not found.
+
+private:
+	void setSchemaInternal(Schema::Ptr pSchema, const Poco::URI& schemaLocation);
+		/// Will fail if a schema with the same namespace exists and conflicts with the new one.
+		/// Otherwise adds the schema, or merges it into the existing schema for its namespace,
+		/// and records it for schemaLocation.
+
+	static void mergeSchema(Schema& target, const Schema& source);
+		/// Adds to target every declaration and imported schema of source that target lacks.
+
+	TypesManager();
+		/// Creates the TypesManager.
+
+	~TypesManager();
+		/// Destroys the TypesManager.
+
+private:
+	Schemas               _schemas;
+	Schemas               _schemaLocations;
+	Definitionss          _definitions;
+	mutable Poco::Mutex   _mutex;
+
+	friend class Poco::SingletonHolder<TypesManager>;
+};
+
+
+//
+// inlines
+//
+inline bool TypesManager::hasSchemaLocation(const Poco::URI& uri) const
+{
+	return (_schemaLocations.find(uri.toString()) != _schemaLocations.end());
+}
+
+
+inline const TypesManager::Schemas& TypesManager::getSchemas() const
+{
+	return _schemas;
+}
+
+
+inline const TypesManager::Definitionss& TypesManager::getDefinitions() const
+{
+	return _definitions;
+}
+
+
+} // namespace Poco::XSD::Types
+
+
+#endif // XSDTypes_TypesManager_INCLUDED

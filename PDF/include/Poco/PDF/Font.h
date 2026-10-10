@@ -19,11 +19,11 @@
 
 
 #include "Poco/PDF/PDF.h"
+#include "Poco/PDF/Declarations.h"
 #include "Poco/PDF/Resource.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API Font: public Resource<HPDF_Font>
@@ -33,34 +33,34 @@ public:
 	Font(HPDF_Doc* pPDF, HPDF_Font resource);
 		/// Creates the font.
 
-	~Font();
+	~Font() override;
 		/// Destroys the font.
 
-	std::string encodingName() const;
+	[[nodiscard]] std::string encodingName() const;
 		/// Returns the name of the encoding.
 
-	int unicodeWidth(Poco::UInt16 ch) const;
+	[[nodiscard]] int unicodeWidth(Poco::UInt16 ch) const;
 		/// Returns the screen width of 16-bit Unicode character.
 
-	Rectangle boundingBox() const;
+	[[nodiscard]] Rectangle boundingBox() const;
 		/// Returns the font's bounding box.
 
-	int ascent() const;
+	[[nodiscard]] int ascent() const;
 		/// Returns the vertical ascent of the font.
 
-	int descent() const;
+	[[nodiscard]] int descent() const;
 		/// Returns the vertical ascent of the font.
 
-	int lowerHeight() const;
+	[[nodiscard]] int lowerHeight() const;
 		/// Returns the distance from the baseline of lowercase letters.
 
-	int upperHeight() const;
+	[[nodiscard]] int upperHeight() const;
 		/// Returns the distance from the baseline of uppercase letters.
 
-	TextWidth textWidth(const std::string& text);
+	[[nodiscard]] TextWidth textWidth(const std::string& text);
 		/// Returns total width of the text, number of characters and number of the words.
 
-	int measureText(const std::string& text,
+	[[nodiscard]] int measureText(const std::string& text,
 		float width,
 		float fontSize,
 		float charSpace,
@@ -69,81 +69,7 @@ public:
 		/// Calculates the byte length which can be included within the specified width.
 };
 
-
-//
-// inlines
-//
-
-inline std::string Font::encodingName() const
-{
-	return HPDF_Font_GetEncodingName(handle());
-}
-
-
-inline int Font::unicodeWidth(Poco::UInt16 ch) const
-{
-	return HPDF_Font_GetUnicodeWidth(handle(), ch);
-}
-
-
-inline Rectangle Font::boundingBox() const
-{
-	return HPDF_Font_GetBBox(handle());
-}
-
-
-inline int Font::ascent() const
-{
-	return HPDF_Font_GetAscent(handle());
-}
-
-
-inline int Font::descent() const
-{
-	return HPDF_Font_GetDescent(handle());
-}
-
-
-inline int Font::lowerHeight() const
-{
-	return static_cast<int>(HPDF_Font_GetXHeight(handle()));
-}
-
-
-inline int Font::upperHeight() const
-{
-	return static_cast<int>(HPDF_Font_GetCapHeight(handle()));
-}
-
-
-inline TextWidth Font::textWidth(const std::string& text)
-{
-	return HPDF_Font_TextWidth(handle(),
-		reinterpret_cast<const HPDF_BYTE*>(text.data()),
-		static_cast<HPDF_UINT>(text.size()));
-}
-
-
-inline int Font::measureText(const std::string& text,
-	float width,
-	float fontSize,
-	float charSpace,
-	float wordSpace,
-	bool wordWrap)
-{
-	return static_cast<int>(HPDF_Font_MeasureText(handle(),
-		reinterpret_cast<const HPDF_BYTE*>(text.data()),
-		static_cast<HPDF_UINT>(text.size()),
-		width,
-		fontSize,
-		charSpace,
-		wordSpace,
-		wordWrap,
-		0));
-}
-
-
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Font_INCLUDED

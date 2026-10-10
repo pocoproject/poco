@@ -54,6 +54,7 @@ class Foundation_API NamedMutex: private NamedMutexImpl
 {
 public:
 	using ScopedLock = Poco::ScopedLock<NamedMutex>;
+	using ScopedLockWithUnlock = Poco::ScopedLockWithUnlock<NamedMutex>;
 
 	NamedMutex(const std::string& name);
 		/// creates the Mutex.
@@ -65,7 +66,7 @@ public:
 		/// Locks the mutex. Blocks if the mutex
 		/// is held by another process or thread.
 
-	bool tryLock();
+	[[nodiscard]] bool tryLock();
 		/// Tries to lock the mutex. Returns false immediately
 		/// if the mutex is already held by another process or thread.
 		/// Returns true if the mutex was successfully locked.

@@ -17,8 +17,10 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
+
+
+IntCounter::~IntCounter() = default;
 
 
 void IntCounter::exportTo(Exporter& exporter) const
@@ -30,4 +32,4 @@ void IntCounter::exportTo(Exporter& exporter) const
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

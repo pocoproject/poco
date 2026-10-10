@@ -25,8 +25,9 @@
 #include "Poco/Mutex.h"
 #include <vector>
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <wincrypt.h>
+#include <subauth.h>
 #include <schannel.h>
 #ifndef SECURITY_WIN32
 #define SECURITY_WIN32
@@ -36,8 +37,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API Context: public Poco::RefCountedObject
@@ -127,11 +127,13 @@ public:
 		OPT_LOAD_CERT_FROM_FILE         = 0x10,
 			/// Load certificate and private key from a PKCS #12 (.pfx) file,
 			/// and not from the certificate store.
+		OPT_USE_CERT_HASH               = 0x20,
+			/// Find the certificate using thumbprint.
 		OPT_DEFAULTS                    = OPT_PERFORM_REVOCATION_CHECK | OPT_TRUST_ROOTS_WIN_CERT_STORE | OPT_USE_STRONG_CRYPTO
 	};
 
 	Context(Usage usage,
-		const std::string& certificateNameOrPath,
+		const std::string& certificateInfoOrPath,
 		VerificationMode verMode = VERIFY_RELAXED,
 		int options = OPT_DEFAULTS,
 		const std::string& certificateStoreName = CERT_STORE_MY);
@@ -139,7 +141,7 @@ public:
 			///
 			///   * usage specifies whether the context is used by a client or server,
 			///     as well as which protocol to use.
-			///   * certificateNameOrPath specifies either the subject name of the certificate to use,
+			///   * certificateInfoOrPath specifies either the subject name or thumbprint of the certificate to use,
 			///     or the path of a PKCS #12 file containing the certificate and corresponding private key.
 			///     If a subject name is specified, the certificate must be located in the certificate
 			///     store specified by certificateStoreName. If a path is given, the OPT_LOAD_CERT_FROM_FILE
@@ -158,17 +160,17 @@ public:
 	~Context();
 		/// Destroys the Context.
 
-	VerificationMode verificationMode() const;
+	[[nodiscard]] VerificationMode verificationMode() const;
 		/// Returns the certificate verification mode.
 
-	Usage usage() const;
+	[[nodiscard]] Usage usage() const;
 		/// Returns whether the context is for use by a client or by a server
 		/// and whether TLSv1.x is required.
 
-	bool isForServerUse() const;
+	[[nodiscard]] bool isForServerUse() const;
 		/// Returns true iff the context is for use by a server.
 
-	bool sessionCacheEnabled() const;
+	[[nodiscard]] bool sessionCacheEnabled() const;
 		/// Returns true iff the session cache is enabled.
 
 	void enableExtendedCertificateVerification(bool flag = true);
@@ -177,11 +179,11 @@ public:
 		///
 		/// See X509Certificate::verify() for more information.
 
-	bool extendedCertificateVerificationEnabled() const;
+	[[nodiscard]] bool extendedCertificateVerificationEnabled() const;
 		/// Returns true iff automatic extended certificate
 		/// verification is enabled.
 
-	int options() const;
+	[[nodiscard]] int options() const;
 		/// Returns the options flags.
 
 	void addTrustedCert(const Poco::Net::X509Certificate& cert);
@@ -201,7 +203,7 @@ public:
 		///
 		///   context.requireMinimumProtocol(PROTO_TLSV1_2);
 
-	Poco::Net::X509Certificate certificate();
+	[[nodiscard]] Poco::Net::X509Certificate certificate();
 		/// Loads or imports and returns the certificate specified in the constructor.
 		///
 		/// Throws a NoCertificateException if the certificate cannot
@@ -210,10 +212,10 @@ public:
 		/// May also throw a filesystem-related exception if the certificate file
 		/// cannot be found.
 
-	HCERTSTORE certificateStore() const;
+	[[nodiscard]] HCERTSTORE certificateStore() const;
 		/// Returns a handle to the certificate store.
 
-	CredHandle& credentials();
+	[[nodiscard]] CredHandle& credentials();
 		/// Returns a reference to the Schannel credentials for this Context.
 
 	static const std::string CERT_STORE_MY;
@@ -227,9 +229,11 @@ protected:
 	void loadCertificate();
 	void importCertificate();
 	void importCertificate(const char* pBuffer, std::size_t size);
-	void acquireSchannelCredentials(CredHandle& credHandle) const;
-	DWORD proto() const;
-	DWORD enabledProtocols() const;
+	SECURITY_STATUS acquireSchannelCredentials(CredHandle& credHandle) const;
+	SECURITY_STATUS acquireSchannelCredentialsLegacy(CredHandle& credHandle) const;
+	[[nodiscard]] DWORD proto() const;
+	[[nodiscard]] DWORD enabledProtocols() const;
+	[[nodiscard]] DWORD disabledProtocols() const;
 
 private:
 	Context(const Context&);
@@ -240,7 +244,7 @@ private:
 	int                        _options;
 	int                        _disabledProtocols;
 	bool                       _extendedCertificateVerification;
-	std::string                _certNameOrPath;
+	std::string                _certInfoOrPath;
 	std::string                _certStoreName;
 	HCERTSTORE                 _hMemCertStore;
 	HCERTSTORE                 _hCollectionCertStore;
@@ -304,7 +308,7 @@ inline HCERTSTORE Context::certificateStore() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_Context_INCLUDED

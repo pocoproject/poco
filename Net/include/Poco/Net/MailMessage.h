@@ -28,8 +28,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class MediaType;
@@ -78,7 +77,7 @@ public:
 
 	using PartVec = std::vector<Part>;
 
-	MailMessage(PartStoreFactory* pStoreFactory = 0);
+	MailMessage(PartStoreFactory* pStoreFactory = nullptr);
 		/// Creates an empty MailMessage.
 		///
 		/// If pStoreFactory is not null, message attachments will be
@@ -96,7 +95,7 @@ public:
 	void setRecipients(const Recipients& recipient);
 		/// Clears existing and sets new recipient list for the message.
 
-	const Recipients& recipients() const;
+	[[nodiscard]] const Recipients& recipients() const;
 		/// Returns the recipients of the message.
 
 	void setSubject(const std::string& subject);
@@ -107,7 +106,7 @@ public:
 		/// in the subject, use RFC 2047 word encoding
 		/// (see encodeWord()).
 
-	const std::string& getSubject() const;
+	[[nodiscard]] const std::string& getSubject() const;
 		/// Returns the subject of the message.
 
 	void setSender(const std::string& sender);
@@ -123,7 +122,7 @@ public:
 		/// in the sender, use RFC 2047 word encoding
 		/// (see encodeWord()).
 
-	const std::string& getSender() const;
+	[[nodiscard]] const std::string& getSender() const;
 		/// Returns the sender of the message (taken
 		/// from the From header field).
 
@@ -141,7 +140,7 @@ public:
 		/// not be used. Content lines always should be terminated with a
 		/// proper CRLF sequence.
 
-	const std::string& getContent() const;
+	[[nodiscard]] const std::string& getContent() const;
 		/// Returns the content of the mail message.
 		///
 		/// A content will only be returned for single-part
@@ -154,16 +153,16 @@ public:
 	void setContentType(const MediaType& mediaType);
 		/// Sets the content type for the message.
 
-	const std::string& getContentType() const;
+	[[nodiscard]] const std::string& getContentType() const;
 		/// Returns the content type for the message.
 
 	void setDate(const Poco::Timestamp& dateTime);
 		/// Sets the Date header to the given date/time value.
 
-	Poco::Timestamp getDate() const;
+	[[nodiscard]] Poco::Timestamp getDate() const;
 		/// Returns the value of the Date header.
 
-	bool isMultipart() const;
+	[[nodiscard]] bool isMultipart() const;
 		/// Returns true iff the message is a multipart message.
 
 	void addPart(const std::string& name,
@@ -204,7 +203,7 @@ public:
 		/// To include non-ASCII characters in the part name or filename,
 		/// use RFC 2047 word encoding (see encodeWord()).
 
-	PartSource* createPartStore(const std::string& content,
+	[[nodiscard]] PartSource* createPartStore(const std::string& content,
 		const std::string& mediaType,
 		const std::string& filename = "");
 		/// Returns either default StringPartSource part store or,
@@ -214,7 +213,7 @@ public:
 		/// responsibility to delete it after use. Typical use is handler
 		/// passing it back to MailMessage, which takes care of the cleanup.
 
-	const PartVec& parts() const;
+	[[nodiscard]] const PartVec& parts() const;
 		/// Returns const reference to the vector containing part stores.
 
 	void read(std::istream& istr, PartHandler& handler);
@@ -234,7 +233,7 @@ public:
 	void write(std::ostream& ostr) const;
 		/// Writes the mail message to the given output stream.
 
-	static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
+	[[nodiscard]] static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
 		/// If the given string contains non-ASCII characters,
 		/// encodes the given string using RFC 2047 "Q" word encoding.
 		///
@@ -257,6 +256,10 @@ public:
 	static const std::string HEADER_MIME_VERSION;
 	static const std::string EMPTY_HEADER;
 	static const std::string TEXT_PLAIN;
+	static constexpr int MAX_PARTS = 100000;
+		/// Maximum number of MIME parts allowed when reading
+		/// a multipart message. Exceeding this limit throws
+		/// a MultipartException.
 	static const std::string CTE_7BIT;
 	static const std::string CTE_8BIT;
 	static const std::string CTE_QUOTED_PRINTABLE;
@@ -273,20 +276,21 @@ protected:
 	void readMultipart(std::istream& istr, PartHandler& handler);
 	void readPart(std::istream& istr, const MessageHeader& header, PartHandler& handler);
 	void handlePart(std::istream& istr, const MessageHeader& header, PartHandler& handler);
-	static const std::string& contentTransferEncodingToString(ContentTransferEncoding encoding);
-	static int lineLength(const std::string& str);
+	[[nodiscard]] static const std::string& contentTransferEncodingToString(ContentTransferEncoding encoding);
+	[[nodiscard]] static int lineLength(const std::string& str);
 	static void appendRecipient(const MailRecipient& recipient, std::string& str);
 
-private:
-	MailMessage(const MailMessage&);
-	MailMessage& operator = (const MailMessage&);
+	MailMessage(const MailMessage&) = delete;
+	MailMessage& operator = (const MailMessage&) = delete;
 
+private:
 	Recipients              _recipients;
 	PartVec                 _parts;
 	std::string             _content;
 	ContentTransferEncoding _encoding;
 	mutable std::string     _boundary;
 	PartStoreFactory*       _pStoreFactory;
+	bool                    _isMultipart = false;
 
 	friend class MultipartSource;
 };
@@ -320,7 +324,7 @@ public:
 		/// use RFC 2047 word encoding (see encodeWord()).
 
 	// PartSource
-	std::istream& stream();
+	[[nodiscard]] std::istream& stream();
 
 protected:
 	static std::string contentTypeWithBoundary(const std::string& contentType);
@@ -352,7 +356,7 @@ inline const MailMessage::PartVec& MailMessage::parts() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MailMessage_INCLUDED

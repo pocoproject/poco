@@ -22,9 +22,9 @@ namespace Poco {
 
 
 TextBufferIterator::TextBufferIterator():
-	_pEncoding(0),
-	_it(0),
-	_end(0)
+	_pEncoding(nullptr),
+	_it(nullptr),
+	_end(nullptr)
 {
 }
 
@@ -54,7 +54,7 @@ TextBufferIterator::TextBufferIterator(const char* begin, const char* end, const
 
 
 TextBufferIterator::TextBufferIterator(const char* end):
-	_pEncoding(0),
+	_pEncoding(nullptr),
 	_it(end),
 	_end(end)
 {
@@ -102,6 +102,7 @@ int TextBufferIterator::operator * () const
 
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
 	unsigned char* p = buffer;
+	unsigned char* pend = p + TextEncoding::MAX_SEQUENCE_LENGTH;
 
 	if (it != _end)
 		*p++ = *it++;
@@ -115,6 +116,7 @@ int TextBufferIterator::operator * () const
 	{
 		while (read < -n && it != _end)
 		{
+			poco_assert(p != pend);
 			*p++ = *it++;
 			read++;
 		}

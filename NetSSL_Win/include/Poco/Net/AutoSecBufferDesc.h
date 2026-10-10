@@ -20,7 +20,7 @@
 
 #include "Poco/Net/NetSSL.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <wincrypt.h>
 #ifndef SECURITY_WIN32
 #define SECURITY_WIN32
@@ -29,8 +29,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <int numBufs>
@@ -83,12 +82,12 @@ public:
 		}
 	}
 
-	SecBuffer& operator [] (Poco::UInt32 idx)
+	[[nodiscard]] SecBuffer& operator [] (Poco::UInt32 idx)
 	{
 		return _buffers[idx];
 	}
 
-	const SecBuffer& operator [] (Poco::UInt32 idx) const
+	[[nodiscard]] const SecBuffer& operator [] (Poco::UInt32 idx) const
 	{
 		return _buffers[idx];
 	}
@@ -163,7 +162,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_AutoSecBufferDesc_INCLUDED

@@ -35,15 +35,15 @@ using Poco::NumberFormatter;
 using Poco::Timespan;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext):
 	_pSSL(nullptr),
 	_pSocket(pSocketImpl),
 	_pContext(pContext),
-	_needHandshake(false)
+	_needHandshake(false),
+	_ticketPending(false)
 {
 	poco_check_ptr (_pSocket);
 	poco_check_ptr (_pContext);
@@ -93,23 +93,37 @@ void SecureSocketImpl::acceptSSL()
 		throw SSLException("Cannot create SSL object");
 	}
 
-#if OPENSSL_VERSION_NUMBER >= 0x1010100fL
-	/* TLS 1.3 server sends session tickets after a handhake as part of
-	* the SSL_accept(). If a client finishes all its job before server
-	* sends the tickets, SSL_accept() fails with EPIPE errno. Since we
-	* are not interested in a session resumption, we can not to send the
-	* tickets. */
-	if (1 != SSL_set_num_tickets(_pSSL, 0))
+	/* A TLS 1.3 server sends session tickets at handshake completion. If the
+	 * client sends its data and closes without reading, the ticket write fails
+	 * with EPIPE and the handshake is reported as failed even though the peer
+	 * completed it.
+	 * With OpenSSL >= 3.0 tickets are therefore always suppressed here; when the
+	 * session cache is enabled, one is requested later, immediately before the
+	 * first application data write (see sendBytes()).
+	 * Older OpenSSL has no way to request a ticket after the handshake, so for
+	 * TLS 1.3 resumption there the handshake-time tickets have to be kept, at
+	 * the price of reinstating the failure described above. */
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	const bool suppressTickets = true;
+#else
+	const bool suppressTickets = !_pContext->sessionCacheEnabled();
+#endif
+	if (suppressTickets && 1 != SSL_set_num_tickets(_pSSL, 0))
 	{
 		::BIO_free(pBIO);
-		throw SSLException("Cannot create SSL object");
+		::SSL_free(_pSSL);
+		_pSSL = nullptr;
+		throw SSLException("Cannot disable session tickets");
 	}
-	//Otherwise we can perform two-way shutdown. Client must call SSL_read() before the final SSL_shutdown().
-#endif
 
 	::SSL_set_bio(_pSSL, pBIO, pBIO);
 	::SSL_set_accept_state(_pSSL);
-	::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this);
+	if (1 != ::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this))
+	{
+		::SSL_free(_pSSL);
+		_pSSL = nullptr;
+		throw SSLException("Cannot store the socket in the SSL object", Utility::getLastError());
+	}
 	_needHandshake = true;
 }
 
@@ -136,7 +150,23 @@ void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespa
 	Poco::Timespan sendTimeout = _pSocket->getSendTimeout();
 	_pSocket->setReceiveTimeout(timeout);
 	_pSocket->setSendTimeout(timeout);
-	connectSSL(performHandshake);
+	try
+	{
+		connectSSL(performHandshake);
+	}
+	catch (...)
+	{
+		// the socket gets its own timeouts back also when there is no connection
+		try
+		{
+			_pSocket->setReceiveTimeout(receiveTimeout);
+			_pSocket->setSendTimeout(sendTimeout);
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		throw;
+	}
 	_pSocket->setReceiveTimeout(receiveTimeout);
 	_pSocket->setSendTimeout(sendTimeout);
 }
@@ -171,31 +201,53 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		throw SSLException("Cannot create SSL object");
 	}
 	::SSL_set_bio(_pSSL, pBIO, pBIO);
-	::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this);
-
-	if (!_peerHostName.empty())
-	{
-		SSL_set_tlsext_host_name(_pSSL, _peerHostName.c_str());
-	}
-
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
-	if(_pContext->ocspStaplingResponseVerificationEnabled())
-	{
-		SSL_set_tlsext_status_type(_pSSL, TLSEXT_STATUSTYPE_ocsp);
-	}
-#endif
-
-	if (_pSession && _pSession->isResumable())
-	{
-		::SSL_set_session(_pSSL, _pSession->sslSession());
-	}
 
 	try
 	{
+		if (1 != ::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this))
+			throw SSLException("Cannot store the socket in the SSL object", Utility::getLastError());
+
+		if (!_peerHostName.empty())
+		{
+			if (1 != SSL_set_tlsext_host_name(_pSSL, _peerHostName.c_str()))
+				throw SSLException("Cannot set the peer host name for SNI", Utility::getLastError());
+		}
+
+		if(_pContext->ocspStaplingResponseVerificationEnabled())
+		{
+			if (1 != SSL_set_tlsext_status_type(_pSSL, TLSEXT_STATUSTYPE_ocsp))
+				throw SSLException("Cannot request an OCSP stapling response", Utility::getLastError());
+		}
+
+		if (_pSession && _pSession->isResumable())
+		{
+			::SSL_set_session(_pSSL, _pSession->sslSession());
+		}
+
 		if (performHandshake && _pSocket->getBlocking())
 		{
-			int ret = ::SSL_connect(_pSSL);
-			handleError(ret);
+			int ret;
+			const auto recvTimeout = _pSocket->getReceiveTimeout();
+			Poco::Timestamp tsStart;
+			while (true)
+			{
+				// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
+				// left there by unrelated code would turn a retry condition into a fatal error.
+				::ERR_clear_error();
+				ret = ::SSL_connect(_pSSL);
+				if (!mustRetry(ret))
+					break;
+
+				// As in completeHandshake(): without a receive timeout the first
+				// failed retry ends the handshake, so that a socket that has
+				// become invalid cannot keep the loop going (GH #3557).
+				if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
+					throw Poco::TimeoutException();
+			};
+			// The peer is verified once the handshake is complete: anything
+			// else that handleError() lets pass is no connection.
+			if (handleError(ret) != 1)
+				throw SSLException("TLS handshake not completed");
 			verifyPeerCertificate();
 		}
 		else
@@ -253,69 +305,77 @@ void SecureSocketImpl::listen(int backlog)
 }
 
 
-void SecureSocketImpl::shutdown()
+int SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
 	{
 		UnLockT l(_mutex);
 
-		// Don't shut down the socket more than once.
 		int shutdownState = ::SSL_get_shutdown(_pSSL);
 		bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
 		if (!shutdownSent)
 		{
-			// A proper clean shutdown would require us to
-			// retry the shutdown if we get a zero return
-			// value, until SSL_shutdown() returns 1.
-			// However, this will lead to problems with
-			// most web browsers, so we just set the shutdown
-			// flag by calling SSL_shutdown() once and be
-			// done with it.
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
 			int rc = 0;
-			if (!_bidirectShutdown)
-				rc = ::SSL_shutdown(_pSSL);
-			else
+			if (_pSocket->getBlocking())
 			{
+				// For blocking sockets, perform bidirectional shutdown
+				// to ensure all data is received by the peer before closing.
 				Poco::Timespan recvTimeout = _pSocket->getReceiveTimeout();
 				Poco::Timespan pollTimeout(0, 100000);
-				Poco::Timestamp tsNow;
+				Poco::Timestamp tsStart;
 				do
 				{
+					::ERR_clear_error();
 					rc = ::SSL_shutdown(_pSSL);
 					if (rc == 1) break;
 					if (rc < 0)
 					{
 						int err = ::SSL_get_error(_pSSL, rc);
 						if (err == SSL_ERROR_WANT_READ)
-							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+							(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
 						else if (err == SSL_ERROR_WANT_WRITE)
-							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
+							(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
 						else
-						{
-							int socketError = SocketImpl::lastError();
-							long lastError = ::ERR_get_error();
-							if ((err == SSL_ERROR_SSL) && (socketError == 0) && (lastError == 0x0A000123))
-								rc = 0;
 							break;
-						}
 					}
-					else _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
-				} while (!tsNow.isElapsed(recvTimeout.totalMicroseconds()));
+					else
+					{
+						(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+					}
+				} while (!tsStart.isElapsed(recvTimeout.totalMicroseconds()));
+				if (rc < 0)
+				{
+					rc = handleError(rc);
+				}
 			}
-#else
-			int rc = ::SSL_shutdown(_pSSL);
-#endif
-			if (rc < 0) handleError(rc);
+			else
+			{
+				// For non-blocking sockets, call SSL_shutdown() once.
+				::ERR_clear_error();
+				rc = ::SSL_shutdown(_pSSL);
+				if (rc < 0)
+				{
+					if (SocketImpl::lastError() == POCO_EWOULDBLOCK)
+						rc = SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
+					else
+						rc = handleError(rc);
+				}
+			}
 
 			l.unlock();
 
-			if (_pSocket->getBlocking())
+			if (rc >= 0)
 			{
-				_pSocket->shutdown();
+				_pSocket->shutdownSend();
 			}
+			return rc;
+		}
+		else
+		{
+			return (shutdownState & SSL_RECEIVED_SHUTDOWN) == SSL_RECEIVED_SHUTDOWN;
 		}
 	}
+	return 1;
 }
 
 
@@ -329,22 +389,6 @@ void SecureSocketImpl::close()
 	{
 	}
 	_pSocket->close();
-}
-
-
-void SecureSocketImpl::setBlocking(bool flag)
-{
-	poco_check_ptr (_pSocket);
-
-	_pSocket->setBlocking(flag);
-}
-
-
-bool SecureSocketImpl::getBlocking() const
-{
-	poco_check_ptr (_pSocket);
-
-	return _pSocket->getBlocking();
 }
 
 
@@ -367,10 +411,21 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		else
 			return rc;
 	}
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	if (_ticketPending)
+	{
+		/* The ticket is queued, not written, and goes out with the data below.
+		 * The return value is ignored: it also reports "not applicable", which
+		 * is the case for every connection below TLS 1.3. */
+		::SSL_new_session_ticket(_pSSL);
+		_ticketPending = false;
+	}
+#endif
 	const auto sendTimeout = _pSocket->getSendTimeout();
 	Poco::Timestamp tsStart;
 	while (true)
 	{
+		::ERR_clear_error();
 		rc = ::SSL_write(_pSSL, buffer, length);
 		if (!mustRetry(rc))
 			break;
@@ -405,18 +460,30 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 			return rc;
 	}
 
+	// The timeout check below prevents an infinite retry loop when
+	// the socket becomes invalid (e.g. closed by the OS during app
+	// backgrounding on mobile platforms). See GH #3557.
+	// With default (unset) receive timeout, isElapsed(0) returns
+	// true immediately, breaking the loop on the first failed retry.
 	const auto recvTimeout = _pSocket->getReceiveTimeout();
 	Poco::Timestamp tsStart;
 	while (true)
 	{
-		rc = ::SSL_read(_pSSL, buffer, length);
+		::ERR_clear_error();
+		if (flags & MSG_PEEK)
+		{
+			rc = SSL_peek(_pSSL, buffer, length);
+		}
+		else
+		{
+			rc = SSL_read(_pSSL, buffer, length);
+		}
 		if (!mustRetry(rc))
 			break;
 
 		if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
 			throw Poco::TimeoutException();
 	};
-	_bidirectShutdown = false;
 	if (rc <= 0)
 	{
 		return handleError(rc);
@@ -445,6 +512,7 @@ int SecureSocketImpl::completeHandshake()
 	Poco::Timestamp tsStart;
 	while (true)
 	{
+		::ERR_clear_error();
 		rc = ::SSL_do_handshake(_pSSL);
 		if (!mustRetry(rc))
 			break;
@@ -457,6 +525,14 @@ int SecureSocketImpl::completeHandshake()
 		return handleError(rc);
 	}
 	_needHandshake = false;
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	/* Request the ticket suppressed in acceptSSL() only once, and only in
+	 * sendBytes(): SSL_new_session_ticket() puts the connection back into the
+	 * handshake state until the ticket is written, and SSL_shutdown() fails
+	 * while in that state. Deferring it to the write keeps the state alive
+	 * only across the call that immediately flushes it. */
+	_ticketPending = ::SSL_is_server(_pSSL) && _pContext->sessionCacheEnabled();
+#endif
 	return rc;
 }
 
@@ -490,7 +566,11 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 		return X509_V_OK;
 	}
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	::X509* pCert = ::SSL_get1_peer_certificate(_pSSL);
+#else
 	::X509* pCert = ::SSL_get_peer_certificate(_pSSL);
+#endif
 	if (pCert)
 	{
 		X509Certificate cert(pCert);
@@ -518,12 +598,14 @@ X509* SecureSocketImpl::peerCertificate() const
 {
 	LockT l(_mutex);
 
-	X509* pCert = nullptr;
-
-	if (_pSSL)
-		return ::SSL_get_peer_certificate(_pSSL);
-	else
+	if (_pSSL == nullptr)
 		return nullptr;
+
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	return ::SSL_get1_peer_certificate(_pSSL);
+#else
+	return ::SSL_get_peer_certificate(_pSSL);
+#endif
 }
 
 
@@ -540,14 +622,14 @@ bool SecureSocketImpl::mustRetry(int rc)
 		case SSL_ERROR_WANT_READ:
 			if (_pSocket->getBlocking())
 			{
-				_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
 				return true;
 			}
 			break;
 		case SSL_ERROR_WANT_WRITE:
 			if (_pSocket->getBlocking())
 			{
-				_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
+				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
 				return true;
 			}
 			break;
@@ -589,19 +671,23 @@ int SecureSocketImpl::handleError(int rc)
 	// SSL_ERROR_SSL with a meaningful error on the error stack.
 	// However, we still need to check for socket errors in both
 	// cases with OpenSSL 3.0 or later.
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	case SSL_ERROR_SSL:
 		// fallthrough to handle socket errors first
 #endif
 	case SSL_ERROR_SYSCALL:
 		if (socketError)
 		{
-			SocketImpl::error(socketError);
+			if (socketError == POCO_EWOULDBLOCK)
+				return SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
+			else
+				SocketImpl::error(socketError);
 		}
 		// fallthrough
 	default:
 		{
-		long lastError = ::ERR_get_error();
+			long lastError = ::ERR_peek_last_error();
+			::ERR_clear_error();
 			std::string msg;
 			if (lastError)
 			{
@@ -614,7 +700,7 @@ int SecureSocketImpl::handleError(int rc)
 			// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
 			// errno was 0.  Since OpenSSL 3.0 the returned error is
 			// SSL_ERROR_SSL with a meaningful error on the error stack.
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 			if (sslError == SSL_ERROR_SSL)
 #else
 			if (lastError == 0)
@@ -642,7 +728,7 @@ int SecureSocketImpl::handleError(int rc)
 				throw SSLException(msg);
 			}
 		}
- 		break;
+		break;
 	}
 	return rc;
 }
@@ -663,6 +749,7 @@ void SecureSocketImpl::reset()
 		::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), nullptr);
 		::SSL_free(_pSSL);
 		_pSSL = nullptr;
+		_ticketPending = false;
 	}
 }
 
@@ -675,6 +762,14 @@ void SecureSocketImpl::abort()
 
 Session::Ptr SecureSocketImpl::currentSession()
 {
+	if (!_pSession && _pSSL)
+	{
+		SSL_SESSION* pSession = SSL_get1_session(_pSSL);
+		if (pSession)
+		{
+			_pSession = new Session(pSession);
+		}
+	}
 	return _pSession;
 }
 
@@ -710,4 +805,4 @@ int SecureSocketImpl::onSessionCreated(SSL* pSSL, SSL_SESSION* pSession)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

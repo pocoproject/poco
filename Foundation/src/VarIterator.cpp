@@ -14,24 +14,16 @@
 
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Dynamic/Var.h"
-//#include "Poco/Dynamic/Struct.h"
-#undef min
-#undef max
-#include <limits>
 
 
-namespace Poco {
-namespace Dynamic {
-
-
-const std::size_t VarIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
+namespace Poco::Dynamic {
 
 
 VarIterator::VarIterator(Var* pVar, bool positionEnd):
 	_pVar(pVar),
 	_position(positionEnd ? POSITION_END : 0)
 {
-    if (!_pVar || _pVar->isEmpty()) throw InvalidAccessException("Cannot create iterator on empty Var");
+	if (!_pVar || _pVar->isEmpty()) throw InvalidAccessException("Cannot create iterator on empty Var");
 }
 
 
@@ -83,8 +75,7 @@ void VarIterator::increment() const
 {
 	if (POSITION_END == _position)
 		throw RangeException("End of iterator reached.");
-
-	if (_position < _pVar->size() - 1)
+	else if (_position < _pVar->size() - 1)
 		++_position;
 	else
 		_position = POSITION_END;
@@ -180,4 +171,4 @@ VarIterator VarIterator::operator - (std::size_t diff) const
 }
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic

@@ -23,8 +23,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API AutoDetectStreamBuf: public Poco::BufferedStreamBuf
@@ -39,8 +38,8 @@ public:
 		/// Destroys the AutoDetectStream.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length);
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
 
 private:
 	enum
@@ -95,7 +94,7 @@ public:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_AutoDetectStream_INCLUDED

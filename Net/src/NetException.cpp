@@ -19,8 +19,7 @@
 using Poco::IOException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 POCO_IMPLEMENT_EXCEPTION(NetException, IOException, "Net Exception")
@@ -52,4 +51,4 @@ POCO_IMPLEMENT_EXCEPTION(UnsupportedFamilyException, NetException, "Unknown or u
 POCO_IMPLEMENT_EXCEPTION(AddressFamilyMismatchException, NetException, "Address family mismatch")
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

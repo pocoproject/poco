@@ -27,7 +27,7 @@
 namespace Poco {
 
 
-std::string Foundation_API format(const std::string& fmt, const Any& value);
+[[nodiscard]] std::string Foundation_API format(const std::string& fmt, const Any& value);
 	/// This function implements sprintf-style formatting in a typesafe way.
 	/// Various variants of the function are available, supporting a
 	/// different number of arguments (up to six).
@@ -62,6 +62,8 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///   * e signed floating-point value in the form [-]d.dddde[<sign>]dd[d]
 	///   * E signed floating-point value in the form [-]d.ddddE[<sign>]dd[d]
 	///   * f signed floating-point value in the form [-]dddd.dddd
+	///   * g use the shortest representation: %e or %f
+	///   * G use the shortest representation: %E or %F
 	///   * s std::string
 	///   * v std::string_view
 	///   * z std::size_t
@@ -116,14 +118,14 @@ inline void formatAny(std::string& result, const std::string& fmt, const std::ve
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
 {
-	Poco::format(result, fmt, values);
+	::Poco::format(result, fmt, values);
 }
 
 inline void formatAny(std::string& result, const char *fmt, const std::vector<Any>& values)
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
 {
-	Poco::format(result, fmt, values);
+	::Poco::format(result, fmt, values);
 }
 
 template <typename T, typename... Args>
@@ -151,7 +153,7 @@ void format(std::string& result, const char* fmt, T arg1, Args... args)
 
 
 template <typename T, typename... Args>
-std::string format(const std::string& fmt, T arg1, Args... args)
+[[nodiscard]] std::string format(const std::string& fmt, T arg1, Args... args)
 	/// Returns the formatted string.
 {
 	std::vector<Any> values;
@@ -165,7 +167,7 @@ std::string format(const std::string& fmt, T arg1, Args... args)
 
 
 template <typename T, typename... Args>
-std::string format(const char* fmt, T arg1, Args... args)
+[[nodiscard]] std::string format(const char* fmt, T arg1, Args... args)
 	/// Returns the formatted string.
 {
 	std::vector<Any> values;

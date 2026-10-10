@@ -19,8 +19,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 StatementPlaceholderProvider::~StatementPlaceholderProvider()
@@ -51,4 +50,4 @@ std::string PostgresStatementPlaceholderProvider::next()
 }
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord

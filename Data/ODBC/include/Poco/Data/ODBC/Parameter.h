@@ -21,14 +21,12 @@
 #include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Data/ODBC/Handle.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqlext.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ODBC_API Parameter
@@ -40,32 +38,32 @@ public:
 	~Parameter();
 		/// Destroys the Parameter.
 
-	std::size_t number() const;
+	[[nodiscard]] std::size_t number() const;
 		/// Returns the column number.
 
-	std::size_t dataType() const;
+	[[nodiscard]] std::size_t dataType() const;
 		/// Returns the SQL data type.
 
-	std::size_t columnSize() const;
+	[[nodiscard]] std::size_t columnSize() const;
 		/// Returns the the size of the column or expression of the corresponding
 		/// parameter marker as defined by the data source.
 
-	std::size_t decimalDigits() const;
+	[[nodiscard]] std::size_t decimalDigits() const;
 		/// Returns the number of decimal digits of the column or expression
 		/// of the corresponding parameter as defined by the data source.
 
-	bool isNullable() const;
+	[[nodiscard]] bool isNullable() const;
 		/// Returns true if column allows null values, false otherwise.
 
 private:
-	Parameter();
+	Parameter() = delete;
 
 	void init();
 
 	SQLSMALLINT _dataType;
-    SQLULEN     _columnSize;
-    SQLSMALLINT _decimalDigits;
-    SQLSMALLINT _isNullable;
+	SQLULEN     _columnSize;
+	SQLSMALLINT _decimalDigits;
+	SQLSMALLINT _isNullable;
 
 	const StatementHandle& _rStmt;
 	std::size_t _number;
@@ -105,7 +103,7 @@ inline bool Parameter::isNullable() const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

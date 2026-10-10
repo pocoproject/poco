@@ -17,8 +17,7 @@
 #include <openssl/rsa.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 ECKey::ECKey(const EVPPKey& key):
@@ -88,4 +87,4 @@ ECKey& ECKey::operator = (ECKey&& other) noexcept
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

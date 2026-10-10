@@ -26,8 +26,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API RSADigestEngine: public Poco::DigestEngine
@@ -51,7 +50,7 @@ public:
 		DIGEST_SHA1
 	};
 
-	//@ deprecated
+	//[[deprecated]] RSADigestEngine(const RSAKey& key, DigestType digestType = DIGEST_SHA1);
 	RSADigestEngine(const RSAKey& key, DigestType digestType = DIGEST_SHA1);
 		/// Creates the RSADigestEngine with the given RSA key,
 		/// using the MD5 or SHA-1 hash algorithm.
@@ -68,7 +67,7 @@ public:
 	~RSADigestEngine();
 		/// Destroys the RSADigestEngine.
 
-	std::size_t digestLength() const;
+	[[nodiscard]] std::size_t digestLength() const;
 		/// Returns the length of the digest in bytes.
 
 	void reset();
@@ -89,7 +88,7 @@ public:
 		///
 		/// Can be called multiple times.
 
-	bool verify(const DigestEngine::Digest& signature);
+	[[nodiscard]] bool verify(const DigestEngine::Digest& signature);
 		/// Verifies the data against the signature.
 		///
 		/// Returns true if the signature can be verified, false otherwise.
@@ -105,7 +104,7 @@ private:
 };
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_RSADigestEngine_INCLUDED

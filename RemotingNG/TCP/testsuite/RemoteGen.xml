@@ -1,0 +1,18 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				../../../Foundation/include/Poco/Timestamp.h
+				src/Tester.h
+			</include>
+		</files>
+		<output>
+			<include>src</include>
+			<src>src</src>
+			<includeRoot>src</includeRoot>
+			<flatIncludes>false</flatIncludes>
+			<mode>both</mode>
+			<timestamps>false</timestamps>
+		</output>
+	</RemoteGen>
+</AppConfig>

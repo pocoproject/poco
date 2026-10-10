@@ -14,16 +14,9 @@
 
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RecordSet.h"
-#undef min
-#undef max
-#include <limits>
 
 
-namespace Poco {
-namespace Data {
-
-
-const std::size_t RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
+namespace Poco::Data {
 
 
 RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd):
@@ -41,9 +34,11 @@ RowIterator::RowIterator(const RowIterator& other):
 
 
 RowIterator::RowIterator(RowIterator&& other) noexcept:
-	_pRecordSet(std::move(other._pRecordSet)),
-	_position(std::move(other._position))
+	_pRecordSet(other._pRecordSet),
+	_position(other._position)
 {
+	other._pRecordSet = nullptr;
+	other._position = POSITION_END;
 }
 
 RowIterator::~RowIterator()
@@ -178,7 +173,7 @@ const RowIterator& RowIterator::operator ++ () const
 }
 
 
-RowIterator RowIterator::operator ++ (int) const
+RowIterator RowIterator::operator ++ ([[maybe_unused]] int n) const
 {
 	RowIterator old(*this);
 	increment();
@@ -193,7 +188,7 @@ const RowIterator& RowIterator::operator -- () const
 }
 
 
-RowIterator RowIterator::operator -- (int) const
+RowIterator RowIterator::operator -- ([[maybe_unused]] int n) const
 {
 	RowIterator old(*this);
 	decrement();
@@ -218,4 +213,4 @@ RowIterator RowIterator::operator - (std::size_t diff) const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

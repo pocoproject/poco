@@ -22,8 +22,6 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/KeyPairImpl.h"
-#include "Poco/Crypto/OpenSSLInitializer.h"
-#include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <istream>
 #include <ostream>
@@ -32,8 +30,7 @@
 #include <openssl/ec.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class X509Certificate;
@@ -73,19 +70,35 @@ public:
 	~ECKeyImpl();
 		/// Destroys the ECKeyImpl.
 
-	EC_KEY* getECKey();
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	[[nodiscard]] EVP_PKEY* getEVPPKey();
+		/// Returns the OpenSSL EVP_PKEY object.
+
+	[[nodiscard]] const EVP_PKEY* getEVPPKey() const;
+		/// Returns the OpenSSL EVP_PKEY object.
+#endif
+
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	POCO_DEPRECATED("use getEVPPKey() instead")
+#endif
+	[[nodiscard]] EC_KEY* getECKey();
 		/// Returns the OpenSSL EC key.
 
-	const EC_KEY* getECKey() const;
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	POCO_DEPRECATED("use getEVPPKey() instead")
+#endif
+	[[nodiscard]] const EC_KEY* getECKey() const;
 		/// Returns the OpenSSL EC key.
+#endif
 
-	int size() const;
+	[[nodiscard]] int size() const;
 		/// Returns the EC key length in bits.
 
-	int groupId() const;
+	[[nodiscard]] int groupId() const;
 		/// Returns the EC key group integer Id.
 
-	std::string groupName() const;
+	[[nodiscard]] std::string groupName() const;
 		/// Returns the EC key group name.
 
 	void save(const std::string& publicKeyFile,
@@ -97,14 +110,14 @@ public:
 		/// is not exported.
 
 	void save(std::ostream* pPublicKeyStream,
-		std::ostream* pPrivateKeyStream = 0,
+		std::ostream* pPrivateKeyStream = nullptr,
 		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and private key to the given streams.
 		///
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
-	static std::string getCurveName(int nid = -1);
+	[[nodiscard]] static std::string getCurveName(int nid = -1);
 		/// Returns elliptical curve name corresponding to
 		/// the given nid; if nid is not found, returns
 		/// empty string.
@@ -113,13 +126,13 @@ public:
 		///
 		/// If no curves are found, returns empty string;
 
-	static int getCurveNID(std::string& name);
+	[[nodiscard]] static int getCurveNID(std::string& name);
 		/// Returns the NID of the specified curve.
 		///
 		/// If name is empty, returns the first curve NID
 		/// and updates the name accordingly.
 
-	static bool hasCurve(const std::string& name);
+	[[nodiscard]] static bool hasCurve(const std::string& name);
 		/// Returns true if the named curve is found,
 		/// false otherwise.
 
@@ -127,13 +140,58 @@ private:
 	void checkEC(const std::string& method, const std::string& func) const;
 	void freeEC();
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	void safeCheckEC(const std::string& method, const std::string& func);
+		/// Calls checkEC(); frees _pEVPPKey and rethrows on failure.
+		/// Use in constructors where destructor will not run.
+	EVP_PKEY* _pEVPPKey;
+#else
 	EC_KEY* _pEC;
+#endif
 };
 
 
 //
 // inlines
 //
+
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
+inline EVP_PKEY* ECKeyImpl::getEVPPKey()
+{
+	return _pEVPPKey;
+}
+
+
+inline const EVP_PKEY* ECKeyImpl::getEVPPKey() const
+{
+	return _pEVPPKey;
+}
+
+
+inline std::string ECKeyImpl::groupName() const
+{
+	return OBJ_nid2sn(groupId());
+}
+
+
+inline void ECKeyImpl::save(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
+	const std::string& privateKeyPassphrase) const
+{
+	EVPPKey(_pEVPPKey).save(publicKeyFile, privateKeyFile, privateKeyPassphrase);
+}
+
+
+inline void ECKeyImpl::save(std::ostream* pPublicKeyStream,
+	std::ostream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase) const
+{
+	EVPPKey(_pEVPPKey).save(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase);
+}
+
+#else // !POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
 inline EC_KEY* ECKeyImpl::getECKey()
 {
 	return _pEC;
@@ -167,8 +225,10 @@ inline void ECKeyImpl::save(std::ostream* pPublicKeyStream,
 	EVPPKey(_pEC).save(pPublicKeyStream, pPrivateKeyStream, privateKeyPassphrase);
 }
 
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
-} } // namespace Poco::Crypto
+
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_ECKeyImplImpl_INCLUDED

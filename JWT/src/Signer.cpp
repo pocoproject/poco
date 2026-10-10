@@ -28,8 +28,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace JWT {
+namespace Poco::JWT {
 
 
 //
@@ -513,4 +512,4 @@ Poco::DigestEngine::Digest Signer::decode(const std::string& signature)
 }
 
 
-} } // namespace Poco::JWT
+} // namespace Poco::JWT

@@ -25,8 +25,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API ZipUtil
@@ -120,7 +119,7 @@ inline void ZipUtil::set64BitValue(const Poco::UInt64 val, char* pVal, const Poc
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipUtil_INCLUDED

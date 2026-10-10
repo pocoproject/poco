@@ -23,8 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API WinRegistryKey
@@ -83,7 +82,7 @@ public:
 		/// Sets the string value (REG_SZ) with the given name.
 		/// An empty name denotes the default value.
 
-	std::string getString(const std::string& name);
+	[[nodiscard]] std::string getString(const std::string& name);
 		/// Returns the string value (REG_SZ) with the given name.
 		/// An empty name denotes the default value.
 		///
@@ -93,7 +92,7 @@ public:
 		/// Sets the expandable string value (REG_EXPAND_SZ) with the given name.
 		/// An empty name denotes the default value.
 
-	std::string getStringExpand(const std::string& name);
+	[[nodiscard]] std::string getStringExpand(const std::string& name);
 		/// Returns the string value (REG_EXPAND_SZ) with the given name.
 		/// An empty name denotes the default value.
 		/// All references to environment variables (%VAR%) in the string
@@ -105,7 +104,7 @@ public:
 		/// Sets the string value (REG_BINARY) with the given name.
 		/// An empty name denotes the default value.
 
-	std::vector<char> getBinary(const std::string& name);
+	[[nodiscard]] std::vector<char> getBinary(const std::string& name);
 		/// Returns the string value (REG_BINARY) with the given name.
 		/// An empty name denotes the default value.
 		///
@@ -115,7 +114,7 @@ public:
 		/// Sets the numeric (REG_DWORD) value with the given name.
 		/// An empty name denotes the default value.
 
-	int getInt(const std::string& name);
+	[[nodiscard]] int getInt(const std::string& name);
 		/// Returns the numeric value (REG_DWORD) with the given name.
 		/// An empty name denotes the default value.
 		///
@@ -127,7 +126,7 @@ public:
 		/// Sets the numeric (REG_QWORD) value with the given name.
 		/// An empty name denotes the default value.
 
-	Poco::Int64 getInt64(const std::string& name);
+	[[nodiscard]] Poco::Int64 getInt64(const std::string& name);
 		/// Returns the numeric value (REG_QWORD) with the given name.
 		/// An empty name denotes the default value.
 		///
@@ -143,13 +142,13 @@ public:
 	void deleteKey();
 		/// Recursively deletes the key and all subkeys.
 
-	bool exists();
+	[[nodiscard]] bool exists();
 		/// Returns true iff the key exists.
 
-	Type type(const std::string& name);
+	[[nodiscard]] Type type(const std::string& name);
 		/// Returns the type of the key value.
 
-	bool exists(const std::string& name);
+	[[nodiscard]] bool exists(const std::string& name);
 		/// Returns true iff the given value exists under that key.
 
 	void subKeys(Keys& keys);
@@ -158,16 +157,16 @@ public:
 	void values(Values& vals);
 		/// Appends all value names to vals;
 
-	bool isReadOnly() const;
+	[[nodiscard]] bool isReadOnly() const;
 		/// Returns true iff the key has been opened for read-only access only.
 
 protected:
 	void open();
 	void close();
-	std::string key() const;
-	std::string key(const std::string& valueName) const;
-	HKEY handle();
-	void handleSetError(const std::string& name);
+	[[nodiscard]] std::string key() const;
+	[[nodiscard]] std::string key(const std::string& valueName) const;
+	[[nodiscard]] HKEY handle();
+	[[noreturn]] void handleSetError(const std::string& name);
 	static HKEY handleFor(const std::string& rootKey);
 
 private:
@@ -192,7 +191,7 @@ inline bool WinRegistryKey::isReadOnly() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_WinRegistryKey_INCLUDED

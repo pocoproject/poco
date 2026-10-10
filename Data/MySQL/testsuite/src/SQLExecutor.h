@@ -16,6 +16,7 @@
 
 #include "Poco/Data/MySQL/MySQL.h"
 #include "Poco/Data/Session.h"
+#include "Poco/Data/Test/SQLExecutor.h"
 
 
 class SQLExecutor: public CppUnit::TestCase
@@ -105,10 +106,14 @@ public:
 	void reconnect();
 	void sessionPoolAndUnicode(const std::string& connString);
 
+	void stdOptional();
+	void stdTupleWithOptional();
+
 private:
 	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
 
 	Poco::Data::Session* _pSession;
+	Poco::Data::Test::SQLExecutor _dataExecutor;
 };
 
 

@@ -34,7 +34,7 @@ NamePoolTest::~NamePoolTest()
 void NamePoolTest::testNamePool()
 {
 	AutoPtr<NamePool> pool = new NamePool;
-	const Name* pName = 0;
+	const Name* pName = nullptr;
 	Name name("pre:local", "http://www.appinf.com");
 
 	pName = &pool->insert(name);

@@ -23,7 +23,7 @@ namespace Poco {
 
 Task::Task(const std::string& name):
 	_name(name),
-	_pOwner(0),
+	_pOwner(nullptr),
 	_progress(0),
 	_state(TASK_IDLE),
 	_cancelEvent(Event::EVENT_MANUALRESET)

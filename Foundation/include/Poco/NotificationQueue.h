@@ -72,9 +72,9 @@ public:
 		///     notificationQueue.enqueueUrgentNotification(new MyNotification);
 		/// does not result in a memory leak.
 
-	Notification* dequeueNotification();
+	[[nodiscard]] Notification* dequeueNotification();
 		/// Dequeues the next pending notification.
-		/// Returns 0 (null) if no notification is available.
+		/// Returns nullptr if no notification is available.
 		/// The caller gains ownership of the notification and
 		/// is expected to release it when done with it.
 		///
@@ -82,20 +82,20 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	Notification* waitDequeueNotification();
+	[[nodiscard]] Notification* waitDequeueNotification();
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
 		/// to be enqueued.
 		/// The caller gains ownership of the notification and
 		/// is expected to release it when done with it.
-		/// This method returns 0 (null) if wakeUpWaitingThreads()
+		/// This method returns nullptr if wakeUpWaitingThreads()
 		/// has been called by another thread.
 		///
 		/// It is highly recommended that the result is immediately
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	Notification* waitDequeueNotification(long milliseconds);
+	[[nodiscard]] Notification* waitDequeueNotification(long milliseconds);
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
 		/// to be enqueued up to the specified time.
@@ -114,10 +114,10 @@ public:
 	void wakeUpAll();
 		/// Wakes up all threads that wait for a notification.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true iff the queue is empty.
 
-	int size() const;
+	[[nodiscard]] int size() const;
 		/// Returns the number of notifications in the queue.
 
 	void clear();
@@ -127,11 +127,11 @@ public:
 		/// Removes a notification from the queue.
 		/// Returns true if remove succeeded, false otherwise
 
-	bool hasIdleThreads() const;
+	[[nodiscard]] bool hasIdleThreads() const;
 		/// Returns true if the queue has at least one thread waiting
 		/// for a notification.
 
-	static NotificationQueue& defaultQueue();
+	[[nodiscard]] static NotificationQueue& defaultQueue();
 		/// Returns a reference to the default
 		/// NotificationQueue.
 
@@ -139,16 +139,17 @@ protected:
 	Notification::Ptr dequeueOne();
 
 private:
-	typedef std::deque<Notification::Ptr> NfQueue;
+	using NfQueue = std::deque<Notification::Ptr>;
 	struct WaitInfo
 	{
 		Notification::Ptr pNf;
 		Event             nfAvailable;
 	};
-	typedef std::deque<WaitInfo*> WaitQueue;
+	using WaitQueue = std::deque<WaitInfo *>;
 
 	NfQueue           _nfQueue;
 	WaitQueue         _waitQueue;
+	bool              _wokeUp = false;
 	mutable FastMutex _mutex;
 };
 

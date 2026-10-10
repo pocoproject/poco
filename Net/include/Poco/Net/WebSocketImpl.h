@@ -24,8 +24,7 @@
 #include "Poco/Buffer.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPSession;
@@ -42,12 +41,21 @@ public:
 	// StreamSocketImpl
 	virtual int sendBytes(const void* buffer, int length, int flags);
 		/// Sends a WebSocket protocol frame.
+		///
+		/// See WebSocket::sendFrame() for more information, including
+		/// behavior if set to non-blocking.
 
 	virtual int receiveBytes(void* buffer, int length, int flags);
 		/// Receives a WebSocket protocol frame.
+		///
+		/// See WebSocket::receiveFrame() for more information, including
+		/// behavior if set to non-blocking.
 
 	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& span = 0);
 		/// Receives a WebSocket protocol frame.
+		///
+		/// See WebSocket::receiveFrame() for more information, including
+		/// behavior if set to non-blocking.
 
 	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
 	virtual void connect(const SocketAddress& address);
@@ -60,23 +68,29 @@ public:
 	virtual void listen(int backlog = 64);
 	virtual void close();
 	virtual void shutdownReceive();
-	virtual void shutdownSend();
-	virtual void shutdown();
+	virtual int shutdownSend();
+	virtual int shutdown();
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 	virtual void sendUrgent(unsigned char data);
-	virtual int available();
-	virtual bool secure() const;
+	[[nodiscard]] virtual int available();
+	[[nodiscard]] virtual bool secure() const;
+	virtual void setSendBufferSize(int size);
+	[[nodiscard]] virtual int getSendBufferSize();
+	virtual void setReceiveBufferSize(int size);
+	[[nodiscard]] virtual int getReceiveBufferSize();
 	virtual void setSendTimeout(const Poco::Timespan& timeout);
-	virtual Poco::Timespan getSendTimeout();
+	[[nodiscard]] virtual Poco::Timespan getSendTimeout();
 	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
-	virtual Poco::Timespan getReceiveTimeout();
+	[[nodiscard]] virtual Poco::Timespan getReceiveTimeout();
+	virtual void setBlocking(bool flag);
+	[[nodiscard]] virtual bool getBlocking() const;
 
 	// Internal
-	int frameFlags() const;
+	[[nodiscard]] int frameFlags() const;
 		/// Returns the frame flags of the most recently received frame.
 
-	bool mustMaskPayload() const;
+	[[nodiscard]] bool mustMaskPayload() const;
 		/// Returns true if the payload must be masked.
 
 	void setMaxPayloadSize(int maxPayloadSize);
@@ -84,7 +98,7 @@ public:
 		///
 		/// The default is std::numeric_limits<int>::max().
 
-	int getMaxPayloadSize() const;
+	[[nodiscard]] int getMaxPayloadSize() const;
 		/// Returns the maximum payload size for receiveFrame().
 		///
 		/// The default is std::numeric_limits<int>::max().
@@ -93,13 +107,44 @@ protected:
 	enum
 	{
 		FRAME_FLAG_MASK   = 0x80,
-		MAX_HEADER_LENGTH = 14
+		MAX_HEADER_LENGTH = 14,
+		MASK_LENGTH       = 4
 	};
 
-	int receiveHeader(char mask[4], bool& useMask);
-	int receivePayload(char *buffer, int payloadLength, char mask[4], bool useMask);
-	int receiveNBytes(void* buffer, int bytes);
-	int receiveSomeBytes(char* buffer, int bytes);
+	struct ReceiveState
+	{
+		int frameFlags = 0;
+		bool useMask = false;
+		char mask[MASK_LENGTH];
+		int headerLength = 0;
+		int payloadLength = 0;
+		int remainingPayloadLength = 0;
+		Poco::Buffer<char> payload{0};
+		int maskOffset = 0;
+	};
+
+	struct SendState
+	{
+		int length = 0;
+		int remainingPayloadOffset = 0;
+		int remainingPayloadLength = 0;
+		Poco::Buffer<char> payload{0};
+	};
+
+	[[nodiscard]] int peekHeader(ReceiveState& receiveState);
+	[[nodiscard]] int incompleteHeader(ReceiveState& receiveState);
+		/// Called by peekHeader() when the bytes available do not make a
+		/// complete frame header. Returns 0 if the peer has closed the
+		/// connection, so that the caller reports the close, and -1
+		/// otherwise, so that the caller waits for the rest of the header.
+		///
+		/// Clears the frame flags, which the caller may already have taken
+		/// from the part of the header it did receive.
+	void skipHeader(int headerLength);
+	[[nodiscard]] int receivePayload(char *buffer, int payloadLength, char mask[MASK_LENGTH], bool useMask, int maskOffset);
+	[[nodiscard]] int receiveNBytes(void* buffer, int length);
+	[[nodiscard]] int receiveSomeBytes(char* buffer, int length);
+	[[nodiscard]] int peekSomeBytes(char* buffer, int length);
 	virtual ~WebSocketImpl();
 
 private:
@@ -109,8 +154,12 @@ private:
 	int _maxPayloadSize;
 	Poco::Buffer<char> _buffer;
 	int _bufferOffset;
-	int _frameFlags;
 	bool _mustMaskPayload;
+	bool _peerClosed;
+		/// Set once a receive on the underlying socket has reported the end
+		/// of the connection.
+	ReceiveState _receiveState;
+	SendState _sendState;
 	Poco::Random _rnd;
 };
 
@@ -120,7 +169,7 @@ private:
 //
 inline int WebSocketImpl::frameFlags() const
 {
-	return _frameFlags;
+	return _receiveState.frameFlags;
 }
 
 
@@ -136,7 +185,7 @@ inline int WebSocketImpl::getMaxPayloadSize() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_WebSocketImpl_INCLUDED

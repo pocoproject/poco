@@ -40,26 +40,26 @@ public:
 	LogStreamBuf(Logger& logger, Message::Priority priority, std::size_t bufferCapacity = 0);
 		/// Creates the LogStream.
 
-	~LogStreamBuf();
-		/// Destroys the LogStream.
+	~LogStreamBuf() override;
+	/// Destroys the LogStream.
 
 	void setPriority(Message::Priority priority);
 		/// Sets the priority for log messages.
 
-	Message::Priority getPriority() const;
+	[[nodiscard]] Message::Priority getPriority() const;
 		/// Returns the priority for log messages.
 
-	Logger& logger() const;
+	[[nodiscard]] Logger& logger() const;
 		/// Returns a reference to the Logger.
 
-	std::size_t capacity() const;
+	[[nodiscard]] std::size_t capacity() const;
 		/// Returns the internal message buffer capacity.
 
 	void reserve(std::size_t capacity);
 		/// Sets the capacity of the internal message buffer to the given size.
 
 private:
-	int writeToDevice(char c);
+	int writeToDevice(char c) override;
 
 private:
 	Logger&           _logger;
@@ -76,8 +76,8 @@ class Foundation_API LogIOS: public virtual std::ios
 {
 public:
 	LogIOS(Logger& logger, Message::Priority priority, std::size_t bufferCapacity = 0);
-	~LogIOS();
-	LogStreamBuf* rdbuf();
+	~LogIOS() override;
+	[[nodiscard]] LogStreamBuf* rdbuf();
 
 protected:
 	LogStreamBuf _buf;
@@ -99,7 +99,7 @@ class Foundation_API LogStream: public LogIOS, public std::ostream
 	///     ls.error() << "Some error message" << std::endl;
 {
 public:
-	static const std::size_t DEFAULT_BUFFER_CAPACITY = 255;
+	static constexpr std::size_t DEFAULT_BUFFER_CAPACITY = 255;
 
 	LogStream(Logger& logger, Message::Priority priority = Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
 		/// Creates the LogStream, using the given logger and priority.
@@ -108,8 +108,8 @@ public:
 		/// Creates the LogStream, using the logger identified
 		/// by loggerName, and sets the priority.
 
-	~LogStream();
-		/// Destroys the LogStream.
+	~LogStream() override;
+	/// Destroys the LogStream.
 
 	LogStream& fatal();
 		/// Sets the priority for log messages to Message::PRIO_FATAL.

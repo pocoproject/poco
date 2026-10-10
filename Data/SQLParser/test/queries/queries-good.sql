@@ -33,6 +33,10 @@ CREATE TABLE teachers (name CHARACTER VARYING(30));
 CREATE TABLE students_2 AS SELECT * FROM students
 CREATE TABLE students_3 AS SELECT city, grade FROM students WHERE grade > 3.0
 CREATE TABLE students (date_of_birth DATE, matriculation_date DATETIME, graduation_date TIMESTAMP, graduated BOOLEAN);
+CREATE TABLE foo (a int, b int REFERENCES bar REFERENCES baz);
+CREATE TABLE foo (a int, b int REFERENCES bar (x) REFERENCES baz (y));
+CREATE TABLE foo (a int, b int, FOREIGN KEY (b) REFERENCES bar, FOREIGN KEY (b) REFERENCES baz);
+CREATE TABLE foo (a int, b int, FOREIGN KEY (b) REFERENCES bar (x), FOREIGN KEY (b) REFERENCES baz (y));
 # Multiple statements
 CREATE TABLE "table" FROM TBL FILE 'students.tbl'; SELECT * FROM "table";
 # INSERT
@@ -61,26 +65,34 @@ DROP INDEX IF EXISTS myindex;
 # PREPARE
 PREPARE prep_inst FROM 'INSERT INTO test VALUES (?, ?, ?)';
 PREPARE prep2 FROM 'INSERT INTO test VALUES (?, 0, 0); INSERT INTO test VALUES (0, ?, 0); INSERT INTO test VALUES (0, 0, ?);';
-EXECUTE prep_inst(1, 2, 3);
+EXECUTE prep_another_inst(1, 2, 3, CAST(1 AS LONG), -2.5, INTERVAL '3 HOURS', -2 SECONDS, TRUE, NULL, DATE '2000-01-01');
 EXECUTE prep;
 DEALLOCATE PREPARE prep;
 # COPY
 COPY students FROM 'student.tbl';
-COPY students FROM 'file_path' WITH FORMAT TBL;
-COPY students FROM 'file_path' WITH FORMAT CSV;
-COPY students FROM 'file_path' WITH FORMAT BIN;
-COPY students FROM 'file_path' WITH FORMAT BINARY;
+COPY students FROM 'file_path' WITH (FORMAT TBL);
+COPY students FROM 'file_path' WITH (FORMAT CSV);
+COPY students FROM 'file_path' WITH (FORMAT BIN);
+COPY students FROM 'file_path' WITH (FORMAT BINARY);
+COPY students FROM 'file_path' WITH (FORMAT CSV, DELIMITER '|', NULL '', QUOTE '"');
+COPY students FROM 'file_path' WITH (DELIMITER '|', NULL '', FORMAT CSV, QUOTE '"');
+COPY students FROM 'file_path' WITH (DELIMITER '|', NULL '', QUOTE '"');
+COPY students FROM 'file_path' WITH (DELIMITER '|', FORMAT CSV);
+COPY students FROM 'file_path' (FORMAT TBL);
 COPY good_students FROM 'file_path' WHERE grade > (SELECT AVG(grade) from alumni);
 COPY students TO 'student.tbl';
-COPY students TO 'file_path' WITH FORMAT TBL;
-COPY students TO 'file_path' WITH FORMAT CSV;
-COPY students TO 'file_path' WITH FORMAT BIN;
-COPY students TO 'file_path' WITH FORMAT BINARY;
+COPY students TO 'file_path' WITH (ENCODING 'some_encoding', FORMAT TBL);
+COPY students TO 'file_path' WITH (FORMAT CSV);
+COPY students TO 'file_path' WITH (FORMAT BIN);
+COPY students TO 'file_path' WITH (FORMAT BINARY);
+COPY students TO 'file_path' (FORMAT BINARY, ENCODING 'FSST');
+COPY students TO 'file_path' WITH (ENCODING 'Dictionary');
 COPY (SELECT firstname, COUNT(*) FROM students GROUP BY firstname) TO 'student_names.csv';
 # HINTS
 SELECT * FROM test WITH HINT(NO_CACHE);
 SELECT * FROM test WITH HINT(NO_CACHE, NO_SAMPLING);
-SELECT * FROM test WITH HINT(NO_CACHE, SAMPLE_RATE(0.1), OMW(1.0, 'test'));
+SELECT * FROM test WITH HINT(NO_CACHE, SAMPLE_RATE(0.1), OMW(1.0, 'test'), START_DATE(CAST('2000-01-01' AS DATE)));
+SELECT * FROM test WITH HINT(TIME_DIFFERENCE(-3 HOURS), ALLOW_RESULT_CACHE(FALSE), DEFAULT_VALUE(NULL), TIMETRAVEL_TO(DATE '2000-01-01'));
 SHOW TABLES;
 SHOW COLUMNS students;
 DESCRIBE students;
@@ -108,3 +120,96 @@ SELECT test1, rank() OVER (ORDER BY test2 DESC, test3 ASC) rnk FROM test;
 SELECT rank() OVER () FROM test;
 SELECT rank() OVER (PARTITION BY test1) FROM test;
 SELECT rank() OVER (PARTITION BY test1 ORDER BY test2) FROM test;
+# Placeholders: PostgreSQL $N and SQLite :name (Poco fork extension)
+SELECT * FROM t WHERE a = $1 AND b = $2;
+SELECT * FROM t WHERE a = :user AND b = :id;
+SELECT * FROM t WHERE a = ? AND b = :id AND c = $3;
+INSERT INTO foo VALUES (?);
+EXECUTE statement_a(?);
+# T-SQL dialect (Poco fork extension)
+SELECT TOP (10) * FROM test;
+SELECT TOP (10) a, b FROM test ORDER BY a;
+SELECT * FROM test ORDER BY id OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
+SELECT * FROM test ORDER BY id OFFSET 20 ROWS FETCH NEXT 5 ROWS ONLY;
+SELECT * FROM [test];
+SELECT [my col] FROM [some schema].[my table];
+SELECT * FROM mydb.some_schema.test;
+SELECT ARRAY[foo] FROM test;
+# T-SQL sequence expression
+SELECT NEXT VALUE FOR seq;
+SELECT NEXT VALUE FOR mydb.dbo.seq AS next_id;
+SELECT COALESCE(MAX(seq_value) + 1, 1) value FROM test;
+# ODBC escape sequences
+SELECT * FROM {oj test LEFT OUTER JOIN other ON test.id = other.id};
+{? = call some_proc(?, 'a', 1)};
+{call some_proc(?)};
+{ ? = call [mydb].[dbo].[some_proc]('a') };
+# TOP with an expression
+SELECT TOP (?) * FROM test;
+SELECT TOP (:limit) * FROM test;
+SELECT TOP (n + 1) * FROM test;
+# Oracle hierarchical query
+SELECT LEVEL FROM dual CONNECT BY LEVEL <= 5;
+SELECT id FROM test START WITH id = 1 CONNECT BY PRIOR id = parent_id;
+SELECT id FROM test CONNECT BY PRIOR id = parent_id;
+# Ordered-set aggregate (WITHIN GROUP)
+SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b) FROM test;
+SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b DESC, c ASC) AS lst FROM test;
+# Oracle outer join marker
+SELECT * FROM test, other WHERE test.id (+) = other.id;
+SELECT * FROM test, other WHERE test.id = other.id (+);
+SELECT * FROM test, other WHERE test.id(+)=other.id AND test.x > 5;
+# Table value constructor in FROM
+SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS v(id, name);
+SELECT * FROM (VALUES (1)) AS v(x);
+# Table-valued function in FROM
+SELECT value FROM STRING_SPLIT('a,b', ',');
+SELECT * FROM STRING_SPLIT('a,b', ',') AS s;
+SELECT * FROM dbo.fn_split('a', ',') f;
+# Row constructor on the left of IN
+SELECT * FROM test WHERE (a, b) IN (SELECT x, y FROM other);
+SELECT * FROM test WHERE (a, b, c) NOT IN (SELECT x, y, z FROM other);
+# Multi-part column references
+SELECT dbo.test.a, mydb.dbo.test.b FROM mydb.dbo.test;
+SELECT dbo.test.*, mydb.dbo.test.* FROM mydb.dbo.test;
+SELECT * FROM [mydb].[dbo].test INNER JOIN [mydb].[dbo].other ON [mydb].[dbo].test.id = [mydb].[dbo].other.id;
+# String literal used as an alias
+SELECT a AS 'Coil Id', b AS 'X' FROM test;
+SELECT * FROM test AS 'my table';
+# Non-reserved keywords used as names
+SELECT * FROM test WHERE created >= DATEADD(MINUTE, -10, GETDATE());
+SELECT DATEDIFF(SECOND, a, b), DATEADD(year, -1, GETDATE()) FROM test;
+SELECT ISNULL(a, 0), CHAR(10), FORMAT(a, '00') FROM test;
+SELECT CONVERT(INT, a), CONVERT(DATETIME, b) FROM test;
+SELECT YEAR, MONTH FROM test ORDER BY YEAR;
+# Scientific notation numeric literals
+SELECT 1.5e3 FROM test;
+SELECT 1.5E+3, 5e-1, .5e1, 2e10 FROM test;
+SELECT * FROM test WHERE a = 0.5e-2;
+# Non-reserved words usable as ordinary names
+SELECT * FROM start;
+SELECT start.a FROM start;
+UPDATE test SET start = 1;
+INSERT INTO test (start, connect) VALUES (1, 2);
+CREATE TABLE test (start INT);
+SELECT a AS within FROM test;
+SELECT * FROM test AS connect;
+SELECT test.YEAR, dbo.test.MONTH FROM dbo.test;
+SELECT a AS year FROM test AS next;
+SELECT * FROM year.test;
+# Row constructor against a literal list
+SELECT * FROM test WHERE (a, b) IN ((1, 2), (3, 4));
+SELECT * FROM test WHERE (a, b, c) NOT IN ((1, 2, 3), (4, 5, 6));
+# Hierarchical clauses in either order, with and without NOCYCLE
+SELECT id FROM test CONNECT BY PRIOR id = parent_id START WITH id = 1;
+SELECT id FROM test CONNECT BY NOCYCLE PRIOR id = parent_id;
+SELECT id FROM test CONNECT BY NOCYCLE PRIOR id = parent_id START WITH id = 1;
+SELECT * FROM test CONNECT BY nocycleflag = 1;
+# Ordered-set aggregates and window clauses on every call form
+SELECT dbo.LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b) FROM test;
+SELECT FORMAT(a) WITHIN GROUP (ORDER BY b) FROM test;
+SELECT RANK() OVER (PARTITION BY a) FROM test;
+# Table-valued function keeps its schema
+SELECT * FROM dbo.fn_split('a', ',') f;
+# ODBC call escape with a return marker
+{? = call some_proc(?, ?)};

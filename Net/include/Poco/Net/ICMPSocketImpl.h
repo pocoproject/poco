@@ -24,8 +24,7 @@
 #include "Poco/Timestamp.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ICMPSocketImpl: public RawSocketImpl
@@ -48,16 +47,16 @@ public:
 		///
 		/// Returns the time elapsed since the originating request was sent.
 
-	int dataSize() const;
+	[[nodiscard]] int dataSize() const;
 		/// Returns the data size in bytes.
 
-	int packetSize() const;
+	[[nodiscard]] int packetSize() const;
 		/// Returns the packet size in bytes.
 
-	int ttl() const;
+	[[nodiscard]] int ttl() const;
 		/// Returns the Time-To-Live value.
 
-	int timeout() const;
+	[[nodiscard]] int timeout() const;
 		/// Returns the socket timeout value.
 
 protected:
@@ -99,7 +98,7 @@ inline int ICMPSocketImpl::timeout() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ICMPSocketImpl_INCLUDED

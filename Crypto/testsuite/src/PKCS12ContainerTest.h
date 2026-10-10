@@ -29,6 +29,9 @@ public:
 	void testFullPKCS12();
 	void testCertsOnlyPKCS12();
 	void testPEMReadWrite();
+	void testPEMReadCorrupt();
+	void testIssuedBy();
+	void testPEMWriteDeviceFull();
 
 	void setUp();
 	void tearDown();

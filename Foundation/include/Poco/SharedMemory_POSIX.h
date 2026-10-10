@@ -52,10 +52,10 @@ public:
 		/// is actually honored is, however, up to the system. Windows platform
 		/// will generally ignore the hint.
 
-	char* begin() const;
+	[[nodiscard]] char* begin() const;
 		/// Returns the start address of the shared memory segment.
 
-	char* end() const;
+	[[nodiscard]] char* end() const;
 		/// Returns the one-past-end end address of the shared memory segment.
 
 protected:
@@ -68,7 +68,7 @@ protected:
 	void close();
 		/// Releases the handle for the shared memory segment.
 
-	~SharedMemoryImpl();
+	~SharedMemoryImpl() override;
 		/// Destroys the SharedMemoryImpl.
 
 private:

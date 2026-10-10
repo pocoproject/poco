@@ -3,7 +3,7 @@ file(GLOB SRCS_G ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 POCO_SOURCES_AUTO(DATA_TEST_LIB_SRCS ${SRCS_G})
 
 # Headers
-file(GLOB HDRS_G ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
+file(GLOB HDRS_G ${CMAKE_CURRENT_SOURCE_DIR}/include/Poco/Data/Test/*.h)
 POCO_HEADERS_AUTO(DATA_TEST_LIB_SRCS ${HDRS_G})
 
 # Version Resource
@@ -24,7 +24,7 @@ set_target_properties(DataTest
 target_link_libraries(DataTest PUBLIC Poco::Data CppUnit)
 target_include_directories(DataTest
 	PUBLIC
-		$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Data/include>
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Data/include>
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )

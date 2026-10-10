@@ -29,8 +29,7 @@ using Poco::TimeoutException;
 using Poco::Exception;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 ICMPClient::ICMPClient(SocketAddress::Family family, int dataSize, int ttl, int timeout):
@@ -148,4 +147,4 @@ int ICMPClient::ping(SocketAddress& address,
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -1,0 +1,71 @@
+/*
+ * Theme variables + base reset, following the same scheme as the HubMonitor
+ * dashboard (alephone/platform/Net/HubMonitor/webui/common.css): every colour is
+ * a CSS variable on :root, and switching themes is only toggling
+ * data-theme="light" on <html>. app.css and app.js read these names, so a
+ * deployment can restyle the whole page by overriding this file alone.
+ */
+
+:root {
+  --bg-app:        #05131a;
+  --bg-panel:      #0a1f2c;
+  --bg-elev:       #102a3a;
+  --bg-deep:       #001824;
+  --border:        #2d3e4a;
+  --border-soft:   #1c2d38;
+
+  --text-strong:   #f7f9fa;
+  --text-default:  #dbe2e8;
+  --text-muted:    #9ca3af;
+  --text-faint:    #5c6b75;
+
+  --accent-blue:   #66bfff;
+  --accent-blue-d: #4db3ff;
+  --accent-green:  #34d399;
+  --accent-amber:  #fbbf24;
+  --accent-red:    #f87171;
+  --focus-ring:    rgba(102, 191, 255, 0.40);
+
+  --row-hover:     rgba(255, 255, 255, 0.04);
+  --code-bg:       #001824;
+
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg-app:        #f7f9fa;
+  --bg-panel:      #ffffff;
+  --bg-elev:       #f0f1f2;
+  --bg-deep:       #f0f1f2;
+  --border:        #e0e2e4;
+  --border-soft:   #eef0f2;
+
+  --text-strong:   #002233;
+  --text-default:  #1f2328;
+  --text-muted:    #6b7280;
+  --text-faint:    #9ca3af;
+
+  --accent-blue:   #0d99ff;
+  --accent-blue-d: #0a7acc;
+  --accent-green:  #059669;
+  --accent-amber:  #d97706;
+  --accent-red:    #dc2626;
+  --focus-ring:    rgba(13, 153, 255, 0.40);
+
+  --row-hover:     rgba(0, 0, 0, 0.035);
+  --code-bg:       #f0f1f2;
+
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; height: 100%;
+  /* The page is a full-height app frame that scrolls inside its own panes,
+     never at the document level, so a transient scrollbar can't reflow it. */
+  overflow: hidden;
+  background: var(--bg-app); color: var(--text-default);
+  font-family: "Open Sans", -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+}

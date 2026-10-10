@@ -35,6 +35,29 @@ using Poco::AutoPtr;
 Poco::FastMutex ICMPClientTest::_mutex;
 
 
+bool ICMPClientTest::_probed = false;
+bool ICMPClientTest::_available = false;
+
+
+bool ICMPClientTest::icmpAvailable()
+{
+	if (!_probed)
+	{
+		_probed = true;
+		try
+		{
+			Poco::Net::ICMPSocket s(Poco::Net::IPAddress::IPv4);
+			_available = true;
+		}
+		catch (Poco::Exception&)
+		{
+			std::cout << "ICMP sockets not available (requires elevated privileges), tests skipped." << std::endl;
+		}
+	}
+	return _available;
+}
+
+
 ICMPClientTest::ICMPClientTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
@@ -48,6 +71,8 @@ ICMPClientTest::~ICMPClientTest()
 
 void ICMPClientTest::testPing()
 {
+	if (!icmpAvailable()) return;
+
 	assertTrue (ICMPClient::pingIPv4("127.0.0.1") > 0);
 
 	Poco::Net::ICMPClient icmpClient(IPAddress::IPv4);
@@ -75,6 +100,8 @@ void ICMPClientTest::testPing()
 
 void ICMPClientTest::testBigPing()
 {
+	if (!icmpAvailable()) return;
+
 	assertTrue (ICMPClient::pingIPv4("127.0.0.1", 1, 96) > 0);
 
 	Poco::Net::ICMPClient icmpClient(IPAddress::IPv4, 96);

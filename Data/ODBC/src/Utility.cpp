@@ -14,15 +14,14 @@
 
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Handle.h"
+#include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTime.h"
 #include <cmath>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 const TypeInfo Utility::_dataTypes;
@@ -152,8 +151,55 @@ void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 	ts.second = dt.second();
 	// Fraction support is limited to milliseconds due to MS SQL Server limitation
 	// see http://support.microsoft.com/kb/263872
-	ts.fraction = (dt.millisecond() * 1000000);// + (dt.microsecond() * 1000);
+	ts.fraction = (dt.millisecond() * 1000000);
 }
 
 
-} } } // namespace Poco::Data::ODBC
+std::string Utility::sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type)
+{
+	std::string ret = "unknown"s;
+	const SQLSMALLINT bufSize = 1024;
+	SQLCHAR dbmsName[bufSize] = {0};
+	SQLSMALLINT retSize = 0;
+	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), type, dbmsName, bufSize, &retSize);
+	if (!isError(rc))
+	{
+		ret.assign(reinterpret_cast<char*>(dbmsName), retSize);
+		// API may return string longer than effective length
+		ret.erase(ret.find_last_not_of('\0') + 1, std::string::npos);
+	}
+	return ret;
+}
+
+
+std::string Utility::dbmsName(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DBMS_NAME);
+}
+
+
+std::string Utility::dbmsVersion(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DBMS_VER);
+}
+
+
+std::string Utility::driverName(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DRIVER_NAME);
+}
+
+
+std::string Utility::driverVersion(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DRIVER_VER);
+}
+
+
+std::string Utility::driverODBCVersion(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DRIVER_ODBC_VER);
+}
+
+
+} // namespace Poco::Data::ODBC

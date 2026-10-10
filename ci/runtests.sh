@@ -12,4 +12,4 @@ if [ "TSAN" = "$1" ]
   then
     export TSAN_OPTIONS="suppressions=$POCO_BASE/tsan.suppress,second_deadlock_stack=1"
 fi
-build/script/runtests.sh
+build/script/runtests.sh "" "$2"

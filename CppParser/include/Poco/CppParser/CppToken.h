@@ -23,8 +23,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API CppToken: public Poco::Token
@@ -35,7 +34,7 @@ public:
 	~CppToken();
 
 protected:
-	void syntaxError(const std::string& expected, const std::string& actual);
+	[[noreturn]] void syntaxError(const std::string& expected, const std::string& actual);
 };
 
 
@@ -98,10 +97,10 @@ public:
 
 	OperatorToken();
 	~OperatorToken();
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	int asInteger() const;
+	[[nodiscard]] int asInteger() const;
 
 private:
 	using OpMap = std::map<std::string, int>;
@@ -203,12 +202,14 @@ public:
 
 	IdentifierToken();
 	~IdentifierToken();
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	int asInteger() const;
+	[[nodiscard]] int asInteger() const;
 
 private:
+	void finishRawString(std::istream& istr);
+
 	using KWMap = std::map<std::string, int>;
 
 	KWMap _kwMap;
@@ -220,10 +221,10 @@ class CppParser_API StringLiteralToken: public CppToken
 public:
 	StringLiteralToken();
 	~StringLiteralToken();
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	std::string asString() const;
+	[[nodiscard]] std::string asString() const;
 };
 
 
@@ -232,10 +233,10 @@ class CppParser_API CharLiteralToken: public CppToken
 public:
 	CharLiteralToken();
 	~CharLiteralToken();
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	char asChar() const;
+	[[nodiscard]] char asChar() const;
 };
 
 
@@ -244,11 +245,11 @@ class CppParser_API NumberLiteralToken: public CppToken
 public:
 	NumberLiteralToken();
 	~NumberLiteralToken();
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	int asInteger() const;
-	double asFloat() const;
+	[[nodiscard]] int asInteger() const;
+	[[nodiscard]] double asFloat() const;
 
 protected:
 	void finishHex(std::istream& istr, int next);
@@ -266,10 +267,10 @@ class CppParser_API CommentToken: public CppToken
 public:
 	CommentToken();
 	~CommentToken();
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	std::string asString() const;
+	[[nodiscard]] std::string asString() const;
 };
 
 
@@ -278,13 +279,13 @@ class CppParser_API PreprocessorToken: public CppToken
 public:
 	PreprocessorToken();
 	~PreprocessorToken();
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
 };
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_CppToken_INCLUDED

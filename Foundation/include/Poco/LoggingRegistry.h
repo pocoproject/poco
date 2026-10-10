@@ -42,17 +42,25 @@ public:
 	~LoggingRegistry();
 		/// Destroys the LoggingRegistry.
 
-	Channel::Ptr channelForName(const std::string& name) const;
+	[[nodiscard]] Channel::Ptr channelForName(const std::string& name) const;
 		/// Returns the Channel object which has been registered
 		/// under the given name.
 		///
 		/// Throws a NotFoundException if the name is unknown.
 
-	Formatter::Ptr formatterForName(const std::string& name) const;
+	[[nodiscard]] Formatter::Ptr formatterForName(const std::string& name) const;
 		/// Returns the Formatter object which has been registered
 		/// under the given name.
 		///
 		/// Throws a NotFoundException if the name is unknown.
+
+	bool hasChannel(const std::string& name) const;
+		/// Returns true if a channel with the given name
+		/// has been registered, false otherwise.
+
+	bool hasFormatter(const std::string& name) const;
+		/// Returns true if a formatter with the given name
+		/// has been registered, false otherwise.
 
 	void registerChannel(const std::string& name, Channel::Ptr pChannel);
 		/// Registers a channel under a given name.
@@ -77,15 +85,15 @@ public:
 	void clear();
 		/// Unregisters all registered channels and formatters.
 
-	static LoggingRegistry& defaultRegistry();
+	[[nodiscard]] static LoggingRegistry& defaultRegistry();
 		/// Returns a reference to the default
 		/// LoggingRegistry.
 
 private:
-	typedef Channel::Ptr ChannelPtr;
-	typedef AutoPtr<Formatter> FormatterPtr;
-	typedef std::map<std::string, ChannelPtr> ChannelMap;
-	typedef std::map<std::string, FormatterPtr> FormatterMap;
+	using ChannelPtr = Channel::Ptr;
+	using FormatterPtr = AutoPtr<Formatter>;
+	using ChannelMap = std::map<std::string, ChannelPtr>;
+	using FormatterMap = std::map<std::string, FormatterPtr>;
 
 	ChannelMap   _channelMap;
 	FormatterMap _formatterMap;

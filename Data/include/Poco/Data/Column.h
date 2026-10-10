@@ -21,14 +21,12 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/RefCountedObject.h"
 #include <vector>
 #include <list>
 #include <deque>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <class C>
@@ -45,6 +43,8 @@ public:
 	using RIterator = typename C::const_reverse_iterator;
 	using Size = typename C::size_type;
 	using Type = typename C::value_type;
+
+	Column() = delete;
 
 	Column(const MetaColumn& metaColumn, Container* pData):
 		_metaColumn(metaColumn),
@@ -69,10 +69,8 @@ public:
 	{
 	}
 
-	~Column()
+	~Column() = default;
 		/// Destroys the Column.
-	{
-	}
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -98,13 +96,13 @@ public:
 		swap(_pData, other._pData);
 	}
 
-	Container& data()
+	[[nodiscard]] Container& data()
 		/// Returns reference to contained data.
 	{
 		return *_pData;
 	}
 
-	const Type& value(std::size_t row) const
+	[[nodiscard]] const Type& value(std::size_t row) const
 		/// Returns the field value in specified row.
 	{
 		try
@@ -117,13 +115,13 @@ public:
 		}
 	}
 
-	const Type& operator [] (std::size_t row) const
+	[[nodiscard]] const Type& operator [] (std::size_t row) const
 		/// Returns the field value in specified row.
 	{
 		return value(row);
 	}
 
-	Size rowCount() const
+	[[nodiscard]] Size rowCount() const
 		/// Returns number of rows.
 	{
 		return _pData->size();
@@ -135,52 +133,50 @@ public:
 		Container().swap(*_pData);
 	}
 
-	const std::string& name() const
+	[[nodiscard]] const std::string& name() const
 		/// Returns column name.
 	{
 		return _metaColumn.name();
 	}
 
-	std::size_t length() const
+	[[nodiscard]] std::size_t length() const
 		/// Returns column maximum length.
 	{
 		return _metaColumn.length();
 	}
 
-	std::size_t precision() const
+	[[nodiscard]] std::size_t precision() const
 		/// Returns column precision.
 		/// Valid for floating point fields only (zero for other data types).
 	{
 		return _metaColumn.precision();
 	}
 
-	std::size_t position() const
+	[[nodiscard]] std::size_t position() const
 		/// Returns column position.
 	{
 		return _metaColumn.position();
 	}
 
-	MetaColumn::ColumnDataType type() const
+	[[nodiscard]] MetaColumn::ColumnDataType type() const
 		/// Returns column type.
 	{
 		return _metaColumn.type();
 	}
 
-	Iterator begin() const
+	[[nodiscard]] Iterator begin() const
 		/// Returns iterator pointing to the beginning of data storage vector.
 	{
 		return _pData->begin();
 	}
 
-	Iterator end() const
+	[[nodiscard]] Iterator end() const
 		/// Returns iterator pointing to the end of data storage vector.
 	{
 		return _pData->end();
 	}
 
 private:
-	Column();
-
 	MetaColumn   _metaColumn;
 	ContainerPtr _pData;
 };
@@ -224,10 +220,10 @@ public:
 		_deque.assign(_pData->begin(), _pData->end());
 	}
 
-	~Column()
+	Column() = delete;
+
+	~Column() = default;
 		/// Destroys the Column.
-	{
-	}
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -246,13 +242,13 @@ public:
 		swap(_deque, other._deque);
 	}
 
-	Container& data()
+	[[nodiscard]] Container& data()
 		/// Returns reference to contained data.
 	{
 		return *_pData;
 	}
 
-	const bool& value(std::size_t row) const
+	[[nodiscard]] const bool& value(std::size_t row) const
 		/// Returns the field value in specified row.
 	{
 		if (_deque.size() < _pData->size())
@@ -268,13 +264,13 @@ public:
 		}
 	}
 
-	const bool& operator [] (std::size_t row) const
+	[[nodiscard]] const bool& operator [] (std::size_t row) const
 		/// Returns the field value in specified row.
 	{
 		return value(row);
 	}
 
-	Size rowCount() const
+	[[nodiscard]] Size rowCount() const
 		/// Returns number of rows.
 	{
 		return _pData->size();
@@ -287,51 +283,50 @@ public:
 		_deque.clear();
 	}
 
-	const std::string& name() const
+	[[nodiscard]] const std::string& name() const
 		/// Returns column name.
 	{
 		return _metaColumn.name();
 	}
 
-	std::size_t length() const
+	[[nodiscard]] std::size_t length() const
 		/// Returns column maximum length.
 	{
 		return _metaColumn.length();
 	}
 
-	std::size_t precision() const
+	[[nodiscard]] std::size_t precision() const
 		/// Returns column precision.
 		/// Valid for floating point fields only (zero for other data types).
 	{
 		return _metaColumn.precision();
 	}
 
-	std::size_t position() const
+	[[nodiscard]] std::size_t position() const
 		/// Returns column position.
 	{
 		return _metaColumn.position();
 	}
 
-	MetaColumn::ColumnDataType type() const
+	[[nodiscard]] MetaColumn::ColumnDataType type() const
 		/// Returns column type.
 	{
 		return _metaColumn.type();
 	}
 
-	Iterator begin() const
+	[[nodiscard]] Iterator begin() const
 		/// Returns iterator pointing to the beginning of data storage vector.
 	{
 		return _pData->begin();
 	}
 
-	Iterator end() const
+	[[nodiscard]] Iterator end() const
 		/// Returns iterator pointing to the end of data storage vector.
 	{
 		return _pData->end();
 	}
 
 private:
-	Column();
 
 	MetaColumn               _metaColumn;
 	ContainerPtr             _pData;
@@ -365,10 +360,10 @@ public:
 	{
 	}
 
-	~Column()
+	Column() = delete;
+
+	~Column() = default;
 		/// Destroys the Column.
-	{
-	}
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -386,13 +381,13 @@ public:
 		swap(_pData, other._pData);
 	}
 
-	Container& data()
+	[[nodiscard]] Container& data()
 		/// Returns reference to contained data.
 	{
 		return *_pData;
 	}
 
-	const T& value(std::size_t row) const
+	[[nodiscard]] const T& value(std::size_t row) const
 		/// Returns the field value in specified row.
 		/// This is the std::list specialization and std::list
 		/// is not the optimal solution for cases where random
@@ -403,32 +398,32 @@ public:
 		/// to start iteration from beginning or end,
 		/// depending on the position requested.
 	{
-		if (row <= (std::size_t) (_pData->size() / 2))
+		if (row <= (_pData->size() / 2))
 		{
 			Iterator it = _pData->begin();
 			Iterator end = _pData->end();
-			for (int i = 0; it != end; ++it, ++i)
+			for (std::size_t i = 0; it != end; ++it, ++i)
 				if (i == row) return *it;
 		}
 		else
 		{
 			row = _pData->size() - row;
 			RIterator it = _pData->rbegin();
-			RIterator end = _pData->rend();
-			for (int i = 1; it != end; ++it, ++i)
+			const RIterator end = _pData->rend();
+			for (std::size_t i = 1; it != end; ++it, ++i)
 				if (i == row) return *it;
 		}
 
 		throw RangeException("Invalid row number.");
 	}
 
-	const T& operator [] (std::size_t row) const
+	[[nodiscard]] const T& operator [] (std::size_t row) const
 		/// Returns the field value in specified row.
 	{
 		return value(row);
 	}
 
-	Size rowCount() const
+	[[nodiscard]] Size rowCount() const
 		/// Returns number of rows.
 	{
 		return _pData->size();
@@ -440,51 +435,50 @@ public:
 		_pData->clear();
 	}
 
-	const std::string& name() const
+	[[nodiscard]] const std::string& name() const
 		/// Returns column name.
 	{
 		return _metaColumn.name();
 	}
 
-	std::size_t length() const
+	[[nodiscard]] std::size_t length() const
 		/// Returns column maximum length.
 	{
 		return _metaColumn.length();
 	}
 
-	std::size_t precision() const
+	[[nodiscard]] std::size_t precision() const
 		/// Returns column precision.
 		/// Valid for floating point fields only (zero for other data types).
 	{
 		return _metaColumn.precision();
 	}
 
-	std::size_t position() const
+	[[nodiscard]] std::size_t position() const
 		/// Returns column position.
 	{
 		return _metaColumn.position();
 	}
 
-	MetaColumn::ColumnDataType type() const
+	[[nodiscard]] MetaColumn::ColumnDataType type() const
 		/// Returns column type.
 	{
 		return _metaColumn.type();
 	}
 
-	Iterator begin() const
+	[[nodiscard]] Iterator begin() const
 		/// Returns iterator pointing to the beginning of data storage vector.
 	{
 		return _pData->begin();
 	}
 
-	Iterator end() const
+	[[nodiscard]] Iterator end() const
 		/// Returns iterator pointing to the end of data storage vector.
 	{
 		return _pData->end();
 	}
 
 private:
-	Column();
 
 	MetaColumn   _metaColumn;
 	ContainerPtr _pData;
@@ -498,8 +492,7 @@ inline void swap(Column<C>& c1, Column<C>& c2) noexcept
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Column_INCLUDED
-

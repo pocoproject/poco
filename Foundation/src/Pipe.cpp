@@ -60,8 +60,7 @@ void Pipe::close(CloseMode mode)
 		_pImpl->closeWrite();
 		break;
 	default:
-		_pImpl->closeRead();
-		_pImpl->closeWrite();
+		_pImpl->close();
 		break;
 	}
 }

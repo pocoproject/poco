@@ -22,9 +22,7 @@
 #include "Poco/Data/Connector.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class MySQL_API Connector: public Poco::Data::Connector
@@ -36,14 +34,14 @@ public:
 	Connector();
 		/// Creates the Connector.
 
-	virtual ~Connector();
+	~Connector() override;
 		/// Destroys the Connector.
 
-	virtual const std::string& name() const;
+	[[nodiscard]] const std::string& name() const override;
 		/// Returns the name associated with this connector.
 
-	virtual Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
-		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT);
+	[[nodiscard]] Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
+		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT) override;
 		/// Creates a MySQL SessionImpl object and initializes it with the given connectionString.
 
 	static void registerConnector();
@@ -54,7 +52,7 @@ public:
 };
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_Connector_INCLUDED

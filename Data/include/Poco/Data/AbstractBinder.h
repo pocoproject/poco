@@ -35,8 +35,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 using NullData = NullType;
@@ -45,7 +44,7 @@ class Transcoder;
 namespace Keywords {
 
 
-static const NullData null = NULL_GENERIC;
+inline const NullData null = std::nullopt;
 
 
 } // namespace Keywords
@@ -353,22 +352,23 @@ public:
 	virtual void reset();
 		/// Resets a binder. No-op by default. Implement for binders that cache data.
 
-	static bool isOutBound(Direction dir);
+	[[nodiscard]] static bool isOutBound(Direction dir);
 		/// Returns true if direction is out bound;
 
-	static bool isInBound(Direction dir);
+	[[nodiscard]] static bool isInBound(Direction dir);
 		/// Returns true if direction is in bound;
 
 protected:
-	bool transcodeRequired() const;
+	[[nodiscard]] bool transcodeRequired() const;
 	void transcode(const std::string& from, std::string& to);
 	void reverseTranscode(const std::string& from, std::string& to);
 
-	const std::string& toString(const UUID& uuid);
+	[[nodiscard]] const std::string& toString(const UUID& uuid);
+	    /// Stores a string representation of uuid and returns a reference to it
 
 private:
 	using StringList = std::vector<std::string*>;
-  
+
 	std::unique_ptr<Transcoder> _pTranscoder;
 	std::unique_ptr<StringList> _pStrings;
 };
@@ -401,7 +401,7 @@ inline bool AbstractBinder::transcodeRequired() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_AbstractBinder_INCLUDED

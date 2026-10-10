@@ -25,9 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API Connector: public Poco::Data::Connector
@@ -39,14 +37,14 @@ public:
 	Connector();
 		/// Creates the Connector.
 
-	virtual ~Connector();
+	~Connector() override;
 		/// Destroys the Connector.
 
-	virtual const std::string& name() const;
+	[[nodiscard]] const std::string& name() const override;
 		/// Returns the name associated with this connector.
 
-	virtual Poco::Data::SessionImpl::Ptr createSession(const std::string&  aConnectionString,
-		std::size_t aTimeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT);
+	[[nodiscard]] Poco::Data::SessionImpl::Ptr createSession(const std::string&  aConnectionString,
+		std::size_t aTimeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT) override;
 		/// Creates a PostgreSQL SessionImpl object and initializes it with the given connectionString.
 
 	static void registerConnector();
@@ -57,7 +55,7 @@ public:
 };
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // Data_PostgreSQL_Connector_INCLUDED

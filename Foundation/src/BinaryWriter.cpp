@@ -24,7 +24,7 @@ namespace Poco {
 
 BinaryWriter::BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder):
 	_ostr(ostr),
-	_pTextConverter(0)
+	_pTextConverter(nullptr)
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
@@ -36,7 +36,7 @@ BinaryWriter::BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder):
 
 BinaryWriter::BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByteOrder byteOrder):
 	_ostr(ostr),
-	_pTextConverter(new TextConverter(Poco::TextEncoding::global(), encoding))
+	_pTextConverter(std::make_shared<TextConverter>(Poco::TextEncoding::global(), encoding))
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
@@ -46,10 +46,7 @@ BinaryWriter::BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByt
 }
 
 
-BinaryWriter::~BinaryWriter()
-{
-	delete _pTextConverter;
-}
+BinaryWriter::~BinaryWriter() = default;
 
 
 BinaryWriter& BinaryWriter::operator << (bool value)
@@ -338,7 +335,7 @@ void BinaryWriter::writeCString(const char* cString, std::streamsize maxLength)
 {
 	const std::size_t len = ::strnlen(cString, static_cast<std::size_t>(maxLength));
 	writeRaw(cString, len);
-	static const char zero = '\0';
+	static constexpr char zero = '\0';
 	_ostr.write(&zero, sizeof(zero));
 }
 

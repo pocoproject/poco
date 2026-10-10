@@ -32,9 +32,9 @@ class BufferAllocator
 	/// BufferAllocator has been specified.
 {
 public:
-	typedef ch char_type;
+	using char_type = ch;
 
-	static char_type* allocate(std::streamsize size)
+	[[nodiscard]] static char_type* allocate(std::streamsize size)
 	{
 		return new char_type[static_cast<std::size_t>(size)];
 	}

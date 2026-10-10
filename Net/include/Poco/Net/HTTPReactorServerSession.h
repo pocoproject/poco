@@ -1,0 +1,65 @@
+#ifndef Net_HTTPReactorServerSession_INCLUDED
+#define Net_HTTPReactorServerSession_INCLUDED
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/StreamSocket.h"
+#include <cstring>
+#include <string>
+namespace Poco::Net {
+
+
+class Net_API HTTPReactorServerSession : public HTTPSession
+/// This class handles the server side of a
+/// HTTP session. It is used internally by
+/// HTTPReactorServer.
+{
+public:
+	HTTPReactorServerSession(const StreamSocket& socket, std::string& buf, HTTPServerParams::Ptr pParams);
+	/// Creates the HTTPReactorServerSession.
+
+	virtual ~HTTPReactorServerSession();
+	/// Destroys the HTTPReactorServerSession.
+
+	[[nodiscard]] SocketAddress clientAddress() override
+	{
+		return _realsocket.peerAddress();
+	}
+	/// Returns the client's address.
+
+	[[nodiscard]] SocketAddress serverAddress() override
+	{
+		return _realsocket.address();
+	}
+	/// Returns the server's address.
+
+	[[nodiscard]] bool checkRequestComplete();
+
+	void popCompletedRequest();
+
+private:
+	[[nodiscard]] int get() override;
+
+	[[nodiscard]] int peek() override;
+
+	int read(char* buffer, std::streamsize length) override;
+
+	int write(const char* buffer, std::streamsize length) override;
+
+	bool parseHeaders(std::size_t pos, std::size_t& bodyStart, std::size_t& contentLength, bool& isChunked);
+
+	bool parseChunkSize(std::size_t& pos, std::size_t& chunkSize, int&);
+
+private:
+	std::string&   _buf;
+	char*          _pcur{nullptr};
+	char*          _pend{nullptr};
+	int            _idx{0};
+	int            _complete{0};
+	StreamSocket   _realsocket;
+};
+
+} // namespace Poco::Net
+
+#endif // Net_HTTPReactorServerSession_INCLUDED
+

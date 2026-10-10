@@ -18,8 +18,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 SessionPool::SessionPool(const std::string& connector, const std::string& connectionString, int minSessions, int maxSessions, int idleTime, int connTimeout):
@@ -141,8 +140,8 @@ int SessionPool::dead()
 	int count = 0;
 
 	Poco::Mutex::ScopedLock lock(_mutex);
-	SessionList::iterator it = _activeSessions.begin();
-	SessionList::iterator itEnd = _activeSessions.end();
+	SessionList::iterator it = _idleSessions.begin();
+	SessionList::iterator itEnd = _idleSessions.end();
 	for (; it != itEnd; ++it)
 	{
 		if (!(*it)->session()->isGood())
@@ -342,4 +341,4 @@ void SessionPool::closeAll(SessionList& sessionList)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

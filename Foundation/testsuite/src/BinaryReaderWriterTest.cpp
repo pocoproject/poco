@@ -14,6 +14,7 @@
 #include "Poco/BinaryWriter.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/Buffer.h"
+#include "Poco/Latin1Encoding.h"
 #include <sstream>
 
 
@@ -258,6 +259,78 @@ void BinaryReaderWriterTest::testWrappers()
 }
 
 
+void BinaryReaderWriterTest::testCopyWithTextEncoding()
+{
+	// A copy shares the TextConverter: the original still converts strings after
+	// the copy is destroyed, and neither deletes the converter a second time.
+	Poco::Latin1Encoding latin1;
+	const std::string text("\xC3\xA4pfel");
+	std::stringstream stream;
+
+	BinaryWriter writer(stream, latin1);
+	{
+		BinaryWriter copy(writer);
+		copy << text;
+	}
+	writer << text;
+	writer.flush();
+	assertTrue (stream.str() == "\x05\xE4pfel\x05\xE4pfel");
+
+	BinaryReader reader(stream, latin1);
+	std::string value;
+	{
+		BinaryReader copy(reader);
+		copy >> value;
+	}
+	assertTrue (value == text);
+	reader >> value;
+	assertTrue (value == text);
+}
+
+
+void BinaryReaderWriterTest::testReadRawString()
+{
+	std::string data(200000, ' ');
+	for (std::string::size_type i = 0; i < data.size(); ++i)
+		data[i] = static_cast<char>('a' + i % 26);
+	std::istringstream istr(data);
+	BinaryReader reader(istr);
+
+	// More than one read chunk, then a stream that ends before the requested length
+	std::string value;
+	reader.readRaw(150000, value);
+	assertTrue (value == data.substr(0, 150000));
+	reader.readRaw(100000, value);
+	assertTrue (value == data.substr(150000));
+	assertTrue (reader.eof());
+
+	reader.readRaw(0, value);
+	assertTrue (value.empty());
+}
+
+
+void BinaryReaderWriterTest::testReadRawStringWithExceptions()
+{
+	// With exceptions enabled on the stream the read throws; the string must hold
+	// only the bytes that actually arrived.
+	const std::string data("12345");
+	std::istringstream istr(data);
+	BinaryReader reader(istr);
+	reader.setExceptions(std::istream::failbit | std::istream::eofbit);
+
+	std::string value;
+	try
+	{
+		reader.readRaw(10, value);
+		fail("readRaw past the end of the stream did not throw");
+	}
+	catch (std::ios_base::failure&)
+	{
+	}
+	assertTrue (value == data);
+}
+
+
 void BinaryReaderWriterTest::setUp()
 {
 }
@@ -276,6 +349,9 @@ CppUnit::Test* BinaryReaderWriterTest::suite()
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testBigEndian);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testLittleEndian);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testWrappers);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testCopyWithTextEncoding);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadRawString);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadRawStringWithExceptions);
 
 	return pSuite;
 }

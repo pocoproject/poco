@@ -22,8 +22,7 @@
 #include "Poco/Data/Statement.h"
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 template <typename ActRec>
@@ -117,7 +116,7 @@ public:
 		return *this;
 	}
 
-	std::vector<typename ActRec::Ptr> execute()
+	[[nodiscard]] std::vector<typename ActRec::Ptr> execute()
 		/// Execute the query and return a vector with the
 		/// results.
 	{
@@ -148,7 +147,7 @@ public:
 		return result;
 	}
 
-	std::size_t totalResults() const
+	[[nodiscard]] std::size_t totalResults() const
 		/// In case of a paged query, returns the total number of results
 		/// that would be returned without paging.
 	{
@@ -229,7 +228,7 @@ private:
 };
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord
 
 
 #endif // ActiveRecord_select_INCLUDED

@@ -24,9 +24,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API PostgreSQLException: public Poco::Data::DataException
@@ -40,7 +38,6 @@ public:
 	explicit PostgreSQLException(const std::string& aMessage,const char * pAnSqlState);
 		/// Creates PostgreSQLException.
 
-
 	PostgreSQLException(const PostgreSQLException& exc);
 		/// Creates PostgreSQLException.
 
@@ -50,26 +47,26 @@ public:
 	PostgreSQLException& operator = (const PostgreSQLException& exc);
 		/// Assignment operator.
 
-	const char* name() const noexcept;
+	[[nodiscard]] const char* name() const noexcept;
 		/// Returns exception name.
 
-	const char* className() const noexcept;
+	[[nodiscard]] const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	Poco::Exception* clone() const;
+	[[nodiscard]] Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
 		///
 		/// The copy can later be thrown again by
 		/// invoking rethrow() on it.
 
-	void rethrow() const;
+	[[noreturn]] void rethrow() const;
 		/// (Re)Throws the exception.
 		///
 		/// This is useful for temporarily storing a
 		/// copy of an exception (see clone()), then
 		/// throwing it again.
 
-	const char* sqlState() const noexcept;
+	[[nodiscard]] const char* sqlState() const noexcept;
 		/// Returns the SqlState
 
 
@@ -152,7 +149,7 @@ inline const char* PostgreSQLException::sqlState() const noexcept
 
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif //SQL_PostgreSQL_PostgreSQLException_INCLUDED

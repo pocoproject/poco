@@ -580,12 +580,12 @@ bool URI::operator != (const std::string& uri) const
 bool URI::equals(const URI& uri) const
 {
 	return _scheme   == uri._scheme
-	    && _userInfo == uri._userInfo
-	    && _host     == uri._host
-	    && getPort() == uri.getPort()
-	    && _path     == uri._path
-	    && _query    == uri._query
-	    && _fragment == uri._fragment;
+		&& _userInfo == uri._userInfo
+		&& _host     == uri._host
+		&& getPort() == uri.getPort()
+		&& _path     == uri._path
+		&& _query    == uri._query
+		&& _fragment == uri._fragment;
 }
 
 
@@ -663,10 +663,10 @@ void URI::encode(const std::string& str, const std::string& reserved, std::strin
 	for (auto c: str)
 	{
 		if ((c >= 'a' && c <= 'z') ||
-		    (c >= 'A' && c <= 'Z') ||
-		    (c >= '0' && c <= '9') ||
-		    c == '-' || c == '_' ||
-		    c == '.' || c == '~')
+			(c >= 'A' && c <= 'Z') ||
+			(c >= '0' && c <= '9') ||
+			c == '-' || c == '_' ||
+			c == '.' || c == '~')
 		{
 			encodedStr += c;
 		}

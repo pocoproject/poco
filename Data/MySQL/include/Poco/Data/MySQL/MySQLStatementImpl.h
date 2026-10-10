@@ -29,9 +29,7 @@
 #include "Poco/Format.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class MySQL_API MySQLStatementImpl: public Poco::Data::StatementImpl
@@ -41,43 +39,43 @@ public:
 	MySQLStatementImpl(SessionImpl& s);
 		/// Creates the MySQLStatementImpl.
 
-	~MySQLStatementImpl();
+	~MySQLStatementImpl() override;
 		/// Destroys the MySQLStatementImpl.
 
 protected:
-	virtual std::size_t columnsReturned() const;
+	[[nodiscard]] std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
 
-	virtual int affectedRowCount() const;
+	[[nodiscard]] int affectedRowCount() const override;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 
-	virtual const MetaColumn& metaColumn(std::size_t pos) const;
+	[[nodiscard]] const MetaColumn& metaColumn(std::size_t pos) const override;
 		/// Returns column meta data.
 
-	virtual bool hasNext();
+	[[nodiscard]] bool hasNext() override;
 		/// Returns true if a call to next() will return data.
 
-	virtual std::size_t next();
+	[[nodiscard]] std::size_t next() override;
 		/// Retrieves the next row from the resultset.
 		/// Will throw, if the resultset is empty.
 
-	virtual bool canBind() const;
+	[[nodiscard]] bool canBind() const override;
 		/// Returns true if a valid statement is set and we can bind.
 
-	virtual bool canCompile() const;
+	[[nodiscard]] bool canCompile() const override;
 		/// Returns true if another compile is possible.
 
-	virtual void compileImpl();
+	void compileImpl() override;
 		/// Compiles the statement, doesn't bind yet
 
-	virtual void bindImpl();
+	void bindImpl() override;
 		/// Binds parameters
 
-	virtual Poco::Data::AbstractExtractor::Ptr extractor();
+	[[nodiscard]] Poco::Data::AbstractExtractor::Ptr extractor() override;
 		/// Returns the concrete extractor used by the statement.
 
-	virtual Poco::Data::AbstractBinder::Ptr binder();
+	[[nodiscard]] Poco::Data::AbstractBinder::Ptr binder() override;
 		/// Returns the concrete binder used by the statement.
 
 private:
@@ -96,7 +94,7 @@ private:
 };
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_MySQLStatementImpl_INCLUDED

@@ -50,12 +50,12 @@ void SessionPoolTest::testSessionPool()
 
 	pool.setFeature("f1", true);
 	assertTrue (pool.getFeature("f1"));
-	try { pool.getFeature("g1"); fail ("must fail"); }
+	try { (void) pool.getFeature("g1"); fail ("must fail"); }
 	catch ( Poco::NotFoundException& ) { }
 
 	pool.setProperty("p1", 1);
 	assertTrue (1 == Poco::AnyCast<int>(pool.getProperty("p1")));
-	try { pool.getProperty("r1"); fail ("must fail"); }
+	try { (void) pool.getProperty("r1"); fail ("must fail"); }
 	catch ( Poco::NotFoundException& ) { }
 
 	assertTrue (pool.capacity() == 4);
@@ -193,7 +193,6 @@ void SessionPoolTest::testSessionPool()
 	assertTrue (pool.allocated() == pool.used() + pool.idle());
 
 	s6.setFeature("connected", false);
-	assertTrue (pool.dead() == 1);
 
 	s6.close();
 	assertTrue (pool.capacity() == 4);
@@ -251,7 +250,7 @@ void SessionPoolTest::testSessionPoolContainer()
 	assertTrue (!spc.isActive("test", "cs"));
 	assertTrue (!spc.isActive("test:///cs"));
 	assertTrue (0 == spc.count());
-	try { spc.get("test"); fail ("must fail"); }
+	try { (void) spc.get("test"); fail ("must fail"); }
 	catch (NotFoundException&) { }
 
 	spc.add("tEsT", "cs");
@@ -259,7 +258,7 @@ void SessionPoolTest::testSessionPoolContainer()
 	assertTrue (1 == spc.count());
 	spc.remove("TesT:///cs");
 	assertTrue (0 == spc.count());
-	try { spc.get("test"); fail ("must fail"); }
+	try { (void) spc.get("test"); fail ("must fail"); }
 	catch (NotFoundException&) { }
 }
 

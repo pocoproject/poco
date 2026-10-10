@@ -1,0 +1,563 @@
+Remoting NG Attribute Reference
+Remoting NG
+
+!!! Attribute Syntax
+
+Attributes can be defined either at class or at member function, variable or event level.
+Attributes must be placed before the respective class or member definition they apply to.
+Attributes are placed within special C++ line comments. A comment defining attributes
+must start with <[//@]>. Multiple attributes can be specified, either using multiple
+lines (each starting with <[//@]>, or within a single comment line, separated by
+comma.
+
+Example: a single attribute:
+
+    //@ remote
+    void myMethod(int i);
+----
+
+Example: multiple attributes on a single line:
+
+    //@ remote, synchronized
+    void myMethod(int i);
+----
+
+Example: multiple attributes on multiple lines:
+
+    //@ remote
+    //@ synchronized
+    void myMethod(int i);
+----
+
+Attributes can have values. If no value is specified for an attribute, the attribute's default
+value is <*true*>.
+
+Example:
+    //@ remote, synchronized
+    void myMethod(int i);
+----
+
+is equivalent to:
+
+    //@ remote=true, synchronized=true
+----
+
+An attribute specified at class level is inherited by all member functions of the class.
+If an attribute is specified both at class and member function level, the latter takes precedence.
+Attribute names and values are case sensitive.
+
+Attributes can be specified for parameters, as well. In this case, the syntax is slightly different.
+The attribute name must be the same as the parameter name, prepended with a dollar sign, and the actual
+attributes are defined as subattributes of the parameter attribute, placed in curly brackets.
+
+Example:
+    //@ remote
+    //@ $i={name="value-i", type="attr"}
+    void myMethod(int i);
+----
+
+Attribute values must be quoted if they contain characters like <[-,.?/]> or begin with an integer value.
+
+
+!!!Attribute Reference
+
+!!action
+Assigns an SOAP action to a method. Used by the SOAP transport only.
+  * level: method
+  * type: string
+
+
+!!authenticated
+Enforces authentication for a method or all methods of a class (unless overridden with a
+method-level attribute). If set to true, a transport-specific authentication mechanism
+must be used to provide credentials (e.g., a username and password) with the request.
+Before the actual method is invoked, the Poco::RemotingNG::Authenticator instance
+registered with the Listener is used to validate the supplied credentials.
+  * level: class/method
+  * type: boolean
+  * default: true
+
+
+!!cacheExpire
+Sets the time how long return values are cached. A cacheExpire value consists
+of a single positive integer number and a single appended unit. Valid units are: ms, s(ec), m(in), h(our)
+If no unit is specified milliseconds are assumed. The entire value must be written within quotes.
+If the value "infinite" is set, data will be cached infinitely. Note that setting this parameter is
+not enough to enable caching. The <[cacheResult]> attribute must be specified as well.
+  * level: class, method
+  * type: "infinite" or an unsigned integer, followed by an optional unit
+
+Examples: "2h", "4min", "2000ms", "infinite"
+
+
+!!cacheResult
+Enables caching of return values. Will reduce the number of method calls if a remote method always
+returns the same value (for a certain time). See also the <[cacheExpire]> attribute.
+  * level: method
+  * type: boolean
+  * default: true
+
+
+!!consumes
+For the REST transport, specifies the MIME content type of the request body.
+If parameters are passed as form data (<[in]> attribute set to "form"), the
+<[consumes]> attribute can be used to change the form encoding to "multipart/form-data"
+(from the default "application/x-www-form-urlencoded").
+  * level: method
+  * type: string
+  * default: "application/json" or "application/x-www-form-urlencoded"
+
+
+!!contentType
+For the REST transport, specifies the MIME content type of a specific parameter.
+Only used with parameters of type <[std::vector<char>]> passed as form data (the <[in]>
+attribute must be set to "form"), and only if the form is encoded as "multipart/form-data"
+(i.e., the <[consumes]> attribute must be set to "multipart/form-data" as well).
+  * level: parameter
+  * type: string
+  * default: "application/octet-stream"
+
+Example:
+    //@ $image={in="form", contentType="image/jpeg"}
+    //@ consumes="multipart/form-data"
+    void post(const std::string& imageName, const std::vector<char>& image);
+----
+
+
+!!direction
+Specifies whether a parameter is input, output or input/output. Whether a parameter is
+input or input/output is normally determined automatically, depending on how the
+parameter is passed (by value or by const or non-const reference).
+However, a C++ function signature provides no way to designate a
+parameter as output only. The <[direction]> attribute allows to rectify that.
+  * level: parameter
+  * type: ["in"|"out"|"inout"]
+  * default: "in" for parameters passed by value or const reference, "inout" for
+    parameters passed by non-const reference
+
+Example:
+    //@ $image={direction="out"}
+    void retrieveImage(const std::string& id, std::vector<char>& image);
+----
+
+Without the <[direction]> attribute, the <[image]> parameter would be
+first passed to the server, which in this case is unnecessary, and then
+passed back to the client, containing the desired result.
+
+
+!!exclusiveMax
+If `exclusiveMax` is `true`, the parameter or variable value must be strictly less than the value,
+specified with `max`. Otherwise the value must be less than or equal to this value.
+The attribute will be reflected in a generated OpenAPI document as `exclusiveMaximum` validation keyword.
+  * level: parameter/variable
+  * type: boolean
+
+
+!!exclusiveMin
+If `exclusiveMin` is `true`, the parameter or variable value must be strictly greater than the value,
+specified with `min`. Otherwise the value must be greater than or equal to this value.
+The attribute will be reflected in a generated OpenAPI document as `exclusiveMinimum` validation keyword.
+  * level: parameter/variable
+  * type: boolean
+
+
+!!header
+Serialize a parameter in the SOAP header instead of the SOAP body.
+Only useful with the SOAP Transport. Can be set at method parameters only.
+Can only be specified for parameters that have a complex data, user-defined data type
+(class or struct).
+Note that the <[soapHeader]> attribute splits method parameters into
+two groups: the header group and the body group. The order value (see the <[order]> attribute)
+of all header group members must be lower than the smallest order value of the body group,
+i.e. all header elements are serialized before the body elements.
+  * level: parameter
+  * type: boolean
+  * default: true
+
+
+!!filter
+Enable or disable event filters for an event. If enabled, event filters can be installed
+at run-time for the event via an object's Poco::RemotingNG::EventDispatcher::setEventFilter()
+method, and will be honored while dispatching the event.
+If disabled, all installed event filters will be ignored when dispatching the event.
+  * level: event
+  * type: boolean
+  * default: false
+
+
+!!format
+For the REST transport, describes the format of a parameter passed in the request
+body or response body.
+  * level: parameter
+  * type: string
+  * default: "json"
+
+Valid values are:
+  * raw: The parameter is passed as a string or raw binary data. Can only be used
+    for simple types, e.g. std::string and std::vector<char>.
+    This is useful for passing raw binary data as a std::string or std::vector<char> in
+    the request or response body. If specified, an appropriate content type should
+    also be specified using the <[consumes]> or <[produces]> attribute.
+  * binary: Same as "raw".
+  * json: The parameter is formatted as JSON. Can be used for simple and complex types.
+
+This parameter can also be specified on a form parameter or type <[std::string]>
+if "multipart/form-data" encoding is used.
+In this case, only the values "raw" or "binary" are valid. This will change
+the parameter's schema <*format*> generated in the OpenAPI document to "binary".
+
+Example:
+    //@ $file={in=path}
+    //@ return={in=body, format=raw}
+    //@ produces="text/plain"
+    std::string get(const std::string& file);
+----
+
+
+!!in
+For the REST transport, defines the location of a parameter.
+  * level: parameter
+  * type: string
+  * default: "body"
+
+Valid values are:
+  * path: The parameter is passed as part of the URI path. A <[path]> attribute
+    must also be specified for the method or object, containing a corresponding
+    place holder for the parameter (<[{name}]>).
+  * query: The parameter is a passed as URI query parameter.
+  * form: The parameter is passed in the request body, using form encoding
+    (content type "application/x-www-form-urlencoded").
+  * header: The parameters is passed as HTTP request or response header.
+  * body: The parameter is passed in the request or response body (raw string or JSON-formatted).
+
+Example:
+    //@ $file={in=path}
+    //@ return={in=body, format=raw}
+    //@ produces="text/plain"
+    std::string get(const std::string& file);
+----
+
+
+!!inline
+Change the way return values are serialized.
+This attribute can only be set for the return value of a method.
+  * level: return value
+  * type: boolean
+  * default: true
+
+For example a method:
+    Time currentTimeAsStruct() const;
+----
+
+will return the following XML structure if the SOAP Transport is used:
+
+    <currentTimeAsStructReply>
+        <return>
+            <hour>10</hour>
+            <minut>31</minute>
+            <second>22</second>
+        </return>
+    </currentTimeAsStructReply>
+----
+
+To change that structure to:
+
+    <Time>
+        <hour>10</hour>
+        <minut>31</minute>
+        <second>22</second>
+    </Time>
+----
+the <[replyName]> attribute can be specified, along with the <[inline]> attribute on the return value,
+as follows:
+
+    //@ replyName="Time", return={inline}
+    Time currentTimeAsStruct() const;
+----
+
+Note that inlining cannot be combined with attributes, only with elements. Furthermore, no other output parameters
+are permitted in the method signature if the <[inline]> attribute is specified.
+
+
+!!length
+The `length` property is used by some transports in the serialization of sequences 
+(vectors, arrays, lists, etc.). It can be set to specify a fixed length for a
+sequence which allows an optimized serialization of the sequence, leaving out
+the length indication at the beginning. Alternatively, it can also specify the
+serialization format of the leading length indication for some custom transports.
+  * level: parameter/variable
+  * type: integer or string (depending on transport)
+
+Note: The `length` attribute is currently not used by any of the included transports.
+
+
+!!mandatory
+Defines if a parameter or member variable is mandatory or optional. Valid on parameters and member variables.
+Only evaluated during deserialization.
+If not specified, the default value is true.
+  * level: parameter/variable
+  * type: boolean
+  * default: true
+
+See also <[optional]>. If both <[mandatory]> and <[optional]> are specified, <[mandatory]> takes precedence.
+
+
+!!max
+Specifies the maximum allowed value for a numeric parameter or variable.
+If `exclusiveMax` is `true`, the value must be strictly less than this value,
+otherwise the value must be less than or equal to this value.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `maximum` validation keyword.
+  * level: parameter/variable
+  * type: number
+
+Example:
+    //@ path="/api/1.0/orders/{orderNo}/items/{itemNo}"
+    //@ $orderNo={in=path, min=1}
+    //@ $itemNo={in=path, min=1, max=999}
+    Item get(int orderNo, int itemNo);
+----
+
+
+!!maxItems
+Specifies the maximum number of elements in a vector or set.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `maxItems` validation keyword.
+  * level: parameter/variable
+  * type: integer
+
+
+!!maxLength
+Specifies the maximum allowed length for a string variable or parameter.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `maxLength` validation keyword.
+  * level: parameter/variable
+  * type: integer
+
+
+!!min
+Specifies the minimum allowed value for a numeric parameter or variable.
+If `exclusiveMin` is `true`, the value must be strictly greater than this value,
+otherwise the value must be greater than or equal to this value.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `minimum` validation keyword.
+  * level: parameter/variable
+  * type: number
+
+
+!!minItems
+Specifies the minimum number of elements in a vector or set.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `minItems` validation keyword.
+  * level: parameter/variable
+  * type: integer
+
+
+!!minLength
+Specifies the minimum allowed length for a string variable or parameter.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `minLength` validation keyword.
+  * level: parameter/variable
+  * type: integer
+
+
+!!multipleOf
+If specified, the variable or parameter value must be a multiple of the
+specified value.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `multipleOf` validation keyword.
+  * level: parameter/variable
+  * type: number
+
+
+!!name
+Rename a method, event, variable or parameter name. Useful for XML based transports, if the used schema requires
+a name which would be invalid in C++, like a name containing a minus sign. If used on a method,
+the <[replyName]> attribute should be specified as well.
+  * level: method/parameter/variable
+  * type: string
+
+
+!!namespace
+Assigns an XML namespace to a class, method or parameter. Used by the SOAP Transport only.
+  * level: class/method/parameter
+  * type: string
+
+
+!!oneway
+Can be set on methods or events that do not have return values or output parameters. Ignored on all other methods.
+The <[oneway]> attribute is an optimization that disables sending any response back to the caller. For example,
+calling a simple method like
+    void foo();
+----
+
+will result in sending a request and returning an empty response or in case of an error, an exception.
+Setting <[oneway]> will force the skeleton and proxy to omit this response. While this will improve performance
+for most transports, it is a setting that should be used with care. It should only be used if the remote method
+is guaranteed not to throw an exception, or if it doesn't matter if an exception is thrown.
+  * level: method/event
+  * type: boolean
+  * default: true
+
+
+!!optional
+Defines if a parameter or member variable is optional or mandatory. Valid on parameters and member variables.
+Only evaluated during deserialization.
+If not specified, the default value is false.
+  * level: parameter/variable
+  * type: boolean
+  * default: false
+
+See also <[mandatory]>. If both <[mandatory]> and <[optional]> are specified, <[mandatory]> takes precedence.
+
+
+!!order
+Enforces that parameters are serialized in a specific order. Useful when an XML schema requires an order which is impossible
+in C++ due to the use of default values.
+Also, the serializer orders member variables (but not parameters) by their name as default.
+This attribute can be used to change that behavior.
+Note that it is not recommended to only partially specify the order element. Omitted or duplicate
+order values lead to undefined results.
+  * level: parameter/variable
+  * type: unsigned integer
+
+Example:
+    //@ remote, $first={order=1}, $second={order=2}
+    void foo(int first, int second);
+----
+
+
+!!path
+For the REST transport, specifies the path template used for extracting parameters
+passed within the request URI.
+  * level: class
+  * type: string
+
+The location of parameters within the path is indicated by putting the parameter
+name in curly brackets. The path template supports two placeholder formats:
+
+  - Simple placeholder: <[{name}]> - matches any path segment and extracts it as a parameter value.
+  - Alternation placeholder: <[{name:(option1|option2|...)}]> - matches only the specified options
+    and extracts the matched value as a parameter.
+
+The alternation placeholder is useful when multiple endpoints share a common base path but differ
+in a specific path segment. Instead of defining separate endpoint classes, a single class can
+handle all alternatives by using an alternation pattern.
+
+Example with simple placeholders:
+    //@ remote
+    //@ path="/api/1.0/orders/{orderNo}/items/{itemNo}"
+    class ItemCollection
+    {
+        ...
+        //@ $orderNo={in=path}
+        //@ $itemNo={in=path}
+        Item get(int orderNo, int itemNo);
+        ...
+    };
+----
+
+Example with alternation placeholder:
+    //@ remote
+    //@ path="/api/{endpoint:(query|config|status)}"
+    class MultiEndpoint
+    {
+        ...
+        //@ $endpoint={in=path}
+        Result handle(const std::string& endpoint);
+        ...
+    };
+----
+
+In the alternation example, the path <[/api/query]>, <[/api/config]>, and <[/api/status]> will all
+match the template, and the <[endpoint]> parameter will receive the matched value (<["query"]>,
+<["config"]>, or <["status"]> respectively). Requests to paths like <[/api/other]> will not match.
+
+
+!!pattern
+Specifies a regular expression to validate a string parameter or variable.
+This attribute is only used for documentation purposes, no validation will
+be performed by the generated code. The attribute will be reflected in a generated
+OpenAPI document as `pattern` validation keyword.
+  * level: parameter/variable
+  * type: string (regular expression)
+
+
+!!permission
+Specifies a permission (in the form of a string) that is required to invoke the method
+or all methods of a class (if specified on class level).
+If specified and set to a non-empty string, the Poco::RemotingNG::Authorizer
+instance registered with the Listener is used to verify that the user identified by
+the supplied credentials has the specific permission. Names and semantics of the
+permission string are entirely up to the supplied Poco::RemotingNG::Authorizer
+implementation.
+  * level: class/method
+  * type: string
+
+
+!!produces
+For the REST transport, specifies the MIME content type of the response body.
+  * level: method
+  * type: string
+  * default: "application/json"
+
+
+!!remote
+Required for the generation of client and server stub code (proxy, skeleton, helper objects, etc.) for a
+class, method or event.
+  * level: class/method/event
+  * type: boolean
+  * default: true
+
+
+!!replyName
+Allows to rename the reply structure (or XML element) name returned by a method.
+The default is the name of the function with <[Reply]> appended
+(e.g., <[getData]> returns a structure named <[getDataReply]>).
+  * level: method/event
+  * type: string
+
+
+!!serialize
+Enable generation of Serializer and Deserializer classes for the given class. Note that the classes must follow
+a certain coding style for this to work. Refer to the Remoting user manual for more information.
+If a class is serializable, all super classes must have the "serialize" attribute as well.
+  * level: class
+  * type: boolean
+  * default: true
+
+
+!!synchronized
+If specified, calls to the remote object and the proxy will be serialized. This is required if the
+service object is not thread-safe. It is also required if the same proxy object is used simultaneously
+by multiple threads, although this practice is not recommended. Can be applied to proxies, remote objects,
+remote bridge objects, or all (default).
+  * level: class/method
+  * type: boolean or ["proxy"|"remote"|"bridge"|"all"|"none"]
+  * default: all
+
+
+!!type
+Specify whether a parameter is serialized as XML element or XML attribute (XML-based transports only).
+Must be either "attr" or "elem". The default value is "elem".
+Note that "attr" can not be set on complex types or vectors.
+As a general rule of thumb, "elem" should be used whenever possible, "attr" only where XML schema
+restrictions require it.
+  * level: parameter
+  * type: ["attr"|"elem"]
+  * default: elem
+
+
+!!xsdType
+Specifies the underlying XML Schema type for serialization of a variable or parameter (XML-based transports only).
+Currently used for serialization of Poco::DateTime only, depending on the underlying type (`date`, `time`,
+`dateTime`).
+  * level: parameter/variable
+  * type: string

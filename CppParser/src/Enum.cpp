@@ -21,8 +21,7 @@
 using Poco::NumberFormatter;
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 int Enum::_count = 0;
@@ -103,4 +102,4 @@ std::string Enum::toString() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

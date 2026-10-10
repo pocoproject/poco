@@ -30,8 +30,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string OAuth10Credentials::SCHEME = "OAuth";
@@ -362,4 +361,4 @@ std::string OAuth10Credentials::percentEncode(const std::string& str)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

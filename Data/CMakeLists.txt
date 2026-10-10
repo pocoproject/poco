@@ -35,7 +35,11 @@ set_target_properties(Data
 )
 
 if (NOT POCO_DATA_NO_SQL_PARSER)
-	target_compile_definitions(Data PUBLIC -DSQLParser_EXPORTS)
+	target_compile_definitions(Data PUBLIC SQLParser_EXPORTS)
+else()
+	# Guards private members in Statement.h, so it must reach consumers of the
+	# installed headers as well.
+	target_compile_definitions(Data PUBLIC POCO_DATA_NO_SQL_PARSER=1)
 endif()
 target_link_libraries(Data PUBLIC Poco::Foundation)
 
@@ -66,7 +70,6 @@ if(ENABLE_TESTS)
 endif()
 
 if(ENABLE_DATA_SQLITE)
-	# SQlite3 is built in any case
 	message(STATUS "SQLite Support Enabled")
 	add_subdirectory(SQLite)
 else(ENABLE_DATA_SQLITE)

@@ -25,8 +25,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Compress;
@@ -50,7 +49,7 @@ protected:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipOperation_INCLUDED

@@ -25,12 +25,11 @@
 namespace Poco {
 
 
-//@ deprecated
 template <class T>
-struct HashFunction
+struct POCO_DEPRECATED("use Hash") HashFunction
 	/// A generic hash function.
 {
-	UInt32 operator () (T key, UInt32 maxValue) const
+	[[nodiscard]] UInt32 operator () (T key, UInt32 maxValue) const
 		/// Returns the hash value for the given key.
 	{
 		return static_cast<UInt32>(Poco::hash(key)) % maxValue;
@@ -38,12 +37,11 @@ struct HashFunction
 };
 
 
-//@ deprecated
 template <>
-struct HashFunction<std::string>
+struct POCO_DEPRECATED("use Hash") HashFunction<std::string>
 	/// A generic hash function.
 {
-	UInt32 operator () (const std::string& key, UInt32 maxValue) const
+	[[nodiscard]] UInt32 operator () (const std::string& key, UInt32 maxValue) const
 		/// Returns the hash value for the given key.
 	{
 		return static_cast<UInt32>(Poco::hash(key)) % maxValue;

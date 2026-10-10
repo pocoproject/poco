@@ -1,0 +1,195 @@
+Remoting NG HTTP Transport User Guide
+Remoting NG
+
+!!!Introduction
+
+The HTTP Transport is a very lightweight HTTP-based Transport implementation, 
+using the Remoting NG binary serialization format with a HTTP connection.
+
+This transport is a good choice if a Remoting NG based C++ application needs
+to communicate with another one if only a HTTP connection is possible between
+them (e.g., due to a proxy server or firewall).
+
+The HTTP transport supports the following features:
+
+  - HTTP compression (GZIP content transfer encoding) for requests and responses.
+  - HTTP authentication (basic or digest, client only)
+  - HTTPS
+
+
+!!!Basic HTTP Transport Usage
+
+!!Server Usage
+
+To use the HTTP Transport in a server, the following three steps must
+be performed:
+
+   1. Register the Poco::RemotingNG::HTTP::TransportFactory with the ORB, 
+   2. Optionally configure the listener,
+   3. Register the Listener with the ORB, and finally, 
+   4. Register the individual objects with the ORB.
+
+Following is an example code fragment for setting up a HTTP Listener
+and registering a service object for use with the listener.
+
+    Poco::RemotingNG::HTTP::Listener::Ptr pListener = new Poco::RemotingNG::HTTP::Listener("localhost:8080");
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(pListener);
+
+    st::string uri = Sample::TimeServiceServerHelper::registerObject(
+        new Sample::TimeService, 
+        "TheTimeService", 
+        listener
+    );
+----
+
+Please see the Poco::RemotingNG::HTTP::Listener class documentation for detailed information
+about how to setup and configure the listener.
+
+
+!!Client Usage
+
+To use the HTTP Transport in a client, the following two steps
+must be performed:
+
+  1. Register the Poco::RemotingNG::HTTP::TransportFactory with the ORB, and
+  2. Retrieve the interface (proxy) object using the helper class.
+
+Following is an example code fragment for setting up a HTTP Transport,
+and obtaining a Proxy object for invoking methods on the service object.
+
+    Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
+    Sample::ITimeService::Ptr pTimeService = MyProject::MyClassHelper::find(
+        "http://localhost:8080/http/TimeService/TheTimeService");
+    );
+----
+
+
+!Configuring The Client Transport
+
+To configure the client transport (e.g., to ,
+enable HTTP compression, or HTTP authentication), the Transport object must
+be obtained from the proxy. This is done in two steps. First, the interface
+pointer obtained from the client helper must be casted to a proxy:
+
+    Poco::RemotingNG::Proxy::Ptr pProxy = pTimeService.cast<Poco::RemotingNG::Proxy>();
+----
+
+Second, the Transport object can be obtained from the proxy:
+
+    Poco::RemotingNG::HTTP::Transport& trans = static_cast<Poco::RemotingNG::HTTP::Transport&>(pProxy->remoting__transport());
+----
+
+These two casts can also be put into a utility function <[transportFromInterface()]>:
+
+    template <class I>
+    Poco::RemotingNG::HTTP::Transport& transportFromInterface(Poco::AutoPtr<I> pInterface)
+    {
+        Poco::RemotingNG::Proxy::Ptr pProxy = pInterface.template cast<Poco::RemotingNG::Proxy>();
+        if (pProxy)
+        {
+            return static_cast<Poco::RemotingNG::HTTP::Transport&>(pProxy->remoting__transport());
+        }
+        else throw Poco::BadCastException();
+    }
+----
+
+Using the <[transportFromInterface()]> function, we can write:
+
+    Poco::RemotingNG::HTTP::Transport& trans = transportFromInterface(pTimeService);
+----
+
+
+Now that we have access to the Transport object, we can configure it:
+
+    trans.enableCompression(true);
+----
+
+Configuration should be done before the first method is invoked over the proxy.
+
+Please see the Poco::RemotingNG::HTTP::Transport class documentation for other
+configuration options, including timeouts and user-agent string.
+
+
+!Enabling HTTP Authentication
+
+The HTTP Transport supports HTTP Basic and Digest authentication. To enable authentication
+for a proxy object, first obtain the Transport object as shown in the previous section.
+HTTP Basic Authentication can then be enabled with:
+
+    trans.setAuthentication(Poco::RemotingNG::HTTP::Transport::AUTH_BASIC);
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+    trans.setCredentials(creds);
+----
+
+To enable HTTP Digest Authentication:
+
+    trans.setAuthentication(Poco::RemotingNG::HTTP::Transport::AUTH_DIGEST);
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+    trans.setCredentials(creds);
+----
+
+Please note that chunked transfer encoding must be disabled in order to use HTTP Digest
+Authentication.
+
+It is also possible to enable both Basic and Digest authentication and use whatever
+the server requests:
+
+    trans.setAuthentication(Poco::RemotingNG::HTTP::Transport::AUTH_ANY);
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+    trans.setCredentials(creds);
+    trans.enableChunkedTransferEncoding(false);
+----
+
+
+!!!Using HTTPS
+
+The HTTP transport normally uses a plain, unencrypted HTTP 
+connection between the client and the server. To make the HTTP Transport use a secure
+HTTP socket connection, the following steps must be performed.
+
+
+!!HTTPS On The Server Side
+
+On the server side, the listener must be created using a
+Poco::Net::SecureServerSocket.
+
+    Poco::Net::SecureServerSocket serverSocket(8443);
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(
+        new Poco::RemotingNG::HTTP::Listener("localhost:8443", serverSocket)
+    );
+    std::string uri = MyProject::MyClassHelper::registerObject(
+        new MyProject::MyClass, 
+        "MyObject", 
+        listener
+    );
+----
+
+
+!!HTTPS On The Client Side
+
+On the client side, the HTTP transport uses a private
+Poco::Net::HTTPSessionFactory object to create
+the Poco::Net::HTTPClientSession for talking to the server.
+So, all that needs to be done to enable HTTPS on the
+client is to register the Poco::Net::HTTPSSessionInstantiator
+with the session factory. Then, a https URI can be used to
+access the web service.
+
+    Poco::RemotingNG::HTTP::Transport::httpSessionFactory().registerProtocol(
+        "https", 
+        new Poco::Net::HTTPSSessionInstantiator
+    );
+    
+    Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
+    
+    MyProject::IMyClass::Ptr pObj = MyProject::MyClassHelper::find(
+        "https://localhost:8443/http/MyClass/TheObject"
+    );
+----
+

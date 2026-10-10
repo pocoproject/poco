@@ -61,18 +61,18 @@ protected:
 	FPEnvironmentImpl& operator = (const FPEnvironmentImpl& env);
 	void keepCurrentImpl();
 	static void clearFlagsImpl();
-	static bool isFlagImpl(FlagImpl flag);
+	[[nodiscard]] static bool isFlagImpl(FlagImpl flag);
 	static void setRoundingModeImpl(RoundingModeImpl mode);
-	static RoundingModeImpl getRoundingModeImpl();
-	static bool isInfiniteImpl(float value);
-	static bool isInfiniteImpl(double value);
-	static bool isInfiniteImpl(long double value);
-	static bool isNaNImpl(float value);
-	static bool isNaNImpl(double value);
-	static bool isNaNImpl(long double value);
-	static float copySignImpl(float target, float source);
-	static double copySignImpl(double target, double source);
-	static long double copySignImpl(long double target, long double source);
+	[[nodiscard]] static RoundingModeImpl getRoundingModeImpl();
+	[[nodiscard]] static bool isInfiniteImpl(float value);
+	[[nodiscard]] static bool isInfiniteImpl(double value);
+	[[nodiscard]] static bool isInfiniteImpl(long double value);
+	[[nodiscard]] static bool isNaNImpl(float value);
+	[[nodiscard]] static bool isNaNImpl(double value);
+	[[nodiscard]] static bool isNaNImpl(long double value);
+	[[nodiscard]] static float copySignImpl(float target, float source);
+	[[nodiscard]] static double copySignImpl(double target, double source);
+	[[nodiscard]] static long double copySignImpl(long double target, long double source);
 
 private:
 #if defined(__VMS)

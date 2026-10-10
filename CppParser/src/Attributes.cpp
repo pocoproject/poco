@@ -21,8 +21,7 @@
 using Poco::NumberParser;
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 Attributes::Attributes()
@@ -151,4 +150,4 @@ void Attributes::clear()
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

@@ -21,22 +21,17 @@
 #include "Poco/Foundation.h"
 #include <cstdint>
 #include <type_traits>
-#if defined(__clang__) || (defined (__GNUC__) && (__GNUC__ >= 3))
-#	if (__cplusplus >= 201703L)
-#		if __has_include(<cxxabi.h>)
-#			include <typeinfo>
-#			include <cxxabi.h>
-#			include <cstdlib>
-#			define POCO_HAVE_CXXABI_H
-#		endif // __has_include(<cxxabi.h>)
-#	endif // __cplusplus >= 201703L
-#endif // defined(__clang__) || (defined (__GNUC__) && (__GNUC__ >= 3))
+#include <typeinfo>
+#include <cstdlib>
 
+#if defined(POCO_HAVE_CXXABI_H)
+	#include <cxxabi.h>
+#endif
 
 namespace Poco {
 
 
-using Int8    = std::conditional<std::is_same<signed char, std::int8_t>::value, std::int8_t, signed char>::type;
+using Int8    = std::conditional_t<std::is_same_v<signed char, std::int8_t>, std::int8_t, signed char>;
 using UInt8   = std::uint8_t;
 using Int16   = std::int16_t;
 using UInt16  = std::uint16_t;
@@ -46,7 +41,6 @@ using Int64   = std::int64_t;
 using UInt64  = std::uint64_t;
 using IntPtr  = std::intptr_t;
 using UIntPtr = std::uintptr_t;
-
 
 #if defined(_MSC_VER)
 	#if defined(_WIN64)
@@ -60,7 +54,7 @@ using UIntPtr = std::uintptr_t;
 		#if defined(__LP64__)
 			#define POCO_PTR_IS_64_BIT 1
 			#define POCO_LONG_IS_64_BIT 1
-			#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_FREE_BSD || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_AIX || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_SOLARIS
+			#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_FREE_BSD || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_AIX || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_SOLARIS || POCO_OS == POCO_OS_GNU_HURD
 				#define POCO_INT64_IS_LONG 1
 			#endif
 		#endif
@@ -83,13 +77,29 @@ using UIntPtr = std::uintptr_t;
 #endif
 
 
-inline std::string Foundation_API demangle(const char* typeName)
+[[nodiscard]] inline std::string Foundation_API demangle(const char* typeName)
+	/// Returns a human-readable type name from a mangled type name.
+	///
+	/// Takes the output of typeid(T).name() and returns a demangled,
+	/// human-readable type name.
+	///
+	/// On GCC/Clang (platforms with cxxabi.h), uses abi::__cxa_demangle().
+	/// On MSVC, strips the type category prefix ("class ", "struct ",
+	/// "enum ", "union ") that MSVC prepends to type names.
+	/// Function types on MSVC are not prefixed; they use calling convention
+	/// syntax instead (e.g., "void __cdecl(void)").
+	///
+	/// Returns the demangled name, or an error token on failure:
+	///   - [ERRMEM]  - memory allocation failed
+	///   - [ERRNAME] - invalid mangled name
+	///   - [ERRARG]  - invalid argument
+	///   - [ERRUNK]  - unknown error
 {
 	std::string result(typeName);
 #ifdef POCO_HAVE_CXXABI_H
 	int status;
 	char* demangled = abi::__cxa_demangle(typeName, nullptr, nullptr, &status);
-	if (demangled)
+	if (demangled != nullptr)
 	{
 		if (status == 0) result = demangled;
 		else
@@ -105,15 +115,75 @@ inline std::string Foundation_API demangle(const char* typeName)
 
 		std::free(demangled);
 	}
+#elif defined(_MSC_VER)
+	// MSVC prefixes types with "class ", "struct ", "enum ", or "union "
+	static constexpr const char* prefixes[] = {"class ", "struct ", "enum ", "union "};
+	for (const char* prefix : prefixes)
+	{
+		std::size_t len = std::strlen(prefix);
+		if (result.compare(0, len, prefix) == 0)
+		{
+			result.erase(0, len);
+			break;
+		}
+	}
 #endif
 	return result;
 }
 
 
 template <typename T>
-std::string demangle()
+[[nodiscard]] std::string demangle()
+	/// Returns a human-readable name for type T.
 {
 	return demangle(typeid(T).name());
+}
+
+
+template <typename T>
+[[nodiscard]] std::string demangle(const T& t)
+	/// Returns a human-readable name for the type of instance t.
+{
+	return demangle(typeid(std::remove_const_t<std::remove_reference_t<decltype(t)>>).name());
+}
+
+
+inline std::string Foundation_API demangleDot(const std::string& name)
+	/// Replaces :: with . in a demangled type name.
+{
+	std::string result;
+	result.reserve(name.size());
+	std::size_t i = 0;
+	while (i < name.size())
+	{
+		if (name[i] == ':' && i + 1 < name.size() && name[i + 1] == ':')
+		{
+			result += '.';
+			i += 2; // skip both ':' characters
+		}
+		else
+		{
+			result += name[i];
+			++i;
+		}
+	}
+	return result;
+}
+
+
+template <typename T>
+std::string demangleDot()
+	/// Returns demangled type name with :: replaced by .
+{
+	return demangleDot(demangle<T>());
+}
+
+
+template <typename T>
+std::string demangleDot(const T& t)
+	/// Returns demangled type name with :: replaced by .
+{
+	return demangleDot(demangle(t));
 }
 
 

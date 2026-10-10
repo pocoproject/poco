@@ -56,7 +56,7 @@ FTPStreamFactoryTest::~FTPStreamFactoryTest()
 
 void FTPStreamFactoryTest::testDownload()
 {
-	FTPStreamFactory::setPasswordProvider(0);
+	FTPStreamFactory::setPasswordProvider(nullptr);
 
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");
@@ -92,7 +92,7 @@ void FTPStreamFactoryTest::testDownload()
 
 void FTPStreamFactoryTest::testList()
 {
-	FTPStreamFactory::setPasswordProvider(0);
+	FTPStreamFactory::setPasswordProvider(nullptr);
 
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");
@@ -130,7 +130,7 @@ void FTPStreamFactoryTest::testList()
 
 void FTPStreamFactoryTest::testUserInfo()
 {
-	FTPStreamFactory::setPasswordProvider(0);
+	FTPStreamFactory::setPasswordProvider(nullptr);
 
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");
@@ -207,7 +207,7 @@ void FTPStreamFactoryTest::testPasswordProvider()
 
 void FTPStreamFactoryTest::testMissingPasswordProvider()
 {
-	FTPStreamFactory::setPasswordProvider(0);
+	FTPStreamFactory::setPasswordProvider(nullptr);
 
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");

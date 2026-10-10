@@ -20,33 +20,28 @@
 #define Crypto_Crypto_INCLUDED
 
 
-//
-// Temporarily suppress deprecation warnings coming
-// from OpenSSL 3.0, until we have updated our code.
-//
-#if !defined(POCO_DONT_SUPPRESS_OPENSSL_DEPRECATED)
-#define OPENSSL_SUPPRESS_DEPRECATED
-#endif
-
 
 #include "Poco/Foundation.h"
 #include <openssl/opensslv.h>
 #include <openssl/err.h>
 
 
-#ifndef OPENSSL_VERSION_PREREQ
-	#if defined(OPENSSL_VERSION_MAJOR) && defined(OPENSSL_VERSION_MINOR)
-		#define OPENSSL_VERSION_PREREQ(maj, min) \
-			((OPENSSL_VERSION_MAJOR << 16) + OPENSSL_VERSION_MINOR >= ((maj) << 16) + (min))
-	#else
-		#define OPENSSL_VERSION_PREREQ(maj, min) \
-			(OPENSSL_VERSION_NUMBER >= (((maj) << 28) | ((min) << 20)))
-	#endif
+#ifndef POCO_OPENSSL_VERSION_PREREQ
+	/// Check for OpenSSL >= major.minor.patch using OPENSSL_VERSION_NUMBER.
+	/// OPENSSL_VERSION_NUMBER encodes version as 0xMNNFFPPS
+	/// (M=major, NN=minor, FF=fix/patch, PP=patch letter, S=status).
+	///
+	/// Note on LibreSSL: LibreSSL sets OPENSSL_VERSION_NUMBER to 0x20000000L,
+	/// which means POCO_OPENSSL_VERSION_PREREQ(3, 0, 0) correctly returns false
+	/// for LibreSSL. Where LibreSSL API diverges from OpenSSL 3.x, use explicit
+	/// #if !defined(LIBRESSL_VERSION_NUMBER) guards in addition to this macro.
+	#define POCO_OPENSSL_VERSION_PREREQ(maj, min, pat) \
+		(OPENSSL_VERSION_NUMBER >= (((maj) << 28) | ((min) << 20) | ((pat) << 12)))
 #endif
 
 
-#if OPENSSL_VERSION_NUMBER < 0x10000000L
-#error "OpenSSL version too old. At least OpenSSL 1.0.0 is required."
+#if !POCO_OPENSSL_VERSION_PREREQ(1, 1, 1)
+#error "OpenSSL version too old. At least OpenSSL 1.1.1 is required."
 #endif
 
 
@@ -70,8 +65,8 @@ enum RSAPaddingMode
 //
 // The following block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the Crypto_EXPORTS
-// symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
+// symbol defined on the command line. This symbol should not be defined on any project
+// that uses this DLL. This way any other project whose source files include this file sees
 // Crypto_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
@@ -107,8 +102,7 @@ enum RSAPaddingMode
 #endif
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 inline std::string& getError(std::string& msg)
@@ -116,10 +110,12 @@ inline std::string& getError(std::string& msg)
 	/// returns the augmented error description.
 {
 	unsigned long err;
+	char buf[256]; // ERR_error_string() would format into a buffer shared by all threads
 	while ((err = ERR_get_error()))
 	{
 		if (!msg.empty()) msg.append(1, '\n');
-		msg.append(ERR_error_string(err, 0));
+		ERR_error_string_n(err, buf, sizeof(buf));
+		msg.append(buf);
 	}
 	return msg;
 }
@@ -146,7 +142,7 @@ void Crypto_API uninitializeCrypto();
 	/// OpenSSLInitializer::uninitialize().
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_Crypto_INCLUDED

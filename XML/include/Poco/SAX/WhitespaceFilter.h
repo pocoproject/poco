@@ -23,8 +23,7 @@
 #include "Poco/SAX/LexicalHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API WhitespaceFilter: public XMLFilterImpl, public LexicalHandler
@@ -45,7 +44,7 @@ public:
 	// XMLReader
 	void setProperty(const XMLString& propertyId, const XMLString& value);
 	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
+	[[nodiscard]] void* getProperty(const XMLString& propertyId) const;
 
 	// ContentHandler
 	void startDocument();
@@ -75,7 +74,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_WhitespaceFilter_INCLUDED

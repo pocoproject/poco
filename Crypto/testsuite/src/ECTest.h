@@ -25,10 +25,18 @@ public:
 	ECTest(const std::string& name);
 	~ECTest();
 
+#if defined(POCO_TEST_DEPRECATED)
+
 	void testECNewKeys();
 	void testECNewKeysNoPassphrase();
 	void testECDSASignSha256();
 	void testECDSASignManipulated();
+
+#endif
+
+	void testCurveNameUnknownNID();
+	void testCurveNIDDefaultName();
+	void testUnknownCurveName();
 
 	void setUp();
 	void tearDown();

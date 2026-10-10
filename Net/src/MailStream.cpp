@@ -15,20 +15,19 @@
 #include "Poco/Net/MailStream.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 MailStreamBuf::MailStreamBuf(std::istream& istr):
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_state(ST_CR_LF)
 {
 }
 
 
 MailStreamBuf::MailStreamBuf(std::ostream& ostr):
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_state(ST_CR_LF)
 {
@@ -132,7 +131,7 @@ int MailStreamBuf::writeToDevice(char c)
 		if (_state == ST_CR)
 			_state = ST_CR_LF;
 		else
-			_state = ST_DATA;
+			_state = ST_LF;
 		break;
 	case '.':
 		if (_state == ST_CR_LF)
@@ -151,6 +150,11 @@ int MailStreamBuf::writeToDevice(char c)
 			_buffer.clear();
 		}
 		_pOstr->put(c);
+	}
+	else if (_state == ST_LF)
+	{
+		_buffer += "\r\n";
+		_state = ST_CR_LF;
 	}
 	else if (_state == ST_CR_LF_DOT)
 	{
@@ -218,4 +222,4 @@ MailOutputStream::~MailOutputStream()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

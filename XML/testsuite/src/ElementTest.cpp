@@ -55,7 +55,7 @@ void ElementTest::testAttributes()
 	assertTrue (pElem->getAttribute("a1") == "v1");
 
 	Attr* pAttr1 = pElem->getAttributeNode("a1");
-	assertTrue (pAttr1 != 0);
+	assertTrue (pAttr1 != nullptr);
 	assertTrue (pAttr1->name() == "a1");
 	assertTrue (pAttr1->nodeName() == "a1");
 	assertTrue (pAttr1->value() == "v1");
@@ -64,8 +64,8 @@ void ElementTest::testAttributes()
 	assertTrue (pAttr1->ownerDocument() == pDoc);
 	assertTrue (pAttr1->innerText() == "v1");
 
-	assertTrue (pAttr1->previousSibling() == 0);
-	assertTrue (pAttr1->nextSibling() == 0);
+	assertTrue (pAttr1->previousSibling() == nullptr);
+	assertTrue (pAttr1->nextSibling() == nullptr);
 
 	pAttr1->setValue("V1");
 	assertTrue (pElem->getAttribute("a1") == "V1");
@@ -77,18 +77,18 @@ void ElementTest::testAttributes()
 	assertTrue (pElem->getAttribute("a2") == "v2");
 
 	Attr* pAttr2 = pElem->getAttributeNode("a2");
-	assertTrue (pAttr2 != 0);
+	assertTrue (pAttr2 != nullptr);
 	assertTrue (pAttr2->name() == "a2");
 	assertTrue (pAttr2->value() == "v2");
 	assertTrue (pAttr2->ownerElement() == pElem);
 
-	assertTrue (pAttr1->previousSibling() == 0);
+	assertTrue (pAttr1->previousSibling() == nullptr);
 	assertTrue (pAttr1->nextSibling() == pAttr2);
 	assertTrue (pAttr2->previousSibling() == pAttr1);
-	assertTrue (pAttr2->nextSibling() == 0);
+	assertTrue (pAttr2->nextSibling() == nullptr);
 
 	Attr* pAttr3 = pElem->getAttributeNode("a3");
-	assertTrue (pAttr3 == 0);
+	assertTrue (pAttr3 == nullptr);
 
 	pAttr3 = pDoc->createAttribute("a3");
 	pAttr3->setValue("v3");
@@ -102,12 +102,12 @@ void ElementTest::testAttributes()
 	assertTrue (pElem->hasAttribute("a3"));
 	assertTrue (pElem->getAttribute("a3") == "v3");
 
-	assertTrue (pAttr1->previousSibling() == 0);
+	assertTrue (pAttr1->previousSibling() == nullptr);
 	assertTrue (pAttr1->nextSibling() == pAttr2);
 	assertTrue (pAttr2->previousSibling() == pAttr1);
 	assertTrue (pAttr2->nextSibling() == pAttr3);
 	assertTrue (pAttr3->previousSibling() == pAttr2);
-	assertTrue (pAttr3->nextSibling() == 0);
+	assertTrue (pAttr3->nextSibling() == nullptr);
 
 	pAttr2 = pDoc->createAttribute("a2");
 	pAttr2->setValue("V2");
@@ -177,7 +177,7 @@ void ElementTest::testAttributesNS()
 	assertTrue (pElem->getAttributeNS("urn:ns1", "a1") == "v1");
 
 	Attr* pAttr1 = pElem->getAttributeNodeNS("urn:ns1", "a1");
-	assertTrue (pAttr1 != 0);
+	assertTrue (pAttr1 != nullptr);
 	assertTrue (pAttr1->name() == "a1");
 	assertTrue (pAttr1->namespaceURI() == "urn:ns1");
 	assertTrue (pAttr1->prefix().empty());
@@ -197,7 +197,7 @@ void ElementTest::testAttributesNS()
 	assertTrue (pElem->getAttributeNS("urn:ns1", "a2") == "v2");
 
 	Attr* pAttr2 = pElem->getAttributeNodeNS("urn:ns1", "a2");
-	assertTrue (pAttr2 != 0);
+	assertTrue (pAttr2 != nullptr);
 	assertTrue (pAttr2->name() == "a2");
 	assertTrue (pAttr2->namespaceURI() == "urn:ns1");
 	assertTrue (pAttr2->prefix().empty());
@@ -206,7 +206,7 @@ void ElementTest::testAttributesNS()
 	assertTrue (pAttr2->ownerElement() == pElem);
 
 	Attr* pAttr3 = pElem->getAttributeNodeNS("urn:ns2", "p:a3");
-	assertTrue (pAttr3 == 0);
+	assertTrue (pAttr3 == nullptr);
 
 	pAttr3 = pDoc->createAttributeNS("urn:ns2", "p:a3");
 	pAttr3->setValue("v3");
@@ -578,9 +578,9 @@ void ElementTest::testChildElement()
 	assertTrue (pRoot->getChildElement("elem1") == pElem1);
 	assertTrue (pRoot->getChildElement("elem2") == pElem2);
 	assertTrue (pRoot->getChildElement("elem3") == pElem3);
-	assertTrue (pRoot->getChildElement("elem4") == 0);
+	assertTrue (pRoot->getChildElement("elem4") == nullptr);
 
-	assertTrue (pElem1->getChildElement("elem11") == 0);
+	assertTrue (pElem1->getChildElement("elem11") == nullptr);
 }
 
 
@@ -601,10 +601,10 @@ void ElementTest::testChildElementNS()
 	assertTrue (pRoot->getChildElementNS("urn:ns", "elem1") == pElem1);
 	assertTrue (pRoot->getChildElementNS("urn:ns", "elem2") == pElem2);
 	assertTrue (pRoot->getChildElementNS("urn:ns", "elem3") == pElem3);
-	assertTrue (pRoot->getChildElementNS("urn:ns", "elem4") == 0);
-	assertTrue (pRoot->getChildElementNS("urn:NS", "elem1") == 0);
+	assertTrue (pRoot->getChildElementNS("urn:ns", "elem4") == nullptr);
+	assertTrue (pRoot->getChildElementNS("urn:NS", "elem1") == nullptr);
 
-	assertTrue (pElem1->getChildElementNS("urn:ns", "elem11") == 0);
+	assertTrue (pElem1->getChildElementNS("urn:ns", "elem11") == nullptr);
 }
 
 
@@ -707,7 +707,7 @@ void ElementTest::testNodeByPath()
 	assertTrue (pNode == pElem12);
 
 	pNode = pRoot->getNodeByPath("/elem1/elemA[2]");
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB");
 	assertTrue (pNode == pElem21);
@@ -722,13 +722,13 @@ void ElementTest::testNodeByPath()
 	assertTrue (pNode == pElem23);
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB[3]");
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB[@attr1]");
 	assertTrue (pNode && pNode->nodeValue() == "value1");
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB[@attr2]");
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pRoot->getNodeByPath("/elem2/elemB[@attr1='value2']");
 	assertTrue (pNode == pElem22);
@@ -752,7 +752,7 @@ void ElementTest::testNodeByPath()
 	assertTrue (pNode == pElem31);
 
 	pNode = pDoc->getNodeByPath("//elemB[@attr1='value5']");
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pDoc->getNodeByPath("//[@attr1='value1']");
 	assertTrue (pNode == pElem21);
@@ -770,16 +770,16 @@ void ElementTest::testNodeByPath()
 	assertTrue (pNode == pElem24);
 
 	pNode = pDoc->getNodeByPath("/root/elem2[1]/elemC");
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pDoc->getNodeByPath("/root/elem2[0]/elemD");
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pDoc->getNodeByPath("/root/elem2[1]/elemD");
 	assertTrue (pNode == pElem32);
 
 	pNode = pDoc->getNodeByPath("/root/elem2[@index=0]/elemD");
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pDoc->getNodeByPath("/root/elem2[@index=1]/elemD");
 	assertTrue (pNode == pElem32);
@@ -879,7 +879,7 @@ void ElementTest::testNodeByPathNS()
 	assertTrue (pNode == pElem12);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem1/NS2:elemA[2]", nsMap);
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB", nsMap);
 	assertTrue (pNode == pElem21);
@@ -894,13 +894,13 @@ void ElementTest::testNodeByPathNS()
 	assertTrue (pNode == pElem23);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[3]", nsMap);
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[@NS2:attr1]", nsMap);
 	assertTrue (pNode && pNode->nodeValue() == "value1");
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[@NS2:attr2]", nsMap);
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/NS2:elemB[@NS2:attr1='value2']", nsMap);
 	assertTrue (pNode == pElem22);
@@ -912,7 +912,7 @@ void ElementTest::testNodeByPathNS()
 	assertTrue (pNode && pNode->nodeValue() == "value1");
 
 	pNode = pRoot->getNodeByPathNS("/NS2:elem1", nsMap);
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value1']", nsMap);
 	assertTrue (pNode == pElem21);
@@ -927,7 +927,7 @@ void ElementTest::testNodeByPathNS()
 	assertTrue (pNode == pElem31);
 
 	pNode = pDoc->getNodeByPathNS("//NS2:elemB[@NS2:attr1='value5']", nsMap);
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 
 	pNode = pDoc->getNodeByPathNS("//[@NS2:attr1='value1']", nsMap);
 	assertTrue (pNode == pElem21);
@@ -942,7 +942,7 @@ void ElementTest::testNodeByPathNS()
 	assertTrue (pNode == pElem22);
 
 	pNode = pRoot->getNodeByPathNS("/ns1:elem2/ns1:*[@NS2:attr1='value2']", nsMap);
-	assertTrue (pNode == 0);
+	assertTrue (pNode == nullptr);
 }
 
 

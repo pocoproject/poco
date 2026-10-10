@@ -25,8 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Transcoder
@@ -43,16 +42,16 @@ public:
 	virtual ~Transcoder();
 		/// Destroys the Transcoder.
 
-	static Ptr create(Poco::TextEncoding::Ptr pFromEncoding = nullptr,
+	[[nodiscard]] static Ptr create(Poco::TextEncoding::Ptr pFromEncoding = nullptr,
 		Poco::TextEncoding::Ptr pToEncoding = nullptr);
 		/// Returns a unique pointer to Transcode instance;
 		/// if there is no need for transcoding, null pointer
 		/// is returned.
 
-	std::string fromEncoding() const;
+	[[nodiscard]] std::string fromEncoding() const;
 		/// Returns "from" encoding canonical name.
 
-	std::string toEncoding() const;
+	[[nodiscard]] std::string toEncoding() const;
 		/// Returns "from" encoding canonical name.
 
 	void transcode(const std::string& from, std::string& to);
@@ -91,7 +90,7 @@ inline std::string Transcoder::toEncoding() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Transcoder_INCLUDED

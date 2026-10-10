@@ -78,13 +78,31 @@ $(ls -C "$base"/build/config/)
     Compile with -DPOCO_NO_SOO.
     Disables small object optimization.
 
+  --std-mutex
+    Compile with -DPOCO_ENABLE_STD_MUTEX.
+    Implements Poco::Mutex and Poco::FastMutex with std::recursive_mutex and std::mutex.
+
   --no-sqlparser
     Compile with -DPOCO_DATA_NO_SQL_PARSER
     Disables compilation of the SQLParser.
 
-  --sqlite-fts=<path>
+  --mssql-bigstring
+    Compile with -DPOCO_DATA_SQL_SERVER_BIG_STRINGS=1
+    Enables strings over 8000 bytes on MS SQL Server.
+
+  --sqlite-fts
     Compile with -DPOCO_DATA_SQLITE_FTS.
     Compile SQLite with Full Text Search support.
+
+  --sqlite-vec
+    Build the bundled sqlite-vec extension (vector search) into
+    Data/SQLite and register it for all SQLite sessions.
+
+  --sqlite-vec-avx
+    Compile sqlite-vec with AVX2 SIMD kernels (-mavx -mavx2).
+    In the make build the flags apply to the whole PocoDataSQLite
+    library, which then requires an AVX2-capable x86-64 CPU.
+    Ignored on other architectures. Implies --sqlite-vec.
 
   --sqlite-thread-safe=<value>
     Compile with -DSQLITE_THREADSAFE=<value>.
@@ -109,6 +127,9 @@ $(ls -C "$base"/build/config/)
 
   --odbc-include=<path>
     Specify the directory where ODBC header files are located.
+
+  --mssql-include=<path>
+    Specify the directory where MS SQL Server ODBC header files are located.
 
   --mysql-lib=<path>
     Specify the directory where MySQL library is located.
@@ -137,6 +158,9 @@ $(ls -C "$base"/build/config/)
   --unbundled
     Use system-provided zlib, pcre, expat and sqlite instead of
     bundled ones.
+
+  --trace
+    Enable stack trace. Implicitly disables stripping in release build.
 
   --static
     Build static libraries. Overrides default mode, which
@@ -167,10 +191,15 @@ includepath=""
 librarypath=""
 odbclib=""
 odbcinclude=""
+mssqlinclude=""
 unbundled=""
+trace=""
+sqlitevec=""
+sqlitevecavx=""
 static=""
 shared=""
 nosqlparser=
+mssqlbigstring=
 omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser PageCompiler"
 omitTypical="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser"
 omit=$omitTypical
@@ -203,6 +232,9 @@ while [ $# -ge 1 ]; do
 
 	--odbc-include=*)
 		odbcinclude="$(echo "${1}" | awk '{print substr($0,16)}')" ;;
+
+	--mssql-include=*)
+		mssqlinclude="$(echo "${1}" | awk '{print substr($0,16)}')" ;;
 
 	--mysql-lib=*)
 		mysqllib="$(echo "${1}" | awk '{print substr($0,13)}')" ;;
@@ -246,23 +278,43 @@ while [ $# -ge 1 ]; do
 	--no-soo)
 		flags="$flags -DPOCO_NO_SOO" ;;
 
+	--std-mutex)
+		flags="$flags -DPOCO_ENABLE_STD_MUTEX" ;;
+
 	--no-sqlparser)
 		flags="$flags -DPOCO_DATA_NO_SQL_PARSER"
 		nosqlparser=1
+		;;
+
+	--mssql-bigstring)
+		flags="$flags -DPOCO_DATA_SQL_SERVER_BIG_STRINGS=1"
+		mssqlbigstring=1
 		;;
 
 	--sqlite-thread-safe=*)
 		flags="$flags -DSQLITE_THREADSAFE=$(echo "${1}" | awk '{print substr($0,22)}')" ;;
 
 	--sqlite-fts)
-		flags="$flags -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_FTS3_PARENTHESIS" ;;
+		flags="$flags -DSQLITE_ENABLE_FTS5" ;;
+
+	--sqlite-vec)
+		sqlitevec=1 ;;
+
+	--sqlite-vec-avx)
+		sqlitevec=1
+		sqlitevecavx=1 ;;
 
 	--poquito)
 		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_JSONCONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION" ;;
 
 	--unbundled)
- 		flags="$flags -DPOCO_UNBUNDLED"
- 		unbundled=1
+		flags="$flags -DPOCO_UNBUNDLED"
+		unbundled=1
+		;;
+
+	--trace)
+		flags="$flags -DPOCO_ENABLE_TRACE"
+		trace=1
 		;;
 
 	--minimal)
@@ -368,6 +420,9 @@ fi
 if [ -n "$odbcinclude" ] ; then
 	echo "POCO_ODBC_INCLUDE = $odbcinclude" >>"$build"/config.make
 fi
+if [ -n "$mssqlinclude" ] ; then
+	echo "POCO_MSSQL_INCLUDE = $mssqlinclude" >>"$build"/config.make
+fi
 if [ -n "$mysqllib" ] ; then
 	echo "POCO_MYSQL_LIB = $mysqllib" >>"$build"/config.make
 fi
@@ -383,11 +438,23 @@ fi
 if [ -n "$unbundled" ] ; then
 	echo "POCO_UNBUNDLED = 1" >>"$build"/config.make
 fi
+if [ -n "$trace" ] ; then
+	echo "POCO_ENABLE_TRACE = 1" >>"$build"/config.make
+fi
+if [ -n "$sqlitevec" ] ; then
+	echo "POCO_ENABLE_SQLITE_VEC = 1" >>"$build"/config.make
+fi
+if [ -n "$sqlitevecavx" ] ; then
+	echo "POCO_ENABLE_SQLITE_VEC_AVX = 1" >>"$build"/config.make
+fi
 if [ -n "$linkmode" ] ; then
 	echo "LINKMODE = $linkmode" >>"$build"/config.make
 fi
 if [ -n "$nosqlparser" ] ; then
 	echo "POCO_DATA_NO_SQL_PARSER = $nosqlparser" >>"$build"/config.make
+fi
+if [ -n "$mssqlbigstring" ] ; then
+	echo "POCO_DATA_SQL_SERVER_BIG_STRINGS = $mssqlbigstring" >>"$build"/config.make
 fi
 
 cat <<__EOF__ >>"$build"/config.make
@@ -416,6 +483,9 @@ fi
 if [ -n "$odbcinclude" ] ; then
 	echo "export POCO_ODBC_INCLUDE" >>"$build"/config.make
 fi
+if [ -n "$mssqlinclude" ] ; then
+	echo "export POCO_MSSQL_INCLUDE" >>"$build"/config.make
+fi
 if [ -n "$mysqllib" ] ; then
 	echo "export POCO_MYSQL_LIB" >>"$build"/config.make
 fi
@@ -431,13 +501,24 @@ fi
 if [ -n "$unbundled" ] ; then
 	echo "export POCO_UNBUNDLED" >>"$build"/config.make
 fi
+if [ -n "$trace" ] ; then
+	echo "export POCO_ENABLE_TRACE" >>"$build"/config.make
+fi
+if [ -n "$sqlitevec" ] ; then
+	echo "export POCO_ENABLE_SQLITE_VEC" >>"$build"/config.make
+fi
+if [ -n "$sqlitevecavx" ] ; then
+	echo "export POCO_ENABLE_SQLITE_VEC_AVX" >>"$build"/config.make
+fi
 if [ -n "$linkmode" ] ; then
 	echo "export LINKMODE" >>"$build"/config.make
 fi
 if [ -n "$nosqlparser" ] ; then
 	echo "export POCO_DATA_NO_SQL_PARSER" >>"$build"/config.make
 fi
-
+if [ -n "$mssqlbigstring" ] ; then
+	echo "POCO_DATA_SQL_SERVER_BIG_STRINGS=$mssqlbigstring" >>"$build"/config.make
+fi
 # create config.build
 echo '# config.build generated by configure script' >"$build"/config.build
 cat <<__EOF__ >>"$build"/config.build

@@ -26,7 +26,7 @@ const char* Windows1252Encoding::_names[] =
 	"Windows-1252",
 	"cp1252",
 	"CP1252",
-	NULL
+	nullptr
 };
 
 

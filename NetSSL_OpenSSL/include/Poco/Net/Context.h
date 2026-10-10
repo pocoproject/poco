@@ -31,8 +31,7 @@
 #include <cstdlib>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API Context: public Poco::RefCountedObject
@@ -136,9 +135,24 @@ public:
 		SECURITY_LEVEL_256_BITS = 5
 	};
 
+	enum KeyDHGroup
+	{
+		// MODP
+		//KEY_DH_GROUP_768  = 1,  // (768-bit)
+		KEY_DH_GROUP_1024 = 2,  // (1024-bit)
+		//KEY_DH_GROUP_1536 = 5,  // (1536-bit)
+		KEY_DH_GROUP_2048 = 14, // (2048-bit)
+		//KEY_DH_GROUP_3072 = 15, // (3072-bit)
+
+		// ECP
+		//KEY_DH_GROUP_256 = 19, // (256-bit random)
+		//KEY_DH_GROUP_384 = 20, // (384-bit random)
+		//KEY_DH_GROUP_521 = 21  // (521-bit random)
+	};
+
 	struct NetSSL_API Params
 	{
-		Params();
+		Params(KeyDHGroup dhBits = KEY_DH_GROUP_2048);
 			/// Initializes the struct with default values.
 
 		std::string privateKeyFile;
@@ -176,14 +190,34 @@ public:
 		std::string cipherList;
 			/// Specifies the supported ciphers in OpenSSL notation.
 			/// Defaults to "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH".
+			/// Note: The cipher list only applies for TLS 1.2 and 
+			/// earlier versions. To configure TLS 1.3 cipher suites, 
+			/// please use the cipherSuites member variable.
+			/// A list with invalid syntax results in an SSLContextException.
+			/// A list that selects no cipher (for example an empty list)
+			/// is accepted; only TLS 1.3 connections are possible then.
+
+		std::string cipherSuites;
+			/// Specifies the supported TLS 1.3 cipher suites.
+			/// If left empty, the OpenSSL default cipher suites
+			/// are used. Please refer to the OpenSSL documentation
+			/// for available cipher suite names.
+			/// A list that OpenSSL rejects results in an SSLContextException.
 
 		std::string dhParamsFile;
 			/// Specifies a file containing Diffie-Hellman parameters.
-			/// If empty, the default parameters are used.
+			/// If empty, the default parameters are used. Only a server uses them.
 
-		bool dhUse2048Bits;
-			/// If set to true, will use 2048-bit MODP Group with 256-bit
-			/// prime order subgroup (RFC5114) instead of 1024-bit for DH.
+		KeyDHGroup dhGroup;
+			/// Selects the built-in Diffie-Hellman parameters (RFC 5114) used if
+			/// dhParamsFile is empty: KEY_DH_GROUP_2048 (default, 2048-bit MODP group
+			/// with 256-bit prime order subgroup) or KEY_DH_GROUP_1024 (1024-bit MODP
+			/// group with 160-bit prime order subgroup). OpenSSL rejects parameters
+			/// that are too small for the security level (KEY_DH_GROUP_1024 above
+			/// SECURITY_LEVEL_80_BITS, KEY_DH_GROUP_2048 above SECURITY_LEVEL_112_BITS);
+			/// a server Context constructor then throws an SSLContextException. Use
+			/// dhParamsFile for larger parameters. In FIPS mode dhGroup and
+			/// dhParamsFile are ignored.
 
 		std::string ecdhCurve;
 			/// OpenSSL 1.0.1 and earlier:
@@ -289,7 +323,17 @@ public:
 	void addCertificateAuthority(const Poco::Crypto::X509Certificate& certificate);
 		/// Add one trusted certification authority to be used by the Context.
 
-	//@deprecated
+	void addCertificateAuthority(const std::string& caLocation);
+		/// Add one or more trusted certification authorities to be used by the Context.
+		///
+		/// The caLocation can refer to a single CA file (containing one or more
+		/// PEM-encoded certificates) or a directory containing certificate files
+		/// looked up by hash values (see OpenSSL c_rehash documentation).
+		///
+		/// Uses SSL_CTX_load_verify_locations() internally, which correctly
+		/// handles certificate trust settings on all OpenSSL versions.
+
+	//POCO_DEPRECATED("")
 	void usePrivateKey(const Poco::Crypto::RSAKey& key);
 		/// Sets the private key to be used by the Context.
 		///
@@ -310,17 +354,17 @@ public:
 		/// must have been setup with the SSLManager, or the SSLManager's PrivateKeyPassphraseRequired
 		/// event must be handled.
 
-	SSL_CTX* sslContext() const;
+	[[nodiscard]] SSL_CTX* sslContext() const;
 		/// Returns the underlying OpenSSL SSL Context object.
 
-	Usage usage() const;
+	[[nodiscard]] Usage usage() const;
 		/// Returns whether the context is for use by a client or by a server
 		/// and whether TLSv1 is required.
 
-	bool isForServerUse() const;
+	[[nodiscard]] bool isForServerUse() const;
 		/// Returns true iff the context is for use by a server.
 
-	Context::VerificationMode verificationMode() const;
+	[[nodiscard]] Context::VerificationMode verificationMode() const;
 		/// Returns the verification mode.
 
 	void enableSessionCache(bool flag = true);
@@ -332,7 +376,8 @@ public:
 		///
 		/// To enable session caching on the server side, use the
 		/// two-argument version of this method to specify
-		/// a session ID context.
+		/// a session ID context. See that overload for the effect
+		/// of session caching on TLS 1.3 session tickets.
 
 	void enableSessionCache(bool flag, const std::string& sessionIdContext);
 		/// Enables or disables SSL/TLS session caching on the server.
@@ -349,9 +394,29 @@ public:
 		/// session caching is disabled to avoid problems with clients
 		/// requesting to reuse a session (e.g. Firefox 3.6).
 		///
+		/// For TLS 1.3 connections, enabling the session cache also
+		/// enables the sending of session tickets, which are required
+		/// for TLS 1.3 session resumption. If session caching is
+		/// disabled (default), a TLS 1.3 server does not send session
+		/// tickets and sessions cannot be resumed.
+		///
+		/// With OpenSSL 3.0 or newer, one ticket is sent together with
+		/// the first application data written after the handshake. A
+		/// server that never writes therefore issues no ticket, and its
+		/// sessions cannot be resumed. Since a ticket can be used for
+		/// one resumption only, a client that has to resume repeatedly
+		/// (such as an FTPS client opening several data connections)
+		/// must take a new session from each connection instead of
+		/// reusing the first one.
+		///
+		/// With older OpenSSL versions, which cannot request a ticket
+		/// after the handshake, tickets are sent during the handshake
+		/// instead. A client that closes the connection without reading
+		/// them makes the handshake fail on the server side.
+		///
 		/// This method may only be called on SERVER_USE Context objects.
 
-	bool sessionCacheEnabled() const;
+	[[nodiscard]] bool sessionCacheEnabled() const;
 		/// Returns true iff the session cache is enabled.
 
 	void setSessionCacheSize(std::size_t size);
@@ -364,7 +429,7 @@ public:
 		///
 		/// This method may only be called on SERVER_USE Context objects.
 
-	std::size_t getSessionCacheSize() const;
+	[[nodiscard]] std::size_t getSessionCacheSize() const;
 		/// Returns the current maximum size of the server session cache.
 		///
 		/// This method may only be called on SERVER_USE Context objects.
@@ -376,7 +441,7 @@ public:
 		///
 		/// This method may only be called on SERVER_USE Context objects.
 
-	long getSessionTimeout() const;
+	[[nodiscard]] long getSessionTimeout() const;
 		/// Returns the timeout (in seconds) of cached sessions on the server.
 		///
 		/// This method may only be called on SERVER_USE Context objects.
@@ -392,7 +457,7 @@ public:
 		///
 		/// See X509Certificate::verify() for more information.
 
-	bool extendedCertificateVerificationEnabled() const;
+	[[nodiscard]] bool extendedCertificateVerificationEnabled() const;
 		/// Returns true iff automatic extended certificate
 		/// verification is enabled.
 
@@ -422,7 +487,7 @@ public:
 		/// preferences. When called, the SSL/TLS server will choose following its own
 		/// preferences.
 
-	bool ocspStaplingResponseVerificationEnabled() const;
+	[[nodiscard]] bool ocspStaplingResponseVerificationEnabled() const;
 		/// Returns true if automatic OCSP response
 		/// reception and verification is enabled for client connections
 
@@ -432,7 +497,7 @@ public:
 		/// If specified, this InvalidCertificateHandler will be used instead of the
 		/// one globally set in the SSLManager.
 
-	InvalidCertificateHandlerPtr getInvalidCertificateHandler() const;
+	[[nodiscard]] InvalidCertificateHandlerPtr getInvalidCertificateHandler() const;
 		/// Returns the InvalidCertificateHandler set for this Context,
 		/// or a null pointer if none has been set.
 
@@ -441,7 +506,7 @@ public:
 
 	void ignoreUnexpectedEof(bool flag = true);
 		/// Enable or disable SSL/TLS SSL_OP_IGNORE_UNEXPECTED_EOF
-		/// 
+		///
 		/// Some TLS implementations do not send the mandatory close_notify alert on shutdown.
 		/// If the application tries to wait for the close_notify alert
 		/// but the peer closes the connection without sending it, an error is generated.
@@ -458,7 +523,7 @@ private:
 	void init(const Params& params);
 		/// Initializes the Context with the given parameters.
 
-	void initDH(bool use2048Bits, const std::string& dhFile);
+	void initDH(KeyDHGroup keyDHGroup, const std::string& dhFile);
 		/// Initializes the Context with Diffie-Hellman parameters.
 
 	void initECDH(const std::string& curve);
@@ -527,7 +592,7 @@ inline Context::InvalidCertificateHandlerPtr Context::getInvalidCertificateHandl
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_Context_INCLUDED

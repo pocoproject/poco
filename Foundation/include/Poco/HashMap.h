@@ -52,12 +52,12 @@ struct HashMapEntry
 	{
 	}
 
-	bool operator == (const HashMapEntry& entry) const
+	[[nodiscard]] bool operator == (const HashMapEntry& entry) const
 	{
 		return first == entry.first;
 	}
 
-	bool operator != (const HashMapEntry& entry) const
+	[[nodiscard]] bool operator != (const HashMapEntry& entry) const
 	{
 		return first != entry.first;
 	}
@@ -68,7 +68,7 @@ template <class HME, class KeyHashFunc>
 struct HashMapEntryHash
 	/// This class template is used internally by HashMap.
 {
-	std::size_t operator () (const HME& entry) const
+	[[nodiscard]] std::size_t operator () (const HME& entry) const
 	{
 		return _func(entry.first);
 	}
@@ -85,26 +85,23 @@ class HashMap
 	/// A HashMap can be used just like a std::map.
 {
 public:
-	typedef Key                 KeyType;
-	typedef Mapped              MappedType;
-	typedef Mapped&             Reference;
-	typedef const Mapped&       ConstReference;
-	typedef Mapped*             Pointer;
-	typedef const Mapped*       ConstPointer;
+	using KeyType = Key;
+	using MappedType = Mapped;
+	using Reference = Mapped &;
+	using ConstReference = const Mapped &;
+	using Pointer = Mapped *;
+	using ConstPointer = const Mapped *;
 
-	typedef HashMapEntry<Key, Mapped>      ValueType;
-	typedef std::pair<KeyType, MappedType> PairType;
+	using ValueType = HashMapEntry<Key, Mapped>;
+	using PairType = std::pair<KeyType, MappedType>;
 
-	typedef HashMapEntryHash<ValueType, HashFunc> HashType;
-	typedef LinearHashTable<ValueType, HashType>  HashTable;
+	using HashType = HashMapEntryHash<ValueType, HashFunc>;
+	using HashTable = LinearHashTable<ValueType, HashType>;
 
-	typedef typename HashTable::Iterator      Iterator;
-	typedef typename HashTable::ConstIterator ConstIterator;
+	using Iterator = typename HashTable::Iterator;
+	using ConstIterator = typename HashTable::ConstIterator;
 
-	HashMap()
-		/// Creates an empty HashMap.
-	{
-	}
+	HashMap() = default;
 
 	HashMap(std::size_t initialReserve):
 		_table(initialReserve)
@@ -126,39 +123,39 @@ public:
 		_table.swap(map._table);
 	}
 
-	ConstIterator begin() const
+	[[nodiscard]] ConstIterator begin() const
 	{
 		return _table.begin();
 	}
 
-	ConstIterator end() const
+	[[nodiscard]] ConstIterator end() const
 	{
 		return _table.end();
 	}
 
-	Iterator begin()
+	[[nodiscard]] Iterator begin()
 	{
 		return _table.begin();
 	}
 
-	Iterator end()
+	[[nodiscard]] Iterator end()
 	{
 		return _table.end();
 	}
 
-	ConstIterator find(const KeyType& key) const
+	[[nodiscard]] ConstIterator find(const KeyType& key) const
 	{
 		ValueType value(key);
 		return _table.find(value);
 	}
 
-	Iterator find(const KeyType& key)
+	[[nodiscard]] Iterator find(const KeyType& key)
 	{
 		ValueType value(key);
 		return _table.find(value);
 	}
 
-	std::size_t count(const KeyType& key) const
+	[[nodiscard]] std::size_t count(const KeyType& key) const
 	{
 		ValueType value(key);
 		return _table.find(value) != _table.end() ? 1 : 0;
@@ -191,17 +188,17 @@ public:
 		_table.clear();
 	}
 
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 	{
 		return _table.size();
 	}
 
-	bool empty() const
+	[[nodiscard]] bool empty() const
 	{
 		return _table.empty();
 	}
 
-	ConstReference operator [] (const KeyType& key) const
+	[[nodiscard]] ConstReference operator [] (const KeyType& key) const
 	{
 		ConstIterator it = _table.find(key);
 		if (it != _table.end())
@@ -210,7 +207,7 @@ public:
 			throw NotFoundException();
 	}
 
-	Reference operator [] (const KeyType& key)
+	[[nodiscard]] Reference operator [] (const KeyType& key)
 	{
 		ValueType value(key);
 		std::pair<Iterator, bool> res = _table.insert(value);

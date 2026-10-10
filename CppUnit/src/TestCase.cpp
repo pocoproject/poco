@@ -4,7 +4,7 @@
 
 
 #include <stdexcept>
-#include <math.h>
+#include <cmath>
 #include "CppUnit/TestCase.h"
 #include "CppUnit/TestResult.h"
 #include "CppUnit/estring.h"
@@ -79,16 +79,31 @@ void TestCase::assertEquals(const char* expected, const std::string& actual, lon
 }
 
 
+// Check for a failed exception message assertion
+void TestCase::assertMessageEquals(const std::string& expected, const std::string& actual, long lineNumber, const std::string& fileName)
+{
+#ifdef POCO_ENABLE_TRACE
+	// Poco::Exception appends a backtrace, starting with a newline, to the message;
+	// a nested message that is empty apart from its backtrace adds ": " before it.
+	if (actual.compare(0, expected.size() + 1, expected + '\n') != 0 &&
+		actual.compare(0, expected.size() + 3, expected + ": \n") != 0)
+#else
+	if (expected != actual)
+#endif
+		assertImplementation(false, notEqualsMessage(expected, actual), lineNumber, fileName);
+}
+
+
 void TestCase::assertNotNull(const void* pointer, const std::string& pointerExpression, long lineNumber, const std::string& fileName)
 {
-	if (pointer == NULL)
+	if (pointer == nullptr)
 		throw CppUnitException(pointerExpression + " must not be NULL", lineNumber, fileName);
 }
 
 
 void TestCase::assertNull(const void* pointer, const std::string& pointerExpression, long lineNumber, const std::string& fileName)
 {
-	if (pointer != NULL)
+	if (pointer != nullptr)
 		throw CppUnitException(pointerExpression + " must be NULL", lineNumber, fileName);
 }
 
@@ -117,18 +132,21 @@ void TestCase::run(TestResult *result, const Test::Callback& callback)
 	}
 	catch (CppUnitException& e)
 	{
-		CppUnitException* copy = new CppUnitException(e);
+		auto* copy = new CppUnitException(e);
 		result->addFailure(this, copy);
 	}
 	catch (std::exception& e)
 	{
 		std::string msg(TestResult::demangle(typeid(e).name()));
-		msg.append(":\n").append(callback(e));
+		if (callback)
+		{
+			msg.append(": ").append(callback(e));
+		}
 		result->addError(this, new CppUnitException(msg));
 	}
 	catch (...)
 	{
-		CppUnitException *e = new CppUnitException ("unknown exception");
+		auto* e = new CppUnitException ("unknown exception");
 		result->addError (this, e);
 	}
 	tearDown ();

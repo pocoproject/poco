@@ -24,8 +24,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API AbstractPreparation
@@ -38,18 +37,18 @@ public:
 	AbstractPreparation(PreparatorPtr pPreparator);
 		/// Creates the AbstractPreparation.
 
+	AbstractPreparation(const AbstractPreparation&) = delete;
+
 	virtual ~AbstractPreparation();
 		/// Destroys the AbstractPreparation.
+
+	AbstractPreparation& operator = (const AbstractPreparation&) = delete;
 
 	virtual void prepare() = 0;
 		/// Prepares data.
 
 protected:
-	AbstractPreparation();
-	AbstractPreparation(const AbstractPreparation&);
-	AbstractPreparation& operator = (const AbstractPreparation&);
-
-	PreparatorPtr preparation();
+	[[nodiscard]] PreparatorPtr preparation();
 		/// Returns the preparation object
 
 	PreparatorPtr _pPreparator;
@@ -65,7 +64,7 @@ inline AbstractPreparation::PreparatorPtr AbstractPreparation::preparation()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_AbstractPreparation_INCLUDED

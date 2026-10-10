@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  AbstractConfiguration
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -30,18 +30,12 @@ using Poco::NumberFormatter;
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 AbstractConfiguration::AbstractConfiguration():
 	_depth(0),
 	_eventsEnabled(true)
-{
-}
-
-
-AbstractConfiguration::~AbstractConfiguration()
 {
 }
 
@@ -174,7 +168,7 @@ Poco::Int16 AbstractConfiguration::getInt16(const std::string& key) const
 		throw NotFoundException(key);
 }
 
-	
+
 Poco::Int16 AbstractConfiguration::getInt16(const std::string& key, Poco::Int16 defaultValue) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -336,7 +330,7 @@ void AbstractConfiguration::setInt16(const std::string& key, Poco::Int16 value)
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
-	
+
 void AbstractConfiguration::setUInt16(const std::string& key, Poco::UInt16 value)
 {
 	setRawWithEvent(key, NumberFormatter::format(value));
@@ -348,7 +342,7 @@ void AbstractConfiguration::setInt32(const std::string& key, Poco::Int32 value)
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
-	
+
 void AbstractConfiguration::setUInt32(const std::string& key, Poco::UInt32 value)
 {
 	setRawWithEvent(key, NumberFormatter::format(value));
@@ -386,6 +380,16 @@ void AbstractConfiguration::setDouble(const std::string& key, double value)
 void AbstractConfiguration::setBool(const std::string& key, bool value)
 {
 	setRawWithEvent(key, value ? "true" : "false");
+}
+
+
+AbstractConfiguration::Keys AbstractConfiguration::keys(const std::string& key) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	Keys range;
+	enumerate(key, range);
+	return range;
 }
 
 
@@ -537,10 +541,10 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 					else prop += *it++;
 				}
 				if (it != end) ++it;
-				std::string value;
-				if (getRaw(prop, value))
+				std::string propValue;
+				if (getRaw(prop, propValue))
 				{
-					result.append(internalExpand(value));
+					result.append(internalExpand(propValue));
 				}
 				else if (haveDefault)
 				{
@@ -665,4 +669,16 @@ void AbstractConfiguration::setRawWithEvent(const std::string& key, std::string 
 }
 
 
-} } // namespace Poco::Util
+AbstractConfiguration::~AbstractConfiguration() = default;
+
+
+} // namespace Poco::Util
+
+
+template class Poco::BasicEvent<Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
+template class Poco::BasicEvent<const Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(Util_EXPORTS)
+template class Util_API Poco::BasicEvent<const std::string, Poco::FastMutex>;
+#else
+template class Poco::BasicEvent<const std::string, Poco::FastMutex>;
+#endif

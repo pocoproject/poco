@@ -7,7 +7,7 @@
 //
 // Definition of the OptionCallback class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -21,8 +21,7 @@
 #include "Poco/Util/Util.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API AbstractOptionCallback
@@ -32,15 +31,15 @@ public:
 	virtual void invoke(const std::string& name, const std::string& value) const = 0;
 		/// Invokes the callback member function.
 
-	virtual AbstractOptionCallback* clone() const = 0;
+	[[nodiscard]] virtual AbstractOptionCallback* clone() const = 0;
 		/// Creates and returns a copy of the object.
 
 	virtual ~AbstractOptionCallback();
 		/// Destroys the AbstractOptionCallback.
 
 protected:
-	AbstractOptionCallback();
-	AbstractOptionCallback(const AbstractOptionCallback&);
+	AbstractOptionCallback() = default;
+	AbstractOptionCallback(const AbstractOptionCallback&) = default;
 };
 
 
@@ -53,6 +52,8 @@ class OptionCallback: public AbstractOptionCallback
 {
 public:
 	typedef void (C::*Callback)(const std::string& name, const std::string& value);
+
+	OptionCallback() = delete;
 
 	OptionCallback(C* pObject, Callback method):
 		_pObject(pObject),
@@ -70,10 +71,8 @@ public:
 	{
 	}
 
-	~OptionCallback()
+	~OptionCallback() = default;
 		/// Destroys the OptionCallback.
-	{
-	}
 
 	OptionCallback& operator = (const OptionCallback& cb)
 	{
@@ -90,20 +89,18 @@ public:
 		(_pObject->*_method)(name, value);
 	}
 
-	AbstractOptionCallback* clone() const
+	[[nodiscard]] AbstractOptionCallback* clone() const
 	{
 		return new OptionCallback(_pObject, _method);
 	}
 
 private:
-	OptionCallback();
-
 	C* _pObject;
 	Callback _method;
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_OptionCallback_INCLUDED

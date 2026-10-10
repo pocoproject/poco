@@ -59,8 +59,8 @@ public:
 
 	using RawIP = std::vector<unsigned char>;
 
-	static const unsigned IPv4Size = sizeof(in_addr);
-	static const unsigned IPv6Size = sizeof(in6_addr);
+	static constexpr unsigned IPv4Size = sizeof(in_addr);
+	static constexpr unsigned IPv6Size = sizeof(in6_addr);
 	using RawIPv4 = std::array<unsigned char, IPv4Size>;
 	using RawIPv6 = std::array<unsigned char, IPv6Size>;
 
@@ -68,9 +68,9 @@ public:
 	// backwards compatible with the previously used
 	// enum declaration.
 	using Family = AddressFamily::Family;
-	static const Family IPv4 = AddressFamily::IPv4;
+	static constexpr Family IPv4 = AddressFamily::IPv4;
 #if defined(POCO_HAVE_IPv6)
-	static const Family IPv6 = AddressFamily::IPv6;
+	static constexpr Family IPv6 = AddressFamily::IPv6;
 #endif
 
 	IPAddress();
@@ -136,21 +136,21 @@ public:
 	IPAddress& operator = (IPAddress&& addr);
 		/// Move-assigns an IPAddress.
 
-	bool isV4() const;
-	bool isV6() const;
-	RawIPv4 toV4Bytes() const;
-	RawIPv6 toV6Bytes() const;
-	RawIP toBytes() const;
+	[[nodiscard]] bool isV4() const;
+	[[nodiscard]] bool isV6() const;
+	[[nodiscard]] RawIPv4 toV4Bytes() const;
+	[[nodiscard]] RawIPv6 toV6Bytes() const;
+	[[nodiscard]] RawIP toBytes() const;
 
-	Family family() const;
+	[[nodiscard]] Family family() const;
 		/// Returns the address family (IPv4 or IPv6) of the address.
 
-	Poco::UInt32 scope() const;
+	[[nodiscard]] Poco::UInt32 scope() const;
 		/// Returns the IPv6 scope identifier of the address. Returns 0 if
 		/// the address is an IPv4 address, or the address is an
 		/// IPv6 address but does not have a scope identifier.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns a string containing a representation of the address
 		/// in presentation format.
 		///
@@ -184,11 +184,11 @@ public:
 		/// appended. On Unix platforms, the name of the interface corresponding
 		/// to the index (interpretation of the scope identifier) is added.
 
-	bool isWildcard() const;
+	[[nodiscard]] bool isWildcard() const;
 		/// Returns true iff the address is a wildcard (all zero)
 		/// address.
 
-	bool isBroadcast() const;
+	[[nodiscard]] bool isBroadcast() const;
 		/// Returns true iff the address is a broadcast address.
 		///
 		/// Only IPv4 addresses can be broadcast addresses. In a broadcast
@@ -196,14 +196,14 @@ public:
 		///
 		/// For an IPv6 address, returns always false.
 
-	bool isLoopback() const;
+	[[nodiscard]] bool isLoopback() const;
 		/// Returns true iff the address is a loopback address.
 		///
 		/// For IPv4, the loopback address is 127.0.0.1.
 		///
 		/// For IPv6, the loopback address is ::1.
 
-	bool isMulticast() const;
+	[[nodiscard]] bool isMulticast() const;
 		/// Returns true iff the address is a multicast address.
 		///
 		/// IPv4 multicast addresses are in the
@@ -213,13 +213,13 @@ public:
 		/// IPv6 multicast addresses are in the
 		/// FFxx:x:x:x:x:x:x:x range.
 
-	bool isUnicast() const;
+	[[nodiscard]] bool isUnicast() const;
 		/// Returns true iff the address is a unicast address.
 		///
 		/// An address is unicast if it is neither a wildcard,
 		/// broadcast or multicast address.
 
-	bool isLinkLocal() const;
+	[[nodiscard]] bool isLinkLocal() const;
 		/// Returns true iff the address is a link local unicast address.
 		///
 		/// IPv4 link local addresses are in the 169.254.0.0/16 range,
@@ -228,7 +228,7 @@ public:
 		/// IPv6 link local addresses have 1111 1110 10 as the first
 		/// 10 bits, followed by 54 zeros.
 
-	bool isSiteLocal() const;
+	[[nodiscard]] bool isSiteLocal() const;
 		/// Returns true iff the address is a site local unicast address.
 		///
 		/// IPv4 site local addresses are in on of the 10.0.0.0/24,
@@ -239,7 +239,7 @@ public:
 		/// this mask are supported, but obsolete; RFC 4193 prescribes
 		/// fc00::/7 (1111 110) as local unicast prefix.
 
-	bool isIPv4Compatible() const;
+	[[nodiscard]] bool isIPv4Compatible() const;
 		/// Returns true iff the address is IPv4 compatible.
 		///
 		/// For IPv4 addresses, this is always true.
@@ -247,14 +247,14 @@ public:
 		/// For IPv6, the address must be in the ::x:x range (the
 		/// first 96 bits are zero).
 
-	bool isIPv4Mapped() const;
+	[[nodiscard]] bool isIPv4Mapped() const;
 		/// Returns true iff the address is an IPv4 mapped IPv6 address.
 		///
 		/// For IPv4 addresses, this is always true.
 		///
 		/// For IPv6, the address must be in the ::FFFF:x:x range.
 
-	bool isWellKnownMC() const;
+	[[nodiscard]] bool isWellKnownMC() const;
 		/// Returns true iff the address is a well-known multicast address.
 		///
 		/// For IPv4, well-known multicast addresses are in the
@@ -263,7 +263,7 @@ public:
 		/// For IPv6, well-known multicast addresses are in the
 		/// FF0x:x:x:x:x:x:x:x range.
 
-	bool isNodeLocalMC() const;
+	[[nodiscard]] bool isNodeLocalMC() const;
 		/// Returns true iff the address is a node-local multicast address.
 		///
 		/// IPv4 does not support node-local addresses, thus the result is
@@ -272,7 +272,7 @@ public:
 		/// For IPv6, node-local multicast addresses are in the
 		/// FFx1:x:x:x:x:x:x:x range.
 
-	bool isLinkLocalMC() const;
+	[[nodiscard]] bool isLinkLocalMC() const;
 		/// Returns true iff the address is a link-local multicast address.
 		///
 		/// For IPv4, link-local multicast addresses are in the
@@ -282,7 +282,7 @@ public:
 		/// For IPv6, link-local multicast addresses are in the
 		/// FFx2:x:x:x:x:x:x:x range.
 
-	bool isSiteLocalMC() const;
+	[[nodiscard]] bool isSiteLocalMC() const;
 		/// Returns true iff the address is a site-local multicast address.
 		///
 		/// For IPv4, site local multicast addresses are in the
@@ -291,7 +291,7 @@ public:
 		/// For IPv6, site-local multicast addresses are in the
 		/// FFx5:x:x:x:x:x:x:x range.
 
-	bool isOrgLocalMC() const;
+	[[nodiscard]] bool isOrgLocalMC() const;
 		/// Returns true iff the address is a organization-local multicast address.
 		///
 		/// For IPv4, organization-local multicast addresses are in the
@@ -300,7 +300,7 @@ public:
 		/// For IPv6, organization-local multicast addresses are in the
 		/// FFx8:x:x:x:x:x:x:x range.
 
-	bool isGlobalMC() const;
+	[[nodiscard]] bool isGlobalMC() const;
 		/// Returns true iff the address is a global multicast address.
 		///
 		/// For IPv4, global multicast addresses are in the
@@ -309,27 +309,27 @@ public:
 		/// For IPv6, global multicast addresses are in the
 		/// FFxF:x:x:x:x:x:x:x range.
 
-	bool operator == (const IPAddress& addr) const;
-	bool operator != (const IPAddress& addr) const;
-	bool operator <  (const IPAddress& addr) const;
-	bool operator <= (const IPAddress& addr) const;
-	bool operator >  (const IPAddress& addr) const;
-	bool operator >= (const IPAddress& addr) const;
-	IPAddress operator & (const IPAddress& addr) const;
-	IPAddress operator | (const IPAddress& addr) const;
-	IPAddress operator ^ (const IPAddress& addr) const;
-	IPAddress operator ~ () const;
+	[[nodiscard]] bool operator == (const IPAddress& addr) const;
+	[[nodiscard]] bool operator != (const IPAddress& addr) const;
+	[[nodiscard]] bool operator <  (const IPAddress& addr) const;
+	[[nodiscard]] bool operator <= (const IPAddress& addr) const;
+	[[nodiscard]] bool operator >  (const IPAddress& addr) const;
+	[[nodiscard]] bool operator >= (const IPAddress& addr) const;
+	[[nodiscard]] IPAddress operator & (const IPAddress& addr) const;
+	[[nodiscard]] IPAddress operator | (const IPAddress& addr) const;
+	[[nodiscard]] IPAddress operator ^ (const IPAddress& addr) const;
+	[[nodiscard]] IPAddress operator ~ () const;
 
-	poco_socklen_t length() const;
+	[[nodiscard]] poco_socklen_t length() const;
 		/// Returns the length in bytes of the internal socket address structure.
 
-	const void* addr() const;
+	[[nodiscard]] const void* addr() const;
 		/// Returns the internal address structure.
 
-	int af() const;
+	[[nodiscard]] int af() const;
 		/// Returns the address family (AF_INET or AF_INET6) of the address.
 
-	unsigned prefixLength() const;
+	[[nodiscard]] unsigned int prefixLength() const;
 		/// Returns the prefix length.
 
 	void mask(const IPAddress& mask);
@@ -344,7 +344,7 @@ public:
 		///
 		/// The new address is (address & mask) | (set & ~mask).
 
-	static IPAddress parse(const std::string& addr);
+	[[nodiscard]] static IPAddress parse(const std::string& addr);
 		/// Creates an IPAddress from the string containing
 		/// an IP address in presentation format (dotted decimal
 		/// for IPv4, hex string for IPv6).
@@ -356,7 +356,7 @@ public:
 		///
 		/// Throws an InvalidAddressException if the address cannot be parsed.
 
-	static bool tryParse(const std::string& addr, IPAddress& result);
+	[[nodiscard]] static bool tryParse(const std::string& addr, IPAddress& result);
 		/// Tries to interpret the given address string as an
 		/// IP address in presentation format (dotted decimal
 		/// for IPv4, hex string for IPv6).
@@ -366,10 +366,10 @@ public:
 		///
 		/// Returns false and leaves result unchanged otherwise.
 
-	static IPAddress wildcard(Family family = IPv4);
+	[[nodiscard]] static IPAddress wildcard(Family family = IPv4);
 		/// Returns a wildcard IPv4 or IPv6 address (0.0.0.0).
 
-	static IPAddress broadcast();
+	[[nodiscard]] static IPAddress broadcast();
 		/// Returns a broadcast IPv4 address (255.255.255.255).
 
 	enum
@@ -387,7 +387,7 @@ private:
 	typedef Poco::Net::Impl::IPAddressImpl Impl;
 	typedef Poco::AutoPtr<Impl> Ptr;
 
-	Ptr pImpl() const;
+	[[nodiscard]] Ptr pImpl() const;
 	void newIPv4();
 	void newIPv4(const void* hostAddr);
 	void newIPv4(unsigned prefix);
@@ -396,8 +396,8 @@ private:
 	void newIPv6(const void* hostAddr);
 	void newIPv6(const void* hostAddr, Poco::UInt32 scope);
 	void newIPv6(unsigned prefix);
-	static std::string& compressV6(std::string& v6addr);
-	static std::string trimIPv6(const std::string& v6Addr);
+	[[nodiscard]] static std::string& compressV6(std::string& v6addr);
+	[[nodiscard]] static std::string trimIPv6(const std::string& v6Addr);
 #endif
 	Ptr _pImpl;
 };

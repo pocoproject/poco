@@ -22,8 +22,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace JWT {
+namespace Poco::JWT {
 
 
 POCO_DECLARE_EXCEPTION(JWT_API, JWTException, Poco::Exception)
@@ -35,7 +34,7 @@ POCO_DECLARE_EXCEPTION(JWT_API, SignatureVerificationException, SignatureExcepti
 POCO_DECLARE_EXCEPTION(JWT_API, SignatureGenerationException, SignatureException)
 
 
-} } // namespace Poco::JWT
+} // namespace Poco::JWT
 
 
 #endif // JWT_JWTException_INCLUDED

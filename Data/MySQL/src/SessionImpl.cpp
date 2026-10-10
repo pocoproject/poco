@@ -34,9 +34,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 const std::string SessionImpl::MYSQL_READ_UNCOMMITTED = "READ UNCOMMITTED";
@@ -48,7 +46,7 @@ const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) :
 	Poco::Data::AbstractSessionImpl<SessionImpl>(connectionString, loginTimeout),
 	_connector("MySQL"),
-	_handle(0),
+	_handle(nullptr),
 	_reset(false),
 	_connected(false),
 	_inTransaction(false),
@@ -59,6 +57,12 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 	setProperty("handle", static_cast<MYSQL*>(_handle));
 	addFeature("failIfInnoReadOnly", &SessionImpl::setFailIfInnoReadOnly, &SessionImpl::getFailIfInnoReadOnly);
 	open();
+}
+
+
+void SessionImpl::setName()
+{
+	setDBMSName("MySQL"s);
 }
 
 
@@ -114,7 +118,7 @@ void SessionImpl::open(const std::string& connect)
 	if (options["user"].empty())
 		throw MySQLException("create session: specify user name");
 
-	const char * db = NULL;
+	const char * db = nullptr;
 	if (!options["db"].empty())
 		db = options["db"].c_str();
 
@@ -175,7 +179,7 @@ void SessionImpl::open(const std::string& connect)
 
 	// autocommit is initially on when a session is opened
 	AbstractSessionImpl::setAutoCommit("", true);
-
+	setName();
 	_connected = true;
 }
 
@@ -266,19 +270,19 @@ Poco::UInt32 SessionImpl::getTransactionIsolation() const
 
 	if (serverInfo.find(MARIADB_SERVERINFO) != std::string::npos) //MariaDB
 	{
-		getSetting("tx_isolation", isolation);
+		(void)getSetting("tx_isolation", isolation);
 		isolation = isolation.c_str();
 	}
 	else //MySQL
 	{
 		if (version >= 80000)
 		{
-			getSetting("transaction_isolation", isolation);
+			(void)getSetting("transaction_isolation", isolation);
 			isolation = isolation.c_str();
 		}
 		else
 		{
-			getSetting("tx_isolation", isolation);
+			(void)getSetting("tx_isolation", isolation);
 		}
 	}
 	Poco::replaceInPlace(isolation, "-", " ");
@@ -376,4 +380,4 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

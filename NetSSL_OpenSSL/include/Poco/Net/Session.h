@@ -24,8 +24,7 @@
 #include <openssl/ssl.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API Session: public Poco::RefCountedObject
@@ -39,10 +38,10 @@ class NetSSL_API Session: public Poco::RefCountedObject
 public:
 	using Ptr = Poco::AutoPtr<Session>;
 
-	SSL_SESSION* sslSession() const;
+	[[nodiscard]] SSL_SESSION* sslSession() const;
 		/// Returns the stored OpenSSL SSL_SESSION object.
 
-	bool isResumable() const;
+	[[nodiscard]] bool isResumable() const;
 		/// Returns true if the session is resumable.
 
 protected:
@@ -76,7 +75,7 @@ inline SSL_SESSION* Session::sslSession() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_Session_INCLUDED

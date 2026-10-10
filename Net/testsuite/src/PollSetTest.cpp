@@ -433,8 +433,8 @@ void PollSetTest::testPollClosedServer()
 	assertTrue(ss2 == smm.begin()->first);
 
 	// socket closed or error
-	assertTrue(0 >= ss1.receiveBytes(0, 0));
-	assertTrue(0 >= ss2.receiveBytes(0, 0));
+	assertTrue(0 >= ss1.receiveBytes(nullptr, 0));
+	assertTrue(0 >= ss2.receiveBytes(nullptr, 0));
 }
 
 

@@ -16,10 +16,11 @@
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#include "Poco/NumericString.h"
-#include "Poco/MemoryStream.h"
 #include "Poco/NumberFormatter.h"
 #include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 class StringTest: public CppUnit::TestCase
@@ -62,6 +63,7 @@ public:
 	void benchmarkFloatToStr();
 	void benchmarkStrToFloat();
 	void benchmarkStrToInt();
+	void benchmarkIntToStr();
 
 	void testJSONString();
 
@@ -99,6 +101,9 @@ private:
 
 		assertTrue (Poco::strToInt("0", result, 010)); assertTrue (result == 0);
 		assertTrue (Poco::strToInt("000", result, 010)); assertTrue (result == 0);
+
+		assertFalse (Poco::strToInt("1,000", result, 0x10));
+		assertFalse (Poco::strToInt("ABCDEFG", result, 0x10));
 	}
 
 	template <typename Larger, typename Smaller>
@@ -162,16 +167,6 @@ private:
 		assertFalse (Poco::safeMultiply(t, f, m));
 	}
 
-	template <typename T>
-	bool parseStream(const std::string& s, T& value)
-	{
-		Poco::MemoryInputStream istr(s.data(), s.size());
-#if !defined(POCO_NO_LOCALE)
-		istr.imbue(std::locale::classic());
-#endif
-		istr >> value;
-		return istr.eof() && !istr.fail();
-	}
 };
 
 

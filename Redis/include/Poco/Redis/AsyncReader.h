@@ -24,8 +24,7 @@
 #include "Poco/Activity.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API AsyncReader
@@ -48,7 +47,7 @@ public:
 	virtual ~AsyncReader();
 		/// Destroys the AsyncReader.
 
-	bool isStopped();
+	[[nodiscard]] bool isStopped();
 		/// Returns true if the activity is not running, false when it is.
 
 	void start();
@@ -92,7 +91,7 @@ inline void AsyncReader::stop()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif //Redis_AsyncReader_INCLUDED

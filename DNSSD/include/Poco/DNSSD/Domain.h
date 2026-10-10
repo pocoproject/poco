@@ -23,8 +23,7 @@
 #include "Poco/DNSSD/DNSSD.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 class DNSSD_API Domain
@@ -44,13 +43,13 @@ public:
 	~Domain();
 		/// Destroys the Domain.
 
-	Poco::Int32 networkInterface() const;
+	[[nodiscard]] Poco::Int32 networkInterface() const;
 		/// Returns the index of the network interface the domain was discovered on.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the name of the domain.
 
-	bool isDefault() const;
+	[[nodiscard]] bool isDefault() const;
 		/// Returns true if the domain is the default domain.
 
 private:
@@ -81,7 +80,7 @@ inline bool Domain::isDefault() const
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_Domain_INCLUDED

@@ -17,9 +17,7 @@
 #include "Poco/Data/SQLite/Notifier.h"
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 Notifier::Notifier(const Session& session, EnabledEventType enabled):
@@ -69,7 +67,7 @@ bool Notifier::disableUpdate()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 
-	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::UpdateCallbackType) 0, this))
+	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::UpdateCallbackType) nullptr, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_UPDATE;
 
 	return !updateEnabled();
@@ -97,7 +95,7 @@ bool Notifier::disableCommit()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 
-	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::CommitCallbackType) 0, this))
+	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::CommitCallbackType) nullptr, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_COMMIT;
 
 	return !commitEnabled();
@@ -125,7 +123,7 @@ bool Notifier::disableRollback()
 {
 	Poco::Mutex::ScopedLock l(_mutex);
 
-	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::RollbackCallbackType) 0, this))
+	if (Utility::registerUpdateHandler(Utility::dbHandle(_session), (Utility::RollbackCallbackType) nullptr, this))
 		_enabledEvents &= ~SQLITE_NOTIFY_ROLLBACK;
 
 	return !rollbackEnabled();
@@ -150,7 +148,7 @@ bool Notifier::disableAll()
 }
 
 
-void Notifier::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, Poco::Int64 row)
+void Notifier::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, long long row)
 {
 	poco_check_ptr(pVal);
 	Notifier* pV = reinterpret_cast<Notifier*>(pVal);
@@ -200,4 +198,4 @@ void Notifier::sqliteRollbackCallbackFn(void* pVal)
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

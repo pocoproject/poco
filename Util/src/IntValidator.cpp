@@ -5,7 +5,7 @@
 // Package: Options
 // Module:  IntValidator
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,18 +23,15 @@ using Poco::NumberParser;
 using Poco::format;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
+
+
+IntValidator::~IntValidator() = default;
 
 
 IntValidator::IntValidator(int min, int max):
 	_min(min),
 	_max(max)
-{
-}
-
-
-IntValidator::~IntValidator()
 {
 }
 
@@ -51,4 +48,4 @@ void IntValidator::validate(const Option& option, const std::string& value)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

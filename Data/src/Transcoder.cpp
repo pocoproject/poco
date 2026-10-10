@@ -15,8 +15,7 @@
 #include "Poco/Data/Transcoder.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Transcoder::Transcoder(Poco::TextEncoding::Ptr pFromEncoding,
@@ -73,4 +72,4 @@ void Transcoder::reverseTranscode(const std::string& from, std::string& to)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

@@ -93,7 +93,7 @@ void FPETest::testFlags()
 	volatile double c = div(a, b);
 
 #if !defined(POCO_NO_FPENVIRONMENT)
-    assertTrue (FPE::isFlag(FPE::FP_DIVIDE_BY_ZERO));
+	assertTrue (FPE::isFlag(FPE::FP_DIVIDE_BY_ZERO));
 #endif
 	assertTrue (FPE::isInfinite(c));
 

@@ -22,9 +22,7 @@
 #include <mysql/mysql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class StatementExecutor
@@ -41,10 +39,14 @@ public:
 	explicit StatementExecutor(MYSQL* mysql);
 		/// Creates the StatementExecutor.
 
+	StatementExecutor(const StatementExecutor&) = delete;
+
+	StatementExecutor& operator=(const StatementExecutor&) = delete;
+
 	~StatementExecutor();
 		/// Destroys the StatementExecutor.
 
-	int state() const;
+	[[nodiscard]] int state() const;
 		/// Returns the current state.
 
 	void prepare(const std::string& query);
@@ -59,20 +61,16 @@ public:
 	void execute();
 		/// Executes the statement.
 
-	bool fetch();
+	[[nodiscard]] bool fetch();
 		/// Fetches the data.
 
-	bool fetchColumn(std::size_t n, MYSQL_BIND *bind);
+	[[nodiscard]] bool fetchColumn(std::size_t n, MYSQL_BIND *bind);
 		/// Fetches the column.
 
-	int getAffectedRowCount() const;
+	[[nodiscard]] int getAffectedRowCount() const;
 
-	operator MYSQL_STMT* ();
+	[[nodiscard]] operator MYSQL_STMT* ();
 		/// Cast operator to native handle type.
-
-private:
-	StatementExecutor(const StatementExecutor&);
-	StatementExecutor& operator=(const StatementExecutor&);
 
 private:
 	MYSQL*      _pSessionHandle;
@@ -93,7 +91,7 @@ inline StatementExecutor::operator MYSQL_STMT* ()
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_StatementHandle_INCLUDED

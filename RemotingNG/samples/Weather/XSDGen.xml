@@ -1,0 +1,13 @@
+<AppConfig>
+	<XSDGen>
+		<default>
+			<include>include/WeatherWS</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+			<timestamps>false</timestamps>
+		</default>
+		<schema targetNamespace="http://ws.cdyne.com/WeatherWS/">
+			<namespace>WeatherWS</namespace>
+		</schema>
+	</XSDGen>
+</AppConfig>

@@ -175,19 +175,105 @@
 // to "d.so", "d.dll", etc. for _DEBUG builds in Poco::SharedLibrary.
 // #define POCO_NO_SHARED_LIBRARY_DEBUG_SUFFIX
 
-
-// Disarm POCO_DEPRECATED macro.
-// #define POCO_NO_DEPRECATED
-
 // Enable usage of Poco::Mutex and Poco::FastMutex
 // as wrappers for std::recursive_mutex and std::mutex
 #ifndef POCO_ENABLE_STD_MUTEX
 //	#define POCO_ENABLE_STD_MUTEX
 #endif
 
+#ifndef POCO_HAVE_SENDFILE
+//	#define POCO_HAVE_SENDFILE
+#endif
+
 #define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
+#define POCO_HAVE_CPP20_COMPILER (__cplusplus >= 202002L)
+#define POCO_HAVE_CPP23_COMPILER (__cplusplus >= 202302L)
+
+#if (POCO_HAVE_CPP20_COMPILER)
+#include <version>
+#if defined(__cpp_lib_jthread)
+	#define POCO_HAVE_JTHREAD true
+#else
+	#define POCO_HAVE_JTHREAD false
+#endif
+#if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
+	#define POCO_HAVE_ATOMIC_SHARED_PTR true
+#else
+	#define POCO_HAVE_ATOMIC_SHARED_PTR false
+#endif
+#else
+	#define POCO_HAVE_ATOMIC_SHARED_PTR false
+#endif
+
+// Float std::to_chars/from_chars support detection.
+// - GCC 11+ (libstdc++): full support since GCC 11
+// - MSVC 19.24+: full support since VS 2019 16.4
+// - Apple Clang: requires macOS 26.0+ deployment target (availability annotations)
+// - Non-Apple libc++ (Android NDK, FreeBSD, Emscripten): requires libc++ 20+
+//   (LLVM 20); libc++ 17-19 have float from_chars overloads explicitly deleted.
+//   On macOS, even non-Apple LLVM (Homebrew) uses system libc++ headers with
+//   Apple availability annotations, so __APPLE__ must also be excluded here.
+#if defined(__APPLE__)
+#include <AvailabilityMacros.h>
+#endif
+#if defined(__cpp_lib_to_chars) && __cpp_lib_to_chars >= 202306L
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#elif defined(_MSC_VER) && _MSC_VER >= 1924
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 11
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#elif defined(__APPLE__) && defined(MAC_OS_X_VERSION_MIN_REQUIRED) && MAC_OS_X_VERSION_MIN_REQUIRED >= 260000
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#elif defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 200000 && !defined(__APPLE__)
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#endif
+
+// Option to silence deprecation warnings.
+#ifndef POCO_SILENCE_DEPRECATED
+	#define POCO_DEPRECATED(reason) [[deprecated(reason)]]
+#else
+	#define POCO_DEPRECATED(reason)
+#endif
+
+// [[nodiscard]] on constructors (C++20, P1771). Used to flag discarded
+// temporaries of RAII types (scoped locks, transactions etc.).
+// Note that [[nodiscard]] cannot be applied to the class itself when the
+// class also carries an export/visibility attribute (eg. Foundation_API),
+// because GCC does not allow standard and GNU attributes to be mixed in a
+// class head; annotate the constructors with POCO_NODISCARD_CTOR instead.
+#if defined(__has_cpp_attribute)
+	#if __has_cpp_attribute(nodiscard) >= 201907L
+		#define POCO_NODISCARD_CTOR [[nodiscard]]
+	#endif
+#endif
+#ifndef POCO_NODISCARD_CTOR
+	#define POCO_NODISCARD_CTOR
+#endif
 
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER
+
+// Uncomment to enable stack trace autogeneration in Exception
+//#define POCO_ENABLE_TRACE 1
+
+// Enable FastLogger (Quill-based high-performance logger) by default.
+// FastLogger provides ~9ns logging latency using the Quill library.
+// Uncomment to disable FastLogger:
+// #define POCO_NO_FASTLOGGER
+#if !defined(POCO_NO_FASTLOGGER) && !defined(POCO_ENABLE_FASTLOGGER)
+	#define POCO_ENABLE_FASTLOGGER
+#endif
+
+#if defined(__cpp_lib_atomic_wait)
+	#if defined(__APPLE__) && __has_include(<Availability.h>)
+		#include <Availability.h>
+		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 110000
+			#define POCO_HAVE_ATOMIC_WAIT 1
+		#endif
+	#else
+		// Standard feature test macro (C++20)
+		#define POCO_HAVE_ATOMIC_WAIT 1
+	#endif
+#endif
 
 #endif // Foundation_Config_INCLUDED

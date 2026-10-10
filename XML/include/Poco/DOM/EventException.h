@@ -22,8 +22,7 @@
 #include "Poco/XML/XMLException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API EventException: public XMLException
@@ -49,17 +48,17 @@ public:
 
 	EventException& operator = (const EventException& exc);
 
-	const char* name() const noexcept;
+	[[nodiscard]] const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	const char* className() const noexcept;
+	[[nodiscard]] const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	unsigned short code() const;
+	[[nodiscard]] unsigned short code() const;
 		/// Returns the Event exception code.
 
 protected:
-	Poco::Exception* clone() const;
+	[[nodiscard]] Exception* clone() const;
 
 private:
 	EventException();
@@ -75,7 +74,7 @@ inline unsigned short EventException::code() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_EventException_INCLUDED

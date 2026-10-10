@@ -5,9 +5,9 @@ on:
 
 jobs:
   close-issues:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/stale@v3
+      - uses: actions/stale@v10
         with:
           days-before-issue-stale: 365
           days-before-issue-close: 60

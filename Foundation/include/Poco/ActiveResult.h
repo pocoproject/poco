@@ -39,8 +39,8 @@ class ActiveResultHolder: public RefCountedObject
 {
 public:
 	ActiveResultHolder():
-		_pData(0),
-		_pExc(0),
+		_pData(nullptr),
+		_pExc(nullptr),
 		_event(Event::EVENT_MANUALRESET)
 		/// Creates an ActiveResultHolder.
 	{
@@ -87,14 +87,14 @@ public:
 		_event.set();
 	}
 
-	bool failed() const
+	[[nodiscard]] bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
-		return _pExc != 0;
+		return _pExc != nullptr;
 	}
 
-	std::string error() const
+	[[nodiscard]] std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
 		/// active method completed successfully.
@@ -105,7 +105,7 @@ public:
 			return std::string();
 	}
 
-	Exception* exception() const
+	[[nodiscard]] Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
 	{
@@ -127,7 +127,7 @@ public:
 	}
 
 protected:
-	~ActiveResultHolder()
+	~ActiveResultHolder() override
 	{
 		delete _pData;
 		delete _pExc;
@@ -146,7 +146,7 @@ class ActiveResultHolder<void>: public RefCountedObject
 {
 public:
 	ActiveResultHolder():
-		_pExc(0),
+		_pExc(nullptr),
 		_event(Event::EVENT_MANUALRESET)
 		/// Creates an ActiveResultHolder.
 	{
@@ -180,14 +180,14 @@ public:
 		_event.set();
 	}
 
-	bool failed() const
+	[[nodiscard]] bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
-		return _pExc != 0;
+		return _pExc != nullptr;
 	}
 
-	std::string error() const
+	[[nodiscard]] std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
 		/// active method completed successfully.
@@ -198,7 +198,7 @@ public:
 			return std::string();
 	}
 
-	Exception* exception() const
+	[[nodiscard]] Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
 	{
@@ -220,7 +220,7 @@ public:
 	}
 
 protected:
-	~ActiveResultHolder()
+	~ActiveResultHolder() override
 	{
 		delete _pExc;
 	}
@@ -238,8 +238,8 @@ class ActiveResult
 	/// result from the execution thread back to the invocation thread.
 {
 public:
-	typedef RT ResultType;
-	typedef ActiveResultHolder<ResultType> ActiveResultHolderType;
+	using ResultType = RT;
+	using ActiveResultHolderType = ActiveResultHolder<ResultType>;
 
 	ActiveResult(ActiveResultHolderType* pHolder):
 		_pHolder(pHolder)
@@ -261,6 +261,8 @@ public:
 		_pHolder->release();
 	}
 
+	ActiveResult() = delete;
+
 	ActiveResult& operator = (const ActiveResult& result)
 		/// Assignment operator.
 	{
@@ -275,7 +277,7 @@ public:
 		swap(_pHolder, result._pHolder);
 	}
 
-	ResultType& data() const
+	[[nodiscard]] ResultType& data() const
 		/// Returns a reference to the result data.
 	{
 		return _pHolder->data();
@@ -308,20 +310,20 @@ public:
 		_pHolder->wait(milliseconds);
 	}
 
-	bool available() const
+	[[nodiscard]] bool available() const
 		/// Returns true if a result is available.
 	{
 		return _pHolder->tryWait(0);
 	}
 
-	bool failed() const
+	[[nodiscard]] bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
 		return _pHolder->failed();
 	}
 
-	std::string error() const
+	[[nodiscard]] std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
 		/// active method completed successfully.
@@ -329,7 +331,7 @@ public:
 		return _pHolder->error();
 	}
 
-	Exception* exception() const
+	[[nodiscard]] Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
 	{
@@ -343,7 +345,7 @@ public:
 		_pHolder->notify();
 	}
 
-	ResultType& data()
+	[[nodiscard]] ResultType& data()
 		/// Returns a non-const reference to the result data. For internal
 		/// use only.
 	{
@@ -363,8 +365,6 @@ public:
 	}
 
 private:
-	ActiveResult();
-
 	ActiveResultHolderType* _pHolder;
 };
 
@@ -377,7 +377,7 @@ class ActiveResult<void>
 	/// result from the execution thread back to the invocation thread.
 {
 public:
-	typedef ActiveResultHolder<void> ActiveResultHolderType;
+	using ActiveResultHolderType = ActiveResultHolder<void>;
 
 	ActiveResult(ActiveResultHolderType* pHolder):
 		_pHolder(pHolder)
@@ -398,6 +398,8 @@ public:
 	{
 		_pHolder->release();
 	}
+
+	ActiveResult() = delete;
 
 	ActiveResult& operator = (const ActiveResult& result)
 		/// Assignment operator.
@@ -435,20 +437,20 @@ public:
 		_pHolder->wait(milliseconds);
 	}
 
-	bool available() const
+	[[nodiscard]] bool available() const
 		/// Returns true if a result is available.
 	{
 		return _pHolder->tryWait(0);
 	}
 
-	bool failed() const
+	[[nodiscard]] bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
 		return _pHolder->failed();
 	}
 
-	std::string error() const
+	[[nodiscard]] std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
 		/// active method completed successfully.
@@ -456,7 +458,7 @@ public:
 		return _pHolder->error();
 	}
 
-	Exception* exception() const
+	[[nodiscard]] Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
 	{
@@ -483,8 +485,6 @@ public:
 	}
 
 private:
-	ActiveResult();
-
 	ActiveResultHolderType* _pHolder;
 };
 

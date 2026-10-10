@@ -19,13 +19,14 @@
 
 
 #include "Poco/Foundation.h"
+#include <mutex>
 
 
 namespace Poco {
 
 
 template <class M>
-class ScopedLock
+class [[nodiscard]] ScopedLock
 	/// A class that simplifies thread synchronization
 	/// with a mutex.
 	/// The constructor accepts a Mutex (and optionally
@@ -43,6 +44,11 @@ public:
 		_mutex.lock(milliseconds);
 	}
 
+	ScopedLock(M& mutex, std::adopt_lock_t) : _mutex(mutex)
+		/// Construct and assume already locked
+	{
+	}
+
 	~ScopedLock()
 	{
 		try
@@ -55,17 +61,17 @@ public:
 		}
 	}
 
+	ScopedLock() = delete;
+	ScopedLock(const ScopedLock&) = delete;
+	ScopedLock& operator=(const ScopedLock&) = delete;
+
 private:
 	M& _mutex;
-
-	ScopedLock();
-	ScopedLock(const ScopedLock&);
-	ScopedLock& operator = (const ScopedLock&);
 };
 
 
 template <class M>
-class ScopedLockWithUnlock
+class [[nodiscard]] ScopedLockWithUnlock
 	/// A class that simplifies thread synchronization
 	/// with a mutex.
 	/// The constructor accepts a Mutex (and optionally
@@ -77,12 +83,38 @@ class ScopedLockWithUnlock
 public:
 	explicit ScopedLockWithUnlock(M& mutex): _pMutex(&mutex)
 	{
+		poco_assert(_pMutex != nullptr);
+
 		_pMutex->lock();
+		_bOwns = true;
 	}
 
 	ScopedLockWithUnlock(M& mutex, long milliseconds): _pMutex(&mutex)
 	{
+		poco_assert(_pMutex != nullptr);
+
 		_pMutex->lock(milliseconds);
+		_bOwns = true;
+	}
+
+	ScopedLockWithUnlock(M& mutex, std::adopt_lock_t) : _pMutex(&mutex), _bOwns(true)
+		/// Construct and assume already locked
+	{
+		poco_assert(_pMutex != nullptr);
+	}
+
+	ScopedLockWithUnlock(M& mutex, std::try_to_lock_t) : _pMutex(&mutex)
+		/// Construct and try to lock
+	{
+		poco_assert(_pMutex != nullptr);
+
+		_bOwns = _pMutex->tryLock();
+	}
+
+	ScopedLockWithUnlock(M& mutex, std::defer_lock_t) : _pMutex(&mutex), _bOwns(false)
+		/// Construct but don't lock
+	{
+		poco_assert(_pMutex != nullptr);
 	}
 
 	~ScopedLockWithUnlock()
@@ -97,21 +129,47 @@ public:
 		}
 	}
 
+	ScopedLockWithUnlock() = delete;
+	ScopedLockWithUnlock(const ScopedLockWithUnlock&) = delete;
+	ScopedLockWithUnlock& operator=(const ScopedLockWithUnlock&) = delete;
+
+	void lock()
+	{
+		poco_assert(_pMutex != nullptr);
+		poco_assert(_bOwns == false);
+
+		_pMutex->lock();
+		_bOwns = true;
+	}
+
+	[[nodiscard]] bool tryLock()
+	{
+		poco_assert(_pMutex != nullptr);
+		poco_assert(_bOwns == false);
+
+		_bOwns = _pMutex->tryLock();
+		return _bOwns;
+	}
+
 	void unlock()
 	{
-		if (_pMutex)
+		if (_bOwns)
 		{
+			poco_assert(_pMutex != nullptr);
+
 			_pMutex->unlock();
-			_pMutex = 0;
+			_bOwns = false;
 		}
+	}
+
+	bool ownsLock() const
+	{
+		return _bOwns;
 	}
 
 private:
 	M* _pMutex;
-
-	ScopedLockWithUnlock();
-	ScopedLockWithUnlock(const ScopedLockWithUnlock&);
-	ScopedLockWithUnlock& operator = (const ScopedLockWithUnlock&);
+	bool _bOwns;
 };
 
 

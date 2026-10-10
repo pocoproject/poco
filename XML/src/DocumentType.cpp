@@ -18,8 +18,7 @@
 #include "Poco/DOM/DOMException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DocumentType::DocumentType(Document* pOwner, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
@@ -81,4 +80,4 @@ Node* DocumentType::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

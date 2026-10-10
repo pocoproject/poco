@@ -24,8 +24,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 template <typename T, Metric::Type metricType>
@@ -118,7 +117,7 @@ public:
 		return *this;
 	}
 
-	Sample value() const
+	[[nodiscard]] Sample value() const
 		/// Invokes the callback function and returns the
 		/// value returned by it.
 	{
@@ -145,7 +144,7 @@ using CallbackCounter = CallbackMetric<double, Metric::Type::COUNTER>;
 using CallbackGauge = CallbackMetric<double, Metric::Type::GAUGE>;
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_CallbackMetric_INCLUDED

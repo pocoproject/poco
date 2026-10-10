@@ -15,12 +15,11 @@
 #include "Poco/ActiveRecord/IDTraits.h"
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 const std::string IDTraits<std::string>::INVALID_ID;
 const Poco::UUID IDTraits<Poco::UUID>::INVALID_ID;
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord

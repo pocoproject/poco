@@ -25,8 +25,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API Array
@@ -46,6 +45,9 @@ public:
 
 	virtual ~Array();
 		/// Destroys the Array.
+
+	Array& operator=(const Array&);
+	Array& operator=(Array&&);
 
 	template<typename T>
 	Array& operator<<(const T& arg)
@@ -98,7 +100,7 @@ public:
 	Array& addSimpleString(const std::string& value);
 		/// Adds a simple string (can't contain newline characters!).
 
-	const_iterator begin() const;
+	[[nodiscard]] const_iterator begin() const;
 		/// Returns an iterator to the start of the array.
 		///
 		/// Note: this can throw a NullValueException when this is a Null array.
@@ -106,13 +108,13 @@ public:
 	void clear();
 		/// Removes all elements from the array.
 
-	const_iterator end() const;
+	[[nodiscard]] const_iterator end() const;
 		/// Returns an iterator to the end of the array.
 		///
 		/// Note: this can throw a NullValueException when this is a Null array.
 
 	template<typename T>
-	T get(size_t pos) const
+	[[nodiscard]] T get(size_t pos) const
 		/// Returns the element on the given position and tries to convert
 		/// to the template type. A Poco::BadCastException will be thrown when the
 		/// the conversion fails. An Poco::InvalidArgumentException will be thrown
@@ -123,40 +125,44 @@ public:
 
 		if ( pos >= _elements.value().size() ) throw InvalidArgumentException();
 
-		RedisType::Ptr element = _elements.value().at(pos);
+		const RedisType::Ptr element = _elements.value().at(pos);
 		if ( RedisTypeTraits<T>::TypeId == element->type() )
 		{
-			Type<T>* concrete = dynamic_cast<Type<T>* >(element.get());
-			if ( concrete != NULL ) return concrete->value();
+			// TypeId check guarantees runtime type; static_cast avoids
+			// hidden-visibility RTTI mismatch across DSOs on macOS.
+			const auto* concrete = static_cast<const Type<T>*>(element.get());
+			return concrete->value();
 		}
 		throw BadCastException();
 	}
 
-	int getType(size_t pos) const;
+	[[nodiscard]] int getType(size_t pos) const;
 		/// Returns the type of the element. This can throw a Poco::NullValueException
 		/// when this array is a Null array. An Poco::InvalidArgumentException will
 		/// be thrown when the index is out of range.
 
-	bool isNull() const;
+	[[nodiscard]] bool isNull() const;
 		/// Returns true when this is a Null array.
 
 	void makeNull();
 		/// Turns the array into a Null array. When the array already has some
 		/// elements, the array will be cleared.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns the String representation as specified in the
 		/// Redis Protocol specification.
 
-	size_t size() const;
+	[[nodiscard]] size_t size() const;
 		/// Returns the size of the array.
 		///
 		/// Note: this can throw a NullValueException when this is a Null array.
 
-private:
 	void checkNull();
-		/// Checks for null array and sets a new vector if true.
+		/// Ensures the array is not null by initializing an empty
+		/// vector if necessary. Call this to transition from a null
+		/// array to an empty (but non-null) array.
 
+private:
 	Nullable<std::vector<RedisType::Ptr>> _elements;
 };
 
@@ -203,9 +209,9 @@ inline Array& Array::add(const char* s)
 
 inline Array& Array::add(const std::vector<std::string>& strings)
 {
-	for(std::vector<std::string>::const_iterator it = strings.begin(); it != strings.end(); ++it)
+	for (const auto& s : strings)
 	{
-		add(*it);
+		add(s);
 	}
 	return *this;
 }
@@ -270,7 +276,7 @@ struct RedisTypeTraits<Array>
 {
 	enum { TypeId = RedisType::REDIS_ARRAY };
 
-	static const char marker = '*';
+	static constexpr char marker = '*';
 
 	static std::string toString(const Array& value)
 	{
@@ -283,10 +289,9 @@ struct RedisTypeTraits<Array>
 		else
 		{
 			result << value.size() << LineEnding::NEWLINE_CRLF;
-			for(std::vector<RedisType::Ptr>::const_iterator it = value.begin();
-				it != value.end(); ++it)
+			for (const auto& element : value)
 			{
-				result << (*it)->toString();
+				result << element->toString();
 			}
 		}
 		return result.str();
@@ -294,18 +299,19 @@ struct RedisTypeTraits<Array>
 
 	static void read(RedisInputStream& input, Array& value)
 	{
-		value.clear();
+		value.makeNull();
 
-		Int64 length = NumberParser::parse64(input.getline());
+		const Int64 length = NumberParser::parse64(input.getline());
 
-		if ( length != -1 )
+		if (length >= 0)
 		{
-			for(int i = 0; i < length; ++i)
+			value.checkNull();
+			for (Int64 i = 0; i < length; ++i)
 			{
-				char marker = input.get();
+				const char marker = input.get();
 				RedisType::Ptr element = RedisType::createRedisType(marker);
 
-				if ( element.isNull() )
+				if (element.isNull())
 					throw RedisException("Wrong answer received from Redis server");
 
 				element->read(input);
@@ -316,7 +322,7 @@ struct RedisTypeTraits<Array>
 };
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_Array_INCLUDED

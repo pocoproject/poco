@@ -22,8 +22,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SecureStreamSocket::SecureStreamSocket():
@@ -60,6 +59,13 @@ SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::
 }
 
 
+SecureStreamSocket::SecureStreamSocket(const std::string& hostName):
+	StreamSocket(new SecureStreamSocketImpl(SSLManager::instance().defaultClientContext()))
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
+}
+
+
 SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, Context::Ptr pContext):
 	StreamSocket(new SecureStreamSocketImpl(pContext))
 {
@@ -80,6 +86,13 @@ SecureStreamSocket::SecureStreamSocket(const SocketAddress& address, const std::
 {
 	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
 	connect(address);
+}
+
+
+SecureStreamSocket::SecureStreamSocket(const std::string& hostName, Context::Ptr pContext):
+	StreamSocket(new SecureStreamSocketImpl(pContext))
+{
+	static_cast<SecureStreamSocketImpl*>(impl())->setPeerHostName(hostName);
 }
 
 
@@ -284,4 +297,4 @@ void SecureStreamSocket::abort()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

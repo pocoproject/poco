@@ -15,8 +15,7 @@
 #include "Poco/SAX/DefaultHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DefaultHandler::DefaultHandler()
@@ -31,7 +30,7 @@ DefaultHandler::~DefaultHandler()
 
 InputSource* DefaultHandler::resolveEntity(const XMLString* publicId, const XMLString& systemId)
 {
-	return 0;
+	return nullptr;
 }
 
 
@@ -75,11 +74,13 @@ void DefaultHandler::endElement(const XMLString& uri, const XMLString& localName
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void DefaultHandler::characters(const XMLChar ch[], int start, int length)
 {
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void DefaultHandler::ignorableWhitespace(const XMLChar ch[], int start, int length)
 {
 }
@@ -120,4 +121,4 @@ void DefaultHandler::fatalError(const SAXException& exc)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

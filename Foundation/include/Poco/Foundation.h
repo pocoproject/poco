@@ -39,9 +39,9 @@
 //
 // The following block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the Foundation_EXPORTS
-// symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
-// Foundation_API functions as being imported from a DLL, wheras this DLL sees symbols
+// symbol defined on the command line. This symbol should not be defined on any project
+// that uses this DLL. This way any other project whose source files include this file sees
+// Foundation_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
@@ -114,6 +114,32 @@ using namespace std::literals;
 
 
 //
+// Guard for headers that use std::numeric_limits<>::min()/max().
+//
+// A function-like min() or max() macro breaks those headers, and the compiler
+// diagnostic does not say why. Most often the macro comes from <windows.h>
+// included without NOMINMAX -- Poco/UnWindows.h sets it, but a consumer that
+// reaches <windows.h> before any POCO header never goes through it. Any other
+// header, on any platform, can define the same macros. Affected headers invoke
+// POCO_CHECK_MINMAX_MACROS once, below their includes, to report the cause.
+//
+// The condition is evaluated here, when this header is first processed, so the
+// check reports a macro that is already in scope by then -- the case above. A
+// macro defined after the first POCO include is not reported, but neither is it
+// reachable via Poco/UnWindows.h, which defines NOMINMAX before <windows.h>.
+//
+#if defined(min) || defined(max)
+	#define POCO_CHECK_MINMAX_MACROS \
+		static_assert(false, \
+			"A min() or max() macro is defined, which breaks this header. " \
+			"Undefine it; on Windows, define NOMINMAX or include a POCO " \
+			"header before <windows.h>.");
+#else
+	#define POCO_CHECK_MINMAX_MACROS
+#endif
+
+
+//
 // Include alignment settings early
 //
 #include "Poco/Alignment.h"
@@ -141,32 +167,22 @@ using namespace std::literals;
 #define POCO_DO_JOIN(X, Y) POCO_DO_JOIN2(X, Y)
 #define POCO_DO_JOIN2(X, Y) X##Y
 
+//
+// MS Visual Studio can use type long for __LINE__ macro
+// when /ZI compilation flag is used - https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information-format?view=msvc-170#zi-1
+// This breaks some poco interfaces, for ex. logger
+// We should fix type for line number
+namespace Poco {
 
-//
-// POCO_DEPRECATED
-//
-// A macro expanding to a compiler-specific clause to
-// mark a class or function as deprecated.
-//
-#if defined(POCO_NO_DEPRECATED)
-#define POCO_DEPRECATED
-#elif defined(_GNUC_)
-#define POCO_DEPRECATED __attribute__((deprecated))
-#elif defined(__clang__)
-#define POCO_DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define POCO_DEPRECATED __declspec(deprecated)
-#else
-#define POCO_DEPRECATED
-#endif
+using LineNumber = decltype(__LINE__);
 
+} // namespace Poco
 
 //
 // Pull in basic definitions
 //
 #include "Poco/Bugcheck.h"
 #include "Poco/Types.h"
-#include <string>
 
 
 #endif // Foundation_Foundation_INCLUDED

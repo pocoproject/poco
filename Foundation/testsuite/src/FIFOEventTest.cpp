@@ -7,6 +7,7 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+#if defined(POCO_TEST_DEPRECATED)
 
 #include "FIFOEventTest.h"
 #include "DummyDelegate.h"
@@ -495,3 +496,5 @@ CppUnit::Test* FIFOEventTest::suite()
 	//CppUnit_addTest(pSuite, FIFOEventTest, testAsyncNotifyBenchmark);
 	return pSuite;
 }
+
+#endif

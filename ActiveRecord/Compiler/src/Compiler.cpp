@@ -32,9 +32,7 @@ using Poco::Util::HelpFormatter;
 using Poco::Util::OptionCallback;
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 class CompilerApp: public Application
@@ -207,16 +205,9 @@ protected:
 			}
 			else
 			{
-				try
+				for (const auto& a: args)
 				{
-					for (const auto& a: args)
-					{
-						compile(a);
-					}
-				}
-				catch (Poco::Exception& exc)
-				{
-					std::cout << exc.displayText() << std::endl;
+					compile(a);
 				}
 			}
 		}
@@ -228,7 +219,7 @@ private:
 };
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler
 
 
 POCO_APP_MAIN(Poco::ActiveRecord::Compiler::CompilerApp)

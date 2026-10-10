@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include <stdexcept>
+#include <typeinfo>
 
 
 namespace Poco {
@@ -43,45 +44,48 @@ public:
 	Exception(const Exception& exc);
 		/// Copy constructor.
 
-	~Exception() noexcept;
+	~Exception() noexcept override;
 		/// Destroys the exception and deletes the nested exception.
 
 	Exception& operator = (const Exception& exc);
 		/// Assignment operator.
 
-	virtual const char* name() const noexcept;
+	[[nodiscard]] virtual const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	virtual const char* className() const noexcept;
+	[[nodiscard]] virtual const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	virtual const char* what() const noexcept;
+	[[nodiscard]] const char* what() const noexcept override;
 		/// Returns a static string describing the exception.
 		///
 		/// Same as name(), but for compatibility with std::exception.
 
-	const Exception* nested() const;
+	[[nodiscard]] const Exception* nested() const;
 		/// Returns a pointer to the nested exception, or
 		/// null if no nested exception exists.
 
-	const std::string& message() const;
+	[[nodiscard]] const std::string& message() const;
 		/// Returns the message text.
 
-	int code() const;
+	[[nodiscard]] int code() const;
 		/// Returns the exception code if defined.
 
-	std::string displayText() const;
+	[[nodiscard]] std::string displayText() const;
 		/// Returns a string consisting of the
 		/// message name and the message text.
 
-	virtual Exception* clone() const;
+	[[nodiscard]] virtual Exception* clone() const;
 		/// Creates an exact copy of the exception.
 		///
 		/// The copy can later be thrown again by
 		/// invoking rethrow() on it.
 
-	virtual void rethrow() const;
+	[[noreturn]] virtual void rethrow() const;
 		/// (Re)Throws the exception.
+		///
+		/// Declared [[noreturn]]: an overriding implementation
+		/// must always throw and must never return normally.
 		///
 		/// This is useful for temporarily storing a
 		/// copy of an exception (see clone()), then
@@ -103,6 +107,12 @@ private:
 	int			_code;
 };
 
+#if defined(_HAS_EXCEPTIONS)
+	// Size of Poco::Exception depends on the exception settings (like _HAS_EXCEPTIONS)
+	// that might influence size of std::exception from which Poco::Exception is derived from.
+	// It is expected that Poco libraries and application using Poco have the same settings.
+	static_assert(_HAS_EXCEPTIONS != 0);
+#endif
 
 //
 // inlines
@@ -148,9 +158,13 @@ inline int Exception::code() const
 		CLS(const CLS& exc);														\
 		~CLS() noexcept;																\
 		CLS& operator = (const CLS& exc);											\
+		[[nodiscard]]                                                               \
 		const char* name() const noexcept;											\
+		[[nodiscard]]                                                               \
 		const char* className() const noexcept;										\
+		[[nodiscard]]                                                               \
 		Poco::Exception* clone() const;												\
+		[[noreturn]]                                                                \
 		void rethrow() const;														\
 	};
 
@@ -181,14 +195,17 @@ inline int Exception::code() const
 		BASE::operator = (exc);																		\
 		return *this;																				\
 	}																								\
+	[[nodiscard]]                                                                                   \
 	const char* CLS::name() const noexcept															\
 	{																								\
 		return NAME;																				\
 	}																								\
+	[[nodiscard]]                                                                                   \
 	const char* CLS::className() const noexcept														\
 	{																								\
 		return typeid(*this).name();																\
 	}																								\
+	[[nodiscard]]                                                                                   \
 	Poco::Exception* CLS::clone() const																\
 	{																								\
 		return new CLS(*this);																		\
@@ -224,10 +241,12 @@ POCO_DECLARE_EXCEPTION(Foundation_API, RegularExpressionException, RuntimeExcept
 POCO_DECLARE_EXCEPTION(Foundation_API, LibraryLoadException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, LibraryAlreadyLoadedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NoThreadAvailableException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ThreadInterruptedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, PropertyNotSupportedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, PoolOverflowException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NoPermissionException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OutOfMemoryException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ResourceLimitException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, DataException, RuntimeException)
 
 POCO_DECLARE_EXCEPTION(Foundation_API, DataFormatException, DataException)
@@ -246,6 +265,7 @@ POCO_DECLARE_EXCEPTION(Foundation_API, CreateFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OpenFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, WriteFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, ReadFileException, FileException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ExecuteFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, FileNotReadyException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, DirectoryNotEmptyException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, UnknownURISchemeException, RuntimeException)

@@ -7,7 +7,7 @@
 //
 // Definition of the IntValidator class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -22,8 +22,7 @@
 #include "Poco/Util/Validator.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API IntValidator: public Validator
@@ -31,26 +30,26 @@ class Util_API IntValidator: public Validator
 	/// which must be an integer, lies within a given range.
 {
 public:
+	IntValidator() = delete;
+
 	IntValidator(int min, int max);
 		/// Creates the IntValidator.
 
 	~IntValidator();
 		/// Destroys the IntValidator.
 
-	void validate(const Option& option, const std::string& value);
+	void validate(const Option& option, const std::string& value) override;
 		/// Validates the value for the given option by
 		/// testing whether it's an integer that lies within
 		/// a given range.
 
 private:
-	IntValidator();
-
 	int _min;
 	int _max;
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_IntValidator_INCLUDED

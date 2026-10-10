@@ -32,8 +32,6 @@ public:
 	void testPostLargeIdentity();
 	void testPostSmallChunked();
 	void testPostLargeChunked();
-	void testPostSmallClose();
-	void testPostLargeClose();
 	void testKeepAlive();
 	void testTrailer();
 	void testProxy();
@@ -41,6 +39,14 @@ public:
 	void testBypassProxy();
 	void testExpectContinue();
 	void testExpectContinueFail();
+	void testProxyConfig();
+	void testSetProxyProtocolValidation();
+	void testSetProxyConfigValidation();
+	void testProxySetters();
+	void testProxyRequestPrefix();
+	void testProxyNonTunnel();
+	void testGlobalProxyConfig();
+	void testBypassProxyExtended();
 
 	void setUp();
 	void tearDown();

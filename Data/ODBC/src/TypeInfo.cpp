@@ -18,9 +18,7 @@
 #include "Poco/Exception.h"
 #include <iostream>
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 TypeInfo::TypeInfo(SQLHDBC* pHDBC): _pHDBC(pHDBC)
@@ -33,6 +31,13 @@ TypeInfo::TypeInfo(SQLHDBC* pHDBC): _pHDBC(pHDBC)
 
 TypeInfo::~TypeInfo()
 {
+}
+
+
+void TypeInfo::reset()
+{
+	_typeInfo.clear();
+	_pHDBC = nullptr;
 }
 
 
@@ -95,7 +100,7 @@ void TypeInfo::fillTypeInfo(const SQLHDBC* pHDBC)
 		TypeInfoVec().swap(_typeInfo);
 
 		SQLRETURN rc;
-		SQLHSTMT hstmt = SQL_NULL_HSTMT;
+		SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
 
 		rc = SQLAllocHandle(SQL_HANDLE_STMT, *_pHDBC, &hstmt);
 		if (!SQL_SUCCEEDED(rc))
@@ -167,7 +172,7 @@ void TypeInfo::fillTypeInfo(const SQLHDBC* pHDBC)
 }
 
 
-DynamicAny TypeInfo::getInfo(SQLSMALLINT type, const std::string& param) const
+Dynamic::Var TypeInfo::getInfo(SQLSMALLINT type, const std::string& param) const
 {
 	TypeInfoVec::const_iterator it = _typeInfo.begin();
 	TypeInfoVec::const_iterator end = _typeInfo.end();
@@ -181,7 +186,7 @@ DynamicAny TypeInfo::getInfo(SQLSMALLINT type, const std::string& param) const
 }
 
 
-bool TypeInfo::tryGetInfo(SQLSMALLINT type, const std::string& param, DynamicAny& result) const
+bool TypeInfo::tryGetInfo(SQLSMALLINT type, const std::string& param, Dynamic::Var& result) const
 {
 	TypeInfoVec::const_iterator it = _typeInfo.begin();
 	TypeInfoVec::const_iterator end = _typeInfo.end();
@@ -198,7 +203,7 @@ bool TypeInfo::tryGetInfo(SQLSMALLINT type, const std::string& param, DynamicAny
 }
 
 
-int TypeInfo::cDataType(int sqlDataType) const
+SQLSMALLINT TypeInfo::cDataType(SQLSMALLINT sqlDataType) const
 {
 	DataTypeMap::const_iterator it = _cDataTypes.find(sqlDataType);
 
@@ -209,7 +214,7 @@ int TypeInfo::cDataType(int sqlDataType) const
 }
 
 
-int TypeInfo::sqlDataType(int cDataType) const
+SQLSMALLINT TypeInfo::sqlDataType(SQLSMALLINT cDataType) const
 {
 	DataTypeMap::const_iterator it = _sqlDataTypes.find(cDataType);
 
@@ -263,4 +268,4 @@ void TypeInfo::print(std::ostream& ostr)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

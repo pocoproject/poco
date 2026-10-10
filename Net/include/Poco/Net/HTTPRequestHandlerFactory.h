@@ -23,8 +23,7 @@
 #include "Poco/BasicEvent.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPServerRequest;
@@ -46,7 +45,7 @@ public:
 	virtual ~HTTPRequestHandlerFactory();
 		/// Destroys the HTTPRequestHandlerFactory.
 
-	virtual HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) = 0;
+	[[nodiscard]] virtual HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) = 0;
 		/// Must be overridden by subclasses.
 		///
 		/// Creates a new request handler for the given HTTP request.
@@ -72,7 +71,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPRequestHandlerFactory_INCLUDED

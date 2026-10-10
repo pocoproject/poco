@@ -25,6 +25,7 @@ public:
 	~TimezoneTest();
 
 	void testTimezone();
+	void testUtcOffsetCaching();
 
 	void setUp();
 	void tearDown();

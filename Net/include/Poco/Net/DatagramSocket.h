@@ -23,8 +23,7 @@
 #include "Poco/Buffer.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API DatagramSocket: public Socket
@@ -67,7 +66,7 @@ public:
 		/// Creates the DatagramSocket with the SocketImpl
 		/// from another socket.
 
-	~DatagramSocket();
+	~DatagramSocket() override;
 		/// Destroys the DatagramSocket.
 
 	DatagramSocket& operator = (const Socket& socket);
@@ -276,7 +275,7 @@ public:
 		/// Setting this flag allows sending datagrams to
 		/// the broadcast address.
 
-	bool getBroadcast() const;
+	[[nodiscard]] bool getBroadcast() const;
 		/// Returns the value of the SO_BROADCAST socket option.
 
 protected:
@@ -304,7 +303,7 @@ inline bool DatagramSocket::getBroadcast() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_DatagramSocket_INCLUDED

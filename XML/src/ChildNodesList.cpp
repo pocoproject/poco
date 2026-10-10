@@ -17,8 +17,7 @@
 #include "Poco/DOM/Document.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 ChildNodesList::ChildNodesList(const Node* pParent):
@@ -63,8 +62,10 @@ unsigned long ChildNodesList::length() const
 
 void ChildNodesList::autoRelease()
 {
-	_pParent->ownerDocument()->autoReleasePool().add(this);
+	auto* pOwner = _pParent->ownerDocument();
+	if (pOwner != nullptr)
+		pOwner->autoReleasePool().add(this);
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -1,8 +1,9 @@
 #ifndef SQLPARSER_COLUMN_TYPE_H
 #define SQLPARSER_COLUMN_TYPE_H
 
-#include"sqlparser_win.h"
+#include "sqlparser_win.h"
 #include <ostream>
+#include <stdint.h>
 
 namespace hsql {
 enum class DataType {

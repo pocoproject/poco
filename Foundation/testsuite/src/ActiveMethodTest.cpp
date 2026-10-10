@@ -195,8 +195,10 @@ void ActiveMethodTest::testFailure()
 	result.wait();
 	assertTrue (result.available());
 	assertTrue (result.failed());
+#ifndef POCO_ENABLE_TRACE
 	std::string msg = result.error();
-	assertTrue (msg == "n == 100");
+	assertEqual ("n == 100", msg);
+#endif
 }
 
 

@@ -1,8 +1,9 @@
-
 #include "sqlhelper.h"
+
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <stdint.h>
 #include <string>
 
 namespace hsql {
@@ -53,6 +54,14 @@ void printTableRefInfo(TableRef* table, uintmax_t num_indent) {
       break;
     case kTableCrossProduct:
       for (TableRef* tbl : *table->list) printTableRefInfo(tbl, num_indent);
+      break;
+    case kTableFunc:
+      inprint("Table-valued Function", num_indent);
+      printExpression(table->func, num_indent + 1);
+      break;
+    case kTableValues:
+      inprint("Values", num_indent);
+      for (Expr* row : *table->values) printExpression(row, num_indent + 1);
       break;
   }
 
@@ -128,6 +137,11 @@ void printExpression(Expr* expr, uintmax_t num_indent) {
         printExpression(e, num_indent + 1);
       }
 
+      if (expr->withinGroupOrder) {
+        inprint("WITHIN GROUP (ORDER BY)", num_indent + 1);
+        printOrderBy(expr->withinGroupOrder, num_indent + 2);
+      }
+
       if (expr->windowDescription) {
         printWindowDescription(expr->windowDescription, num_indent + 1);
       }
@@ -150,6 +164,12 @@ void printExpression(Expr* expr, uintmax_t num_indent) {
       break;
     case kExprParameter:
       inprint(expr->ival, num_indent);
+      break;
+    case kExprParameterDollar:
+      inprint(expr->ival, num_indent);
+      break;
+    case kExprParameterNamed:
+      inprint(expr->name, num_indent);
       break;
     case kExprArray:
       for (Expr* e : *expr->exprList) {
@@ -226,6 +246,16 @@ void printSelectStatementInfo(const SelectStatement* stmt, uintmax_t num_indent)
   if (stmt->whereClause) {
     inprint("Search Conditions:", num_indent + 1);
     printExpression(stmt->whereClause, num_indent + 2);
+  }
+
+  if (stmt->startWith) {
+    inprint("START WITH:", num_indent + 1);
+    printExpression(stmt->startWith, num_indent + 2);
+  }
+
+  if (stmt->connectBy) {
+    inprint("CONNECT BY:", num_indent + 1);
+    printExpression(stmt->connectBy, num_indent + 2);
   }
 
   if (stmt->groupBy) {
@@ -448,7 +478,8 @@ std::ostream& operator<<(std::ostream& os, const OperatorType& op) {
       {kOpOr, "OR"},         {kOpIn, "IN"},
       {kOpConcat, "CONCAT"}, {kOpNot, "NOT"},
       {kOpUnaryMinus, "-"},  {kOpIsNull, "IS NULL"},
-      {kOpExists, "EXISTS"}};
+      {kOpExists, "EXISTS"},  {kOpOuterJoin, "(+)"},
+      {kOpPrior, "PRIOR"}};
 
   const auto found = operatorToToken.find(op);
   if (found == operatorToToken.cend()) {

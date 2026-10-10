@@ -15,8 +15,7 @@
 #include "Poco/Net/EscapeHTMLStream.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 EscapeHTMLStreamBuf::EscapeHTMLStreamBuf(std::ostream& ostr):
@@ -89,4 +88,4 @@ EscapeHTMLOutputStream::~EscapeHTMLOutputStream()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

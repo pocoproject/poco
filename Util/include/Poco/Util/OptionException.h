@@ -22,8 +22,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 POCO_DECLARE_EXCEPTION(Util_API, OptionException, Poco::DataException)
@@ -38,7 +37,7 @@ POCO_DECLARE_EXCEPTION(Util_API, DuplicateOptionException, OptionException)
 POCO_DECLARE_EXCEPTION(Util_API, EmptyOptionException, OptionException)
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_OptionException_INCLUDED

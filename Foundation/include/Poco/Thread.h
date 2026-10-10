@@ -51,7 +51,7 @@ class Foundation_API Thread: private ThreadImpl
 	/// The name of a thread can be changed at any time.
 {
 public:
-	typedef ThreadImpl::TIDImpl TID;
+	using TID = ThreadImpl::TIDImpl;
 
 	using ThreadImpl::Callable;
 
@@ -91,16 +91,16 @@ public:
 	~Thread();
 		/// Destroys the thread.
 
-	int id() const;
+	[[nodiscard]] int id() const;
 		/// Returns the unique thread ID of the thread.
 
-	TID tid() const;
+	[[nodiscard]] TID tid() const;
 		/// Returns the native thread ID of the thread.
 
-	std::string name() const;
+	[[nodiscard]] std::string name() const;
 		/// Returns the name of the thread.
 
-	std::string getName() const;
+	[[nodiscard]] std::string getName() const;
 		/// Returns the name of the thread.
 
 	void setName(const std::string& name);
@@ -113,7 +113,7 @@ public:
 		/// Some platform only allow changing a thread's priority
 		/// if the process has certain privileges.
 
-	Priority getPriority() const;
+	[[nodiscard]] Priority getPriority() const;
 		/// Returns the thread's priority.
 
 	void setOSPriority(int prio, int policy = POLICY_DEFAULT);
@@ -124,17 +124,17 @@ public:
 		/// only used on POSIX platforms where the values SCHED_OTHER (default),
 		/// SCHED_FIFO and SCHED_RR are supported.
 
-	int getOSPriority() const;
+	[[nodiscard]] int getOSPriority() const;
 		/// Returns the thread's priority, expressed as an operating system
 		/// specific priority value.
 		///
 		/// May return 0 if the priority has not been explicitly set.
 
-	static int getMinOSPriority(int policy = POLICY_DEFAULT);
+	[[nodiscard]] static int getMinOSPriority(int policy = POLICY_DEFAULT);
 		/// Returns the minimum operating system-specific priority value,
 		/// which can be passed to setOSPriority() for the given policy.
 
-	static int getMaxOSPriority(int policy = POLICY_DEFAULT);
+	[[nodiscard]] static int getMaxOSPriority(int policy = POLICY_DEFAULT);
 		/// Returns the maximum operating system-specific priority value,
 		/// which can be passed to setOSPriority() for the given policy.
 
@@ -144,7 +144,7 @@ public:
 		/// Typically, the real stack size is rounded up to the nearest
 		/// page size multiple.
 
-	int getStackSize() const;
+	[[nodiscard]] int getStackSize() const;
 		/// Returns the thread's stack size in bytes.
 		/// If the default stack size is used, 0 is returned.
 
@@ -161,7 +161,7 @@ public:
 		/// The Thread ensures that the given target stays
 		/// alive while the thread is running.
 
-	void start(Callable target, void* pData = 0);
+	void start(Callable target, void* pData = nullptr);
 		/// Starts the thread with the given target and parameter.
 
 	template <class Functor>
@@ -188,12 +188,12 @@ public:
 		/// to complete. Throws a TimeoutException if the thread
 		/// does not complete within the specified time interval.
 
-	bool tryJoin(long milliseconds);
+	[[nodiscard]] bool tryJoin(long milliseconds);
 		/// Waits for at most the given interval for the thread
 		/// to complete. Returns true if the thread has finished,
 		/// false otherwise.
 
-	bool isRunning() const;
+	[[nodiscard]] bool isRunning() const;
 		/// Returns true if the thread is running.
 
 	static bool trySleep(long milliseconds);
@@ -234,16 +234,27 @@ public:
 	static void yield();
 		/// Yields cpu to other threads.
 
-	static Thread* current();
+	[[nodiscard]] static Thread* current();
 		/// Returns the Thread object for the currently active thread.
 		/// If the current thread is the main thread, 0 is returned.
 
-	static TID currentTid();
+	[[nodiscard]] static TID currentTid();
 		/// Returns the native thread ID for the current thread.
 
-	static long currentOsTid();
+	[[nodiscard]] static long currentOsTid();
 		/// Returns the operating system specific thread ID for the current thread.
 		/// On error, or if the platform does not support this functionality, it returns zero.
+
+	static void setCurrentName(const std::string& name);
+		/// Sets the name of the current thread.
+		/// Support for this feature varies across platforms.
+		/// Any errors are silently ignored.
+
+	[[nodiscard]] static std::string getCurrentName();
+		/// Returns the name of the current thread.
+		/// Support for this feature varies across platforms.
+		/// Returns an empty string if not supported, on error,
+		/// or if no name has been set for the thread.
 
 	bool setAffinity(int coreId);
 		/// Sets the thread affinity to the coreID.
@@ -251,22 +262,51 @@ public:
 		/// Returns false if not succesful or not
 		/// implemented.
 
-	int getAffinity() const;
+	[[nodiscard]] int getAffinity() const;
 		/// Returns the thread affinity.
 		/// Negative value means the thread has
 		/// no CPU core affinity.
 
+	[[nodiscard]] bool isInterrupted();
+		/// Tests whether current thread has been interrupted.
+		/// Return true if the task running on this thread should be stopped.
+		/// An interruption can be requested by interrupt().
+		///
+		/// This function can be used to make long running tasks cleanly interruptible.
+		/// Never checking or acting on the value returned by this function is safe,
+		/// however it is advisable do so regularly in long running functions.
+		/// Take care not to call it too often, to keep the overhead low.
+		/// 
+		/// See also checkInterrupted().
+
+	void checkInterrupted();
+		/// Tests whether current thread has been interrupted.
+		/// Throws Poco::ThreadInterruptedException if isInterrupted() return true.
+		///
+		/// Note: The interrupted status of the thread is cleared by this method.
+
+	void interrupt();
+		/// Interrupts this thread.
+		///
+		/// This function does not stop any event loop running on the thread and
+		/// does not terminate it in any way.
+		///
+		/// See also isInterrupted().
+
+	void clearInterrupt();
+		/// Clear the the interrupted status.
+
 protected:
-	ThreadLocalStorage& tls();
+	[[nodiscard]] ThreadLocalStorage& tls();
 		/// Returns a reference to the thread's local storage.
 
 	void clearTLS();
 		/// Clears the thread's local storage.
 
-	std::string makeName();
+	[[nodiscard]] std::string makeName();
 		/// Creates a unique name for a thread.
 
-	static int uniqueId();
+	[[nodiscard]] static int uniqueId();
 		/// Creates and returns a unique id for a thread.
 
 	template <class Functor>
@@ -283,11 +323,9 @@ protected:
 		{
 		}
 
-		~FunctorRunnable()
-		{
-		}
+		~FunctorRunnable() override = default;
 
-		void run()
+		void run() override
 		{
 			_functor();
 		}
@@ -303,6 +341,7 @@ private:
 	int                 _id;
 	ThreadLocalStorage* _pTLS;
 	Event               _event;
+	std::atomic_bool    _interruptionRequested;
 
 	friend class ThreadLocalStorage;
 	friend class PooledThread;
@@ -404,6 +443,24 @@ inline Thread::TID Thread::currentTid()
 inline long Thread::currentOsTid()
 {
 	return currentOsTidImpl();
+}
+
+inline void Thread::setCurrentName(const std::string& name)
+{
+#ifndef POCO_NO_THREADNAME
+	setCurrentNameImpl(name);
+#else
+	(void)name;
+#endif
+}
+
+inline std::string Thread::getCurrentName()
+{
+#ifndef POCO_NO_THREADNAME
+	return getCurrentNameImpl();
+#else
+	return std::string();
+#endif
 }
 
 inline bool Thread::setAffinity(int coreId)

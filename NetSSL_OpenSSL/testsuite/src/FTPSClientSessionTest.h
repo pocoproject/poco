@@ -10,20 +10,19 @@
 //
 
 
-#ifndef FTPClientSessionTest_INCLUDED
-#define FTPClientSessionTest_INCLUDED
+#ifndef FTPSClientSessionTest_INCLUDED
+#define FTPSClientSessionTest_INCLUDED
 
 
 #include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 class FTPSClientSession;
 
-} }
+} // namespace Poco::Net
 
 
 class DialogServer;
@@ -36,10 +35,14 @@ public:
 	~FTPSClientSessionTest();
 
 	void testLogin1();
+	void testNoPlaintextFallback();
+	void testCredentialConstructorRequiresTLS();
 	void testLogin2();
 	void testLogin3();
 	void testLoginFailed1();
 	void testLoginFailed2();
+	void testWelcomeMessageRead();
+	void testWelcomeMessageNotRead();
 	void testCommands();
 	void testDownloadPORT();
 	void testDownloadEPRT();
@@ -59,4 +62,4 @@ private:
 };
 
 
-#endif // FTPClientSessionTest_INCLUDED
+#endif // FTPSClientSessionTest_INCLUDED

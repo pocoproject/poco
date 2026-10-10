@@ -17,8 +17,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 SessionFactory::SessionFactory()
@@ -61,7 +60,7 @@ void SessionFactory::remove(const std::string& key)
 
 Session SessionFactory::create(const std::string& key,
 	const std::string& connectionString,
-	std::size_t timeout)
+	std::size_t loginTimeout)
 {
 	Poco::SharedPtr<Connector> ptrSI;
 	{
@@ -70,16 +69,16 @@ Session SessionFactory::create(const std::string& key,
 		if (_connectors.end() == it) throw Poco::NotFoundException(key);
 		ptrSI = it->second.ptrSI;
 	}
-	return Session(ptrSI->createSession(connectionString, timeout));
+	return Session(ptrSI->createSession(connectionString, loginTimeout));
 }
 
 
 Session SessionFactory::create(const std::string& uri,
-	std::size_t timeout)
+	std::size_t loginTimeout)
 {
 	URI u(uri);
 	poco_assert (!u.getPath().empty());
-	return create(u.getScheme(), u.getPath().substr(1), timeout);
+	return create(u.getScheme(), u.getPath().substr(1), loginTimeout);
 }
 
 
@@ -90,4 +89,4 @@ SessionFactory::SessionInfo::SessionInfo(Connector* pSI):
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

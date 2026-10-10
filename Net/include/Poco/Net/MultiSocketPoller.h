@@ -19,12 +19,13 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/PollSet.h"
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/UDPHandler.h"
+#include "Poco/Net/UDPSocketReader.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <std::size_t S = POCO_UDP_BUF_SIZE>
@@ -59,14 +60,14 @@ public:
 	{
 	}
 
-	Poco::UInt16 port() const
+	[[nodiscard]] Poco::UInt16 port() const
 		/// Returns the port the socket is
 		/// listening on.
 	{
 		return _address.port();
 	}
 
-	Poco::Net::SocketAddress address() const
+	[[nodiscard]] Poco::Net::SocketAddress address() const
 		/// Returns the address of the server.
 	{
 		return _address;
@@ -100,7 +101,7 @@ public:
 		_reader.stopHandler();
 	}
 
-	bool done() const
+	[[nodiscard]] bool done() const
 	{
 		return _reader.handlerDone();
 	}
@@ -122,7 +123,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MultiSocketPoller_INCLUDED

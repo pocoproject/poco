@@ -23,8 +23,7 @@
 #include "Poco/Net/FTPClientSession.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API FTPSClientSession: public Poco::Net::FTPClientSession
@@ -47,6 +46,11 @@ public:
 		/// Creates an FTPSClientSession using the given
 		/// connected socket for the control connection.
 		///
+		/// If readWelcomeMessage is true (the default), the welcome reply
+		/// sent by the server on connect is read from the socket. Pass false
+		/// only if the welcome reply has already been read from the socket;
+		/// see FTPClientSession for the implications.
+		///
 		/// Passive mode will be used for data transfers.
 
 	FTPSClientSession(const std::string& host, Poco::UInt16 port = FTP_PORT, const std::string& username = "", const std::string& password = "", Context::Ptr pContext = nullptr);
@@ -61,11 +65,26 @@ public:
 	void enableFTPS(bool enable = true);
 		/// Enable or disable FTPS (FTP over SSL/TLS).
 
-	bool isSecure() const;
+	[[nodiscard]] bool isSecure() const;
 		/// Returns true if the session is FTPS.
 
 	void forceSessionReuse(bool force = true);
 		/// Enable or disable session reusing
+
+	void allowPlaintextFallback(bool allow = true);
+		/// Allow the session to continue unencrypted if the server refuses both
+		/// AUTH TLS and AUTH SSL. Must be set before the first command, so it
+		/// cannot be combined with the constructor that takes credentials:
+		/// that form logs in immediately and always requires TLS.
+		///
+		/// Disabled by default: otherwise a server that simply denies both
+		/// commands downgrades the session, and the credentials passed to
+		/// login() are then sent in the clear.
+
+	[[nodiscard]] bool isPlaintextFallbackAllowed() const;
+		/// Returns true if the session may continue unencrypted when the server
+		/// refuses to start TLS.
+
 
 protected:
 	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
@@ -84,6 +103,7 @@ private:
 	bool _enableFTPS = true;
 	bool _secureDataConnection = false;
 	bool _forceSessionReuse = false;
+	bool _allowPlaintextFallback = false;
 	Context::Ptr _pContext;
 };
 
@@ -105,7 +125,19 @@ inline void FTPSClientSession::forceSessionReuse(bool force)
 }
 
 
-} } // namespace Poco::Net
+inline void FTPSClientSession::allowPlaintextFallback(bool allow)
+{
+	_allowPlaintextFallback = allow;
+}
+
+
+inline bool FTPSClientSession::isPlaintextFallbackAllowed() const
+{
+	return _allowPlaintextFallback;
+}
+
+
+} // namespace Poco::Net
 
 
 #endif // #define NetSSL_FTPSClientSession_INCLUDED

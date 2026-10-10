@@ -20,8 +20,10 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
+
+
+Collector::~Collector() = default;
 
 
 const std::string& Collector::validateName(const std::string& name)
@@ -34,4 +36,4 @@ const std::string& Collector::validateName(const std::string& name)
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

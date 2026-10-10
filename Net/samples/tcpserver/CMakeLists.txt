@@ -1,2 +1,2 @@
-add_executable(tcpserver src/tcpserver.cpp)
+poco_add_executable(tcpserver src/tcpserver.cpp)
 target_link_libraries(tcpserver PUBLIC Poco::Net)

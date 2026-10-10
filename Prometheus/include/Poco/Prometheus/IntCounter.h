@@ -22,8 +22,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Registry;
@@ -60,7 +59,7 @@ public:
 		/// Creates a IntCounter with the given name and help text (via params), and
 		/// registers it with the given registry (if not nullptr).
 
-	~IntCounter() = default;
+	~IntCounter();
 		/// Destroys the IntCounter.
 
 	using Metric::help;
@@ -70,7 +69,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the IntCounter.
 
-	Sample value() const;
+	[[nodiscard]] Sample value() const;
 		/// Returns the IntCounter's current value.
 
 	void inc();
@@ -147,7 +146,7 @@ inline void IntCounter::inc(IntCounter::Sample v)
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_IntCounter_INCLUDED

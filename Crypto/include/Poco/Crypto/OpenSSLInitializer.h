@@ -19,36 +19,32 @@
 
 
 #include "Poco/Crypto/Crypto.h"
-#include "Poco/Mutex.h"
 #include "Poco/AtomicCounter.h"
 #include <openssl/crypto.h>
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/provider.h>
+#include <openssl/evp.h>
 #include <atomic>
 #endif
-#if defined(OPENSSL_FIPS) && OPENSSL_VERSION_NUMBER < 0x010001000L
-#include <openssl/fips.h>
-#endif
 
 
-extern "C"
-{
-	struct CRYPTO_dynlock_value
-	{
-		Poco::FastMutex _mutex;
-	};
-}
-
-
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API OpenSSLInitializer
-	/// Initalizes the OpenSSL library.
+	/// Initializes the OpenSSL library.
 	///
 	/// The class ensures the earliest initialization and the
 	/// latest shutdown of the OpenSSL library.
+	///
+	/// With OpenSSL 3.0 and newer, initialize() loads the default and,
+	/// if available, the legacy provider; they stay loaded until the
+	/// process exits.
+	///
+	/// OPENSSL_cleanup() is never called, because OpenSSL cannot be
+	/// initialized again afterwards. OpenSSL 4.0 no longer frees its
+	/// global data at exit; an application that needs a clean leak
+	/// report can call OPENSSL_cleanup() at the end of main().
 {
 public:
 	OpenSSLInitializer();
@@ -61,40 +57,31 @@ public:
 		/// Initializes the OpenSSL machinery.
 
 	static void uninitialize();
-		/// Shuts down the OpenSSL machinery.
+		/// Shuts down the OpenSSL machinery. The providers stay loaded.
 
-	static bool isFIPSEnabled();
+	[[nodiscard]] static bool isFIPSEnabled();
 		/// Returns true if FIPS mode is enabled, false otherwise.
+		/// Always false with OpenSSL versions before 3.0.
 
 	static void enableFIPSMode(bool enabled);
-		/// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
+		/// Enables or disables FIPS mode by setting the default property
+		/// query "fips=yes"; the other providers stay loaded.
+		///
+		/// Throws a CryptoException if FIPS mode cannot be enabled: the
+		/// FIPS provider must be activated in the OpenSSL configuration
+		/// file (openssl.cnf), and OpenSSL 3.0 or newer is required.
+		/// Disabling does nothing with older versions.
+		///
+		/// Not thread safe. Call it during startup, before other threads
+		/// use OpenSSL and before a Poco::Net::Context is created.
 
-	static bool haveLegacyProvider();
+	[[nodiscard]] static bool haveLegacyProvider();
 		/// Returns true if the OpenSSL legacy provider is available, otherwise false.
-
-protected:
-	enum
-	{
-		SEEDSIZE = 256
-	};
-
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
-	// OpenSSL multithreading support
-	static void lock(int mode, int n, const char* file, int line);
-	static unsigned long id();
-	static struct CRYPTO_dynlock_value* dynlockCreate(const char* file, int line);
-	static void dynlock(int mode, struct CRYPTO_dynlock_value* lock, const char* file, int line);
-	static void dynlockDestroy(struct CRYPTO_dynlock_value* lock, const char* file, int line);
-#endif
 
 private:
 	static Poco::AtomicCounter _rc;
 
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
-	static Poco::FastMutex* _mutexes;
-#endif
-
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	static OSSL_PROVIDER* _defaultProvider;
 	static OSSL_PROVIDER* _legacyProvider;
 #endif
@@ -106,29 +93,17 @@ private:
 //
 inline bool OpenSSLInitializer::isFIPSEnabled()
 {
-#ifdef OPENSSL_FIPS
-	return FIPS_mode() ? true : false;
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	return EVP_default_properties_is_fips_enabled(nullptr) ? true : false;
 #else
 	return false;
 #endif
 }
 
 
-#ifdef OPENSSL_FIPS
-inline void OpenSSLInitializer::enableFIPSMode(bool enabled)
-{
-	FIPS_mode_set(enabled);
-}
-#else
-inline void OpenSSLInitializer::enableFIPSMode(bool /*enabled*/)
-{
-}
-#endif
-
-
 inline bool OpenSSLInitializer::haveLegacyProvider()
 {
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	return _legacyProvider != nullptr;
 #else
 	return false;
@@ -136,7 +111,7 @@ inline bool OpenSSLInitializer::haveLegacyProvider()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_OpenSSLInitializer_INCLUDED

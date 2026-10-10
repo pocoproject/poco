@@ -48,19 +48,17 @@ public:
 	{
 	}
 
-	~TLSSlot()
-	{
-	}
+	~TLSSlot() override = default;
 
-	C& value()
+	TLSSlot(const TLSSlot&) = delete;
+	TLSSlot& operator=(const TLSSlot&) = delete;
+
+	[[nodiscard]] C& value()
 	{
 		return _value;
 	}
 
 private:
-	TLSSlot(const TLSSlot&);
-	TLSSlot& operator = (const TLSSlot&);
-
 	C _value;
 };
 
@@ -77,10 +75,10 @@ public:
 	~ThreadLocalStorage();
 		/// Deletes the TLS.
 
-	TLSAbstractSlot*& get(const void* key);
+	[[nodiscard]] TLSAbstractSlot*& get(const void* key);
 		/// Returns the slot for the given key.
 
-	static ThreadLocalStorage& current();
+	[[nodiscard]] static ThreadLocalStorage& current();
 		/// Returns the TLS object for the current thread
 		/// (which may also be the main thread).
 
@@ -89,7 +87,7 @@ public:
 		/// Does nothing in the main thread.
 
 private:
-	typedef std::map<const void*, TLSAbstractSlot*> TLSMap;
+	using TLSMap = std::map<const void *, TLSAbstractSlot *>;
 
 	TLSMap _map;
 
@@ -112,16 +110,15 @@ class ThreadLocal
 	/// thread local data. There is no way for a thread
 	/// to access another thread's local data.
 {
-	typedef TLSSlot<C> Slot;
+	using Slot = TLSSlot<C>;
 
 public:
-	ThreadLocal()
-	{
-	}
+	ThreadLocal() = default;
 
-	~ThreadLocal()
-	{
-	}
+	~ThreadLocal() = default;
+
+	ThreadLocal(const ThreadLocal&) = delete;
+	ThreadLocal& operator=(const ThreadLocal&) = delete;
 
 	C* operator -> ()
 	{
@@ -136,7 +133,7 @@ public:
 		return get();
 	}
 
-	C& get()
+	[[nodiscard]] C& get()
 		/// Returns a reference to the underlying data object.
 		/// The reference can be used to modify the object.
 	{
@@ -144,10 +141,6 @@ public:
 		if (!p) p = new Slot;
 		return static_cast<Slot*>(p)->value();
 	}
-
-private:
-	ThreadLocal(const ThreadLocal&);
-	ThreadLocal& operator = (const ThreadLocal&);
 };
 
 

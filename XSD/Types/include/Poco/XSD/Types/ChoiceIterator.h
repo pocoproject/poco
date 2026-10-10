@@ -1,0 +1,73 @@
+//
+// ChoiceIterator.h
+//
+// Library: XSD/Types
+// Package: Iterator
+// Module:  ChoiceIterator
+//
+// Definition of the ChoiceIterator class.
+//
+// Copyright (c) 2008-2012, Applied Informatics Software Engineering GmbH.
+// All rights reserved.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#ifndef XSDTypes_ChoiceIterator_INCLUDED
+#define XSDTypes_ChoiceIterator_INCLUDED
+
+
+#include "Poco/XSD/Types/XSDTypes.h"
+#include "Poco/XSD/Types/OrderIteratorImpl.h"
+#include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
+
+
+namespace Poco::XSD::Types {
+
+
+class Choice;
+
+
+class XSDTypes_API ChoiceIterator: public OrderIteratorImpl
+	/// An iterator for iterating over a Choice's content.
+{
+public:
+	explicit ChoiceIterator(const Choice& choice);
+		/// Creates the ChoiceIterator.
+
+	~ChoiceIterator() override;
+		/// Destroys the ChoiceIterator.
+
+	// OrderIteratorImpl
+	OrderContent::Ptr next(const std::string& name) override;
+	[[nodiscard]] const std::set<std::string>& validNexts() const override;
+	[[nodiscard]] bool end() const override;
+	[[nodiscard]] bool validNext(const std::string& name) const override;
+	void close() override;
+	[[nodiscard]] bool canClose() const override;
+	void reset() override;
+
+private:
+	using Iterators = std::vector<OrderIterator>;
+
+	static constexpr Iterators::size_type NO_CHOICE = std::numeric_limits<Iterators::size_type>::max();
+		/// Value of _lastChosenPos while no alternative has been chosen.
+
+	UInt32    _min;
+	UInt32    _max;
+	mutable Iterators _vecIt;
+	mutable Iterators::size_type _lastChosenPos = NO_CHOICE;
+	mutable std::set<std::string> _next;
+	UInt32 _chosenElementCnt = 0;
+	mutable bool _dirtyFlag = true;
+};
+
+
+} // namespace Poco::XSD::Types
+
+
+#endif // XSDTypes_ChoiceIterator_INCLUDED

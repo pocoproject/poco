@@ -22,8 +22,7 @@
 #include "Poco/CppParser/Symbol.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API BuiltIn: public Symbol
@@ -36,12 +35,12 @@ public:
 	~BuiltIn();
 		/// Destroys the BuiltIn.
 
-	Symbol::Kind kind() const;
-	std::string toString() const;
+	[[nodiscard]] Symbol::Kind kind() const;
+	[[nodiscard]] std::string toString() const;
 };
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_BuiltIn_INCLUDED

@@ -1,0 +1,96 @@
+//
+// MemoryDBTest.h
+//
+// Definition of the MemoryDBTest class.
+//
+// Copyright (c) 2026, Aleph ONE Software Engineering LLC.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#ifndef MemoryDBTest_INCLUDED
+#define MemoryDBTest_INCLUDED
+
+
+#include "Poco/Data/SQLite/SQLite.h"
+#include "CppUnit/TestCase.h"
+#include <string>
+
+
+class MemoryDBTest: public CppUnit::TestCase
+{
+public:
+	MemoryDBTest(const std::string& name);
+	~MemoryDBTest();
+
+	void testConnectorRegistrationBalanced();
+	void testPersistAndReload();
+	void testManualFlushAndDirty();
+	void testDestructorFlush();
+	void testShardingBySize();
+	void testActiveOnlyRewrite();
+	void testUpdateSealedRow();
+	void testTruncate();
+	void testWithoutRowidRejected();
+	void testWithoutRowidRejectedViaSession();
+	void testCommentPrefixedWithoutRowidRejected();
+	void testLoadArchivedFalse();
+	void testInsertAfterReopenKeepsSealedRows();
+	void testInsertAfterReopenKeepsSealedRowsAutoincrement();
+	void testInsertAfterReopenKeepsSealedRowsImplicitRowid();
+	void testAutoincrementSequenceSurvivesReopen();
+	void testAutoincrementSequenceSavedWhileWriting();
+	void testInsertIntoArchivedRangeRejected();
+	void testEmptiedArchiveRangeIsReused();
+	void testUpsertAfterReopenUpdatesNewestRow();
+	void testMovedRowSurvivesFailedFlush();
+	void testMovedRowSurvivesCatalogWriteBeforeFlush();
+	void testIdleFlush();
+	void testCustomShardNamer();
+	void testIndexPreservedAcrossReload();
+	void testDropTableClassified();
+	void testAlterTableClassified();
+	void testRequiresSerializedThreadMode();
+	void testVecPersistAndReload();
+	void testVecStaysInActiveShard();
+	void testVecDirtyTracking();
+	void testVecDropTable();
+	void testVecShadowNameCollisionRejected();
+	void testVecHistoryView();
+	void testHistoryView();
+	void testDeleteSealedShardLoaded();
+	void testDeleteSealedShardUnloaded();
+	void testDeleteActiveShardRefused();
+	void testDeleteNonexistentShardRefused();
+	void testShardDescriptors();
+	void testRetentionByAge();
+	void testRetentionByTotalBytes();
+	void testDropOlderThan();
+	void testDropToFit();
+	void testRetentionDisabledIsNoop();
+	void testHistoryViewTimeRange();
+	void testHistoryViewTimeRangeOverflow();
+	void testDetachAllArchived();
+	void testDetachDeferredUnderReadTxn();
+	void testShardCeilingAutoDrop();
+	void testConcurrentAccess();
+
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+
+private:
+	void insertAfterReopen(const std::string& columns);
+		/// Seals every row of a table created with the given columns,
+		/// reopens without loading sealed shards, inserts one more row,
+		/// and checks that the sealed rows are all still there and that
+		/// the new row is numbered above them.
+
+	std::string _dir;
+};
+
+
+#endif // MemoryDBTest_INCLUDED

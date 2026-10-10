@@ -21,8 +21,7 @@
 #include "Poco/Redis/Type.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API RedisEventArgs
@@ -38,11 +37,11 @@ public:
 	~RedisEventArgs();
 		/// Destroys the RedisEventArgs.
 
-	RedisType::Ptr message() const;
+	[[nodiscard]] RedisType::Ptr message() const;
 		/// Returns the message retrieved from the Redis server.
 		/// This can be a NULL pointer when this event is about an exception.
 
-	const Exception* exception() const;
+	[[nodiscard]] const Exception* exception() const;
 		/// Returns the exception if any, otherwise it returns null pointer.
 
 	void stop();
@@ -52,7 +51,7 @@ public:
 		/// event. Use this for example for pub/sub when there are no
 		/// subcribers anymore.
 
-	bool isStopped() const;
+	[[nodiscard]] bool isStopped() const;
 		/// Returns true when the AsyncReader will stop.
 
 private:
@@ -93,7 +92,7 @@ inline void RedisEventArgs::stop()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_RedisEventArgs_INCLUDED

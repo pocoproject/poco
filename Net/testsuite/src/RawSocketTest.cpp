@@ -17,6 +17,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Timespan.h"
 #include "Poco/Stopwatch.h"
+#include <iostream>
 
 
 using Poco::Net::Socket;
@@ -31,8 +32,31 @@ using Poco::InvalidArgumentException;
 using Poco::IOException;
 
 
+bool RawSocketTest::_probed = false;
+bool RawSocketTest::_available = false;
+
+
 RawSocketTest::RawSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
+}
+
+
+bool RawSocketTest::rawSocketsAvailable()
+{
+	if (!_probed)
+	{
+		_probed = true;
+		try
+		{
+			RawSocket rs(IPAddress::IPv4);
+			_available = true;
+		}
+		catch (Poco::Exception&)
+		{
+			std::cout << "Raw sockets not available (requires elevated privileges), tests skipped." << std::endl;
+		}
+	}
+	return _available;
 }
 
 
@@ -43,6 +67,8 @@ RawSocketTest::~RawSocketTest()
 
 void RawSocketTest::testEchoIPv4()
 {
+	if (!rawSocketsAvailable()) return;
+
 	SocketAddress sa("127.0.0.1", 0);
 	RawSocket rs(IPAddress::IPv4);
 	rs.connect(sa);
@@ -66,6 +92,8 @@ void RawSocketTest::testEchoIPv4()
 
 void RawSocketTest::testSendToReceiveFromIPv4()
 {
+	if (!rawSocketsAvailable()) return;
+
 	RawSocket rs(IPAddress::IPv4);
 
 	int n = rs.sendTo("hello", 5, SocketAddress("127.0.0.1", 0));
@@ -86,6 +114,8 @@ void RawSocketTest::testSendToReceiveFromIPv4()
 
 void RawSocketTest::testEchoIPv4Move()
 {
+	if (!rawSocketsAvailable()) return;
+
 	SocketAddress sa("127.0.0.1", 0);
 	RawSocket rs0 = RawSocket(IPAddress::IPv4);
 	rs0.connect(sa);

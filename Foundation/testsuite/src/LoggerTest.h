@@ -16,7 +16,7 @@
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-
+#include <string>
 
 class LoggerTest: public CppUnit::TestCase
 {
@@ -28,6 +28,20 @@ public:
 	void testFormat();
 	void testFormatAny();
 	void testDump();
+	void testFormatThreadName();
+	void testFormatStdThreadName();
+	void testLoggerRefSurvivesShutdown();
+	void testConcurrentChannelReplacement();
+	void testConcurrentShutdown();
+	void testLogDuringDestructionOfReplaced();
+	void testGetDuringDestructionOfDetached();
+	void testConcurrentSetLevel();
+	void testReplacedChannelReleased();
+	void testReplaceChannelWithMessageOnItsWay();
+	void testReplaceFormatterWithMessageOnItsWay();
+	void testReplacedChannelNotKeptByLaterMessage();
+	void testChannelReplacesItself();
+	void testLogWhileThreadEnds();
 
 	void setUp();
 	void tearDown();
@@ -35,6 +49,8 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	template <typename ThreadFactory>
+	std::string doTestFormatThreadName(ThreadFactory makeThread);
 };
 
 

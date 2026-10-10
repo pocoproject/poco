@@ -19,6 +19,7 @@
 #include "Poco/Format.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/UnWindows.h"
+#include <limits>
 
 
 namespace Poco {
@@ -49,9 +50,9 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 	const DWORD dwMaxSizeLow = static_cast<DWORD>(_size);
 	const DWORD dwMaxSizeHigh = 0UL;
 #endif
-	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, NULL, _mode, dwMaxSizeHigh, dwMaxSizeLow, utf16name.c_str());
+	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, _mode, dwMaxSizeHigh, dwMaxSizeLow, utf16name.c_str());
 
-	if (!_memHandle)
+	if (_memHandle == nullptr)
 	{
 		DWORD dwRetVal = GetLastError();
 		int retVal = static_cast<int>(dwRetVal);
@@ -63,7 +64,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 		}
 
 		_memHandle = OpenFileMappingW(PAGE_READONLY, FALSE, utf16name.c_str());
-		if (!_memHandle)
+		if (_memHandle == nullptr)
 		{
 			dwRetVal = GetLastError();
 			throw SystemException(Poco::format("Cannot open shared memory object %s [Error %d: %s]",
@@ -98,12 +99,12 @@ SharedMemoryImpl::SharedMemoryImpl(const Poco::File& file, SharedMemory::AccessM
 
 	std::wstring utf16name;
 	UnicodeConverter::toUTF16(_name, utf16name);
-	_fileHandle = CreateFileW(utf16name.c_str(), fileMode, shareMode, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	_fileHandle = CreateFileW(utf16name.c_str(), fileMode, shareMode, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if (_fileHandle == INVALID_HANDLE_VALUE)
 		throw OpenFileException("Cannot open memory mapped file", _name);
 
-	_memHandle = CreateFileMapping(_fileHandle, NULL, _mode, 0, 0, NULL);
+	_memHandle = CreateFileMapping(_fileHandle, nullptr, _mode, 0, 0, nullptr);
 	if (!_memHandle)
 	{
 		DWORD dwRetVal = GetLastError();
@@ -128,7 +129,7 @@ void SharedMemoryImpl::map()
 	if (_mode == PAGE_READWRITE)
 		access = FILE_MAP_WRITE;
 	LPVOID addr = MapViewOfFile(_memHandle, access, 0, 0, _size);
-	if (!addr)
+	if (addr == nullptr)
 	{
 		DWORD dwRetVal = GetLastError();
 		throw SystemException(format("Cannot map shared memory object %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));

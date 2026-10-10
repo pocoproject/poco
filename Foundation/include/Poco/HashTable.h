@@ -31,9 +31,8 @@
 namespace Poco {
 
 
-//@ deprecated
 template <class Key, class Value, class KeyHashFunction = HashFunction<Key>>
-class HashTable
+class POCO_DEPRECATED("use LinearHashTable") HashTable
 	/// A HashTable stores a key value pair that can be looked up via a hashed key.
 	///
 	/// Collision handling is done via overflow maps(!). With small hash tables performance of this
@@ -45,11 +44,11 @@ class HashTable
 	/// This class is NOT thread safe.
 {
 public:
-	typedef std::map<Key, Value> HashEntryMap;
-	typedef HashEntryMap**       HashTableVector;
+	using HashEntryMap = std::map<Key, Value>;
+	using HashTableVector = HashEntryMap **;
 
-	typedef typename HashEntryMap::const_iterator ConstIterator;
-	typedef typename HashEntryMap::iterator Iterator;
+	using ConstIterator = typename HashEntryMap::const_iterator;
+	using Iterator = typename HashEntryMap::iterator;
 
 	HashTable(UInt32 initialSize = 251):
 		_entries(0),
@@ -175,19 +174,19 @@ public:
 		}
 	}
 
-	UInt32 hash(const Key& key) const
+	[[nodiscard]] UInt32 hash(const Key& key) const
 	{
 		return _hash(key, _maxCapacity);
 	}
 
-	const Value& get(const Key& key) const
+	[[nodiscard]] const Value& get(const Key& key) const
 		/// Throws an exception if the value does not exist
 	{
 		UInt32 hsh = hash(key);
 		return getRaw(key, hsh);
 	}
 
-	const Value& getRaw(const Key& key, UInt32 hsh) const
+	[[nodiscard]] const Value& getRaw(const Key& key, UInt32 hsh) const
 		/// Throws an exception if the value does not exist
 	{
 		if (!_entries[hsh])
@@ -200,19 +199,19 @@ public:
 		return it->second;
 	}
 
-	Value& get(const Key& key)
+	[[nodiscard]] Value& get(const Key& key)
 		/// Throws an exception if the value does not exist
 	{
 		UInt32 hsh = hash(key);
 		return const_cast<Value&>(getRaw(key, hsh));
 	}
 
-	const Value& operator [] (const Key& key) const
+	[[nodiscard]] const Value& operator [] (const Key& key) const
 	{
 		return get(key);
 	}
 
-	Value& operator [] (const Key& key)
+	[[nodiscard]] Value& operator [] (const Key& key)
 	{
 		UInt32 hsh = hash(key);
 
@@ -226,7 +225,7 @@ public:
 		return it->second;
 	}
 
-	const Key& getKeyRaw(const Key& key, UInt32 hsh)
+	[[nodiscard]] const Key& getKeyRaw(const Key& key, UInt32 hsh)
 		/// Throws an exception if the key does not exist. returns a reference to the internally
 		/// stored key. Useful when someone does an insert and wants for performance reason only to store
 		/// a pointer to the key in another collection
@@ -239,14 +238,14 @@ public:
 		return it->first;
 	}
 
-	bool get(const Key& key, Value& v) const
+	[[nodiscard]] bool get(const Key& key, Value& v) const
 		/// Sets v to the found value, returns false if no value was found
 	{
 		UInt32 hsh = hash(key);
 		return getRaw(key, hsh, v);
 	}
 
-	bool getRaw(const Key& key, UInt32 hsh, Value& v) const
+	[[nodiscard]] bool getRaw(const Key& key, UInt32 hsh, Value& v) const
 		/// Sets v to the found value, returns false if no value was found
 	{
 		if (!_entries[hsh])
@@ -260,24 +259,24 @@ public:
 		return true;
 	}
 
-	bool exists(const Key& key)
+	[[nodiscard]] bool exists(const Key& key)
 	{
 		UInt32 hsh = hash(key);
 		return existsRaw(key, hsh);
 	}
 
-	bool existsRaw(const Key& key, UInt32 hsh)
+	[[nodiscard]] bool existsRaw(const Key& key, UInt32 hsh)
 	{
 		return _entries[hsh] && (_entries[hsh]->end() != _entries[hsh]->find(key));
 	}
 
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 		/// Returns the number of elements already inserted into the HashTable
 	{
 		return _size;
 	}
 
-	UInt32 maxCapacity() const
+	[[nodiscard]] UInt32 maxCapacity() const
 	{
 		return _maxCapacity;
 	}
@@ -318,7 +317,7 @@ public:
 		}
 	}
 
-	HashStatistic currentState(bool details = false) const
+	[[nodiscard]] HashStatistic currentState(bool details = false) const
 		/// Returns the current internal state
 	{
 		UInt32 numberOfEntries = (UInt32)_size;

@@ -22,8 +22,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 const std::string TextExporter::COUNTER{"counter"s};
@@ -88,6 +87,9 @@ TextExporter::TextExporter(std::ostream& ostr):
 	_stream(ostr)
 {
 }
+
+
+TextExporter::~TextExporter() = default;
 
 
 void TextExporter::writeHeader(const Metric& metric)
@@ -182,4 +184,4 @@ const std::string& TextExporter::typeToString(Metric::Type type)
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

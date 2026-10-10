@@ -22,8 +22,7 @@ using Poco::NullOutputStream;
 using Poco::StreamCopier;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 NullPartHandler::NullPartHandler()
@@ -43,4 +42,4 @@ void NullPartHandler::handlePart(const MessageHeader& header, std::istream& stre
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

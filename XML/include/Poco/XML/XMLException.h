@@ -22,8 +22,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 POCO_DECLARE_EXCEPTION(XML_API, XMLException, Poco::RuntimeException)
@@ -31,7 +30,7 @@ POCO_DECLARE_EXCEPTION(XML_API, XMLException, Poco::RuntimeException)
 	/// and DOMException.
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_XMLException_INCLUDED

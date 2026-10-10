@@ -18,12 +18,12 @@
 #define Net_HTTPServerResponseImpl_INCLUDED
 
 
+#include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPServerResponse.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPServerSession;
@@ -42,7 +42,7 @@ class Net_API HTTPServerResponseImpl: public HTTPServerResponse
 	/// as necessary, and provide a message body.
 {
 public:
-	HTTPServerResponseImpl(HTTPServerSession& session);
+	HTTPServerResponseImpl(HTTPSession& session);
 		/// Creates the HTTPServerResponseImpl.
 
 	~HTTPServerResponseImpl();
@@ -103,14 +103,14 @@ public:
 		/// and sets the "WWW-Authenticate" header field
 		/// according to the given realm.
 
-	bool sent() const;
+	[[nodiscard]] bool sent() const;
 		/// Returns true if the response (header) has been sent.
 
 protected:
 	void attachRequest(HTTPServerRequestImpl* pRequest);
 
 private:
-	HTTPServerSession& _session;
+	HTTPSession& _session;
 	HTTPServerRequestImpl* _pRequest;
 	std::ostream*      _pStream;
 
@@ -123,7 +123,7 @@ private:
 //
 inline bool HTTPServerResponseImpl::sent() const
 {
-	return _pStream != 0;
+	return _pStream != nullptr;
 }
 
 
@@ -133,7 +133,7 @@ inline void HTTPServerResponseImpl::attachRequest(HTTPServerRequestImpl* pReques
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerResponseImpl_INCLUDED

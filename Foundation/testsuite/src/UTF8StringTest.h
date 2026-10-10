@@ -29,6 +29,9 @@ public:
 
 	void testEscape();
 	void testUnescape();
+	void testUnescapeTrailingBackslash();
+
+	void testNormalize();
 
 	void setUp();
 	void tearDown();

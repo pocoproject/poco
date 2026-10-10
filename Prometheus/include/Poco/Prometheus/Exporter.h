@@ -23,8 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Metric;
@@ -60,8 +59,8 @@ public:
 		/// Writes a sample for the given metric and the given labels.
 
 protected:
-	Exporter() = default;
-	virtual ~Exporter() = default;
+	Exporter();
+	virtual ~Exporter();
 
 	Exporter(const Exporter&) = delete;
 	Exporter(Exporter&&) = delete;
@@ -70,7 +69,7 @@ protected:
 };
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Exporter_INCLUDED

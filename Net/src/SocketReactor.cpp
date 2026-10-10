@@ -23,11 +23,14 @@ using Poco::Exception;
 using Poco::ErrorHandler;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
-SocketReactor::SocketReactor(): _threadAffinity(-1),
+//
+// SocketReactor
+//
+
+SocketReactor::SocketReactor():
 	_stop(false),
 	_pReadableNotification(new ReadableNotification(this)),
 	_pWritableNotification(new WritableNotification(this)),
@@ -66,6 +69,7 @@ SocketReactor::SocketReactor(const Params& params, int threadAffinity):
 
 SocketReactor::~SocketReactor()
 {
+	stop();
 }
 
 
@@ -78,14 +82,16 @@ void SocketReactor::run()
 	}
 	Poco::Stopwatch sw;
 	if (_params.throttle) sw.start();
-	PollSet::SocketModeMap sm;
 	while (!_stop)
 	{
 		try
 		{
 			if (hasSocketHandlers())
 			{
-				sm = _pollSet.poll(_params.pollTimeout);
+				// The sockets of a poll are held for its round only: one whose
+				// handlers are removed while it is served is closed when the
+				// round is over, not when a later poll returns.
+				PollSet::SocketModeMap sm = _pollSet.poll(_params.pollTimeout);
 				if (_stop) break;
 				for (const auto& s : sm)
 				{
@@ -159,6 +165,12 @@ void SocketReactor::sleep()
 }
 
 
+void SocketReactor::start()
+{
+	_stop.exchange(false);
+}
+
+
 void SocketReactor::stop()
 {
 	if (_stop.exchange(true)) return;
@@ -216,15 +228,15 @@ bool SocketReactor::hasEventHandler(const Socket& socket, const Poco::AbstractOb
 SocketReactor::NotifierPtr SocketReactor::getNotifier(const Socket& socket, bool makeNew)
 {
 	const SocketImpl* pImpl = socket.impl();
-	if (pImpl == nullptr) return 0;
+	if (pImpl == nullptr) return nullptr;
 	poco_socket_t sockfd = pImpl->sockfd();
 	ScopedLock lock(_mutex);
 
-	EventHandlerMap::iterator it = _handlers.find(sockfd);
+	auto it = _handlers.find(sockfd);
 	if (it != _handlers.end()) return it->second;
 	else if (makeNew) return (_handlers[sockfd] = new SocketNotifier(socket));
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -257,6 +269,34 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 }
 
 
+void SocketReactor::remove(const Socket& socket)
+{
+	const SocketImpl* pImpl = socket.impl();
+	if (pImpl == nullptr) return;
+
+	// Remove from pollset first - prevents new events
+	// epoll_ctl may fail if socket FD is already in bad state, but we must
+	// still clean up handlers to prevent further dispatch attempts
+	try { _pollSet.remove(socket); }
+	catch (...) { }
+
+	// Get and remove the notifier under lock, but disable observers outside
+	// the lock to avoid deadlock with handlers calling back into reactor
+	NotifierPtr pNotifier;
+	{
+		ScopedLock lock(_mutex);
+		auto it = _handlers.find(pImpl->sockfd());
+		if (it != _handlers.end())
+		{
+			pNotifier = it->second;
+			_handlers.erase(it);
+		}
+	}
+	if (pNotifier)
+		pNotifier->disableObservers();
+}
+
+
 void SocketReactor::onTimeout()
 {
 	dispatch(_pTimeoutNotification);
@@ -271,9 +311,11 @@ void SocketReactor::onShutdown()
 
 void SocketReactor::dispatch(const Socket& socket, SocketNotification* pNotification)
 {
+	if (!_pollSet.has(socket)) return;  // Socket was removed, skip dispatch
+
 	NotifierPtr pNotifier = getNotifier(socket);
 	if (!pNotifier) return;
-	dispatch(pNotifier, pNotification);
+	pNotifier->dispatch(pNotification);
 }
 
 
@@ -283,14 +325,41 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 	{
 		ScopedLock lock(_mutex);
 		delegates.reserve(_handlers.size());
-		for (EventHandlerMap::iterator it = _handlers.begin(); it != _handlers.end(); ++it)
-			delegates.push_back(it->second);
+		for (auto& _handler : _handlers)
+			delegates.push_back(_handler.second);
 	}
-	for (std::vector<NotifierPtr>::iterator it = delegates.begin(); it != delegates.end(); ++it)
+	for (auto& delegate : delegates)
 	{
-		dispatch(*it, pNotification);
+		if (!_pollSet.has(delegate->socket())) continue;
+		delegate->dispatch(pNotification);
 	}
 }
 
 
-} } // namespace Poco::Net
+//
+// ScopedSocketReactor
+//
+
+ScopedSocketReactor::ScopedSocketReactor():
+	_pReactor(new SocketReactor)
+{
+	_thread.start(*_pReactor);
+}
+
+
+ScopedSocketReactor::ScopedSocketReactor(const SocketReactor::Params& params):
+	_pReactor(new SocketReactor(params))
+{
+	_thread.start(*_pReactor);
+}
+
+
+ScopedSocketReactor::~ScopedSocketReactor()
+{
+	_pReactor->stop();
+	_thread.join();
+	delete _pReactor;
+}
+
+
+} // namespace Poco::Net

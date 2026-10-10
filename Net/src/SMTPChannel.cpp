@@ -29,8 +29,7 @@
 #include "Poco/Environment.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string SMTPChannel::PROP_MAILHOST("mailhost");
@@ -127,7 +126,7 @@ void SMTPChannel::log(const Message& msg)
 
 					std::streamoff size = fis.tellg();
 					poco_assert (std::numeric_limits<unsigned int>::max() >= size);
-					poco_assert (std::numeric_limits<SST>::max() >= size);
+					poco_assert (static_cast<std::streamoff>(std::numeric_limits<SST>::max()) >= size);
 					char* pMem = new char [static_cast<unsigned int>(size)];
 					fis.seekg(std::ios::beg);
 					fis.read(pMem, size);
@@ -207,4 +206,4 @@ void SMTPChannel::registerChannel()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

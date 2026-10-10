@@ -24,15 +24,13 @@ using Poco::NumberParser;
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPMessage::HTTP_1_0                   = "HTTP/1.0";
 const std::string HTTPMessage::HTTP_1_1                   = "HTTP/1.1";
 const std::string HTTPMessage::IDENTITY_TRANSFER_ENCODING = "identity";
 const std::string HTTPMessage::CHUNKED_TRANSFER_ENCODING  = "chunked";
-const int         HTTPMessage::UNKNOWN_CONTENT_LENGTH     = -1;
 const std::string HTTPMessage::UNKNOWN_CONTENT_TYPE;
 const std::string HTTPMessage::CONTENT_LENGTH             = "Content-Length";
 const std::string HTTPMessage::CONTENT_TYPE               = "Content-Type";
@@ -139,7 +137,7 @@ void HTTPMessage::setTransferEncoding(const std::string& transferEncoding)
 }
 
 
-const std::string& HTTPMessage::getTransferEncoding() const
+std::string HTTPMessage::getTransferEncoding() const
 {
 	return get(TRANSFER_ENCODING, IDENTITY_TRANSFER_ENCODING);
 }
@@ -148,9 +146,13 @@ const std::string& HTTPMessage::getTransferEncoding() const
 void HTTPMessage::setChunkedTransferEncoding(bool flag)
 {
 	if (flag)
+	{
 		setTransferEncoding(CHUNKED_TRANSFER_ENCODING);
-	else
-		setTransferEncoding(IDENTITY_TRANSFER_ENCODING);
+		// The two together make the message length ambiguous, and a recipient is
+		// entitled to reject it.
+		erase(CONTENT_LENGTH);
+	}
+	else setTransferEncoding(IDENTITY_TRANSFER_ENCODING);
 }
 
 
@@ -175,7 +177,7 @@ void HTTPMessage::setContentType(const MediaType& mediaType)
 }
 
 
-const std::string& HTTPMessage::getContentType() const
+std::string HTTPMessage::getContentType() const
 {
 	return get(CONTENT_TYPE, UNKNOWN_CONTENT_TYPE);
 }
@@ -200,4 +202,4 @@ bool HTTPMessage::getKeepAlive() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

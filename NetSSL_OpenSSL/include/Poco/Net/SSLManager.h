@@ -29,13 +29,9 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #include <openssl/ssl.h>
-#if defined(OPENSSL_FIPS) && OPENSSL_VERSION_NUMBER < 0x010001000L
-#include <openssl/fips.h>
-#endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Context;
@@ -140,7 +136,11 @@ class NetSSL_API SSLManager
 	///      Specifying a size of 0 will set an unlimited cache size.
 	///    - sessionTimeout (integer):  Sets the timeout (in seconds) of cached sessions on the server.
 	///    - extendedVerification (boolean): Enable or disable the automatic post-connection
-	///      extended certificate verification.
+	///      extended certificate verification. For openSSL.client this defaults to true,
+	///      matching a programmatically created Context; disabling it also disables the
+	///      check that the peer certificate was issued for the host actually connected to.
+	///      For openSSL.server it defaults to false, because a server has no host name to
+	///      match a client certificate against.
 	///    - requireTLSv1 (boolean): Require a TLSv1 connection.
 	///    - requireTLSv1_1 (boolean): Require a TLSv1.1 connection.
 	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection.
@@ -151,8 +151,12 @@ class NetSSL_API SSLManager
 	///      If not specified or empty, the default parameters are used.
 	///    - ecdhCurve (string): Specifies the name of the curve to use for ECDH, based
 	///      on the curve names specified in RFC 4492. Defaults to "prime256v1".
-	///    - fips: Enable or disable OpenSSL FIPS mode. Only supported if the OpenSSL version
-	///      that this library is built against supports FIPS mode.
+	///    - fips (boolean): Enable OpenSSL FIPS mode for the whole process when the first
+	///      default context is created. The property name is openSSL.fips, without the
+	///      server or client prefix. Requires OpenSSL 3.0 or newer and a FIPS provider
+	///      activated in openssl.cnf; otherwise creating the context fails with a
+	///      Poco::Crypto::CryptoException. Defaults to false (mode left unchanged).
+	///      Create the context during startup, before other threads use OpenSSL.
 	///
 	/// Please see the Context class documentation regarding TLSv1.3 support.
 {
@@ -170,7 +174,7 @@ public:
 		/// Fired when a encrypted certificate is loaded. Not setting the password
 		/// in the event parameter will result in a failure to load the certificate.
 
-	static SSLManager& instance();
+	[[nodiscard]] static SSLManager& instance();
 		/// Returns the instance of the SSLManager singleton.
 
 	void initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrCertificateHandler, Context::Ptr ptrContext);
@@ -205,44 +209,44 @@ public:
 		///     Context::Ptr pContext = new Context(Context::CLIENT_USE, "", "", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
 		///     SSLManager::instance().initializeClient(pConsoleHandler, pInvalidCertHandler, pContext);
 
-	Context::Ptr defaultServerContext();
+	[[nodiscard]] Context::Ptr defaultServerContext();
 		/// Returns the default Context used by the server.
 		///
 		/// Unless initializeServer() has been called, the first call to this method initializes the default Context
 		/// from the application configuration.
 
-	Context::Ptr defaultClientContext();
+	[[nodiscard]] Context::Ptr defaultClientContext();
 		/// Returns the default Context used by the client.
 		///
 		/// Unless initializeClient() has been called, the first call to this method initializes the default Context
 		/// from the application configuration.
 
-	PrivateKeyPassphraseHandlerPtr serverPassphraseHandler();
+	[[nodiscard]] PrivateKeyPassphraseHandlerPtr serverPassphraseHandler();
 		/// Returns the configured passphrase handler of the server. If none is set, the method will create a default one
 		/// from an application configuration.
 
-	InvalidCertificateHandlerPtr serverCertificateHandler();
+	[[nodiscard]] InvalidCertificateHandlerPtr serverCertificateHandler();
 		/// Returns an initialized certificate handler (used by the server to verify client cert) which determines how invalid certificates are treated.
 		/// If none is set, it will try to auto-initialize one from an application configuration.
 
-	PrivateKeyPassphraseHandlerPtr clientPassphraseHandler();
+	[[nodiscard]] PrivateKeyPassphraseHandlerPtr clientPassphraseHandler();
 		/// Returns the configured passphrase handler of the client. If none is set, the method will create a default one
 		/// from an application configuration.
 
-	InvalidCertificateHandlerPtr clientCertificateHandler();
+	[[nodiscard]] InvalidCertificateHandlerPtr clientCertificateHandler();
 		/// Returns an initialized certificate handler (used by the client to verify server cert) which determines how invalid certificates are treated.
 		/// If none is set, it will try to auto-initialize one from an application configuration.
 
-	PrivateKeyFactoryMgr& privateKeyFactoryMgr();
+	[[nodiscard]] PrivateKeyFactoryMgr& privateKeyFactoryMgr();
 		/// Returns the private key factory manager which stores the
 		/// factories for the different registered passphrase handlers for private keys.
 
-	CertificateHandlerFactoryMgr& certificateHandlerFactoryMgr();
+	[[nodiscard]] CertificateHandlerFactoryMgr& certificateHandlerFactoryMgr();
 		/// Returns the CertificateHandlerFactoryMgr which stores the
 		/// factories for the different registered certificate handlers.
 
-	static bool isFIPSEnabled();
-		// Returns true if FIPS mode is enabled, false otherwise.
+	[[nodiscard]] static bool isFIPSEnabled();
+		/// Returns true if FIPS mode is enabled, false otherwise.
 
 	void shutdown();
 		/// Shuts down the SSLManager and releases the default Context
@@ -277,17 +281,17 @@ protected:
 		/// verification are handled. Return 0 to terminate the handshake,
 		/// or 1 to continue despite the error.
 
-	static Poco::Util::AbstractConfiguration& appConfig();
+	[[nodiscard]] static Poco::Util::AbstractConfiguration& appConfig();
 		/// Returns the application configuration.
 		///
 		/// Throws a InvalidStateException if not application instance
 		/// is available.
 
-	int contextIndex() const;
+	[[nodiscard]] int contextIndex() const;
 		/// Returns the index for SSL_CTX_set_ex_data() and SSL_CTX_get_ex_data() to
 		/// store the Context* in the underlying SSL_CTX.
 
-	int socketIndex() const;
+	[[nodiscard]] int socketIndex() const;
 		/// Returns the index for SSL_set_ex_data() and SSL_get_ex_data() to
 		/// store the SecureSocketImpl* in the underlying SSL.
 
@@ -331,11 +335,11 @@ private:
 	static const std::string CFG_CERTIFICATE_FILE;
 	static const std::string CFG_CA_LOCATION;
 	static const std::string CFG_VER_MODE;
-	static const Context::VerificationMode VAL_VER_MODE;
+	static constexpr Context::VerificationMode VAL_VER_MODE = Context::VERIFY_RELAXED;
 	static const std::string CFG_VER_DEPTH;
-	static const int         VAL_VER_DEPTH;
+	static constexpr int     VAL_VER_DEPTH = 9;
 	static const std::string CFG_ENABLE_DEFAULT_CA;
-	static const bool        VAL_ENABLE_DEFAULT_CA;
+	static constexpr bool    VAL_ENABLE_DEFAULT_CA = true;
 	static const std::string CFG_CIPHER_LIST;
 	static const std::string CFG_CYPHER_LIST; // for backwards compatibility
 	static const std::string VAL_CIPHER_LIST;
@@ -349,6 +353,8 @@ private:
 	static const std::string CFG_SESSION_CACHE_SIZE;
 	static const std::string CFG_SESSION_TIMEOUT;
 	static const std::string CFG_EXTENDED_VERIFICATION;
+	static const bool        VAL_EXTENDED_VERIFICATION;
+		/// Client-side default; servers default to false (see initDefaultContext()).
 	static const std::string CFG_REQUIRE_TLSV1;
 	static const std::string CFG_REQUIRE_TLSV1_1;
 	static const std::string CFG_REQUIRE_TLSV1_2;
@@ -356,11 +362,8 @@ private:
 	static const std::string CFG_DISABLE_PROTOCOLS;
 	static const std::string CFG_DH_PARAMS_FILE;
 	static const std::string CFG_ECDH_CURVE;
-
-#ifdef OPENSSL_FIPS
 	static const std::string CFG_FIPS_MODE;
-	static const bool        VAL_FIPS_MODE;
-#endif
+	static constexpr bool    VAL_FIPS_MODE = false;
 
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class Context;
@@ -380,16 +383,6 @@ inline PrivateKeyFactoryMgr& SSLManager::privateKeyFactoryMgr()
 inline CertificateHandlerFactoryMgr& SSLManager::certificateHandlerFactoryMgr()
 {
 	return _certHandlerFactoryMgr;
-}
-
-
-inline bool SSLManager::isFIPSEnabled()
-{
-#ifdef OPENSSL_FIPS
-	return FIPS_mode() ? true : false;
-#else
-	return false;
-#endif
 }
 
 
@@ -417,7 +410,7 @@ inline int SSLManager::socketIndex() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SSLManager_INCLUDED

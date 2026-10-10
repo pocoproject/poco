@@ -29,8 +29,7 @@
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 using namespace Keywords;
@@ -328,7 +327,7 @@ void StatementImpl::setStorage(const std::string& storage)
 
 void StatementImpl::makeExtractors(std::size_t count)
 {
-	for (int i = 0; i < count; ++i)
+	for (std::size_t i = 0; i < count; ++i)
 	{
 		const MetaColumn& mc = metaColumn(i);
 		switch (mc.type())
@@ -392,9 +391,9 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 	throw NotFoundException(format("Invalid column name: %s", name));
 }
 
-void StatementImpl::execDirectImpl(const std::string& query)
+void StatementImpl::execDirectImpl(const std::string& /*query*/)
 {
-	poco_assert("Not implemented");
+	throw NotImplementedException("executeDirect() is not supported by the connector", _rSession.connectorName());
 }
 
 
@@ -458,7 +457,7 @@ std::size_t StatementImpl::columnsExtracted(int dataSet) const
 	if (USE_CURRENT_DATA_SET == dataSet) dataSet = static_cast<int>(_curDataSet);
 	if (_columnsExtracted.size() > 0)
 	{
-		poco_assert (dataSet >= 0 && dataSet < _columnsExtracted.size());
+		poco_assert (dataSet >= 0 && static_cast<std::size_t>(dataSet) < _columnsExtracted.size());
 		return _columnsExtracted[dataSet];
 	}
 
@@ -471,7 +470,7 @@ std::size_t StatementImpl::rowsExtracted(int dataSet) const
 	if (USE_CURRENT_DATA_SET == dataSet) dataSet = static_cast<int>(_curDataSet);
 	if (extractions().size() > 0)
 	{
-		poco_assert (dataSet >= 0 && dataSet < _extractors.size());
+		poco_assert (dataSet >= 0 && static_cast<std::size_t>(dataSet) < _extractors.size());
 		if (_extractors[dataSet].size() > 0)
 			return _extractors[dataSet][0]->numOfRowsHandled();
 	}
@@ -485,7 +484,7 @@ std::size_t StatementImpl::subTotalRowCount(int dataSet) const
 	if (USE_CURRENT_DATA_SET == dataSet) dataSet = static_cast<int>(_curDataSet);
 	if (_subTotalRowCount.size() > 0)
 	{
-		poco_assert (dataSet >= 0 && dataSet < _subTotalRowCount.size());
+		poco_assert (dataSet >= 0 && static_cast<std::size_t>(dataSet) < _subTotalRowCount.size());
 		return _subTotalRowCount[dataSet];
 	}
 
@@ -502,4 +501,4 @@ void StatementImpl::formatSQL(std::vector<Any>& arguments)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

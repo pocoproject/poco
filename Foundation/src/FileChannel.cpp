@@ -24,6 +24,7 @@
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
+#include <memory>
 
 
 namespace Poco {
@@ -47,8 +48,9 @@ FileChannel::FileChannel():
 	_pFile(nullptr),
 	_pRotateStrategy(new NullRotateStrategy()),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
-	_pPurgeStrategy(new NullPurgeStrategy())
+	_pPurgeStrategy(std::make_shared<NullPurgeStrategy>())
 {
+	_pArchiveStrategy->setPurgeCallback([this]() { purge(); });
 }
 
 
@@ -61,8 +63,9 @@ FileChannel::FileChannel(const std::string& path):
 	_pFile(nullptr),
 	_pRotateStrategy(new NullRotateStrategy()),
 	_pArchiveStrategy(new ArchiveByNumberStrategy),
-	_pPurgeStrategy(new NullPurgeStrategy())
+	_pPurgeStrategy(std::make_shared<NullPurgeStrategy>())
 {
+	_pArchiveStrategy->setPurgeCallback([this]() { purge(); });
 }
 
 
@@ -73,7 +76,6 @@ FileChannel::~FileChannel()
 		close();
 		delete _pRotateStrategy;
 		delete _pArchiveStrategy;
-		delete _pPurgeStrategy;
 	}
 	catch (...)
 	{
@@ -85,16 +87,20 @@ FileChannel::~FileChannel()
 void FileChannel::open()
 {
 	FastMutex::ScopedLock lock(_mutex);
+	unsafeOpen();
+}
 
+
+void FileChannel::unsafeOpen()
+{
 	if (!_pFile)
 	{
 		_pFile = new LogFile(_path);
-		if (_rotateOnOpen && _pFile->size() > 0)
+		if (_rotateOnOpen && _pFile.load()->size() > 0)
 		{
 			try
 			{
 				_pFile = _pArchiveStrategy->archive(_pFile);
-				purge();
 			}
 			catch (...)
 			{
@@ -114,23 +120,26 @@ void FileChannel::close()
 	if (_pFile != nullptr)
 		_pArchiveStrategy->close();
 
-	delete _pFile;
-	_pFile = nullptr;
+	delete _pFile.exchange(nullptr);
 }
 
 
 void FileChannel::log(const Message& msg)
 {
-	open();
+	// A channel that is not open is opened by open(), which a subclass
+	// may have overridden.
+	if (!_pFile) open();
 
 	FastMutex::ScopedLock lock(_mutex);
+
+	// The channel may have been closed again since.
+	unsafeOpen();
 
 	if (_pRotateStrategy->mustRotate(_pFile))
 	{
 		try
 		{
 			_pFile = _pArchiveStrategy->archive(_pFile);
-			purge();
 		}
 		catch (...)
 		{
@@ -139,9 +148,9 @@ void FileChannel::log(const Message& msg)
 		// we must call mustRotate() again to give the
 		// RotateByIntervalStrategy a chance to write its timestamp
 		// to the new file.
-		_pRotateStrategy->mustRotate(_pFile);
+		(void) _pRotateStrategy->mustRotate(_pFile);
 	}
-	_pFile->write(msg.getText(), _flush);
+	_pFile.load()->write(msg.getText(), _flush);
 }
 
 
@@ -160,7 +169,10 @@ void FileChannel::setProperty(const std::string& name, const std::string& value)
 			setArchive(_archive);
 	}
 	else if (name == PROP_PATH)
+	{
+		FastMutex::ScopedLock purgeLock(_purgeMutex);
 		_path = value;
+	}
 	else if (name == PROP_ROTATION)
 		setRotation(value);
 	else if (name == PROP_ARCHIVE)
@@ -182,6 +194,8 @@ void FileChannel::setProperty(const std::string& name, const std::string& value)
 
 std::string FileChannel::getProperty(const std::string& name) const
 {
+	FastMutex::ScopedLock lock(_mutex);
+
 	if (name == PROP_TIMES)
 		return _times;
 	else if (name == PROP_PATH)
@@ -207,8 +221,11 @@ std::string FileChannel::getProperty(const std::string& name) const
 
 Timestamp FileChannel::creationDate() const
 {
-	if (_pFile)
-		return _pFile->creationDate();
+	FastMutex::ScopedLock lock(_mutex);
+
+	const LogFile* pFile = _pFile;
+	if (pFile)
+		return pFile->creationDate();
 	else
 		return 0;
 }
@@ -216,15 +233,19 @@ Timestamp FileChannel::creationDate() const
 
 UInt64 FileChannel::size() const
 {
-	if (_pFile)
-		return _pFile->size();
+	FastMutex::ScopedLock lock(_mutex);
+
+	const LogFile* pFile = _pFile;
+	if (pFile)
+		return pFile->size();
 	else
 		return 0;
 }
 
 
-const std::string& FileChannel::path() const
+std::string FileChannel::path() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _path;
 }
 
@@ -240,7 +261,7 @@ RotateStrategy* FileChannel::createRotationStrategy(const std::string& rotation,
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
 
-	RotateStrategy* pStrategy = 0;
+	RotateStrategy* pStrategy = nullptr;
 	if ((rotation.find(',') != std::string::npos) || (rotation.find(':') != std::string::npos))
 	{
 		if (times == "utc")
@@ -287,6 +308,20 @@ void FileChannel::setRotationStrategy(RotateStrategy* strategy)
 {
 	poco_check_ptr(strategy);
 
+	// The strategy that is replaced is deleted when the mutex is free again.
+	std::unique_ptr<RotateStrategy> pReplaced;
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		pReplaced.reset(_pRotateStrategy);
+		_pRotateStrategy = strategy;
+	}
+}
+
+
+void FileChannel::unsafeSetRotationStrategy(RotateStrategy* strategy)
+{
+	poco_check_ptr(strategy);
+
 	delete _pRotateStrategy;
 	_pRotateStrategy = strategy;
 }
@@ -294,7 +329,7 @@ void FileChannel::setRotationStrategy(RotateStrategy* strategy)
 
 void FileChannel::setRotation(const std::string& rotation)
 {
-	setRotationStrategy(createRotationStrategy(rotation, _times));
+	unsafeSetRotationStrategy(createRotationStrategy(rotation, _times));
 	_rotation = rotation;
 }
 
@@ -324,8 +359,15 @@ void FileChannel::setArchiveStrategy(ArchiveStrategy* strategy)
 {
 	poco_check_ptr(strategy);
 
-	delete _pArchiveStrategy;
-	_pArchiveStrategy = strategy;
+	strategy->setPurgeCallback([this]() { purge(); });
+
+	// The strategy that is replaced is deleted when the mutex is free again.
+	std::unique_ptr<ArchiveStrategy> pReplaced;
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		pReplaced.reset(_pArchiveStrategy);
+		_pArchiveStrategy = strategy;
+	}
 }
 
 
@@ -348,6 +390,7 @@ void FileChannel::setArchive(const std::string& archive)
 	else throw InvalidArgumentException("archive", archive);
 	delete _pArchiveStrategy;
 	pStrategy->compress(_compress);
+	pStrategy->setPurgeCallback([this]() { purge(); });
 	_pArchiveStrategy = pStrategy;
 	_archive = archive;
 }
@@ -397,15 +440,26 @@ void FileChannel::setRotateOnOpen(const std::string& rotateOnOpen)
 
 void FileChannel::purge()
 {
-	if (_pPurgeStrategy)
+	// The archive strategy calls this on a thread that logs, which holds
+	// the mutex of the channel, and on the thread that compresses, which
+	// does not. The purge strategy and the path are copied under a mutex
+	// of their own, and the purge runs without it.
+	std::shared_ptr<PurgeStrategy> pPurgeStrategy;
+	std::string path;
 	{
-	try
-	{
-		_pPurgeStrategy->purge(_path);
+		FastMutex::ScopedLock lock(_purgeMutex);
+		pPurgeStrategy = _pPurgeStrategy;
+		path = _path;
 	}
-	catch (...)
+	if (pPurgeStrategy)
 	{
-	}
+		try
+		{
+			pPurgeStrategy->purge(path);
+		}
+		catch (...)
+		{
+		}
 	}
 }
 
@@ -414,8 +468,7 @@ bool FileChannel::setNoPurge(const std::string& value)
 {
 	if (value.empty() || 0 == icompare(value, "none"))
 	{
-		delete _pPurgeStrategy;
-		_pPurgeStrategy = new NullPurgeStrategy();
+		setPurgeStrategy(new NullPurgeStrategy());
 		_purgeAge = "none";
 		return true;
 	}
@@ -448,8 +501,13 @@ void FileChannel::setPurgeStrategy(PurgeStrategy* strategy)
 {
 	poco_check_ptr(strategy);
 
-	delete _pPurgeStrategy;
-	_pPurgeStrategy = strategy;
+	// The strategy that is replaced is released when the mutex is free
+	// again, and not before a purge that uses it has returned.
+	std::shared_ptr<PurgeStrategy> pPurgeStrategy(strategy);
+	{
+		FastMutex::ScopedLock lock(_purgeMutex);
+		_pPurgeStrategy.swap(pPurgeStrategy);
+	}
 }
 
 

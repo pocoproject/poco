@@ -23,8 +23,7 @@
 #include <ios>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPBufferAllocator
@@ -33,6 +32,7 @@ class Net_API HTTPBufferAllocator
 public:
 	static char* allocate(std::streamsize size);
 	static void deallocate(char* ptr, std::streamsize size);
+	[[nodiscard]] static const Poco::MemoryPool& pool();
 
 	enum
 	{
@@ -44,7 +44,18 @@ private:
 };
 
 
-} } // namespace Poco::Net
+//
+// inlines
+//
+
+
+inline const Poco::MemoryPool& HTTPBufferAllocator::pool()
+{
+	return _pool;
+}
+
+
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPBufferAllocator_INCLUDED

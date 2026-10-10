@@ -15,8 +15,7 @@
 #include "Poco/DOM/Entity.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString Entity::NODE_NAME = toXMLString("#entity");
@@ -65,4 +64,4 @@ Node* Entity::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

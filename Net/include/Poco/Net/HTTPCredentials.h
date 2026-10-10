@@ -97,24 +97,24 @@ public:
 	void setUsername(const std::string& username);
 		/// Sets the username.
 
-	const std::string& getUsername() const;
+	[[nodiscard]] const std::string& getUsername() const;
 		/// Returns the username.
 
 	void setPassword(const std::string& password);
 		/// Sets the password.
 
-	const std::string& getPassword() const;
+	[[nodiscard]] const std::string& getPassword() const;
 		/// Returns the password.
 
 	void setHost(const std::string& host);
 		/// Sets the target host. Only used for SSPI-based NTLM authentication using
 		/// the credentials of the currently logged-in user on Windows.
 
-	const std::string& getHost() const;
+	[[nodiscard]] const std::string& getHost() const;
 		/// Returns the target host. Only used for SSPI-based NTLM authentication using
 		/// the credentials of the currently logged-in user on Windows.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true if both username and password are empty, otherwise false.
 
 	void authenticate(HTTPRequest& request, const HTTPResponse& response);
@@ -141,31 +141,31 @@ public:
 		/// Updates internal state (in case of digest authentication) and
 		/// replaces proxy authentication information in the request accordingly.
 
-	static bool isBasicCredentials(const std::string& header);
+	[[nodiscard]] static bool isBasicCredentials(const std::string& header);
 		/// Returns true if authentication header is for Basic authentication.
 
-	static bool isDigestCredentials(const std::string& header);
+	[[nodiscard]] static bool isDigestCredentials(const std::string& header);
 		/// Returns true if authentication header is for Digest authentication.
 
-	static bool isNTLMCredentials(const std::string& header);
+	[[nodiscard]] static bool isNTLMCredentials(const std::string& header);
 		/// Returns true if authentication header is for NTLM authentication.
 
-	static bool hasBasicCredentials(const HTTPRequest& request);
+	[[nodiscard]] static bool hasBasicCredentials(const HTTPRequest& request);
 		/// Returns true if an Authorization header with Basic credentials is present in the request.
 
-	static bool hasDigestCredentials(const HTTPRequest& request);
+	[[nodiscard]] static bool hasDigestCredentials(const HTTPRequest& request);
 		/// Returns true if an Authorization header with Digest credentials is present in the request.
 
-	static bool hasNTLMCredentials(const HTTPRequest& request);
+	[[nodiscard]] static bool hasNTLMCredentials(const HTTPRequest& request);
 		/// Returns true if an Authorization header with NTLM credentials is present in the request.
 
-	static bool hasProxyBasicCredentials(const HTTPRequest& request);
+	[[nodiscard]] static bool hasProxyBasicCredentials(const HTTPRequest& request);
 		/// Returns true if a Proxy-Authorization header with Basic credentials is present in the request.
 
-	static bool hasProxyDigestCredentials(const HTTPRequest& request);
+	[[nodiscard]] static bool hasProxyDigestCredentials(const HTTPRequest& request);
 		/// Returns true if a Proxy-Authorization header with Digest credentials is present in the request.
 
-	static bool hasProxyNTLMCredentials(const HTTPRequest& request);
+	[[nodiscard]] static bool hasProxyNTLMCredentials(const HTTPRequest& request);
 		/// Returns true if a Proxy-Authorization header with Digest credentials is present in the request.
 
 	static void extractCredentials(const std::string& userInfo, std::string& username, std::string& password);

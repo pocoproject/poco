@@ -19,8 +19,7 @@
 #include "Poco/Redis/Array.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 RedisType::RedisType()
@@ -59,4 +58,4 @@ RedisType::Ptr RedisType::createRedisType(char marker)
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

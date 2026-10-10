@@ -22,8 +22,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 POCO_DECLARE_EXCEPTION(Data_API, DataException, Poco::IOException)
@@ -44,7 +43,7 @@ POCO_DECLARE_EXCEPTION(Data_API, ConnectionFailedException, DataException)
 POCO_DECLARE_EXCEPTION(Data_API, NotConnectedException, DataException)
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_DataException_INCLUDED

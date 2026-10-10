@@ -16,8 +16,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const std::string DOMException::MESSAGES[_NUMBER_OF_MESSAGES] =
@@ -104,4 +103,4 @@ const std::string& DOMException::message(unsigned short code)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

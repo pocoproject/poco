@@ -35,7 +35,7 @@ using Poco::format;
 using Poco::NotFoundException;
 
 
-Session*    ODBCAccessTest::_pSession = 0;
+Session*    ODBCAccessTest::_pSession = nullptr;
 std::string ODBCAccessTest::_dbConnString;
 Poco::Data::ODBC::Utility::DriverMap ODBCAccessTest::_drivers;
 
@@ -136,7 +136,7 @@ bool ODBCAccessTest::canConnect(const std::string& driver, const std::string& ds
 	}
 
 	Utility::DSNMap dataSources;
-	Utility::dataSources(dataSources);
+	(void) Utility::dataSources(dataSources);
 	Utility::DSNMap::iterator itDSN = dataSources.begin();
 	for (; itDSN != dataSources.end(); ++itDSN)
 	{
@@ -179,7 +179,7 @@ void ODBCAccessTest::tearDown()
 
 bool ODBCAccessTest::init(const std::string& driver, const std::string& dsn)
 {
-	Utility::drivers(_drivers);
+	(void) Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn)) return false;
 
 	try
@@ -209,5 +209,5 @@ CppUnit::Test* ODBCAccessTest::suite()
 		return pSuite;
 	}
 
-	return 0;
+	return nullptr;
 }

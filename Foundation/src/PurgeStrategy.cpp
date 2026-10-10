@@ -112,7 +112,7 @@ void PurgeByAgeStrategy::purge(const std::string& path)
 //
 
 
-PurgeByCountStrategy::PurgeByCountStrategy(int count): _count(count)
+PurgeByCountStrategy::PurgeByCountStrategy(std::size_t count): _count(count)
 {
 	poco_assert(count > 0);
 }

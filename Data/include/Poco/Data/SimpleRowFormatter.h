@@ -22,8 +22,7 @@
 #include "Poco/Data/RowFormatter.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API SimpleRowFormatter: public RowFormatter
@@ -34,8 +33,8 @@ public:
 	//using NameVecPtr = RowFormatter::NameVecPtr;
 	//using ValueVec = RowFormatter::ValueVec;
 
-	static const int DEFAULT_COLUMN_WIDTH = 16;
-	static const int DEFAULT_SPACING = 1;
+	static constexpr int DEFAULT_COLUMN_WIDTH = 16;
+	static constexpr int DEFAULT_SPACING = 1;
 
 	SimpleRowFormatter(std::streamsize columnWidth = DEFAULT_COLUMN_WIDTH, std::streamsize spacing = DEFAULT_SPACING);
 		/// Creates the SimpleRowFormatter and sets the column width to specified value.
@@ -58,16 +57,16 @@ public:
 	std::string& formatValues(const ValueVec& vals, std::string& formattedValues);
 		/// Formats the row values.
 
-	int rowCount() const;
+	[[nodiscard]] int rowCount() const;
 		/// Returns row count.
 
 	void setColumnWidth(std::streamsize width);
 		/// Sets the column width.
 
-	std::streamsize getColumnWidth() const;
+	[[nodiscard]] std::streamsize getColumnWidth() const;
 		/// Returns the column width.
 
-	std::streamsize getSpacing() const;
+	[[nodiscard]] std::streamsize getSpacing() const;
 		/// Returns the spacing.
 
 private:
@@ -104,23 +103,22 @@ inline std::streamsize SimpleRowFormatter::getSpacing() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
+#ifndef POCO_DOC
 namespace std
 {
-	// Note: for an unknown reason, clang refuses to compile this function as noexcept
 	template<>
 	inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1,
 		Poco::Data::SimpleRowFormatter& s2)
-#ifndef POCO_COMPILER_CLANG
-		noexcept
-#endif
+		noexcept(std::is_nothrow_swappable_v<Poco::Data::SimpleRowFormatter>)
 		/// Full template specalization of std:::swap for SimpleRowFormatter
 	{
 		s1.swap(s2);
 	}
 }
+#endif
 
 
 #endif // Data_SimpleRowFormatter_INCLUDED

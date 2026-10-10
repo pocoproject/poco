@@ -18,11 +18,10 @@
 #include "Poco/JSONString.h"
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(Foundation_EXPORTS)
 
 template class Foundation_API Struct<std::string>;
 template class Foundation_API Struct<int>;
@@ -114,4 +113,4 @@ void appendJSONValue(std::string& val, const Var& any, bool wrap)
 } // namespace Impl
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic

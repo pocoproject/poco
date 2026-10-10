@@ -7,7 +7,7 @@
 //
 // Definition of the PropertyFileConfiguration class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -21,11 +21,13 @@
 #include "Poco/Util/Util.h"
 #include "Poco/Util/MapConfiguration.h"
 #include <istream>
+#include <map>
 #include <ostream>
+#include <set>
+#include <vector>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API PropertyFileConfiguration: public MapConfiguration
@@ -34,6 +36,7 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	///
 	/// The file syntax is implemented as follows.
 	///   - a line starting with a hash '#' or exclamation mark '!' is treated as a comment and ignored
+	///     (with the exception of the !include directive described below)
 	///   - every other line denotes a property assignment in the form
 	///     <key> = <value> or
 	///     <key> : <value>
@@ -50,21 +53,67 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	/// A value can spread across multiple lines if the last character in a line (the character
 	/// immediately before the carriage return or line feed character) is a single backslash.
 	///
+	/// A line of the form
+	///   !include <path>
+	/// (where <path> is a relative or absolute file path) includes another properties file.
+	/// The included file must exist; a missing file throws Poco::OpenFileException.
+	/// A line of the form
+	///   ?include <path>
+	/// is an OPTIONAL include: if the file does not exist the directive is
+	/// silently ignored (an existing but unreadable file still throws). This
+	/// enables overlay configurations - e.g. a production file ending in
+	///   ?include app.dev.properties
+	/// is unaffected where the overlay is absent, while a development
+	/// environment that ships the overlay has its values override the
+	/// preceding ones (the last assignment of a key wins).
+	/// Relative paths are resolved relative to the directory of the including file.
+	/// ${variable} references in include paths are expanded, either from
+	/// properties already loaded in the same file, or from an optional parent
+	/// configuration passed via the constructor.
+	/// Note: '?' is not a comment character - a line starting with '?' that is
+	/// not exactly '?include' followed by whitespace is parsed as an ordinary
+	/// property assignment, as before.
+	///
 	/// Property names are case sensitive. Leading and trailing whitespace is
 	/// removed from both keys and values. A property name can neither contain
 	/// a colon ':' nor an equal sign '=' character.
 {
 public:
-	PropertyFileConfiguration();
+	explicit PropertyFileConfiguration(AbstractConfiguration* pParentConfig = nullptr);
 		/// Creates an empty PropertyFileConfiguration.
+		/// If pParentConfig is not null, it is used to expand ${variable}
+		/// references in !include directive paths.
+		/// The parent configuration is not owned by this object;
+		/// the caller must ensure it outlives this configuration.
 
-	PropertyFileConfiguration(std::istream& istr);
+	explicit PropertyFileConfiguration(std::istream& istr, AbstractConfiguration* pParentConfig = nullptr);
 		/// Creates an PropertyFileConfiguration and loads the configuration data
 		/// from the given stream, which must be in properties file format.
+		/// If pParentConfig is not null, it is used to expand ${variable}
+		/// references in !include directive paths.
+		/// The parent configuration is not owned by this object;
+		/// the caller must ensure it outlives this configuration.
 
-	PropertyFileConfiguration(const std::string& path);
+	explicit PropertyFileConfiguration(const std::string& path, AbstractConfiguration* pParentConfig = nullptr);
 		/// Creates an PropertyFileConfiguration and loads the configuration data
 		/// from the given file, which must be in properties file format.
+		/// If pParentConfig is not null, it is used to expand ${variable}
+		/// references in !include directive paths.
+		/// The parent configuration is not owned by this object;
+		/// the caller must ensure it outlives this configuration.
+
+	POCO_DEPRECATED("Pass a raw AbstractConfiguration*; PropertyFileConfiguration does not take ownership of the parent")
+	explicit PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig);
+		/// Deprecated. Use the AbstractConfiguration* overload instead.
+		/// Forwards to the raw-pointer constructor.
+
+	POCO_DEPRECATED("Pass a raw AbstractConfiguration*; PropertyFileConfiguration does not take ownership of the parent")
+	PropertyFileConfiguration(std::istream& istr, AbstractConfiguration::Ptr pParentConfig);
+		/// Deprecated. Use the AbstractConfiguration* overload instead.
+
+	POCO_DEPRECATED("Pass a raw AbstractConfiguration*; PropertyFileConfiguration does not take ownership of the parent")
+	PropertyFileConfiguration(const std::string& path, AbstractConfiguration::Ptr pParentConfig);
+		/// Deprecated. Use the AbstractConfiguration* overload instead.
 
 	void load(std::istream& istr);
 		/// Loads the configuration data from the given stream, which
@@ -78,22 +127,105 @@ public:
 		/// Writes the configuration data to the given stream.
 		///
 		/// The data is written as a sequence of statements in the form
-		/// <key>: <value>
+		/// <key> = <value>
 		/// separated by a newline character.
 
 	void save(const std::string& path) const;
 		/// Writes the configuration data to the given file.
+		///
+		/// If the configuration was loaded from a file (and possibly
+		/// includes), save preserves comments, blank lines, and
+		/// !include directives. Changed values are written back to the
+		/// file they were originally loaded from. New keys are appended
+		/// to the root file. Source files of removed keys are also
+		/// rewritten so deleted properties do not linger on disk, even
+		/// when the removal empties an included file. If no provenance
+		/// information is available, the file is written as a flat list
+		/// of key-value pairs.
+
+	std::string getSourceFile(const std::string& key) const;
+		/// Returns the file path the given key was loaded from,
+		/// or an empty string if unknown.
+
+	void setSourceFile(const std::string& key, const std::string& path);
+		/// Sets the source file for the given key. When save() is called
+		/// with provenance-based saving, the key will be written to this file.
+
+	void clear();
+		/// Clears the configuration, including provenance information.
+
+	std::map<std::string, std::string> getSourceFiles() const;
+		/// Returns a snapshot of the source file map (key -> file path).
+
+	std::vector<std::string> getIncludeFiles(const std::string& path = "") const;
+		/// Returns the list of !include file paths (absolute) found in the
+		/// given file. If path is empty, the file from which the configuration
+		/// was originally loaded is scanned.
+		/// Returns an empty vector if no root file is set.
+
+	void addIncludeFile(const std::string& path);
+		/// Adds an !include directive for the given file path to the root file.
+		/// The path is written as-is to the file; internally it is resolved
+		/// to absolute for duplicate detection. If the target file does not
+		/// exist, it is created as an empty file.
+		/// Any properties in the included file are loaded into memory
+		/// immediately (no reload required). If the included file has
+		/// invalid syntax or cyclic includes, the exception propagates
+		/// and the root file is left untouched.
+		/// This method performs file I/O while holding the configuration lock.
+		/// Throws Poco::IllegalStateException if no root file is set.
+		/// Throws Poco::FileExistsException if an !include directive for
+		///   this file already exists in the root file.
+
+	void removeIncludeFile(const std::string& path, bool removeKeys = false);
+		/// Removes the !include directive for the given file path from the root file.
+		/// Only removes the directive from the root file; nested includes
+		/// within the removed file are not affected. The included file
+		/// itself is not deleted from disk.
+		/// If removeKeys is true, all keys whose provenance matches this file
+		/// are also removed from the configuration.
+		/// If removeKeys is false (default), keys remain in memory but their
+		/// provenance is cleared. A subsequent save() will write those keys
+		/// to the root file.
+		/// This method performs file I/O while holding the configuration lock.
+		/// Throws Poco::IllegalStateException if no root file is set.
+		/// Throws Poco::NotFoundException if no matching !include directive exists.
 
 protected:
 	~PropertyFileConfiguration();
 
+	void removeRaw(const std::string& key) override;
+
 private:
-	void parseLine(std::istream& istr);
+	void loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
+	void parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
+	void processInclude(const std::string& includePath, bool optional, const std::string& basePath, std::set<std::string>& includeStack);
+		/// Resolves and loads one include directive's file (cycle-guarded).
+		/// optional = the ?include form: a missing file is silently skipped.
+	static void saveToFile(const std::string& path, const std::map<std::string, std::string>& values);
+	[[nodiscard]] std::string resolveIncludePath(const std::string& rawPath, const std::string& basePath) const;
+	[[nodiscard]] static std::string extractIncludePath(const std::string& line, bool* pOptional = nullptr);
+		/// If line is an !include or ?include directive, returns the raw path
+		/// (and sets *pOptional to true for the ?include form); otherwise
+		/// returns empty.
+	[[nodiscard]] std::vector<std::string> scanIncludeFiles(const std::string& filePath) const;
+		/// Scans the given file for !include / ?include directives. Caller must hold the lock.
 	static int readChar(std::istream& istr);
+	[[nodiscard]] static std::string escapeValue(const std::string& value);
+
+	AbstractConfiguration* _pParentConfig = nullptr;
+		/// Non-owning back-pointer to the parent configuration used for
+		/// ${variable} expansion in !include directive paths.
+		/// This is intentionally a raw pointer to avoid a circular reference:
+		/// the parent (typically LayeredConfiguration) owns this
+		/// PropertyFileConfiguration, so the parent always outlives the child.
+	std::map<std::string, std::string> _sourceMap;
+	mutable std::set<std::string> _removedSourceFiles;
+	std::string _rootFile;
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_PropertyFileConfiguration_INCLUDED

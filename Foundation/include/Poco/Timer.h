@@ -71,7 +71,7 @@ public:
 		/// startInterval expires.
 		/// To start the timer, call the Start() method.
 
-	virtual ~Timer();
+	~Timer() override;
 		/// Stops and destroys the timer.
 
 	void start(const AbstractTimerCallback& method);
@@ -117,14 +117,14 @@ public:
 		/// Sets a new periodic interval and restarts the timer.
 		/// An interval of 0 will stop the timer.
 
-	long getStartInterval() const;
+	[[nodiscard]] long getStartInterval() const;
 		/// Returns the start interval.
 
 	void setStartInterval(long milliseconds);
 		/// Sets the start interval. Will only be
 		/// effective before start() is called.
 
-	long getPeriodicInterval() const;
+	[[nodiscard]] long getPeriodicInterval() const;
 		/// Returns the periodic interval.
 
 	void setPeriodicInterval(long milliseconds);
@@ -132,13 +132,13 @@ public:
 		/// the new interval will be effective when the current interval
 		/// expires.
 
-	long skipped() const;
+	[[nodiscard]] long skipped() const;
 		/// Returns the number of skipped invocations since the last invocation.
 		/// Skipped invocations happen if the timer callback function takes
 		/// longer to execute than the timer interval.
 
 protected:
-	void run();
+	void run() override;
 
 private:
 	long _startInterval;
@@ -167,7 +167,7 @@ public:
 	AbstractTimerCallback& operator = (const AbstractTimerCallback& callback);
 
 	virtual void invoke(Timer& timer) const = 0;
-	virtual AbstractTimerCallback* clone() const = 0;
+	[[nodiscard]] virtual AbstractTimerCallback* clone() const = 0;
 };
 
 
@@ -181,19 +181,19 @@ class TimerCallback: public AbstractTimerCallback
 	/// to use this template class.
 {
 public:
-	typedef void (C::*Callback)(Timer&);
+	using Callback = void (C::*)(Timer &);
+
+	TimerCallback() = delete;
 
 	TimerCallback(C& object, Callback method): _pObject(&object), _method(method)
 	{
 	}
 
-	TimerCallback(const TimerCallback& callback): _pObject(callback._pObject), _method(callback._method)
+	TimerCallback(const TimerCallback& callback): AbstractTimerCallback(callback), _pObject(callback._pObject), _method(callback._method)
 	{
 	}
 
-	~TimerCallback()
-	{
-	}
+	~TimerCallback() override = default;
 
 	TimerCallback& operator = (const TimerCallback& callback)
 	{
@@ -205,19 +205,17 @@ public:
 		return *this;
 	}
 
-	void invoke(Timer& timer) const
+	void invoke(Timer& timer) const override
 	{
 		(_pObject->*_method)(timer);
 	}
 
-	AbstractTimerCallback* clone() const
+	[[nodiscard]] AbstractTimerCallback* clone() const override
 	{
 		return new TimerCallback(*this);
 	}
 
 private:
-	TimerCallback();
-
 	C*       _pObject;
 	Callback _method;
 };

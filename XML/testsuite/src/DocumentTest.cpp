@@ -44,7 +44,7 @@ void DocumentTest::testDocumentElement()
 	AutoPtr<Document> pDoc = new Document;
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
 
-	assertTrue (pDoc->documentElement() == 0);
+	assertTrue (pDoc->documentElement() == nullptr);
 	pDoc->appendChild(pRoot);
 	assertTrue (pDoc->documentElement() == pRoot);
 
@@ -213,10 +213,10 @@ void DocumentTest::testElementById()
 	assertTrue (pFound == pElem3);
 
 	pFound = pDoc->getElementById("4", "id");
-	assertTrue (pFound == 0);
+	assertTrue (pFound == nullptr);
 
 	pFound = pDoc->getElementById("0", "ID");
-	assertTrue (pFound == 0);
+	assertTrue (pFound == nullptr);
 }
 
 
@@ -252,13 +252,13 @@ void DocumentTest::testElementByIdNS()
 	assertTrue (pFound == pElem3);
 
 	pFound = pDoc->getElementByIdNS("4", "urn:ns1", "id");
-	assertTrue (pFound == 0);
+	assertTrue (pFound == nullptr);
 
 	pFound = pDoc->getElementByIdNS("0", "urn:ns1", "ID");
-	assertTrue (pFound == 0);
+	assertTrue (pFound == nullptr);
 
 	pFound = pDoc->getElementByIdNS("0", "urn:ns2", "id");
-	assertTrue (pFound == 0);
+	assertTrue (pFound == nullptr);
 }
 
 

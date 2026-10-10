@@ -74,7 +74,7 @@ namespace
 		case MYSQL_TYPE_BLOB:
 #ifdef POCO_MYSQL_JSON
 		case MYSQL_TYPE_JSON:
-#endif		
+#endif
 			return field.length;
 
 		default:
@@ -144,9 +144,7 @@ namespace
 } // namespace
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 ResultMetadata::~ResultMetadata()
@@ -168,8 +166,8 @@ void ResultMetadata::reset()
 
 void ResultMetadata::freeMemory()
 {
-	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
-		std::free(*it);
+    for (auto c: _buffer)
+        std::free(c);
 }
 
 
@@ -273,4 +271,4 @@ void ResultMetadata::adjustColumnSizeToFit(std::size_t pos)
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

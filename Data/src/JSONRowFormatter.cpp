@@ -23,14 +23,7 @@ using Poco::format;
 using Poco::toJSON;
 
 
-namespace Poco {
-namespace Data {
-
-
-const int JSONRowFormatter::JSON_FMT_MODE_SMALL;
-const int JSONRowFormatter::JSON_FMT_MODE_ROW_COUNT;
-const int JSONRowFormatter::JSON_FMT_MODE_COLUMN_NAMES;
-const int JSONRowFormatter::JSON_FMT_MODE_FULL;
+namespace Poco::Data {
 
 
 JSONRowFormatter::JSONRowFormatter(int mode) : RowFormatter("{", "]}"),
@@ -186,4 +179,4 @@ std::string& JSONRowFormatter::formatNames(const NameVecPtr pNames, std::string&
 }
 
 
-} }// namespace Poco::Data
+} // namespace Poco::Data

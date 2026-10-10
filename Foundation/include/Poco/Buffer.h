@@ -54,7 +54,7 @@ public:
 	Buffer(std::size_t length):
 		_capacity(length),
 		_used(length),
-		_ptr(0),
+		_ptr(nullptr),
 		_ownMem(true)
 		/// Creates and allocates the Buffer.
 	{
@@ -81,7 +81,7 @@ public:
 	Buffer(const T* pMem, std::size_t length):
 		_capacity(length),
 		_used(length),
-		_ptr(0),
+		_ptr(nullptr),
 		_ownMem(true)
 		/// Creates and allocates the Buffer; copies the contents of
 		/// the supplied memory into the buffer. Length argument specifies
@@ -99,7 +99,7 @@ public:
 		/// Copy constructor.
 		_capacity(other._used),
 		_used(other._used),
-		_ptr(0),
+		_ptr(nullptr),
 		_ownMem(true)
 	{
 		if (_used)
@@ -158,6 +158,8 @@ public:
 		if (_ownMem) delete [] _ptr;
 	}
 
+	Buffer() = delete;
+
 	void resize(std::size_t newCapacity, bool preserveContent = true)
 		/// Resizes the buffer capacity and size. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
@@ -202,7 +204,7 @@ public:
 
 		if (newCapacity != _capacity)
 		{
-			T* ptr = 0;
+			T* ptr = nullptr;
 			if (newCapacity > 0)
 			{
 				ptr = new T[newCapacity];
@@ -251,13 +253,13 @@ public:
 		append(buf.begin(), buf.size());
 	}
 
-	std::size_t capacity() const
+	[[nodiscard]] std::size_t capacity() const
 		/// Returns the allocated memory size in elements.
 	{
 		return _capacity;
 	}
 
-	std::size_t capacityBytes() const
+	[[nodiscard]] std::size_t capacityBytes() const
 		/// Returns the allocated memory size in bytes.
 	{
 		return _capacity * sizeof(T);
@@ -274,7 +276,7 @@ public:
 		swap(_ownMem, other._ownMem);
 	}
 
-	bool operator == (const Buffer& other) const
+	[[nodiscard]] bool operator == (const Buffer& other) const
 		/// Compare operator.
 	{
 		if (this != &other)
@@ -293,7 +295,7 @@ public:
 		return true;
 	}
 
-	bool operator != (const Buffer& other) const
+	[[nodiscard]] bool operator != (const Buffer& other) const
 		/// Compare operator.
 	{
 		return !(*this == other);
@@ -302,59 +304,63 @@ public:
 	void clear()
 		/// Sets the contents of the buffer to zero.
 	{
-		std::memset(_ptr, 0, _used * sizeof(T));
+		// An empty buffer has no storage; memset must not be called with a null pointer.
+		if (_ptr != nullptr && _used > 0)
+		{
+			std::memset(_ptr, 0, _used * sizeof(T));
+		}
 	}
 
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 		/// Returns the used size of the buffer in elements.
 	{
 		return _used;
 	}
 
-	std::size_t sizeBytes() const
+	[[nodiscard]] std::size_t sizeBytes() const
 		/// Returns the used size of the buffer in bytes.
 	{
 		return _used * sizeof(T);
 	}
 
-	T* begin()
+	[[nodiscard]] T* begin()
 		/// Returns a pointer to the beginning of the buffer.
 	{
 		return _ptr;
 	}
 
-	const T* begin() const
+	[[nodiscard]] const T* begin() const
 		/// Returns a pointer to the beginning of the buffer.
 	{
 		return _ptr;
 	}
 
-	T* end()
+	[[nodiscard]] T* end()
 		/// Returns a pointer to end of the buffer.
 	{
 		return _ptr + _used;
 	}
 
-	const T* end() const
+	[[nodiscard]] const T* end() const
 		/// Returns a pointer to the end of the buffer.
 	{
 		return _ptr + _used;
 	}
 
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Return true if buffer is empty.
 	{
 		return 0 == _used;
 	}
 
-	T& operator [] (std::size_t index)
+	[[nodiscard]] T& operator [] (std::size_t index)
 	{
 		poco_assert (index < _used);
 
 		return _ptr[index];
 	}
 
-	const T& operator [] (std::size_t index) const
+	[[nodiscard]] const T& operator [] (std::size_t index) const
 	{
 		poco_assert (index < _used);
 
@@ -362,8 +368,6 @@ public:
 	}
 
 private:
-	Buffer();
-
 	std::size_t _capacity;
 	std::size_t _used;
 	T*          _ptr;

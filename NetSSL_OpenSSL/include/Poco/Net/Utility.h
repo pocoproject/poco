@@ -22,8 +22,7 @@
 #include "Poco/Net/Context.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API Utility
@@ -31,14 +30,14 @@ class NetSSL_API Utility
 	/// with the OpenSSL library.
 {
 public:
-	static Context::VerificationMode convertVerificationMode(const std::string& verMode);
+	[[nodiscard]] static Context::VerificationMode convertVerificationMode(const std::string& verMode);
 		/// Non-case sensitive conversion of a string to a VerificationMode enum.
 		/// If verMode is illegal an InvalidArgumentException is thrown.
 
-	static std::string convertCertificateError(long errCode);
+	[[nodiscard]] static std::string convertCertificateError(long errCode);
 		/// Converts an SSL certificate handling error code into an error message.
 
-	static std::string getLastError();
+	[[nodiscard]] static std::string getLastError();
 		/// Returns the last error from the error stack
 
 	static void clearErrorStack();
@@ -46,7 +45,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_Utility_INCLUDED

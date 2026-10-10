@@ -43,8 +43,8 @@ class ActiveRunnable: public ActiveRunnableBase
 	/// See the ActiveMethod class for more information.
 {
 public:
-	typedef ResultType (OwnerType::*Callback)(const ArgType&);
-	typedef ActiveResult<ResultType> ActiveResultType;
+	using Callback = ResultType (OwnerType::*)(const ArgType &);
+	using ActiveResultType = ActiveResult<ResultType>;
 
 	ActiveRunnable(OwnerType* pOwner, Callback method, const ArgType& arg, const ActiveResultType& result):
 		_pOwner(pOwner),
@@ -55,7 +55,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	void run()
+	void run() override
 	{
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try
@@ -91,8 +91,8 @@ class ActiveRunnable<void, ArgType, OwnerType>: public ActiveRunnableBase
 	/// See the ActiveMethod class for more information.
 {
 public:
-	typedef void (OwnerType::*Callback)(const ArgType&);
-	typedef ActiveResult<void> ActiveResultType;
+	using Callback = void (OwnerType::*)(const ArgType &);
+	using ActiveResultType = ActiveResult<void>;
 
 	ActiveRunnable(OwnerType* pOwner, Callback method, const ArgType& arg, const ActiveResultType& result):
 		_pOwner(pOwner),
@@ -103,7 +103,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	void run()
+	void run() override
 	{
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try
@@ -139,8 +139,8 @@ class ActiveRunnable<ResultType, void, OwnerType>: public ActiveRunnableBase
 	/// See the ActiveMethod class for more information.
 {
 public:
-	typedef ResultType (OwnerType::*Callback)();
-	typedef ActiveResult<ResultType> ActiveResultType;
+	using Callback = ResultType (OwnerType::*)();
+	using ActiveResultType = ActiveResult<ResultType>;
 
 	ActiveRunnable(OwnerType* pOwner, Callback method, const ActiveResultType& result):
 		_pOwner(pOwner),
@@ -150,7 +150,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	void run()
+	void run() override
 	{
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try
@@ -185,8 +185,8 @@ class ActiveRunnable<void, void, OwnerType>: public ActiveRunnableBase
 	/// See the ActiveMethod class for more information.
 {
 public:
-	typedef void (OwnerType::*Callback)();
-	typedef ActiveResult<void> ActiveResultType;
+	using Callback = void (OwnerType::*)();
+	using ActiveResultType = ActiveResult<void>;
 
 	ActiveRunnable(OwnerType* pOwner, Callback method, const ActiveResultType& result):
 		_pOwner(pOwner),
@@ -196,7 +196,7 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	void run()
+	void run() override
 	{
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try

@@ -18,8 +18,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 Context::Context(const Poco::Data::Session& session):
@@ -34,6 +33,9 @@ Context::Context(const std::string& connector, const std::string& connectionStri
 }
 
 
+Context::~Context() = default;
+
+
 StatementPlaceholderProvider::Ptr Context::statementPlaceholderProvider() const
 {
 	if (Poco::icompare(_session.connector(), "postgresql"s) == 0)
@@ -43,4 +45,4 @@ StatementPlaceholderProvider::Ptr Context::statementPlaceholderProvider() const
 }
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord

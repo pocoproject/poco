@@ -15,12 +15,14 @@
 #include "Poco/Latin1Encoding.h"
 #include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
+#include "Poco/UTF32Encoding.h"
 
 
 using Poco::TextIterator;
 using Poco::Latin1Encoding;
 using Poco::UTF8Encoding;
 using Poco::UTF16Encoding;
+using Poco::UTF32Encoding;
 
 
 TextIteratorTest::TextIteratorTest(const std::string& name): CppUnit::TestCase(name)
@@ -242,6 +244,36 @@ void TextIteratorTest::testSwap()
 }
 
 
+void TextIteratorTest::testUTF32Invalid1()
+{
+	UTF32Encoding encoding;
+	const Poco::UInt32 data[] = {0x00000041, 0xffffffef, 0x00000041, 0x00000041, 0x00000041, 0x00000041, 0x00};
+	std::string text((const char*) data, 24);
+	TextIterator it(text, encoding);
+	TextIterator end(text);
+
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x41);
+	assertTrue (it != end);
+	assertTrue (*it++ == -1);
+}
+
+
+void TextIteratorTest::testUTF32Invalid2()
+{
+	UTF32Encoding encoding;
+	const Poco::UInt32 data[] = {0x00000041, 0xfffffffe, 0xfffffffe, 0x00};
+	std::string text((const char*) data, 12);
+	TextIterator it(text, encoding);
+	TextIterator end(text);
+
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x41);
+	assertTrue (it != end);
+	assertTrue (*it++ == -1);
+}
+
+
 void TextIteratorTest::setUp()
 {
 }
@@ -265,6 +297,8 @@ CppUnit::Test* TextIteratorTest::suite()
 	CppUnit_addTest(pSuite, TextIteratorTest, testUTF8Supplementary);
 	CppUnit_addTest(pSuite, TextIteratorTest, testUTF16Supplementary);
 	CppUnit_addTest(pSuite, TextIteratorTest, testSwap);
+	CppUnit_addTest(pSuite, TextIteratorTest, testUTF32Invalid1);
+	CppUnit_addTest(pSuite, TextIteratorTest, testUTF32Invalid2);
 
 	return pSuite;
 }

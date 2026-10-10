@@ -33,4 +33,12 @@ objects     += JSONConfiguration
 target_libs += PocoJSON
 endif
 
+# FastLoggerConfigurator requires FastLogger - enabled by default
+# Set POCO_NO_FASTLOGGER=1 to disable
+ifdef POCO_NO_FASTLOGGER
+COMMONFLAGS += -DPOCO_NO_FASTLOGGER
+else
+objects += FastLoggerConfigurator
+endif
+
 include $(POCO_BASE)/build/rules/lib

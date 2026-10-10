@@ -24,8 +24,7 @@
 #include "Poco/Timespan.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class MailMessage;
@@ -70,7 +69,7 @@ public:
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for socket read operations.
 
-	Poco::Timespan getTimeout() const;
+	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the timeout for socket read operations.
 
 	void login(const std::string& hostname);
@@ -186,11 +185,11 @@ protected:
 	void loginUsingPlain(const std::string& username, const std::string& password);
 	void loginUsingXOAUTH2(const std::string& username, const std::string& password);
 	void loginUsingNTLM(const std::string& username, const std::string& password);
-	DialogSocket& socket();
-	const std::string& host() const;
+	[[nodiscard]] DialogSocket& socket();
+	[[nodiscard]] const std::string& host() const;
 
 private:
-	void sendCommands(const MailMessage& message, const Recipients* pRecipients = 0);
+	void sendCommands(const MailMessage& message, const Recipients* pRecipients = nullptr);
 	void transportMessage(const MailMessage& message);
 
 	std::string  _host;
@@ -238,7 +237,7 @@ inline const std::string& SMTPClientSession::host() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SMTPClientSession_INCLUDED

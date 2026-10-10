@@ -1,15 +1,10 @@
 #ifndef SQLPARSER_IMPORT_STATEMENT_H
 #define SQLPARSER_IMPORT_STATEMENT_H
 
+#include "ImportExportOptions.h"
 #include "SQLStatement.h"
 
 namespace hsql {
-enum ImportType {
-  kImportCSV,
-  kImportTbl,  // Hyrise file format
-  kImportBinary,
-  kImportAuto
-};
 
 // Represents SQL Import statements.
 struct SQLParser_API ImportStatement : SQLStatement {
@@ -21,6 +16,8 @@ struct SQLParser_API ImportStatement : SQLStatement {
   char* schema;
   char* tableName;
   Expr* whereClause;
+  char* encoding;
+  CsvOptions* csv_options;
 };
 
 }  // namespace hsql

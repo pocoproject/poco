@@ -39,8 +39,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 EventDispatcher::EventDispatcher():
@@ -71,7 +70,7 @@ void EventDispatcher::removeEventListener(const XMLString& type, EventListener* 
 	{
 		if (it->type == type && it->pListener == listener && it->useCapture == useCapture)
 		{
-			it->pListener = 0;
+			it->pListener = nullptr;
 		}
 		if (!_inDispatch && !it->pListener)
 		{
@@ -93,13 +92,9 @@ void EventDispatcher::dispatchEvent(Event* evt)
 		{
 			it->pListener->handleEvent(evt);
 		}
-		if (!it->pListener)
-		{
-			EventListenerList::iterator del = it++;
-			_listeners.erase(del);
-		}
-		else ++it;
+		++it;
 	}
+	removeDeadListeners();
 }
 
 
@@ -113,13 +108,9 @@ void EventDispatcher::captureEvent(Event* evt)
 		{
 			it->pListener->handleEvent(evt);
 		}
-		if (!it->pListener)
-		{
-			EventListenerList::iterator del = it++;
-			_listeners.erase(del);
-		}
-		else ++it;
+		++it;
 	}
+	removeDeadListeners();
 }
 
 
@@ -133,14 +124,28 @@ void EventDispatcher::bubbleEvent(Event* evt)
 		{
 			it->pListener->handleEvent(evt);
 		}
-		if (!it->pListener)
+		++it;
+	}
+	removeDeadListeners();
+}
+
+
+void EventDispatcher::removeDeadListeners()
+{
+	if (_inDispatch == 1)
+	{
+		EventListenerList::iterator it = _listeners.begin();
+		while (it != _listeners.end())
 		{
-			EventListenerList::iterator del = it++;
-			_listeners.erase(del);
+			if (!it->pListener)
+			{
+				EventListenerList::iterator del = it++;
+				_listeners.erase(del);
+			}
+			else ++it;
 		}
-		else ++it;
 	}
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

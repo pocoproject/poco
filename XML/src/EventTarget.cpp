@@ -15,8 +15,7 @@
 #include "Poco/DOM/EventTarget.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 EventTarget::~EventTarget()
@@ -24,4 +23,4 @@ EventTarget::~EventTarget()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

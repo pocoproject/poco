@@ -16,9 +16,7 @@
 #include "Poco/Data/PostgreSQL/Extractor.h"
 #include "Poco/Data/PostgreSQL/BinaryExtractor.h"
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 PostgreSQLStatementImpl::PostgreSQLStatementImpl(SessionImpl& aSessionImpl):
@@ -169,4 +167,4 @@ Poco::Data::AbstractBinder::Ptr PostgreSQLStatementImpl::binder()
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

@@ -1,0 +1,21 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				include/WebServiceX/ConvertTemperature.h
+			</include>
+			<include-paths>
+				include
+			</include-paths>
+		</files>
+		<output>
+			<mode>client</mode>
+			<namespace>WebServiceX</namespace>
+			<include>include/WebServiceX</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+			<flatIncludes>false</flatIncludes>
+			<timestamps>false</timestamps>
+		</output>
+	</RemoteGen>
+</AppConfig>

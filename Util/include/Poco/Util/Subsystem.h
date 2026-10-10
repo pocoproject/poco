@@ -7,7 +7,7 @@
 //
 // Definition of the Subsystem class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -22,8 +22,7 @@
 #include "Poco/RefCountedObject.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Application;
@@ -51,7 +50,11 @@ public:
 	Subsystem();
 		/// Creates the Subsystem.
 
-	virtual const char* name() const = 0;
+	Subsystem(const Subsystem&) = delete;
+
+	Subsystem& operator = (const Subsystem&) = delete;
+
+	[[nodiscard]] virtual const char* name() const = 0;
 		/// Returns the name of the subsystem.
 		/// Must be implemented by subclasses.
 
@@ -81,18 +84,14 @@ protected:
 		/// the option to a configuration property or specify a callback
 		/// to handle the option.
 
-	virtual ~Subsystem();
+	~Subsystem();
 		/// Destroys the Subsystem.
 
 	friend class Application;
-
-private:
-	Subsystem(const Subsystem&);
-	Subsystem& operator = (const Subsystem&);
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_Subsystem_INCLUDED

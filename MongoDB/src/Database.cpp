@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  Database
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -13,29 +13,36 @@
 
 
 #include "Poco/MongoDB/Database.h"
+#include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/Binary.h"
-#include "Poco/MD5Engine.h"
-#include "Poco/SHA1Engine.h"
-#include "Poco/PBKDF2Engine.h"
-#include "Poco/HMACEngine.h"
 #include "Poco/Base64Decoder.h"
-#include "Poco/MemoryStream.h"
-#include "Poco/StreamCopier.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/DigestEngine.h"
 #include "Poco/Exception.h"
-#include "Poco/RandomStream.h"
-#include "Poco/Random.h"
 #include "Poco/Format.h"
+#include "Poco/HMACEngine.h"
+#include "Poco/MD5Engine.h"
+#include "Poco/MemoryStream.h"
 #include "Poco/NumberParser.h"
-#include <sstream>
+#include "Poco/PBKDF2Engine.h"
+#include "Poco/Random.h"
+#include "Poco/RandomStream.h"
+#include "Poco/SHA1Engine.h"
+#include "Poco/SHA2Engine.h"
+#include "Poco/StreamCopier.h"
+#include <algorithm>
 #include <map>
+#include <sstream>
+#include <utility>
+
+using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
-const std::string Database::AUTH_MONGODB_CR("MONGODB-CR");
 const std::string Database::AUTH_SCRAM_SHA1("SCRAM-SHA-1");
+const std::string Database::AUTH_SCRAM_SHA256("SCRAM-SHA-256");
 
 
 namespace
@@ -43,17 +50,24 @@ namespace
 	std::map<std::string, std::string> parseKeyValueList(const std::string& str)
 	{
 		std::map<std::string, std::string> kvm;
-		std::string::const_iterator it = str.begin();
-		std::string::const_iterator end = str.end();
-		while (it != end)
+		std::string::size_type pos = 0;
+		while (pos < str.size())
 		{
-			std::string k;
-			std::string v;
-			while (it != end && *it != '=') k += *it++;
-			if (it != end) ++it;
-			while (it != end && *it != ',') v += *it++;
-			if (it != end) ++it;
-			kvm[k] = v;
+			// Find key-value separators using find() instead of character-by-character iteration
+			std::string::size_type eqPos = str.find('=', pos);
+			if (eqPos == std::string::npos)
+				break;
+
+			std::string::size_type commaPos = str.find(',', eqPos);
+			if (commaPos == std::string::npos)
+				commaPos = str.length();
+
+			// Extract key and value using substr (single allocation each)
+			std::string key = str.substr(pos, eqPos - pos);
+			std::string value = str.substr(eqPos + 1, commaPos - eqPos - 1);
+
+			kvm[std::move(key)] = std::move(value);
+			pos = commaPos + 1;
 		}
 		return kvm;
 	}
@@ -80,7 +94,7 @@ namespace
 	std::string digestToBinaryString(Poco::DigestEngine& engine)
 	{
 		Poco::DigestEngine::Digest d = engine.digest();
-		return std::string(reinterpret_cast<const char*>(&d[0]), d.size());
+		return { reinterpret_cast<const char*>(&d[0]), d.size() };
 	}
 
 	std::string digestToHexString(Poco::DigestEngine& engine)
@@ -115,7 +129,144 @@ namespace
 		}
 		return digestToHexString(md5);
 	}
-}
+
+	bool isAsciiOnly(const std::string& s) noexcept
+	{
+		return std::all_of(s.begin(), s.end(),
+			[](char c) { return static_cast<unsigned char>(c) <= 0x7F; });
+	}
+
+	template <class HashEngine>
+	bool runScramAuth(
+		Database& db,
+		Connection& connection,
+		const std::string& username,
+		const std::string& password,
+		const std::string& mechanism,
+		bool legacyMongoCrPasswordHash,
+		Poco::UInt32 dkLen)
+	{
+		std::string clientNonce(createNonce());
+		std::string clientFirstMsg = Poco::format("n=%s,r=%s", username, clientNonce);
+
+		Poco::SharedPtr<OpMsgMessage> pCommand = db.createOpMsgMessage("$cmd");
+		pCommand->setCommandName(OpMsgMessage::CMD_SASL_START);
+		pCommand->body()
+			.add<std::string>("mechanism", mechanism)
+			.add<Binary::Ptr>("payload", new Binary(Poco::format("n,,%s", clientFirstMsg)))
+			.add<bool>("autoAuthorize", true);
+
+		OpMsgMessage response;
+		connection.sendRequest(*pCommand, response);
+
+		Int32 conversationId = 0;
+		std::string serverFirstMsg;
+
+		if (!response.responseOk())
+		{
+			return false;
+		}
+		{
+			Document::Ptr pDoc = new Document(response.body());
+			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
+			serverFirstMsg = pPayload->toRawString();
+			conversationId = pDoc->get<Int32>("conversationId");
+		}
+
+		std::map<std::string, std::string> kvm = parseKeyValueList(serverFirstMsg);
+		const std::string serverNonce = kvm["r"];
+		const std::string salt = decodeBase64(kvm["s"]);
+		const unsigned iterations = Poco::NumberParser::parseUnsigned(kvm["i"]);
+
+		// SCRAM-SHA-1 path (MongoDB legacy): hash the credential as MD5 hex
+		//   of "username:mongo:password" before passing to PBKDF2. SCRAM-SHA-256
+		//   uses the password directly (after SASLprep, which is a no-op for
+		//   ASCII input).
+		std::string preprocessedPassword = legacyMongoCrPasswordHash
+			? hashCredentials(username, password)
+			: password;
+
+		Poco::PBKDF2Engine<Poco::HMACEngine<HashEngine>> pbkdf2(salt, iterations, dkLen);
+		pbkdf2.update(preprocessedPassword);
+		std::string saltedPassword = digestToBinaryString(pbkdf2);
+
+		std::string clientFinalNoProof = Poco::format("c=biws,r=%s", serverNonce);
+		std::string authMessage = Poco::format("%s,%s,%s", clientFirstMsg, serverFirstMsg, clientFinalNoProof);
+
+		Poco::HMACEngine<HashEngine> hmacKey(saltedPassword);
+		hmacKey.update(std::string("Client Key"));
+		std::string clientKey = digestToBinaryString(hmacKey);
+
+		HashEngine h;
+		h.update(clientKey);
+		std::string storedKey = digestToBinaryString(h);
+
+		Poco::HMACEngine<HashEngine> hmacSig(storedKey);
+		hmacSig.update(authMessage);
+		std::string clientSignature = digestToBinaryString(hmacSig);
+
+		std::string clientProof(clientKey);
+		for (std::size_t i = 0; i < clientProof.size(); i++)
+		{
+			clientProof[i] ^= clientSignature[i];
+		}
+
+		std::string clientFinal = Poco::format("%s,p=%s", clientFinalNoProof, encodeBase64(clientProof));
+
+		pCommand = db.createOpMsgMessage("$cmd");
+		pCommand->setCommandName(OpMsgMessage::CMD_SASL_CONTINUE);
+		pCommand->body()
+			.add<Poco::Int32>("conversationId", conversationId)
+			.add<Binary::Ptr>("payload", new Binary(clientFinal));
+
+		std::string serverSecondMsg;
+		connection.sendRequest(*pCommand, response);
+
+		if (!response.responseOk())
+		{
+			return false;
+		}
+		{
+			Document::Ptr pDoc = new Document(response.body());
+			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
+			serverSecondMsg = pPayload->toRawString();
+		}
+
+		Poco::HMACEngine<HashEngine> hmacSKey(saltedPassword);
+		hmacSKey.update(std::string("Server Key"));
+		std::string serverKey = digestToBinaryString(hmacSKey);
+
+		Poco::HMACEngine<HashEngine> hmacSSig(serverKey);
+		hmacSSig.update(authMessage);
+		std::string serverSignature = digestToBase64(hmacSSig);
+
+		kvm = parseKeyValueList(serverSecondMsg);
+		std::string serverSignatureReceived = kvm["v"];
+
+		if (serverSignature != serverSignatureReceived)
+			throw Poco::ProtocolException("server signature verification failed");
+
+		pCommand = db.createOpMsgMessage("$cmd");
+		pCommand->setCommandName(OpMsgMessage::CMD_SASL_CONTINUE);
+		pCommand->body()
+			.add<Poco::Int32>("conversationId", conversationId)
+			.add<Binary::Ptr>("payload", new Binary);
+
+		connection.sendRequest(*pCommand, response);
+		return response.responseOk();
+	}
+
+
+	Document::Ptr keysFromIndexedFields(const Database::IndexedFields& indexedFields)
+	{
+		Document::Ptr keys = new Document();
+		for (const auto& [name, ascending]: indexedFields)
+		{
+			keys->add(name, ascending ? 1 : -1);
+		}
+		return keys;
+	}
+} // namespace
 
 
 Database::Database(const std::string& db):
@@ -134,190 +285,56 @@ bool Database::authenticate(Connection& connection, const std::string& username,
 	if (username.empty()) throw Poco::InvalidArgumentException("empty username");
 	if (password.empty()) throw Poco::InvalidArgumentException("empty password");
 
-	if (method == AUTH_MONGODB_CR)
-		return authCR(connection, username, password);
-	else if (method == AUTH_SCRAM_SHA1)
+	if (method == AUTH_SCRAM_SHA1)
 		return authSCRAM(connection, username, password);
+	else if (method == AUTH_SCRAM_SHA256)
+		return authSCRAM256(connection, username, password);
 	else
 		throw Poco::InvalidArgumentException("authentication method", method);
 }
 
 
-bool Database::authCR(Connection& connection, const std::string& username, const std::string& password)
+bool Database::authSCRAM(Connection& connection, const std::string& username, const std::string& password)
 {
-	std::string nonce;
-	Poco::SharedPtr<QueryRequest> pCommand = createCommand();
-	pCommand->selector().add<Poco::Int32>("getnonce", 1);
-
-	ResponseMessage response;
-	connection.sendRequest(*pCommand, response);
-	if (response.documents().size() > 0)
-	{
-		Document::Ptr pDoc = response.documents()[0];
-		if (pDoc->getInteger("ok") != 1) return false;
-		nonce = pDoc->get<std::string>("nonce", "");
-		if (nonce.empty()) throw Poco::ProtocolException("no nonce received");
-	}
-	else throw Poco::ProtocolException("empty response for getnonce");
-
-	std::string credsDigest = hashCredentials(username, password);
-
-	Poco::MD5Engine md5;
-	md5.update(nonce);
-	md5.update(username);
-	md5.update(credsDigest);
-	std::string key = digestToHexString(md5);
-
-	pCommand = createCommand();
-	pCommand->selector()
-		.add<Poco::Int32>("authenticate", 1)
-		.add<std::string>("user", username)
-		.add<std::string>("nonce", nonce)
-		.add<std::string>("key", key);
-
-	connection.sendRequest(*pCommand, response);
-	if (response.documents().size() > 0)
-	{
-		Document::Ptr pDoc = response.documents()[0];
-		return pDoc->getInteger("ok") == 1;
-	}
-	else throw Poco::ProtocolException("empty response for authenticate");
+	constexpr bool kLegacyMongoCrPasswordHash = true;
+	constexpr Poco::UInt32 kSHA1DigestLen = 20;
+	return runScramAuth<Poco::SHA1Engine>(
+		*this, connection, username, password, AUTH_SCRAM_SHA1,
+		kLegacyMongoCrPasswordHash, kSHA1DigestLen);
 }
 
 
-bool Database::authSCRAM(Connection& connection, const std::string& username, const std::string& password)
+bool Database::authSCRAM256(Connection& connection, const std::string& username, const std::string& password)
 {
-	std::string clientNonce(createNonce());
-	std::string clientFirstMsg = Poco::format("n=%s,r=%s", username, clientNonce);
+	if (!isAsciiOnly(password))
+		throw Poco::NotImplementedException(
+			"SCRAM-SHA-256 with non-ASCII passwords requires SASLprep (RFC 4013), "
+			"which is not yet implemented. Use SCRAM-SHA-1 or an ASCII password.");
 
-	Poco::SharedPtr<QueryRequest> pCommand = createCommand();
-	pCommand->selector()
-		.add<Poco::Int32>("saslStart", 1)
-		.add<std::string>("mechanism", AUTH_SCRAM_SHA1)
-		.add<Binary::Ptr>("payload", new Binary(Poco::format("n,,%s", clientFirstMsg)))
-		.add<bool>("authAuthorize", true);
-
-	ResponseMessage response;
-	connection.sendRequest(*pCommand, response);
-
-	Int32 conversationId = 0;
-	std::string serverFirstMsg;
-
-	if (response.documents().size() > 0)
-	{
-		Document::Ptr pDoc = response.documents()[0];
-		if (pDoc->getInteger("ok") == 1)
-		{
-			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
-			serverFirstMsg = pPayload->toRawString();
-			conversationId = pDoc->get<Int32>("conversationId");
-		}
-		else return false;
-	}
-	else throw Poco::ProtocolException("empty response for saslStart");
-
-	std::map<std::string, std::string> kvm = parseKeyValueList(serverFirstMsg);
-	const std::string serverNonce = kvm["r"];
-	const std::string salt = decodeBase64(kvm["s"]);
-	const unsigned iterations = Poco::NumberParser::parseUnsigned(kvm["i"]);
-	const Poco::UInt32 dkLen = 20;
-
-	std::string hashedPassword = hashCredentials(username, password);
-
-	Poco::PBKDF2Engine<Poco::HMACEngine<Poco::SHA1Engine> > pbkdf2(salt, iterations, dkLen);
-	pbkdf2.update(hashedPassword);
-	std::string saltedPassword = digestToBinaryString(pbkdf2);
-
-	std::string clientFinalNoProof = Poco::format("c=biws,r=%s", serverNonce);
-	std::string authMessage = Poco::format("%s,%s,%s", clientFirstMsg, serverFirstMsg, clientFinalNoProof);
-
-	Poco::HMACEngine<Poco::SHA1Engine> hmacKey(saltedPassword);
-	hmacKey.update(std::string("Client Key"));
-	std::string clientKey = digestToBinaryString(hmacKey);
-
-	Poco::SHA1Engine sha1;
-	sha1.update(clientKey);
-	std::string storedKey = digestToBinaryString(sha1);
-
-	Poco::HMACEngine<Poco::SHA1Engine> hmacSig(storedKey);
-	hmacSig.update(authMessage);
-	std::string clientSignature = digestToBinaryString(hmacSig);
-
-	std::string clientProof(clientKey);
-	for (std::size_t i = 0; i < clientProof.size(); i++)
-	{
-		clientProof[i] ^= clientSignature[i];
-	}
-
-	std::string clientFinal = Poco::format("%s,p=%s", clientFinalNoProof, encodeBase64(clientProof));
-
-	pCommand = createCommand();
-	pCommand->selector()
-		.add<Poco::Int32>("saslContinue", 1)
-		.add<Poco::Int32>("conversationId", conversationId)
-		.add<Binary::Ptr>("payload", new Binary(clientFinal));
-
-	std::string serverSecondMsg;
-	connection.sendRequest(*pCommand, response);
-	if (response.documents().size() > 0)
-	{
-		Document::Ptr pDoc = response.documents()[0];
-		if (pDoc->getInteger("ok") == 1)
-		{
-			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
-			serverSecondMsg = pPayload->toRawString();
-		}
-		else return false;
-	}
-	else throw Poco::ProtocolException("empty response for saslContinue");
-
-	Poco::HMACEngine<Poco::SHA1Engine> hmacSKey(saltedPassword);
-	hmacSKey.update(std::string("Server Key"));
-	std::string serverKey = digestToBinaryString(hmacSKey);
-
-	Poco::HMACEngine<Poco::SHA1Engine> hmacSSig(serverKey);
-	hmacSSig.update(authMessage);
-	std::string serverSignature = digestToBase64(hmacSSig);
-
-	kvm = parseKeyValueList(serverSecondMsg);
-	std::string serverSignatureReceived = kvm["v"];
-
-	if (serverSignature != serverSignatureReceived)
-		throw Poco::ProtocolException("server signature verification failed");
-
-	pCommand = createCommand();
-	pCommand->selector()
-		.add<Poco::Int32>("saslContinue", 1)
-		.add<Poco::Int32>("conversationId", conversationId)
-		.add<Binary::Ptr>("payload", new Binary);
-
-	connection.sendRequest(*pCommand, response);
-	if (response.documents().size() > 0)
-	{
-		Document::Ptr pDoc = response.documents()[0];
-		return pDoc->getInteger("ok") == 1;
-	}
-	else throw Poco::ProtocolException("empty response for saslContinue");
+	constexpr bool kLegacyMongoCrPasswordHash = false;
+	constexpr Poco::UInt32 kSHA256DigestLen = 32;
+	return runScramAuth<Poco::SHA2Engine256>(
+		*this, connection, username, password, AUTH_SCRAM_SHA256,
+		kLegacyMongoCrPasswordHash, kSHA256DigestLen);
 }
 
 
 Document::Ptr Database::queryBuildInfo(Connection& connection) const
 {
-	// build info can be issued on "config" system database
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createCommand();
-	request->selector().add("buildInfo", 1);
+	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = createOpMsgMessage();
+	request->setCommandName(OpMsgMessage::CMD_BUILD_INFO);
 
-	Poco::MongoDB::ResponseMessage response;
+	Poco::MongoDB::OpMsgMessage response;
 	connection.sendRequest(*request, response);
 
 	Document::Ptr buildInfo;
-	if ( response.documents().size() > 0 )
+	if (response.responseOk())
 	{
-		buildInfo = response.documents()[0];
+		buildInfo = new Document(response.body());
 	}
 	else
 	{
-		throw Poco::ProtocolException("Didn't get a response from the buildinfo command");
+		throw Poco::ProtocolException("Didn't get a response from the buildInfo command");
 	}
 	return buildInfo;
 }
@@ -325,17 +342,16 @@ Document::Ptr Database::queryBuildInfo(Connection& connection) const
 
 Document::Ptr Database::queryServerHello(Connection& connection) const
 {
-	// hello can be issued on "config" system database
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createCommand();
-	request->selector().add("hello", 1);
+	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = createOpMsgMessage();
+	request->setCommandName(OpMsgMessage::CMD_HELLO);
 
-	Poco::MongoDB::ResponseMessage response;
+	Poco::MongoDB::OpMsgMessage response;
 	connection.sendRequest(*request, response);
 
 	Document::Ptr hello;
-	if ( response.documents().size() > 0 )
+	if (response.responseOk())
 	{
-		hello = response.documents()[0];
+		hello = new Document(response.body());
 	}
 	else
 	{
@@ -347,95 +363,159 @@ Document::Ptr Database::queryServerHello(Connection& connection) const
 
 Int64 Database::count(Connection& connection, const std::string& collectionName) const
 {
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> countRequest = createCountRequest(collectionName);
+	Poco::SharedPtr<OpMsgMessage> request = createOpMsgMessage(collectionName);
+	request->setCommandName(OpMsgMessage::CMD_AGGREGATE);
 
-	Poco::MongoDB::ResponseMessage response;
-	connection.sendRequest(*countRequest, response);
+	Array::Ptr pipeline = new Array();
+	Document::Ptr countStage = new Document();
+	countStage->add("$count"s, "n"s);
+	pipeline->add(countStage);
+	request->body().add("pipeline"s, pipeline);
+	request->body().addNewDocument("cursor"s);
 
-	if (response.documents().size() > 0)
-	{
-		Poco::MongoDB::Document::Ptr doc = response.documents()[0];
-		return doc->getInteger("n");
-	}
-
-	return -1;
-}
-
-
-Poco::MongoDB::Document::Ptr Database::ensureIndex(Connection& connection, const std::string& collection, const std::string& indexName, Poco::MongoDB::Document::Ptr keys, bool unique, bool background, int version, int ttl)
-{
-	Poco::MongoDB::Document::Ptr index = new Poco::MongoDB::Document();
-	index->add("ns", _dbname + "." + collection);
-	index->add("name", indexName);
-	index->add("key", keys);
-
-	if (version > 0)
-	{
-		index->add("version", version);
-	}
-
-	if (unique)
-	{
-		index->add("unique", true);
-	}
-
-	if (background)
-	{
-		index->add("background", true);
-	}
-
-	if (ttl > 0)
-	{
-		index->add("expireAfterSeconds", ttl);
-	}
-
-	Poco::SharedPtr<Poco::MongoDB::InsertRequest> insertRequest = createInsertRequest("system.indexes");
-	insertRequest->documents().push_back(index);
-	connection.sendRequest(*insertRequest);
-
-	return getLastErrorDoc(connection);
-}
-
-
-Document::Ptr Database::getLastErrorDoc(Connection& connection) const
-{
-	Document::Ptr errorDoc;
-
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createCommand();
-	request->setNumberToReturn(1);
-	request->selector().add("getLastError", 1);
-
-	Poco::MongoDB::ResponseMessage response;
+	OpMsgMessage response;
 	connection.sendRequest(*request, response);
 
-	if (response.documents().size() > 0)
+	if (!response.responseOk()) return -1;
+
+	// aggregate returns a cursor; the first batch holds { n: <Int64> }.
+	const auto& body = response.body();
+	Document::Ptr cursor = body.get<Document::Ptr>("cursor", Document::Ptr());
+	if (!cursor) return -1;
+
+	Array::Ptr firstBatch = cursor->get<Array::Ptr>("firstBatch", Array::Ptr());
+	if (!firstBatch || firstBatch->size() == 0) return 0;
+
+	Document::Ptr first = firstBatch->get<Document::Ptr>(0, Document::Ptr());
+	if (!first || !first->exists("n")) return 0;
+	return first->getInteger("n");
+}
+
+
+Poco::MongoDB::Document::Ptr Database::createIndex(
+	Connection& connection,
+	const std::string& collection,
+	const IndexedFields& indexedFields,
+	const std::string &indexName,
+	unsigned long options,
+	int expirationSeconds,
+	int version)
+{
+	return createIndex(connection, collection, indexedFields, indexName,
+		Document::Ptr(), options, expirationSeconds, version);
+}
+
+
+Poco::MongoDB::Document::Ptr Database::createIndex(
+	Connection& connection,
+	const std::string& collection,
+	const IndexedFields& indexedFields,
+	const std::string& indexName,
+	Document::Ptr extraOptions,
+	unsigned long options,
+	int expirationSeconds,
+	int version)
+{
+// https://www.mongodb.com/docs/manual/reference/command/createIndexes/
+
+	MongoDB::Document::Ptr keys = keysFromIndexedFields(indexedFields);
+
+	MongoDB::Document::Ptr index = new MongoDB::Document();
+	index->add("key"s, keys);
+	index->add("ns"s, _dbname + '.' + collection);
+	if (!indexName.empty())
 	{
-		errorDoc = response.documents()[0];
+		index->add("name"s, indexName);
 	}
 
-	return errorDoc;
-}
-
-
-std::string Database::getLastError(Connection& connection) const
-{
-	Document::Ptr errorDoc = getLastErrorDoc(connection);
-	if (!errorDoc.isNull() && errorDoc->isType<std::string>("err"))
-	{
-		return errorDoc->get<std::string>("err");
+	if (options & INDEX_UNIQUE) {
+		index->add("unique"s, true);
+	}
+	if (options & INDEX_SPARSE) {
+		index->add("sparse"s, true);
+	}
+	if (options & INDEX_HIDDEN) {
+		index->add("hidden"s, true);
+	}
+	// INDEX_BACKGROUND is deprecated (MongoDB 4.2 made all index builds online);
+	// the option is left in the enum for source compatibility but is not
+	// forwarded to the server.
+	if (expirationSeconds > 0) {
+		index->add("expireAfterSeconds"s, static_cast<Poco::Int32>(expirationSeconds));
+	}
+	if (version > 0) {
+		index->add("version"s, static_cast<Poco::Int32>(version));
 	}
 
-	return "";
+	if (extraOptions)
+	{
+		std::vector<std::string> names;
+		extraOptions->elementNames(names);
+		for (const auto& name: names)
+		{
+			Element::Ptr element = extraOptions->get(name);
+			if (element) index->addElement(element);
+		}
+	}
+
+	MongoDB::Array::Ptr indexes = new MongoDB::Array();
+	indexes->add(index);
+
+	auto request = createOpMsgMessage(collection);
+	request->setCommandName(OpMsgMessage::CMD_CREATE_INDEXES);
+	request->body().add("indexes", indexes);
+
+	OpMsgMessage response;
+	connection.sendRequest(*request, response);
+
+	MongoDB::Document::Ptr result = new MongoDB::Document(response.body());
+
+	return result;
 }
 
 
-Poco::SharedPtr<Poco::MongoDB::QueryRequest> Database::createCountRequest(const std::string& collectionName) const
+Poco::MongoDB::Document::Ptr Database::dropIndex(
+	Connection& connection,
+	const std::string& collection,
+	const std::string& indexName)
 {
-	Poco::SharedPtr<Poco::MongoDB::QueryRequest> request = createCommand();
-	request->setNumberToReturn(1);
-	request->selector().add("count", collectionName);
-	return request;
+// https://www.mongodb.com/docs/manual/reference/command/dropIndexes/
+
+	auto request = createOpMsgMessage(collection);
+	request->setCommandName(OpMsgMessage::CMD_DROP_INDEXES);
+	request->body().add("index"s, indexName);
+
+	OpMsgMessage response;
+	connection.sendRequest(*request, response);
+
+	return new MongoDB::Document(response.body());
 }
 
 
-} } // namespace Poco::MongoDB
+Poco::MongoDB::Document::Ptr Database::dropIndex(
+	Connection& connection,
+	const std::string& collection,
+	const IndexedFields& indexedFields)
+{
+// https://www.mongodb.com/docs/manual/reference/command/dropIndexes/
+
+	auto request = createOpMsgMessage(collection);
+	request->setCommandName(OpMsgMessage::CMD_DROP_INDEXES);
+	request->body().add("index"s, keysFromIndexedFields(indexedFields));
+
+	OpMsgMessage response;
+	connection.sendRequest(*request, response);
+
+	return new MongoDB::Document(response.body());
+}
+
+
+Poco::MongoDB::Document::Ptr Database::dropAllIndexes(
+	Connection& connection,
+	const std::string& collection)
+{
+	return dropIndex(connection, collection, "*"s);
+}
+
+
+} // namespace Poco::MongoDB

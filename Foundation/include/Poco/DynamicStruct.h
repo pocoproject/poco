@@ -17,8 +17,12 @@
 #ifndef Foundation_DynamicStruct_INCLUDED
 #define Foundation_DynamicStruct_INCLUDED
 
-//@ deprecated
 #include "Poco/Dynamic/Struct.h"
 
+namespace {
+	POCO_DEPRECATED("Deprecated header: include Poco/Dynamic/Struct.h instead")
+	constexpr static int dynamicstruct_hpp_is_deprecated {0xBAD};
+	constexpr static int please_dont_use_badheader_hpp = dynamicstruct_hpp_is_deprecated;
+}
 
 #endif // Foundation_DynamicStruct_INCLUDED

@@ -40,8 +40,7 @@ using Poco::Net::Impl::LocalSocketAddressImpl;
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 struct AFLT
@@ -56,19 +55,6 @@ struct AFLT
 //
 // SocketAddress
 //
-
-
-#if !defined(_MSC_VER) || defined(__STDC__)
-// Go home MSVC, you're drunk...
-// See http://stackoverflow.com/questions/5899857/multiple-definition-error-for-static-const-class-members
-const SocketAddress::Family SocketAddress::IPv4;
-#if defined(POCO_HAVE_IPv6)
-const SocketAddress::Family SocketAddress::IPv6;
-#endif
-#if defined(POCO_HAS_UNIX_SOCKET)
-const SocketAddress::Family SocketAddress::UNIX_LOCAL;
-#endif
-#endif
 
 
 SocketAddress::SocketAddress()
@@ -380,11 +366,13 @@ void SocketAddress::init(const std::string& hostAndPort)
 {
 	poco_assert (!hostAndPort.empty());
 
+#if defined(POCO_HAS_UNIX_SOCKET)
 	if (isUnixLocal(hostAndPort))
 	{
 		newLocal(hostAndPort);
 		return;
 	}
+#endif
 
 	std::string host;
 	std::string port;
@@ -423,7 +411,7 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 #if defined(POCO_VXWORKS)
 		throw ServiceNotFoundException(service);
 #else
-		struct servent* se = getservbyname(service.c_str(), NULL);
+		struct servent* se = getservbyname(service.c_str(), nullptr);
 		if (se)
 			return ntohs(se->s_port);
 		else
@@ -431,6 +419,20 @@ Poco::UInt16 SocketAddress::resolveService(const std::string& service)
 #endif
 	}
 }
+
+
+void SocketAddress::newIPv4(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+	_pImpl = new Poco::Net::Impl::IPv4SocketAddressImpl(hostAddress.addr(), htons(portNumber));
+}
+
+
+#if defined(POCO_HAVE_IPv6)
+void SocketAddress::newIPv6(const IPAddress& hostAddress, Poco::UInt16 portNumber)
+{
+	_pImpl = new Poco::Net::Impl::IPv6SocketAddressImpl(hostAddress.addr(), htons(portNumber), hostAddress.scope());
+}
+#endif // POCO_HAVE_IPv6
 
 
 Poco::BinaryWriter& operator << (Poco::BinaryWriter& writer, const Poco::Net::SocketAddress& value)
@@ -459,6 +461,6 @@ std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& a
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 

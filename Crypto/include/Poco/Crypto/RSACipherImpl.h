@@ -25,8 +25,7 @@
 #include <openssl/evp.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class RSACipherImpl: public Cipher
@@ -46,13 +45,13 @@ public:
 	virtual ~RSACipherImpl();
 		/// Destroys the RSACipherImpl.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the name of the Cipher.
 
-	CryptoTransform::Ptr createEncryptor();
+	[[nodiscard]] CryptoTransform::Ptr createEncryptor();
 		/// Creates an encryptor object.
 
-	CryptoTransform::Ptr createDecryptor();
+	[[nodiscard]] CryptoTransform::Ptr createDecryptor();
 		/// Creates a decryptor object.
 
 private:
@@ -71,7 +70,7 @@ inline const std::string& RSACipherImpl::name() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_RSACipherImpl_INCLUDED

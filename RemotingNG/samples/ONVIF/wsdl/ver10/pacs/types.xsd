@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2010-2019 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this
+document so long as this copyright notice, license and disclaimer are
+retained with all copies of the document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND
+THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE;
+OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS,
+COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE
+FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS
+DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES
+HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES
+WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR
+DISTRIBUTION OF THIS DOCUMENT.
+THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO,
+INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS
+AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN
+CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<xs:schema targetNamespace="http://www.onvif.org/ver10/pacs"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+		   xmlns:pt="http://www.onvif.org/ver10/pacs"
+		   elementFormDefault="qualified"
+		   version="19.12">
+	<!--====== types ======-->
+	<xs:simpleType name="ReferenceToken">
+		<xs:annotation>
+			<xs:documentation>Type used to reference logical and physical entities.
+			Token may be extended by intermediate terminal with adding prefix to make it global unique.
+			The length should be within 36 characters for generating as a local token.
+			See "Remote Token" section in Resource Query specification.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="64"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--===============================-->
+	<xs:complexType name="DataEntity">
+		<xs:annotation>
+			<xs:documentation>General datastructure referenced by a token.
+				Should be used as extension base.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+		</xs:sequence>
+		<xs:attribute name="token" type="pt:ReferenceToken" use="required">
+			<xs:annotation>
+				<xs:documentation>A service-unique identifier of the item.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<!--===============================-->
+	<xs:simpleType name="Name">
+		<xs:annotation>
+			<xs:documentation>Type used for names of logical and physical entities.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="64"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--===============================-->
+	<xs:simpleType name="Description">
+		<xs:annotation>
+			<xs:documentation>Description is optional and the maximum length is device specific.
+				If the length is more than maximum length, it is silently chopped to the maximum length
+				supported by the device/service (which may be 0).
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="1024"/>
+			<xs:minLength value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--===============================-->
+	<xs:simpleType name="PositiveInteger">
+		<xs:annotation>
+			<xs:documentation>Type used to represent the numbers from 1 ,2 , 3,...</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:unsignedInt">
+			<xs:minInclusive value="1"></xs:minInclusive>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--===============================-->
+	<xs:complexType name="Attribute">
+		<xs:annotation>
+			<xs:documentation>
+				Attributes contains a Name and an optional Value and type.
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+		</xs:sequence>
+		<xs:attribute name="Name" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Name of attribute. Key names starting with "ONVIF" (any case) are reserved for ONVIF
+					use.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Value" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Value of attribute</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:anyAttribute processContents="lax"/>
+	</xs:complexType>
+	<!--===============================-->
+	<xs:simpleType name="RecognitionType">
+		<xs:annotation>
+			<xs:documentation>Recognition/identification types supported by ONVIF.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="pt:Card">
+				<xs:annotation>
+					<xs:documentation>A credential number is used for recognition/identification.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pt:PIN">
+				<xs:annotation>
+					<xs:documentation>A PIN code is used for recognition/identification.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pt:Fingerprint">
+				<xs:annotation>
+					<xs:documentation>A fingerprint is used for recognition/identification.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pt:Face">
+				<xs:annotation>
+					<xs:documentation>A face is used for recognition/identification.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pt:Iris">
+				<xs:annotation>
+					<xs:documentation>An iris is used for recognition/identification.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pt:Vein">
+				<xs:annotation>
+					<xs:documentation>A vein is used for recognition/identification.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pt:Palm">
+				<xs:annotation>
+					<xs:documentation>A palm is used for recognition/identification.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pt:Retina">
+				<xs:annotation>
+					<xs:documentation>A retina is used for recognition/identification.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pt:LicensePlate">
+				<xs:annotation>
+					<xs:documentation>A license plate is used for recognition/identification.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pt:REX">
+				<xs:annotation>
+					<xs:documentation>
+						A request-to-exit button is used for anonymous recognition (but not for identification).
+					</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--===============================-->
+	<xs:simpleType name="StringList">
+		<xs:list itemType="xs:string"/>
+	</xs:simpleType>
+</xs:schema>

@@ -185,42 +185,42 @@ typedef UInt32 UL;	/* to save space */
 /* The four SHA sub-rounds */
 #define subRound1(count)    \
 { \
-    temp = S( 5, A ) + f1( B, C, D ) + E + W[ count ] + K1; \
-    E = D; \
-    D = C; \
-    C = S( 30, B ); \
-    B = A; \
-    A = temp; \
+	temp = S( 5, A ) + f1( B, C, D ) + E + W[ count ] + K1; \
+	E = D; \
+	D = C; \
+	C = S( 30, B ); \
+	B = A; \
+	A = temp; \
 }
 
 #define subRound2(count)    \
 { \
-    temp = S( 5, A ) + f2( B, C, D ) + E + W[ count ] + K2; \
-    E = D; \
-    D = C; \
-    C = S( 30, B ); \
-    B = A; \
-    A = temp; \
+	temp = S( 5, A ) + f2( B, C, D ) + E + W[ count ] + K2; \
+	E = D; \
+	D = C; \
+	C = S( 30, B ); \
+	B = A; \
+	A = temp; \
 }
 
 #define subRound3(count)    \
 { \
-    temp = S( 5, A ) + f3( B, C, D ) + E + W[ count ] + K3; \
-    E = D; \
-    D = C; \
-    C = S( 30, B ); \
-    B = A; \
-    A = temp; \
+	temp = S( 5, A ) + f3( B, C, D ) + E + W[ count ] + K3; \
+	E = D; \
+	D = C; \
+	C = S( 30, B ); \
+	B = A; \
+	A = temp; \
 }
 
 #define subRound4(count)    \
 { \
-    temp = S( 5, A ) + f4( B, C, D ) + E + W[ count ] + K4; \
-    E = D; \
-    D = C; \
-    C = S( 30, B ); \
-    B = A; \
-    A = temp; \
+	temp = S( 5, A ) + f4( B, C, D ) + E + W[ count ] + K4; \
+	E = D; \
+	D = C; \
+	C = S( 30, B ); \
+	B = A; \
+	A = temp; \
 }
 
 

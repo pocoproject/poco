@@ -1,6 +1,870 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 2.0.0
+
+!!Summary of Changes
+
+In-class <*static const*> members with constant initialisers are now
+<*static constexpr*>, which removes their out-of-class definitions and the
+exported symbols that went with them. Headers using
+<*std::numeric_limits<>::min()*> / <*max()*> now require that no function-like
+<*min()*> or <*max()*> macro is in scope.
+
+Data/SQLite can now optionally bundle the sqlite-vec vector search extension
+(disabled by default).
+
+RemotingNG (remote objects framework with TCP, HTTP, JSON-RPC, REST and SOAP transports and
+the RemoteGenNG code generator) and CodeGeneration, previously part of macchina.io, are now
+POCO components.
+XSD (XML Schema object model, XML Schema and WSDL parser, the XSDGen code generator and the
+libxml2-based Validator), previously part of macchina.io, is a group of POCO components.
+
+!!Features
+
+  - GH #5440 <*Data/SQLite*>: sqlite-vec vector search extension -- optional bundled
+    <*sqlite-vec*> 0.1.9 with <*vec0*> virtual tables, KNN queries and distance functions,
+    available in every SQLite session including <*MemoryDB*>. Disabled by default; enable
+    with cmake <*ENABLE_DATA_SQLITE_VEC*>, gnu make <*POCO_ENABLE_SQLITE_VEC*> or
+    <*./configure --sqlite-vec*>. (PR #5459)
+  - GH #5447 <*RemotingNG*>, <*CodeGeneration*>: the RemotingNG remote objects framework from
+    macchina.io with the TCP, HTTP, JSON-RPC, REST and SOAP transports and the <*RemoteGenNG*>
+    code generator, and the <*CodeGeneration*> library it builds on. Enable with cmake
+    <*ENABLE_REMOTINGNG*>, <*ENABLE_REMOTINGNG_TCP*>, <*ENABLE_REMOTINGNG_HTTP*>,
+    <*ENABLE_REMOTINGNG_JSONRPC*>, <*ENABLE_REMOTINGNG_REST*>, <*ENABLE_REMOTINGNG_SOAP*>,
+    <*ENABLE_REMOTINGNG_REMOTEGEN*> and <*ENABLE_CODEGENERATION*> (all on by default; off with
+    <*POCO_MINIMAL_BUILD*>).
+  - GH #5450 <*XSD*>: the XML Schema object model, the XML Schema and WSDL parser, the
+    <*XSDGen*> code generator and the libxml2-based <*Validator*> from macchina.io. Enable with
+    cmake <*ENABLE_XSD_TYPES*>, <*ENABLE_XSD_PARSER*>, <*ENABLE_XSD_CODEGEN*> (on by default;
+    off with <*POCO_MINIMAL_BUILD*>) and <*ENABLE_XSD_VALIDATOR*> (off by default, requires
+    libxml2); make components <*XSD/Types*>, <*XSD/Parser*>, <*XSD/CodeGen*>.
+    <*XSD/Validator*> is built with <*make -C XSD/Validator*> and its headers are not installed
+    by <*make install*>.
+
+!!Breaking Changes
+
+  - In-class <*static const*> members with constant initialisers are now <*static constexpr*>.
+    Their out-of-class definitions are gone, which removes 37+ exported symbols from the shipped
+    libraries (Foundation, Net, Util, Data, DataSQLite, MongoDB, XML, CppUnit, Zip, NetSSL and
+    Prometheus) -- for example <*Timespan::SECONDS*>, <*Timestamp::TIMEVAL_MAX*>,
+    <*IPAddress::IPv4*> and <*HTTPMessage::UNKNOWN_CONTENT_LENGTH*>. The change is
+    source-compatible but binary-incompatible; recompile against the new headers. (PR #5453)
+  - <*Poco::Net::ICMPv4PacketImpl::MAX_PACKET_SIZE*> is removed. It shadowed
+    <*ICMPPacketImpl::MAX_PACKET_SIZE*> and was never defined in libPocoNet, so any odr-use of
+    it was a link error. The name now resolves to the inherited member, which has the same
+    value. (PR #5453)
+  - Headers that use <*std::numeric_limits<>::min()*> / <*max()*> no longer tolerate a
+    function-like <*min()*> or <*max()*> macro in scope. POCO's own scattered <*#undef min*> /
+    <*#undef max*> guards are replaced by a single <*POCO_CHECK_MINMAX_MACROS*> check, defined in
+    <*Poco/Foundation.h*>, which reports the cause as a static assertion instead of an opaque
+    preprocessor error. On Windows this means defining <*NOMINMAX*>, or including any POCO header
+    before <windows.h> -- <*Poco/UnWindows.h*>, now the only route to <windows.h> within POCO,
+    does both. Affected headers: <*Poco/Timestamp.h*>, <*Poco/Clock.h*>,
+    <*Poco/NumericString.h*>, <*Poco/Dynamic/VarHolder.h*>, <*Poco/Dynamic/VarIterator.h*>,
+    <*Poco/OrderedSet.h*>, <*Poco/OrderedMap.h*>, <*Poco/Net/SocketProactor.h*>,
+    <*Poco/Data/Constants.h*>, <*Poco/Data/RecordSet.h*>, <*Poco/Data/RowIterator.h*>,
+    <*Poco/MongoDB/ServerDescription.h*> and <*Poco/ActiveRecord/IDTraits.h*>. (PR #5453)
+
+!!Bug Fixes and Improvements
+
+  - GH #5450 <*Poco::XML::SAXParser*>, <*DOMParser*>: when a content handler throws, the events
+    Expat still delivers for the current token (the end tag of an empty element and its namespace
+    undeclarations) are no longer forwarded to the handlers. Since 1.15.4 the exception is stored
+    and the parse is stopped with <*XML_StopParser()*>, so handlers received these events after
+    their own exception.
+
+
+!!!Release 1.15.4
+
+!!Summary of Changes
+
+Security release. Ten security advisories are fixed: host name verification
+disabled by default in SSLManager configurations, OCSP responses accepted from a
+substituted issuer and plaintext fallback in FTPSClientSession (NetSSL),
+redirects into file: and other non-web schemes (Foundation, NetSSL), HTTP
+request framing differences and unbounded buffering of incomplete requests in
+HTTPReactorServer (Net), and parser defects in Zip, SevenZip and JSON.
+
+Bundled expat is updated to 2.8.5, pcre2 to 10.48, SQLite to 3.53.4, 7-Zip
+(LZMA SDK) to 26.02 and pdjson to a current upstream revision. A remotely
+triggerable WebSocket busy-loop and inactive billion laughs protection in
+unbundled builds are also fixed. Also included are OpenSSL build and FIPS
+fixes for Crypto and NetSSL, bug fixes in Foundation, Net, NetSSL, Crypto,
+Data and MongoDB, and two performance improvements.
+
+Behaviour changes: client contexts created from the SSLManager configuration
+verify the host name by default; FTPSClientSession no longer falls back to
+plaintext when the server refuses TLS, unless allowPlaintextFallback() is
+called; HTTP requests with duplicate or conflicting framing headers are
+rejected; URIStreamOpener and HTTPSStreamFactory follow redirects only to
+http and https.
+
+!!Security Fixes
+
+  - GHSA-xmgr-9wvg-r67x NetSSL: SSLManager configuration disabled host name verification for client contexts by default (reported by Dan Birtwhistle)
+  - GHSA-pqw3-rjcp-v354 Foundation, NetSSL: URIStreamOpener and HTTPSStreamFactory followed redirects into file: and other non-web schemes (reported by Dan Birtwhistle)
+  - GHSA-rcrh-846h-22hx SevenZip: path traversal in Archive::extract (reported by Tristan, Talence Security)
+  - GHSA-2pm5-6f5q-c76r Net: HTTPReactorServer buffered incomplete requests without a size limit (reported by EQSTLab, found by 232-323)
+  - GHSA-8gjp-96jp-4wh9 NetSSL: OCSP stapling accepted a response signed by a substituted issuer (reported by Dan Birtwhistle)
+  - GHSA-gjfc-f6f9-rxx6 NetSSL: FTPSClientSession fell back to plaintext when the server refused AUTH TLS and AUTH SSL (reported by Dan Birtwhistle)
+  - GHSA-p4j9-25v2-pp68 Net: header decoding and duplicate headers could change HTTP request framing (reported by Dan Birtwhistle)
+  - GHSA-734q-56c6-xp96 Zip: ZIP64 parsing allowed unbounded allocation and heap over-read (reported by Dan Birtwhistle)
+  - GHSA-7frw-wjhr-x6g8 JSON: comment stripping removed comment delimiters inside strings (reported by tomerbatt)
+  - GHSA-f6vm-f3m6-6v9r JSON: object keys were truncated at an embedded NUL (reported by Dan Birtwhistle)
+  - GH #5489 Upgrade bundled pcre2 to 10.48 (6 CVEs); expat 2.8.5 (CVE-2026-93990) and SQLite 3.53.4 (CVE-2026-11822, CVE-2026-11824) (PR #5492)
+  - GH #5472 Net: WebSocket::receiveFrame() busy-loops forever when the peer closes after a partial frame header (PR #5473)
+  - GH #5470 Billion laughs protection inactive when unbundled; ABI-affecting build options (PR #5471)
+  - GH #5468 Expat 2.8.4 (CVE-2026-66046, CVE-2026-76641, CVE-2026-76956, CVE-2026-76957)
+  - GH #5434 Upgrade bundled expat to 2.8.3 (CVE-2026-72522) (PR #5435)
+  - GH #5432 Upgrade bundled 7zip (LZMA SDK) to 26.02 (PR #5437)
+  - GH #5395 Expat 2.8.2 update (13 CVEs) (PR #5396)
+
+Bundled Third-Party Library Upgrades:
+  - expat 2.8.1 -> 2.8.5 (19 CVEs; see Security Fixes)
+  - pcre2 10.47 -> 10.48 (CVE-2026-89156, CVE-2026-89157, CVE-2026-89158, CVE-2026-89160, CVE-2026-89161, CVE-2026-89162)
+  - SQLite 3.53.1 -> 3.53.4 (CVE-2026-11822, CVE-2026-11824; FTS5 only)
+  - 7zip (LZMA SDK) 26.01 -> 26.02 (bug and vulnerability fixes)
+  - pdjson upstream 78fe04b -> 57eb2c4 (out-of-bounds read after a failed stack push, unterminated tokens after a parse error, byte 0xFF read as end of input)
+
+!!Features, Enhancements and Third Party Updates
+
+  - MongoDB::OpMsgMessage::CMD_PING added (the rest of PR #5404 remains in 2.0)
+  - PR #5390 Net/testsuite: register MessageHeader tests that were never run; cover long header values
+
+!!Performance Improvements
+
+  - MongoDB: Document::addElement() no longer has quadratic cost when large documents and arrays are built (PR #5478)
+  - Foundation: BinaryReader::readRaw() reads in 64 KB chunks instead of byte by byte (PR #5478)
+
+!!Bug Fixes and Improvements
+
+  - GH #5476 MongoDB: ReplicaSetConnection re-sends a failing command indefinitely (PR #5482)
+  - GH #5475 MongoDB: valid server replies larger than 16 MB are rejected (PR #5478)
+  - GH #5466 fix(Net): TCPReactorServerConnection registers no error or shutdown handler (PR #5469)
+  - GH #5415 OpenSSL no_deprecated (PR #5416)
+  - GH #5413 FTPClientSession(socket, readWelcomeMessage=false) sets _serverReady=true without reading welcome reply (PR #5418)
+  - GH #5409 Backtrace not thread safe (PR #5408)
+  - GH #5407 HTTPReactorServer: client abort leaks the connection and hot-spins the reactor (PR #5408, PR #5410)
+  - GH #5393 ProcessRunner heap-use-after-free on failed start (PR #5394)
+  - GH #5383 Poco::Data::Transaction unusable on an auto-commit session (PR #5384)
+  - PR #5491 fix(NetSSL_OpenSSL): built-in DH parameters, stale OpenSSL errors in TLS I/O, verify callback without certificate
+  - PR #5488 fix(Crypto): check the results of the OpenSSL calls in DigestEngine
+  - PR #5484 fix(Foundation): Buffer::clear() on an empty buffer passed a null pointer to memset
+  - PR #5479 fix(Foundation): share TextConverter between copies of BinaryReader and BinaryWriter
+  - PR #5474 fix(CppUnit, Data): warnmsg() must warn instead of fail; execDirectImpl() must throw NotImplementedException
+  - PR #5464 fix(Crypto,NetSSL): restore missing #else in isFIPSEnabled(), add OpenSSL 1.1.1 CI job
+  - PR #5460 fix(NetSSL): FIPS fixes for NetSSL_OpenSSL
+  - PR #5445 fix(Foundation): return value from ScopedLockWithUnlock::tryLock
+  - NetSSL: the OCSP status callback did not handle a missing peer certificate chain
+
+
+!!!Release 1.15.3
+
+!!Summary of Changes
+
+Bug fixes, expat CVE updates in bundled deps, MongoDB 6.0/7.0/8.0
+compatibility, PostgreSQL URI connection strings, and a corrected %c
+date/time format specifier (breaking).
+
+!!Breaking Changes
+
+  - GH #3949 Poco::DateTimeFormatter %c does not format to centisecond but decisecond (PR #5350)
+
+!!API Changes
+
+  - MongoDB::Database::authenticate() default is now SCRAM-SHA-256; pass AUTH_SCRAM_SHA1 for the previous default. ASCII passwords only. (PR #5359)
+  - MongoDB::Database::count() now uses {$count: "n"} aggregation; signature unchanged, accurate on sharded clusters, transaction-safe. (PR #5359)
+  - MongoDB::Database::INDEX_BACKGROUND and MongoDB::OpMsgMessage::CMD_MAP_REDUCE are POCO_DEPRECATED (deprecated server-side in 4.2 and 5.0). (PR #5359)
+  - GH #5322 Circular reference in `Application::loadConfiguration()` -- PropertyFileConfiguration parent parameter is now AbstractConfiguration* (was Ptr); caller owns lifetime. Ptr overloads retained as deprecated. Constructors are now explicit.
+
+!!Security Fixes
+
+  - PR #5351 chore(deps): bundled third-party library updates for 1.15.3
+  - GH #5050 CodeQL: Net: Comparison result is always the same (PR #5349)
+
+Bundled Third-Party Library Upgrades:
+  - expat 2.7.5 -> 2.8.1 (CVE-2026-41080, CVE-2026-45186)
+  - SQLite 3.53.0 -> 3.53.1 (WAL-reset corruption fix)
+  - libpng 1.6.57 -> 1.6.58 (png_get_PLTE regression fix)
+  - 7zip (LZMA SDK) 26.00 -> 26.01
+
+!!Features, Enhancements and Third Party Updates
+
+  - PR #5359 enh(MongoDB): MongoDB 6.0/7.0/8.0 compat -- partial indexes, Decimal128, SCRAM-SHA-256
+  - GH #5354 CppUnit terminate handler (PR #5355)
+  - PR #5346 Support quoted parameters and URI syntax in PostgreSQL connection strings
+  - GH #5344 POCO::JWT issue with OPENSSL_NO_DEPRECATED (PR #5332)
+  - PR #5334 enh(MongoDB): add wire version constants for MongoDB 6.1-8.0
+  - GH #5337 `ProcessRunner` error message format (PR #5338)
+
+!!Bug Fixes and Improvements
+
+  - PR #5358 fix(AbstractEvent): operator-= holds the event mutex across Delegate destructor
+  - PR #5356 [fix] Only allow use atomic when C++20 is properly configured
+  - GH #5352 C++ 20 does not guarantee atomic_flag.test (PR #5353)
+  - GH #5347 PDF does not build with make
+  - GH #5342 Oracle ODBC CI fail (PR #5343)
+  - GH #5340 PropertyFileConfiguration does not persist deletion of last key from included property files (PR #5341)
+  - GH #5330 POCO_UNBUNDLED=ON build fails when ZLIB is a transitive dependency of another found package
+  - GH #5327 UnbufferedStreamBuf::xsgetn silently swallows decoder errors after partial read (regression from #5290)
+  - GH #5324 `Logger::shutdown()` use-after-free
+  - GH #5316 ThreadTest::testTrySleep flaky on macOS, causes segfault
+  - PR #5345 fix(cmake): replace obsolete -s with -Wl,-x on Apple linker
+  - PR #5336 Fix C1021 fatal error when building DataSQLite with POCO_SQLITE_UNBUNDLED on MSVC
+  - PR #5333 fix(Foundation): handle INTERFACE_LIBRARY Pcre2::Pcre2 from CONFIG-mode packages
+  - PR #5318 Fix: DateTimeParser trailing timezone designators & Timezone UTC offset cache invalidation
+
+
+!!!Release 1.15.2
+
+!!Summary of Changes
+
+This release focuses on security hardening and bug fixes. Key changes include
+TLS 1.3 support for NetSSL_Win, building Crypto and NetSSL with
+OPENSSL_NO_DEPRECATED, removal of deprecated non-EVP OpenSSL code (breaking
+change), significant multipart parsing performance improvements, Prometheus
+thread/CPU metrics, GNU Hurd platform support, and numerous bug fixes across
+networking, cryptography, and data handling. All bundled third-party libraries
+have been updated to their latest releases.
+
+!!Breaking Changes
+
+  - GH #4602 OpenSSL: Remove deprecated non EVP code
+
+!!Security Fixes
+
+  - PR #5306 chore(dependencies): refresh bundled third-party libraries
+  - GH #5296 Crypto and NetSSL_OpenSSL should build with OPENSSL_NO_DEPRECATED defined
+  - GH #5278 NetSSL_Win does not support TLS 1.3
+
+Bundled Third-Party Library Upgrades:
+  - libpng 1.6.55 -> 1.6.57 - security fixes
+  - libharu (hpdf) 2.4.5 -> 2.4.6 - security (TTF fixes) + memory alloc / Windows build fixes
+  - SQLite 3.51.2 -> 3.53.0 - WAL-reset database corruption fix, query planner improvements
+  - Quill 11.0.2 -> 11.1.0 - thread-local context fix, nullptr checks, backend poll hooks
+
+!!Features and Enhancements
+
+  - PR #5305 enh(Foundation): auto-disable FastLogger on unsupported platforms
+  - PR #5303 enh: bump macOS deployment target to 15.0 (Sequoia)
+  - PR #5300 chore(PropertyConfigurationFile): use '=' as default separator
+  - PR #5298 Foundation: Fix sign-compare warnings in StreamConverter
+  - PR #5294 Link with atomic library on architectures that need it
+  - GH #5292 enh: reduce binary size growth since 1.14.2
+  - GH #5291 Component Install Support
+  - PR #5286 fix(cmake,DNSSD): build fixes and cmake dependency resolution
+  - GH #5280 Remove WinDriver.cpp files
+  - GH #5275 Prometheus: add memory and thread metrics
+  - GH #5266 PropertyFileConfiguration: add include file capability
+  - GH #5250 Poco::Net::Context::addCertificateAuthority() could include a call to SSL_CTX_load_verify_locations()
+  - GH #4846 NetSSL/Crypto: Replace deprecated OpenSSL features
+
+!!Bug Fixes and Improvements
+
+  - PR #5309 fix(Redis,XML,CppParser): replace dynamic_cast with static_cast for hidden visibility
+  - GH #5308 Net: SocketProactor reports success on TCP write after non-blocking connect refusal
+  - PR #5304 fix(MongoDB): suppress false topology change notifications on heartbeat
+  - PR #5293 Port library to GNU Hurd
+  - GH #5288 Fuzzing Issue in MailMessage
+  - GH #5287 Fuzzing Issue in DateTime
+  - PR #5284 fix(Redis): use shared_ptr for NotificationCenter, harden AsyncNotificationCenter::stop()
+  - PR #5283 fix(ApacheConnector,Foundation): fix compile warnings with GCC 15
+  - GH #5269 Pipe close deadlocks on
+  - PR #5264 fix(Data): Robust date/time parsing in SQLite/PostgreSQL extractor
+  - GH #5263 X509Certificate validFrom method throws exception for timestamps ending with Z
+  - GH #4883 SecureSocketImpl::shutdown() regression since 1.14.0
+  - GH #4772 InvalidCertificateHandler onInvalidCertificate wrong exception
+  - GH #4118 Poco Multipart parsing is 10x slower than its Boost/beat or restinio equivalent
+  - GH #1097 Process::isRunning returns true for defunct tagged process
+
+!!!Release 1.15.1
+
+!!Summary of Changes
+
+This is a bugfix and maintenance release that also introduces a few new features:
+
+PropertyFileConfiguration now supports an `!include` directive for composing
+configuration from multiple files, and preserves the original file layout
+(comments, blank lines, key order) when saving changes.
+
+ProcessRunner gained a PROCESS_KILL_TREE option for terminating entire
+process trees on supported platforms.
+
+clang-cl is now supported as a build compiler on Windows.
+
+LoggingConfigurator can now create fully configured loggers at runtime.
+
+All bundled third-party libraries have been upgraded to their latest releases,
+including security fixes for libexpat, libpng, zlib, and utf8proc.
+
+!!Security Fixes
+
+  - GH #5255 Upgrade bundled libexpat to release 2.7.5
+    - CVE-2026-32776 (NULL function pointer dereference)
+    - CVE-2026-32777 (infinite loop)
+    - CVE-2026-32778 (NULL dereference on OOM retry)
+  - PR #5232 enh(deps): upgrade bundled zlib, utf8proc, double-conversion, and wepoll
+    - zlib inflateCopy() OOB fix
+    - utf8proc out-of-bounds memory access fix
+  - GH #5207 Upgrade bundled dependencies to latest versions
+    - libpng CVE-2026-22801 (heap over-read)
+    - libpng CVE-2026-25646 (heap buffer overflow)
+
+Bundled Third-Party Library Upgrades:
+  - libpng 1.6.53 → 1.6.55
+  - SQLite 3.51.1 → 3.51.2 - deadlock fix, query optimizer bug fixes
+  - zlib 1.3.1 → 1.3.2
+  - utf8proc 2.11.0 → 2.11.3
+  - LZMA SDK 25.01 → 26.00 - format improvements, sparse file TAR fix
+  - double-conversion 3.3.1 → 3.4.0
+  - wepoll 1.5.4 → 1.5.8
+  - cpptrace ~0.6.x → 1.0.4
+  - libexpat 2.7.4 → 2.7.5
+
+!!Features, Enhancements and Third Party Updates
+
+  - GH #5260 Allow creation of loggers with configuration at runtime
+  - GH #5257 Preserve properties file on save
+  - GH #5253 Add `!include` directive support to PropertyFileConfiguration
+  - PR #5233 Extract tessil into dependencies/
+  - PR #5231 Add WinGet instructions to README
+  - PR #5229 feat(CppUnit): add ENABLE_INSTALL_CPPUNIT option to control installation
+  - PR #5219 Extract and upgrade cpptrace to dependencies/
+  - PR #5215 fix(MinGW): update ODBCVER to 0x0350 for SQL_GUID support
+  - GH #5201 ProcessRunner: add PROCESS_KILL_TREE option
+  - GH #5195 clang-cl support
+
+!!Bug Fixes and Improvements
+
+  - PR #5245 fix(ODBC): defensive UTF-16 length handling in makeUTF8 for Informix
+    Note: some ODBC drivers (notably IBM Informix) report unreliable column sizes;
+    string data exceeding maxFieldSize (default 1024 bytes) will be truncated.
+    Use session.setProperty("maxFieldSize", Poco::Any(8192)) to increase the limit.
+  - GH #5237 Constify X509* usage where needed and use ASN1_STRING accessors
+  - GH #5236 ServerApplication: Windows SCM does not forward ImagePath arguments to ServiceMain
+  - GH #5228 deadlock when app exit if AsyncChannel is used in the logging system
+  - PR #5227 fix(Net): reactor-based HTTP server not responding to requests with body
+  - GH #5225 Building Data samples fails with CMake - SQLite support disabled but still required
+  - GH #5220 Poco::Data::Statement should not be in ST_DONE state after addBinding() call
+  - GH #5217 RedisStreamBuf: SIGSEGV when socket dies during std::getline()
+  - GH #5213 NotificationQueue::wakeUpAll() lost-wakeup race causes deadlock on shutdown
+  - GH #5210 File::getExecutablePath() returns directory instead of executable
+  - PR #5204 fix(MongoDB): Add timeout support and harden replica set connections
+  - GH #5200 1.15.0: linker errors with MSVC link-time-code-generation
+  - GH #5199 ProcessRunner::stop() termination signal lost on Windows due to NamedEvent race
+  - GH #5198 ServerApplication::hasConsole() returns false when stdout is closed (Windows)
+  - GH #5196 1.15.0 CMake build failure with -DENABLE_PDF:BOOL=FALSE
+  - GH #5176 Build error when cross-compiling for Win32 from Debian12
+  - GH #5157 Accessing array with JSONConfiguration
+
+!!!Release 1.15.0
+
+!!Summary of Changes
+
+This is a major feature release with C++20 as the default standard, comprehensive
+MongoDB replica set support, a new reactor-based HTTP server implementation, ULID
+support, C++17 modernization of core classes, and significant third-party library
+upgrades.
+
+Poco::MongoDB:
+  - Full replica set support: automatic server discovery, topology monitoring, failover
+    handling, read preference-based server selection, connection pooling, and URI parsing.
+  - Note: Legacy wire protocol (pre-MongoDB 5.1) has been removed. Use OP_MSG-based
+    interface for all MongoDB operations.
+
+Poco::Net:
+  - New reactor-based HTTP server implementation (HTTPReactorServer) for high-performance
+    scenarios using the SocketReactor pattern instead of thread-per-connection model.
+  - HTTP cookies updated to RFC 6265 specification.
+
+Poco::Redis:
+  - Event notifications support for pub/sub integration.
+
+Poco::Foundation:
+  - ULID (Universally Unique Lexicographically Sortable Identifier) support with
+    ULIDGenerator class, similar to existing UUID support.
+  - C++17 modernization of Tuple, TypeList, ScopedLock and other core classes with
+    significant code reduction. Full backward API compatibility maintained.
+  - New AsyncNotificationCenter for asynchronous notification dispatch with auto-configured
+    worker threads.
+  - FastLogger (Quill wrapper, fully compatible with Poco Logging system)
+  - Single/Multiple Producer, Single Consumer lock-free notification queues.
+  - DataNotification class for carrying typed payloads in notifications.
+  - NativeThreadInfo support for including native thread ID and name in log messages.
+  - Thread interrupt feature added for cooperative thread cancellation.
+  - LogFileImpl::createFile() now creates parent directories if they don't exist.
+  - Poco::format() now supports %g and %G format specifiers like printf().
+  - Windows: Missing DLL names now reported in SharedLibrary load errors.
+  - Poco::Observer is now deprecated; use Poco::NObserver instead.
+
+Poco::NetSSL_Win:
+  - Find certificates from Windows store using SHA-1 thumbprint for easier certificate
+    selection in enterprise environments.
+
+Poco::Data:
+  - PostgreSQL: UUID field type (UUIDOID) now correctly mapped to Poco::UUID instead
+    of BLOB, enabling direct UUID value extraction from RecordSet.
+  - ODBC: Improved Oracle database integer type handling.
+  - ODBC: Fixed UUID handling in Preparator for SQL Server.
+
+Build System:
+  - C++20 is now the default standard (use POCO_ENABLE_CPP20 CMake option).
+  - C++20 modules support added (ENABLE_MODULES). Modules match namespace names
+    (Poco.Foundation, Poco.Net, etc.) with a unified Poco module for importing all.
+  - External dependencies reorganised into separate 'dependencies' subdirectory.
+  - New POCO_UNBUNDLED_SQLITE option for fine-grained unbundled control.
+  - New POCO_MINIMAL_BUILD option builds only the libraries explicitly enabled via
+    ENABLE_* options, useful for reducing build times and binary size.
+  - CMake uninstall target renamed to 'uninstall-poco' to avoid conflicts.
+
+Bundled Third-Party Library Upgrades:
+  - expat 2.7.1 → 2.7.4 - fixes CVE-2026-24515 (NULL pointer dereference), CVE-2026-25210 (integer overflow),
+    CVE-2025-59375 (DoS via memory allocation), CVE-2024-8176 (stack overflow)
+  - PCRE2 10.44 → 10.47 - skips 10.45 which had CVE-2025-58050 (heap-buffer-overflow)
+  - SQLite 3.49.1 → 3.51.1 - fixes CVE-2025-6965 (memory corruption)
+  - libpng 1.6.43 → 1.6.53 - fixes CVE-2025-64720, CVE-2025-65018 (buffer overflows), 5 security fixes total
+  - libharu 2.3.0RC2 → 2.4.5 (first stable release since RC)
+  - utf8proc 2.9.0 → 2.11.0 - adds Unicode 16 and 17 support
+  - LZMA SDK 9.22 → 25.01 (major upgrade from 2011 version)
+  - Quill 11.0.2 (new)
+
+!!Breaking Changes and Migration Notes
+
+  - GH #5030 Foundation: DateTimeParser rejects trailing garbage. Review any code that
+    relies on specific parsing behavior for non-standard date/time formats.
+  - GH #4844 AbstractConfiguration::createView() and createLocalView() return
+    AbstractConfiguration::Ptr (AutoPtr) since version 1.11. Code that assigns the
+    return value to a raw pointer (AbstractConfiguration*) will compile but cause
+    use-after-free crashes. Always use AbstractConfiguration::Ptr or auto for the
+    return value.
+  - GH #4781 Poco::MongoDB legacy wire protocol (OP_INSERT, OP_UPDATE, OP_DELETE,
+    OP_QUERY, OP_GET_MORE) has been removed. These were deprecated in MongoDB 5.0
+    and removed in MongoDB 5.1. All code must use the OP_MSG-based interface
+    (OpMsgMessage, OpMsgCursor). MongoDB 3.6+ is required.
+  - GH #4460 Remove VS projects from release. Use CMake to generate Visual Studio
+    solutions.
+  - GH #3739 Drop support for OpenSSL < 1.1.1. Systems with older OpenSSL versions
+    must upgrade before using this release.
+
+!!Security Fixes
+
+  - GH #5177 Upgrade bundled expat to 2.7.4 [fixes CVE-2026-24515, CVE-2026-25210]
+  - PR #5096 enh(deps): Upgrade bundled SQLite from 3.49.1 to 3.51.1
+  - PR #5093 enh(PDF): Upgrade bundled libpng from 1.6.43 to 1.6.53 (security fixes)
+  - GH #5028 Upgrade bundled libexpat to 2.7.3 [fixes CVE]
+  - GH #4912 Upgrade bundled PCRE2 to 10.47
+  - GH #4623 Poco::Zip library now checks archive consistency before extracting to
+    prevent path traversal and zip bomb attacks
+
+!!Features
+
+  - GH #5163 Foundation: Add demangleDot function for type name formatting
+  - GH #5162 Add IOLock
+  - GH #5134 Lock-free queues
+  - GH #5133 Add Channel::log(message&&)
+  - GH #5132 Make SpinlockMutex adaptive
+  - PR #5129 Foundation: Add ULID support
+  - GH #5083 CppUnit: Improve test name display and selection
+  - PR #5081 Foundation: Add benchmark infrastructure and FastLogger
+  - GH #5069 Missing DLLs not reported on Windows
+  - PR #5068 MongoDB: Add replica set support with automatic failover
+  - GH #5060 Auto-configure AsyncNotificationCenter number of workers
+  - GH #5058 Add event notifications to Redis
+  - GH #5047 Foundation: Add DataNotification for typed payload
+  - PR #4999 Modules: Add C++20 modules component
+  - PR #4946 Net: Add reactor-based HTTP server
+  - GH #4932 Windows: Better Poco::Environment::osDisplayName
+  - GH #4851 Foundation: AsyncNotificationCenter should dispatch asynchronously
+  - GH #4731 Foundation: Allow specifying SharedLibrary flags in ClassLoader
+  - GH #4518 Net: Update HTTP cookies to RFC 6265
+  - GH #3333 Foundation: Add NativeThreadInfo and blend in Message
+
+!!Enhancements and Third-Party Updates
+
+  - PR #5186 Foundation: Proper implementation of File::getExecutablePath
+  - GH #5178 XML: Use vanilla Expat sources instead of POCO-patched version
+  - PR #5166 Update readme with Windows and Arch Linux instructions
+  - PR #5154 MongoDB: Document performance header cleanup
+  - PR #5153 Util: Modernize Poco::Util and clean up code duplications
+  - GH #5150 Net: SocketReactor socket removal
+  - PR #5149 Build: Add unit testing build to oss-fuzz build script
+  - GH #5146 CMake: Use platform-specific cppignore files
+  - GH #5144 ODBC: Add nix shells for mssql and oracle
+  - PR #5136 Data: C++17 modernization of TypeHandler with variadic templates
+  - PR #5130 fix: Resolve compiler warnings and fix potential bugs
+  - PR #5119 Util: Add [[nodiscard]] to createView/createLocalView
+  - GH #5115 Data/SQLite: Remove redundant error messages
+  - PR #5103 fix: Resolve compiler warnings across multiple modules
+  - PR #5100 fix(Net): Use MessageHeader::quote() for boundary in HTMLForm
+  - PR #5099 enh(expat): Add patch system for POCO-specific xmlparse modifications
+  - PR #5098 enh(deps): Upgrade bundled libharu from 2.3.0RC2 to 2.4.5
+  - PR #5097 enh(deps): Upgrade bundled utf8proc from 2.9.0 to 2.11.0
+  - PR #5094 enh(SevenZip): Upgrade bundled LZMA SDK from 9.22 to 25.01
+  - PR #5092 fix: Resolve compiler warnings in Net, Zip, and Foundation modules
+  - PR #5086 Foundation: Simplify Tuple, TypeList, FunctionPriorityDelegate and other with C++17
+  - GH #5084 Add C++20 support and make it default
+  - GH #5078 Foundation: Improve logging system performance
+  - GH #5033 Build: Improve Linux debug build flags
+  - PR #5031 enh(MongoDB): Improve stability of the OpMsgCursor
+  - PR #5029 JSON: Eliminate extra copies in Object
+  - PR #5023 Find certificate from Windows store using its thumbprint
+  - PR #5013 CMake minimal build and dependencies
+  - PR #5005 enh(ScopedLock): Add std::adopt_lock, try_to_lock, defer_lock support
+  - GH #5002 Data/ODBC: Oracle integer types fail with v23 driver
+  - PR #4995 Foundation: Add deprecation reasons to APIs
+  - PR #4993 Enable Avahi support on FreeBSD
+  - PR #4991 Enable building Poco::Trace on FreeBSD
+  - PR #4990 Teach FindApache2.cmake to locate Apache on FreeBSD
+  - PR #4987 Poco Zip: link ZLIB::ZLIB when unbundled
+  - PR #4983 New SQLite Only Unbundled Option
+  - PR #4972 Add ENABLE_CPPUNIT to enable CppUnit without building the tests
+  - PR #4971 enh(CMake): FindOpenSSL.cmake with modifications for ARM Windows
+  - GH #4962 Add `bool Application::exists()`
+  - GH #4958 Poco::Observer is obsolete in favour of Poco::NObserver
+  - PR #4956 enh(cmake): Add option POCO_ENABLE_CPP20
+  - PR #4942 fix(Thread): fix Thread reuse error, add thread interrupt feature
+  - PR #4879 CMake: Include pcre2 source files to unbundled build based on pcre2 library type
+  - PR #4867 enh(Foundation): modernised header files (override, using, nullptr, ...)
+  - PR #4841 enh(Poco::Dynamic): Modernised code to use C++17 features
+  - GH #4789 Build: Provide zlib as shared dependency for Foundation and PDF
+  - GH #4651 Incorporate wdx_ziptype changes (fix for Poco::Zlib: Unexpected exceptions)
+  - GH #4348 0 (or NULL) for null pointer shall be replaced with nullptr
+  - GH #4202 Foundation: LogFileImpl::createFile() fails if path does not exist
+  - GH #2731 Poco::format() supports %g and %G format specifiers
+
+!!Bug Fixes
+
+  - GH #5191 Process/Win: Fix PROCESS_CLOSE_STD* flags closing parent's handles
+    instead of child's
+  - GH #5187 Foundation: Use setenv instead of putenv in Environment
+  - PR #5183 MongoDB: Fix Document::toString() to produce valid JSON by quoting
+    all string-like values
+  - GH #5182 Data: SQLChannel does not create directory for absolute paths
+  - GH #5180 Foundation: Fix ProcessRunner::start() to handle Windows executables
+    without .exe extension
+  - GH #5175 Foundation: Fix format specifiers in DateTimeFormatter and
+    PatternFormatter
+  - GH #5174 Foundation: Fix bad casing in include
+  - GH #5172 Foundation: Fix DateTimeParser tests with day 0
+  - GH #5168 Foundation: Lock-Order-Inversion Deadlock in NObserver/Observer
+  - PR #5165 fix(Foundation): VS2022 clang-cl compatibility
+  - GH #5161 Pipe is not thread-safe
+  - GH #5159 Lock-order-inversion deadlock in NotificationCenter
+  - GH #5158 Foundation: Change lock type to ScopedWriteLock in NotificationCenter
+  - GH #5147 Net: Fix TSAN warnings in SocketImpl
+  - GH #5142 VarHolderImpl: Implement isDate/isTime diagnostics
+  - PR #5140 Data: Refactor ODBC tests and fix testReconnect TypeInfo caching
+  - PR #5137 fix(Foundation): Replace timing-dependent tests with condition-based waiting
+  - GH #5131 Build: Fix PCRE compile with clang/c++20 and GNU make
+  - PR #5114 fix(Foundation): Fix deadlock in NotificationCenter removeObserver
+  - PR #5107 fix(Zip): Improve parsing of non-standard ZIP archives
+  - GH #5090 UBSan: Integer overflow errors in VarHolder.h
+  - GH #5087 Net: Fix dll attribute position in pocoNetworkInitializer to support
+    MinGW-GCC/Clang
+  - GH #5085 CMake build not stripping release binaries
+  - GH #5083 CppUnit: Improve test name display and selection
+  - GH #5070 CMake does not produce proper binary names
+  - GH #5064 Net: Build fails when POCO_HAS_UNIX_SOCKET is not defined
+  - GH #5059 Foundation: AsyncNotificationCenter hangs on stop()
+  - GH #5055 Make Socket::select() deprecation conditional
+  - GH #5054 Foundation: ProcessRunner termination detection unreliable
+  - GH #5048 Adapt makefiles for external dependencies
+  - GH #5044 Build: Missing bundled dependencies
+  - PR #5038 Prevent hostname being replaced with IP during handshake
+  - GH #5032 HTTPChunkedInputStream does not raise an error when stream ends prematurely
+  - GH #5025 PostgreSQL reconnect() doesn't restore session state correctly
+  - PR #5020 Poco::Path("C:") throws if path is disk-letter only
+  - GH #5018 Data/ODBC: Wrong UUID handling in Preparator
+  - GH #5017 Poco::Data ODBC recordset is reading previous row value
+  - GH #5011 Foundation: File crashes with Windows long path prefix (\\?\)
+  - GH #5010 Build failure with ODBC due to PREFIX macro conflict
+  - GH #5004 Bugcheck::poco_unexpected trailing semicolon
+  - PR #4994 chore(CI): Fix installation of Microsoft ODBC connector
+  - PR #4992 Fix building of FileStreamTest.cpp on FreeBSD
+  - PR #4986 Fix Thread_POSIX not compiling with Emscripten
+  - GH #4980 Zip component build error with CMake + POCO_UNBUNDLED
+  - GH #4978 ODBC MSSQL bulk insert UNIQUEIDENTIFIER type does not work
+  - GH #4977 Possible flaky tests when building for nixpkgs
+  - GH #4976 Net: SocketReactor dispatches ErrorNotification to all observers
+  - GH #4973 MSVC 2017 Build error: Cannot open include file 'version'
+  - GH #4970 Net: Deadlock in SocketReactor when removing handler from callback
+  - GH #4969 MongoDB::Database::authSCRAM() fails due to protocol typographic error
+  - PR #4966 Foundation: Resolve Poco::format ambiguity with std::format in C++23
+  - GH #4949 Foundation: TaskManager memory leak
+  - GH #4947 Build: ENABLE_SEVENZIP and ENABLE_ZIP still require ENABLE_XML
+  - GH #4924 Data/PostgreSQL: RecordSet does not recognize UUID field
+  - GH #4908 CI: UBSan errors in GitHub CI
+  - GH #4900 Data/ODBC: Binder hides AbstractBinder::bind()
+  - GH #4881 Conflicting 'uninstall' targets with CMake
+  - GH #4877 NetSSL: Context throws on unimplemented DH group
+  - GH #4871 CMake: static build with POCO_UNBUNDLED fails with static external pcre2
+  - GH #4870 Foundation: Incorrect bitwise check for newline mode in RegularExpression
+  - GH #4854 Poco::Data::Session constructor freezes when opening non-SQLite file
+  - GH #4848 Foundation: FileChannel purge race condition with compression (#2439)
+  - GH #4801 publish_release.yml should also update documentation website
+  - GH #4800 QA: packages-qa.yml should check result of mkdoc job
+  - GH #4756 Net: WebSocket sendFrame delay due to missing TCP_NODELAY
+  - GH #4639 Cannot run Crypto sample code
+  - GH #4627 Loading passphrase-protected key should not prompt cin
+  - GH #4549 ClassLoader crash when DLL and EXE use different runtime library
+  - GH #4537 Net: Socket::available causes connection reset on Windows UDP sockets
+  - GH #4439 Enable CodeQL fail if error found
+  - GH #4358 Reorganise source code of external libraries
+  - GH #4122 Util: ServerApplication compile error with C++20
+  - GH #3907 NetSSL_Win certificate verification failure with intermediate certificates
+  - GH #3694 Poco::Zip::Compress::addFile with MemoryInputStream broken since 1.12.0
+
+
+!!!Release 1.14.2
+
+!!Summary of Changes
+
+This is a bugfix release.
+
+!!Breaking Changes
+
+  - GH #4906 NetSSL_OpenSSL: non-blocking functions return value
+
+!!Security Fixes
+
+  - GH #4899 Upgrade bundled libexpat to 2.7.1 [fixes CVE]
+  - GH #4926 Crash in Poco::Net::NTLMCredentials::parseChallengeMessage
+
+!!Features, Enhancements and Third Party Updates
+
+  - GH #4892 TCPServer continues to accept connections after stop()
+  - GH #4911 Upgrade bundled libexpat to 2.7.1
+  - GH #4907 Upgrade bundled SQLite to 3.49.1
+  - GH #4905 XML fuzzing memory leak
+  - PR #4937 CMake: make utf8proc, PCRE2, zlib and expat private dependencies
+
+!!Bug Fixes and Improvements
+
+  - GH #4923 Poco::Data::SessionPool::dead() must check idle, not active, sessions
+  - GH #4886 Poco::Dynamic::Var conversion to floating point does not handle precision checks correctly for negative numbers.
+  - GH #4884 WebSocket receiveFrame() keeps returning the same frame when no payload (flags/header only)
+  - GH #4875 prebuild does not work as intended
+  - GH #4935 HTTP server/client request body RFC compliance
+  - GH #4930 Poco::Net::PollSet.cpp:188 compare between int and size_t is not correct.
+  - GH #4920 Adapt to avoid Clang warning deprecated-enum-enum-conversion
+  - GH #4915 [BUG] A SEGV at `Net/src/MultipartReader.cpp:164:1`
+  - PR #4933 Windows: report strings for all PROCESSOR_ARCHITECTURE_* constants in osArchitectureImpl()
+  - PR #4896 fix(TCPServer): continues to accept connections after stop()
+
+
+!!!Release 1.14.1
+
+!!Summary of Changes
+
+This is a bugfix release.
+
+!!Features, Enhancements and Third Party Updates
+
+  - GH #4833 Add start() method to the SocketReactor
+  - GH #4825 Poco::Net::HTTPResponse: add replaceCookie() and removeCookie()
+
+!!Bug Fixes and Improvements
+
+  - GH #4866 Poco::icompare(str, pos, ptr) out of bounds error if pos > str.size()
+  - GH #4864 OpenSSL: Need to add openssl/applink.c to Windows executables using OpenSSL
+  - GH #4859 Poco::NumberParser::tryParseHex raise Poco::SyntaxException exception.
+  - GH #4852 Issue concerning Net/CMakeLists.txt detection of HAVE_SENDFILE
+  - GH #4850 WebSocket: non-blocking receiveFrame()/receiveBytes() with TLS connection may get stuck receiving header
+  - GH #4840 latest 1.14.0 release fails to build on armv7hl
+  - GH #4832 Missing parameter for enabling FTS5
+  - GH #4831 httpS server seems to not work in v1.14
+  - GH #4828 POCO_HAVE_CXXABI_H does not check for existence of header file
+  - GH #4817 Windows Static Build Problem / Changed behaviour of POCO_MT (CMake 3.15)
+  - GH #4806 Poco 1.14.0 now requires libatomic
+  - GH #4798 PocoFoundationConfig.cmake is missing Utf8Proc dependency
+  - GH #3304 Windows Eventviewer not able to find PocoFoundation DLL
+  - PR #4865 Fix openssl cmake applink
+  - PR #4863 Fix StreamSocket::sendFile()
+  - PR #4862 fix(cmake): Add back missing compiler definitions for static_build in the generated CMake files
+  - PR #4845 fix(Net) Use of Uninitialized value in NTLMCredentials::parseChallengeMessage
+  - PR #4838 fix(Net) bad mask with odd number of bytes
+  - PR #4836 Fix typo that leads to the use of freed memory
+  - PR #4834 Missing parameter for enabling FTS5
+  - PR #4822 MongoDB: use constants instead of typed enum in OpMsgMessage
+  - PR #4818 Modifications of Poco::Any in an attempt to fix OSS Fuzz report
+  - PR #4849 fix(templates): Corrected explicit template instantiations
+  - PR #4811 fix(cmake): remove libatomic dependency
+  - PR #4805 fix(cmake): correct typo AVHAI -> AVAHI
+  - PR #4803 Updated CMake to also include the generated pocomessage.rc File
+
+
+!!!Release 1.14.0
+
+!!Summary of Changes
+
+This release marks many functions and classes as deprecated with C++ [[deprecated]]
+attribute. Warnings can be silenced by defining POCO_SILENCE_DEPRECATED.
+
+Deprecated functionality will be removed in one of the next releases.
+
+Minimal supported standard is C++17 since version 1.13. Decent part of the
+source code is modernised in this release.
+
+Bundled software libraries are updated to latest versions:
+
+  - zlib 1.3.1
+  - expat 2.6.4
+  - pcre2 10.44
+  - libpng 1.6.43
+  - SQLite 3.47.1
+
+Poco::Foundation:
+
+  - Support for Version 6 and Version 7 UUIDs
+
+Poco::MongoDB:
+
+  - Obsolete wire-protocol (pre 3.6) that was removed from MongoDB in version 5.1
+    is obsolete in this version of Poco. It will be removed in one of next versions. Update code to use
+    OpMsg-based interface.
+
+Poco::Data:
+
+  - Full Nullable support (including bulk inserts)
+  - ODBC SQL Server big strings support
+
+
+!!Breaking Changes
+
+  - GH #4426 Mark deprecated code for removal
+
+!!Security Fixes
+
+  - GH #4760 Upgrade libexpat to release 2.6.4
+  - GH #4690 Net: stack-buffer-overflow if HTTP request contains a header with invalid UTF32 sequence
+  - GH #4687 Net::MailMessage: Double free if Content-Disposition header is empty
+  - GH #4629 XML: fuzzing stack overflow
+  - GH #4123 DoS vulnerability in XML/src/xmlparse.cpp
+  - GH #4478 Upgrade bundled PCRE2 to 10.44
+  - PR #4677 libpng version 1.6.43
+
+!!Features, Enhancements and Third Party Updates
+
+  - PR #4787 NetSSL_OpenSSL and NetSSL_Win: non-blocking support, shutdown behavior fix
+  - PR #4681 zlib: Version 1.3.1 in module PDF (#4582)
+  - PR #4788 Update bundled SQLite to version 3.47.1 (released 2024-11-25)
+  - GH #4669 Upgrade JSON parser
+  - GH #4580 Poco::UUID/UUIDGenerator: add support for Version 6 and Version 7 UUIDs
+  - PR #4724 Hide zlib and expat libs from the user of Poco libraries (replaces #4579)
+  - GH #4766 ProcessRunner sync
+  - GH #4750 DBLogger sample
+  - GH #4712 Error code for pthread_mutex_lock failure
+  - GH #4710 UTF8::normalize()
+  - GH #4680 Poco::Path::forDirectory("C:") throws if the path is disk-letter only
+  - GH #4556 Overriding SocketReactor::run() is not reasonably possible
+  - GH #4553 Poco::Logger can not output __FILE__ and __LINE__
+  - GH #4544 The load balancing issue in Poco::ActiveThreadPool
+  - GH #4502 Optional and Nullable Improvements
+  - GH #4431 Consolidate LogFile implementation to use FileOutputStream
+  - GH #4423 `Dynamic::Var` silently loses precision on int->float conversion
+  - GH #4230 Poco::Data fixes and improvements
+  - GH #3997 operator<<() for SocketAddress doesn't work with ADL
+  - GH #3801 ODBC: DataFormatException getting Time value from SQL Server
+  - GH #3656 Parse json into specified descendant class
+  - GH #2808 Failed to insert Poco::Nullable< Poco::Data::Date> data into MSSQL using ODBC
+  - GH #1540 Poco::DateTime uses assertions for validation
+  - GH #4769 pocoNetworkInitializer - change fixed path (Windows Platform related)
+  - GH #4716 Logging: JSONFormatter
+  - GH #4692 Stacktrace
+  - GH #4643 `ServerApplication` callbacks
+  - GH #4632 Add `prebuild` action to make build
+  - GH #4630 Make `Util::Application::getApplicationPath()` and `findAppConfigFile()` protected
+  - GH #4559 ServerApplication has no pidfile option on windows
+  - GH #4536 Serializable Isolation level for SQLite Databases
+  - GH #4529 SQLChannel stops logging on LoggingSubsystem shutdown
+  - GH #4493 PocoDoc: search support
+  - GH #4447 Add checkers for Any holding nullptr
+  - GH #4414 Improve NotificationCenter speed and usability
+  - GH #4413 StreamCopier range support
+  - GH #4409 Add string_view format type spec
+  - GH #4365 `Poco::Data::Statement`: unified '?' placeholder support
+  - GH #4341 1.12.4 version Json set enum value failed
+  - GH #4324 Poco:Data::ODBC - MSSQL (n)varchar(max) length issue
+  - GH #4001 Insert NULL using BULK
+  - GH #3281 DTLS 1.2 support
+  - PR #4777 enh(ODBC): ODBC: DataFormatException getting Time value from SQL Serv…
+  - PR #4774 Non-blocking sockets support (TLS, WebSocket)
+  - PR #4770 feat(WindowsBuild): customizable path to include for pocoNetworkInitializer #4769
+  - PR #4755 Insert NULL using BULK #4001
+  - PR #4748 Activity now sets _running flag to false when it finishes or throws.
+  - PR #4721 fix(Data::ODBC): use connection and login timeouts in ODBC session implementation
+  - PR #4714 Add missing relational operators to VarIterator
+  - PR #4699 Apply patches from Debian packaging
+  - PR #4693 Serializable Isolation level for SQLite Databases
+  - PR #4663 Fixed incorrect SSL_CTX_set0_tmp_dh_pkey() usage
+  - PR #4624 enh(Poco::ActiveThreadPool): make it easy to use correctly
+  - PR #4621 enh(FileStream): Add FileStreamBuf::resizeBuffer
+  - PR #4617 enh(CI): Add unbundled build on Linux.
+  - PR #4616 Cppunit and data test enhancements
+  - PR #4569 Allow ADL for swapping Optional values
+  - PR #4563 enh(MongoDB): Document::get returns value by const reference
+  - PR #3040 HTTPS proxy support
+  - PR #4734 File lock
+  - PR #4424 Allow using Poco::FileStream to wrap arbitrary file handles/descriptors as C++ streams
+  - PR #4685 CMake: Remove possibility to build with internal OpenSSL
+
+!!Bug Fixes and Improvements
+
+  - GH #4773 Non-blocking sockets support (TLS, WebSocket)
+  - GH #4768 Data:  warning: 'isNull' overrides a member function but is not marked 'override'
+  - GH #4742 Poco does not build on AIX
+  - GH #4722 libcxx: error: implicit instantiation of undefined template 'std::char_traits<unsigned char>'
+  - GH #4713 replaceInPlace std::wstring
+  - GH #4711 Poco::Placeholder initialization uses wrong size
+  - GH #4703 File Channel Logs in UTC Despite ‘times = local’
+  - GH #4695 Build error with GCC-15 (class Poco::PriorityDelegate<TObj, void, true>’ has no member named ‘_pTarget’)
+  - GH #4689 SMTPClientSession: replace bare newlines in message content with CRLF.
+  - GH #4668 Cross-module exception issue with pre-compiler define _HAS_EXCEPTIONS=0 used in an application
+  - GH #4664 HTTPCookie Constructor Fails to Handle Discard Attribute Properly
+  - GH #4648 ProcessRunner erases its PID file name
+  - GH #4644 TryParse scoped ipv6 addressess for addresses enclosed in [  ]
+  - GH #4634 Poco::ActiveThreadPool _targetCompleted event never reset
+  - GH #4610 Incorrect setting of ciphersuites for TLSv1.3
+  - GH #4592 Significant performance degradation of Poco::DateTimeParser
+  - GH #4586 MacOS ARM64 build error: symbol `fdopen` is duplicated defined
+  - GH #4585 MacOS ARM64 build warning: 'OS_CODE' macro redefined
+  - GH #4557 NestedDiagnosticContext should be thread local
+  - GH #4540 Postgres CMakeList.txt
+  - GH #4535 decodeWord adds spaces at folding borders, when there are special characters encoded
+  - GH #4525 RecordSet issue since 1.10.0
+  - GH #4503 GitHub runner: Linux thread sanitizer tests fail with "unexpected memory mapping"
+  - GH #4482 ProcessRunner does not detect launch errors
+  - GH #4395 There is no way to resolve host in advance and connect to HTTPS server with SNI.
+  - GH #4368 fix Oracle failing ODBC tests
+  - GH #3913 Missing sources in release package - buildwin.ps1 and NetSSL_Win
+  - GH #3896 TryParse scoped ipv6 addressess
+  - GH #3180 Poco::Environment::osDisplayName
+  - GH #2971 Poco::NamedEvent does not release System V semaphore on Linux
+  - GH #2439 Issue with log purging when FileChannel compression is enabled
+  - PR #4762 Properly define POCO_DLL and POCO_STATIC based on BUILD_SHARED_LIBS
+  - PR #4753 Openssl DH key size
+  - PR #4737 fix(cmake): fix Data::PostgreSQL target include, remove unnecessary cmake modules.
+  - PR #4727 GitHub runner ubuntu 24.04 and resolve some issues
+  - PR #4726 Explicitly define conditional LOB constructors for const (w)string &
+  - PR #4725 Exception (VS): static assert to make sure that _HAS_EXCEPTIONS is set
+  - PR #4702 SimpleRowFormatter.h: fix the build on `gcc-15` (unsatisfied `noexcept`)
+  - PR #4688 Fix double free in Net::MailMessage if Content-Disposition header is empty
+  - PR #4657 LibPNG Unbundled
+  - PR #4652 enh(ScopedLockWithUnlock): make it more alike std::unique_lock
+  - PR #4647 Use Int64 for TcpServerDispatcher::totalConnections()
+  - PR #4635 fix(Poco::Zip::ZipLocalFileHeader) Fix const-correctness
+  - PR #4622 fix(SimpleFileChannel): unify default "flush" to be false as it is in FileChannel
+  - PR #4613 Usage modern C++ features on JSON modules (enhanced)
+  - PR #4597 Fix MinGW build error
+  - PR #4593 DateTimeParser Validation and Performance Improvements
+  - PR #4550 enh: resolve unit test and few other warnings.
+  - PR #4545 Add CACHE PATH to multi-config output directory variables
+  - PR #4542 Decode word
+  - PR #4417 fix(logs): synchronise log file rotation and compression.
+  - PR #4085 Usage modern C++ features on JSON modules
+
+
 !!!Release 1.13.3
 
 !!Summary of Changes
@@ -18,7 +882,7 @@ This is a bugfix release.
   - GH #4515 Upgrade bundled SQLite to 3.45.2
   - PR #4517 Optimize Net module for Android
 
-!!Bug Fixes and Improvements:
+!!Bug Fixes and Improvements
 
   - GH #4505 ODBC Unicode wrappers do not check for null length pointers
   - GH #4492 Poco::BasicMemoryStreamBuf is missing seekpos()
@@ -66,7 +930,7 @@ This is a bugfix release.
 
 !!Bug Fixes and Improvements
 
-  - GH #4443 Upgrade libexpat to 2.6.0 
+  - GH #4443 Upgrade libexpat to 2.6.0
   - GH #4425 Unit tests: optional testing of deprecated functionality
   - GH #4421 Multiple calls to initializeSSL/uninitializeSSL cause assert failure during certificate validation
   - GH #4411 NULL pointer: strategy when setting rotation never in FileChannel

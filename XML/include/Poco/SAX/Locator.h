@@ -22,8 +22,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API Locator
@@ -44,13 +43,13 @@ class XML_API Locator
 	/// the application should assume that a locator is not available.
 {
 public:
-	virtual XMLString getPublicId() const = 0;
+	[[nodiscard]] virtual XMLString getPublicId() const = 0;
 		/// Return the public identifier for the current document event.
 		///
 		/// The return value is the public identifier of the document entity or of the external
 		/// parsed entity in which the markup triggering the event appears.
 
-	virtual XMLString getSystemId() const = 0;
+	[[nodiscard]] virtual XMLString getSystemId() const = 0;
 		/// Return the system identifier for the current document event.
 		///
 		/// The return value is the system identifier of the document entity or of the external
@@ -60,7 +59,7 @@ public:
 		/// it to the application. For example, a file name must always be provided as a
 		/// file:... URL, and other kinds of relative URI are also resolved against their bases.
 
-	virtual int getLineNumber() const = 0;
+	[[nodiscard]] virtual int getLineNumber() const = 0;
 		/// Return the line number where the current document event ends.
 		/// Lines are delimited by line ends, which are defined in the XML specification.
 		///
@@ -76,7 +75,7 @@ public:
 		/// If possible, the SAX driver should provide the line position of the first character after
 		/// the text associated with the document event. The first line is line 1.
 
-	virtual int getColumnNumber() const = 0;
+	[[nodiscard]] virtual int getColumnNumber() const = 0;
 		/// Return the column number where the current document event ends.
 		/// This is one-based number of characters since the last line end.
 		///
@@ -97,7 +96,7 @@ protected:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_Locator_INCLUDED

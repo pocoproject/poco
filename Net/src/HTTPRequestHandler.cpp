@@ -15,8 +15,7 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPRequestHandler::HTTPRequestHandler()
@@ -29,4 +28,4 @@ HTTPRequestHandler::~HTTPRequestHandler()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

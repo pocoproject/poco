@@ -17,8 +17,7 @@
 #include "Poco/Net/KeyConsoleHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 PrivateKeyFactoryMgr::PrivateKeyFactoryMgr()
@@ -54,7 +53,7 @@ const PrivateKeyFactory* PrivateKeyFactoryMgr::getFactory(const std::string& nam
 	if (it != _factories.end())
 		return it->second;
 	else
-		return 0;
+		return nullptr;
 }
 
 
@@ -64,4 +63,4 @@ void PrivateKeyFactoryMgr::removeFactory(const std::string& name)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

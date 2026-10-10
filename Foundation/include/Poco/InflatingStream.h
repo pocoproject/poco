@@ -22,11 +22,8 @@
 #include "Poco/BufferedStreamBuf.h"
 #include <istream>
 #include <ostream>
-#if defined(POCO_UNBUNDLED)
-#include <zlib.h>
-#else
-#include "Poco/zlib.h"
-#endif
+
+struct z_stream_s;
 
 
 namespace Poco {
@@ -69,8 +66,8 @@ public:
 		/// Please refer to the zlib documentation of inflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~InflatingStreamBuf();
-		/// Destroys the InflatingStreamBuf.
+	~InflatingStreamBuf() override;
+	/// Destroys the InflatingStreamBuf.
 
 	int close();
 		/// Finishes up the stream.
@@ -81,9 +78,9 @@ public:
 		/// Resets the stream buffer.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
-	int sync();
+	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length) override;
+	int sync() override;
 
 private:
 	enum
@@ -92,12 +89,12 @@ private:
 		INFLATE_BUFFER_SIZE = 32768
 	};
 
-	std::istream*  _pIstr;
-	std::ostream*  _pOstr;
-	char*    _buffer;
-	z_stream _zstr;
-	bool     _eof;
-	bool     _check;
+	std::istream*	_pIstr;
+	std::ostream*	_pOstr;
+	char*			_buffer;
+	z_stream_s*		_pZstr;
+	bool			_eof;
+	bool			_check;
 };
 
 
@@ -130,10 +127,10 @@ public:
 		/// Please refer to the zlib documentation of inflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~InflatingIOS();
-		/// Destroys the InflatingIOS.
+	~InflatingIOS() override;
+	/// Destroys the InflatingIOS.
 
-	InflatingStreamBuf* rdbuf();
+	[[nodiscard]] InflatingStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying stream buffer.
 
 protected:
@@ -160,8 +157,8 @@ public:
 		/// Please refer to the zlib documentation of inflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~InflatingOutputStream();
-		/// Destroys the InflatingOutputStream.
+	~InflatingOutputStream() override;
+	/// Destroys the InflatingOutputStream.
 
 	int close();
 		/// Finishes up the stream.
@@ -196,8 +193,8 @@ public:
 		/// Please refer to the zlib documentation of inflateInit2() for a description
 		/// of the windowBits parameter.
 
-	~InflatingInputStream();
-		/// Destroys the InflatingInputStream.
+	~InflatingInputStream() override;
+	/// Destroys the InflatingInputStream.
 
 	void reset();
 		/// Resets the zlib machinery so that another zlib stream can be read from

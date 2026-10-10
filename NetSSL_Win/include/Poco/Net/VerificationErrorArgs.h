@@ -22,8 +22,7 @@
 #include "Poco/Net/X509Certificate.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API VerificationErrorArgs
@@ -36,22 +35,22 @@ public:
 	~VerificationErrorArgs();
 		/// Destroys the VerificationErrorArgs.
 
-	const X509Certificate& certificate() const;
+	[[nodiscard]] const X509Certificate& certificate() const;
 		/// Returns the certificate that caused the error.
 
-	int errorDepth() const;
+	[[nodiscard]] int errorDepth() const;
 		/// Returns the position of the certificate in the certificate chain.
 
-	int errorNumber() const;
+	[[nodiscard]] int errorNumber() const;
 		/// Returns the id of the error
 
-	const std::string& errorMessage() const;
+	[[nodiscard]] const std::string& errorMessage() const;
 		/// Returns the textual presentation of the errorNumber.
 
 	void setIgnoreError(bool ignoreError);
 		/// setIgnoreError to true, if a verification error is judged non-fatal by the user.
 
-	bool getIgnoreError() const;
+	[[nodiscard]] bool getIgnoreError() const;
 		/// returns the value of _ignoreError
 
 private:
@@ -102,7 +101,7 @@ inline bool VerificationErrorArgs::getIgnoreError() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_VerificationErrorArgs_INCLUDED

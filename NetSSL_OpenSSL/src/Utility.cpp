@@ -19,8 +19,7 @@
 #include <openssl/err.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 Context::VerificationMode Utility::convertVerificationMode(const std::string& vMode)
@@ -64,4 +63,4 @@ void Utility::clearErrorStack()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

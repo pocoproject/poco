@@ -22,9 +22,7 @@
 #include <mysql/mysql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class SessionHandle
@@ -34,10 +32,14 @@ public:
 	explicit SessionHandle(MYSQL* mysql);
 		/// Creates session handle
 
+	SessionHandle(const SessionHandle&) = delete;
+
+	SessionHandle& operator=(const SessionHandle&) = delete;
+
 	~SessionHandle();
 		/// Destroy handle, close connection
 
-	void init(MYSQL* mysql = 0);
+	void init(MYSQL* mysql = nullptr);
 		/// Initializes the handle iff not initialized.
 
 	void options(mysql_option opt);
@@ -73,14 +75,10 @@ public:
 	void reset();
 		/// Reset connection with dababase and clears session state, but without disconnecting
 
-	bool ping();
+	[[nodiscard]] bool ping();
 		/// Checks if the connection is alive.
 
-	operator MYSQL* ();
-
-private:
-	SessionHandle(const SessionHandle&);
-	SessionHandle& operator=(const SessionHandle&);
+	[[nodiscard]] operator MYSQL* ();
 
 private:
 	MYSQL* _pHandle;
@@ -97,7 +95,7 @@ inline SessionHandle::operator MYSQL* ()
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_SessionHandle_INCLUDED

@@ -37,6 +37,10 @@
 #include <memory>
 #include <iostream>
 #include <system_error>
+#include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 namespace Poco {
@@ -62,11 +66,11 @@ public:
 	using Work = std::function<void()>;
 	using Callback = std::function<void (const std::error_code& failure, int bytesReceived)>;
 
-	static const int POLL_READ = PollSet::POLL_READ;
-	static const int POLL_WRITE = PollSet::POLL_WRITE;
-	static const int POLL_ERROR = PollSet::POLL_ERROR;
+	static constexpr int POLL_READ = PollSet::POLL_READ;
+	static constexpr int POLL_WRITE = PollSet::POLL_WRITE;
+	static constexpr int POLL_ERROR = PollSet::POLL_ERROR;
 
-	static const Timestamp::TimeDiff PERMANENT_COMPLETION_HANDLER;
+	static constexpr Timestamp::TimeDiff PERMANENT_COMPLETION_HANDLER = std::numeric_limits<Timestamp::TimeDiff>::max();
 
 	explicit SocketProactor(bool worker = true);
 		/// Creates the SocketProactor.
@@ -79,7 +83,7 @@ public:
 	SocketProactor& operator=(const SocketProactor&) = delete;
 	SocketProactor& operator=(SocketProactor&&) = delete;
 
-	~SocketProactor();
+	~SocketProactor() override;
 		/// Destroys the SocketProactor.
 
 	void addWork(const Work& ch, Timestamp::TimeDiff ms = PERMANENT_COMPLETION_HANDLER);
@@ -97,7 +101,7 @@ public:
 	void removeWork();
 		/// Removes all scheduled work.
 
-	int scheduledWork();
+	[[nodiscard]] int scheduledWork();
 		/// Returns the number of scheduled functions.
 
 	int removeScheduledWork(int count = -1);
@@ -105,7 +109,7 @@ public:
 		/// from the front of the schedule queue.
 		/// Default is removal of all scheduled functions.
 
-	int permanentWork();
+	[[nodiscard]] int permanentWork();
 		/// Returns the number of permanent functions.
 
 	int removePermanentWork(int count = -1);
@@ -113,7 +117,7 @@ public:
 		/// from the front of the schedule queue.
 		/// Default is removal of all functions.
 
-	int poll(int* pHandled = 0);
+	[[nodiscard]] int poll(int* pHandled = nullptr);
 		/// Polls all registered sockets and calls their respective handlers.
 		/// If pHandled is not null, after the call it contains the total number
 		/// of read/write/error socket handlers called.
@@ -126,7 +130,7 @@ public:
 		/// Returns 1 on successful handler invocation, 0 on
 		/// exception.
 
-	void run();
+	void run() override;
 		/// Runs the SocketProactor. The reactor will run
 		/// until stop() is called (in a separate thread).
 
@@ -154,16 +158,16 @@ public:
 		/// The timeout is passed to the Socket::select()
 		/// method.
 
-	Poco::Timespan getTimeout() const;
+	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the timeout.
 
-	void addSocket(Socket sock, int mode);
+	void addSocket(const Socket& sock, int mode);
 		/// Adds the socket to the poll set.
 
-	void updateSocket(Socket sock, int mode);
+	void updateSocket(const Socket& sock, int mode);
 		/// Updates the socket mode in the poll set.
 
-	void removeSocket(Socket sock);
+	void removeSocket(const Socket& sock);
 		/// Removes the socket from the poll set.
 
 	void addReceiveFrom(Socket sock, Buffer& buf, SocketAddress& addr, Callback&& onCompletion);
@@ -192,13 +196,13 @@ public:
 	bool hasSocketHandlers() const;
 		/// Returns true if proactor had at least one I/O completion handler.
 
-	bool has(const Socket& sock) const;
+	[[nodiscard]] bool has(const Socket& sock) const;
 		/// Returns true if socket is registered with this proactor.
 
-	bool isRunning() const;
+	[[nodiscard]] bool isRunning() const;
 		/// Returns true if this proactor is running
 
-	bool ioCompletionInProgress() const;
+	[[nodiscard]] bool ioCompletionInProgress() const;
 		/// Returns true if there are not executed handlers from last IO.
 
 private:
@@ -212,10 +216,10 @@ private:
 		/// If expiredOnly is true, only expired temporary functions
 		/// are called.
 
-	typedef Poco::Mutex MutexType;
-	typedef MutexType::ScopedLock ScopedLock;
+	using MutexType = Poco::Mutex;
+	using ScopedLock = MutexType::ScopedLock;
 
-	static const long DEFAULT_MAX_TIMEOUT_MS = 250;
+	static constexpr long DEFAULT_MAX_TIMEOUT_MS = 250;
 
 	struct Handler
 		/// Handler struct holds the scheduled I/O.
@@ -245,7 +249,7 @@ private:
 		{
 		}
 
-		~IONotification() = default;
+		~IONotification() override = default;
 
 		void call()
 			/// Calls the completion handler.
@@ -310,7 +314,7 @@ private:
 			_nq.wakeUpAll();
 		}
 
-		int queueSize() const
+		[[nodiscard]] int queueSize() const
 		{
 			return _nq.size();
 		}
@@ -319,7 +323,7 @@ private:
 		bool runOne()
 			/// Runs the next I/O completion handler in the queue.
 		{
-			IONotification* pNf = dynamic_cast<IONotification*>(_nq.waitDequeueNotification());
+			auto* pNf = dynamic_cast<IONotification*>(_nq.waitDequeueNotification());
 			if (_activity.isStopped()) return false;
 			if (pNf)
 			{
@@ -373,12 +377,12 @@ private:
 		/// The value of _timeout can grow up to
 		/// _maxTimeout value.
 
-	int error(Socket& sock);
+	[[nodiscard]] int error(Socket& sock);
 		/// Enqueues the completion handlers and removes
 		/// them from the handlers list after the operation
 		/// successfully completes.
 
-	bool hasHandlers(SubscriberMap& handlers, int sockfd);
+	[[nodiscard]] bool hasHandlers(SubscriberMap& handlers, int sockfd);
 	void deleteHandler(IOHandlerList& handlers, IOHandlerList::iterator& it);
 
 	template <typename T>
@@ -438,7 +442,7 @@ private:
 		/// Enqueues the completion handler into the I/O
 		/// completion handler.
 
-	Worker& worker();
+	[[nodiscard]] Worker& worker();
 
 	std::atomic<bool> _isRunning;
 	std::atomic<bool> _isStopped;
@@ -462,19 +466,19 @@ private:
 // inlines
 //
 
-inline void SocketProactor::addSocket(Socket sock, int mode)
+inline void SocketProactor::addSocket(const Socket& sock, int mode)
 {
 	_pollSet.add(sock, mode | PollSet::POLL_ERROR);
 }
 
 
-inline void SocketProactor::updateSocket(Socket sock, int mode)
+inline void SocketProactor::updateSocket(const Socket& sock, int mode)
 {
 	_pollSet.update(sock, mode);
 }
 
 
-inline void SocketProactor::removeSocket(Socket sock)
+inline void SocketProactor::removeSocket(const Socket& sock)
 {
 	_pollSet.remove(sock);
 }

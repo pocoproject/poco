@@ -22,14 +22,13 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 using Poco::AutoPtr;
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_DOMAutoPtr_INCLUDED

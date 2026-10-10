@@ -22,94 +22,99 @@
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
-#include "sqlite3.h"
+#include "Poco/Dynamic/Var.h"
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+extern "C"
+{
+	typedef struct sqlite3_stmt sqlite3_stmt;
+}
+
+
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Binder: public Poco::Data::AbstractBinder
 	/// Binds placeholders in the sql query to the provided values. Performs data types mapping.
 {
 public:
+	using AbstractBinder::bind;
+
 	Binder(sqlite3_stmt* pStmt);
 		/// Creates the Binder.
 
-	~Binder();
+	~Binder() override;
 		/// Destroys the Binder.
 
-	void bind(std::size_t pos, const Poco::Int8 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int8 &val, Direction dir) override;
 		/// Binds an Int8.
 
-	void bind(std::size_t pos, const Poco::UInt8 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt8 &val, Direction dir) override;
 		/// Binds an UInt8.
 
-	void bind(std::size_t pos, const Poco::Int16 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int16 &val, Direction dir) override;
 		/// Binds an Int16.
 
-	void bind(std::size_t pos, const Poco::UInt16 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt16 &val, Direction dir) override;
 		/// Binds an UInt16.
 
-	void bind(std::size_t pos, const Poco::Int32 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int32 &val, Direction dir) override;
 		/// Binds an Int32.
 
-	void bind(std::size_t pos, const Poco::UInt32 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt32 &val, Direction dir) override;
 		/// Binds an UInt32.
 
-	void bind(std::size_t pos, const Poco::Int64 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int64 &val, Direction dir) override;
 		/// Binds an Int64.
 
-	void bind(std::size_t pos, const Poco::UInt64 &val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt64 &val, Direction dir) override;
 		/// Binds an UInt64.
 
 #ifndef POCO_INT64_IS_LONG
-	void bind(std::size_t pos, const long &val, Direction dir);
+	void bind(std::size_t pos, const long &val, Direction dir) override;
 		/// Binds a long
 
-	void bind(std::size_t pos, const unsigned long &val, Direction dir);
+	void bind(std::size_t pos, const unsigned long &val, Direction dir) override;
 		/// Binds an unsigned long
 #endif
 
-	void bind(std::size_t pos, const bool &val, Direction dir);
+	void bind(std::size_t pos, const bool &val, Direction dir) override;
 		/// Binds a boolean.
 
-	void bind(std::size_t pos, const float &val, Direction dir);
+	void bind(std::size_t pos, const float &val, Direction dir) override;
 		/// Binds a float.
 
-	void bind(std::size_t pos, const double &val, Direction dir);
+	void bind(std::size_t pos, const double &val, Direction dir) override;
 		/// Binds a double.
 
-	void bind(std::size_t pos, const char &val, Direction dir);
+	void bind(std::size_t pos, const char &val, Direction dir) override;
 		/// Binds a single character.
 
-	void bind(std::size_t pos, const char* const &pVal, Direction dir);
+	void bind(std::size_t pos, const char* const &pVal, Direction dir) override;
 		/// Binds a const char ptr.
 
-	void bind(std::size_t pos, const std::string& val, Direction dir);
+	void bind(std::size_t pos, const std::string& val, Direction dir) override;
 		/// Binds a string.
 
-	void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Data::BLOB& val, Direction dir) override;
 		/// Binds a BLOB.
 
-	void bind(std::size_t pos, const Poco::Data::CLOB& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Data::CLOB& val, Direction dir) override;
 		/// Binds a CLOB.
 
-	void bind(std::size_t pos, const Date& val, Direction dir);
+	void bind(std::size_t pos, const Date& val, Direction dir) override;
 		/// Binds a Date.
 
-	void bind(std::size_t pos, const Time& val, Direction dir);
+	void bind(std::size_t pos, const Time& val, Direction dir) override;
 		/// Binds a Time.
 
-	void bind(std::size_t pos, const DateTime& val, Direction dir);
+	void bind(std::size_t pos, const DateTime& val, Direction dir) override;
 		/// Binds a DateTime.
 
-	void bind(std::size_t pos, const UUID& val, Direction dir);
+	void bind(std::size_t pos, const UUID& val, Direction dir) override;
 		/// Binds a UUID.
 
-	void bind(std::size_t pos, const NullData& val, Direction dir);
+	void bind(std::size_t pos, const NullData& val, Direction dir) override;
 		/// Binds a null.
 
 private:
@@ -117,15 +122,18 @@ private:
 		/// Checks the SQLite return code and throws an appropriate exception
 		/// if error has occurred.
 
+	static int bindBlobStatic(sqlite3_stmt* pStmt, int pos, const void* pData, int valSize);
+		/// Type-erased wrapper over sqlite3_bind_blob with SQLITE_STATIC lifetime.
+		/// Exists so the bindLOB template body does not have to name a sqlite3
+		/// function or macro - that lets the header forward-declare sqlite3_stmt
+		/// and skip pulling in <sqlite3.h>. See bindLOB below.
+
 	template <typename T>
 	void bindLOB(std::size_t pos, const Poco::Data::LOB<T>& val, Direction dir)
 	{
-		// convert a blob to a an unsigned char* array
 		const T* pData = reinterpret_cast<const T*>(val.rawContent());
 		int valSize = static_cast<int>(val.size());
-
-		int rc = sqlite3_bind_blob(_pStmt, static_cast<int>(pos), pData, valSize, SQLITE_STATIC); // no deep copy, do not free memory
-		checkReturn(rc);
+		checkReturn(bindBlobStatic(_pStmt, static_cast<int>(pos), pData, valSize));
 	}
 
 	sqlite3_stmt* _pStmt;
@@ -217,7 +225,7 @@ inline void Binder::bind(std::size_t pos, const Poco::Data::CLOB& val, Direction
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // Data_SQLite_Binder_INCLUDED

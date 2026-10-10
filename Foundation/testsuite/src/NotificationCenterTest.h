@@ -24,6 +24,10 @@
 
 class TestNotification;
 
+namespace Poco {
+	class NotificationCenter;
+}
+
 
 class NotificationCenterTest: public CppUnit::TestCase
 {
@@ -32,38 +36,42 @@ public:
 	~NotificationCenterTest();
 
 	void testNotificationCenter1();
+#ifdef POCO_TEST_DEPRECATED
 	void testNotificationCenter2();
 	void testNotificationCenter3();
 	void testNotificationCenter4();
 	void testNotificationCenter5();
+#endif
 	void testNotificationCenterAuto();
-	void testAsyncObserver();
-	void testAsyncNotificationCenter();
+#ifdef POCO_TEST_DEPRECATED
 	void testDefaultNotificationCenter();
-	void testMixedObservers();
+#endif
+	void testDeadlock();
 
 	void setUp();
 	void tearDown();
 
 	static CppUnit::Test* suite();
 
+	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
+	void handleDeadlock(const Poco::AutoPtr<Poco::Notification>& pNf);
+
 protected:
+#ifdef POCO_TEST_DEPRECATED
 	void handle1(Poco::Notification* pNf);
 	void handle2(Poco::Notification* pNf);
 	void handle3(Poco::Notification* pNf);
 	void handleTest(TestNotification* pNf);
-	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
-	void handleAsync1(const Poco::AutoPtr<TestNotification>& pNf);
-	void handleAsync2(const Poco::AutoPtr<TestNotification>& pNf);
-	bool matchAsync(const std::string& name) const;
+#endif
 
 private:
 	std::set<std::string> _set;
 	std::atomic<bool> _handle1Done;
 	std::atomic<bool> _handleAuto1Done;
-	std::atomic<bool> _handleAsync1Done;
-	std::atomic<bool> _handleAsync2Done;
+	std::atomic<bool> _handlerStarted;
+	std::atomic<int> _handlerCallCount;
 	Poco::Mutex _mutex;
+	Poco::NotificationCenter* _pNC;
 };
 
 

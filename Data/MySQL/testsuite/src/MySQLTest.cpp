@@ -37,8 +37,8 @@ using Poco::Nullable;
 using Poco::Tuple;
 using Poco::NamedTuple;
 
-Poco::SharedPtr<Poco::Data::Session> MySQLTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = 0;
+Poco::SharedPtr<Poco::Data::Session> MySQLTest::_pSession = nullptr;
+Poco::SharedPtr<SQLExecutor> MySQLTest::_pExecutor = nullptr;
 
 //
 // Parameters for barebone-test
@@ -674,6 +674,14 @@ void MySQLTest::testNullableString()
 	assertTrue (resAddress != null);
 }
 
+void MySQLTest::testOptionalString()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateNullableStringTable();
+	_pExecutor->stdOptional();
+}
+
 
 void MySQLTest::testTupleWithNullable()
 {
@@ -724,6 +732,15 @@ void MySQLTest::testTupleWithNullable()
 	assertTrue (result[5].get<1>() == std::string("B"));
 	assertTrue (result[5].get<2>() == null);
 
+}
+
+
+void MySQLTest::testStdTupleWithOptional()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateNullableStringTable();
+	_pExecutor->stdTupleWithOptional();
 }
 
 
@@ -936,7 +953,7 @@ CppUnit::Test* MySQLTest::suite()
 		catch (ConnectionFailedException& ex)
 		{
 			std::cout << ex.displayText() << std::endl;
-			return 0;
+			return nullptr;
 		}
 	}
 
@@ -998,7 +1015,9 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testNull);
 	CppUnit_addTest(pSuite, MySQLTest, testNullableInt);
 	CppUnit_addTest(pSuite, MySQLTest, testNullableString);
+	CppUnit_addTest(pSuite, MySQLTest, testOptionalString);
 	CppUnit_addTest(pSuite, MySQLTest, testTupleWithNullable);
+	CppUnit_addTest(pSuite, MySQLTest, testStdTupleWithOptional);
 	CppUnit_addTest(pSuite, MySQLTest, testSessionTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testReconnect);

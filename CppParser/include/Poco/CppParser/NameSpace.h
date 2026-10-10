@@ -25,8 +25,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API NameSpace: public Symbol
@@ -41,7 +40,7 @@ public:
 	NameSpace();
 		/// Creates the NameSpace.
 
-	NameSpace(const std::string& name, NameSpace* pNameSpace = 0);
+	NameSpace(const std::string& name, NameSpace* pNameSpace = nullptr, bool isInline = false);
 		/// Creates the NameSpace.
 
 	~NameSpace();
@@ -56,19 +55,19 @@ public:
 	void importNameSpace(const std::string& nameSpace);
 		/// Imports a namespace (using namespace <namespace>).
 
-	Iterator begin() const;
+	[[nodiscard]] Iterator begin() const;
 		/// Returns an iterator for iterating over the NameSpace's Symbol's.
 
-	Iterator end() const;
+	[[nodiscard]] Iterator end() const;
 		/// Returns an iterator for iterating over the NameSpace's Symbol's.
-	
-	virtual Symbol* lookup(const std::string& name) const;
+
+	[[nodiscard]] virtual Symbol* lookup(const std::string& name) const;
 		/// Looks up the given name in the symbol table
 		/// and returns the corresponding symbol, or null
 		/// if no symbol can be found. The name can include
 		/// a namespace.
 
-	static NameSpace* root();
+	[[nodiscard]] static NameSpace* root();
 		/// Returns the root namespace. Never delete this one!
 
 	void nameSpaces(SymbolTable& table) const;
@@ -92,18 +91,25 @@ public:
 	void variables(SymbolTable& table) const;
 		/// Fills the symbol table with all variables.
 
-	const AliasMap& importedSymbols() const;
+	[[nodiscard]] const AliasMap& importedSymbols() const;
 		/// Returns a const reference to a SymbolTable containing all
 		/// imported symbols.
 
-	const NameSpaceVec& importedNameSpaces() const;
+	[[nodiscard]] const NameSpaceVec& importedNameSpaces() const;
 		/// Returns a vector containing all imported namespaces.
 
-	Symbol::Kind kind() const;
-	std::string toString() const;
+	[[nodiscard]]
+	bool isInline() const;
+		/// Returns true if this is an inline namespace.
+
+	void setInline(bool isInline);
+		/// Sets the inline flag for this namespace.
+
+	[[nodiscard]] Symbol::Kind kind() const;
+	[[nodiscard]] std::string toString() const;
 
 private:
-	Symbol* lookup(const std::string& name, std::set<const NameSpace*>& alreadyVisited) const;
+	[[nodiscard]] Symbol* lookup(const std::string& name, std::set<const NameSpace*>& alreadyVisited) const;
 		/// Looks up the given name in the symbol table
 		/// and returns the corresponding symbol, or null
 		/// if no symbol can be found. The name can include
@@ -117,6 +123,7 @@ private:
 	SymbolTable _symbols;
 	AliasMap _importedSymbols;
 	NameSpaceVec _importedNameSpaces;
+	bool _isInline = false;
 };
 
 
@@ -135,7 +142,13 @@ inline const NameSpace::NameSpaceVec& NameSpace::importedNameSpaces() const
 }
 
 
-} } // namespace Poco::CppParser
+inline bool NameSpace::isInline() const
+{
+	return _isInline;
+}
+
+
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_NameSpace_INCLUDED

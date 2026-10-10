@@ -27,7 +27,7 @@ const std::string PageReader::ESC_EXPR_END(");\n");
 
 PageReader::PageReader(Page& page, const std::string& path):
 	_page(page),
-	_pParent(0),
+	_pParent(nullptr),
 	_path(path),
 	_line(0),
 	_emitLineDirectives(false)
@@ -251,7 +251,7 @@ void PageReader::parse(std::istream& pageStream)
 
 void PageReader::parseAttributes()
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	std::string basename;
 	std::istringstream istr(_attrs);

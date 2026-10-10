@@ -24,8 +24,7 @@
 #include "Poco/Buffer.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class WebSocketImpl;
@@ -49,6 +48,15 @@ class Net_API WebSocket: public StreamSocket
 	/// Note that special frames like PING must be handled at
 	/// application level. In the case of a PING, a PONG message
 	/// must be returned.
+	///
+	/// Once connected, a WebSocket can be put into non-blocking
+	/// mode, by calling setBlocking(false). 
+	/// Please refer to the sendFrame() and receiveFrame() documentation
+	/// for non-blocking behavior.
+	///
+	/// TCP_NODELAY is automatically enabled on the underlying socket
+	/// to prevent delays from Nagle's algorithm when sending small
+	/// WebSocket frames.
 {
 public:
 	enum Mode
@@ -82,9 +90,9 @@ public:
 	enum SendFlags
 		/// Combined header flags and opcodes for use with sendFrame().
 	{
-		FRAME_TEXT   = FRAME_FLAG_FIN | FRAME_OP_TEXT,
+				FRAME_TEXT   = static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_TEXT),
 			/// Use this for sending a single text (UTF-8) payload frame.
-		FRAME_BINARY = FRAME_FLAG_FIN | FRAME_OP_BINARY
+				FRAME_BINARY = static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_BINARY)
 			/// Use this for sending a single binary payload frame.
 	};
 
@@ -221,15 +229,21 @@ public:
 
 #endif //POCO_NEW_STATE_ON_MOVE
 
-	void shutdown();
+	int shutdown();
 		/// Sends a Close control frame to the server end of
 		/// the connection to initiate an orderly shutdown
 		/// of the connection.
+		///
+		/// Returns the number of bytes sent or -1 if the socket
+		/// is non-blocking and the frame cannot be sent at this time.
 
-	void shutdown(Poco::UInt16 statusCode, const std::string& statusMessage = "");
+	int shutdown(Poco::UInt16 statusCode, const std::string& statusMessage = "");
 		/// Sends a Close control frame to the server end of
 		/// the connection to initiate an orderly shutdown
 		/// of the connection.
+		///
+		/// Returns the number of bytes sent or -1 if the socket
+		/// is non-blocking and the frame cannot be sent at this time.
 
 	int sendFrame(const void* buffer, int length, int flags = FRAME_TEXT);
 		/// Sends the contents of the given buffer through
@@ -238,11 +252,15 @@ public:
 		/// Values from the FrameFlags, FrameOpcodes and SendFlags enumerations
 		/// can be specified in flags.
 		///
-		/// Returns the number of bytes sent, which may be
-		/// less than the number of bytes specified.
+		/// Returns the number of bytes sent.
 		///
-		/// Certain socket implementations may also return a negative
-		/// value denoting a certain condition.
+		/// If the WebSocket is non-blocking and the frame could not
+		/// be sent in full, returns -1. In this case, the call
+		/// to sendFrame() must be repeated with exactly the same
+		/// parameters as soon as the socket becomes writable again 
+		/// (see select() or poll()). 
+		/// The value of length is returned after the complete
+		/// frame has been sent.
 
 	int receiveFrame(void* buffer, int length, int& flags);
 		/// Receives a frame from the socket and stores it
@@ -260,6 +278,13 @@ public:
 		/// A WebSocketException will also be thrown if a malformed
 		/// or incomplete frame is received.
 		///
+		/// A connection closed in the middle of a frame header is reported
+		/// as a closed connection rather than as an incomplete frame: the
+		/// header can never be completed, and RFC 6455 treats a transport
+		/// close without a Close frame as an abnormal closure whether or
+		/// not a partial frame preceded it. A frame whose payload is cut
+		/// short by the close still throws.
+		///
 		/// Returns the number of payload bytes received.
 		/// A return value of 0, with flags also 0, means that the peer has
 		/// shut down or closed the connection.
@@ -272,6 +297,14 @@ public:
 		///
 		/// The frame flags and opcode (FrameFlags and FrameOpcodes)
 		/// is stored in flags.
+		///
+		/// In case of a non-blocking socket, may return -1, even
+		/// if a partial frame has been received. 
+		/// In this case, receiveFrame() should be called again as 
+		/// soon as more data becomes available (see select() or poll()).
+		/// Eventually, receiveFrame() will return the complete frame.
+		/// The given buffer will not be modified until the full frame has 
+		/// been received.
 
 	int receiveFrame(Poco::Buffer<char>& buffer, int& flags);
 		/// Receives a frame from the socket and stores it
@@ -314,8 +347,16 @@ public:
 		/// called on the buffer beforehand, if the expectation is that
 		/// the received data is stored starting at the beginning of the
 		/// buffer.
+		///
+		/// In case of a non-blocking socket, may return -1, even
+		/// if a partial frame has been received. 
+		/// In this case, receiveFrame() should be called again as 
+		/// soon as more data becomes available (see select() or poll()).
+		/// Eventually, receiveFrame() will return the complete frame.
+		/// The given buffer will not be modified until the full frame has 
+		/// been received.
 
-	Mode mode() const;
+	[[nodiscard]] Mode mode() const;
 		/// Returns WS_SERVER if the WebSocket is a server-side
 		/// WebSocket, or WS_CLIENT otherwise.
 
@@ -324,7 +365,7 @@ public:
 		///
 		/// The default is std::numeric_limits<int>::max().
 
-	int getMaxPayloadSize() const;
+	[[nodiscard]] int getMaxPayloadSize() const;
 		/// Returns the maximum payload size for receiveFrame().
 		///
 		/// The default is std::numeric_limits<int>::max().
@@ -347,7 +388,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_WebSocket_INCLUDED

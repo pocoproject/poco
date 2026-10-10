@@ -17,8 +17,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 CharacterData::CharacterData(Document* pOwnerDocument, const XMLString& data):
@@ -149,4 +148,4 @@ XMLString CharacterData::trimmedData() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

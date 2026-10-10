@@ -21,8 +21,7 @@
 #include "Poco/XML/XMLException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XMLStreamParser;
@@ -35,11 +34,11 @@ public:
 	XMLStreamParserException(const XMLStreamParser&, const std::string& description);
 	virtual ~XMLStreamParserException() noexcept;
 
-	const char* name() const noexcept;
-	Poco::UInt64 line() const;
-	Poco::UInt64 column() const;
-	const std::string& description() const;
-	virtual const char* what() const noexcept;
+	[[nodiscard]] const char* name() const noexcept;
+	[[nodiscard]] Poco::UInt64 line() const;
+	[[nodiscard]] Poco::UInt64 column() const;
+	[[nodiscard]] const std::string& description() const;
+	[[nodiscard]] virtual const char* what() const noexcept;
 
 private:
 	void init();
@@ -52,7 +51,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_XMLStreamParserException_INCLUDED

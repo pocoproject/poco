@@ -15,8 +15,7 @@
 #include "Poco/DOM/MutationEvent.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString MutationEvent::DOMSubtreeModified          = toXMLString("DOMSubtreeModified");
@@ -29,9 +28,9 @@ const XMLString MutationEvent::DOMCharacterDataModified    = toXMLString("DOMCha
 
 
 MutationEvent::MutationEvent(Document* pOwnerDocument, const XMLString& type):
-	Event(pOwnerDocument, type, 0, true, false),
+	Event(pOwnerDocument, type, nullptr, true, false),
 	_change(MODIFICATION),
-	_pRelatedNode(0)
+	_pRelatedNode(nullptr)
 {
 }
 
@@ -73,4 +72,4 @@ void MutationEvent::initMutationEvent(const XMLString& type, bool canBubble, boo
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

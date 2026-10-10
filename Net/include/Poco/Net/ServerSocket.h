@@ -23,8 +23,7 @@
 #include "Poco/Net/StreamSocket.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ServerSocket: public Socket
@@ -60,11 +59,11 @@ public:
 		/// After successful construction, the server socket
 		/// is ready to accept connections.
 
-	static ServerSocket fromFileDescriptor(poco_socket_t fd);
+	[[nodiscard]] static ServerSocket fromFileDescriptor(poco_socket_t fd);
 		// Creates a socket from an existing file descriptor.
 		// Ownership is taken by poco
 
-	virtual ~ServerSocket();
+	~ServerSocket() override;
 		/// Destroys the ServerSocket.
 
 	ServerSocket& operator = (const Socket& socket);
@@ -114,7 +113,7 @@ public:
 		///
 		/// If reuseAddress is true, sets the SO_REUSEADDR
 		/// socket option.
-        ///
+		///
 		/// If reusePort is true, sets the SO_REUSEPORT
 		/// socket option.
 
@@ -228,7 +227,7 @@ protected:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ServerSocket_INCLUDED

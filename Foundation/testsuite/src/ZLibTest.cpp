@@ -18,7 +18,6 @@
 #include "Poco/Buffer.h"
 #include <sstream>
 
-
 using Poco::InflatingInputStream;
 using Poco::InflatingOutputStream;
 using Poco::DeflatingOutputStream;
@@ -97,7 +96,7 @@ void ZLibTest::testDeflate4()
 {
 	Poco::Buffer<char> buffer(1024);
 	Poco::MemoryOutputStream ostr(buffer.begin(), static_cast<std::streamsize>(buffer.size()));
-	DeflatingOutputStream deflater(ostr, -10, Z_BEST_SPEED);
+	DeflatingOutputStream deflater(ostr, -10, DeflatingStreamBuf::BEST_SPEED);
 	std::string data(36828, 'x');
 	deflater << data;
 	deflater.close();

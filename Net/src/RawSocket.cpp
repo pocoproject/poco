@@ -20,8 +20,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 RawSocket::RawSocket():
@@ -156,4 +155,4 @@ int RawSocket::receiveFrom(void* buffer, int length, SocketAddress& address, int
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

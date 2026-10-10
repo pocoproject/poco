@@ -21,6 +21,14 @@
 static thread_local std::stringstream strbuf;
 
 %}
+
+  /*
+   * Whitespace, carriage return included. Every rule that has to skip or span
+   * whitespace uses this, so a CRLF input cannot be handled by one rule and
+   * missed by the next.
+   */
+WS  [ \t\r\n]
+
 %x singlequotedstring
 
 /***************************
@@ -41,7 +49,7 @@ static thread_local std::stringstream strbuf;
 
 /* other flags */
 %option noyywrap
-%option nounput
+%option noinput nounput
 %option warn
 %option case-insensitive
 %option prefix="hsql_"
@@ -49,7 +57,13 @@ static thread_local std::stringstream strbuf;
 /* %option nodefault */
 
 
-%s COMMENT
+  /*
+   * Exclusive: an inclusive COMMENT would also run the whitespace rule below,
+   * which matches longer than the newline ending the comment and so never
+   * returns to INITIAL - silently swallowing the line after the comment.
+   */
+%x COMMENT
+%x afterarray
 
 /***************************
  ** Section 3: Rules
@@ -60,7 +74,7 @@ static thread_local std::stringstream strbuf;
 <COMMENT>[^\n]* /* skipping comment content until a end of line is read */;
 <COMMENT>\n     BEGIN(INITIAL);
 
-[ \t\n]+        /* skip whitespace */;
+{WS}+           /* skip whitespace; CR is included so CRLF input never reaches the catch-all rule below, which ends the token stream */;
 
 ADD         TOKEN(ADD)
 AFTER       TOKEN(AFTER)
@@ -68,7 +82,7 @@ ALL         TOKEN(ALL)
 ALTER       TOKEN(ALTER)
 ANALYZE     TOKEN(ANALYZE)
 AND         TOKEN(AND)
-ARRAY       TOKEN(ARRAY)
+ARRAY       { BEGIN(afterarray); return SQL_ARRAY; }
 AS          TOKEN(AS)
 ASC         TOKEN(ASC)
 BEFORE      TOKEN(BEFORE)
@@ -105,6 +119,7 @@ DISTINCT    TOKEN(DISTINCT)
 DOUBLE      TOKEN(DOUBLE)
 DROP        TOKEN(DROP)
 ELSE        TOKEN(ELSE)
+ENCODING    TOKEN(ENCODING)
 END         TOKEN(END)
 ESCAPE      TOKEN(ESCAPE)
 EXCEPT      TOKEN(EXCEPT)
@@ -113,10 +128,12 @@ EXISTS      TOKEN(EXISTS)
 EXPLAIN     TOKEN(EXPLAIN)
 EXTRACT     TOKEN(EXTRACT)
 FALSE       TOKEN(FALSE)
+FETCH       TOKEN(FETCH)
 FILE        TOKEN(FILE)
 FLOAT       TOKEN(FLOAT)
 FOLLOWING   TOKEN(FOLLOWING)
 FOR         TOKEN(FOR)
+FOREIGN     TOKEN(FOREIGN)
 FORMAT      TOKEN(FORMAT)
 FROM        TOKEN(FROM)
 FULL        TOKEN(FULL)
@@ -158,6 +175,7 @@ MINUTES     TOKEN(MINUTES)
 MONTH       TOKEN(MONTH)
 MONTHS      TOKEN(MONTHS)
 NATURAL     TOKEN(NATURAL)
+NEXT        TOKEN(NEXT)
 NO          TOKEN(NO)
 NOT         TOKEN(NOT)
 NOWAIT      TOKEN(NOWAIT)
@@ -167,6 +185,7 @@ OF          TOKEN(OF)
 OFF         TOKEN(OFF)
 OFFSET      TOKEN(OFFSET)
 ON          TOKEN(ON)
+ONLY        TOKEN(ONLY)
 OR          TOKEN(OR)
 ORDER       TOKEN(ORDER)
 OUTER       TOKEN(OUTER)
@@ -177,8 +196,10 @@ PLAN        TOKEN(PLAN)
 PRECEDING   TOKEN(PRECEDING)
 PREPARE     TOKEN(PREPARE)
 PRIMARY     TOKEN(PRIMARY)
+PRIOR       TOKEN(PRIOR)
 RANGE       TOKEN(RANGE)
 REAL        TOKEN(REAL)
+REFERENCES  TOKEN(REFERENCES)
 RENAME      TOKEN(RENAME)
 RESTRICT    TOKEN(RESTRICT)
 RIGHT       TOKEN(RIGHT)
@@ -224,8 +245,20 @@ WITH        TOKEN(WITH)
 YEAR        TOKEN(YEAR)
 YEARS       TOKEN(YEARS)
 
-CURRENT[ \t\n]+ROW       TOKEN(CURRENT_ROW)
-CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
+  /*
+   * Phrases rather than single reserved words: START, CONNECT and WITHIN are
+   * ordinary names on their own, and reserving them broke statements such as
+   * "SELECT * FROM start". The trailing context keeps "CONNECT BY nocycleflag"
+   * from lexing as CONNECT_BY_NOCYCLE followed by "flag".
+   */
+START{WS}+WITH/[^A-Za-z0-9_]              TOKEN(START_WITH)
+CONNECT{WS}+BY{WS}+NOCYCLE/[^A-Za-z0-9_]  TOKEN(CONNECT_BY_NOCYCLE)
+CONNECT{WS}+BY/[^A-Za-z0-9_]              TOKEN(CONNECT_BY)
+WITHIN{WS}+GROUP/[^A-Za-z0-9_]            TOKEN(WITHIN_GROUP)
+
+CURRENT{WS}+ROW              TOKEN(CURRENT_ROW)
+NEXT{WS}+VALUE{WS}+FOR       TOKEN(NEXT_VALUE_FOR)
+CHARACTER{WS}+VARYING        TOKEN(CHARACTER_VARYING)
 
             /* Allow =/== see https://sqlite.org/lang_expr.html#collateop */
 "=="        TOKEN(EQUALS)
@@ -235,7 +268,43 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 ">="        TOKEN(GREATEREQ)
 "||"        TOKEN(CONCAT)
 
+  /*
+   * ODBC outer join escape prefix. Lexed as one token so "oj" keeps working as
+   * an ordinary identifier everywhere else. The trailing context stops the rule
+   * from taking the "{oj" out of a name such as "{ojtest".
+   */
+"{"{WS}*oj/[^A-Za-z0-9_]    TOKEN(ODBC_OJ)
+
+  /*
+   * Oracle's legacy outer join marker. Lexed as one token so it cannot be
+   * confused with a parenthesized expression - "(" followed by a lone "+" is
+   * not valid SQL in any other position, since the grammar has no unary plus.
+   */
+"("{WS}*"+"{WS}*")"    TOKEN(OUTERJOIN)
+
+\$[0-9]+    {
+  yylval->ival = atoll(yytext + 1);
+  return SQL_DOLLAR_PARAM;
+}
+
+:[A-Za-z][A-Za-z0-9_]*  {
+  yylval->sval = strdup(yytext + 1);
+  return SQL_NAMED_PARAM;
+}
+
 [-+*/(){},.;<>=^%:?[\]|]    { return yytext[0]; }
+
+  /*
+   * Scientific notation, e.g. 1.5e3, 1.5E+3, .5e-3, 2e10. Matched as one token;
+   * the plain float and integer rules would otherwise take the mantissa and leave
+   * the exponent to be scanned as an identifier.
+   */
+[0-9]+"."[0-9]*e[-+]?[0-9]+ |
+"."[0-9]+e[-+]?[0-9]+ |
+[0-9]+e[-+]?[0-9]+ {
+  yylval->fval = atof(yytext);
+  return SQL_FLOATVAL;
+}
 
 [0-9]+"."[0-9]* |
 "."[0-9]*  {
@@ -265,6 +334,34 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 
 \"[^\"\n]+\" {
   // Crop the leading and trailing quote char
+  yylval->sval = hsql::substr(yytext, 1, strlen(yytext)-1);
+  return SQL_IDENTIFIER;
+}
+
+<afterarray>{WS}+ ; /* stay in afterarray across whitespace before the '[', e.g. "ARRAY [1,2,3]" */
+
+<afterarray>\[ {
+  // The '[' immediately after ARRAY belongs to the array_expr grammar
+  // (ARRAY '[' expr_list ']'), not bracket-quoting - even for a single
+  // bare-identifier element like ARRAY[foo]. Let it fall through as plain
+  // punctuation instead of being swallowed by the bracket-identifier rule below.
+  BEGIN(INITIAL);
+  return yytext[0];
+}
+
+<afterarray>. {
+  // Whatever follows ARRAY wasn't '[' (a syntax error downstream either
+  // way) - drop back to normal lexing and reprocess this character there.
+  BEGIN(INITIAL);
+  yyless(0);
+}
+
+\[[A-Za-z_][A-Za-z0-9_ ]*\] {
+  // T-SQL bracket-quoted identifier, e.g. [dbo] or [My Table]. Restricted to
+  // content starting with a letter/underscore so it doesn't shadow the
+  // existing array_index ('[' int_literal ']') grammar, whose bracket
+  // contents start with a digit. The ARRAY[...] case (including a single
+  // bare-identifier element) is handled above via the afterarray state.
   yylval->sval = hsql::substr(yytext, 1, strlen(yytext)-1);
   return SQL_IDENTIFIER;
 }

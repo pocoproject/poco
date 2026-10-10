@@ -26,8 +26,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Statement::Statement(StatementImpl::Ptr pImpl):
@@ -49,10 +48,8 @@ Statement::Statement(Session& session):
 
 
 Statement::Statement(const Statement& stmt):
-#ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult(stmt._pParseResult),
 	_parseError(stmt._parseError),
-#endif
 	_pImpl(stmt._pImpl),
 	_async(stmt._async),
 	_pResult(stmt._pResult),
@@ -65,33 +62,36 @@ Statement::Statement(const Statement& stmt):
 
 
 Statement::Statement(Statement&& stmt) noexcept:
-#ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult(std::move(stmt._pParseResult)),
 	_parseError(std::move(stmt._parseError)),
-#endif
 	_pImpl(std::move(stmt._pImpl)),
-	_async(std::move(stmt._async)),
+	_async(stmt._async),
 	_pResult(std::move(stmt._pResult)),
 	_pAsyncExec(std::move(stmt._pAsyncExec)),
 	_arguments(std::move(stmt._arguments)),
 	_pRowFormatter(std::move(stmt._pRowFormatter)),
 	_stmtString(std::move(stmt._stmtString))
 {
-	stmt._pImpl = nullptr;
-	stmt._async = false;
-	stmt._pResult = nullptr;
-	stmt._pAsyncExec = nullptr;
-	stmt._arguments.clear();
-	stmt._pRowFormatter = nullptr;
-	_stmtString.clear();
-#ifndef POCO_DATA_NO_SQL_PARSER
-	_parseError.clear();
-#endif
+	stmt.clear();
 }
 
 
 Statement::~Statement()
 {
+}
+
+
+void Statement::clear() noexcept
+{
+	_pImpl.reset();
+	_async = false;
+	_pResult = nullptr;
+	_pAsyncExec = nullptr;
+	_arguments.clear();
+	_pRowFormatter = nullptr;
+	_stmtString.clear();
+	_pParseResult = nullptr;
+	_parseError.clear();
 }
 
 
@@ -105,25 +105,16 @@ Statement& Statement::operator = (const Statement& stmt)
 
 Statement& Statement::operator = (Statement&& stmt) noexcept
 {
-#ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult = std::move(stmt._pParseResult);
 	_parseError = std::move(stmt._parseError);
-	_parseError.clear();
-#endif
 	_pImpl = std::move(stmt._pImpl);
-	stmt._pImpl = nullptr;
-	_async = std::move(stmt._async);
-	stmt._async = false;
+	_async = stmt._async;
 	_pResult = std::move(stmt._pResult);
-	stmt._pResult = nullptr;
 	_pAsyncExec = std::move(stmt._pAsyncExec);
-	stmt._pAsyncExec = nullptr;
 	_arguments = std::move(stmt._arguments);
-	stmt._arguments.clear();
 	_pRowFormatter = std::move(stmt._pRowFormatter);
-	stmt._pRowFormatter = nullptr;
 	_stmtString = std::move(stmt._stmtString);
-	_stmtString.clear();
+	stmt.clear();
 
 	return *this;
 }
@@ -131,10 +122,8 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 void Statement::swap(Statement& other) noexcept
 {
 	using std::swap;
-#ifndef POCO_DATA_NO_SQL_PARSER
 	swap(_pParseResult, other._pParseResult);
 	swap(_parseError, other._parseError);
-#endif
 	swap(_pImpl, other._pImpl);
 	swap(_async, other._async);
 	swap(_pResult, other._pResult);
@@ -175,7 +164,7 @@ Optional<bool> Statement::parse()
 {
 	Optional<bool> result;
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_stmtString.empty()) toString();
+	if (_stmtString.empty()) (void) toString();
 	if (!_stmtString.empty())
 	{
 		_pParseResult->reset();
@@ -202,7 +191,7 @@ bool Statement::isType(unsigned int type) const
 	std::size_t sz = _pParseResult->size();
 	if (sz)
 	{
-		for (int i = 0; i < sz; ++i)
+		for (std::size_t i = 0; i < sz; ++i)
 		{
 			if (_pParseResult->getStatement(i)->type() != st)
 				return false;
@@ -216,7 +205,7 @@ bool Statement::isType(unsigned int type) const
 bool Statement::hasType(unsigned int type) const
 {
 	const auto st = static_cast<Parser::StatementType>(type);
-	for (int i = 0; i < _pParseResult->size(); ++i)
+	for (std::size_t i = 0; i < _pParseResult->size(); ++i)
 	{
 		if (_pParseResult->getStatement(i)->type() == st)
 			return true;
@@ -230,12 +219,7 @@ bool Statement::hasType(unsigned int type) const
 
 const std::string& Statement::parseError()
 {
-#ifdef POCO_DATA_NO_SQL_PARSER
-	static std::string empty;
-	return empty;
-#else
 	return _parseError;
-#endif
 }
 
 
@@ -585,4 +569,4 @@ Session Statement::session()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

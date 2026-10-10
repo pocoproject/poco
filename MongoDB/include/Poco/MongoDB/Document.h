@@ -7,7 +7,7 @@
 //
 // Definition of the Document class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -24,33 +24,66 @@
 #include "Poco/MongoDB/Element.h"
 #include <algorithm>
 #include <cstdlib>
+#include <set>
+#include <string_view>
+#include <type_traits>
+#include <vector>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
+
 
 class Array;
+
+/// Comparison functor for Element::Ptr with transparent lookup support (C++14+).
+/// Allows lookup by std::string without creating Element.
+struct ElementPtrCompare
+{
+	using is_transparent = void;
+
+	bool operator()(const Element::Ptr& lhs, const Element::Ptr& rhs) const noexcept
+	{
+		return lhs->name() < rhs->name();
+	}
+
+	bool operator()(const Element::Ptr& elem, const std::string& name) const noexcept
+	{
+		return elem->name() < name;
+	}
+
+	bool operator()(const std::string& name, const Element::Ptr& elem) const noexcept
+	{
+		return name < elem->name();
+	}
+};
 
 class MongoDB_API ElementFindByName
 {
 public:
-	ElementFindByName(const std::string& name):
+	ElementFindByName(std::string_view name) noexcept:
 		_name(name)
 	{
 	}
 
-	bool operator()(const Element::Ptr& element)
+	bool operator()(const Element::Ptr& element) const noexcept
 	{
 		return !element.isNull() && element->name() == _name;
 	}
 
 private:
-	std::string _name;
+	std::string_view _name;
 };
 
 
 class MongoDB_API Document
 	/// Represents a MongoDB (BSON) document.
+	///
+	/// THREAD SAFETY:
+	/// This class is NOT thread-safe. Document instances must not be accessed
+	/// concurrently from multiple threads without external synchronization.
+	/// Concurrent modifications to the element list will cause undefined behavior.
+	///
+	/// Each thread should use its own Document instances.
 {
 public:
 	using Ptr = SharedPtr<Document>;
@@ -63,7 +96,7 @@ public:
 		/// Destroys the Document.
 
 	Document& addElement(Element::Ptr element);
-		/// Add an element to the document.
+		/// Adds an element to the document, replacing an element with the same name.
 		///
 		/// The active document is returned to allow chaining of the add methods.
 
@@ -76,6 +109,21 @@ public:
 	{
 		return addElement(new ConcreteElement<T>(name, value));
 	}
+
+	template<typename T>
+	typename std::enable_if<!std::is_same<typename std::decay<T>::type, const char*>::value, Document&>::type
+	add(std::string&& name, T value)
+		/// Creates an element with the given name (moved) and value and
+		/// adds it to the document. Move semantics for efficiency.
+		/// Disabled for const char* to avoid ambiguity.
+		///
+		/// The active document is returned to allow chaining of the add methods.
+	{
+		return addElement(new ConcreteElement<T>(std::move(name), value));
+	}
+
+	void reserve(std::size_t size);
+		/// Reserves space for elements.
 
 	Document& add(const std::string& name, const char* value)
 		/// Creates an element with the given name and value and
@@ -95,42 +143,46 @@ public:
 		/// Create a new array and add it to this document.
 		/// Method returns a reference to the new array.
 
-	void clear();
+	void clear() noexcept;
 		/// Removes all elements from the document.
 
 	void elementNames(std::vector<std::string>& keys) const;
 		/// Puts all element names into std::vector.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const noexcept;
 		/// Returns true if the document doesn't contain any documents.
 
-	bool exists(const std::string& name) const;
+	[[nodiscard]] bool exists(const std::string& name) const noexcept;
 		/// Returns true if the document has an element with the given name.
 
 	template<typename T>
-	T get(const std::string& name) const
+	const T& get(const std::string& name) const
 		/// Returns the element with the given name and tries to convert
 		/// it to the template type. When the element is not found, a
 		/// NotFoundException will be thrown. When the element can't be
 		/// converted a BadCastException will be thrown.
 	{
-		Element::Ptr element = get(name);
+		const Element::Ptr element = get(name);
 		if (element.isNull())
 		{
 			throw NotFoundException(name);
 		}
-		else
+
+		if (ElementTraits<T>::TypeId == element->type())
 		{
-			if (ElementTraits<T>::TypeId == element->type())
-			{
-				ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
-				if (concrete != 0)
-				{
-					return concrete->value();
-				}
-			}
-			throw BadCastException("Invalid type mismatch!");
+			// TypeId check already guarantees the runtime type; static_cast
+			// matches Document::getInteger and is ~10x faster than dynamic_cast.
+			// It also avoids a hidden-visibility RTTI mismatch on macOS: when
+			// ConcreteElement<T> is instantiated in one dylib (e.g. addNewArray
+			// creates ConcreteElement<Array::Ptr> inside libPocoMongoDB.dylib)
+			// and Document::get<T> is instantiated in another TU, dyld does not
+			// coalesce the two type_info objects under hidden visibility, so
+			// dynamic_cast returns nullptr and get<T> wrongly throws.
+			const auto* concrete = static_cast<const ConcreteElement<T>*>(element.get());
+			return concrete->value();
 		}
+
+		throw BadCastException("Invalid type mismatch!");
 	}
 
 	template<typename T>
@@ -147,21 +199,20 @@ public:
 
 		if (ElementTraits<T>::TypeId == element->type())
 		{
-			ConcreteElement<T>* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
-			if (concrete != 0)
-			{
-				return concrete->value();
-			}
+			// See note in get<T>(name) above: TypeId check is the type guard,
+			// static_cast avoids hidden-visibility RTTI mismatches across DSOs.
+			auto* concrete = static_cast<ConcreteElement<T>*>(element.get());
+			return concrete->value();
 		}
 
 		return def;
 	}
 
-	Element::Ptr get(const std::string& name) const;
+	[[nodiscard]] Element::Ptr get(const std::string& name) const;
 		/// Returns the element with the given name.
 		/// An empty element will be returned when the element is not found.
 
-	Int64 getInteger(const std::string& name) const;
+	[[nodiscard]] Int64 getInteger(const std::string& name) const;
 		/// Returns an integer. Useful when MongoDB returns Int32, Int64
 		/// or double for a number (count for example). This method will always
 		/// return an Int64. When the element is not found, a
@@ -184,32 +235,76 @@ public:
 	}
 
 	void read(BinaryReader& reader);
-		/// Reads a document from the reader
+		/// Reads a document of at most MAX_MESSAGE_SIZE_BYTES bytes from the reader.
+		///
+		/// BSON is little-endian; the reader's byte order is not used, as in write().
+		///
+		/// Only bounds are checked: every length must fit in the enclosing
+		/// document, strings and documents must end where their length says,
+		/// the size is limited to MAX_MESSAGE_SIZE_BYTES and the nesting depth
+		/// is limited. Throws DataFormatException if a check fails or the data
+		/// ends early, and NotImplementedException for an unsupported element type.
 
-	std::size_t size() const;
+	Int32 read(BinaryReader& reader, Int32 maxSize);
+		/// Reads a document of at most maxSize bytes and returns its size.
+		///
+		/// BSON is little-endian; the reader's byte order is not used, as in write().
+		///
+		/// The checks are those of read(BinaryReader&).
+
+	[[nodiscard]] std::size_t size() const noexcept;
 		/// Returns the number of elements in the document.
 
-	virtual std::string toString(int indent = 0) const;
+	[[nodiscard]] virtual std::string toString(int indent = 0) const;
 		/// Returns a String representation of the document.
 
-	void write(BinaryWriter& writer);
-		/// Writes a document to the reader
+	void write(BinaryWriter& writer) const;
+		/// Writes a document to the writer.
+		///
+		/// Throws InvalidArgumentException if the document is nested too deeply,
+		/// an element that should hold a document holds none, or an element name
+		/// contains a null character, and RangeException for a BSONTimestamp
+		/// outside 1970-2106.
 
 protected:
-	ElementSet _elements;
+
+	using LinearContainer = std::vector<Element::Ptr>;
+
+	const LinearContainer& elements() const noexcept;
+		/// Returns const reference to elements in insertion order for read-only access by derived classes.
+
+private:
+	[[nodiscard]] Int32 readImpl(BinaryReader& reader, Int32 maxSize, int depth);
+		/// Reads a document of at most maxSize bytes and returns its size.
+
+	[[nodiscard]] static Element::Ptr readValue(unsigned char type, std::string&& name, BSONReader& reader, Int32& available);
+		/// Reads the value of an element that is not a document or an array;
+		/// kept out of readImpl to keep its recursive stack frame small.
+
+	void writeImpl(BinaryWriter& writer, int depth) const;
+		/// Writes a document nested depth levels deep.
+
+	void rebuildElementSet() const;
+		/// Rebuilds _elementSet from _elements when it is out of date.
+
+	LinearContainer _elements;
+		/// Vector of elements in insertion order.
+
+	mutable std::set<Element::Ptr, ElementPtrCompare> _elementSet;
+		/// Ordered set for O(log n) element lookups by name.
+		/// Uses heterogeneous lookup (C++14+) - can search by string without creating Element.
+		/// Stores Element::Ptr directly, no string duplication.
+		/// Built lazily on first get() call after modifications; addElement()
+		/// keeps it current for larger documents.
+
+	mutable bool _elementSetValid = false;
+		/// Flag indicating whether _elementSet is in sync with _elements.
 };
 
 
 //
 // inlines
 //
-inline Document& Document::addElement(Element::Ptr element)
-{
-	_elements.push_back(element);
-	return *this;
-}
-
-
 inline Document& Document::addNewDocument(const std::string& name)
 {
 	Document::Ptr newDoc = new Document();
@@ -218,13 +313,15 @@ inline Document& Document::addNewDocument(const std::string& name)
 }
 
 
-inline void Document::clear()
+inline void Document::clear() noexcept
 {
 	_elements.clear();
+	_elementSet.clear();
+	_elementSetValid = false;
 }
 
 
-inline bool Document::empty() const
+inline bool Document::empty() const noexcept
 {
 	return _elements.empty();
 }
@@ -232,33 +329,29 @@ inline bool Document::empty() const
 
 inline void Document::elementNames(std::vector<std::string>& keys) const
 {
-	for (ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	keys.reserve(keys.size() + _elements.size());
+	for (const auto& elem : _elements)
 	{
-		keys.push_back((*it)->name());
+		keys.push_back(elem->name());
 	}
 }
 
 
-inline bool Document::exists(const std::string& name) const
+inline bool Document::exists(const std::string& name) const noexcept
 {
 	return std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name)) != _elements.end();
 }
 
 
-inline bool Document::remove(const std::string& name)
+inline std::size_t Document::size() const noexcept
 {
-	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-	if (it == _elements.end())
-		return false;
-
-	_elements.erase(it);
-	return true;
+	return _elements.size();
 }
 
 
-inline std::size_t Document::size() const
+inline const Document::LinearContainer& Document::elements() const noexcept
 {
-	return _elements.size();
+	return _elements;
 }
 
 
@@ -284,13 +377,13 @@ inline void BSONReader::read<Document::Ptr>(Document::Ptr& to)
 
 
 template<>
-inline void BSONWriter::write<Document::Ptr>(Document::Ptr& from)
+inline void BSONWriter::write<Document::Ptr>(const Document::Ptr& from)
 {
 	from->write(_writer);
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Document_INCLUDED

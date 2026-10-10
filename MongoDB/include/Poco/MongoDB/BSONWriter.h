@@ -7,7 +7,7 @@
 //
 // Definition of the BSONWriter class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -20,10 +20,10 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/BinaryWriter.h"
+#include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API BSONWriter
@@ -42,7 +42,7 @@ public:
 	}
 
 	template<typename T>
-	void write(T& t)
+	void write(const T& t)
 		/// Writes the value to the writer. The default implementation uses
 		/// the << operator. Special types can write their own version.
 	{
@@ -52,6 +52,9 @@ public:
 	void writeCString(const std::string& value);
 		/// Writes a cstring to the writer. A cstring is a string
 		/// terminated a null character.
+		///
+		/// Throws InvalidArgumentException if value contains a null
+		/// character, which would end the cstring early.
 
 private:
 	Poco::BinaryWriter _writer;
@@ -63,12 +66,14 @@ private:
 //
 inline void BSONWriter::writeCString(const std::string& value)
 {
+	if (value.find('\0') != std::string::npos)
+		throw Poco::InvalidArgumentException("BSON name contains a null character");
 	_writer.writeRaw(value);
-	_writer << (unsigned char) 0x00;
+	_writer << static_cast<unsigned char>(0x00);
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_BSONWriter_INCLUDED

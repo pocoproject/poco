@@ -25,8 +25,7 @@
 #include "Poco/URI.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API HTTPSSessionInstantiator: public HTTPSessionInstantiator
@@ -42,7 +41,7 @@ public:
 	~HTTPSSessionInstantiator();
 		/// Destroys the HTTPSSessionInstantiator.
 
-	HTTPClientSession* createClientSession(const Poco::URI& uri);
+	[[nodiscard]] HTTPClientSession* createClientSession(const Poco::URI& uri);
 		/// Creates a HTTPSClientSession for the given URI.
 
 	static void registerInstantiator();
@@ -59,7 +58,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPSSessionInstantiator_INCLUDED

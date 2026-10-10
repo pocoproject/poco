@@ -19,6 +19,7 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPCredentials.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Exception.h"
 #include "Poco/URI.h"
 #include "Poco/URIStreamOpener.h"
 #include "Poco/UnbufferedStreamBuf.h"
@@ -34,8 +35,7 @@ using Poco::URIStreamOpener;
 using Poco::UnbufferedStreamBuf;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPSStreamFactory::HTTPSStreamFactory():
@@ -71,7 +71,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 
 	URI resolvedURI(uri);
 	URI proxyUri;
-	HTTPClientSession* pSession = 0;
+	HTTPClientSession* pSession = nullptr;
 	HTTPResponse res;
 	try
 	{
@@ -127,19 +127,25 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 			pSession->sendRequest(req);
 			std::istream& rs = pSession->receiveResponse(res);
 			bool moved = (res.getStatus() == HTTPResponse::HTTP_MOVED_PERMANENTLY ||
-			              res.getStatus() == HTTPResponse::HTTP_FOUND ||
-			              res.getStatus() == HTTPResponse::HTTP_SEE_OTHER ||
+						  res.getStatus() == HTTPResponse::HTTP_FOUND ||
+						  res.getStatus() == HTTPResponse::HTTP_SEE_OTHER ||
 						  res.getStatus() == HTTPResponse::HTTP_TEMPORARY_REDIRECT);
 			if (moved)
 			{
 				resolvedURI.resolve(res.get("Location"));
+				// A redirect must stay within the web schemes; anything else is
+				// treated as https below and would be requested against a host
+				// taken from an unrelated scheme.
+				const std::string& redirectedScheme(resolvedURI.getScheme());
+				if (redirectedScheme != "http" && redirectedScheme != "https")
+					throw UnknownURISchemeException(resolvedURI.toString() + "; cross-scheme redirect from " + uri.toString());
 				if (!username.empty())
 				{
 					resolvedURI.setUserInfo(username + ":" + password);
 					authorize = false;
 				}
 				delete pSession;
-				pSession = 0;
+				pSession = nullptr;
 				++redirects;
 				retry = true;
 			}
@@ -147,7 +153,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 			{
 				return new HTTPResponseStream(rs, pSession);
 			}
-			else if (res.getStatus() == HTTPResponse::HTTP_USEPROXY && !retry)
+			else if (res.getStatus() == HTTPResponse::HTTP_USE_PROXY && !retry)
 			{
 				// The requested resource MUST be accessed through the proxy
 				// given by the Location field. The Location field gives the
@@ -156,7 +162,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 				// only use for one single request!
 				proxyUri.resolve(res.get("Location"));
 				delete pSession;
-				pSession = 0;
+				pSession = nullptr;
 				retry = true; // only allow useproxy once
 			}
 			else if (res.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED && !authorize)
@@ -191,4 +197,4 @@ void HTTPSStreamFactory::unregisterFactory()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

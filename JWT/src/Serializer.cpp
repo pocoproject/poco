@@ -22,8 +22,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace JWT {
+namespace Poco::JWT {
 
 
 std::string Serializer::serialize(const Poco::JSON::Object& object)
@@ -78,4 +77,4 @@ std::vector<std::string> Serializer::split(const std::string& token)
 }
 
 
-} } // namespace Poco::JWT
+} // namespace Poco::JWT

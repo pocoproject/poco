@@ -33,6 +33,14 @@ public:
 	void testRSACipherLarge();
 	void testCertificate();
 
+	void testPublicKeyDecryptionExponent();
+	void testGenerateInvalidKeyLength();
+	void testLoadSubjectPublicKeyInfo();
+	void testLoadMissingFile();
+	void testSaveCannotCreateFile();
+	void testSaveFlushFailure();
+	void testLoadInvalidKey();
+
 	void setUp();
 	void tearDown();
 

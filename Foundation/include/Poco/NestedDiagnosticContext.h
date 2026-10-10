@@ -51,7 +51,7 @@ class Foundation_API NestedDiagnosticContext
 	/// source code line number and file name.
 {
 public:
-	typedef NDCScope Scope;
+	using Scope = NDCScope;
 
 	NestedDiagnosticContext();
 		/// Creates the NestedDiagnosticContext.
@@ -68,7 +68,7 @@ public:
 	void push(const std::string& info);
 		/// Pushes a context (without line number and filename) onto the stack.
 
-	void push(const std::string& info, int line, const char* filename);
+	void push(const std::string& info, LineNumber line, const char* filename);
 		/// Pushes a context (including line number and filename)
 		/// onto the stack. Filename must be a static string, such as the
 		/// one produced by the __FILE__ preprocessor macro.
@@ -76,10 +76,10 @@ public:
 	void pop();
 		/// Pops the top-most context off the stack.
 
-	int depth() const;
+	[[nodiscard]] int depth() const;
 		/// Returns the depth (number of contexts) of the stack.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns the stack as a string with entries
 		/// delimited by colons. The string does not contain
 		/// line numbers and filenames.
@@ -89,14 +89,16 @@ public:
 		/// to the given stream. The entries are delimited by
 		/// a newline.
 
-	void dump(std::ostream& ostr, const std::string& delimiter) const;
+	void dump(std::ostream& ostr, const std::string& delimiter, bool nameOnly = false) const;
 		/// Dumps the stack (including line number and filenames)
 		/// to the given stream.
+		/// If nameOnly is false (default), the whole path to file is printed,
+		/// otherwise only the file name.
 
 	void clear();
 		/// Clears the NDC stack.
 
-	static NestedDiagnosticContext& current();
+	[[nodiscard]] static NestedDiagnosticContext& current();
 		/// Returns the current thread's NDC.
 
 private:
@@ -104,16 +106,14 @@ private:
 	{
 		std::string info;
 		const char* file;
-		int         line;
+		LineNumber  line;
 	};
-	typedef std::vector<Context> Stack;
+	using Stack = std::vector<Context>;
 
 	Stack _stack;
 };
 
-
-typedef NestedDiagnosticContext NDC;
-
+using NDC = NestedDiagnosticContext;
 
 class Foundation_API NDCScope
 	/// This class can be used to automatically push a context onto
@@ -121,10 +121,10 @@ class Foundation_API NDCScope
 	/// the context at the end of the scope.
 {
 public:
-	NDCScope(const std::string& info);
+	POCO_NODISCARD_CTOR NDCScope(const std::string& info);
 		/// Pushes a context on the stack.
 
-	NDCScope(const std::string& info, int line, const char* filename);
+	POCO_NODISCARD_CTOR NDCScope(const std::string& info, LineNumber line, const char* filename);
 		/// Pushes a context on the stack.
 
 	~NDCScope();
@@ -141,7 +141,7 @@ inline NDCScope::NDCScope(const std::string& info)
 }
 
 
-inline NDCScope::NDCScope(const std::string& info, int line, const char* filename)
+inline NDCScope::NDCScope(const std::string& info, LineNumber line, const char* filename)
 {
 	NestedDiagnosticContext::current().push(info, line, filename);
 }

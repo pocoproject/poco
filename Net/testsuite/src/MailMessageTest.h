@@ -38,8 +38,16 @@ public:
 	void testReadMultiPartWithAttachmentNames();
 	void testReadMultiPartDefaultTransferEncoding();
 	void testReadMultiPartMixedCaseHeaders();
+	void testReadMultiPartInvalidContentDisposition();
 	void testReadMultiPartNoFinalBoundaryFromFile();
 	void testEncodeWord();
+	void testReadMultiPartEmptyBoundary();
+	void testReadMultiPartWithContentLength();
+	void testReadMultiPartWithZeroContentLength();
+	void testReadMultiPartManyParts();
+	void testReadMultiPartTooManyParts();
+	void testReadMultiPartLargeWithContentLength();
+	void testReadMultiPartLargeWithoutContentLength();
 
 	void setUp();
 	void tearDown();

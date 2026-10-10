@@ -23,8 +23,7 @@
 #include "Poco/Zip/ZipLocalFileHeader.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API Keep: public ZipOperation
@@ -43,7 +42,7 @@ private:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_Keep_INCLUDED

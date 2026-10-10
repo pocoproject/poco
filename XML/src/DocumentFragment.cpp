@@ -15,8 +15,7 @@
 #include "Poco/DOM/DocumentFragment.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString DocumentFragment::NODE_NAME = toXMLString("#document-fragment");
@@ -67,4 +66,4 @@ Node* DocumentFragment::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

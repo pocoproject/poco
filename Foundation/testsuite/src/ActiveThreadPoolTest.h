@@ -26,7 +26,9 @@ public:
 	ActiveThreadPoolTest(const std::string& name);
 	~ActiveThreadPoolTest();
 
-	void testActiveThreadPool();
+	void testActiveThreadPool1();
+	void testActiveThreadPool2();
+	void testActiveThreadPool3();
 
 	void setUp();
 	void tearDown();

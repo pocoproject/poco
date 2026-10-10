@@ -67,7 +67,7 @@ int SQLParserResult::errorColumn() const { return errorColumn_; }
 void SQLParserResult::setIsValid(bool isValid) { isValid_ = isValid; }
 
 void SQLParserResult::setErrorDetails(char* errorMsg, int errorLine, int errorColumn) {
-  if (errorMsg_) free(errorMsg);
+  if (errorMsg_) free(errorMsg_);
   errorMsg_ = errorMsg;
   errorLine_ = errorLine;
   errorColumn_ = errorColumn;
@@ -80,8 +80,7 @@ const std::vector<SQLStatement*>& SQLParserResult::getStatements() const {
 
 std::vector<SQLStatement*> SQLParserResult::releaseStatements() {
   std::vector<SQLStatement*> copy;
-  if (statements_)
-  {
+  if (statements_) {
     copy = *statements_;
     statements_->clear();
   }
@@ -89,10 +88,8 @@ std::vector<SQLStatement*> SQLParserResult::releaseStatements() {
 }
 
 void SQLParserResult::reset(bool mv) {
-  if (statements_)
-  {
-    if (!mv)
-    {
+  if (statements_) {
+    if (!mv) {
       for (SQLStatement* statement : *statements_) {
         delete statement;
       }
@@ -101,16 +98,14 @@ void SQLParserResult::reset(bool mv) {
     statements_ = nullptr;
   }
 
-  if (parameters_)
-  {
+  if (parameters_) {
     if (!mv) delete parameters_;
     parameters_ = nullptr;
   }
 
   isValid_ = false;
 
-  if (errorMsg_)
-  {
+  if (errorMsg_) {
     if (!mv) free(errorMsg_);
     errorMsg_ = nullptr;
   }

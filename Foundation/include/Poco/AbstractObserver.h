@@ -30,22 +30,32 @@ class Foundation_API AbstractObserver
 	/// the Observer and NObserver template classes.
 {
 public:
+
 	AbstractObserver();
 	AbstractObserver(const AbstractObserver& observer);
+	AbstractObserver(AbstractObserver&& observer);
 	virtual ~AbstractObserver();
 
 	AbstractObserver& operator = (const AbstractObserver& observer);
+	AbstractObserver& operator = (AbstractObserver&& observer);
 
 	virtual void notify(Notification* pNf) const = 0;
 
-	virtual bool equals(const AbstractObserver& observer) const = 0;
+	virtual NotificationResult notifySync(Notification* pNf) const;
+		/// Synchronous notification processing. Blocks and returns a result.
+		/// Default implementation throws NotImplementedException.
 
-	[[deprecated("use `Poco::Any accepts(Notification*)` instead")]]
+	[[nodiscard]] virtual bool equals(const AbstractObserver& observer) const = 0;
+
+	[[nodiscard]] POCO_DEPRECATED("use `bool accepts(Notification::Ptr&)` instead")
 	virtual bool accepts(Notification* pNf, const char* pName) const = 0;
 
-	virtual bool accepts(const Notification::Ptr& pNf) const = 0;
+	[[nodiscard]] virtual bool accepts(const Notification::Ptr& pNf) const = 0;
 
-	virtual AbstractObserver* clone() const = 0;
+	[[nodiscard]] virtual bool acceptsSync() const;
+		/// Returns true if this observer supports synchronous notification processing.
+
+	[[nodiscard]] virtual AbstractObserver* clone() const = 0;
 
 	virtual void start();
 		/// No-op.
@@ -54,7 +64,7 @@ public:
 
 	virtual void disable() = 0;
 
-	virtual int backlog() const;
+	[[nodiscard]] virtual int backlog() const;
 		/// Returns number of queued messages that this Observer has.
 		/// For non-active (synchronous) observers, always returns zero.
 };

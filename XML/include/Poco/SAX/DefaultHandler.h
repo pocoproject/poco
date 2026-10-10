@@ -25,8 +25,7 @@
 #include "Poco/SAX/ErrorHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API DefaultHandler: public EntityResolver, public DTDHandler, public ContentHandler, public ErrorHandler
@@ -77,7 +76,7 @@ public:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_DefaultHandler_INCLUDED

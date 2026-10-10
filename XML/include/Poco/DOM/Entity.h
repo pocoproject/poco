@@ -23,8 +23,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API Entity: public AbstractContainerNode
@@ -61,31 +60,31 @@ class XML_API Entity: public AbstractContainerNode
 	/// An Entity node does not have any parent.
 {
 public:
-	const XMLString& publicId() const;
+	[[nodiscard]] const XMLString& publicId() const;
 		/// Returns the public identifier associated with
 		/// the entity, if specified. If the public identifier
 		/// was not specified, this is the empty string.
 
-	const XMLString& systemId() const;
+	[[nodiscard]] const XMLString& systemId() const;
 		/// Returns the system identifier associated with
 		/// the entity, if specified. If the system identifier
 		/// was not specified, this is the empty string.
 
-	const XMLString& notationName() const;
+	[[nodiscard]] const XMLString& notationName() const;
 		/// Returns, for unparsed entities, the name of the
 		/// notation for the entity. For parsed entities, this
 		/// is the empty string.
 
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 protected:
 	Entity(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName);
 	Entity(Document* pOwnerDocument, const Entity& entity);
 	~Entity();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;
@@ -120,7 +119,7 @@ inline const XMLString& Entity::notationName() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_Entity_INCLUDED

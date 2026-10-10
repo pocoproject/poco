@@ -150,6 +150,40 @@ void HexBinaryTest::testDecoder()
 		}
 		assertTrue (!decoder.eof());
 	}
+	{
+		// istream::read() goes through xsgetn; badbit must be set
+		// when a mid-read decoder error occurs.
+		std::istringstream istr("AABB#CCDD");
+		HexBinaryDecoder decoder(istr);
+		char buf[16];
+		try
+		{
+			decoder.read(buf, sizeof(buf));
+			assertTrue (decoder.bad());
+		}
+		catch (DataFormatException&)
+		{
+		}
+		assertTrue (!decoder.eof());
+	}
+	{
+		// exceptions(badbit) opt-in must still rethrow the decoder
+		// exception when the failure occurs mid-read via xsgetn.
+		std::istringstream istr("AABB#CCDD");
+		HexBinaryDecoder decoder(istr);
+		decoder.exceptions(std::ios::badbit);
+		char buf[16];
+		bool threw = false;
+		try
+		{
+			decoder.read(buf, sizeof(buf));
+		}
+		catch (DataFormatException&)
+		{
+			threw = true;
+		}
+		assertTrue (threw);
+	}
 }
 
 

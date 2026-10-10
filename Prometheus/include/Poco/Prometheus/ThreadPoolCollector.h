@@ -25,8 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Prometheus_API ThreadPoolCollector: public Collector
@@ -51,7 +50,7 @@ public:
 		/// Creates a custom ThreadPoolCollector with the given name
 		/// and registers it with the given Registry.
 
-	~ThreadPoolCollector() = default;
+	~ThreadPoolCollector();
 		/// Destroys the ThreadPoolCollector.
 
 	// Collector
@@ -61,7 +60,7 @@ public:
 protected:
 	void buildMetrics();
 
-	static std::string collectorName(const std::string& threadPoolName);
+	[[nodiscard]] static std::string collectorName(const std::string& threadPoolName);
 
 	static const std::string NAME_PREFIX;
 
@@ -73,7 +72,7 @@ private:
 };
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_ThreadPoolCollector_INCLUDED

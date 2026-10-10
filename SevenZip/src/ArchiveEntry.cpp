@@ -2,7 +2,7 @@
 // ArchiveEntry.cpp
 //
 // Library: SevenZip
-// Package: Archive
+// Package: SevenZip
 // Module:  ArchiveEntry
 //
 // Copyright (c) 2014, Applied Informatics Software Engineering GmbH.
@@ -16,8 +16,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace SevenZip {
+namespace Poco::SevenZip {
 
 
 ArchiveEntry::ArchiveEntry():
@@ -76,4 +75,4 @@ void ArchiveEntry::swap(ArchiveEntry& entry) noexcept
 }
 
 
-} } // namespace Poco::SevenZip
+} // namespace Poco::SevenZip

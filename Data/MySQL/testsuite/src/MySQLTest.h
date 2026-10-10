@@ -101,7 +101,9 @@ public:
 
 	void testNullableInt();
 	void testNullableString();
+	void testOptionalString();
 	void testTupleWithNullable();
+	void testStdTupleWithOptional();
 
 	void testSessionTransaction();
 	void testTransaction();

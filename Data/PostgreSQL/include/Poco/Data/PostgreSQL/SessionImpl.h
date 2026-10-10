@@ -25,9 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
@@ -46,69 +44,69 @@ public:
 		///
 		/// consult postgres documentation for other parameters
 
-	~SessionImpl();
+	~SessionImpl() override;
 		/// Destroys the SessionImpl.
 
-	void setConnectionTimeout(std::size_t aTimeout);
+	void setConnectionTimeout(std::size_t aTimeout) override;
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout() const;
+	[[nodiscard]] std::size_t getConnectionTimeout() const override;
 		/// Returns the session connection timeout value.
 
-	void open(const std::string& aConnectionString = std::string());
+	void open(const std::string& aConnectionString = std::string()) override;
 		/// Opens a connection to the database.
 
-	void close();
+	void close() override;
 		/// Closes the connection.
 
-	void reset();
+	void reset() override;
 		/// Do nothing
 
-	bool isConnected() const;
+	[[nodiscard]] bool isConnected() const override;
 		/// Returns true if connected, false otherwise.
 
-	Poco::Data::StatementImpl::Ptr createStatementImpl();
+	[[nodiscard]] Poco::Data::StatementImpl::Ptr createStatementImpl() override;
 		/// Returns an PostgreSQL StatementImpl
 
-	void begin();
+	void begin() override;
 		/// Starts a transaction
 
-	void commit();
+	void commit() override;
 		/// Commits and ends a transaction
 
-	void rollback();
+	void rollback() override;
 		/// Aborts a transaction
 
-	bool canTransact() const;
+	[[nodiscard]] bool canTransact() const override;
 		/// Returns true if session has transaction capabilities.
 
-	bool isTransaction() const;
+	[[nodiscard]] bool isTransaction() const override;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
-	void setTransactionIsolation(Poco::UInt32 aTI);
+	void setTransactionIsolation(Poco::UInt32 aTI) override;
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation() const;
+	[[nodiscard]] Poco::UInt32 getTransactionIsolation() const override;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32 aTI) const;
+	[[nodiscard]] bool hasTransactionIsolation(Poco::UInt32 aTI) const override;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32 aTI) const;
+	[[nodiscard]] bool isTransactionIsolation(Poco::UInt32 aTI) const override;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
 	void autoCommit(const std::string&, bool aValue);
 		/// Sets autocommit property for the session.
 
-	bool isAutoCommit(const std::string& aName = std::string()) const;
+	[[nodiscard]] bool isAutoCommit(const std::string& aName = std::string()) const;
 		/// Returns autocommit property value.
 
 	void setAsynchronousCommit(const std::string&, bool aValue);
 		/// Sets asynchronousCommit property for the session.
 
-	bool isAsynchronousCommit(const std::string& aName = std::string()) const;
+	[[nodiscard]] bool isAsynchronousCommit(const std::string& aName = std::string()) const;
 		/// is the connection in Asynchronous commit mode?
 
 	void setBinaryExtraction(const std::string& feature, bool enabled);
@@ -120,15 +118,17 @@ public:
 		/// lower performance, but allows to extract also types not supported
 		/// directly by Poco::Data.
 
-	bool isBinaryExtraction(const std::string& feature = std::string()) const;
+	[[nodiscard]] bool isBinaryExtraction(const std::string& feature = std::string()) const;
 		/// Returns true if binary extraction is enabled, otherwise false.
 		/// See setBinaryExtraction() for more information.
 
-	SessionHandle& handle();
+	[[nodiscard]] SessionHandle& handle();
 		/// Get handle
 
-	const std::string& connectorName() const;
+	[[nodiscard]] const std::string& connectorName() const override;
 		/// Returns the name of the connector.
+
+	void setName();
 
 private:
 	std::string	          _connectorName;
@@ -179,7 +179,7 @@ inline bool SessionImpl::isBinaryExtraction(const std::string&) const
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_SessionImpl_INCLUDED

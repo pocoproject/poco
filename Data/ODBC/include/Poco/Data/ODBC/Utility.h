@@ -23,30 +23,32 @@
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/DateTime.h"
-#include <sstream>
-#include <map>
 #include <sqltypes.h>
+#include <map>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
+
+
+class ConnectionHandle;
 
 
 class ODBC_API Utility
 	/// Various utility functions
 {
 public:
+	inline static const std::string MS_SQL_SERVER_DBMS_NAME = "Microsoft SQL Server"s;
+
 	typedef std::map<std::string, std::string> DSNMap;
 	typedef DSNMap DriverMap;
 
-	static bool isError(SQLRETURN rc);
+	[[nodiscard]] static bool isError(SQLRETURN rc);
 		/// Returns true if return code is error
 
-	static DriverMap& drivers(DriverMap& driverMap);
+	[[nodiscard]] static DriverMap& drivers(DriverMap& driverMap);
 		/// Returns driver-attributes map of available ODBC drivers.
 
-	static DSNMap& dataSources(DSNMap& dsnMap);
+	[[nodiscard]] static DSNMap& dataSources(DSNMap& dsnMap);
 		/// Returns DSN-description map of available ODBC data sources.
 
 	template<typename MapType, typename KeyArgType, typename ValueArgType>
@@ -66,10 +68,10 @@ public:
 		}
 	}
 
-	static int cDataType(int sqlDataType);
+	[[nodiscard]] static int cDataType(int sqlDataType);
 		/// Returns C data type corresponding to supplied SQL data type.
 
-	static int sqlDataType(int cDataType);
+	[[nodiscard]] static int sqlDataType(int cDataType);
 		/// Returns SQL data type corresponding to supplied C data type.
 
 	static void dateSync(Date& dt, const SQL_DATE_STRUCT& ts);
@@ -162,6 +164,50 @@ public:
 		for (; it != end; ++it, ++tIt) dateTimeSync(*tIt, *it);
 	}
 
+	[[nodiscard]] static std::string sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type);
+		/// Returns the requested info about the DBMS or ODBC driver.
+		/// On error, returns "unknown".
+
+	[[nodiscard]] static std::string dbmsName(const ConnectionHandle& db);
+		/// Returns the back end DBMS name.
+
+	[[nodiscard]] std::string dbmsVersion(const ConnectionHandle& db);
+		/// Returns the back end DBMS version.
+
+	[[nodiscard]] std::string driverName(const ConnectionHandle& db);
+		/// Returns the driver name.
+
+	[[nodiscard]] std::string driverVersion(const ConnectionHandle& db);
+		/// Returns the driver version.
+
+	[[nodiscard]] std::string driverODBCVersion(const ConnectionHandle& db);
+		/// Returns the driver ODBC standard version.
+
+	template <typename T>
+	[[nodiscard]] static constexpr SQLINTEGER sizeOf()
+		/// Returns size of the data type.
+	{
+		static_assert (
+			(std::is_same_v<T, Date>) ||
+			(std::is_same_v<T, Time>) ||
+			(std::is_same_v<T, DateTime>) ||
+			(std::is_same_v<T, UUID>), "Utility::sizeOf(): Unsupported type"
+		);
+
+		if constexpr(std::is_same_v<T, Date    >) return sizeof(SQL_DATE_STRUCT);
+		if constexpr(std::is_same_v<T, Time    >) return sizeof(SQL_TIME_STRUCT);
+		if constexpr(std::is_same_v<T, DateTime>) return sizeof(SQL_TIMESTAMP_STRUCT);
+		if constexpr(std::is_same_v<T, UUID    >) return 16;
+		return 0;
+	}
+
+	template <typename T>
+	[[nodiscard]] static constexpr SQLINTEGER sizeOf(const T&)
+		/// Returns size of the data type.
+	{
+		return sizeOf<std::remove_const_t<std::remove_reference_t<T>>>();
+	}
+
 private:
 	static const TypeInfo _dataTypes;
 		/// C <==> SQL data type mapping
@@ -201,7 +247,7 @@ inline void Utility::timeSync(Time& t, const SQL_TIME_STRUCT& ts)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

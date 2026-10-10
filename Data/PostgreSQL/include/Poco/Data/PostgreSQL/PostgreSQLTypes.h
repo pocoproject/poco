@@ -23,9 +23,7 @@
 #include <libpq-fe.h>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 /// Oid constants duplicated from PostgreSQL "include/postgresql/server/catalog/pg_type.h"
@@ -64,7 +62,7 @@ const Oid MACADDROID     = 829;
 const Oid UUIDOID        = 2950;
 
 
-Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID);
+[[nodiscard]] Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID);
 
 
 class InputParameter
@@ -78,15 +76,15 @@ public:
 
 	~InputParameter();
 
-	CDT fieldType() const;
-	const void* pData() const;
-	std::size_t size() const;
-	bool isBinary() const;
+	[[nodiscard]] CDT fieldType() const;
+	[[nodiscard]] const void* pData() const;
+	[[nodiscard]] std::size_t size() const;
+	[[nodiscard]] bool isBinary() const;
 
 	void setStringVersionRepresentation(const std::string& aString);
 	void setNonStringVersionRepresentation(const void* aPtr, std::size_t theSize);
 
-	const void* pInternalRepresentation() const;
+	[[nodiscard]] const void* pInternalRepresentation() const;
 
 private:
 	CDT         _fieldType;
@@ -116,12 +114,12 @@ public:
 	void setValues(CDT fieldType, Oid internalFieldType, std::size_t rowNumber,
 		const char* dataPtr, std::size_t size, bool isNull);
 
-	CDT fieldType() const;
-	Oid internalFieldType() const;
-	std::size_t rowNumber() const;
-	const char* pData() const;
-	std::size_t size() const;
-	bool isNull() const;
+	[[nodiscard]] CDT fieldType() const;
+	[[nodiscard]] Oid internalFieldType() const;
+	[[nodiscard]] std::size_t rowNumber() const;
+	[[nodiscard]] const char* pData() const;
+	[[nodiscard]] std::size_t size() const;
+	[[nodiscard]] bool isNull() const;
 
 private:
 	CDT         _fieldType;
@@ -144,11 +142,11 @@ public:
 	~PQConnectionInfoOptionsFree();
 
 private:
-	PQConnectionInfoOptionsFree(const PQConnectionInfoOptionsFree&);
-	PQConnectionInfoOptionsFree& operator = (const PQConnectionInfoOptionsFree&);
+	PQConnectionInfoOptionsFree(const PQConnectionInfoOptionsFree&) = delete;
+	PQConnectionInfoOptionsFree& operator = (const PQConnectionInfoOptionsFree&) = delete;
 
 private:
-    PQconninfoOption* _pConnectionInfoOption;
+	PQconninfoOption* _pConnectionInfoOption;
 };
 
 
@@ -160,8 +158,8 @@ public:
 	~PQResultClear();
 
 private:
-	PQResultClear(const PQResultClear&);
-	PQResultClear& operator = (const PQResultClear&);
+	PQResultClear(const PQResultClear&) = delete;
+	PQResultClear& operator = (const PQResultClear&) = delete;
 
 private:
 	PGresult* _pPQResult;
@@ -176,8 +174,8 @@ public:
 	~PGCancelFree();
 
 private:
-	PGCancelFree(const PGCancelFree&);
-	PGCancelFree& operator = (const PGCancelFree&);
+	PGCancelFree(const PGCancelFree&) = delete;
+	PGCancelFree& operator = (const PGCancelFree&) = delete;
 
 private:
 	PGcancel* _pPGCancel;
@@ -194,16 +192,16 @@ inline InputParameter::InputParameter(Poco::Data::MetaColumn::ColumnDataType fie
 	_pData(aDataPtr),
 	_size(theSize),
 	_isBinary(Poco::Data::MetaColumn::FDT_BLOB == _fieldType || Poco::Data::MetaColumn::FDT_CLOB == _fieldType),
-	_pNonStringVersionRepresentation(0)
+	_pNonStringVersionRepresentation(nullptr)
 {
 }
 
 
 inline InputParameter::InputParameter(): _fieldType(Poco::Data::MetaColumn::FDT_UNKNOWN),
-	_pData(0),
+	_pData(nullptr),
 	_size(0),
 	_isBinary(false),
-	_pNonStringVersionRepresentation(0)
+	_pNonStringVersionRepresentation(nullptr)
 {
 }
 
@@ -215,7 +213,7 @@ inline InputParameter::~InputParameter()
 
 inline const void* InputParameter::pData() const
 {
-    return _pData;
+	return _pData;
 }
 
 
@@ -239,7 +237,7 @@ inline bool InputParameter::isBinary() const
 
 inline void InputParameter::setStringVersionRepresentation(const std::string& aString)
 {
-	_pNonStringVersionRepresentation = 0;
+	_pNonStringVersionRepresentation = nullptr;
 	_stringVersionRepresentation = aString;
 	_size = _stringVersionRepresentation.size();
 }
@@ -281,8 +279,8 @@ inline const void* InputParameter::pInternalRepresentation() const
 
 	case Poco::Data::MetaColumn::FDT_UNKNOWN:
 	default:
-		return 0;
-    }
+		return nullptr;
+	}
 }
 
 
@@ -306,7 +304,7 @@ inline OutputParameter::OutputParameter():
 	_fieldType(Poco::Data::MetaColumn::FDT_UNKNOWN),
 	_internalFieldType(static_cast<Oid>(-1)),
 	_rowNumber(0),
-	_pData(0),
+	_pData(nullptr),
 	_size(0),
 	_isNull(true)
 {
@@ -325,48 +323,48 @@ inline void OutputParameter::setValues(Poco::Data::MetaColumn::ColumnDataType aF
 	std::size_t theSize,
 	bool anIsNull)
 {
-    _fieldType         = aFieldType;
-    _internalFieldType = anInternalFieldType;
-    _rowNumber         = aRowNumber;
-    _pData             = aDataPtr;
-    _size              = theSize;
-    _isNull            = anIsNull;
+	_fieldType         = aFieldType;
+	_internalFieldType = anInternalFieldType;
+	_rowNumber         = aRowNumber;
+	_pData             = aDataPtr;
+	_size              = theSize;
+	_isNull            = anIsNull;
 }
 
 
 inline Poco::Data::MetaColumn::ColumnDataType OutputParameter::fieldType() const
 {
-    return _fieldType;
+	return _fieldType;
 }
 
 
 inline Oid OutputParameter::internalFieldType() const
 {
-    return _internalFieldType;
+	return _internalFieldType;
 }
 
 
 inline std::size_t OutputParameter::rowNumber() const
 {
-    return _rowNumber;
+	return _rowNumber;
 }
 
 
 inline const char* OutputParameter::pData() const
 {
-    return _pData;
+	return _pData;
 }
 
 
 inline std::size_t OutputParameter::size() const
 {
-    return _size;
+	return _size;
 }
 
 
 inline bool OutputParameter::isNull() const
 {
-    return _isNull;
+	return _isNull;
 }
 
 
@@ -378,11 +376,11 @@ inline PQConnectionInfoOptionsFree::PQConnectionInfoOptionsFree(PQconninfoOption
 
 inline PQConnectionInfoOptionsFree::~PQConnectionInfoOptionsFree()
 {
-    if (_pConnectionInfoOption)
-    {
-        PQconninfoFree(_pConnectionInfoOption);
-        _pConnectionInfoOption = 0;
-    }
+	if (_pConnectionInfoOption)
+	{
+		PQconninfoFree(_pConnectionInfoOption);
+		_pConnectionInfoOption = nullptr;
+	}
 }
 
 
@@ -394,11 +392,11 @@ inline PQResultClear::PQResultClear(PGresult* aPQResultPtr):
 
 inline PQResultClear::~PQResultClear()
 {
-    if (_pPQResult)
-    {
-        PQclear(_pPQResult);
-        _pPQResult = 0;
-    }
+	if (_pPQResult)
+	{
+		PQclear(_pPQResult);
+		_pPQResult = nullptr;
+	}
 }
 
 
@@ -412,15 +410,15 @@ inline PGCancelFree::PGCancelFree(PGcancel* aStatementCancelPtr):
 
 inline PGCancelFree::~PGCancelFree()
 {
-    if (_pPGCancel)
-    {
-        PQfreeCancel(_pPGCancel);
-        _pPGCancel = 0;
-    }
+	if (_pPGCancel)
+	{
+		PQfreeCancel(_pPGCancel);
+		_pPGCancel = nullptr;
+	}
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_Types_INCLUDED

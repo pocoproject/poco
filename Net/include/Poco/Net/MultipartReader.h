@@ -20,14 +20,16 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/BufferedStreamBuf.h"
+#include <memory>
 #include <istream>
+#include <string>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class MessageHeader;
+class ReadWindow;
 
 
 class Net_API MultipartStreamBuf: public Poco::BufferedStreamBuf
@@ -35,21 +37,41 @@ class Net_API MultipartStreamBuf: public Poco::BufferedStreamBuf
 {
 public:
 	MultipartStreamBuf(std::istream& istr, const std::string& boundary);
+		/// Creates the MultipartStreamBuf and connects it
+		/// to the given input stream.
+
+	MultipartStreamBuf(std::istream& istr, const std::string& boundary, std::streamsize contentLength);
+		/// Creates the MultipartStreamBuf with a known Content-Length
+		/// for the current part, enabling bulk-read optimization.
+
 	~MultipartStreamBuf();
-	bool lastPart() const;
+	[[nodiscard]] bool lastPart() const;
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length);
 
 private:
-	enum
-	{
-		STREAM_BUFFER_SIZE = 1024
-	};
+	std::streamsize readContent(char* buffer, std::streamsize length);
+		/// Reads content bytes, using bulk sgetn when Content-Length is known,
+		/// or bulk-read + in-buffer boundary scanning otherwise.
 
-	std::istream& _istr;
-	std::string   _boundary;
-	bool          _lastPart;
+	void consumePostBoundaryDelimiter();
+		/// After a boundary match, consumes the trailing delimiter
+		/// (CRLF for next part, or "--" for last part).
+
+	std::streamsize scanForBoundary(const char* data, std::streamsize size);
+		/// Searches for "\r\n--boundary" or "\n--boundary" in data[0..size).
+		/// Returns the offset of the \r or \n that starts the match,
+		/// or -1 if not found.
+
+	static constexpr std::streamsize STREAM_BUFFER_SIZE = 32768;
+
+	std::istream&      _istr;
+	std::string        _boundary;
+	bool               _lastPart;
+	bool               _boundaryFound;
+	std::streamsize    _contentLength;
+	std::streamsize    _bytesRead;
 };
 
 
@@ -58,9 +80,10 @@ class Net_API MultipartIOS: public virtual std::ios
 {
 public:
 	MultipartIOS(std::istream& istr, const std::string& boundary);
+	MultipartIOS(std::istream& istr, const std::string& boundary, std::streamsize contentLength);
 	~MultipartIOS();
-	MultipartStreamBuf* rdbuf();
-	bool lastPart() const;
+	[[nodiscard]] MultipartStreamBuf* rdbuf();
+	[[nodiscard]] bool lastPart() const;
 
 protected:
 	MultipartStreamBuf _buf;
@@ -72,6 +95,7 @@ class Net_API MultipartInputStream: public MultipartIOS, public std::istream
 {
 public:
 	MultipartInputStream(std::istream& istr, const std::string& boundary);
+	MultipartInputStream(std::istream& istr, const std::string& boundary, std::streamsize contentLength);
 	~MultipartInputStream();
 };
 
@@ -120,13 +144,13 @@ public:
 		/// available, or if no boundary line can be found in
 		/// the input stream.
 
-	bool hasNextPart();
+	[[nodiscard]] bool hasNextPart();
 		/// Returns true iff more parts are available.
 		///
 		/// Before the first call to nextPart(), returns
 		/// always true.
 
-	std::istream& stream() const;
+	[[nodiscard]] std::istream& stream() const;
 		/// Returns a reference to the reader's stream that
 		/// can be used to read the current part.
 		///
@@ -134,27 +158,29 @@ public:
 		/// nextPart() is called or the MultipartReader
 		/// object is destroyed.
 
-	const std::string& boundary() const;
+	[[nodiscard]] const std::string& boundary() const;
 		/// Returns the multipart boundary used by this reader.
 
 protected:
 	void findFirstBoundary();
 	void guessBoundary();
 	void parseHeader(MessageHeader& messageHeader);
-	bool readLine(std::string& line, std::string::size_type n);
+	[[nodiscard]] bool readLine(std::string& line, std::string::size_type n);
+
+	MultipartReader() = delete;
+	MultipartReader(const MultipartReader&) = delete;
+	MultipartReader& operator = (const MultipartReader&) = delete;
 
 private:
-	MultipartReader();
-	MultipartReader(const MultipartReader&);
-	MultipartReader& operator = (const MultipartReader&);
-
 	std::istream&         _istr;
 	std::string           _boundary;
-	MultipartInputStream* _pMPI;
+	std::unique_ptr<ReadWindow>       _window;   /// Top-level read-ahead buffer wrapping _istr
+	std::unique_ptr<std::istream>     _windowStr; /// Persistent istream over _window
+	std::unique_ptr<MultipartInputStream> _pMPI;
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MultipartReader_INCLUDED

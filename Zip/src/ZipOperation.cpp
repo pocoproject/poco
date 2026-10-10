@@ -15,8 +15,7 @@
 #include "Poco/Zip/ZipOperation.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 ZipOperation::ZipOperation()
@@ -29,4 +28,4 @@ ZipOperation::~ZipOperation()
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

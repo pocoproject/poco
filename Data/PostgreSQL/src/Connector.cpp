@@ -17,9 +17,7 @@
 #include "Poco/Data/SessionFactory.h"
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 const std::string Connector::KEY("postgresql");
@@ -59,4 +57,4 @@ void Connector::unregisterConnector()
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

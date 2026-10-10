@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../ver20/util/fedsearch-docu-viewer.xsl"?>
+<!--
+Copyright (c) 2012 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this document so long as this copyright notice, license and disclaimer are retained with all copies of the document. No license is granted to modify this document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE; OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT.  THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO, INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tfs="http://www.onvif.org/ver10/federatedsearch/wsdl" xmlns:mpqf="urn:mpeg:mpqf:schema:2008" targetNamespace="http://www.onvif.org/ver10/federatedsearch/wsdl">
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/federatedsearch/wsdl" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.0">
+			<xs:import namespace="urn:mpeg:mpqf:schema:2008" schemaLocation="http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-7_schema_files/mpqf.xsd"/>
+			<!--  Message Request/Responses elements  -->
+			<!--===============================
+			In order for the federated search service to make use of ISO/IEC 15938-12 the following 
+			MPEG disclaimer has to be cited here: 
+			
+			Software Copyright Licencing Disclaimer for MPEG Standards
+			This software module was originally developed in the course of development of ISO/IEC 15938-12 for 
+			reference purposes and its performance may not have been optimized. This software module is an 
+			implementation of one or more tools as specified by ISO/IEC 15938-12.
+			Those intending to use this software module in products are advised that its use may infringe existing 
+			patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+			This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.  
+			===============================-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType/>
+			</xs:element>
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="tfs:Capabilities"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:complexType name="Capabilities">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="tfs:Capabilities"/>
+			<!--===============================-->
+			<xs:element name="GetServiceFeatures">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="InputCapabilities" type="mpqf:MpegQueryType">
+							<xs:annotation>
+								<xs:documentation>Contains descriptions of desired services
+									capabilities and may contain the ID for a particular service to
+									be addressed.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetServiceFeaturesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="OutputCapabilities" type="mpqf:MpegQueryType">
+							<xs:annotation>
+								<xs:documentation>Contains a list of available service capability
+									descriptions or a system message in case of an error. If no
+									service is available or matches the given capabilities, then an
+									empty Output element is returned.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="Search">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="InputQuery" type="mpqf:MpegQueryType">
+							<xs:annotation>
+								<xs:documentation>Container for describing a query request
+									containing a set of conditions and/or the specification of the
+									structure and content of the output query format and a
+									declaration part.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SearchResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="OutputQuery" type="mpqf:MpegQueryType">
+							<xs:annotation>
+								<xs:documentation>Container for all the results from a responder to
+									a requester. It may contain in addition messages such as error
+									and exception.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetSearchResults">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Results" type="mpqf:MpegQueryType">
+							<xs:annotation>
+								<xs:documentation>Allows to request the results of a previous query
+									issued.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetSearchResultsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ResultItem" type="mpqf:MpegQueryType" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Describes a single result returned from a
+									responder.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="RegisterDatabase">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="DatabaseFeaturesSupported" type="tfs:RegisterDatabase" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Describes a predefined set of features supported
+									by the database registered.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RegisterDatabaseResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<!--===============================-->
+			<!--         Federated Search Types     	           -->
+			<!--===============================-->
+			<xs:complexType name="RegisterDatabase">
+				<xs:annotation>
+					<xs:documentation>Contains features provided by a database, formatted according to
+				presets defined in ISO/IEC 15938-12</xs:documentation>
+					<xs:documentation>RecordingSearchInterfaceRegistration attribute to register ONVIF
+				Recording Search Service interfaces at a search broker</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="tfs:CapabilityType">
+						<xs:sequence>
+							<xs:element name="Extension" type="tfs:RegisterDatabaseExtension" minOccurs="0"/>
+						</xs:sequence>
+						<xs:attribute name="serviceID" type="xs:anyURI" use="required"/>
+						<xs:attribute name="RecordingSearchInterfaceRegistration" type="xs:boolean"/>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="RegisterDatabaseExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="CapabilityType">
+				<xs:sequence>
+					<xs:annotation>
+						<xs:documentation>Elements used are as defined in ISO/IEC 15938-12</xs:documentation>
+					</xs:annotation>
+					<xs:element name="SupportedQFProfile" type="tfs:TermType" minOccurs="0"/>
+					<xs:element name="SupportedMetadata" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="SupportedExampleMediaTypes" minOccurs="0">
+						<xs:simpleType>
+							<xs:list itemType="tfs:mimeType"/>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="SupportedResultMediaTypes" minOccurs="0">
+						<xs:simpleType>
+							<xs:list itemType="tfs:mimeType"/>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="SupportedQueryTypes" type="tfs:TermType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="SupportedExpressions" type="tfs:TermType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="TermType">
+				<xs:annotation>
+					<xs:documentation>Corresponds to TermType definition in ISO/IEC 15938-12</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Name" type="xs:string" minOccurs="0"/>
+					<xs:element name="Description" type="xs:string" minOccurs="0"/>
+					<xs:element name="Term" type="tfs:TermType" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="href" type="tfs:SimpleTermType" use="required"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:simpleType name="SimpleTermType">
+				<xs:annotation>
+					<xs:documentation>Corresponds to SimpleTermType definition in ISO/IEC 15938-12</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:anyURI"/>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:simpleType name="mimeType">
+				<xs:annotation>
+					<xs:documentation>Corresponds to mimeType definition in ISO/IEC 15938-12</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:whiteSpace value="collapse"/>
+					<xs:pattern value="([Xx]\-)?[!#$%&#x27;*+.0-9A-Z\^-~&#x7f;]+/([Xx]\-)?[!#$%&#x27;*+.0-9A-Z\^-~&#x7f;\-]+"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:schema>
+		<!--===============================-->
+	</wsdl:types>
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameter" element="tfs:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameter" element="tfs:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceFeaturesRequest">
+		<wsdl:part name="parameters" element="tfs:GetServiceFeatures"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceFeaturesResponse">
+		<wsdl:part name="parameters" element="tfs:GetServiceFeaturesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SearchRequest">
+		<wsdl:part name="parameters" element="tfs:Search"/>
+	</wsdl:message>
+	<wsdl:message name="SearchResponse">
+		<wsdl:part name="parameters" element="tfs:SearchResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetSearchResultsRequest">
+		<wsdl:part name="parameters" element="tfs:GetSearchResults"/>
+	</wsdl:message>
+	<wsdl:message name="GetSearchResultsResponse">
+		<wsdl:part name="parameters" element="tfs:GetSearchResultsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="RegisterDatabaseRequest">
+		<wsdl:part name="parameters" element="tfs:RegisterDatabase"/>
+	</wsdl:message>
+	<wsdl:message name="RegisterDatabaseResponse">
+		<wsdl:part name="parameters" element="tfs:RegisterDatabaseResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="FederatedSearchPort">
+		<!--===============================-->
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>Returns the capabilities of the federated search service. The result is returned in a typed answer.</wsdl:documentation>
+			<wsdl:input message="tfs:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="tfs:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetServiceFeatures">
+			<wsdl:input message="tfs:GetServiceFeaturesRequest"/>
+			<wsdl:output message="tfs:GetServiceFeaturesResponse"/>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="Search">
+			<wsdl:input message="tfs:SearchRequest"/>
+			<wsdl:output message="tfs:SearchResponse"/>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetSearchResults">
+			<wsdl:input message="tfs:GetSearchResultsRequest"/>
+			<wsdl:output message="tfs:GetSearchResultsResponse"/>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="RegisterDatabase">
+			<wsdl:input message="tfs:RegisterDatabaseRequest"/>
+			<wsdl:output message="tfs:RegisterDatabaseResponse"/>
+		</wsdl:operation>
+		<!--===============================-->
+	</wsdl:portType>
+	<wsdl:binding name="FederatedSearchBinding" type="tfs:FederatedSearchPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<!--===============================-->
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/federatedsearch/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetServiceFeatures">
+			<soap:operation soapAction="http://www.onvif.org/ver10/federatedsearch/wsdl/GetServiceFeatures"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="Search">
+			<soap:operation soapAction="http://www.onvif.org/ver10/federatedsearch/wsdl/Search"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetSearchResults">
+			<soap:operation soapAction="http://www.onvif.org/ver10/federatedsearch/wsdl/GetSearchResults"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="RegisterDatabase">
+			<soap:operation soapAction="http://www.onvif.org/ver10/federatedsearch/wsdl/RegisterDatabase"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+	</wsdl:binding>
+	<!--===============================-->
+	<!--===============================-->
+	<!--===============================-->
+</wsdl:definitions>

@@ -23,8 +23,7 @@
 using Poco::NumberFormatter;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPRequest::HTTP_GET            = "GET";
@@ -84,6 +83,8 @@ HTTPRequest::HTTPRequest(const HTTPRequest& other):
 
 HTTPRequest::~HTTPRequest()
 {
+	secureErase(AUTHORIZATION);
+	secureErase(PROXY_AUTHORIZATION);
 }
 
 
@@ -194,7 +195,7 @@ void HTTPRequest::setCredentials(const std::string& scheme, const std::string& a
 
 void HTTPRequest::removeCredentials()
 {
-	erase(AUTHORIZATION);
+	secureErase(AUTHORIZATION);
 }
 
 
@@ -218,7 +219,7 @@ void HTTPRequest::setProxyCredentials(const std::string& scheme, const std::stri
 
 void HTTPRequest::removeProxyCredentials()
 {
-	erase(PROXY_AUTHORIZATION);
+	secureErase(PROXY_AUTHORIZATION);
 }
 
 
@@ -232,7 +233,7 @@ void HTTPRequest::write(std::ostream& ostr) const
 
 void HTTPRequest::read(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	std::string method;
 	std::string uri;
@@ -306,4 +307,4 @@ void HTTPRequest::setExpectContinue(bool expectContinue)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

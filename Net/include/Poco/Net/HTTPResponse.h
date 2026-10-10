@@ -25,8 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPCookie;
@@ -62,7 +61,7 @@ public:
 		HTTP_SEE_OTHER                       = 303,
 		HTTP_NOT_MODIFIED                    = 304,
 		HTTP_USE_PROXY                       = 305,
-		HTTP_USEPROXY                        = 305, /// @deprecated
+		HTTP_USEPROXY POCO_DEPRECATED("use HTTP_USE_PROXY") = 305,
 		// UNUSED: 306
 		HTTP_TEMPORARY_REDIRECT              = 307,
 		HTTP_PERMANENT_REDIRECT              = 308,
@@ -80,11 +79,11 @@ public:
 		HTTP_LENGTH_REQUIRED                 = 411,
 		HTTP_PRECONDITION_FAILED             = 412,
 		HTTP_REQUEST_ENTITY_TOO_LARGE        = 413,
-		HTTP_REQUESTENTITYTOOLARGE           = 413, /// @deprecated
+		HTTP_REQUESTENTITYTOOLARGE POCO_DEPRECATED("Use HTTP_REQUEST_ENTITY_TOO_LARGE") = 413,
 		HTTP_REQUEST_URI_TOO_LONG            = 414,
-		HTTP_REQUESTURITOOLONG               = 414, /// @deprecated
+		HTTP_REQUESTURITOOLONG POCO_DEPRECATED("Use HTTP_REQUEST_URI_TOO_LONG") = 414,
 		HTTP_UNSUPPORTED_MEDIA_TYPE          = 415,
-		HTTP_UNSUPPORTEDMEDIATYPE            = 415, /// @deprecated
+		HTTP_UNSUPPORTEDMEDIATYPE POCO_DEPRECATED("Use HTTP_UNSUPPORTED_MEDIA_TYPE") = 415,
 		HTTP_REQUESTED_RANGE_NOT_SATISFIABLE = 416,
 		HTTP_EXPECTATION_FAILED              = 417,
 		HTTP_IM_A_TEAPOT                     = 418,
@@ -134,7 +133,7 @@ public:
 	HTTPResponse(const HTTPResponse& other);
 		/// Creates the HTTPResponse by copying another one.
 
-	virtual ~HTTPResponse();
+	~HTTPResponse() override;
 		/// Destroys the HTTPResponse.
 
 	HTTPResponse& operator = (const HTTPResponse& other);
@@ -145,7 +144,7 @@ public:
 		///
 		/// Does not change the reason phrase.
 
-	HTTPStatus getStatus() const;
+	[[nodiscard]] HTTPStatus getStatus() const;
 		/// Returns the HTTP status code.
 
 	void setStatus(const std::string& status);
@@ -157,7 +156,7 @@ public:
 	void setReason(const std::string& reason);
 		/// Sets the HTTP reason phrase.
 
-	const std::string& getReason() const;
+	[[nodiscard]] const std::string& getReason() const;
 		/// Returns the HTTP reason phrase.
 
 	void setStatusAndReason(HTTPStatus status, const std::string& reason);
@@ -171,12 +170,21 @@ public:
 	void setDate(const Poco::Timestamp& dateTime);
 		/// Sets the Date header to the given date/time value.
 
-	Poco::Timestamp getDate() const;
+	[[nodiscard]] Poco::Timestamp getDate() const;
 		/// Returns the value of the Date header.
 
 	void addCookie(const HTTPCookie& cookie);
 		/// Adds the cookie to the response by
 		/// adding a Set-Cookie header.
+
+	void removeCookie(const std::string& cookieName);
+		/// Removes the Set-Cookie header for the cookie with the given name,
+		/// if the header is present. Otherwise does nothing.
+
+	void replaceCookie(const HTTPCookie& cookie);
+		/// Replaces a Set-Cookie header for the given cookie with the
+		/// updated cookie, or adds a new Set-Cookie header of none
+		/// is present for the given cookie.
 
 	void getCookies(std::vector<HTTPCookie>& cookies) const;
 		/// Returns a vector with all the cookies
@@ -185,17 +193,17 @@ public:
 		/// May throw an exception in case of a malformed
 		/// Set-Cookie header.
 
-	void write(std::ostream& ostr) const;
+	void write(std::ostream& ostr) const override;
 		/// Writes the HTTP response to the given
 		/// output stream.
 
-	void read(std::istream& istr);
+	void read(std::istream& istr) override;
 		/// Reads the HTTP response from the
 		/// given input stream.
 		///
 		/// 100 Continue responses are ignored.
 
-	static const std::string& getReasonForStatus(HTTPStatus status);
+	[[nodiscard]] static const std::string& getReasonForStatus(HTTPStatus status);
 		/// Returns an appropriate reason phrase
 		/// for the given status code.
 
@@ -294,7 +302,7 @@ inline const std::string& HTTPResponse::getReason() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPResponse_INCLUDED

@@ -84,7 +84,7 @@ public:
 		UCP_SPACE_SEPARATOR
 	};
 
-	enum Script
+	enum  Script
 		/// Unicode 7.0 script identifiers.
 	{
 		UCP_ARABIC,
@@ -238,32 +238,32 @@ public:
 		/// Return the Unicode character properties for the
 		/// character with the given Unicode value.
 
-	static bool isSpace(int ch);
+	[[nodiscard]] static bool isSpace(int ch);
 		/// Returns true iff the given character is a separator.
 
-	static bool isDigit(int ch);
+	[[nodiscard]] static bool isDigit(int ch);
 		/// Returns true iff the given character is a numeric character.
 
-	static bool isPunct(int ch);
+	[[nodiscard]] static bool isPunct(int ch);
 		/// Returns true iff the given character is a punctuation character.
 
-	static bool isAlpha(int ch);
+	[[nodiscard]] static bool isAlpha(int ch);
 		/// Returns true iff the given character is a letter.
 
-	static bool isLower(int ch);
+	[[nodiscard]] static bool isLower(int ch);
 		/// Returns true iff the given character is a lowercase
 		/// character.
 
-	static bool isUpper(int ch);
+	[[nodiscard]] static bool isUpper(int ch);
 		/// Returns true iff the given character is an uppercase
 		/// character.
 
-	static int toLower(int ch);
+	[[nodiscard]] static int toLower(int ch);
 		/// If the given character is an uppercase character,
 		/// return its lowercase counterpart, otherwise return
 		/// the character.
 
-	static int toUpper(int ch);
+	[[nodiscard]] static int toUpper(int ch);
 		/// If the given character is a lowercase character,
 		/// return its uppercase counterpart, otherwise return
 		/// the character.

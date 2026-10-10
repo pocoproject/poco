@@ -19,17 +19,20 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
+#include "Poco/Data/ODBC/Utility.h"
 #include <vector>
 #include <cstring>
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqlext.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
+
+
+template <typename H, SQLSMALLINT handleType>
+class Error;
 
 
 template <typename H, SQLSMALLINT handleType>
@@ -41,10 +44,10 @@ class Diagnostics
 {
 public:
 
-	static const unsigned int SQL_STATE_SIZE = SQL_SQLSTATE_SIZE + 1;
-	static const unsigned int SQL_MESSAGE_LENGTH = SQL_MAX_MESSAGE_LENGTH + 1;
-	static const unsigned int SQL_NAME_LENGTH = 128;
-	static const std::string  DATA_TRUNCATED;
+	static constexpr unsigned int SQL_STATE_SIZE = SQL_SQLSTATE_SIZE + 1;
+	static constexpr unsigned int SQL_MESSAGE_LENGTH = SQL_MAX_MESSAGE_LENGTH + 1;
+	static constexpr unsigned int SQL_NAME_LENGTH = 128;
+	inline static const std::string  DATA_TRUNCATED;
 
 	struct DiagnosticFields
 	{
@@ -62,7 +65,7 @@ public:
 	{
 		std::memset(_connectionName, 0, sizeof(_connectionName));
 		std::memset(_serverName, 0, sizeof(_serverName));
-		diagnostics();
+		(void)diagnostics();
 	}
 
 	~Diagnostics()
@@ -70,28 +73,28 @@ public:
 	{
 	}
 
-	std::string sqlState(int index) const
+	[[nodiscard]] std::string sqlState(int index) const
 		/// Returns SQL state.
 	{
 		poco_assert (index < count());
 		return std::string((char*) _fields[index]._sqlState);
 	}
 
-	std::string message(int index) const
+	[[nodiscard]] std::string message(int index) const
 		/// Returns error message.
 	{
 		poco_assert (index < count());
 		return std::string((char*) _fields[index]._message);
 	}
 
-	long nativeError(int index) const
+	[[nodiscard]] long nativeError(int index) const
 		/// Returns native error code.
 	{
 		poco_assert (index < count());
 		return _fields[index]._nativeError;
 	}
 
-	std::string connectionName() const
+	[[nodiscard]] std::string connectionName() const
 		/// Returns the connection name.
 		/// If there is no active connection, connection name defaults to NONE.
 		/// If connection name is not applicable for query context (such as when querying environment handle),
@@ -100,7 +103,7 @@ public:
 		return std::string((char*) _connectionName);
 	}
 
-	std::string serverName() const
+	[[nodiscard]] std::string serverName() const
 		/// Returns the server name.
 		/// If the connection has not been established, server name defaults to NONE.
 		/// If server name is not applicable for query context (such as when querying environment handle),
@@ -109,7 +112,7 @@ public:
 		return std::string((char*) _serverName);
 	}
 
-	int count() const
+	[[nodiscard]] int count() const
 		/// Returns the number of contained diagnostic records.
 	{
 		return (int) _fields.size();
@@ -121,24 +124,24 @@ public:
 		_fields.clear();
 	}
 
-	const FieldVec& fields() const
+	[[nodiscard]] const FieldVec& fields() const
 	{
 		return _fields;
 	}
 
-	Iterator begin() const
+	[[nodiscard]] Iterator begin() const
 	{
 		return _fields.begin();
 	}
 
-	Iterator end() const
+	[[nodiscard]] Iterator end() const
 	{
 		return _fields.end();
 	}
 
-	const Diagnostics& diagnostics()
+	[[nodiscard]] const Diagnostics& diagnostics()
 	{
-		if (SQL_NULL_HANDLE == _handle) return *this;
+		if (POCO_ODBC_NULL_HANDLE == _handle) return *this;
 
 		DiagnosticFields df;
 		SQLSMALLINT count = 1;
@@ -213,6 +216,12 @@ public:
 		return *this;
 	}
 
+protected:
+	[[nodiscard]] const H& handle() const
+	{
+		return _handle;
+	}
+
 private:
 
 	Diagnostics();
@@ -226,16 +235,36 @@ private:
 
 	/// Context handle
 	const H& _handle;
+
+	friend class Error<H, handleType>;
 };
 
 
-typedef Diagnostics<SQLHENV, SQL_HANDLE_ENV> EnvironmentDiagnostics;
-typedef Diagnostics<SQLHDBC, SQL_HANDLE_DBC> ConnectionDiagnostics;
-typedef Diagnostics<SQLHSTMT, SQL_HANDLE_STMT> StatementDiagnostics;
-typedef Diagnostics<SQLHDESC, SQL_HANDLE_DESC> DescriptorDiagnostics;
+// explicit instantiation definition
+#ifndef POCO_DOC
+
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
+extern template class Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
+extern template class Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
+#else
+extern template class ODBC_API Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
+extern template class ODBC_API Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class ODBC_API Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class ODBC_API Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
+
+#endif
 
 
-} } } // namespace Poco::Data::ODBC
+using EnvironmentDiagnostics = Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
+using ConnectionDiagnostics = Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
+using StatementDiagnostics = Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
+using DescriptorDiagnostics = Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
+
+
+} // namespace Poco::Data::ODBC
 
 
 #endif

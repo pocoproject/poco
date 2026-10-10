@@ -23,6 +23,7 @@
 #include "Poco/ScopedLock.h"
 #include "Poco/Timestamp.h"
 #include <atomic>
+#include <thread>
 
 #ifdef POCO_ENABLE_STD_MUTEX
 #include "Poco/Mutex_STD.h"
@@ -52,6 +53,7 @@ class Foundation_API Mutex: private MutexImpl
 {
 public:
 	using ScopedLock = Poco::ScopedLock<Mutex>;
+	using ScopedLockWithUnlock = Poco::ScopedLockWithUnlock<Mutex>;
 
 	Mutex();
 		/// creates the Mutex.
@@ -72,12 +74,12 @@ public:
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
-	bool tryLock();
+	[[nodiscard]] bool tryLock();
 		/// Tries to lock the mutex. Returns false immediately
 		/// if the mutex is already held by another thread.
 		/// Returns true if the mutex was successfully locked.
 
-	bool tryLock(long milliseconds);
+	[[nodiscard]] bool tryLock(long milliseconds);
 		/// Locks the mutex. Blocks up to the given number of milliseconds
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
@@ -107,6 +109,7 @@ class Foundation_API FastMutex: private FastMutexImpl
 {
 public:
 	using ScopedLock = Poco::ScopedLock<FastMutex>;
+	using ScopedLockWithUnlock = Poco::ScopedLockWithUnlock<FastMutex>;
 
 	FastMutex();
 		/// creates the Mutex.
@@ -127,12 +130,12 @@ public:
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
-	bool tryLock();
+	[[nodiscard]] bool tryLock();
 		/// Tries to lock the mutex. Returns false immediately
 		/// if the mutex is already held by another thread.
 		/// Returns true if the mutex was successfully locked.
 
-	bool tryLock(long milliseconds);
+	[[nodiscard]] bool tryLock(long milliseconds);
 		/// Locks the mutex. Blocks up to the given number of milliseconds
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
@@ -155,6 +158,12 @@ class Foundation_API SpinlockMutex
 	/// A SpinlockMutex, implemented in terms of std::atomic_flag, as
 	/// busy-wait mutual exclusion.
 	///
+	/// Spins adaptively: spin briefly, then yield, then sleep.
+	/// This avoids burning CPU while still being fast for uncontended locks.
+	/// On C++20, uses test() with relaxed ordering for efficient polling
+	/// (avoids cache line bouncing), then test_and_set() with acquire
+	/// only when the lock appears free.
+	///
 	/// While in some cases (eg. locking small blocks of code)
 	/// busy-waiting may be an optimal solution, in many scenarios
 	/// spinlock may not be the right choice (especially on single-core
@@ -165,6 +174,7 @@ class Foundation_API SpinlockMutex
 {
 public:
 	using ScopedLock = Poco::ScopedLock<SpinlockMutex>;
+	using ScopedLockWithUnlock = Poco::ScopedLockWithUnlock<SpinlockMutex>;
 
 	SpinlockMutex();
 		/// Creates the SpinlockMutex.
@@ -181,12 +191,12 @@ public:
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 
-	bool tryLock();
+	[[nodiscard]] bool tryLock();
 		/// Tries to lock the mutex. Returns immediately, false
 		/// if the mutex is already held by another thread, true
 		/// if the mutex was successfully locked.
 
-	bool tryLock(long milliseconds);
+	[[nodiscard]] bool tryLock(long milliseconds);
 		/// Locks the mutex. Blocks up to the given number of milliseconds
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
@@ -209,16 +219,13 @@ class Foundation_API NullMutex
 {
 public:
 	using ScopedLock = Poco::ScopedLock<NullMutex>;
+	using ScopedLockWithUnlock = Poco::ScopedLockWithUnlock<NullMutex>;
 
-	NullMutex()
+	NullMutex() = default;
 		/// Creates the NullMutex.
-	{
-	}
 
-	~NullMutex()
+	~NullMutex() = default;
 		/// Destroys the NullMutex.
-	{
-	}
 
 	void lock()
 		/// Does nothing.
@@ -230,13 +237,13 @@ public:
 	{
 	}
 
-	bool tryLock()
+	[[nodiscard]] bool tryLock()
 		/// Does nothing and always returns true.
 	{
 		return true;
 	}
 
-	bool tryLock(long)
+	[[nodiscard]] bool tryLock(long)
 		/// Does nothing and always returns true.
 	{
 		return true;
@@ -327,38 +334,10 @@ inline void FastMutex::unlock()
 // SpinlockMutex
 //
 
-inline void SpinlockMutex::lock()
-{
-	while (_flag.test_and_set(std::memory_order_acquire));
-}
-
-
-inline void SpinlockMutex::lock(long milliseconds)
-{
-	Timestamp now;
-	Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
-	while (_flag.test_and_set(std::memory_order_acquire))
-	{
-		if (now.isElapsed(diff)) throw TimeoutException();
-	}
-}
-
 
 inline bool SpinlockMutex::tryLock()
 {
 	return !_flag.test_and_set(std::memory_order_acquire);
-}
-
-
-inline bool SpinlockMutex::tryLock(long milliseconds)
-{
-	Timestamp now;
-	Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
-	while (_flag.test_and_set(std::memory_order_acquire))
-	{
-		if (now.isElapsed(diff)) return false;
-	}
-	return true;
 }
 
 

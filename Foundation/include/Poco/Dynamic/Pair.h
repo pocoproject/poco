@@ -24,8 +24,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 template <typename K>
@@ -62,10 +61,8 @@ public:
 	{
 	}
 
-	virtual ~Pair()
+	virtual ~Pair() = default;
 		/// Destroys the Pair.
-	{
-	}
 
 	Pair& swap(Pair& other) noexcept
 		/// Swaps the content of the two Pairs.
@@ -81,19 +78,19 @@ public:
 		return *this;
 	}
 
-	inline const K& first() const
+	[[nodiscard]] inline const K& first() const
 		/// Returns the first member of the pair.
 	{
 		return _data.first;
 	}
 
-	inline const Var& second() const
+	[[nodiscard]] inline const Var& second() const
 		/// Returns the second member of the pair.
 	{
 		return _data.second;
 	}
 
-	std::string toString()
+	[[nodiscard]] std::string toString()
 	{
 		std::string str;
 		Var(*this).template convert<std::string>(str);
@@ -113,138 +110,136 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	[[nodiscard]] const std::type_info& type() const override
 	{
 		return typeid(Pair<std::string>);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to Int8");
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to Int16");
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to Int32");
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to Int64");
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to UInt8");
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to UInt16");
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to UInt32");
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to UInt64");
 	}
 
-	void convert(bool& val) const
+	void convert(bool&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to bool");
 	}
 
-	void convert(float& val) const
+	void convert(float&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to float");
 	}
 
-	void convert(double& val) const
+	void convert(double&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to double");
 	}
 
-	void convert(char& val) const
+	void convert(char&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to char");
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		// Serialize in JSON format: equals an object
 		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
 		val.append("{ ");
-		Var key(_val.first());
+		const Var key(_val.first());
 		Impl::appendJSONKey(val, key);
 		val.append(": ");
 		Impl::appendJSONValue(val, _val.second());
 		val.append(" }");
 	}
 
-	void convert(Poco::DateTime&) const
+	void convert(Poco::DateTime&) const override
 	{
 		throw BadCastException("Pair -> Poco::DateTime");
 	}
 
-	void convert(Poco::LocalDateTime&) const
+	void convert(Poco::LocalDateTime&) const override
 	{
 		throw BadCastException("Pair -> Poco::LocalDateTime");
 	}
 
-	void convert(Poco::Timestamp&) const
+	void convert(Poco::Timestamp&) const override
 	{
 		throw BadCastException("Pair -> Poco::Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
-	const Pair<std::string>& value() const
+	[[nodiscard]] const Pair<std::string>& value() const
 	{
 		return _val;
 	}
 
-	bool isArray() const
+	[[nodiscard]] bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	[[nodiscard]] bool isStruct() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	[[nodiscard]] bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	[[nodiscard]] bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	[[nodiscard]] bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	[[nodiscard]] bool isString() const override
 	{
 		return false;
 	}
@@ -262,139 +257,134 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	[[nodiscard]] const std::type_info& type() const override
 	{
 		return typeid(Pair<int>);
 	}
 
-	void convert(Int8& val) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to Int8");
 	}
 
-	void convert(Int16& val) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to Int16");
 	}
 
-	void convert(Int32& val) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to Int32");
 	}
 
-	void convert(Int64& val) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to Int64");
 	}
 
-	void convert(UInt8& val) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to UInt8");
 	}
 
-	void convert(UInt16& val) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to UInt16");
 	}
 
-	void convert(UInt32& val) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to UInt32");
 	}
 
-	void convert(UInt64& val) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to UInt64");
 	}
 
-	void convert(bool& val) const
+	void convert(bool&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to bool");
 	}
 
-	void convert(float& val) const
+	void convert(float&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to float");
 	}
 
-	void convert(double& val) const
+	void convert(double&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to double");
 	}
 
-	void convert(char& val) const
+	void convert(char&) const override
 	{
 		throw BadCastException("Cannot cast Pair type to char");
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		// Serialize in JSON format: equals an object
 		// JSON format definition: { string ':' value } string:value pair n-times, sep. by ','
 		val.append("{ ");
-		Var key(_val.first());
+		const Var key(_val.first());
 		Impl::appendJSONKey(val, key);
 		val.append(": ");
 		Impl::appendJSONValue(val, _val.second());
 		val.append(" }");
 	}
 
-	void convert(Poco::DateTime&) const
+	void convert(Poco::DateTime&) const override
 	{
 		throw BadCastException("Pair -> Poco::DateTime");
 	}
 
-	void convert(Poco::LocalDateTime&) const
+	void convert(Poco::LocalDateTime&) const override
 	{
 		throw BadCastException("Pair -> Poco::LocalDateTime");
 	}
 
-	void convert(Poco::Timestamp&) const
+	void convert(Poco::Timestamp&) const override
 	{
 		throw BadCastException("Pair -> Poco::Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
-	const Pair<int>& value() const
+	[[nodiscard]] const Pair<int>& value() const
 	{
 		return _val;
 	}
 
-	bool isArray() const
+	[[nodiscard]] bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	[[nodiscard]] bool isStruct() const override {
+		return false;
+	}
+
+	[[nodiscard]] bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	[[nodiscard]] bool isSigned() const override {
+		return false;
+	}
+
+	[[nodiscard]] bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
-	{
-		return false;
-	}
-
-	bool isNumeric() const
-	{
-		return false;
-	}
-
-	bool isString() const
-	{
+	[[nodiscard]] bool isString() const override {
 		return false;
 	}
 
@@ -403,10 +393,7 @@ private:
 };
 
 
-} // namespace Dynamic
-
-
-} // namespace Poco
+} // namespace Poco::Dynamic
 
 
 #endif // Foundation_Pair_INCLUDED

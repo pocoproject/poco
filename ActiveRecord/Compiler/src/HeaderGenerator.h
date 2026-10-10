@@ -16,9 +16,7 @@
 #include "Types.h"
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 class HeaderGenerator: public CodeGenerator
@@ -53,7 +51,7 @@ private:
 };
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler
 
 
 #endif // ActiveRecordCompiler_HeaderGenerator_INCLUDED

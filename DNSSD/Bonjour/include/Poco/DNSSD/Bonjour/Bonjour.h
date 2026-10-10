@@ -29,8 +29,8 @@
 // The following block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the Bonjour_EXPORTS
 // symbol defined on the command line. This symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
-// DNSSD_Bonjour_API functions as being imported from a DLL, wheras this DLL sees symbols
+// that uses this DLL. This way any other project whose source files include this file sees
+// DNSSD_Bonjour_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
@@ -58,8 +58,7 @@
 #endif
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 void DNSSD_Bonjour_API initializeDNSSD();
@@ -70,7 +69,7 @@ void DNSSD_Bonjour_API uninitializeDNSSD();
 	/// Uninitialize the DNSSD subsystem.
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_Bonjour_Bonjour_INCLUDED

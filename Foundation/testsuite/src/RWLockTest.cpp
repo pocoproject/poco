@@ -25,11 +25,7 @@ using Poco::Runnable;
 class RWLockRunnable: public Runnable
 {
 public:
-#ifdef __cpp_lib_atomic_ref
-	RWLockRunnable(RWLock& lock, int& counter):
-#else
-	RWLockRunnable(RWLock& lock, volatile int& counter):
-#endif
+	RWLockRunnable(RWLock& lock, std::atomic<int>& counter):
 		_lock(lock), _counter(counter), _ok(true)
 	{
 	}
@@ -71,11 +67,7 @@ public:
 
 private:
 	RWLock& _lock;
-#ifdef __cpp_lib_atomic_ref
-	std::atomic_ref<int> _counter;
-#else
-	volatile int& _counter;
-#endif
+	std::atomic<int>& _counter;
 	bool _ok;
 };
 
@@ -83,11 +75,7 @@ private:
 class RWTryLockRunnable: public Runnable
 {
 public:
-#ifdef __cpp_lib_atomic_ref
-	RWTryLockRunnable(RWLock& lock, int& counter):
-#else
-	RWTryLockRunnable(RWLock& lock, volatile int& counter):
-#endif
+	RWTryLockRunnable(RWLock& lock, std::atomic<int>& counter):
 		_lock(lock), _counter(counter), _ok(true)
 	{
 	}
@@ -129,11 +117,7 @@ public:
 
 private:
 	RWLock& _lock;
-#ifdef __cpp_lib_atomic_ref
-	std::atomic_ref<int> _counter;
-#else
-	volatile int& _counter;
-#endif
+	std::atomic<int>& _counter;
 	bool _ok;
 };
 
@@ -151,7 +135,7 @@ RWLockTest::~RWLockTest()
 void RWLockTest::testLock()
 {
 	RWLock lock;
-	int counter = 0;
+	std::atomic<int> counter{0};
 	RWLockRunnable r1(lock, counter);
 	RWLockRunnable r2(lock, counter);
 	RWLockRunnable r3(lock, counter);
@@ -184,7 +168,7 @@ void RWLockTest::testLock()
 void RWLockTest::testTryLock()
 {
 	RWLock lock;
-	int counter = 0;
+	std::atomic<int> counter{0};
 	RWTryLockRunnable r1(lock, counter);
 	RWTryLockRunnable r2(lock, counter);
 	RWTryLockRunnable r3(lock, counter);

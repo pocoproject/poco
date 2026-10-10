@@ -63,7 +63,7 @@ public:
 		/// as ignorable, which means that next() will
 		/// not return it.
 
-	const Token* next();
+	[[nodiscard]] const Token* next();
 		/// Extracts the next token from the input stream.
 		/// Returns a pointer to an EOFToken if there are
 		/// no more characters to read.
@@ -72,7 +72,7 @@ public:
 		/// If a token is marked as ignorable, it will not
 		/// be returned, and the next token will be
 		/// examined.
-		/// Never returns a NULL pointer.
+		/// Never returns a nullptr pointer.
 		/// You must not delete the token returned by next().
 
 private:
@@ -82,7 +82,7 @@ private:
 		bool   ignore;
 	};
 
-	typedef std::vector<TokenInfo> TokenVec;
+	using TokenVec = std::vector<TokenInfo>;
 
 	TokenVec      _tokens;
 	std::istream* _pIstr;

@@ -48,9 +48,9 @@ void writeString(const std::string &value, T& obj, typename WriteFunc<T, S>::Typ
 	}
 	else
 	{
-		for(std::string::const_iterator it = value.begin(), end = value.end(); it != end; ++it)
+		for (auto it = value.cbegin(); it != value.cend(); ++it)
 		{
-			if ((*it >= 0 && *it <= 31) || (*it == '"') || (*it == '\\'))
+			if ((static_cast<unsigned char>(*it) <= 31) || (*it == '"') || (*it == '\\'))
 			{
 				std::string str = Poco::UTF8::escape(it, it + 1, true, lowerCaseHex);
 				(obj.*write)(str.c_str(), str.size());

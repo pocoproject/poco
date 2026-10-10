@@ -26,8 +26,7 @@
 #include "Poco/Net/X509Certificate.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class SecureStreamSocket;
@@ -78,10 +77,12 @@ public:
 	HTTPSClientSession();
 		/// Creates an unconnected HTTPSClientSession.
 
-	explicit HTTPSClientSession(const SecureStreamSocket& socket);
+	explicit HTTPSClientSession(const SecureStreamSocket& socket, const std::string& host, Poco::UInt16 port = HTTPS_PORT);
 		/// Creates a HTTPSClientSession using the given socket.
 		/// The socket must not be connected. The session
 		/// takes ownership of the socket.
+		///
+		/// The given host name is used for certificate verification.
 
 	HTTPSClientSession(const SecureStreamSocket& socket, Session::Ptr pSession);
 		/// Creates a HTTPSClientSession using the given socket.
@@ -123,16 +124,16 @@ public:
 		/// Destroys the HTTPSClientSession and closes
 		/// the underlying socket.
 
-	bool secure() const;
+	[[nodiscard]] bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
 		/// or false otherwise.
 
-	X509Certificate serverCertificate();
+	[[nodiscard]] X509Certificate serverCertificate();
 		/// Returns the server's certificate.
 		///
 		/// The certificate is available after the first request has been sent.
 
-	Session::Ptr sslSession();
+	[[nodiscard]] Session::Ptr sslSession();
 		/// Returns the SSL Session object for the current
 		/// connection, if session caching has been enabled for
 		/// the HTTPSClientSession's Context. A null pointer is
@@ -146,20 +147,26 @@ public:
 
 protected:
 	void connect(const SocketAddress& address);
-	std::string proxyRequestPrefix() const;
+	[[nodiscard]] std::string proxyRequestPrefix() const;
 	void proxyAuthenticate(HTTPRequest& request);
 	int read(char* buffer, std::streamsize length);
 
 private:
-	HTTPSClientSession(const HTTPSClientSession&);
-	HTTPSClientSession& operator = (const HTTPSClientSession&);
+	void initProxySessionFactory();
+		/// Registers the "https" protocol with _proxySessionFactory using default context.
+
+	void initProxySessionFactory(Context::Ptr pContext);
+		/// Registers the "https" protocol with _proxySessionFactory using given context.
+
+	HTTPSClientSession(const HTTPSClientSession&) = delete;
+	HTTPSClientSession& operator = (const HTTPSClientSession&) = delete;
 
 	Context::Ptr _pContext;
 	Session::Ptr _pSession;
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPSClientSession_INCLUDED

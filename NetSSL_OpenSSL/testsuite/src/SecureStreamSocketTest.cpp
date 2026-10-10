@@ -1,0 +1,651 @@
+//
+// SecureStreamSocketTest.cpp
+//
+// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#include "SecureStreamSocketTest.h"
+#include "ErrorQueueCleaner.h"
+#include "CppUnit/TestCaller.h"
+#include "CppUnit/TestSuite.h"
+#include "Poco/Net/TCPServer.h"
+#include "Poco/Net/TCPServerConnection.h"
+#include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Net/TCPServerParams.h"
+#include "Poco/Net/SecureStreamSocket.h"
+#include "Poco/Net/SecureServerSocket.h"
+#include "Poco/Net/Context.h"
+#include "Poco/Net/RejectCertificateHandler.h"
+#include "Poco/Net/AcceptCertificateHandler.h"
+#include "Poco/Net/Session.h"
+#include "Poco/Net/SSLManager.h"
+#include "Poco/Net/SSLException.h"
+#include "Poco/Util/Application.h"
+#include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/Event.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
+#include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/pem.h>
+#include <iostream>
+
+
+using Poco::Net::TCPServer;
+using Poco::Net::TCPServerConnection;
+using Poco::Net::TCPServerConnectionFactory;
+using Poco::Net::TCPServerConnectionFactoryImpl;
+using Poco::Net::TCPServerParams;
+using Poco::Net::StreamSocket;
+using Poco::Net::SecureStreamSocket;
+using Poco::Net::SecureServerSocket;
+using Poco::Net::SocketAddress;
+using Poco::Net::Context;
+using Poco::Net::Session;
+using Poco::Net::SSLManager;
+using Poco::Thread;
+using Poco::Util::Application;
+
+
+namespace
+{
+	class EchoConnection: public TCPServerConnection
+	{
+	public:
+		EchoConnection(const StreamSocket& s): TCPServerConnection(s)
+		{
+		}
+
+		void run()
+		{
+			StreamSocket& ss = socket();
+			try
+			{
+				char buffer[256];
+				int n = ss.receiveBytes(buffer, sizeof(buffer));
+				while (n > 0)
+				{
+					ss.sendBytes(buffer, n);
+					n = ss.receiveBytes(buffer, sizeof(buffer));
+				}
+			}
+			catch (Poco::Exception& exc)
+			{
+				std::cerr << "EchoConnection: " << exc.displayText() << std::endl;
+			}
+		}
+	};
+
+	class CopyToStringConnection: public TCPServerConnection
+	{
+	public:
+		CopyToStringConnection(const StreamSocket& s): 
+			TCPServerConnection(s)
+		{
+		}
+
+		void run()
+		{
+			{
+				Poco::FastMutex::ScopedLock lock(_mutex);
+				_data.clear();
+			}
+			StreamSocket& ss = socket();
+			try
+			{
+				char buffer[256];
+				int n = ss.receiveBytes(buffer, sizeof(buffer));
+				while (n > 0)
+				{
+					{
+						Poco::FastMutex::ScopedLock lock(_mutex);
+						_data.append(buffer, n);
+					}
+					n = ss.receiveBytes(buffer, sizeof(buffer));
+				}
+			}
+			catch (Poco::Exception& exc)
+			{
+				std::cerr << "CopyToStringConnection: " << exc.displayText() << std::endl;
+			}
+		}
+
+		static const std::string data()
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _data;
+		}
+
+	private:
+		static Poco::FastMutex _mutex;
+		static std::string _data;
+	};
+
+	Poco::FastMutex CopyToStringConnection::_mutex;
+	std::string CopyToStringConnection::_data;
+
+	class HeldBackServer: public Poco::Runnable
+		/// Takes one connection and answers the TLS handshake only when
+		/// it is told to. Keeps what the client then sends.
+	{
+	public:
+		HeldBackServer():
+			_socket(SocketAddress("127.0.0.1", 0))
+		{
+		}
+
+		Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		void proceed()
+		{
+			_proceed.set();
+		}
+
+		std::string received()
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _received;
+		}
+
+		void run() override
+		{
+			try
+			{
+				// the handshake of an accepted socket is made with its first data
+				StreamSocket socket = _socket.acceptConnection();
+				_proceed.wait(30000);
+				socket.setReceiveTimeout(Poco::Timespan(10, 0));
+				char buffer[256];
+				int n = socket.receiveBytes(buffer, sizeof(buffer));
+				if (n > 0)
+				{
+					Poco::FastMutex::ScopedLock lock(_mutex);
+					_received.assign(buffer, n);
+				}
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+
+	private:
+		SecureServerSocket _socket;
+		Poco::Event _proceed;
+		Poco::FastMutex _mutex;
+		std::string _received;
+	};
+}
+
+
+SecureStreamSocketTest::SecureStreamSocketTest(const std::string& name): CppUnit::TestCase(name)
+{
+}
+
+
+SecureStreamSocketTest::~SecureStreamSocketTest()
+{
+}
+
+
+void SecureStreamSocketTest::testSendReceive()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+	SecureStreamSocket ss1(sa);
+	std::string data("hello, world");
+	ss1.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[8192];
+	int rc = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (rc > 0);
+	assertTrue (std::string(buffer, rc) == data);
+
+	const std::vector<std::size_t> sizes = {67, 467, 7883, 19937};
+	for (const auto n: sizes)
+	{
+		data.assign(n, 'X');
+		ss1.sendBytes(data.data(), static_cast<int>(data.size()));
+		std::string received;
+		while (received.size() < n)
+		{
+			rc = ss1.receiveBytes(buffer, sizeof(buffer));
+			if (rc > 0)
+			{
+				received.append(buffer, rc);
+			}
+			else if (rc == 0)
+			{
+				break;
+			}
+		}
+		assertTrue (received == data);
+	}
+
+	ss1.close();
+}
+
+
+void SecureStreamSocketTest::testPeek()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+	SecureStreamSocket ss(sa);
+	
+	int n = ss.sendBytes("hello, world!", 13);
+	assertTrue (n == 13);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, 5, MSG_PEEK);
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+	n = ss.receiveBytes(buffer, sizeof(buffer), MSG_PEEK);
+	assertTrue (n == 13);
+	assertTrue (std::string(buffer, n) == "hello, world!");
+	n = ss.receiveBytes(buffer, 7);
+	assertTrue (n == 7);
+	assertTrue (std::string(buffer, n) == "hello, ");
+	n = ss.receiveBytes(buffer, 6);
+	assertTrue (n == 6);
+	assertTrue (std::string(buffer, n) == "world!");
+	ss.close();
+}
+
+
+void SecureStreamSocketTest::testNB()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+	SecureStreamSocket ss1(sa);
+	ss1.setBlocking(false);
+	ss1.setSendBufferSize(32000);
+
+	char buffer[8192];
+	const std::vector<std::size_t> sizes = {67, 467, 7883, 19937};
+	for (const auto s: sizes)
+	{
+		std::string data(s, 'X');
+		ss1.sendBytes(data.data(), static_cast<int>(data.size()));
+
+		int rc;
+		do
+		{
+			rc = ss1.receiveBytes(buffer, sizeof(buffer), MSG_PEEK);
+		}
+		while (rc < 0);
+		assertTrue (rc > 0 && rc <= s);
+		assertTrue (data.compare(0, rc, buffer, rc) == 0);
+
+		std::string received;
+		while (received.size() < s)
+		{
+			rc = ss1.receiveBytes(buffer, sizeof(buffer));
+			if (rc > 0)
+			{
+				received.append(buffer, rc);
+			}
+			else if (rc == 0)
+			{
+				break;
+			}
+		}
+		assertTrue (received == data);
+	}
+
+	ss1.close();
+}
+
+
+void SecureStreamSocketTest::testLazyHandshake()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.setLazyHandshake(true);
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()));
+
+	// the handshake is made with the first data
+	std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[256];
+	int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+
+	ss.close();
+}
+
+
+void SecureStreamSocketTest::testSendFile()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string sentData = "Hello, world!";
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	ostr.write(sentData.data(), sentData.size());
+	ostr.close();
+	
+	Poco::FileInputStream istr(file.path());
+	std::streamsize n = ss.sendFile(istr);
+	assertTrue (n == file.getSize());
+
+	istr.close();
+	ss.close();
+
+	Poco::Thread::sleep(200);
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
+	{
+		Poco::Thread::sleep(100);
+	}
+	assertTrue(srv.currentConnections() == 0);
+	srv.stop();
+
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
+
+
+void SecureStreamSocketTest::testSendFileLarge()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string sentData;
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	std::string data("0123456789abcdef");
+	for (int i = 0; i < 10000; i++)
+	{
+		ostr.write(data.data(), data.size());
+		sentData += data;
+	}
+	ostr.close();
+	
+	Poco::FileInputStream istr(file.path());
+	std::streamsize n = ss.sendFile(istr);
+	assertTrue (n == file.getSize());
+
+	istr.close();
+	ss.close();
+
+	Poco::Thread::sleep(200);
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
+	{
+		Poco::Thread::sleep(100);
+	}
+	assertTrue(srv.currentConnections() == 0);
+	srv.stop();
+
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
+
+
+void SecureStreamSocketTest::testSendFileRange()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	std::string fileData;
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	std::string data("0123456789abcdef");
+	for (int i = 0; i < 1024; i++)
+	{
+		ostr.write(data.data(), data.size());
+		fileData += data;
+	}
+	ostr.close();
+	
+	const std::streamoff offset = 4000;
+	const std::streamsize count = 10000;
+
+	Poco::FileInputStream istr(file.path());
+	std::streamsize n = ss.sendFile(istr, offset, count);
+	assertTrue (n == count);
+
+	istr.close();
+	ss.close();
+
+	Poco::Thread::sleep(200);
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
+	{
+		Poco::Thread::sleep(100);
+	}
+	assertTrue(srv.currentConnections() == 0);
+	srv.stop();
+
+	assertTrue (CopyToStringConnection::data() == fileData.substr(offset, count));
+}
+
+
+void SecureStreamSocketTest::testShutdownBidirectional()
+{
+	// Test that bidirectional shutdown ensures all data is received
+	// by the peer before closing (regression test for GH #4883).
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	const int chunkSize = 1024;
+	const int chunkCount = 100;
+	std::string sentData(chunkSize * chunkCount, 'A');
+	for (int i = 0; i < chunkCount; i++)
+	{
+		const char* p = sentData.data() + i * chunkSize;
+		int remaining = chunkSize;
+		while (remaining > 0)
+		{
+			int n = ss.sendBytes(p, remaining);
+			if (n <= 0) break;
+			p += n;
+			remaining -= n;
+		}
+	}
+
+	// Close immediately after sending -- with bidirectional shutdown,
+	// the receiver should still get all data.
+	ss.close();
+
+	Poco::Thread::sleep(200);
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
+	{
+		Poco::Thread::sleep(100);
+	}
+	assertTrue(srv.currentConnections() == 0);
+	srv.stop();
+
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
+
+
+void SecureStreamSocketTest::testPeerHostNameTooLong()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	// no certificate verification: only the SNI setup can reject this connection
+	Context::Ptr pContext = new Context(Context::TLS_CLIENT_USE, "", Context::VERIFY_NONE);
+	SecureStreamSocket ss(pContext);
+	ss.setPeerHostName(std::string(256, 'a'));
+	try
+	{
+		ss.connect(SocketAddress("127.0.0.1", svs.address().port()));
+		fail("host name too long for SNI - must throw");
+	}
+	catch (Poco::Net::SSLException&)
+	{
+	}
+}
+
+
+void SecureStreamSocketTest::testStaleErrorQueue()
+{
+	ErrorQueueCleaner cleaner;
+
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+	SecureStreamSocket ss1(sa);
+	ss1.setBlocking(false);
+
+	// an unrelated failure leaves an entry in this thread's OpenSSL error queue
+	BIO* pBIO = BIO_new(BIO_s_mem());
+	assertNotNullPtr (pBIO);
+	assertNullPtr (PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr));
+	BIO_free(pBIO);
+	assertTrue (ERR_peek_error() != 0);
+
+	char buffer[256];
+	int rc = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertEqual (static_cast<int>(SecureStreamSocket::ERR_SSL_WANT_READ), rc);
+	assertTrue (ERR_peek_error() == 0);
+
+	ss1.setBlocking(true);
+	ss1.setReceiveTimeout(Poco::Timespan(10, 0));
+	std::string data("hello, world");
+	ss1.sendBytes(data.data(), static_cast<int>(data.size()));
+	rc = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (std::string(buffer, rc) == data);
+
+	ss1.close();
+}
+
+
+void SecureStreamSocketTest::testHandshakeTimeout()
+{
+	// The certificate of the test servers is not one for this name, and no
+	// name service is needed to tell the name from the local host.
+	const std::string otherName("192.0.2.1");
+
+	{
+		SecureServerSocket svs(0);
+		TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+		srv.start();
+
+		SecureStreamSocket ss;
+		ss.setPeerHostName(otherName);
+		try
+		{
+			ss.connect(SocketAddress("127.0.0.1", svs.address().port()));
+			fail("certificate for another host - must throw");
+		}
+		catch (Poco::Net::CertificateValidationException&)
+		{
+		}
+	}
+
+	// A server that does not answer the handshake within the time allowed
+	// for connecting: there is no connection then, whatever the server
+	// does afterwards.
+	HeldBackServer server;
+	Thread thread;
+	thread.start(server);
+
+	SecureStreamSocket ss;
+	ss.setPeerHostName(otherName);
+	std::string outcome("connected");
+	try
+	{
+		ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(0, 250000));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		outcome = "timeout";
+	}
+	catch (Poco::Exception& exc)
+	{
+		outcome = exc.displayText();
+	}
+	// the time allowed for connecting does not stay on the socket
+	Poco::Timespan timeoutLeft(1, 0);
+	try
+	{
+		timeoutLeft = ss.getReceiveTimeout();
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	// the server is let go before anything is asserted: its thread uses what is on this stack
+	server.proceed();
+	ss.close();
+	thread.join();
+	assertEqual (std::string("timeout"), outcome);
+	assertTrue (timeoutLeft == Poco::Timespan());
+	assertTrue (server.received().empty());
+}
+
+
+void SecureStreamSocketTest::setUp()
+{
+}
+
+
+void SecureStreamSocketTest::tearDown()
+{
+}
+
+
+CppUnit::Test* SecureStreamSocketTest::suite()
+{
+	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SecureStreamSocketTest");
+
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendReceive);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testPeek);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLazyHandshake);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFile);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileLarge);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileRange);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownBidirectional);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testPeerHostNameTooLong);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testStaleErrorQueue);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
+
+	return pSuite;
+}

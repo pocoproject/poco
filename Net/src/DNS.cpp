@@ -36,8 +36,7 @@ using Poco::NumberFormatter;
 using Poco::IOException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 typedef Poco::UInt32 punycode_uint;
@@ -76,7 +75,7 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 	struct addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_flags = hintFlags;
-	int rc = getaddrinfo(hostname.c_str(), NULL, &hints, &pAI);
+	int rc = getaddrinfo(hostname.c_str(), nullptr, &hints, &pAI);
 	if (rc == 0)
 	{
 		HostEntry result(pAI);
@@ -118,14 +117,14 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 #if defined(POCO_HAVE_ADDRINFO)
 	SocketAddress sa(address, 0);
 	char fqname[1024];
-	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD);
+	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), nullptr, 0, NI_NAMEREQD);
 	if (rc == 0)
 	{
 		struct addrinfo* pAI;
 		struct addrinfo hints;
 		std::memset(&hints, 0, sizeof(hints));
 		hints.ai_flags = hintFlags;
-		rc = getaddrinfo(fqname, NULL, &hints, &pAI);
+		rc = getaddrinfo(fqname, nullptr, &hints, &pAI);
 		if (rc == 0)
 		{
 			HostEntry result(pAI);
@@ -382,7 +381,6 @@ void DNS::aierror(int code, const std::string& arg)
 #if defined(EAI_SYSTEM)
 	case EAI_SYSTEM:
 		error(lastError(), arg);
-		break;
 #endif
 #if defined(_WIN32)
 	case WSANO_DATA: // may happen on XP
@@ -391,6 +389,8 @@ void DNS::aierror(int code, const std::string& arg)
 	default:
 		throw DNSException("EAI", NumberFormatter::format(code));
 	}
+#else
+	throw DNSException("EAI", NumberFormatter::format(code));
 #endif // POCO_HAVE_IPv6 || defined(POCO_HAVE_ADDRINFO)
 }
 
@@ -411,15 +411,15 @@ void DNS::aierror(int code, const std::string& arg)
 
   B. Disclaimer and license
 
-    Regarding this entire document or any portion of it (including
-    the pseudocode and C code), the author makes no guarantees and
-    is not responsible for any damage resulting from its use.  The
-    author grants irrevocable permission to anyone to use, modify,
-    and distribute it in any way that does not diminish the rights
-    of anyone else to use, modify, and distribute it, provided that
-    redistributed derivative works do not contain misleading author or
-    version information.  Derivative works need not be licensed under
-    similar terms.
+	Regarding this entire document or any portion of it (including
+	the pseudocode and C code), the author makes no guarantees and
+	is not responsible for any damage resulting from its use.  The
+	author grants irrevocable permission to anyone to use, modify,
+	and distribute it in any way that does not diminish the rights
+	of anyone else to use, modify, and distribute it, provided that
+	redistributed derivative works do not contain misleading author or
+	version information.  Derivative works need not be licensed under
+	similar terms.
 
   C. Punycode sample implementation
 
@@ -434,17 +434,14 @@ void DNS::aierror(int code, const std::string& arg)
 
 /*** Bootstring parameters for Punycode ***/
 
-enum
-{
-	base = 36,
-	tmin = 1,
-	tmax = 26,
-	skew = 38,
-	damp = 700,
-	initial_bias = 72,
-	initial_n = 0x80,
-	delimiter = 0x2D
-};
+constexpr punycode_uint base = 36;
+constexpr punycode_uint tmin = 1;
+constexpr punycode_uint tmax = 26;
+constexpr punycode_uint skew = 38;
+constexpr punycode_uint damp = 700;
+constexpr punycode_uint initial_bias = 72;
+constexpr punycode_uint initial_n = 0x80;
+constexpr punycode_uint delimiter = 0x2D;
 
 /* basic(cp) tests whether cp is a basic code point: */
 #define basic(cp) ((punycode_uint)(cp) < 0x80)
@@ -478,7 +475,7 @@ static unsigned decode_digit(int cp)
 /*** Platform-specific constants ***/
 
 /* maxint is the maximum value of a punycode_uint variable: */
-static const punycode_uint maxint = -1;
+static constexpr punycode_uint maxint = -1;
 /* Because maxint is unsigned, -1 becomes the maximum value. */
 
 /*** Bias adaptation function ***/
@@ -532,8 +529,6 @@ int punycode_encode(size_t input_length_orig, const punycode_uint input[], size_
 			if (max_out - out < 2) return punycode_big_output;
 			output[out++] = (char) input[j];
 		}
-		/* else if (input[j] < n) return punycode_bad_input; */
-		/* (not needed for Punycode with unsigned code points) */
 	}
 
 	h = b = (punycode_uint) out;
@@ -554,8 +549,6 @@ int punycode_encode(size_t input_length_orig, const punycode_uint input[], size_
 
 		for (m = maxint, j = 0;  j < input_length;  ++j)
 		{
-			/* if (basic(input[j])) continue; */
-			/* (not needed for Punycode) */
 			if (input[j] >= n && input[j] < m) m = input[j];
 		}
 
@@ -670,8 +663,6 @@ int punycode_decode(size_t input_length, const char input[], size_t *output_leng
 
 		/* Insert n at position i of the output: */
 
-		/* not needed for Punycode: */
-		/* if (basic(n)) return punycode_bad_input; */
 		if (out >= max_out) return punycode_big_output;
 
 		std::memmove(output + i + 1, output + i, (out - i) * sizeof *output);
@@ -684,4 +675,4 @@ int punycode_decode(size_t input_length, const char input[], size_t *output_leng
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

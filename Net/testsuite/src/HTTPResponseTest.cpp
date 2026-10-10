@@ -197,7 +197,48 @@ void HTTPResponseTest::testCookies()
 	response2.getCookies(cookies);
 	assertTrue (cookies.size() == 2);
 	assertTrue (((cookies[0].getName() == "name1") && (cookies[1].getName() == "name2"))
-	     || ((cookies[0].getName() == "name2") && (cookies[1].getName() == "name1")));
+		 || ((cookies[0].getName() == "name2") && (cookies[1].getName() == "name1")));
+}
+
+
+void HTTPResponseTest::testReplaceCookie()
+{
+	HTTPResponse response;
+	HTTPCookie cookie1("cookie1", "value1");
+	response.replaceCookie(cookie1); // cookie does not exist, will add cookie
+	std::vector<HTTPCookie> cookies;
+	response.getCookies(cookies);
+	assertTrue (cookies.size() == 1);
+	assertTrue (cookie1.getName() == cookies[0].getName());
+	assertTrue (cookie1.getValue() == cookies[0].getValue());
+
+	HTTPCookie cookie1new("cookie1", "value2");
+	response.replaceCookie(cookie1new);
+	cookies.clear();
+	response.getCookies(cookies);
+	assertTrue (cookies.size() == 1);
+	assertTrue (cookie1new.getName() == cookies[0].getName());
+	assertTrue (cookie1new.getValue() == cookies[0].getValue());
+}
+
+
+void HTTPResponseTest::testRemoveCookie()
+{
+	HTTPResponse response;
+	HTTPCookie cookie1("cookie1", "value1");
+	response.addCookie(cookie1); 
+	std::vector<HTTPCookie> cookies;
+	response.getCookies(cookies);
+	assertTrue (cookies.size() == 1);
+	assertTrue (cookie1.getName() == cookies[0].getName());
+	assertTrue (cookie1.getValue() == cookies[0].getValue());
+
+	response.removeCookie("cookie1");
+	cookies.clear();
+	response.getCookies(cookies);
+	assertTrue (cookies.size() == 0);
+
+	response.removeCookie("cookie2"); // should do nothing
 }
 
 
@@ -224,6 +265,8 @@ CppUnit::Test* HTTPResponseTest::suite()
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid2);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid3);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testCookies);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testReplaceCookie);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testRemoveCookie);
 
 	return pSuite;
 }

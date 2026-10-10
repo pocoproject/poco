@@ -87,30 +87,30 @@ void TreeWalkerTest::testShowAll()
 	assertTrue (it.nextNode() == pText1);
 	assertTrue (it.nextNode() == pElem2);
 	assertTrue (it.nextNode() == pText2);
-	assertTrue (it.nextNode() == 0);
+	assertTrue (it.nextNode() == nullptr);
 
 	assertTrue (it.currentNode() == pText2);
 	assertTrue (it.previousNode() == pElem2);
 	assertTrue (it.previousNode() == pText1);
 	assertTrue (it.previousNode() == pElem1);
 	assertTrue (it.previousNode() == pRoot);
-	assertTrue (it.previousNode() == 0);
+	assertTrue (it.previousNode() == nullptr);
 
 	assertTrue (it.currentNode() == pRoot);
-	assertTrue (it.parentNode() == 0);
+	assertTrue (it.parentNode() == nullptr);
 	assertTrue (it.currentNode() == pRoot);
 	assertTrue (it.firstChild() == pElem1);
 	assertTrue (it.parentNode() == pRoot);
 	assertTrue (it.lastChild() == pElem2);
 	assertTrue (it.previousSibling() == pElem1);
-	assertTrue (it.previousSibling() == 0);
+	assertTrue (it.previousSibling() == nullptr);
 	assertTrue (it.currentNode() == pElem1);
 	assertTrue (it.nextSibling() == pElem2);
-	assertTrue (it.nextSibling() == 0);
+	assertTrue (it.nextSibling() == nullptr);
 	assertTrue (it.currentNode() == pElem2);
 	assertTrue (it.firstChild() == pText2);
-	assertTrue (it.nextSibling() == 0);
-	assertTrue (it.previousSibling() == 0);
+	assertTrue (it.nextSibling() == nullptr);
+	assertTrue (it.previousSibling() == nullptr);
 	assertTrue (it.parentNode() == pElem2);
 	assertTrue (it.lastChild() == pText2);
 }
@@ -136,26 +136,26 @@ void TreeWalkerTest::testShowElements()
 	assertTrue (it.currentNode() == pRoot);
 	assertTrue (it.nextNode() == pElem1);
 	assertTrue (it.nextNode() == pElem2);
-	assertTrue (it.nextNode() == 0);
+	assertTrue (it.nextNode() == nullptr);
 
 	assertTrue (it.currentNode() == pElem2);
 	assertTrue (it.previousNode() == pElem1);
 	assertTrue (it.previousNode() == pRoot);
-	assertTrue (it.previousNode() == 0);
+	assertTrue (it.previousNode() == nullptr);
 
 	assertTrue (it.currentNode() == pRoot);
-	assertTrue (it.parentNode() == 0);
+	assertTrue (it.parentNode() == nullptr);
 	assertTrue (it.currentNode() == pRoot);
 	assertTrue (it.firstChild() == pElem1);
 	assertTrue (it.parentNode() == pRoot);
 	assertTrue (it.lastChild() == pElem2);
-	assertTrue (it.firstChild() == 0);
+	assertTrue (it.firstChild() == nullptr);
 	assertTrue (it.currentNode() == pElem2);
-	assertTrue (it.lastChild() == 0);
+	assertTrue (it.lastChild() == nullptr);
 	assertTrue (it.currentNode() == pElem2);
 	assertTrue (it.previousSibling() == pElem1);
-	assertTrue (it.firstChild() == 0);
-	assertTrue (it.lastChild() == 0);
+	assertTrue (it.firstChild() == nullptr);
+	assertTrue (it.lastChild() == nullptr);
 	assertTrue (it.parentNode() == pRoot);
 }
 
@@ -179,53 +179,53 @@ void TreeWalkerTest::testFilter()
 	TreeWalker it1(pRoot, NodeFilter::SHOW_ELEMENT, &skipFilter);
 
 	assertTrue (it1.nextNode() == pElem1);
-	assertTrue (it1.nextNode() == 0);
+	assertTrue (it1.nextNode() == nullptr);
 
 	assertTrue (it1.currentNode() == pElem1);
-	assertTrue (it1.previousNode() == 0);
+	assertTrue (it1.previousNode() == nullptr);
 
-	assertTrue (it1.parentNode() == 0);
-	assertTrue (it1.firstChild() == 0);
-	assertTrue (it1.lastChild() == 0);
-	assertTrue (it1.nextSibling() == 0);
-	assertTrue (it1.previousSibling() == 0);
+	assertTrue (it1.parentNode() == nullptr);
+	assertTrue (it1.firstChild() == nullptr);
+	assertTrue (it1.lastChild() == nullptr);
+	assertTrue (it1.nextSibling() == nullptr);
+	assertTrue (it1.previousSibling() == nullptr);
 
 	TreeWalker it2(pRoot, NodeFilter::SHOW_ALL, &skipFilter);
 
 	assertTrue (it2.nextNode() == pElem1);
 	assertTrue (it2.nextNode() == pText1);
 	assertTrue (it2.nextNode() == pText2);
-	assertTrue (it2.nextNode() == 0);
+	assertTrue (it2.nextNode() == nullptr);
 
 	assertTrue (it2.currentNode() == pText2);
 	assertTrue (it2.previousNode() == pText1);
 	assertTrue (it2.previousNode() == pElem1);
-	assertTrue (it2.previousNode() == 0);
+	assertTrue (it2.previousNode() == nullptr);
 
 	assertTrue (it2.currentNode() == pElem1);
-	assertTrue (it2.parentNode() == 0);
-	assertTrue (it2.nextSibling() == 0);
-	assertTrue (it2.previousSibling() == 0);
+	assertTrue (it2.parentNode() == nullptr);
+	assertTrue (it2.nextSibling() == nullptr);
+	assertTrue (it2.previousSibling() == nullptr);
 	assertTrue (it2.firstChild() == pText1);
-	assertTrue (it2.nextSibling() == 0);
-	assertTrue (it2.previousSibling() == 0);
+	assertTrue (it2.nextSibling() == nullptr);
+	assertTrue (it2.previousSibling() == nullptr);
 	assertTrue (it2.parentNode() == pElem1);
 
 	RejectNodeFilter rejectFilter;
 	TreeWalker it3(pRoot, NodeFilter::SHOW_ELEMENT, &rejectFilter);
 
 	assertTrue (it3.nextNode() == pElem1);
-	assertTrue (it3.nextNode() == 0);
+	assertTrue (it3.nextNode() == nullptr);
 
 	assertTrue (it3.currentNode() == pElem1);
 	assertTrue (it3.previousNode() == pRoot);
-	assertTrue (it3.previousNode() == 0);
+	assertTrue (it3.previousNode() == nullptr);
 
 	assertTrue (it3.currentNode() == pRoot);
-	assertTrue (it3.parentNode() == 0);
+	assertTrue (it3.parentNode() == nullptr);
 	assertTrue (it3.firstChild() == pElem1);
-	assertTrue (it3.nextSibling() == 0);
-	assertTrue (it3.previousSibling() == 0);
+	assertTrue (it3.nextSibling() == nullptr);
+	assertTrue (it3.previousSibling() == nullptr);
 	assertTrue (it3.parentNode() == pRoot);
 	assertTrue (it3.lastChild() == pElem1);
 
@@ -233,24 +233,24 @@ void TreeWalkerTest::testFilter()
 
 	assertTrue (it4.nextNode() == pElem1);
 	assertTrue (it4.nextNode() == pText1);
-	assertTrue (it4.nextNode() == 0);
+	assertTrue (it4.nextNode() == nullptr);
 
 	assertTrue (it4.currentNode() == pText1);
 	assertTrue (it4.previousNode() == pElem1);
 	assertTrue (it4.previousNode() == pRoot);
-	assertTrue (it4.previousNode() == 0);
+	assertTrue (it4.previousNode() == nullptr);
 
 	assertTrue (it4.currentNode() == pRoot);
-	assertTrue (it4.parentNode() == 0);
+	assertTrue (it4.parentNode() == nullptr);
 	assertTrue (it4.firstChild() == pElem1);
 	assertTrue (it4.firstChild() == pText1);
-	assertTrue (it4.nextSibling() == 0);
-	assertTrue (it4.previousSibling() == 0);
+	assertTrue (it4.nextSibling() == nullptr);
+	assertTrue (it4.previousSibling() == nullptr);
 	assertTrue (it4.parentNode() == pElem1);
 	assertTrue (it4.lastChild() == pText1);
 	assertTrue (it4.parentNode() == pElem1);
-	assertTrue (it4.nextSibling() == 0);
-	assertTrue (it4.previousSibling() == 0);
+	assertTrue (it4.nextSibling() == nullptr);
+	assertTrue (it4.previousSibling() == nullptr);
 	assertTrue (it4.parentNode() == pRoot);
 }
 
@@ -272,15 +272,15 @@ void TreeWalkerTest::testShowNothing()
 
 	TreeWalker it(pRoot, 0);
 
-	assertTrue (it.nextNode() == 0);
+	assertTrue (it.nextNode() == nullptr);
 
-	assertTrue (it.previousNode() == 0);
+	assertTrue (it.previousNode() == nullptr);
 
 	assertTrue (it.currentNode() == pRoot);
-	assertTrue (it.firstChild() == 0);
-	assertTrue (it.lastChild() == 0);
-	assertTrue (it.nextSibling() == 0);
-	assertTrue (it.previousSibling() == 0);
+	assertTrue (it.firstChild() == nullptr);
+	assertTrue (it.lastChild() == nullptr);
+	assertTrue (it.nextSibling() == nullptr);
+	assertTrue (it.previousSibling() == nullptr);
 }
 
 

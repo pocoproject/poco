@@ -15,8 +15,7 @@
 #include "Poco/SAX/AttributesImpl.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 AttributesImpl::EmptyAttribute::EmptyAttribute()
@@ -281,7 +280,7 @@ AttributesImpl::Attribute* AttributesImpl::find(const XMLString& qname) const
 		if (it->qname == qname)
 			return const_cast<Attribute*>(&(*it));
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -292,8 +291,8 @@ AttributesImpl::Attribute* AttributesImpl::find(const XMLString& namespaceURI, c
 		if (it->namespaceURI == namespaceURI && it->localName == localName)
 			return const_cast<Attribute*>(&(*it));
 	}
-	return 0;
+	return nullptr;
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

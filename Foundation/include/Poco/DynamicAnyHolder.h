@@ -17,8 +17,13 @@
 #ifndef Foundation_DynamicAnyHolder_INCLUDED
 #define Foundation_DynamicAnyHolder_INCLUDED
 
-//@ deprecated
 #include "Poco/Dynamic/VarHolder.h"
+
+namespace {
+	POCO_DEPRECATED("Deprecated header: include Poco/Dynamic/VarHolder.h instead")
+	constexpr static int dynamicanyholder_hpp_is_deprecated {0xBAD};
+	constexpr static int please_dont_use_badheader_hpp = dynamicanyholder_hpp_is_deprecated;
+}
 
 
 #endif // Foundation_DynamicAnyHolder_INCLUDED

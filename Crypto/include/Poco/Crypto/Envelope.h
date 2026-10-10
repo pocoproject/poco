@@ -24,8 +24,7 @@
 #include <openssl/evp.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API Envelope
@@ -62,16 +61,16 @@ public:
 	~Envelope();
 		/// Destroys the Envelope.
 
-	const ByteVec& iv() const;
+	[[nodiscard]] const ByteVec& iv() const;
 		/// Returns the initialization vector.
 
 	void addKey(const EVPPKey& key);
 		/// Adds the key to the list of private keys.
 
-	const EncKeyVec& keys() const;
+	[[nodiscard]] const EncKeyVec& keys() const;
 		/// Returns encrypted symmetric keys.
 
-	int cipherNID() const;
+	[[nodiscard]] int cipherNID() const;
 		/// Reurns the cipher NID.
 
 	const ByteVec& seal(const std::string& plainText);
@@ -80,7 +79,7 @@ public:
 	const ByteVec& seal(const ByteVec& plainData);
 		/// Encrypts the given data and returns the encrypted data.
 
-	const ByteVec& getContent() const;
+	[[nodiscard]] const ByteVec& getContent() const;
 		/// Returns the encrypted content.
 	
 	void setContent(const ByteVec& enc);
@@ -92,16 +91,16 @@ public:
 	std::string openAsString(const EVPPKey& privKey, const ByteVec& encKeys, const ByteVec& iv = ByteVec());
 		/// Decrypts the stored encrypted data and returns it.
 
-	static std::string toString(const ByteVec& data);
+	[[nodiscard]] static std::string toString(const ByteVec& data);
 		/// Converts and returns string from ByteVec.
 
 private:
 	Envelope(int cipherNID);
 	Envelope(int cipherNID, const ByteVec& iv);
 
-	int ivSize() const;
-	int blockSize() const;
-	void handleErrors(std::string&& msg);
+	[[nodiscard]] int ivSize() const;
+	[[nodiscard]] int blockSize() const;
+	[[noreturn]] void handleErrors(std::string&& msg);
 
 	const EVP_CIPHER* _pCipher;
 	EVP_CIPHER_CTX*   _pCtx;
@@ -168,7 +167,7 @@ inline int Envelope::cipherNID() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_Envelope_INCLUDED

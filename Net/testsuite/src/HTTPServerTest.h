@@ -25,12 +25,11 @@ public:
 	~HTTPServerTest();
 
 	void testIdentityRequest();
+	void testFramingConflicts();
 	void testPutIdentityRequest();
 	void testChunkedRequest();
-	void testClosedRequest();
 	void testIdentityRequestKeepAlive();
 	void testChunkedRequestKeepAlive();
-	void testClosedRequestKeepAlive();
 	void testMaxKeepAlive();
 	void testKeepAliveTimeout();
 	void test100Continue();
@@ -38,6 +37,7 @@ public:
 	void testAuth();
 	void testNotImpl();
 	void testBuffer();
+	void testFile();
 	void testChunkedTrailer();
 
 	void setUp();

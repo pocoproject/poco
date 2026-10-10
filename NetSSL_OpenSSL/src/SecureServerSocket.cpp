@@ -22,8 +22,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SecureServerSocket::SecureServerSocket():
@@ -118,4 +117,4 @@ Context::Ptr SecureServerSocket::context() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

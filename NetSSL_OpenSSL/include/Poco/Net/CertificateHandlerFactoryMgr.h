@@ -24,8 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API CertificateHandlerFactoryMgr
@@ -44,10 +43,10 @@ public:
 		/// Registers the factory. Class takes ownership of the pointer.
 		/// If a factory with the same name already exists, an exception is thrown.
 
-	bool hasFactory(const std::string& name) const;
+	[[nodiscard]] bool hasFactory(const std::string& name) const;
 		/// Returns true if for the given name a factory is already registered
 
-	const CertificateHandlerFactory* getFactory(const std::string& name) const;
+	[[nodiscard]] const CertificateHandlerFactory* getFactory(const std::string& name) const;
 		/// Returns NULL if for the given name a factory does not exist, otherwise the factory is returned
 
 	void removeFactory(const std::string& name);
@@ -58,7 +57,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_CertificateHandlerFactoryMgr_INCLUDED

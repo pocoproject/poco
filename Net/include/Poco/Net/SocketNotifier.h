@@ -26,8 +26,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Socket;
@@ -49,29 +48,36 @@ public:
 	void removeObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer);
 		/// Removes the given observer.
 
-	bool hasObserver(const Poco::AbstractObserver& observer) const;
+	[[nodiscard]] bool hasObserver(const Poco::AbstractObserver& observer) const;
 		/// Returns true if the given observer is registered.
 
-	bool accepts(SocketNotification* pNotification);
+	[[nodiscard]] bool accepts(SocketNotification* pNotification);
 		/// Returns true if there is at least one observer for the given notification.
 
 	void dispatch(SocketNotification* pNotification);
 		/// Dispatches the notification to all observers.
 
-	bool hasObservers() const;
+	[[nodiscard]] bool hasObservers() const;
 		/// Returns true if there are subscribers.
 
-	std::size_t countObservers() const;
-		/// Returns the number of subscribers;
+	[[nodiscard]] std::size_t countObservers() const;
+		/// Returns the number of subscribers
+
+	[[nodiscard]] Socket socket() const;
+		/// Returns the socket.
+
+	void disableObservers();
+		/// Disables all observers, preventing any further
+		/// handler calls even if notifications are in flight.
 
 protected:
-	~SocketNotifier();
+	~SocketNotifier() override;
 		/// Destroys the SocketNotifier.
 
 private:
-	typedef std::multiset<SocketNotification*> EventSet;
-	typedef Poco::FastMutex                    MutexType;
-	typedef MutexType::ScopedLock              ScopedLock;
+	using EventSet = std::multiset<SocketNotification *>;
+	using MutexType = Poco::FastMutex;
+	using ScopedLock = MutexType::ScopedLock;
 
 	EventSet                 _events;
 	Poco::NotificationCenter _nc;
@@ -102,13 +108,19 @@ inline bool SocketNotifier::hasObservers() const
 }
 
 
+inline Socket SocketNotifier::socket() const
+{
+	return _socket;
+}
+
+
 inline std::size_t SocketNotifier::countObservers() const
 {
 	return _nc.countObservers();
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketNotifier_INCLUDED

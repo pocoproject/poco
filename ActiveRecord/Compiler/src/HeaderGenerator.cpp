@@ -15,9 +15,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 HeaderGenerator::HeaderGenerator(const std::string& source, std::ostream& stream, const Class& clazz, const ClassMap& classes):
@@ -348,4 +346,4 @@ const Class& HeaderGenerator::referencedClass(const Property& property) const
 }
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler

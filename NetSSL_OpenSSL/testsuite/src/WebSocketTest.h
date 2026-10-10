@@ -27,6 +27,7 @@ public:
 	void testWebSocketTimeout();
 	void testWebSocket();
 	void testWebSocketLarge();
+	void testWebSocketNB();
 
 	void setUp() override;
 	void tearDown() override;

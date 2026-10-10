@@ -21,8 +21,7 @@
 #include "Poco/Zip/Zip.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API ZipCommon
@@ -34,9 +33,11 @@ public:
 		HEADER_SIZE = 4
 	};
 
-	static const Poco::UInt16 ZIP64_EXTRA_ID	= 0x1;		  // Extra data id tag for Zip64 data (in extension for ZipLocalFileHeader and ZipFileInfo)
-	static const Poco::UInt16 ZIP64_MAGIC_SHORT = 0xFFFF;
-	static const Poco::UInt32 ZIP64_MAGIC		= 0xFFFFFFFF;
+	static constexpr Poco::UInt16 ZIP64_EXTRA_ID	= 0x1;		  // Extra data id tag for Zip64 data (in extension for ZipLocalFileHeader and ZipFileInfo)
+	static constexpr Poco::UInt16 EXTRA_FIELD_HEADER_SIZE = 4;	  // Extra field header: id and data size
+	static constexpr Poco::UInt16 ZIP64_VALUE_SIZE	= 8;		  // One 64-bit value in a Zip64 extra field
+	static constexpr Poco::UInt16 ZIP64_MAGIC_SHORT = 0xFFFF;
+	static constexpr Poco::UInt32 ZIP64_MAGIC		= 0xFFFFFFFF;
 
 	enum CompressionMethod
 	{
@@ -51,8 +52,24 @@ public:
 		CM_DEFLATE = 8,
 		CM_ENHANCEDDEFLATE = 9,
 		CM_DATECOMPRIMPLODING = 10,
-		CM_UNUSED = 11,
-		CM_AUTO = 255 /// automatically select DM_DEFLATE or CM_STORE based on file type (extension)
+		CM_RESERVED11 = 11,
+		CM_BZIP2 = 12,
+		CM_RESERVED13 = 13,
+		CM_LZMA = 14,
+		CM_RESERVED15 = 15,
+		CM_IBM_CMPSC = 16,
+		CM_RESERVED17 = 17,
+		CM_IBM_TERSE = 18,
+		CM_IBM_LZ77 = 19,
+		CM_ZSTD_DEPRECATED = 20,
+		CM_ZSTD = 93,
+		CM_MP3 = 94,
+		CM_XZ = 95,
+		CM_JPEG = 96,
+		CM_WAVPACK = 97,
+		CM_PPMD = 98,
+		CM_AES = 99,
+		CM_AUTO = 255 /// automatically select CM_DEFLATE or CM_STORE based on file type (extension)
 	};
 
 	enum CompressionLevel
@@ -92,13 +109,13 @@ public:
 		FT_ASCII = 1
 	};
 
-	static bool isValidPath(const std::string& path);
+	[[nodiscard]] static bool isValidPath(const std::string& path);
 		/// Checks whether the given path is valid (does
 		/// not contain ".." path segments).
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipCommon_INCLUDED

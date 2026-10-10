@@ -31,8 +31,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string NTLMCredentials::NTLMSSP("NTLMSSP");
@@ -59,7 +58,7 @@ std::vector<unsigned char> NTLMCredentials::createNonce()
 
 Poco::UInt64 NTLMCredentials::createTimestamp()
 {
-	const Poco::UInt64 EPOCH_DELTA_SECONDS = 11644473600; // seconds between January 1, 1970 and January 1, 1601
+	constexpr Poco::UInt64 EPOCH_DELTA_SECONDS = 11644473600; // seconds between January 1, 1970 and January 1, 1601
 
 	Poco::Timestamp now;
 	Poco::UInt64 ts = now.epochMicroseconds();
@@ -209,17 +208,17 @@ bool NTLMCredentials::parseChallengeMessage(const unsigned char* buffer, std::si
 	reader.readRaw(7, signature);
 	if (signature != NTLMSSP) return false;
 
-	Poco::UInt8 zero;
+	Poco::UInt8 zero = 1;
 	reader >> zero;
 	if (zero != 0) return false;
 
-	Poco::UInt32 type;
+	Poco::UInt32 type = 0;
 	reader >> type;
 	if (type != NTLM_MESSAGE_TYPE_CHALLENGE) return false;
 
 	BufferDesc targetDesc;
 	readBufferDesc(reader, targetDesc);
-	if (targetDesc.offset + targetDesc.length > size) return false;
+	if (targetDesc.offset > size || targetDesc.offset + targetDesc.length > size) return false;
 
 	reader >> message.flags;
 
@@ -236,7 +235,7 @@ bool NTLMCredentials::parseChallengeMessage(const unsigned char* buffer, std::si
 	if (message.flags & NTLM_FLAG_NEGOTIATE_TARGET)
 	{
 		readBufferDesc(reader, targetInfoDesc);
-		if (targetInfoDesc.offset + targetInfoDesc.length > size) return false;
+		if (targetInfoDesc.offset > size || targetInfoDesc.offset + targetInfoDesc.length > size) return false;
 	}
 
 	if (targetDesc.length > 0)
@@ -377,4 +376,4 @@ std::vector<unsigned char> NTLMCredentials::fromBase64(const std::string& base64
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

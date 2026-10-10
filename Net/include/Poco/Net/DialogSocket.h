@@ -23,8 +23,7 @@
 #include <cstdlib>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API DialogSocket: public StreamSocket
@@ -67,7 +66,7 @@ public:
 	DialogSocket(const DialogSocket& socket);
 		/// Creates the DialogSocket as copy of another dialog socket.
 
-	~DialogSocket();
+	~DialogSocket() override;
 		/// Destroys the DialogSocket.
 
 	DialogSocket& operator = (const Socket& socket);
@@ -129,12 +128,12 @@ public:
 		/// character, including the status code. The status code is returned.
 		/// If the response line does not contain a status code, 0 is returned.
 
-	int get();
+	[[nodiscard]] int get();
 		/// Reads one character from the connection.
 		///
 		/// Returns -1 (EOF_CHAR) if no more characters are available.
 
-	int peek();
+	[[nodiscard]] int peek();
 		/// Returns the character that would be returned by the next call
 		/// to get(), without actually extracting the character from the
 		/// buffer.
@@ -205,7 +204,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_DialogSocket_INCLUDED

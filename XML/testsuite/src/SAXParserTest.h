@@ -33,9 +33,11 @@ public:
 	void testPI();
 	void testDTD();
 	void testInternalEntity();
+	void testBillionLaughsProtection();
 	void testNotation();
 	void testExternalUnparsed();
 	void testExternalParsed();
+	void testExternalEntitiesDisabledByDefault();
 	void testDefaultNamespace();
 	void testNamespaces();
 	void testNamespacesNoPrefixes();
@@ -48,6 +50,7 @@ public:
 	void testParseMemory();
 	void testCharacters();
 	void testParsePartialReads();
+	void testContentHandlerThrows();
 
 	void setUp();
 	void tearDown();

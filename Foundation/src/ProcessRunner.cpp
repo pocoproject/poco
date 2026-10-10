@@ -6,7 +6,7 @@
 // Module:  ProcessRunner
 //
 // Copyright (c) 2023, Applied Informatics Software Engineering GmbH.
-// Aleph ONE Software Engineering d.o.o.,
+// Aleph ONE Software Engineering LLC,
 // and Contributors.
 //
 // SPDX-License-Identifier:    BSL-1.0
@@ -20,6 +20,14 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/String.h"
+#include "Poco/Error.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/NamedEvent.h"
+#include "Poco/UnWindows.h"
+#else
+#include <signal.h>
+#include <cerrno>
+#endif
 #include <fstream>
 
 
@@ -34,6 +42,36 @@ using Poco::Stopwatch;
 
 
 namespace Poco {
+
+
+namespace {
+
+
+// RAII guard that joins the ProcessRunner monitor thread on scope exit, so the
+// thread is always reaped before control leaves a function even if an
+// intervening operation throws. Thread::join() is a safe no-op when the thread
+// was never started or is already joined; a destructor must not throw while
+// unwinding, so a (practically impossible) join failure is swallowed. Callers
+// must have already signalled the monitored process to exit before this guard
+// runs, otherwise the join blocks until run()'s process wait returns.
+struct ThreadJoiner
+{
+	explicit ThreadJoiner(Thread& t): _t(t) {}
+
+	~ThreadJoiner()
+	{
+		try { _t.join(); }
+		catch (...) { }
+	}
+
+	ThreadJoiner(const ThreadJoiner&) = delete;
+	ThreadJoiner& operator = (const ThreadJoiner&) = delete;
+
+	Thread& _t;
+};
+
+
+} // namespace
 
 
 ProcessRunner::ProcessRunner(const std::string& cmd,
@@ -64,7 +102,7 @@ ProcessRunner::ProcessRunner(const std::string& cmd,
 				if (pos == 0)
 				{
 					_pidFile = a.substr(fmt.length());
-					PIDFile::getFileName(_pidFile);
+					(void) PIDFile::getFileName(_pidFile);
 					break;
 				}
 			}
@@ -104,17 +142,117 @@ std::string ProcessRunner::cmdLine() const
 
 void ProcessRunner::run()
 {
+	int errHandle = 0;
+	int errPID = 0;
+	int errRC = 0;
+
+	{
+		Poco::FastMutex::ScopedLock l(_mutex);
+		_error.clear();
+	}
+
+	_pid = INVALID_PID;
+	_pPH = nullptr;
+
 	ProcessHandle* pPH = nullptr;
 	try
 	{
-		_pPH = pPH = new ProcessHandle(Process::launch(_cmd, _args, _options));
+		pPH = new ProcessHandle(Process::launch(_cmd, _args, _options));
+		errHandle = Error::last();
+
 		_pid = pPH->id();
+		errPID = Error::last();
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		if (_options & PROCESS_KILL_TREE)
+		{
+			std::string jobErr;
+
+			_hJob.reset(CreateJobObjectW(nullptr, nullptr));
+			if (_hJob)
+			{
+				JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = {};
+				jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+				if (!SetInformationJobObject(_hJob.handle(),
+					JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
+				{
+					Poco::format(jobErr, "SetInformationJobObject: %s", Error::getMessage(Error::last()));
+					_hJob.reset();
+				}
+			}
+			else
+			{
+				Poco::format(jobErr, "CreateJobObjectW: %s", Error::getMessage(Error::last()));
+			}
+			if (_hJob)
+			{
+				HANDLE hProc = OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE,
+					FALSE, static_cast<DWORD>(pPH->id()));
+				if (hProc)
+				{
+					if (!AssignProcessToJobObject(_hJob.handle(), hProc))
+					{
+						Poco::format(jobErr, "AssignProcessToJobObject: %s", Error::getMessage(Error::last()));
+						_hJob.reset();
+					}
+					CloseHandle(hProc);
+				}
+				else
+				{
+					Poco::format(jobErr, "OpenProcess: %s", Error::getMessage(Error::last()));
+					_hJob.reset();
+				}
+			}
+			if (!jobErr.empty())
+			{
+				Poco::FastMutex::ScopedLock l(_mutex);
+				Poco::format(_error, "ProcessRunner::run(%s): PROCESS_KILL_TREE degraded, %s",
+					_cmd, jobErr);
+			}
+		}
+#endif
+		// Set _pPH after _pid to ensure pid() returns valid value when running() is true
+		_pPH = pPH;
+
 		_rc = pPH->wait();
+		errRC = Error::last();
+
+		if (errHandle || errPID || errRC || _rc != 0)
+		{
+			Poco::FastMutex::ScopedLock l(_mutex);
+
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+			if ((_options & PROCESS_KILL_TREE) && _rc == PROCESS_EXIT_SETPGID_FAILED)
+			{
+				Poco::format(_error, "ProcessRunner::run(%s): "
+					"child failed to create process group (setpgid failed, exit code %d)",
+					_cmd, _rc.load());
+			}
+			else
+#endif
+			Poco::format(_error, "ProcessRunner::run() error; "
+				"handle=%?d (%?d:%s); pid=%?d (%?d:%s); return=%?d (%?d:%s)",
+				(pPH ? pPH->id() : 0), errHandle, Error::getMessage(errHandle),
+				_pid.load(), errPID, Error::getMessage(errPID),
+				_rc.load(), errRC, Error::getMessage(errRC));
+		}
+	}
+	catch (Poco::Exception& ex)
+	{
+		setError(ex.displayText());
+	}
+	catch (std::exception& ex)
+	{
+		setError(ex.what());
 	}
 	catch (...)
 	{
+		setError("Unknown exception"s);
 	}
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	_hJob.reset();
+#endif
 	_pid = INVALID_PID;
 	_pPH = nullptr;
 	++_runCount;
@@ -127,42 +265,160 @@ void ProcessRunner::stop()
 	if (_started)
 	{
 		PID pid;
-		Stopwatch sw; sw.start();
+		_sw.restart();
 		if (_pPH.exchange(nullptr) && ((pid = _pid.exchange(INVALID_PID))) != INVALID_PID)
 		{
-			while (Process::isRunning(pid))
+			// Join the monitor thread on every exit from this block, even if the
+			// termination logic below throws (e.g. the process will not die, or a
+			// signal fails). stop() runs from ~ProcessRunner(), so a skipped join
+			// would let the thread race the object's destruction. The process is
+			// signalled to exit by the logic below before this guard's join runs.
+			ThreadJoiner joiner(_t);
+
+			if (pid <= 0)
+				throw Poco::IllegalStateException("Invalid PID, can't terminate process");
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+			// On Windows, Process::requestTermination() creates a temporary NamedEvent,
+			// signals it, and immediately destroys it. If the child process has not yet
+			// created its own NamedEvent handle (during static initialization of its
+			// ServerApplication::_terminate member), the kernel event object is destroyed
+			// when our handle closes, and the termination signal is lost.
+			// Keep the NamedEvent alive here so the kernel object persists until the child
+			// opens its own handle and receives the signal.
+			//
+			// Note: When PROCESS_KILL_TREE is set, the NamedEvent only reaches the
+			// leader process (Poco ServerApplication). Non-Poco children in the Job
+			// Object receive no graceful signal — they are terminated when the Job
+			// handle is closed (_hJob.reset()). This is a platform limitation:
+			// Windows has no equivalent of Unix process-group signals.
+			NamedEvent terminateEvent(Process::terminationEventName(pid));
+			terminateEvent.set();
+#else
+			if (_options & PROCESS_KILL_TREE)
 			{
-				if (pid > 0)
-				{
-					Process::requestTermination(pid);
-					checkTimeout(sw, "Waiting for process termination");
-				}
-				else throw Poco::IllegalStateException("Invalid PID, can;t terminate process");
+				if (::kill(-pid, SIGINT) != 0 && errno != ESRCH)
+					throw Poco::SystemException(Poco::format("Cannot signal process group %d", (int)pid));
 			}
-			_t.join();
+			else
+				Process::requestTermination(pid);
+#endif
+
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+			if (_options & PROCESS_KILL_TREE)
+			{
+				// Wait for the entire process group to exit.
+				// setpgid(0, 0) was called in the child, so -pid
+				// addresses the whole group.
+				// kill(-pid, 0) returns 0 if any process in the group exists
+				// and we have permission, or -1 with errno:
+				//   ESRCH  - no such process group (done)
+				//   EPERM  - group exists but no permission (still alive)
+				// Note: errno must be captured immediately after kill()
+				// since Thread::sleep() may overwrite it.
+				while (true)
+				{
+					int rc = ::kill(-pid, 0);
+					int err = errno;
+					if (rc == -1 && err != EPERM)
+						break;
+					if (_sw.elapsedSeconds() > _timeout)
+					{
+						::kill(-pid, SIGKILL);
+						Stopwatch killSw; killSw.start();
+						while (true)
+						{
+							rc = ::kill(-pid, 0);
+							err = errno;
+							if (rc == -1 && err != EPERM)
+								break;
+							if (killSw.elapsedSeconds() > _timeout)
+							{
+								throw Poco::TimeoutException("Unable to terminate process tree");
+							}
+							Thread::sleep(10);
+						}
+						break;
+					}
+					Thread::sleep(10);
+				}
+			}
+			else
+#endif
+			{
+				while (Process::isRunning(pid))
+				{
+					if (_sw.elapsedSeconds() > _timeout)
+					{
+						Process::kill(pid);
+						Stopwatch killSw; killSw.start();
+						while (Process::isRunning(pid))
+						{
+							if (killSw.elapsedSeconds() > _timeout)
+							{
+								throw Poco::TimeoutException("Unable to terminate process");
+							}
+							Thread::sleep(10);
+						}
+						break;
+					}
+					Thread::sleep(10);
+				}
+			}
 		}
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		_hJob.reset();
+#endif
 
 		if (!_pidFile.empty())
 		{
-			if (!_pidFile.empty())
+			File pidFile(_pidFile);
+			if (pidFile.exists())
 			{
-				File pidFile(_pidFile);
-				_pidFile.clear();
 				std::string msg;
 				Poco::format(msg, "Waiting for PID file (pidFile: '%s')", _pidFile);
-				sw.restart();
+				_sw.restart();
 				while (pidFile.exists())
-					checkTimeout(sw, msg);
+				{
+					if (_sw.elapsedSeconds() > _timeout)
+					{
+						try
+						{
+							pidFile.remove(false);
+						}
+						catch (...)
+						{
+							// give up trying to remove stale pid file
+						}
+						break;
+					}
+					Thread::sleep(10);
+				}
 			}
+		}
+
+		{
+			Poco::FastMutex::ScopedLock l(_mutex);
+			_error.clear();
 		}
 	}
 	_started.store(false);
 }
 
 
-void ProcessRunner::checkTimeout(const Stopwatch& sw, const std::string& msg)
+void ProcessRunner::checkError()
 {
-	if (sw.elapsedSeconds() > _timeout)
+	Poco::FastMutex::ScopedLock l(_mutex);
+
+	if (!_error.empty())
+		throw Poco::RuntimeException(_error);
+}
+
+
+void ProcessRunner::checkTimeout(const std::string& msg)
+{
+	if (_sw.elapsedSeconds() > _timeout)
 	{
 		throw Poco::TimeoutException(
 			Poco::format("ProcessRunner::checkTimeout(): %s", msg));
@@ -171,42 +427,84 @@ void ProcessRunner::checkTimeout(const Stopwatch& sw, const std::string& msg)
 }
 
 
+void ProcessRunner::checkStatus(const std::string& msg, bool tOut)
+{
+	checkError();
+	if (tOut) checkTimeout(msg);
+}
+
+
 void ProcessRunner::start()
 {
 	if (!_started.exchange(true))
 	{
+		std::string execPath = File(_cmd).getExecutablePath();
+		if (execPath.empty())
+		{
+			throw Poco::FileNotFoundException(
+				Poco::format("ProcessRunner::start(%s): command not found", _cmd));
+		}
+		else if (!File(execPath).canExecute())
+		{
+			throw Poco::ExecuteFileException(
+				Poco::format("ProcessRunner::start(%s): cannot execute", _cmd));
+		}
+
 		int prevRunCnt = runCount();
 
 		_t.start(*this);
 
-		std::string msg;
-		Poco::format(msg, "Waiting for process to start (pidFile: '%s')", _pidFile);
-		Stopwatch sw; sw.start();
-
-		// wait for the process to be either running or completed by monitoring run counts.
-		while (!running() && prevRunCnt >= runCount()) checkTimeout(sw, msg);
-
-		// we could wait for the process handle != INVALID_PID,
-		// but if pidFile name was given, we should wait for
-		// the process to write it
-		if (!_pidFile.empty())
+		try
 		{
-			sw.restart();
-			// wait until process is fully initialized
-			File pidFile(_pidFile);
-			while (!pidFile.exists())
-				checkTimeout(sw, "waiting for PID file");
+			std::string msg;
+			Poco::format(msg, "Waiting for process to start (pidFile: '%s')", _pidFile);
+			_sw.restart();
 
-			// verify that the file content is actually the process PID
-			FileInputStream fis(_pidFile);
-			int fPID = 0;
-			if (fis.peek() != std::ifstream::traits_type::eof())
-				fis >> fPID;
-			while (fPID != pid())
+			// wait for the process to be either running or completed by monitoring run counts.
+			while (!running() && prevRunCnt >= runCount()) checkStatus(msg);
+
+			// we could wait for the process handle != INVALID_PID,
+			// but if pidFile name was given, we should wait for
+			// the process to write it
+			if (!_pidFile.empty())
 			{
-				fis.clear(); fis.seekg(0); fis >> fPID;
-				checkTimeout(sw, Poco::format("waiting for new PID (%s)", _pidFile));
+				_sw.restart();
+				// wait until process is fully initialized
+				File pidFile(_pidFile);
+				while (!pidFile.exists())
+					checkStatus(Poco::format("waiting for PID file '%s' creation.", _pidFile));
+
+				// verify that the file content is actually the process PID
+				FileInputStream fis(_pidFile);
+				PID fPID = 0;
+				if (fis.peek() != std::ifstream::traits_type::eof())
+					fis >> fPID;
+				while (fPID != pid())
+				{
+					fis.clear(); fis.seekg(0); fis >> fPID;
+					checkStatus(Poco::format("waiting for new PID (%s)", _pidFile));
+				}
 			}
+		}
+		catch (...)
+		{
+			// The monitored child has usually already exited - often the very
+			// reason we are here, e.g. a duplicate instance that bailed out at
+			// startup. Signal it best-effort first (Process::kill() throws
+			// NotFoundException on ESRCH, which must NOT prevent the join), then
+			// let ThreadJoiner reap the monitor thread as we unwind. Leaving run()
+			// executing past this point would let a throwing heap-allocated
+			// constructor's operator delete free the object under the running
+			// thread - a heap-use-after-free.
+			PID p = _pid.load();
+			if (p != INVALID_PID)
+			{
+				try { Process::kill(p); }
+				catch (...) { /* already gone or not permitted - nothing to clean up */ }
+			}
+			ThreadJoiner joiner(_t);
+			_started.store(false);
+			throw;
 		}
 	}
 	else

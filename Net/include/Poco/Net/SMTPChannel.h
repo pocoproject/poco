@@ -24,8 +24,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API SMTPChannel: public Poco::Channel
@@ -64,7 +63,7 @@ public:
 		///     * throw:      Boolean value indicating whether to throw
 		///                   exception upon failure.
 
-	std::string getProperty(const std::string& name) const;
+	[[nodiscard]] std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 
 	static void registerChannel();
@@ -83,7 +82,7 @@ protected:
 	~SMTPChannel();
 
 private:
-	bool isTrue(const std::string& value) const;
+	[[nodiscard]] bool isTrue(const std::string& value) const;
 
 	std::string _mailHost;
 	std::string _sender;
@@ -105,7 +104,7 @@ inline bool SMTPChannel::isTrue(const std::string& value) const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SMTPChannel_INCLUDED

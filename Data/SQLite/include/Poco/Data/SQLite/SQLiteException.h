@@ -22,9 +22,7 @@
 #include "Poco/Data/DataException.h"
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 POCO_DECLARE_EXCEPTION(SQLite_API, SQLiteException, Poco::Data::DataException)
@@ -54,7 +52,7 @@ POCO_DECLARE_EXCEPTION(SQLite_API, AuthorizationDeniedException, SQLiteException
 POCO_DECLARE_EXCEPTION(SQLite_API, TransactionException, SQLiteException)
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif

@@ -23,8 +23,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API Session: public Poco::RefCountedObject
@@ -61,7 +60,7 @@ private:
 //
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_Session_INCLUDED

@@ -73,7 +73,7 @@ void SocketAddressTest::testSocketAddress()
 
 	SocketAddress sa04 = SocketAddress("pocoproject.org", 80);
 	SocketAddress sa4(std::move(sa04));
-	assertTrue (sa4.host().toString() == "54.93.62.90");
+	assertTrue (sa4.host().toString() == "157.90.17.168");
 	assertTrue (sa4.port() == 80);
 
 	try
@@ -149,10 +149,10 @@ void SocketAddressTest::testSocketAddress()
 void SocketAddressTest::testSocketRelationals()
 {
 	SocketAddress sa1("192.168.1.100", 100);
-    SocketAddress sa2("192.168.1.100:100");
+	SocketAddress sa2("192.168.1.100:100");
 	assertTrue (sa1 == sa2);
 
-    SocketAddress sa3("192.168.1.101", "99");
+	SocketAddress sa3("192.168.1.101", "99");
 	assertTrue (sa2 < sa3);
 
 	SocketAddress sa4("192.168.1.101", "102");

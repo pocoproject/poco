@@ -26,8 +26,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HostEntry;
@@ -97,8 +96,8 @@ public:
 		/// Returns true if verification succeeded, or false otherwise.
 
 protected:
-	static bool containsWildcards(const std::string& commonName);
-	static bool matchWildcard(const std::string& alias, const std::string& hostName);
+	[[nodiscard]] static bool containsWildcards(const std::string& commonName);
+	[[nodiscard]] static bool matchWildcard(const std::string& alias, const std::string& hostName);
 
 private:
 	enum
@@ -108,7 +107,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_X509Certificate_INCLUDED

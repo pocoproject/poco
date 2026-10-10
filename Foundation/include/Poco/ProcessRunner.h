@@ -8,7 +8,7 @@
 // Definition of the ProcessRunner class.
 //
 // Copyright (c) 2023, Applied Informatics Software Engineering GmbH.
-// Aleph ONE Software Engineering d.o.o.,
+// Aleph ONE Software Engineering LLC,
 // and Contributors.
 //
 // SPDX-License-Identifier:    BSL-1.0
@@ -48,7 +48,7 @@ public:
 	using Args = Poco::Process::Args;
 	using PID = Poco::ProcessHandle::PID;
 
-	static const int NO_OUT = Poco::PROCESS_CLOSE_STDOUT|Poco::PROCESS_CLOSE_STDERR;
+	static constexpr int NO_OUT = Poco::PROCESS_CLOSE_STDOUT|Poco::PROCESS_CLOSE_STDERR;
 		/// Constant to prevent std out and err from being received from the process.
 
 	ProcessRunner(const std::string& cmd,
@@ -81,20 +81,20 @@ public:
 		///
 		/// If `startProcess` is true, the process is started on object creation.
 
-	~ProcessRunner();
+	~ProcessRunner() override;
 		/// Destroys the ProcessRunner.
 
-	PID pid() const;
+	[[nodiscard]] PID pid() const;
 		/// Returns the process PID.
 
-	const std::string& pidFile() const;
+	[[nodiscard]] const std::string& pidFile() const;
 		/// Returns the process PID filename.
 		/// Returns empty string when pid filename
 		/// is not specified at construction, either
 		/// explicitly, or implicitly through
 		/// command line argument.
 
-	bool running() const;
+	[[nodiscard]] bool running() const;
 		/// Returns true if process is running.
 
 	void start();
@@ -112,21 +112,28 @@ public:
 		///
 		/// Calling stop() on a stopped process is a no-op.
 
-	std::string cmdLine() const;
+	[[nodiscard]] std::string cmdLine() const;
 		/// Returns process full command line.
 
-	int result() const;
+	[[nodiscard]] int result() const;
 		/// Returns process return code.
 
-	int runCount() const;
+	[[nodiscard]] int runCount() const;
 		/// Returns the number of times the process has been executed.
 
+	[[nodiscard]] const std::string& error() const;
+		/// Returns the error message.
 
 private:
-	static const Poco::ProcessHandle::PID INVALID_PID = -1;
-	static const int RESULT_UNKNOWN = -1;
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// On Windows, 0 is the invalid/error value returned by GetProcessId()
+	static constexpr Poco::ProcessHandle::PID INVALID_PID = 0;
+#else
+	static constexpr Poco::ProcessHandle::PID INVALID_PID = -1;
+#endif
+	static constexpr int RESULT_UNKNOWN = -1;
 
-	static Args pidArgFormat()
+	[[nodiscard]] static Args pidArgFormat()
 	{
 #if defined(POCO_OS_FAMILY_WINDOWS)
 		return Args{"-p", "--pidfile=", "/p", "/pidfile="};
@@ -135,15 +142,27 @@ private:
 #endif
 	}
 
-
-	void run();
+	void run() override;
 		/// Starts the process and waits for it to be fully initialized.
 		/// Process initialization completion is indicated by new pid in
 		/// the pid file. If pid file is not specified, there is no waiting.
 
-	void checkTimeout(const Poco::Stopwatch& sw, const std::string& msg);
+	void checkError();
 		/// If timeout is exceeded, throws TimeoutException with `msg`
 		/// message.
+
+	void checkTimeout(const std::string& msg);
+		/// If timeout is exceeded, throws TimeoutException with `msg`
+		/// message.
+
+	void checkStatus(const std::string& msg, bool tOut = true);
+		/// If there were andy errors during process start/stop,
+		/// throws RuntimeException with the error message;
+		/// otherwise, if tOut is true and timeout is exceeded, throws
+		/// TimeoutException with `msg` message.
+
+	void setError(const std::string& msg);
+		/// Sets the error message.
 
 	Poco::Thread _t;
 	std::string _cmd;
@@ -156,6 +175,61 @@ private:
 	std::atomic<bool> _started;
 	std::atomic<int> _rc;
 	std::atomic<int> _runCount;
+	Stopwatch _sw;
+	std::string _error;
+	mutable Poco::FastMutex _mutex;
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	struct HandleGuard
+		/// RAII wrapper for a Windows HANDLE.
+		/// Closes the handle on destruction or reset.
+	{
+		HandleGuard() = default;
+		~HandleGuard() { close(); }
+
+		HandleGuard(const HandleGuard&) = delete;
+		HandleGuard& operator=(const HandleGuard&) = delete;
+
+		HandleGuard(HandleGuard&& other) noexcept: _handle(other._handle)
+		{
+			other._handle = nullptr;
+		}
+
+		HandleGuard& operator=(HandleGuard&& other) noexcept
+		{
+			if (this != &other)
+			{
+				close();
+				_handle = other._handle;
+				other._handle = nullptr;
+			}
+			return *this;
+		}
+
+		HANDLE handle() const { return _handle; }
+
+		void reset(HANDLE h = nullptr)
+		{
+			if (h != _handle)
+			{
+				close();
+				_handle = h;
+			}
+		}
+
+		explicit operator bool() const { return _handle != nullptr; }
+
+	private:
+		void close()
+		{
+			if (_handle) CloseHandle(_handle);
+			_handle = nullptr;
+		}
+
+		HANDLE _handle = nullptr;
+	};
+
+	HandleGuard _hJob;
+#endif
 };
 
 
@@ -190,6 +264,20 @@ inline int ProcessRunner::result() const
 inline int ProcessRunner::runCount() const
 {
 	return _runCount;
+}
+
+
+inline void ProcessRunner::setError(const std::string& msg)
+{
+	_error = Poco::format("ProcessRunner(%s): %s", cmdLine(), msg);
+}
+
+
+inline const std::string& ProcessRunner::error() const
+{
+	Poco::FastMutex::ScopedLock l(_mutex);
+
+	return _error;
 }
 
 

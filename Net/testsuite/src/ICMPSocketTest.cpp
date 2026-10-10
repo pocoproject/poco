@@ -36,6 +36,29 @@ using Poco::Exception;
 using Poco::TimeoutException;
 
 
+bool ICMPSocketTest::_probed = false;
+bool ICMPSocketTest::_available = false;
+
+
+bool ICMPSocketTest::icmpAvailable()
+{
+	if (!_probed)
+	{
+		_probed = true;
+		try
+		{
+			Poco::Net::ICMPSocket s(Poco::Net::IPAddress::IPv4);
+			_available = true;
+		}
+		catch (Poco::Exception&)
+		{
+			std::cout << "ICMP sockets not available (requires elevated privileges), tests skipped." << std::endl;
+		}
+	}
+	return _available;
+}
+
+
 ICMPSocketTest::ICMPSocketTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -48,12 +71,16 @@ ICMPSocketTest::~ICMPSocketTest()
 
 void ICMPSocketTest::testAssign()
 {
+	if (!icmpAvailable()) return;
+
 	ICMPSocket s1(IPAddress::IPv4);
 	ICMPSocket s2(s1);
 }
 
 void ICMPSocketTest::testSendToReceiveFrom()
 {
+	if (!icmpAvailable()) return;
+
 	ICMPSocket ss(IPAddress::IPv4);
 
 	SocketAddress sa("github.com", 0);
@@ -78,6 +105,8 @@ void ICMPSocketTest::testSendToReceiveFrom()
 
 void ICMPSocketTest::testMTU()
 {
+	if (!icmpAvailable()) return;
+
 	try
 	{
 		Poco::UInt16 sz = ICMPPacketImpl::MAX_PAYLOAD_SIZE + 1;

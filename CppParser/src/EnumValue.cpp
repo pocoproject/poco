@@ -16,8 +16,7 @@
 #include "Poco/CppParser/Enum.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 EnumValue::EnumValue(const std::string& name, const std::string& value, Enum* pEnum):
@@ -51,4 +50,4 @@ std::string EnumValue::toString() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

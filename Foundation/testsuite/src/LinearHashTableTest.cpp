@@ -12,12 +12,14 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/LinearHashTable.h"
-#include "Poco/HashTable.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/NumberFormatter.h"
 #include <set>
-#include <iostream>
 
+#if defined(POCO_TEST_DEPRECATED)
+#include "Poco/HashTable.h"
+#include <iostream>
+#endif
 
 #ifdef POCO_COMPILER_MSVC
 #pragma warning(push)
@@ -27,9 +29,11 @@
 
 using Poco::LinearHashTable;
 using Poco::Hash;
-using Poco::HashTable;
 using Poco::Stopwatch;
 using Poco::NumberFormatter;
+#if defined(POCO_TEST_DEPRECATED)
+using Poco::HashTable;
+#endif
 
 
 LinearHashTableTest::LinearHashTableTest(const std::string& name): CppUnit::TestCase(name)
@@ -189,10 +193,11 @@ void LinearHashTableTest::testConstIterator()
 	assertTrue (values.size() == N);
 }
 
+#if defined(POCO_TEST_DEPRECATED)
 
 void LinearHashTableTest::testPerformanceInt()
 {
-	const int N = 5000000;
+	const int N = 50000000;
 	Stopwatch sw;
 
 	{
@@ -209,7 +214,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			lht.find(i);
+			(void) lht.find(i);
 		}
 		sw.stop();
 		std::cout << "Find LHT: " << sw.elapsedSeconds() << std::endl;
@@ -231,7 +236,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			ht.exists(i);
+			(void) ht.exists(i);
 		}
 		sw.stop();
 		std::cout << "Find HT: " << sw.elapsedSeconds() << std::endl;
@@ -263,10 +268,11 @@ void LinearHashTableTest::testPerformanceInt()
 
 void LinearHashTableTest::testPerformanceStr()
 {
-	const int N = 5000000;
+	const int N = 50000000;
 	Stopwatch sw;
 
 	std::vector<std::string> values;
+	values.reserve(N);
 	for (int i = 0; i < N; ++i)
 	{
 		values.push_back(NumberFormatter::format0(i, 8));
@@ -286,7 +292,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			lht.find(values[i]);
+			(void) lht.find(values[i]);
 		}
 		sw.stop();
 		std::cout << "Find LHT: " << sw.elapsedSeconds() << std::endl;
@@ -308,7 +314,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			ht.exists(values[i]);
+			(void) ht.exists(values[i]);
 		}
 		sw.stop();
 		std::cout << "Find HT: " << sw.elapsedSeconds() << std::endl;
@@ -336,6 +342,7 @@ void LinearHashTableTest::testPerformanceStr()
 	}
 }
 
+#endif
 
 void LinearHashTableTest::setUp()
 {
@@ -355,8 +362,11 @@ CppUnit::Test* LinearHashTableTest::suite()
 	CppUnit_addTest(pSuite, LinearHashTableTest, testErase);
 	CppUnit_addTest(pSuite, LinearHashTableTest, testIterator);
 	CppUnit_addTest(pSuite, LinearHashTableTest, testConstIterator);
-	//CppUnit_addTest(pSuite, LinearHashTableTest, testPerformanceInt);
-	//CppUnit_addTest(pSuite, LinearHashTableTest, testPerformanceStr);
+
+#if defined(POCO_TEST_DEPRECATED)
+	CppUnit_addTest(pSuite, LinearHashTableTest, testPerformanceInt);
+	CppUnit_addTest(pSuite, LinearHashTableTest, testPerformanceStr);
+#endif
 
 	return pSuite;
 }

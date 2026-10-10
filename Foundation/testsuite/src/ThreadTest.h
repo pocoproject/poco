@@ -28,6 +28,7 @@ public:
 	void testNamedThread();
 	void testCurrent();
 	void testThreads();
+	void testTryJoin();
 	void testJoin();
 	void testNotJoin();
 	void testNotRun();
@@ -39,6 +40,7 @@ public:
 	void testThreadStackSize();
 	void testSleep();
 	void testAffinity();
+	void testInterrupt();
 
 	void setUp();
 	void tearDown();

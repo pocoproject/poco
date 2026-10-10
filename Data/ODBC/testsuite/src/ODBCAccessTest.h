@@ -32,12 +32,12 @@ class ODBCAccessTest: public CppUnit::TestCase
 {
 public:
 	ODBCAccessTest(const std::string& name);
-	~ODBCAccessTest();
+	~ODBCAccessTest() override;
 
 	void testSimpleAccess();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 
@@ -51,7 +51,6 @@ private:
 	static Poco::Data::ODBC::Utility::DriverMap _drivers;
 	static std::string _dbConnString;
 	static Poco::Data::Session* _pSession;
-	bool _owner;
 };
 
 

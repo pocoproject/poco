@@ -27,8 +27,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class ZipArchive;
@@ -51,13 +50,13 @@ public:
 	void close(Poco::UInt64& extraDataSize);
 		/// Informs a writing outputstream that writing is done for this stream
 
-	bool crcValid() const;
+	[[nodiscard]] bool crcValid() const;
 		/// Call this method once all bytes were read from the input stream to determine if the CRC is valid
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length);
 
-	int writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
 
 private:
 	enum
@@ -101,7 +100,7 @@ public:
 	~ZipIOS();
 		/// Destroys the stream.
 
-	ZipStreamBuf* rdbuf();
+	[[nodiscard]] ZipStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
 protected:
@@ -121,7 +120,7 @@ public:
 	~ZipInputStream();
 		/// Destroys the ZipInputStream.
 
-	bool crcValid() const;
+	[[nodiscard]] bool crcValid() const;
 		/// Call this method once all bytes were read from the input stream to determine if the CRC is valid
 };
 
@@ -144,7 +143,7 @@ public:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipStream_INCLUDED

@@ -75,7 +75,7 @@
 	// Microsoft Visual Studio with Dinkumware STL (but not STLport)
 #	if defined(_MSC_VER) && (!defined(_STLP_MSVC) || defined(_STLP_NO_OWN_IOSTREAMS))
 #		define POCO_IOS_INIT_HACK 1
-    // QNX with Dinkumware but not GNU C++ Library
+	// QNX with Dinkumware but not GNU C++ Library
 #	elif defined(__QNX__) && !defined(__GLIBCPP__)
 #		define POCO_IOS_INIT_HACK 1
 	// Linux with Clang libc++

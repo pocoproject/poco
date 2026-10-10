@@ -18,19 +18,21 @@
 #define Data_Constants_INCLUDED
 
 
-#undef max
+#include "Poco/Foundation.h"
 #include <limits>
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+POCO_CHECK_MINMAX_MACROS
 
 
-static const std::size_t POCO_DATA_INVALID_ROW = std::numeric_limits<std::size_t>::max();
+namespace Poco::Data {
 
 
-} } // namespace Poco::Data
+inline const std::size_t POCO_DATA_INVALID_ROW = std::numeric_limits<std::size_t>::max();
+
+
+} // namespace Poco::Data
 
 
 #endif // Data_Constants_INCLUDED

@@ -20,11 +20,13 @@
 
 #include "Poco/XML/XML.h"
 #include "Poco/SAX/XMLReader.h"
-#include "Poco/XML/ParserEngine.h"
+#include "Poco/TextEncoding.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
+
+
+class ParserEngine;
 
 
 class XML_API SAXParser: public XMLReader
@@ -64,7 +66,7 @@ public:
 		/// Sets the encoding used by the parser if no
 		/// encoding is specified in the XML document.
 
-	const XMLString& getEncoding() const;
+	[[nodiscard]] const XMLString& getEncoding() const;
 		/// Returns the name of the encoding used by
 		/// the parser if no encoding is specified in
 		/// the XML document.
@@ -74,18 +76,18 @@ public:
 
 	/// XMLReader
 	void setEntityResolver(EntityResolver* pResolver);
-	EntityResolver* getEntityResolver() const;
+	[[nodiscard]] EntityResolver* getEntityResolver() const;
 	void setDTDHandler(DTDHandler* pDTDHandler);
-	DTDHandler* getDTDHandler() const;
+	[[nodiscard]] DTDHandler* getDTDHandler() const;
 	void setContentHandler(ContentHandler* pContentHandler);
-	ContentHandler* getContentHandler() const;
+	[[nodiscard]] ContentHandler* getContentHandler() const;
 	void setErrorHandler(ErrorHandler* pErrorHandler);
-	ErrorHandler* getErrorHandler() const;
+	[[nodiscard]] ErrorHandler* getErrorHandler() const;
 	void setFeature(const XMLString& featureId, bool state);
-	bool getFeature(const XMLString& featureId) const;
+	[[nodiscard]] bool getFeature(const XMLString& featureId) const;
 	void setProperty(const XMLString& propertyId, const XMLString& value);
 	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
+	[[nodiscard]] void* getProperty(const XMLString& propertyId) const;
 	void parse(InputSource* pSource);
 	void parse(const XMLString& systemId);
 	void parseMemoryNP(const char* xml, std::size_t size);
@@ -101,13 +103,13 @@ protected:
 	void setupParse();
 
 private:
-	ParserEngine _engine;
+	ParserEngine* _engine;
 	bool _namespaces;
 	bool _namespacePrefixes;
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_SAXParser_INCLUDED

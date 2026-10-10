@@ -17,8 +17,7 @@
 #include "Poco/DOM/DOMException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString Text::NODE_NAME = toXMLString("#text");
@@ -77,4 +76,4 @@ Node* Text::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -12,9 +12,7 @@
 #include "SessionImpl.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 TestStatementImpl::TestStatementImpl(SessionImpl& rSession, bool throwOnHasNext):
@@ -101,4 +99,4 @@ std::size_t TestStatementImpl::next()
 }
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test

@@ -28,23 +28,25 @@
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/XMLReader.h"
 #include "Poco/SAX/AttributesImpl.h"
+#include "Poco/XML/XMLException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString DOMBuilder::EMPTY_STRING;
 
 
-DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool):
+DOMBuilder::DOMBuilder(XMLReader& xmlReader, NamePool* pNamePool, std::size_t maxDepth):
 	_xmlReader(xmlReader),
 	_pNamePool(pNamePool),
-	_pDocument(0),
-	_pParent(0),
-	_pPrevious(0),
+	_maxDepth(maxDepth),
+	_pDocument(nullptr),
+	_pParent(nullptr),
+	_pPrevious(nullptr),
 	_inCDATA(false),
-	_namespaces(true)
+	_namespaces(true),
+	_depth(0)
 {
 	_xmlReader.setContentHandler(this);
 	_xmlReader.setDTDHandler(this);
@@ -71,9 +73,9 @@ Document* DOMBuilder::parse(const XMLString& uri)
 	catch (...)
 	{
 		_pDocument->release();
-		_pDocument = 0;
-		_pParent   = 0;
-		_pPrevious = 0;
+		_pDocument = nullptr;
+		_pParent   = nullptr;
+		_pPrevious = nullptr;
 		throw;
 	}
 	_pDocument->resumeEvents();
@@ -93,9 +95,9 @@ Document* DOMBuilder::parse(InputSource* pInputSource)
 	catch (...)
 	{
 		_pDocument->release();
-		_pDocument = 0;
-		_pParent   = 0;
-		_pPrevious = 0;
+		_pDocument = nullptr;
+		_pParent   = nullptr;
+		_pPrevious = nullptr;
 		throw;
 	}
 	_pDocument->resumeEvents();
@@ -115,9 +117,9 @@ Document* DOMBuilder::parseMemoryNP(const char* xml, std::size_t size)
 	catch (...)
 	{
 		_pDocument->release();
-		_pDocument = 0;
-		_pParent   = 0;
-		_pPrevious = 0;
+		_pDocument = nullptr;
+		_pParent   = nullptr;
+		_pPrevious = nullptr;
 		throw;
 	}
 	_pDocument->resumeEvents();
@@ -130,7 +132,7 @@ void DOMBuilder::setupParse()
 {
 	_pDocument  = new Document(_pNamePool);
 	_pParent    = _pDocument;
-	_pPrevious  = 0;
+	_pPrevious  = nullptr;
 	_inCDATA    = false;
 	_namespaces = _xmlReader.getFeature(XMLReader::FEATURE_NAMESPACES);
 }
@@ -188,13 +190,16 @@ void DOMBuilder::endDocument()
 
 void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attributes)
 {
+	++_depth;
+	if (_maxDepth > 0 && _depth > _maxDepth) throw XMLException("Maximum element depth exceeded");
+
 	AutoPtr<Element> pElem = _namespaces ? _pDocument->createElementNS(uri, qname.empty() ? localName : qname) : _pDocument->createElement(qname);
 
-	const AttributesImpl& attrs = dynamic_cast<const AttributesImpl&>(attributes);
-	Attr* pPrevAttr = 0;
+	const auto& attrs = static_cast<const AttributesImpl&>(attributes);
+	Attr* pPrevAttr = nullptr;
 	for (const auto& attr: attrs)
 	{
-		AutoPtr<Attr> pAttr = new Attr(_pDocument, 0, attr.namespaceURI, attr.localName, attr.qname, attr.value, attr.specified);
+		AutoPtr<Attr> pAttr = new Attr(_pDocument, nullptr, attr.namespaceURI, attr.localName, attr.qname, attr.value, attr.specified);
 		pPrevAttr = pElem->addAttributeNodeNP(pPrevAttr, pAttr);
 	}
 	appendNode(pElem);
@@ -204,7 +209,10 @@ void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, 
 
 void DOMBuilder::endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname)
 {
+	--_depth;
+
 	_pPrevious = _pParent;
+	poco_assert_dbg (_pParent->parentNode() != nullptr);
 	_pParent   = static_cast<AbstractContainerNode*>(_pParent->parentNode());
 }
 
@@ -309,4 +317,4 @@ void DOMBuilder::comment(const XMLChar ch[], int start, int length)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

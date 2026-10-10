@@ -15,16 +15,9 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SessionFactory.h"
-#if defined(POCO_UNBUNDLED)
 #include <sqlite3.h>
-#else
-#include "sqlite3.h"
-#endif
 
-
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 const std::string Connector::KEY("sqlite");
@@ -71,4 +64,4 @@ void Connector::enableSoftHeapLimit(int limit)
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

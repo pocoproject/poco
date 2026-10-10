@@ -24,8 +24,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API Utility
@@ -79,7 +78,7 @@ std::string CppParser_API replace(const std::string& input, const std::string& o
 	/// Replaces in character input all oldTokens with the newToken
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Utility_INCLUDED

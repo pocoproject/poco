@@ -48,7 +48,7 @@ public:
 		MAX_SEQUENCE_LENGTH = 4 /// The maximum character byte sequence length supported.
 	};
 
-	typedef int CharacterMap[256];
+	using CharacterMap = int[256];
 		/// The map[b] member gives information about byte sequences
 		/// whose first byte is b.
 		/// If map[b] is c where c is >= 0, then b by itself encodes the Unicode scalar value c.
@@ -60,18 +60,18 @@ public:
 	virtual ~TextEncoding();
 		/// Destroys the encoding.
 
-	virtual const char* canonicalName() const = 0;
+	[[nodiscard]] virtual const char* canonicalName() const = 0;
 		/// Returns the canonical name of this encoding,
 		/// e.g. "ISO-8859-1". Encoding name comparisons are case
 		/// insensitive.
 
-	virtual bool isA(const std::string& encodingName) const = 0;
+	[[nodiscard]] virtual bool isA(const std::string& encodingName) const = 0;
 		/// Returns true if the given name is one of the names of this encoding.
 		/// For example, the "ISO-8859-1" encoding is also known as "Latin-1".
 		///
 		/// Encoding name comparisons are case insensitive.
 
-	virtual const CharacterMap& characterMap() const = 0;
+	[[nodiscard]] virtual const CharacterMap& characterMap() const = 0;
 		/// Returns the CharacterMap for the encoding.
 		/// The CharacterMap should be kept in a static member. As
 		/// characterMap() can be called frequently, it should be
@@ -134,14 +134,14 @@ public:
 		/// the byte sequence remains unchanged.
 		/// The default implementation simply returns 0.
 
-	static TextEncoding& byName(const std::string& encodingName);
+	[[nodiscard]] static TextEncoding& byName(const std::string& encodingName);
 		/// Returns the TextEncoding object for the given encoding name.
 		///
 		/// Throws a NotFoundException if the encoding with given name is not available.
 
-	static TextEncoding::Ptr find(const std::string& encodingName);
+	[[nodiscard]] static TextEncoding::Ptr find(const std::string& encodingName);
 		/// Returns a pointer to the TextEncoding object for the given encodingName,
-		/// or NULL if no such TextEncoding object exists.
+		/// or nullptr if no such TextEncoding object exists.
 
 	static void add(TextEncoding::Ptr encoding);
 		/// Adds the given TextEncoding to the table of text encodings,
@@ -167,14 +167,14 @@ public:
 		/// This function sets the global encoding to the argument and returns a
 		/// reference of the previous global encoding.
 
-	static TextEncoding& global();
+	[[nodiscard]] static TextEncoding& global();
 		/// Return the current global TextEncoding object
 
 	static const std::string GLOBAL;
 		/// Name of the global TextEncoding, which is the empty string.
 
 protected:
-	static TextEncodingManager& manager();
+	[[nodiscard]] static TextEncodingManager& manager();
 		/// Returns the TextEncodingManager.
 };
 

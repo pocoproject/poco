@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Mutex.h"
 #include "Poco/Runnable.h"
 #include "Poco/SignalHandler.h"
 #include "Poco/Event.h"
@@ -31,7 +32,6 @@
 #if !defined(POCO_NO_SYS_SELECT_H)
 #include <sys/select.h>
 #endif
-#include <errno.h>
 #if defined(POCO_VXWORKS)
 #include <cstring>
 #endif
@@ -41,8 +41,8 @@ namespace Poco {
 class Foundation_API ThreadImpl
 {
 public:
-	typedef pthread_t TIDImpl;
-	typedef void (*Callable)(void*);
+	using TIDImpl = pthread_t;
+	using Callable = void (*)(void *);
 
 	enum Priority
 	{
@@ -61,37 +61,43 @@ public:
 	ThreadImpl();
 	~ThreadImpl();
 
-	TIDImpl tidImpl() const;
+	[[nodiscard]] TIDImpl tidImpl() const;
 	void setNameImpl(const std::string& threadName);
-	std::string getNameImpl() const;
-	std::string getOSThreadNameImpl();
+	[[nodiscard]] std::string getNameImpl() const;
+#ifndef POCO_NO_THREADNAME
+	[[nodiscard]] std::string getOSThreadNameImpl();
 		/// Returns the thread's name, expressed as an operating system
 		/// specific name value. Return empty string if thread is not running.
 		/// For test used only.
+#endif
 	void setPriorityImpl(int prio);
-	int getPriorityImpl() const;
+	[[nodiscard]] int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
-	int getOSPriorityImpl() const;
-	static int getMinOSPriorityImpl(int policy);
-	static int getMaxOSPriorityImpl(int policy);
+	[[nodiscard]] int getOSPriorityImpl() const;
+	[[nodiscard]] static int getMinOSPriorityImpl(int policy);
+	[[nodiscard]] static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
-	int getStackSizeImpl() const;
+	[[nodiscard]] int getStackSizeImpl() const;
 	void setSignalMaskImpl(uint32_t sigMask);
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
-	bool isRunningImpl() const;
+	[[nodiscard]] bool isRunningImpl() const;
 	static void yieldImpl();
-	static ThreadImpl* currentImpl();
-	static TIDImpl currentTidImpl();
-	static long currentOsTidImpl();
+	[[nodiscard]] static ThreadImpl* currentImpl();
+	[[nodiscard]] static TIDImpl currentTidImpl();
+	[[nodiscard]] static long currentOsTidImpl();
+#ifndef POCO_NO_THREADNAME
+	static void setCurrentNameImpl(const std::string& name);
+	[[nodiscard]] static std::string getCurrentNameImpl();
+#endif
 	bool setAffinityImpl(int coreID);
-	int getAffinityImpl() const;
+	[[nodiscard]] int getAffinityImpl() const;
 
 protected:
-	static void* runnableEntry(void* pThread);
-	static int mapPrio(int prio, int policy = SCHED_OTHER);
-	static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
+	[[nodiscard]] static void* runnableEntry(void* pThread);
+	[[nodiscard]] static int mapPrio(int prio, int policy = SCHED_OTHER);
+	[[nodiscard]] static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
 
 private:
 	class CurrentThreadHolder
@@ -99,14 +105,14 @@ private:
 	public:
 		CurrentThreadHolder()
 		{
-			if (pthread_key_create(&_key, NULL))
+			if (pthread_key_create(&_key, nullptr))
 				throw SystemException("cannot allocate thread context key");
 		}
 		~CurrentThreadHolder()
 		{
 			pthread_key_delete(_key);
 		}
-		ThreadImpl* get() const
+		[[nodiscard]] ThreadImpl* get() const
 		{
 			return reinterpret_cast<ThreadImpl*>(pthread_getspecific(_key));
 		}
@@ -122,11 +128,11 @@ private:
 	struct ThreadData: public RefCountedObject
 	{
 		ThreadData():
-			thread(0),
+			thread{},
 			prio(PRIO_NORMAL_IMPL),
 			osPrio(),
 			policy(SCHED_OTHER),
-			done(false),
+			done(Event::EVENT_MANUALRESET),
 			stackSize(POCO_THREAD_STACK_SIZE),
 			started(false),
 			joined(false)

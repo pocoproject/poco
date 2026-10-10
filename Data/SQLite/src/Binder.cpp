@@ -19,6 +19,7 @@
 #include "Poco/Exception.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
+#include <sqlite3.h>
 #include <cstdlib>
 
 
@@ -26,9 +27,7 @@ using Poco::DateTimeFormatter;
 using Poco::DateTimeFormat;
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 Binder::Binder(sqlite3_stmt* pStmt):
@@ -39,6 +38,16 @@ Binder::Binder(sqlite3_stmt* pStmt):
 
 Binder::~Binder()
 {
+}
+
+
+int Binder::bindBlobStatic(sqlite3_stmt* pStmt, int pos, const void* pData, int valSize)
+{
+	// nullptr destructor argument is equivalent to SQLITE_STATIC: tells SQLite
+	// the data is static/persistent and should not be freed. Using nullptr
+	// avoids the -Wzero-as-null-pointer-constant warning that SQLITE_STATIC
+	// (defined as ((sqlite3_destructor_type)0)) triggers under -Wall.
+	return sqlite3_bind_blob(pStmt, pos, pData, valSize, nullptr);
 }
 
 
@@ -131,4 +140,4 @@ void Binder::checkReturn(int rc)
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

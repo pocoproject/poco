@@ -50,7 +50,7 @@ using Poco::format;
 
 std::ostream& operator << (std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac)
 {
-	std::ios state(0);
+	std::ios state(nullptr);
 	state.copyfmt(os);
 	for (unsigned i = 0; i < mac.size(); ++i)
 	{
@@ -62,8 +62,7 @@ std::ostream& operator << (std::ostream& os, const Poco::Net::NetworkInterface::
 }
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -78,8 +77,8 @@ public:
 	using Type = NetworkInterface::Type;
 
 	NetworkInterfaceImpl(unsigned index);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = 0);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = 0);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = nullptr);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = nullptr);
 	NetworkInterfaceImpl(const std::string& name,
 		const std::string& displayName,
 		const std::string& adapterName,
@@ -87,7 +86,7 @@ public:
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		NetworkInterface::MACAddress* pMACAddress = 0);
+		NetworkInterface::MACAddress* pMACAddress = nullptr);
 
 	unsigned index() const;
 	const std::string& name() const;
@@ -841,7 +840,7 @@ NetworkInterface NetworkInterface::forAddress(const IPAddress& addr)
 	for (; it != end; ++it)
 	{
 		const std::size_t count = it->second.addressList().size();
-		for (int i = 0; i < count; ++i)
+		for (std::size_t i = 0; i < count; ++i)
 		{
 			if (it->second.address(i) == addr)
 				return it->second;
@@ -923,7 +922,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 //
@@ -941,14 +940,13 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 #include <iterator>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 namespace {
 
 
-IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr, ULONG* pprefix = 0)
+IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr, ULONG* pprefix = nullptr)
 	/// This function relies on (1) subnet prefix being at the position
 	/// immediately preceding and (2) broadcast address being at the position
 	/// immediately succeeding the IPv4 unicast address.
@@ -959,7 +957,7 @@ IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr,
 	/// not contain prefix length; for those platforms, this function
 	/// returns prefix through pprefix argument.
 {
-	PIP_ADAPTER_PREFIX pPrev = 0;
+	PIP_ADAPTER_PREFIX pPrev = nullptr;
 	for (int i = 0; pPrefix; pPrefix = pPrefix->Next, ++i)
 	{
 		ADDRESS_FAMILY family = pPrefix->Address.lpSockaddr->sa_family;
@@ -1019,9 +1017,9 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 			return IPAddress();
 		wchar_t unetmask[16];
 		DWORD size = sizeof(unetmask);
-		if (RegQueryValueExW(hKey, L"DhcpSubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+		if (RegQueryValueExW(hKey, L"DhcpSubnetMask", nullptr, nullptr, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
 		{
-			if (RegQueryValueExW(hKey, L"SubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+			if (RegQueryValueExW(hKey, L"SubnetMask", nullptr, nullptr, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
 			{
 				RegCloseKey(hKey);
 				return IPAddress();
@@ -1059,12 +1057,12 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #endif
 	DWORD dwRetVal = 0;
 	ULONG iterations = 0;
-	PIP_ADAPTER_ADDRESSES pAddress = 0;
+	PIP_ADAPTER_ADDRESSES pAddress = nullptr;
 	do
 	{
 		pAddress = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(memory.begin()); // leave in the loop, begin may change after resize
 		poco_assert (memory.capacity() >= outBufLen);
-		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, 0, pAddress, &outBufLen)))
+		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, nullptr, pAddress, &outBufLen)))
 			memory.resize(outBufLen, false); // adjust size and try again
 		else if (ERROR_NO_DATA == dwRetVal) // no network interfaces found
 			return result;
@@ -1140,7 +1138,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		Poco::UnicodeConverter::toUTF8(pAddress->Description, displayName);
 
 		bool isUp = (pAddress->OperStatus == IfOperStatusUp);
-		bool isIP = (0 != pAddress->FirstUnicastAddress);
+		bool isIP = (nullptr != pAddress->FirstUnicastAddress);
 		if (((ipOnly && isIP) || !ipOnly) && ((upOnly && isUp) || !upOnly))
 		{
 			NetworkInterface ni(name, displayName, adapterName, ifIndex);
@@ -1242,7 +1240,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #elif defined(POCO_VXWORKS)
@@ -1251,54 +1249,6 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 //
 
 #error TODO
-
-/*
-namespace Poco {
-namespace Net {
-
-
-NetworkInterface::NetworkInterfaceList NetworkInterface::list()
-{
-	FastMutex::ScopedLock lock(_mutex);
-	NetworkInterfaceList result;
-
-	int ifIndex = 1;
-	char ifName[32];
-	char ifAddr[INET_ADDR_LEN];
-
-	for (;;)
-	{
-		if (ifIndexToIfName(ifIndex, ifName) == OK)
-		{
-			std::string name(ifName);
-			IPAddress addr;
-			IPAddress mask;
-			IPAddress bcst;
-			if (ifAddrGet(ifName, ifAddr) == OK)
-			{
-				addr = IPAddress(std::string(ifAddr));
-			}
-			int ifMask;
-			if (ifMaskGet(ifName, &ifMask) == OK)
-			{
-				mask = IPAddress(&ifMask, sizeof(ifMask));
-			}
-			if (ifBroadcastGet(ifName, ifAddr) == OK)
-			{
-				bcst = IPAddress(std::string(ifAddr));
-			}
-			result.push_back(NetworkInterface(name, name, name, addr, mask, bcst));
-			ifIndex++;
-		}
-		else break;
-	}
-
-	return result;
-}
-
-
-} } // namespace Poco::Net
-*/
 
 #elif defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_QNX) || (POCO_OS == POCO_OS_SOLARIS)
 //
@@ -1314,8 +1264,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 namespace {
@@ -1369,13 +1318,13 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	NetworkInterface intf;
 	Map::iterator ifIt;
 
-	struct ifaddrs* ifaces = 0;
-	struct ifaddrs* currIface = 0;
+	struct ifaddrs* ifaces = nullptr;
+	struct ifaddrs* currIface = nullptr;
 
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");
 
-	for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next)
+	for (currIface = ifaces; currIface != nullptr; currIface = currIface->ifa_next)
 	{
 		try
 		{
@@ -1476,7 +1425,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
@@ -1496,8 +1445,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #include <net/if_arp.h>
 #include <iostream>
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 namespace {
@@ -1587,8 +1535,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	NetworkInterface intf;
 	Map::iterator ifIt;
 
-	struct ifaddrs* ifaces = 0;
-	struct ifaddrs* iface = 0;
+	struct ifaddrs* ifaces = nullptr;
+	struct ifaddrs* iface = nullptr;
 
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");
@@ -1702,7 +1650,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #else
@@ -1710,87 +1658,6 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 // Non-BSD Unix variants
 //
 #error TODO
-/*
-NetworkInterface::NetworkInterfaceList NetworkInterface::list()
-{
-	FastMutex::ScopedLock lock(_mutex);
-	NetworkInterfaceList result;
-	DatagramSocket socket;
-	// the following code is loosely based
-	// on W. Richard Stevens, UNIX Network Programming, pp 434ff.
-	int lastlen = 0;
-	int len = 100*sizeof(struct ifreq);
-	char* buf = 0;
-	try
-	{
-		struct ifconf ifc;
-		for (;;)
-		{
-			buf = new char[len];
-			ifc.ifc_len = len;
-			ifc.ifc_buf = buf;
-			if (::ioctl(socket.impl()->sockfd(), SIOCGIFCONF, &ifc) < 0)
-			{
-				if (errno != EINVAL || lastlen != 0)
-					throw NetException("cannot get network adapter list");
-			}
-			else
-			{
-				if (ifc.ifc_len == lastlen)
-					break;
-				lastlen = ifc.ifc_len;
-			}
-			len += 10*sizeof(struct ifreq);
-			delete [] buf;
-		}
-		for (const char* ptr = buf; ptr < buf + ifc.ifc_len;)
-		{
-			const struct ifreq* ifr = reinterpret_cast<const struct ifreq*>(ptr);
-#if defined(POCO_HAVE_SALEN)
-			len = ifr->ifr_addr.sa_len;
-			if (sizeof(struct sockaddr) > len) len = sizeof(struct sockaddr);
-#else
-			len = sizeof(struct sockaddr);
-#endif
-			IPAddress addr;
-			bool haveAddr = false;
-			int ifIndex(-1);
-			switch (ifr->ifr_addr.sa_family)
-			{
-#if defined(POCO_HAVE_IPv6)
-			case AF_INET6:
-				ifIndex = if_nametoindex(ifr->ifr_name);
-				if (len < sizeof(struct sockaddr_in6)) len = sizeof(struct sockaddr_in6);
-				addr = IPAddress(&reinterpret_cast<const struct sockaddr_in6*>(&ifr->ifr_addr)->sin6_addr, sizeof(struct in6_addr), ifIndex);
-				haveAddr = true;
-				break;
-#endif
-			case AF_INET:
-				if (len < sizeof(struct sockaddr_in)) len = sizeof(struct sockaddr_in);
-				addr = IPAddress(ifr->ifr_addr);
-				haveAddr = true;
-				break;
-			default:
-				break;
-			}
-			if (haveAddr)
-			{
-				std::string name(ifr->ifr_name);
-				result.push_back(NetworkInterface(name, name, name, addr, ifIndex));
-			}
-			len += sizeof(ifr->ifr_name);
-			ptr += len;
-		}
-	}
-	catch (...)
-	{
-		delete [] buf;
-		throw;
-	}
-	delete [] buf;
-	return result;
-}
-*/
 
 } } // namespace Poco::Net
 

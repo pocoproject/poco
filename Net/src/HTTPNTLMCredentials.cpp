@@ -21,10 +21,10 @@
 #include "Poco/DateTime.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPNTLMCredentials::SCHEME = "NTLM";
@@ -44,6 +44,7 @@ HTTPNTLMCredentials::HTTPNTLMCredentials(const std::string& username, const std:
 
 HTTPNTLMCredentials::~HTTPNTLMCredentials()
 {
+	clear();
 }
 
 
@@ -54,8 +55,8 @@ void HTTPNTLMCredentials::reset()
 
 void HTTPNTLMCredentials::clear()
 {
-	_username.clear();
-	_password.clear();
+	Poco::secureClear(_username);
+	Poco::secureClear(_password);
 	_host.clear();
 }
 
@@ -182,4 +183,4 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

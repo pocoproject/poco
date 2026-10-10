@@ -20,8 +20,7 @@
 using Poco::URI;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPSessionInstantiator::HTTPSessionInstantiator()
@@ -58,11 +57,11 @@ void HTTPSessionInstantiator::unregisterInstantiator()
 }
 
 
-void HTTPSessionInstantiator::setProxyConfig(const HTTPClientSession::ProxyConfig& proxyConfig)
+void HTTPSessionInstantiator::setProxyConfig(const ProxyConfig& proxyConfig)
 {
 	_proxyConfig = proxyConfig;
 }
 
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -25,8 +25,7 @@ using Poco::FastMutex;
 using Poco::AutoPtr;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class TCPConnectionNotification: public Notification
@@ -101,7 +100,7 @@ void TCPServerDispatcher::run()
 
 	int idleTime = (int) _pParams->getThreadIdleTime().totalMilliseconds();
 
-	for (;;)
+	while (true)
 	{
 		try
 		{
@@ -112,10 +111,12 @@ void TCPServerDispatcher::run()
 				if (pCNf)
 				{
 					std::unique_ptr<TCPServerConnection> pConnection(_pConnectionFactory->createConnection(pCNf->socket()));
-					poco_check_ptr(pConnection.get());
-					beginConnection();
-					pConnection->start();
-					endConnection();
+					if (pConnection)
+					{
+						beginConnection();
+						pConnection->start();
+						endConnection();
+					}
 				}
 			}
 		}
@@ -173,6 +174,7 @@ void TCPServerDispatcher::enqueue(const StreamSocket& socket)
 void TCPServerDispatcher::stop()
 {
 	FastMutex::ScopedLock lock(_mutex);
+	_pConnectionFactory->stop();
 	_stopped = true;
 	_queue.clear();
 	for (int i = 0; i < _threadPool.allocated(); i++)
@@ -195,7 +197,7 @@ int TCPServerDispatcher::maxThreads() const
 }
 
 
-int TCPServerDispatcher::totalConnections() const
+Int64 TCPServerDispatcher::totalConnections() const
 {
 	return _totalConnections;
 }
@@ -242,4 +244,4 @@ void TCPServerDispatcher::endConnection()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

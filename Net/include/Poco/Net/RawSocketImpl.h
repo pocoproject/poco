@@ -22,8 +22,7 @@
 #include "Poco/Net/SocketImpl.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API RawSocketImpl: public SocketImpl
@@ -43,14 +42,14 @@ public:
 		/// Creates a RawSocketImpl using the given native socket.
 
 protected:
-	void init(int af);
+	void init(int af) override;
 	void init2(int af, int proto);
 
-	~RawSocketImpl();
+	~RawSocketImpl() override;
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_RawSocketImpl_INCLUDED

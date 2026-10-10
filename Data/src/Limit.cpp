@@ -15,8 +15,7 @@
 #include "Poco/Data/Limit.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Limit::Limit(SizeT value, bool hardLimit, bool isLowerLimit) :
@@ -32,4 +31,4 @@ Limit::~Limit()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

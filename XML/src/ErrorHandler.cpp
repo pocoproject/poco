@@ -15,8 +15,7 @@
 #include "Poco/SAX/ErrorHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 ErrorHandler::~ErrorHandler()
@@ -24,4 +23,4 @@ ErrorHandler::~ErrorHandler()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

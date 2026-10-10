@@ -11,11 +11,10 @@
 #include "SessionImpl.h"
 #include "TestStatementImpl.h"
 #include "Connector.h"
+#include "Poco/Data/DataException.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 SessionImpl::SessionImpl(const std::string& init, std::size_t timeout):
@@ -24,13 +23,16 @@ SessionImpl::SessionImpl(const std::string& init, std::size_t timeout):
 	_connected(true)
 {
 	addFeature("f1", &SessionImpl::setF, &SessionImpl::getF);
-	addFeature("f2", 0, &SessionImpl::getF);
-	addFeature("f3", &SessionImpl::setF, 0);
+	addFeature("f2", nullptr, &SessionImpl::getF);
+	addFeature("f3", &SessionImpl::setF, nullptr);
 	addFeature("throwOnHasNext", &SessionImpl::setThrowOnHasNext, &SessionImpl::getThrowOnHasNext);
+	addFeature("throwOnBegin", &SessionImpl::setThrowOnBegin, &SessionImpl::getThrowOnBegin);
+	addFeature("throwOnRollback", &SessionImpl::setThrowOnRollback, &SessionImpl::getThrowOnRollback);
 	addFeature("connected", &SessionImpl::setConnected, &SessionImpl::getConnected);
 	addProperty("p1", &SessionImpl::setP, &SessionImpl::getP);
-	addProperty("p2", 0, &SessionImpl::getP);
+	addProperty("p2", nullptr, &SessionImpl::getP);
 	addProperty("p3", &SessionImpl::setP, &SessionImpl::getP);
+	setDBMSName("Test");
 }
 
 
@@ -80,16 +82,23 @@ StatementImpl::Ptr SessionImpl::createStatementImpl()
 
 void SessionImpl::begin()
 {
+	if (_throwOnBegin)
+		throw Poco::Data::ConnectionFailedException("Test: begin() failed");
+	_inTransaction = true;
 }
 
 
 void SessionImpl::commit()
 {
+	_inTransaction = false;
 }
 
 
 void SessionImpl::rollback()
 {
+	_inTransaction = false;
+	if (_throwOnRollback)
+		throw Poco::Data::ConnectionFailedException("Test: rollback() failed");
 }
 
 
@@ -101,7 +110,7 @@ bool SessionImpl::canTransact() const
 
 bool SessionImpl::isTransaction() const
 {
-	return false;
+	return _inTransaction;
 }
 
 
@@ -169,6 +178,30 @@ bool SessionImpl::getThrowOnHasNext(const std::string& name) const
 	return _throwOnHasNext;
 }
 
+
+void SessionImpl::setThrowOnBegin(const std::string&, bool value)
+{
+	_throwOnBegin = value;
+}
+
+
+bool SessionImpl::getThrowOnBegin(const std::string& name) const
+{
+	return _throwOnBegin;
+}
+
+
+void SessionImpl::setThrowOnRollback(const std::string&, bool value)
+{
+	_throwOnRollback = value;
+}
+
+
+bool SessionImpl::getThrowOnRollback(const std::string& name) const
+{
+	return _throwOnRollback;
+}
+
 void SessionImpl::setP(const std::string& name, const Poco::Any& value)
 {
 	_p = value;
@@ -181,4 +214,4 @@ Poco::Any SessionImpl::getP(const std::string& name) const
 }
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test

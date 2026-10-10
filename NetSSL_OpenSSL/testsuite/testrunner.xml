@@ -6,7 +6,10 @@
 			<verificationMode>none</verificationMode>
 			<verificationDepth>9</verificationDepth>
 			<loadDefaultCAFile>true</loadDefaultCAFile>
-			<cypherList>ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH</cypherList>
+			<cypherList>
+				ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH
+			</cypherList>
+			<dhParamsFile>${application.configDir}dhparams.pem</dhParamsFile>
 			<privateKeyPassphraseHandler>
 				<name>KeyFileHandler</name>
 				<options>
@@ -25,8 +28,9 @@
 			<verificationMode>relaxed</verificationMode>
 			<verificationDepth>9</verificationDepth>
 			<loadDefaultCAFile>true</loadDefaultCAFile>
-			<cypherList>ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH</cypherList>
-			<dhParamsFile>${application.configDir}dhparams.pem</dhParamsFile>
+			<cypherList>
+				ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH
+			</cypherList>
 			<privateKeyPassphraseHandler>
 				<name>KeyFileHandler</name>
 				<options>

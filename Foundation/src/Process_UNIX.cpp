@@ -18,6 +18,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Pipe.h"
 #include <errno.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -40,7 +41,8 @@ namespace Poco {
 // ProcessHandleImpl
 //
 ProcessHandleImpl::ProcessHandleImpl(pid_t pid):
-	_pid(pid)
+	_pid(pid),
+	_event(Event::EVENT_MANUALRESET)
 {
 }
 
@@ -56,43 +58,130 @@ pid_t ProcessHandleImpl::id() const
 }
 
 
+// Converts a raw waitpid status to a Poco exit code.
+// Normal exit: WEXITSTATUS (0-255).
+// Signal death: 256 + signal_number.
+int ProcessHandleImpl::statusToExitCode(int status)
+{
+	if (WIFEXITED(status))
+		return WEXITSTATUS(status);
+	else
+		return 256 + WTERMSIG(status);
+}
+
+
 int ProcessHandleImpl::wait() const
 {
+	if (wait(0) != _pid)
+		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
+
+	return statusToExitCode(_status.load());
+}
+
+
+int ProcessHandleImpl::wait(int options) const
+{
+	if (_hasStatus.load()) return _pid;
 	int status;
 	int rc;
 	do
 	{
-		rc = waitpid(_pid, &status, 0);
+		rc = ::waitpid(_pid, &status, options);
 	}
 	while (rc < 0 && errno == EINTR);
-	if (rc != _pid)
-		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
+	if (rc == _pid)
+	{
+		_status.store(status);
+		_hasStatus.store(true);
+		// N.B. _hasStatus must be stored before _event.set()
+		// because the ECHILD/WNOHANG path checks tryWait(0) && _hasStatus
+		_event.set();
+	}
+	else if (rc < 0 && errno == ECHILD)
+	{
+		// Another thread reaped the process; synchronize with its status update.
+		// Preserve the requested wait semantics:
+		//  - blocking waits block until the status has been published
+		//  - WNOHANG waits remain non-blocking
+		if (options & WNOHANG)
+		{
+			if (_event.tryWait(0) && _hasStatus.load())
+				rc = _pid;
+			else
+				rc = 0;
+		}
+		else
+		{
+			_event.wait();
+			if (_hasStatus.load())
+				rc = _pid;
+			else
+				throw SystemException("Lost process status (internal error)", NumberFormatter::format(_pid));
+		}
+	}
 
-	if (WIFEXITED(status)) // normal termination
-		return WEXITSTATUS(status);
-	else // termination by a signal
-		return 256 + WTERMSIG(status);
+	return rc;
 }
 
 
 int ProcessHandleImpl::tryWait() const
 {
-	int status;
-	int rc;
-	do
-	{
-		rc = waitpid(_pid, &status, WNOHANG);
-	}
-	while (rc < 0 && errno == EINTR);
+	int rc = wait(WNOHANG);
 	if (rc == 0)
 		return -1;
 	if (rc != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
-	if (WIFEXITED(status)) // normal termination
-		return WEXITSTATUS(status);
-	else // termination by a signal
-		return 256 + WTERMSIG(status);
+	return statusToExitCode(_status.load());
 }
+
+
+bool ProcessHandleImpl::isRunning() const
+{
+	if (_hasStatus.load())
+		return false;
+	// Note: concurrent calls may briefly return true after the process
+	// exits (transient false-positive) until the reaping thread publishes
+	// status. Self-correcting on the next call.
+	return wait(WNOHANG) == 0;
+}
+
+
+#if !defined(POCO_NO_FORK_EXEC)
+namespace
+{
+	void closeStandardStream(int fd)
+		/// Cuts a standard stream of the process off without leaving its
+		/// descriptor free: the descriptor is attached to the null device,
+		/// so that the next file or socket the process opens does not take
+		/// the place of its standard input, output or error. If the null
+		/// device cannot be opened, or the descriptor cannot be attached
+		/// to it, the descriptor is closed.
+		///
+		/// For a child between fork() and exec(): uses only what is safe
+		/// to call there.
+	{
+		int null = -1;
+		do
+		{
+			null = ::open("/dev/null", fd == STDIN_FILENO ? O_RDONLY : O_WRONLY);
+		}
+		while (null < 0 && errno == EINTR);
+		if (null == fd) return;
+
+		int rc = -1;
+		if (null >= 0)
+		{
+			do
+			{
+				rc = ::dup2(null, fd);
+			}
+			while (rc < 0 && errno == EINTR);
+			::close(null);
+		}
+		if (rc < 0) ::close(fd);
+	}
+}
+#endif
 
 
 //
@@ -100,16 +189,25 @@ int ProcessHandleImpl::tryWait() const
 //
 ProcessImpl::PIDImpl ProcessImpl::idImpl()
 {
-	return getpid();
+	return ::getpid();
 }
 
 
 void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 {
 	struct rusage usage;
-	getrusage(RUSAGE_SELF, &usage);
+	::getrusage(RUSAGE_SELF, &usage);
 	userTime   = usage.ru_utime.tv_sec;
 	kernelTime = usage.ru_stime.tv_sec;
+}
+
+
+void ProcessImpl::timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime)
+{
+	struct rusage usage;
+	::getrusage(RUSAGE_SELF, &usage);
+	userTime   = static_cast<Poco::Int64>(usage.ru_utime.tv_sec)*1000000 + usage.ru_utime.tv_usec;
+	kernelTime = static_cast<Poco::Int64>(usage.ru_stime.tv_sec)*1000000 + usage.ru_stime.tv_usec;
 }
 
 
@@ -124,14 +222,28 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		argv[i++] = const_cast<char*>(command.c_str());
 		for (const auto& a: args)
 			argv[i++] = const_cast<char*>(a.c_str());
-		argv[i] = NULL;
+		argv[i] = nullptr;
 		struct inheritance inherit;
 		std::memset(&inherit, 0, sizeof(inherit));
 		inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
+		if (options & PROCESS_KILL_TREE)
+		{
+			inherit.flags |= SPAWN_SETGROUP;
+			inherit.pgroup = SPAWN_NEWPGROUP;
+		}
+		// A stream that is closed for the child is attached to the null
+		// device, as launchByForkExecImpl() does it, and closed in the
+		// child if the null device cannot be opened. The descriptors of
+		// this process stay as they are.
+		int nullIn = (options & PROCESS_CLOSE_STDIN) ? ::open("/dev/null", O_RDONLY) : -1;
+		int nullOut = (options & (PROCESS_CLOSE_STDOUT | PROCESS_CLOSE_STDERR)) ? ::open("/dev/null", O_WRONLY) : -1;
 		int fdmap[3];
 		fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
 		fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
 		fdmap[2] = errPipe ? errPipe->writeHandle() : 2;
+		if (options & PROCESS_CLOSE_STDIN) fdmap[0] = nullIn >= 0 ? nullIn : SPAWN_FDCLOSED;
+		if (options & PROCESS_CLOSE_STDOUT) fdmap[1] = nullOut >= 0 ? nullOut : SPAWN_FDCLOSED;
+		if (options & PROCESS_CLOSE_STDERR) fdmap[2] = nullOut >= 0 ? nullOut : SPAWN_FDCLOSED;
 
 		char** envPtr = 0;
 		std::vector<char> envChars;
@@ -151,17 +263,16 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 			envPtr = &envPtrs[0];
 		}
 
-		int pid = spawn(command.c_str(), 3, fdmap, &inherit, argv, envPtr);
+		int pid = ::spawn(command.c_str(), 3, fdmap, &inherit, argv, envPtr);
 		delete [] argv;
+		if (nullIn >= 0) ::close(nullIn);
+		if (nullOut >= 0) ::close(nullOut);
 		if (pid == -1)
 			throw SystemException("cannot spawn", command);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
-		if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
 		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
-		if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
 		if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
-		if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
 		return new ProcessHandleImpl(pid);
 	}
 	else
@@ -180,7 +291,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	// On some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number,
 	// which would closing all file descriptors up to that number extremely slow.
 	// We therefore limit the maximum number of file descriptors we close.
-	const long CLOSE_FD_MAX = 100000;
+	constexpr long CLOSE_FD_MAX = 100000;
 
 	do
 	{
@@ -195,11 +306,11 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		{
 			argv[i++] = const_cast<char*>(a.c_str());
 		}
-		argv[i] = NULL;
+		argv[i] = nullptr;
 
-		const char* pInitialDirectory = initialDirectory.empty() ? 0 : initialDirectory.c_str();
+		const char* pInitialDirectory = initialDirectory.empty() ? nullptr : initialDirectory.c_str();
 
-		int pid = fork();
+		int pid = ::fork();
 		if (pid < 0)
 		{
 			throw SystemException("Cannot fork process for", command);
@@ -208,7 +319,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		{
 			if (pInitialDirectory)
 			{
-				if (chdir(pInitialDirectory) != 0)
+				if (::chdir(pInitialDirectory) != 0)
 				{
 					break;
 				}
@@ -218,7 +329,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 			char* p = &envChars[0];
 			while (*p)
 			{
-				putenv(p);
+				::putenv(p);
 				while (*p) ++p;
 				++p;
 			}
@@ -226,30 +337,44 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 			// setup redirection
 			if (inPipe)
 			{
-				dup2(inPipe->readHandle(), STDIN_FILENO);
+				::dup2(inPipe->readHandle(), STDIN_FILENO);
 				inPipe->close(Pipe::CLOSE_BOTH);
 			}
-			if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
+			if (options & PROCESS_CLOSE_STDIN) closeStandardStream(STDIN_FILENO);
 
 			// outPipe and errPipe may be the same, so we dup first and close later
-			if (outPipe) dup2(outPipe->writeHandle(), STDOUT_FILENO);
-			if (errPipe) dup2(errPipe->writeHandle(), STDERR_FILENO);
+			if (outPipe) ::dup2(outPipe->writeHandle(), STDOUT_FILENO);
+			if (errPipe) ::dup2(errPipe->writeHandle(), STDERR_FILENO);
 			if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
-			if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
+			if (options & PROCESS_CLOSE_STDOUT) closeStandardStream(STDOUT_FILENO);
 			if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
-			if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
+			if (options & PROCESS_CLOSE_STDERR) closeStandardStream(STDERR_FILENO);
 			// close all open file descriptors other than stdin, stdout, stderr
-			long fdMax = sysconf(_SC_OPEN_MAX);
+			long fdMax = ::sysconf(_SC_OPEN_MAX);
 			// on some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number
 			if (fdMax > CLOSE_FD_MAX) fdMax = CLOSE_FD_MAX;
 			for (long j = 3; j < fdMax; ++j)
 			{
-				close(j);
+				::close(j);
 			}
 
-			execvp(argv[0], &argv[0]);
+			// Create a new process group so the entire tree can be signaled.
+			if (options & PROCESS_KILL_TREE)
+			{
+				if (setpgid(0, 0) != 0)
+					_exit(PROCESS_EXIT_SETPGID_FAILED);
+			}
+
+			::execvp(argv[0], &argv[0]);
 			break;
 		}
+
+		// Close the race window where stop() could be called before the
+		// child reaches setpgid(0, 0). setpgid(pid, pid) is idempotent
+		// with the child's call; if the child already called it, this
+		// is a harmless no-op (EACCES after exec is also benign).
+		if (options & PROCESS_KILL_TREE)
+			setpgid(pid, pid);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
 		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
@@ -258,7 +383,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	}
 	while (false);
 
-	_exit(72);
+	_exit(PROCESS_EXIT_EXEC_FAILED);
 #else
 	throw Poco::NotImplementedException("platform does not allow fork/exec");
 #endif
@@ -273,7 +398,7 @@ void ProcessImpl::killImpl(ProcessHandleImpl& handle)
 
 void ProcessImpl::killImpl(PIDImpl pid)
 {
-	if (kill(pid, SIGKILL) != 0)
+	if (::kill(pid, SIGKILL) != 0)
 	{
 		switch (errno)
 		{
@@ -290,26 +415,30 @@ void ProcessImpl::killImpl(PIDImpl pid)
 
 bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 {
-	return isRunningImpl(handle.id());
+	return handle.isRunning();
 }
 
 
 bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
-	if (kill(pid, 0) == 0)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	// Use waitid with WNOWAIT to check zombie status without reaping.
+	// This avoids consuming the waitable state, so a subsequent
+	// ProcessHandle::wait() on the same child still works.
+	siginfo_t info{};
+	int rc = ::waitid(P_PID, pid, &info, WEXITED | WNOHANG | WNOWAIT);
+	if (rc == 0 && info.si_pid == pid)
+		return false; // exited/zombie, but NOT reaped
+	if (rc == 0 && info.si_pid == 0)
+		return true; // still running
+	// Not our child or error (ECHILD); fall back to kill check
+	if (::kill(pid, 0) == 0) return true;
+	return errno == EPERM;
 }
 
 
 void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 {
-	if (kill(pid, SIGINT) != 0)
+	if (::kill(pid, SIGINT) != 0)
 	{
 		switch (errno)
 		{

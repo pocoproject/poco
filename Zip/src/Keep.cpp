@@ -18,8 +18,7 @@
 #include "Poco/StreamCopier.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 Keep::Keep(const ZipLocalFileHeader& hdr):
@@ -34,4 +33,4 @@ void Keep::execute(Compress& c, std::istream& input)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

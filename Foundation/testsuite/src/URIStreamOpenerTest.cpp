@@ -16,6 +16,7 @@
 #include "Poco/URI.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/Path.h"
+#include "Poco/Exception.h"
 #include <fstream>
 #include <sstream>
 
@@ -40,6 +41,23 @@ namespace
 		{
 			return new std::istringstream(uri.toString());
 		}
+	};
+
+	class RedirectingStreamFactory: public URIStreamFactory
+		// Stands in for an HTTP server answering with a 302 to _target.
+	{
+	public:
+		RedirectingStreamFactory(const std::string& target): _target(target)
+		{
+		}
+
+		std::istream* open(const URI& /*uri*/)
+		{
+			throw Poco::URIRedirection(_target);
+		}
+
+	private:
+		std::string _target;
 	};
 }
 
@@ -70,7 +88,7 @@ void URIStreamOpenerTest::testStreamOpenerFile()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uri);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -90,7 +108,7 @@ void URIStreamOpenerTest::testStreamOpenerRelative()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uri);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -112,7 +130,7 @@ void URIStreamOpenerTest::testStreamOpenerURI()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uriString);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -138,7 +156,7 @@ void URIStreamOpenerTest::testStreamOpenerURIResolve()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(uriString, p.getFileName());
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -155,7 +173,7 @@ void URIStreamOpenerTest::testStreamOpenerPath()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(path);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -176,7 +194,7 @@ void URIStreamOpenerTest::testStreamOpenerPathResolve()
 
 	URIStreamOpener opener;
 	std::istream* istr = opener.open(base, p.getFileName());
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 }
@@ -190,11 +208,62 @@ void URIStreamOpenerTest::testRegisterUnregister()
 	assertTrue (opener.supportsScheme("string"));
 	URI uri("string:foobar");
 	std::istream* istr = opener.open(uri);
-	assertTrue (istr != 0);
+	assertTrue (istr != nullptr);
 	assertTrue (istr->good());
 	delete istr;
 	opener.unregisterStreamFactory("string");
 	assertTrue (!opener.supportsScheme("string"));
+}
+
+
+void URIStreamOpenerTest::testRedirectToFileSchemeRejected()
+{
+	TemporaryFile tempFile;
+	std::string path = tempFile.path();
+	std::ofstream ostr(path.c_str());
+	assertTrue (ostr.good());
+	ostr << "secret" << std::endl;
+	ostr.close();
+
+	URI fileURI;
+	fileURI.setScheme("file");
+	fileURI.setPath(Path(path).toString(Path::PATH_UNIX));
+
+	URIStreamOpener opener;
+	opener.registerStreamFactory("http", new RedirectingStreamFactory(fileURI.toString()));
+	try
+	{
+		std::istream* istr = opener.open(URI("http://localhost/redirect"));
+		delete istr;
+		fail("redirect into the file scheme must be rejected");
+	}
+	catch (Poco::UnknownURISchemeException&)
+	{
+	}
+
+	// The string overload must reject it too: it catches URISyntaxException and
+	// retries the input as a filesystem path, so the rejection must not be one.
+	try
+	{
+		std::istream* istr = opener.open(std::string("http://localhost/redirect"));
+		delete istr;
+		fail("redirect into the file scheme must be rejected");
+	}
+	catch (Poco::UnknownURISchemeException&)
+	{
+	}
+}
+
+
+void URIStreamOpenerTest::testRedirectToWebSchemeAllowed()
+{
+	URIStreamOpener opener;
+	opener.registerStreamFactory("http", new RedirectingStreamFactory("https://localhost/target"));
+	opener.registerStreamFactory("https", new StringStreamFactory);
+	std::istream* istr = opener.open(URI("http://localhost/redirect"));
+	assertTrue (istr != nullptr);
+	assertTrue (istr->good());
+	delete istr;
 }
 
 
@@ -219,6 +288,8 @@ CppUnit::Test* URIStreamOpenerTest::suite()
 	CppUnit_addTest(pSuite, URIStreamOpenerTest, testStreamOpenerPath);
 	CppUnit_addTest(pSuite, URIStreamOpenerTest, testStreamOpenerPathResolve);
 	CppUnit_addTest(pSuite, URIStreamOpenerTest, testRegisterUnregister);
+	CppUnit_addTest(pSuite, URIStreamOpenerTest, testRedirectToFileSchemeRejected);
+	CppUnit_addTest(pSuite, URIStreamOpenerTest, testRedirectToWebSchemeAllowed);
 
 	return pSuite;
 }

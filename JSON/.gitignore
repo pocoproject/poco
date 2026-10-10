@@ -1,0 +1,4 @@
+# Build-time symlinks to bundled pdjson library
+# Created by prebuild step in Makefile when POCO_UNBUNDLED is not set
+src/pdjson.c
+src/pdjson.h

@@ -19,8 +19,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 const std::string ThreadPoolCollector::NAME_PREFIX{"poco_threadpool"s};
@@ -51,6 +50,9 @@ ThreadPoolCollector::ThreadPoolCollector(const std::string& name, const Poco::Th
 {
 	buildMetrics();
 }
+
+
+ThreadPoolCollector::~ThreadPoolCollector() = default;
 
 
 void ThreadPoolCollector::exportTo(Exporter& exporter) const
@@ -117,4 +119,4 @@ std::string ThreadPoolCollector::collectorName(const std::string& threadPoolName
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

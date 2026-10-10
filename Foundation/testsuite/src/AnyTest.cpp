@@ -57,7 +57,7 @@ void AnyTest::testAnyDefaultCtor()
 	const Any value;
 
 	assertTrue (value.empty());
-	assertTrue (0 == AnyCast<int>(&value));
+	assertTrue (nullptr == AnyCast<int>(&value));
 	assertTrue (value.type() == typeid(void));
 }
 
@@ -69,8 +69,8 @@ void AnyTest::testAnyConvertingCtor()
 
 	assertTrue (!value.empty());
 	assertTrue (value.type() == typeid(std::string));
-	assertTrue (0 == AnyCast<int>(&value));
-	assertTrue (0 != AnyCast<std::string>(&value));
+	assertTrue (nullptr == AnyCast<int>(&value));
+	assertTrue (nullptr != AnyCast<std::string>(&value));
 	assertTrue (AnyCast<std::string>(value) == text);
 	assertTrue (AnyCast<std::string>(&value) != &text);
 }
@@ -119,8 +119,8 @@ void AnyTest::testAnyConvertingAssign()
 
 	assertTrue (!value.empty());
 	assertTrue (value.type() == typeid(std::string));
-	assertTrue (0 == AnyCast<int>(&value));
-	assertTrue (0 != AnyCast<std::string>(&value));
+	assertTrue (nullptr == AnyCast<int>(&value));
+	assertTrue (nullptr != AnyCast<std::string>(&value));
 	assertTrue (AnyCast<std::string>(value) == text);
 	assertTrue (AnyCast<std::string>(&value) != &text);
 	assertTrue (assignResult == &value);
@@ -134,7 +134,7 @@ void AnyTest::testAnyCastToReference()
 
 	int&                ra    = AnyCast<int &>(a);
 	int const&          ra_c  = AnyCast<int const &>(a);
-	// NOTE: The following two AnyCasts will trigger the
+	// NOTE: The volatile AnyCasts will trigger the
 	// undefined behavior sanitizer.
 	int volatile&       ra_v  = AnyCast<int volatile &>(a);
 	int const volatile& ra_cv = AnyCast<int const volatile&>(a);
@@ -154,14 +154,14 @@ void AnyTest::testAnyCastToReference()
 
 	try
 	{
-		AnyCast<char &>(a);
+		(void) AnyCast<char &>(a);
 		failmsg ("AnyCast to incorrect reference type");
 	}
 	catch (BadCastException&) { }
 
 	try
 	{
-		AnyCast<const char &>(b),
+		(void) AnyCast<const char &>(b);
 		failmsg ("AnyCast to incorrect const reference type");
 	}
 	catch (BadCastException&) { }
@@ -175,7 +175,7 @@ void AnyTest::testAnyBadCast()
 
 	try
 	{
-		AnyCast<const char *>(value);
+		(void) AnyCast<const char *>(value);
 		fail ("must throw");
 	}
 	catch (BadCastException&) { }
@@ -218,7 +218,7 @@ void AnyTest::testAnySwap()
 	assertTrue (!swapped.empty());
 	assertTrue (swapped.type() == typeid(std::string));
 	assertTrue (text == AnyCast<std::string>(swapped));
-	assertTrue (0 != originalPtr);
+	assertTrue (nullptr != originalPtr);
 	assertTrue (swapResult == &original);
 
 	struct BigObject
@@ -233,7 +233,7 @@ void AnyTest::testAnySwap()
 		Poco::UInt64 eight = 8;
 		Poco::UInt64 nine = 9;
 
-		bool operator==(const BigObject& other)
+		bool operator==(const BigObject& other) const
 		{
 			return one == other.one &&
 				two == other.two &&
@@ -262,7 +262,7 @@ void AnyTest::testAnySwap()
 	assertTrue (!swappedBig.empty());
 	assertTrue (swappedBig.type() == typeid(BigObject));
 	assertTrue (bigObject == AnyCast<BigObject>(swappedBig));
-	assertTrue (0 != bigPtr);
+	assertTrue (nullptr != bigPtr);
 	assertTrue (swapBigResult == &bigOriginal);
 
 	// assure proper assignment behavior after swapping
@@ -326,9 +326,9 @@ void AnyTest::testAnyInt()
 	*cpyI = 20;
 	assertTrue (*cpyI != *i);
 	std::string* s = AnyCast<std::string>(&a);
-	assertTrue (s == NULL);
+	assertTrue (s == nullptr);
 
-	int POCO_UNUSED tmp = AnyCast<int>(a);
+	[[maybe_unused]] int tmp = AnyCast<int>(a);
 	const Any c = a;
 	tmp = AnyCast<int>(a);
 }
@@ -337,7 +337,7 @@ void AnyTest::testAnyInt()
 class A
 {
 public:
-    void f() {}
+	void f() {}
 	int m;
 };
 
@@ -359,21 +359,21 @@ void AnyTest::testAnyPointer()
 	*cpyI = 20;
 	assertTrue (*cpyI == *p);
 	std::string* s = AnyCast<std::string>(&a);
-	assertTrue (s == NULL);
+	assertTrue (s == nullptr);
 	assertTrue (AnyCast<std::nullptr_t>(&a) == nullptr);
 
-	int* POCO_UNUSED tmp = AnyCast<int*>(a);
+	[[maybe_unused]] int* tmp = AnyCast<int*>(a);
 	const Any c = a;
 	tmp = AnyCast<int*>(a);
 
 	Any nullPtr(nullptr);
 	assertFalse (AnyHoldsNullPtr<std::nullptr_t>(nullptr));
-	assertFalse (AnyHoldsNullPtr<void*>(0));
+	assertFalse (AnyHoldsNullPtr<void*>(nullptr));
 	assertTrue (AnyHoldsNullPtr<std::nullptr_t>(nullPtr));
 	assertTrue (AnyHoldsNullPtr<std::nullptr_t>(&nullPtr));
 	try
 	{
-		AnyHoldsNullPtr<void*>(nullPtr);
+		(void) AnyHoldsNullPtr<void*>(nullPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
 	catch(const Poco::BadCastException&) {}
@@ -391,7 +391,7 @@ void AnyTest::testAnyPointer()
 	assertTrue (AnyHoldsNullPtr<void*>(nullVoidPtr));
 	try
 	{
-		AnyHoldsNullPtr<std::nullptr_t>(voidPtr);
+		(void) AnyHoldsNullPtr<std::nullptr_t>(voidPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
 	catch(const Poco::BadCastException&) {}
@@ -402,7 +402,7 @@ void AnyTest::testAnyPointer()
 	assertTrue (AnyHoldsNullPtr<FP>(funcPtr));
 	try
 	{
-		AnyHoldsNullPtr<FP>(voidPtr);
+		(void) AnyHoldsNullPtr<FP>(voidPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
 	catch(const Poco::BadCastException&) {}
@@ -416,7 +416,7 @@ void AnyTest::testAnyPointer()
 	objPtr = &AnyTest::_dummyObject;
 	try
 	{
-		AnyHoldsNullPtr<OP>(funcPtr);
+		(void) AnyHoldsNullPtr<OP>(funcPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
 	catch(const Poco::BadCastException&) {}
@@ -430,7 +430,7 @@ void AnyTest::testAnyPointer()
 	memPtr = &AnyTest::_dummy;
 	try
 	{
-		AnyHoldsNullPtr<MP>(objPtr);
+		(void) AnyHoldsNullPtr<MP>(objPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
 	catch(const Poco::BadCastException&) {}

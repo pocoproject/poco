@@ -24,8 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <class C>
@@ -51,13 +50,9 @@ public:
 		/// The getter method for a property.
 
 	AbstractSessionImpl(const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT): SessionImpl(connectionString, timeout),
-			_storage(std::string("deque")),
-			_bulk(false),
-			_emptyStringIsNull(false),
-			_forceEmptyString(false),
-			_sqlParse(false),
-			_autoCommit(true)
+		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT):
+			SessionImpl(connectionString, timeout),
+			_storage(std::string("deque"))
 		/// Creates the AbstractSessionImpl.
 		///
 		/// Adds "storage" property and sets the default internal storage container
@@ -132,12 +127,10 @@ public:
 			&AbstractSessionImpl<C>::getAutoCommit);
 	}
 
-	~AbstractSessionImpl()
+	~AbstractSessionImpl() override = default;
 		/// Destroys the AbstractSessionImpl.
-	{
-	}
 
-	bool hasFeature(const std::string& name) const
+	[[nodiscard]] bool hasFeature(const std::string& name) const override
 		/// Looks a feature up in the features map
 		/// and returns true if there is one.
 	{
@@ -147,7 +140,7 @@ public:
 			it->second.setter;
 	}
 
-	void setFeature(const std::string& name, bool state)
+	void setFeature(const std::string& name, bool state) override
 		/// Looks a feature up in the features map
 		/// and calls the feature's setter, if there is one.
 	{
@@ -162,7 +155,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	bool getFeature(const std::string& name) const
+	[[nodiscard]] bool getFeature(const std::string& name) const override
 		/// Looks a feature up in the features map
 		/// and calls the feature's getter, if there is one.
 	{
@@ -177,7 +170,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	bool hasProperty(const std::string& name) const
+	[[nodiscard]] bool hasProperty(const std::string& name) const override
 		/// Looks a property up in the properties map
 		/// and returns true if there is one.
 	{
@@ -187,7 +180,7 @@ public:
 			it->second.setter;
 	}
 
-	void setProperty(const std::string& name, const Poco::Any& value)
+	void setProperty(const std::string& name, const Poco::Any& value) override
 		/// Looks a property up in the properties map
 		/// and calls the property's setter, if there is one.
 	{
@@ -202,7 +195,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	Poco::Any getProperty(const std::string& name) const
+	[[nodiscard]] Poco::Any getProperty(const std::string& name) const override
 		/// Looks a property up in the properties map
 		/// and calls the property's getter, if there is one.
 	{
@@ -229,7 +222,7 @@ public:
 		_storage = Poco::RefAnyCast<std::string>(value);
 	}
 
-	Poco::Any getStorage(const std::string& name="") const
+	[[nodiscard]] Poco::Any getStorage(const std::string& name="") const
 		/// Returns the storage type
 	{
 		return _storage;
@@ -241,7 +234,7 @@ public:
 		_handle = handle;
 	}
 
-	Poco::Any getHandle(const std::string& name="") const
+	[[nodiscard]] Poco::Any getHandle(const std::string& name="") const
 		/// Returns the native session handle.
 	{
 		return _handle;
@@ -253,7 +246,7 @@ public:
 		_bulk = bulk;
 	}
 
-	bool getBulk(const std::string& name="") const
+	[[nodiscard]] bool getBulk(const std::string& name="") const
 		/// Returns the execution type
 	{
 		return _bulk;
@@ -271,7 +264,7 @@ public:
 		_emptyStringIsNull = emptyStringIsNull;
 	}
 
-	bool getEmptyStringIsNull(const std::string& name="") const
+	[[nodiscard]] bool getEmptyStringIsNull(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setEmptyStringIsNull(const std::string&, bool)
 		/// and this class documentation for feature rationale and details.
@@ -292,7 +285,7 @@ public:
 		_forceEmptyString = forceEmptyString;
 	}
 
-	bool getForceEmptyString(const std::string& name="") const
+	[[nodiscard]] bool getForceEmptyString(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setForceEmptyString(const std::string&, bool)
 		/// and this class documentation for feature rationale and details.
@@ -313,7 +306,7 @@ public:
 	}
 
 
-	bool getSQLParse(const std::string& name = "") const
+	[[nodiscard]] bool getSQLParse(const std::string& name = "") const
 		/// Returns the value of the SQL parsing flag.
 	{
 		return _sqlParse;
@@ -363,7 +356,7 @@ protected:
 		_autoCommit = autoCommit;
 	}
 
-	bool getAutoCommit(const std::string& name = "") const
+	[[nodiscard]] bool getAutoCommit(const std::string& name = "") const
 		/// Returns the value of the automatic commit flag.
 		/// See setAutoCommit() documentation for more details.
 	{
@@ -389,16 +382,16 @@ private:
 	FeatureMap  _features;
 	PropertyMap _properties;
 	std::string _storage;
-	bool        _bulk;
-	bool        _emptyStringIsNull;
-	bool        _forceEmptyString;
-	bool        _sqlParse;
-	bool        _autoCommit;
+	bool        _bulk{false};
+	bool        _emptyStringIsNull{false};
+	bool        _forceEmptyString{false};
+	bool        _sqlParse{false};
+	bool        _autoCommit{true};
 	Poco::Any   _handle;
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_AbstractSessionImpl_INCLUDED

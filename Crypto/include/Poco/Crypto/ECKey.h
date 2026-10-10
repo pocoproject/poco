@@ -24,15 +24,14 @@
 #include "Poco/Crypto/ECKeyImpl.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class X509Certificate;
 class PKCS12Container;
 
+//class [[deprecated]] ECKey;
 
-//@ deprecated
 class Crypto_API ECKey: public KeyPair
 	/// This class stores an EC key pair, consisting
 	/// of private and public key. Storage of the private
@@ -65,7 +64,7 @@ public:
 		/// If a private key is specified, you don't need to specify a public key file.
 		/// OpenSSL will auto-create the public key from the private key.
 
-	ECKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+	ECKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream = nullptr, const std::string& privateKeyPassphrase = "");
 		/// Creates the ECKey, by reading public and private key from the given streams and
 		/// using the given passphrase for the private key.
 		///
@@ -89,10 +88,10 @@ public:
 	ECKey& operator = (ECKey&& other) noexcept;
 		/// Move assignment.
 
-	ECKeyImpl::Ptr impl() const;
+	[[nodiscard]] ECKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
 
-	static std::string getCurveName(int nid = -1);
+	[[nodiscard]] static std::string getCurveName(int nid = -1);
 		/// Returns elliptical curve name corresponding to
 		/// the given nid; if nid is not found, returns
 		/// empty string.
@@ -101,13 +100,13 @@ public:
 		///
 		/// If no curves are found, returns empty string;
 
-	static int getCurveNID(std::string& name);
+	[[nodiscard]] static int getCurveNID(std::string& name);
 		/// Returns the NID of the specified curve.
 		///
 		/// If name is empty, returns the first curve NID
 		/// and updates the name accordingly.
 
-	static bool hasCurve(const std::string& name);
+	[[nodiscard]] static bool hasCurve(const std::string& name);
 		/// Returns true if the named curve is found,
 		/// false otherwise.
 };
@@ -140,7 +139,7 @@ inline bool ECKey::hasCurve(const std::string& name)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_ECKey_INCLUDED

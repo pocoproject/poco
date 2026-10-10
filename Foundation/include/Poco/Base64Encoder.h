@@ -51,7 +51,7 @@ class Foundation_API Base64EncoderBuf: public UnbufferedStreamBuf
 {
 public:
 	Base64EncoderBuf(std::ostream& ostr, int options = 0);
-	~Base64EncoderBuf();
+	~Base64EncoderBuf() override;
 
 	int close();
 		/// Closes the stream buffer.
@@ -64,11 +64,11 @@ public:
 		///
 		/// Specify 0 for an unlimited line length.
 
-	int getLineLength() const;
+	[[nodiscard]] int getLineLength() const;
 		/// Returns the currently set line length.
 
 private:
-	int writeToDevice(char c);
+	int writeToDevice(char c) override;
 
 	int             _options;
 	unsigned char   _group[3];
@@ -96,9 +96,9 @@ class Foundation_API Base64EncoderIOS: public virtual std::ios
 {
 public:
 	Base64EncoderIOS(std::ostream& ostr, int options = 0);
-	~Base64EncoderIOS();
+	~Base64EncoderIOS() override;
 	int close();
-	Base64EncoderBuf* rdbuf();
+	[[nodiscard]] Base64EncoderBuf* rdbuf();
 
 protected:
 	Base64EncoderBuf _buf;
@@ -126,7 +126,7 @@ class Foundation_API Base64Encoder: public Base64EncoderIOS, public std::ostream
 {
 public:
 	Base64Encoder(std::ostream& ostr, int options = 0);
-	~Base64Encoder();
+	~Base64Encoder() override;
 
 private:
 	Base64Encoder(const Base64Encoder&);

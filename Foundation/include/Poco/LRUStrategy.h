@@ -36,12 +36,12 @@ class LRUStrategy: public AbstractStrategy<TKey, TValue>
 	/// An LRUStrategy implements least recently used cache replacement.
 {
 public:
-	typedef std::list<TKey>                   Keys;
-	typedef typename Keys::iterator           Iterator;
-	typedef typename Keys::const_iterator     ConstIterator;
-	typedef std::map<TKey, Iterator>          KeyIndex;
-	typedef typename KeyIndex::iterator       IndexIterator;
-	typedef typename KeyIndex::const_iterator ConstIndexIterator;
+	using Keys = std::list<TKey>;
+	using Iterator = typename Keys::iterator;
+	using ConstIterator = typename Keys::const_iterator;
+	using KeyIndex = std::map<TKey, Iterator>;
+	using IndexIterator = typename KeyIndex::iterator;
+	using ConstIndexIterator = typename KeyIndex::const_iterator;
 
 public:
 	LRUStrategy(std::size_t size):
@@ -50,9 +50,7 @@ public:
 		if (_size < 1) throw InvalidArgumentException("size must be > 0");
 	}
 
-	~LRUStrategy()
-	{
-	}
+	~LRUStrategy() = default;
 
 	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
 	{

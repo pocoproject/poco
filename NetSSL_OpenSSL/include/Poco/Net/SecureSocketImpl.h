@@ -23,12 +23,12 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/X509Certificate.h"
 #include "Poco/Net/Session.h"
+#include "Poco/Mutex.h"
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HostEntry;
@@ -148,10 +148,11 @@ public:
 		/// number of connections that can be queued
 		/// for this socket.
 
-	void shutdown();
+	int shutdown();
 		/// Shuts down the connection by attempting
 		/// an orderly SSL shutdown, then actually
-		/// shutting down the TCP connection.
+		/// shutting down the TCP connection in the
+		/// send direction.
 
 	void close();
 		/// Close the socket.
@@ -160,15 +161,6 @@ public:
 		/// Aborts the connection by closing the
 		/// underlying TCP connection. No orderly SSL shutdown
 		/// is performed.
-
-	void setBlocking(bool flag);
-		/// Sets the socket in blocking mode if flag is true,
-		/// disables blocking mode if flag is false.
-
-	bool getBlocking() const;
-		/// Returns the blocking mode of the socket.
-		/// This method will only work if the blocking modes of
-		/// the socket are changed via the setBlocking method!
 
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through
@@ -194,13 +186,15 @@ public:
 		/// the server-side handshake is completed, otherwise
 		/// a client-side handshake is performed.
 
-	poco_socket_t sockfd();
+	[[nodiscard]] poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
 
-	X509* peerCertificate() const;
-		/// Returns the peer's certificate.
+	[[nodiscard]] X509* peerCertificate() const;
+		/// Returns the peer's certificate, or a null pointer if
+		/// no certificate is available. The caller is responsible
+		/// for releasing the returned reference with X509_free().
 
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used for this socket.
 
 	void verifyPeerCertificate();
@@ -215,10 +209,10 @@ public:
 	void setPeerHostName(const std::string& hostName);
 		/// Sets the peer host name for certificate validation purposes.
 
-	const std::string& getPeerHostName() const;
+	[[nodiscard]] const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 
-	Session::Ptr currentSession();
+	[[nodiscard]] Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,
 		/// for reuse in a future connection (if session caching
 		/// is enabled).
@@ -235,9 +229,15 @@ public:
 		///
 		/// Must be called before connect() to be effective.
 
-	bool sessionWasReused();
+	[[nodiscard]] bool sessionWasReused();
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
+
+	[[nodiscard]] SocketImpl* socket();
+		/// Returns the underlying SocketImpl.
+
+	[[nodiscard]] const SocketImpl* socket() const;
+		/// Returns the underlying SocketImpl.
 
 protected:
 	void acceptSSL();
@@ -250,11 +250,11 @@ protected:
 	long verifyPeerCertificateImpl(const std::string& hostName);
 		/// Performs post-connect (or post-accept) peer certificate validation.
 
-	static bool isLocalHost(const std::string& hostName);
+	[[nodiscard]] static bool isLocalHost(const std::string& hostName);
 		/// Returns true iff the given host name is the local host
 		/// (either "localhost" or "127.0.0.1").
 
-	bool mustRetry(int rc);
+	[[nodiscard]] bool mustRetry(int rc);
 		/// Returns true if the last operation should be retried,
 		/// otherwise false.
 		///
@@ -295,9 +295,9 @@ private:
 	Poco::AutoPtr<SocketImpl> _pSocket;
 	Context::Ptr _pContext;
 	bool _needHandshake;
+	bool _ticketPending;
 	std::string _peerHostName;
 	Session::Ptr _pSession;
-	bool _bidirectShutdown = true;
 	mutable MutexT _mutex;
 
 	friend class SecureStreamSocketImpl;
@@ -308,6 +308,18 @@ private:
 //
 // inlines
 //
+inline SocketImpl* SecureSocketImpl::socket()
+{
+	return _pSocket.get();
+}
+
+
+inline const SocketImpl* SecureSocketImpl::socket() const
+{
+	return _pSocket.get();
+}
+
+
 inline poco_socket_t SecureSocketImpl::sockfd()
 {
 	return _pSocket->sockfd();
@@ -326,7 +338,7 @@ inline const std::string& SecureSocketImpl::getPeerHostName() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureSocketImpl_INCLUDED

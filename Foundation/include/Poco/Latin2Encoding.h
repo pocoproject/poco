@@ -33,14 +33,14 @@ class Foundation_API Latin2Encoding: public TextEncoding
 {
 public:
 	Latin2Encoding();
-	virtual ~Latin2Encoding();
-	const char* canonicalName() const;
-	bool isA(const std::string& encodingName) const;
-	const CharacterMap& characterMap() const;
-	int convert(const unsigned char* bytes) const;
-	int convert(int ch, unsigned char* bytes, int length) const;
-	int queryConvert(const unsigned char* bytes, int length) const;
-	int sequenceLength(const unsigned char* bytes, int length) const;
+	~Latin2Encoding() override;
+	[[nodiscard]] const char* canonicalName() const override;
+	[[nodiscard]] bool isA(const std::string& encodingName) const override;
+	[[nodiscard]] const CharacterMap& characterMap() const override;
+	[[nodiscard]] int convert(const unsigned char* bytes) const override;
+	[[nodiscard]] int convert(int ch, unsigned char* bytes, int length) const override;
+	[[nodiscard]] int queryConvert(const unsigned char* bytes, int length) const override;
+	[[nodiscard]] int sequenceLength(const unsigned char* bytes, int length) const override;
 
 private:
 	static const char* _names[];

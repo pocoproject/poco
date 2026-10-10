@@ -28,6 +28,22 @@ public:
 	~SQLParserTest();
 
 	void testSQLParser();
+	void testInvalidSQL();
+	void testTopWithParentheses();
+	void testOffsetFetchNext();
+	void testBracketedIdentifiers();
+	void testThreePartTableName();
+	void testArrayLiteralNotShadowedByBracketIdentifier();
+	void testDialectStatements();
+	void testCarriageReturn();
+	void testODBCCallParameters();
+	void testResetClearsParameters();
+	void testNamedParameter();
+	void testAlterDropColumnIfExists();
+	void testDropDiscrimination();
+	void testDeleteShape();
+	void testComments();
+	void testTokenize();
 
 	void setUp();
 	void tearDown();

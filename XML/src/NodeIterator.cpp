@@ -18,15 +18,14 @@
 #include "Poco/DOM/DOMException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 NodeIterator::NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter):
 	_pRoot(root),
 	_whatToShow(whatToShow),
 	_pFilter(pFilter),
-	_pCurrent(0)
+	_pCurrent(nullptr)
 {
 }
 
@@ -88,8 +87,8 @@ Node* NodeIterator::previousNode()
 
 void NodeIterator::detach()
 {
-	_pRoot    = 0;
-	_pCurrent = 0;
+	_pRoot    = nullptr;
+	_pCurrent = nullptr;
 }
 
 
@@ -140,13 +139,13 @@ Node* NodeIterator::next() const
 		if (pSibling) return pSibling;
 		pNext = pNext->parentNode();
 	}
-	return 0;
+	return nullptr;
 }
 
 
 Node* NodeIterator::previous() const
 {
-	if (_pCurrent == _pRoot) return 0;
+	if (_pCurrent == _pRoot) return nullptr;
 	Node* pPrev = _pCurrent->previousSibling();
 	while (pPrev)
 	{
@@ -163,7 +162,7 @@ Node* NodeIterator::previous() const
 Node* NodeIterator::last()
 {
 	_pCurrent = _pRoot;
-	Node* pLast = 0;
+	Node* pLast = nullptr;
 	while (_pCurrent)
 	{
 		pLast = _pCurrent;
@@ -173,4 +172,4 @@ Node* NodeIterator::last()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

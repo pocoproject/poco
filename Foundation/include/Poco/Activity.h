@@ -74,8 +74,8 @@ class Activity: public Runnable
 	///     };
 {
 public:
-	typedef RunnableAdapter<C> RunnableAdapterType;
-	typedef typename RunnableAdapterType::Callback Callback;
+	using RunnableAdapterType = RunnableAdapter<C>;
+	using Callback = typename RunnableAdapterType::Callback;
 
 	Activity(C* pOwner, Callback method):
 		_pOwner(pOwner),
@@ -89,8 +89,8 @@ public:
 		poco_check_ptr (pOwner);
 	}
 
-	~Activity()
-		/// Stops and destroys the activity.
+	~Activity() override
+	/// Stops and destroys the activity.
 	{
 		try
 		{
@@ -102,6 +102,10 @@ public:
 			poco_unexpected();
 		}
 	}
+
+	Activity() = delete;
+	Activity(const Activity &) = delete;
+	Activity &operator=(const Activity &) = delete;
 
 	void start()
 		/// Starts the activity by acquiring a
@@ -159,20 +163,20 @@ public:
 		}
 	}
 
-	bool isStopped() const
+	[[nodiscard]] bool isStopped() const
 		/// Returns true if the activity has been requested to stop.
 	{
 		return _stopped;
 	}
 
-	bool isRunning() const
+	[[nodiscard]] bool isRunning() const
 		/// Returns true if the activity is running.
 	{
 		return _running;
 	}
 
 protected:
-	void run()
+	void run() override
 	{
 		try
 		{
@@ -180,17 +184,15 @@ protected:
 		}
 		catch (...)
 		{
+			_running = false;
 			_done.set();
 			throw;
 		}
+		_running = false;
 		_done.set();
 	}
 
 private:
-	Activity();
-	Activity(const Activity&);
-	Activity& operator = (const Activity&);
-
 	C*                  _pOwner;
 	RunnableAdapterType _runnable;
 	std::atomic<bool>   _stopped;

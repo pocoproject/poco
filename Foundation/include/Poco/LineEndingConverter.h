@@ -56,8 +56,8 @@ public:
 		/// Creates the LineEndingConverterStreamBuf and connects it
 		/// to the given output stream.
 
-	~LineEndingConverterStreamBuf();
-		/// Destroys the LineEndingConverterStream.
+	~LineEndingConverterStreamBuf() override;
+	/// Destroys the LineEndingConverterStream.
 
 	void setNewLine(const std::string& newLineCharacters);
 		/// Sets the target line ending for the converter.
@@ -71,12 +71,12 @@ public:
 		/// In theory, any character sequence can be used as newline sequence.
 		/// In practice, however, only the above three make sense.
 
-	const std::string& getNewLine() const;
+	[[nodiscard]] const std::string& getNewLine() const;
 		/// Returns the line ending currently in use.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 
 private:
 	std::istream*               _pIstr;
@@ -102,8 +102,8 @@ public:
 		/// Creates the LineEndingConverterIOS and connects it
 		/// to the given output stream.
 
-	~LineEndingConverterIOS();
-		/// Destroys the stream.
+	~LineEndingConverterIOS() override;
+	/// Destroys the stream.
 
 	void setNewLine(const std::string& newLineCharacters);
 		/// Sets the target line ending for the converter.
@@ -120,10 +120,10 @@ public:
 		/// If an empty string is given, all newline characters are removed from
 		/// the stream.
 
-	const std::string& getNewLine() const;
+	[[nodiscard]] const std::string& getNewLine() const;
 		/// Returns the line ending currently in use.
 
-	LineEndingConverterStreamBuf* rdbuf();
+	[[nodiscard]] LineEndingConverterStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
 protected:
@@ -148,8 +148,8 @@ public:
 		/// Creates the LineEndingConverterInputStream and connects it
 		/// to the given input stream.
 
-	~InputLineEndingConverter();
-		/// Destroys the stream.
+	~InputLineEndingConverter() override;
+	/// Destroys the stream.
 };
 
 
@@ -170,8 +170,8 @@ public:
 		/// Creates the LineEndingConverterOutputStream and connects it
 		/// to the given input stream.
 
-	~OutputLineEndingConverter();
-		/// Destroys the LineEndingConverterOutputStream.
+	~OutputLineEndingConverter() override;
+	/// Destroys the LineEndingConverterOutputStream.
 };
 
 

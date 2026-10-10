@@ -13,6 +13,7 @@
 
 
 #include "Poco/Channel.h"
+#include "Poco/Message.h"
 
 
 namespace Poco {
@@ -35,6 +36,15 @@ void Channel::open()
 
 void Channel::close()
 {
+}
+
+
+void Channel::log(Message&& msg)
+{
+	// Default implementation forwards to log(const Message&).
+	// Subclasses that buffer messages (e.g., AsyncChannel) should
+	// override to take advantage of move semantics.
+	log(static_cast<const Message&>(msg));
 }
 
 

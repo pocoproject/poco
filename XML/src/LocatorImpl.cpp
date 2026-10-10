@@ -15,8 +15,7 @@
 #include "Poco/SAX/LocatorImpl.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 LocatorImpl::LocatorImpl()
@@ -101,4 +100,4 @@ void LocatorImpl::setColumnNumber(int columnNumber)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

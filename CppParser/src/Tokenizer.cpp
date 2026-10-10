@@ -20,8 +20,7 @@ using Poco::StreamTokenizer;
 using Poco::WhitespaceToken;
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 Tokenizer::Tokenizer(std::istream& istr):
@@ -43,4 +42,4 @@ Tokenizer::~Tokenizer()
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

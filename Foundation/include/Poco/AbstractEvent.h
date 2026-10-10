@@ -149,8 +149,8 @@ class AbstractEvent
 	/// to create the PriorityDelegate.
 {
 public:
-	typedef TDelegate* DelegateHandle;
-	typedef TArgs Args;
+	using DelegateHandle = TDelegate *;
+	using Args = TArgs;
 
 	AbstractEvent():
 		_executeAsync(this, &AbstractEvent::executeAsyncImpl),
@@ -165,9 +165,10 @@ public:
 	{
 	}
 
-	virtual ~AbstractEvent()
-	{
-	}
+	virtual ~AbstractEvent() = default;
+
+	AbstractEvent(const AbstractEvent &other) = delete;
+	AbstractEvent &operator=(const AbstractEvent &other) = delete;
 
 	void operator += (const TDelegate& aDelegate)
 		/// Adds a delegate to the event.
@@ -183,8 +184,16 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.remove(aDelegate);
+		// Detach under the event mutex, disable() outside it. Holding
+		// the event mutex across Delegate::disable() would close a
+		// lock-order cycle with the M_delegate -> M_event edge that
+		// notify()'s target callbacks set up when they do `event -= d`.
+		typename TStrategy::DelegatePtr pRemoved;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			pRemoved = _strategy.detach(aDelegate);
+		}
+		if (pRemoved) pRemoved->disable();
 	}
 
 	DelegateHandle add(const TDelegate& aDelegate)
@@ -205,8 +214,12 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.remove(delegateHandle);
+		typename TStrategy::DelegatePtr pRemoved;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			pRemoved = _strategy.detach(delegateHandle);
+		}
+		if (pRemoved) pRemoved->disable();
 	}
 
 	void operator () (const void* pSender, TArgs& args)
@@ -244,7 +257,7 @@ public:
 		strategy.notify(pSender, args);
 	}
 
-	bool hasDelegates() const
+	[[nodiscard]] bool hasDelegates() const
 		/// Returns true if there are registered delegates.
 	{
 		return !empty();
@@ -294,7 +307,7 @@ public:
 		_enabled = false;
 	}
 
-	bool isEnabled() const
+	[[nodiscard]] bool isEnabled() const
 		/// Returns true if event is enabled.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
@@ -304,11 +317,20 @@ public:
 	void clear()
 		/// Removes all delegates.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.clear();
+		// Same reason as operator -=: disable() must run outside _mutex.
+		typename TStrategy::Delegates detached;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			detached = _strategy.detachAll();
+		}
+		for (typename TStrategy::Delegates::iterator it = detached.begin();
+		     it != detached.end(); ++it)
+		{
+			(*it)->disable();
+		}
 	}
 
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Checks if any delegates are registered at the delegate.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
@@ -345,12 +367,8 @@ protected:
 
 	TStrategy _strategy; /// The strategy used to notify observers.
 	bool      _enabled;  /// Stores if an event is enabled. Notifies on disabled events have no effect
-	                     /// but it is possible to change the observers.
+						 /// but it is possible to change the observers.
 	mutable TMutex _mutex;
-
-private:
-	AbstractEvent(const AbstractEvent& other);
-	AbstractEvent& operator = (const AbstractEvent& other);
 };
 
 
@@ -358,7 +376,7 @@ template <class TStrategy, class TDelegate, class TMutex>
 class AbstractEvent<void, TStrategy, TDelegate, TMutex>
 {
 public:
-	typedef TDelegate* DelegateHandle;
+	using DelegateHandle = TDelegate *;
 
 	AbstractEvent():
 		_executeAsync(this, &AbstractEvent::executeAsyncImpl),
@@ -373,9 +391,10 @@ public:
 	{
 	}
 
-	virtual ~AbstractEvent()
-	{
-	}
+	virtual ~AbstractEvent() = default;
+
+	AbstractEvent(const AbstractEvent &other) = delete;
+	AbstractEvent &operator=(const AbstractEvent &other) = delete;
 
 	void operator += (const TDelegate& aDelegate)
 		/// Adds a delegate to the event.
@@ -391,8 +410,13 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.remove(aDelegate);
+		// See the TArgs specialization for the rationale.
+		typename TStrategy::DelegatePtr pRemoved;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			pRemoved = _strategy.detach(aDelegate);
+		}
+		if (pRemoved) pRemoved->disable();
 	}
 
 	DelegateHandle add(const TDelegate& aDelegate)
@@ -413,8 +437,12 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.remove(delegateHandle);
+		typename TStrategy::DelegatePtr pRemoved;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			pRemoved = _strategy.detach(delegateHandle);
+		}
+		if (pRemoved) pRemoved->disable();
 	}
 
 	void operator () (const void* pSender)
@@ -496,7 +524,7 @@ public:
 		_enabled = false;
 	}
 
-	bool isEnabled() const
+	[[nodiscard]] bool isEnabled() const
 	{
 		typename TMutex::ScopedLock lock(_mutex);
 		return _enabled;
@@ -505,11 +533,20 @@ public:
 	void clear()
 		/// Removes all delegates.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.clear();
+		// Same reason as operator -=: disable() must run outside _mutex.
+		typename TStrategy::Delegates detached;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			detached = _strategy.detachAll();
+		}
+		for (typename TStrategy::Delegates::iterator it = detached.begin();
+		     it != detached.end(); ++it)
+		{
+			(*it)->disable();
+		}
 	}
 
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Checks if any delegates are registered at the delegate.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
@@ -545,12 +582,8 @@ protected:
 
 	TStrategy _strategy; /// The strategy used to notify observers.
 	bool      _enabled;  /// Stores if an event is enabled. Notifies on disabled events have no effect
-	                     /// but it is possible to change the observers.
+						 /// but it is possible to change the observers.
 	mutable TMutex _mutex;
-
-private:
-	AbstractEvent(const AbstractEvent& other);
-	AbstractEvent& operator = (const AbstractEvent& other);
 };
 
 

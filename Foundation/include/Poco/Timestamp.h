@@ -20,6 +20,10 @@
 
 #include "Poco/Foundation.h"
 #include <ctime>
+#include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 namespace Poco {
@@ -58,8 +62,8 @@ public:
 	using TimeDiff = Int64;
 		/// Difference between two TimeVal values in microseconds.
 
-	static const TimeVal TIMEVAL_MIN; /// Minimum timestamp value.
-	static const TimeVal TIMEVAL_MAX; /// Maximum timestamp value.
+	static constexpr TimeVal TIMEVAL_MIN = std::numeric_limits<TimeVal>::min(); /// Minimum timestamp value.
+	static constexpr TimeVal TIMEVAL_MAX = std::numeric_limits<TimeVal>::max(); /// Maximum timestamp value.
 
 	Timestamp();
 		/// Creates a timestamp with the current time.
@@ -83,12 +87,12 @@ public:
 	void update();
 		/// Updates the Timestamp with the current time.
 
-	bool operator == (const Timestamp& ts) const;
-	bool operator != (const Timestamp& ts) const;
-	bool operator >  (const Timestamp& ts) const;
-	bool operator >= (const Timestamp& ts) const;
-	bool operator <  (const Timestamp& ts) const;
-	bool operator <= (const Timestamp& ts) const;
+	[[nodiscard]] bool operator == (const Timestamp& ts) const;
+	[[nodiscard]] bool operator != (const Timestamp& ts) const;
+	[[nodiscard]] bool operator >  (const Timestamp& ts) const;
+	[[nodiscard]] bool operator >= (const Timestamp& ts) const;
+	[[nodiscard]] bool operator <  (const Timestamp& ts) const;
+	[[nodiscard]] bool operator <= (const Timestamp& ts) const;
 
 	Timestamp  operator +  (TimeDiff d) const;
 	Timestamp  operator +  (const Timespan& span) const;
@@ -100,48 +104,48 @@ public:
 	Timestamp& operator -= (TimeDiff d);
 	Timestamp& operator -= (const Timespan& span);
 
-	std::time_t epochTime() const;
+	[[nodiscard]] std::time_t epochTime() const;
 		/// Returns the timestamp expressed in time_t.
 		/// time_t base time is midnight, January 1, 1970.
 		/// Resolution is one second.
 
-	UtcTimeVal utcTime() const;
+	[[nodiscard]] UtcTimeVal utcTime() const;
 		/// Returns the timestamp expressed in UTC-based
 		/// time. UTC base time is midnight, October 15, 1582.
 		/// Resolution is 100 nanoseconds.
 
-	TimeVal epochMicroseconds() const;
+	[[nodiscard]] TimeVal epochMicroseconds() const;
 		/// Returns the timestamp expressed in microseconds
 		/// since the Unix epoch, midnight, January 1, 1970.
 
-	TimeDiff elapsed() const;
+	[[nodiscard]] TimeDiff elapsed() const;
 		/// Returns the time elapsed since the time denoted by
 		/// the timestamp. Equivalent to Timestamp() - *this.
 
-	bool isElapsed(TimeDiff interval) const;
+	[[nodiscard]] bool isElapsed(TimeDiff interval) const;
 		/// Returns true iff the given interval has passed
 		/// since the time denoted by the timestamp.
 
-	TimeVal raw() const;
+	[[nodiscard]] TimeVal raw() const;
 		/// Returns the raw time value.
 		///
 		/// Same as epochMicroseconds().
 
-	static Timestamp fromEpochTime(std::time_t t);
+	[[nodiscard]] static Timestamp fromEpochTime(std::time_t t);
 		/// Creates a timestamp from a std::time_t.
 
-	static Timestamp fromUtcTime(UtcTimeVal val);
+	[[nodiscard]] static Timestamp fromUtcTime(UtcTimeVal val);
 		/// Creates a timestamp from a UTC time value
 		/// (100 nanosecond intervals since midnight,
 		/// October 15, 1582).
 
-	static constexpr TimeDiff resolution();
+	[[nodiscard]] static constexpr TimeDiff resolution();
 		/// Returns the resolution in units per second.
 		/// Since the timestamp has microsecond resolution,
 		/// the returned value is always 1000000.
 
 #if defined(_WIN32)
-	static Timestamp fromFileTimeNP(UInt32 fileTimeLow, UInt32 fileTimeHigh);
+	[[nodiscard]] static Timestamp fromFileTimeNP(UInt32 fileTimeLow, UInt32 fileTimeHigh);
 	void toFileTimeNP(UInt32& fileTimeLow, UInt32& fileTimeHigh) const;
 #endif
 

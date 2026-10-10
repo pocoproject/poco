@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2008-2010 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this document so long as this copyright notice, license and disclaimer are retained with all copies of the document. No license is granted to modify this document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE; OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT.  THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO, INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:trv="http://www.onvif.org/ver10/receiver/wsdl" targetNamespace="http://www.onvif.org/ver10/receiver/wsdl">
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/receiver/wsdl" xmlns:tt="http://www.onvif.org/ver10/schema" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="2.1.1">
+			<xs:import namespace="http://www.onvif.org/ver10/schema" schemaLocation="../ver10/schema/onvif.xsd"/>
+			<!--  Message Request/Responses elements  -->
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="trv:Capabilities">
+							<xs:annotation>
+								<xs:documentation>The capabilities for the receiver service is returned in the Capabilities element.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:complexType name="Capabilities">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="RTP_Multicast" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that the device can receive RTP multicast streams.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="RTP_TCP" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that the device can receive RTP/TCP streams</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="RTP_RTSP_TCP" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates that the device can receive RTP/RTSP/TCP streams.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="SupportedReceivers" type="xs:int" use="required">
+					<xs:annotation>
+						<xs:documentation>The maximum number of receivers supported by the device.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaximumRTSPURILength" type="xs:int">
+					<xs:annotation>
+						<xs:documentation>The maximum allowed length for RTSP URIs (Minimum and default value is 128 octet).</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="trv:Capabilities"/>
+			<!--===============================-->
+			<xs:element name="GetReceivers">
+				<xs:complexType>
+					<xs:sequence>
+          </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetReceiversResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Receivers" type="tt:Receiver" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>A list of all receivers that currently exist on the device.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetReceiver">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReceiverToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The token of the receiver to be retrieved.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetReceiverResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Receiver" type="tt:Receiver">
+							<xs:annotation>
+								<xs:documentation>The details of the receiver.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CreateReceiver">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tt:ReceiverConfiguration">
+							<xs:annotation>
+								<xs:documentation>The initial configuration for the new receiver.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CreateReceiverResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Receiver" type="tt:Receiver">
+							<xs:annotation>
+								<xs:documentation>The details of the receiver that was created.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DeleteReceiver">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReceiverToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The token of the receiver to be deleted.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DeleteReceiverResponse">
+				<xs:complexType>
+					<xs:sequence>
+          </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ConfigureReceiver">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReceiverToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The token of the receiver to be configured.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Configuration" type="tt:ReceiverConfiguration">
+							<xs:annotation>
+								<xs:documentation>The new configuration for the receiver.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ConfigureReceiverResponse">
+				<xs:complexType>
+					<xs:sequence>
+          </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetReceiverMode">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReceiverToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The token of the receiver to be changed.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Mode" type="tt:ReceiverMode">
+							<xs:annotation>
+								<xs:documentation>The new receiver mode. Options available are:</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetReceiverModeResponse">
+				<xs:complexType>
+					<xs:sequence>
+          </xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetReceiverState">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReceiverToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The token of the receiver to be queried.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetReceiverStateResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ReceiverState" type="tt:ReceiverStateInformation">
+							<xs:annotation>
+								<xs:documentation>Description of the current receiver state.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="trv:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="trv:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetReceiversRequest">
+		<wsdl:part name="parameters" element="trv:GetReceivers"/>
+	</wsdl:message>
+	<wsdl:message name="GetReceiversResponse">
+		<wsdl:part name="parameters" element="trv:GetReceiversResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetReceiverRequest">
+		<wsdl:part name="parameters" element="trv:GetReceiver"/>
+	</wsdl:message>
+	<wsdl:message name="GetReceiverResponse">
+		<wsdl:part name="parameters" element="trv:GetReceiverResponse"/>
+	</wsdl:message>
+	<wsdl:message name="CreateReceiverRequest">
+		<wsdl:part name="parameters" element="trv:CreateReceiver"/>
+	</wsdl:message>
+	<wsdl:message name="CreateReceiverResponse">
+		<wsdl:part name="parameters" element="trv:CreateReceiverResponse"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteReceiverRequest">
+		<wsdl:part name="parameters" element="trv:DeleteReceiver"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteReceiverResponse">
+		<wsdl:part name="parameters" element="trv:DeleteReceiverResponse"/>
+	</wsdl:message>
+	<wsdl:message name="ConfigureReceiverRequest">
+		<wsdl:part name="parameters" element="trv:ConfigureReceiver"/>
+	</wsdl:message>
+	<wsdl:message name="ConfigureReceiverResponse">
+		<wsdl:part name="parameters" element="trv:ConfigureReceiverResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetReceiverModeRequest">
+		<wsdl:part name="parameters" element="trv:SetReceiverMode"/>
+	</wsdl:message>
+	<wsdl:message name="SetReceiverModeResponse">
+		<wsdl:part name="parameters" element="trv:SetReceiverModeResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetReceiverStateRequest">
+		<wsdl:part name="parameters" element="trv:GetReceiverState"/>
+	</wsdl:message>
+	<wsdl:message name="GetReceiverStateResponse">
+		<wsdl:part name="parameters" element="trv:GetReceiverStateResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="ReceiverPort">
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>Returns the capabilities of the receiver service. The result is returned in a typed answer.</wsdl:documentation>
+			<wsdl:input message="trv:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="trv:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetReceivers">
+			<wsdl:documentation>
+				Lists all receivers currently present on a device. This operation is mandatory.
+			</wsdl:documentation>
+			<wsdl:input message="trv:GetReceiversRequest"/>
+			<wsdl:output message="trv:GetReceiversResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetReceiver">
+			<wsdl:documentation>
+				Retrieves the details of a specific receiver. This operation is mandatory.
+			</wsdl:documentation>
+			<wsdl:input message="trv:GetReceiverRequest"/>
+			<wsdl:output message="trv:GetReceiverResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="CreateReceiver">
+			<wsdl:documentation>
+				Creates a new receiver. This operation is mandatory, although the service may
+				raise a fault if the receiver cannot be created.
+			</wsdl:documentation>
+			<wsdl:input message="trv:CreateReceiverRequest"/>
+			<wsdl:output message="trv:CreateReceiverResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteReceiver">
+			<wsdl:documentation>
+				Deletes an existing receiver. A receiver may be deleted only if it is not
+				currently in use; otherwise a fault shall be raised.
+				This operation is mandatory.
+			</wsdl:documentation>
+			<wsdl:input message="trv:DeleteReceiverRequest"/>
+			<wsdl:output message="trv:DeleteReceiverResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="ConfigureReceiver">
+			<wsdl:documentation>
+				Configures an existing receiver. This operation is mandatory.
+			</wsdl:documentation>
+			<wsdl:input message="trv:ConfigureReceiverRequest"/>
+			<wsdl:output message="trv:ConfigureReceiverResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetReceiverMode">
+			<wsdl:documentation>
+				Sets the mode of the receiver without affecting the rest of its configuration.
+				This operation is mandatory.
+			</wsdl:documentation>
+			<wsdl:input message="trv:SetReceiverModeRequest"/>
+			<wsdl:output message="trv:SetReceiverModeResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetReceiverState">
+			<wsdl:documentation>
+				Determines whether the receiver is currently disconnected, connected or
+				attempting to connect.
+				This operation is mandatory.
+			</wsdl:documentation>
+			<wsdl:input message="trv:GetReceiverStateRequest"/>
+			<wsdl:output message="trv:GetReceiverStateResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="ReceiverBinding" type="trv:ReceiverPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/receiver/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetReceivers">
+			<soap:operation soapAction="http://www.onvif.org/ver10/receiver/wsdl/GetReceivers"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetReceiver">
+			<soap:operation soapAction="http://www.onvif.org/ver10/receiver/wsdl/GetReceiver"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="CreateReceiver">
+			<soap:operation soapAction="http://www.onvif.org/ver10/receiver/wsdl/CreateReceiver"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteReceiver">
+			<soap:operation soapAction="http://www.onvif.org/ver10/receiver/wsdl/DeleteReceiver"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="ConfigureReceiver">
+			<soap:operation soapAction="http://www.onvif.org/ver10/receiver/wsdl/ConfigureReceiver"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetReceiverMode">
+			<soap:operation soapAction="http://www.onvif.org/ver10/receiver/wsdl/SetReceiverMode"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetReceiverState">
+			<soap:operation soapAction="http://www.onvif.org/ver10/receiver/wsdl/GetReceiverState"/>
+			<wsdl:input>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body parts="parameters" use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+</wsdl:definitions>

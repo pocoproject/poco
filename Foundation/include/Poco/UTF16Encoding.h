@@ -51,9 +51,9 @@ public:
 		/// indicated by the given byte-order mark, which is the Unicode
 		/// character 0xFEFF.
 
-	~UTF16Encoding();
+	~UTF16Encoding() override;
 
-	ByteOrderType getByteOrder() const;
+	[[nodiscard]] ByteOrderType getByteOrder() const;
 		/// Returns the byte-order currently in use.
 
 	void setByteOrder(ByteOrderType byteOrder);
@@ -64,13 +64,13 @@ public:
 		/// byte order mark, which is the Unicode
 		/// character 0xFEFF.
 
-	const char* canonicalName() const;
-	bool isA(const std::string& encodingName) const;
-	const CharacterMap& characterMap() const;
-	int convert(const unsigned char* bytes) const;
-	int convert(int ch, unsigned char* bytes, int length) const;
-	int queryConvert(const unsigned char* bytes, int length) const;
-	int sequenceLength(const unsigned char* bytes, int length) const;
+	[[nodiscard]] const char* canonicalName() const override;
+	[[nodiscard]] bool isA(const std::string& encodingName) const override;
+	[[nodiscard]] const CharacterMap& characterMap() const override;
+	int convert(const unsigned char* bytes) const override;
+	int convert(int ch, unsigned char* bytes, int length) const override;
+	int queryConvert(const unsigned char* bytes, int length) const override;
+	int sequenceLength(const unsigned char* bytes, int length) const override;
 
 private:
 	bool _flipBytes;

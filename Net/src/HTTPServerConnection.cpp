@@ -28,8 +28,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
@@ -178,4 +177,4 @@ void HTTPServerConnection::onServerStopped(const bool& abortCurrent)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

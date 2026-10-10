@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  Array
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -16,8 +16,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 Array::Array():
@@ -42,15 +41,17 @@ std::string Array::toString(int indent) const
 {
 	std::ostringstream oss;
 
-	oss << "[";
+	oss << '[';
 
 	if (indent > 0) oss << std::endl;
 
-	for (ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	// Use protected accessor to get ordered elements
+	const auto& elems = elements();
+	for (auto it = elems.begin(); it != elems.end(); ++it)
 	{
-		if (it != _elements.begin())
+		if (it != elems.begin())
 		{
-			oss << ",";
+			oss << ',';
 			if (indent > 0) oss << std::endl;
 		}
 
@@ -66,10 +67,10 @@ std::string Array::toString(int indent) const
 		for (int i = 0; i < indent; ++i) oss << ' ';
 	}
 
-	oss << "]";
+	oss << ']';
 
 	return oss.str();
 }
 
 
-} } // Namespace Poco::Mongo
+} // namespace Poco::MongoDB

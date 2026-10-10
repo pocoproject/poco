@@ -22,8 +22,8 @@ ApacheServerRequest::ApacheServerRequest(
 	const char* clientName,
 	int clientPort):
 	_pApacheRequest(pApacheRequest),
-    _pResponse(0),
-    _pStream(new ApacheInputStream(_pApacheRequest)),
+	_pResponse(0),
+	_pStream(new ApacheInputStream(_pApacheRequest)),
 	_serverAddress(serverName, serverPort),
 	_clientAddress(clientName, clientPort)
 {

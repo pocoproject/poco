@@ -23,8 +23,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Prometheus_API TextExporter: public Exporter
@@ -41,7 +40,7 @@ public:
 	TextExporter(const TextExporter&) = delete;
 	TextExporter& operator = (const TextExporter&) = delete;
 
-	~TextExporter() = default;
+	~TextExporter();
 
 	// Exporter
 	void writeHeader(const Metric& metric) override;
@@ -67,7 +66,7 @@ private:
 };
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_TextExporter_INCLUDED

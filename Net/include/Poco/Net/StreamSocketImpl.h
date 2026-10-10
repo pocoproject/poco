@@ -22,8 +22,7 @@
 #include "Poco/Net/SocketImpl.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API StreamSocketImpl: public SocketImpl
@@ -40,7 +39,7 @@ public:
 	StreamSocketImpl(poco_socket_t sockfd);
 		/// Creates a StreamSocketImpl using the given native socket.
 
-	virtual int sendBytes(const void* buffer, int length, int flags = 0);
+	int sendBytes(const void* buffer, int length, int flags = 0) override;
 		/// Ensures that all data in buffer is sent if the socket
 		/// is blocking. In case of a non-blocking socket, sends as
 		/// many bytes as possible.
@@ -53,7 +52,7 @@ protected:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_StreamSocketImpl_INCLUDED

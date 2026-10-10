@@ -22,8 +22,7 @@
 #include "Poco/SAX/XMLReader.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API XMLFilter: public XMLReader
@@ -37,7 +36,7 @@ class XML_API XMLFilter: public XMLReader
 	/// all EntityResolver, DTDHandler, ContentHandler and ErrorHandler events automatically.
 {
 public:
-	virtual XMLReader* getParent() const = 0;
+	[[nodiscard]] virtual XMLReader* getParent() const = 0;
 		/// Set the parent reader.
 		///
 		/// This method allows the application to link the filter to a parent reader (which may be another
@@ -55,7 +54,7 @@ protected:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_XMLFilter_INCLUDED

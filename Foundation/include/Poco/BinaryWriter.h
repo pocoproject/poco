@@ -23,6 +23,7 @@
 #include "Poco/MemoryStream.h"
 #include <vector>
 #include <ostream>
+#include <memory>
 
 
 namespace Poco {
@@ -55,7 +56,7 @@ public:
 		LITTLE_ENDIAN_BYTE_ORDER = 3  /// little-endian byte-order
 	};
 
-	static const std::streamsize	DEFAULT_MAX_CSTR_LENGTH { 1024 };
+	static constexpr std::streamsize	DEFAULT_MAX_CSTR_LENGTH { 1024 };
 
 	BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
 		/// Creates the BinaryWriter.
@@ -65,6 +66,8 @@ public:
 		///
 		/// Strings will be converted from the currently set global encoding
 		/// (see Poco::TextEncoding::global()) to the specified encoding.
+		/// A copy of the BinaryWriter writes to the same stream and
+		/// shares the converter.
 
 	~BinaryWriter();
 		/// Destroys the BinaryWriter.
@@ -146,26 +149,27 @@ public:
 	void flush();
 		/// Flushes the underlying stream.
 
-	bool good();
+	[[nodiscard]] bool good();
 		/// Returns _ostr.good();
 
-	bool fail();
+	[[nodiscard]] bool fail();
 		/// Returns _ostr.fail();
 
-	bool bad();
+	[[nodiscard]] bool bad();
 		/// Returns _ostr.bad();
 
-	std::ostream& stream() const;
+	[[nodiscard]] std::ostream& stream() const;
 		/// Returns the underlying stream.
 
-	StreamByteOrder byteOrder() const;
+	[[nodiscard]] StreamByteOrder byteOrder() const;
 		/// Returns the byte ordering used by the writer, which is
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
 
 private:
 	std::ostream&  _ostr;
 	bool           _flipBytes;
-	TextConverter* _pTextConverter;
+	std::shared_ptr<TextConverter> _pTextConverter;
+		/// Shared, so that a copy of the writer does not delete it a second time.
 };
 
 
@@ -200,22 +204,22 @@ public:
 		}
 	}
 
-	Buffer<T>& data()
+	[[nodiscard]] Buffer<T>& data()
 	{
 		return _data;
 	}
 
-	const Buffer<T>& data() const
+	[[nodiscard]] const Buffer<T>& data() const
 	{
 		return _data;
 	}
 
-	const MemoryOutputStream& stream() const
+	[[nodiscard]] const MemoryOutputStream& stream() const
 	{
 		return _ostr;
 	}
 
-	MemoryOutputStream& stream()
+	[[nodiscard]] MemoryOutputStream& stream()
 	{
 		return _ostr;
 	}
@@ -225,9 +229,7 @@ private:
 	MemoryOutputStream _ostr;
 };
 
-
-typedef BasicMemoryBinaryWriter<char> MemoryBinaryWriter;
-
+using MemoryBinaryWriter = BasicMemoryBinaryWriter<char>;
 
 //
 // inlines

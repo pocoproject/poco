@@ -21,8 +21,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 template <typename T>
@@ -58,12 +57,12 @@ public:
 		return *this;
 	}
 
-	operator T () const
+	[[nodiscard]] operator T () const
 	{
 		return _value.load();
 	}
 
-	T value() const
+	[[nodiscard]] T value() const
 	{
 		return _value.load();
 	}
@@ -99,7 +98,7 @@ private:
 };
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_AtomicFloat_INCLUDED

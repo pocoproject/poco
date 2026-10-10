@@ -26,7 +26,7 @@ const std::string LineEnding::NEWLINE_LF("\n");
 
 LineEndingConverterStreamBuf::LineEndingConverterStreamBuf(std::istream& istr):
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_newLine(LineEnding::NEWLINE_DEFAULT),
 	_lastChar(0)
 {
@@ -35,7 +35,7 @@ LineEndingConverterStreamBuf::LineEndingConverterStreamBuf(std::istream& istr):
 
 
 LineEndingConverterStreamBuf::LineEndingConverterStreamBuf(std::ostream& ostr):
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_newLine(LineEnding::NEWLINE_DEFAULT),
 	_lastChar(0)

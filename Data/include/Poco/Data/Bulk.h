@@ -22,13 +22,14 @@
 #include "Poco/Data/Limit.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Bulk
 {
 public:
+	Bulk() = delete;
+
 	Bulk(const Limit& limit);
 		/// Creates the Bulk.
 
@@ -38,16 +39,14 @@ public:
 	~Bulk();
 		/// Destroys the bulk.
 
-	const Limit& limit() const;
+	[[nodiscard]] const Limit& limit() const;
 		/// Returns the limit asociated with this bulk object.
 
-	Poco::UInt32 size() const;
+	[[nodiscard]] Poco::UInt32 size() const;
 		/// Returns the value of the limit asociated with
 		/// this bulk object.
 
 private:
-	Bulk();
-
 	Limit _limit;
 };
 
@@ -69,15 +68,14 @@ inline Poco::UInt32 Bulk::size() const
 
 namespace Keywords {
 
-
-inline Bulk bulk(const Limit& limit = Limit(Limit::LIMIT_UNLIMITED, false, false))
+[[nodiscard]] inline Bulk bulk(const Limit& limit = Limit(Limit::LIMIT_UNLIMITED, false, false))
 	/// Convenience function for creation of bulk.
 {
-	return Bulk(limit);
+	return {limit};
 }
 
 
-inline void bulk(Void)
+inline void bulk([[maybe_unused]] Void v)
 	/// Dummy bulk function. Used for bulk binding creation
 	/// (see BulkBinding) and bulk extraction signalling to Statement.
 {
@@ -87,10 +85,10 @@ inline void bulk(Void)
 } // namespace Keywords
 
 
-typedef void (*BulkFnType)(Void);
+using BulkFnType = void (*)(Void);
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Bulk_INCLUDED

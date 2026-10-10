@@ -32,8 +32,7 @@ using Poco::DateTimeFormat;
 using Poco::DateTimeParser;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPResponse::HTTP_REASON_CONTINUE                        = "Continue";
@@ -217,6 +216,40 @@ void HTTPResponse::addCookie(const HTTPCookie& cookie)
 }
 
 
+void HTTPResponse::removeCookie(const std::string& cookieName)
+{
+	NameValueCollection::Iterator it = find(SET_COOKIE);
+	while (it != end() && Poco::icompare(it->first, SET_COOKIE) == 0)
+	{
+		const std::string& hv = it->second;
+		if (hv.size() > cookieName.size() && hv[cookieName.size()] == '=' && hv.compare(0, cookieName.size(), cookieName) == 0)
+		{
+			erase(it);
+			break;
+		}
+		++it;
+	}
+}
+
+
+void HTTPResponse::replaceCookie(const HTTPCookie& cookie)
+{
+	const std::string& cookieName = cookie.getName();
+	NameValueCollection::Iterator it = find(SET_COOKIE);
+	while (it != end() && Poco::icompare(it->first, SET_COOKIE) == 0)
+	{
+		const std::string& hv = it->second;
+		if (hv.size() > cookieName.size() && hv[cookieName.size()] == '=' && hv.compare(0, cookieName.size(), cookieName) == 0)
+		{
+			it->second = cookie.toString();
+			return;
+		}
+		++it;
+	}
+	add(SET_COOKIE, cookie.toString());
+}
+
+
 void HTTPResponse::getCookies(std::vector<HTTPCookie>& cookies) const
 {
 	cookies.clear();
@@ -241,7 +274,7 @@ void HTTPResponse::write(std::ostream& ostr) const
 
 void HTTPResponse::read(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	std::string version;
 	std::string status;
@@ -404,4 +437,4 @@ const std::string& HTTPResponse::getReasonForStatus(HTTPStatus status)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

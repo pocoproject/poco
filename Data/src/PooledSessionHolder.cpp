@@ -15,8 +15,7 @@
 #include "Poco/Data/PooledSessionHolder.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 PooledSessionHolder::PooledSessionHolder(SessionPool& owner, SessionImpl* pSessionImpl):
@@ -31,4 +30,4 @@ PooledSessionHolder::~PooledSessionHolder()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

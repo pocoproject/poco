@@ -1,7 +1,7 @@
 #
 # Darwin-clang-libc++
 #
-# Build settings for Mac OS X 10.11 and later (clang, libc++, x86_64/arm64)
+# Build settings for Mac OS X 10.13 and later (clang, libc++, x86_64/arm64)
 # The build settings defined in this file are compatible
 # with XCode C++ projects.
 #
@@ -13,7 +13,7 @@ LINKMODE ?= SHARED
 
 ARCHFLAGS          ?= -arch $(POCO_HOST_OSARCH)
 SANITIZEFLAGS      ?=
-OSFLAGS            ?= -mmacosx-version-min=10.11 -isysroot $(shell xcrun --show-sdk-path)
+OSFLAGS            ?= -mmacosx-version-min=10.15 -isysroot $(shell xcrun --show-sdk-path)
 
 ifeq ($(POCO_HOST_OSARCH),arm64)
 OPENSSL_DIR        ?= /opt/homebrew/opt/openssl

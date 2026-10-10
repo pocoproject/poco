@@ -17,12 +17,7 @@
 #include "Poco/Util/Option.h"
 
 
-namespace Poco {
-namespace Util {
-
-
-const int HelpFormatter::TAB_WIDTH  = 4;
-const int HelpFormatter::LINE_WIDTH = 78;
+namespace Poco::Util {
 
 
 HelpFormatter::HelpFormatter(const OptionSet& options):
@@ -141,7 +136,7 @@ int HelpFormatter::calcIndent() const
 				n += 1 + opt.argumentName().length() + (opt.argumentRequired() ? 0 : 2);
 		}
 		n += 2;
-		if (n > indent)
+		if (static_cast<int>(n) > indent)
 			indent = static_cast<int>(n);
 	}
 	return indent;
@@ -180,6 +175,7 @@ void HelpFormatter::formatOption(std::ostream& ostr, const Option& option, int w
 		n += (int) shortPrefix().length() + (int) option.shortName().length();
 		if (option.takesArgument())
 		{
+			ostr << ' ';
 			if (!option.argumentRequired()) { ostr << '['; ++n; }
 			ostr << option.argumentName();
 			n += (int) option.argumentName().length();
@@ -242,7 +238,7 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 		}
 		else
 		{
-			if (word.length() == maxWordLen)
+			if (static_cast<int>(word.length()) == maxWordLen)
 			{
 				clearWord(ostr, pos, word, indent);
 			}
@@ -255,7 +251,7 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 
 void HelpFormatter::formatWord(std::ostream& ostr, int& pos, const std::string& word, int indent) const
 {
-	if (pos + word.length() > _width)
+	if (pos + static_cast<int>(word.length()) > _width)
 	{
 		ostr << '\n';
 		pos = 0;
@@ -293,4 +289,4 @@ std::string HelpFormatter::longPrefix() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

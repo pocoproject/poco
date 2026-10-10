@@ -32,15 +32,7 @@ using Poco::UInt16;
 using Poco::Int32;
 
 
-namespace Poco {
-namespace Net {
-
-
-const UInt8 ICMPv4PacketImpl::DESTINATION_UNREACHABLE_TYPE = 3;
-const Poco::UInt8 ICMPv4PacketImpl::SOURCE_QUENCH_TYPE     = 4;
-const Poco::UInt8 ICMPv4PacketImpl::REDIRECT_MESSAGE_TYPE  = 5;
-const UInt8 ICMPv4PacketImpl::TIME_EXCEEDED_TYPE           = 11;
-const Poco::UInt8 ICMPv4PacketImpl::PARAMETER_PROBLEM_TYPE = 12;
+namespace Poco::Net {
 
 
 const std::string ICMPv4PacketImpl::MESSAGE_TYPE[] =
@@ -148,7 +140,7 @@ struct timeval ICMPv4PacketImpl::time(Poco::UInt8* buffer, int length) const
 {
 	struct timeval tv;
 
-	if (0 == buffer || 0 == length)
+	if (nullptr == buffer || 0 == length)
 	{
 		Timespan value(Timestamp().epochMicroseconds());
 		tv.tv_sec  = (long) value.totalSeconds();
@@ -169,7 +161,7 @@ ICMPv4PacketImpl::Header* ICMPv4PacketImpl::header(Poco::UInt8* buffer, int leng
 	poco_check_ptr (buffer);
 
 	int offset = (buffer[0] & 0x0F) * 4;
-	if ((offset + sizeof(Header)) > length) return 0;
+	if (static_cast<std::size_t>(offset) + sizeof(Header) > static_cast<std::size_t>(length)) return nullptr;
 
 	buffer += offset;
 	return reinterpret_cast<Header*>(buffer);
@@ -209,13 +201,14 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 
 	type = icp->type;
 	MessageType msgType = static_cast<MessageType>(type);
-	code = icp->code;
+	code = static_cast<int>(icp->code);
 	std::ostringstream err;
 
 	switch (msgType)
 	{
 	case DESTINATION_UNREACHABLE_TYPE:
-		if (code >= NET_UNREACHABLE && code < DESTINATION_UNREACHABLE_UNKNOWN)
+		// lower-bound check is defensive (enum values may change)
+		if (code >= static_cast<int>(NET_UNREACHABLE) && code < static_cast<int>(DESTINATION_UNREACHABLE_UNKNOWN))
 			err << DESTINATION_UNREACHABLE_CODE[code];
 		else
 			err << DESTINATION_UNREACHABLE_CODE[DESTINATION_UNREACHABLE_UNKNOWN];
@@ -226,22 +219,24 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 		break;
 
 	case REDIRECT_MESSAGE_TYPE:
-		if (code >= REDIRECT_NETWORK && code < REDIRECT_MESSAGE_UNKNOWN)
+		// lower-bound check is defensive (enum values may change)
+		if (code >= static_cast<int>(REDIRECT_NETWORK) && code < static_cast<int>(REDIRECT_MESSAGE_UNKNOWN))
 			err << REDIRECT_MESSAGE_CODE[code];
 		else
 			err << REDIRECT_MESSAGE_CODE[REDIRECT_MESSAGE_UNKNOWN];
 		break;
 
 	case TIME_EXCEEDED_TYPE:
-		if (code >= TIME_TO_LIVE && code < TIME_EXCEEDED_UNKNOWN)
+		// lower-bound check is defensive (enum values may change)
+		if (code >= static_cast<int>(TIME_TO_LIVE) && code < static_cast<int>(TIME_EXCEEDED_UNKNOWN))
 			err << TIME_EXCEEDED_CODE[code];
 		else
 			err << TIME_EXCEEDED_CODE[TIME_EXCEEDED_UNKNOWN];
 		break;
 
 	case PARAMETER_PROBLEM_TYPE:
-		if (POINTER_INDICATES_THE_ERROR != code)
-			code = PARAMETER_PROBLEM_UNKNOWN;
+		if (static_cast<int>(POINTER_INDICATES_THE_ERROR) != code)
+			code = static_cast<int>(PARAMETER_PROBLEM_UNKNOWN);
 		err << PARAMETER_PROBLEM_CODE[code] << ": error in octet #" << pointer;
 		break;
 
@@ -261,4 +256,4 @@ std::string ICMPv4PacketImpl::typeDescription(int typeId)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

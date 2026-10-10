@@ -5,9 +5,9 @@
 // Package: Configuration
 // Module:  LocalConfigurationView
 //
-// Definition of the ConfigurationView class.
+// Definition of the LocalConfigurationView class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -16,14 +16,13 @@
 #ifndef Util_LocalConfigurationView_INCLUDED
 #define Util_LocalConfigurationView_INCLUDED
 
-#include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/Util/ConfigurationView.h"
 #include "Poco/Util/Util.h"
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
-class Util_API LocalConfigurationView : public AbstractConfiguration
+class Util_API LocalConfigurationView : public AbstractConfigurationView
 	/// This configuration implements a "view" into a sub-hierarchy
 	/// of another configuration.
 	///
@@ -49,23 +48,14 @@ public:
 		/// Creates the LocalConfigurationView. The LocalConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 
-protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
-	std::string translateKey(const std::string& key) const;
 	~LocalConfigurationView();
 
-private:
-	LocalConfigurationView(const LocalConfigurationView&);
-	LocalConfigurationView& operator=(const LocalConfigurationView&);
-	std::string _prefix;
-	AbstractConfiguration::Ptr _pConfig;
+protected:
+	[[nodiscard]] bool getRaw(const std::string& key, std::string& value) const override;
 };
 
 
-}} // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif  // Util_LocalConfigurationView_INCLUDED

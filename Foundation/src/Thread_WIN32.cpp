@@ -54,7 +54,7 @@ namespace
 		{
 		}
 #endif
-    }
+	}
 }
 
 
@@ -143,10 +143,10 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 void ThreadImpl::createImpl(Entry ent, void* pData)
 {
 #if defined(_DLL)
-	_thread = CreateThread(NULL, _stackSize, ent, pData, 0, &_threadId);
+	_thread = CreateThread(nullptr, _stackSize, ent, pData, 0, &_threadId);
 #else
 	unsigned threadId;
-	_thread = (HANDLE) _beginthreadex(NULL, _stackSize, ent, this, 0, &threadId);
+	_thread = (HANDLE) _beginthreadex(nullptr, _stackSize, ent, this, 0, &threadId);
 	_threadId = static_cast<DWORD>(threadId);
 #endif
 	if (!_thread)
@@ -220,6 +220,76 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 long ThreadImpl::currentOsTidImpl()
 {
 	return GetCurrentThreadId();
+}
+
+
+namespace
+{
+	// SetThreadDescription/GetThreadDescription require Windows 10 version 1607+
+	// Use dynamic loading for compatibility with older Windows versions
+	using SetThreadDescriptionFunc = HRESULT (WINAPI *)(HANDLE, PCWSTR);
+	using GetThreadDescriptionFunc = HRESULT (WINAPI *)(HANDLE, PWSTR*);
+
+	SetThreadDescriptionFunc getSetThreadDescriptionFunc()
+	{
+		static SetThreadDescriptionFunc func = reinterpret_cast<SetThreadDescriptionFunc>(
+			GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "SetThreadDescription"));
+		return func;
+	}
+
+	GetThreadDescriptionFunc getGetThreadDescriptionFunc()
+	{
+		static GetThreadDescriptionFunc func = reinterpret_cast<GetThreadDescriptionFunc>(
+			GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetThreadDescription"));
+		return func;
+	}
+}
+
+
+void ThreadImpl::setCurrentNameImpl(const std::string& threadName)
+{
+	// Try modern API first (Windows 10 1607+)
+	auto setDesc = getSetThreadDescriptionFunc();
+	if (setDesc)
+	{
+		int wideLen = MultiByteToWideChar(CP_UTF8, 0, threadName.c_str(), -1, NULL, 0);
+		if (wideLen > 0)
+		{
+			std::wstring wname(wideLen, L'\0');
+			MultiByteToWideChar(CP_UTF8, 0, threadName.c_str(), -1, &wname[0], wideLen);
+			if (SUCCEEDED(setDesc(GetCurrentThread(), wname.c_str())))
+				return;
+		}
+	}
+
+	// Fall back to legacy exception method for older Windows/debuggers
+	setThreadName(static_cast<DWORD>(-1), threadName);
+}
+
+
+std::string ThreadImpl::getCurrentNameImpl()
+{
+	auto getDesc = getGetThreadDescriptionFunc();
+	if (!getDesc) return std::string();
+
+	PWSTR data = nullptr;
+	HRESULT hr = getDesc(GetCurrentThread(), &data);
+	if (SUCCEEDED(hr) && data)
+	{
+		std::string result;
+		int convSize = WideCharToMultiByte(CP_UTF8, 0, data, -1, NULL, 0, NULL, NULL);
+		if (convSize > 0)
+		{
+			result.resize(convSize);
+			WideCharToMultiByte(CP_UTF8, 0, data, -1, &result[0], convSize, NULL, NULL);
+			// Remove null terminator from string
+			if (!result.empty() && result.back() == '\0')
+				result.pop_back();
+		}
+		LocalFree(data);
+		return result;
+	}
+	return std::string();
 }
 
 

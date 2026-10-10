@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  Message
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -15,8 +15,7 @@
 #include "Poco/MongoDB/Message.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 Message::Message(MessageHeader::OpCode opcode):
@@ -30,4 +29,4 @@ Message::~Message()
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

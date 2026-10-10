@@ -15,8 +15,13 @@
 #include "Poco/Prometheus/Counter.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
+
+
+CounterSample::CounterSample() = default;
+
+
+CounterSample::~CounterSample() = default;
 
 
 Counter::Counter(const std::string& name):
@@ -45,6 +50,9 @@ Counter::Counter(const std::string& name, const Params& params, Registry* pRegis
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
 }
+
+
+Counter::~Counter() = default;
 
 
 double Counter::value() const
@@ -79,4 +87,4 @@ void Counter::writeSample(Exporter& exporter, const std::vector<std::string>& la
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

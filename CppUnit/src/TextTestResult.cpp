@@ -89,7 +89,7 @@ void TextTestResult::ignoring(const std::string ignore)
 {
 	std::string::const_iterator it = ignore.begin();
 	std::string::const_iterator end = ignore.end();
-	for (;;)
+	while (true)
 	{
 		while (it != end && (std::isspace(*it) || *it == '"' || *it == ',' || *it == '\'')) ++it;
 		if (it == end)
@@ -162,19 +162,18 @@ void TextTestResult::printErrors(std::ostream& stream)
 			stream << "There were " << testErrors() << " errors: " << std::endl;
 
 		int i = 1;
-		for (std::vector<TestFailure*>::iterator it = errors().begin(); it != errors().end(); ++it)
+		for (const auto& failure : errors())
 		{
-			TestFailure* failure = *it;
 			CppUnitException* e = failure->thrownException();
 
 			stream << std::setw(2) << i
-			       << ": "
-			       << failure->failedTest()->toString() << "\n"
-			       << "    \"" << (e ? e->what() : "") << "\"\n"
-			       << "    in \""
-			       << (e ? e->fileName() : std::string())
-			       << "\", line ";
-			if (e == 0)
+				   << ": "
+				   << failure->failedTest()->toString() << "\n"
+				   << "    \"" << (e ? e->what() : "") << "\"\n"
+				   << "    in \""
+				   << (e ? e->fileName() : std::string())
+				   << "\", line ";
+			if (e == nullptr)
 			{
 				stream << "0";
 			}
@@ -184,7 +183,7 @@ void TextTestResult::printErrors(std::ostream& stream)
 				if (e->data2LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
 					stream << " data lines " << e->data1LineNumber()
-                                               << ", " << e->data2LineNumber();
+											   << ", " << e->data2LineNumber();
 				}
 				else if (e->data1LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
@@ -210,19 +209,18 @@ void TextTestResult::printFailures(std::ostream& stream)
 
 		int i = 1;
 
-		for (std::vector<TestFailure*>::iterator it = failures().begin(); it != failures().end(); ++it)
+		for (const auto& failure : failures())
 		{
-			TestFailure* failure = *it;
-			CppUnitException* e = failure->thrownException();
+				CppUnitException* e = failure->thrownException();
 
 			stream << std::setw(2) << i
-			       << ": "
-			       << failure->failedTest()->toString() << "\n"
-			       << "    \"" << (e ? e->what() : "") << "\"\n"
-			       << "    in \""
-			       << (e ? e->fileName() : std::string())
-			       << "\", line ";
-			if (e == 0)
+				   << ": "
+				   << failure->failedTest()->toString() << "\n"
+				   << "    \"" << (e ? e->what() : "") << "\"\n"
+				   << "    in \""
+				   << (e ? e->fileName() : std::string())
+				   << "\", line ";
+			if (e == nullptr)
 			{
 				stream << "0";
 			}
@@ -232,8 +230,8 @@ void TextTestResult::printFailures(std::ostream& stream)
 				if (e->data2LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
 					stream << " data lines "
-					       << e->data1LineNumber()
-                           << ", " << e->data2LineNumber();
+						   << e->data1LineNumber()
+						   << ", " << e->data2LineNumber();
 				}
 				else if (e->data1LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
@@ -260,22 +258,45 @@ void TextTestResult::printHeader(std::ostream& stream)
 	stream << "\n\n";
 	if (wasSuccessful())
 		stream << "OK ("
-		          << runTests() << " tests)"
-		          << std::endl;
+				  << runTests() << " tests)"
+				  << std::endl;
 	else
 		stream << "!!!FAILURES!!!" << "\n"
-		          << "Runs: "
-		          << runTests ()
-		          << "   Failures: "
-		          << testFailures ()
-		          << "   Errors: "
-		          << testErrors ()
-		          << std::endl;
+				  << "Runs: "
+				  << runTests ()
+				  << "   Failures: "
+				  << testFailures ()
+				  << "   Errors: "
+				  << testErrors ()
+				  << std::endl;
 }
 
 
 std::string TextTestResult::shortName(const std::string& testName)
 {
+	// Convert "CppUnit::TestCaller<ClassName>.methodName" or "TestCaller<ClassName>.methodName"
+	// to "ClassName::methodName"
+	// On MSVC, typeid().name() includes "class " prefix, so handle "TestCaller<class ClassName>" too
+	std::string::size_type callerPos = testName.find("TestCaller<");
+	if (callerPos != std::string::npos)
+	{
+		std::string::size_type endPos = testName.find(">.", callerPos);
+		if (endPos != std::string::npos)
+		{
+			std::string className = testName.substr(callerPos + 11, endPos - callerPos - 11);
+			std::string methodName = testName.substr(endPos + 2);
+
+			// Strip "class " or "struct " prefix added by MSVC's typeid().name()
+			if (className.compare(0, 6, "class ") == 0)
+				className = className.substr(6);
+			else if (className.compare(0, 7, "struct ") == 0)
+				className = className.substr(7);
+
+			return className + "::" + methodName;
+		}
+	}
+
+	// Fallback: just return the part after the last dot
 	std::string::size_type pos = testName.rfind('.');
 	if (pos != std::string::npos)
 		return std::string(testName, pos + 1);

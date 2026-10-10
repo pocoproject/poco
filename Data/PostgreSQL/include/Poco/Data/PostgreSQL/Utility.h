@@ -23,43 +23,41 @@
 #include "Poco/Data/Session.h"
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API Utility
 	/// Various utility functions for PostgreSQL.
 {
 public:
-	static std::string serverInfo(SessionHandle* aHandlePtr);
+	[[nodiscard]] static std::string serverInfo(SessionHandle* aHandlePtr);
 		/// Returns server info.
 
-	static std::string serverInfo(Poco::Data::Session& aSession);
+	[[nodiscard]] static std::string serverInfo(Poco::Data::Session& aSession);
 		/// Returns server info.
 
-	static int serverVersion(SessionHandle* aHandlePtr);
+	[[nodiscard]] static int serverVersion(SessionHandle* aHandlePtr);
 		/// Returns server version.
 
-	static int serverVersion(Poco::Data::Session& aSession);
+	[[nodiscard]] static int serverVersion(Poco::Data::Session& aSession);
 		/// Returns server version.
 
-	static std::string hostInfo(SessionHandle* aHandlePtr);
+	[[nodiscard]] static std::string hostInfo(SessionHandle* aHandlePtr);
 		/// Returns host info.
 
-	static std::string hostInfo(Poco::Data::Session& aSession);
+	[[nodiscard]] static std::string hostInfo(Poco::Data::Session& aSession);
 		/// Returns host info.
 
-	static std::string sessionEncoding(SessionHandle* aHandlePtr);
+	[[nodiscard]] static std::string sessionEncoding(SessionHandle* aHandlePtr);
 		/// Returns session encoding.
 
-	static std::string sessionEncoding(Poco::Data::Session& aSession);
+	[[nodiscard]] static std::string sessionEncoding(Poco::Data::Session& aSession);
 		/// Returns session encoding.
 
-	static bool hasMicrosecond() { return true; }
+	[[nodiscard]] static bool hasMicrosecond() { return true; }
 		/// Rturns true if microseconds are suported.
 
-	static SessionHandle* handle(Poco::Data::Session& aSession);
+	[[nodiscard]] static SessionHandle* handle(Poco::Data::Session& aSession);
 		/// Returns native PostgreSQL handle for the session.
 };
 
@@ -75,7 +73,7 @@ inline SessionHandle* Utility::handle(Session& aSession)
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_Utility_INCLUDED

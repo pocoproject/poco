@@ -1159,7 +1159,7 @@ void JSONTest::testQuery()
 
 	Object address;
 	address.set("dummy", 123);
-	query.findObject("bad address", address);
+	(void) query.findObject("bad address", address);
 	assertTrue (!address.has("dummy"));
 	Object& rAddress = query.findObject("address", address);
 	assertTrue (rAddress.getValue<int>("number") == 123);
@@ -1176,7 +1176,7 @@ void JSONTest::testQuery()
 
 	Array children;
 	children.add("dummy");
-	query.findArray("no children", children);
+	(void) query.findArray("no children", children);
 	assertTrue (children.size() == 0);
 	Array& rChildren = query.findArray("children", children);
 	assertTrue (rChildren.getElement<std::string>(1) == "Ellen");
@@ -1583,6 +1583,34 @@ void JSONTest::testStringify()
 		"    }\n"
 		"}";
 	assertTrue (ostr.str() == str);
+
+	{
+		std::string jsonStr = R"json({"default":"\u0007\u0007"})json";
+		auto jsonStrUnescape = Poco::UTF8::unescape(jsonStr);
+		Poco::JSON::Parser parser1;
+		Poco::Dynamic::Var result1 = parser1.parse(jsonStr);
+		const auto & obj = result1.extract<Poco::JSON::Object::Ptr>();
+		auto default_val = obj->get("default");
+		Poco::JSON::Object::Ptr json1 = new Poco::JSON::Object();
+		json1->set("default", default_val);
+		std::stringstream ss1;
+		json1->stringify(ss1);
+		assertEqual(ss1.str(), jsonStr);
+	}
+
+	{
+		std::string jsonStr = R"json({"default":"\u0050\u0050"})json";
+		auto jsonStrUnescape = Poco::UTF8::unescape(jsonStr);
+		Poco::JSON::Parser parser2;
+		Poco::Dynamic::Var result2 = parser2.parse(jsonStr);
+		const auto & obj = result2.extract<Poco::JSON::Object::Ptr>();
+		auto default_val = obj->get("default");
+		Poco::JSON::Object::Ptr json2 = new Poco::JSON::Object();
+		json2->set("default", default_val);
+		std::stringstream ss2;
+		json2->stringify(ss2);
+		assertEqual(ss2.str(), jsonStrUnescape);
+	}
 }
 
 
@@ -1821,7 +1849,7 @@ void JSONTest::testBasicJson()
 		}
 	)";
     Poco::JSON::Parser jsonParser;
-    Poco::Dynamic::Var jsonObject = jsonParser.parse(json);
+    Var jsonObject = jsonParser.parse(json);
 
     Poco::JSON::Object::Ptr jsonPtr = jsonObject.extract<Poco::JSON::Object::Ptr>();
 
@@ -2369,6 +2397,247 @@ void JSONTest::testRemove()
 	assertTrue(nl[1] == "baz");
 
 }
+void JSONTest::testEnum()
+{
+	enum SAMPLE_ENUM
+	{
+		SE_VALUE = 42
+	};
+
+	enum class SAMPLE_ENUM_CLASS
+	{
+		VALUE = 42
+	};
+
+	enum class SAMPLE_ENUM_CLASS_I8: Poco::Int8
+	{
+		VALUE = 42
+	};
+
+	enum class SAMPLE_ENUM_CLASS_I16: Poco::Int16
+	{
+		VALUE = 42
+	};
+
+	enum class SAMPLE_ENUM_CLASS_I32: Poco::Int32
+	{
+		VALUE = 42
+	};
+
+	enum class SAMPLE_ENUM_CLASS_I64: Poco::Int64
+	{
+		VALUE = 42
+	};
+
+	enum class SAMPLE_ENUM_CLASS_UI8: Poco::UInt8
+	{
+		VALUE = 42
+	};
+
+	enum class SAMPLE_ENUM_CLASS_UI16: Poco::UInt16
+	{
+		VALUE = 42
+	};
+
+	enum class SAMPLE_ENUM_CLASS_UI32: Poco::UInt32
+	{
+		VALUE = 42
+	};
+
+	enum class SAMPLE_ENUM_CLASS_UI64: Poco::UInt64
+	{
+		VALUE = 42
+	};
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("simple_enum", SE_VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"simple_enum\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM se = obj->get("simple_enum").extract<SAMPLE_ENUM>();
+		assertTrue(se == SE_VALUE);
+	}
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("enum_class", SAMPLE_ENUM_CLASS::VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"enum_class\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM_CLASS se = obj->get("enum_class").extract<SAMPLE_ENUM_CLASS>();
+		assertTrue(se == SAMPLE_ENUM_CLASS::VALUE);
+	}
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("enum_class_i8", SAMPLE_ENUM_CLASS_I8::VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"enum_class_i8\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM_CLASS_I8 se = obj->get("enum_class_i8").extract<SAMPLE_ENUM_CLASS_I8>();
+		assertTrue(se == SAMPLE_ENUM_CLASS_I8::VALUE);
+	}
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("enum_class_i16", SAMPLE_ENUM_CLASS_I16::VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"enum_class_i16\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM_CLASS_I16 se = obj->get("enum_class_i16").extract<SAMPLE_ENUM_CLASS_I16>();
+		assertTrue(se == SAMPLE_ENUM_CLASS_I16::VALUE);
+	}
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("enum_class_i32", SAMPLE_ENUM_CLASS_I32::VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"enum_class_i32\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM_CLASS_I32 se = obj->get("enum_class_i32").extract<SAMPLE_ENUM_CLASS_I32>();
+		assertTrue(se == SAMPLE_ENUM_CLASS_I32::VALUE);
+	}
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("enum_class_i64", SAMPLE_ENUM_CLASS_I64::VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"enum_class_i64\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM_CLASS_I64 se = obj->get("enum_class_i64").extract<SAMPLE_ENUM_CLASS_I64>();
+		assertTrue(se == SAMPLE_ENUM_CLASS_I64::VALUE);
+	}
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("enum_class_ui8", SAMPLE_ENUM_CLASS_UI8::VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"enum_class_ui8\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM_CLASS_UI8 se = obj->get("enum_class_ui8").extract<SAMPLE_ENUM_CLASS_UI8>();
+		assertTrue(se == SAMPLE_ENUM_CLASS_UI8::VALUE);
+	}
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("enum_class_ui16", SAMPLE_ENUM_CLASS_UI16::VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"enum_class_ui16\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM_CLASS_UI16 se = obj->get("enum_class_ui16").extract<SAMPLE_ENUM_CLASS_UI16>();
+		assertTrue(se == SAMPLE_ENUM_CLASS_UI16::VALUE);
+	}
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("enum_class_ui32", SAMPLE_ENUM_CLASS_UI32::VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"enum_class_ui32\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM_CLASS_UI32 se = obj->get("enum_class_ui32").extract<SAMPLE_ENUM_CLASS_UI32>();
+		assertTrue(se == SAMPLE_ENUM_CLASS_UI32::VALUE);
+	}
+
+	{
+		Poco::JSON::Object::Ptr obj = new Poco::JSON::Object();
+		obj->set("enum_class_ui64", SAMPLE_ENUM_CLASS_UI64::VALUE);
+		Poco::Dynamic::Var var(obj);
+		std::string expected = "{\"enum_class_ui64\":42}";
+		std::string result = var.convert<std::string>();
+		assertEquals(expected, result);
+
+		SAMPLE_ENUM_CLASS_UI64 se = obj->get("enum_class_ui64").extract<SAMPLE_ENUM_CLASS_UI64>();
+		assertTrue(se == SAMPLE_ENUM_CLASS_UI64::VALUE);
+	}
+}
+
+void JSONTest::testEmbeddedNulKey()
+{
+	// A key containing an escaped NUL must keep its full length: truncating at
+	// the NUL would make two distinct keys collide.
+	std::string json = "{ \"admin\\u0000shadow\" : 1, \"admin\" : 2 }";
+	Parser parser;
+	Var result = parser.parse(json);
+	Object::Ptr object = result.extract<Object::Ptr>();
+	assertTrue (object->size() == 2);
+	assertTrue (object->has(std::string("admin\0shadow", 12)));
+	assertTrue (object->has("admin"));
+	assertTrue (object->getValue<int>("admin") == 2);
+	assertTrue (object->getValue<int>(std::string("admin\0shadow", 12)) == 1);
+}
+
+
+void JSONTest::testCommentsInStrings()
+{
+	// With comment support enabled, a comment delimiter inside a string value is
+	// part of the value and must not remove the text that follows it.
+	std::string json = "{ \"user\" : \"attacker/*\", \"isAdmin\" : false, \"note\" : \"*/\" }";
+	Parser parser;
+	parser.setAllowComments(true);
+	Var result = parser.parse(json);
+	Object::Ptr object = result.extract<Object::Ptr>();
+	assertTrue (object->size() == 3);
+	assertTrue (object->has("isAdmin"));
+	assertTrue (object->getValue<bool>("isAdmin") == false);
+	assertTrue (object->getValue<std::string>("user") == "attacker/*");
+	assertTrue (object->getValue<std::string>("note") == "*/");
+
+	// An escaped quote must not end the string either: the value itself is what
+	// the escape handling protects.
+	std::string escaped = "{ \"a\" : \"x\\\"/*\", \"b\" : 1 }";
+	Parser parser2;
+	parser2.setAllowComments(true);
+	Object::Ptr obj2 = parser2.parse(escaped).extract<Object::Ptr>();
+	assertTrue (obj2->size() == 2);
+	assertTrue (obj2->getValue<std::string>("a") == "x\"/*");
+	assertTrue (obj2->getValue<int>("b") == 1);
+
+	// "/*/" is an opening delimiter, not a complete comment.
+	std::string selfClosing = "{ \"a\" : 1, /*/ \"isAdmin\" : true /*/ }";
+	Parser parser4;
+	parser4.setAllowComments(true);
+	try
+	{
+		parser4.parse(selfClosing);
+		fail("/*/ must not close the comment it opens");
+	}
+	catch (Poco::Exception&)
+	{
+	}
+
+	// An empty key survives the length-bounded read.
+	Parser parser5;
+	Object::Ptr obj5 = parser5.parse("{ \"\" : 7 }").extract<Object::Ptr>();
+	assertTrue (obj5->has(""));
+	assertTrue (obj5->getValue<int>("") == 7);
+
+	// A real comment outside a string is still removed.
+	std::string withComment = "{ /* drop me */ \"a\" : 1 }";
+	Parser parser3;
+	parser3.setAllowComments(true);
+	Object::Ptr obj3 = parser3.parse(withComment).extract<Object::Ptr>();
+	assertTrue (obj3->size() == 1);
+	assertTrue (obj3->getValue<int>("a") == 1);
+}
 
 
 CppUnit::Test* JSONTest::suite()
@@ -2424,6 +2693,9 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
 	CppUnit_addTest(pSuite, JSONTest, testRemove);
+	CppUnit_addTest(pSuite, JSONTest, testEnum);
+	CppUnit_addTest(pSuite, JSONTest, testEmbeddedNulKey);
+	CppUnit_addTest(pSuite, JSONTest, testCommentsInStrings);
 
 	return pSuite;
 }

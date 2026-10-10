@@ -22,8 +22,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API LexicalHandler
@@ -107,6 +106,7 @@ public:
 	virtual void endCDATA() = 0;
 		/// Report the end of a CDATA section.
 
+	// CodeQL [cpp/raw-array-interface]: SAX specification API
 	virtual void comment(const XMLChar ch[], int start, int length) = 0;
 		/// Report an XML comment anywhere in the document.
 		///
@@ -119,7 +119,7 @@ protected:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_LexicalHandler_INCLUDED

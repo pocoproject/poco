@@ -18,8 +18,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <typename T>
@@ -149,4 +148,4 @@ HostEntry::~HostEntry()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

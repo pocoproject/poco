@@ -5,7 +5,7 @@
 // Package: Windows
 // Module:  WinRegistryConfiguration
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -22,8 +22,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 WinRegistryConfiguration::WinRegistryConfiguration(const std::string& rootPath, REGSAM extraSam): _rootPath(rootPath), _extraSam(extraSam)
@@ -34,11 +33,6 @@ WinRegistryConfiguration::WinRegistryConfiguration(const std::string& rootPath, 
 		if (_rootPath[_rootPath.length() - 1] != '\\')
 			_rootPath += '\\';
 	}
-}
-
-
-WinRegistryConfiguration::~WinRegistryConfiguration()
-{
 }
 
 
@@ -137,4 +131,4 @@ std::string WinRegistryConfiguration::convertToRegFormat(const std::string& key,
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

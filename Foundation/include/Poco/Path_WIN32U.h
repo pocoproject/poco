@@ -28,18 +28,18 @@ namespace Poco {
 class Foundation_API PathImpl
 {
 public:
-	static std::string selfImpl();
-	static std::string currentImpl();
-	static std::string homeImpl();
-	static std::string configHomeImpl();
-	static std::string dataHomeImpl();
-	static std::string cacheHomeImpl();
-	static std::string tempHomeImpl();
-	static std::string tempImpl();
-	static std::string configImpl();
-	static std::string nullImpl();
-	static std::string systemImpl();
-	static std::string expandImpl(const std::string& path);
+	[[nodiscard]] static std::string selfImpl();
+	[[nodiscard]] static std::string currentImpl();
+	[[nodiscard]] static std::string homeImpl();
+	[[nodiscard]] static std::string configHomeImpl();
+	[[nodiscard]] static std::string dataHomeImpl();
+	[[nodiscard]] static std::string cacheHomeImpl();
+	[[nodiscard]] static std::string tempHomeImpl();
+	[[nodiscard]] static std::string tempImpl();
+	[[nodiscard]] static std::string configImpl();
+	[[nodiscard]] static std::string nullImpl();
+	[[nodiscard]] static std::string systemImpl();
+	[[nodiscard]] static std::string expandImpl(const std::string& path);
 	static void listRootsImpl(std::vector<std::string>& roots);
 
 	enum

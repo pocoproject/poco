@@ -15,11 +15,11 @@
 
 
 #include "Poco/Redis/RedisStream.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 //
@@ -39,15 +39,29 @@ RedisStreamBuf::~RedisStreamBuf()
 }
 
 
-int RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
+std::streamsize RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
 {
-	return _redis.receiveBytes(buffer, static_cast<int>(len));
+	try
+	{
+		return _redis.receiveBytes(buffer, static_cast<int>(len));
+	}
+	catch (...)
+	{
+		return -1;
+	}
 }
 
 
-int RedisStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize RedisStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
-	return _redis.sendBytes(buffer, static_cast<int>(length));
+	try
+	{
+		return _redis.sendBytes(buffer, static_cast<int>(length));
+	}
+	catch (...)
+	{
+		return -1;
+	}
 }
 
 
@@ -83,7 +97,8 @@ RedisStreamBuf* RedisIOS::rdbuf()
 
 void RedisIOS::close()
 {
-	_buf.sync();
+	if (_buf.sync() == -1)
+		throw Poco::IOException("Failed to flush Redis stream buffer");
 }
 
 
@@ -125,9 +140,9 @@ std::string RedisInputStream::getline()
 {
 	std::string line;
 	std::getline(*this, line);
-	if ( line.size() > 0 ) line.erase(line.end() - 1);
+	if (!line.empty() && line.back() == '\r') line.pop_back();
 	return line;
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

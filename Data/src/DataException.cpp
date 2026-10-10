@@ -16,8 +16,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 POCO_IMPLEMENT_EXCEPTION(DataException, Poco::IOException, "Database Exception")
@@ -38,4 +37,4 @@ POCO_IMPLEMENT_EXCEPTION(ConnectionFailedException, DataException, "Connection a
 POCO_IMPLEMENT_EXCEPTION(NotConnectedException, DataException, "Not connected to data source")
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

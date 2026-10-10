@@ -23,8 +23,7 @@
 #include "Poco/DNSSD/DNSSD.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 class DNSSD_API Error
@@ -46,13 +45,13 @@ public:
 	~Error();
 		/// Destroys the ServiceError.
 
-	Poco::Int32 networkInterface() const;
+	[[nodiscard]] Poco::Int32 networkInterface() const;
 		/// Returns the network interface on which the error occurred.
 
-	Poco::Int32 code() const;
+	[[nodiscard]] Poco::Int32 code() const;
 		/// Returns the implementation-specific error code.
 
-	const std::string& message() const;
+	[[nodiscard]] const std::string& message() const;
 		/// Returns the human-readable error message.
 
 private:
@@ -83,7 +82,7 @@ inline const std::string& Error::message() const
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_Error_INCLUDED

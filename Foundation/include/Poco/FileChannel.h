@@ -23,6 +23,8 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/Mutex.h"
+#include <atomic>
+#include <memory>
 
 
 namespace Poco {
@@ -171,16 +173,20 @@ public:
 	FileChannel(const std::string& path);
 		/// Creates the FileChannel for a file with the given path.
 
-	void open();
+	void open() override;
 		/// Opens the FileChannel and creates the log file if necessary.
 
-	void close();
+	void close() override;
 		/// Closes the FileChannel.
+		///
+		/// The channel can be closed and opened while other threads
+		/// log: a message that finds it closed opens it again.
 
-	void log(const Message& msg);
-		/// Logs the given message to the file.
+	void log(const Message& msg) override;
+		/// Logs the given message to the file. A channel that is
+		/// not open is opened first.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given name.
 		///
 		/// The following properties are supported:
@@ -206,7 +212,7 @@ public:
 		///   * rotateOnOpen: Specifies whether an existing log file should be
 		///                   rotated and archived when the channel is opened.
 
-	std::string getProperty(const std::string& name) const;
+	[[nodiscard]] std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 		/// See setProperty() for a description of the supported
 		/// properties.
@@ -214,22 +220,22 @@ public:
 	void setRotationStrategy(RotateStrategy* strategy);
 		/// Set a rotation strategy. 
 		/// FileChannel will take ownership of the pointer
-	
+
 	void setArchiveStrategy(ArchiveStrategy* strategy);
 		/// Set an archive strategy. 
 		/// FileChannel will take ownership of the pointer
-		
+
 	void setPurgeStrategy(PurgeStrategy* strategy);
 		/// Set a purge strategy. 
 		/// FileChannel will take ownership of the pointer
-		
-	Timestamp creationDate() const;
+
+	[[nodiscard]] Timestamp creationDate() const;
 		/// Returns the log file's creation date.
 
-	UInt64 size() const;
+	[[nodiscard]] UInt64 size() const;
 		/// Returns the log file's current size in bytes.
 
-	const std::string& path() const;
+	[[nodiscard]] std::string path() const;
 		/// Returns the log file's path.
 
 	static const std::string PROP_PATH;
@@ -243,7 +249,7 @@ public:
 	static const std::string PROP_ROTATEONOPEN;
 
 protected:
-	~FileChannel();
+	~FileChannel() override;
 
 	void setRotation(const std::string& rotation);
 	void setArchive(const std::string& archive);
@@ -256,11 +262,16 @@ protected:
 
 private:
 	bool setNoPurge(const std::string& value);
-	int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = NULL) const;
-	Timespan::TimeDiff extractFactor(const std::string& value, std::string::const_iterator start) const;
+	[[nodiscard]] int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = nullptr) const;
+	[[nodiscard]] Timespan::TimeDiff extractFactor(const std::string& value, std::string::const_iterator start) const;
 
-	RotateStrategy* createRotationStrategy(const std::string& rotation, const std::string& times) const;
-	ArchiveStrategy* createArchiveStrategy(const std::string& archive, const std::string& times) const;
+	[[nodiscard]] RotateStrategy* createRotationStrategy(const std::string& rotation, const std::string& times) const;
+	[[nodiscard]] ArchiveStrategy* createArchiveStrategy(const std::string& archive, const std::string& times) const;
+	void unsafeOpen();
+		/// Opens the log file if it is not open. The caller holds the mutex.
+
+	void unsafeSetRotationStrategy(RotateStrategy* strategy);
+		/// Replaces the rotation strategy. The caller holds the mutex.
 
 	std::string      _path;
 	std::string      _times;
@@ -271,11 +282,15 @@ private:
 	std::string      _purgeCount;
 	bool             _flush;
 	bool             _rotateOnOpen;
-	LogFile*         _pFile;
+	std::atomic<LogFile*> _pFile;
 	RotateStrategy*  _pRotateStrategy;
 	ArchiveStrategy* _pArchiveStrategy;
-	PurgeStrategy*   _pPurgeStrategy;
-	FastMutex        _mutex;
+	std::shared_ptr<PurgeStrategy> _pPurgeStrategy;
+	mutable FastMutex _mutex;
+	mutable FastMutex _purgeMutex;
+		/// Guards the purge strategy and the path for purge(), which is
+		/// also called by the thread that compresses archived files.
+		/// It is the last mutex to be taken.
 };
 
 

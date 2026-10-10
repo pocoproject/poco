@@ -139,4 +139,11 @@ bool SharedLibraryImpl::setSearchPathImpl(const std::string&)
 }
 
 
+std::vector<std::string> SharedLibraryImpl::findMissingDependenciesImpl(const std::string&)
+{
+	// not implemented
+	return std::vector<std::string>();
+}
+
+
 } // namespace Poco

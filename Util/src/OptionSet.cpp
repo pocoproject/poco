@@ -5,7 +5,7 @@
 // Package: Options
 // Module:  OptionSet
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -17,32 +17,19 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
-OptionSet::OptionSet()
-{
-}
+OptionSet::OptionSet() = default;
 
 
-OptionSet::OptionSet(const OptionSet& options):
-	_options(options._options)
-{
-}
+OptionSet::OptionSet(const OptionSet& options) = default;
 
 
-OptionSet::~OptionSet()
-{
-}
+OptionSet::~OptionSet() = default;
 
 
-OptionSet& OptionSet::operator = (const OptionSet& options)
-{
-	if (&options != this)
-		_options = options._options;
-	return *this;
-}
+OptionSet& OptionSet::operator = (const OptionSet& options) = default;
 
 
 void OptionSet::addOption(const Option& option)
@@ -81,7 +68,7 @@ bool OptionSet::hasOption(const std::string& name, bool matchShort) const
 
 const Option& OptionSet::getOption(const std::string& name, bool matchShort) const
 {
-	const Option* pOption = 0;
+	const Option* pOption = nullptr;
 	for (const auto& opt: _options)
 	{
 		if ((matchShort && opt.matchesShort(name)) || (!matchShort && opt.matchesPartial(name)))
@@ -107,16 +94,4 @@ const Option& OptionSet::getOption(const std::string& name, bool matchShort) con
 }
 
 
-OptionSet::Iterator OptionSet::begin() const
-{
-	return _options.begin();
-}
-
-
-OptionSet::Iterator OptionSet::end() const
-{
-	return _options.end();
-}
-
-
-} } // namespace Poco::Util
+} // namespace Poco::Util

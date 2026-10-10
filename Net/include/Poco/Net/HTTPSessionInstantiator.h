@@ -23,8 +23,7 @@
 #include "Poco/URI.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPSessionInstantiator
@@ -42,7 +41,7 @@ public:
 	virtual ~HTTPSessionInstantiator();
 		/// Destroys the HTTPSessionInstantiator.
 
-	virtual HTTPClientSession* createClientSession(const Poco::URI& uri);
+	[[nodiscard]] virtual HTTPClientSession* createClientSession(const Poco::URI& uri);
 		/// Creates a HTTPClientSession for the given URI.
 
 	static void registerInstantiator();
@@ -52,14 +51,14 @@ public:
 		/// Unregisters the factory with the global HTTPSessionFactory.
 
 protected:
-	void setProxyConfig(const HTTPClientSession::ProxyConfig& proxyConfig);
+	void setProxyConfig(const ProxyConfig& proxyConfig);
 		/// Sets the proxy configuration.
 
-	const HTTPClientSession::ProxyConfig& getProxyConfig() const;
+	[[nodiscard]] const ProxyConfig& getProxyConfig() const;
 		/// Returns the proxy configuration.
 
 private:
-	HTTPClientSession::ProxyConfig _proxyConfig;
+	ProxyConfig _proxyConfig;
 
 	friend class HTTPSessionFactory;
 };
@@ -68,13 +67,13 @@ private:
 //
 // inlines
 //
-inline const HTTPClientSession::ProxyConfig& HTTPSessionInstantiator::getProxyConfig() const
+inline const ProxyConfig& HTTPSessionInstantiator::getProxyConfig() const
 {
 	return _proxyConfig;
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPSessionInstantiator_INCLUDED

@@ -38,13 +38,9 @@ public:
 	using ConstIterator = typename Strategies::const_iterator;
 
 public:
-	StrategyCollection()
-	{
-	}
+	StrategyCollection() = default;
 
-	~StrategyCollection()
-	{
-	}
+	~StrategyCollection() = default;
 
 	void pushBack(AbstractStrategy<TKey, TValue>* pStrat)
 		/// Adds an AbstractStrategy to the collection. Class takes ownership of pointer

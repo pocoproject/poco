@@ -80,7 +80,7 @@ public:
 	sigjmp_buf& jumpBuffer();
 		/// Returns the top-most sigjmp_buf for the current thread.
 
-	static void throwSignalException(int sig);
+	[[noreturn]] static void throwSignalException(int sig);
 		/// Throws a SignalException with a textual description
 		/// of the given signal as argument.
 
@@ -89,7 +89,7 @@ public:
 		/// and SIGSYS.
 
 protected:
-	static void handleSignal(int sig);
+	[[noreturn]] static void handleSignal(int sig);
 		/// The actual signal handler.
 
 	struct JumpBuffer
@@ -98,7 +98,7 @@ protected:
 	{
 		sigjmp_buf buf;
 	};
-	typedef std::vector<JumpBuffer> JumpBufferVec;
+	using JumpBufferVec = std::vector<JumpBuffer>;
 
 	static JumpBufferVec& jumpBufferVec();
 		/// Returns the JumpBufferVec for the current thread.

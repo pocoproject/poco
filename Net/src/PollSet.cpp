@@ -14,16 +14,17 @@
 
 #include "Poco/Net/PollSet.h"
 #include "Poco/Net/SocketImpl.h"
-#include "Poco/TemporaryFile.h"
 #include "Poco/Mutex.h"
+#include "Poco/IOLock.h"
 #include <set>
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
 	#ifdef POCO_OS_FAMILY_WINDOWS
-		#include "Poco/Net/ServerSocket.h"
+		#include "Poco/Net/DatagramSocket.h"
 		#include "Poco/Net/SocketAddress.h"
 		#include "wepoll.h"
+		#include <memory>
 	#else
 		#include <sys/epoll.h>
 		#include <sys/eventfd.h>
@@ -36,8 +37,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
@@ -48,16 +48,13 @@ namespace Net {
 
 
 #ifdef WEPOLL_H_
-
-namespace {
-
-int close(HANDLE h)
+namespace
 {
-	return epoll_close(h);
+	int close(HANDLE h)
+	{
+		return epoll_close(h);
+	}
 }
-
-}
-
 #endif // WEPOLL_H_
 
 
@@ -72,11 +69,7 @@ public:
 	static const epoll_event EPOLL_NULL_EVENT;
 
 	PollSetImpl(): _events(FD_SETSIZE, EPOLL_NULL_EVENT),
-#if defined(WEPOLL_H_)
-		_eventfd(eventfd()),
-#else
 		_eventfd(eventfd(0, 0)),
-#endif // WEPOLL_H_
 		_epollfd(epoll_create(1))
 	{
 		int err = addFD(_eventfd, PollSet::POLL_READ, EPOLL_CTL_ADD);
@@ -92,12 +85,17 @@ public:
 
 	~PollSetImpl()
 	{
+		// Signal shutdown, close fds to wake up epoll_wait(), then wait
+		// for poll() to exit before freeing memory (since epoll_wait()
+		// writes to _events).
+		_pollLock.markClosed();
 #ifdef WEPOLL_H_
 		if (_epollfd) close(_epollfd);
 #else
 		if (_eventfd > 0) close(_eventfd.exchange(0));
 		if (_epollfd >= 0) close(_epollfd);
 #endif
+		_pollLock.wait();
 	}
 
 	void add(const Socket& socket, int mode)
@@ -122,7 +120,7 @@ public:
 		poco_socket_t fd = socket.impl()->sockfd();
 		struct epoll_event ev;
 		ev.events = 0;
-		ev.data.ptr = 0;
+		ev.data.ptr = nullptr;
 
 		int err = epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &ev);
 		if (err) SocketImpl::error();
@@ -171,27 +169,37 @@ public:
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
+		ScopedIOLock pollLock(_pollLock);
+		if (!pollLock)
+			return result;
+
 		while (true)
 		{
 			Poco::Timestamp start;
-			rc = epoll_wait(_epollfd, &_events[0],
-				static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
+			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
 			if (rc == 0)
 			{
-				if (keepWaiting(start, remainingTime)) continue;
+				if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
 				return result;
 			}
 
 			// if we are hitting the events limit, resize it; even without resizing, the subseqent
 			// calls would round-robin through the remaining ready sockets, but it's better to give
 			// the call enough room once we start hitting the boundary
-			if (rc >= _events.size()) _events.resize(_events.size()*2);
+			if (rc > 0 && static_cast<size_t>(rc) >= _events.size())
+			{
+				_events.resize(_events.size()*2);
+			}
 			else if (rc < 0)
 			{
 				// if interrupted and there's still time left, keep waiting
 				if (SocketImpl::lastError() == POCO_EINTR)
 				{
-					if (keepWaiting(start, remainingTime)) continue;
+					if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
+				}
+				else if (pollLock.isClosed())
+				{
+					return result;
 				}
 				else SocketImpl::error();
 			}
@@ -217,12 +225,17 @@ public:
 			}
 			else if (_events[i].events & EPOLLIN) // eventfd signaled
 			{
-				uint64_t val;
 #ifdef WEPOLL_H_
-				if (_pSocket && _pSocket->available())
-					_pSocket->impl()->receiveBytes(&val, sizeof(val));
+				if (_pEventSocket)
+				{
+					char val;
+					Poco::Net::SocketAddress sa;
+					_pEventSocket->receiveFrom(&val, sizeof(val), sa);
+				}
 #else
-				read(_eventfd, &val, sizeof(val));
+				std::uint64_t val;
+				if (read(_eventfd, &val, sizeof(val)) < 0)
+					poco_debugger_msg("eventfd read failed");
 #endif
 			}
 		}
@@ -231,27 +244,24 @@ public:
 
 	void wakeUp()
 	{
-		uint64_t val = 1;
+		if (_pollLock.isClosed())
+			return;
 #ifdef WEPOLL_H_
-	#ifdef POCO_HAS_UNIX_SOCKET
-		poco_check_ptr (_pSockFile);
-		StreamSocket ss(SocketAddress(_pSockFile->path()));
-	#else
-		StreamSocket ss(SocketAddress("127.0.0.1", _port));
-	#endif
-		ss.sendBytes(&val, sizeof(val));
+		char val = 1;
+		_pEventSocket->sendTo(&val, sizeof(val), _pEventSocket->address());
 #else
 		// This is guaranteed to write into a valid fd,
 		// or 0 (meaning PollSet is being destroyed).
 		// Errors are ignored.
-		write(_eventfd, &val, sizeof(val));
+		std::uint64_t val = 1;
+		[[maybe_unused]] auto n = write(_eventfd, &val, sizeof(val));
 #endif
 	}
 
-	int count() const
+	std::size_t size() const
 	{
 		ScopedLock lock(_mutex);
-		return static_cast<int>(_socketMap.size());
+		return _socketMap.size();
 	}
 
 private:
@@ -274,6 +284,7 @@ private:
 	int updateImpl(const Socket& socket, int mode)
 	{
 		SocketImpl* sockImpl = socket.impl();
+		poco_check_ptr(sockImpl);
 		int ret = addFD(static_cast<int>(sockImpl->sockfd()), mode, EPOLL_CTL_MOD, sockImpl);
 		if (ret == 0) socketMapUpdate(socket, mode);
 		return ret;
@@ -282,13 +293,14 @@ private:
 	int addImpl(const Socket& socket, int mode)
 	{
 		SocketImpl* sockImpl = socket.impl();
+		poco_check_ptr(sockImpl);
 		int newMode = getNewMode(sockImpl, mode);
 		int ret = addFD(static_cast<int>(sockImpl->sockfd()), newMode, EPOLL_CTL_ADD, sockImpl);
 		if (ret == 0) socketMapUpdate(socket, newMode);
 		return ret;
 	}
 
-	int addFD(int fd, int mode, int op, void* ptr = 0)
+	int addFD(int fd, int mode, int op, void* ptr = nullptr)
 	{
 		struct epoll_event ev{};
 		ev.events = 0;
@@ -319,31 +331,18 @@ private:
 #else // WEPOLL_H_
 	using EPollHandle = std::atomic<HANDLE>;
 
-	#ifdef POCO_HAS_UNIX_SOCKET
-		int eventfd()
+	int eventfd(int, int)
+	{
+		static const SocketAddress eventSA("127.0.0.238"s, 0);
+		if (!_pEventSocket)
 		{
-			if (!_pSockFile)
-			{
-				_pSockFile.reset(new TemporaryFile);
-				_pSocket.reset(new ServerSocket(SocketAddress(_pSockFile->path())));
-			}
-			_pSocket->setBlocking(false);
-			return static_cast<int>(_pSocket->impl()->sockfd());
+			_pEventSocket.reset(new DatagramSocket(eventSA, true));
+			_pEventSocket->setBlocking(false);
 		}
-		std::unique_ptr<TemporaryFile> _pSockFile;
-	#else // no unix socket, listen on localhost
-		int eventfd()
-		{
-			if (!_pSocket)
-				_pSocket.reset(new ServerSocket(SocketAddress("127.0.0.1", 0)));
-			_port = _pSocket->address().port();
-			_pSocket->setBlocking(false);
-			return static_cast<int>(_pSocket->impl()->sockfd());
-		}
-		int _port = 0;
-	#endif // POCO_HAS_UNIX_SOCKET
+		return static_cast<int>(_pEventSocket->impl()->sockfd());
+	}
 
-	std::unique_ptr<ServerSocket> _pSocket;
+	std::unique_ptr<DatagramSocket> _pEventSocket;
 #endif // WEPOLL_H_
 
 	mutable Mutex _mutex;
@@ -351,9 +350,12 @@ private:
 	std::vector<struct epoll_event> _events;
 	std::atomic<int> _eventfd;
 	EPollHandle      _epollfd;
+	IOLock          _pollLock;
 };
 
-const epoll_event PollSetImpl::EPOLL_NULL_EVENT = {0, {0}};
+
+const epoll_event PollSetImpl::EPOLL_NULL_EVENT = {0, {nullptr}};
+
 
 #elif defined(POCO_HAVE_FD_POLL)
 
@@ -372,7 +374,12 @@ public:
 
 	~PollSetImpl()
 	{
-		_pipe.close();
+		// Signal shutdown, close pipe to wake up poll(), then wait
+		// for poll() to exit before freeing memory (since ::poll()
+		// writes to _pollfds).
+		_pollLock.markClosed();
+		try { _pipe.close(); } catch (...) { }
+		_pollLock.wait();
 	}
 
 	void add(const Socket& socket, int mode)
@@ -411,13 +418,13 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		poco_socket_t fd = socket.impl()->sockfd();
-		for (auto it = _pollfds.begin(); it != _pollfds.end(); ++it)
+		for (auto& _pollfd : _pollfds)
 		{
-			if (it->fd == fd)
+			if (_pollfd.fd == fd)
 			{
-				it->events = 0;
-				it->revents = 0;
-				setMode(it->events, mode);
+				_pollfd.events = 0;
+				_pollfd.revents = 0;
+				setMode(_pollfd.events, mode);
 			}
 		}
 	}
@@ -435,6 +442,11 @@ public:
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
 	{
 		PollSet::SocketModeMap result;
+
+		ScopedIOLock pollLock(_pollLock);
+		if (!pollLock)
+			return result;
+
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
 
@@ -452,13 +464,13 @@ public:
 			}
 
 			_pollfds.reserve(_pollfds.size() + _addMap.size());
-			for (auto it = _addMap.begin(); it != _addMap.end(); ++it)
+			for (auto& it : _addMap)
 			{
 				pollfd pfd;
-				pfd.fd = it->first;
+				pfd.fd = it.first;
 				pfd.events = 0;
 				pfd.revents = 0;
-				setMode(pfd.events, it->second);
+				setMode(pfd.events, it.second);
 				_pollfds.push_back(pfd);
 			}
 			_addMap.clear();
@@ -468,10 +480,11 @@ public:
 
 		Poco::Timespan remainingTime(timeout);
 		int rc;
+
 		do
 		{
 			Poco::Timestamp start;
-			rc = ::poll(&_pollfds[0], _pollfds.size(), remainingTime.totalMilliseconds());
+			rc = ::poll(_pollfds.data(), _pollfds.size(), remainingTime.totalMilliseconds());
 			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 			{
 				Poco::Timestamp end;
@@ -482,34 +495,36 @@ public:
 					remainingTime = 0;
 			}
 		}
-		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !pollLock.isClosed());
+
+		if (pollLock.isClosed())
+			return result;
+
 		if (rc < 0) SocketImpl::error();
 
+		if (_pollfds[0].revents & POLLIN)
 		{
-			if (_pollfds[0].revents & POLLIN)
-			{
-				char c;
-				_pipe.readBytes(&c, 1);
-			}
+			char c;
+			(void) _pipe.readBytes(&c, 1);
+		}
 
-			Poco::FastMutex::ScopedLock lock(_mutex);
+		Poco::FastMutex::ScopedLock lock(_mutex);
 
-			if (!_socketMap.empty())
+		if (!_socketMap.empty())
+		{
+			for (auto it = _pollfds.begin() + 1; it != _pollfds.end(); ++it)
 			{
-				for (auto it = _pollfds.begin() + 1; it != _pollfds.end(); ++it)
+				auto its = _socketMap.find(it->fd);
+				if (its != _socketMap.end())
 				{
-					std::map<poco_socket_t, Socket>::const_iterator its = _socketMap.find(it->fd);
-					if (its != _socketMap.end())
-					{
-						if (it->revents & POLLIN)
-							result[its->second] |= PollSet::POLL_READ;
-						if (it->revents & POLLOUT)
-							result[its->second] |= PollSet::POLL_WRITE;
-						if (it->revents & POLLERR || (it->revents & POLLHUP))
-							result[its->second] |= PollSet::POLL_ERROR;
-					}
-					it->revents = 0;
+					if (it->revents & POLLIN)
+						result[its->second] |= PollSet::POLL_READ;
+					if (it->revents & POLLOUT)
+						result[its->second] |= PollSet::POLL_WRITE;
+					if (it->revents & POLLERR || (it->revents & POLLHUP))
+						result[its->second] |= PollSet::POLL_ERROR;
 				}
+				it->revents = 0;
 			}
 		}
 
@@ -518,18 +533,19 @@ public:
 
 	void wakeUp()
 	{
-		char c = 1;
-		_pipe.writeBytes(&c, 1);
+		static constexpr char c = 1;
+		if (_pollLock.isClosed())
+			return;
+		(void) _pipe.writeBytes(&c, 1);
 	}
 
-	int count() const
+	std::size_t size() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		return static_cast<int>(_socketMap.size());
+		return _socketMap.size();
 	}
 
 private:
-
 	void setMode(short& target, int mode)
 	{
 		if (mode & PollSet::POLL_READ)
@@ -545,6 +561,7 @@ private:
 	std::set<poco_socket_t>         _removeSet;
 	std::vector<pollfd>             _pollfds;
 	Poco::Pipe                      _pipe;
+	IOLock                         _pollLock;
 };
 
 
@@ -557,6 +574,13 @@ private:
 class PollSetImpl
 {
 public:
+	~PollSetImpl()
+	{
+		// Wait for poll() to exit before freeing memory.
+		// Note: select() cannot be woken up, so we just wait for timeout.
+		_pollLock.close();
+	}
+
 	void add(const Socket& socket, int mode)
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
@@ -595,10 +619,15 @@ public:
 
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
 	{
+		PollSet::SocketModeMap result;
 		fd_set fdRead;
 		fd_set fdWrite;
 		fd_set fdExcept;
 		int nfd = 0;
+
+		ScopedIOLock pollLock(_pollLock);
+		if (!pollLock)
+			return result;
 
 		FD_ZERO(&fdRead);
 		FD_ZERO(&fdWrite);
@@ -630,11 +659,11 @@ public:
 			}
 		}
 
-		PollSet::SocketModeMap result;
 		if (nfd == 0) return result;
 
 		Poco::Timespan remainingTime(timeout);
 		int rc;
+
 		do
 		{
 			struct timeval tv;
@@ -652,29 +681,31 @@ public:
 					remainingTime = 0;
 			}
 		}
-		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !pollLock.isClosed());
+
+		if (pollLock.isClosed())
+			return result;
+
 		if (rc < 0) SocketImpl::error();
 
-		{
-			Poco::FastMutex::ScopedLock lock(_mutex);
+		Poco::FastMutex::ScopedLock lock(_mutex);
 
-			for (auto it = _map.begin(); it != _map.end(); ++it)
+		for (auto it = _map.begin(); it != _map.end(); ++it)
+		{
+			poco_socket_t fd = it->first.impl()->sockfd();
+			if (fd != POCO_INVALID_SOCKET)
 			{
-				poco_socket_t fd = it->first.impl()->sockfd();
-				if (fd != POCO_INVALID_SOCKET)
+				if (FD_ISSET(fd, &fdRead))
 				{
-					if (FD_ISSET(fd, &fdRead))
-					{
-						result[it->first] |= PollSet::POLL_READ;
-					}
-					if (FD_ISSET(fd, &fdWrite))
-					{
-						result[it->first] |= PollSet::POLL_WRITE;
-					}
-					if (FD_ISSET(fd, &fdExcept))
-					{
-						result[it->first] |= PollSet::POLL_ERROR;
-					}
+					result[it->first] |= PollSet::POLL_READ;
+				}
+				if (FD_ISSET(fd, &fdWrite))
+				{
+					result[it->first] |= PollSet::POLL_WRITE;
+				}
+				if (FD_ISSET(fd, &fdExcept))
+				{
+					result[it->first] |= PollSet::POLL_ERROR;
 				}
 			}
 		}
@@ -687,15 +718,16 @@ public:
 		// TODO
 	}
 
-	int count() const
+	std::size_t size() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		return static_cast<int>(_map.size());
+		return _map.size();
 	}
 
 private:
 	mutable Poco::FastMutex _mutex;
 	PollSet::SocketModeMap  _map;
+	IOLock                  _pollLock;
 };
 
 
@@ -758,7 +790,13 @@ PollSet::SocketModeMap PollSet::poll(const Poco::Timespan& timeout)
 
 int PollSet::count() const
 {
-	return _pImpl->count();
+	return static_cast<int>(_pImpl->size());
+}
+
+
+std::size_t PollSet::size() const
+{
+	return _pImpl->size();
 }
 
 
@@ -768,4 +806,4 @@ void PollSet::wakeUp()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

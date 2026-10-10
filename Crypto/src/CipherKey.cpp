@@ -15,8 +15,7 @@
 #include "Poco/Crypto/CipherKey.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 CipherKey::CipherKey(const std::string& name,
@@ -75,4 +74,4 @@ CipherKey& CipherKey::operator = (CipherKey&& other) noexcept
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

@@ -24,8 +24,7 @@ using Poco::Dynamic::Var;
 using Poco::NumberFormatter;
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Date::Date()
@@ -103,14 +102,13 @@ Date& Date::operator = (const Var& var)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #ifdef __GNUC__
 // only needed for g++ (see comment in Date::operator = above)
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 using Poco::Data::Date;
@@ -136,7 +134,7 @@ Var::operator Date () const
 }
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic
 
 
 #endif // __GNUC__

@@ -21,17 +21,18 @@
 
 
 #include "Poco/Foundation.h"
+#include <cstddef>
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 
 
 //
 // The following block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the ODBC_EXPORTS
-// symbol defined on the command line. this symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file see
-// ODBC_API functions as being imported from a DLL, wheras this DLL sees symbols
+// symbol defined on the command line. This symbol should not be defined on any project
+// that uses this DLL. This way any other project whose source files include this file sees
+// ODBC_API functions as being imported from a DLL, whereas this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
@@ -54,12 +55,40 @@
 
 #include "Poco/Data/ODBC/Unicode.h"
 
-#if (__cplusplus >= 201703L)
+#if POCO_HAVE_CPP17_COMPILER
 	#if __has_include(<msodbcsql.h>)
 		#include <msodbcsql.h>
 		#define POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+
+		// To enable varchar(max) > 8000 bytes, set to 1.
+		//
+		// Notes:
+		//
+		// - this setting works in conjunction with
+		//   the session "maxFieldSize" property, which
+		//   ultimately determines the max string length.
+		//
+		// - increasing the "maxFieldSize" property may
+		//   affect performance (more memory preallocated
+		//   for prepared statements in order to safely
+		//   accommodate data returned at execution)
+		#if !defined(POCO_DATA_SQL_SERVER_BIG_STRINGS)
+			#define POCO_DATA_SQL_SERVER_BIG_STRINGS 1
+		#endif
 	#endif
 #endif
+
+
+//
+// ODBC headers define SQL_NULL_HANDLE, SQL_NULL_HENV, SQL_NULL_HDBC, SQL_NULL_HSTMT
+// as literal 0, which triggers -Wzero-as-null-pointer-constant warnings in C++.
+// We define these as nullptr to use in place of the ODBC macros.
+//
+inline constexpr std::nullptr_t POCO_ODBC_NULL_HANDLE = nullptr;
+inline constexpr std::nullptr_t POCO_ODBC_NULL_HENV   = nullptr;
+inline constexpr std::nullptr_t POCO_ODBC_NULL_HDBC   = nullptr;
+inline constexpr std::nullptr_t POCO_ODBC_NULL_HSTMT  = nullptr;
+inline constexpr std::nullptr_t POCO_ODBC_NULL_HDESC  = nullptr;
 
 
 //

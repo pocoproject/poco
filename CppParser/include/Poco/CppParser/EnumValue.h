@@ -22,8 +22,7 @@
 #include "Poco/CppParser/Symbol.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class Enum;
@@ -40,11 +39,11 @@ public:
 	virtual ~EnumValue();
 		/// Destroys the EnumValue.
 
-	const std::string& value() const;
+	[[nodiscard]] const std::string& value() const;
 		/// Returns the value, which may be empty.
 
-	Symbol::Kind kind() const;
-	std::string toString() const;
+	[[nodiscard]] Symbol::Kind kind() const;
+	[[nodiscard]] std::string toString() const;
 
 private:
 	std::string _value;
@@ -60,7 +59,7 @@ inline const std::string& EnumValue::value() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_EnumValue_INCLUDED

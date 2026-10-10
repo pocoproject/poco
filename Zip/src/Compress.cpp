@@ -24,8 +24,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 Compress::Compress(std::ostream& out, bool seekableOut, bool forceZip64):
@@ -180,8 +179,8 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 		if (hdr.hasExtraField())	 // Update sizes in header extension.
 			hdr.setZip64Data();
 		_out.seekp(hdr.getStartPos(), std::ios_base::beg);
-		std::string header = hdr.createHeader();
-		_out.write(header.c_str(), static_cast<std::streamsize>(header.size()));
+		std::string headerData = hdr.createHeader();
+		_out.write(headerData.c_str(), static_cast<std::streamsize>(headerData.size()));
 		_out.seekp(0, std::ios_base::end);
 	}
 
@@ -298,8 +297,8 @@ void Compress::addRecursive(const Poco::Path& entry, ZipCommon::CompressionMetho
 	{
 		Poco::Path realFile(entry, *it);
 		Poco::Path renamedFile(aName, *it);
-		Poco::File aFile(realFile);
-		if (aFile.isDirectory())
+		Poco::File childFile(realFile);
+		if (childFile.isDirectory())
 		{
 			realFile.makeDirectory();
 			renamedFile.makeDirectory();
@@ -392,4 +391,4 @@ void Compress::setStoreExtensions(const std::set<std::string>& extensions)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

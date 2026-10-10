@@ -40,16 +40,16 @@ public:
 	{
 	}
 
-	~ValidArgs()
-	{
-	}
+	~ValidArgs() = default;
 
-	const TKey&	key() const
+	ValidArgs& operator=(const ValidArgs& args) = delete;
+
+	[[nodiscard]] const TKey&	key() const
 	{
 		return _key;
 	}
 
-	bool isValid() const
+	[[nodiscard]] bool isValid() const
 	{
 		return _isValid;
 	}
@@ -62,9 +62,6 @@ public:
 protected:
 	const TKey& _key;
 	bool        _isValid;
-
-private:
-	ValidArgs& operator = (const ValidArgs& args);
 };
 
 

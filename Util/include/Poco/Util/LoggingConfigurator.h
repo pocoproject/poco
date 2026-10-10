@@ -7,7 +7,7 @@
 //
 // Definition of the LoggingConfigurator class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -22,10 +22,19 @@
 #include "Poco/Formatter.h"
 #include "Poco/Channel.h"
 #include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/Mutex.h"
+#include <set>
+#include <string>
 
 
 namespace Poco {
-namespace Util {
+
+class Logger;
+
+}
+
+
+namespace Poco::Util {
 
 
 class Util_API LoggingConfigurator
@@ -95,6 +104,14 @@ class Util_API LoggingConfigurator
 	/// Furthermore, a "channel" property is supported, which can either refer
 	/// to a named channel, or which can contain an inline channel definition.
 	///
+	/// An optional "type" property can be used to specify the logger implementation.
+	/// If set to "fast", a FastLogger (based on Quill) will be used instead of the
+	/// standard Logger. FastLogger provides much lower latency (~9ns vs ~100ns) by
+	/// using asynchronous logging. If the "type" property is omitted or set to any
+	/// other value, the standard Logger is used. Note that FastLogger requires
+	/// POCO_ENABLE_FASTLOGGER to be defined; otherwise an InvalidAccessException
+	/// is thrown.
+	///
 	/// Examples:
 	///     logging.loggers.root.channel = c1
 	///     logging.loggers.root.level = warning
@@ -102,13 +119,21 @@ class Util_API LoggingConfigurator
 	///     logging.loggers.l1.channel.class = ConsoleChannel
 	///     logging.loggers.l1.channel.pattern = %s: [%p] %t
 	///     logging.loggers.l1.level = information
+	///     logging.loggers.l2.name = fastlogger1
+	///     logging.loggers.l2.type = fast
+	///     logging.loggers.l2.channel.class = ConsoleChannel
+	///     logging.loggers.l2.level = debug
 {
 public:
 	LoggingConfigurator();
 		/// Creates the LoggingConfigurator.
 
+	LoggingConfigurator(const LoggingConfigurator&) = delete;
+
 	~LoggingConfigurator();
 		/// Destroys the LoggingConfigurator.
+
+	LoggingConfigurator& operator = (const LoggingConfigurator&) = delete;
 
 	void configure(AbstractConfiguration::Ptr pConfig);
 		/// Configures the logging subsystem based on
@@ -117,21 +142,72 @@ public:
 		/// A ConfigurationView can be used to pass only
 		/// a part of a larger configuration.
 
+	void configure(AbstractConfiguration::Ptr pConfig, const std::string& loggerKey);
+		/// Configures or reconfigures a single logger identified by loggerKey.
+		/// The loggerKey is the key under "logging.loggers" in the configuration
+		/// (e.g., "l1" for "logging.loggers.l1.name = myLogger").
+		///
+		/// Only formatters, channels, and the logger matching loggerKey are
+		/// processed. Existing entries in the LoggingRegistry are overwritten,
+		/// and the logger's channel is updated if it changed.
+		///
+		/// This method can be called multiple times to reconfigure a logger
+		/// at runtime (e.g., to change its log file path).
+
+	[[nodiscard]] Poco::Logger& getLogger(const std::string& name, AbstractConfiguration::Ptr pConfig);
+		/// Returns a reference to the Logger with the given name.
+		/// If the Logger does not yet exist, it is first configured
+		/// using the given configuration (which follows the standard
+		/// "logging.formatters", "logging.channels", "logging.loggers"
+		/// format), and then returned.
+		/// If the Logger already exists, pConfig is silently ignored
+		/// and the existing Logger is returned.
+		///
+		/// The configuration can reference formatters and channels
+		/// already registered by the initial application configuration.
+		/// If defining new formatters or channels, use unique names -
+		/// if any name collides with an existing registry entry, the
+		/// configuration is skipped and the logger inherits from its parent.
+
+	static void configure(
+		const std::string& level,
+		const std::string& pattern = "%Y-%m-%d %H:%M:%S.%i [%p] %s<%I>: %t",
+		const std::string& configTemplate =
+			"logging.loggers.root.channel = c1\n"
+			"logging.loggers.root.level = %s\n"
+			"logging.channels.c1.class = ColorConsoleChannel\n"
+			"logging.channels.c1.formatter = f1\n"
+			"logging.formatters.f1.class = PatternFormatter\n"
+			"logging.formatters.f1.pattern = %s\n"
+			"logging.formatters.f1.times = local\n");
+		/// Convenience method that configures logging with the specified
+		/// log level and pattern format.
+		///
+		/// The configTemplate uses Poco::format() placeholders:
+		///   - First %s is replaced with the level
+		///   - Second %s is replaced with the pattern
+		///
+		/// Default configuration sets up a ColorConsoleChannel with a
+		/// PatternFormatter using local time.
+
 private:
 	void configureFormatters(AbstractConfiguration::Ptr pConfig);
 	void configureChannels(AbstractConfiguration::Ptr pConfig);
 	void configureLoggers(AbstractConfiguration::Ptr pConfig);
-	Poco::Formatter::Ptr createFormatter(AbstractConfiguration::Ptr pConfig);
-	Poco::Channel::Ptr createChannel(AbstractConfiguration::Ptr pConfig);
+	[[nodiscard]] Poco::Formatter::Ptr createFormatter(AbstractConfiguration::Ptr pConfig);
+	[[nodiscard]] Poco::Channel::Ptr createChannel(AbstractConfiguration::Ptr pConfig);
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
+	[[nodiscard]] bool validateConfiguration(AbstractConfiguration::Ptr pConfig) const;
+	static void collectChannelNames(const std::string& name, AbstractConfiguration::Ptr pChConfig, std::set<std::string>& channelNames, int depth = 0);
 
-	LoggingConfigurator(const LoggingConfigurator&);
-	LoggingConfigurator& operator = (const LoggingConfigurator&);
+	static Poco::Mutex _mutex;
+		/// Static because all instances operate on the same
+		/// global LoggingRegistry and Logger map.
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_LoggingConfigurator_INCLUDED

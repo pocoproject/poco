@@ -33,8 +33,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <class T>
@@ -69,32 +68,30 @@ public:
 	{
 	}
 
-	~Extraction()
+	~Extraction() override = default;
 		/// Destroys the Extraction object.
-	{
-	}
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _extracted ? 1u : 0;
 	}
 
-	std::size_t numOfRowsAllowed() const
+	[[nodiscard]] std::size_t numOfRowsAllowed() const override
 	{
 		return 1u;
 	}
 
-	bool isNull(std::size_t /*row*/ = 0) const
+	[[nodiscard]] bool isNull([[maybe_unused]] std::size_t row = 0) const override
 	{
 		return _null;
 	}
 
-	std::size_t extract(std::size_t pos)
+	std::size_t extract(std::size_t pos) override
 	{
 		if (_extracted) throw ExtractException("value already extracted");
 		_extracted = true;
@@ -105,17 +102,17 @@ public:
 		return 1u;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_extracted = false;
 	}
 
-	bool canExtract() const
+	[[nodiscard]] bool canExtract() const override
 	{
 		return !_extracted;
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
+	[[nodiscard]] AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos) override
 	{
 		return new Preparation<T>(pPrep, pos, _rResult);
 	}
@@ -154,26 +151,24 @@ public:
 		_rResult.clear();
 	}
 
-	virtual ~Extraction()
-	{
-	}
+	~Extraction() override = default;
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_rResult.size());
 	}
 
-	std::size_t numOfRowsAllowed() const
+	[[nodiscard]] std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	bool isNull(std::size_t row) const
+	[[nodiscard]] bool isNull(std::size_t row) const override
 	{
 		try
 		{
@@ -185,7 +180,7 @@ public:
 		}
 	}
 
-	std::size_t extract(std::size_t pos)
+	std::size_t extract(std::size_t pos) override
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
 		_rResult.push_back(_default);
@@ -194,19 +189,19 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
+	[[nodiscard]] AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos) override
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
 
-	void reset()
+	void reset() override
 	{
 		_nulls.clear();
 	}
 
 protected:
 
-	const std::vector<T>& result() const
+	[[nodiscard]] const std::vector<T>& result() const
 	{
 		return _rResult;
 	}
@@ -244,26 +239,24 @@ public:
 		_rResult.clear();
 	}
 
-	virtual ~Extraction()
-	{
-	}
+	~Extraction() override = default;
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<bool>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_rResult.size());
 	}
 
-	std::size_t numOfRowsAllowed() const
+	[[nodiscard]] std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	bool isNull(std::size_t row) const
+	[[nodiscard]] bool isNull(std::size_t row) const override
 	{
 		try
 		{
@@ -275,7 +268,7 @@ public:
 		}
 	}
 
-	std::size_t extract(std::size_t pos)
+	std::size_t extract(std::size_t pos) override
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
 
@@ -286,19 +279,19 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
+	[[nodiscard]] AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos) override
 	{
 		return new Preparation<bool>(pPrep, pos, _default);
 	}
 
-	void reset()
+	void reset() override
 	{
 		_nulls.clear();
 	}
 
 protected:
 
-	const std::vector<bool>& result() const
+	[[nodiscard]] const std::vector<bool>& result() const
 	{
 		return _rResult;
 	}
@@ -336,26 +329,24 @@ public:
 		_rResult.clear();
 	}
 
-	virtual ~Extraction()
-	{
-	}
+	~Extraction() override = default;
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _rResult.size();
 	}
 
-	std::size_t numOfRowsAllowed() const
+	[[nodiscard]] std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	bool isNull(std::size_t row) const
+	[[nodiscard]] bool isNull(std::size_t row) const override
 	{
 		try
 		{
@@ -367,7 +358,7 @@ public:
 		}
 	}
 
-	std::size_t extract(std::size_t pos)
+	std::size_t extract(std::size_t pos) override
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
 		_rResult.push_back(_default);
@@ -376,19 +367,19 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
+	[[nodiscard]] AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos) override
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
 
-	void reset()
+	void reset() override
 	{
 		_nulls.clear();
 	}
 
 protected:
 
-	const std::list<T>& result() const
+	[[nodiscard]] const std::list<T>& result() const
 	{
 		return _rResult;
 	}
@@ -426,26 +417,24 @@ public:
 		_rResult.clear();
 	}
 
-	virtual ~Extraction()
-	{
-	}
+	~Extraction() override = default;
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _rResult.size();
 	}
 
-	std::size_t numOfRowsAllowed() const
+	[[nodiscard]] std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	bool isNull(std::size_t row) const
+	[[nodiscard]] bool isNull(std::size_t row) const override
 	{
 		try
 		{
@@ -457,7 +446,7 @@ public:
 		}
 	}
 
-	std::size_t extract(std::size_t pos)
+	std::size_t extract(std::size_t pos) override
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
 		_rResult.push_back(_default);
@@ -466,19 +455,19 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
+	[[nodiscard]] AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos) override
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
 
-	void reset()
+	void reset() override
 	{
 		_nulls.clear();
 	}
 
 protected:
 
-	const std::deque<T>& result() const
+	[[nodiscard]] const std::deque<T>& result() const
 	{
 		return _rResult;
 	}
@@ -513,19 +502,23 @@ public:
 		AbstractExtraction::setHeldType<C>();
 	}
 
-	~InternalExtraction()
+	~InternalExtraction() override
 		/// Destroys InternalExtraction.
 	{
 		delete _pColumn;
 	}
 
-	void reset()
+	InternalExtraction() = delete;
+	InternalExtraction(const InternalExtraction&) = delete;
+	InternalExtraction& operator = (const InternalExtraction&) = delete;
+
+	void reset() override
 	{
 		Extraction<C>::reset();
 		_pColumn->reset();
 	}
 
-	const HeldValType& value(int index) const
+	[[nodiscard]] const HeldValType& value(int index) const
 	{
 		try
 		{
@@ -537,21 +530,17 @@ public:
 		}
 	}
 
-	bool isNull(std::size_t row) const
+	[[nodiscard]] bool isNull(std::size_t row) const override
 	{
 		return Extraction<C>::isNull(row);
 	}
 
-	const Column<C>& column() const
+	[[nodiscard]] const Column<C>& column() const
 	{
 		return *_pColumn;
 	}
 
 private:
-	InternalExtraction();
-	InternalExtraction(const InternalExtraction&);
-	InternalExtraction& operator = (const InternalExtraction&);
-
 	Column<C>* _pColumn;
 };
 
@@ -583,26 +572,24 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction()
-	{
-	}
+	~Extraction() override = default;
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_rResult.size());
 	}
 
-	std::size_t numOfRowsAllowed() const
+	[[nodiscard]] std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	std::size_t extract(std::size_t pos)
+	std::size_t extract(std::size_t pos) override
 	{
 		T tmp;
 		TypeHandler<T>::extract(pos, tmp, _default, getExtractor());
@@ -610,7 +597,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
+	[[nodiscard]] AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos) override
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -647,26 +634,24 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction()
-	{
-	}
+	~Extraction() override = default;
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_rResult.size());
 	}
 
-	std::size_t numOfRowsAllowed() const
+	[[nodiscard]] std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	std::size_t extract(std::size_t pos)
+	std::size_t extract(std::size_t pos) override
 	{
 		T tmp;
 		TypeHandler<T>::extract(pos, tmp, _default, getExtractor());
@@ -674,7 +659,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
+	[[nodiscard]] AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos) override
 	{
 		return new Preparation<T>(pPrep, pos, _default);
 	}
@@ -711,26 +696,24 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction()
-	{
-	}
+	~Extraction() override = default;
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_rResult.size());
 	}
 
-	std::size_t numOfRowsAllowed() const
+	[[nodiscard]] std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	std::size_t extract(std::size_t pos)
+	std::size_t extract(std::size_t pos) override
 	{
 		V tmp;
 		TypeHandler<V>::extract(pos, tmp, _default, getExtractor());
@@ -738,7 +721,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
+	[[nodiscard]] AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos) override
 	{
 		return new Preparation<V>(pPrep, pos, _default);
 	}
@@ -775,26 +758,24 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction()
-	{
-	}
+	~Extraction() override = default;
 
-	std::size_t numOfColumnsHandled() const
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_rResult.size());
 	}
 
-	std::size_t numOfRowsAllowed() const
+	[[nodiscard]] std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	std::size_t extract(std::size_t pos)
+	std::size_t extract(std::size_t pos) override
 	{
 		V tmp;
 		TypeHandler<V>::extract(pos, tmp, _default, getExtractor());
@@ -802,7 +783,7 @@ public:
 		return 1u;
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos)
+	[[nodiscard]] AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t pos) override
 	{
 		return new Preparation<V>(pPrep, pos, _default);
 	}
@@ -817,7 +798,7 @@ namespace Keywords {
 
 
 template <typename T>
-inline AbstractExtraction::Ptr into(T& t)
+[[nodiscard]] inline AbstractExtraction::Ptr into(T& t)
 	/// Convenience function to allow for a more compact creation of an extraction object.
 {
 	return new Extraction<T>(t);
@@ -825,7 +806,7 @@ inline AbstractExtraction::Ptr into(T& t)
 
 
 template <typename T>
-inline AbstractExtraction::Ptr into(T& t, const Position& pos)
+[[nodiscard]] inline AbstractExtraction::Ptr into(T& t, const Position& pos)
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with multiple recordset support.
 {
@@ -834,7 +815,7 @@ inline AbstractExtraction::Ptr into(T& t, const Position& pos)
 
 
 template <typename T>
-inline AbstractExtraction::Ptr into(T& t, const Position& pos, const T& def)
+[[nodiscard]] inline AbstractExtraction::Ptr into(T& t, const Position& pos, const T& def)
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with multiple recordset support and the given default
 {
@@ -859,7 +840,7 @@ inline AbstractExtractionVec& into(AbstractExtractionVec& ev)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Extraction_INCLUDED

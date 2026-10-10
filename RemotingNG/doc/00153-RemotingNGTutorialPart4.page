@@ -1,0 +1,377 @@
+Remoting NG Tutorial Part 4: RESTful Web Services
+Remoting NG
+
+!!!Welcome Back
+
+Welcome to part four of the Remoting tutorial.
+This final part of the Remoting NG tutorial shows how to implement
+RESTful web services or APIs with the Remoting NG REST Transport.
+
+This tuturial assumes that you are familiar with basic POCO C++ Libraries
+programming techniques. You should also have read the [[00100-RemotingNGOverview.html Remoting Overview]]
+and be familiar with basic Remoting concepts, such as presented in
+[[00150-RemotingNGTutorialPart1.html part 1] of the Remoting tutorial.
+
+
+!!!Defining RESTful Interfaces
+
+Defining RESTful interfaces with C++ classes for Remoting NG is different from defining interfaces
+for other transports such as SOAP, JSON-RPC or TCP. The main difference is that
+method names are directly mapped to HTTP request method names (GET, POST, PATCH, PUT and
+DELETE). Therefore, only the following method names may be used:
+
+  - get
+  - post
+  - patch
+  - put
+  - delete_ (note the trailing underscore)
+
+
+!!RESTful vs. RPC-based interfaces
+
+When defining RESTful interfaces, it's best to think in terms of <*collections*> and
+<*resources*>, and to define <*endpoints*> for both. Typically, a collection endpoint will be
+used to create new resources, and to obtain a list of existing resources of a given
+type or class. For that purpose, <[post()]> and <[get()]> methods are used.
+Resource endpoints are used to obtain details of a specific resource or object, make changes
+to the resource, or delete it, using <[get()]>, <[patch()]> (or <[put()]>) and <[delete_()]>
+methods.
+
+The difference between RPC-based remote interfaces and RESTful interfaces is best
+demonstrated using a concrete example.
+
+
+!!Example: User Management
+
+A (quite simplistic) RPC-based remote service for user account management (using the
+TCP-based transport protocol, JSON-RPC or SOAP) could be implemented as follows:
+
+    //@ serialize
+    struct User
+    {
+        std::string name;
+        Poco::Optional<std::string> password;
+        Poco::Optional<std::set<std::string>> permissions;
+        Poco::Optional<std::set<std::string>> roles;
+    };
+
+
+    //@ remote
+    class UserManager
+    {
+    public:
+        UserManager(/* ... */);
+        ~UserManager();
+
+        void addUser(const User& user);
+        void updateUser(const User& user);
+        User getUser(const std::string& username);
+        void deleteUser(const std::string& username);
+
+    private:
+        // ...
+    };
+----
+
+
+For implementing similar features in the form of a RESTful API, the implementation
+of the interface must be done in a different way. In fact, multiple classes will be
+used that cover different aspects of the web service according to REST principles.
+A typical implementation could consist of the following API endpoints:
+
+!Retrieving a List of Users
+
+This is achieved with a GET request to the <*users*> collection:
+
+    GET /api/1.0/users HTTP/1.1
+    Host: localhost:80
+
+----
+
+The response looks like:
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Content-Length: nnn
+
+    [
+        {
+            "name": "admin",
+            "permissions:
+            [
+            ],
+            "roles":
+            [
+                "administrator"
+            ]
+        },
+        {
+            ...
+        }
+    ]
+----
+
+Using query parameters, the result can be filtered or restricted:
+
+    GET /api/1.0/users?maxResults=10&start=10 HTTP/1.1
+    Host: localhost:80
+
+----
+
+!Creating a User
+
+This is achieved with a POST request to the users collection:
+
+    POST /api/1.0/users HTTP/1.1
+    Host: localhost:80
+    Content-Type: application/json
+    Content-Length: nnn
+
+    {
+        "name": "admin",
+        "password": "s3cr3t",
+        "permissions": [
+        ],
+        "roles": [
+            "administrator"
+        ]
+    }
+----
+
+!Updating and Deleting a User
+
+We'd also like to be able to update and delete user accounts:
+
+    PATCH /api/1.0/users/admin HTTP/1.1
+    Host: localhost:80
+    Content-Type: application/json
+    Content-Length: nnn
+
+    {
+        "permissions": [
+            "somePermission"
+        ]
+    }
+----
+
+    DELETE /api/1.0/users/admin HTTP/1.1
+    Host: localhost:80
+
+----
+
+To keep things simple, we'll leave the supported operations at that. A real service could
+also add endpoints for nested objects such as permissions or roles. Implementing such a
+web service is straightforward with Remoting NG. We need to provide two C++ classes,
+one for handling the user collection, and the other for handling a single user account.
+The class declarations are shown in the following (we're using the User struct from above,
+but making the name field optional):
+
+    //@ serialize
+    struct User
+    {
+        Poco::Optional<std::string> name;
+        Poco::Optional<std::string> password;
+        Poco::Optional<std::set<std::string>> permissions;
+        Poco::Optional<std::set<std::string>> roles;
+    };
+
+
+    //@ remote
+    //@ path="/api/1.0/users"
+    class UserCollectionEndpoint
+    {
+    public:
+        UserCollectionEndpoint(/* ... */);
+        ~UserCollectionEndpoint();
+
+        User post(const User& user);
+            /// Create a new user.
+
+        //@ $maxResults={in=query, optional}
+        //@ $start={in=query, optional}
+        std::vector<User> get(int maxResults = 0, int start = 0);
+            /// Return a list of user objects, starting with
+            /// the given start index, and return at most
+            /// maxResults items.
+
+    private:
+        // ...
+    };
+
+
+    //@ remote
+    //@ path="/api/1.0/users/{name}"
+    class UserEndpoint
+    {
+    public:
+        UserEndpoint(/* ... */);
+        ~UserEndpoint();
+
+        //@ $name={in=path}
+        User put(const std::string& name, const User& user);
+            /// Update a user (calls patch()).
+
+        //@ $name={in=path}
+        User patch(const std::string& name, const User& user);
+            /// Update a user.
+
+        //@ $name={in=path}
+        User get(const std::string& name);
+            /// Retrieve a user by name.
+
+        //@ $name={in=path}
+        void delete_(const std::string& name);
+            /// Delete a user.
+
+    private:
+        // ...
+    };
+----
+
+What can be seen in the above code samples is that we only have to implement member
+functions for the HTTP methods (GET, POST, PUT, PATCH, DELETE) that our API supports.
+We don't have to deal with the details of parsing or creating JSON, or handling request
+URIs and query strings, or the intricacies of HTTP requests.
+The Remoting REST framework does all these things automatically, using code generated by
+the Remoting code generator, based on the annotations in the header files.
+
+For example, for the UserCollectionEndpoint::post() method, the parameter is automatically
+serialized and deserialized to/from JSON, whereas for UserEndpoint::put(), the name of
+the user is extracted from the request path (note the placeholder {name} in the path
+annotation). Parameters passed in a query can also be handled, as seen in
+UserCollectionEndpoint::get(). Query parameters can be made optional by specifying the
+`optional` attribute for the parameter. Parameters can also be passed in HTTP request/response
+headers or in a form. Furthermore, HTTP authentication (basic, digest, token/bearer) is supported,
+as well as HTTPS.
+
+
+!!Parameters
+
+In general, in RESTful web services, parameters can be passed in the following locations:
+
+  - request/response body, using JSON or raw format
+  - query strings
+  - form data in request body
+  - request path
+  - HTTP request/response headers
+
+Non-scalar values can only be passed in request or response body, using JSON format.
+Scalar values can be passed in any part of the request or response. The location
+and format of parameters is specified using REST-specific
+[[00300-RemotingNGAttributesReference.html Remoting NG attributes]].
+
+
+!!Resource Paths
+
+The default Remoting NG resource path (/rest/<*class*>/<*object*>) is not really well
+suited for RESTful web service endpoints. Therefore, every endpoint class should
+specify a proper path with the <[path]> attribute. The path can contain parameter
+placeholders in the form of a parameter name enclosed in curly brackets.
+Resource paths specified on an endpoint object using the <[path]> attribute will
+automatically be registered as alias paths with the ORB when the respective
+<*RemoteObject*> is registered using the generated <*ServerHelper*>.
+
+In addition to simple placeholders like <[{id}]>, path templates also support
+alternation placeholders using the syntax <[{name:(option1|option2|...)}]>. This allows
+a single endpoint class to handle multiple path variants. For example,
+<[/api/{endpoint:(query|config|status)}]> will match <[/api/query]>, <[/api/config]>,
+and <[/api/status]>, extracting the matched segment as the <[endpoint]> parameter.
+See the [[00300-RemotingNGAttributesReference.html#path path attribute reference]]
+for more details.
+
+
+!!!Working With RESTful Web Services
+
+Setting up a server to provide a RESTful web service works the same as with the
+other Remoting NG transports. Again the first step is setting up and optionally
+configuring the REST Listener instance (Poco::RemotingNG::REST::Listener).
+Then, endpoints can be registered using the Listener.
+
+    // create and register REST listener
+    Poco::RemotingNG::REST::Listener::Ptr pListener = new Poco::RemotingNG::REST::Listener("0.0.0.0:8080");
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(pListener);
+
+    // register endpoints
+    std::string userCollectionEndpointURI = UserCollectionEndpointServerHelper::registerObject(
+        new UserCollectionEndpoint(/* ... */), "endpoint", listener);
+    std::string userEndpointURI = UserEndpointServerHelper::registerObject(
+        new UserEndpoint(/* ... */), "endpoint", listener);
+----
+
+Since the default Remoting NG resource path (in the above example,
+"/rest/UserCollectionEndpoint/endpoint" and "/rest/UserEndpoint/endpoint")
+will not be used by clients, the name of the service object passed to registerObject()
+does not really matter, we simply use the name "endpoint" here. Any other (valid)
+name would also be fine.
+
+On the client side, invoking a RESTful web service using Remoting NG generated
+code also involves the steps known from the previous tutorials.
+First, the REST Transport Factory (Poco::RemotingNG::REST::TransportFactory) must be
+registered. Then, the generated <*ClientHelper*> classes are used to create
+proxy objects for the endpoints. One difference here is that since we're not using
+the standard Remoting NG URI paths, we need to specify a second argument to the
+<*ClientHelper*> to tell it we're going to use the REST Transport.
+
+    // register transport
+    Poco::RemotingNG::REST::TransportFactory::registerFactory();
+
+    // get proxies for remote objects
+    IUserCollectionEndpoint::Ptr pUserCollection = UserCollectionEndpointClientHelper::find(
+        "http://localhost:8080/api/1.0/users", "rest");
+    IUserEndpoint::Ptr pUser = UserEndpointClientHelper::find(
+        "http://localhost:8080/api/1.0/users/{name}", "rest");
+----
+
+The URI path specified in the call to <[*ClientHelper::find()]> should be the same
+that's specified in the endpoint class using the <[path]> attribute, even if it contains
+placeholders.
+
+
+!!!Generating OpenAPI (Swagger) Documents
+
+The <*RemoteGenNG*> tool supports the creation of [[https://www.openapis.org OpenAPI]]
+specifications (also known as Swagger documents).
+The OpenAPI specification is a broadly adopted industry standard
+for describing RESTful APIs. Version 3.0 of the specification is supported.
+
+An OpenAPI specification document can be used to generate documentation
+for an API, or to generate client and server code for implementing the API with
+different programming languages and libraries.
+
+In order to enable generation of an OpenAPI document, a few elements must be
+added to the <*RemoteGenNG*> configuration file. Most OpenAPI-related
+elements are optional, but three elements must be provided:
+
+  - <*output/openAPI/path*>: This setting specifies the path and file name of the OpenAPI
+    specification file. This setting will also enable generation of the OpenAPI
+    specification file.
+  - <*output/openAPI/info/title*>: This setting specifies the title of the API,
+    which is a required part of an OpenAPI document.
+  - <*output/openAPI/server/url*>: This setting specifies the URL of the
+    server providing the API.
+
+Here is an example <*openAPI*> fragment:
+
+    <openAPI>
+        <path>openapi/api.json</path>
+        <info>
+            <title>Sample REST API</title>
+            <description>An example for a RESTful API.</description>
+            <version>1.0.0</version>
+            <contact>
+                <name>Applied Informatics Software Engineering GmbH</name>
+                <url>https://pocoproject.org/pro/</url>
+            </contact>
+        </info>
+        <server>
+            <url>http://localhost:8080/</url>
+        </server>
+    </openAPI>
+----
+
+OpenAPI documents can only be generated for services that follow the RESTful
+style required by the RemotingNG REST Transport.
+
+This concludes the Remoting NG tutorials. Please look at the sample applications
+provided with Remoting NG for more examples showing how to invoke RESTful
+web services.

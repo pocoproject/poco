@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Event.h"
 #include "Poco/RefCountedObject.h"
 #include <unistd.h>
 #include <vector>
@@ -36,26 +37,33 @@ class Foundation_API ProcessHandleImpl: public RefCountedObject
 {
 public:
 	ProcessHandleImpl(pid_t pid);
-	~ProcessHandleImpl();
+	~ProcessHandleImpl() override;
 
-	pid_t id() const;
+	[[nodiscard]] pid_t id() const;
 	int wait() const;
+	int wait(int options) const;
 	int tryWait() const;
+	bool isRunning() const;
 
 private:
-	std::atomic<pid_t> _pid;
+	static int statusToExitCode(int status);
+	const pid_t _pid;
+	mutable Event _event;
+	mutable std::atomic<int> _status{0};
+	mutable std::atomic<bool> _hasStatus{false};
 };
 
 
 class Foundation_API ProcessImpl
 {
 public:
-	typedef pid_t PIDImpl;
-	typedef std::vector<std::string> ArgsImpl;
-	typedef std::map<std::string, std::string> EnvImpl;
+	using PIDImpl = pid_t;
+	using ArgsImpl = std::vector<std::string>;
+	using EnvImpl = std::map<std::string, std::string>;
 
-	static PIDImpl idImpl();
+	[[nodiscard]] static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
+	static void timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime);
 	static ProcessHandleImpl* launchImpl(
 		const std::string& command,
 		const ArgsImpl& args,
@@ -67,8 +75,8 @@ public:
 		int options = 0);
 	static void killImpl(ProcessHandleImpl& handle);
 	static void killImpl(PIDImpl pid);
-	static bool isRunningImpl(const ProcessHandleImpl& handle);
-	static bool isRunningImpl(PIDImpl pid);
+	[[nodiscard]] static bool isRunningImpl(const ProcessHandleImpl& handle);
+	[[nodiscard]] static bool isRunningImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
 
 private:

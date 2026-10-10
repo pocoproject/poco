@@ -21,10 +21,13 @@
 #include "Poco/Exception.h"
 #include <iterator>
 #include <algorithm>
+#include <limits>
 
 
-namespace Poco {
-namespace Dynamic {
+POCO_CHECK_MINMAX_MACROS
+
+
+namespace Poco::Dynamic {
 
 
 class Var;
@@ -34,13 +37,13 @@ class Foundation_API VarIterator
 	/// VarIterator class.
 {
 public:
-	typedef std::bidirectional_iterator_tag iterator_category;
-	typedef Var                             value_type;
-	typedef std::ptrdiff_t                  difference_type;
-	typedef Var*                            pointer;
-	typedef Var&                            reference;
+	using iterator_category = std::bidirectional_iterator_tag;
+	using value_type = Var;
+	using difference_type = std::ptrdiff_t;
+	using pointer = Var *;
+	using reference = Var &;
 
-	static const std::size_t POSITION_END;
+	static constexpr std::size_t POSITION_END = std::numeric_limits<std::size_t>::max();
 		/// End position indicator.
 
 	VarIterator(Var* pVar, bool positionEnd);
@@ -63,11 +66,23 @@ public:
 	VarIterator& operator = (VarIterator&& other) noexcept;
 		/// Assigns the other VarIterator.
 
-	bool operator == (const VarIterator& other) const;
+	[[nodiscard]] bool operator == (const VarIterator& other) const;
 		/// Equality operator.
 
-	bool operator != (const VarIterator& other) const;
+	[[nodiscard]] bool operator != (const VarIterator& other) const;
 		/// Inequality operator.
+
+	[[nodiscard]] bool operator < (const VarIterator& other) const;
+		/// Less than operator.
+
+	[[nodiscard]] bool operator > (const VarIterator& other) const;
+		/// Greater than operator.
+
+	[[nodiscard]] bool operator <= (const VarIterator& other) const;
+		/// Less than or equal to operator.
+
+	[[nodiscard]] bool operator >= (const VarIterator& other) const;
+		/// Greater than or equal to operator.
 
 	Var& operator * () const;
 		/// Returns value at the current position.
@@ -138,7 +153,31 @@ inline bool VarIterator::operator != (const VarIterator& other) const
 }
 
 
-} } // namespace Poco::Dynamic
+inline bool VarIterator::operator < (const VarIterator& other) const
+{
+	return _position < other._position;
+}
+
+
+inline bool VarIterator::operator > (const VarIterator& other) const
+{
+	return _position > other._position;
+}
+
+
+inline bool VarIterator::operator <= (const VarIterator& other) const
+{
+	return _position <= other._position;
+}
+
+
+inline bool VarIterator::operator >= (const VarIterator& other) const
+{
+	return _position >= other._position;
+}
+
+
+} // namespace Poco::Dynamic
 
 
 namespace std

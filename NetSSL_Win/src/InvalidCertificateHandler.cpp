@@ -20,8 +20,7 @@
 using Poco::Delegate;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 InvalidCertificateHandler::InvalidCertificateHandler(bool handleErrorsOnServerSide): _handleErrorsOnServerSide(handleErrorsOnServerSide)
@@ -49,4 +48,4 @@ InvalidCertificateHandler::~InvalidCertificateHandler()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

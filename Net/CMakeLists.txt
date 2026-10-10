@@ -6,9 +6,27 @@ POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 
-# Platform Specific
-POCO_SOURCES_AUTO_PLAT(SRCS WIN32 src/wepoll.c)
-POCO_HEADERS_AUTO(SRCS src/wepoll.h)
+if (MSVC OR MINGW)
+	set(HAVE_SENDFILE ON)
+else()
+	include(CheckIncludeFiles)
+	include(CheckSymbolExists)
+	check_include_files(sys/sendfile.h HAVE_SYS_SENDFILE_H)
+	if(HAVE_SYS_SENDFILE_H)
+		check_symbol_exists(sendfile sys/sendfile.h HAVE_SENDFILE)
+		if (NOT HAVE_SENDFILE)
+			check_symbol_exists(sendfile64 sys/sendfile.h HAVE_SENDFILE64)
+		endif()
+	else()
+		# BSD version
+		check_symbol_exists(sendfile "sys/types.h;sys/socket.h;sys/uio.h" HAVE_SENDFILE)
+	endif()
+endif()
+
+if (HAVE_SENDFILE OR HAVE_SENDFILE64)
+	message(STATUS "OS has native sendfile function")
+	add_compile_definitions(POCO_HAVE_SENDFILE)
+endif()
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
@@ -16,7 +34,12 @@ if(MSVC AND BUILD_SHARED_LIBS)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
+
 add_library(Net ${SRCS})
+if(WIN32)
+	target_link_libraries(Net PRIVATE "$<BUILD_LOCAL_INTERFACE:WEPoll::WEPoll>")
+endif()
+
 add_library(Poco::Net ALIAS Net)
 set_target_properties(Net
 	PROPERTIES
@@ -53,3 +76,6 @@ if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 
+if(ENABLE_FUZZING)
+	add_subdirectory(fuzzing)
+endif()

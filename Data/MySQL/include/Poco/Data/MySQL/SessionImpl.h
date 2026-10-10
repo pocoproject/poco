@@ -27,9 +27,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class MySQL_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
@@ -69,25 +67,25 @@ public:
 		/// could change the character encoding used for the connection. Therefore the
 		/// reset option should be used with caution.
 
-	~SessionImpl();
+	~SessionImpl() override;
 		/// Destroys the SessionImpl.
 
-	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl();
+	[[nodiscard]] Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl() override;
 		/// Returns an MySQL StatementImpl
 
-	void open(const std::string& connection = "");
+	void open(const std::string& connection = "") override;
 		/// Opens a connection to the database.
 
-	void close();
+	void close() override;
 		/// Closes the connection.
 
-	void reset();
+	void reset() override;
 		/// Reset connection with dababase and clears session state, but without disconnecting
 
-	bool isConnected() const;
+	[[nodiscard]] bool isConnected() const override;
 		/// Returns true if connected, false otherwise.
 
-	bool isGood() const;
+	[[nodiscard]] bool isGood() const override;
 		/// Returns true iff the database session is good.
 		/// For the session to be considered good:
 		///   - it must be connected
@@ -99,82 +97,82 @@ public:
 		/// must be false. The flag is only checked if the
 		/// session has a non-zero error code.
 
-	void setConnectionTimeout(std::size_t timeout);
+	void setConnectionTimeout(std::size_t timeout) override;
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout() const;
+	[[nodiscard]] std::size_t getConnectionTimeout() const override;
 		/// Returns the session connection timeout value.
 
-	void begin();
+	void begin() override;
 		/// Starts a transaction
 
-	void commit();
+	void commit() override;
 		/// Commits and ends a transaction
 
-	void rollback();
+	void rollback() override;
 		/// Aborts a transaction
 
-	bool canTransact() const;
+	[[nodiscard]] bool canTransact() const override;
 		/// Returns true if session has transaction capabilities.
 
-	bool isTransaction() const;
+	[[nodiscard]] bool isTransaction() const override;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
-	void setTransactionIsolation(Poco::UInt32 ti);
+	void setTransactionIsolation(Poco::UInt32 ti) override;
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation() const;
+	[[nodiscard]] Poco::UInt32 getTransactionIsolation() const override;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32 ti) const;
+	[[nodiscard]] bool hasTransactionIsolation(Poco::UInt32 ti) const override;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32 ti) const;
+	[[nodiscard]] bool isTransactionIsolation(Poco::UInt32 ti) const override;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
 	void autoCommit(const std::string&, bool val);
 		/// Sets autocommit property for the session.
 
-	bool isAutoCommit(const std::string& name="") const;
+	[[nodiscard]] bool isAutoCommit(const std::string& name="") const;
 		/// Returns autocommit property value.
 
 	void setInsertId(const std::string&, const Poco::Any&);
 		/// Try to set insert id - do nothing.
 
-	Poco::Any getInsertId(const std::string&) const;
+	[[nodiscard]] Poco::Any getInsertId(const std::string&) const;
 		/// Get insert id
 
 	void setFailIfInnoReadOnly(const std::string&, bool value);
 		/// Sets the "failIfInnoReadOnly" feature. If set, isGood() will
 		/// return false if the database is in read-only mode.
 
-	bool getFailIfInnoReadOnly(const std::string&) const;
+	[[nodiscard]] bool getFailIfInnoReadOnly(const std::string&) const;
 		/// Returns the state of the "failIfInnoReadOnly" feature.
 
 	void setLastError(int err);
 		/// Sets an error code. If a non-zero error code is set, the session
 		/// is considered bad.
 
-	int getLastError() const;
+	[[nodiscard]] int getLastError() const;
 		/// Returns the last set error code.
 
-	SessionHandle& handle();
+	[[nodiscard]] SessionHandle& handle();
 		// Get handle
 
-	const std::string& connectorName() const;
+	[[nodiscard]] const std::string& connectorName() const override;
 		/// Returns the name of the connector.
 
 private:
 	template <typename T>
-	static inline T& getValue(MYSQL_BIND* pResult, T& val)
+	[[nodiscard]] static inline T& getValue(MYSQL_BIND* pResult, T& val)
 	{
 		return val = *((T*) pResult->buffer);
 	}
 
 	template <typename T>
-	T& getSetting(const std::string& name, T& val) const
+	[[nodiscard]] T& getSetting(const std::string& name, T& val) const
 		/// Returns required setting.
 		/// Limited to one setting at a time.
 	{
@@ -189,10 +187,13 @@ private:
 		else
 			throw InvalidArgumentException("No data returned.");
 
-		ex.execute(); ex.fetch();
+		ex.execute();
+		(void) ex.fetch();
 		MYSQL_BIND* pResult = metadata.row();
 		return getValue<T>(pResult, val);
 	}
+
+	void setName();
 
 	std::string           _connector;
 	mutable SessionHandle _handle;
@@ -288,7 +289,7 @@ inline std::string& SessionImpl::getValue(MYSQL_BIND* pResult, std::string& val)
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_SessionImpl_INCLUDED

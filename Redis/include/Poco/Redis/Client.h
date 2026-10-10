@@ -24,10 +24,13 @@
 #include "Poco/Redis/RedisStream.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Timespan.h"
+#include "Poco/AsyncNotificationCenter.h"
+#include <memory>
+#include <atomic>
+#include <mutex>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API Client
@@ -69,9 +72,14 @@ class Redis_API Client
 	///
 	///     Command command("LLEN");
 	///     command << "list";
+	///
+	/// Redis client owns a lazily-created AsyncNotificationCenter that can be used to
+	/// register for connect, disconnect, and error notifications. Use this to monitor
+	/// the state of the client.
 {
 public:
 	using Ptr = SharedPtr<Client>;
+	using NotificationCenterPtr = std::shared_ptr<AsyncNotificationCenter>;
 
 	Client();
 		/// Creates an unconnected Client.
@@ -95,7 +103,7 @@ public:
 	virtual ~Client();
 		/// Destroys the Client.
 
-	Net::SocketAddress address() const;
+	[[nodiscard]] Net::SocketAddress address() const;
 		/// Returns the address of the Redis connection.
 
 	void connect(const std::string& hostAndPort);
@@ -126,10 +134,10 @@ public:
 	void disconnect();
 		/// Disconnects from the Redis server.
 
-	bool isConnected() const;
+	[[nodiscard]] bool isConnected() const;
 		/// Returns true iff the Client is connected to a Redis server.
 
-	template<typename T>
+	template <typename T>
 	T execute(const Array& command)
 		/// Sends the Redis Command to the server. It gets the reply
 		/// and tries to convert it to the given template type.
@@ -160,7 +168,7 @@ public:
 	RedisType::Ptr readReply();
 		/// Read a reply from the Redis server.
 
-	template<typename T>
+	template <typename T>
 	void readReply(T& result)
 		/// Read a reply from the Redis server and tries to convert that reply
 		/// to the template type. When the reply is a Redis error, it will
@@ -170,14 +178,16 @@ public:
 		RedisType::Ptr redisResult = readReply();
 		if (redisResult->type() == RedisTypeTraits<Error>::TypeId)
 		{
-			Type<Error>* error = dynamic_cast<Type<Error>*>(redisResult.get());
+			// TypeId check guarantees runtime type; static_cast avoids
+			// hidden-visibility RTTI mismatch across DSOs on macOS.
+			const auto* error = static_cast<const Type<Error>*>(redisResult.get());
 			throw RedisException(error->value().getMessage());
 		}
 
 		if (redisResult->type() == RedisTypeTraits<T>::TypeId)
 		{
-			Type<T>* type = dynamic_cast<Type<T>*>(redisResult.get());
-			if (type != NULL) result = type->value();
+			const auto* type = static_cast<const Type<T>*>(redisResult.get());
+			result = type->value();
 		}
 		else throw BadCastException();
 	}
@@ -188,6 +198,9 @@ public:
 
 	void setReceiveTimeout(const Timespan& timeout);
 		/// Sets a receive timeout.
+
+	[[nodiscard]] NotificationCenterPtr notificationCenter();
+		/// Returns the notification center for this client.
 
 private:
 	Client(const Client&);
@@ -205,10 +218,24 @@ private:
 		/// call readReply as many times as you called writeCommand, even when
 		/// an error occurred on a command.
 
+	NotificationCenterPtr loadNC() const;
+		/// Thread-safe load of the notification center pointer.
+
+	void storeNC(NotificationCenterPtr pNC);
+		/// Thread-safe store of the notification center pointer.
+
 	Net::SocketAddress _address;
 	Net::StreamSocket _socket;
-	RedisInputStream* _input;
-	RedisOutputStream* _output;
+	std::unique_ptr<RedisInputStream> _pInput{};
+	std::unique_ptr<RedisOutputStream> _pOutput{};
+
+#if POCO_HAVE_ATOMIC_SHARED_PTR
+	std::atomic<NotificationCenterPtr> _pNC{};
+#else
+	NotificationCenterPtr _pNC;
+	mutable std::mutex _ncMutex;
+#endif
+	mutable std::once_flag _ncInitFlag{};
 };
 
 
@@ -232,8 +259,8 @@ void Client::execute<void>(const Array& command)
 
 inline void Client::flush()
 {
-	poco_assert(_output);
-	_output->flush();
+	poco_assert(_pOutput);
+	_pOutput->flush();
 }
 
 
@@ -243,7 +270,7 @@ inline void Client::setReceiveTimeout(const Timespan& timeout)
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_Client_INCLUDED

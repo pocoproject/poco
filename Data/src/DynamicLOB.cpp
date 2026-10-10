@@ -20,8 +20,7 @@
 #include "Poco/Dynamic/Var.h"
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 using Poco::Data::CLOB;
@@ -67,7 +66,7 @@ Var::operator BLOB () const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Dynamic
 
 
 #endif // __GNUC__
