@@ -797,6 +797,12 @@ void LoggerTest::testGetDuringDestructionOfDetached()
 	logger.setChannel(new LastWordsChannel(pSetChannelBystander));
 	Logger::setChannel("TestLogger.DestructionOfDetached", nullptr);
 	assertTrue (pSetChannelBystander->couldLog());
+
+	auto pDestroyBystander = std::make_shared<Bystander>(getOne);
+	Logger& loggerToDestroy = Logger::get("TestLogger.DestructionOnDestroy");
+	loggerToDestroy.setChannel(new LastWordsChannel(pDestroyBystander));
+	Logger::destroy("TestLogger.DestructionOnDestroy");
+	assertTrue (pDestroyBystander->couldLog());
 }
 
 
