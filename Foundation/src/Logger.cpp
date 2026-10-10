@@ -428,12 +428,19 @@ Logger::Ptr Logger::find(const std::string& name)
 
 void Logger::destroy(const std::string& name)
 {
-	Mutex::ScopedLock lock(_mapMtx);
-
-	if (_pLoggerMap)
+	Logger::Ptr pLogger;
 	{
-		LoggerMap::iterator it = _pLoggerMap->find(name);
-		if (it != _pLoggerMap->end()) _pLoggerMap->erase(it);
+		Mutex::ScopedLock lock(_mapMtx);
+
+		if (_pLoggerMap)
+		{
+			LoggerMap::iterator it = _pLoggerMap->find(name);
+			if (it != _pLoggerMap->end())
+			{
+				pLogger = it->second;
+				_pLoggerMap->erase(it);
+			}
+		}
 	}
 }
 
