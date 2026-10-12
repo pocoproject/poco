@@ -326,6 +326,9 @@ private:
 	Context::Ptr _pContext;
 	bool _needHandshake;
 	bool _ticketPending;
+	bool _pendingWrite;
+		/// A TLS record of an unfinished SSL_write() is unsent. A close_notify
+		/// alert cannot reach the peer before that record.
 	std::string _peerHostName;
 	bool _tunneled;
 	Session::Ptr _pSession;
