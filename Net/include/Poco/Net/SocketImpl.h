@@ -323,14 +323,20 @@ public:
 		/// without causing the socket to block.
 
 	[[nodiscard]] virtual bool poll(const Poco::Timespan& timeout, int mode);
-		/// Determines the status of the socket, using a
-		/// call to select().
+		/// Determines the status of the socket, using poll() where the
+		/// platform provides it, epoll_wait() of wepoll on Windows, or
+		/// select() otherwise.
 		///
 		/// The mode argument is constructed by combining the values
 		/// of the SelectMode enumeration.
 		///
+		/// A negative timeout waits without limit, also when a signal
+		/// interrupts the wait.
+		///
 		/// Returns true if the next operation corresponding to
 		/// mode will not block, false otherwise.
+		///
+		/// Throws an IOException if the socket descriptor is not open.
 
 	[[nodiscard]] Type type();
 		/// Returns the socket type.

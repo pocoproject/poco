@@ -20,19 +20,15 @@
 #include "Poco/FileStream.h"
 #include "Poco/Error.h"
 #include <algorithm>
+#include <limits>
 #include <optional>
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
-#if defined(POCO_HAVE_FD_EPOLL)
-	#ifdef POCO_OS_FAMILY_WINDOWS
-		#include "wepoll.h"
-		#include "mswsock.h"
-	#else
-		#include <sys/epoll.h>
-		#include <sys/eventfd.h>
-	#endif
-#elif defined(POCO_HAVE_FD_POLL)
+#if defined(POCO_HAVE_FD_EPOLL) && defined(POCO_OS_FAMILY_WINDOWS)
+	#include "wepoll.h"
+	#include "mswsock.h"
+#elif defined(POCO_HAVE_FD_EPOLL) || defined(POCO_HAVE_FD_POLL)
 	#ifndef _WIN32
 		#include <poll.h>
 	#endif
@@ -954,18 +950,10 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	poco_socket_t sockfd = _sockfd;
 	if (sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
-#if defined(POCO_HAVE_FD_EPOLL)
-#ifdef WEPOLL_H_
+#if defined(POCO_HAVE_FD_EPOLL) && defined(POCO_OS_FAMILY_WINDOWS)
 	HANDLE epollfd = epoll_create(1);
-#else
-	int epollfd = epoll_create1(EPOLL_CLOEXEC);
-#endif
 
-#ifdef WEPOLL_H_
 	if (!epollfd)
-#else
-	if (epollfd < 0)
-#endif
 	{
 		error("Can't create epoll queue");
 	}
@@ -994,7 +982,9 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		memset(&evout, 0, sizeof(evout));
 
 		Poco::Timestamp start;
-		rc = epoll_wait(epollfd, &evout, 1, static_cast<int>(remainingTime.totalMilliseconds()));
+		// A negative timeout is passed as -1, which epoll_wait() takes as no timeout.
+		const int milliseconds = (remainingTime < 0) ? -1 : static_cast<int>(std::min<Poco::Int64>(remainingTime.totalMilliseconds(), std::numeric_limits<int>::max()));
+		rc = epoll_wait(epollfd, &evout, 1, milliseconds);
 		if (rc < 0 && lastError() == POCO_EINTR)
 		{
 			Poco::Timestamp end;
@@ -1011,12 +1001,14 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	if (rc < 0) error();
 	return rc > 0;
 
-#elif defined(POCO_HAVE_FD_POLL)
+#elif defined(POCO_HAVE_FD_EPOLL) || defined(POCO_HAVE_FD_POLL)
 
+	// On Linux, poll() needs no additional descriptor, unlike epoll,
+	// so it also works when the process has no free descriptor left.
 	pollfd pollBuf;
 
 	memset(&pollBuf, 0, sizeof(pollfd));
-	pollBuf.fd = _sockfd;
+	pollBuf.fd = sockfd;
 	if (mode & SELECT_READ) pollBuf.events |= POLLIN;
 	if (mode & SELECT_WRITE) pollBuf.events |= POLLOUT;
 
@@ -1024,13 +1016,15 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	int rc;
 	do
 	{
+		// A negative timeout is passed as -1, which poll() and WSAPoll() take as no timeout.
+		const int milliseconds = (remainingTime < 0) ? -1 : static_cast<int>(std::min<Poco::Int64>(remainingTime.totalMilliseconds(), std::numeric_limits<int>::max()));
 		Poco::Timestamp start;
 #ifdef _WIN32
-		rc = WSAPoll(&pollBuf, 1, static_cast<INT>(remainingTime.totalMilliseconds()));
+		rc = WSAPoll(&pollBuf, 1, milliseconds);
 #else
-		rc = ::poll(&pollBuf, 1, remainingTime.totalMilliseconds());
+		rc = ::poll(&pollBuf, 1, milliseconds);
 #endif
-		if (rc < 0 && lastError() == POCO_EINTR)
+		if (rc < 0 && lastError() == POCO_EINTR && remainingTime > 0)
 		{
 			Poco::Timestamp end;
 			Poco::Timespan waited = end - start;
@@ -1042,6 +1036,15 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
 	if (rc < 0) error();
+	// A descriptor that is not open is reported as an event, not as a failure of the call.
+	if (rc > 0 && (pollBuf.revents & POLLNVAL) != 0)
+	{
+#ifdef _WIN32
+		error(POCO_ENOTSOCK);
+#else
+		error(EBADF);
+#endif
+	}
 	return rc > 0;
 
 #else
@@ -1073,8 +1076,9 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		tv.tv_sec  = (long) remainingTime.totalSeconds();
 		tv.tv_usec = (long) remainingTime.useconds();
 		Poco::Timestamp start;
-		rc = ::select(int(sockfd) + 1, &fdRead, &fdWrite, &fdExcept, &tv);
-		if (rc < 0 && (errorCode = lastError()) == POCO_EINTR)
+		// A negative timeout is passed as a null pointer, which select() takes as no timeout.
+		rc = ::select(int(sockfd) + 1, &fdRead, &fdWrite, &fdExcept, remainingTime < 0 ? nullptr : &tv);
+		if (rc < 0 && (errorCode = lastError()) == POCO_EINTR && remainingTime > 0)
 		{
 			Poco::Timestamp end;
 			Poco::Timespan waited = end - start;
