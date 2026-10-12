@@ -88,6 +88,23 @@ namespace {
 namespace Poco::Net {
 
 
+#if !defined(POCO_HAVE_ACCEPT4)
+namespace
+{
+	[[nodiscard]] bool setCloseOnExec(poco_socket_t sockfd)
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		return SetHandleInformation(reinterpret_cast<HANDLE>(sockfd), HANDLE_FLAG_INHERIT, 0) != 0;
+#elif defined(FD_CLOEXEC)
+		return ::fcntl(sockfd, F_SETFD, FD_CLOEXEC) != -1;
+#else
+		return true;
+#endif
+	}
+}
+#endif // !POCO_HAVE_ACCEPT4
+
+
 bool checkIsBrokenTimeout()
 {
 #if defined(POCO_BROKEN_TIMEOUTS)
@@ -136,11 +153,23 @@ SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 	poco_socket_t sd;
 	do
 	{
+#if defined(POCO_HAVE_ACCEPT4)
+		sd = ::accept4(_sockfd, pSA, &saLen, SOCK_CLOEXEC);
+#else
 		sd = ::accept(_sockfd, pSA, &saLen);
+#endif
 	}
 	while (sd == POCO_INVALID_SOCKET && lastError() == POCO_EINTR);
 	if (sd != POCO_INVALID_SOCKET)
 	{
+#if !defined(POCO_HAVE_ACCEPT4)
+		if (!setCloseOnExec(sd))
+		{
+			int err = lastError();
+			poco_closesocket(sd);
+			error(err);
+		}
+#endif
 		clientAddr = SocketAddress(pSA, saLen);
 		return new StreamSocketImpl(sd);
 	}
@@ -745,7 +774,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 #ifdef WEPOLL_H_
 	HANDLE epollfd = epoll_create(1);
 #else
-	int epollfd = epoll_create(1);
+	int epollfd = epoll_create1(EPOLL_CLOEXEC);
 #endif
 
 #ifdef WEPOLL_H_
@@ -1308,9 +1337,25 @@ void SocketImpl::initSocket(int af, int type, int proto)
 {
 	poco_assert (_sockfd == POCO_INVALID_SOCKET);
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	_sockfd = ::WSASocketW(af, type, proto, nullptr, 0, WSA_FLAG_OVERLAPPED | WSA_FLAG_NO_HANDLE_INHERIT);
+#elif defined(SOCK_CLOEXEC)
+	_sockfd = ::socket(af, type | SOCK_CLOEXEC, proto);
+#else
 	_sockfd = ::socket(af, type, proto);
+#endif
 	if (_sockfd == POCO_INVALID_SOCKET)
 		error();
+
+#if !defined(POCO_OS_FAMILY_WINDOWS) && !defined(SOCK_CLOEXEC)
+	if (!setCloseOnExec(_sockfd))
+	{
+		int err = lastError();
+		poco_closesocket(_sockfd);
+		_sockfd = POCO_INVALID_SOCKET;
+		error(err);
+	}
+#endif
 
 #if defined(__MACH__) && defined(__APPLE__) || defined(__FreeBSD__)
 	// SIGPIPE sends a signal that if unhandled (which is the default)
