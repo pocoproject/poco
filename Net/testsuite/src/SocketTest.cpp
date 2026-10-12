@@ -1159,6 +1159,60 @@ void SocketTest::testSendFileRange()
 }
 
 
+void SocketTest::testSendFileTruncated()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	assertTrue (server.poll(Timespan(5, 0), Socket::SELECT_READ));
+	StreamSocket peer = server.acceptConnection();
+	peer.setReceiveTimeout(Timespan(5, 0));
+
+	const std::string fileData(8000, 'x');
+	const std::string remainingData = fileData.substr(0, 3000);
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	ostr.write(fileData.data(), fileData.size());
+	ostr.close();
+
+	Poco::FileInputStream istr(file.path());
+	const auto count = static_cast<std::streamsize>(istr.size());
+	file.setSize(remainingData.size());
+
+	std::streamsize sent = -1;
+	Poco::Event done;
+	Poco::Thread sender;
+	sender.startFunc([&ss, &istr, &sent, &done, count]
+	{
+		try
+		{
+			sent = ss.sendFile(istr, 0, count);
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		done.set();
+	});
+	const bool returned = done.tryWait(5000);
+	// ends a send that does not return
+	if (!returned) ss.close();
+	sender.join();
+	assertTrue (returned);
+	assertTrue (sent == static_cast<std::streamsize>(remainingData.size()));
+
+	ss.shutdownSend();
+	std::string receivedData;
+	char buffer[1024];
+	int n = peer.receiveBytes(buffer, sizeof(buffer));
+	while (n > 0)
+	{
+		receivedData.append(buffer, n);
+		n = peer.receiveBytes(buffer, sizeof(buffer));
+	}
+	assertTrue (receivedData == remainingData);
+}
+
+
 void SocketTest::testCloseOnExec()
 {
 	ServerSocket server(SocketAddress("127.0.0.1", 0));
@@ -1681,6 +1735,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSendFile);
 	CppUnit_addTest(pSuite, SocketTest, testSendFileLarge);
 	CppUnit_addTest(pSuite, SocketTest, testSendFileRange);
+	CppUnit_addTest(pSuite, SocketTest, testSendFileTruncated);
 	CppUnit_addTest(pSuite, SocketTest, testCloseOnExec);
 	CppUnit_addTest(pSuite, SocketTest, testReceiveNonBlockingIgnoresTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testPollNegativeTimeoutBelowOneMillisecond);

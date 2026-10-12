@@ -135,6 +135,19 @@ namespace
 			response.sendFile(fileName, "text/plain");
 		}
 	};
+
+	class EmptyFileRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			Poco::Path testFilePath = Poco::Path::temp().append("test.http.server.sendfile.empty.txt");
+			const std::string fileName = testFilePath.toString();
+			FileOutputStream fout(fileName);
+			fout.close();
+			response.sendFile(fileName, "text/plain");
+		}
+	};
 	
 	class TrailerRequestHandler: public HTTPRequestHandler
 	{
@@ -170,6 +183,8 @@ namespace
 				return new TrailerRequestHandler;
 			else if (request.getURI() == "/file")
 				return new FileRequestHandler;
+			else if (request.getURI() == "/emptyFile")
+				return new EmptyFileRequestHandler;
 			else
 				return nullptr;
 		}
@@ -543,6 +558,68 @@ void HTTPServerTest::testFile()
 }
 
 
+void HTTPServerTest::testFileKeepAlive()
+{
+	std::string payload(sendFileSize, 'x');
+
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(true);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
+	cs.setKeepAlive(true);
+	for (int i = 0; i < 2; ++i)
+	{
+		HTTPRequest request("GET", "/file", HTTPMessage::HTTP_1_1);
+		cs.sendRequest(request);
+		HTTPResponse response;
+		std::string rbody;
+		cs.receiveResponse(response) >> rbody;
+		assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+		assertTrue (response.getContentLength() == sendFileSize);
+		assertTrue (response.getKeepAlive());
+		assertTrue (rbody == payload);
+	}
+}
+
+
+void HTTPServerTest::testEmptyFileKeepAlive()
+{
+	std::string payload(sendFileSize, 'x');
+
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(true);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
+	cs.setKeepAlive(true);
+	HTTPRequest request("GET", "/emptyFile", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	HTTPResponse response;
+	std::string rbody;
+	cs.receiveResponse(response) >> rbody;
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	assertTrue (response.getContentLength() == 0);
+	assertTrue (response.getKeepAlive());
+	assertTrue (rbody.empty());
+	const Poco::Net::SocketAddress clientAddress = cs.socket().address();
+
+	// the connection still carries the next request
+	HTTPRequest fileRequest("GET", "/file", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(fileRequest);
+	HTTPResponse fileResponse;
+	std::string fileBody;
+	cs.receiveResponse(fileResponse) >> fileBody;
+	assertTrue (fileResponse.getStatus() == HTTPResponse::HTTP_OK);
+	assertTrue (fileBody == payload);
+	assertTrue (cs.socket().address() == clientAddress);
+}
+
+
 void HTTPServerTest::testChunkedTrailer()
 {
 	ServerSocket svs(0);
@@ -654,6 +731,8 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testNotImpl);
 	CppUnit_addTest(pSuite, HTTPServerTest, testBuffer);
 	CppUnit_addTest(pSuite, HTTPServerTest, testFile);
+	CppUnit_addTest(pSuite, HTTPServerTest, testFileKeepAlive);
+	CppUnit_addTest(pSuite, HTTPServerTest, testEmptyFileKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedTrailer);
 
 	return pSuite;

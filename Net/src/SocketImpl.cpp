@@ -1758,7 +1758,10 @@ void SocketImpl::error(int code, const std::string& arg)
 std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std::streamoff offset, std::streamsize count)
 {
 	FileIOS::NativeHandle fd = fileInputStream.nativeHandle();
-	if (count == 0) count = fileInputStream.size() - offset;
+	// TransmitFile() refuses a count beyond the end of the file, and takes 0 as the whole file.
+	const std::streamsize available = static_cast<std::streamsize>(fileInputStream.size()) - offset;
+	if (count == 0 || count > available) count = available;
+	if (count <= 0) return 0;
 	LARGE_INTEGER offsetHelper;
 	offsetHelper.QuadPart = offset;
 	OVERLAPPED overlapped;
@@ -1782,8 +1785,14 @@ std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std
 		}
 		WaitForSingleObject(overlapped.hEvent, INFINITE);
 	}
+	// an asynchronous transfer can fail after it has started
+	DWORD transferred = 0;
+	DWORD flags = 0;
+	const bool completed = WSAGetOverlappedResult(_sockfd, &overlapped, &transferred, FALSE, &flags) != FALSE;
+	int err = completed ? 0 : WSAGetLastError();
 	CloseHandle(overlapped.hEvent);
-	return count;
+	if (!completed) error(err);
+	return static_cast<std::streamsize>(transferred);
 }
 
 
@@ -1841,11 +1850,16 @@ std::streamsize SocketImpl::sendFileNative(FileInputStream& fileInputStream, std
 	while (count > 0)
 	{
 		std::streamoff rc = sendFileUnix(_sockfd, fd, offset, count);
-		if (rc >= 0)
+		if (rc > 0)
 		{
 			sent += rc;
 			offset += rc;
 			count -= rc;
+		}
+		else if (rc == 0)
+		{
+			// the file is shorter than requested or was truncated
+			break;
 		}
 		else
 		{

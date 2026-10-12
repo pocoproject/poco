@@ -57,6 +57,7 @@ public:
 	void testSendFile();
 	void testSendFileLarge();
 	void testSendFileRange();
+	void testSendFileTruncated();
 	void testCloseOnExec();
 	void testReceiveNonBlockingIgnoresTimeout();
 	void testPollNegativeTimeoutBelowOneMillisecond();
