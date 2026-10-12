@@ -542,10 +542,12 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	{
 		clearSSLErrors();
 		rc = ::SSL_write(_pSSL, buffer, length);
-		if (!mustRetry(rc))
+		bool interrupted = false;
+		if (!mustRetry(rc, interrupted))
 			break;
 
-		if (tsStart.isElapsed(sendTimeout.totalMicroseconds()))
+		// a signal does not end a send that has no timeout
+		if (!(interrupted && sendTimeout == 0) && tsStart.isElapsed(sendTimeout.totalMicroseconds()))
 		{
 			_pendingWrite = true;
 			throw Poco::TimeoutException();
@@ -581,7 +583,8 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	// the socket becomes invalid (e.g. closed by the OS during app
 	// backgrounding on mobile platforms). See GH #3557.
 	// With default (unset) receive timeout, isElapsed(0) returns
-	// true immediately, breaking the loop on the first failed retry.
+	// true immediately, breaking the loop on the first failed retry,
+	// unless a signal interrupted the read.
 	const auto recvTimeout = _pSocket->getReceiveTimeout();
 	Poco::Timestamp tsStart;
 	while (true)
@@ -595,10 +598,11 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		{
 			rc = SSL_read(_pSSL, buffer, length);
 		}
-		if (!mustRetry(rc))
+		bool interrupted = false;
+		if (!mustRetry(rc, interrupted))
 			break;
 
-		if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
+		if (!(interrupted && recvTimeout == 0) && tsStart.isElapsed(recvTimeout.totalMicroseconds()))
 			throw Poco::TimeoutException();
 	};
 	if (rc <= 0)
@@ -665,13 +669,15 @@ int SecureSocketImpl::handshakeWithDeadline(const Poco::Timespan& timeout)
 			// left there by unrelated code would turn a retry condition into a fatal error.
 			clearSSLErrors();
 			rc = ::SSL_do_handshake(_pSSL);
-			if (!mustRetry(rc))
+			bool interrupted = false;
+			if (!mustRetry(rc, interrupted))
 				break;
 
 			// Without a timeout the first failed retry ends the handshake,
 			// so that a socket that has become invalid cannot keep the
-			// loop going (GH #3557).
-			if (tsStart.isElapsed(timeout.totalMicroseconds()))
+			// loop going (GH #3557). A retry after a signal is not such
+			// a failure.
+			if (!(interrupted && timeout == 0) && tsStart.isElapsed(timeout.totalMicroseconds()))
 				throw Poco::TimeoutException();
 		};
 		return rc;
@@ -690,13 +696,14 @@ int SecureSocketImpl::handshakeWithDeadline(const Poco::Timespan& timeout)
 			if (rc > 0)
 				break;
 
+			bool interrupted = false;
 			int mode = 0;
 			const int sslError = ::SSL_get_error(_pSSL, rc);
 			if (sslError == SSL_ERROR_WANT_READ)
 				mode = Poco::Net::Socket::SELECT_READ;
 			else if (sslError == SSL_ERROR_WANT_WRITE)
 				mode = Poco::Net::Socket::SELECT_WRITE;
-			else if (!mustRetry(rc))
+			else if (!mustRetry(rc, interrupted))
 				break;
 
 			const Poco::Timespan remaining = timeout - tsStart.elapsed();
@@ -827,8 +834,9 @@ X509* SecureSocketImpl::peerCertificate() const
 }
 
 
-bool SecureSocketImpl::mustRetry(int rc)
+bool SecureSocketImpl::mustRetry(int rc, bool& interrupted)
 {
+	interrupted = false;
 	if (rc <= 0)
 	{
 		static const Poco::Timespan pollTimeout(0, 100000);
@@ -840,6 +848,7 @@ bool SecureSocketImpl::mustRetry(int rc)
 		case SSL_ERROR_WANT_READ:
 			if (_pSocket->getBlocking())
 			{
+				interrupted = socketError == POCO_EINTR;
 				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
 				return true;
 			}
@@ -847,6 +856,7 @@ bool SecureSocketImpl::mustRetry(int rc)
 		case SSL_ERROR_WANT_WRITE:
 			if (_pSocket->getBlocking())
 			{
+				interrupted = socketError == POCO_EINTR;
 				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
 				return true;
 			}

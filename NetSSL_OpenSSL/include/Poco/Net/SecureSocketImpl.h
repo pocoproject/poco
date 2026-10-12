@@ -301,7 +301,7 @@ protected:
 		/// (in any letter case) or a loopback IP address literal.
 		/// The name is not resolved.
 
-	[[nodiscard]] bool mustRetry(int rc);
+	[[nodiscard]] bool mustRetry(int rc, bool& interrupted);
 		/// Returns true if the last operation should be retried,
 		/// otherwise false.
 		///
@@ -311,9 +311,12 @@ protected:
 		/// In case of an SSL_ERROR_WANT_WRITE error, and if the socket is
 		/// blocking, waits for the underlying socket to become writable.
 		///
-		/// Can also throw a Poco::TimeoutException if the socket does
-		/// not become readable or writable within the sockets
-		/// receive or send timeout.
+		/// The wait is short and does not throw: the caller enforces
+		/// the receive or send timeout of the socket.
+		///
+		/// Sets interrupted to true if the retry is due to a signal that
+		/// interrupted the operation on a blocking socket, otherwise
+		/// to false.
 
 	int handleError(int rc);
 		/// Handles an SSL error by throwing an appropriate exception.

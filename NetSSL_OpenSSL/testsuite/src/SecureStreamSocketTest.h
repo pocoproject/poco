@@ -64,6 +64,10 @@ public:
 	void testShutdownAfterReceiveTimeout();
 	void testReceiveAfterCloseNotifyStaleError();
 	void testSendAfterShutdownStaleError();
+	void testReceiveInterruptedNoTimeout();
+	void testReceiveInterruptedWithTimeout();
+	void testSendInterruptedNoTimeout();
+	void testHandshakeInterruptedNoTimeout();
 
 	void setUp();
 	void tearDown();
