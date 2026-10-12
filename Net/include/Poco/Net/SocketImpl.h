@@ -22,6 +22,7 @@
 #include "Poco/Net/SocketDefs.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/Clock.h"
 #include "Poco/Timespan.h"
 #include "Poco/Buffer.h"
 #include <atomic>
@@ -590,6 +591,33 @@ protected:
 private:
 	SocketImpl(const SocketImpl&);
 	SocketImpl& operator = (const SocketImpl&);
+
+	class ShortenedTimeout;
+
+	void waitAfterInterrupt(const Poco::Clock& start, ShortenedTimeout& timeout);
+		/// Called when a signal has interrupted a blocking send,
+		/// receive or accept that was started at the given time.
+		/// Returns when the call can be repeated. Where the repeated
+		/// call can block again (a send() on a stream socket, a receive
+		/// with MSG_WAITALL), shortens the timeout of the socket to the
+		/// time that is left; the ShortenedTimeout restores it.
+		///
+		/// For accept(), called on Linux only: other systems do not
+		/// apply the receive timeout to accept().
+		///
+		/// Throws a TimeoutException if the send timeout (SELECT_WRITE)
+		/// or the receive timeout (SELECT_READ) of the socket has passed
+		/// since the start. Without this check, every repetition restarts
+		/// the timeout, and signals that arrive more often than the timeout
+		/// keep the call from ever timing out.
+		///
+		/// A system call that the operating system restarts after a
+		/// signal (SA_RESTART on macOS and BSD) does not return here,
+		/// so its timeout cannot be limited this way.
+
+	void setTimeoutOption(SelectMode mode, const Poco::Timespan& timeout);
+		/// Sets SO_RCVTIMEO (SELECT_READ) or SO_SNDTIMEO (SELECT_WRITE) on
+		/// the socket; does not change the stored timeouts.
 
 	std::atomic<poco_socket_t>  _sockfd;
 	Poco::Timespan _recvTimeout;

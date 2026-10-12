@@ -19,6 +19,8 @@
 #include "Poco/Timestamp.h"
 #include "Poco/FileStream.h"
 #include "Poco/Error.h"
+#include <algorithm>
+#include <optional>
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
@@ -105,6 +107,104 @@ namespace
 #endif // !POCO_HAVE_ACCEPT4
 
 
+class SocketImpl::ShortenedTimeout
+	/// Shortens the send or receive timeout of the socket for a system call
+	/// that is repeated after a signal, and restores it when destroyed.
+	///
+	/// A call that another thread starts in the same direction on the same
+	/// socket sees the shortened timeout. A timeout that another thread sets
+	/// in the meantime is kept. A timeout set with setOption() is not known
+	/// here: the value given to setReceiveTimeout() or setSendTimeout() is
+	/// restored.
+{
+public:
+	enum class Repeat
+		/// Whether the repeated system call can block again.
+	{
+		RETURNS,  /// The repeated call returns without blocking after the readiness poll;
+		          /// the timeout is left as it is.
+		CAN_BLOCK /// The repeated call can block again (send() on a stream socket, recv()
+		          /// with MSG_WAITALL); the timeout is shortened to the time that is left.
+	};
+
+	POCO_NODISCARD_CTOR ShortenedTimeout(SocketImpl& impl, SelectMode mode, Repeat repeat):
+		_impl(impl),
+		_mode(mode),
+		_repeat(repeat)
+	{
+	}
+
+	~ShortenedTimeout()
+	{
+		if (_shortened.has_value())
+		{
+			try
+			{
+				// A different value was set by another thread and is kept.
+				const Poco::Timespan reported = get();
+				if (reported >= _shortened.value() - ROUNDING_STEP && reported <= _shortened.value() + ROUNDING_STEP)
+					_impl.setTimeoutOption(_mode, original());
+			}
+			catch (...)
+			{
+				// the socket may have been closed in the meantime
+			}
+		}
+	}
+
+	ShortenedTimeout(const ShortenedTimeout&) = delete;
+	ShortenedTimeout(ShortenedTimeout&&) = delete;
+	ShortenedTimeout& operator = (const ShortenedTimeout&) = delete;
+	ShortenedTimeout& operator = (ShortenedTimeout&&) = delete;
+
+	[[nodiscard]] SelectMode mode() const
+		/// Returns SELECT_READ for the receive timeout and SELECT_WRITE
+		/// for the send timeout.
+	{
+		return _mode;
+	}
+
+	[[nodiscard]] Poco::Timespan original()
+		/// Returns the timeout to restore: the one given to setReceiveTimeout()
+		/// or setSendTimeout(), or the one the socket reports if that is zero.
+	{
+		if (!_original.has_value())
+		{
+			const Poco::Timespan stored = (_mode == SELECT_READ) ? _impl._recvTimeout : _impl._sndTimeout;
+			_original = (stored != 0) ? stored : get();
+		}
+		return _original.value();
+	}
+
+	void shorten(const Poco::Timespan& remaining)
+		/// Sets the given time that is left as the timeout of the socket
+		/// if the repeated call can block again.
+	{
+		// With broken timeouts there is no socket option to shorten.
+		if (_repeat == Repeat::RETURNS || _impl._isBrokenTimeout) return;
+		_original = original();
+		_impl.setTimeoutOption(_mode, remaining);
+		_shortened = remaining;
+	}
+
+private:
+	// Kernels round a timeout up to a clock tick, Windows truncates to whole milliseconds.
+	static constexpr Poco::Timespan::TimeDiff ROUNDING_STEP = 10*Poco::Timespan::MILLISECONDS;
+
+	// Qualified calls: the timeout of this socket, not that of a subclass that wraps another socket.
+	[[nodiscard]] Poco::Timespan get()
+	{
+		return (_mode == SELECT_READ) ? _impl.SocketImpl::getReceiveTimeout() : _impl.SocketImpl::getSendTimeout();
+	}
+
+	SocketImpl& _impl;
+	const SelectMode _mode;
+	const Repeat _repeat;
+	std::optional<Poco::Timespan> _original;
+	std::optional<Poco::Timespan> _shortened;
+};
+
+
 bool checkIsBrokenTimeout()
 {
 #if defined(POCO_BROKEN_TIMEOUTS)
@@ -151,6 +251,13 @@ SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 	struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(&buffer);
 	poco_socklen_t saLen = sizeof(buffer);
 	poco_socket_t sd;
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+	Poco::Clock start(0);
+	if (_blocking) start.update();
+	// The repeated accept() returns at once after the poll; on Linux, accepted sockets inherit the listener's timeout.
+	ShortenedTimeout timeout(*this, SELECT_READ, ShortenedTimeout::Repeat::RETURNS);
+#endif
+	bool interrupted;
 	do
 	{
 #if defined(POCO_HAVE_ACCEPT4)
@@ -158,8 +265,14 @@ SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 #else
 		sd = ::accept(_sockfd, pSA, &saLen);
 #endif
+		interrupted = sd == POCO_INVALID_SOCKET && lastError() == POCO_EINTR;
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+		// Only Linux applies the receive timeout of a listening socket to accept();
+		// elsewhere accept() waits without a limit.
+		if (interrupted && _blocking) waitAfterInterrupt(start, timeout);
+#endif
 	}
-	while (sd == POCO_INVALID_SOCKET && lastError() == POCO_EINTR);
+	while (interrupted);
 	if (sd != POCO_INVALID_SOCKET)
 	{
 #if !defined(POCO_HAVE_ACCEPT4)
@@ -173,7 +286,11 @@ SocketImpl* SocketImpl::acceptConnection(SocketAddress& clientAddr)
 		clientAddr = SocketAddress(pSA, saLen);
 		return new StreamSocketImpl(sd);
 	}
-	error(); // will throw
+	int err = lastError();
+	// Linux reports an expired receive timeout of a listening socket this way.
+	if (_blocking && (err == POCO_EAGAIN || err == POCO_EWOULDBLOCK))
+		throw TimeoutException(err);
+	error(err); // will throw
 	return nullptr;
 }
 
@@ -388,6 +505,23 @@ void SocketImpl::checkBrokenTimeout(SelectMode mode)
 }
 
 
+void SocketImpl::waitAfterInterrupt(const Poco::Clock& start, ShortenedTimeout& timeout)
+{
+	const Poco::Timespan original = timeout.original();
+	if (original > 0)
+	{
+		// A repeated system call starts its timeout anew, so the time already spent is subtracted.
+		const Poco::Timespan elapsed = start.elapsed();
+		// Qualified call: the readiness of this socket, not that of a subclass that wraps another socket.
+		if (elapsed >= original || !SocketImpl::poll(original - elapsed, timeout.mode()))
+			throw TimeoutException();
+		// The poll bounds only the wait for readiness; a repeated call that can block again gets the time that is left.
+		// At least one millisecond: zero means no timeout, and Windows sets whole milliseconds.
+		timeout.shorten(std::max(original - start.elapsed(), Poco::Timespan(Poco::Timespan::MILLISECONDS)));
+	}
+}
+
+
 int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	if (_blocking)
@@ -395,13 +529,19 @@ int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 		checkBrokenTimeout(SELECT_WRITE);
 	}
 	int rc;
+	Poco::Clock start(0);
+	if (_blocking) start.update();
+	ShortenedTimeout timeout(*this, SELECT_WRITE, ShortenedTimeout::Repeat::CAN_BLOCK);
+	bool interrupted;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 		// CodeQL [cpp/cleartext-transmission]: base socket layer; encryption handled by SecureSocketImpl
 		rc = ::send(_sockfd, reinterpret_cast<const char*>(buffer), length, flags);
+		interrupted = _blocking && rc < 0 && lastError() == POCO_EINTR;
+		if (interrupted) waitAfterInterrupt(start, timeout);
 	}
-	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	while (interrupted);
 	if (rc < 0)
 	{
 		int err = lastError();
@@ -423,6 +563,10 @@ int SocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
 		checkBrokenTimeout(SELECT_WRITE);
 	}
 	int rc = 0;
+	Poco::Clock start(0);
+	if (_blocking) start.update();
+	ShortenedTimeout timeout(*this, SELECT_WRITE, ShortenedTimeout::Repeat::CAN_BLOCK);
+	bool interrupted;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
@@ -436,8 +580,10 @@ int SocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
 #elif defined(POCO_OS_FAMILY_UNIX)
 		rc = writev(_sockfd, &buffers[0], static_cast<int>(buffers.size()));
 #endif
+		interrupted = _blocking && rc < 0 && lastError() == POCO_EINTR;
+		if (interrupted) waitAfterInterrupt(start, timeout);
 	}
-	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	while (interrupted);
 	if (rc < 0)
 	{
 		int err = lastError();
@@ -459,12 +605,19 @@ int SocketImpl::receiveBytes(void* buffer, int length, int flags)
 		checkBrokenTimeout(SELECT_READ);
 	}
 	int rc;
+	Poco::Clock start(0);
+	if (_blocking) start.update();
+	const ShortenedTimeout::Repeat repeat = (flags & MSG_WAITALL) != 0 ? ShortenedTimeout::Repeat::CAN_BLOCK : ShortenedTimeout::Repeat::RETURNS;
+	ShortenedTimeout timeout(*this, SELECT_READ, repeat);
+	bool interrupted;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 		rc = ::recv(_sockfd, reinterpret_cast<char*>(buffer), length, flags);
+		interrupted = _blocking && rc < 0 && lastError() == POCO_EINTR;
+		if (interrupted) waitAfterInterrupt(start, timeout);
 	}
-	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	while (interrupted);
 	if (rc < 0)
 	{
 		int err = lastError();
@@ -486,6 +639,11 @@ int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 		checkBrokenTimeout(SELECT_READ);
 	}
 	int rc = 0;
+	Poco::Clock start(0);
+	if (_blocking) start.update();
+	const ShortenedTimeout::Repeat repeat = (flags & MSG_WAITALL) != 0 ? ShortenedTimeout::Repeat::CAN_BLOCK : ShortenedTimeout::Repeat::RETURNS;
+	ShortenedTimeout timeout(*this, SELECT_READ, repeat);
+	bool interrupted;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
@@ -499,8 +657,10 @@ int SocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
 #elif defined(POCO_OS_FAMILY_UNIX)
 		rc = readv(_sockfd, &buffers[0], static_cast<int>(buffers.size()));
 #endif
+		interrupted = _blocking && rc < 0 && lastError() == POCO_EINTR;
+		if (interrupted) waitAfterInterrupt(start, timeout);
 	}
-	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	while (interrupted);
 	if (rc < 0)
 	{
 		int err = lastError();
@@ -549,6 +709,10 @@ int SocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::
 int SocketImpl::sendTo(const void* buffer, int length, const SocketAddress& address, int flags)
 {
 	int rc;
+	Poco::Clock start(0);
+	if (_blocking) start.update();
+	ShortenedTimeout timeout(*this, SELECT_WRITE, ShortenedTimeout::Repeat::RETURNS);
+	bool interrupted;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) init(address.af());
@@ -557,8 +721,10 @@ int SocketImpl::sendTo(const void* buffer, int length, const SocketAddress& addr
 #else
 		rc = ::sendto(_sockfd, reinterpret_cast<const char*>(buffer), length, flags, address.addr(), address.length());
 #endif
+		interrupted = _blocking && rc < 0 && lastError() == POCO_EINTR;
+		if (interrupted) waitAfterInterrupt(start, timeout);
 	}
-	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	while (interrupted);
 	if (rc < 0)
 	{
 		int err = lastError();
@@ -576,6 +742,10 @@ int SocketImpl::sendTo(const void* buffer, int length, const SocketAddress& addr
 int SocketImpl::sendTo(const SocketBufVec& buffers, const SocketAddress& address, int flags)
 {
 	int rc = 0;
+	Poco::Clock start(0);
+	if (_blocking) start.update();
+	ShortenedTimeout timeout(*this, SELECT_WRITE, ShortenedTimeout::Repeat::RETURNS);
+	bool interrupted;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) init(address.af());
@@ -598,8 +768,10 @@ int SocketImpl::sendTo(const SocketBufVec& buffers, const SocketAddress& address
 		msgHdr.msg_flags = flags;
 		rc = sendmsg(_sockfd, &msgHdr, flags);
 #endif
+		interrupted = _blocking && rc < 0 && lastError() == POCO_EINTR;
+		if (interrupted) waitAfterInterrupt(start, timeout);
 	}
-	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	while (interrupted);
 	if (rc < 0)
 	{
 		int err = lastError();
@@ -636,12 +808,18 @@ int SocketImpl::receiveFrom(void* buffer, int length, struct sockaddr** ppSA, po
 		checkBrokenTimeout(SELECT_READ);
 	}
 	int rc;
+	Poco::Clock start(0);
+	if (_blocking) start.update();
+	ShortenedTimeout timeout(*this, SELECT_READ, ShortenedTimeout::Repeat::RETURNS);
+	bool interrupted;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 		rc = ::recvfrom(_sockfd, reinterpret_cast<char*>(buffer), length, flags, *ppSA, *ppSALen);
+		interrupted = _blocking && rc < 0 && lastError() == POCO_EINTR;
+		if (interrupted) waitAfterInterrupt(start, timeout);
 	}
-	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	while (interrupted);
 	if (rc < 0)
 	{
 		int err = lastError();
@@ -678,6 +856,10 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_s
 		checkBrokenTimeout(SELECT_READ);
 	}
 	int rc = 0;
+	Poco::Clock start(0);
+	if (_blocking) start.update();
+	ShortenedTimeout timeout(*this, SELECT_READ, ShortenedTimeout::Repeat::RETURNS);
+	bool interrupted;
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
@@ -700,8 +882,10 @@ int SocketImpl::receiveFrom(SocketBufVec& buffers, struct sockaddr** pSA, poco_s
 		rc = recvmsg(_sockfd, &msgHdr, flags);
 		if (rc >= 0) **ppSALen = msgHdr.msg_namelen;
 #endif
+		interrupted = _blocking && rc < 0 && lastError() == POCO_EINTR;
+		if (interrupted) waitAfterInterrupt(start, timeout);
 	}
-	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
+	while (interrupted);
 	if (rc < 0)
 	{
 		int err = lastError();
@@ -946,14 +1130,8 @@ int SocketImpl::getReceiveBufferSize()
 
 void SocketImpl::setSendTimeout(const Poco::Timespan& timeout)
 {
-#if defined(_WIN32) && !defined(POCO_BROKEN_TIMEOUTS)
-	int value = (int) timeout.totalMilliseconds();
-	setOption(SOL_SOCKET, SO_SNDTIMEO, value);
-#elif !defined(POCO_BROKEN_TIMEOUTS)
-	setOption(SOL_SOCKET, SO_SNDTIMEO, timeout);
-#endif
-	if (_isBrokenTimeout)
-		_sndTimeout = timeout;
+	setTimeoutOption(SELECT_WRITE, timeout);
+	_sndTimeout = timeout;
 }
 
 
@@ -975,16 +1153,8 @@ Poco::Timespan SocketImpl::getSendTimeout()
 
 void SocketImpl::setReceiveTimeout(const Poco::Timespan& timeout)
 {
-#ifndef POCO_BROKEN_TIMEOUTS
-#if defined(_WIN32)
-	int value = (int) timeout.totalMilliseconds();
-	setOption(SOL_SOCKET, SO_RCVTIMEO, value);
-#else
-	setOption(SOL_SOCKET, SO_RCVTIMEO, timeout);
-#endif
-#endif
-	if (_isBrokenTimeout)
-		_recvTimeout = timeout;
+	setTimeoutOption(SELECT_READ, timeout);
+	_recvTimeout = timeout;
 }
 
 
@@ -1001,6 +1171,19 @@ Poco::Timespan SocketImpl::getReceiveTimeout()
 	if (_isBrokenTimeout)
 		result = _recvTimeout;
 	return result;
+}
+
+
+void SocketImpl::setTimeoutOption(SelectMode mode, const Poco::Timespan& timeout)
+{
+#ifndef POCO_BROKEN_TIMEOUTS
+	const int option = (mode == SELECT_READ) ? SO_RCVTIMEO : SO_SNDTIMEO;
+#if defined(_WIN32)
+	setOption(SOL_SOCKET, option, static_cast<int>(timeout.totalMilliseconds()));
+#else
+	setOption(SOL_SOCKET, option, timeout);
+#endif
+#endif
 }
 
 

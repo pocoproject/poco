@@ -30,7 +30,15 @@
 #include "Poco/FileStream.h"
 #include "Poco/Path.h"
 #include "Poco/Thread.h"
+#include "Poco/Event.h"
+#include "Poco/Clock.h"
+#include "Poco/Runnable.h"
 #include <iostream>
+#include <functional>
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <csignal>
+#include <pthread.h>
+#endif
 
 
 using Poco::Net::Socket;
@@ -55,6 +63,94 @@ using Poco::delegate;
 
 namespace
 {
+#if defined(POCO_OS_FAMILY_UNIX)
+	extern "C" void ignoreSignal(int)
+	{
+	}
+
+	class InterruptingSignal
+		/// Installs a handler for SIGUSR1 that does not restart an
+		/// interrupted system call, for the lifetime of the object.
+	{
+	public:
+		InterruptingSignal()
+		{
+			struct sigaction action;
+			action.sa_handler = ignoreSignal;
+			sigemptyset(&action.sa_mask);
+			action.sa_flags = 0;
+			sigaction(SIGUSR1, &action, &_previous);
+		}
+
+		~InterruptingSignal()
+		{
+			sigaction(SIGUSR1, &_previous, nullptr);
+		}
+
+	private:
+		struct sigaction _previous;
+	};
+
+	class Interrupter: public Poco::Runnable
+		/// Sends a signal to a thread every 50 milliseconds, to interrupt
+		/// its blocking system calls, until it is stopped or three seconds
+		/// have passed.
+	{
+	public:
+		explicit Interrupter(pthread_t target):
+			_target(target)
+		{
+		}
+
+		void stop()
+		{
+			_stop.set();
+		}
+
+		void run() override
+		{
+			for (int i = 0; i < 60 && !_stop.tryWait(50); i++)
+			{
+				pthread_kill(_target, SIGUSR1);
+			}
+		}
+
+	private:
+		pthread_t _target;
+		Poco::Event _stop;
+	};
+
+	bool timesOutWhileInterrupted(const std::function<void()>& blockingCall, Timespan& elapsed)
+		/// Runs the call while signals interrupt the calling thread.
+		/// Returns true if the call ended with a TimeoutException; stores
+		/// the time the call took in elapsed.
+	{
+		InterruptingSignal signal;
+		Interrupter interrupter(pthread_self());
+		Poco::Thread interrupterThread;
+		interrupterThread.start(interrupter);
+
+		bool timedOut = false;
+		Poco::Clock start;
+		try
+		{
+			blockingCall();
+		}
+		catch (TimeoutException&)
+		{
+			timedOut = true;
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		elapsed = start.elapsed();
+
+		interrupter.stop();
+		interrupterThread.join();
+		return timedOut;
+	}
+#endif
+
 	class CopyToStringConnection: public TCPServerConnection
 	{
 	public:
@@ -1002,6 +1098,246 @@ void SocketTest::testCloseOnExec()
 }
 
 
+void SocketTest::testReceiveNonBlockingIgnoresTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	ss.setReceiveTimeout(Timespan(0, 500000));
+	ss.setBlocking(false);
+
+	// a non-blocking receive does not wait for the receive timeout, nor throw a TimeoutException
+	char buffer[256];
+	const Poco::Clock start;
+	const int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n < 0);
+	assertTrue (start.elapsed() < 250000);
+}
+
+
+#if defined(POCO_OS_FAMILY_UNIX)
+void SocketTest::testReceiveInterruptedWithTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	ss.setReceiveTimeout(Timespan(0, 500000));
+
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&ss]
+		{
+			char buffer[256];
+			ss.receiveBytes(buffer, sizeof(buffer));
+		}, elapsed);
+
+	// the signals do not restart the receive timeout
+	assertTrue (timedOut);
+	assertTrue (elapsed < Timespan(2, 0));
+}
+
+
+void SocketTest::testReceiveWaitAllInterruptedKeepsTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+	ss.setReceiveTimeout(Timespan(0, 500000));
+	const Timespan configured = ss.getReceiveTimeout();
+
+	InterruptingSignal signal;
+
+	// the signal interrupts the receive, then only one of the two bytes arrives
+	const pthread_t receiver = pthread_self();
+	Poco::Thread peerThread;
+	peerThread.startFunc([&peer, receiver]
+		{
+			Poco::Thread::sleep(200);
+			pthread_kill(receiver, SIGUSR1);
+			Poco::Thread::sleep(200);
+			try
+			{
+				peer.sendBytes("x", 1);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	char buffer[2];
+	int n = -1;
+	bool timedOut = false;
+	const Poco::Clock start;
+	try
+	{
+		n = ss.receiveBytes(buffer, sizeof(buffer), MSG_WAITALL);
+	}
+	catch (TimeoutException&)
+	{
+		timedOut = true;
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	const Timespan elapsed = start.elapsed();
+	peerThread.join();
+
+	// the repeated receive waits only for the rest of the receive timeout
+	assertTrue (n == 1 || timedOut);
+	assertTrue (elapsed < Timespan(0, 750000));
+	assertTrue (ss.getReceiveTimeout() == configured);
+}
+
+
+void SocketTest::testSendInterruptedWithTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	ss.setSendTimeout(Timespan(0, 500000));
+
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&ss]
+		{
+			// the peer does not read, so a send blocks once the buffers are full
+			const Buffer<char> data(65536);
+			const Poco::Clock start;
+			while (start.elapsed() < 10000000)
+			{
+				ss.sendBytes(data.begin(), static_cast<int>(data.size()));
+			}
+		}, elapsed);
+
+	assertTrue (timedOut);
+	assertTrue (elapsed < Timespan(2, 0));
+}
+
+
+void SocketTest::testReceiveFromInterruptedWithTimeout()
+{
+	DatagramSocket ds(SocketAddress("127.0.0.1", 0), false);
+	ds.setReceiveTimeout(Timespan(0, 500000));
+
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&ds]
+		{
+			char buffer[256];
+			SocketAddress sender;
+			ds.receiveFrom(buffer, sizeof(buffer), sender);
+		}, elapsed);
+
+	assertTrue (timedOut);
+	assertTrue (elapsed < Timespan(2, 0));
+}
+
+
+void SocketTest::testAcceptInterruptedWithTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	server.setReceiveTimeout(Timespan(0, 500000));
+
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+	// Linux applies the receive timeout of the listening socket to accept()
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&server]
+		{
+			StreamSocket accepted = server.acceptConnection();
+		}, elapsed);
+
+	assertTrue (timedOut);
+	assertTrue (elapsed < Timespan(2, 0));
+
+	// without signals, the expired timeout is reported in the same way
+	const Poco::Clock start;
+	try
+	{
+		StreamSocket accepted = server.acceptConnection();
+		fail("accept must time out");
+	}
+	catch (TimeoutException&)
+	{
+	}
+	assertTrue (start.elapsed() < 2000000);
+#else
+	// accept() has no timeout here, so an interrupted accept keeps waiting:
+	// the client connects only after the receive timeout has passed
+	const SocketAddress address = server.address();
+	StreamSocket client;
+	Poco::Thread clientThread;
+	clientThread.startFunc([&client, &address]
+		{
+			Poco::Thread::sleep(1000);
+			try
+			{
+				client.connect(address);
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		});
+
+	bool accepted = false;
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&server, &accepted]
+		{
+			StreamSocket ss = server.acceptConnection();
+			accepted = true;
+		}, elapsed);
+	clientThread.join();
+
+	assertFalse (timedOut);
+	assertTrue (accepted);
+#endif
+}
+
+
+void SocketTest::testReceiveInterruptedNoTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	InterruptingSignal signal;
+
+	// the peer sends only after the receive was interrupted a number of times
+	const pthread_t receiver = pthread_self();
+	Poco::Thread peerThread;
+	peerThread.startFunc([&peer, receiver]
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				Poco::Thread::sleep(100);
+				pthread_kill(receiver, SIGUSR1);
+			}
+			try
+			{
+				peer.sendBytes("pong", 4);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	char buffer[256];
+	int n = -1;
+	try
+	{
+		n = ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	peerThread.join();
+
+	assertEqual (4, n);
+	assertEqual (std::string("pong"), std::string(buffer, n));
+}
+#endif
+
+
 void SocketTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1065,6 +1401,15 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSendFileLarge);
 	CppUnit_addTest(pSuite, SocketTest, testSendFileRange);
 	CppUnit_addTest(pSuite, SocketTest, testCloseOnExec);
+	CppUnit_addTest(pSuite, SocketTest, testReceiveNonBlockingIgnoresTimeout);
+#if defined(POCO_OS_FAMILY_UNIX)
+	CppUnit_addTest(pSuite, SocketTest, testReceiveInterruptedWithTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testReceiveWaitAllInterruptedKeepsTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testSendInterruptedWithTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testReceiveFromInterruptedWithTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testAcceptInterruptedWithTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testReceiveInterruptedNoTimeout);
+#endif
 
 	return pSuite;
 }
