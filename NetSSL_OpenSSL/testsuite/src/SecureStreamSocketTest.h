@@ -36,6 +36,8 @@ public:
 	void testStaleErrorQueue();
 	void testHandshakeTimeout();
 	void testDefaultCipherListRefusesAnonymousServer();
+	void testClientRejectsAnonymousServer();
+	void testRelaxedServerAcceptsClientWithoutCertificate();
 
 	void setUp();
 	void tearDown();

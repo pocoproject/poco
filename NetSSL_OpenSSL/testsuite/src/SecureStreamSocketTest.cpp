@@ -670,6 +670,107 @@ void SecureStreamSocketTest::testDefaultCipherListRefusesAnonymousServer()
 }
 
 
+void SecureStreamSocketTest::testClientRejectsAnonymousServer()
+{
+	ErrorQueueCleaner cleaner;
+
+	const std::string anonymousSuite("AECDH-AES256-SHA");
+
+	// a server without a certificate: it can only agree on a cipher suite without authentication
+	Context::Params serverParams;
+	serverParams.verificationMode = Context::VERIFY_NONE;
+	serverParams.cipherList = anonymousSuite;
+	Context::Ptr pServerContext = new Context(Context::TLS_SERVER_USE, serverParams);
+	SecureServerSocket svs(0, 64, pServerContext);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+	const SocketAddress address("127.0.0.1", svs.address().port());
+	const Poco::Timespan timeout(10, 0);
+
+	// the client allows the suite, so that the handshake itself succeeds
+	auto clientContext = [&anonymousSuite](Context::VerificationMode mode)
+	{
+		Context::Params params;
+		params.verificationMode = mode;
+		params.cipherList = anonymousSuite;
+		Context::Ptr pContext = new Context(Context::TLS_CLIENT_USE, params);
+		pContext->disableProtocols(Context::PROTO_TLSV1_3);
+		return pContext;
+	};
+
+	{
+		SecureStreamSocket ss(clientContext(Context::VERIFY_NONE));
+		ss.connect(address, timeout);
+		assertFalse (ss.havePeerCertificate());
+	}
+
+	try
+	{
+		SecureStreamSocket ss(clientContext(Context::VERIFY_STRICT));
+		ss.connect(address, timeout);
+		fail("strict verification, server without a certificate - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+	}
+
+	try
+	{
+		// not a loopback name: relaxed verification makes no exception for it
+		SecureStreamSocket ss(clientContext(Context::VERIFY_RELAXED));
+		ss.setPeerHostName("192.0.2.1");
+		ss.connect(address, timeout);
+		fail("relaxed verification, server without a certificate - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+	}
+
+	try
+	{
+		Context::Ptr pContext = clientContext(Context::VERIFY_RELAXED);
+		pContext->enableExtendedCertificateVerification(false);
+		SecureStreamSocket ss(pContext);
+		ss.connect(address, timeout);
+		fail("no extended verification, server without a certificate - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+	}
+}
+
+
+void SecureStreamSocketTest::testRelaxedServerAcceptsClientWithoutCertificate()
+{
+	ErrorQueueCleaner cleaner;
+
+	// the server asks for a client certificate and does not require one
+	Context::Params serverParams;
+	serverParams.privateKeyFile = Application::instance().config().getString("openSSL.server.privateKeyFile");
+	serverParams.certificateFile = serverParams.privateKeyFile;
+	serverParams.caLocation = Application::instance().config().getString("openSSL.server.caConfig");
+	serverParams.verificationMode = Context::VERIFY_RELAXED;
+	Context::Ptr pServerContext = new Context(Context::TLS_SERVER_USE, serverParams);
+	SecureServerSocket svs(0, 64, pServerContext);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	Context::Params clientParams;
+	clientParams.verificationMode = Context::VERIFY_NONE;
+	Context::Ptr pClientContext = new Context(Context::TLS_CLIENT_USE, clientParams);
+	SecureStreamSocket ss(pClientContext);
+	const Poco::Timespan timeout(10, 0);
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()), timeout);
+	ss.setReceiveTimeout(timeout);
+	const std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[256];
+	const int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -696,6 +797,8 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testStaleErrorQueue);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testDefaultCipherListRefusesAnonymousServer);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testClientRejectsAnonymousServer);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testRelaxedServerAcceptsClientWithoutCertificate);
 
 	return pSuite;
 }
