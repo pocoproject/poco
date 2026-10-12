@@ -87,7 +87,7 @@ class NetSSL_Win_API SSLManager
 	///                </options>
 	///            </privateKeyPassphraseHandler>
 	///            <invalidCertificateHandler>
-	///                 <name>ConsoleCertificateHandler</name>
+	///                 <name>RejectCertificateHandler</name>
 	///                 <options>
 	///                 </options>
 	///            </invalidCertificateHandler>
@@ -122,8 +122,11 @@ class NetSSL_Win_API SSLManager
 	///    - privateKeyPassphraseHandler.name (string): The name of the class (subclass of PrivateKeyPassphraseHandler)
 	///      used for obtaining the passphrase for accessing the private key.
 	///    - privateKeyPassphraseHandler.options.password (string): The password to be used by KeyFileHandler.
-	///    - invalidCertificateHandler.name: The name of the class (subclass of CertificateHandler)
-	///      used for confirming invalid certificates.
+	///    - invalidCertificateHandler.name: The name of the class (subclass of InvalidCertificateHandler)
+	///      used for confirming invalid certificates. Defaults to RejectCertificateHandler, which
+	///      rejects every certificate that fails verification. ConsoleCertificateHandler asks on the
+	///      console and blocks the thread performing the handshake until it gets an answer;
+	///      AcceptCertificateHandler accepts every certificate and is for testing only.
 	///    - requireTLSv1 (boolean): Require a TLSv1 connection.
 	///    - requireTLSv1_1 (boolean): Require a TLSv1.1 connection. Not supported on Windows Embedded Compact.
 	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection. Not supported on Windows Embedded Compact.
@@ -156,7 +159,7 @@ public:
 		/// the Context.
 		///
 		/// Valid initialization code would be:
-		///     SharedPtr<InvalidCertificateHandler> pInvalidCertHandler = new ConsoleCertificateHandler;
+		///     SharedPtr<InvalidCertificateHandler> pInvalidCertHandler = new RejectCertificateHandler(true);
 		///     Context::Ptr pContext = new Context(Context::SERVER_USE, "mycert");
 		///     SSLManager::instance().initializeServer(pInvalidCertHandler, pContext);
 
@@ -171,7 +174,7 @@ public:
 		/// the Context, as during creation of the Context the passphrase for the private key might be needed.
 		///
 		/// Valid initialization code would be:
-		///     SharedPtr<InvalidCertificateHandler> pInvalidCertHandler = new ConsoleCertificateHandler;
+		///     SharedPtr<InvalidCertificateHandler> pInvalidCertHandler = new RejectCertificateHandler(false);
 		///     Context::Ptr pContext = new Context(Context::CLIENT_USE, "");
 		///     SSLManager::instance().initializeClient(pInvalidCertHandler, pContext);
 
