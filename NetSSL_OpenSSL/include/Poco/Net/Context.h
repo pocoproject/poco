@@ -135,6 +135,12 @@ public:
 		SECURITY_LEVEL_256_BITS = 5
 	};
 
+	static constexpr const char* DEFAULT_CIPHER_LIST = "ALL:!aNULL:!LOW:!EXP:!MD5:!3DES:!IDEA:@STRENGTH";
+		/// The default cipher list excludes the cipher suites without
+		/// authentication (anonymous DH and ECDH), which accept a server
+		/// without a certificate, and those using 3DES or IDEA. It applies
+		/// only to TLS 1.2 and earlier.
+
 	enum KeyDHGroup
 	{
 		// MODP
@@ -189,7 +195,7 @@ public:
 
 		std::string cipherList;
 			/// Specifies the supported ciphers in OpenSSL notation.
-			/// Defaults to "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH".
+			/// Defaults to DEFAULT_CIPHER_LIST.
 			/// Note: The cipher list only applies for TLS 1.2 and 
 			/// earlier versions. To configure TLS 1.3 cipher suites, 
 			/// please use the cipherSuites member variable.
@@ -260,7 +266,7 @@ public:
 		VerificationMode verificationMode = VERIFY_RELAXED,
 		int verificationDepth = 9,
 		bool loadDefaultCAs = false,
-		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		const std::string& cipherList = DEFAULT_CIPHER_LIST);
 		/// Creates a Context.
 		///
 		///   * usage specifies whether the context is used by a client or server.
@@ -288,7 +294,7 @@ public:
 		VerificationMode verificationMode = VERIFY_RELAXED,
 		int verificationDepth = 9,
 		bool loadDefaultCAs = false,
-		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		const std::string& cipherList = DEFAULT_CIPHER_LIST);
 		/// Creates a Context.
 		///
 		///   * usage specifies whether the context is used by a client or server.

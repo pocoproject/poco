@@ -45,7 +45,7 @@ Context::Params::Params(KeyDHGroup dhBits):
 	verificationDepth(9),
 	loadDefaultCAs(false),
 	ocspStaplingVerification(false),
-	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
+	cipherList(DEFAULT_CIPHER_LIST),
 	dhGroup(dhBits),
 	securityLevel(SECURITY_LEVEL_NONE)
 {

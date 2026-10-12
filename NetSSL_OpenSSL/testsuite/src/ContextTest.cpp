@@ -91,6 +91,35 @@ void ContextTest::testCipherListWithoutMatch()
 }
 
 
+void ContextTest::testDefaultCipherListExcludesWeak()
+{
+	// level 0 is the default: it is the cipher list alone that keeps these suites out
+	const Context::Params params;
+	assertTrue (params.securityLevel == Context::SECURITY_LEVEL_NONE);
+
+	const Context::Ptr contexts[] =
+	{
+		new Context(Context::TLS_CLIENT_USE, params),
+		new Context(Context::TLS_CLIENT_USE, ""),
+		new Context(Context::TLS_CLIENT_USE, "", "", "")
+	};
+	for (const auto& pContext: contexts)
+	{
+		const STACK_OF(SSL_CIPHER)* pCiphers = SSL_CTX_get_ciphers(pContext->sslContext());
+		assertTrue (pCiphers != nullptr);
+		const int count = sk_SSL_CIPHER_num(pCiphers);
+		assertTrue (count > 0);
+		for (int i = 0; i < count; ++i)
+		{
+			const SSL_CIPHER* pCipher = sk_SSL_CIPHER_value(pCiphers, i);
+			assertTrue (SSL_CIPHER_get_auth_nid(pCipher) != NID_auth_null);
+			assertTrue (SSL_CIPHER_get_cipher_nid(pCipher) != NID_des_ede3_cbc);
+			assertTrue (SSL_CIPHER_get_cipher_nid(pCipher) != NID_idea_cbc);
+		}
+	}
+}
+
+
 void ContextTest::testInvalidCipherSuites()
 {
 	Context::Params params;
@@ -271,6 +300,7 @@ CppUnit::Test* ContextTest::suite()
 	CppUnit_addTest(pSuite, ContextTest, testValidCipherConfiguration);
 	CppUnit_addTest(pSuite, ContextTest, testInvalidCipherList);
 	CppUnit_addTest(pSuite, ContextTest, testCipherListWithoutMatch);
+	CppUnit_addTest(pSuite, ContextTest, testDefaultCipherListExcludesWeak);
 	CppUnit_addTest(pSuite, ContextTest, testInvalidCipherSuites);
 	CppUnit_addTest(pSuite, ContextTest, testInvalidECDHGroups);
 	CppUnit_addTest(pSuite, ContextTest, testDHParametersRejectedBySecurityLevel);

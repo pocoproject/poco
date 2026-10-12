@@ -35,6 +35,7 @@ public:
 	void testPeerHostNameTooLong();
 	void testStaleErrorQueue();
 	void testHandshakeTimeout();
+	void testDefaultCipherListRefusesAnonymousServer();
 
 	void setUp();
 	void tearDown();

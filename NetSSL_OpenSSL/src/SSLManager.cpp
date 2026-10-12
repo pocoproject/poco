@@ -45,7 +45,7 @@ const std::string SSLManager::CFG_VER_DEPTH("verificationDepth");
 const std::string SSLManager::CFG_ENABLE_DEFAULT_CA("loadDefaultCAFile");
 const std::string SSLManager::CFG_CIPHER_LIST("cipherList");
 const std::string SSLManager::CFG_CYPHER_LIST("cypherList");
-const std::string SSLManager::VAL_CIPHER_LIST("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+const std::string SSLManager::VAL_CIPHER_LIST(Context::DEFAULT_CIPHER_LIST);
 const std::string SSLManager::CFG_PREFER_SERVER_CIPHERS("preferServerCiphers");
 const std::string SSLManager::CFG_DELEGATE_HANDLER("privateKeyPassphraseHandler.name");
 const std::string SSLManager::VAL_DELEGATE_HANDLER("KeyConsoleHandler");
