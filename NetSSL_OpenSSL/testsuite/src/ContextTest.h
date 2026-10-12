@@ -41,6 +41,7 @@ public:
 	void testAddChainCertificateWithoutX509();
 	void testClientContextIgnoresDHParameters();
 	void testVerifyErrorWithoutCertificate();
+	void testDefaultCertificateHandler();
 
 	void setUp();
 	void tearDown();

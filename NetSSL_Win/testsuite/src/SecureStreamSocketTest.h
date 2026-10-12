@@ -29,6 +29,7 @@ public:
 	void testNB();
 	void testHandshakeTimeout();
 	void testLazyHandshake();
+	void testDefaultCertificateHandler();
 	void testLoopbackPeerHostName();
 	void testTunneledLoopbackPeerIsVerified();
 	void testResolvedLoopbackNameIsVerified();

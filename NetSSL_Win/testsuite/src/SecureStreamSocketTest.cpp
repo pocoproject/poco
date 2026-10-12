@@ -27,6 +27,7 @@
 #include "Poco/Net/NetworkInterface.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/Util/LayeredConfiguration.h"
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include "Poco/Event.h"
@@ -46,10 +47,13 @@ using Poco::Net::SecureStreamSocket;
 using Poco::Net::SecureServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::Context;
+using Poco::Net::RejectCertificateHandler;
 using Poco::Net::Session;
 using Poco::Net::SSLManager;
 using Poco::Thread;
+using Poco::Util::AbstractConfiguration;
 using Poco::Util::Application;
+using Poco::Util::LayeredConfiguration;
 
 
 namespace
@@ -333,6 +337,45 @@ void SecureStreamSocketTest::testLazyHandshake()
 }
 
 
+void SecureStreamSocketTest::testDefaultCertificateHandler()
+{
+	SSLManager& manager = SSLManager::instance();
+	const SSLManager::PrivateKeyPassphraseHandlerPtr pPassphraseHandler = manager.clientPassphraseHandler();
+	const SSLManager::InvalidCertificateHandlerPtr pConfiguredHandler = manager.clientCertificateHandler();
+	const Context::Ptr pContext = manager.defaultClientContext();
+
+	// The configuration file names a handler in a read-only layer, so the layers before the
+	// system properties are removed while the SSLManager creates the handler. Both are
+	// unlabeled: first the writeable layer of the Application, then the configuration file.
+	LayeredConfiguration& config = Application::instance().config();
+	const AbstractConfiguration::Ptr pApplicationLayer = config.find("");
+	config.removeConfiguration(pApplicationLayer);
+	const AbstractConfiguration::Ptr pFileLayer = config.find("");
+	config.removeConfiguration(pFileLayer);
+	const bool configured = config.has(SSLManager::CFG_CLIENT_PREFIX + "invalidCertificateHandler.name");
+
+	SSLManager::InvalidCertificateHandlerPtr pDefaultHandler;
+	manager.initializeClient(pPassphraseHandler, nullptr, pContext);
+	try
+	{
+		pDefaultHandler = manager.clientCertificateHandler();
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	manager.initializeClient(pPassphraseHandler, pConfiguredHandler, pContext);
+	config.add(pFileLayer, Application::PRIO_DEFAULT, false);
+	config.add(pApplicationLayer, Application::PRIO_APPLICATION, true);
+
+	assertFalse (configured);
+	assertFalse (pDefaultHandler.isNull());
+	// a handler that asks on the console would block the thread performing the handshake
+	assertNotNullPtr (dynamic_cast<RejectCertificateHandler*>(pDefaultHandler.get()));
+
+	assertTrue (manager.certificateHandlerFactoryMgr().hasFactory("ConsoleCertificateHandler"));
+}
+
+
 void SecureStreamSocketTest::testLoopbackPeerHostName()
 {
 	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
@@ -498,6 +541,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLazyHandshake);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testDefaultCertificateHandler);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLoopbackPeerHostName);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testTunneledLoopbackPeerIsVerified);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testResolvedLoopbackNameIsVerified);

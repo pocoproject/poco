@@ -46,7 +46,7 @@ const std::string SSLManager::CFG_USE_STRONG_CRYPTO("useStrongCrypto");
 const std::string SSLManager::CFG_DELEGATE_HANDLER("privateKeyPassphraseHandler.name");
 const std::string SSLManager::VAL_DELEGATE_HANDLER("KeyConsoleHandler");
 const std::string SSLManager::CFG_CERTIFICATE_HANDLER("invalidCertificateHandler.name");
-const std::string SSLManager::VAL_CERTIFICATE_HANDLER("ConsoleCertificateHandler");
+const std::string SSLManager::VAL_CERTIFICATE_HANDLER("RejectCertificateHandler");
 const std::string SSLManager::CFG_SERVER_PREFIX("schannel.server.");
 const std::string SSLManager::CFG_CLIENT_PREFIX("schannel.client.");
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");

@@ -29,6 +29,10 @@ class NetSSL_Win_API ConsoleCertificateHandler: public InvalidCertificateHandler
 	/// A ConsoleCertificateHandler is invoked whenever an error occurs verifying the certificate.
 	///
 	/// The certificate is printed to stdout and the user is asked via console if he wants to accept it.
+	///
+	/// The thread performing the TLS handshake blocks without a timeout until
+	/// an answer is entered on the console. Use this handler in interactive
+	/// tools only.
 {
 public:
 	ConsoleCertificateHandler(bool handleErrorsOnServerSide);

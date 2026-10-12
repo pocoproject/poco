@@ -12,12 +12,17 @@
 #include "ErrorQueueCleaner.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Net/PrivateKeyPassphraseHandler.h"
+#include "Poco/Net/RejectCertificateHandler.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
+#include "Poco/Net/VerificationErrorArgs.h"
+#include "Poco/Net/X509Certificate.h"
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Util/Application.h"
+#include "Poco/Util/LayeredConfiguration.h"
 #include "Poco/Exception.h"
 #include <openssl/bio.h>
 #include <openssl/err.h>
@@ -34,10 +39,14 @@
 
 using Poco::Crypto::X509Certificate;
 using Poco::Net::Context;
+using Poco::Net::RejectCertificateHandler;
 using Poco::Net::SSLContextException;
 using Poco::Net::SSLException;
 using Poco::Net::SSLManager;
+using Poco::Net::VerificationErrorArgs;
+using Poco::Util::AbstractConfiguration;
 using Poco::Util::Application;
+using Poco::Util::LayeredConfiguration;
 
 
 ContextTest::ContextTest(const std::string& name): CppUnit::TestCase(name)
@@ -313,6 +322,51 @@ void ContextTest::testVerifyErrorWithoutCertificate()
 }
 
 
+void ContextTest::testDefaultCertificateHandler()
+{
+	SSLManager& manager = SSLManager::instance();
+	const SSLManager::PrivateKeyPassphraseHandlerPtr pPassphraseHandler = manager.clientPassphraseHandler();
+	const SSLManager::InvalidCertificateHandlerPtr pConfiguredHandler = manager.clientCertificateHandler();
+	const Context::Ptr pContext = manager.defaultClientContext();
+
+	// The configuration file names a handler and its layer is read-only, so the layers before the
+	// system properties are removed while the SSLManager creates the handler. Neither has a label:
+	// the first is the writeable layer of the Application, the second the configuration file.
+	LayeredConfiguration& config = Application::instance().config();
+	const AbstractConfiguration::Ptr pApplicationLayer = config.find("");
+	config.removeConfiguration(pApplicationLayer);
+	const AbstractConfiguration::Ptr pFileLayer = config.find("");
+	config.removeConfiguration(pFileLayer);
+	const bool configured = config.has(SSLManager::CFG_CLIENT_PREFIX + "invalidCertificateHandler.name");
+
+	SSLManager::InvalidCertificateHandlerPtr pDefaultHandler;
+	manager.initializeClient(pPassphraseHandler, nullptr, pContext);
+	try
+	{
+		pDefaultHandler = manager.clientCertificateHandler();
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	manager.initializeClient(pPassphraseHandler, pConfiguredHandler, pContext);
+	config.add(pFileLayer, Application::PRIO_DEFAULT, false);
+	config.add(pApplicationLayer, Application::PRIO_APPLICATION, true);
+
+	assertFalse (configured);
+	assertFalse (pDefaultHandler.isNull());
+	// a handler that asks on the console would block this thread in the call below
+	assertNotNullPtr (dynamic_cast<RejectCertificateHandler*>(pDefaultHandler.get()));
+
+	const Poco::Net::X509Certificate certificate(config.getString("openSSL.server.privateKeyFile"));
+	VerificationErrorArgs args(pContext, certificate, 0, X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT, "self-signed certificate");
+	args.setIgnoreError(true);
+	pDefaultHandler->onInvalidCertificate(&manager, args);
+	assertFalse (args.getIgnoreError());
+
+	assertTrue (manager.certificateHandlerFactoryMgr().hasFactory("ConsoleCertificateHandler"));
+}
+
+
 void ContextTest::assertRejected(const Context::Params& params)
 {
 	ErrorQueueCleaner cleaner;
@@ -419,6 +473,7 @@ CppUnit::Test* ContextTest::suite()
 	CppUnit_addTest(pSuite, ContextTest, testAddChainCertificateWithoutX509);
 	CppUnit_addTest(pSuite, ContextTest, testClientContextIgnoresDHParameters);
 	CppUnit_addTest(pSuite, ContextTest, testVerifyErrorWithoutCertificate);
+	CppUnit_addTest(pSuite, ContextTest, testDefaultCertificateHandler);
 
 	return pSuite;
 }
