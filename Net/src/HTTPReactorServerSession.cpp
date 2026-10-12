@@ -1,6 +1,7 @@
 #include "Poco/Net/HTTPReactorServerSession.h"
 #include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/MessageHeader.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/String.h"
 #include "Poco/NumberParser.h"
 #include "Poco/Ascii.h"
@@ -84,14 +85,14 @@ bool HTTPReactorServerSession::checkRequestComplete()
 		}
 		case PARSING_CHUNK_DATA:
 		{
-			if (pos + chunkSize + 2 <= _buf.size())
-			{
-				pos += chunkSize + 2; // Skip chunk data and trailing "\r\n"
-				state = PARSING_CHUNK_SIZE;
-			} else
-			{
+			// Compared without adding, so that a large chunk size cannot wrap the
+			// sum past the end of the buffer.
+			if (chunkSize > _buf.size() - pos || _buf.size() - pos - chunkSize < 2)
 				return false; // Incomplete chunk data
-			}
+			if (_buf.compare(pos + chunkSize, 2, "\r\n") != 0)
+				throw MessageException("Missing CRLF after chunk data");
+			pos += chunkSize + 2; // Skip chunk data and trailing "\r\n"
+			state = PARSING_CHUNK_SIZE;
 			break;
 		}
 		case PARSING_BODY:
@@ -162,8 +163,23 @@ bool HTTPReactorServerSession::parseChunkSize(std::size_t& pos, std::size_t& chu
 	if (chunkSizeEnd == std::string::npos)
 		return false; // Incomplete chunk size
 
-	std::string chunkSizeStr = _buf.substr(pos, chunkSizeEnd - pos);
-	chunkSize = std::stoi(chunkSizeStr, nullptr, 16); // Parse hex chunk size
+	// Only a size line that HTTPChunkedStreamBuf reads the same way is accepted,
+	// so that this framing and the body the request handler reads cannot disagree:
+	// one to eight hex digits, then the CR LF that ends the line, a space, a tab
+	// or a chunk extension. A sign, a "0x" prefix or any other spelling is rejected
+	// rather than guessed. So is a CR or an LF inside the line, because the body
+	// reader ends the line at the first LF.
+	std::size_t digitsEnd = pos;
+	while (digitsEnd < chunkSizeEnd && digitsEnd - pos < 8 && Poco::Ascii::isHexDigit(_buf[digitsEnd]))
+		++digitsEnd;
+	const bool terminated = digitsEnd == chunkSizeEnd
+		|| _buf[digitsEnd] == ' ' || _buf[digitsEnd] == '\t' || _buf[digitsEnd] == ';';
+	unsigned chunk = 0;
+	if (digitsEnd == pos || !terminated
+		|| _buf.find_first_of("\r\n", digitsEnd) != chunkSizeEnd
+		|| !Poco::NumberParser::tryParseHex(_buf.substr(pos, digitsEnd - pos), chunk))
+		throw MessageException("Malformed chunk size");
+	chunkSize = chunk;
 	if (chunkSize == 0)
 	{
 		std::size_t finalChunkEnd = _buf.find("\r\n\r\n", chunkSizeEnd);
