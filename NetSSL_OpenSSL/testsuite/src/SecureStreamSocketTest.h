@@ -58,6 +58,10 @@ public:
 	void testShutdownWithoutPeerAnswer();
 	void testShutdownWaitsForSendBuffer();
 	void testShutdownWaitsForPeer();
+	void testShutdownAfterReceiveError();
+	void testShutdownAfterSendError();
+	void testShutdownOnResetConnection();
+	void testShutdownAfterReceiveTimeout();
 
 	void setUp();
 	void tearDown();

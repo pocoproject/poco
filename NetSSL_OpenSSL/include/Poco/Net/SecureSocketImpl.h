@@ -172,6 +172,11 @@ public:
 		/// is sent: the TCP connection is shut down in both
 		/// directions, which ends the call of the other thread, and
 		/// 0 is returned.
+		///
+		/// After a fatal TLS or I/O error on the connection, including one
+		/// while the alert is sent or awaited, no further alert is sent: only
+		/// the send direction of the TCP connection is shut down, and 0 is
+		/// returned. A send or receive that timed out is not a fatal error.
 
 	void close();
 		/// Close the socket.
@@ -353,6 +358,9 @@ private:
 	bool _pendingWrite;
 		/// A TLS record of an unfinished SSL_write() is unsent. A close_notify
 		/// alert cannot reach the peer before that record.
+	bool _fatalError;
+		/// A fatal TLS or I/O error has occurred on the connection.
+		/// A send or receive that timed out is not one.
 	std::string _peerHostName;
 	bool _tunneled;
 	Session::Ptr _pSession;
