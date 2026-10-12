@@ -185,6 +185,14 @@ public:
 		/// If the SSL connection was the result of an accept(),
 		/// the server-side handshake is completed, otherwise
 		/// a client-side handshake is performed.
+		///
+		/// Once the handshake is complete, the peer certificate is
+		/// verified as in verifyPeerCertificate(). Throws a
+		/// CertificateValidationException if the certificate is
+		/// not acceptable; the handshake then remains incomplete.
+		/// This also holds for the server-side handshake, where
+		/// the certificate of a client is checked against the
+		/// IP address of the client.
 
 	[[nodiscard]] poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.

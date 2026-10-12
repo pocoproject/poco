@@ -406,11 +406,9 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	if (_needHandshake)
 	{
 		rc = completeHandshake();
-		if (rc == 1)
-			verifyPeerCertificate();
-		else if (rc == 0)
+		if (rc == 0)
 			throw SSLConnectionUnexpectedlyClosedException();
-		else
+		else if (rc != 1)
 			return rc;
 	}
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
@@ -456,9 +454,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	if (_needHandshake)
 	{
 		rc = completeHandshake();
-		if (rc == 1)
-			verifyPeerCertificate();
-		else
+		if (rc != 1)
 			return rc;
 	}
 
@@ -526,6 +522,9 @@ int SecureSocketImpl::completeHandshake()
 	{
 		return handleError(rc);
 	}
+	// The handshake stays pending when the peer is not accepted, so that
+	// no later call sends or receives data on the connection.
+	verifyPeerCertificate();
 	_needHandshake = false;
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	/* Request the ticket suppressed in acceptSSL() only once, and only in
@@ -541,6 +540,11 @@ int SecureSocketImpl::completeHandshake()
 
 void SecureSocketImpl::verifyPeerCertificate()
 {
+	// Without verification the peer address is not needed, and it is no
+	// longer available once the peer has reset the connection.
+	if (_pContext->verificationMode() == Context::VERIFY_NONE)
+		return;
+
 	if (_peerHostName.empty())
 		verifyPeerCertificate(_pSocket->peerAddress().host().toString());
 	else
