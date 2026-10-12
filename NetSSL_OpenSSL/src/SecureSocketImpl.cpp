@@ -45,6 +45,7 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_pContext(pContext),
 	_needHandshake(false),
 	_ticketPending(false),
+	_pendingWrite(false),
 	_tunneled(false)
 {
 	poco_check_ptr (_pSocket);
@@ -127,6 +128,7 @@ void SecureSocketImpl::acceptSSL()
 		throw SSLException("Cannot store the socket in the SSL object", Utility::getLastError());
 	}
 	_needHandshake = true;
+	_pendingWrite = false;
 }
 
 
@@ -203,6 +205,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		throw SSLException("Cannot create SSL object");
 	}
 	::SSL_set_bio(_pSSL, pBIO, pBIO);
+	_pendingWrite = false;
 
 	try
 	{
@@ -313,6 +316,10 @@ int SecureSocketImpl::shutdown()
 					::ERR_clear_error();
 					rc = ::SSL_shutdown(_pSSL);
 					if (rc == 1) break;
+					/* The close_notify alert stays behind the unsent TLS record,
+					 * so the peer cannot answer it and waiting for the answer
+					 * would only use up the receive timeout. */
+					if (_pendingWrite) break;
 					if (rc < 0)
 					{
 						int err = ::SSL_get_error(_pSSL, rc);
@@ -414,13 +421,17 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 			break;
 
 		if (tsStart.isElapsed(sendTimeout.totalMicroseconds()))
+		{
+			_pendingWrite = true;
 			throw Poco::TimeoutException();
+		}
 	};
 	if (rc <= 0)
 	{
 		rc = handleError(rc);
 		if (rc == 0) throw SSLConnectionUnexpectedlyClosedException();
 	}
+	_pendingWrite = (rc == SecureStreamSocket::ERR_SSL_WANT_WRITE);
 	return rc;
 }
 
@@ -815,6 +826,7 @@ void SecureSocketImpl::reset()
 		::SSL_free(_pSSL);
 		_pSSL = nullptr;
 		_ticketPending = false;
+		_pendingWrite = false;
 	}
 }
 

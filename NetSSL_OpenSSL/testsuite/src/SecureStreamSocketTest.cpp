@@ -266,6 +266,105 @@ namespace
 		bool _accept;
 		Poco::Event _stop;
 	};
+
+	class ParkedServer: public Poco::Runnable
+		/// Takes one connection, completes the TLS handshake and then
+		/// reads nothing until it is released.
+	{
+	public:
+		ParkedServer():
+			_socket(SocketAddress("127.0.0.1", 0))
+		{
+		}
+
+		Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		void release()
+		{
+			_release.set();
+		}
+
+		void run() override
+		{
+			try
+			{
+				if (!_socket.poll(Poco::Timespan(10, 0), Socket::SELECT_READ))
+					return;
+				SecureStreamSocket socket(_socket.acceptConnection());
+				socket.setReceiveBufferSize(4096);
+				socket.setReceiveTimeout(Poco::Timespan(10, 0));
+				socket.completeHandshake();
+				_release.wait(30000);
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+
+	private:
+		SecureServerSocket _socket;
+		Poco::Event _release;
+	};
+
+	class HelperThread
+		/// Runs a test helper, such as a server, on its own thread. The
+		/// helper uses objects of the test function, so the thread is
+		/// joined before they are destroyed, also when the test ends with
+		/// an exception.
+	{
+	public:
+		explicit HelperThread(Poco::Runnable& helper, std::function<void()> release = {}):
+			_release(std::move(release))
+		{
+			_thread.start(helper);
+		}
+
+		~HelperThread()
+		{
+			join();
+		}
+
+		HelperThread(const HelperThread&) = delete;
+		HelperThread& operator=(const HelperThread&) = delete;
+
+		void join()
+			/// Releases the helper with the release function and joins the
+			/// thread. Does nothing after the first call.
+		{
+			if (_joined) return;
+			_joined = true;
+			if (_release) _release();
+			_thread.join();
+		}
+
+	private:
+		Thread _thread;
+		std::function<void()> _release;
+		bool _joined = false;
+	};
+
+
+	bool sendUntilTimeout(SecureStreamSocket& socket)
+		/// Sends until the peer, which does not read, makes a send time out.
+		/// Returns false if no send timed out.
+	{
+		const std::string data(65536, 'x');
+		try
+		{
+			for (int i = 0; i < 1024; i++)
+			{
+				socket.sendBytes(data.data(), static_cast<int>(data.size()));
+			}
+		}
+		catch (Poco::TimeoutException&)
+		{
+			return true;
+		}
+		return false;
+	}
 }
 
 
@@ -1226,6 +1325,88 @@ void SecureStreamSocketTest::testHandshakeLeavesSocketBlocking()
 }
 
 
+void SecureStreamSocketTest::testCloseAfterSendTimeout()
+{
+	ParkedServer server;
+	HelperThread thread(server, [&server]() { server.release(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setSendBufferSize(4096);
+	ss.setSendTimeout(Poco::Timespan(0, 250000));
+	ss.setReceiveTimeout(Poco::Timespan(6, 0));
+	const bool timedOut = sendUntilTimeout(ss);
+
+	// the peer cannot answer a close_notify that stays behind unsent data
+	Poco::Timestamp start;
+	ss.close();
+	const Poco::Timespan elapsed = start.elapsed();
+
+	thread.join();
+
+	assertTrue (timedOut);
+	assertTrue (elapsed < Poco::Timespan(2, 0));
+}
+
+
+void SecureStreamSocketTest::testCloseAfterSendAndReceiveTimeout()
+{
+	ParkedServer server;
+	HelperThread thread(server, [&server]() { server.release(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setSendBufferSize(4096);
+	ss.setSendTimeout(Poco::Timespan(0, 250000));
+	ss.setReceiveTimeout(Poco::Timespan(0, 300000));
+	const bool sendTimedOut = sendUntilTimeout(ss);
+
+	bool receiveTimedOut = false;
+	try
+	{
+		char buffer[256];
+		ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		receiveTimedOut = true;
+	}
+
+	ss.setReceiveTimeout(Poco::Timespan(6, 0));
+	Poco::Timestamp start;
+	ss.close();
+	const Poco::Timespan elapsed = start.elapsed();
+
+	thread.join();
+
+	assertTrue (sendTimedOut);
+	assertTrue (receiveTimedOut);
+	assertTrue (elapsed < Poco::Timespan(2, 0));
+}
+
+
+void SecureStreamSocketTest::testShutdownWaitsForPeer()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+
+	std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[256];
+	int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+
+	// 1 means that the close_notify of the peer was received
+	assertEqual (1, ss.shutdown());
+	ss.close();
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -1265,6 +1446,9 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testServerHandshakeDripFeed);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testClientHandshakeDripFeed);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeLeavesSocketBlocking);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseAfterSendTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseAfterSendAndReceiveTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownWaitsForPeer);
 
 	return pSuite;
 }

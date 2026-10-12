@@ -49,6 +49,9 @@ public:
 	void testServerHandshakeDripFeed();
 	void testClientHandshakeDripFeed();
 	void testHandshakeLeavesSocketBlocking();
+	void testCloseAfterSendTimeout();
+	void testCloseAfterSendAndReceiveTimeout();
+	void testShutdownWaitsForPeer();
 
 	void setUp();
 	void tearDown();
