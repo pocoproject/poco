@@ -465,6 +465,52 @@ namespace
 		}
 	}
 
+	class AbortingServer: public Poco::Runnable
+		/// Takes one connection, completes the TLS handshake and, when it
+		/// is released, resets the TCP connection without a close_notify alert.
+	{
+	public:
+		AbortingServer():
+			_socket(SocketAddress("127.0.0.1", 0))
+		{
+		}
+
+		Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		void release()
+			/// Called once the client is connected: the client checks the
+			/// certificate against the address of the peer, which Linux does
+			/// not report for a reset connection.
+		{
+			_release.set();
+		}
+
+		void run() override
+		{
+			try
+			{
+				StreamSocket connection = _socket.acceptConnection();
+				SecureStreamSocket socket = SecureStreamSocket::attach(connection, SSLManager::instance().defaultServerContext());
+				socket.setReceiveTimeout(Poco::Timespan(10, 0));
+				socket.completeHandshake();
+				_release.tryWait(10000);
+				// closing the TCP socket leaves the TLS connection no way to send the alert
+				connection.setLinger(true, 0);
+				connection.close();
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+
+	private:
+		ServerSocket _socket;
+		Poco::Event _release;
+	};
+
 	bool sendUntilTimeout(SecureStreamSocket& socket)
 		/// Sends until the peer, which does not read, makes a send time out.
 		/// Returns false if no send timed out.
@@ -1759,6 +1805,120 @@ void SecureStreamSocketTest::testShutdownWaitsForPeer()
 }
 
 
+void SecureStreamSocketTest::testShutdownAfterReceiveError()
+{
+	AbortingServer server;
+	HelperThread thread(server, [&server]() { server.release(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	server.release();
+
+	bool receiveFailed = false;
+	try
+	{
+		char buffer[256];
+		ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	catch (Poco::IOException&)
+	{
+		receiveFailed = true;
+	}
+	thread.join();
+	assertTrue (receiveFailed);
+
+	// no close_notify is sent on a connection that has failed
+	assertEqual (0, ss.shutdown());
+}
+
+
+void SecureStreamSocketTest::testShutdownAfterSendError()
+{
+	AbortingServer server;
+	HelperThread thread(server, [&server]() { server.release(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setSendTimeout(Poco::Timespan(10, 0));
+	server.release();
+	thread.join();
+
+	// the peer has reset the connection
+	bool sendFailed = false;
+	const std::string data(65536, 'x');
+	try
+	{
+		for (int i = 0; i < 1024; i++)
+		{
+			ss.sendBytes(data.data(), static_cast<int>(data.size()));
+		}
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	catch (Poco::IOException&)
+	{
+		sendFailed = true;
+	}
+	assertTrue (sendFailed);
+
+	assertEqual (0, ss.shutdown());
+}
+
+
+void SecureStreamSocketTest::testShutdownOnResetConnection()
+{
+	AbortingServer server;
+	HelperThread thread(server, [&server]() { server.release(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	server.release();
+	thread.join();
+
+	// shutdown() is the first call to meet the reset
+	assertEqual (0, ss.shutdown());
+	assertEqual (0, ss.shutdown());
+}
+
+
+void SecureStreamSocketTest::testShutdownAfterReceiveTimeout()
+{
+	DelayedReader server(Poco::Timespan(0, 0));
+	HelperThread thread(server, [&server]() { server.readAfterDelay(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(0, 300000));
+
+	bool receiveTimedOut = false;
+	try
+	{
+		char buffer[256];
+		ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		receiveTimedOut = true;
+	}
+
+	server.readAfterDelay();
+	const int rc = ss.shutdown();
+	ss.close();
+	thread.join();
+
+	assertTrue (receiveTimedOut);
+	// a receive that timed out is no failure of the connection
+	assertTrue (rc >= 0);
+	assertTrue (server.closedByAlert());
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -1811,6 +1971,10 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownWaitsForSendBuffer);
 #endif
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownWaitsForPeer);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownAfterReceiveError);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownAfterSendError);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownOnResetConnection);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownAfterReceiveTimeout);
 
 	return pSuite;
 }

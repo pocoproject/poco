@@ -60,6 +60,7 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_needHandshake(false),
 	_ticketPending(false),
 	_pendingWrite(false),
+	_fatalError(false),
 	_tunneled(false)
 {
 	poco_check_ptr (_pSocket);
@@ -143,6 +144,7 @@ void SecureSocketImpl::acceptSSL()
 	}
 	_needHandshake = true;
 	_pendingWrite = false;
+	_fatalError = false;
 }
 
 
@@ -220,6 +222,7 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	}
 	::SSL_set_bio(_pSSL, pBIO, pBIO);
 	_pendingWrite = false;
+	_fatalError = false;
 
 	try
 	{
@@ -323,6 +326,20 @@ int SecureSocketImpl::shutdown()
 			return 0;
 		}
 		UnLockT l(_mutex, std::adopt_lock);
+		if (_fatalError)
+		{
+			// OpenSSL does not allow SSL_shutdown() after a fatal error.
+			l.unlock();
+			try
+			{
+				_pSocket->shutdownSend();
+			}
+			catch (NetException&)
+			{
+				// the connection is gone, there is nothing left to shut down
+			}
+			return 0;
+		}
 		if (_needHandshake || ::SSL_in_init(_pSSL) != 0)
 		{
 			// No close_notify alert can be sent before the handshake is complete.
@@ -396,7 +413,18 @@ int SecureSocketImpl::shutdown()
 					if (::SSL_get_error(_pSSL, rc) == SSL_ERROR_WANT_READ)
 						rc = 0;
 					else
-						rc = handleError(rc);
+					{
+						try
+						{
+							rc = handleError(rc);
+						}
+						catch (Poco::IOException&)
+						{
+						}
+						catch (Poco::TimeoutException&)
+						{
+						}
+					}
 				}
 			}
 			else
@@ -409,8 +437,26 @@ int SecureSocketImpl::shutdown()
 					if (SocketImpl::lastError() == POCO_EWOULDBLOCK)
 						rc = SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
 					else
-						rc = handleError(rc);
+					{
+						try
+						{
+							rc = handleError(rc);
+						}
+						catch (Poco::IOException&)
+						{
+						}
+						catch (Poco::TimeoutException&)
+						{
+							// ETIMEDOUT is reported as a TimeoutException, which is not an IOException
+						}
+					}
 				}
+			}
+			if (_fatalError)
+			{
+				// The connection failed in this call: take the fatal error path.
+				l.unlock();
+				return shutdown();
 			}
 
 			l.unlock();
@@ -812,6 +858,7 @@ int SecureSocketImpl::handleError(int rc)
 	case SSL_ERROR_WANT_ACCEPT:
 	case SSL_ERROR_WANT_X509_LOOKUP:
 		// these should not occur
+		_fatalError = true;
 		poco_bugcheck();
 		return rc;
 	// SSL_GET_ERROR(3ossl):
@@ -826,6 +873,15 @@ int SecureSocketImpl::handleError(int rc)
 		// fallthrough to handle socket errors first
 #endif
 	case SSL_ERROR_SYSCALL:
+#if defined(_WIN32)
+		// A send or receive that timed out leaves the connection usable. On
+		// Windows the timeout of a blocking socket is reported this way.
+		if (sslError != SSL_ERROR_SYSCALL || socketError != POCO_ETIMEDOUT)
+			_fatalError = true;
+#else
+		// ETIMEDOUT from a send or receive means that the TCP connection is dead.
+		_fatalError = true;
+#endif
 		if (socketError)
 		{
 			if (socketError == POCO_EWOULDBLOCK)
@@ -836,6 +892,7 @@ int SecureSocketImpl::handleError(int rc)
 		// fallthrough
 	default:
 		{
+			_fatalError = true;
 			long lastError = ::ERR_peek_last_error();
 			::ERR_clear_error();
 			std::string msg;
@@ -901,6 +958,7 @@ void SecureSocketImpl::reset()
 		_pSSL = nullptr;
 		_ticketPending = false;
 		_pendingWrite = false;
+		_fatalError = false;
 	}
 }
 
