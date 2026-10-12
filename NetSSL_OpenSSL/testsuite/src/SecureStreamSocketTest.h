@@ -51,6 +51,9 @@ public:
 	void testHandshakeLeavesSocketBlocking();
 	void testCloseAfterSendTimeout();
 	void testCloseAfterSendAndReceiveTimeout();
+	void testCloseAfterReceiveTimeout();
+	void testShutdownWithoutPeerAnswer();
+	void testShutdownWaitsForSendBuffer();
 	void testShutdownWaitsForPeer();
 
 	void setUp();

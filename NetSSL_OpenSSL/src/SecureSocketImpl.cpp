@@ -27,6 +27,7 @@
 #include "Poco/String.h"
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
+#include <algorithm>
 
 
 using Poco::IOException;
@@ -34,6 +35,14 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::NumberFormatter;
 using Poco::Timespan;
+
+
+namespace
+{
+	// The longest time that shutdown() of a blocking socket waits for the
+	// close_notify alert of the peer.
+	const Poco::Timespan SHUTDOWN_WAIT(1, 0);
+}
 
 
 namespace Poco::Net {
@@ -308,36 +317,64 @@ int SecureSocketImpl::shutdown()
 			{
 				// For blocking sockets, perform bidirectional shutdown
 				// to ensure all data is received by the peer before closing.
-				Poco::Timespan recvTimeout = _pSocket->getReceiveTimeout();
-				Poco::Timespan pollTimeout(0, 100000);
-				Poco::Timestamp tsStart;
-				do
+				// The wait for the close_notify alert of the peer has its own
+				// limit: a peer that never answers would otherwise hold close()
+				// and the destructor for the whole receive timeout.
+				const Poco::Timespan wait = std::min(_pSocket->getReceiveTimeout(), SHUTDOWN_WAIT);
+				// The own close_notify alert is sent on the blocking socket,
+				// so that the send timeout is its limit.
+				::ERR_clear_error();
+				rc = ::SSL_shutdown(_pSSL);
+				/* The close_notify alert stays behind the unsent TLS record,
+				 * so the peer cannot answer it. */
+				if (rc == 0 && !_pendingWrite && wait > 0)
 				{
-					::ERR_clear_error();
-					rc = ::SSL_shutdown(_pSSL);
-					if (rc == 1) break;
-					/* The close_notify alert stays behind the unsent TLS record,
-					 * so the peer cannot answer it and waiting for the answer
-					 * would only use up the receive timeout. */
-					if (_pendingWrite) break;
-					if (rc < 0)
+					Poco::Timestamp tsStart;
+					// A blocking SSL_shutdown() returns only when a single read finds
+					// no data within the receive timeout, so the time is counted here.
+					_pSocket->setBlocking(false);
+					try
 					{
-						int err = ::SSL_get_error(_pSSL, rc);
-						if (err == SSL_ERROR_WANT_READ)
-							(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
-						else if (err == SSL_ERROR_WANT_WRITE)
-							(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
-						else
-							break;
+						int mode = Poco::Net::Socket::SELECT_READ;
+						while (true)
+						{
+							const Poco::Timespan remaining = wait - tsStart.elapsed();
+							if (remaining <= 0 || !_pSocket->poll(remaining, mode)) break;
+							::ERR_clear_error();
+							rc = ::SSL_shutdown(_pSSL);
+							if (rc == 1) break;
+							mode = Poco::Net::Socket::SELECT_READ;
+							if (rc < 0)
+							{
+								int err = ::SSL_get_error(_pSSL, rc);
+								if (err == SSL_ERROR_WANT_WRITE)
+									mode = Poco::Net::Socket::SELECT_WRITE;
+								else if (err != SSL_ERROR_WANT_READ)
+									break;
+							}
+						}
 					}
-					else
+					catch (...)
 					{
-						(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+						try
+						{
+							_pSocket->setBlocking(true);
+						}
+						catch (Poco::Exception&)
+						{
+						}
+						throw;
 					}
-				} while (!tsStart.isElapsed(recvTimeout.totalMicroseconds()));
+					_pSocket->setBlocking(true);
+				}
 				if (rc < 0)
 				{
-					rc = handleError(rc);
+					// The close_notify alert was sent; only the one of the peer
+					// did not arrive in time, which SSL_shutdown() reports as 0.
+					if (::SSL_get_error(_pSSL, rc) == SSL_ERROR_WANT_READ)
+						rc = 0;
+					else
+						rc = handleError(rc);
 				}
 			}
 			else
