@@ -46,6 +46,7 @@ using Poco::Net::TCPServerConnection;
 using Poco::Net::TCPServerConnectionFactory;
 using Poco::Net::TCPServerConnectionFactoryImpl;
 using Poco::Net::TCPServerParams;
+using Poco::Net::Socket;
 using Poco::Net::StreamSocket;
 using Poco::Net::SecureStreamSocket;
 using Poco::Net::SecureServerSocket;
@@ -934,6 +935,141 @@ void SecureStreamSocketTest::testLocalhostNameOnOtherAddressIsVerified()
 }
 
 
+void SecureStreamSocketTest::testCompleteHandshakeVerifiesPeer()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.setLazyHandshake(true);
+	// the certificate of the test server is not one for this name
+	ss.setPeerHostName("192.0.2.1");
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	try
+	{
+		ss.completeHandshake();
+		fail("certificate for another host - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+	}
+
+	// the failed check does not leave a connection that can be used
+	try
+	{
+		ss.sendBytes("hello", 5);
+		fail("certificate for another host, send after the failed handshake - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+	}
+}
+
+
+void SecureStreamSocketTest::testCompleteHandshakeVerifiesPeerNB()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	// the certificate of the test server is not one for this name
+	ss.setPeerHostName("192.0.2.1");
+	ss.connectNB(SocketAddress("127.0.0.1", svs.address().port()));
+
+	const Poco::Timespan timeout(10, 0);
+	assertTrue (ss.poll(timeout, Socket::SELECT_WRITE));
+	Poco::Timestamp start;
+	int rc = SecureStreamSocket::ERR_SSL_WANT_WRITE;
+	try
+	{
+		while (rc < 0 && !start.isElapsed(timeout.totalMicroseconds()))
+		{
+			const int mode = rc == SecureStreamSocket::ERR_SSL_WANT_WRITE ? Socket::SELECT_WRITE : Socket::SELECT_READ;
+			ss.poll(Poco::Timespan(0, 100000), mode);
+			rc = ss.completeHandshake();
+		}
+		fail("certificate for another host - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+	}
+}
+
+
+void SecureStreamSocketTest::testCompleteHandshakeAcceptsPeer()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.setLazyHandshake(true);
+	// the name in the certificate of the test server
+	ss.setPeerHostName("www.appinf.com");
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	assertEqual (1, ss.completeHandshake());
+
+	std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[256];
+	int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+
+	ss.close();
+}
+
+
+void SecureStreamSocketTest::testServerCompleteHandshakeVerifiesClientCertificate()
+{
+	ErrorQueueCleaner cleaner;
+
+	// the server requires a client certificate and completes the handshake itself
+	Context::Params serverParams;
+	serverParams.privateKeyFile = Application::instance().config().getString("openSSL.server.privateKeyFile");
+	serverParams.certificateFile = serverParams.privateKeyFile;
+	// the certificate of the test client is self-signed
+	serverParams.caLocation = Application::instance().config().getString("openSSL.client.privateKeyFile");
+	serverParams.verificationMode = Context::VERIFY_STRICT;
+	Context::Ptr pServerContext = new Context(Context::TLS_SERVER_USE, serverParams);
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0), 64, pServerContext);
+
+	// the certificate of the test client is not one for its IP address
+	SecureStreamSocket client;
+	client.connectNB(svs.address());
+
+	const Poco::Timespan timeout(10, 0);
+	assertTrue (svs.poll(timeout, Socket::SELECT_READ));
+	SecureStreamSocket server(svs.acceptConnection());
+	server.setBlocking(false);
+	assertTrue (client.poll(timeout, Socket::SELECT_WRITE));
+
+	Poco::Timestamp start;
+	int clientRc = SecureStreamSocket::ERR_SSL_WANT_WRITE;
+	int serverRc = SecureStreamSocket::ERR_SSL_WANT_READ;
+	bool refused = false;
+	while (!refused && serverRc < 0 && !start.isElapsed(timeout.totalMicroseconds()))
+	{
+		// the client accepts the server: an exception of the client is an error of the test
+		if (clientRc < 0) clientRc = client.completeHandshake();
+		server.poll(Poco::Timespan(0, 100000), Socket::SELECT_READ);
+		try
+		{
+			serverRc = server.completeHandshake();
+		}
+		catch (Poco::Net::CertificateValidationException&)
+		{
+			refused = true;
+		}
+	}
+	if (!refused) fail("client certificate for another host - must throw");
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -966,6 +1102,10 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testTunneledLoopbackPeerIsVerified);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testResolvedLoopbackNameIsVerified);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLocalhostNameOnOtherAddressIsVerified);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCompleteHandshakeVerifiesPeer);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCompleteHandshakeVerifiesPeerNB);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCompleteHandshakeAcceptsPeer);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testServerCompleteHandshakeVerifiesClientCertificate);
 
 	return pSuite;
 }

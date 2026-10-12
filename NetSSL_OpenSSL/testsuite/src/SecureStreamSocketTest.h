@@ -42,6 +42,10 @@ public:
 	void testTunneledLoopbackPeerIsVerified();
 	void testResolvedLoopbackNameIsVerified();
 	void testLocalhostNameOnOtherAddressIsVerified();
+	void testCompleteHandshakeVerifiesPeer();
+	void testCompleteHandshakeVerifiesPeerNB();
+	void testCompleteHandshakeAcceptsPeer();
+	void testServerCompleteHandshakeVerifiesClientCertificate();
 
 	void setUp();
 	void tearDown();

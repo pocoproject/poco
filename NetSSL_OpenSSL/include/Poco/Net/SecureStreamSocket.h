@@ -42,12 +42,12 @@ class NetSSL_API SecureStreamSocket: public StreamSocket
 	/// ERR_SSL_WANT_READ is returned, receiveBytes() must be called
 	/// as soon as data is available for reading (indicated by select()).
 	///
-	/// The SSL handshake is delayed until the first sendBytes() or
-	/// receiveBytes() operation is performed on the socket. No automatic
-	/// post connection check (checking the peer certificate for a valid
-	/// hostname) is performed when using nonblocking I/O. To manually
-	/// perform peer certificate validation, call verifyPeerCertificate()
-	/// after the SSL handshake has been completed.
+	/// The SSL handshake is delayed until the first sendBytes(),
+	/// receiveBytes() or completeHandshake() call on the socket.
+	/// The post connection check (checking the peer certificate for a
+	/// valid hostname) is performed when the SSL handshake completes.
+	/// If the check fails, a CertificateValidationException is thrown
+	/// and no data can be sent or received over the connection.
 {
 public:
 	enum
@@ -231,15 +231,18 @@ public:
 		/// using the peer host name set with setPeerHostName(), or the peer's
 		/// IP address string if no peer host name has been set.
 		///
-		/// Should only be used for non-blocking connections, after the
-		/// initial SSL handshake has been performed (see completeHandshake()).
+		/// This validation is performed automatically when the SSL handshake
+		/// completes.
 
 	void verifyPeerCertificate(const std::string& hostName);
 		/// Performs post-connect (or post-accept) peer certificate validation
 		/// using the given host name.
 		///
-		/// Should only be used for non-blocking connections, after the
-		/// initial SSL handshake has been performed (see completeHandshake()).
+		/// This method is an additional check against another host name; the
+		/// validation against the host name set with setPeerHostName() before
+		/// the SSL handshake is performed automatically. It can only be made
+		/// after the SSL handshake has completed and the automatic validation
+		/// has passed (see completeHandshake()).
 
 	int completeHandshake();
 		/// Completes the SSL handshake.
@@ -252,6 +255,18 @@ public:
 		/// ERR_SSL_WANT_WRITE if more data is required to complete the
 		/// handshake. In this case, completeHandshake() should be called
 		/// again, after the necessary condition has been met.
+		///
+		/// Once the handshake is complete, the peer certificate is validated
+		/// as in verifyPeerCertificate(). Throws a CertificateValidationException
+		/// if the certificate is not acceptable.
+		///
+		/// On the server side, no peer host name is set, so the certificate
+		/// of a client must match the IP address of the client if the Context
+		/// verifies client certificates (VERIFY_RELAXED or VERIFY_STRICT, with
+		/// extended certificate verification enabled). With VERIFY_RELAXED,
+		/// the address is not checked for a client on the local host.
+		/// Throws a NetException if the peer has closed the connection and
+		/// its address cannot be obtained.
 
 	[[nodiscard]] Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,
