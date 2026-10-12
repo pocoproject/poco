@@ -38,6 +38,8 @@ public:
 	void testNotImpl();
 	void testBuffer();
 	void testFile();
+	void testFileKeepAlive();
+	void testEmptyFileKeepAlive();
 	void testChunkedTrailer();
 
 	void setUp();

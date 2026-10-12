@@ -311,8 +311,8 @@ public:
 		/// or the socket is a secure one (secure() returne true),
 		/// falls back to reading the file block by block and calling sendBytes().
 		///
-		/// Returns the number of bytes sent, which should be the same
-		/// as count, unless count is 0.
+		/// Returns the number of bytes sent, which is less than count
+		/// if the file ends before count bytes have been sent.
 		///
 		/// Throws NetException (or a subclass) in case of any errors.
 		/// Also throws a NetException if the socket has been set to
