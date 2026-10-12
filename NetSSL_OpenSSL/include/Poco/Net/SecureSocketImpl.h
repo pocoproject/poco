@@ -72,6 +72,9 @@ public:
 		/// If performHandshake is true, the SSL handshake is performed immediately
 		/// after establishing the connection. Otherwise, the handshake is performed
 		/// the first time sendBytes(), receiveBytes() or completeHandshake() is called.
+		///
+		/// If performHandshake is true, the timeout also limits the whole
+		/// handshake, not only the wait for a single read or write.
 
 	void connectNB(const SocketAddress& address);
 		/// Initializes the socket and establishes a secure connection to
@@ -186,13 +189,15 @@ public:
 		/// the server-side handshake is completed, otherwise
 		/// a client-side handshake is performed.
 		///
-		/// Once the handshake is complete, the peer certificate is
-		/// verified as in verifyPeerCertificate(). Throws a
-		/// CertificateValidationException if the certificate is
-		/// not acceptable; the handshake then remains incomplete.
-		/// This also holds for the server-side handshake, where
-		/// the certificate of a client is checked against the
-		/// IP address of the client.
+		/// Once the handshake is complete, the peer certificate is verified
+		/// as in verifyPeerCertificate(), on the server side against the IP
+		/// address of the client. Throws a CertificateValidationException if
+		/// the certificate is not acceptable; the handshake then remains
+		/// incomplete.
+		///
+		/// On a blocking socket, the receive timeout, if set, limits the whole
+		/// handshake, not only the wait for a single read or write. Throws a
+		/// Poco::TimeoutException if the handshake does not complete in time.
 
 	[[nodiscard]] poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
@@ -307,6 +312,14 @@ private:
 
 	SecureSocketImpl(const SecureSocketImpl&);
 	SecureSocketImpl& operator = (const SecureSocketImpl&);
+
+	int handshakeWithDeadline(const Poco::Timespan& timeout);
+		/// Runs the SSL handshake and returns the result of
+		/// SSL_do_handshake().
+		///
+		/// On a blocking socket and with a non-zero timeout, throws a
+		/// Poco::TimeoutException if the handshake does not complete
+		/// within the timeout, however the peer spreads its data.
 
 	std::atomic<SSL*> _pSSL;
 	Poco::AutoPtr<SocketImpl> _pSocket;
