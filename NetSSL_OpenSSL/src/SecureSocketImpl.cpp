@@ -28,6 +28,7 @@
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 #include <algorithm>
+#include <cerrno>
 #include <mutex>
 
 
@@ -47,6 +48,18 @@ namespace
 	// The longest time that shutdown() waits for another thread to leave
 	// its call on the socket before it takes that thread as blocked.
 	const Poco::Timespan LOCK_WAIT(0, 100000);
+
+	// Called before an SSL operation, so that SocketImpl::lastError()
+	// afterwards cannot hold the error code of an unrelated earlier call.
+	void clearSSLErrors()
+	{
+		::ERR_clear_error();
+#if defined(_WIN32)
+		WSASetLastError(0);
+#else
+		errno = 0;
+#endif
+	}
 }
 
 
@@ -362,7 +375,7 @@ int SecureSocketImpl::shutdown()
 				const Poco::Timespan wait = std::min(_pSocket->getReceiveTimeout(), SHUTDOWN_WAIT);
 				// The own close_notify alert is sent on the blocking socket,
 				// so that the send timeout is its limit.
-				::ERR_clear_error();
+				clearSSLErrors();
 				rc = ::SSL_shutdown(_pSSL);
 				/* The close_notify alert stays behind the unsent TLS record,
 				 * so the peer cannot answer it. */
@@ -379,7 +392,7 @@ int SecureSocketImpl::shutdown()
 						{
 							const Poco::Timespan remaining = wait - tsStart.elapsed();
 							if (remaining <= 0 || !_pSocket->poll(remaining, mode)) break;
-							::ERR_clear_error();
+							clearSSLErrors();
 							rc = ::SSL_shutdown(_pSSL);
 							if (rc == 1) break;
 							mode = Poco::Net::Socket::SELECT_READ;
@@ -430,7 +443,7 @@ int SecureSocketImpl::shutdown()
 			else
 			{
 				// For non-blocking sockets, call SSL_shutdown() once.
-				::ERR_clear_error();
+				clearSSLErrors();
 				rc = ::SSL_shutdown(_pSSL);
 				if (rc < 0)
 				{
@@ -527,7 +540,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	Poco::Timestamp tsStart;
 	while (true)
 	{
-		::ERR_clear_error();
+		clearSSLErrors();
 		rc = ::SSL_write(_pSSL, buffer, length);
 		if (!mustRetry(rc))
 			break;
@@ -573,7 +586,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	Poco::Timestamp tsStart;
 	while (true)
 	{
-		::ERR_clear_error();
+		clearSSLErrors();
 		if (flags & MSG_PEEK)
 		{
 			rc = SSL_peek(_pSSL, buffer, length);
@@ -650,7 +663,7 @@ int SecureSocketImpl::handshakeWithDeadline(const Poco::Timespan& timeout)
 		{
 			// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
 			// left there by unrelated code would turn a retry condition into a fatal error.
-			::ERR_clear_error();
+			clearSSLErrors();
 			rc = ::SSL_do_handshake(_pSSL);
 			if (!mustRetry(rc))
 				break;
@@ -672,7 +685,7 @@ int SecureSocketImpl::handshakeWithDeadline(const Poco::Timespan& timeout)
 	{
 		while (true)
 		{
-			::ERR_clear_error();
+			clearSSLErrors();
 			rc = ::SSL_do_handshake(_pSSL);
 			if (rc > 0)
 				break;
@@ -690,7 +703,16 @@ int SecureSocketImpl::handshakeWithDeadline(const Poco::Timespan& timeout)
 			if (remaining <= 0)
 				throw Poco::TimeoutException();
 			if (mode != 0)
+			{
+#if defined(_WIN32)
+				// close() of another thread does not wait for this call, and a
+				// socket that is closed during poll() is not reported: the short
+				// wait lets the next poll() find the closed socket and throw.
+				(void) _pSocket->poll(std::min(remaining, LOCK_WAIT), mode);
+#else
 				(void) _pSocket->poll(remaining, mode);
+#endif
+			}
 		};
 	}
 	catch (...)
@@ -830,9 +852,13 @@ bool SecureSocketImpl::mustRetry(int rc)
 			}
 			break;
 		case SSL_ERROR_SYSCALL:
-			return socketError == POCO_EAGAIN || socketError == POCO_EINTR;
+			// On POSIX systems, OpenSSL reports EINTR as a retry condition.
+			// On Windows, WSAEINTR means that closesocket() of another thread
+			// has cancelled the call, and a retry would use the closed socket.
+			return socketError == POCO_EAGAIN;
 		default:
-			return socketError == POCO_EINTR;
+			// every other result is final
+			break;
 		}
 	}
 	return false;

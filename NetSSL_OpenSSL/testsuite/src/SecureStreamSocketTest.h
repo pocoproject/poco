@@ -62,6 +62,8 @@ public:
 	void testShutdownAfterSendError();
 	void testShutdownOnResetConnection();
 	void testShutdownAfterReceiveTimeout();
+	void testReceiveAfterCloseNotifyStaleError();
+	void testSendAfterShutdownStaleError();
 
 	void setUp();
 	void tearDown();
