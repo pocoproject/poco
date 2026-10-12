@@ -26,6 +26,7 @@ public:
 
 	void testFromSocket();
 	void testGetSmall();
+	void testSourceAddress();
 	void testGetLarge();
 	void testHead();
 	void testPostSmallIdentity();
