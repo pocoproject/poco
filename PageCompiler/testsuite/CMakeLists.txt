@@ -33,7 +33,7 @@ function(pagecompiler_test_page page handler)
 	set(TEST_SRCS ${TEST_SRCS} "${source}" "${header}" PARENT_SCOPE)
 endfunction()
 
-pagecompiler_test_page(../test/test.cpsp TestHandler)
+pagecompiler_test_page(data/test.cpsp TestHandler)
 pagecompiler_test_page(data/test-no-form.cpsp TestHandlerNoForm)
 pagecompiler_test_page(data/test-stringify.cpsp StringifyHandler)
 pagecompiler_test_page(data/test-stringify-no-form.cpsp StringifyHandlerNoForm)
