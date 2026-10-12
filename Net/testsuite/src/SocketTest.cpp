@@ -35,10 +35,10 @@
 #include "Poco/Runnable.h"
 #include <iostream>
 #include <functional>
-#if defined(POCO_OS_FAMILY_UNIX)
 #include <algorithm>
-#include <csignal>
 #include <vector>
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <csignal>
 #include <pthread.h>
 #include <sys/resource.h>
 #include <unistd.h>
@@ -1541,6 +1541,79 @@ void SocketTest::testPollAtFdLimit()
 	assertEqual (std::string(), error);
 	assertTrue (writable);
 }
+
+
+#if defined(MSG_DONTWAIT)
+void SocketTest::testReceiveDontWaitBlocking()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+	ss.setReceiveTimeout(Timespan(5, 0));
+
+	// nothing to receive: the calls return -1 and neither wait nor throw
+	char c = 0;
+	Buffer<char> buffer(16);
+	const Poco::Clock start;
+	assertEqual (-1, ss.receiveBytes(&c, 1, MSG_DONTWAIT));
+	assertEqual (-1, ss.receiveBytes(buffer, MSG_DONTWAIT, Timespan(5, 0)));
+	Buffer<char> empty(0);
+	assertEqual (-1, ss.receiveBytes(empty, MSG_DONTWAIT, Timespan(5, 0)));
+
+	DatagramSocket ds(SocketAddress("127.0.0.1", 0), false);
+	ds.setReceiveTimeout(Timespan(5, 0));
+	SocketAddress sender;
+	assertEqual (-1, ds.receiveFrom(&c, 1, sender, MSG_DONTWAIT));
+	assertTrue (start.elapsed() < 2000000);
+
+	assertEqual (1, peer.sendBytes("x", 1));
+	assertTrue (ss.poll(Timespan(5, 0), Socket::SELECT_READ));
+	assertEqual (1, ss.receiveBytes(&c, 1, MSG_DONTWAIT | MSG_PEEK));
+	assertEqual ('x', c);
+	assertEqual (1, ss.receiveBytes(&c, 1, MSG_DONTWAIT));
+}
+
+
+void SocketTest::testSendDontWaitBlocking()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+	// ends the test where a send waits although it must not
+	ss.setSendTimeout(Timespan(5, 0));
+
+	// The peer does not read, so a send fails once the buffers are full.
+	// A block this small is never sent in part with a wait for the rest.
+	Buffer<char> data(1024);
+	for (std::size_t i = 0; i < data.size(); i++) data[i] = static_cast<char>(i % 251);
+	std::vector<char> expected;
+	int rc = 0;
+	const Poco::Clock start;
+	while (rc >= 0 && start.elapsed() < 10000000)
+	{
+		rc = ss.sendBytes(data.begin(), static_cast<int>(data.size()), MSG_DONTWAIT);
+		if (rc > 0) expected.insert(expected.end(), data.begin(), data.begin() + rc);
+	}
+	assertEqual (-1, rc);
+	assertTrue (start.elapsed() < 2000000);
+	assertFalse (expected.empty());
+	ss.shutdownSend();
+
+	// what the calls reported as sent is what the peer receives
+	peer.setReceiveTimeout(Timespan(5, 0));
+	std::vector<char> received;
+	int n = 0;
+	do
+	{
+		n = peer.receiveBytes(data.begin(), static_cast<int>(data.size()));
+		if (n > 0) received.insert(received.end(), data.begin(), data.begin() + n);
+	}
+	while (n > 0);
+	assertTrue (expected == received);
+}
+#endif // MSG_DONTWAIT
 #endif
 
 
@@ -1621,6 +1694,10 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testPollInterruptedNoTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testPollClosedDescriptor);
 	CppUnit_addTest(pSuite, SocketTest, testPollAtFdLimit);
+#if defined(MSG_DONTWAIT)
+	CppUnit_addTest(pSuite, SocketTest, testReceiveDontWaitBlocking);
+	CppUnit_addTest(pSuite, SocketTest, testSendDontWaitBlocking);
+#endif
 #endif
 
 	return pSuite;

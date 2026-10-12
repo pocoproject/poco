@@ -15,6 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/SocketDefs.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -69,6 +70,10 @@ public:
 	void testPollInterruptedNoTimeout();
 	void testPollClosedDescriptor();
 	void testPollAtFdLimit();
+#if defined(MSG_DONTWAIT)
+	void testReceiveDontWaitBlocking();
+	void testSendDontWaitBlocking();
+#endif
 #endif
 
 	void setUp() override;

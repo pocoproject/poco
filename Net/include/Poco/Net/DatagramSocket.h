@@ -29,6 +29,12 @@ namespace Poco::Net {
 class Net_API DatagramSocket: public Socket
 	/// This class provides an interface to an
 	/// UDP stream socket.
+	///
+	/// On POSIX systems, a send or receive call with the MSG_DONTWAIT
+	/// flag returns -1 instead of throwing a TimeoutException when it
+	/// would wait, also on a blocking socket.
+	/// The sendBytes() and receiveBytes() overloads taking a SocketBufVec
+	/// ignore the flags argument and wait.
 {
 public:
 	DatagramSocket();
