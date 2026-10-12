@@ -18,6 +18,7 @@
 #include "Poco/Net/TCPServerParams.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureServerSocket.h"
+#include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/RejectCertificateHandler.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
@@ -49,6 +50,7 @@ using Poco::Net::TCPServerParams;
 using Poco::Net::Socket;
 using Poco::Net::StreamSocket;
 using Poco::Net::SecureStreamSocket;
+using Poco::Net::ServerSocket;
 using Poco::Net::SecureServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::Context;
@@ -206,6 +208,63 @@ namespace
 		Poco::Event _proceed;
 		Poco::FastMutex _mutex;
 		std::string _received;
+	};
+
+	class DripFeeder: public Poco::Runnable
+		/// Sends the header of a TLS handshake record of the largest size,
+		/// then its content one byte at a time, each byte within the
+		/// receive timeout of the peer. Stops after a limited time, so that
+		/// a peer that waits for the whole record does not wait forever.
+	{
+	public:
+		explicit DripFeeder(const StreamSocket& socket):
+			_socket(socket),
+			_accept(false)
+		{
+		}
+
+		explicit DripFeeder(const ServerSocket& server):
+			_server(server),
+			_accept(true)
+		{
+		}
+
+		void stop()
+		{
+			_stop.set();
+		}
+
+		void run() override
+		{
+			try
+			{
+				if (_accept)
+				{
+					if (!_server.poll(Poco::Timespan(10, 0), Socket::SELECT_READ))
+						return;
+					_socket = _server.acceptConnection();
+				}
+				const unsigned char header[] = {0x16, 0x03, 0x01, 0x40, 0x00};
+				_socket.sendBytes(header, sizeof(header));
+				const char content = 0;
+				const Poco::Timespan limit(6, 0);
+				Poco::Timestamp start;
+				while (!start.isElapsed(limit.totalMicroseconds()) && !_stop.tryWait(250))
+				{
+					_socket.sendBytes(&content, 1);
+				}
+				_socket.close();
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+
+	private:
+		ServerSocket _server;
+		StreamSocket _socket;
+		bool _accept;
+		Poco::Event _stop;
 	};
 }
 
@@ -1070,6 +1129,103 @@ void SecureStreamSocketTest::testServerCompleteHandshakeVerifiesClientCertificat
 }
 
 
+void SecureStreamSocketTest::testServerHandshakeDripFeed()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	StreamSocket client;
+	client.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	assertTrue (svs.poll(Poco::Timespan(10, 0), Socket::SELECT_READ));
+	// the handshake of an accepted socket is made with its first data
+	StreamSocket socket = svs.acceptConnection();
+	socket.setReceiveTimeout(Poco::Timespan(1, 0));
+
+	DripFeeder feeder(client);
+	Thread thread;
+	thread.start(feeder);
+
+	std::string outcome("received");
+	Poco::Timestamp start;
+	try
+	{
+		char buffer[256];
+		socket.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		outcome = "timeout";
+	}
+	catch (Poco::Exception& exc)
+	{
+		outcome = exc.displayText();
+	}
+	const Poco::Timespan elapsed = start.elapsed();
+	const bool blocking = socket.getBlocking();
+	feeder.stop();
+	thread.join();
+	assertEqual (std::string("timeout"), outcome);
+	// the receive timeout limits the handshake, not the wait for the next byte
+	assertTrue (elapsed < Poco::Timespan(4, 0));
+	assertTrue (blocking);
+}
+
+
+void SecureStreamSocketTest::testClientHandshakeDripFeed()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	DripFeeder feeder(server);
+	Thread thread;
+	thread.start(feeder);
+
+	SecureStreamSocket ss;
+	std::string outcome("connected");
+	Poco::Timestamp start;
+	try
+	{
+		ss.connect(SocketAddress("127.0.0.1", server.address().port()), Poco::Timespan(1, 0));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		outcome = "timeout";
+	}
+	catch (Poco::Exception& exc)
+	{
+		outcome = exc.displayText();
+	}
+	const Poco::Timespan elapsed = start.elapsed();
+	const bool blocking = ss.getBlocking();
+	feeder.stop();
+	thread.join();
+	assertEqual (std::string("timeout"), outcome);
+	// the time allowed for connecting limits the handshake, not the wait for the next byte
+	assertTrue (elapsed < Poco::Timespan(4, 0));
+	assertTrue (blocking);
+}
+
+
+void SecureStreamSocketTest::testHandshakeLeavesSocketBlocking()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.setLazyHandshake(true);
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	assertEqual (1, ss.completeHandshake());
+	assertTrue (ss.getBlocking());
+
+	std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[256];
+	int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+
+	ss.close();
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -1106,6 +1262,9 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCompleteHandshakeVerifiesPeerNB);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCompleteHandshakeAcceptsPeer);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testServerCompleteHandshakeVerifiesClientCertificate);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testServerHandshakeDripFeed);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testClientHandshakeDripFeed);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeLeavesSocketBlocking);
 
 	return pSuite;
 }

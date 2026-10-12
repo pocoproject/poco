@@ -46,6 +46,9 @@ public:
 	void testCompleteHandshakeVerifiesPeerNB();
 	void testCompleteHandshakeAcceptsPeer();
 	void testServerCompleteHandshakeVerifiesClientCertificate();
+	void testServerHandshakeDripFeed();
+	void testClientHandshakeDripFeed();
+	void testHandshakeLeavesSocketBlocking();
 
 	void setUp();
 	void tearDown();

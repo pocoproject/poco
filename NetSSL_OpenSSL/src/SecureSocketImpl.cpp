@@ -226,26 +226,10 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 			::SSL_set_session(_pSSL, _pSession->sslSession());
 		}
 
+		::SSL_set_connect_state(_pSSL);
 		if (performHandshake && _pSocket->getBlocking())
 		{
-			int ret;
-			const auto recvTimeout = _pSocket->getReceiveTimeout();
-			Poco::Timestamp tsStart;
-			while (true)
-			{
-				// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
-				// left there by unrelated code would turn a retry condition into a fatal error.
-				::ERR_clear_error();
-				ret = ::SSL_connect(_pSSL);
-				if (!mustRetry(ret))
-					break;
-
-				// As in completeHandshake(): without a receive timeout the first
-				// failed retry ends the handshake, so that a socket that has
-				// become invalid cannot keep the loop going (GH #3557).
-				if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
-					throw Poco::TimeoutException();
-			};
+			const int ret = handshakeWithDeadline(_pSocket->getReceiveTimeout());
 			// The peer is verified once the handshake is complete: anything
 			// else that handleError() lets pass is no connection.
 			if (handleError(ret) != 1)
@@ -254,7 +238,6 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		}
 		else
 		{
-			::SSL_set_connect_state(_pSSL);
 			_needHandshake = true;
 		}
 	}
@@ -505,19 +488,7 @@ int SecureSocketImpl::completeHandshake()
 	poco_assert (_pSocket->initialized());
 	poco_check_ptr (_pSSL);
 
-	int rc;
-	const auto recvTimeout = _pSocket->getReceiveTimeout();
-	Poco::Timestamp tsStart;
-	while (true)
-	{
-		::ERR_clear_error();
-		rc = ::SSL_do_handshake(_pSSL);
-		if (!mustRetry(rc))
-			break;
-
-		if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
-			throw Poco::TimeoutException();
-	};
+	const int rc = handshakeWithDeadline(_pSocket->getReceiveTimeout());
 	if (rc <= 0)
 	{
 		return handleError(rc);
@@ -534,6 +505,75 @@ int SecureSocketImpl::completeHandshake()
 	 * only across the call that immediately flushes it. */
 	_ticketPending = ::SSL_is_server(_pSSL) && _pContext->sessionCacheEnabled();
 #endif
+	return rc;
+}
+
+
+int SecureSocketImpl::handshakeWithDeadline(const Poco::Timespan& timeout)
+{
+	int rc;
+	Poco::Timestamp tsStart;
+	if (timeout <= 0 || !_pSocket->getBlocking())
+	{
+		while (true)
+		{
+			// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
+			// left there by unrelated code would turn a retry condition into a fatal error.
+			::ERR_clear_error();
+			rc = ::SSL_do_handshake(_pSSL);
+			if (!mustRetry(rc))
+				break;
+
+			// Without a timeout the first failed retry ends the handshake,
+			// so that a socket that has become invalid cannot keep the
+			// loop going (GH #3557).
+			if (tsStart.isElapsed(timeout.totalMicroseconds()))
+				throw Poco::TimeoutException();
+		};
+		return rc;
+	}
+
+	// A blocking SSL_do_handshake() returns only when a single read finds
+	// no data within the receive timeout: a peer that sends one byte at a
+	// time would keep it going. The time is therefore counted here.
+	_pSocket->setBlocking(false);
+	try
+	{
+		while (true)
+		{
+			::ERR_clear_error();
+			rc = ::SSL_do_handshake(_pSSL);
+			if (rc > 0)
+				break;
+
+			int mode = 0;
+			const int sslError = ::SSL_get_error(_pSSL, rc);
+			if (sslError == SSL_ERROR_WANT_READ)
+				mode = Poco::Net::Socket::SELECT_READ;
+			else if (sslError == SSL_ERROR_WANT_WRITE)
+				mode = Poco::Net::Socket::SELECT_WRITE;
+			else if (!mustRetry(rc))
+				break;
+
+			const Poco::Timespan remaining = timeout - tsStart.elapsed();
+			if (remaining <= 0)
+				throw Poco::TimeoutException();
+			if (mode != 0)
+				(void) _pSocket->poll(remaining, mode);
+		};
+	}
+	catch (...)
+	{
+		try
+		{
+			_pSocket->setBlocking(true);
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		throw;
+	}
+	_pSocket->setBlocking(true);
 	return rc;
 }
 
