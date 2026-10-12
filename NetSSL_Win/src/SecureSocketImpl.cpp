@@ -21,6 +21,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Format.h"
+#include "Poco/String.h"
 #include "Poco/UnicodeConverter.h"
 #include <wininet.h>
 #include <cstring>
@@ -60,6 +61,7 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_pContext(pContext),
 	_mode(pContext->isForServerUse() ? MODE_SERVER : MODE_CLIENT),
 	_shutdownFlags(0),
+	_tunneled(false),
 	_clientAuthRequired(pContext->verificationMode() >= Context::VERIFY_STRICT),
 	_securityFunctions(SSLManager::instance().securityFunctions()),
 	_pOwnCertificate(nullptr),
@@ -364,10 +366,20 @@ void SecureSocketImpl::verifyPeerCertificate()
 void SecureSocketImpl::verifyPeerCertificate(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
-	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
-		(mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
+	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled())
 	{
 		return;
+	}
+	if (mode != Context::VERIFY_STRICT && isLocalHost(hostName) && !_tunneled)
+	{
+		// The name alone does not say where the connection ends: skip the
+		// verification only for a loopback peer address. The peer address of
+		// a tunneled connection is that of the proxy, not of the named host.
+		const SocketAddress peer = _pSocket->peerAddress();
+		if ((peer.family() == SocketAddress::IPv4 || peer.family() == SocketAddress::IPv6) && peer.host().isLoopback())
+		{
+			return;
+		}
 	}
 
 	if (_mode == MODE_SERVER)
@@ -406,8 +418,13 @@ int SecureSocketImpl::stateToReturnValue(State state)
 
 bool SecureSocketImpl::isLocalHost(const std::string& hostName)
 {
-	SocketAddress addr(hostName, 0);
-	return addr.host().isLoopback();
+	// The name service must not decide whether the certificate is verified.
+	if (Poco::icompare(hostName, "localhost") == 0)
+	{
+		return true;
+	}
+	IPAddress address;
+	return IPAddress::tryParse(hostName, address) && address.isLoopback();
 }
 
 

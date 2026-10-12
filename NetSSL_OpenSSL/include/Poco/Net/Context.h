@@ -102,6 +102,13 @@ public:
 			/// reason for the verification failure. A server that sends no
 			/// certificate (anonymous cipher) is rejected with a
 			/// CertificateValidationException once the handshake is complete.
+			///
+			/// With extended certificate verification, the certificate is not
+			/// checked against the peer host name if that name is "localhost" or
+			/// a loopback IP address literal (not resolved) and the socket is
+			/// connected to a loopback address, unless SecureStreamSocket::attach()
+			/// marks the socket as tunneled, as HTTPSClientSession does for a
+			/// proxy tunnel. VERIFY_STRICT always checks the host name.
 
 		VERIFY_STRICT  = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
 			/// Server: If the client did not return a certificate, the TLS/SSL

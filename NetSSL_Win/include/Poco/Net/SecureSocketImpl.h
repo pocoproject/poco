@@ -198,6 +198,14 @@ public:
 	[[nodiscard]] const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 
+	void setTunneled(bool tunneled);
+		/// Sets whether the connection is tunneled, that is, reaches the
+		/// peer host through a proxy whose address is the peer address of
+		/// the socket. Must be called before the handshake to be effective.
+
+	[[nodiscard]] bool getTunneled() const;
+		/// Returns true if the connection is tunneled.
+
 	void verifyPeerCertificate();
 		/// Performs post-connect (or post-accept) peer certificate validation,
 		/// using the peer host name set with setPeerHostName(), or the peer's
@@ -327,6 +335,9 @@ protected:
 	void setState(State st);
 	[[nodiscard]] static int stateToReturnValue(State state);
 	[[nodiscard]] static bool isLocalHost(const std::string& hostName);
+		/// Returns true iff the given host name is "localhost"
+		/// (in any letter case) or a loopback IP address literal.
+		/// The name is not resolved.
 
 #ifdef ENABLE_PRINT_STATE
 	void printState(const std::string& msg);
@@ -341,6 +352,7 @@ private:
 	Mode           _mode;
 	int            _shutdownFlags;
 	std::string    _peerHostName;
+	bool           _tunneled;
 	bool           _useMachineStore;
 	bool           _clientAuthRequired;
 
@@ -419,6 +431,18 @@ inline void SecureSocketImpl::setState(SecureSocketImpl::State st)
 inline const std::string& SecureSocketImpl::getPeerHostName() const
 {
 	return _peerHostName;
+}
+
+
+inline void SecureSocketImpl::setTunneled(bool tunneled)
+{
+	_tunneled = tunneled;
+}
+
+
+inline bool SecureSocketImpl::getTunneled() const
+{
+	return _tunneled;
 }
 
 

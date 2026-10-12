@@ -24,6 +24,7 @@
 #include "Poco/Net/Session.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SSLException.h"
+#include "Poco/Net/NetworkInterface.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Thread.h"
@@ -58,6 +59,25 @@ using Poco::Util::Application;
 
 namespace
 {
+#ifdef POCO_NET_HAS_INTERFACE
+	bool acceptsConnections(const Poco::Net::IPAddress& address)
+		/// Returns true if a socket bound to the address can be connected to;
+		/// the address of a bridge or a similar interface cannot.
+	{
+		try
+		{
+			Poco::Net::ServerSocket server(SocketAddress(address, 0));
+			StreamSocket client;
+			client.connect(server.address(), Poco::Timespan(1, 0));
+			return true;
+		}
+		catch (Poco::Exception&)
+		{
+			return false;
+		}
+	}
+#endif
+
 	class EchoConnection: public TCPServerConnection
 	{
 	public:
@@ -771,6 +791,143 @@ void SecureStreamSocketTest::testRelaxedServerAcceptsClientWithoutCertificate()
 }
 
 
+void SecureStreamSocketTest::testLoopbackPeerHostName()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+	const SocketAddress address("127.0.0.1", svs.address().port());
+
+	// the certificate of the test server is not one for any of these names
+	const std::vector<std::string> names = {"localhost", "LocalHost", "127.0.0.1", "::1"};
+	for (const auto& name: names)
+	{
+		SecureStreamSocket ss;
+		ss.setPeerHostName(name);
+		ss.connect(address, Poco::Timespan(10, 0));
+		ss.setReceiveTimeout(Poco::Timespan(10, 0));
+		std::string data("hello, world");
+		ss.sendBytes(data.data(), static_cast<int>(data.size()));
+		char buffer[256];
+		int n = ss.receiveBytes(buffer, sizeof(buffer));
+		assertTrue (n > 0);
+		assertTrue (std::string(buffer, n) == data);
+		ss.close();
+	}
+}
+
+
+void SecureStreamSocketTest::testTunneledLoopbackPeerIsVerified()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+	const SocketAddress address("127.0.0.1", svs.address().port());
+
+	// not tunneled: the peer is on this host, so the host name check is left out
+	StreamSocket direct;
+	direct.connect(address, Poco::Timespan(10, 0));
+	SecureStreamSocket ss = SecureStreamSocket::attach(direct, "localhost", SSLManager::instance().defaultClientContext(), nullptr, false);
+	ss.close();
+
+	// tunneled: the peer address is that of a proxy, so the host name is checked
+	StreamSocket tunnel;
+	tunnel.connect(address, Poco::Timespan(10, 0));
+	try
+	{
+		SecureStreamSocket tunneled = SecureStreamSocket::attach(tunnel, "localhost", SSLManager::instance().defaultClientContext(), nullptr, true);
+		fail("certificate for another host, tunneled connection - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+	}
+}
+
+
+void SecureStreamSocketTest::testResolvedLoopbackNameIsVerified()
+{
+	// names that a host may resolve to a loopback address without being "localhost"
+	const std::vector<std::string> candidates = {"ip6-localhost", "localhost.localdomain", "poco-test.localhost"};
+	std::string name;
+	for (const auto& candidate: candidates)
+	{
+		try
+		{
+			if (SocketAddress(candidate, 0).host().isLoopback())
+			{
+				name = candidate;
+				break;
+			}
+		}
+		catch (Poco::Exception&)
+		{
+		}
+	}
+	if (name.empty())
+	{
+		std::cout << "no name other than localhost resolves to a loopback address; test skipped" << std::endl;
+		return;
+	}
+
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.setPeerHostName(name);
+	try
+	{
+		ss.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+		fail("certificate for another host, name resolves to loopback - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+	}
+}
+
+
+void SecureStreamSocketTest::testLocalhostNameOnOtherAddressIsVerified()
+{
+#ifdef POCO_NET_HAS_INTERFACE
+	// an address of this host that is not a loopback address and accepts connections
+	Poco::Net::IPAddress host;
+	for (const auto& interfc: Poco::Net::NetworkInterface::list())
+	{
+		for (const auto& entry: interfc.addressList())
+		{
+			const Poco::Net::IPAddress& candidate = entry.get<Poco::Net::NetworkInterface::IP_ADDRESS>();
+			if (host.isWildcard() && candidate.family() == Poco::Net::IPAddress::IPv4 && !candidate.isLoopback() && !candidate.isWildcard() && acceptsConnections(candidate))
+			{
+				host = candidate;
+			}
+		}
+	}
+	if (host.isWildcard())
+	{
+		std::cout << "this host has no IPv4 address other than loopback that accepts connections; test skipped" << std::endl;
+		return;
+	}
+
+	SecureServerSocket svs(SocketAddress(host, 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.setPeerHostName("localhost");
+	try
+	{
+		ss.connect(SocketAddress(host, svs.address().port()), Poco::Timespan(10, 0));
+		fail("certificate for another host, peer not on loopback - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+	}
+#else
+	std::cout << "no network interface detection on this platform; test skipped" << std::endl;
+#endif
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -799,6 +956,10 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testDefaultCipherListRefusesAnonymousServer);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testClientRejectsAnonymousServer);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testRelaxedServerAcceptsClientWithoutCertificate);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLoopbackPeerHostName);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testTunneledLoopbackPeerIsVerified);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testResolvedLoopbackNameIsVerified);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLocalhostNameOnOtherAddressIsVerified);
 
 	return pSuite;
 }

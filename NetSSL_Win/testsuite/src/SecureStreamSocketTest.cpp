@@ -17,11 +17,14 @@
 #include "Poco/Net/TCPServerParams.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureServerSocket.h"
+#include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/RejectCertificateHandler.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
 #include "Poco/Net/Session.h"
 #include "Poco/Net/SSLManager.h"
+#include "Poco/Net/SSLException.h"
+#include "Poco/Net/NetworkInterface.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Thread.h"
@@ -51,6 +54,23 @@ using Poco::Util::Application;
 
 namespace
 {
+	bool acceptsConnections(const Poco::Net::IPAddress& address)
+		/// Returns true if a socket bound to the address can be connected to;
+		/// the address of a bridge or a similar interface cannot.
+	{
+		try
+		{
+			Poco::Net::ServerSocket server(SocketAddress(address, 0));
+			StreamSocket client;
+			client.connect(server.address(), Poco::Timespan(1, 0));
+			return true;
+		}
+		catch (Poco::Exception&)
+		{
+			return false;
+		}
+	}
+
 	class EchoConnection: public TCPServerConnection
 	{
 	public:
@@ -313,6 +333,152 @@ void SecureStreamSocketTest::testLazyHandshake()
 }
 
 
+void SecureStreamSocketTest::testLoopbackPeerHostName()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+	const SocketAddress address("127.0.0.1", svs.address().port());
+
+	// the certificate of the test server is issued by a CA that is not trusted:
+	// verifyPeerCertificate() throws unless it leaves the verification out
+	const std::vector<std::string> names = {"localhost", "LocalHost", "127.0.0.1", "::1"};
+	for (const auto& name: names)
+	{
+		SecureStreamSocket ss;
+		ss.setPeerHostName(name);
+		ss.connect(address, Poco::Timespan(10, 0));
+		// The handshake accepts the certificate, as the configured AcceptCertificateHandler
+		// ignores the errors; this handler is notified after it and makes them fail.
+		RejectCertificateHandler rejectHandler(false);
+		ss.verifyPeerCertificate();
+	}
+}
+
+
+void SecureStreamSocketTest::testTunneledLoopbackPeerIsVerified()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+	const SocketAddress address("127.0.0.1", svs.address().port());
+
+	// not tunneled: the peer is on this host, so the verification is left out
+	StreamSocket direct;
+	direct.connect(address, Poco::Timespan(10, 0));
+	SecureStreamSocket ss = SecureStreamSocket::attach(direct, "localhost", SSLManager::instance().defaultClientContext(), nullptr, false);
+	{
+		// The handshake accepts the certificate, as the configured AcceptCertificateHandler
+		// ignores the errors; this handler is notified after it and makes them fail.
+		RejectCertificateHandler rejectHandler(false);
+		ss.verifyPeerCertificate();
+	}
+	ss.close();
+
+	// tunneled: the peer address is the one of a proxy and says nothing about
+	// the named host, so the certificate is verified
+	StreamSocket tunnel;
+	tunnel.connect(address, Poco::Timespan(10, 0));
+	SecureStreamSocket tunneled = SecureStreamSocket::attach(tunnel, "localhost", SSLManager::instance().defaultClientContext(), nullptr, true);
+	RejectCertificateHandler rejectHandler(false);
+	try
+	{
+		// the certificate of the test server (CN=*) matches no host name and is issued by a CA that is not trusted
+		tunneled.verifyPeerCertificate();
+		fail("certificate not trusted, tunneled connection - must throw");
+	}
+	catch (Poco::Net::SSLException&)
+	{
+	}
+}
+
+
+void SecureStreamSocketTest::testResolvedLoopbackNameIsVerified()
+{
+	// names that a host may resolve to a loopback address without being "localhost"
+	const std::vector<std::string> candidates = {"localhost.", "ip6-localhost", "localhost.localdomain", "poco-test.localhost"};
+	std::string name;
+	for (const auto& candidate: candidates)
+	{
+		try
+		{
+			if (SocketAddress(candidate, 0).host().isLoopback())
+			{
+				name = candidate;
+				break;
+			}
+		}
+		catch (Poco::Exception&)
+		{
+		}
+	}
+	if (name.empty())
+	{
+		std::cout << "no name other than localhost resolves to a loopback address; test skipped" << std::endl;
+		return;
+	}
+
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.setPeerHostName(name);
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	RejectCertificateHandler rejectHandler(false);
+	try
+	{
+		// the certificate of the test server (CN=*) is issued by a CA that is not trusted
+		ss.verifyPeerCertificate();
+		fail("certificate not trusted, name resolves to loopback - must throw");
+	}
+	catch (Poco::Net::SSLException&)
+	{
+	}
+}
+
+
+void SecureStreamSocketTest::testLocalhostNameOnOtherAddressIsVerified()
+{
+	// an address of this host that is not a loopback address and accepts connections
+	Poco::Net::IPAddress host;
+	for (const auto& interfc: Poco::Net::NetworkInterface::list())
+	{
+		for (const auto& entry: interfc.addressList())
+		{
+			const Poco::Net::IPAddress& candidate = entry.get<Poco::Net::NetworkInterface::IP_ADDRESS>();
+			if (host.isWildcard() && candidate.family() == Poco::Net::IPAddress::IPv4 && !candidate.isLoopback() && !candidate.isWildcard() && acceptsConnections(candidate))
+			{
+				host = candidate;
+			}
+		}
+	}
+	if (host.isWildcard())
+	{
+		std::cout << "this host has no IPv4 address other than loopback that accepts connections; test skipped" << std::endl;
+		return;
+	}
+
+	SecureServerSocket svs(SocketAddress(host, 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.setPeerHostName("localhost");
+	ss.connect(SocketAddress(host, svs.address().port()), Poco::Timespan(10, 0));
+	RejectCertificateHandler rejectHandler(false);
+	try
+	{
+		// the certificate of the test server (CN=*) is issued by a CA that is not trusted
+		ss.verifyPeerCertificate();
+		fail("certificate not trusted, peer not on loopback - must throw");
+	}
+	catch (Poco::Net::SSLException&)
+	{
+	}
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -332,6 +498,10 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLazyHandshake);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLoopbackPeerHostName);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testTunneledLoopbackPeerIsVerified);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testResolvedLoopbackNameIsVerified);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLocalhostNameOnOtherAddressIsVerified);
 
 	return pSuite;
 }

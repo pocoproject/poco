@@ -89,6 +89,14 @@ public:
 			/// If the verification process fails, the TLS/SSL handshake is
 			/// immediately terminated with an alert message containing the
 			/// reason for the verification failure.
+			///
+			/// With extended certificate verification,
+			/// SecureStreamSocket::verifyPeerCertificate() does not verify the
+			/// certificate if the peer host name (not resolved) is "localhost" or
+			/// a loopback IP address literal and the socket is connected to a
+			/// loopback address, unless SecureStreamSocket::attach() marked the
+			/// socket as tunneled, as HTTPSClientSession does for a proxy tunnel.
+			/// VERIFY_STRICT always verifies the certificate.
 
 		VERIFY_STRICT  = 2,
 			/// Server: If the client did not return a certificate, the TLS/SSL

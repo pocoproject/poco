@@ -174,6 +174,9 @@ public:
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
+		///
+		/// For a socket connected through a proxy tunnel, use the attach()
+		/// overload with the tunneled argument; its pSession can be null.
 
 	[[nodiscard]] static SecureStreamSocket attach(const StreamSocket& streamSocket, Context::Ptr pContext);
 		/// Creates a SecureStreamSocket over an existing socket
@@ -199,7 +202,7 @@ public:
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
 
-	[[nodiscard]] static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession);
+	[[nodiscard]] static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession, bool tunneled = false);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
@@ -207,6 +210,10 @@ public:
 		/// The given Session is reused, if possible (client session
 		/// caching is enabled for the given Context, and the server
 		/// agrees to reuse the session).
+		///
+		/// If tunneled is true, the connection to peerHostName goes
+		/// through a proxy tunnel, and the host name check is never left
+		/// out for a loopback peer (see Context::VERIFY_RELAXED).
 
 	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
