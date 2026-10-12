@@ -150,6 +150,13 @@ public:
 	[[nodiscard]] const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 
+	void setTunneled(bool tunneled);
+		/// Sets whether the connection reaches the peer host through
+		/// a proxy tunnel (see SecureSocketImpl::setTunneled()).
+
+	[[nodiscard]] bool getTunneled() const;
+		/// Returns true if the connection is tunneled.
+
 	[[nodiscard]] bool havePeerCertificate() const;
 		/// Returns true iff the peer has presented a
 		/// certificate.
@@ -253,6 +260,18 @@ inline const std::string& SecureStreamSocketImpl::getPeerHostName() const
 inline void SecureStreamSocketImpl::setPeerHostName(const std::string& peerHostName)
 {
 	_impl.setPeerHostName(peerHostName);
+}
+
+
+inline void SecureStreamSocketImpl::setTunneled(bool tunneled)
+{
+	_impl.setTunneled(tunneled);
+}
+
+
+inline bool SecureStreamSocketImpl::getTunneled() const
+{
+	return _impl.getTunneled();
 }
 
 

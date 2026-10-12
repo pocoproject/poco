@@ -38,6 +38,10 @@ public:
 	void testDefaultCipherListRefusesAnonymousServer();
 	void testClientRejectsAnonymousServer();
 	void testRelaxedServerAcceptsClientWithoutCertificate();
+	void testLoopbackPeerHostName();
+	void testTunneledLoopbackPeerIsVerified();
+	void testResolvedLoopbackNameIsVerified();
+	void testLocalhostNameOnOtherAddressIsVerified();
 
 	void setUp();
 	void tearDown();

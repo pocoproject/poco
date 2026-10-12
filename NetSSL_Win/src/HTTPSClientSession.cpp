@@ -158,7 +158,7 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 	else
 	{
 		StreamSocket proxySocket(proxyConnect());
-		SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession);
+		SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession, true);
 		attachSocket(secureSocket);
 		if (_pContext->sessionCacheEnabled())
 		{

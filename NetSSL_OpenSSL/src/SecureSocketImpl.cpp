@@ -24,6 +24,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Format.h"
+#include "Poco/String.h"
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 
@@ -43,7 +44,8 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_pSocket(pSocketImpl),
 	_pContext(pContext),
 	_needHandshake(false),
-	_ticketPending(false)
+	_ticketPending(false),
+	_tunneled(false)
 {
 	poco_check_ptr (_pSocket);
 	poco_check_ptr (_pContext);
@@ -581,10 +583,20 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 	}
 	X509Certificate cert(pCert);
 
-	if (!_pContext->extendedCertificateVerificationEnabled() ||
-	   (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
+	if (!_pContext->extendedCertificateVerificationEnabled())
 	{
 		return X509_V_OK;
+	}
+	if (mode != Context::VERIFY_STRICT && isLocalHost(hostName) && !_tunneled)
+	{
+		// The name alone does not say where the connection ends: the host name
+		// check is left out only for a loopback peer address, and never for a
+		// tunneled connection, whose peer address is the one of the proxy.
+		const SocketAddress peer = _pSocket->peerAddress();
+		if ((peer.family() == SocketAddress::IPv4 || peer.family() == SocketAddress::IPv6) && peer.host().isLoopback())
+		{
+			return X509_V_OK;
+		}
 	}
 	return cert.verify(hostName) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
 }
@@ -592,15 +604,14 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 
 bool SecureSocketImpl::isLocalHost(const std::string& hostName)
 {
-	try
+	// No name resolution: an answer of the name service must not decide
+	// whether the host name of a certificate is checked.
+	if (Poco::icompare(hostName, "localhost") == 0)
 	{
-		SocketAddress addr(hostName, 0);
-		return addr.host().isLoopback();
+		return true;
 	}
-	catch (const Poco::Exception&)
-	{
-		return false;
-	}
+	IPAddress address;
+	return IPAddress::tryParse(hostName, address) && address.isLoopback();
 }
 
 

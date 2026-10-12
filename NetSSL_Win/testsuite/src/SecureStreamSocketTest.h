@@ -29,6 +29,10 @@ public:
 	void testNB();
 	void testHandshakeTimeout();
 	void testLazyHandshake();
+	void testLoopbackPeerHostName();
+	void testTunneledLoopbackPeerIsVerified();
+	void testResolvedLoopbackNameIsVerified();
+	void testLocalhostNameOnOtherAddressIsVerified();
 
 	void setUp();
 	void tearDown();
