@@ -70,7 +70,7 @@ class NetSSL_API SSLManager
 	///            <verificationMode>none|relaxed|strict|once</verificationMode>
 	///            <verificationDepth>1..9</verificationDepth>
 	///            <loadDefaultCAFile>true|false</loadDefaultCAFile>
-	///            <cipherList>ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH</cipherList>
+	///            <cipherList>ALL:!aNULL:!LOW:!EXP:!MD5:!3DES:!IDEA:@STRENGTH</cipherList>
 	///            <preferServerCiphers>true|false</preferServerCiphers>
 	///            <privateKeyPassphraseHandler>
 	///                <name>KeyFileHandler</name>
@@ -113,7 +113,7 @@ class NetSSL_API SSLManager
 	///      will fail if a certificate chain larger than this is encountered.
 	///    - loadDefaultCAFile (boolean): Specifies whether the builtin CA certificates from OpenSSL are used.
 	///    - cipherList (string): Specifies the supported ciphers in OpenSSL notation
-	///      (e.g. "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH").
+	///      (e.g. "ALL:!aNULL:!LOW:!EXP:!MD5:!3DES:!IDEA:@STRENGTH").
 	///    - preferServerCiphers (bool): When choosing a cipher, use the server's preferences instead of the
 	///      client preferences. When not called, the SSL server will always follow the clients
 	///      preferences. When called, the SSL/TLS server will choose following its own
@@ -190,7 +190,7 @@ public:
 		/// Valid initialization code would be:
 		///     SharedPtr<PrivateKeyPassphraseHandler> pConsoleHandler = new KeyConsoleHandler;
 		///     SharedPtr<InvalidCertificateHandler> pInvalidCertHandler = new ConsoleCertificateHandler;
-		///     Context::Ptr pContext = new Context(Context::SERVER_USE, "any.pem", "any.pem", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		///     Context::Ptr pContext = new Context(Context::SERVER_USE, "any.pem", "any.pem", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!aNULL:!LOW:!EXP:!MD5:!3DES:!IDEA:@STRENGTH");
 		///     SSLManager::instance().initializeServer(pConsoleHandler, pInvalidCertHandler, pContext);
 
 	void initializeClient(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrHandler, Context::Ptr ptrContext);
@@ -206,7 +206,7 @@ public:
 		/// Valid initialization code would be:
 		///     SharedPtr<PrivateKeyPassphraseHandler> pConsoleHandler = new KeyConsoleHandler;
 		///     SharedPtr<InvalidCertificateHandler> pInvalidCertHandler = new ConsoleCertificateHandler;
-		///     Context::Ptr pContext = new Context(Context::CLIENT_USE, "", "", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		///     Context::Ptr pContext = new Context(Context::CLIENT_USE, "", "", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!aNULL:!LOW:!EXP:!MD5:!3DES:!IDEA:@STRENGTH");
 		///     SSLManager::instance().initializeClient(pConsoleHandler, pInvalidCertHandler, pContext);
 
 	[[nodiscard]] Context::Ptr defaultServerContext();

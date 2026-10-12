@@ -621,6 +621,55 @@ void SecureStreamSocketTest::testHandshakeTimeout()
 }
 
 
+void SecureStreamSocketTest::testDefaultCipherListRefusesAnonymousServer()
+{
+	ErrorQueueCleaner cleaner;
+
+	// a server without a certificate: it can only agree on a cipher suite without authentication
+	Context::Params serverParams;
+	serverParams.verificationMode = Context::VERIFY_NONE;
+	serverParams.cipherList = "AECDH-AES256-SHA";
+	Context::Ptr pServerContext = new Context(Context::TLS_SERVER_USE, serverParams);
+	SecureServerSocket svs(0, 64, pServerContext);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	// the server does complete a handshake over that cipher suite: it is the client that refuses below
+	Context::Params anonymousParams;
+	anonymousParams.verificationMode = Context::VERIFY_NONE;
+	anonymousParams.cipherList = serverParams.cipherList;
+	Context::Ptr pAnonymousContext = new Context(Context::TLS_CLIENT_USE, anonymousParams);
+	SecureStreamSocket anonymous(pAnonymousContext);
+	anonymous.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	anonymous.setReceiveTimeout(Poco::Timespan(10, 0));
+	const std::string data("hello, world");
+	anonymous.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[256];
+	const int n = anonymous.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (std::string(buffer, n) == data);
+	anonymous.close();
+
+	// a client that accepts any server at any security level: only the cipher list can refuse
+	Context::Params clientParams;
+	clientParams.verificationMode = Context::VERIFY_NONE;
+	clientParams.securityLevel = Context::SECURITY_LEVEL_NONE;
+	Context::Ptr pClientContext = new Context(Context::TLS_CLIENT_USE, clientParams);
+	SecureStreamSocket ss(pClientContext);
+	try
+	{
+		ss.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+		fail("server without a certificate - must throw");
+	}
+	catch (Poco::Net::CertificateValidationException&)
+	{
+		fail("the cipher list, not the certificate verification, must refuse the server");
+	}
+	catch (Poco::Net::SSLException&)
+	{
+	}
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -646,6 +695,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testPeerHostNameTooLong);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testStaleErrorQueue);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testDefaultCipherListRefusesAnonymousServer);
 
 	return pSuite;
 }

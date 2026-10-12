@@ -28,6 +28,7 @@ public:
 	void testValidCipherConfiguration();
 	void testInvalidCipherList();
 	void testCipherListWithoutMatch();
+	void testDefaultCipherListExcludesWeak();
 	void testInvalidCipherSuites();
 	void testInvalidECDHGroups();
 	void testDHParametersRejectedBySecurityLevel();
