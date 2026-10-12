@@ -38,6 +38,15 @@ class StreamSocketImpl;
 class Net_API StreamSocket: public Socket
 	/// This class provides an interface to a
 	/// TCP stream socket.
+	///
+	/// On POSIX systems, a send or receive call with the MSG_DONTWAIT
+	/// flag returns -1 instead of throwing a TimeoutException if it
+	/// cannot transfer any data without waiting, also on a blocking
+	/// socket. Where the system ignores the flag for a blocking socket
+	/// (macOS), a send call on such a socket that transfers part of the
+	/// data waits for the remainder. The sendBytes() and receiveBytes()
+	/// overloads taking a SocketBufVec ignore the flags and wait.
+	/// A SecureStreamSocket ignores the flag.
 {
 public:
 	StreamSocket();
