@@ -48,6 +48,9 @@ class NetSSL_API SecureStreamSocket: public StreamSocket
 	/// valid hostname) is performed when the SSL handshake completes.
 	/// If the check fails, a CertificateValidationException is thrown
 	/// and no data can be sent or received over the connection.
+	///
+	/// The sendBytes() and receiveBytes() overloads taking a SocketBufVec
+	/// or a Poco::Buffer throw a Poco::InvalidAccessException.
 {
 public:
 	enum

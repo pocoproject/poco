@@ -135,9 +135,27 @@ int SecureStreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 }
 
 
+int SecureStreamSocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
+{
+	throw Poco::InvalidAccessException("Cannot sendBytes() a SocketBufVec on a SecureStreamSocketImpl");
+}
+
+
 int SecureStreamSocketImpl::receiveBytes(void* buffer, int length, int flags)
 {
 	return _impl.receiveBytes(buffer, length, flags);
+}
+
+
+int SecureStreamSocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
+{
+	throw Poco::InvalidAccessException("Cannot receiveBytes() into a SocketBufVec on a SecureStreamSocketImpl");
+}
+
+
+int SecureStreamSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::Timespan& timeout)
+{
+	throw Poco::InvalidAccessException("Cannot receiveBytes() into a Poco::Buffer on a SecureStreamSocketImpl");
 }
 
 
@@ -147,9 +165,21 @@ int SecureStreamSocketImpl::sendTo(const void* buffer, int length, const SocketA
 }
 
 
+int SecureStreamSocketImpl::sendTo(const SocketBufVec& buffers, const SocketAddress& address, int flags)
+{
+	throw Poco::InvalidAccessException("Cannot sendTo() a SocketBufVec on a SecureStreamSocketImpl");
+}
+
+
 int SecureStreamSocketImpl::receiveFrom(void* buffer, int length, SocketAddress& address, int flags)
 {
 	throw Poco::InvalidAccessException("Cannot receiveFrom() on a SecureStreamSocketImpl");
+}
+
+
+int SecureStreamSocketImpl::receiveFrom(SocketBufVec& buffers, SocketAddress& address, int flags)
+{
+	throw Poco::InvalidAccessException("Cannot receiveFrom() into a SocketBufVec on a SecureStreamSocketImpl");
 }
 
 
