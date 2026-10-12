@@ -14,6 +14,7 @@
 #include "EchoServer.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/TCPServerConnection.h"
 #include "Poco/Net/TCPServerConnectionFactory.h"
@@ -35,6 +36,7 @@
 using Poco::Net::Socket;
 using Poco::Net::StreamSocket;
 using Poco::Net::ServerSocket;
+using Poco::Net::DatagramSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::ConnectionRefusedException;
 using Poco::Net::TCPServerConnection;
@@ -100,6 +102,21 @@ namespace
 
 	Poco::FastMutex CopyToStringConnection::_mutex;
 	std::string CopyToStringConnection::_data;
+
+	bool isInheritedByChildProcess(const Socket& socket)
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		DWORD flags = 0;
+		if (GetHandleInformation(reinterpret_cast<HANDLE>(socket.impl()->sockfd()), &flags) == 0)
+			throw Poco::SystemException("GetHandleInformation");
+		return (flags & HANDLE_FLAG_INHERIT) != 0;
+#else
+		int flags = ::fcntl(socket.impl()->sockfd(), F_GETFD);
+		if (flags == -1)
+			throw Poco::SystemException("fcntl(F_GETFD)");
+		return (flags & FD_CLOEXEC) == 0;
+#endif
+	}
 }
 
 
@@ -968,6 +985,23 @@ void SocketTest::testSendFileRange()
 }
 
 
+void SocketTest::testCloseOnExec()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	assertFalse (isInheritedByChildProcess(server));
+
+	StreamSocket client(server.address());
+	assertFalse (isInheritedByChildProcess(client));
+
+	assertTrue (server.poll(Timespan(5, 0), Socket::SELECT_READ));
+	StreamSocket accepted = server.acceptConnection();
+	assertFalse (isInheritedByChildProcess(accepted));
+
+	DatagramSocket datagram(SocketAddress("127.0.0.1", 0), false);
+	assertFalse (isInheritedByChildProcess(datagram));
+}
+
+
 void SocketTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1030,6 +1064,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSendFile);
 	CppUnit_addTest(pSuite, SocketTest, testSendFileLarge);
 	CppUnit_addTest(pSuite, SocketTest, testSendFileRange);
+	CppUnit_addTest(pSuite, SocketTest, testCloseOnExec);
 
 	return pSuite;
 }

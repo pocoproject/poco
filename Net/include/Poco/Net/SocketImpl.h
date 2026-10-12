@@ -42,6 +42,12 @@ class Net_API SocketImpl: public Poco::RefCountedObject
 	/// Subclasses implement specific socket types like
 	/// stream or datagram sockets.
 	///
+	/// A native socket that this class creates or accepts
+	/// is not inherited by a child process: it is
+	/// close-on-exec on POSIX platforms and not inheritable
+	/// on Windows. A native socket that is given to this
+	/// class is left as it is.
+	///
 	/// You should not create any instances of this class.
 {
 public:

@@ -32,6 +32,7 @@ public:
 	void testPollClosedServer();
 	void testPollSetWakeUp();
 	void testClear();
+	void testCloseOnExec();
 
 	void setUp();
 	void tearDown();

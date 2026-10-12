@@ -37,6 +37,13 @@ class Net_API Socket
 	/// socket classes.
 	///
 	/// It provides operations common to all socket types.
+	///
+	/// A native socket that a socket class creates or accepts is
+	/// not inherited by child processes: it is close-on-exec on
+	/// POSIX platforms and not inheritable on Windows. To let a
+	/// child process inherit a socket, change the flag on the
+	/// native socket (impl()->sockfd()) before starting the
+	/// child process.
 {
 public:
 	using BufVec = SocketBufVec;

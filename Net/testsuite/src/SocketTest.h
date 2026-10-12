@@ -54,6 +54,7 @@ public:
 	void testSendFile();
 	void testSendFileLarge();
 	void testSendFileRange();
+	void testCloseOnExec();
 
 	void setUp() override;
 	void tearDown() override;

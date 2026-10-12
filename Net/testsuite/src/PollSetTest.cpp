@@ -18,7 +18,9 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/PollSet.h"
 #include "Poco/Stopwatch.h"
+#include <algorithm>
 #include <iostream>
+#include <set>
 
 
 using Poco::Net::Socket;
@@ -60,6 +62,26 @@ private:
 	Timespan _timeout;
 	std::atomic<bool> _running;
 };
+
+
+#if defined(POCO_OS_FAMILY_UNIX)
+std::set<int> inheritableDescriptors()
+{
+	// The limit of open descriptors can be very large; the descriptors
+	// of the test runner are far below this bound.
+	static constexpr long MAX_DESCRIPTORS = 65536;
+
+	std::set<int> result;
+	const int end = static_cast<int>(std::min(::sysconf(_SC_OPEN_MAX), MAX_DESCRIPTORS));
+	for (int fd = 0; fd < end; ++fd)
+	{
+		int flags = ::fcntl(fd, F_GETFD);
+		if (flags != -1 && (flags & FD_CLOEXEC) == 0)
+			result.insert(fd);
+	}
+	return result;
+}
+#endif
 
 
 }
@@ -489,6 +511,21 @@ void PollSetTest::testClear()
 }
 
 
+void PollSetTest::testCloseOnExec()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	// Windows has no table of descriptors to walk through.
+	const std::set<int> before = inheritableDescriptors();
+
+	PollSet ps;
+	assertTrue (inheritableDescriptors() == before);
+
+	ps.clear();
+	assertTrue (inheritableDescriptors() == before);
+#endif
+}
+
+
 void PollSetTest::setUp()
 {
 }
@@ -511,6 +548,7 @@ CppUnit::Test* PollSetTest::suite()
 	CppUnit_addTest(pSuite, PollSetTest, testPollClosedServer);
 	CppUnit_addTest(pSuite, PollSetTest, testPollSetWakeUp);
 	CppUnit_addTest(pSuite, PollSetTest, testClear);
+	CppUnit_addTest(pSuite, PollSetTest, testCloseOnExec);
 
 	return pSuite;
 }
