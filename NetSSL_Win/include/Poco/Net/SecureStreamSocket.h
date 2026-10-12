@@ -48,6 +48,9 @@ class NetSSL_Win_API SecureStreamSocket: public StreamSocket
 	/// hostname) is performed when using nonblocking I/O. To manually
 	/// perform peer certificate validation, call verifyPeerCertificate()
 	/// after the SSL handshake has been completed.
+	///
+	/// The sendBytes() and receiveBytes() overloads taking a SocketBufVec
+	/// or a Poco::Buffer throw a Poco::InvalidAccessException.
 {
 public:
 	enum

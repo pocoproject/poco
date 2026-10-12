@@ -28,6 +28,7 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Util/LayeredConfiguration.h"
+#include "Poco/Buffer.h"
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include "Poco/Event.h"
@@ -42,6 +43,7 @@ using Poco::Net::TCPServerConnection;
 using Poco::Net::TCPServerConnectionFactory;
 using Poco::Net::TCPServerConnectionFactoryImpl;
 using Poco::Net::TCPServerParams;
+using Poco::Net::Socket;
 using Poco::Net::StreamSocket;
 using Poco::Net::SecureStreamSocket;
 using Poco::Net::SecureServerSocket;
@@ -232,6 +234,53 @@ void SecureStreamSocketTest::testPeek()
 	n = ss.receiveBytes(buffer, 6);
 	assertTrue (n == 6);
 	assertTrue (std::string(buffer, n) == "world!");
+	ss.close();
+}
+
+
+void SecureStreamSocketTest::testBufVecAndBufferOverloadsRefused()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+	SecureStreamSocket ss(sa);
+	char data[] = "cleartext";
+	Poco::Net::SocketBufVec vec{Socket::makeBuffer(data, sizeof(data) - 1)};
+	try
+	{
+		ss.sendBytes(vec);
+		fail("sendBytes() of a SocketBufVec bypasses TLS - must throw");
+	}
+	catch (Poco::InvalidAccessException&)
+	{
+	}
+	try
+	{
+		ss.receiveBytes(vec);
+		fail("receiveBytes() into a SocketBufVec bypasses TLS - must throw");
+	}
+	catch (Poco::InvalidAccessException&)
+	{
+	}
+	Poco::Buffer<char> pocoBuffer(0);
+	try
+	{
+		ss.receiveBytes(pocoBuffer);
+		fail("receiveBytes() into a Poco::Buffer bypasses TLS - must throw");
+	}
+	catch (Poco::InvalidAccessException&)
+	{
+	}
+
+	// the echo arrives intact only if the refused calls did not touch the connection
+	int n = ss.sendBytes("hello, world!", 13);
+	assertTrue (n == 13);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 13);
+	assertTrue (std::string(buffer, n) == "hello, world!");
 	ss.close();
 }
 
@@ -579,6 +628,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendReceive);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testPeek);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testBufVecAndBufferOverloadsRefused);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLazyHandshake);

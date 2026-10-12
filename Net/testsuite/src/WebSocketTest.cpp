@@ -298,6 +298,51 @@ void WebSocketTest::testWebSocket()
 }
 
 
+void WebSocketTest::testBufVecOverloadsRefused()
+{
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+	HTTPResponse response;
+	WebSocket ws(cs, request, response);
+
+	char data[] = "unframed";
+	Poco::Net::SocketBufVec vec{Poco::Net::Socket::makeBuffer(data, sizeof(data) - 1)};
+	try
+	{
+		ws.sendBytes(vec);
+		fail("sendBytes() of a SocketBufVec bypasses the framing - must throw");
+	}
+	catch (Poco::InvalidAccessException&)
+	{
+	}
+	try
+	{
+		ws.receiveBytes(vec);
+		fail("receiveBytes() into a SocketBufVec bypasses the framing - must throw");
+	}
+	catch (Poco::InvalidAccessException&)
+	{
+	}
+
+	// the echo arrives intact only if the refused calls did not touch the connection
+	std::string payload("Hello, world!");
+	ws.sendFrame(payload.data(), (int) payload.size());
+	char buffer[1024] = {};
+	int flags;
+	int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+	assertTrue (n == payload.size());
+	assertTrue (payload.compare(0, payload.size(), buffer, n) == 0);
+	assertTrue (flags == WebSocket::FRAME_TEXT);
+
+	ws.close();
+	server.stop();
+}
+
+
 void WebSocketTest::testWebSocketLarge()
 {
 	const int msgSize = 64000;
@@ -531,6 +576,7 @@ CppUnit::Test* WebSocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("WebSocketTest");
 
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocket);
+	CppUnit_addTest(pSuite, WebSocketTest, testBufVecOverloadsRefused);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLarge);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLargeInOneFrame);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketNB);

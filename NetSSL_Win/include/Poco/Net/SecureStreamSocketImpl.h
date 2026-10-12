@@ -92,18 +92,43 @@ public:
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
 
+	int sendBytes(const SocketBufVec& buffers, int flags = 0) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	int receiveBytes(void* buffer, int length, int flags = 0) override;
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		///
 		/// Returns the number of bytes received.
 
+	int receiveBytes(SocketBufVec& buffers, int flags = 0) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
+	int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& timeout = 100000) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
+	int sendTo(const SocketBufVec& buffers, const SocketAddress& address, int flags = 0) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
+	int receiveFrom(SocketBufVec& buffers, SocketAddress& address, int flags = 0) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.

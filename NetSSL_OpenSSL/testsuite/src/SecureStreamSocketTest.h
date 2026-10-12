@@ -27,6 +27,7 @@ public:
 
 	void testSendReceive();
 	void testPeek();
+	void testBufVecAndBufferOverloadsRefused();
 	void testNB();
 	void testLazyHandshake();
 	void testBindClient();

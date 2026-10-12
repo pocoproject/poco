@@ -458,6 +458,18 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 }
 
 
+int WebSocketImpl::sendBytes(const SocketBufVec& buffers, int flags)
+{
+	throw Poco::InvalidAccessException("Cannot sendBytes() a SocketBufVec on a WebSocket");
+}
+
+
+int WebSocketImpl::receiveBytes(SocketBufVec& buffers, int flags)
+{
+	throw Poco::InvalidAccessException("Cannot receiveBytes() into a SocketBufVec on a WebSocket");
+}
+
+
 int WebSocketImpl::receiveNBytes(void* buffer, int length)
 {
 	int received = receiveSomeBytes(reinterpret_cast<char*>(buffer), length);

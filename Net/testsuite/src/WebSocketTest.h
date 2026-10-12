@@ -25,6 +25,7 @@ public:
 	~WebSocketTest();
 
 	void testWebSocket();
+	void testBufVecOverloadsRefused();
 	void testWebSocketLarge();
 	void testWebSocketLargeInOneFrame();
 	void testWebSocketNB();
