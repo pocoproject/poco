@@ -347,6 +347,69 @@ namespace
 	};
 
 
+	class DelayedReader: public Poco::Runnable
+		/// Takes one connection and completes the TLS handshake. When told
+		/// to, waits the given delay, then reads until the peer ends the
+		/// connection.
+	{
+	public:
+		explicit DelayedReader(const Poco::Timespan& delay):
+			_socket(SocketAddress("127.0.0.1", 0)),
+			_delay(delay),
+			_closedByAlert(false)
+		{
+			_socket.setReceiveBufferSize(4096);
+		}
+
+		Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		void readAfterDelay()
+		{
+			_read.set();
+		}
+
+		bool closedByAlert() const
+			/// Returns true if the peer ended the connection with a close_notify alert.
+		{
+			return _closedByAlert;
+		}
+
+		void run() override
+		{
+			try
+			{
+				if (!_socket.poll(Poco::Timespan(10, 0), Socket::SELECT_READ))
+					return;
+				SecureStreamSocket socket(_socket.acceptConnection());
+				socket.setReceiveTimeout(Poco::Timespan(10, 0));
+				socket.completeHandshake();
+				if (!_read.tryWait(10000))
+					return;
+				Thread::sleep(static_cast<long>(_delay.totalMilliseconds()));
+				char buffer[4096];
+				int n = 0;
+				do
+				{
+					n = socket.receiveBytes(buffer, sizeof(buffer));
+				}
+				while (n > 0);
+				_closedByAlert = (n == 0);
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+
+	private:
+		SecureServerSocket _socket;
+		Poco::Timespan _delay;
+		Poco::Event _read;
+		bool _closedByAlert;
+	};
+
 	bool sendUntilTimeout(SecureStreamSocket& socket)
 		/// Sends until the peer, which does not read, makes a send time out.
 		/// Returns false if no send timed out.
@@ -1385,6 +1448,117 @@ void SecureStreamSocketTest::testCloseAfterSendAndReceiveTimeout()
 }
 
 
+void SecureStreamSocketTest::testCloseAfterReceiveTimeout()
+{
+	ParkedServer server;
+	HelperThread thread(server, [&server]() { server.release(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(0, 300000));
+
+	bool receiveTimedOut = false;
+	try
+	{
+		char buffer[256];
+		ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		receiveTimedOut = true;
+	}
+
+	// the peer keeps the connection open and never sends its close_notify
+	ss.setReceiveTimeout(Poco::Timespan(6, 0));
+	Poco::Timestamp start;
+	ss.close();
+	const Poco::Timespan elapsed = start.elapsed();
+
+	thread.join();
+
+	assertTrue (receiveTimedOut);
+	// the wait for the close_notify has its own limit, shorter than the receive timeout
+	assertTrue (elapsed < Poco::Timespan(3, 0));
+}
+
+
+void SecureStreamSocketTest::testShutdownWithoutPeerAnswer()
+{
+	ParkedServer server;
+	HelperThread thread(server, [&server]() { server.release(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(6, 0));
+
+	Poco::Timestamp start;
+	const int rc = ss.shutdown();
+	const Poco::Timespan elapsed = start.elapsed();
+	const bool blocking = ss.getBlocking();
+
+	thread.join();
+
+	// 0 means that the close_notify was sent and the one of the peer was not received
+	assertEqual (0, rc);
+	assertTrue (elapsed < Poco::Timespan(3, 0));
+	assertTrue (blocking);
+}
+
+
+#if !defined(_WIN32)
+// On Windows, a send that times out fails with WSAETIMEDOUT, which OpenSSL takes as a fatal error, so no close_notify alert follows.
+void SecureStreamSocketTest::testShutdownWaitsForSendBuffer()
+{
+	// the peer starts to read later than shutdown() waits for a close_notify
+	DelayedReader server(Poco::Timespan(1, 500000));
+	HelperThread thread(server, [&server]() { server.readAfterDelay(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setSendBufferSize(4096);
+	ss.setSendTimeout(Poco::Timespan(0, 250000));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+
+	// fill the receive buffer of the peer, which does not read yet
+	bool sendTimedOut = false;
+	const std::string data(4096, 'x');
+	for (int i = 0; i < 16384 && !sendTimedOut; i++)
+	{
+		try
+		{
+			ss.sendBytes(data.data(), static_cast<int>(data.size()));
+		}
+		catch (Poco::TimeoutException&)
+		{
+			sendTimedOut = true;
+		}
+	}
+
+	// complete the send that timed out: with room in the send buffer
+	// no unsent TLS record is left, and the data stays in that buffer
+	ss.setSendBufferSize(262144);
+	ss.setSendTimeout(Poco::Timespan(10, 0));
+	for (int i = 0; i < 4; i++)
+	{
+		ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	}
+	// leaves no room for the close_notify until the peer reads
+	ss.setSendBufferSize(4096);
+
+	server.readAfterDelay();
+	const int rc = ss.shutdown();
+	ss.close();
+
+	thread.join();
+
+	assertTrue (sendTimedOut);
+	// the close_notify has the send timeout as its limit
+	assertTrue (rc >= 0);
+	assertTrue (server.closedByAlert());
+}
+#endif
+
+
 void SecureStreamSocketTest::testShutdownWaitsForPeer()
 {
 	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
@@ -1448,6 +1622,11 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeLeavesSocketBlocking);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseAfterSendTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseAfterSendAndReceiveTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseAfterReceiveTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownWithoutPeerAnswer);
+#if !defined(_WIN32)
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownWaitsForSendBuffer);
+#endif
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownWaitsForPeer);
 
 	return pSuite;

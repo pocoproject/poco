@@ -156,6 +156,15 @@ public:
 		/// an orderly SSL shutdown, then actually
 		/// shutting down the TCP connection in the
 		/// send direction.
+		///
+		/// On a blocking socket, the send timeout limits sending the own
+		/// close_notify alert. If the socket has a receive timeout, the alert
+		/// of the peer is then awaited for that time, but at most one second.
+		///
+		/// Returns 1 if the alert of the peer was received, 0 if only
+		/// the own alert was sent, and a negative value
+		/// (SecureStreamSocket::ERR_SSL_WANT_WRITE) if the own alert
+		/// could not be sent within the send timeout.
 
 	void close();
 		/// Close the socket.
