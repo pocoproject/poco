@@ -26,6 +26,7 @@
 #include "Poco/Mutex.h"
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
+#include <exception>
 
 
 namespace Poco::Net {
@@ -353,6 +354,25 @@ private:
 		/// Poco::TimeoutException if the handshake does not complete
 		/// within the timeout, however the peer spreads its data.
 
+	[[nodiscard]] BIO* createBIO();
+		/// Creates the BIO of the SSL object, or returns a null pointer
+		/// if OpenSSL cannot create it.
+		///
+		/// The BIO of a socket that is not secure reads from and writes
+		/// to the socket descriptor. If the underlying socket is itself
+		/// a secure socket, the BIO calls its sendBytes() and
+		/// receiveBytes(), so that this TLS connection runs inside the
+		/// TLS connection of the underlying socket.
+
+	template <typename IO>
+	int socketIO(BIO* pBIO, int direction, IO&& io);
+		/// Runs a send or receive on the underlying socket for its BIO
+		/// and returns the result in the terms of a BIO.
+
+	static int bioWrite(BIO* pBIO, const char* buffer, int length);
+	static int bioRead(BIO* pBIO, char* buffer, int length);
+	static long bioCtrl(BIO* pBIO, int cmd, long larg, void* parg);
+
 	std::atomic<SSL*> _pSSL;
 	Poco::AutoPtr<SocketImpl> _pSocket;
 	Context::Ptr _pContext;
@@ -364,6 +384,12 @@ private:
 	bool _fatalError;
 		/// A fatal TLS or I/O error has occurred on the connection.
 		/// A send or receive that timed out is not one.
+	bool _bioEOF;
+		/// A receive of the underlying secure socket has reached the end
+		/// of its data.
+	std::exception_ptr _bioException;
+		/// The exception that ended a send or receive of the underlying
+		/// secure socket inside an SSL call.
 	std::string _peerHostName;
 	bool _tunneled;
 	Session::Ptr _pSession;

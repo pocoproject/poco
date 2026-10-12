@@ -177,6 +177,17 @@ public:
 		///
 		/// For a socket connected through a proxy tunnel, use the attach()
 		/// overload with the tunneled argument; its pSession can be null.
+		///
+		/// If the given socket is itself a SecureStreamSocket, the
+		/// TLS connection of the created socket runs inside the TLS
+		/// connection of the given socket. This holds for all
+		/// attach() functions.
+		///
+		/// NOTE: available() and poll() of a socket attached to a
+		/// SecureStreamSocket do not see data that the given socket
+		/// has received and the created socket has not processed, so
+		/// they can report no data although receiveBytes() would
+		/// return some.
 
 	[[nodiscard]] static SecureStreamSocket attach(const StreamSocket& streamSocket, Context::Ptr pContext);
 		/// Creates a SecureStreamSocket over an existing socket

@@ -43,6 +43,13 @@ public:
 	void testProxyConfig();
 	void testProxySetters();
 	void testStalledPeerTimeout();
+	void testHttpsProxyTunnel();
+	void testHttpsProxyTunnelVerifiesTargetName();
+	void testHttpsProxyTunnelClosed();
+	void testHttpsProxyTunnelStalled();
+	void testHttpsProxyTunnelCorruptedRecord();
+	void testHttpsProxyTunnelClosedInBody();
+	void testHttpsProxyTunnelCloseEndsHandshake();
 
 	void setUp();
 	void tearDown();
