@@ -46,6 +46,7 @@ const std::string SSLManager::CFG_ENABLE_DEFAULT_CA("loadDefaultCAFile");
 const std::string SSLManager::CFG_CIPHER_LIST("cipherList");
 const std::string SSLManager::CFG_CYPHER_LIST("cypherList");
 const std::string SSLManager::VAL_CIPHER_LIST(Context::DEFAULT_CIPHER_LIST);
+const std::string SSLManager::CFG_SECURITY_LEVEL("securityLevel");
 const std::string SSLManager::CFG_PREFER_SERVER_CIPHERS("preferServerCiphers");
 const std::string SSLManager::CFG_DELEGATE_HANDLER("privateKeyPassphraseHandler.name");
 const std::string SSLManager::VAL_DELEGATE_HANDLER("KeyConsoleHandler");
@@ -471,6 +472,13 @@ void SSLManager::initDefaultContext(bool server)
 	params.cipherList = config.getString(prefix + CFG_CIPHER_LIST, VAL_CIPHER_LIST);
 	params.cipherList = config.getString(prefix + CFG_CYPHER_LIST, params.cipherList); // for backwards compatibility
 	Poco::trimInPlace(params.cipherList);
+	if (config.hasProperty(prefix + CFG_SECURITY_LEVEL))
+	{
+		const int level = config.getInt(prefix + CFG_SECURITY_LEVEL);
+		if (level < Context::SECURITY_LEVEL_NONE || level > Context::SECURITY_LEVEL_256_BITS)
+			throw SSLException("Configuration error: invalid security level", prefix + CFG_SECURITY_LEVEL);
+		params.securityLevel = static_cast<Context::SecurityLevel>(level);
+	}
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
 	bool requireTLSv1_1 = config.getBool(prefix + CFG_REQUIRE_TLSV1_1, false);
 	bool requireTLSv1_2 = config.getBool(prefix + CFG_REQUIRE_TLSV1_2, false);

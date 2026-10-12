@@ -645,9 +645,11 @@ void SecureStreamSocketTest::testDefaultCipherListRefusesAnonymousServer()
 {
 	ErrorQueueCleaner cleaner;
 
-	// a server without a certificate: it can only agree on a cipher suite without authentication
+	// a server without a certificate: it can only agree on a cipher suite without authentication,
+	// which OpenSSL allows at security level 0 only
 	Context::Params serverParams;
 	serverParams.verificationMode = Context::VERIFY_NONE;
+	serverParams.securityLevel = Context::SECURITY_LEVEL_NONE;
 	serverParams.cipherList = "AECDH-AES256-SHA";
 	Context::Ptr pServerContext = new Context(Context::TLS_SERVER_USE, serverParams);
 	SecureServerSocket svs(0, 64, pServerContext);
@@ -657,6 +659,7 @@ void SecureStreamSocketTest::testDefaultCipherListRefusesAnonymousServer()
 	// the server does complete a handshake over that cipher suite: it is the client that refuses below
 	Context::Params anonymousParams;
 	anonymousParams.verificationMode = Context::VERIFY_NONE;
+	anonymousParams.securityLevel = Context::SECURITY_LEVEL_NONE;
 	anonymousParams.cipherList = serverParams.cipherList;
 	Context::Ptr pAnonymousContext = new Context(Context::TLS_CLIENT_USE, anonymousParams);
 	SecureStreamSocket anonymous(pAnonymousContext);
@@ -696,9 +699,11 @@ void SecureStreamSocketTest::testClientRejectsAnonymousServer()
 
 	const std::string anonymousSuite("AECDH-AES256-SHA");
 
-	// a server without a certificate: it can only agree on a cipher suite without authentication
+	// a server without a certificate: it can only agree on a cipher suite without authentication,
+	// which OpenSSL allows at security level 0 only
 	Context::Params serverParams;
 	serverParams.verificationMode = Context::VERIFY_NONE;
+	serverParams.securityLevel = Context::SECURITY_LEVEL_NONE;
 	serverParams.cipherList = anonymousSuite;
 	Context::Ptr pServerContext = new Context(Context::TLS_SERVER_USE, serverParams);
 	SecureServerSocket svs(0, 64, pServerContext);
@@ -712,6 +717,7 @@ void SecureStreamSocketTest::testClientRejectsAnonymousServer()
 	{
 		Context::Params params;
 		params.verificationMode = mode;
+		params.securityLevel = Context::SECURITY_LEVEL_NONE;
 		params.cipherList = anonymousSuite;
 		Context::Ptr pContext = new Context(Context::TLS_CLIENT_USE, params);
 		pContext->disableProtocols(Context::PROTO_TLSV1_3);

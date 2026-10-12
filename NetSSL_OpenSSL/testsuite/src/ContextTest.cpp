@@ -14,7 +14,9 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/Net/SSLManager.h"
+#include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Exception.h"
 #include <openssl/bio.h>
@@ -33,6 +35,7 @@
 using Poco::Crypto::X509Certificate;
 using Poco::Net::Context;
 using Poco::Net::SSLContextException;
+using Poco::Net::SSLException;
 using Poco::Net::SSLManager;
 using Poco::Util::Application;
 
@@ -93,9 +96,8 @@ void ContextTest::testCipherListWithoutMatch()
 
 void ContextTest::testDefaultCipherListExcludesWeak()
 {
-	// level 0 is the default: it is the cipher list alone that keeps these suites out
+	// the security level does not filter this list: the cipher list alone keeps these suites out
 	const Context::Params params;
-	assertTrue (params.securityLevel == Context::SECURITY_LEVEL_NONE);
 
 	const Context::Ptr contexts[] =
 	{
@@ -117,6 +119,86 @@ void ContextTest::testDefaultCipherListExcludesWeak()
 			assertTrue (SSL_CIPHER_get_cipher_nid(pCipher) != NID_idea_cbc);
 		}
 	}
+}
+
+
+void ContextTest::testDefaultSecurityLevel()
+{
+	std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> pBare(SSL_CTX_new(TLS_client_method()), &SSL_CTX_free);
+	assertNotNullPtr (pBare.get());
+	const int opensslLevel = SSL_CTX_get_security_level(pBare.get());
+
+	Context::Params params;
+	const Context::Ptr contexts[] =
+	{
+		new Context(Context::TLS_CLIENT_USE, params),
+		new Context(Context::TLS_CLIENT_USE, ""),
+		new Context(Context::TLS_CLIENT_USE, "", "", "")
+	};
+	for (const auto& pContext: contexts)
+	{
+		assertEqual (opensslLevel, SSL_CTX_get_security_level(pContext->sslContext()));
+		assertEqual (opensslLevel, static_cast<int>(pContext->getSecurityLevel()));
+	}
+
+	params.securityLevel = Context::SECURITY_LEVEL_NONE;
+	Context::Ptr pContext = new Context(Context::TLS_CLIENT_USE, params);
+	assertEqual (0, SSL_CTX_get_security_level(pContext->sslContext()));
+
+	pContext->setSecurityLevel(Context::SECURITY_LEVEL_128_BITS);
+	assertTrue (pContext->getSecurityLevel() == Context::SECURITY_LEVEL_128_BITS);
+	pContext->setSecurityLevel(Context::SECURITY_LEVEL_DEFAULT);
+	assertTrue (pContext->getSecurityLevel() == Context::SECURITY_LEVEL_128_BITS);
+
+	// the configuration of the test suite sets no security level
+	assertEqual (opensslLevel, static_cast<int>(SSLManager::instance().defaultClientContext()->getSecurityLevel()));
+	assertEqual (opensslLevel, static_cast<int>(SSLManager::instance().defaultServerContext()->getSecurityLevel()));
+}
+
+
+void ContextTest::testConfiguredSecurityLevel()
+{
+	ErrorQueueCleaner cleaner;
+
+	const std::string key("openSSL.client.securityLevel");
+	Poco::Util::AbstractConfiguration& config = Application::instance().config();
+	SSLManager& manager = SSLManager::instance();
+	const Context::Ptr pDefaultContext = manager.defaultClientContext();
+	// without a default context the SSLManager creates one from the configuration
+	const auto configuredContext = [&](int level)
+	{
+		config.setInt(key, level);
+		manager.initializeClient(manager.clientPassphraseHandler(), manager.clientCertificateHandler(), nullptr);
+		return manager.defaultClientContext();
+	};
+	const auto restore = [&]()
+	{
+		config.remove(key);
+		manager.initializeClient(manager.clientPassphraseHandler(), manager.clientCertificateHandler(), pDefaultContext);
+	};
+
+	try
+	{
+		assertTrue (configuredContext(0)->getSecurityLevel() == Context::SECURITY_LEVEL_NONE);
+		assertTrue (configuredContext(1)->getSecurityLevel() == Context::SECURITY_LEVEL_80_BITS);
+		for (const int level: {-1, 6})
+		{
+			try
+			{
+				configuredContext(level);
+				fail("security level out of range - must throw");
+			}
+			catch (SSLException&)
+			{
+			}
+		}
+	}
+	catch (...)
+	{
+		restore();
+		throw;
+	}
+	restore();
 }
 
 
@@ -144,6 +226,27 @@ void ContextTest::testDHParametersRejectedBySecurityLevel()
 	Context::Params params(Context::KEY_DH_GROUP_1024);
 	params.securityLevel = Context::SECURITY_LEVEL_112_BITS;
 	assertRejected(params);
+
+	params = Context::Params();
+	params.securityLevel = Context::SECURITY_LEVEL_128_BITS;
+	params.dhParamsFile = Application::instance().config().getString("openSSL.server.dhParamsFile");
+	assertRejected(params);
+}
+
+
+void ContextTest::testDefaultDHParametersRejectedBySecurityLevel()
+{
+	// in FIPS mode the DH parameters are ignored
+	if (SSLManager::isFIPSEnabled()) return;
+
+	ErrorQueueCleaner cleaner;
+
+	// the application has not chosen the built-in 2048-bit group: OpenSSL selects the parameters instead
+	Context::Params params;
+	params.securityLevel = Context::SECURITY_LEVEL_128_BITS;
+	ERR_clear_error();
+	Context::Ptr pContext = new Context(Context::TLS_SERVER_USE, params);
+	assertTrue (ERR_peek_error() == 0);
 }
 
 
@@ -234,13 +337,16 @@ std::string ContextTest::negotiatedDHGroup(Context::KeyDHGroup dhGroup)
 	// neither a failed handshake nor an unnamed group may leave its errors to the following tests
 	ErrorQueueCleaner cleaner;
 
+	// the default security level rejects the 1024-bit parameters on both sides
 	Context::Params serverParams(dhGroup);
+	serverParams.securityLevel = Context::SECURITY_LEVEL_NONE;
 	serverParams.privateKeyFile = Application::instance().config().getString("openSSL.server.privateKeyFile");
 	serverParams.verificationMode = Context::VERIFY_NONE;
 	Context::Ptr pServerContext = new Context(Context::TLS_SERVER_USE, serverParams);
 
 	Context::Params clientParams;
 	clientParams.verificationMode = Context::VERIFY_NONE;
+	clientParams.securityLevel = Context::SECURITY_LEVEL_NONE;
 	clientParams.cipherList = "DHE-RSA-AES256-GCM-SHA384";
 	// without ffdhe groups the server has to send its own DH parameters (OpenSSL 4.0 prefers RFC 7919 groups)
 	clientParams.ecdhCurve = "X25519:P-256";
@@ -301,9 +407,12 @@ CppUnit::Test* ContextTest::suite()
 	CppUnit_addTest(pSuite, ContextTest, testInvalidCipherList);
 	CppUnit_addTest(pSuite, ContextTest, testCipherListWithoutMatch);
 	CppUnit_addTest(pSuite, ContextTest, testDefaultCipherListExcludesWeak);
+	CppUnit_addTest(pSuite, ContextTest, testDefaultSecurityLevel);
+	CppUnit_addTest(pSuite, ContextTest, testConfiguredSecurityLevel);
 	CppUnit_addTest(pSuite, ContextTest, testInvalidCipherSuites);
 	CppUnit_addTest(pSuite, ContextTest, testInvalidECDHGroups);
 	CppUnit_addTest(pSuite, ContextTest, testDHParametersRejectedBySecurityLevel);
+	CppUnit_addTest(pSuite, ContextTest, testDefaultDHParametersRejectedBySecurityLevel);
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	CppUnit_addTest(pSuite, ContextTest, testBuiltInDHParameters);
 #endif
