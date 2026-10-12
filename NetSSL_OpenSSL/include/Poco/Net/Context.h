@@ -84,9 +84,10 @@ public:
 			/// Server: The server will not send a client certificate
 			/// request to the client, so the client will not send a certificate.
 			///
-			/// Client: If not using an anonymous cipher (by default disabled),
-			/// the server will send a certificate which will be checked, but
-			/// the result of the check will be ignored.
+			/// Client: If not using an anonymous cipher, the server will
+			/// send a certificate which will be checked, but the result of
+			/// the check will be ignored. This is the only mode in which a
+			/// client accepts a server that sends no certificate.
 
 		VERIFY_RELAXED = SSL_VERIFY_PEER,
 			/// Server: The server sends a client certificate request to the
@@ -95,10 +96,12 @@ public:
 			/// immediately terminated with an alert message containing the
 			/// reason for the verification failure.
 			///
-			/// Client: The server certificate is verified, if one is provided.
+			/// Client: The server certificate is verified.
 			/// If the verification process fails, the TLS/SSL handshake is
 			/// immediately terminated with an alert message containing the
-			/// reason for the verification failure.
+			/// reason for the verification failure. A server that sends no
+			/// certificate (anonymous cipher) is rejected with a
+			/// CertificateValidationException once the handshake is complete.
 
 		VERIFY_STRICT  = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
 			/// Server: If the client did not return a certificate, the TLS/SSL
