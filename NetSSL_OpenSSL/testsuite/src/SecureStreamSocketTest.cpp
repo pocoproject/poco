@@ -42,7 +42,13 @@
 #include <openssl/pem.h>
 #include <atomic>
 #include <cerrno>
+#include <functional>
 #include <iostream>
+#include <utility>
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <csignal>
+#include <pthread.h>
+#endif
 
 
 using Poco::Net::TCPServer;
@@ -349,7 +355,6 @@ namespace
 		bool _joined = false;
 	};
 
-
 	class DelayedReader: public Poco::Runnable
 		/// Takes one connection and completes the TLS handshake. When told
 		/// to, waits the given delay, then reads until the peer ends the
@@ -541,6 +546,103 @@ namespace
 		errno = code;
 #endif
 	}
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	class ReplyingServer: public Poco::Runnable
+		/// Takes one connection, completes the TLS handshake and sends
+		/// a reply when it is told to.
+	{
+	public:
+		explicit ReplyingServer(Poco::Event& reply):
+			_socket(SocketAddress("127.0.0.1", 0)),
+			_reply(reply)
+		{
+		}
+
+		Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		void run() override
+		{
+			try
+			{
+				SecureStreamSocket socket(_socket.acceptConnection());
+				socket.setReceiveTimeout(Poco::Timespan(10, 0));
+				socket.completeHandshake();
+				_reply.wait(30000);
+				socket.sendBytes("pong", 4);
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+
+	private:
+		SecureServerSocket _socket;
+		Poco::Event& _reply;
+	};
+
+	class Interrupter: public Poco::Runnable
+		/// Sends SIGUSR1 to a thread every 50 milliseconds for up to five
+		/// seconds or until stopped, interrupting a blocking system call
+		/// of that thread. Calls the done function after the fifth signal.
+	{
+	public:
+		Interrupter(pthread_t target, std::function<void()> done):
+			_target(target),
+			_done(std::move(done))
+		{
+		}
+
+		void stop()
+		{
+			_stop.set();
+		}
+
+		void run() override
+		{
+			for (int i = 0; i < 100 && !_stop.tryWait(50); i++)
+			{
+				pthread_kill(_target, SIGUSR1);
+				if (i == 4) _done();
+			}
+		}
+
+	private:
+		pthread_t _target;
+		std::function<void()> _done;
+		Poco::Event _stop;
+	};
+
+	extern "C" void ignoreSignal(int)
+	{
+	}
+
+	class InterruptingSignal
+		/// Installs a handler for SIGUSR1 that does not restart an
+		/// interrupted system call, for the lifetime of the object.
+	{
+	public:
+		InterruptingSignal()
+		{
+			struct sigaction action;
+			action.sa_handler = ignoreSignal;
+			sigemptyset(&action.sa_mask);
+			action.sa_flags = 0;
+			sigaction(SIGUSR1, &action, &_previous);
+		}
+
+		~InterruptingSignal()
+		{
+			sigaction(SIGUSR1, &_previous, nullptr);
+		}
+
+	private:
+		struct sigaction _previous;
+	};
+#endif
 }
 
 
@@ -2001,6 +2103,164 @@ void SecureStreamSocketTest::testSendAfterShutdownStaleError()
 }
 
 
+#if defined(POCO_OS_FAMILY_UNIX)
+void SecureStreamSocketTest::testReceiveInterruptedNoTimeout()
+{
+	InterruptingSignal signal;
+	Poco::Event interrupted;
+	ReplyingServer server(interrupted);
+	HelperThread serverThread(server, [&interrupted]() { interrupted.set(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan());
+
+	// the server replies only after five signals, and the signals go on until the receive returns
+	Interrupter interrupter(pthread_self(), [&interrupted]() { interrupted.set(); });
+	HelperThread interrupterThread(interrupter, [&interrupter]() { interrupter.stop(); });
+
+	char buffer[256];
+	int n = -1;
+	std::string outcome("received");
+	try
+	{
+		n = ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::Exception& exc)
+	{
+		outcome = exc.displayText();
+	}
+
+	interrupterThread.join();
+	serverThread.join();
+
+	assertEqual (std::string("received"), outcome);
+	assertEqual (4, n);
+	assertEqual (std::string("pong"), std::string(buffer, n));
+}
+
+
+void SecureStreamSocketTest::testReceiveInterruptedWithTimeout()
+{
+	InterruptingSignal signal;
+	ParkedServer server;
+	HelperThread serverThread(server, [&server]() { server.release(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(0, 300000));
+
+	Interrupter interrupter(pthread_self(), []() {});
+	HelperThread interrupterThread(interrupter, [&interrupter]() { interrupter.stop(); });
+
+	std::string outcome("received");
+	Poco::Timestamp start;
+	try
+	{
+		char buffer[256];
+		ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		outcome = "timeout";
+	}
+	catch (Poco::Exception& exc)
+	{
+		outcome = exc.displayText();
+	}
+	const Poco::Timespan elapsed = start.elapsed();
+
+	interrupterThread.join();
+	serverThread.join();
+
+	// the signals go on for five seconds and do not extend the receive timeout
+	assertEqual (std::string("timeout"), outcome);
+	assertTrue (elapsed < Poco::Timespan(2, 0));
+}
+
+
+void SecureStreamSocketTest::testSendInterruptedNoTimeout()
+{
+	InterruptingSignal signal;
+	DelayedReader server(Poco::Timespan(0, 0));
+	HelperThread serverThread(server, [&server]() { server.readAfterDelay(); });
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setSendTimeout(Poco::Timespan());
+
+	// the server reads only after five signals, and the signals go on until the send returns
+	Interrupter interrupter(pthread_self(), [&server]() { server.readAfterDelay(); });
+	HelperThread interrupterThread(interrupter, [&interrupter]() { interrupter.stop(); });
+
+	// more than the socket buffers of both sides hold
+	const std::string data(16*1024*1024, 'x');
+	int n = -1;
+	bool timedOut = false;
+	try
+	{
+		n = ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		timedOut = true;
+	}
+	catch (Poco::Exception&)
+	{
+		// the threads use objects of this function
+	}
+
+	interrupterThread.join();
+	ss.close();
+	serverThread.join();
+
+	assertFalse (timedOut);
+	assertEqual (static_cast<int>(data.size()), n);
+}
+
+
+void SecureStreamSocketTest::testHandshakeInterruptedNoTimeout()
+{
+	InterruptingSignal signal;
+	HeldBackServer server;
+	HelperThread serverThread(server, [&server]() { server.proceed(); });
+
+	SecureStreamSocket ss;
+	ss.setLazyHandshake(true);
+	ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan());
+
+	// the server answers the handshake only after five signals, and the signals go on until the handshake and the send return
+	Interrupter interrupter(pthread_self(), [&server]() { server.proceed(); });
+	HelperThread interrupterThread(interrupter, [&interrupter]() { interrupter.stop(); });
+
+	int rc = -1;
+	bool timedOut = false;
+	try
+	{
+		rc = ss.completeHandshake();
+		ss.sendBytes("ping", 4);
+	}
+	catch (Poco::TimeoutException&)
+	{
+		timedOut = true;
+	}
+	catch (Poco::Exception&)
+	{
+		// the threads use objects of this function
+	}
+
+	interrupterThread.join();
+	ss.close();
+	serverThread.join();
+
+	assertFalse (timedOut);
+	assertEqual (1, rc);
+	assertEqual (std::string("ping"), server.received());
+}
+#endif
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -2059,6 +2319,12 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownAfterReceiveTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testReceiveAfterCloseNotifyStaleError);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendAfterShutdownStaleError);
+#if defined(POCO_OS_FAMILY_UNIX)
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testReceiveInterruptedNoTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testReceiveInterruptedWithTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendInterruptedNoTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeInterruptedNoTimeout);
+#endif
 
 	return pSuite;
 }
