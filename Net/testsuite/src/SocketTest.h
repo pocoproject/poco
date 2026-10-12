@@ -55,6 +55,15 @@ public:
 	void testSendFileLarge();
 	void testSendFileRange();
 	void testCloseOnExec();
+	void testReceiveNonBlockingIgnoresTimeout();
+#if defined(POCO_OS_FAMILY_UNIX)
+	void testReceiveInterruptedWithTimeout();
+	void testReceiveWaitAllInterruptedKeepsTimeout();
+	void testSendInterruptedWithTimeout();
+	void testReceiveFromInterruptedWithTimeout();
+	void testAcceptInterruptedWithTimeout();
+	void testReceiveInterruptedNoTimeout();
+#endif
 
 	void setUp() override;
 	void tearDown() override;
