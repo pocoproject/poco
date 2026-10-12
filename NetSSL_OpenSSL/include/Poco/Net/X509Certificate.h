@@ -84,6 +84,14 @@ public:
 		/// a domain name that matches the domain name
 		/// of the host.
 		///
+		/// A wildcard must be the complete leftmost label ("*.example.com");
+		/// a partial wildcard ("f*.example.com") matches no host name.
+		/// The common name of the subject is considered only if the
+		/// subject alternative names contain no domain name.
+		///
+		/// If hostName is an IP address, it matches only an IP address
+		/// in the subject alternative names.
+		///
 		/// Returns true if verification succeeded, or false otherwise.
 
 	static bool verify(const Poco::Crypto::X509Certificate& cert, const std::string& hostName);
@@ -92,6 +100,14 @@ public:
 		/// For this check to be successful, the certificate must contain
 		/// a domain name that matches the domain name
 		/// of the host.
+		///
+		/// A wildcard must be the complete leftmost label ("*.example.com");
+		/// a partial wildcard ("f*.example.com") matches no host name.
+		/// The common name of the subject is considered only if the
+		/// subject alternative names contain no domain name.
+		///
+		/// If hostName is an IP address, it matches only an IP address
+		/// in the subject alternative names.
 		///
 		/// Returns true if verification succeeded, or false otherwise.
 
