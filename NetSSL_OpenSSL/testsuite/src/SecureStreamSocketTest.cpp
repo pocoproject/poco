@@ -41,6 +41,7 @@
 #include <openssl/err.h>
 #include <openssl/pem.h>
 #include <atomic>
+#include <cerrno>
 #include <iostream>
 
 
@@ -528,6 +529,17 @@ namespace
 			return true;
 		}
 		return false;
+	}
+
+	void setLastSocketError(int code)
+		/// Sets the last socket error of the calling thread, as an earlier
+		/// unrelated failed call does.
+	{
+#if defined(_WIN32)
+		WSASetLastError(code);
+#else
+		errno = code;
+#endif
 	}
 }
 
@@ -1919,6 +1931,76 @@ void SecureStreamSocketTest::testShutdownAfterReceiveTimeout()
 }
 
 
+void SecureStreamSocketTest::testReceiveAfterCloseNotifyStaleError()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(2, 0));
+
+	// 1 means that the close_notify of the peer was received
+	assertEqual (1, ss.shutdown());
+
+	// the receive ends in OpenSSL without a call that would set the error code
+	setLastSocketError(POCO_EINTR);
+	char buffer[256];
+	int n = -1;
+	Poco::Timestamp start;
+	try
+	{
+		n = ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	const Poco::Timespan elapsed = start.elapsed();
+
+	assertEqual (0, n);
+	assertTrue (elapsed < Poco::Timespan(1, 0));
+}
+
+
+void SecureStreamSocketTest::testSendAfterShutdownStaleError()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	ss.setSendTimeout(Poco::Timespan(2, 0));
+
+	assertEqual (1, ss.shutdown());
+
+	// OpenSSL refuses the send without a call that would set the error code
+	for (const int staleError: {POCO_EINTR, POCO_EWOULDBLOCK, POCO_ENOTCONN})
+	{
+		setLastSocketError(staleError);
+		bool refused = false;
+		Poco::Timestamp start;
+		try
+		{
+			ss.sendBytes("x", 1);
+		}
+		catch (Poco::Net::SSLException&)
+		{
+			refused = true;
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		const Poco::Timespan elapsed = start.elapsed();
+
+		assertTrue (refused);
+		assertTrue (elapsed < Poco::Timespan(1, 0));
+	}
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -1975,6 +2057,8 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownAfterSendError);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownOnResetConnection);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownAfterReceiveTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testReceiveAfterCloseNotifyStaleError);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendAfterShutdownStaleError);
 
 	return pSuite;
 }
