@@ -52,6 +52,9 @@ public:
 	void testCloseAfterSendTimeout();
 	void testCloseAfterSendAndReceiveTimeout();
 	void testCloseAfterReceiveTimeout();
+	void testCloseEndsBlockedReceive();
+	void testCloseWaitsForReceive();
+	void testShutdownWaitsForShortReceive();
 	void testShutdownWithoutPeerAnswer();
 	void testShutdownWaitsForSendBuffer();
 	void testShutdownWaitsForPeer();

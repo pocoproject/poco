@@ -165,9 +165,20 @@ public:
 		/// the own alert was sent, and a negative value
 		/// (SecureStreamSocket::ERR_SSL_WANT_WRITE) if the own alert
 		/// could not be sent within the send timeout.
+		///
+		/// If another thread is sending, receiving or completing the
+		/// handshake on this socket and does not return within a
+		/// short time, or the handshake is not complete, no alert
+		/// is sent: the TCP connection is shut down in both
+		/// directions, which ends the call of the other thread, and
+		/// 0 is returned.
 
 	void close();
 		/// Close the socket.
+		///
+		/// Except on Windows, the socket is closed only after a thread
+		/// that is sending, receiving or completing the handshake on
+		/// it has left that call.
 
 	void abort();
 		/// Aborts the connection by closing the
@@ -321,6 +332,10 @@ private:
 
 	SecureSocketImpl(const SecureSocketImpl&);
 	SecureSocketImpl& operator = (const SecureSocketImpl&);
+
+	int completeHandshakeLocked();
+		/// Completes the SSL handshake as completeHandshake() does,
+		/// for a caller that holds the mutex.
 
 	int handshakeWithDeadline(const Poco::Timespan& timeout);
 		/// Runs the SSL handshake and returns the result of

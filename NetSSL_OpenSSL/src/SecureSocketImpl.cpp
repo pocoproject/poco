@@ -28,6 +28,7 @@
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
 #include <algorithm>
+#include <mutex>
 
 
 using Poco::IOException;
@@ -42,6 +43,10 @@ namespace
 	// The longest time that shutdown() of a blocking socket waits for the
 	// close_notify alert of the peer.
 	const Poco::Timespan SHUTDOWN_WAIT(1, 0);
+
+	// The longest time that shutdown() waits for another thread to leave
+	// its call on the socket before it takes that thread as blocked.
+	const Poco::Timespan LOCK_WAIT(0, 100000);
 }
 
 
@@ -306,7 +311,24 @@ int SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
 	{
-		UnLockT l(_mutex);
+		// The mutex is also held for a moment by a call that does not wait
+		// for the peer, so only a thread that keeps it counts as blocked.
+		if (!_mutex.tryLock(static_cast<long>(LOCK_WAIT.totalMilliseconds())))
+		{
+			// Another thread is inside an SSL call on this connection: no
+			// close_notify alert can be sent. Shutting down the TCP connection
+			// ends the pending call, which could otherwise hold the mutex for
+			// as long as the peer likes.
+			_pSocket->shutdown();
+			return 0;
+		}
+		UnLockT l(_mutex, std::adopt_lock);
+		if (_needHandshake || ::SSL_in_init(_pSSL) != 0)
+		{
+			// No close_notify alert can be sent before the handshake is complete.
+			_pSocket->shutdown();
+			return 0;
+		}
 
 		int shutdownState = ::SSL_get_shutdown(_pSSL);
 		bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
@@ -417,6 +439,13 @@ void SecureSocketImpl::close()
 	catch (...)
 	{
 	}
+#if !defined(_WIN32)
+	// Close the descriptor only after a thread blocked on this socket has left
+	// the call that shutdown() ended: a descriptor opened in between could get
+	// the same number, and the call would continue on it. On Windows a shutdown
+	// does not end a call that waits in select(); closing the descriptor does.
+	LockT l(_mutex);
+#endif
 	_pSocket->close();
 }
 
@@ -432,7 +461,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 
 	if (_needHandshake)
 	{
-		rc = completeHandshake();
+		rc = completeHandshakeLocked();
 		if (rc == 0)
 			throw SSLConnectionUnexpectedlyClosedException();
 		else if (rc != 1)
@@ -484,7 +513,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 
 	if (_needHandshake)
 	{
-		rc = completeHandshake();
+		rc = completeHandshakeLocked();
 		if (rc != 1)
 			return rc;
 	}
@@ -532,6 +561,14 @@ int SecureSocketImpl::available() const
 
 
 int SecureSocketImpl::completeHandshake()
+{
+	LockT l(_mutex);
+
+	return completeHandshakeLocked();
+}
+
+
+int SecureSocketImpl::completeHandshakeLocked()
 {
 	poco_assert (_pSocket->initialized());
 	poco_check_ptr (_pSSL);

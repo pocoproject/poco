@@ -19,6 +19,7 @@
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/RejectCertificateHandler.h"
 #include "Poco/Net/AcceptCertificateHandler.h"
@@ -39,6 +40,7 @@
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/pem.h>
+#include <atomic>
 #include <iostream>
 
 
@@ -409,6 +411,59 @@ namespace
 		Poco::Event _read;
 		bool _closedByAlert;
 	};
+
+	class GatedSocketImpl: public Poco::Net::StreamSocketImpl
+		/// A stream socket that reports the next request for its receive
+		/// timeout and keeps it waiting until it is told to proceed.
+		/// SecureSocketImpl::receiveBytes() makes that request while it
+		/// holds the lock of the TLS connection.
+	{
+	public:
+		void arm()
+		{
+			_armed = true;
+		}
+
+		bool waitEntered()
+			/// Returns false if no request arrived in time.
+		{
+			return _entered.tryWait(10000);
+		}
+
+		void proceed()
+		{
+			_proceed.set();
+		}
+
+		Poco::Timespan getReceiveTimeout() override
+		{
+			if (_armed.exchange(false))
+			{
+				_entered.set();
+				_proceed.tryWait(10000);
+			}
+			return StreamSocketImpl::getReceiveTimeout();
+		}
+
+	private:
+		std::atomic<bool> _armed{false};
+		Poco::Event _entered;
+		Poco::Event _proceed;
+	};
+
+	void receiveOnce(SecureStreamSocket& socket)
+		/// The body of a thread that receives on a socket which another
+		/// thread shuts down or closes.
+	{
+		try
+		{
+			char buffer[256];
+			socket.receiveBytes(buffer, sizeof(buffer));
+		}
+		catch (Poco::Exception&)
+		{
+		}
+	}
 
 	bool sendUntilTimeout(SecureStreamSocket& socket)
 		/// Sends until the peer, which does not read, makes a send time out.
@@ -1482,6 +1537,129 @@ void SecureStreamSocketTest::testCloseAfterReceiveTimeout()
 }
 
 
+void SecureStreamSocketTest::testCloseEndsBlockedReceive()
+{
+	ParkedServer server;
+	HelperThread thread(server, [&server]() { server.release(); });
+
+	GatedSocketImpl* pImpl = new GatedSocketImpl;
+	StreamSocket socket(pImpl);
+	socket.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	socket.setReceiveTimeout(Poco::Timespan(30, 0));
+	SecureStreamSocket ss(SecureStreamSocket::attach(socket, "127.0.0.1"));
+
+	// the peer sends nothing, so the receive waits for its timeout
+	pImpl->arm();
+	Thread receiver;
+	receiver.startFunc([&ss]() { receiveOnce(ss); });
+	const bool entered = pImpl->waitEntered();
+	pImpl->proceed();
+
+	Poco::Timestamp start;
+	ss.close();
+	const Poco::Timespan elapsed = start.elapsed();
+	const bool receiveEnded = receiver.tryJoin(40000);
+
+	thread.join();
+
+	assertTrue (entered);
+	assertTrue (elapsed < Poco::Timespan(3, 0));
+	assertTrue (receiveEnded);
+}
+
+
+#if !defined(_WIN32)
+// On Windows, closing the descriptor ends the receive, so close() does not wait for it.
+void SecureStreamSocketTest::testCloseWaitsForReceive()
+{
+	ParkedServer server;
+	HelperThread thread(server, [&server]() { server.release(); });
+
+	GatedSocketImpl* pImpl = new GatedSocketImpl;
+	StreamSocket socket(pImpl);
+	socket.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(10, 0));
+	socket.setReceiveTimeout(Poco::Timespan(30, 0));
+	SecureStreamSocket ss(SecureStreamSocket::attach(socket, "127.0.0.1"));
+
+	// the receive stays inside the TLS connection until it may proceed
+	pImpl->arm();
+	Thread receiver;
+	receiver.startFunc([&ss]() { receiveOnce(ss); });
+	const bool entered = pImpl->waitEntered();
+
+	Thread closer;
+	closer.startFunc([&ss]() { ss.close(); });
+	// the descriptor must stay open while the receive uses it
+	const bool closedDuringReceive = closer.tryJoin(500);
+	pImpl->proceed();
+	const bool receiveEnded = receiver.tryJoin(40000);
+	const bool closed = closedDuringReceive || closer.tryJoin(10000);
+
+	thread.join();
+
+	assertTrue (entered);
+	assertTrue (!closedDuringReceive);
+	assertTrue (receiveEnded);
+	assertTrue (closed);
+}
+#endif
+
+
+void SecureStreamSocketTest::testShutdownWaitsForShortReceive()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	GatedSocketImpl* pImpl = new GatedSocketImpl;
+	StreamSocket socket(pImpl);
+	socket.connect(SocketAddress("127.0.0.1", svs.address().port()), Poco::Timespan(10, 0));
+	socket.setReceiveTimeout(Poco::Timespan(10, 0));
+	SecureStreamSocket ss(SecureStreamSocket::attach(socket, "127.0.0.1"));
+
+	// with the answer of the peer at hand the receive returns at once
+	std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	const bool answered = ss.poll(Poco::Timespan(10, 0), Socket::SELECT_READ);
+
+	pImpl->arm();
+	Thread receiver;
+	receiver.startFunc([&ss]() { receiveOnce(ss); });
+	const bool entered = pImpl->waitEntered();
+
+	// shutdown() finds the receive inside the TLS connection; the receive is
+	// released shortly after, well within the time that shutdown() waits for the lock
+	int rc = -1;
+	Poco::Event started;
+	Thread shutdownThread;
+	shutdownThread.startFunc([&ss, &rc, &started]()
+	{
+		try
+		{
+			started.set();
+			rc = ss.shutdown();
+		}
+		catch (Poco::Exception&)
+		{
+		}
+	});
+	const bool shutdownStarted = started.tryWait(10000);
+	const bool shutdownEndedEarly = shutdownThread.tryJoin(5);
+	pImpl->proceed();
+	const bool receiveEnded = receiver.tryJoin(40000);
+	const bool shutdownEnded = shutdownEndedEarly || shutdownThread.tryJoin(40000);
+	ss.close();
+
+	assertTrue (answered);
+	assertTrue (entered);
+	assertTrue (shutdownStarted);
+	assertTrue (receiveEnded);
+	assertTrue (shutdownEnded);
+	// 1 means that the close_notify was sent and the one of the peer was received
+	assertEqual (1, rc);
+}
+
+
 void SecureStreamSocketTest::testShutdownWithoutPeerAnswer()
 {
 	ParkedServer server;
@@ -1623,6 +1801,11 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseAfterSendTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseAfterSendAndReceiveTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseAfterReceiveTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseEndsBlockedReceive);
+#if !defined(_WIN32)
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseWaitsForReceive);
+#endif
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownWaitsForShortReceive);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownWithoutPeerAnswer);
 #if !defined(_WIN32)
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownWaitsForSendBuffer);
