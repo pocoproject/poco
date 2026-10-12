@@ -137,6 +137,9 @@ public:
 
 	enum SecurityLevel
 	{
+		SECURITY_LEVEL_DEFAULT  = -1,
+			/// The security level that OpenSSL and its configuration
+			/// (including a system-wide policy) define.
 		SECURITY_LEVEL_NONE     = 0,
 		SECURITY_LEVEL_80_BITS  = 1,
 		SECURITY_LEVEL_112_BITS = 2,
@@ -230,8 +233,11 @@ public:
 			/// with 256-bit prime order subgroup) or KEY_DH_GROUP_1024 (1024-bit MODP
 			/// group with 160-bit prime order subgroup). OpenSSL rejects parameters
 			/// that are too small for the security level (KEY_DH_GROUP_1024 above
-			/// SECURITY_LEVEL_80_BITS, KEY_DH_GROUP_2048 above SECURITY_LEVEL_112_BITS);
-			/// a server Context constructor then throws an SSLContextException. Use
+			/// SECURITY_LEVEL_80_BITS, KEY_DH_GROUP_2048 above SECURITY_LEVEL_112_BITS).
+			/// For KEY_DH_GROUP_1024 and for the parameters of dhParamsFile a server
+			/// Context constructor then throws an SSLContextException. Instead of
+			/// KEY_DH_GROUP_2048, which is the default, the server then uses
+			/// parameters that OpenSSL selects (SSL_CTX_set_dh_auto()). Use
 			/// dhParamsFile for larger parameters. In FIPS mode dhGroup and
 			/// dhParamsFile are ignored.
 
@@ -257,6 +263,12 @@ public:
 		SecurityLevel securityLevel;
 			/// Defines minimal number of security bits allowed.
 			/// Requires OpenSSL >= 1.1 to be effective.
+			/// Defaults to SECURITY_LEVEL_DEFAULT.
+			/// A lower level admits protocol versions, signature algorithms
+			/// and key sizes of peers that the default level rejects.
+			/// The level in effect, including one that a system-wide policy
+			/// defines, applies to the Diffie-Hellman parameters of a server
+			/// (see dhGroup).
 
 	};
 
@@ -518,7 +530,11 @@ public:
 		/// or a null pointer if none has been set.
 
 	void setSecurityLevel(SecurityLevel level);
-		/// Sets the security level.
+		/// Sets the security level. SECURITY_LEVEL_DEFAULT
+		/// leaves the current security level unchanged.
+
+	[[nodiscard]] SecurityLevel getSecurityLevel() const;
+		/// Returns the security level in effect.
 
 	void ignoreUnexpectedEof(bool flag = true);
 		/// Enable or disable SSL/TLS SSL_OP_IGNORE_UNEXPECTED_EOF
