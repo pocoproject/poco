@@ -15,6 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/SocketAddress.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -29,6 +30,8 @@ public:
 	void testNB();
 	void testHandshakeTimeout();
 	void testLazyHandshake();
+	void testBindClient();
+	void testBindClientIPv6();
 	void testDefaultCertificateHandler();
 	void testLoopbackPeerHostName();
 	void testTunneledLoopbackPeerIsVerified();
@@ -41,6 +44,10 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void bindAndConnect(const Poco::Net::SocketAddress& loopback, bool reuseAddress);
+		/// Binds a client socket to the given loopback address, connects it
+		/// to an echo server listening on that address and checks that the
+		/// connection uses the bound socket.
 };
 
 

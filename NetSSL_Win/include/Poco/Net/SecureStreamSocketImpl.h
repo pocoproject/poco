@@ -62,9 +62,20 @@ public:
 		/// connection the socket is set to nonblocking mode.
 
 	void bind(const SocketAddress& address, bool reuseAddress = false) override;
-		/// Not supported by a SecureStreamSocket.
-		///
-		/// Throws a Poco::InvalidAccessException.
+		/// Binds the underlying TCP socket to a local address
+		/// before connect().
+
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort) override;
+		/// Binds the underlying TCP socket to a local address
+		/// before connect().
+
+	void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false) override;
+		/// Binds the underlying TCP socket to a local IPv6 address
+		/// before connect().
+
+	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only) override;
+		/// Binds the underlying TCP socket to a local IPv6 address
+		/// before connect().
 
 	void listen(int backlog = 64) override;
 		/// Not supported by a SecureStreamSocket.

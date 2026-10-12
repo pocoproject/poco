@@ -378,6 +378,26 @@ void HTTPSClientSessionTest::testGetSmall()
 }
 
 
+void HTTPSClientSessionTest::testSourceAddress()
+{
+	HTTPSTestServer srv;
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setSourceAddress(SocketAddress("127.0.0.1", 0));
+	// without keep-alive the second request binds and connects again
+	for (int i = 0; i < 2; ++i)
+	{
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs = s.receiveResponse(response);
+		assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+		std::ostringstream ostr;
+		StreamCopier::copyStream(rs, ostr);
+		assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	}
+}
+
+
 void HTTPSClientSessionTest::testGetLarge()
 {
 	HTTPSTestServer srv;
@@ -1051,6 +1071,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testFromSocket);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetSmall);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testSourceAddress);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetLarge);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHead);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostSmallIdentity);

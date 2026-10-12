@@ -102,6 +102,22 @@ void HTTPSClientSessionTest::testGetSmall()
 }
 
 
+void HTTPSClientSessionTest::testSourceAddress()
+{
+	HTTPSTestServer srv;
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setSourceAddress(SocketAddress("127.0.0.1", 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+}
+
+
 void HTTPSClientSessionTest::testGetLarge()
 {
 	HTTPSTestServer srv;
@@ -422,6 +438,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPSClientSessionTest");
 
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetSmall);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testSourceAddress);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetLarge);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHead);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostSmallIdentity);

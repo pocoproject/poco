@@ -337,6 +337,47 @@ void SecureStreamSocketTest::testLazyHandshake()
 }
 
 
+void SecureStreamSocketTest::testBindClient()
+{
+	bindAndConnect(SocketAddress("127.0.0.1", 0), false);
+}
+
+
+void SecureStreamSocketTest::testBindClientIPv6()
+{
+#if defined(POCO_HAVE_IPv6)
+	bindAndConnect(SocketAddress("::1", 0), true);
+#endif
+}
+
+
+void SecureStreamSocketTest::bindAndConnect(const SocketAddress& loopback, bool reuseAddress)
+{
+	SecureServerSocket svs(loopback);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.bind(loopback, reuseAddress);
+	const SocketAddress boundAddress = ss.address();
+	const poco_socket_t boundSocket = ss.impl()->sockfd();
+	assertTrue (boundAddress.port() != 0);
+
+	ss.connect(svs.address());
+	assertTrue (ss.impl()->sockfd() == boundSocket);
+	assertTrue (ss.address() == boundAddress);
+
+	std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[256];
+	int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+
+	ss.close();
+}
+
+
 void SecureStreamSocketTest::testDefaultCertificateHandler()
 {
 	SSLManager& manager = SSLManager::instance();
@@ -541,6 +582,10 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLazyHandshake);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testBindClient);
+#if defined(POCO_HAVE_IPv6)
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testBindClientIPv6);
+#endif
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testDefaultCertificateHandler);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLoopbackPeerHostName);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testTunneledLoopbackPeerIsVerified);
