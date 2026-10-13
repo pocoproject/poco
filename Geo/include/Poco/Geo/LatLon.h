@@ -19,6 +19,7 @@
 
 #include "Poco/Geo/Geo.h"
 #include "Poco/Geo/Angle.h"
+#include <utility>
 
 
 namespace Poco::Geo {
@@ -35,13 +36,19 @@ struct Cartesian
 class Geo_API LatLon
 	/// LatLon represents a point on the two-dimensional surface of a globe. 
 	/// Latitude is the degrees North and ranges between [-90, 90]
-	/// while longitude refers to degrees East, and ranges between (-180, 180].
+	/// while longitude refers to degrees East, and ranges between [-180, 180].
+	/// The range is not enforced; Angle::normalizedLatitude() and
+	/// Angle::normalizedLongitude() reduce a position to it.
+	///
+	/// A position outside the domain of a computation, and a position with a NaN
+	/// coordinate, yield NaN coordinates and NaN distances. Every comparison against
+	/// a NaN is false, so a geofence reports such a position as outside.
 	///
 	/// Based on code from the LatLon (gov.nasa.worldwind.geom.LatLon)  
 	/// class from the NASA World Wind Java source code released
 	/// under the Apache License 2.0.
 	///
-	/// fromCartesian() and toCartesian() are based on WGS84toCartesian.hpp by Christian Berger,
+	/// toCartesian() is based on WGS84toCartesian.hpp by Christian Berger,
 	/// partially based on the work from Gerald I. Evenden on proj 4.3 released under public domain terms.
 	///
 	/// Note: when comparing LatLons for equality, the usual
@@ -169,6 +176,16 @@ public:
 		/// delta of this position. Delta is given in degrees.
 
 private:
+	[[nodiscard]] static std::pair<double, double> referenceParameters(const LatLon& reference);
+		/// Returns the reference longitude in radians and the meridional distance of the
+		/// reference latitude, the two quantities of the cartesian projection that depend
+		/// on the reference alone.
+
+	[[nodiscard]] static Cartesian toCartesian(double lon0, double ml0, const LatLon& latLon);
+		/// Converts the given position to cartesian coordinates, with the reference
+		/// parameters computed once by referenceParameters(), so that a sequence of
+		/// conversions against one reference does not recompute them.
+
 	Angle _latitude;
 	Angle _longitude;
 };
