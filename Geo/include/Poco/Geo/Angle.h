@@ -120,7 +120,7 @@ public:
 		/// and returns the result.
 		
 	[[nodiscard]] double operator / (const Angle& angle) const;
-		/// Divices the Angle by the given angle
+		/// Divides the Angle by the given angle
 		/// and returns the result.
 		
 	[[nodiscard]] double sin() const;

@@ -21,7 +21,7 @@ XSD (XML Schema object model, XML Schema and WSDL parser, the XSDGen code genera
 libxml2-based Validator), previously part of macchina.io, is a group of POCO components.
 Geo (geographic coordinates and angles, great-circle and rhumb-line calculations,
 conversions to and from local cartesian coordinates, and geofences), previously part of
-macchina.io, is now a POCO component.
+macchina.io, is a POCO component.
 
 !!Features
 
