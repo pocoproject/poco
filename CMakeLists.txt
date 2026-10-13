@@ -263,6 +263,7 @@ option(ENABLE_XSD_PARSER "Enable XSD Parser (XML Schema and WSDL parser)" ${_ena
 option(ENABLE_XSD_CODEGEN "Enable XSD code generator (XSDGen)" ${_enable_default})
 option(ENABLE_XSD_VALIDATOR "Enable XSD Validator (XML validation against XML Schema, requires libxml2)" OFF)
 option(ENABLE_GEO "Enable Geo" ${_enable_default})
+option(ENABLE_SERIAL "Enable Serial (serial port I/O)" ${_enable_default})
 
 if(WIN32)
 	option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
@@ -470,6 +471,11 @@ if(ENABLE_XSD_VALIDATOR)
 		message(STATUS "libxml2 not found - disabling XSD Validator")
 		set(ENABLE_XSD_VALIDATOR OFF CACHE BOOL "Enable XSD Validator (XML validation against XML Schema, requires libxml2)" FORCE)
 	endif()
+endif()
+
+if(ENABLE_SERIAL AND EMSCRIPTEN)
+	message(STATUS "emscripten target - disabling Serial")
+	set(ENABLE_SERIAL OFF CACHE BOOL "Enable Serial (serial port I/O)" FORCE)
 endif()
 
 if(ENABLE_NETSSL)
@@ -758,6 +764,11 @@ endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/Geo AND ENABLE_GEO)
 	add_subdirectory(Geo)
 	list(APPEND Poco_COMPONENTS "Geo")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/Serial AND ENABLE_SERIAL)
+	add_subdirectory(Serial)
+	list(APPEND Poco_COMPONENTS "Serial")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/PocoDoc AND ENABLE_POCODOC)

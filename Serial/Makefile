@@ -21,7 +21,7 @@ endif
 objects = SerialPort
 
 target         = PocoSerial
-target_version = 1
+target_version = $(LIBVERSION)
 target_libs    = PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib
