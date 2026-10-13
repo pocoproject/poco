@@ -87,4 +87,5 @@ bool PolygonalGeofence::isInside(const LatLon& position) const
 	return inside;
 }
 
+
 } // namespace Poco::Geo

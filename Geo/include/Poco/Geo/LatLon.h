@@ -82,7 +82,7 @@ public:
 	void assign(const Angle& latitude, const Angle& longitude);
 		/// Assigns another latitude and longitude.
 		
-	void swap(LatLon& other);
+	void swap(LatLon& other) noexcept;
 		/// Swaps the LatLon with another one.
 		
 	[[nodiscard]] static LatLon fromDegrees(double latitude, double longitude);
@@ -115,7 +115,7 @@ public:
 
 	[[nodiscard]] Angle greatCircleDistanceTo(const LatLon& latLon) const;
 		/// Computes the great circle angular distance between two locations using
-		/// the harvesine formula.
+		/// the haversine formula.
 		///
 		/// The return value gives the distance as the angle between the two positions 
 		/// on the PI radius circle. In radians, this angle is also the arc length of the
@@ -131,7 +131,7 @@ public:
 
 	[[nodiscard]] Angle greatCircleAzimuthTo(const LatLon& latLon) const;
 		/// Computes the azimuth angle (clockwise from North) that points from this
-		/// location to the second location using the harvesine formula.
+		/// location to the second location using the haversine formula.
 		///
 		/// This angle can be used as the starting azimuth for a great circle arc 
 		/// that begins at the first location, and passes through the second location.
@@ -230,7 +230,7 @@ inline bool LatLon::operator != (const LatLon& other) const
 }
 
 
-inline void swap(LatLon& l1, LatLon& l2)
+inline void swap(LatLon& l1, LatLon& l2) noexcept
 {
 	l1.swap(l2);
 }

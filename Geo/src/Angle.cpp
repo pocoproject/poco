@@ -12,6 +12,7 @@
 
 
 #include "Poco/Geo/Angle.h"
+#include <array>
 #include <cmath>
 #include <utility>
 
@@ -43,7 +44,7 @@ const std::string Angle::COMPASS_NW("NW");
 const std::string Angle::COMPASS_NNW("NNW");
 
 
-void Angle::swap(Angle& other)
+void Angle::swap(Angle& other) noexcept
 {
 	std::swap(_degrees, other._degrees);
 	std::swap(_radians, other._radians);
@@ -118,7 +119,7 @@ Angle Angle::normalized() const
 
 namespace
 {
-	const std::string* const DIRECTIONS[] =
+	const std::array<const std::string*, 16> DIRECTIONS =
 	{
 		&Angle::COMPASS_N,
 		&Angle::COMPASS_NNE,
