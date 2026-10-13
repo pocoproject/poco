@@ -392,6 +392,13 @@ Cartesian LatLon::toCartesian(const LatLon& reference, const LatLon& latLon)
 Cartesian LatLon::toCartesian(double lon0, double ml0, const LatLon& latLon)
 {
 	double lat = latLon.latitude().radians();
+	// On the equator the longitude does not enter the y coordinate, so a position with
+	// a NaN longitude would otherwise come out with a finite y.
+	if (!std::isfinite(lat) || !std::isfinite(latLon.longitude().radians()))
+	{
+		return Cartesian{std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
+	}
+
 	const double D = std::abs(lat) - Angle::PI_OVER_2;
 	if (D > EPSILON12)
 	{

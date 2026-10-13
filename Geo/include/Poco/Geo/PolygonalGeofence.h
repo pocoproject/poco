@@ -33,7 +33,10 @@ class Geo_API PolygonalGeofence: public Geofence
 	/// as a parallel or as a great circle is approximated, with an error that grows
 	/// with the length of the edge. A position exactly on a vertex is outside the
 	/// geofence; the rest of the boundary is half-open, so of two polygons sharing an
-	/// edge a position on that edge is inside exactly one of them.
+	/// edge a position on that edge is inside exactly one of them. That holds only for
+	/// polygons that project against the same reference; each polygon derives its
+	/// reference from its own vertices, so a shared edge becomes two slightly different
+	/// chords, with a narrow band between them that is outside both polygons.
 {
 public:
 	explicit PolygonalGeofence(const std::vector<LatLon>& coordinates);
