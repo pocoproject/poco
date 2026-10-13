@@ -18,6 +18,7 @@
 
 
 #include "Poco/Geo/Geo.h"
+#include <string>
 
 
 #define POCO_GEO_PI 3.141592653589793238462643383279502884197
@@ -32,7 +33,7 @@ class Geo_API Angle
 	///
 	/// Based on code from the Angle (gov.nasa.worldwind.geom.Angle)  
 	/// class from the NASA World Wind Java source code released
-	/// under the NOSA license.
+	/// under the Apache License 2.0.
 	///
 	/// Note: when comparing Angles for equality, the usual
 	/// issues when comparing floating-point numbers should 

@@ -25,7 +25,7 @@ namespace Geo {
 
 
 class Geo_API Geofence
-	/// Base class for different kindes of geofences.
+	/// Base class for different kinds of geofences.
 {
 public:
 	virtual ~Geofence() = default;

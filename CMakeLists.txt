@@ -262,6 +262,7 @@ option(ENABLE_XSD_TYPES "Enable XSD Types (XML Schema object model)" ${_enable_d
 option(ENABLE_XSD_PARSER "Enable XSD Parser (XML Schema and WSDL parser)" ${_enable_default})
 option(ENABLE_XSD_CODEGEN "Enable XSD code generator (XSDGen)" ${_enable_default})
 option(ENABLE_XSD_VALIDATOR "Enable XSD Validator (XML validation against XML Schema, requires libxml2)" OFF)
+option(ENABLE_GEO "Enable Geo" ${_enable_default})
 
 if(WIN32)
 	option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
@@ -752,6 +753,11 @@ endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/XSD/Validator AND ENABLE_XSD_VALIDATOR)
 	add_subdirectory(XSD/Validator)
 	list(APPEND Poco_COMPONENTS "XSD/Validator")
+endif()
+
+if(EXISTS ${PROJECT_SOURCE_DIR}/Geo AND ENABLE_GEO)
+	add_subdirectory(Geo)
+	list(APPEND Poco_COMPONENTS "Geo")
 endif()
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/PocoDoc AND ENABLE_POCODOC)

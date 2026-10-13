@@ -21,7 +21,7 @@ set_target_properties(Geo
 	DEFINE_SYMBOL Geo_EXPORTS
 )
 
-target_link_libraries(Geo PUBLIC Poco::Foundation Poco::Net Poco::Util)
+target_link_libraries(Geo PUBLIC Poco::Foundation)
 
 target_include_directories(Geo
 	PUBLIC
@@ -32,3 +32,7 @@ target_include_directories(Geo
 
 POCO_INSTALL(Geo)
 POCO_GENERATE_PACKAGE(Geo)
+
+if(ENABLE_TESTS)
+	add_subdirectory(testsuite)
+endif()

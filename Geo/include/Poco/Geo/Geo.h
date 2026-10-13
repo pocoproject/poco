@@ -40,7 +40,11 @@
 
 
 #if !defined(Geo_API)
-	#define Geo_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define Geo_API __attribute__ ((visibility ("default")))
+	#else
+		#define Geo_API
+	#endif
 #endif
 
 
