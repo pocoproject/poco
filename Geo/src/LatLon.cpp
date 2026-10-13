@@ -260,39 +260,51 @@ LatLon LatLon::fromCartesian(const LatLon& reference, const Cartesian& xy)
 
 LatLon LatLon::fromCartesian(const LatLon& reference, double x, double y)
 {
-    constexpr double EPSILON10{1.0e-4};
-    const int32_t signLon{(x < 0) ? -1 : 1};
-    const int32_t signLat{(y < 0) ? -1 : 1};
+	// The projection has no simple closed-form inverse, but it is smooth, so
+	// Newton's method on toCartesian() converges in a few steps. The Jacobian is
+	// obtained by finite differences, which keeps this function tied to the
+	// forward projection as the single definition of the mapping.
+	//
+	// The residual is a distance in meters and the step is in degrees, so the
+	// Jacobian is what converts between the two. Stepping by a fraction of the
+	// residual in degrees, as a steepest-descent search over one coordinate at a
+	// time would, overshoots by the number of meters in a degree.
 
-    double approxLat(reference.latitude().degrees());
-	double approxLon(reference.longitude().degrees());
-    Cartesian cartesianResult{toCartesian(reference, reference)};
+	constexpr double TOLERANCE = 1e-9;
+		/// Residual in meters at which the position is accepted.
+	constexpr double DELTA = 1e-6;
+		/// Step in degrees for the finite differences, about 0.11 m.
+	constexpr int MAX_ITERATIONS = 16;
 
-    double dPrev{(std::numeric_limits<double>::max)()};
-    double d = std::abs(y - cartesianResult.y);
-    double incLat{1e-6};
-    while ((d < dPrev) && (d > EPSILON10)) 
+	double lat = reference.latitude().degrees();
+	double lon = reference.longitude().degrees();
+
+	for (int i = 0; i < MAX_ITERATIONS; ++i)
 	{
-        incLat = std::max(1e-6 * d, static_cast<double>(1e-9));
-        approxLat += signLat * incLat;
-        cartesianResult = toCartesian(reference, LatLon::fromDegrees(approxLat, approxLon));
-        dPrev = d;
-        d = std::abs(y - cartesianResult.y);
-    }
+		const Cartesian f = toCartesian(reference, fromDegrees(lat, lon));
+		const double rx = f.x - x;
+		const double ry = f.y - y;
+		if (std::hypot(rx, ry) <= TOLERANCE) break;
 
-    dPrev = (std::numeric_limits<double>::max)();
-    d = std::abs(x - cartesianResult.x);
-    double incLon{1e-6};
-    while ((d < dPrev) && (d > EPSILON10)) 
-	{
-        incLon = std::max(1e-6 * d, static_cast<double>(1e-9));
-        approxLon += signLon * incLon;
-        cartesianResult = toCartesian(reference, LatLon::fromDegrees(approxLat, approxLon));
-        dPrev = d;
-        d = std::abs(x - cartesianResult.x);
-    }
+		const Cartesian fLat = toCartesian(reference, fromDegrees(lat + DELTA, lon));
+		const Cartesian fLon = toCartesian(reference, fromDegrees(lat, lon + DELTA));
+		const double dxdLat = (fLat.x - f.x)/DELTA;
+		const double dxdLon = (fLon.x - f.x)/DELTA;
+		const double dydLat = (fLat.y - f.y)/DELTA;
+		const double dydLon = (fLon.y - f.y)/DELTA;
 
-    return LatLon::fromDegrees(approxLat, approxLon);
+		const double determinant = dxdLat*dydLon - dxdLon*dydLat;
+		if (std::abs(determinant) < std::numeric_limits<double>::min())
+		{
+			// Degenerate at a pole, where the forward projection is not invertible.
+			break;
+		}
+
+		lat -= ( dydLon*rx - dxdLon*ry)/determinant;
+		lon -= (-dydLat*rx + dxdLat*ry)/determinant;
+	}
+
+	return fromDegrees(lat, lon);
 }
 
 
