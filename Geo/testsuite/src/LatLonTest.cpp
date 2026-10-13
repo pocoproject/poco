@@ -317,6 +317,23 @@ void LatLonTest::testToCartesianOutOfDomain()
 }
 
 
+void LatLonTest::testToCartesianNonFiniteCoordinate()
+{
+	// On the equator the longitude does not enter the northing, so without a guard
+	// a position with only a non-finite longitude would project to a finite y.
+	const LatLon ref = LatLon::fromDegrees(0, 10);
+	const double nonFinite = std::numeric_limits<double>::quiet_NaN();
+
+	Cartesian result = LatLon::toCartesian(ref, LatLon::fromDegrees(0.0, nonFinite));
+	assertTrue (FPEnvironment::isNaN(result.x));
+	assertTrue (FPEnvironment::isNaN(result.y));
+
+	result = LatLon::toCartesian(ref, LatLon::fromDegrees(nonFinite, 10.0));
+	assertTrue (FPEnvironment::isNaN(result.x));
+	assertTrue (FPEnvironment::isNaN(result.y));
+}
+
+
 void LatLonTest::testFromCartesianNearPole()
 {
 	// Next to a pole the projection is not invertible. The solve reports that, rather
@@ -383,6 +400,7 @@ CppUnit::Test* LatLonTest::suite()
 	CppUnit_addTest(pSuite, LatLonTest, testRhumbWestAcrossAntimeridian);
 	CppUnit_addTest(pSuite, LatLonTest, testToCartesianAcrossAntimeridian);
 	CppUnit_addTest(pSuite, LatLonTest, testToCartesianOutOfDomain);
+	CppUnit_addTest(pSuite, LatLonTest, testToCartesianNonFiniteCoordinate);
 	CppUnit_addTest(pSuite, LatLonTest, testFromCartesianNearPole);
 	CppUnit_addTest(pSuite, LatLonTest, testEqualsAcrossAntimeridian);
 

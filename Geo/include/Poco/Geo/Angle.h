@@ -29,7 +29,7 @@ class Geo_API Angle
 	/// This class represents a geometric angle.
 	///
 	/// Based on code from the Angle (gov.nasa.worldwind.geom.Angle)  
-	/// class from the NASA World Wind Java source code released
+	/// class from the NASA WorldWind Java source code released
 	/// under the Apache License 2.0.
 	///
 	/// Note: when comparing Angles for equality, the usual
