@@ -61,7 +61,7 @@ public:
 	Angle& operator = (const Angle& angle) = default;
 		/// Assignment operator.
 		
-	void swap(Angle& other);
+	void swap(Angle& other) noexcept;
 		/// Swaps the Angle with another one.
 	
 	[[nodiscard]] static constexpr Angle fromDegrees(double deg);
@@ -326,7 +326,7 @@ inline double Angle::operator / (const Angle& angle) const
 }
 
 
-inline void swap(Angle& a1, Angle& a2)
+inline void swap(Angle& a1, Angle& a2) noexcept
 {
 	a1.swap(a2);
 }

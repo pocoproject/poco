@@ -74,7 +74,7 @@ void LatLon::assign(const Angle& latitude, const Angle& longitude)
 }		
 
 	
-void LatLon::swap(LatLon& other)
+void LatLon::swap(LatLon& other) noexcept
 {
 	_latitude.swap(other._latitude);
 	_longitude.swap(other._longitude);
@@ -414,7 +414,7 @@ Cartesian LatLon::toCartesian(double lon0, double ml0, const LatLon& latLon)
 	double lon = wrapLongitude(latLon.longitude().radians() - lon0);
 
 	Cartesian xy{lon, -1.0 * ml0};
-	if (!(std::abs(lat) < EPSILON10)) 
+	if (!(std::abs(lat) < EPSILON10))
 	{
 		const double ms{(std::abs(std::sin(lat)) > EPSILON10) ? msfn(std::sin(lat), std::cos(lat), SQUARED_ECCENTRICITY) / std::sin(lat) : 0.0};
 		xy.x = ms * std::sin(lon *= std::sin(lat));
