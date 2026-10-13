@@ -27,13 +27,13 @@ namespace Poco::Geo {
 class Geo_API PolygonalGeofence: public Geofence
 	/// A geofence defined by a polygon.
 	///
-	/// A point that falls on the geofence boundary is considered
-	/// outside the geofence. A point within one micrometer of an
-	/// edge is taken to be on the boundary.
-	///
-	/// Internally, all coordinates (polygon and point to test)
-	/// are converted to cartesian, then the even-odd rule is used
-	/// to check whether the point is inside the polygon.
+	/// All coordinates, the polygon's and the position to test, are converted to
+	/// cartesian coordinates in a local projection, where the even-odd rule decides
+	/// containment. The edges are straight lines in that projection, so an edge given
+	/// as a parallel or as a great circle is approximated, with an error that grows
+	/// with the length of the edge. A position exactly on a vertex is outside the
+	/// geofence; the rest of the boundary is half-open, so of two polygons sharing an
+	/// edge a position on that edge is inside exactly one of them.
 {
 public:
 	explicit PolygonalGeofence(const std::vector<LatLon>& coordinates);
