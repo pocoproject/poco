@@ -12,7 +12,6 @@
 
 
 #include "Poco/Geo/PolygonalGeofence.h"
-#include <algorithm>
 #include <cmath>
 
 
@@ -44,95 +43,66 @@ PolygonalGeofence::PolygonalGeofence(const std::vector<LatLon>& coordinates)
 }
 
 
-bool PolygonalGeofence::isInside(const LatLon& position) const
+namespace
 {
-	// Adapted from: https://paulbourke.net/geometry/polygonmesh/ and
-	// https://paulbourke.net/geometry/polygonmesh/InsidePolygonWithBounds.cpp
+	constexpr double BOUNDARY_TOLERANCE = 1e-6;
+		/// A position within one micrometer of an edge is considered to be on it.
+		/// The cartesian coordinates are in meters, so this is an absolute tolerance.
 
-	const Cartesian p = position.toCartesian(_reference);
 
-	// cross points count of x
-    int count = 0;
+	bool isOnEdge(const Cartesian& p, const Cartesian& a, const Cartesian& b)
+		/// Returns true iff p lies on the line segment from a to b,
+		/// within BOUNDARY_TOLERANCE.
+	{
+		const double dx = b.x - a.x;
+		const double dy = b.y - a.y;
+		const double length = std::hypot(dx, dy);
+		if (length <= BOUNDARY_TOLERANCE)
+		{
+			return std::hypot(p.x - a.x, p.y - a.y) <= BOUNDARY_TOLERANCE;
+		}
 
-    // neighbour bound vertices
-    Cartesian p1;
-	Cartesian p2;
+		// Distance of p from the infinite line through a and b.
+		if (std::abs(dx*(p.y - a.y) - dy*(p.x - a.x))/length > BOUNDARY_TOLERANCE) return false;
 
-    // left vertex
-    p1 = _coordinates[0];
-
-    // check all rays
-	std::size_t n = _coordinates.size();
-    for (std::size_t i = 1; i <= n; ++i)
-    {
-        // point is an vertex
-        if (p.x == p1.x && p.y == p1.y) return false;
-
-        // right vertex
-        p2 = _coordinates[i % n];
-
-        // ray is outside of our interests
-        if (p.y < std::min(p1.y, p2.y) || p.y > std::max(p1.y, p2.y))
-        {
-            // next ray left point
-            p1 = p2; continue;
-        }
-
-        // ray is crossing over by the algorithm (common part of)
-        if (p.y > std::min(p1.y, p2.y) && p.y < std::max(p1.y, p2.y))
-        {
-            // x is before of ray
-            if (p.x <= std::max(p1.x, p2.x))
-            {
-                // overlies on a horizontal ray
-                if (p1.y == p2.y && p.x >= std::min(p1.x, p2.x)) return false;
-
-                // ray is vertical
-                if (p1.x == p2.x)
-                {
-                    // overlies on a ray
-                    if (p1.x == p.x) return false;
-                    // before ray
-                    else ++count;
-                }
-                else // cross point on the left side
-                {
-                    // cross point of x
-                    double xinters = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
-
-                    // overlies on a ray
-                    if (std::abs(p.x - xinters) < __DBL_EPSILON__) return false;
-
-                    // before ray
-                    if (p.x < xinters) ++count;
-                }
-            }
-        }
-        else // special case when ray is crossing through the vertex
-        {
-            // p crossing over p2
-            if (p.y == p2.y && p.x <= p2.x)
-            {
-                // next vertex
-                const Cartesian& p3 = _coordinates[(i+1) % n];
-
-                // p.y lies between p1.y & p3.y
-                if (p.y >= std::min(p1.y, p3.y) && p.y <= std::max(p1.y, p3.y))
-                {
-                    ++count;
-                }
-                else
-                {
-                    count += 2;
-                }
-            }
-        }
-        // next ray left point
-        p1 = p2;
-    }
-
-	return count % 2 != 0;
+		// Position of the projection of p on the segment, as a fraction of its length.
+		const double t = (dx*(p.x - a.x) + dy*(p.y - a.y))/(length*length);
+		const double slack = BOUNDARY_TOLERANCE/length;
+		return t >= -slack && t <= 1.0 + slack;
+	}
 }
 
+
+bool PolygonalGeofence::isInside(const LatLon& position) const
+{
+	// Even-odd rule: count how often the ray that runs from the position in the
+	// direction of increasing x crosses an edge of the polygon. An odd number of
+	// crossings means the position is inside.
+	//
+	// An edge is considered for a crossing when exactly one of its endpoints lies
+	// above the ray. That half-open condition counts a crossing through a vertex
+	// for one of the two adjacent edges only, and never counts an edge that is
+	// parallel to the ray, so neither case needs to be handled separately.
+
+	const Cartesian p = position.toCartesian(_reference);
+	const std::size_t n = _coordinates.size();
+
+	bool inside = false;
+	for (std::size_t i = 0, j = n - 1; i < n; j = i++)
+	{
+		const Cartesian& a = _coordinates[j];
+		const Cartesian& b = _coordinates[i];
+
+		if (isOnEdge(p, a, b)) return false;
+
+		if ((b.y > p.y) != (a.y > p.y))
+		{
+			const double x = b.x + (p.y - b.y)*(a.x - b.x)/(a.y - b.y);
+			if (p.x < x) inside = !inside;
+		}
+	}
+
+	return inside;
+}
 
 } } // namespace Poco::Geo

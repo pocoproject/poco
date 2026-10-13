@@ -165,7 +165,12 @@ double Angle::cos() const
 
 double Angle::normalizedDegreesLatitude(double degrees)
 {
-	double lat = std::fmod(degrees, 180.0);
+	// Reduce to (-180, 180] first. Taking the remainder modulo 180 loses the
+	// hemisphere: 190 degrees is 10 degrees south on the far side of the north
+	// pole, not 10 degrees north.
+	double lat = std::fmod(degrees, 360.0);
+	if (lat > 180) lat -= 360;
+	else if (lat < -180) lat += 360;
 	return lat > 90 ? 180 - lat : lat < -90 ? -180 - lat : lat;
 }
 

@@ -29,11 +29,12 @@ class Geo_API PolygonalGeofence: public Geofence
 	/// A geofence defined by a polygon.
 	///
 	/// A point that falls on the geofence boundary is considered
-	/// outside the geofence.
+	/// outside the geofence. A point within one micrometer of an
+	/// edge is taken to be on the boundary.
 	///
 	/// Internally, all coordinates (polygon and point to test)
-	/// are converted to cartesian, then the ray-casting algorithm
-	/// is used to check whether the point is inside the polygon.
+	/// are converted to cartesian, then the even-odd rule is used
+	/// to check whether the point is inside the polygon.
 {
 public:
 	PolygonalGeofence(const std::vector<LatLon>& coordinates);

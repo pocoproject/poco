@@ -20,6 +20,13 @@
 using Poco::FPEnvironment;
 
 
+//
+// The rhumb line calculations below are based on the formulas and scripts at
+// http://www.movable-type.co.uk/scripts/latlong.html
+// Copyright (c) 2002-2022 Chris Veness, MIT license.
+//
+
+
 namespace Poco {
 namespace Geo {
 
