@@ -222,6 +222,15 @@ void AngleTest::testNormalization()
 	assertEqualDelta (85.0, Angle::normalizedDegreesLatitude(95), 1e-12);
 	assertEqualDelta (-80.0, Angle::normalizedDegreesLatitude(-100), 1e-12);
 
+	// Beyond 180 degrees the reflection changes hemisphere: going north from the
+	// equator, 90 is the north pole, 180 is the equator on the far side, 270 is
+	// the south pole and 360 is the starting point again.
+	assertEqualDelta (-10.0, Angle::normalizedDegreesLatitude(190), 1e-12);
+	assertEqualDelta (-90.0, Angle::normalizedDegreesLatitude(270), 1e-12);
+	assertEqualDelta (0.0, Angle::normalizedDegreesLatitude(360), 1e-12);
+	assertEqualDelta (10.0, Angle::normalizedDegreesLatitude(-190), 1e-12);
+	assertEqualDelta (90.0, Angle::normalizedDegreesLatitude(-270), 1e-12);
+
 	// normalizedDegreesLongitude() wraps a longitude at the antimeridian.
 	assertEqualDelta (-90.0, Angle::normalizedDegreesLongitude(-90), 1e-12);
 	assertEqualDelta (-160.0, Angle::normalizedDegreesLongitude(200), 1e-12);

@@ -46,6 +46,7 @@ and not practical to extract as separate libraries.
 | PostgreSQL large object header | `Data/PostgreSQL/include/libpq/libpq-fs.h` | PostgreSQL License | PostgreSQL Global Development Group | Minimal header for large object definitions |
 | NASA World Wind geodesy | `Geo/include/Poco/Geo/Angle.h`, `Geo/src/Angle.cpp`, `Geo/include/Poco/Geo/LatLon.h`, `Geo/src/LatLon.cpp` | Apache-2.0 | United States Government, as represented by the Administrator of NASA | Angle and LatLon are based on the WorldWind Java classes of the same names |
 | WGS84 cartesian conversion | `Geo/src/LatLon.cpp` | MIT | Christian Berger (2018) | LatLon::toCartesian() and fromCartesian(), from WGS84toCartesian.hpp |
+| Rhumb line calculations | `Geo/src/LatLon.cpp` | MIT | Chris Veness (2002-2022) | LatLon::rhumbDistanceTo(), rhumbAzimuthTo() and rhumbEndPosition(), from movable-type.co.uk/scripts/latlong.html |
 
 ## Additional Notes
 * `sqlite-vec` maps `__builtin_popcountl` to the MSVC intrinsic `__popcnt64`, which does not exist on 32-bit x86; `sqlite-vec/popcnt64_win32.c` supplies the symbol there so the bundled source stays unmodified.
@@ -54,3 +55,6 @@ and not practical to extract as separate libraries.
 * `quill` only supports specific OS and CPU architecture combinations. `ENABLE_FASTLOGGER` is auto-disabled on unsupported platforms via a whitelist in the top-level `CMakeLists.txt` (derived from `ThreadUtilities.h`, `BackendWorkerLock.h`, and `Rdtsc.h`). When updating quill from upstream, re-assess the whitelist against the new version's platform support.
 * The WorldWind Java sources are `gov/nasa/worldwind/geom/Angle.java` and `gov/nasa/worldwind/geom/LatLon.java` in [NASAWorldWind/WorldWindJava](https://github.com/NASAWorldWind/WorldWindJava), which is Apache-2.0 licensed since release v2.2.0. The `Poco::Geo` classes are an independent C++ implementation of the same formulas, so there is nothing to synchronise mechanically when the Java sources change.
 * [chrberger/WGS84toCartesian](https://github.com/chrberger/WGS84toCartesian) is the single-header origin of the two conversion functions, which Geo transcribes into members of `Poco::Geo::LatLon`.
+* The rhumb line formulas are documented at [movable-type.co.uk/scripts/latlong.html](https://www.movable-type.co.uk/scripts/latlong.html), whose MIT terms ask that the copyright notice and a link to the page be retained; both are in `Geo/src/LatLon.cpp`. The page's own implementation is JavaScript, so there is nothing to bundle.
+* The great-circle and meridional arc formulas in `Geo/src/LatLon.cpp` cite Snyder, *Map Projections - A Working Manual* (USGS Professional Paper 1395), a work of the United States Government and in the public domain. The citations are kept for reference; a formula is not itself subject to copyright.
+* `Poco::Geo::PolygonalGeofence` implements the even-odd rule from its published description rather than from any particular implementation, so it carries no third-party code.
