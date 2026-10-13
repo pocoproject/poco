@@ -128,6 +128,127 @@ void LatLonTest::testFromCartesian()
 }
 
 
+void LatLonTest::testCartesianRoundTrip()
+{
+	// fromCartesian() solves for the position iteratively and stops once the
+	// residual of the cartesian coordinate is below 1.0e-4 meters, which would
+	// suggest agreement well below a millimeter. Its step size is proportional
+	// to that residual, however, so the iteration overshoots and stops
+	// improving as the offset from the reference grows: the round trip error
+	// measured here is about 1 mm at 150 m, 0.1 m at 1.5 km and 1 m at 4.5 km.
+	// The tolerances below keep several times the measured error as headroom, so
+	// the case still fails if the conversion loses accuracy.
+	const LatLon ref = LatLon::fromDegrees(52.247041, 10.575830);
+
+	// About 150 m from the reference.
+	LatLon pos = LatLon::fromDegrees(52.248091, 10.574170);
+	LatLon back = LatLon::fromCartesian(ref, pos.toCartesian(ref));
+	double error = pos.greatCircleDistanceTo(back).radians()*LatLon::EARTH_MEAN_RADIUS;
+	assertEquals(0.0, error, 0.01);
+
+	// About 470 m from the reference.
+	pos = LatLon::fromDegrees(52.251011, 10.573568);
+	back = LatLon::fromCartesian(ref, pos.toCartesian(ref));
+	error = pos.greatCircleDistanceTo(back).radians()*LatLon::EARTH_MEAN_RADIUS;
+	assertEquals(0.0, error, 0.01);
+
+	// About 4.5 km from the reference.
+	pos = LatLon::fromDegrees(52.280000, 10.620000);
+	back = LatLon::fromCartesian(ref, pos.toCartesian(ref));
+	error = pos.greatCircleDistanceTo(back).radians()*LatLon::EARTH_MEAN_RADIUS;
+	assertEquals(0.0, error, 5.0);
+
+	// A reference in the southern hemisphere, at another latitude band, with a
+	// position about 1.5 km away.
+	const LatLon southernRef = LatLon::fromDegrees(-33.856800, 151.215200);
+
+	pos = LatLon::fromDegrees(-33.850000, 151.230000);
+	back = LatLon::fromCartesian(southernRef, pos.toCartesian(southernRef));
+	error = pos.greatCircleDistanceTo(back).radians()*LatLon::EARTH_MEAN_RADIUS;
+	assertEquals(0.0, error, 1.0);
+}
+
+
+void LatLonTest::testCartesianOverloads()
+{
+	const LatLon ref = LatLon::fromDegrees(52.247041, 10.575830);
+	const LatLon pos = LatLon::fromDegrees(52.251011, 10.573568);
+
+	// The member and the static toCartesian(), and the two fromCartesian()
+	// overloads, perform the same computation, so they agree exactly.
+	const Cartesian fromMember = pos.toCartesian(ref);
+	const Cartesian fromStatic = LatLon::toCartesian(ref, pos);
+	assertEquals(fromMember.x, fromStatic.x, 0);
+	assertEquals(fromMember.y, fromStatic.y, 0);
+
+	const LatLon fromStruct = LatLon::fromCartesian(ref, fromMember);
+	const LatLon fromCoordinates = LatLon::fromCartesian(ref, fromMember.x, fromMember.y);
+	assertTrue (fromStruct == fromCoordinates);
+
+	assertEquals(52.251011, fromStruct.latitude().degrees(), 0.000001);
+	assertEquals(10.573568, fromStruct.longitude().degrees(), 0.000001);
+}
+
+
+void LatLonTest::testAssignAndSwap()
+{
+	const LatLon southTower = LatLon::fromDegrees(37.813964, -122.478192);
+	const LatLon northTower = LatLon::fromDegrees(37.825585, -122.479426);
+
+	LatLon copy(southTower);
+	assertTrue (copy == southTower);
+
+	copy = northTower;
+	assertTrue (copy == northTower);
+
+	copy.assign(southTower);
+	assertTrue (copy == southTower);
+
+	copy.assign(Angle::fromDegrees(10), Angle::fromDegrees(20));
+	assertEquals(10.0, copy.latitude().degrees(), 0);
+	assertEquals(20.0, copy.longitude().degrees(), 0);
+
+	LatLon other(northTower);
+	copy.swap(other);
+	assertTrue (copy == northTower);
+	assertEquals(10.0, other.latitude().degrees(), 0);
+	assertEquals(20.0, other.longitude().degrees(), 0);
+}
+
+
+void LatLonTest::testComparison()
+{
+	const LatLon southTower = LatLon::fromDegrees(37.813964, -122.478192);
+	const LatLon sameTower = LatLon::fromDegrees(37.813964, -122.478192);
+	const LatLon northTower = LatLon::fromDegrees(37.825585, -122.479426);
+
+	assertTrue (southTower == sameTower);
+	assertFalse (southTower != sameTower);
+	assertTrue (southTower != northTower);
+	assertFalse (southTower == northTower);
+
+	// equals() compares latitude and longitude separately, with the delta given
+	// in degrees. The two towers are 0.011621 degrees of latitude apart.
+	assertTrue (southTower.equals(northTower, 0.02));
+	assertFalse (southTower.equals(northTower, 0.01));
+	assertTrue (southTower.equals(sameTower, 0));
+}
+
+
+void LatLonTest::testFromRadians()
+{
+	// PI/4 radians are 45 degrees, PI/2 radians are 90 degrees.
+	LatLon latLon = LatLon::fromRadians(Angle::PI/4, Angle::PI/2);
+	assertTrue (latLon.equals(LatLon::fromDegrees(45, 90), 1e-12));
+
+	latLon = LatLon::fromRadians(-Angle::PI/6, -Angle::PI/3);
+	assertTrue (latLon.equals(LatLon::fromDegrees(-30, -60), 1e-12));
+
+	latLon = LatLon::fromRadians(0, 0);
+	assertTrue (latLon == LatLon::ZERO);
+}
+
+
 void LatLonTest::setUp()
 {
 }
@@ -145,6 +266,11 @@ CppUnit::Test* LatLonTest::suite()
 	CppUnit_addTest(pSuite, LatLonTest, testLatLon);
 	CppUnit_addTest(pSuite, LatLonTest, testToCartesian);
 	CppUnit_addTest(pSuite, LatLonTest, testFromCartesian);
+	CppUnit_addTest(pSuite, LatLonTest, testCartesianRoundTrip);
+	CppUnit_addTest(pSuite, LatLonTest, testCartesianOverloads);
+	CppUnit_addTest(pSuite, LatLonTest, testAssignAndSwap);
+	CppUnit_addTest(pSuite, LatLonTest, testComparison);
+	CppUnit_addTest(pSuite, LatLonTest, testFromRadians);
 
 	return pSuite;
 }

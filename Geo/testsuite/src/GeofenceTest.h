@@ -25,6 +25,11 @@ public:
 
 	void testCircular();
 	void testPolygonal();
+	void testPolygonalBoundary();
+	void testPolygonalDegenerate();
+	void testPolygonalConcave();
+	void testCircularBoundary();
+	void testGeofenceBase();
 
 	void setUp();
 	void tearDown();

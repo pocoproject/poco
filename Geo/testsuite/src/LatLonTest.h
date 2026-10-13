@@ -26,6 +26,11 @@ public:
 	void testLatLon();
 	void testToCartesian();
 	void testFromCartesian();
+	void testCartesianRoundTrip();
+	void testCartesianOverloads();
+	void testAssignAndSwap();
+	void testComparison();
+	void testFromRadians();
 	void setUp();
 	void tearDown();
 
