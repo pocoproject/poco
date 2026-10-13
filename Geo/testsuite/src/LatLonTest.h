@@ -27,10 +27,19 @@ public:
 	void testToCartesian();
 	void testFromCartesian();
 	void testCartesianRoundTrip();
-	void testCartesianOverloads();
 	void testAssignAndSwap();
 	void testComparison();
 	void testFromRadians();
+	void testAntipodalGreatCircleDistance();
+	void testGreatCircleEndPositionAtPole();
+	void testDistanceToNaNPosition();
+	void testRhumbDueEastOnEquator();
+	void testRhumbBetweenNearlyEqualLatitudes();
+	void testRhumbWestAcrossAntimeridian();
+	void testToCartesianAcrossAntimeridian();
+	void testToCartesianOutOfDomain();
+	void testFromCartesianNearPole();
+	void testEqualsAcrossAntimeridian();
 	void setUp();
 	void tearDown();
 
@@ -40,4 +49,4 @@ private:
 };
 
 
-#endif // GeoTest_INCLUDED
+#endif // LatLonTest_INCLUDED

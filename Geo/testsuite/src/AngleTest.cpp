@@ -249,6 +249,15 @@ void AngleTest::testNormalization()
 }
 
 
+void AngleTest::testNormalizedDegreesNearZero()
+{
+	// A negative value too small to change a full turn when added to it must still
+	// normalize into [0, 360), not to the 360 that such an addition leaves.
+	assertEqual (0.0, Angle::normalizedDegrees(-1e-15));
+	assertEqual (0.0, Angle::normalizedDegrees(-1e-300));
+}
+
+
 void AngleTest::testArithmetic()
 {
 	Angle a = Angle::fromDegrees(30) + Angle::fromDegrees(45);
@@ -272,6 +281,15 @@ void AngleTest::testArithmetic()
 	assertEqualDelta (20.0, Angle::fromDegrees(10).angularDistanceTo(Angle::fromDegrees(350)).degrees(), 1e-12);
 	assertEqualDelta (20.0, Angle::fromDegrees(170).angularDistanceTo(Angle::fromDegrees(-170)).degrees(), 1e-12);
 	assertEqualDelta (20.0, Angle::fromDegrees(-170).angularDistanceTo(Angle::fromDegrees(170)).degrees(), 1e-12);
+}
+
+
+void AngleTest::testAngularDistanceBeyondFullTurn()
+{
+	// Beyond 540 degrees the difference of the two angles wraps a second time, which
+	// taking the complement of a difference only once does not account for.
+	assertEqualDelta (0.0, Angle::fromDegrees(0).angularDistanceTo(Angle::fromDegrees(720)).degrees(), 1e-12);
+	assertEqualDelta (120.0, Angle::fromDegrees(0).angularDistanceTo(Angle::fromDegrees(600)).degrees(), 1e-12);
 }
 
 
@@ -347,7 +365,9 @@ CppUnit::Test* AngleTest::suite()
 	CppUnit_addTest(pSuite, AngleTest, testFromRadiansAndXY);
 	CppUnit_addTest(pSuite, AngleTest, testClamping);
 	CppUnit_addTest(pSuite, AngleTest, testNormalization);
+	CppUnit_addTest(pSuite, AngleTest, testNormalizedDegreesNearZero);
 	CppUnit_addTest(pSuite, AngleTest, testArithmetic);
+	CppUnit_addTest(pSuite, AngleTest, testAngularDistanceBeyondFullTurn);
 	CppUnit_addTest(pSuite, AngleTest, testComparisonOperators);
 	CppUnit_addTest(pSuite, AngleTest, testSinCos);
 
