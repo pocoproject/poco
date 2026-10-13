@@ -31,22 +31,27 @@ public:
 	void testConstructBufferSize();
 	void testConstructLogger();
 	void testOpenBadParameterLength();
+	void testOpenEmptyDevice();
 	void testOpenNonexistentDevice();
 	void testOpenNotATerminal();
 	void testClosedPortThrows();
 	void testCloseWhenNotOpen();
 	void testRS485Flags();
+	void testRS485ParamsDefaults();
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	void testOpenClose();
 	void testOpenDefaultSpeed();
+	void testOpenSetsBlockingRead();
 	void testOpenTwice();
+	void testOpenCharacterSize5();
 	void testBadCharacterSize();
 	void testBadParity();
 	void testBadStopBits();
 	void testBadSpeed();
 	void testClosedAfterFailedOpen();
 	void testWrite();
+	void testWriteEmptyString();
 	void testReadBuffer();
 	void testReadString();
 	void testReadChar();

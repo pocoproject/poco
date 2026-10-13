@@ -16,6 +16,7 @@
 #include "Poco/Format.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 
 
 using Poco::format;
@@ -161,13 +162,18 @@ void SerialPortImpl::openImpl(const std::string& device, int baudRate, const std
 
 void SerialPortImpl::closeImpl()
 {
-	CloseHandle(_handle);
-	_handle = INVALID_HANDLE_VALUE;
+	if (_handle != INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(_handle);
+		_handle = INVALID_HANDLE_VALUE;
+	}
 }
 
 
 void SerialPortImpl::drainImpl()
 {
+	if (!FlushFileBuffers(_handle))
+		throw Poco::IOException("error draining serial port", Poco::Error::getMessage(GetLastError()));
 }
 
 

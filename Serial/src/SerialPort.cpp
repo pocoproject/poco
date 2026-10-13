@@ -15,6 +15,8 @@
 #include "Poco/Serial/SerialPort.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+#include <algorithm>
+#include <limits>
 
 
 using Poco::format;
@@ -95,6 +97,7 @@ SerialPort::~SerialPort()
 void SerialPort::open(const std::string& device, int baudRate, const std::string& parameters, FlowControl flowControl)
 {
 	if (isOpenImpl()) throw Poco::IllegalStateException("Port is already open", device);
+	if (device.empty()) throw Poco::InvalidArgumentException("no device specified");
 	if (parameters.size() != 3) throw Poco::InvalidArgumentException("Parameters string must be three characters long", parameters);
 
 	if (_logger.debug())
@@ -128,24 +131,32 @@ void SerialPort::close()
 
 void SerialPort::drain()
 {
+	if (!isOpenImpl()) throw Poco::IllegalStateException("Port is not open");
+
 	drainImpl();
 }
 
 
 void SerialPort::configureRS485(const RS485Params& rs485Params)
 {
+	if (!isOpenImpl()) throw Poco::IllegalStateException("Port is not open");
+
 	configureRS485Impl(rs485Params);
 }
 
 
 void SerialPort::setRTS(bool status)
 {
+	if (!isOpenImpl()) throw Poco::IllegalStateException("Port is not open");
+
 	setRTSImpl(status);
 }
 
 	
 bool SerialPort::getRTS() const
 {
+	if (!isOpenImpl()) throw Poco::IllegalStateException("Port is not open");
+
 	return getRTSImpl();
 }
 
@@ -175,6 +186,8 @@ bool SerialPort::poll(const Poco::Timespan& timeout)
 std::size_t SerialPort::write(const char* data, std::size_t size)
 {
 	if (!isOpenImpl()) throw Poco::IllegalStateException("Port is not open");
+	if (size > static_cast<std::size_t>(std::numeric_limits<int>::max()))
+		throw Poco::InvalidArgumentException("size exceeds the maximum of a single write");
 
 	if (_logger.debug())
 	{
@@ -183,7 +196,7 @@ std::size_t SerialPort::write(const char* data, std::size_t size)
 	int n = writeImpl(data, size);
 	if (n < 0)
 		throw Poco::IOException("serial port write error");
-	else if (n < size)
+	else if (static_cast<std::size_t>(n) < size)
 		throw Poco::IOException(format("short write on serial port: %d of %z bytes", n, size));
 	else
 		return static_cast<std::size_t>(n);
@@ -192,7 +205,7 @@ std::size_t SerialPort::write(const char* data, std::size_t size)
 
 std::size_t SerialPort::write(const std::string& data)
 {
-	return write(data.data(), static_cast<int>(data.size()));
+	return write(data.data(), data.size());
 }
 
 
@@ -255,7 +268,8 @@ void SerialPort::readBuffer()
 	if (!isOpenImpl()) throw Poco::IllegalStateException("Port is not open");
 
 	_cur = _end = _buffer.begin();
-	int n = readImpl(_cur, _buffer.size());
+	const std::size_t size = std::min(_buffer.size(), static_cast<std::size_t>(std::numeric_limits<int>::max()));
+	int n = readImpl(_cur, size);
 	if (n >= 0)
 	{
 		_end += n;
