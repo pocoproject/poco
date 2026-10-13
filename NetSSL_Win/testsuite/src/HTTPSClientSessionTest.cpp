@@ -31,6 +31,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Thread.h"
+#include "Poco/Timespan.h"
 #include "HTTPSTestServer.h"
 #include <istream>
 #include <ostream>
@@ -115,6 +116,30 @@ void HTTPSClientSessionTest::testSourceAddress()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+}
+
+
+void HTTPSClientSessionTest::testRequestRightAfterHandshake()
+{
+	// The second request of a session connects again; the resumed handshake often
+	// lets the request reach the server in the same read as the client's Finished.
+	for (int i = 0; i < 15; ++i)
+	{
+		HTTPSTestServer srv;
+		HTTPSClientSession s("127.0.0.1", srv.port());
+		s.setTimeout(Poco::Timespan(5, 0));
+		for (int k = 0; k < 2; ++k)
+		{
+			HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+			s.sendRequest(request);
+			HTTPResponse response;
+			std::istream& rs = s.receiveResponse(response);
+			assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+			std::ostringstream ostr;
+			StreamCopier::copyStream(rs, ostr);
+			assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+		}
+	}
 }
 
 
@@ -439,6 +464,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetSmall);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testSourceAddress);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testRequestRightAfterHandshake);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetLarge);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHead);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostSmallIdentity);

@@ -81,6 +81,7 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_inSecBuffer(&_securityFunctions, false),
 	_extraSecBuffer(),
 	_securityStatus(SEC_E_INCOMPLETE_MESSAGE),
+	_inputConsumed(true),
 	_state(ST_INITIAL)
 {
 	SecInvalidateHandle(&_hCreds);
@@ -993,7 +994,13 @@ void SecureSocketImpl::stateClientHandshakeLoopInit()
 	_inSecBuffer.reset(false);
 	_outSecBuffer.reset(true);
 
-	if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_CONTINUE_NEEDED)
+	if (_securityStatus == SEC_I_CONTINUE_NEEDED && _inputConsumed && _recvBufferOffset > 0 && bufferHasCompleteRecords(_recvBuffer.begin(), _recvBufferOffset))
+	{
+		// The kept extra bytes hold the next records: a receive would wait for data that has
+		// already arrived. Input that was not consumed at all is not offered again without more data.
+		setState(ST_CLIENT_HSK_LOOP_PROCESS);
+	}
+	else if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_CONTINUE_NEEDED)
 	{
 		setState(ST_CLIENT_HSK_LOOP_RECV);
 	}
@@ -1136,13 +1143,19 @@ void SecureSocketImpl::sendOutSecBufferAndAdvanceState(State state)
 
 void SecureSocketImpl::drainExtraBuffer()
 {
-	if (_inSecBuffer[1].BufferType == SECBUFFER_EXTRA && _inSecBuffer[1].pvBuffer && _inSecBuffer[1].cbBuffer > 0)
+	// Schannel reports unprocessed input by BufferType and cbBuffer only: the extra bytes are
+	// the last cbBuffer bytes of the input token, and pvBuffer does not point to them.
+	if (_inSecBuffer[1].BufferType == SECBUFFER_EXTRA && _inSecBuffer[1].cbBuffer > 0)
 	{
+		if (_inSecBuffer[1].cbBuffer > _recvBufferOffset)
+			throw SSLException("Invalid extra buffer length from the security provider");
+		_inputConsumed = _inSecBuffer[1].cbBuffer < _recvBufferOffset;
 		std::memmove(_recvBuffer.begin(), _recvBuffer.begin() + (_recvBufferOffset - _inSecBuffer[1].cbBuffer), _inSecBuffer[1].cbBuffer);
 		_recvBufferOffset = _inSecBuffer[1].cbBuffer;
 	}
 	else 
 	{
+		_inputConsumed = true;
 		_recvBufferOffset = 0;
 	}
 }
@@ -1223,7 +1236,13 @@ void SecureSocketImpl::stateServerHandshakeLoopInit()
 {
 	if (_securityStatus == SEC_I_CONTINUE_NEEDED || _securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_INCOMPLETE_CREDENTIALS)
 	{
-		if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_CONTINUE_NEEDED)
+		if (_securityStatus == SEC_I_CONTINUE_NEEDED && _inputConsumed && _recvBufferOffset > 0 && bufferHasCompleteRecords(_recvBuffer.begin(), _recvBufferOffset))
+		{
+			// The kept extra bytes hold the next records: a receive would wait for data that has
+			// already arrived. Input that was not consumed at all is not offered again without more data.
+			setState(ST_SERVER_HSK_LOOP_PROCESS);
+		}
+		else if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_CONTINUE_NEEDED)
 		{
 			setState(ST_SERVER_HSK_LOOP_RECV);
 		}

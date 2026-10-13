@@ -87,6 +87,7 @@ namespace
 		void run()
 		{
 			StreamSocket& ss = socket();
+			ss.setReceiveTimeout(Poco::Timespan(10, 0));
 			try
 			{
 				char buffer[256];
@@ -178,6 +179,7 @@ void SecureStreamSocketTest::testSendReceive()
 
 	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss1(sa);
+	ss1.setReceiveTimeout(Poco::Timespan(10, 0));
 	std::string data("hello, world");
 	ss1.sendBytes(data.data(), static_cast<int>(data.size()));
 	char buffer[8192];
@@ -218,6 +220,7 @@ void SecureStreamSocketTest::testPeek()
 
 	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss(sa);
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
 	
 	int n = ss.sendBytes("hello, world!", 13);
 	assertTrue (n == 13);
@@ -246,6 +249,7 @@ void SecureStreamSocketTest::testBufVecAndBufferOverloadsRefused()
 
 	SocketAddress sa("127.0.0.1", svs.address().port());
 	SecureStreamSocket ss(sa);
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
 	char data[] = "cleartext";
 	Poco::Net::SocketBufVec vec{Socket::makeBuffer(data, sizeof(data) - 1)};
 	try
@@ -373,6 +377,7 @@ void SecureStreamSocketTest::testLazyHandshake()
 	SecureStreamSocket ss;
 	ss.setLazyHandshake(true);
 	ss.connect(SocketAddress("127.0.0.1", svs.address().port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
 
 	// the handshake is made with the first data
 	std::string data("hello, world");
@@ -415,6 +420,7 @@ void SecureStreamSocketTest::bindAndConnect(const SocketAddress& loopback, bool 
 	ss.connect(svs.address());
 	assertTrue (ss.impl()->sockfd() == boundSocket);
 	assertTrue (ss.address() == boundAddress);
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
 
 	std::string data("hello, world");
 	ss.sendBytes(data.data(), static_cast<int>(data.size()));
