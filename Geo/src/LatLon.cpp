@@ -13,6 +13,7 @@
 
 #include "Poco/Geo/LatLon.h"
 #include "Poco/FPEnvironment.h"
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -28,6 +29,25 @@ using Poco::FPEnvironment;
 
 
 namespace Poco::Geo {
+
+
+namespace
+{
+	// Smallest difference of the stretched latitudes for which a rhumb line's
+	// stretch factor can be formed as a quotient. Below it, the difference rounds
+	// to zero on a due east or west course and for latitudes a few ulps apart,
+	// which makes the quotient infinite.
+	constexpr double MIN_DELTA_PHI = 1.0e-12;
+
+	double wrapLongitude(double radians)
+		/// Reduces a longitude or a longitude difference to (-PI, PI].
+	{
+		// std::remainder is exact, but yields [-PI, PI]. The antimeridian is named
+		// 180 degrees east, so an exact half turn belongs at the positive end.
+		const double wrapped = std::remainder(radians, 2.0*Angle::PI);
+		return wrapped == -Angle::PI ? Angle::PI : wrapped;
+	}
+}
 
 
 const LatLon LatLon::ZERO; 
@@ -74,11 +94,14 @@ Angle LatLon::greatCircleDistanceTo(const LatLon& latLon) const
 	// Taken from "Map Projections - A Working Manual", page 30, equation 5-3a.
 	// The traditional d=2*asin(a) form has been replaced with d=2*atan2(sqrt(a), sqrt(1-a))
 	// to reduce rounding errors with large distances.
-	double a = std::sin((lat2 - lat1) / 2.0) * std::sin((lat2 - lat1) / 2.0)
-			+ std::cos(lat1) * std::cos(lat2) * std::sin((lon2 - lon1) / 2.0) * std::sin((lon2 - lon1) / 2.0);
+	// The term rounds above 1 for antipodal positions, where the square root of
+	// its complement would be NaN.
+	double a = std::clamp(std::sin((lat2 - lat1) / 2.0) * std::sin((lat2 - lat1) / 2.0)
+			+ std::cos(lat1) * std::cos(lat2) * std::sin((lon2 - lon1) / 2.0) * std::sin((lon2 - lon1) / 2.0),
+			0.0, 1.0);
 	double distanceRadians = 2.0 * std::atan2(std::sqrt(a), std::sqrt(1 - a));
 	
-	return FPEnvironment::isNaN(distanceRadians) ? Angle() : Angle::fromRadians(distanceRadians);
+	return Angle::fromRadians(distanceRadians);
 }
 
 
@@ -101,7 +124,7 @@ Angle LatLon::greatCircleAzimuthTo(const LatLon& latLon) const
 	double x = std::cos(lat1) * std::sin(lat2) - std::sin(lat1) * std::cos(lat2) * std::cos(lon2 - lon1);
 	double azimuthRadians = std::atan2(y, x);
 	
-	return FPEnvironment::isNaN(azimuthRadians) ? Angle() : Angle::fromRadians(azimuthRadians);
+	return Angle::fromRadians(azimuthRadians);
 }
 
 
@@ -116,8 +139,9 @@ LatLon LatLon::greatCircleEndPosition(const Angle& greatCircleAzimuth, const Ang
 		return *this;
 	
 	// Taken from "Map Projections - A Working Manual", page 31, equation 5-5 and 5-6.
-	double endLatRadians = std::asin(std::sin(lat) * std::cos(distance)
-			+ std::cos(lat) * std::sin(distance) * std::cos(azimuth));
+	// The argument of the arc sine rounds above 1 when the end position is a pole.
+	double endLatRadians = std::asin(std::clamp(std::sin(lat) * std::cos(distance)
+			+ std::cos(lat) * std::sin(distance) * std::cos(azimuth), -1.0, 1.0));
 	double endLonRadians = lon + std::atan2(
 			std::sin(distance) * std::sin(azimuth),
 			std::cos(lat) * std::cos(distance) - std::sin(lat) * std::sin(distance) * std::cos(azimuth));
@@ -143,7 +167,7 @@ Angle LatLon::rhumbDistanceTo(const LatLon& latLon) const
 	double dLat = lat2 - lat1;
 	double dLon = lon2 - lon1;
 	double dPhi = std::log(std::tan(lat2 / 2.0 + Angle::PI / 4.0) / std::tan(lat1 / 2.0 + Angle::PI / 4.0));
-	double q = dLat / dPhi;
+	double q = std::fabs(dPhi) < MIN_DELTA_PHI ? std::cos(lat1) : dLat / dPhi;
 	if (FPEnvironment::isNaN(dPhi) || FPEnvironment::isNaN(q))
 	{
 		q = std::cos(lat1);
@@ -156,7 +180,7 @@ Angle LatLon::rhumbDistanceTo(const LatLon& latLon) const
 	
 	double distanceRadians = std::sqrt(dLat * dLat + q * q * dLon * dLon);
 	
-	return FPEnvironment::isNaN(distanceRadians) ? Angle() : Angle::fromRadians(distanceRadians);
+	return Angle::fromRadians(distanceRadians);
 }
 
 
@@ -181,7 +205,7 @@ Angle LatLon::rhumbAzimuthTo(const LatLon& latLon) const
 
 	double azimuthRadians = std::atan2(dLon, dPhi);
 
-	return FPEnvironment::isNaN(azimuthRadians) ? Angle() : Angle::fromRadians(azimuthRadians);
+	return Angle::fromRadians(azimuthRadians);
 }
 
 
@@ -198,31 +222,28 @@ LatLon LatLon::rhumbEndPosition(const Angle& rhumbAzimuth, const Angle& arcDista
 	// Taken from http://www.movable-type.co.uk/scripts/latlong.html
 	double lat2 = lat1 + distance * std::cos(azimuth);
 	double dPhi = std::log(std::tan(lat2 / 2.0 + Angle::PI / 4.0) / std::tan(lat1 / 2.0 + Angle::PI / 4.0));
-	double q = (lat2 - lat1) / dPhi;
+	double q = std::fabs(dPhi) < MIN_DELTA_PHI ? std::cos(lat1) : (lat2 - lat1) / dPhi;
 	if (FPEnvironment::isNaN(dPhi) || FPEnvironment::isNaN(q))
 	{
 		q = std::cos(lat1);
 	}
 	double dLon = distance * std::sin(azimuth) / q;
-	// Handle latitude passing over either pole.
-	if (std::fabs(lat2) > Angle::PI / 2.0)
-	{
-		lat2 = lat2 > 0 ? Angle::PI - lat2 : -Angle::PI - lat2;
-	}
-	double lon2 = std::fmod((lon1 + dLon + Angle::PI), (2 * Angle::PI)) - Angle::PI;
 	
-	if (FPEnvironment::isNaN(lat2) || FPEnvironment::isNaN(lon2))
+	if (FPEnvironment::isNaN(lat2) || FPEnvironment::isNaN(dLon))
 		return *this;
 	
-	return fromRadians(lat2, lon2);
+	// Normalizing reflects a latitude that passed over a pole and brings a longitude
+	// that crossed the antimeridian back into range.
+	return LatLon(Angle::fromRadians(lat2).normalizedLatitude(), Angle::fromRadians(lon1 + dLon).normalizedLongitude());
 }
 
 
 bool LatLon::equals(const LatLon& other, double delta) const
 {
-	double dLat = std::fabs(_latitude.degrees() - other._latitude.degrees());
-	double dLon = std::fabs(_longitude.degrees() - other._longitude.degrees());
-	return dLat <= delta && dLon <= delta;
+	// The angular distance wraps the difference, so that two positions on either
+	// side of the antimeridian are as close to each other as they are on a globe.
+	return _latitude.angularDistanceTo(other._latitude).degrees() <= delta
+		&& _longitude.angularDistanceTo(other._longitude).degrees() <= delta;
 }
 
 
@@ -236,64 +257,77 @@ LatLon LatLon::fromCartesian(const LatLon& reference, double x, double y)
 {
 	// The projection has no simple closed-form inverse, but it is smooth, so
 	// Newton's method on toCartesian() converges in a few steps. The Jacobian is
-	// obtained by finite differences, which keeps this function tied to the
-	// forward projection as the single definition of the mapping.
+	// obtained by finite differences, which keeps the forward projection the single
+	// definition of the mapping: a correction to it carries into the inverse.
 	//
 	// The residual is a distance in meters and the step is in degrees, so the
-	// Jacobian is what converts between the two. Stepping by a fraction of the
-	// residual in degrees, as a steepest-descent search over one coordinate at a
-	// time would, overshoots by the number of meters in a degree.
+	// Jacobian is what converts between the two.
 
+	// Residual in meters at which the position is accepted without a further step.
 	constexpr double TOLERANCE = 1e-9;
-		/// Residual in meters at which the position is accepted.
+	// Step in degrees for the finite differences, about 0.11 m.
 	constexpr double DELTA = 1e-6;
-		/// Step in degrees for the finite differences, about 0.11 m.
 	constexpr int MAX_ITERATIONS = 16;
+	// A residual cannot fall below the spacing of the projected coordinates, so the
+	// iteration also stops as soon as one no longer decreases. A residual far above
+	// that spacing then means the solve failed instead of reaching that limit.
+	constexpr double RESIDUAL_FLOOR = EARTH_EQUATORIAL_RADIUS*std::numeric_limits<double>::epsilon();
+	constexpr double MAX_ACCEPTED_RESIDUAL = 1000.0*RESIDUAL_FLOOR;
+	// The finite differences lose about ten digits, so a determinant below this
+	// fraction of the product of the Jacobian's column norms carries no direction.
+	constexpr double MIN_RELATIVE_DETERMINANT = 1e-8;
+	// Meters per degree along a meridian, the local scale of the projection.
+	constexpr double METERS_PER_DEGREE = Angle::DEGREES_TO_RADIANS*EARTH_EQUATORIAL_RADIUS;
 
-	double lat = reference.latitude().degrees();
-	double lon = reference.longitude().degrees();
+	const auto [lon0, ml0] = referenceParameters(reference);
+
+	// Starting from the local scale instead of from the reference saves one
+	// iteration. It is a guess only, because the projection is not linear.
+	double lat = std::clamp(reference.latitude().degrees() + y/METERS_PER_DEGREE, -90.0, 90.0);
+	double lon = Angle::normalizedDegreesLongitude(reference.longitude().degrees()
+			+ x/(METERS_PER_DEGREE*std::cos(reference.latitude().radians())));
+	double residual = std::numeric_limits<double>::infinity();
+	bool accepted = false;
 
 	for (int i = 0; i < MAX_ITERATIONS; ++i)
 	{
-		const Cartesian f = toCartesian(reference, fromDegrees(lat, lon));
+		const Cartesian f = toCartesian(lon0, ml0, fromDegrees(lat, lon));
 		const double rx = f.x - x;
 		const double ry = f.y - y;
-		if (std::hypot(rx, ry) <= TOLERANCE) break;
+		const double r = std::hypot(rx, ry);
+		accepted = r <= MAX_ACCEPTED_RESIDUAL;
+		if (r <= TOLERANCE || r >= residual) break;
+		residual = r;
 
-		const Cartesian fLat = toCartesian(reference, fromDegrees(lat + DELTA, lon));
-		const Cartesian fLon = toCartesian(reference, fromDegrees(lat, lon + DELTA));
+		const Cartesian fLat = toCartesian(lon0, ml0, fromDegrees(lat + DELTA, lon));
+		const Cartesian fLon = toCartesian(lon0, ml0, fromDegrees(lat, lon + DELTA));
 		const double dxdLat = (fLat.x - f.x)/DELTA;
 		const double dxdLon = (fLon.x - f.x)/DELTA;
 		const double dydLat = (fLat.y - f.y)/DELTA;
 		const double dydLon = (fLon.y - f.y)/DELTA;
 
 		const double determinant = dxdLat*dydLon - dxdLon*dydLat;
-		if (std::abs(determinant) < std::numeric_limits<double>::min())
+		if (std::abs(determinant) < MIN_RELATIVE_DETERMINANT*std::hypot(dxdLat, dydLat)*std::hypot(dxdLon, dydLon))
 		{
 			// Degenerate at a pole, where the forward projection is not invertible.
 			break;
 		}
 
-		lat -= ( dydLon*rx - dxdLon*ry)/determinant;
-		lon -= (-dydLat*rx + dxdLat*ry)/determinant;
+		// The step itself does not respect the range of a position, so the iterate
+		// is brought back into it.
+		lat = std::clamp(lat - ( dydLon*rx - dxdLon*ry)/determinant, -90.0, 90.0);
+		lon = Angle::normalizedDegreesLongitude(lon - (-dydLat*rx + dxdLat*ry)/determinant);
 	}
+
+	if (!accepted)
+		return fromDegrees(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
 
 	return fromDegrees(lat, lon);
 }
 
 
-Cartesian LatLon::toCartesian(const LatLon& reference) const
+namespace
 {
-	return toCartesian(reference, *this);
-}
-
-
-Cartesian LatLon::toCartesian(const LatLon& reference, const LatLon& latLon)
-{
-#ifndef M_PI
-	constexpr double M_PI = 3.141592653589793;
-#endif
-	constexpr double HALF_PI{M_PI / 2.0};
 	constexpr double EPSILON10{1.0e-10};
 	constexpr double EPSILON12{1.0e-12};
 
@@ -321,50 +355,66 @@ Cartesian LatLon::toCartesian(const LatLon& reference, const LatLon& latLon)
 	constexpr double R3{R3T * (C66 - SQUARED_ECCENTRICITY * C68)};
 	constexpr double R4{R3T * SQUARED_ECCENTRICITY * C88};
 
-	auto mlfn = [&](const double &lat) 
+	double mlfn(double lat)
 	{
 		const double sin_phi{std::sin(lat)};
 		const double cos_phi{std::cos(lat) * sin_phi};
 		const double squared_sin_phi = sin_phi * sin_phi;
 		return (R0 * lat - cos_phi * (R1 + squared_sin_phi * (R2 + squared_sin_phi * (R3 + squared_sin_phi * R4))));
-	};
+	}
 
-	const double ML0{mlfn(reference.latitude().radians())};
-
-	auto msfn = [&](double sinPhi, double cosPhi, double es) 
+	double msfn(double sinPhi, double cosPhi, double es)
 	{
 		return (cosPhi / std::sqrt(1.0 - es * sinPhi * sinPhi));
-	};
+	}
+}
 
-	auto project = [&](double lat, double lon) 
+
+std::pair<double, double> LatLon::referenceParameters(const LatLon& reference)
+{
+	return { reference.longitude().radians(), mlfn(reference.latitude().radians()) };
+}
+
+
+Cartesian LatLon::toCartesian(const LatLon& reference) const
+{
+	return toCartesian(reference, *this);
+}
+
+
+Cartesian LatLon::toCartesian(const LatLon& reference, const LatLon& latLon)
+{
+	const auto [lon0, ml0] = referenceParameters(reference);
+	return toCartesian(lon0, ml0, latLon);
+}
+
+
+Cartesian LatLon::toCartesian(double lon0, double ml0, const LatLon& latLon)
+{
+	double lat = latLon.latitude().radians();
+	const double D = std::abs(lat) - Angle::PI_OVER_2;
+	if (D > EPSILON12)
 	{
-		Cartesian xy{lon, -1.0 * ML0};
-		if (!(std::abs(lat) < EPSILON10)) 
-		{
-			const double ms{(std::abs(std::sin(lat)) > EPSILON10) ? msfn(std::sin(lat), std::cos(lat), SQUARED_ECCENTRICITY) / std::sin(lat) : 0.0};
-			xy.x = ms * std::sin(lon *= std::sin(lat));
-			xy.y = (mlfn(lat) - ML0) + ms * (1.0 - std::cos(lon));
-		}
-		return xy;
-	};
-
-	auto fwd = [&](double lat, double lon) 
+		return Cartesian{std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
+	}
+	if (std::abs(D) < EPSILON12)
 	{
-		const double D = std::abs(lat) - HALF_PI;
-		if ((D > EPSILON12) || (std::abs(lon) > 10.0)) 
-		{
-			return Cartesian{0.0, 0.0};
-		}
-		if (std::abs(D) < EPSILON12) 
-		{
-			lat = (lat < 0.0) ? -1.0 * HALF_PI : HALF_PI;
-		}
-		lon -= reference.longitude().radians();
-		const auto projected{project(lat, lon)};
-		return Cartesian{EARTH_EQUATORIAL_RADIUS * projected.x, EARTH_EQUATORIAL_RADIUS * projected.y};
-	};
+		lat = (lat < 0.0) ? -1.0 * Angle::PI_OVER_2 : Angle::PI_OVER_2;
+	}
 
-	return fwd(latLon.latitude().radians(), latLon.longitude().radians());
+	// Without wrapping the difference, a position and a reference on either side of
+	// the antimeridian come out a whole turn apart.
+	double lon = wrapLongitude(latLon.longitude().radians() - lon0);
+
+	Cartesian xy{lon, -1.0 * ml0};
+	if (!(std::abs(lat) < EPSILON10)) 
+	{
+		const double ms{(std::abs(std::sin(lat)) > EPSILON10) ? msfn(std::sin(lat), std::cos(lat), SQUARED_ECCENTRICITY) / std::sin(lat) : 0.0};
+		xy.x = ms * std::sin(lon *= std::sin(lat));
+		xy.y = (mlfn(lat) - ml0) + ms * (1.0 - std::cos(lon));
+	}
+
+	return Cartesian{EARTH_EQUATORIAL_RADIUS * xy.x, EARTH_EQUATORIAL_RADIUS * xy.y};
 }
 
 
