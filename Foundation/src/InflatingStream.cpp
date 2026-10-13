@@ -175,7 +175,13 @@ std::streamsize InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize
 			_eof = true;
 			return length - _pZstr->avail_out;
 		}
-		if (rc != Z_OK) throw IOException(zError(rc));
+		if (rc != Z_OK)
+		{
+			// The rest of the input belongs to the stream that failed. Drop it, so
+			// that after reset() the next stream is read from the underlying input.
+			_pZstr->avail_in = 0;
+			throw IOException(zError(rc));
+		}
 		if (_pZstr->avail_out == 0)
 			return length;
 		if (_pZstr->avail_in == 0)

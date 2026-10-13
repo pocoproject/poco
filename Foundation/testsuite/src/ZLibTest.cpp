@@ -174,6 +174,30 @@ void ZLibTest::testGzip3()
 }
 
 
+void ZLibTest::testInflateResetAfterError()
+{
+	// a zlib header followed by an invalid deflate block
+	std::stringstream buffer;
+	buffer << std::string("\x78\x9c\xff\xff\xff\xff\xff\xff\xff\xff", 10);
+
+	InflatingInputStream inflater(buffer, InflatingStreamBuf::STREAM_ZLIB);
+	std::string data;
+	inflater >> data;
+	assertTrue (inflater.bad());
+
+	// the underlying stream is now positioned at the start of a valid stream
+	buffer.clear();
+	DeflatingOutputStream deflater(buffer, DeflatingStreamBuf::STREAM_ZLIB);
+	deflater << "abcdefabcdefabcdefabcdefabcdefabcdef" << std::endl;
+	deflater.close();
+
+	inflater.clear();
+	inflater.reset();
+	inflater >> data;
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+}
+
+
 void ZLibTest::setUp()
 {
 }
@@ -195,6 +219,7 @@ CppUnit::Test* ZLibTest::suite()
 	CppUnit_addTest(pSuite, ZLibTest, testGzip1);
 	CppUnit_addTest(pSuite, ZLibTest, testGzip2);
 	CppUnit_addTest(pSuite, ZLibTest, testGzip3);
+	CppUnit_addTest(pSuite, ZLibTest, testInflateResetAfterError);
 
 	return pSuite;
 }
