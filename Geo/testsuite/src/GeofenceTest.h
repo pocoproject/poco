@@ -28,7 +28,10 @@ public:
 	void testPolygonalBoundary();
 	void testPolygonalDegenerate();
 	void testPolygonalConcave();
+	void testPolygonalAcrossAntimeridian();
+	void testPolygonalOutOfRangePosition();
 	void testCircularBoundary();
+	void testNaNPositionOutside();
 	void testGeofenceBase();
 
 	void setUp();
@@ -40,4 +43,4 @@ private:
 };
 
 
-#endif // GeoTest_INCLUDED
+#endif // GeofenceTest_INCLUDED

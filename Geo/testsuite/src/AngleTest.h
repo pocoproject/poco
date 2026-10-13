@@ -28,7 +28,9 @@ public:
 	void testFromRadiansAndXY();
 	void testClamping();
 	void testNormalization();
+	void testNormalizedDegreesNearZero();
 	void testArithmetic();
+	void testAngularDistanceBeyondFullTurn();
 	void testComparisonOperators();
 	void testSinCos();
 
@@ -41,4 +43,4 @@ private:
 };
 
 
-#endif // GeoTest_INCLUDED
+#endif // AngleTest_INCLUDED
