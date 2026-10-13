@@ -20,8 +20,7 @@
 #include "Poco/Geo/Geofence.h"
 
 
-namespace Poco {
-namespace Geo {
+namespace Poco::Geo {
 
 
 class Geo_API CircularGeofence: public Geofence
@@ -34,7 +33,7 @@ public:
 		/// and radius (in meters).
 
 	// Geofence
-	bool isInside(const LatLon& position) const;
+	[[nodiscard]] bool isInside(const LatLon& position) const override;
 
 private:
 	LatLon _center;
@@ -42,7 +41,7 @@ private:
 };
 
 
-} } // namespace Poco::Geo
+} // namespace Poco::Geo
 
 
 #endif // Geo_CircularGeofence_INCLUDED

@@ -21,8 +21,7 @@
 #include "Poco/Geo/Angle.h"
 
 
-namespace Poco {
-namespace Geo {
+namespace Poco::Geo {
 
 
 struct Cartesian
@@ -55,19 +54,19 @@ public:
 	static constexpr double EARTH_POLAR_RADIUS = 6356752.3; /// Earth polar radius in meters (6356752.3 m, derived from WGS-84 ellipsoid)
 	static constexpr double EARTH_MEAN_RADIUS = 6371009.0; /// Earth mean radius according to IUGG in meters (6371009 m)
 	
-	LatLon();
+	constexpr LatLon() = default;
 		/// Creates a zero LatLon.
 		
 	LatLon(const Angle& latitude, const Angle& longitude);
 		/// Creates a LatLon with the given latitude and longitude.
 		
-	LatLon(const LatLon& other);
+	LatLon(const LatLon& other) = default;
 		/// Creates a LatLon by copying another one.
 		
-	~LatLon();
+	~LatLon() = default;
 		/// Destroys the LatLon.
 
-	LatLon& operator = (const LatLon& other);
+	LatLon& operator = (const LatLon& other) = default;
 		/// Assignment operator.
 		
 	void assign(const LatLon& other);
@@ -79,35 +78,35 @@ public:
 	void swap(LatLon& other);
 		/// Swaps the LatLon with another one.
 		
-	static LatLon fromDegrees(double latitude, double longitude);
+	[[nodiscard]] static LatLon fromDegrees(double latitude, double longitude);
 		/// Creates a LatLon from the given latitude and longitude in degrees.
 
-	static LatLon fromRadians(double latitude, double longitude);
+	[[nodiscard]] static LatLon fromRadians(double latitude, double longitude);
 		/// Creates a LatLon from the given latitude and longitude in radians.
 
-	static LatLon fromCartesian(const LatLon& reference, const Cartesian& xy);
+	[[nodiscard]] static LatLon fromCartesian(const LatLon& reference, const Cartesian& xy);
 		/// Creates a LatLon from the given cartesian coordinates (in meters),
 		/// relative to the given reference position.
 
-	static LatLon fromCartesian(const LatLon& reference, double x, double y);
+	[[nodiscard]] static LatLon fromCartesian(const LatLon& reference, double x, double y);
 		/// Creates a LatLon from the given cartesian coordinates (in meters),
 		/// relative to the given reference position.
 
-	Cartesian toCartesian(const LatLon& reference) const;
+	[[nodiscard]] Cartesian toCartesian(const LatLon& reference) const;
 		/// Converts the LatLon to cartesian coordinates (in meters),
 		/// relative to the given reference position.
 
-	static Cartesian toCartesian(const LatLon& reference, const LatLon& latLon);
+	[[nodiscard]] static Cartesian toCartesian(const LatLon& reference, const LatLon& latLon);
 		/// Converts the LatLon to cartesian coordinates (in meters),
 		/// relative to the given reference position.
 
-	const Angle& latitude() const;
+	[[nodiscard]] constexpr const Angle& latitude() const;
 		/// Returns the latitude.
 		
-	const Angle& longitude() const;
+	[[nodiscard]] constexpr const Angle& longitude() const;
 		/// Returns the longitude.
 
-	Angle greatCircleDistanceTo(const LatLon& latLon) const;
+	[[nodiscard]] Angle greatCircleDistanceTo(const LatLon& latLon) const;
 		/// Computes the great circle angular distance between two locations using
 		/// the harvesine formula.
 		///
@@ -123,14 +122,14 @@ public:
 		///     Angle a = newYork.greatCircleDistanceTo(sanFrancisco);
 		///     double m = a.radians()*LatLon::EARTH_MEAN_RADIUS;
 
-	Angle greatCircleAzimuthTo(const LatLon& latLon) const;
+	[[nodiscard]] Angle greatCircleAzimuthTo(const LatLon& latLon) const;
 		/// Computes the azimuth angle (clockwise from North) that points from this
 		/// location to the second location using the harvesine formula.
 		///
 		/// This angle can be used as the starting azimuth for a great circle arc 
 		/// that begins at the first location, and passes through the second location.
 
-	LatLon greatCircleEndPosition(const Angle& greatCircleAzimuth, const Angle& arcDistance) const;
+	[[nodiscard]] LatLon greatCircleEndPosition(const Angle& greatCircleAzimuth, const Angle& arcDistance) const;
 		/// Computes the location on a great circle arc with this as starting location, 
 		/// the given azimuth, and arc distance.
 		///
@@ -143,7 +142,7 @@ public:
 		///     LatLon destination = newYork.greatCircleEndPosition(Angle::fromDegrees(281.6), 
 		///                              Angle::fromRadians(4131767.0/LatLon::EARTH_MEAN_RADIUS));
 
-	Angle rhumbDistanceTo(const LatLon& latLon) const;
+	[[nodiscard]] Angle rhumbDistanceTo(const LatLon& latLon) const;
 		/// Computes the length of the rhumb line (a line of constant heading) between two locations.
 		///
 		/// The return value gives the distance as the angular distance between the 
@@ -151,21 +150,21 @@ public:
 		/// of the segment between the two positions on that circle. 
 		/// To compute a distance in meters from this value, multiply it by the radius of the globe.
 
-	Angle rhumbAzimuthTo(const LatLon& latLon) const;
+	[[nodiscard]] Angle rhumbAzimuthTo(const LatLon& latLon) const;
 		/// Computes the azimuth angle (clockwise from North) of a rhumb line 
 		/// (a line of constant heading) between two locations.
 		
-	LatLon rhumbEndPosition(const Angle& rhumbAzimuth, const Angle& arcDistance) const;
+	[[nodiscard]] LatLon rhumbEndPosition(const Angle& rhumbAzimuth, const Angle& arcDistance) const;
 		/// Computes the location on a rhumb line with the given starting location, 
 		/// rhumb azimuth, and arc distance along the line.
 		///
 		/// To compute the arcDistance (in radians) from a distance in meters, divide 
 		/// the distance in meters by the radius of the globe.
 		
-	bool operator == (const LatLon& other) const;
-	bool operator != (const LatLon& other) const;
+	[[nodiscard]] bool operator == (const LatLon& other) const;
+	[[nodiscard]] bool operator != (const LatLon& other) const;
 	
-	bool equals(const LatLon& other, double delta) const;
+	[[nodiscard]] bool equals(const LatLon& other, double delta) const;
 		/// Returns true if the other position is within the given
 		/// delta of this position. Delta is given in degrees.
 
@@ -190,13 +189,13 @@ inline LatLon LatLon::fromRadians(double latitude, double longitude)
 }
 
 
-inline const Angle& LatLon::latitude() const
+constexpr const Angle& LatLon::latitude() const
 {
 	return _latitude;
 }
 
 
-inline const Angle& LatLon::longitude() const
+constexpr const Angle& LatLon::longitude() const
 {
 	return _longitude;
 }
@@ -220,7 +219,7 @@ inline void swap(LatLon& l1, LatLon& l2)
 }
 
 
-} } // namespace Poco::Geo
+} // namespace Poco::Geo
 
 
 #endif // Geo_LatLon_INCLUDED
