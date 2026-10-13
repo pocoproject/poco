@@ -380,6 +380,8 @@ private:
 	AutoSecBufferDesc<2> _inSecBuffer;
 	SecBuffer _extraSecBuffer;
 	SECURITY_STATUS _securityStatus;
+	bool _inputConsumed;
+		/// The last handshake call took at least one record of its input.
 	State _state;
 	bool _initServerContext = false;
 

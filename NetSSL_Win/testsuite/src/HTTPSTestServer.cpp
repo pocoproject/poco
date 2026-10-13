@@ -78,6 +78,7 @@ void HTTPSTestServer::run()
 		if (_socket.poll(span, Socket::SELECT_READ))
 		{
 			StreamSocket ss = _socket.acceptConnection();
+			ss.setReceiveTimeout(Poco::Timespan(10, 0));
 			try
 			{
 				_lastRequest.clear();
