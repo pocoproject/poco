@@ -18,6 +18,7 @@
 
 
 #include "Poco/Geo/Geo.h"
+#include <algorithm>
 #include <string>
 
 
@@ -72,22 +73,22 @@ public:
 	[[nodiscard]] static constexpr Angle fromDegreesLatitude(double degrees);
 		/// Creates an Angle from a latitude in degrees.
 		///
-		/// The latitude must be in the interval [-90, 90].
+		/// Values outside [-90, 90] are clamped.
 
 	[[nodiscard]] static constexpr Angle fromRadiansLatitude(double radians);
 		/// Creates an Angle from a latitude in radians.
 		///
-		/// The latitude must be in the interval [-PI/2, PI/2].
+		/// Values outside [-PI/2, PI/2] are clamped.
 
 	[[nodiscard]] static constexpr Angle fromDegreesLongitude(double degrees);
 		/// Creates an Angle from a longitude in degrees.
 		///
-		/// The latitude must be in the interval [-180, 180].
+		/// Values outside [-180, 180] are clamped.
 
 	[[nodiscard]] static constexpr Angle fromRadiansLongitude(double radians);
 		/// Creates an Angle from a longitude in radians.
 		///
-		/// The latitude must be in the interval [-PI, PI].
+		/// Values outside [-PI, PI] are clamped.
 		
 	[[nodiscard]] static Angle fromXY(double x, double y);
 		/// Creates an Angle from rectangular coordinates.
@@ -185,11 +186,10 @@ public:
 	static const std::string COMPASS_NW;
 	static const std::string COMPASS_NNW;
 	
-protected:
+private:
 	constexpr Angle(double deg, double rad);
 		/// Creates an Angle.
 	
-private:
 	double _degrees;
 	double _radians;
 };
@@ -226,41 +226,25 @@ constexpr Angle Angle::fromRadians(double rad)
 
 constexpr Angle Angle::fromDegreesLatitude(double degrees)
 {
-	degrees = degrees < -90 ? -90 : degrees > 90 ? 90 : degrees;
-	double radians = DEGREES_TO_RADIANS*degrees;
-	radians = radians < -PI_OVER_2 ? -PI_OVER_2 : radians > PI_OVER_2 ? PI_OVER_2 : radians;
-
-	return Angle(degrees, radians);
+	return fromDegrees(std::clamp(degrees, -90.0, 90.0));
 }
 
 
 constexpr Angle Angle::fromRadiansLatitude(double radians)
 {
-	radians = radians < -PI_OVER_2 ? -PI_OVER_2 : radians > PI_OVER_2 ? PI_OVER_2 : radians;
-	double degrees = RADIANS_TO_DEGREES*radians;
-	degrees = degrees < -90 ? -90 : degrees > 90 ? 90 : degrees;
-
-	return Angle(degrees, radians);
+	return fromRadians(std::clamp(radians, -PI_OVER_2, PI_OVER_2));
 }
 
 
 constexpr Angle Angle::fromDegreesLongitude(double degrees)
 {
-	degrees = degrees < -180 ? -180 : degrees > 180 ? 180 : degrees;
-	double radians = DEGREES_TO_RADIANS*degrees;
-	radians = radians < -PI ? -PI : radians > PI ? PI : radians;
-
-	return Angle(degrees, radians);
+	return fromDegrees(std::clamp(degrees, -180.0, 180.0));
 }
 
 
 constexpr Angle Angle::fromRadiansLongitude(double radians)
 {
-	radians = radians < -PI ? -PI : radians > PI ? PI : radians;
-	double degrees = RADIANS_TO_DEGREES*radians;
-	degrees = degrees < -180 ? -180 : degrees > 180 ? 180 : degrees;
-
-	return Angle(degrees, radians);
+	return fromRadians(std::clamp(radians, -PI, PI));
 }
 
 

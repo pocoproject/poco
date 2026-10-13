@@ -52,21 +52,13 @@ void Angle::swap(Angle& other)
 
 Angle Angle::fromXY(double x, double y)
 {
-	double radians = std::atan2(y, x);
-	return Angle(RADIANS_TO_DEGREES*radians, radians);
+	return fromRadians(std::atan2(y, x));
 }
 
 
 Angle Angle::angularDistanceTo(const Angle& angle) const
 {
-	double differenceDegrees = (angle - *this)._degrees;
-	if (differenceDegrees < -180)
-		differenceDegrees += 360;
-	else if (differenceDegrees > 180)
-		differenceDegrees -= 360;
-	
-	double absAngle = std::abs(differenceDegrees);
-	return fromDegrees(absAngle);
+	return fromDegrees(std::abs(normalizedDegreesLongitude(angle._degrees - _degrees)));
 }
 
 
@@ -84,12 +76,9 @@ double Angle::cos() const
 
 double Angle::normalizedDegreesLatitude(double degrees)
 {
-	// Reduce to (-180, 180] first. Taking the remainder modulo 180 loses the
-	// hemisphere: 190 degrees is 10 degrees south on the far side of the north
-	// pole, not 10 degrees north.
-	double lat = std::fmod(degrees, 360.0);
-	if (lat > 180) lat -= 360;
-	else if (lat < -180) lat += 360;
+	// Reducing modulo 180 would lose the hemisphere: 190 degrees is 10 degrees
+	// south on the far side of the north pole, not 10 degrees north.
+	const double lat = normalizedDegreesLongitude(degrees);
 	return lat > 90 ? 180 - lat : lat < -90 ? -180 - lat : lat;
 }
 
@@ -103,8 +92,9 @@ double Angle::normalizedDegreesLongitude(double degrees)
 
 double Angle::normalizedDegrees(double degrees)
 {
-	double deg = std::fmod(degrees, 360.0);
-	return deg < 0 ? 360 + deg : deg;
+	// std::remainder reduces exactly, to [-180, 180]. The outer fmod keeps the
+	// interval half-open, where adding 360 to a tiny negative value rounds up to 360.
+	return std::fmod(std::remainder(degrees, 360.0) + 360.0, 360.0);
 }
 
 
@@ -126,44 +116,39 @@ Angle Angle::normalized() const
 }
 
 
+namespace
+{
+	const std::string* const DIRECTIONS[] =
+	{
+		&Angle::COMPASS_N,
+		&Angle::COMPASS_NNE,
+		&Angle::COMPASS_NE,
+		&Angle::COMPASS_ENE,
+		&Angle::COMPASS_E,
+		&Angle::COMPASS_ESE,
+		&Angle::COMPASS_SE,
+		&Angle::COMPASS_SSE,
+		&Angle::COMPASS_S,
+		&Angle::COMPASS_SSW,
+		&Angle::COMPASS_SW,
+		&Angle::COMPASS_WSW,
+		&Angle::COMPASS_W,
+		&Angle::COMPASS_WNW,
+		&Angle::COMPASS_NW,
+		&Angle::COMPASS_NNW
+	};
+		/// Indexed by compass sector, clockwise from north.
+}
+
+
 const std::string& Angle::compassDirectionFromDegrees(double degrees)
 {
 	degrees = normalizedDegrees(degrees);
+	int sector = 16;
+	while (sector > 0 && degrees < sector*22.5 - 11.25) --sector;
 
-	if (degrees >= 15*22.5 + 11.25)
-		return COMPASS_N;
-	else if (degrees >= 14*22.5 + 11.25)
-		return COMPASS_NNW;
-	else if (degrees >= 13*22.5 + 11.25)
-		return COMPASS_NW;
-	else if (degrees >= 12*22.5 + 11.25)
-		return COMPASS_WNW;
-	else if (degrees >= 11*22.5 + 11.25)
-		return COMPASS_W;
-	else if (degrees >= 10*22.5 + 11.25)
-		return COMPASS_WSW;
-	else if (degrees >= 9*22.5 + 11.25)
-		return COMPASS_SW;
-	else if (degrees >= 8*22.5 + 11.25)
-		return COMPASS_SSW;
-	else if (degrees >= 7*22.5 + 11.25)
-		return COMPASS_S;
-	else if (degrees >= 6*22.5 + 11.25)
-		return COMPASS_SSE;
-	else if (degrees >= 5*22.5 + 11.25)
-		return COMPASS_SE;
-	else if (degrees >= 4*22.5 + 11.25)
-		return COMPASS_ESE;
-	else if (degrees >= 3*22.5 + 11.25)
-		return COMPASS_E;
-	else if (degrees >= 2*22.5 + 11.25)
-		return COMPASS_ENE;
-	else if (degrees >= 1*22.5 + 11.25)
-		return COMPASS_NE;
-	else if (degrees >= 11.25)
-		return COMPASS_NNE;
-	else
-		return COMPASS_N;
+	// The north sector straddles zero, so its upper half comes out as sector 16.
+	return *DIRECTIONS[sector % 16];
 }
 
 
