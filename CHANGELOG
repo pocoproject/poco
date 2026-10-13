@@ -63,6 +63,21 @@ New Components:
   ENABLE_XSD_VALIDATOR (off by default, requires libxml2); make components XSD/Types,
   XSD/Parser, XSD/CodeGen; XSD/Validator is built with make -C XSD/Validator and its headers
   are not installed by make install.
+- GH #5532 AI/MCP (Model Context Protocol, specification revision 2025-06-18: JSON-RPC 2.0
+  envelope, dispatcher with tools, resources and prompts, server with stream and message
+  ingress, stream client, stdio transport) and AI/MCP/HTTP (the Streamable HTTP client
+  transport, which takes its sessions from Poco::Net::HTTPSessionFactory and therefore links
+  Net only; HTTPS comes from the instantiator the application registers). CMake options
+  ENABLE_AI_MCP and ENABLE_AI_MCP_HTTP (off by default); make components AI/MCP and
+  AI/MCP/HTTP.
+- GH #5533 AI: a client library for large language model APIs and a minimal agent runtime:
+  providers for the Anthropic Messages API and the OpenAI Chat Completions format (streaming,
+  tool calls, model listing and embeddings on the OpenAI-compatible side), a thread-safe tool
+  registry, the agent loop (call the model, execute the tools it requests, feed the results
+  back, repeat), keyword-rule dispatch for models without native tool calling, and MCPHost,
+  which mirrors the tools of MCP servers into the registry. HTTPS through
+  Poco::Net::HTTPSessionFactory, so no NetSSL link. CMake option ENABLE_AI (off by default);
+  make component AI.
 
 Bug Fixes and Improvements:
 
@@ -71,6 +86,9 @@ Bug Fixes and Improvements:
   connection, the event and every other event of the object until the request times out. The thread
   of the connection does not wait for the EventDispatcher; a request that follows the change on the
   connection is still served after it. New: EventDispatcher::trySubscribe() and tryUnsubscribe().
+- PR #5535 build/config/Linux-clang passed -arch, a macOS driver option that clang on Linux rejects, so
+  the make build could not compile anything with this config; the flag is gone and ARCHFLAGS stays
+  overridable.
 - GH #5516 Poco::Net::SocketReactor lets go of the sockets of a poll when their round is over, so
   that a connection closed while it is served is closed at once and not when a later poll returns.
 - GH #5516 Poco::Net::SocketImpl: on macOS, setting an option on a socket that has been shut down
