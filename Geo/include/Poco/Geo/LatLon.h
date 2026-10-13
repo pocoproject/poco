@@ -40,7 +40,7 @@ class Geo_API LatLon
 	///
 	/// Based on code from the LatLon (gov.nasa.worldwind.geom.LatLon)  
 	/// class from the NASA World Wind Java source code released
-	/// under the NOSA license.
+	/// under the Apache License 2.0.
 	///
 	/// fromCartesian() and toCartesian() are based on WGS84toCartesian.hpp by Christian Berger,
 	/// partially based on the work from Gerald I. Evenden on proj 4.3 released under public domain terms.

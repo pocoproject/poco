@@ -63,6 +63,9 @@ New Components:
   ENABLE_XSD_VALIDATOR (off by default, requires libxml2); make components XSD/Types,
   XSD/Parser, XSD/CodeGen; XSD/Validator is built with make -C XSD/Validator and its headers
   are not installed by make install.
+- GH #5448 Geo (geographic coordinates and angles, great-circle and rhumb-line calculations,
+  conversions to and from local cartesian coordinates, and circular and polygonal geofences)
+  moved from macchina.io into POCO. CMake option ENABLE_GEO; make component Geo.
 
 Bug Fixes and Improvements:
 

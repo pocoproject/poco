@@ -19,6 +19,9 @@ the RemoteGenNG code generator) and CodeGeneration, previously part of macchina.
 POCO components.
 XSD (XML Schema object model, XML Schema and WSDL parser, the XSDGen code generator and the
 libxml2-based Validator), previously part of macchina.io, is a group of POCO components.
+Geo (geographic coordinates and angles, great-circle and rhumb-line calculations,
+conversions to and from local cartesian coordinates, and geofences), previously part of
+macchina.io, is now a POCO component.
 
 !!Features
 
@@ -41,6 +44,11 @@ libxml2-based Validator), previously part of macchina.io, is a group of POCO com
     libxml2); make components <*XSD/Types*>, <*XSD/Parser*>, <*XSD/CodeGen*>.
     <*XSD/Validator*> is built with <*make -C XSD/Validator*> and its headers are not installed
     by <*make install*>.
+  - GH #5448 <*Geo*>: geographic coordinates and angles, great-circle and rhumb-line
+    distances and azimuths, conversions to and from local cartesian coordinates, and
+    circular and polygonal geofences, from macchina.io. Enable with cmake
+    <*ENABLE_GEO*> (on by default; off with <*POCO_MINIMAL_BUILD*>); make component
+    <*Geo*>.
 
 !!Breaking Changes
 
