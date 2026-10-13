@@ -8,7 +8,7 @@
 // Copyright (c) 2009-2016, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
 //
-// SPDX-License-Identifier: BSL-1.0
+// SPDX-License-Identifier:	BSL-1.0
 //
 
 
@@ -24,7 +24,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <cerrno>
-#include <cstdio>
 #include <cstring>
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
 #include <linux/serial.h>
@@ -34,19 +33,7 @@
 using Poco::format;
 
 
-namespace Poco {
-namespace Serial {
-
-
-SerialPortImpl::SerialPortImpl():
-	_fd(-1)
-{
-}
-
-
-SerialPortImpl::~SerialPortImpl()
-{
-}
+namespace Poco::Serial {
 
 
 void SerialPortImpl::openImpl(const std::string& device, int baudRate, const std::string& parameters, FlowControlImpl flowControl)
@@ -274,7 +261,7 @@ bool SerialPortImpl::getRTSImpl() const
 }
 
 
-int SerialPortImpl::pollImpl(char* data, std::size_t size, const Poco::Timespan& timeout)
+int SerialPortImpl::pollImpl([[maybe_unused]] char* data, [[maybe_unused]] std::size_t size, const Poco::Timespan& timeout)
 {
 	fd_set fdRead;
 	Poco::Timespan remainingTime(timeout);
@@ -284,8 +271,8 @@ int SerialPortImpl::pollImpl(char* data, std::size_t size, const Poco::Timespan&
 		FD_ZERO(&fdRead);
 		FD_SET(_fd, &fdRead);
 		struct timeval tv;
-		tv.tv_sec  = (long) remainingTime.totalSeconds();
-		tv.tv_usec = (long) remainingTime.useconds();
+		tv.tv_sec  = static_cast<long>(remainingTime.totalSeconds());
+		tv.tv_usec = static_cast<long>(remainingTime.useconds());
 		Poco::Timestamp start;
 		rc = ::select(_fd + 1, &fdRead, nullptr, nullptr, &tv);
 		if (rc < 0 && errno == EINTR)
@@ -316,4 +303,4 @@ int SerialPortImpl::readImpl(char* buffer, std::size_t size)
 }
 
 
-} } // namespace Poco::Serial
+} // namespace Poco::Serial

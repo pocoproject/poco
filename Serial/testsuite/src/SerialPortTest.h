@@ -22,10 +22,10 @@ class SerialPortTest: public CppUnit::TestCase
 {
 public:
 	SerialPortTest(const std::string& name);
-	~SerialPortTest();
+	~SerialPortTest() override;
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	void testConstructDefaults();
 	void testConstructBufferSize();

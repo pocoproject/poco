@@ -8,7 +8,7 @@
 // Copyright (c) 2009-2016, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
 //
-// SPDX-License-Identifier: BSL-1.0
+// SPDX-License-Identifier:	BSL-1.0
 //
 
 
@@ -22,20 +22,7 @@
 using Poco::format;
 
 
-namespace Poco {
-namespace Serial {
-
-
-SerialPortImpl::SerialPortImpl():
-	_handle(INVALID_HANDLE_VALUE),
-	_rtsState(false)
-{
-}
-
-
-SerialPortImpl::~SerialPortImpl()
-{
-}
+namespace Poco::Serial {
 
 
 void SerialPortImpl::openImpl(const std::string& device, int baudRate, const std::string& parameters, FlowControlImpl flowControl)
@@ -46,7 +33,7 @@ void SerialPortImpl::openImpl(const std::string& device, int baudRate, const std
 	std::wstring wdevice;
 	Poco::UnicodeConverter::toUTF16(fixedDeviceName, wdevice);
 
-	_handle = CreateFileW(wdevice.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	_handle = CreateFileW(wdevice.c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (_handle == INVALID_HANDLE_VALUE) throw Poco::IOException("cannot open serial port " + device);
 
 	try
@@ -177,7 +164,7 @@ void SerialPortImpl::drainImpl()
 }
 
 
-void SerialPortImpl::configureRS485Impl(const RS485ParamsImpl& rs485Params)
+void SerialPortImpl::configureRS485Impl([[maybe_unused]] const RS485ParamsImpl& rs485Params)
 {
 	throw Poco::NotImplementedException("RS-485 mode");
 }
@@ -216,7 +203,7 @@ int SerialPortImpl::pollImpl(char* buffer, std::size_t size, const Poco::Timespa
 	try
 	{
 		DWORD bytesRead = 0;
-		if (!ReadFile(_handle, buffer, size, &bytesRead, NULL))
+		if (!ReadFile(_handle, buffer, size, &bytesRead, nullptr))
 			throw Poco::IOException("failed to read from serial port");
 		SetCommTimeouts(_handle, &prevCTO);
 		return (bytesRead == 0) ? -1 : bytesRead;
@@ -232,7 +219,7 @@ int SerialPortImpl::pollImpl(char* buffer, std::size_t size, const Poco::Timespa
 int SerialPortImpl::writeImpl(const char* buffer, std::size_t size)
 {
 	DWORD bytesWritten = 0;
-	if (!WriteFile(_handle, buffer, size, &bytesWritten, NULL))
+	if (!WriteFile(_handle, buffer, size, &bytesWritten, nullptr))
 		return -1;
 	return bytesWritten;
 }
@@ -241,10 +228,10 @@ int SerialPortImpl::writeImpl(const char* buffer, std::size_t size)
 int SerialPortImpl::readImpl(char* buffer, std::size_t size)
 {
 	DWORD bytesRead = 0;
-	if (!ReadFile(_handle, buffer, size, &bytesRead, NULL))
+	if (!ReadFile(_handle, buffer, size, &bytesRead, nullptr))
 		return -1;
 	return bytesRead;
 }
 
 
-} } // namespace Poco::Serial
+} // namespace Poco::Serial

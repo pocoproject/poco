@@ -15,9 +15,10 @@
 #include "Poco/Logger.h"
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
+#include <type_traits>
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <termios.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <fcntl.h>
 #include <sys/select.h>
 #include <unistd.h>
@@ -26,6 +27,12 @@
 
 
 using Poco::Serial::SerialPort;
+
+
+static_assert(!std::is_copy_constructible_v<Poco::Serial::SerialPort>,
+	"SerialPort owns an open port and must not be copy constructible");
+static_assert(!std::is_copy_assignable_v<Poco::Serial::SerialPort>,
+	"SerialPort owns an open port and must not be copy assignable");
 
 
 namespace
@@ -78,12 +85,12 @@ public:
 	PseudoTerminal(const PseudoTerminal&) = delete;
 	PseudoTerminal& operator = (const PseudoTerminal&) = delete;
 
-	bool valid() const
+	[[nodiscard]] bool valid() const
 	{
 		return _master != -1;
 	}
 
-	const std::string& slave() const
+	[[nodiscard]] const std::string& slave() const
 	{
 		return _slave;
 	}
@@ -175,9 +182,7 @@ SerialPortTest::SerialPortTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-SerialPortTest::~SerialPortTest()
-{
-}
+SerialPortTest::~SerialPortTest() = default;
 
 
 void SerialPortTest::setUp()
@@ -286,7 +291,7 @@ void SerialPortTest::testClosedPortThrows()
 
 	try
 	{
-		port.poll(Poco::Timespan(0, 1000));
+		(void) port.poll(Poco::Timespan(0, 1000));
 		fail("poll() must throw on a port that is not open");
 	}
 	catch (const Poco::IllegalStateException&) { }
@@ -307,14 +312,14 @@ void SerialPortTest::testClosedPortThrows()
 
 	try
 	{
-		port.read(buffer, sizeof(buffer));
+		(void) port.read(buffer, sizeof(buffer));
 		fail("read(buffer) must throw on a port that is not open");
 	}
 	catch (const Poco::IllegalStateException&) { }
 
 	try
 	{
-		port.read(buffer, sizeof(buffer), Poco::Timespan(0, 1000));
+		(void) port.read(buffer, sizeof(buffer), Poco::Timespan(0, 1000));
 		fail("read(buffer, timeout) must throw on a port that is not open");
 	}
 	catch (const Poco::IllegalStateException&) { }
@@ -329,7 +334,7 @@ void SerialPortTest::testClosedPortThrows()
 
 	try
 	{
-		port.read();
+		(void) port.read();
 		fail("read() must throw on a port that is not open");
 	}
 	catch (const Poco::IllegalStateException&) { }
@@ -350,7 +355,7 @@ void SerialPortTest::testClosedPortThrows()
 
 	try
 	{
-		port.getRTS();
+		(void) port.getRTS();
 		fail("getRTS() must throw on a port that is not open");
 	}
 	catch (const Poco::IllegalStateException&) { }
@@ -412,7 +417,7 @@ void SerialPortTest::testOpenClose()
 
 	try
 	{
-		port.poll(Poco::Timespan(0, 1000));
+		(void) port.poll(Poco::Timespan(0, 1000));
 		fail("poll() must throw after close()");
 	}
 	catch (const Poco::IllegalStateException&) { }

@@ -8,7 +8,7 @@
 // Copyright (c) 2009-2016, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
 //
-// SPDX-License-Identifier: BSL-1.0
+// SPDX-License-Identifier:	BSL-1.0
 //
 
 
@@ -16,6 +16,7 @@
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <cstring>
 #include <limits>
 
 
@@ -29,8 +30,7 @@ using Poco::format;
 #endif
 
 
-namespace Poco {
-namespace Serial {
+namespace Poco::Serial {
 
 
 const std::string SerialPort::LOGGER_NAME("IO.SerialPort");
@@ -105,9 +105,9 @@ void SerialPort::open(const std::string& device, int baudRate, const std::string
 		_logger.debug(format("Opening serial port %s, speed %d, parameters %s, flow control %s", device, baudRate, parameters, std::string(flowControl == FLOW_NONE ? "none" : "RTS/CTS")));
 	}
 
-    _cur = _end = _buffer.begin();
+	_cur = _end = _buffer.begin();
 	openImpl(device, baudRate, parameters, static_cast<FlowControlImpl>(flowControl));
-	
+
 	_device = device;
 	_baudRate = baudRate;
 	_parameters = parameters;
@@ -124,7 +124,7 @@ void SerialPort::close()
 			_logger.debug("Closing serial port");
 		}
 		closeImpl();
-	    _cur = _end = _buffer.begin();
+		_cur = _end = _buffer.begin();
 	}
 }
 
@@ -152,7 +152,7 @@ void SerialPort::setRTS(bool status)
 	setRTSImpl(status);
 }
 
-	
+
 bool SerialPort::getRTS() const
 {
 	if (!isOpenImpl()) throw Poco::IllegalStateException("Port is not open");
@@ -171,7 +171,7 @@ bool SerialPort::poll(const Poco::Timespan& timeout)
 	}
 	else
 	{
-	    _cur = _end = _buffer.begin();
+		_cur = _end = _buffer.begin();
 		int n = pollImpl(_cur, _buffer.size(), timeout);
 		if (n >= 0)
 		{
@@ -282,4 +282,4 @@ void SerialPort::readBuffer()
 }
 
 
-} } // namespace Poco::Serial
+} // namespace Poco::Serial
