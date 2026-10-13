@@ -29,6 +29,7 @@ bool CircularGeofence::isInside(const LatLon& position) const
 {
 	Angle a = _center.greatCircleDistanceTo(position);
 	double distance = a.radians()*LatLon::EARTH_MEAN_RADIUS;
+	// A NaN distance, from a position outside the domain of the computation, compares false and so reads as outside.
 	return distance < _radius;
 }
 
