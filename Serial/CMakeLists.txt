@@ -32,3 +32,7 @@ target_include_directories(Serial
 
 POCO_INSTALL(Serial)
 POCO_GENERATE_PACKAGE(Serial)
+
+if(ENABLE_TESTS)
+	add_subdirectory(testsuite)
+endif()
