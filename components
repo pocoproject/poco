@@ -35,6 +35,7 @@ XSD/Parser
 XSD/CodeGen
 XSD/Validator
 Geo
+Serial
 MongoDB
 Redis
 Prometheus
