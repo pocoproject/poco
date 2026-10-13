@@ -20,8 +20,7 @@
 #include "Poco/Geo/LatLon.h"
 
 
-namespace Poco {
-namespace Geo {
+namespace Poco::Geo {
 
 
 class Geo_API Geofence
@@ -30,13 +29,13 @@ class Geo_API Geofence
 public:
 	virtual ~Geofence() = default;
 
-	virtual bool isInside(const LatLon& position) const = 0;
+	[[nodiscard]] virtual bool isInside(const LatLon& position) const = 0;
 		/// Returns true iff the given position is
 		/// inside of the geofence, otherwise false.
 };
 
 
-} } // namespace Poco::Geo
+} // namespace Poco::Geo
 
 
 #endif // Geo_Geofence_INCLUDED

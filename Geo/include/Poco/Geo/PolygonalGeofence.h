@@ -21,8 +21,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Geo {
+namespace Poco::Geo {
 
 
 class Geo_API PolygonalGeofence: public Geofence
@@ -37,12 +36,12 @@ class Geo_API PolygonalGeofence: public Geofence
 	/// to check whether the point is inside the polygon.
 {
 public:
-	PolygonalGeofence(const std::vector<LatLon>& coordinates);
+	explicit PolygonalGeofence(const std::vector<LatLon>& coordinates);
 		/// Creates a polygon-shaped geofence with the 
 		/// given polygon coordinates.
 
 	// Geofence
-	bool isInside(const LatLon& position) const;
+	[[nodiscard]] bool isInside(const LatLon& position) const override;
 
 private:
 	LatLon _reference;
@@ -50,7 +49,7 @@ private:
 };
 
 
-} } // namespace Poco::Geo
+} // namespace Poco::Geo
 
 
 #endif // Geo_PolygonalGeofence_INCLUDED

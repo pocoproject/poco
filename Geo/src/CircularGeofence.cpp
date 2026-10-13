@@ -14,8 +14,7 @@
 #include "Poco/Geo/CircularGeofence.h"
 
 
-namespace Poco {
-namespace Geo {
+namespace Poco::Geo {
 
 
 CircularGeofence::CircularGeofence(const LatLon& center, double radius):
@@ -34,4 +33,4 @@ bool CircularGeofence::isInside(const LatLon& position) const
 }
 
 
-} } // namespace Poco::Geo
+} // namespace Poco::Geo

@@ -52,7 +52,7 @@ The CMake option <*ENABLE_GEO*> is on by default and off with <*POCO_MINIMAL_BUI
 
 !!GNU Make
 
-The component <[Geo]> is part of the default build.
+The component <*Geo*> is part of the default build.
 
 
 !!!Examples

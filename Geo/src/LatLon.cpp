@@ -27,18 +27,12 @@ using Poco::FPEnvironment;
 //
 
 
-namespace Poco {
-namespace Geo {
+namespace Poco::Geo {
 
 
 const LatLon LatLon::ZERO; 
 
 
-LatLon::LatLon()
-{
-}
-
-	
 LatLon::LatLon(const Angle& latitude, const Angle& longitude):
 	_latitude(latitude),
 	_longitude(longitude)
@@ -46,26 +40,6 @@ LatLon::LatLon(const Angle& latitude, const Angle& longitude):
 }
 
 	
-LatLon::LatLon(const LatLon& other):
-	_latitude(other._latitude),
-	_longitude(other._longitude)
-{
-}
-
-	
-LatLon::~LatLon()
-{
-}
-
-
-LatLon& LatLon::operator = (const LatLon& other)
-{
-	LatLon tmp(other);
-	swap(tmp);
-	return *this;
-}
-
-
 void LatLon::assign(const LatLon& other)
 {
 	LatLon tmp(other);
@@ -394,4 +368,4 @@ Cartesian LatLon::toCartesian(const LatLon& reference, const LatLon& latLon)
 }
 
 
-} } // namespace Poco::Geo
+} // namespace Poco::Geo

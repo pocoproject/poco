@@ -15,8 +15,7 @@
 #include <cmath>
 
 
-namespace Poco {
-namespace Geo {
+namespace Poco::Geo {
 
 
 PolygonalGeofence::PolygonalGeofence(const std::vector<LatLon>& coordinates)
@@ -105,4 +104,4 @@ bool PolygonalGeofence::isInside(const LatLon& position) const
 	return inside;
 }
 
-} } // namespace Poco::Geo
+} // namespace Poco::Geo

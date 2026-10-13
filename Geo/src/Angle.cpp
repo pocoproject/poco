@@ -13,17 +13,10 @@
 
 #include "Poco/Geo/Angle.h"
 #include <cmath>
-#include <algorithm>
+#include <utility>
 
 
-namespace Poco {
-namespace Geo {
-
-
-const double Angle::PI(POCO_GEO_PI);
-const double Angle::DEGREES_TO_RADIANS(POCO_GEO_PI/180.0);
-const double Angle::RADIANS_TO_DEGREES(180.0/POCO_GEO_PI);
-const double Angle::PI_OVER_2(POCO_GEO_PI/2);
+namespace Poco::Geo {
 
 
 const Angle Angle::ZERO;
@@ -50,84 +43,10 @@ const std::string Angle::COMPASS_NW("NW");
 const std::string Angle::COMPASS_NNW("NNW");
 
 
-Angle::Angle():
-	_degrees(0.0),
-	_radians(0.0)
-{
-}
-
-
-Angle::Angle(double deg, double rad):
-	_degrees(deg),
-	_radians(rad)
-{
-}
-
-
-Angle::Angle(const Angle& angle):
-	_degrees(angle._degrees),
-	_radians(angle._radians)
-{
-}
-
-
-Angle::~Angle()
-{
-}
-
-
-Angle& Angle::operator = (const Angle& angle)
-{
-	Angle tmp(angle);
-	swap(tmp);
-	return *this;
-}
-
-
 void Angle::swap(Angle& other)
 {
 	std::swap(_degrees, other._degrees);
 	std::swap(_radians, other._radians);
-}
-
-
-Angle Angle::fromDegreesLatitude(double degrees)
-{
-	degrees = degrees < -90 ? -90 : degrees > 90 ? 90 : degrees;
-	double radians = DEGREES_TO_RADIANS*degrees;
-	radians = radians < -PI_OVER_2 ? -PI_OVER_2 : radians > PI_OVER_2 ? PI_OVER_2 : radians;
-	
-	return Angle(degrees, radians);
-}
-
-
-Angle Angle::fromRadiansLatitude(double radians)
-{
-	radians = radians < -PI_OVER_2 ? -PI_OVER_2 : radians > PI_OVER_2 ? PI_OVER_2 : radians;
-	double degrees = RADIANS_TO_DEGREES*radians;
-	degrees = degrees < -90 ? -90 : degrees > 90 ? 90 : degrees;
-	
-	return Angle(degrees, radians);
-}
-
-
-Angle Angle::fromDegreesLongitude(double degrees)
-{
-	degrees = degrees < -180 ? -180 : degrees > 180 ? 180 : degrees;
-	double radians = DEGREES_TO_RADIANS*degrees;
-	radians = radians < -PI ? -PI : radians > PI ? PI : radians;
-	
-	return Angle(degrees, radians);
-}
-
-
-Angle Angle::fromRadiansLongitude(double radians)
-{
-	radians = radians < -PI ? -PI : radians > PI ? PI : radians;
-	double degrees = RADIANS_TO_DEGREES*radians;
-	degrees = degrees < -180 ? -180 : degrees > 180 ? 180 : degrees;
-	
-	return Angle(degrees, radians);
 }
 
 
@@ -254,4 +173,4 @@ const std::string& Angle::compassDirection() const
 }
 
 
-} } // namespace Poco::Geo
+} // namespace Poco::Geo

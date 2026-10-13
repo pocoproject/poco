@@ -17,6 +17,11 @@
 using namespace Poco::Geo;
 
 
+static_assert(Angle::PI > 3.14159 && Angle::PI < 3.1416);
+static_assert(Angle::fromDegrees(90.0).degrees() == 90.0);
+static_assert(Angle::fromDegreesLatitude(100.0).degrees() == 90.0);
+
+
 AngleTest::AngleTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
