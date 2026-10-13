@@ -39,6 +39,7 @@ public:
 	void testToCartesianAcrossAntimeridian();
 	void testToCartesianOutOfDomain();
 	void testToCartesianNonFiniteCoordinate();
+	void testDegenerateAzimuth();
 	void testFromCartesianNearPole();
 	void testEqualsAcrossAntimeridian();
 	void setUp();

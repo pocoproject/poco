@@ -47,6 +47,23 @@ namespace
 		const double wrapped = std::remainder(radians, 2.0*Angle::PI);
 		return wrapped == -Angle::PI ? Angle::PI : wrapped;
 	}
+
+	bool samePosition(const LatLon& a, const LatLon& b)
+		/// Returns true only for two positions that are exactly equal.
+		///
+		/// The comparison is deliberately exact. Two positions that differ at all,
+		/// even by one unit in the last place, have a defined distance and azimuth
+		/// and must reach the general formula, and a position with a NaN coordinate
+		/// compares unequal so that the NaN propagates.
+		///
+		/// For greatCircleAzimuthTo() this is not merely a shortcut. The azimuth
+		/// formula subtracts two products that cancel only in exact arithmetic, so
+		/// for one position against itself it divides a zero by a small negative
+		/// residue and yields 180 degrees rather than 0.
+	{
+		return a.latitude().radians() == b.latitude().radians()
+			&& a.longitude().radians() == b.longitude().radians();
+	}
 }
 
 
@@ -88,7 +105,7 @@ Angle LatLon::greatCircleDistanceTo(const LatLon& latLon) const
 	double lat2 = latLon._latitude.radians();
 	double lon2 = latLon._longitude.radians();
 	
-	if (lat1 == lat2 && lon1 == lon2)
+	if (samePosition(*this, latLon))
 		return Angle();
 	
 	// Taken from "Map Projections - A Working Manual", page 30, equation 5-3a.
@@ -112,9 +129,11 @@ Angle LatLon::greatCircleAzimuthTo(const LatLon& latLon) const
 	double lat2 = latLon._latitude.radians();
 	double lon2 = latLon._longitude.radians();
 	
-	if (lat1 == lat2 && lon1 == lon2)
+	if (samePosition(*this, latLon))
 		return Angle();
 	
+	// Exact again, as in samePosition(): on the same meridian the course is due
+	// north or due south, and any difference at all has a defined azimuth.
 	if (lon1 == lon2)
 		return lat1 > lat2 ? Angle::POS180 : Angle();
 	
@@ -160,7 +179,7 @@ Angle LatLon::rhumbDistanceTo(const LatLon& latLon) const
 	double lat2 = latLon._latitude.radians();
 	double lon2 = latLon._longitude.radians();
 	
-	if (lat1 == lat2 && lon1 == lon2)
+	if (samePosition(*this, latLon))
 		return Angle();
 	
 	// Taken from http://www.movable-type.co.uk/scripts/latlong.html
@@ -191,7 +210,7 @@ Angle LatLon::rhumbAzimuthTo(const LatLon& latLon) const
 	double lat2 = latLon._latitude.radians();
 	double lon2 = latLon._longitude.radians();
 	
-	if (lat1 == lat2 && lon1 == lon2)
+	if (samePosition(*this, latLon))
 		return Angle();
 	
 	// Taken from http://www.movable-type.co.uk/scripts/latlong.html

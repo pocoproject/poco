@@ -317,6 +317,27 @@ void LatLonTest::testToCartesianOutOfDomain()
 }
 
 
+void LatLonTest::testDegenerateAzimuth()
+{
+	// The azimuth formula subtracts two products that cancel only in exact
+	// arithmetic, so for a position against itself it yields 180 degrees. The
+	// exact comparison in the implementation is what keeps these defined.
+	const LatLon p = LatLon::fromDegrees(46.6, 14.04);
+
+	assertEqualDelta (0.0, p.greatCircleAzimuthTo(p).degrees(), 1e-12);
+	assertEqualDelta (0.0, p.rhumbAzimuthTo(p).degrees(), 1e-12);
+	assertEqualDelta (0.0, p.greatCircleDistanceTo(p).degrees(), 1e-12);
+	assertEqualDelta (0.0, p.rhumbDistanceTo(p).degrees(), 1e-12);
+
+	// On one meridian the course is due north or due south.
+	const LatLon north = LatLon::fromDegrees(50.0, 14.04);
+	const LatLon south = LatLon::fromDegrees(40.0, 14.04);
+
+	assertEqualDelta (0.0, south.greatCircleAzimuthTo(north).degrees(), 1e-12);
+	assertEqualDelta (180.0, north.greatCircleAzimuthTo(south).degrees(), 1e-12);
+}
+
+
 void LatLonTest::testToCartesianNonFiniteCoordinate()
 {
 	// On the equator the longitude does not enter the northing, so without a guard
@@ -401,6 +422,7 @@ CppUnit::Test* LatLonTest::suite()
 	CppUnit_addTest(pSuite, LatLonTest, testToCartesianAcrossAntimeridian);
 	CppUnit_addTest(pSuite, LatLonTest, testToCartesianOutOfDomain);
 	CppUnit_addTest(pSuite, LatLonTest, testToCartesianNonFiniteCoordinate);
+	CppUnit_addTest(pSuite, LatLonTest, testDegenerateAzimuth);
 	CppUnit_addTest(pSuite, LatLonTest, testFromCartesianNearPole);
 	CppUnit_addTest(pSuite, LatLonTest, testEqualsAcrossAntimeridian);
 
