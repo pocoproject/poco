@@ -130,33 +130,34 @@ void LatLonTest::testFromCartesian()
 
 void LatLonTest::testCartesianRoundTrip()
 {
-	// fromCartesian() solves for the position iteratively and stops once the
-	// residual of the cartesian coordinate is below 1.0e-4 meters, which would
-	// suggest agreement well below a millimeter. Its step size is proportional
-	// to that residual, however, so the iteration overshoots and stops
-	// improving as the offset from the reference grows: the round trip error
-	// measured here is about 1 mm at 150 m, 0.1 m at 1.5 km and 1 m at 4.5 km.
-	// The tolerances below keep several times the measured error as headroom, so
-	// the case still fails if the conversion loses accuracy.
+	// fromCartesian() solves for the position with Newton's method on the forward
+	// projection and accepts a residual of 1.0e-9 meters. The round trip error is
+	// independent of the offset from the reference: it stays at a few nanometers
+	// from 10 m out to 100 km, at every bearing and in every latitude band. The
+	// tolerance below is one micrometer, which is three orders of magnitude above
+	// the measured error and still three orders below the millimeter that an
+	// application of this library could notice.
+	constexpr double TOLERANCE = 1e-6;
+
 	const LatLon ref = LatLon::fromDegrees(52.247041, 10.575830);
 
 	// About 150 m from the reference.
 	LatLon pos = LatLon::fromDegrees(52.248091, 10.574170);
 	LatLon back = LatLon::fromCartesian(ref, pos.toCartesian(ref));
 	double error = pos.greatCircleDistanceTo(back).radians()*LatLon::EARTH_MEAN_RADIUS;
-	assertEquals(0.0, error, 0.01);
+	assertEquals(0.0, error, TOLERANCE);
 
 	// About 470 m from the reference.
 	pos = LatLon::fromDegrees(52.251011, 10.573568);
 	back = LatLon::fromCartesian(ref, pos.toCartesian(ref));
 	error = pos.greatCircleDistanceTo(back).radians()*LatLon::EARTH_MEAN_RADIUS;
-	assertEquals(0.0, error, 0.01);
+	assertEquals(0.0, error, TOLERANCE);
 
 	// About 4.5 km from the reference.
 	pos = LatLon::fromDegrees(52.280000, 10.620000);
 	back = LatLon::fromCartesian(ref, pos.toCartesian(ref));
 	error = pos.greatCircleDistanceTo(back).radians()*LatLon::EARTH_MEAN_RADIUS;
-	assertEquals(0.0, error, 5.0);
+	assertEquals(0.0, error, TOLERANCE);
 
 	// A reference in the southern hemisphere, at another latitude band, with a
 	// position about 1.5 km away.
@@ -165,7 +166,7 @@ void LatLonTest::testCartesianRoundTrip()
 	pos = LatLon::fromDegrees(-33.850000, 151.230000);
 	back = LatLon::fromCartesian(southernRef, pos.toCartesian(southernRef));
 	error = pos.greatCircleDistanceTo(back).radians()*LatLon::EARTH_MEAN_RADIUS;
-	assertEquals(0.0, error, 1.0);
+	assertEquals(0.0, error, TOLERANCE);
 }
 
 
