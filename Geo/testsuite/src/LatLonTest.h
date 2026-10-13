@@ -38,6 +38,7 @@ public:
 	void testRhumbWestAcrossAntimeridian();
 	void testToCartesianAcrossAntimeridian();
 	void testToCartesianOutOfDomain();
+	void testToCartesianNonFiniteCoordinate();
 	void testFromCartesianNearPole();
 	void testEqualsAcrossAntimeridian();
 	void setUp();

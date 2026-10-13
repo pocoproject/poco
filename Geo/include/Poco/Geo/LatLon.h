@@ -45,7 +45,7 @@ class Geo_API LatLon
 	/// a NaN is false, so a geofence reports such a position as outside.
 	///
 	/// Based on code from the LatLon (gov.nasa.worldwind.geom.LatLon)  
-	/// class from the NASA World Wind Java source code released
+	/// class from the NASA WorldWind Java source code released
 	/// under the Apache License 2.0.
 	///
 	/// toCartesian() is based on WGS84toCartesian.hpp by Christian Berger,
