@@ -16,10 +16,12 @@
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
 #if defined(POCO_OS_FAMILY_UNIX)
+#include <termios.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/select.h>
 #include <unistd.h>
+#include <cerrno>
 #endif
 
 
@@ -69,6 +71,7 @@ public:
 
 	~PseudoTerminal()
 	{
+		closeSlave();
 		closeMaster();
 	}
 
@@ -85,6 +88,18 @@ public:
 		return _slave;
 	}
 
+	int openSlave()
+		/// Opens the slave side with a plain descriptor and keeps it open for
+		/// the lifetime of this object, so that a failing assertion cannot
+		/// leak it. A pseudo terminal returns its termios settings to the
+		/// default when the last slave descriptor is closed, so a test that
+		/// prepares those settings must hold the descriptor open.
+	{
+		closeSlave();
+		_slaveFd = ::open(_slave.c_str(), O_RDWR | O_NOCTTY);
+		return _slaveFd;
+	}
+
 	std::size_t writeMaster(const std::string& data)
 		/// Writes to the master side, which puts the data into the slave's
 		/// input queue.
@@ -98,13 +113,30 @@ public:
 		/// Returns 0 on a timeout rather than blocking, so that a test which
 		/// expects data fails instead of hanging.
 	{
-		fd_set readable;
-		FD_ZERO(&readable);
-		FD_SET(_master, &readable);
-		struct timeval tv;
-		tv.tv_sec = static_cast<long>(timeout.totalSeconds());
-		tv.tv_usec = static_cast<long>(timeout.useconds());
-		if (::select(_master + 1, &readable, nullptr, nullptr, &tv) <= 0) return 0;
+		Poco::Timespan remainingTime(timeout);
+		int rc;
+		do
+		{
+			fd_set readable;
+			FD_ZERO(&readable);
+			FD_SET(_master, &readable);
+			struct timeval tv;
+			tv.tv_sec = static_cast<long>(remainingTime.totalSeconds());
+			tv.tv_usec = static_cast<long>(remainingTime.useconds());
+			Poco::Timestamp start;
+			rc = ::select(_master + 1, &readable, nullptr, nullptr, &tv);
+			if (rc < 0 && errno == EINTR)
+			{
+				Poco::Timestamp end;
+				Poco::Timespan waited = end - start;
+				if (waited < remainingTime)
+					remainingTime -= waited;
+				else
+					remainingTime = 0;
+			}
+		}
+		while (rc < 0 && errno == EINTR);
+		if (rc <= 0) return 0;
 
 		ssize_t n = ::read(_master, buffer, size);
 		return n < 0 ? 0 : static_cast<std::size_t>(n);
@@ -120,7 +152,17 @@ private:
 		}
 	}
 
+	void closeSlave()
+	{
+		if (_slaveFd != -1)
+		{
+			::close(_slaveFd);
+			_slaveFd = -1;
+		}
+	}
+
 	int _master;
+	int _slaveFd = -1;
 	std::string _slave;
 };
 
@@ -191,6 +233,25 @@ void SerialPortTest::testOpenBadParameterLength()
 		}
 		catch (const Poco::IllegalStateException&) { }
 	}
+}
+
+
+void SerialPortTest::testOpenEmptyDevice()
+{
+	SerialPort port;
+	try
+	{
+		port.open("");
+		fail("open() must reject an empty device name");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		port.write(std::string("x"));
+		fail("port must still be closed after a rejected device name");
+	}
+	catch (const Poco::IllegalStateException&) { }
 }
 
 
@@ -272,6 +333,35 @@ void SerialPortTest::testClosedPortThrows()
 		fail("read() must throw on a port that is not open");
 	}
 	catch (const Poco::IllegalStateException&) { }
+
+	try
+	{
+		port.drain();
+		fail("drain() must throw on a port that is not open");
+	}
+	catch (const Poco::IllegalStateException&) { }
+
+	try
+	{
+		port.setRTS(true);
+		fail("setRTS() must throw on a port that is not open");
+	}
+	catch (const Poco::IllegalStateException&) { }
+
+	try
+	{
+		port.getRTS();
+		fail("getRTS() must throw on a port that is not open");
+	}
+	catch (const Poco::IllegalStateException&) { }
+
+	try
+	{
+		SerialPort::RS485Params params;
+		port.configureRS485(params);
+		fail("configureRS485() must throw on a port that is not open");
+	}
+	catch (const Poco::IllegalStateException&) { }
 }
 
 
@@ -290,6 +380,16 @@ void SerialPortTest::testRS485Flags()
 	assertEqual(2, static_cast<int>(SerialPort::RS485Params::RS485_RTS_ON_SEND));
 	assertEqual(4, static_cast<int>(SerialPort::RS485Params::RS485_RTS_AFTER_SEND));
 	assertEqual(32, static_cast<int>(SerialPort::RS485Params::RS485_USE_GPIO));
+}
+
+
+void SerialPortTest::testRS485ParamsDefaults()
+{
+	SerialPort::RS485Params params;
+	assertEqual(0, params.flags);
+	assertEqual(0, params.delayRTSBeforeSend);
+	assertEqual(0, params.delayRTSAfterSend);
+	assertEqual(0, params.gpioPin);
 }
 
 
@@ -330,6 +430,35 @@ void SerialPortTest::testOpenDefaultSpeed()
 }
 
 
+void SerialPortTest::testOpenSetsBlockingRead()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	// Give the device the control characters of a non-blocking read, so that
+	// what is asserted below is what open() established and not what the
+	// device happened to carry. The descriptor stays open until the end of
+	// the case because a pseudo terminal returns its settings to the default
+	// when the last slave descriptor is closed.
+	const int fd = pty.openSlave();
+	assertTrue(fd != -1);
+	struct termios term;
+	assertTrue(::tcgetattr(fd, &term) == 0);
+	term.c_cc[VMIN]  = 0;
+	term.c_cc[VTIME] = 0;
+	assertTrue(::tcsetattr(fd, TCSANOW, &term) == 0);
+
+	SerialPort port;
+	port.open(pty.slave(), 9600, "8N1");
+
+	// Termios settings belong to the device, not to the descriptor, so this
+	// descriptor sees what the library configured.
+	assertTrue(::tcgetattr(fd, &term) == 0);
+	assertEqual(1, static_cast<int>(term.c_cc[VMIN]));
+	assertEqual(0, static_cast<int>(term.c_cc[VTIME]));
+}
+
+
 void SerialPortTest::testOpenTwice()
 {
 	PseudoTerminal pty;
@@ -343,6 +472,28 @@ void SerialPortTest::testOpenTwice()
 		fail("open() must throw on a port that is already open");
 	}
 	catch (const Poco::IllegalStateException&) { }
+}
+
+
+void SerialPortTest::testOpenCharacterSize5()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	SerialPort port;
+	try
+	{
+		port.open(pty.slave(), 9600, "5N1");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+		fail("open() must accept a character size of five bits");
+	}
+	catch (const Poco::IOException&)
+	{
+		// A pseudo terminal need not support five bit characters; it
+		// rejects them in tcsetattr(), which is not an argument error.
+	}
 }
 
 
@@ -447,6 +598,17 @@ void SerialPortTest::testWrite()
 }
 
 
+void SerialPortTest::testWriteEmptyString()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	SerialPort port;
+	port.open(pty.slave(), 9600, "8N1");
+	assertEqual(0, port.write(std::string()));
+}
+
+
 void SerialPortTest::testReadBuffer()
 {
 	PseudoTerminal pty;
@@ -521,6 +683,7 @@ void SerialPortTest::testPollTimeout()
 
 	Poco::Timestamp start;
 	assertTrue(!port.poll(Poco::Timespan(0, 200000)));
+	assertTrue(start.elapsed() >= Poco::Timespan(0, 150000).totalMicroseconds());
 	assertTrue(start.elapsed() < Poco::Timespan(2, 0).totalMicroseconds());
 }
 
@@ -608,22 +771,27 @@ CppUnit::Test* SerialPortTest::suite()
 	CppUnit_addTest(pSuite, SerialPortTest, testConstructBufferSize);
 	CppUnit_addTest(pSuite, SerialPortTest, testConstructLogger);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenBadParameterLength);
+	CppUnit_addTest(pSuite, SerialPortTest, testOpenEmptyDevice);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenNonexistentDevice);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenNotATerminal);
 	CppUnit_addTest(pSuite, SerialPortTest, testClosedPortThrows);
 	CppUnit_addTest(pSuite, SerialPortTest, testCloseWhenNotOpen);
 	CppUnit_addTest(pSuite, SerialPortTest, testRS485Flags);
+	CppUnit_addTest(pSuite, SerialPortTest, testRS485ParamsDefaults);
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenClose);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenDefaultSpeed);
+	CppUnit_addTest(pSuite, SerialPortTest, testOpenSetsBlockingRead);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenTwice);
+	CppUnit_addTest(pSuite, SerialPortTest, testOpenCharacterSize5);
 	CppUnit_addTest(pSuite, SerialPortTest, testBadCharacterSize);
 	CppUnit_addTest(pSuite, SerialPortTest, testBadParity);
 	CppUnit_addTest(pSuite, SerialPortTest, testBadStopBits);
 	CppUnit_addTest(pSuite, SerialPortTest, testBadSpeed);
 	CppUnit_addTest(pSuite, SerialPortTest, testClosedAfterFailedOpen);
 	CppUnit_addTest(pSuite, SerialPortTest, testWrite);
+	CppUnit_addTest(pSuite, SerialPortTest, testWriteEmptyString);
 	CppUnit_addTest(pSuite, SerialPortTest, testReadBuffer);
 	CppUnit_addTest(pSuite, SerialPortTest, testReadString);
 	CppUnit_addTest(pSuite, SerialPortTest, testReadChar);

@@ -107,6 +107,8 @@ public:
 		
 	void drain();
 		/// Waits until all output written to the serial port has been transmitted.
+		///
+		/// Blocks for as long as the receiver does not read the pending output.
 
 	void configureRS485(const RS485Params& rs485Params);
 		/// Enable and configure RS-485 mode, if supported.

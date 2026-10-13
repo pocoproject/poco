@@ -15,6 +15,7 @@
 #include "Poco/Serial/SerialPort_POSIX.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include <termios.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -22,6 +23,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <cerrno>
 #include <cstdio>
 #include <cstring>
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
@@ -50,25 +52,28 @@ SerialPortImpl::~SerialPortImpl()
 void SerialPortImpl::openImpl(const std::string& device, int baudRate, const std::string& parameters, FlowControlImpl flowControl)
 {
 	_fd = ::open(device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
-	if (_fd == -1) throw Poco::IOException("cannot open serial port " + device, strerror(errno));
+	if (_fd == -1) throw Poco::IOException("cannot open serial port " + device, Poco::Error::getMessage(errno));
 
 	try
 	{
 		int rc = fcntl(_fd, F_SETFL, 0); // FNDELAY for non-blocking
-		if (rc == -1) throw Poco::IOException("error calling fcntl() on " + device, strerror(errno));
+		if (rc == -1) throw Poco::IOException("error calling fcntl() on " + device, Poco::Error::getMessage(errno));
 
 		struct termios term;
 		rc = tcgetattr(_fd, &term);
-		if (rc == -1) throw Poco::IOException("cannot get serial port configuration for " + device, strerror(errno));
+		if (rc == -1) throw Poco::IOException("cannot get serial port configuration for " + device, Poco::Error::getMessage(errno));
 
 		term.c_cflag &= ~(CSIZE | PARENB | PARODD | CSTOPB | CRTSCTS);
 		term.c_cflag |= CLOCAL | CREAD;
 		term.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
 		term.c_oflag &= ~(OPOST | ONLCR | OCRNL | ONOCR | ONLRET);
 		term.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+		term.c_cc[VMIN]  = 1;
+		term.c_cc[VTIME] = 0;
 
 		switch (parameters[0])
 		{
+		case '5': term.c_cflag |= CS5; break;
 		case '6': term.c_cflag |= CS6; break;
 		case '7': term.c_cflag |= CS7; break;
 		case '8': term.c_cflag |= CS8; break;
@@ -177,14 +182,14 @@ void SerialPortImpl::openImpl(const std::string& device, int baudRate, const std
 		if (baudRate != -1)
 		{
 			rc = cfsetspeed(&term, speed);
-			if (rc == -1) throw Poco::IOException("error setting baud rate on serial port " + device, strerror(errno));
+			if (rc == -1) throw Poco::IOException("error setting baud rate on serial port " + device, Poco::Error::getMessage(errno));
 		}
 
 		rc = tcflush(_fd, TCIOFLUSH);
-		if (rc == -1) throw Poco::IOException("error flushing serial port " + device, strerror(errno));
+		if (rc == -1) throw Poco::IOException("error flushing serial port " + device, Poco::Error::getMessage(errno));
 
 		rc = tcsetattr(_fd, TCSANOW, &term);
-		if (rc == -1) throw Poco::IOException("error configuring serial port " + device, strerror(errno));
+		if (rc == -1) throw Poco::IOException("error configuring serial port " + device, Poco::Error::getMessage(errno));
 	}
 	catch (...)
 	{
@@ -196,8 +201,11 @@ void SerialPortImpl::openImpl(const std::string& device, int baudRate, const std
 
 void SerialPortImpl::closeImpl()
 {
-	::close(_fd);
-	_fd = -1;
+	if (_fd != -1)
+	{
+		::close(_fd);
+		_fd = -1;
+	}
 }
 
 
@@ -206,7 +214,7 @@ void SerialPortImpl::drainImpl()
 	poco_assert (_fd != -1);
 
 	int rc = tcdrain(_fd);
- 	if (rc == -1) throw Poco::IOException("error draining serial port", strerror(errno));
+	if (rc == -1) throw Poco::IOException("error draining serial port", Poco::Error::getMessage(errno));
 }
 
 
@@ -228,7 +236,7 @@ void SerialPortImpl::configureRS485Impl(const RS485ParamsImpl& rs485Params)
 	#endif
 	if (ioctl (_fd, TIOCSRS485, &rs485conf) < 0)
 	{
-		throw Poco::IOException("error configuring RS-485 mode for serial port", strerror(errno));
+		throw Poco::IOException("error configuring RS-485 mode for serial port", Poco::Error::getMessage(errno));
 	}
 #else
 	throw Poco::NotImplementedException("RS-485 mode");
@@ -242,7 +250,7 @@ void SerialPortImpl::setRTSImpl(bool status)
 
 	int flags;
 	if (ioctl(_fd, TIOCMGET, &flags) == -1)
-		throw Poco::IOException("error getting serial port flags", strerror(errno));
+		throw Poco::IOException("error getting serial port flags", Poco::Error::getMessage(errno));
 
 	if (status)
 		flags |= TIOCM_RTS;
@@ -250,7 +258,7 @@ void SerialPortImpl::setRTSImpl(bool status)
 		flags &= ~TIOCM_RTS;
 
 	if (ioctl(_fd, TIOCMSET, &flags) == -1)
-		throw Poco::IOException("error setting serial port flags", strerror(errno));
+		throw Poco::IOException("error setting serial port flags", Poco::Error::getMessage(errno));
 }
 
 
@@ -260,30 +268,26 @@ bool SerialPortImpl::getRTSImpl() const
 
 	int flags;
 	if (ioctl(_fd, TIOCMGET, &flags) == -1)
-		throw Poco::IOException("error getting serial port flags", strerror(errno));
+		throw Poco::IOException("error getting serial port flags", Poco::Error::getMessage(errno));
 
-	return flags & TIOCM_RTS;
+	return (flags & TIOCM_RTS) != 0;
 }
 
 
 int SerialPortImpl::pollImpl(char* data, std::size_t size, const Poco::Timespan& timeout)
 {
 	fd_set fdRead;
-	fd_set fdWrite;
-	fd_set fdExcept;
-	FD_ZERO(&fdRead);
-	FD_ZERO(&fdWrite);
-	FD_ZERO(&fdExcept);
-	FD_SET(_fd, &fdRead);
 	Poco::Timespan remainingTime(timeout);
 	int rc;
 	do
 	{
+		FD_ZERO(&fdRead);
+		FD_SET(_fd, &fdRead);
 		struct timeval tv;
 		tv.tv_sec  = (long) remainingTime.totalSeconds();
 		tv.tv_usec = (long) remainingTime.useconds();
 		Poco::Timestamp start;
-		rc = ::select(_fd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
+		rc = ::select(_fd + 1, &fdRead, nullptr, nullptr, &tv);
 		if (rc < 0 && errno == EINTR)
 		{
 			Poco::Timestamp end;
@@ -295,7 +299,7 @@ int SerialPortImpl::pollImpl(char* data, std::size_t size, const Poco::Timespan&
 		}
 	}
 	while (rc < 0 && errno == EINTR);
-	if (rc < 0) throw Poco::IOException("serial port poll error", strerror(errno));
+	if (rc < 0) throw Poco::IOException("serial port poll error", Poco::Error::getMessage(errno));
 	return rc > 0 ? 0 : -1;
 }
 

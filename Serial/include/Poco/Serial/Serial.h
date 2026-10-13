@@ -41,7 +41,11 @@
 
 
 #if !defined(Serial_API)
-	#define Serial_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define Serial_API __attribute__ ((visibility ("default")))
+	#else
+		#define Serial_API
+	#endif
 #endif
 
 

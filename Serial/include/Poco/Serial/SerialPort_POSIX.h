@@ -54,13 +54,13 @@ public:
 				/// RS-485 driver.
 		};
 		
-		int flags;
+		int flags = 0;
 			/// Flags to configure RS-485 mode.
-		int delayRTSBeforeSend;
+		int delayRTSBeforeSend = 0;
 			/// RTS delay before send.
-		int delayRTSAfterSend;
+		int delayRTSAfterSend = 0;
 			/// RTS delay after send.
-		int gpioPin;
+		int gpioPin = 0;
 			/// GPIO pin to use if RS485_USE_GPIO flag is set.
 	};
 
