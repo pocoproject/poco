@@ -25,6 +25,12 @@ public:
 
 	void testAngle();
 	void testCompass();
+	void testFromRadiansAndXY();
+	void testClamping();
+	void testNormalization();
+	void testArithmetic();
+	void testComparisonOperators();
+	void testSinCos();
 
 	void setUp();
 	void tearDown();
