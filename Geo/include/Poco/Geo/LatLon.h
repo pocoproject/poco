@@ -40,9 +40,12 @@ class Geo_API LatLon
 	/// The range is not enforced; Angle::normalizedLatitude() and
 	/// Angle::normalizedLongitude() reduce a position to it.
 	///
-	/// A position outside the domain of a computation, and a position with a NaN
-	/// coordinate, yield NaN coordinates and NaN distances. Every comparison against
-	/// a NaN is false, so a geofence reports such a position as outside.
+	/// A position takes part in a computation only if both coordinates are finite
+	/// and its latitude lies within [-90, 90]; the longitude is not bounded, since
+	/// every formula is periodic in it. Any other position, an undefined azimuth or
+	/// distance, and a reference position that fails the same test yield NaN
+	/// coordinates, distances and azimuths. Every comparison against a NaN is false,
+	/// so a geofence reports such a position as outside.
 	///
 	/// Based on code from the LatLon (gov.nasa.worldwind.geom.LatLon)  
 	/// class from the NASA WorldWind Java source code released

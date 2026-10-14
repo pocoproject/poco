@@ -64,6 +64,31 @@ namespace
 		return a.latitude().radians() == b.latitude().radians()
 			&& a.longitude().radians() == b.longitude().radians();
 	}
+
+	bool inDomain(const LatLon& position)
+		/// Returns true if the position can take part in a computation.
+		///
+		/// The latitude must lie within [-90, 90], because a value beyond a pole
+		/// names no point on the globe, and both coordinates must be finite. The
+		/// longitude is not bounded: the formulas are periodic in it, so an
+		/// unnormalized value names the position it is congruent to.
+	{
+		return std::isfinite(position.latitude().degrees())
+			&& std::isfinite(position.longitude().degrees())
+			&& std::abs(position.latitude().degrees()) <= 90.0;
+	}
+
+	Angle undefinedAngle()
+		/// The result of a computation whose arguments are outside its domain.
+	{
+		return Angle::fromRadians(std::numeric_limits<double>::quiet_NaN());
+	}
+
+	LatLon undefinedPosition()
+		/// The result of a computation whose arguments are outside its domain.
+	{
+		return LatLon(undefinedAngle(), undefinedAngle());
+	}
 }
 
 
@@ -105,6 +130,9 @@ Angle LatLon::greatCircleDistanceTo(const LatLon& latLon) const
 	double lat2 = latLon._latitude.radians();
 	double lon2 = latLon._longitude.radians();
 	
+	if (!inDomain(*this) || !inDomain(latLon))
+		return undefinedAngle();
+
 	if (samePosition(*this, latLon))
 		return Angle();
 	
@@ -129,6 +157,9 @@ Angle LatLon::greatCircleAzimuthTo(const LatLon& latLon) const
 	double lat2 = latLon._latitude.radians();
 	double lon2 = latLon._longitude.radians();
 	
+	if (!inDomain(*this) || !inDomain(latLon))
+		return undefinedAngle();
+
 	if (samePosition(*this, latLon))
 		return Angle();
 	
@@ -166,7 +197,7 @@ LatLon LatLon::greatCircleEndPosition(const Angle& greatCircleAzimuth, const Ang
 			std::cos(lat) * std::cos(distance) - std::sin(lat) * std::sin(distance) * std::cos(azimuth));
 	
 	if (FPEnvironment::isNaN(endLatRadians) || FPEnvironment::isNaN(endLonRadians))
-		return *this;
+		return undefinedPosition();
 	
 	return LatLon(Angle::fromRadians(endLatRadians).normalizedLatitude(), Angle::fromRadians(endLonRadians).normalizedLongitude());
 }
@@ -179,6 +210,9 @@ Angle LatLon::rhumbDistanceTo(const LatLon& latLon) const
 	double lat2 = latLon._latitude.radians();
 	double lon2 = latLon._longitude.radians();
 	
+	if (!inDomain(*this) || !inDomain(latLon))
+		return undefinedAngle();
+
 	if (samePosition(*this, latLon))
 		return Angle();
 	
@@ -210,6 +244,9 @@ Angle LatLon::rhumbAzimuthTo(const LatLon& latLon) const
 	double lat2 = latLon._latitude.radians();
 	double lon2 = latLon._longitude.radians();
 	
+	if (!inDomain(*this) || !inDomain(latLon))
+		return undefinedAngle();
+
 	if (samePosition(*this, latLon))
 		return Angle();
 	
@@ -249,7 +286,7 @@ LatLon LatLon::rhumbEndPosition(const Angle& rhumbAzimuth, const Angle& arcDista
 	double dLon = distance * std::sin(azimuth) / q;
 	
 	if (FPEnvironment::isNaN(lat2) || FPEnvironment::isNaN(dLon))
-		return *this;
+		return undefinedPosition();
 	
 	// Normalizing reflects a latitude that passed over a pole and brings a longitude
 	// that crossed the antimeridian back into range.
@@ -391,6 +428,14 @@ namespace
 
 std::pair<double, double> LatLon::referenceParameters(const LatLon& reference)
 {
+	// Validated here so that both the forward and the inverse conversion inherit
+	// the check: a non-finite parameter makes the projection yield NaN below.
+	if (!inDomain(reference))
+	{
+		const double undefined = std::numeric_limits<double>::quiet_NaN();
+		return { undefined, undefined };
+	}
+
 	return { reference.longitude().radians(), mlfn(reference.latitude().radians()) };
 }
 
@@ -412,8 +457,11 @@ Cartesian LatLon::toCartesian(double lon0, double ml0, const LatLon& latLon)
 {
 	double lat = latLon.latitude().radians();
 	// On the equator the longitude does not enter the y coordinate, so a position with
-	// a NaN longitude would otherwise come out with a finite y.
-	if (!std::isfinite(lat) || !std::isfinite(latLon.longitude().radians()))
+	// a NaN longitude would otherwise come out with a finite y. The reference arrives
+	// as lon0 and ml0, which referenceParameters() leaves non-finite when it is itself
+	// outside the domain.
+	if (!std::isfinite(lat) || !std::isfinite(latLon.longitude().radians())
+		|| !std::isfinite(lon0) || !std::isfinite(ml0))
 	{
 		return Cartesian{std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN()};
 	}

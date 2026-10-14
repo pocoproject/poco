@@ -317,6 +317,76 @@ void LatLonTest::testToCartesianOutOfDomain()
 }
 
 
+void LatLonTest::testOutOfDomainDistance()
+{
+	// A latitude beyond a pole names no point on the globe, so a distance or an
+	// azimuth involving it is undefined rather than an ordinary spherical result.
+	const LatLon valid = LatLon::fromDegrees(89, 0);
+	const LatLon beyondPole = LatLon::fromDegrees(95, 0);
+
+	assertTrue (FPEnvironment::isNaN(valid.greatCircleDistanceTo(beyondPole).radians()));
+	assertTrue (FPEnvironment::isNaN(valid.greatCircleAzimuthTo(beyondPole).radians()));
+	assertTrue (FPEnvironment::isNaN(valid.rhumbDistanceTo(beyondPole).radians()));
+	assertTrue (FPEnvironment::isNaN(valid.rhumbAzimuthTo(beyondPole).radians()));
+
+	// Two identical positions beyond a pole are still undefined, not zero apart.
+	assertTrue (FPEnvironment::isNaN(beyondPole.greatCircleDistanceTo(beyondPole).radians()));
+}
+
+
+void LatLonTest::testUnnormalizedLongitude()
+{
+	// The formulas are periodic in longitude, so an unnormalized longitude names the
+	// position it is congruent to and must not be treated as out of domain.
+	const LatLon a = LatLon::fromDegrees(0, 10);
+	const LatLon b = LatLon::fromDegrees(0, 370);
+
+	assertEqualDelta (0.0, a.greatCircleDistanceTo(b).degrees(), 1e-9);
+}
+
+
+void LatLonTest::testEndPositionUndefinedInput()
+{
+	// An undefined azimuth or distance yields an undefined position. Returning the
+	// start would make invalid input indistinguishable from zero travel.
+	const LatLon start = LatLon::fromDegrees(46.6, 14.04);
+	const double nan = std::numeric_limits<double>::quiet_NaN();
+	const double infinite = std::numeric_limits<double>::infinity();
+
+	LatLon end = start.greatCircleEndPosition(Angle::fromRadians(nan), Angle::fromDegrees(10));
+	assertTrue (FPEnvironment::isNaN(end.latitude().radians()));
+	assertTrue (FPEnvironment::isNaN(end.longitude().radians()));
+
+	end = start.greatCircleEndPosition(Angle::fromDegrees(45), Angle::fromRadians(infinite));
+	assertTrue (FPEnvironment::isNaN(end.latitude().radians()));
+
+	end = start.rhumbEndPosition(Angle::fromRadians(nan), Angle::fromDegrees(10));
+	assertTrue (FPEnvironment::isNaN(end.latitude().radians()));
+	assertTrue (FPEnvironment::isNaN(end.longitude().radians()));
+}
+
+
+void LatLonTest::testToCartesianInvalidReference()
+{
+	// The reference is held to the same domain as the position, so an invalid one
+	// yields NaN in both coordinates rather than a finite or half-defined result.
+	const LatLon position = LatLon::fromDegrees(46.6, 14.04);
+	const double nan = std::numeric_limits<double>::quiet_NaN();
+
+	Cartesian result = LatLon::toCartesian(LatLon::fromDegrees(95, 10), position);
+	assertTrue (FPEnvironment::isNaN(result.x));
+	assertTrue (FPEnvironment::isNaN(result.y));
+
+	result = LatLon::toCartesian(LatLon::fromDegrees(0, nan), LatLon::fromDegrees(0, 10));
+	assertTrue (FPEnvironment::isNaN(result.x));
+	assertTrue (FPEnvironment::isNaN(result.y));
+
+	result = LatLon::toCartesian(LatLon::fromDegrees(nan, 10), position);
+	assertTrue (FPEnvironment::isNaN(result.x));
+	assertTrue (FPEnvironment::isNaN(result.y));
+}
+
+
 void LatLonTest::testDegenerateAzimuth()
 {
 	// The azimuth formula subtracts two products that cancel only in exact
@@ -423,6 +493,10 @@ CppUnit::Test* LatLonTest::suite()
 	CppUnit_addTest(pSuite, LatLonTest, testToCartesianOutOfDomain);
 	CppUnit_addTest(pSuite, LatLonTest, testToCartesianNonFiniteCoordinate);
 	CppUnit_addTest(pSuite, LatLonTest, testDegenerateAzimuth);
+	CppUnit_addTest(pSuite, LatLonTest, testOutOfDomainDistance);
+	CppUnit_addTest(pSuite, LatLonTest, testUnnormalizedLongitude);
+	CppUnit_addTest(pSuite, LatLonTest, testEndPositionUndefinedInput);
+	CppUnit_addTest(pSuite, LatLonTest, testToCartesianInvalidReference);
 	CppUnit_addTest(pSuite, LatLonTest, testFromCartesianNearPole);
 	CppUnit_addTest(pSuite, LatLonTest, testEqualsAcrossAntimeridian);
 

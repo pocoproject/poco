@@ -40,6 +40,10 @@ public:
 	void testToCartesianOutOfDomain();
 	void testToCartesianNonFiniteCoordinate();
 	void testDegenerateAzimuth();
+	void testOutOfDomainDistance();
+	void testUnnormalizedLongitude();
+	void testEndPositionUndefinedInput();
+	void testToCartesianInvalidReference();
 	void testFromCartesianNearPole();
 	void testEqualsAcrossAntimeridian();
 	void setUp();
