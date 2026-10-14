@@ -138,6 +138,14 @@ public:
 		/// a domain name that matches the domain name
 		/// of the host.
 		///
+		/// A wildcard must be the complete leftmost label ("*.example.com");
+		/// a partial wildcard ("f*.example.com") matches no host name.
+		/// The common name of the subject is considered only if the
+		/// subject alternative names contain no domain name.
+		///
+		/// If hostName is an IP address, it matches only an IP address
+		/// in the subject alternative names.
+		///
 		/// Returns true if verification succeeded, or false otherwise.
 
 	[[nodiscard]] static bool verify(const Poco::Net::X509Certificate& cert, const std::string& hostName);
@@ -146,6 +154,14 @@ public:
 		/// For this check to be successful, the certificate must contain
 		/// a domain name that matches the domain name
 		/// of the host.
+		///
+		/// A wildcard must be the complete leftmost label ("*.example.com");
+		/// a partial wildcard ("f*.example.com") matches no host name.
+		/// The common name of the subject is considered only if the
+		/// subject alternative names contain no domain name.
+		///
+		/// If hostName is an IP address, it matches only an IP address
+		/// in the subject alternative names.
 		///
 		/// Returns true if verification succeeded, or false otherwise.
 
@@ -168,6 +184,10 @@ protected:
 
 	[[nodiscard]] static bool containsWildcards(const std::string& commonName);
 	[[nodiscard]] static bool matchWildcard(const std::string& alias, const std::string& hostName);
+		/// Returns true if alias is a wildcard name whose wildcard is the
+		/// complete leftmost label ("*.example.com"), followed by at least
+		/// two labels, and hostName matches it with exactly one label in
+		/// place of the wildcard. Names are compared case-insensitively.
 
 private:
 	std::string _issuerName;
