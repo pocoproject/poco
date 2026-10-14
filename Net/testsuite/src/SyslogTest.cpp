@@ -519,10 +519,12 @@ namespace
 			return -1;
 		}
 
-		bool poll(const Poco::Timespan& timeout, int) override
+		bool poll(const Poco::Timespan& timeout, int mode) override
 		{
-			// nothing arrives on the connection either: the time runs out
-			return StreamSocketImpl::poll(timeout, SELECT_READ);
+			// A wait for room to send runs out: nothing arrives on the
+			// connection either. Other waits are the real ones, else the one
+			// of connect() would time out before a message is offered.
+			return StreamSocketImpl::poll(timeout, mode == SELECT_WRITE ? SELECT_READ : mode);
 		}
 	};
 
