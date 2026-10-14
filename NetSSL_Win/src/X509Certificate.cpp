@@ -25,11 +25,85 @@
 #include "Poco/Buffer.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Format.h"
-#include "Poco/RegularExpression.h"
-#include "Poco/Net/DNS.h"
+#include "Poco/Net/IPAddress.h"
+#include <algorithm>
+#include <cstring>
 
 
 namespace Poco::Net {
+
+
+namespace
+{
+	template <typename F>
+	void forEachSubjectAltName(PCCERT_CONTEXT pCert, F&& f)
+		/// Decodes the subject alternative name extension of the
+		/// certificate and calls f with each of its entries.
+	{
+		PCERT_EXTENSION pExt = pCert->pCertInfo->rgExtension;
+		for (DWORD i = 0; i < pCert->pCertInfo->cExtension; i++, pExt++)
+		{
+			if (std::strcmp(pExt->pszObjId, szOID_SUBJECT_ALT_NAME2) == 0)
+			{
+				DWORD flags(0);
+#if defined(CRYPT_DECODE_ENABLE_PUNYCODE_FLAG)
+				flags |= CRYPT_DECODE_ENABLE_PUNYCODE_FLAG;
+#endif
+				Poco::Buffer<char> buffer(256);
+				DWORD bufferSize = static_cast<DWORD>(buffer.sizeBytes());
+				BOOL rc = CryptDecodeObjectEx(
+						X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+						pExt->pszObjId,
+						pExt->Value.pbData,
+						pExt->Value.cbData,
+						flags,
+						nullptr,
+						buffer.begin(),
+						&bufferSize);
+				if (!rc && GetLastError() == ERROR_MORE_DATA)
+				{
+					buffer.resize(bufferSize);
+					rc = CryptDecodeObjectEx(
+						X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
+						pExt->pszObjId,
+						pExt->Value.pbData,
+						pExt->Value.cbData,
+						flags,
+						nullptr,
+						buffer.begin(),
+						&bufferSize);
+				}
+				if (rc)
+				{
+					PCERT_ALT_NAME_INFO pNameInfo = reinterpret_cast<PCERT_ALT_NAME_INFO>(buffer.begin());
+					for (DWORD j = 0; j < pNameInfo->cAltEntry; j++)
+					{
+						f(pNameInfo->rgAltEntry[j]);
+					}
+				}
+			}
+		}
+	}
+
+
+	bool subjectAltNameHasAddress(PCCERT_CONTEXT pCert, const IPAddress& address)
+		/// Returns true if an IP address entry of the subject alternative
+		/// names of the certificate equals the address.
+	{
+		bool found = false;
+		forEachSubjectAltName(pCert, [&address, &found](const CERT_ALT_NAME_ENTRY& entry)
+		{
+			// The entry is compared as bytes: its length tells IPv4 from IPv6, and an
+			// entry of another length is malformed and matches no address.
+			const CRYPT_DATA_BLOB& blob = entry.IPAddress;
+			if (!found && entry.dwAltNameChoice == CERT_ALT_NAME_IP_ADDRESS && blob.cbData == static_cast<DWORD>(address.length()))
+			{
+				found = std::memcmp(blob.pbData, address.addr(), blob.cbData) == 0;
+			}
+		});
+		return found;
+	}
+}
 
 
 X509Certificate::X509Certificate(const std::string& path):
@@ -239,56 +313,17 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 {
 	domainNames.clear();
 	cmnName = commonName();
-	PCERT_EXTENSION pExt = _pCert->pCertInfo->rgExtension;
-	for (DWORD i = 0; i < _pCert->pCertInfo->cExtension; i++, pExt++)
+	forEachSubjectAltName(_pCert, [&domainNames](const CERT_ALT_NAME_ENTRY& entry)
 	{
-		if (std::strcmp(pExt->pszObjId, szOID_SUBJECT_ALT_NAME2) == 0)
+		// Some certificates have Subject Alternative Name entries that are not DNS Name. Skip them.
+		if (entry.dwAltNameChoice == CERT_ALT_NAME_DNS_NAME)
 		{
-			DWORD flags(0);
-#if defined(CRYPT_DECODE_ENABLE_PUNYCODE_FLAG)
-			flags |= CRYPT_DECODE_ENABLE_PUNYCODE_FLAG;
-#endif
-			Poco::Buffer<char> buffer(256);
-			DWORD bufferSize = static_cast<DWORD>(buffer.sizeBytes());
-			BOOL rc = CryptDecodeObjectEx(
-					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-					pExt->pszObjId,
-					pExt->Value.pbData,
-					pExt->Value.cbData,
-					flags,
-					nullptr,
-					buffer.begin(),
-					&bufferSize);
-			if (!rc && GetLastError() == ERROR_MORE_DATA)
-			{
-				buffer.resize(bufferSize);
-				rc = CryptDecodeObjectEx(
-					X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
-					pExt->pszObjId,
-					pExt->Value.pbData,
-					pExt->Value.cbData,
-					flags,
-					nullptr,
-					buffer.begin(),
-					&bufferSize);
-			}
-			if (rc)
-			{
-				PCERT_ALT_NAME_INFO pNameInfo = reinterpret_cast<PCERT_ALT_NAME_INFO>(buffer.begin());
-				for (DWORD i = 0; i < pNameInfo->cAltEntry; i++)
-				{
-					// Some certificates have Subject Alternative Name entries that are not DNS Name. Skip them.
-					if (pNameInfo->rgAltEntry[i].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME)
-					{
-						std::wstring waltName(pNameInfo->rgAltEntry[i].pwszDNSName);
-						std::string altName;
-						Poco::UnicodeConverter::toUTF8(waltName, altName);
-						domainNames.insert(altName);
-					}
-				}
-			}
+			std::wstring waltName(entry.pwszDNSName);
+			std::string altName;
+			Poco::UnicodeConverter::toUTF8(waltName, altName);
+			domainNames.insert(altName);
 		}
-	}
+	});
 	if (!cmnName.empty() && domainNames.empty())
 	{
 		domainNames.insert(cmnName);
@@ -495,56 +530,23 @@ bool X509Certificate::verify(const std::string& hostName) const
 
 bool X509Certificate::verify(const Poco::Net::X509Certificate& certificate, const std::string& hostName)
 {
-	std::string commonName;
-	std::set<std::string> dnsNames;
-	certificate.extractNames(commonName, dnsNames);
-	if (!commonName.empty()) dnsNames.insert(commonName);
-	bool ok = (dnsNames.find(hostName) != dnsNames.end());
-	if (!ok)
+	IPAddress ip;
+	if (IPAddress::tryParse(hostName, ip))
 	{
-		for (std::set<std::string>::const_iterator it = dnsNames.begin(); !ok && it != dnsNames.end(); ++it)
-		{
-			try
-			{
-				// two cases: strData contains wildcards or not
-				if (containsWildcards(*it))
-				{
-					// a compare by IPAddress is not possible with wildcards
-					// only allow compare by name
-					ok = matchWildcard(*it, hostName);
-				}
-				else
-				{
-					// it depends on hostName if we compare by IP or by alias
-					IPAddress ip;
-					if (IPAddress::tryParse(hostName, ip))
-					{
-						// compare by IP
-						const auto& heData = DNS::resolve(*it);
-						for (const auto& address : heData.addresses())
-						{
-							if (address == ip)
-							{
-								ok = true;
-								break;
-							}
-						}
-					}
-					else
-					{
-						ok = Poco::icompare(*it, hostName) == 0;
-					}
-				}
-			}
-			catch (NoAddressFoundException&)
-			{
-			}
-			catch (HostNotFoundException&)
-			{
-			}
-		}
+		return subjectAltNameHasAddress(certificate.system(), ip);
 	}
-	return ok;
+
+	// extractNames() adds the common name only if there is no DNS name.
+	std::string commonName;
+	std::set<std::string> domainNames;
+	certificate.extractNames(commonName, domainNames);
+	return std::any_of(domainNames.begin(), domainNames.end(), [&hostName](const std::string& name)
+	{
+		if (containsWildcards(name))
+			return matchWildcard(name, hostName);
+		else
+			return Poco::icompare(name, hostName) == 0;
+	});
 }
 
 
@@ -556,17 +558,14 @@ bool X509Certificate::containsWildcards(const std::string& commonName)
 
 bool X509Certificate::matchWildcard(const std::string& wildcard, const std::string& hostName)
 {
-	// fix wildcards
-	std::string wildcardExpr("^");
-	wildcardExpr += Poco::replace(wildcard, ".", "\\.");
-	Poco::replaceInPlace(wildcardExpr, "*", ".*");
-	Poco::replaceInPlace(wildcardExpr, "..*", ".*");
-	Poco::replaceInPlace(wildcardExpr, "?", ".?");
-	Poco::replaceInPlace(wildcardExpr, "..?", ".?");
-	wildcardExpr += "$";
-
-	Poco::RegularExpression expr(wildcardExpr, Poco::RegularExpression::RE_CASELESS);
-	return expr.match(hostName);
+	if (wildcard.compare(0, 2, "*.") != 0) return false;
+	const std::string suffix = wildcard.substr(2);
+	// at least two labels after the wildcard, none of them empty
+	if (containsWildcards(suffix) || suffix.find('.') == std::string::npos) return false;
+	if (suffix.front() == '.' || suffix.back() == '.' || suffix.find("..") != std::string::npos) return false;
+	const std::string::size_type dot = hostName.find('.');
+	if (dot == std::string::npos || dot == 0) return false;
+	return Poco::icompare(hostName.substr(dot + 1), suffix) == 0;
 }
 
 
