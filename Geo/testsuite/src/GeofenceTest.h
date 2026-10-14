@@ -32,6 +32,7 @@ public:
 	void testPolygonalOutOfRangePosition();
 	void testCircularBoundary();
 	void testNaNPositionOutside();
+	void testOutOfDomainPositionOutside();
 	void testGeofenceBase();
 
 	void setUp();

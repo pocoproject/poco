@@ -249,6 +249,18 @@ void GeofenceTest::testCircularBoundary()
 }
 
 
+void GeofenceTest::testOutOfDomainPositionOutside()
+{
+	// A latitude beyond a pole is outside every geofence, circular as well as
+	// polygonal, because the distance to it is undefined.
+	const LatLon centre = LatLon::fromDegrees(89, 0);
+	CircularGeofence circle(centre, 700000.0);
+
+	assertFalse (circle.isInside(LatLon::fromDegrees(95, 0)));
+	assertTrue (circle.isInside(LatLon::fromDegrees(88, 0)));
+}
+
+
 void GeofenceTest::testNaNPositionOutside()
 {
 	// A NaN coordinate must neither become a zero distance nor the origin of the
@@ -309,6 +321,7 @@ CppUnit::Test* GeofenceTest::suite()
 	CppUnit_addTest(pSuite, GeofenceTest, testPolygonalOutOfRangePosition);
 	CppUnit_addTest(pSuite, GeofenceTest, testCircularBoundary);
 	CppUnit_addTest(pSuite, GeofenceTest, testNaNPositionOutside);
+	CppUnit_addTest(pSuite, GeofenceTest, testOutOfDomainPositionOutside);
 	CppUnit_addTest(pSuite, GeofenceTest, testGeofenceBase);
 
 	return pSuite;
