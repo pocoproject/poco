@@ -33,6 +33,9 @@ public:
 	void testDHParametersRejectedBySecurityLevel();
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	void testBuiltInDHParameters();
+	void testProviderContext();
+	void testProviderContextLibctxOnlyIsUsed();
+	void testProviderContextInvalidProviderQueryRejected();
 #endif
 	void testAddChainCertificateWithoutX509();
 	void testClientContextIgnoresDHParameters();
@@ -50,6 +53,7 @@ private:
 		/// Returns the OpenSSL name of the DH group that a server Context with
 		/// the given built-in parameters sends in a TLS 1.2 DHE handshake.
 #endif
+
 };
 
 

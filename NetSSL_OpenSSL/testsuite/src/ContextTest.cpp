@@ -33,6 +33,7 @@
 using Poco::Crypto::X509Certificate;
 using Poco::Net::Context;
 using Poco::Net::SSLContextException;
+using Poco::Net::SSLException;
 using Poco::Net::SSLManager;
 using Poco::Util::Application;
 
@@ -126,6 +127,80 @@ void ContextTest::testBuiltInDHParameters()
 
 	assertEqual (std::string("dh_2048_256"), negotiatedDHGroup(Context::KEY_DH_GROUP_2048));
 	assertEqual (std::string("dh_1024_160"), negotiatedDHGroup(Context::KEY_DH_GROUP_1024));
+}
+
+
+void ContextTest::testProviderContext()
+{
+	using LibCtxPtr = std::unique_ptr<OSSL_LIB_CTX, decltype(&OSSL_LIB_CTX_free)>;
+	LibCtxPtr pLibCtx(OSSL_LIB_CTX_new(), &OSSL_LIB_CTX_free);
+	assertNotNullPtr (pLibCtx.get());
+
+	OSSL_PROVIDER* pProvider = OSSL_PROVIDER_load(pLibCtx.get(), "default");
+	assertNotNullPtr (pProvider);
+
+	Context::Ptr pContext = new Context(
+		Context::TLS_SERVER_USE,
+		pLibCtx.get(),
+		"provider=default",
+		Context::VERIFY_NONE);
+	assertNotNullPtr (pContext->sslContext());
+
+	OSSL_PROVIDER_unload(pProvider);
+}
+
+
+void ContextTest::testProviderContextLibctxOnlyIsUsed()
+{
+
+	using LibCtxPtr = std::unique_ptr<OSSL_LIB_CTX, decltype(&OSSL_LIB_CTX_free)>;
+	LibCtxPtr pLibCtx(OSSL_LIB_CTX_new(), &OSSL_LIB_CTX_free);
+	assertNotNullPtr (pLibCtx.get());
+
+	OSSL_PROVIDER* pProvider = OSSL_PROVIDER_load(pLibCtx.get(), "default");
+	assertNotNullPtr (pProvider);
+
+	Context::Ptr pContext = new Context(
+		Context::TLS_SERVER_USE,
+		pLibCtx.get(),
+		"",	// no provider query string, only a custom libctx
+		Context::VERIFY_NONE);
+	assertNotNullPtr (pContext->sslContext());
+
+	OSSL_PROVIDER_unload(pProvider);
+}
+
+
+void ContextTest::testProviderContextInvalidProviderQueryRejected()
+{
+	ErrorQueueCleaner cleaner;
+
+	using LibCtxPtr = std::unique_ptr<OSSL_LIB_CTX, decltype(&OSSL_LIB_CTX_free)>;
+	LibCtxPtr pLibCtx(OSSL_LIB_CTX_new(), &OSSL_LIB_CTX_free);
+	assertNotNullPtr (pLibCtx.get());
+
+	using ProviderPtr = std::unique_ptr<OSSL_PROVIDER, decltype(&OSSL_PROVIDER_unload)>;
+	ProviderPtr pProvider(OSSL_PROVIDER_load(pLibCtx.get(), "default"), &OSSL_PROVIDER_unload);
+	assertNotNullPtr (pProvider.get());
+
+	Context::Params params;
+	params.libctx = pLibCtx.get();
+	params.providerName = "provider=nonexistent-provider";
+	params.cipherSuites = "TLS_AES_256_GCM_SHA384";
+	params.verificationMode = Context::VERIFY_NONE;
+
+	ERR_clear_error();
+	try
+	{
+		Context::Ptr pContext = new Context(Context::TLS_SERVER_USE, params);
+		fail("unresolvable provider query string - must throw");
+	}
+	catch (SSLContextException&)
+	{
+	}
+	catch ( SSLException & )
+	{
+	}
 }
 #endif
 
@@ -276,6 +351,9 @@ CppUnit::Test* ContextTest::suite()
 	CppUnit_addTest(pSuite, ContextTest, testDHParametersRejectedBySecurityLevel);
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	CppUnit_addTest(pSuite, ContextTest, testBuiltInDHParameters);
+	CppUnit_addTest(pSuite, ContextTest, testProviderContext);
+	CppUnit_addTest(pSuite, ContextTest, testProviderContextLibctxOnlyIsUsed);
+	CppUnit_addTest(pSuite, ContextTest, testProviderContextInvalidProviderQueryRejected);
 #endif
 	CppUnit_addTest(pSuite, ContextTest, testAddChainCertificateWithoutX509);
 	CppUnit_addTest(pSuite, ContextTest, testClientContextIgnoresDHParameters);
