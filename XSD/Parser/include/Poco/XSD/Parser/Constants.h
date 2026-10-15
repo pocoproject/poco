@@ -124,10 +124,7 @@ public:
 	static const std::string XSD_OPTIONAL;
 	static const std::string XSD_PROHIBITED;
 
-	enum
-	{
-		VAL_UNBOUNDED = 0xffffffff
-	};
+	static constexpr Poco::UInt32 VAL_UNBOUNDED = 0xffffffff;
 
 	// Other
 	static const std::string XSD_COLON;

@@ -181,7 +181,7 @@ void XSDContentHandler::ignorableWhitespace(const XMLChar* ch, int start, int le
 }
 
 
-void XSDContentHandler::processingInstruction(const std::string& target, const std::string& data)
+void XSDContentHandler::processingInstruction(const std::string& /*target*/, const std::string& /*data*/)
 {
 }
 
@@ -198,12 +198,12 @@ void XSDContentHandler::endPrefixMapping(const std::string& prefix)
 }
 
 
-void XSDContentHandler::skippedEntity(const std::string& name)
+void XSDContentHandler::skippedEntity(const std::string& /*name*/)
 {
 }
 
 
-void XSDContentHandler::stateAllStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateAllStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//	<all
 	//    id = ID
@@ -225,7 +225,7 @@ void XSDContentHandler::stateAllStart(const std::string& uri, const std::string&
 }
 
 
-void XSDContentHandler::stateAnnotationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateAnnotationStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<annotation
 	//  id = ID
@@ -240,7 +240,7 @@ void XSDContentHandler::stateAnnotationStart(const std::string& uri, const std::
 }
 
 
-void XSDContentHandler::stateAnyStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateAnyStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<any
 	//  id = ID
@@ -263,7 +263,7 @@ void XSDContentHandler::stateAnyStart(const std::string& uri, const std::string&
 }
 
 
-void XSDContentHandler::stateMetaAnyStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateMetaAnyStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	// truly anything!
 	// we could serialize to string, but then, we would loose namespace info
@@ -272,7 +272,7 @@ void XSDContentHandler::stateMetaAnyStart(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateAnyAttributeStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateAnyAttributeStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<anyAttribute
 	//  id = ID
@@ -291,7 +291,7 @@ void XSDContentHandler::stateAnyAttributeStart(const std::string& uri, const std
 }
 
 
-void XSDContentHandler::stateAppInfoStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateAppInfoStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<appinfo
 	//  source = anyURI
@@ -306,7 +306,7 @@ void XSDContentHandler::stateAppInfoStart(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateAttributeStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateAttributeStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<attribute
 	//  default = string
@@ -362,7 +362,7 @@ void XSDContentHandler::stateAttributeStart(const std::string& uri, const std::s
 }
 
 
-void XSDContentHandler::stateAttributeGroupStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateAttributeGroupStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<attributeGroup
 	//  id = ID
@@ -392,7 +392,7 @@ void XSDContentHandler::stateAttributeGroupStart(const std::string& uri, const s
 }
 
 
-void XSDContentHandler::stateChoiceStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateChoiceStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<choice
 	//  id = ID
@@ -412,7 +412,7 @@ void XSDContentHandler::stateChoiceStart(const std::string& uri, const std::stri
 }
 
 
-void XSDContentHandler::stateComplexContentStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateComplexContentStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<complexContent
 	//  id = ID
@@ -428,7 +428,7 @@ void XSDContentHandler::stateComplexContentStart(const std::string& uri, const s
 }
 
 
-void XSDContentHandler::stateComplexTypeStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateComplexTypeStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<complexType
 	//  abstract = boolean : false
@@ -473,7 +473,7 @@ void XSDContentHandler::stateComplexTypeStart(const std::string& uri, const std:
 }
 
 
-void XSDContentHandler::stateDocumentationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateDocumentationStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<documentation
 	//  source = anyURI
@@ -490,7 +490,7 @@ void XSDContentHandler::stateDocumentationStart(const std::string& uri, const st
 }
 
 
-void XSDContentHandler::stateElementStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateElementStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<element
 	//  abstract = boolean : false
@@ -601,7 +601,7 @@ void XSDContentHandler::stateElementStart(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateSimpleExtensionStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSimpleExtensionStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//parent is simpleContent
 	//<extension
@@ -618,7 +618,7 @@ void XSDContentHandler::stateSimpleExtensionStart(const std::string& uri, const 
 }
 
 
-void XSDContentHandler::stateComplexExtensionStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateComplexExtensionStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//parent is complexContent:
 	//<extension
@@ -636,7 +636,7 @@ void XSDContentHandler::stateComplexExtensionStart(const std::string& uri, const
 }
 
 
-void XSDContentHandler::stateFieldStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateFieldStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<field
 	//  id = ID
@@ -650,7 +650,7 @@ void XSDContentHandler::stateFieldStart(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::stateGroupStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateGroupStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<group
 	//  id = ID
@@ -685,7 +685,7 @@ void XSDContentHandler::stateGroupStart(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::stateXSDImportStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateXSDImportStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<import
 	//  id = ID
@@ -745,7 +745,7 @@ void XSDContentHandler::stateXSDImportStart(const std::string& uri, const std::s
 }
 
 
-void XSDContentHandler::stateIncludeStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateIncludeStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<include
 	//  id = ID
@@ -768,7 +768,7 @@ void XSDContentHandler::stateIncludeStart(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateKeyStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateKeyStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<key
 	//  id = ID
@@ -782,7 +782,7 @@ void XSDContentHandler::stateKeyStart(const std::string& uri, const std::string&
 }
 
 
-void XSDContentHandler::stateKeyrefStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateKeyrefStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<keyref
 	//  id = ID
@@ -797,7 +797,7 @@ void XSDContentHandler::stateKeyrefStart(const std::string& uri, const std::stri
 }
 
 
-void XSDContentHandler::stateListStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateListStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<list
 	//  id = ID
@@ -831,7 +831,7 @@ void XSDContentHandler::stateListStart(const std::string& uri, const std::string
 }
 
 
-void XSDContentHandler::stateNotationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateNotationStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<notation
 	//  id = ID
@@ -853,7 +853,7 @@ void XSDContentHandler::stateNotationStart(const std::string& uri, const std::st
 }
 
 
-void XSDContentHandler::stateRedefineStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateRedefineStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<redefine
 	//  id = ID
@@ -865,7 +865,7 @@ void XSDContentHandler::stateRedefineStart(const std::string& uri, const std::st
 }
 
 
-void XSDContentHandler::stateComplexRestrictionStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateComplexRestrictionStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//parent is complexContent:
 	//<restriction
@@ -882,7 +882,7 @@ void XSDContentHandler::stateComplexRestrictionStart(const std::string& uri, con
 }
 
 
-void XSDContentHandler::stateSimpleContentRestrictionStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSimpleContentRestrictionStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	// parent is simpleContent
 	//<restriction
@@ -900,7 +900,7 @@ void XSDContentHandler::stateSimpleContentRestrictionStart(const std::string& ur
 
 
 
-void XSDContentHandler::stateSimpleTypeRestrictionStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSimpleTypeRestrictionStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	// parent is SimpleType
 	//<restriction
@@ -927,7 +927,7 @@ void XSDContentHandler::stateSimpleTypeRestrictionStart(const std::string& uri, 
 }
 
 
-void XSDContentHandler::stateSchemaStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSchemaStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<schema
 	//  attributeFormDefault = (qualified | unqualified) : unqualified
@@ -976,7 +976,7 @@ void XSDContentHandler::stateSchemaStart(const std::string& uri, const std::stri
 }
 
 
-void XSDContentHandler::stateSelectorStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSelectorStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<selector
 	//  id = ID
@@ -990,7 +990,7 @@ void XSDContentHandler::stateSelectorStart(const std::string& uri, const std::st
 }
 
 
-void XSDContentHandler::stateSequenceStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSequenceStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<sequence
 	//  id = ID
@@ -1010,7 +1010,7 @@ void XSDContentHandler::stateSequenceStart(const std::string& uri, const std::st
 }
 
 
-void XSDContentHandler::stateSimpleContentStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSimpleContentStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<simpleContent
 	//  id = ID
@@ -1025,7 +1025,7 @@ void XSDContentHandler::stateSimpleContentStart(const std::string& uri, const st
 }
 
 
-void XSDContentHandler::stateSimpleTypeStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSimpleTypeStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<simpleType
 	//  final = (#all | List of (list | union | restriction))
@@ -1060,7 +1060,7 @@ void XSDContentHandler::stateSimpleTypeStart(const std::string& uri, const std::
 }
 
 
-void XSDContentHandler::stateUnionStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateUnionStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<union
 	//  id = ID
@@ -1085,7 +1085,7 @@ void XSDContentHandler::stateUnionStart(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::stateUniqueStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateUniqueStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<unique
 	//  id = ID
@@ -1099,7 +1099,7 @@ void XSDContentHandler::stateUniqueStart(const std::string& uri, const std::stri
 }
 
 
-void XSDContentHandler::stateEnumerationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateEnumerationStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<enumeration
 	//  id = ID
@@ -1113,7 +1113,7 @@ void XSDContentHandler::stateEnumerationStart(const std::string& uri, const std:
 }
 
 
-void XSDContentHandler::stateFractionDigitsStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateFractionDigitsStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<fractionDigits
 	//  fixed = boolean : false
@@ -1128,7 +1128,7 @@ void XSDContentHandler::stateFractionDigitsStart(const std::string& uri, const s
 }
 
 
-void XSDContentHandler::stateLengthStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateLengthStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<length
 	//  fixed = boolean : false
@@ -1143,7 +1143,7 @@ void XSDContentHandler::stateLengthStart(const std::string& uri, const std::stri
 }
 
 
-void XSDContentHandler::stateMaxExclusiveStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateMaxExclusiveStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<maxExclusive
 	//  fixed = boolean : false
@@ -1158,7 +1158,7 @@ void XSDContentHandler::stateMaxExclusiveStart(const std::string& uri, const std
 }
 
 
-void XSDContentHandler::stateMaxInclusiveStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateMaxInclusiveStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<maxInclusive
 	//  fixed = boolean : false
@@ -1173,7 +1173,7 @@ void XSDContentHandler::stateMaxInclusiveStart(const std::string& uri, const std
 }
 
 
-void XSDContentHandler::stateMaxLengthStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateMaxLengthStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<maxLength
 	//  fixed = boolean : false
@@ -1188,7 +1188,7 @@ void XSDContentHandler::stateMaxLengthStart(const std::string& uri, const std::s
 }
 
 
-void XSDContentHandler::stateMinExclusiveStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateMinExclusiveStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<minExclusive
 	//  fixed = boolean : false
@@ -1203,7 +1203,7 @@ void XSDContentHandler::stateMinExclusiveStart(const std::string& uri, const std
 }
 
 
-void XSDContentHandler::stateMinInclusiveStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateMinInclusiveStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<minInclusive
 	//  fixed = boolean : false
@@ -1218,7 +1218,7 @@ void XSDContentHandler::stateMinInclusiveStart(const std::string& uri, const std
 }
 
 
-void XSDContentHandler::stateMinLengthStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateMinLengthStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<minLength
 	//  fixed = boolean : false
@@ -1233,7 +1233,7 @@ void XSDContentHandler::stateMinLengthStart(const std::string& uri, const std::s
 }
 
 
-void XSDContentHandler::statePatternStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::statePatternStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<pattern
 	//  id = ID
@@ -1247,7 +1247,7 @@ void XSDContentHandler::statePatternStart(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateTotalDigitsStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateTotalDigitsStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<totalDigits
 	//  fixed = boolean : false
@@ -1262,13 +1262,13 @@ void XSDContentHandler::stateTotalDigitsStart(const std::string& uri, const std:
 }
 
 
-void XSDContentHandler::stateUninitializedStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateUninitializedStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	throw XSDException("Illegal startElement method call on uninitialized XSDContentHandler");
 }
 
 
-void XSDContentHandler::stateWhiteSpaceStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateWhiteSpaceStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 	//<whiteSpace
 	//  fixed = boolean : false
@@ -1283,7 +1283,7 @@ void XSDContentHandler::stateWhiteSpaceStart(const std::string& uri, const std::
 }
 
 
-void XSDContentHandler::stateAllEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateAllEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert_dbg (!_all.empty());
 
@@ -1318,7 +1318,7 @@ void XSDContentHandler::stateAllEnd(const std::string& uri, const std::string& l
 
 
 
-void XSDContentHandler::stateAnnotationEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateAnnotationEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert_dbg (!_annot.empty());
 	if (_objects.empty()) throw Types::SchemaException("xs:annotation outside a schema component", location());
@@ -1327,7 +1327,7 @@ void XSDContentHandler::stateAnnotationEnd(const std::string& uri, const std::st
 }
 
 
-void XSDContentHandler::stateAnyEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateAnyEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// pushed: _any ,_objects
 	Types::Any::Ptr ptr = _any.top();
@@ -1342,7 +1342,7 @@ void XSDContentHandler::stateAnyEnd(const std::string& uri, const std::string& l
 }
 
 
-void XSDContentHandler::stateAnyAttributeEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateAnyAttributeEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// pushed: _attributes, _objects
 	AttributeContent::Ptr ptr = _attributes.top();
@@ -1369,7 +1369,7 @@ void XSDContentHandler::stateAnyAttributeEnd(const std::string& uri, const std::
 }
 
 
-void XSDContentHandler::stateAppInfoEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateAppInfoEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert_dbg (!_annotContent.empty());
 	poco_assert_dbg (!_annot.empty());
@@ -1382,7 +1382,7 @@ void XSDContentHandler::stateAppInfoEnd(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::stateAttributeEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateAttributeEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: schema attributeGroup complexType simpleContentExtension complexContentExtension complexContentRestriction simpleContentRestriction
 
@@ -1411,7 +1411,7 @@ void XSDContentHandler::stateAttributeEnd(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateAttributeGroupEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateAttributeGroupEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: attributeGroup complexType simpleContentExtension complexContentExtension refine(NOTSUP)
 	// complexContentRestriction simpleContentRestriction schema
@@ -1440,7 +1440,7 @@ void XSDContentHandler::stateAttributeGroupEnd(const std::string& uri, const std
 }
 
 
-void XSDContentHandler::stateChoiceEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateChoiceEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: choice complexType complexContentExtension group complexContentRestriction sequence
 
@@ -1470,7 +1470,7 @@ void XSDContentHandler::stateChoiceEnd(const std::string& uri, const std::string
 }
 
 
-void XSDContentHandler::stateComplexContentEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateComplexContentEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: complexType
 
@@ -1487,7 +1487,7 @@ void XSDContentHandler::stateComplexContentEnd(const std::string& uri, const std
 }
 
 
-void XSDContentHandler::stateComplexTypeEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateComplexTypeEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: element redefine(NOTSUP) schema
 
@@ -1513,7 +1513,7 @@ void XSDContentHandler::stateComplexTypeEnd(const std::string& uri, const std::s
 }
 
 
-void XSDContentHandler::stateDocumentationEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateDocumentationEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// in case of a misplaced xsd:documentation, _annotContent and _annot will be empty.
 	if (!_annotContent.empty() && !_annot.empty())
@@ -1528,7 +1528,7 @@ void XSDContentHandler::stateDocumentationEnd(const std::string& uri, const std:
 }
 
 
-void XSDContentHandler::stateElementEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateElementEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: all choice schema sequence
 
@@ -1560,7 +1560,7 @@ void XSDContentHandler::stateElementEnd(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::stateSimpleExtensionEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSimpleExtensionEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: simpleContent
 
@@ -1570,7 +1570,7 @@ void XSDContentHandler::stateSimpleExtensionEnd(const std::string& uri, const st
 }
 
 
-void XSDContentHandler::stateComplexExtensionEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateComplexExtensionEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: complexContent
 
@@ -1580,14 +1580,14 @@ void XSDContentHandler::stateComplexExtensionEnd(const std::string& uri, const s
 }
 
 
-void XSDContentHandler::stateFieldEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateFieldEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported, but we had to add a dummy entry to _objects to catch possible content
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateGroupEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateGroupEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: choice complexType complexContentExtension redefine (NOTSUP) complexContentRestriction schema sequence
 
@@ -1622,35 +1622,35 @@ void XSDContentHandler::stateGroupEnd(const std::string& uri, const std::string&
 }
 
 
-void XSDContentHandler::stateXSDImportEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateXSDImportEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// pop dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateIncludeEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateIncludeEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// pop dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateKeyEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateKeyEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateKeyrefEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateKeyrefEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateListEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateListEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: SimpleType
 
@@ -1672,7 +1672,7 @@ void XSDContentHandler::stateListEnd(const std::string& uri, const std::string& 
 }
 
 
-void XSDContentHandler::stateNotationEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateNotationEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: schema
 
@@ -1685,14 +1685,14 @@ void XSDContentHandler::stateNotationEnd(const std::string& uri, const std::stri
 }
 
 
-void XSDContentHandler::stateRedefineEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateRedefineEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported state
 	throw Poco::NotImplementedException();
 }
 
 
-void XSDContentHandler::stateSimpleTypeRestrictionEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSimpleTypeRestrictionEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: SimpleType
 
@@ -1709,7 +1709,7 @@ void XSDContentHandler::stateSimpleTypeRestrictionEnd(const std::string& uri, co
 }
 
 
-void XSDContentHandler::stateSimpleContentRestrictionEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSimpleContentRestrictionEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: SimpleContent
 
@@ -1719,7 +1719,7 @@ void XSDContentHandler::stateSimpleContentRestrictionEnd(const std::string& uri,
 }
 
 
-void XSDContentHandler::stateComplexRestrictionEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateComplexRestrictionEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: ComplexContent
 
@@ -1729,7 +1729,7 @@ void XSDContentHandler::stateComplexRestrictionEnd(const std::string& uri, const
 }
 
 
-void XSDContentHandler::stateSchemaEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSchemaEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	_objects.pop();
 	poco_assert_dbg (_objects.empty());
@@ -1755,14 +1755,14 @@ void XSDContentHandler::stateSchemaEnd(const std::string& uri, const std::string
 }
 
 
-void XSDContentHandler::stateSelectorEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSelectorEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateSequenceEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSequenceEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: choice complexType complexContentExtension group complexContentRestriction sequence
 
@@ -1802,7 +1802,7 @@ void XSDContentHandler::stateSequenceEnd(const std::string& uri, const std::stri
 }
 
 
-void XSDContentHandler::stateSimpleContentEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSimpleContentEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: complexType
 
@@ -1817,7 +1817,7 @@ void XSDContentHandler::stateSimpleContentEnd(const std::string& uri, const std:
 }
 
 
-void XSDContentHandler::stateSimpleTypeEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSimpleTypeEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// valid parents: union attribute element list redefine(NOTSUP) simpleContentRestriction simpleTypeRestriction schema
 
@@ -1867,7 +1867,7 @@ void XSDContentHandler::stateSimpleTypeEnd(const std::string& uri, const std::st
 }
 
 
-void XSDContentHandler::stateUnionEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateUnionEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	//valid parents: SimpleType
 	poco_assert_dbg (getParentState() == StateMachine::ST_INSIMPLETYPE);
@@ -1883,104 +1883,104 @@ void XSDContentHandler::stateUnionEnd(const std::string& uri, const std::string&
 }
 
 
-void XSDContentHandler::stateUniqueEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateUniqueEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateEnumerationEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateEnumerationEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateFractionDigitsEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateFractionDigitsEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateLengthEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateLengthEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateMaxExclusiveEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateMaxExclusiveEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateMaxInclusiveEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateMaxInclusiveEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateMaxLengthEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateMaxLengthEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateMinExclusiveEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateMinExclusiveEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateMinInclusiveEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateMinInclusiveEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateMinLengthEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateMinLengthEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::statePatternEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::statePatternEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateTotalDigitsEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateTotalDigitsEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateUninitializedEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateUninitializedEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	throw XSDException("Illegal endElement method call on uninitialized XSDContentHandler");
 }
 
 
-void XSDContentHandler::stateWhiteSpaceEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateWhiteSpaceEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	// not supported: catched content by adding dummy entry
 	_objects.pop();
 }
 
 
-void XSDContentHandler::stateMetaAnyEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateMetaAnyEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert_dbg(_states.size() > 1);
 	if (_states[_states.size()-2] != StateMachine::ST_INMETAANY)
@@ -1994,7 +1994,7 @@ void XSDContentHandler::stateMetaAnyEnd(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::stateDefinitionsStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateDefinitionsStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	auto itEnd = attrList.end();
 	const std::string& tns = Utility::getString(itEnd, attrList.find(Constants::XSD_TARGETNAMESPACE), Constants::XSD_EMPTY_STRING);
@@ -2005,13 +2005,13 @@ void XSDContentHandler::stateDefinitionsStart(const std::string& uri, const std:
 }
 
 
-void XSDContentHandler::stateDefinitionsEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateDefinitionsEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	_pDefinitions = nullptr;
 }
 
 
-void XSDContentHandler::stateWSDLImportStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateWSDLImportStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<import
 	//  id = ID
@@ -2034,22 +2034,22 @@ void XSDContentHandler::stateWSDLImportStart(const std::string& uri, const std::
 }
 
 
-void XSDContentHandler::stateWSDLImportEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateWSDLImportEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateTypesStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateTypesStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 }
 
 
-void XSDContentHandler::stateTypesEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateTypesEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateMessageStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateMessageStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
@@ -2058,7 +2058,7 @@ void XSDContentHandler::stateMessageStart(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateMessageEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateMessageEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert (!_objects.empty());
 	Types::Message::Ptr pMessage = _objects.top().cast<Types::Message>();
@@ -2068,7 +2068,7 @@ void XSDContentHandler::stateMessageEnd(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::statePartStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::statePartStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_assert (!_objects.empty());
 	Types::Message::Ptr pMessage = _objects.top().cast<Types::Message>();
@@ -2093,12 +2093,12 @@ void XSDContentHandler::statePartStart(const std::string& uri, const std::string
 }
 
 
-void XSDContentHandler::statePartEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::statePartEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::statePortTypeStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::statePortTypeStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
@@ -2107,7 +2107,7 @@ void XSDContentHandler::statePortTypeStart(const std::string& uri, const std::st
 }
 
 
-void XSDContentHandler::statePortTypeEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::statePortTypeEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert (!_objects.empty());
 	Types::PortType::Ptr pPortType = _objects.top().cast<Types::PortType>();
@@ -2117,7 +2117,7 @@ void XSDContentHandler::statePortTypeEnd(const std::string& uri, const std::stri
 }
 
 
-void XSDContentHandler::stateOperationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateOperationStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
@@ -2148,7 +2148,7 @@ void XSDContentHandler::stateOperationStart(const std::string& uri, const std::s
 }
 
 
-void XSDContentHandler::stateOperationEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateOperationEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert (!_objects.empty());
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
@@ -2171,7 +2171,7 @@ void XSDContentHandler::stateOperationEnd(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateInputStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateInputStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_assert (!_objects.empty());
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
@@ -2191,12 +2191,12 @@ void XSDContentHandler::stateInputStart(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::stateInputEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateInputEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateOutputStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateOutputStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_assert (!_objects.empty());
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
@@ -2216,12 +2216,12 @@ void XSDContentHandler::stateOutputStart(const std::string& uri, const std::stri
 }
 
 
-void XSDContentHandler::stateOutputEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateOutputEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateFaultStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateFaultStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_assert (!_objects.empty());
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
@@ -2241,12 +2241,12 @@ void XSDContentHandler::stateFaultStart(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::stateFaultEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateFaultEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateBindingStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateBindingStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
@@ -2269,7 +2269,7 @@ void XSDContentHandler::stateBindingStart(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateBindingEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateBindingEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert (!_objects.empty());
 	Types::Binding::Ptr pBinding = _objects.top().cast<Types::Binding>();
@@ -2280,7 +2280,7 @@ void XSDContentHandler::stateBindingEnd(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::stateSoapBindingStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSoapBindingStart(const std::string& uri, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_check_ptr (_pBinding);
 
@@ -2295,12 +2295,12 @@ void XSDContentHandler::stateSoapBindingStart(const std::string& uri, const std:
 }
 
 
-void XSDContentHandler::stateSoapBindingEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSoapBindingEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateSoapOperationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSoapOperationStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_assert (!_objects.empty());
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
@@ -2314,12 +2314,12 @@ void XSDContentHandler::stateSoapOperationStart(const std::string& uri, const st
 }
 
 
-void XSDContentHandler::stateSoapOperationEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSoapOperationEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateSoapHeaderStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSoapHeaderStart(const std::string& uri, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_assert (!_objects.empty());
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
@@ -2349,12 +2349,12 @@ void XSDContentHandler::stateSoapHeaderStart(const std::string& uri, const std::
 }
 
 
-void XSDContentHandler::stateSoapHeaderEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSoapHeaderEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateSoapHeaderFaultStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSoapHeaderFaultStart(const std::string& uri, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_assert (!_objects.empty());
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
@@ -2386,12 +2386,12 @@ void XSDContentHandler::stateSoapHeaderFaultStart(const std::string& uri, const 
 }
 
 
-void XSDContentHandler::stateSoapHeaderFaultEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSoapHeaderFaultEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateSoapBodyStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSoapBodyStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_assert (!_objects.empty());
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
@@ -2411,12 +2411,12 @@ void XSDContentHandler::stateSoapBodyStart(const std::string& uri, const std::st
 }
 
 
-void XSDContentHandler::stateSoapBodyEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSoapBodyEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateSoapFaultStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSoapFaultStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	poco_assert (!_objects.empty());
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
@@ -2436,12 +2436,12 @@ void XSDContentHandler::stateSoapFaultStart(const std::string& uri, const std::s
 }
 
 
-void XSDContentHandler::stateSoapFaultEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSoapFaultEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateServiceStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateServiceStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
@@ -2451,7 +2451,7 @@ void XSDContentHandler::stateServiceStart(const std::string& uri, const std::str
 }
 
 
-void XSDContentHandler::stateServiceEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateServiceEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert (!_objects.empty());
 	Types::Service::Ptr pService = _objects.top().cast<Types::Service>();
@@ -2461,7 +2461,7 @@ void XSDContentHandler::stateServiceEnd(const std::string& uri, const std::strin
 }
 
 
-void XSDContentHandler::statePortStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::statePortStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
@@ -2478,22 +2478,22 @@ void XSDContentHandler::statePortStart(const std::string& uri, const std::string
 }
 
 
-void XSDContentHandler::statePortEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::statePortEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateSoapAddressStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateSoapAddressStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& /*attrList*/)
 {
 }
 
 
-void XSDContentHandler::stateSoapAddressEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateSoapAddressEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 }
 
 
-void XSDContentHandler::stateWSDLDocumentationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
+void XSDContentHandler::stateWSDLDocumentationStart(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/, const CompactAttributes& attrList)
 {
 	//<documentation
 	//  source = anyURI
@@ -2513,7 +2513,7 @@ void XSDContentHandler::stateWSDLDocumentationStart(const std::string& uri, cons
 }
 
 
-void XSDContentHandler::stateWSDLDocumentationEnd(const std::string& uri, const std::string& localName, const std::string& qname)
+void XSDContentHandler::stateWSDLDocumentationEnd(const std::string& /*uri*/, const std::string& /*localName*/, const std::string& /*qname*/)
 {
 	poco_assert_dbg (!_annotContent.empty());
 	poco_assert_dbg (!_annot.empty());

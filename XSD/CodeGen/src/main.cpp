@@ -109,14 +109,14 @@ protected:
 				.callback(OptionCallback<GenApp>(this, &GenApp::handleGenerateAllBindings)));
 	}
 
-	void handleHelp(const std::string& name, const std::string& value)
+	void handleHelp(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_helpRequested = true;
 		displayHelp();
 		stopOptionsProcessing();
 	}
 
-	void handleConfig(const std::string& name, const std::string& value)
+	void handleConfig(const std::string& /*name*/, const std::string& value)
 	{
 		Poco::Path aPath(value);
 		aPath.makeAbsolute();
@@ -124,7 +124,7 @@ protected:
 		loadConfiguration(fullPath);
 	}
 
-	void handleGenerateAllBindings(const std::string& name, const std::string& value)
+	void handleGenerateAllBindings(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_generateAllBindings = true;
 	}
