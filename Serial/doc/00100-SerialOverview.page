@@ -1,0 +1,187 @@
+Serial Overview
+Serial
+
+!!!Introduction
+
+The <*Serial*> library (<*PocoSerial*>, namespace <[Poco::Serial]>) provides access to serial
+ports through a single class, <[Poco::Serial::SerialPort]>. A port is opened by device name and
+configured with a line speed, a character size, a parity setting, a number of stop bits and
+optional hardware (RTS/CTS) flow control. Incoming data is read through an internal buffer,
+while a write is passed straight to the device; the arrival of data can be awaited with a
+timeout, RTS can be driven manually, and RS-485 mode can be configured where the platform
+supports it.
+
+Unless a logger is passed to the constructor, the port writes its debug messages to the logger
+<[IO.SerialPort]>.
+
+Dependencies: Foundation.
+
+
+!!!Building Serial
+
+The CMake option <*ENABLE_SERIAL*> is on by default and off with <*POCO_MINIMAL_BUILD*>.
+
+    cmake -B build -DENABLE_SERIAL=ON
+    cmake --build build
+
+The library is not supported for the emscripten target. <*ENABLE_SERIAL*> is turned off
+automatically when building for emscripten, and turning it on for that target is not supported.
+
+
+!!!Reading from and Writing to a Port
+
+The constructor that takes a device name opens the port; the default constructor leaves it
+closed for a later call to <[open()]>, and a port that is not open throws
+<[Poco::IllegalStateException]>. <[isOpen()]> reports whether a port is open. The destructor
+closes the port.
+
+A <[SerialPort]> cannot be copied, but it can be moved. The move constructor takes over the
+device, the buffered input and the logger of the other port; move assignment takes over the
+device and the buffered input, and keeps the logger of the port that is assigned to, because
+that logger is a reference. The port that is moved from is left closed and without a buffer,
+so that only destroying it or assigning to it is supported; <[open()]> on it throws
+<[Poco::IllegalStateException]>.
+
+<[poll()]> waits for incoming data for up to the given <[Poco::Timespan]> and returns whether
+data is available. A negative timeout is treated as zero, so the call returns at once, and on
+Windows a positive wait shorter than a millisecond is rounded up to a millisecond, because a
+total read timeout of zero means to the driver that there is no timeout at all. Once
+<[poll()]> has returned <[true]> the data is in the internal buffer on Windows, while on POSIX
+platforms it is fetched by the following read, so <[available()]> may still be 0 there.
+
+<[read()]> without a timeout blocks until data arrives, for as long as the port stays
+connected. Because <[open()]> asks the device for at least one character per read, a read of
+zero bytes on an open port means that the peer has hung up, which is what unplugging a USB
+serial adapter does; all four <[read()]> overloads report it as <[Poco::IOException]>.
+<[write()]> is not buffered: it passes the data to the device and returns once all of it has
+been written.
+
+Data is read into an internal buffer of 4096 bytes, or of the size passed to the constructor;
+<[available()]> returns how much of it has not been read yet. A buffer size of zero is
+rejected with <[Poco::InvalidArgumentException]>.
+
+    #include "Poco/Serial/SerialPort.h"
+    #include "Poco/Timespan.h"
+    #include "Poco/Exception.h"
+    #include <iostream>
+    #include <string>
+
+    int main()
+    {
+        try
+        {
+            Poco::Serial::SerialPort port("/dev/ttyS0", 9600, "8N1");
+            port.write("AT\r");
+            if (port.poll(Poco::Timespan(2, 0)))
+            {
+                std::string response;
+                port.read(response);
+                std::cout << response << std::endl;
+            }
+            port.close();
+        }
+        catch (const Poco::Exception& exc)
+        {
+            std::cerr << exc.displayText() << std::endl;
+            return 1;
+        }
+        return 0;
+    }
+
+The program links with PocoSerial and PocoFoundation.
+
+
+!!!Exclusive Use and Concurrency
+
+On Windows a port is opened for exclusive use, so a second attempt to open the same device
+fails. POSIX platforms do not lock the device, so two ports can be open on it at the same
+time, and the bytes that arrive are then split between their readers.
+
+<[SerialPort]> is not thread-safe. <[read()]>, <[poll()]> and <[available()]> all work on the
+receive buffer, so one port must not be read from more than one thread at a time: two such
+calls can interleave and advance the buffer past its end. <[write()]>, <[drain()]> and
+<[setRTS()]> do not touch the buffer and may be called while another thread reads.
+
+On Windows the operations on one port are serialised, because the handle is not overlapped: a
+thread waiting in <[read()]> also delays a <[write()]>, <[drain()]> or <[setRTS()]> issued from
+another thread. On POSIX platforms a blocked read does not delay a write.
+
+
+!!!Device Names
+
+A device name is the name of the port's device file. On POSIX platforms it is something
+like <[/dev/ttyS0]>, <[/dev/ttyUSB0]> or <[/dev/tty.usbserial-XXX]>, on Windows <[COM1]>. A
+device name that does not already begin with a backslash is prefixed with \\.\ by the Windows
+implementation, so that port numbers above 9 work as well.
+
+
+!!!Line Parameters
+
+The parameters argument of <[open()]> is a string of three characters: the character size, the
+parity and the number of stop bits, for example <[8N1]> for eight bit characters, no parity and
+one stop bit. A string of any other length is rejected with <[Poco::InvalidArgumentException]>,
+and so is a character the platform does not accept. Parity may be given in upper or in lower
+case. The accepted characters differ between the platforms:
+
+  - POSIX: character size <[5]>, <[6]>, <[7]> or <[8]>; parity <[N]> (none), <[E]> (even) or
+    <[O]> (odd); <[1]> or <[2]> stop bits.
+  - Windows: the same character sizes; parity <[N]>, <[E]>, <[O]>, <[M]> (mark) or <[S]>
+    (space); <[1]> or <[2]> stop bits, and <[5]> in the third position for 1.5 stop bits.
+    Windows rejects 5 data bits with 2 stop bits, and 1.5 stop bits with 6, 7 or 8 data bits.
+
+A device can accept the request and apply only part of it. On POSIX platforms the character
+size, the parity and the number of stop bits are therefore read back once they have been set,
+and a difference from what was asked for makes <[open()]> throw <[Poco::IOException]>. The
+line speed is not read back, because a device may round it.
+
+The line speed is given in bits per second and differs between the platforms as well. POSIX
+accepts 50, 75, 110, 134, 150, 200, 300, 600, 1200, 1800, 2400, 4800, 9600, 19200, 38400,
+57600, 115200 and 230400, and 460800, 500000, 576000, 921600, 1000000, 1152000, 1500000,
+2000000, 2500000, 3000000, 3500000 and 4000000 where the platform defines them. Windows
+accepts 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600 and 115200. A speed
+of -1, the default, leaves the device at the speed it is configured for.
+
+
+!!!Draining the Output
+
+<[drain()]> waits for the output written to the port to be transmitted, and it takes no
+timeout: an application whose peer may stop reading needs a timeout of its own. On POSIX
+platforms it waits until the device has transmitted the pending output, and therefore blocks
+for as long as the receiver does not read it. On Windows it waits for the queued writes to
+complete, which does not guarantee that the transmit buffer of the device is empty, so
+switching the direction of an RS-485 transceiver immediately after <[drain()]> can truncate the
+end of the frame there; a driver that implements no flush at all returns without doing
+anything.
+
+
+!!!Manual RTS Control
+
+<[setRTS()]> raises or lowers the RTS line of an open port, except on Windows under
+<[FLOW_RTSCTS]>, where the driver owns the line and the call throws <[Poco::IOException]>.
+<[getRTS()]> reports the state of the line, but not in the same way on both platforms: on
+POSIX it reads the line from the device, while on Windows it returns the value that
+<[open()]> or the last call to <[setRTS()]> established.
+
+
+!!!RS-485 Mode
+
+<[configureRS485()]> enables and configures RS-485 mode. On platforms that have no interface
+for it at all, among them macOS and Windows, the call throws
+<[Poco::NotImplementedException]>; where the interface exists but the device refuses the
+request, which is what Linux does on hardware without RS-485 support, it throws
+<[Poco::IOException]>. <[SerialPort::RS485Params]> carries the flags, the RTS delays before and
+after sending, and the GPIO pin.
+
+The GPIO pin is passed to the kernel in the <[gpio_pin]> member of <[struct serial_rs485]>,
+which only a patched <[linux/serial.h]> provides (<[SER_RS485_USE_GPIO]>). With an unpatched
+header, building the library with the macro <*POCO_SERIAL_ENABLE_BEAGLEBONE_RS485_HACK*> passes
+the pin in the first padding field of that structure instead, which is where the BeagleBone
+kernel expects it.
+
+
+!!!Testing
+
+The test suite needs no serial hardware. Some of its cases touch no device at all; the others
+open a pseudo terminal, which has a termios line discipline and nothing behind it, and skip
+themselves with a warning where no pseudo terminal can be created. The cases that use a pseudo
+terminal are POSIX only.
