@@ -237,6 +237,7 @@ Poco::JSON::Object::Ptr SwaggerGenerator::createSchemaForType(const Poco::CppPar
 	bool isPtrType = GenUtility::isPtrType(resolvedType);
 	bool isOptionalType = GenUtility::isOptionalType(resolvedType);
 	bool isVectorType = GenUtility::isVectorType(resolvedType);
+	bool isUniqueVectorType = GenUtility::isUniqueVectorType(resolvedType);
 
 	if (isPtrType || isNullableType || isOptionalType || isVectorType)
 	{
@@ -275,7 +276,7 @@ Poco::JSON::Object::Ptr SwaggerGenerator::createSchemaForType(const Poco::CppPar
 		Poco::JSON::Object::Ptr pArraySchema = new Poco::JSON::Object(Poco::JSON_PRESERVE_KEY_ORDER);
 		pArraySchema->set("type"s, "array"s);
 		pArraySchema->set("items"s, pSchema);
-		if (GenUtility::isUniqueVectorType(resolvedType))
+		if (isUniqueVectorType)
 		{
 			pArraySchema->set("uniqueItems"s, true);
 		}
@@ -345,12 +346,13 @@ void SwaggerGenerator::createSchemaForObject(const Poco::CppParser::Struct* pStr
 	{
 		std::string propertyName;
 		bool isVector = false;
+		bool isUniqueVector = false;
 		bool isMandatory = true;
 		bool isNullable = false;
 		std::string resolvedType;
 		Poco::CodeGeneration::CodeGenerator::Properties varProps;
 		Poco::CodeGeneration::GeneratorEngine::parseProperties(member.second->second.first, varProps);
-		variableProperties(member.second->second.first, isVector, isMandatory, isNullable, propertyName, resolvedType);
+		variableProperties(member.second->second.first, isVector, isUniqueVector, isMandatory, isNullable, propertyName, resolvedType);
 		const Poco::CppParser::Symbol* pSymbol = Poco::CppParser::NameSpace::root()->lookup(resolvedType);
 		if (!pSymbol)
 		{
@@ -371,7 +373,7 @@ void SwaggerGenerator::createSchemaForObject(const Poco::CppParser::Struct* pStr
 			Poco::JSON::Object::Ptr pArraySchema = new Poco::JSON::Object(Poco::JSON_PRESERVE_KEY_ORDER);
 			pArraySchema->set("type"s, "array"s);
 			pArraySchema->set("items"s, pPropSchema);
-			if (GenUtility::isUniqueVectorType(resolvedType))
+			if (isUniqueVector)
 			{
 				pArraySchema->set("uniqueItems"s, true);
 			}
@@ -842,10 +844,11 @@ Poco::JSON::Object::Ptr SwaggerGenerator::createResponseBodyContent(const std::s
 	pContent->set(produces, pContentType);
 
 	bool isVector = false;
+	bool isUniqueVector = false;
 	bool isMandatory = false;
 	bool isNullable = false;
 	std::string resolvedType;
-	typeProperties(type, isVector, isMandatory, isNullable, resolvedType);
+	typeProperties(type, isVector, isUniqueVector, isMandatory, isNullable, resolvedType);
 
 	const Poco::CppParser::Symbol* pSymbol = Poco::CppParser::NameSpace::root()->lookup(resolvedType);
 	if (!pSymbol)
@@ -866,7 +869,7 @@ Poco::JSON::Object::Ptr SwaggerGenerator::createResponseBodyContent(const std::s
 		Poco::JSON::Object::Ptr pArraySchema = new Poco::JSON::Object(Poco::JSON_PRESERVE_KEY_ORDER);
 		pArraySchema->set("type"s, "array"s);
 		pArraySchema->set("items"s, pSchema);
-		if (GenUtility::isUniqueVectorType(resolvedType))
+		if (isUniqueVector)
 		{
 			pArraySchema->set("uniqueItems"s, true);
 		}
@@ -1021,11 +1024,11 @@ bool SwaggerGenerator::operationCanHaveBody(const std::string& name)
 }
 
 
-void SwaggerGenerator::variableProperties(const Poco::CppParser::Variable* pVar, bool& isVector, bool& isMandatory, bool& isNullable, std::string& name, std::string& resolvedType)
+void SwaggerGenerator::variableProperties(const Poco::CppParser::Variable* pVar, bool& isVector, bool& isUniqueVector, bool& isMandatory, bool& isNullable, std::string& name, std::string& resolvedType)
 {
 	const std::string& decl = pVar->declType();
 
-	typeProperties(decl, isVector, isMandatory, isNullable, resolvedType);
+	typeProperties(decl, isVector, isUniqueVector, isMandatory, isNullable, resolvedType);
 
 	isMandatory = isMandatory && GenUtility::getIsMandatory(pVar);
 	name = GenUtility::getVariableName(pVar);
@@ -1036,14 +1039,15 @@ void SwaggerGenerator::parameterProperties(const Poco::CppParser::Function* pFun
 {
 	const std::string& decl = pParam->declType();
 
-	typeProperties(decl, isVector, isMandatory, isNullable, resolvedType);
+	bool isUniqueVector = false;
+	typeProperties(decl, isVector, isUniqueVector, isMandatory, isNullable, resolvedType);
 
 	isMandatory = isMandatory && GenUtility::getIsMandatory(pFunc, pParam);
 	name = GenUtility::getParameterName(pFunc, pParam);
 }
 
 
-void SwaggerGenerator::typeProperties(const std::string& decl, bool& isVector, bool& isMandatory, bool& isNullable, std::string& resolvedType)
+void SwaggerGenerator::typeProperties(const std::string& decl, bool& isVector, bool& isUniqueVector, bool& isMandatory, bool& isNullable, std::string& resolvedType)
 {
 	resolvedType = decl;
 	std::string tmp;
@@ -1069,6 +1073,7 @@ void SwaggerGenerator::typeProperties(const std::string& decl, bool& isVector, b
 	}
 	poco_assert (!resolvedType.empty());
 	isVector = GenUtility::isVectorType(resolvedType);
+	isUniqueVector = isVector && GenUtility::isUniqueVectorType(resolvedType);
 	isNullable = GenUtility::isNullableType(resolvedType);
 	isMandatory = !GenUtility::isOptionalType(resolvedType);
 	bool isVectorOrOptional = isVector || !isMandatory || isNullable;

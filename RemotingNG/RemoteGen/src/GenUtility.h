@@ -150,11 +150,8 @@ private:
 	static const std::string VAL_REQUEST;
 	static const std::string VAL_REPLY;
 
-	static constexpr int KEYS_VECTOR_SIZE = 8;
-	static constexpr int KEYS_UNIQUE_VECTOR_SIZE = 4;
-
-	static const std::string KEYS_VECTOR[KEYS_VECTOR_SIZE];
-	static const std::string KEYS_UNIQUE_VECTOR[KEYS_UNIQUE_VECTOR_SIZE];
+	static const std::string KEYS_VECTOR[];
+	static const std::string KEYS_UNIQUE_VECTOR[];
 };
 
 
