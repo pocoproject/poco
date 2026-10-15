@@ -62,7 +62,7 @@ CppGen::CppGen(const std::map<std::string, SchemaInfo>& config, const std::strin
 CppGen::~CppGen() = default;
 
 
-void CppGen::visit(const Poco::XSD::Types::Annotation& ann)
+void CppGen::visit(const Poco::XSD::Types::Annotation& /*ann*/)
 {
 }
 
@@ -200,12 +200,12 @@ void CppGen::visit(const Poco::XSD::Types::Sequence& val)
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::Documentation& doc)
+void CppGen::visit(const Poco::XSD::Types::Documentation& /*doc*/)
 {
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::AppInfo& doc)
+void CppGen::visit(const Poco::XSD::Types::AppInfo& /*doc*/)
 {
 }
 
@@ -517,12 +517,12 @@ void CppGen::addVarToClass(ClassInfo& ci, const std::string& cppVarName, const s
 		mod = Variable::V_ISVECTOR;
 	if (recursiveDataStructure)
 	{
-		mod = (Variable::Modifiers)((int)mod|Variable::V_ISPOINTER);
+		mod = static_cast<Variable::Modifiers>(static_cast<int>(mod) | Variable::V_ISPOINTER);
 	}
 	Variable var(cppVarName, cppType,
-		Utility::AC_PRIVATE, (int)ci.getVariables().size(),
+		Utility::AC_PRIVATE, static_cast<int>(ci.getVariables().size()),
 		mod, isOptional, isNillable);
-	var.insert("order", Poco::NumberFormatter::format((int)ci.getVariables().size()));
+	var.insert("order", Poco::NumberFormatter::format(static_cast<int>(ci.getVariables().size())));
 	var.insert("name", xsdName);
 	if (typeAttr != "elem") var.insert("type", typeAttr);
 	if (isOptional) var.insert("mandatory", "false");
@@ -537,7 +537,7 @@ void CppGen::addVarToClass(ClassInfo& ci, const std::string& cppVarName, const s
 		modMethod = Variable::V_ISCONSTREFVECTOR;
 	if (recursiveDataStructure)
 	{
-		modMethod = (Variable::Modifiers)((int)modMethod | Variable::V_ISPOINTER);
+		modMethod = static_cast<Variable::Modifiers>(static_cast<int>(modMethod) | Variable::V_ISPOINTER);
 	}
 
 	// also add getter/setter for the member var
@@ -557,7 +557,7 @@ void CppGen::addVarToClass(ClassInfo& ci, const std::string& cppVarName, const s
 	if (!isFixedValue && !var.getType().isScalar())
 	{
 		MethodInfo miSetMove(Utility::setterMethodName(cppVarName), Utility::AC_PUBLIC, false, false, false, false);
-		miSetMove.addParameter(Parameter("val", var.getType(), 0, (Variable::Modifiers)(modMethod | Variable::V_ISRVREF), var.isOptional(), false, var.isNillable()));
+		miSetMove.addParameter(Parameter("val", var.getType(), 0, static_cast<Variable::Modifiers>(modMethod | Variable::V_ISRVREF), var.isOptional(), false, var.isNillable()));
 		miSetMove.addCode(var.getName() + " = std::move(val);");
 		ci.addMethod(miSetMove);
 	}
@@ -566,7 +566,7 @@ void CppGen::addVarToClass(ClassInfo& ci, const std::string& cppVarName, const s
 	{
 		modMethod = Variable::V_ISREFVECTOR;
 		if (recursiveDataStructure)
-			modMethod = (Variable::Modifiers)((int)modMethod | Variable::V_ISPOINTER);
+			modMethod = static_cast<Variable::Modifiers>(static_cast<int>(modMethod) | Variable::V_ISPOINTER);
 		MethodInfo miGetVector(Utility::getterMethodName(cppVarName), Utility::AC_PUBLIC, false, false, false, false);
 		miGetVector.setReturnParameter(new Parameter("", var.getType(), 0, modMethod, var.isOptional(), false, var.isNillable()));
 		miGetVector.addCode("return " + var.getName() + ";");
@@ -658,13 +658,13 @@ void CppGen::visit(const Poco::XSD::Types::All& val)
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::Any& val)
+void CppGen::visit(const Poco::XSD::Types::Any& /*val*/)
 {
 	// xs:any is not mapped to C++.
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::AnyAttribute& val)
+void CppGen::visit(const Poco::XSD::Types::AnyAttribute& /*val*/)
 {
 	// xs:anyAttribute is not mapped to C++.
 }
@@ -683,12 +683,12 @@ void CppGen::visit(const Poco::XSD::Types::Choice& val)
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::Notation& val)
+void CppGen::visit(const Poco::XSD::Types::Notation& /*val*/)
 {
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::Union& val)
+void CppGen::visit(const Poco::XSD::Types::Union& /*val*/)
 {
 	throw Poco::NotImplementedException("union not supported");
 }
@@ -701,25 +701,25 @@ void CppGen::visit(const Poco::XSD::Types::InheritanceInfo& val)
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::List& val)
+void CppGen::visit(const Poco::XSD::Types::List& /*val*/)
 {
 	throw Poco::NotImplementedException("list not reachable");
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::ListTypeRef& val)
+void CppGen::visit(const Poco::XSD::Types::ListTypeRef& /*val*/)
 {
 	throw Poco::NotImplementedException("listtyperef not reachable");
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::SimpleRestriction& val)
+void CppGen::visit(const Poco::XSD::Types::SimpleRestriction& /*val*/)
 {
 	throw Poco::NotImplementedException("SimpleRestriction not reachable");
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::SimpleRestrictionInlineType& val)
+void CppGen::visit(const Poco::XSD::Types::SimpleRestrictionInlineType& /*val*/)
 {
 	throw Poco::NotImplementedException("SimpleRestrictionInlineType not reachable");
 }
@@ -753,12 +753,12 @@ void CppGen::visit(const Poco::XSD::Types::Definitions& val)
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::Message& val)
+void CppGen::visit(const Poco::XSD::Types::Message& /*val*/)
 {
 }
 
 
-void CppGen::visit(const Poco::XSD::Types::Operation& val)
+void CppGen::visit(const Poco::XSD::Types::Operation& /*val*/)
 {
 }
 
