@@ -63,11 +63,15 @@ public:
 			/// GPIO pin to use if RS485_USE_GPIO flag is set.
 	};
 
+	SerialPortImpl(const SerialPortImpl&) = delete;
+	SerialPortImpl& operator = (const SerialPortImpl&) = delete;
+
+protected:
 	SerialPortImpl() = default;
 	~SerialPortImpl() = default;
 
-	SerialPortImpl(const SerialPortImpl&) = delete;
-	SerialPortImpl& operator = (const SerialPortImpl&) = delete;
+	SerialPortImpl(SerialPortImpl&& other) noexcept;
+	SerialPortImpl& operator = (SerialPortImpl&& other) noexcept;
 
 	void openImpl(const std::string& device, int baudRate, const std::string& parameters, FlowControlImpl flowControl);
 	void closeImpl();
@@ -78,8 +82,8 @@ public:
 	void setRTSImpl(bool status);
 	[[nodiscard]] bool getRTSImpl() const;
 	[[nodiscard]] int pollImpl(char* data, std::size_t size, const Poco::Timespan& timeout);
-	[[nodiscard]] int readImpl(char* data, std::size_t size);
-	[[nodiscard]] int writeImpl(const char* data, std::size_t size);
+	int readImpl(char* data, std::size_t size);
+	int writeImpl(const char* data, std::size_t size);
 
 private:
 	int _fd = -1;
