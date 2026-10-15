@@ -27,9 +27,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 const std::string Serializer::SOAPPREFIX("soap");
@@ -88,8 +86,8 @@ Serializer::Serializer(int options):
 	handleStartElementNil(&Serializer::handleStartElementNilImpl),
 	handleStartElementInclude(&Serializer::handleStartElementIncludeImpl),
 	_documentStarted(false),
-	_pStream(0),
-	_pMultipartWriter(0),
+	_pStream(nullptr),
+	_pMultipartWriter(nullptr),
 	_declareEnvelopeNamespace(false)
 {
 }
@@ -107,16 +105,14 @@ Serializer::Serializer(SOAPVersion soapVersion, int options):
 	handleStartElementNil(&Serializer::handleStartElementNilImpl),
 	handleStartElementInclude(&Serializer::handleStartElementIncludeImpl),
 	_documentStarted(false),
-	_pStream(0),
-	_pMultipartWriter(0),
+	_pStream(nullptr),
+	_pMultipartWriter(nullptr),
 	_declareEnvelopeNamespace(false)
 {
 }
 
 
-Serializer::~Serializer()
-{
-}
+Serializer::~Serializer() = default;
 
 
 void Serializer::addHeaderInterceptor(HeaderInterceptor::Ptr pInterceptor)
@@ -247,12 +243,12 @@ void Serializer::serializeMessageEnd(const std::string& name, Poco::RemotingNG::
 			writeParts();
 			_pMultipartWriter->close();
 			delete _pMultipartWriter;
-			_pMultipartWriter = 0;
+			_pMultipartWriter = nullptr;
 			_parts.clear();
 		}
 		_pStream->flush();
-		_pStream = 0;
-		_pXMLWriter.reset(0);
+		_pStream = nullptr;
+		_pXMLWriter.reset(nullptr);
 	}
 }
 
@@ -340,7 +336,7 @@ void Serializer::serializeFaultMessage(const std::string& /*name*/, const Poco::
 	_pXMLWriter->endPrefixMapping(SOAPPREFIX);
 	_pXMLWriter->endPrefixMapping(REMOTINGPREFIX);
 	_pXMLWriter->endDocument();
-	_pXMLWriter.reset(0);
+	_pXMLWriter.reset(nullptr);
 }
 
 
@@ -590,7 +586,7 @@ void Serializer::handleStartElementXml(const std::string& name, const std::strin
 				if (!_pDelayed->value.empty())
 					_pXMLWriter->characters(_pDelayed->value);
 			}
-			_pDelayed = 0;
+			_pDelayed = nullptr;
 		}
 	}
 	else isElem = true;
@@ -640,7 +636,7 @@ void Serializer::handleStartElementXml(const std::string& name, const std::strin
 				_pXMLWriter->characters(_pDelayed->value);
 			if (_pDelayed->simpleElem)
 				_pXMLWriter->endElement(_pDelayed->nameSpace, _pDelayed->name, EMPTYSTRING);
-			_pDelayed = 0;
+			_pDelayed = nullptr;
 		}
 	}
 }
@@ -727,7 +723,7 @@ void Serializer::handleEndElementComplexXml(const std::string& name)
 			_pXMLWriter->startElement(_pDelayed->nameSpace, _pDelayed->name, EMPTYSTRING, _pDelayed->attr);
 			_pXMLWriter->endElement(_pDelayed->nameSpace, _pDelayed->name, EMPTYSTRING);
 		}
-		_pDelayed = 0;
+		_pDelayed = nullptr;
 	}
 }
 
@@ -865,13 +861,13 @@ void Serializer::setupImpl(std::ostream& out)
 void Serializer::resetImpl()
 {
 	delete _pMultipartWriter;
-	_pMultipartWriter = 0;
+	_pMultipartWriter = nullptr;
 	_parts.clear();
-	_pXMLWriter.reset(0);
+	_pXMLWriter.reset(nullptr);
 	_attr.clear();
 	_headerElements.clear();
 	_depth = 0;
-	_pRoot = 0;
+	_pRoot = nullptr;
 	handleStartElement = &Serializer::handleStartElementImpl;
 	handleStartElementComplex = &Serializer::handleStartElementComplexImpl;
 	handleEndElementComplex = &Serializer::handleEndElementComplexImpl;
@@ -1148,4 +1144,4 @@ Serializer::DelayedElement Serializer::delayElement(const XMLElement& element)
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

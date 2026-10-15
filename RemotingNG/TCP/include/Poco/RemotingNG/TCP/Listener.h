@@ -32,9 +32,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API Listener: public Poco::RemotingNG::EventListener
@@ -94,7 +92,7 @@ public:
 		/// Poco::Net::SecureServerSocket in order to set up
 		/// a secure connection.
 
-	~Listener();
+	~Listener() override;
 		/// Destroys the Listener.
 
 	void setTimeout(Poco::Timespan timeout);
@@ -145,17 +143,17 @@ public:
 		/// already been set.
 
 	// Poco::RemotingNG::EventListener
-	[[nodiscard]] std::string subscribeToEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber);
-	void unsubscribeFromEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber);
+	[[nodiscard]] std::string subscribeToEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber) override;
+	void unsubscribeFromEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber) override;
 
 	// Poco::RemotingNG::Listener
-	void start();
-	void stop();
-	[[nodiscard]] const std::string& protocol() const;
-	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
-	[[nodiscard]] bool handlesURI(const std::string& uri);
-	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton);
-	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject);
+	void start() override;
+	void stop() override;
+	[[nodiscard]] const std::string& protocol() const override;
+	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId) override;
+	[[nodiscard]] bool handlesURI(const std::string& uri) override;
+	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton) override;
+	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject) override;
 
 	// internal
 	[[nodiscard]] Poco::RemotingNG::EventSubscriber::Ptr findEventSubscriber(const std::string& path) const;
@@ -164,12 +162,9 @@ protected:
 	void registerEventFrameHandler(Connection::Ptr pConnection);
 
 private:
-	enum
-	{
-		DEFAULT_TIMEOUT = 30,
-		DEFAULT_HANDSHAKE_TIMEOUT = 8,
-		DEFAULT_EVENT_SUBSCR_TIMEOUT = 60
-	};
+	static constexpr long DEFAULT_TIMEOUT = 30;
+	static constexpr long DEFAULT_HANDSHAKE_TIMEOUT = 8;
+	static constexpr long DEFAULT_EVENT_SUBSCR_TIMEOUT = 60;
 
 	class RemotingNGTCP_API EventSubscription: public TimerTask
 	{
@@ -177,9 +172,9 @@ private:
 		using Ptr = Poco::AutoPtr<EventSubscription>;
 
 		EventSubscription(Listener& listener, const std::string& uri, Poco::UInt32 id);
-		void run();
-		const std::string& uri() const;
-		const std::string& path() const;
+		void run() override;
+		[[nodiscard]] const std::string& uri() const;
+		[[nodiscard]] const std::string& path() const;
 
 	private:
 		Listener& _listener;
@@ -211,7 +206,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_Listener_INCLUDED

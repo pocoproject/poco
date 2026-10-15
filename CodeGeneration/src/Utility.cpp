@@ -29,8 +29,7 @@
 #include <cctype>
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 const std::string Utility::HFILEEXTENSION(".h");
@@ -451,8 +450,8 @@ std::string Utility::resolveTypeImpl(const Poco::CppParser::NameSpace* pParent, 
 		// inner type of a map: int, std::map<std::string, int>
 		// parse that
 		int openTemplates = 0;
-		int end = 0;
-		for (int i = 0; i < innerType.size(); ++i)
+		std::size_t end = 0;
+		for (std::size_t i = 0; i < innerType.size(); ++i)
 		{
 			if (innerType[i] == '<')
 				openTemplates++;
@@ -550,7 +549,7 @@ void Utility::writeNameSpaceBegin(std::ostream& out, const std::string& nameSpac
 	if (!nameSpace.empty())
 	{
 		Poco::StringTokenizer aTok(nameSpace, ":", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
-		int nsCnt = (int)aTok.count();
+		int nsCnt = static_cast<int>(aTok.count());
 
 		for (int i = 0; i < nsCnt; ++i)
 		{
@@ -565,7 +564,7 @@ void Utility::writeNameSpaceEnd(std::ostream& out, const std::string& nameSpace)
 	if (!nameSpace.empty())
 	{
 		Poco::StringTokenizer aTok(nameSpace, ":", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
-		int nsCnt = (int)aTok.count();
+		int nsCnt = static_cast<int>(aTok.count());
 
 		for (int i = 0; i < nsCnt; ++i)
 		{
@@ -595,4 +594,4 @@ void Utility::writeDocumentation(std::ostream& out, const std::string& docu, int
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration

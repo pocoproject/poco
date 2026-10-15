@@ -15,8 +15,7 @@
 #include "Poco/RemotingNG/EventListener.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 EventListener::EventListener(const std::string& endPoint):
@@ -25,9 +24,7 @@ EventListener::EventListener(const std::string& endPoint):
 }
 
 
-EventListener::~EventListener()
-{
-}
+EventListener::~EventListener() = default;
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

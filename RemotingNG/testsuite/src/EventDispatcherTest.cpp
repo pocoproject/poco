@@ -82,9 +82,7 @@ EventDispatcherTest::EventDispatcherTest(const std::string& name): CppUnit::Test
 }
 
 
-EventDispatcherTest::~EventDispatcherTest()
-{
-}
+EventDispatcherTest::~EventDispatcherTest() = default;
 
 
 void EventDispatcherTest::setUp()

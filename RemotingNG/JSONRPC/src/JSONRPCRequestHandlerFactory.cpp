@@ -17,9 +17,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 JSONRPCRequestHandlerFactory::JSONRPCRequestHandlerFactory(Listener& listener):
@@ -28,15 +26,13 @@ JSONRPCRequestHandlerFactory::JSONRPCRequestHandlerFactory(Listener& listener):
 }
 
 
-JSONRPCRequestHandlerFactory::~JSONRPCRequestHandlerFactory()
-{
-}
+JSONRPCRequestHandlerFactory::~JSONRPCRequestHandlerFactory() = default;
 
 
-Poco::Net::HTTPRequestHandler* JSONRPCRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+Poco::Net::HTTPRequestHandler* JSONRPCRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& /*request*/)
 {
 	return new JSONRPCRequestHandler(_listener);
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

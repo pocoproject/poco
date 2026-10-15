@@ -27,7 +27,7 @@ class RemotingTest: public CppUnit::TestCase
 {
 public:
 	RemotingTest(const std::string& name);
-	~RemotingTest();
+	~RemotingTest() override;
 	
 	void testRegistration();
 	void testPost();
@@ -37,8 +37,8 @@ public:
 	void testCookie();
 	void testFault();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 protected:
 	virtual ITester::Ptr createProxy(const std::string& uri);
@@ -55,9 +55,9 @@ class RemotingTestREST: public RemotingTest
 {
 public:
 	RemotingTestREST(const std::string& name);
-	~RemotingTestREST();
+	~RemotingTestREST() override;
 
-	void setUp();
+	void setUp() override;
 
 	static CppUnit::Test* suite();
 };
@@ -67,14 +67,14 @@ class RemotingTestRESTCompressed: public RemotingTest
 {
 public:
 	RemotingTestRESTCompressed(const std::string& name);
-	~RemotingTestRESTCompressed();
+	~RemotingTestRESTCompressed() override;
 
-	void setUp();
+	void setUp() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -82,14 +82,14 @@ class RemotingTestRESTChunked: public RemotingTest
 {
 public:
 	RemotingTestRESTChunked(const std::string& name);
-	~RemotingTestRESTChunked();
+	~RemotingTestRESTChunked() override;
 
-	void setUp();
+	void setUp() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -97,14 +97,14 @@ class RemotingTestRESTChunkedCompressed: public RemotingTest
 {
 public:
 	RemotingTestRESTChunkedCompressed(const std::string& name);
-	~RemotingTestRESTChunkedCompressed();
+	~RemotingTestRESTChunkedCompressed() override;
 
-	void setUp();
+	void setUp() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -112,17 +112,17 @@ class RemotingTestRESTAuth: public RemotingTest
 {
 public:
 	RemotingTestRESTAuth(const std::string& name);
-	~RemotingTestRESTAuth();
+	~RemotingTestRESTAuth() override;
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	void testUnauthorized();
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 	ITester::Ptr createUnauthorizedProxy(const std::string& uri);
 	
 private:
@@ -134,7 +134,7 @@ class RemotingTestAuth: public CppUnit::TestCase
 {
 public:
 	RemotingTestAuth(const std::string& name);
-	~RemotingTestAuth();
+	~RemotingTestAuth() override;
 	
 	void testAuthenticatedGoodCredentials();
 	void testAuthenticatedNoCredentials();
@@ -144,8 +144,8 @@ public:
 	void testPermission();
 	void testNoPermission();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

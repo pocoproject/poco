@@ -16,22 +16,17 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 const std::string BinarySerializer::MESSAGE_START_TAG("!msg");
 const std::string BinarySerializer::MESSAGE_END_TAG("!eom");
 
 
-BinarySerializer::BinarySerializer()
-{
-}
+BinarySerializer::BinarySerializer() = default;
 
 
-BinarySerializer::~BinarySerializer()
-{
-}
+BinarySerializer::~BinarySerializer() = default;
 
 
 void BinarySerializer::serializeEndPoint(const std::string& oid, const std::string& tid)
@@ -231,4 +226,4 @@ void BinarySerializer::setupImpl(std::ostream& ostr)
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

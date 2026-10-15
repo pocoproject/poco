@@ -22,9 +22,7 @@
 #include "Poco/RemotingNG/REST/JSValue.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API RESTServerException: public Poco::RemotingNG::RemoteException
@@ -41,22 +39,22 @@ public:
 	RESTServerException(const RESTServerException& exc);
 		/// Creates a new RESTServerException from another one.
 
-	~RESTServerException() noexcept;
+	~RESTServerException() noexcept override;
 		/// Destroy the exception.
 
 	RESTServerException& operator = (const RESTServerException& exc);
 		/// Assignment operator.
 
-	[[nodiscard]] const char* name() const noexcept;
+	[[nodiscard]] const char* name() const noexcept override;
 		/// Returns a static string describing the exception.
 
-	[[nodiscard]] const char* className() const noexcept;
+	[[nodiscard]] const char* className() const noexcept override;
 		/// Returns the name of the exception class.
 
-	[[nodiscard]] Poco::Exception* clone() const;
+	[[nodiscard]] Poco::Exception* clone() const override;
 		/// Creates an exact copy of the exception.
 
-	[[noreturn]] void rethrow() const;
+	[[noreturn]] void rethrow() const override;
 		/// (Re)Throws the exception.
 
 	[[nodiscard]] const std::string& reason() const;
@@ -105,7 +103,7 @@ inline JSValue::Ptr RESTServerException::content() const
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_RESTServerException_INCLUDED

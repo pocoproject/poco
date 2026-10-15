@@ -27,8 +27,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API Listener: public Poco::RefCountedObject
@@ -44,8 +43,11 @@ public:
 		/// Takes a local endpoint address as input. For network based listener, this will
 		/// typically be a port number or socket address in the form <host>:<port>.
 
-	virtual ~Listener();
+	~Listener() override;
 		/// Destroys the Listener.
+
+	Listener(const Listener&) = delete;
+	Listener& operator = (const Listener&) = delete;
 
 	virtual void start() = 0;
 		/// Start accepting requests.
@@ -130,10 +132,6 @@ public:
 		/// Returns the Authorizer instance for this Listener.
 
 private:
-	Listener(const Listener&);
-	Listener& operator = (const Listener&);
-
-private:
 	std::string _endPoint;
 	Authenticator::Ptr _pAuthenticator;
 	Authorizer::Ptr _pAuthorizer;
@@ -161,7 +159,7 @@ inline Authorizer::Ptr Listener::getAuthorizer() const
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Listener_INCLUDED

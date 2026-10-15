@@ -23,8 +23,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class Transport;
@@ -39,7 +38,7 @@ public:
 	TransportFactory();
 		/// Creates a TransportFactory.
 
-	virtual ~TransportFactory();
+	~TransportFactory() override;
 		/// Destroys the TransportFactory.
 
 	[[nodiscard]] virtual Transport* createTransport() = 0;
@@ -47,7 +46,7 @@ public:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_TransportFactory_INCLUDED

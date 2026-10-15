@@ -15,27 +15,22 @@
 #include "Poco/RemotingNG/ServerTransport.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-ServerTransport::ServerTransport()
-{
-}
+ServerTransport::ServerTransport() = default;
 
 
-ServerTransport::~ServerTransport()
-{
-}
+ServerTransport::~ServerTransport() = default;
 
 
-bool ServerTransport::authorize(const std::string& method, const std::string& permission)
+bool ServerTransport::authorize(const std::string& /*method*/, const std::string& /*permission*/)
 {
 	return true;
 }
 
 
-bool ServerTransport::authenticate(const std::string& method)
+bool ServerTransport::authenticate(const std::string& /*method*/)
 {
 	return true;
 }
@@ -46,4 +41,4 @@ void ServerTransport::reportException(const std::string& /* method */, const Poc
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

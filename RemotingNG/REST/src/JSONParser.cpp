@@ -21,9 +21,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class DepthGuard
@@ -51,9 +49,7 @@ JSONParser::JSONParser(std::istream& istr):
 }
 
 
-JSONParser::~JSONParser()
-{
-}
+JSONParser::~JSONParser() = default;
 
 
 JSValue::Ptr JSONParser::parse()
@@ -242,4 +238,4 @@ int JSONParser::skipWhitespace(int ch)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

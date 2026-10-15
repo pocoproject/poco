@@ -34,9 +34,7 @@ ServerHelperGenerator::ServerHelperGenerator(Poco::CodeGeneration::CppGenerator&
 }
 
 
-ServerHelperGenerator::~ServerHelperGenerator()
-{
-}
+ServerHelperGenerator::~ServerHelperGenerator() = default;
 
 
 std::string ServerHelperGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)
@@ -91,17 +89,17 @@ void ServerHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	pRegObj->addDocumentation(" ");
 	pRegObj->addDocumentation("	Returns the URI created for the object.");
 
-	Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", 0);
-	Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", 0);
-	Poco::CppParser::Parameter* pParam3= new Poco::CppParser::Parameter("const std::string& listenerId", 0);
+	Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", nullptr);
+	Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", nullptr);
+	Poco::CppParser::Parameter* pParam3= new Poco::CppParser::Parameter("const std::string& listenerId", nullptr);
 	pRegObj->addParameter(pParam1);
 	pRegObj->addParameter(pParam2);
 	pRegObj->addParameter(pParam3);
 
 	pRegObj = new Poco::CppParser::Function("std::string registerObjectImpl", _pStruct);
 	pRegObj->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1 = new Poco::CppParser::Parameter("Poco::AutoPtr<" + roName + "> pRemoteObject", 0);
-	pParam3 = new Poco::CppParser::Parameter("const std::string& listenerId", 0);
+	pParam1 = new Poco::CppParser::Parameter("Poco::AutoPtr<" + roName + "> pRemoteObject", nullptr);
+	pParam3 = new Poco::CppParser::Parameter("const std::string& listenerId", nullptr);
 	pRegObj->addParameter(pParam1);
 	pRegObj->addParameter(pParam3);
 
@@ -112,34 +110,34 @@ void ServerHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	pRegObj->addDocumentation(" uniquely identified by the Listener's ID.");
 	pRegObj->addDocumentation(" ");
 	pRegObj->addDocumentation("	Returns the URI created for the object.");
-	pParam1 = new Poco::CppParser::Parameter("Poco::AutoPtr<" + roName + "> pRemoteObject", 0);
-	pParam3 = new Poco::CppParser::Parameter("const std::string& listenerId", 0);
+	pParam1 = new Poco::CppParser::Parameter("Poco::AutoPtr<" + roName + "> pRemoteObject", nullptr);
+	pParam3 = new Poco::CppParser::Parameter("const std::string& listenerId", nullptr);
 	pRegObj->addParameter(pParam1);
 	pRegObj->addParameter(pParam3);
 
 	Poco::CppParser::Function* pUnregObj = new Poco::CppParser::Function("static void unregisterObject", _pStruct);
 	pUnregObj->makeInline();
 	pUnregObj->addDocumentation(" Unregisters a service object identified by URI from the ORB.");
-	pParam1 = new Poco::CppParser::Parameter("const std::string& uri", 0);
+	pParam1 = new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 	pUnregObj->addParameter(pParam1);
 
 	pUnregObj = new Poco::CppParser::Function("void unregisterObjectImpl", _pStruct);
 	pUnregObj->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1 = new Poco::CppParser::Parameter("const std::string& uri", 0);
+	pParam1 = new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 	pUnregObj->addParameter(pParam1);
 
 	Poco::CppParser::Function* pCreateObj = new Poco::CppParser::Function("static Poco::AutoPtr<" + roName + "> createRemoteObject", _pStruct);
 	pCreateObj->makeInline();
 	pCreateObj->addDocumentation(" Creates and returns a RemoteObject wrapper for the given " + pStruct->fullName() + " instance.");
-	pParam1 = new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", 0);
-	pParam2 = new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", 0);
+	pParam1 = new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", nullptr);
+	pParam2 = new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", nullptr);
 	pCreateObj->addParameter(pParam1);
 	pCreateObj->addParameter(pParam2);
 
 	pCreateObj = new Poco::CppParser::Function("static Poco::AutoPtr<" + roName + "> createRemoteObjectImpl", _pStruct);
 	pCreateObj->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1 = new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", 0);
-	pParam2 = new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", 0);
+	pParam1 = new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", nullptr);
+	pParam2 = new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", nullptr);
 	pCreateObj->addParameter(pParam1);
 	pCreateObj->addParameter(pParam2);
 
@@ -155,16 +153,16 @@ void ServerHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 		pEnableEvents->addDocumentation("");
 		pEnableEvents->addDocumentation(" Events will be delivered using the Transport for the given protocol.");
 		pEnableEvents->addDocumentation(" Can be called multiple times for the same URI with different protocols.");
-		pParam1 = new Poco::CppParser::Parameter("const std::string& uri", 0);
+		pParam1 = new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 		pEnableEvents->addParameter(pParam1);
-		pParam2 = new Poco::CppParser::Parameter("const std::string& protocol", 0);
+		pParam2 = new Poco::CppParser::Parameter("const std::string& protocol", nullptr);
 		pEnableEvents->addParameter(pParam2);
 
 		pEnableEvents = new Poco::CppParser::Function("void enableEventsImpl", _pStruct);
 		pEnableEvents->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-		pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
+		pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 		pEnableEvents->addParameter(pParam1);
-		pParam2= new Poco::CppParser::Parameter("const std::string& protocol", 0);
+		pParam2= new Poco::CppParser::Parameter("const std::string& protocol", nullptr);
 		pEnableEvents->addParameter(pParam2);
 	}
 
@@ -205,7 +203,7 @@ void ServerHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 }
 
 
-void ServerHelperGenerator::methodStart(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+void ServerHelperGenerator::methodStart(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
@@ -232,7 +230,7 @@ void ServerHelperGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEng
 }
 
 
-std::vector<std::string> ServerHelperGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> ServerHelperGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	// no base classes for this one
 	std::vector<std::string> bases;
@@ -241,7 +239,7 @@ std::vector<std::string> ServerHelperGenerator::newBaseClasses(const Poco::CppPa
 }
 
 
-void ServerHelperGenerator::singletonHolder(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::singletonHolder(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	std::string code("namespace\n");
 	code.append("{\n");
@@ -255,7 +253,7 @@ void ServerHelperGenerator::singletonHolder(const Poco::CppParser::Function* pFu
 }
 
 
-void ServerHelperGenerator::helperSpecialization(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::helperSpecialization(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& /*gen*/, void* addParam)
 {
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
 	ServerHelperGenerator* pGen = dynamic_cast<ServerHelperGenerator*>(pAGen);
@@ -273,19 +271,19 @@ void ServerHelperGenerator::helperSpecialization(const Poco::CppParser::Function
 }
 
 
-void ServerHelperGenerator::constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::constructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("_pORB = &Poco::RemotingNG::ORB::instance();");
 	gen.writeMethodImplementation("registerSkeleton();");
 }
 
 
-void ServerHelperGenerator::destructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::destructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& /*gen*/, void* /*addParam*/)
 {
 }
 
 
-void ServerHelperGenerator::registerSkeletonCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::registerSkeletonCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -302,7 +300,7 @@ void ServerHelperGenerator::registerSkeletonCodeGen(const Poco::CppParser::Funct
 }
 
 
-void ServerHelperGenerator::unregisterSkeletonCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::unregisterSkeletonCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -317,13 +315,13 @@ void ServerHelperGenerator::unregisterSkeletonCodeGen(const Poco::CppParser::Fun
 }
 
 
-void ServerHelperGenerator::registerRemoteObjectCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::registerRemoteObjectCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("return " + pStruct->name() + "::instance().registerObjectImpl(pRemoteObject, listenerId);");
 }
 
 
-void ServerHelperGenerator::registerObjectCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::registerObjectCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -336,7 +334,7 @@ void ServerHelperGenerator::registerObjectCodeGen(const Poco::CppParser::Functio
 }
 
 
-void ServerHelperGenerator::registerObjectImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::registerObjectImplCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -346,13 +344,13 @@ void ServerHelperGenerator::registerObjectImplCodeGen(const Poco::CppParser::Fun
 }
 
 
-void ServerHelperGenerator::instanceCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::instanceCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("return *sh" + pStruct->name() + ".get();");
 }
 
 
-void ServerHelperGenerator::unregisterObjectCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::unregisterObjectCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -362,14 +360,14 @@ void ServerHelperGenerator::unregisterObjectCodeGen(const Poco::CppParser::Funct
 }
 
 
-void ServerHelperGenerator::unregisterObjectImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::unregisterObjectImplCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	std::string regLine("_pORB->unregisterObject(uri);");
 	gen.writeMethodImplementation(regLine);
 }
 
 
-void ServerHelperGenerator::createRemoteObjectCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::createRemoteObjectCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -379,7 +377,7 @@ void ServerHelperGenerator::createRemoteObjectCodeGen(const Poco::CppParser::Fun
 }
 
 
-void ServerHelperGenerator::createRemoteObjectImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::createRemoteObjectImplCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -416,7 +414,7 @@ void ServerHelperGenerator::createRemoteObjectImplCodeGen(const Poco::CppParser:
 }
 
 
-void ServerHelperGenerator::shutdownCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::shutdownCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -427,7 +425,7 @@ void ServerHelperGenerator::shutdownCodeGen(const Poco::CppParser::Function* pFu
 }
 
 
-void ServerHelperGenerator::enableEventsCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::enableEventsCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -437,7 +435,7 @@ void ServerHelperGenerator::enableEventsCodeGen(const Poco::CppParser::Function*
 }
 
 
-void ServerHelperGenerator::enableEventsImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ServerHelperGenerator::enableEventsImplCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);

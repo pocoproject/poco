@@ -25,9 +25,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API SCRAMAuthenticator: public Authenticator
@@ -60,11 +58,11 @@ public:
 	SCRAMAuthenticator();
 		/// Creates the SCRAMAuthenticator.
 
-	~SCRAMAuthenticator();
+	~SCRAMAuthenticator() override;
 		/// Destroys the SCRAMAuthenticator.
 
 	// Authenticator
-	[[nodiscard]] AuthenticateResult authenticate(const Credentials& credentials, Poco::UInt32 conversationID);
+	[[nodiscard]] AuthenticateResult authenticate(const Credentials& credentials, Poco::UInt32 conversationID) override;
 
 	// Utility methods
 	[[nodiscard]] static std::string createNonce();
@@ -100,30 +98,26 @@ protected:
 	{
 		using Ptr = Poco::SharedPtr<Conversation>;
 
-		Conversation():
-			state(STATE_INIT),
-			iterations(0)
-		{
-		}
+		Conversation() = default;
 
-		State state;
+		State state = STATE_INIT;
 		std::string username;
 		std::string clientNonce;
 		std::string serverNonce;
 		std::string salt;
-		int iterations;
+		int iterations = 0;
 	};
 
 	using ConversationCache = Poco::ExpireCache<Poco::UInt32, Conversation>;
 
 private:
 	ConversationCache _conversations;
-	Poco::UInt32 _nextConversationID;
+	Poco::UInt32 _nextConversationID = 0;
 	Poco::FastMutex _mutex;
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_SCRAMAuthenticator_INCLUDED

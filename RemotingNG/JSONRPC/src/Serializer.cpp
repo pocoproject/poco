@@ -18,9 +18,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 const std::string Serializer::JSON_JSONRPC("jsonrpc");
@@ -37,17 +35,10 @@ const std::string Serializer::JSON_FALSE("false");
 const std::string Serializer::JSON_NULL("null");
 
 
-Serializer::Serializer():
-	_pStream(0),
-	_indent(0),
-	_id(0)
-{
-}
+Serializer::Serializer() = default;
 
 
-Serializer::~Serializer()
-{
-}
+Serializer::~Serializer() = default;
 
 
 void Serializer::setupImpl(std::ostream& out)
@@ -92,7 +83,7 @@ void Serializer::serializeMessageBegin(const std::string& name, Poco::RemotingNG
 }
 
 
-void Serializer::serializeMessageEnd(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type)
+void Serializer::serializeMessageEnd(const std::string& /*name*/, Poco::RemotingNG::SerializerBase::MessageType type)
 {
 	poco_assert_dbg(_pStream);
 
@@ -107,7 +98,7 @@ void Serializer::serializeMessageEnd(const std::string& name, Poco::RemotingNG::
 			"\t}\n" <<
 			"}\n";
 		_pStream->flush();
-		_pStream = 0;
+		_pStream = nullptr;
 		break;
 
 	default:
@@ -116,7 +107,7 @@ void Serializer::serializeMessageEnd(const std::string& name, Poco::RemotingNG::
 }
 
 
-void Serializer::serializeFaultMessage(const std::string& methodName, const Poco::Exception& e)
+void Serializer::serializeFaultMessage(const std::string& /*methodName*/, const Poco::Exception& e)
 {
 	poco_assert_dbg(_pStream);
 
@@ -149,7 +140,7 @@ void Serializer::serializeStructBegin(const std::string& name)
 }
 
 
-void Serializer::serializeStructEnd(const std::string& name)
+void Serializer::serializeStructEnd(const std::string& /*name*/)
 {
 	_state.pop_back();
 	--_indent;
@@ -159,7 +150,7 @@ void Serializer::serializeStructEnd(const std::string& name)
 }
 
 
-void Serializer::serializeSequenceBegin(const std::string& name, Poco::UInt32 numElems)
+void Serializer::serializeSequenceBegin(const std::string& name, Poco::UInt32 /*numElems*/)
 {
 	if (!_state.empty())
 	{
@@ -175,7 +166,7 @@ void Serializer::serializeSequenceBegin(const std::string& name, Poco::UInt32 nu
 }
 
 
-void Serializer::serializeSequenceEnd(const std::string& name)
+void Serializer::serializeSequenceEnd(const std::string& /*name*/)
 {
 	_state.pop_back();
 	--_indent;
@@ -309,4 +300,4 @@ std::string Serializer::escapeString(const std::string& val)
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

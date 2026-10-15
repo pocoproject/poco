@@ -18,19 +18,10 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
-XMLElement::XMLElement(const XMLElement& element):
-	_name(element._name),
-	_uri(element._uri),
-	_value(element._value),
-	_attributes(element._attributes),
-	_children(element._children)
-{
-}
+XMLElement::XMLElement(const XMLElement& element) = default;
 
 
 XMLElement::XMLElement(XMLElement&& element) noexcept:
@@ -86,4 +77,4 @@ const XMLElement* XMLElement::findChild(const std::string& name, const std::stri
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

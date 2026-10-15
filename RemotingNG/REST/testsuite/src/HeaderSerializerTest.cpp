@@ -25,9 +25,7 @@ HeaderSerializerTest::HeaderSerializerTest(const std::string& name): CppUnit::Te
 }
 
 
-HeaderSerializerTest::~HeaderSerializerTest()
-{
-}
+HeaderSerializerTest::~HeaderSerializerTest() = default;
 
 
 void HeaderSerializerTest::testParams()

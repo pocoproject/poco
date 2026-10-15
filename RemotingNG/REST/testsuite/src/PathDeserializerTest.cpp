@@ -23,9 +23,7 @@ PathDeserializerTest::PathDeserializerTest(const std::string& name): CppUnit::Te
 }
 
 
-PathDeserializerTest::~PathDeserializerTest()
-{
-}
+PathDeserializerTest::~PathDeserializerTest() = default;
 
 
 void PathDeserializerTest::testParams()

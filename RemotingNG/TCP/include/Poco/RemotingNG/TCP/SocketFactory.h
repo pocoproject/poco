@@ -25,9 +25,7 @@
 #include "Poco/URI.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API SocketFactory: public Poco::RefCountedObject
@@ -51,7 +49,7 @@ public:
 	SocketFactory();
 		/// Creates the SocketFactory.
 
-	~SocketFactory();
+	~SocketFactory() override;
 		/// Destroys the SocketFactory.
 
 	[[nodiscard]] virtual Poco::Net::StreamSocket createSocket(const Poco::URI& uri);
@@ -63,7 +61,7 @@ public:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_SocketFactory_INCLUDED

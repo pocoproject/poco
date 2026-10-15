@@ -21,8 +21,7 @@
 #include "Poco/RemotingNG/AttributedObject.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API Credentials: public AttributedObject
@@ -53,7 +52,7 @@ public:
 	Credentials& operator = (Credentials&& other) noexcept;
 		/// Assigns the attributes from another Credentials object.
 		
-	~Credentials();
+	~Credentials() override;
 		/// Destroys the Credentials object.
 		
 	static const std::string ATTR_USERNAME;
@@ -78,7 +77,7 @@ public:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Credentials_INCLUDED

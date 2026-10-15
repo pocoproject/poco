@@ -33,9 +33,7 @@ InterfaceGenerator::InterfaceGenerator(Poco::CodeGeneration::CppGenerator& cppGe
 }
 
 
-InterfaceGenerator::~InterfaceGenerator()
-{
-}
+InterfaceGenerator::~InterfaceGenerator() = default;
 
 
 std::string InterfaceGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)
@@ -101,7 +99,7 @@ void InterfaceGenerator::structStart(const Poco::CppParser::Struct* pStruct, con
 		// bool isA(const std::type_info& otherType) const;
 		Poco::CppParser::Function* pIsA = new Poco::CppParser::Function(std::string("bool isA"), _pStruct);
 		pIsA->makeConst();
-		Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter("const std::type_info& otherType", 0);
+		Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter("const std::type_info& otherType", nullptr);
 		pIsA->addParameter(pParam);
 		pIsA->addDocumentation(" Returns true if the class is a subclass of the class given by otherType.");
 	}
@@ -110,9 +108,9 @@ void InterfaceGenerator::structStart(const Poco::CppParser::Struct* pStruct, con
 	if (ev)
 	{
 		Poco::CppParser::Function* pEvents = new Poco::CppParser::Function("virtual std::string remoting__enableEvents", _pStruct);
-		Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter("Poco::RemotingNG::Listener::Ptr pListener", 0);
+		Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter("Poco::RemotingNG::Listener::Ptr pListener", nullptr);
 		pEvents->addParameter(pParam);
-		pParam = new Poco::CppParser::Parameter("bool enable = true", 0);
+		pParam = new Poco::CppParser::Parameter("bool enable = true", nullptr);
 		pEvents->addParameter(pParam);
 		pEvents->makePureVirtual();
 		pEvents->addDocumentation(" Enable or disable delivery of remote events.");
@@ -224,7 +222,7 @@ void InterfaceGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine
 }
 
 
-void InterfaceGenerator::ifaceTypeIdCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void InterfaceGenerator::ifaceTypeIdCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -239,7 +237,7 @@ void InterfaceGenerator::ifaceTypeIdCodeGen(const Poco::CppParser::Function* pFu
 }
 
 
-void InterfaceGenerator::ifaceTypeCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void InterfaceGenerator::ifaceTypeCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -254,7 +252,7 @@ void InterfaceGenerator::ifaceTypeCodeGen(const Poco::CppParser::Function* pFunc
 }
 
 
-void InterfaceGenerator::ifaceIsACodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void InterfaceGenerator::ifaceIsACodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 

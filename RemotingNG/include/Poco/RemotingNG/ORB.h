@@ -36,8 +36,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class ServerTransport;
@@ -59,6 +58,9 @@ class RemotingNG_API ORB
 	/// findObject() directly.
 {
 public:
+	ORB(const ORB&) = delete;
+	ORB& operator = (const ORB&) = delete;
+
 	using ListenerVec = std::vector<Listener::Ptr>;
 	
 	struct ObjectRegistration
@@ -273,13 +275,11 @@ private:
 
 	ORB();
 	~ORB();
-	ORB(const ORB&);
-	ORB& operator = (const ORB&);
 
 	[[nodiscard]] RemoteObjectInfo::Ptr findLocalObject(const Identifiable::TypeId& tid, const Identifiable::ObjectId& oid, const std::string& protocol) const;
 	[[nodiscard]] URIAliases::const_iterator findAlias(const std::string& path) const;
 
-	bool                _enabled;
+	bool                _enabled = true;
 	ListenerMap         _listeners;         /// Maps endpoints to Listener objects
 	ProxyFactoryManager _proxyFactories;
 	RemoteObjects       _remoteObjects;     /// Maps object paths to RemoteObjectInfo objects
@@ -293,7 +293,7 @@ private:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_ORB_INCLUDED

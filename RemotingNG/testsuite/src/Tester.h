@@ -58,7 +58,7 @@ enum class ScopedEnum: unsigned short
 //@ serialize
 struct Struct1
 {
-	typedef Poco::SharedPtr<Struct1> Ptr;
+	using Ptr = Poco::SharedPtr<Struct1>;
 
 	enum Enum2
 	{
@@ -75,8 +75,8 @@ struct Struct1
 };
 
 
-typedef Struct1 AnotherStruct1;
-typedef std::vector<AnotherStruct1> Struct1Vec;
+using AnotherStruct1 = Struct1;
+using Struct1Vec = std::vector<AnotherStruct1>;
 
 
 //@ serialize
@@ -152,18 +152,14 @@ struct Struct8
 class Class1
 {
 public:
-	Class1():
-		_anEnum(VALUE_1),
-		_anInt(0)
-	{
-	}
+	Class1() = default;
 
 	void setAnEnum(Enum1 anEnum)
 	{
 		_anEnum = anEnum;
 	}
 
-	Enum1 getAnEnum() const
+	[[nodiscard]] Enum1 getAnEnum() const
 	{
 		return _anEnum;
 	}
@@ -173,7 +169,7 @@ public:
 		_anInt = anInt;
 	}
 
-	int getAnInt() const
+	[[nodiscard]] int getAnInt() const
 	{
 		return _anInt;
 	}
@@ -183,16 +179,16 @@ public:
 		_aString = str;
 	}
 
-	const std::string& getAString() const
+	[[nodiscard]] const std::string& getAString() const
 	{
 		return _aString;
 	}
 
-	void write(Poco::BinaryWriter& writer)
+	void write(Poco::BinaryWriter& /*writer*/)
 	{
 	}
 
-	void read(Poco::BinaryReader& reader)
+	void read(Poco::BinaryReader& /*reader*/)
 	{
 	}
 
@@ -205,8 +201,8 @@ public:
 	static const int A_CONSTANT;
 
 private:
-	Enum1 _anEnum;
-	int _anInt;
+	Enum1 _anEnum = VALUE_1;
+	int _anInt = 0;
 	std::string _aString;
 };
 

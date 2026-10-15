@@ -24,9 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API PathDeserializer: public ScalarDeserializer
@@ -48,24 +46,24 @@ public:
 		/// Creates the PathDeserializer using the given path template and HTTP request.
 		/// The path template defines which segments contain parameters to extract.
 
-	~PathDeserializer();
+	~PathDeserializer() override;
 		/// Destroys the PathDeserializer.
 
 	// Poco::RemotingNG::Deserializer
-	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull);
+	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull) override;
 
 protected:
 	void parsePath(const std::string& pathTemplate, const Poco::Net::HTTPRequest& request);
 
 	// ScalarDeserializer
-	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
+	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found) override;
 
 private:
 	std::map<std::string, std::string> _values;
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_PathDeserializer_INCLUDED

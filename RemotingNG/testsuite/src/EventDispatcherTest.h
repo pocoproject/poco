@@ -22,13 +22,13 @@ class EventDispatcherTest: public CppUnit::TestCase
 {
 public:
 	EventDispatcherTest(const std::string& name);
-	~EventDispatcherTest();
+	~EventDispatcherTest() override;
 
 	void testTrySubscribe();
 	void testTryUnsubscribe();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 };

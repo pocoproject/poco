@@ -25,9 +25,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 class RemotingNGJSONRPC_API JSValue: public Poco::RefCountedObject
@@ -128,7 +126,7 @@ inline bool JSValue::asBool() const
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC
 
 
 #endif // RemotingNG_JSONRPC_JSValue_INCLUDED

@@ -22,21 +22,16 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
-JSONDeserializer::JSONDeserializer(std::istream& stream):
-	_objectDepth(0)
+JSONDeserializer::JSONDeserializer(std::istream& stream)
 {
 	setupImpl(stream);
 }
 
 
-JSONDeserializer::~JSONDeserializer()
-{
-}
+JSONDeserializer::~JSONDeserializer() = default;
 
 
 void JSONDeserializer::deserializeError(const std::string& reason, int status)
@@ -81,7 +76,7 @@ void JSONDeserializer::deserializeMessageBegin(const std::string&, SerializerBas
 }
 
 
-void JSONDeserializer::deserializeMessageEnd(const std::string& name, SerializerBase::MessageType type)
+void JSONDeserializer::deserializeMessageEnd(const std::string& /*name*/, SerializerBase::MessageType /*type*/)
 {
 	poco_bugcheck();
 }
@@ -114,7 +109,7 @@ bool JSONDeserializer::deserializeStructBegin(const std::string& name, bool isMa
 }
 
 
-void JSONDeserializer::deserializeStructEnd(const std::string& name)
+void JSONDeserializer::deserializeStructEnd(const std::string& /*name*/)
 {
 	_objectDepth--;
 	_objectStack.pop_back();
@@ -152,7 +147,7 @@ bool JSONDeserializer::deserializeSequenceBegin(const std::string& name, bool is
 }
 
 
-void JSONDeserializer::deserializeSequenceEnd(const std::string& name)
+void JSONDeserializer::deserializeSequenceEnd(const std::string& /*name*/)
 {
 	_objectDepth--;
 	_indexStack.pop_back();
@@ -178,12 +173,12 @@ bool JSONDeserializer::deserializeNullableBegin(const std::string& name, bool is
 }
 
 
-void JSONDeserializer::deserializeNullableEnd(const std::string& name)
+void JSONDeserializer::deserializeNullableEnd(const std::string& /*name*/)
 {
 }
 
 
-bool JSONDeserializer::deserializeOptionalBegin(const std::string& name, bool isMandatory, bool& isSpecified)
+bool JSONDeserializer::deserializeOptionalBegin(const std::string& name, bool /*isMandatory*/, bool& isSpecified)
 {
 	JSValue::Ptr pValue = findValue(name, false, isSpecified);
 	if (isSpecified)
@@ -199,7 +194,7 @@ bool JSONDeserializer::deserializeOptionalBegin(const std::string& name, bool is
 }
 
 
-void JSONDeserializer::deserializeOptionalEnd(const std::string& name)
+void JSONDeserializer::deserializeOptionalEnd(const std::string& /*name*/)
 {
 }
 
@@ -497,4 +492,4 @@ void JSONDeserializer::setupImpl(std::istream& stream)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

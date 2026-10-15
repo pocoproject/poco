@@ -23,9 +23,7 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 class Listener;
@@ -38,18 +36,18 @@ public:
 	JSONRPCRequestHandlerFactory(Listener& listener);
 		/// Creates the JSONRPCRequestHandlerFactory.
 
-	~JSONRPCRequestHandlerFactory();
+	~JSONRPCRequestHandlerFactory() override;
 		/// Destroys the JSONRPCRequestHandlerFactory.
 
 	// Poco::Net::HTTPRequestHandlerFactory
-	[[nodiscard]] Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+	[[nodiscard]] Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override;
 
 private:
 	Listener& _listener;
 };
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC
 
 
 #endif // RemotingNG_JSONRPC_JSONRPCRequestHandlerFactory_INCLUDED

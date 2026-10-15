@@ -23,9 +23,7 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class Listener;
@@ -38,18 +36,18 @@ public:
 	RESTRequestHandlerFactory(Listener& listener);
 		/// Creates the RESTRequestHandlerFactory.
 
-	~RESTRequestHandlerFactory();
+	~RESTRequestHandlerFactory() override;
 		/// Destroys the RESTRequestHandlerFactory.
 
 	// Poco::Net::HTTPRequestHandlerFactory
-	[[nodiscard]] Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+	[[nodiscard]] Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override;
 
 private:
 	Listener& _listener;
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_RESTRequestHandlerFactory_INCLUDED

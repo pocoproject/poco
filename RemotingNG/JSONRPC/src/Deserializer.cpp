@@ -22,20 +22,13 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
-Deserializer::Deserializer():
-	_pAssociatedSerializer(0)
-{
-}
+Deserializer::Deserializer() = default;
 
 
-Deserializer::~Deserializer()
-{
-}
+Deserializer::~Deserializer() = default;
 
 
 Poco::RemotingNG::SerializerBase::MessageType Deserializer::findMessage(std::string& name)
@@ -47,7 +40,7 @@ Poco::RemotingNG::SerializerBase::MessageType Deserializer::findMessage(std::str
 }
 
 
-void Deserializer::deserializeMessageBegin(const std::string& name, SerializerBase::MessageType type)
+void Deserializer::deserializeMessageBegin(const std::string& /*name*/, SerializerBase::MessageType type)
 {
 	poco_assert_dbg (_objectStack.size() == 1);
 
@@ -90,7 +83,7 @@ void Deserializer::deserializeMessageBegin(const std::string& name, SerializerBa
 }
 
 
-void Deserializer::deserializeMessageEnd(const std::string& name, SerializerBase::MessageType type)
+void Deserializer::deserializeMessageEnd(const std::string& /*name*/, SerializerBase::MessageType type)
 {
 	poco_assert_dbg (_objectStack.size() == 2);
 
@@ -101,7 +94,7 @@ void Deserializer::deserializeMessageEnd(const std::string& name, SerializerBase
 		{
 			_indexStack.pop_back();
 		}
-		// fallthrough
+		[[fallthrough]];
 
 	case Poco::RemotingNG::SerializerBase::MESSAGE_REPLY:
 		_objectStack.pop_back();
@@ -137,7 +130,7 @@ bool Deserializer::deserializeStructBegin(const std::string& name, bool isMandat
 }
 
 
-void Deserializer::deserializeStructEnd(const std::string& name)
+void Deserializer::deserializeStructEnd(const std::string& /*name*/)
 {
 	_objectStack.pop_back();
 }
@@ -172,7 +165,7 @@ bool Deserializer::deserializeSequenceBegin(const std::string& name, bool isMand
 }
 
 
-void Deserializer::deserializeSequenceEnd(const std::string& name)
+void Deserializer::deserializeSequenceEnd(const std::string& /*name*/)
 {
 	_indexStack.pop_back();
 	_objectStack.pop_back();
@@ -197,7 +190,7 @@ bool Deserializer::deserializeNullableBegin(const std::string& name, bool isMand
 }
 
 
-void Deserializer::deserializeNullableEnd(const std::string& name)
+void Deserializer::deserializeNullableEnd(const std::string& /*name*/)
 {
 }
 
@@ -470,4 +463,4 @@ void Deserializer::associateSerializer(Serializer& ser)
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

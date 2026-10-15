@@ -28,8 +28,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class Serializer;
@@ -93,7 +92,7 @@ public:
 	Transport();
 		/// Creates a Transport.
 
-	virtual ~Transport();
+	~Transport() override;
 		/// Destroys the Transport.
 
 	[[nodiscard]] virtual const std::string& endPoint() const = 0;
@@ -173,7 +172,7 @@ inline void Transport::unlock()
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Transport_INCLUDED

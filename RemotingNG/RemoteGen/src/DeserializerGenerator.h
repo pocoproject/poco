@@ -27,7 +27,7 @@ public:
 	DeserializerGenerator(Poco::CodeGeneration::CppGenerator& cppGen);
 		/// Creates the DeserializerGenerator.
 
-	~DeserializerGenerator();
+	~DeserializerGenerator() override;
 		/// Destroys the DeserializerGenerator.
 
 	[[nodiscard]] static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
@@ -36,18 +36,18 @@ public:
 	[[nodiscard]] static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
-	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
+	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties) override;
 		/// Must not write the namespace
 
-	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 		/// Writes the method header. Properties contains the properties found in the functions docuementation and in the class documentation.
 
-	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
+	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e) override;
 
-	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct) override;
 		/// generates the new class name based on the old one
 
-	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct) override;
 
 private:
 	void addParameters(Poco::CppParser::Function* pFunc, const std::string& className);

@@ -22,8 +22,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 	
 	
 class EventListener;
@@ -43,7 +42,7 @@ public:
 	RemoteObject(const Poco::RemotingNG::Identifiable::ObjectId& oid);
 		/// Creates a RemoteObject.
 
-	virtual ~RemoteObject();
+	~RemoteObject() override;
 		/// Destroys the RemoteObject.
 
 	[[nodiscard]] virtual bool remoting__hasEvents() const;
@@ -78,7 +77,7 @@ inline Poco::FastMutex& RemoteObject::mutex() const
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_RemoteObject_INCLUDED

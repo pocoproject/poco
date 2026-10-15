@@ -18,13 +18,10 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-AttributedObject::AttributedObject()
-{
-}
+AttributedObject::AttributedObject() = default;
 
 
 AttributedObject::AttributedObject(const AttributedObject& other):
@@ -56,9 +53,7 @@ AttributedObject& AttributedObject::operator = (AttributedObject&& other) noexce
 }
 
 
-AttributedObject::~AttributedObject()
-{
-}
+AttributedObject::~AttributedObject() = default;
 
 	
 void AttributedObject::setAttribute(const std::string& name, const std::string& value)
@@ -132,4 +127,4 @@ void AttributedObject::clearAttributes()
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

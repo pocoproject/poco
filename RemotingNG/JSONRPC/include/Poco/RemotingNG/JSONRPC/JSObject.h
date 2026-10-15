@@ -22,9 +22,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 class RemotingNGJSONRPC_API JSObject: public JSValue
@@ -39,14 +37,14 @@ public:
 		/// Creates an empty JSObject.
 
 	// JSValue
-	[[nodiscard]] Type type() const;
-	[[nodiscard]] std::size_t size() const;
-	[[nodiscard]] const Ptr& operator [] (const std::string& name) const;
-	[[nodiscard]] Ptr& operator [] (const std::string& name);
-	[[nodiscard]] bool has(const std::string& name) const;
+	[[nodiscard]] Type type() const override;
+	[[nodiscard]] std::size_t size() const override;
+	[[nodiscard]] const Ptr& operator [] (const std::string& name) const override;
+	[[nodiscard]] Ptr& operator [] (const std::string& name) override;
+	[[nodiscard]] bool has(const std::string& name) const override;
 
 protected:
-	~JSObject();
+	~JSObject() override;
 		/// Destroys the JSObject.
 
 private:
@@ -56,7 +54,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC
 
 
 #endif // RemotingNG_JSONRPC_JSObject_INCLUDED

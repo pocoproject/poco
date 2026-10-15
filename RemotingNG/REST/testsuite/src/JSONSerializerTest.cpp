@@ -25,9 +25,7 @@ JSONSerializerTest::JSONSerializerTest(const std::string& name): CppUnit::TestCa
 }
 
 
-JSONSerializerTest::~JSONSerializerTest()
-{
-}
+JSONSerializerTest::~JSONSerializerTest() = default;
 
 
 void JSONSerializerTest::testError()

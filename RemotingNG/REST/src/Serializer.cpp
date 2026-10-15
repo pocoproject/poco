@@ -21,9 +21,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 const std::string Serializer::LOCATION_PATH("path");
@@ -36,17 +34,10 @@ const std::string Serializer::FORMAT_BINARY("binary");
 const std::string Serializer::FORMAT_JSON("json");
 
 
-Serializer::Serializer():
-	_pStream(0),
-	_pRequest(0),
-	_pResponse(0)
-{
-}
+Serializer::Serializer() = default;
 
 
-Serializer::~Serializer()
-{
-}
+Serializer::~Serializer() = default;
 
 
 void Serializer::serializeMessageBegin(const std::string&, Poco::RemotingNG::SerializerBase::MessageType type)
@@ -76,13 +67,13 @@ void Serializer::serializeMessageEnd(const std::string&, Poco::RemotingNG::Seria
 			_pPathSerializer->close();
 		if (_pQuerySerializer)
 			_pQuerySerializer->close();
-		// fallthrough
+		[[fallthrough]];
 
 	case Poco::RemotingNG::SerializerBase::MESSAGE_REPLY:
 		if (_pFormSerializer)
 			_pFormSerializer->close();
 		_pStream->flush();
-		_pStream = 0;
+		_pStream = nullptr;
 		break;
 
 	default:
@@ -302,14 +293,14 @@ void Serializer::setupImpl(std::ostream& stream)
 
 void Serializer::resetImpl()
 {
-	_pRequest = 0;
-	_pResponse = 0;
-	_pPathSerializer = 0;
-	_pQuerySerializer = 0;
-	_pHeaderSerializer = 0;
-	_pRawSerializer = 0;
-	_pJSONSerializer = 0;
-	_pFormSerializer = 0;
+	_pRequest = nullptr;
+	_pResponse = nullptr;
+	_pPathSerializer = nullptr;
+	_pQuerySerializer = nullptr;
+	_pHeaderSerializer = nullptr;
+	_pRawSerializer = nullptr;
+	_pJSONSerializer = nullptr;
+	_pFormSerializer = nullptr;
 }
 
 
@@ -390,4 +381,4 @@ Poco::SharedPtr<Poco::RemotingNG::Serializer> Serializer::subSerializer()
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

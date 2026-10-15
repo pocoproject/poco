@@ -15,19 +15,13 @@
 #include "Poco/RemotingNG/SOAP/SOAPContentHandler.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
-SOAPContentHandler::SOAPContentHandler()
-{
-}
+SOAPContentHandler::SOAPContentHandler() = default;
 
 
-SOAPContentHandler::~SOAPContentHandler()
-{
-}
+SOAPContentHandler::~SOAPContentHandler() = default;
 
 
 void SOAPContentHandler::setDocumentLocator(const XML::Locator* /*loc*/)
@@ -99,4 +93,4 @@ void SOAPContentHandler::skippedEntity(const std::string& /*name*/)
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

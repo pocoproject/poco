@@ -23,9 +23,7 @@
 #include "Poco/RemotingNG/TransportFactory.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 class RemotingNGSOAP_API TransportFactory: public Poco::RemotingNG::TransportFactory
@@ -35,10 +33,10 @@ public:
 	TransportFactory(Serializer::SOAPVersion = Serializer::SOAP_1_1);
 		/// Creates a TransportFactory.
 
-	~TransportFactory();
+	~TransportFactory() override;
 		/// Destroys the TransportFactory.
 
-	[[nodiscard]] Poco::RemotingNG::Transport* createTransport();
+	[[nodiscard]] Poco::RemotingNG::Transport* createTransport() override;
 
 	static void registerFactory();
 		/// Helper function to register the factory with the manager.
@@ -55,7 +53,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP
 
 
 #endif // RemotingNG_SOAP_TransportFactory_INCLUDED

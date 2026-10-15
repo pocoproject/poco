@@ -22,7 +22,7 @@ class SerializerTest: public CppUnit::TestCase
 {
 public:
 	SerializerTest(const std::string& name);
-	~SerializerTest();
+	~SerializerTest() override;
 
 	void testGet();
 	void testPostForm();
@@ -32,8 +32,8 @@ public:
 	void testPostRaw();
 	void testPostRawHeader();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

@@ -26,9 +26,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API FormSerializer: public ScalarSerializer
@@ -45,7 +43,7 @@ public:
 	FormSerializer(Poco::Net::HTTPResponse& response, std::ostream& stream);
 		/// Creates the FormSerializer.
 
-	~FormSerializer();
+	~FormSerializer() override;
 		/// Destroys the FormSerializer.
 
 	void close();
@@ -53,8 +51,8 @@ public:
 
 protected:
 	// ScalarSerializer
-	void serializeData(const std::string& name, const std::string& val);
-	void serializeBuffer(const std::string& name, const std::vector<char>& val);
+	void serializeData(const std::string& name, const std::string& val) override;
+	void serializeBuffer(const std::string& name, const std::vector<char>& val) override;
 
 	static const std::string APPLICATION_OCTET_STREAM;
 
@@ -68,7 +66,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_FormSerializer_INCLUDED

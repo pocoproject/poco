@@ -22,7 +22,7 @@ class SerializerTest: public CppUnit::TestCase
 {
 public:
 	SerializerTest(const std::string& name);
-	~SerializerTest();
+	~SerializerTest() override;
 
 	void testRequestNoParams11();
 	void testRequestNoParams11DeclareEncNS();
@@ -66,8 +66,8 @@ public:
 	void testInterceptor();
 	void testInterceptorComplex();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

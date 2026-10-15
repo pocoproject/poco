@@ -26,8 +26,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 class CodeGeneration_API CodeGenerator
@@ -44,10 +43,10 @@ public:
 		/// Must guarantee that the primary order is by namespace, then by class
 	};
 
-	typedef std::set<std::string> IncludeSet;
-	typedef std::map<std::string, std::string> Properties;
+	using IncludeSet = std::set<std::string>;
+	using Properties = std::map<std::string, std::string>;
 	/// Maps a property name to its value.
-	typedef std::set<FwdDecl> FwdDecls;
+	using FwdDecls = std::set<FwdDecl>;
 
 	CodeGenerator(const std::string& nameSpace, const std::string& libraryName, bool usePocoIncludeStyle, const std::string& copyright);
 		/// Creates the CodeGenerator. The nameSpace declares in which nameSpace the generated class will be,
@@ -211,7 +210,7 @@ inline const std::string& CodeGenerator::copyright() const
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration
 
 
 #endif // CodeGeneration_CodeGenerator_INCLUDED

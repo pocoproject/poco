@@ -45,8 +45,7 @@
 #include <memory>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 template <typename T>
@@ -63,17 +62,15 @@ class TypeDeserializer
 	/// specializations of the TypeDeserializer class template.
 {
 public:
+	TypeDeserializer() = delete;
+	~TypeDeserializer() = delete;
+	TypeDeserializer(const TypeDeserializer&) = delete;
+	TypeDeserializer& operator = (const TypeDeserializer&) = delete;
+
 	static bool deserialize(const std::string& name, bool isMandatory, Deserializer& deser, T& value)
 	{
 		return deser.deserialize(name, isMandatory, value);
 	}
-
-private:
-	TypeDeserializer();
-	~TypeDeserializer();
-
-	TypeDeserializer(const TypeDeserializer&);
-	TypeDeserializer& operator = (const TypeDeserializer&);
 };
 
 
@@ -496,7 +493,7 @@ public:
 				return true;
 			}
 		}
-		value = 0;
+		value = nullptr;
 		return found;
 	}
 };
@@ -546,7 +543,7 @@ public:
 				return true;
 			}
 		}
-		value = 0;
+		value = nullptr;
 		return found;
 	}
 };
@@ -640,7 +637,7 @@ public:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_TypeDeserializer_INCLUDED

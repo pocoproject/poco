@@ -26,9 +26,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API Listener: public Poco::RemotingNG::Listener
@@ -76,7 +74,7 @@ public:
 		/// which must be bound to a socket address corresponding to
 		/// the given endPoint.
 
-	~Listener();
+	~Listener() override;
 		/// Destroys the Listener.
 
 	void enableChunkedTransferEncoding(bool enable = true);
@@ -148,13 +146,13 @@ public:
 		/// otherwise false.
 
 	// Poco::RemotingNG::Listener
-	void start();
-	void stop();
-	[[nodiscard]] const std::string& protocol() const;
-	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
-	[[nodiscard]] bool handlesURI(const std::string& uri);
-	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton);
-	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject);
+	void start() override;
+	void stop() override;
+	[[nodiscard]] const std::string& protocol() const override;
+	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId) override;
+	[[nodiscard]] bool handlesURI(const std::string& uri) override;
+	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton) override;
+	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject) override;
 
 	static const std::string CORS_ALLOWED_HEADERS;
 
@@ -209,7 +207,7 @@ inline bool Listener::areServiceExceptionsLogged() const
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_Listener_INCLUDED

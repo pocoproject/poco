@@ -28,9 +28,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace HTTP {
+namespace Poco::RemotingNG::HTTP {
 
 
 const std::string Transport::PROTOCOL("http");
@@ -41,18 +39,10 @@ const std::string Transport::CONTENT_TYPE("application/octet-stream");
 Poco::Net::HTTPSessionFactory Transport::_httpSessionFactory;
 
 
-Transport::Transport():
-	_keepAlive(false),
-	_chunkedTransferEncoding(true),
-	_compression(false),
-	_authMode(AUTH_NONE)
-{
-}
+Transport::Transport() = default;
 
 
-Transport::~Transport()
-{
-}
+Transport::~Transport() = default;
 
 
 Poco::Timespan Transport::getTimeout() const
@@ -217,7 +207,7 @@ void Transport::connect(const std::string& endPoint)
 
 void Transport::disconnect()
 {
-	_pSession = 0;
+	_pSession = nullptr;
 	_endPoint.clear();
 	_endPointURI.clear();
 }
@@ -235,12 +225,12 @@ Poco::RemotingNG::Serializer& Transport::beginMessage(const Poco::RemotingNG::Id
 }
 
 
-void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
+void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
 	if (_pDeflater)
 	{
 		_pDeflater->close();
-		_pDeflater = 0;
+		_pDeflater = nullptr;
 	}
 	if (!_chunkedTransferEncoding)
 	{
@@ -258,7 +248,7 @@ void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oi
 }
 
 
-Poco::RemotingNG::Serializer& Transport::beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType)
+Poco::RemotingNG::Serializer& Transport::beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType messageType)
 {
 	if (messageType == Poco::RemotingNG::SerializerBase::MESSAGE_REQUEST)
 	{
@@ -292,12 +282,12 @@ Poco::RemotingNG::Serializer& Transport::beginRequest(const Poco::RemotingNG::Id
 }
 
 
-Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
+Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
 	if (_pDeflater)
 	{
 		_pDeflater->close();
-		_pDeflater = 0;
+		_pDeflater = nullptr;
 	}
 	Poco::Net::HTTPResponse response;
 	std::istream* pResponseStream;
@@ -356,9 +346,9 @@ void Transport::endRequest()
 {
 	_serializer.reset();
 	_deserializer.reset();
-	_pStream = 0;
-	_pDeflater = 0;
-	_pInflater = 0;
+	_pStream = nullptr;
+	_pDeflater = nullptr;
+	_pInflater = nullptr;
 }
 
 
@@ -405,4 +395,4 @@ void Transport::prepareRequest(Poco::Net::HTTPRequest& request)
 }
 
 
-} } } // namespace Poco::RemotingNG::HTTP
+} // namespace Poco::RemotingNG::HTTP

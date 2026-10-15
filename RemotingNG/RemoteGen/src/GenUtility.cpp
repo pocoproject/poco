@@ -32,8 +32,8 @@ const std::string GenUtility::VAL_REQUEST("Request");
 const std::string GenUtility::VAL_REPLY("Reply");
 const std::string GenUtility::ATTR_RETURN("return");
 const std::string GenUtility::ATTR_HEADER("header");
-const std::string GenUtility::KEYS_VECTOR[KEYS_VECTOR_SIZE] = {"std::vector", "std::set", "std::multiset", "std::unordered_set", "std::unordered_multiset", "std::list", "std::array", "Poco::Array"};
-const std::string GenUtility::KEYS_UNIQUE_VECTOR[KEYS_UNIQUE_VECTOR_SIZE] = {"std::set", "std::unordered_set"};
+const std::string GenUtility::KEYS_VECTOR[] = {"std::vector", "std::set", "std::multiset", "std::unordered_set", "std::unordered_multiset", "std::list", "std::array", "Poco::Array"};
+const std::string GenUtility::KEYS_UNIQUE_VECTOR[] = {"std::set", "std::unordered_set"};
 
 
 bool GenUtility::isRemoteMethod(const Poco::CppParser::Function* pFunc, const Poco::CodeGeneration::CodeGenerator::Properties& properties)
@@ -302,23 +302,21 @@ bool GenUtility::isVectorType(const Poco::CppParser::NameSpace* pNS, const Poco:
 bool GenUtility::isVectorType(const std::string& resolvedType)
 {
 	if (resolvedType == "std::vector < char >") return false;
-	bool found = false;
-	for (int i = 0; i < KEYS_VECTOR_SIZE && !found; ++i)
+	for (const auto& key: KEYS_VECTOR)
 	{
-		found = (resolvedType.find(KEYS_VECTOR[i]) == 0);
+		if (resolvedType.find(key) == 0) return true;
 	}
-	return found;
+	return false;
 }
 
 
 bool GenUtility::isUniqueVectorType(const std::string& resolvedType)
 {
-	bool found = false;
-	for (int i = 0; i < KEYS_UNIQUE_VECTOR_SIZE && !found; ++i)
+	for (const auto& key: KEYS_UNIQUE_VECTOR)
 	{
-		found = (resolvedType.find(KEYS_UNIQUE_VECTOR[i]) == 0);
+		if (resolvedType.find(key) == 0) return true;
 	}
-	return found;
+	return false;
 }
 
 
@@ -409,7 +407,7 @@ std::vector<std::string> GenUtility::getInnerTemplateTypes(const std::string& ty
 	//a typical template def std::map<int, std::pair<int,int> >
 	int lvl = 0;
 	std::string temp;
-	for (int i = 0; i < typeDecl.size(); ++i)
+	for (std::size_t i = 0; i < typeDecl.size(); ++i)
 	{
 		char c = typeDecl[i];
 		if (c == '<')

@@ -15,18 +15,13 @@
 #include "Poco/RemotingNG/TransportFactory.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-TransportFactory::TransportFactory()
-{
-}
+TransportFactory::TransportFactory() = default;
 
 
-TransportFactory::~TransportFactory()
-{
-}
+TransportFactory::~TransportFactory() = default;
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

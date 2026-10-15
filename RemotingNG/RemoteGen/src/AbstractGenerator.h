@@ -21,15 +21,14 @@
 #include <set>
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 class GeneratorEngine;
 class CppGenerator;
 
 
-} }
+} // namespace Poco::CodeGeneration
 
 
 class AbstractGenerator: public Poco::CodeGeneration::CodeGenerator
@@ -44,29 +43,29 @@ public:
 	AbstractGenerator(Poco::CodeGeneration::CppGenerator& cppGen);
 		/// Creates the AbstractGenerator.
 
-	virtual ~AbstractGenerator();
+	~AbstractGenerator() override;
 		/// Destroys the AbstractGenerator.
 
-	void writeDefaultHeader(const Poco::CppParser::Struct* pStruct, const std::string& className, const std::string& libraryName, const std::string& package);
+	void writeDefaultHeader(const Poco::CppParser::Struct* pStruct, const std::string& className, const std::string& libraryName, const std::string& package) override;
 		/// Writes the default header, e.g. copyright notice, no include namespace open or anything else is written
 		/// This is always the first method that is called!
 
-	void writeInclude(const std::string& include, bool toHeader);
+	void writeInclude(const std::string& include, bool toHeader) override;
 
-	void writeSystemInclude(const std::string& include);
+	void writeSystemInclude(const std::string& include) override;
 
-	void writeNameSpaceBegin(const std::string& namespacePrefix);
+	void writeNameSpaceBegin(const std::string& namespacePrefix) override;
 		/// Writes the namespacePrefix+"_BEGIN"
 
-	void writeFwdDecls(const CodeGenerator::FwdDecls& decl);
+	void writeFwdDecls(const CodeGenerator::FwdDecls& decl) override;
 
-	void writeNameSpaceEnd(const std::string& namespacePrefix);
+	void writeNameSpaceEnd(const std::string& namespacePrefix) override;
 		/// Writes the namespacePrefix+"_END"
 
-	virtual void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
+	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties) override;
 		/// The default impl simply clones the incoming struct. Override this method.
 
-	virtual void structEnd();
+	void structEnd() override;
 		/// Must not write the namespace
 
 	[[nodiscard]] virtual Poco::CppParser::Function* methodClone(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
@@ -83,25 +82,25 @@ public:
 	[[nodiscard]] virtual std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct) = 0;
 		/// generates the new base classes
 
-	void writeMethodImplementation(const std::string& code);
+	void writeMethodImplementation(const std::string& code) override;
 		/// Only valid when inside a method. Simply forwards the code lines to the implementation file.
 
-	void writeImplementation(const std::string& code);
+	void writeImplementation(const std::string& code) override;
 
-	virtual void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 		/// Closes the method
 
-	void variablesStart();
+	void variablesStart() override;
 
-	void variable(const Poco::CppParser::Variable* pVar);
+	void variable(const Poco::CppParser::Variable* pVar) override;
 
-	void variablesEnd();
+	void variablesEnd() override;
 
-	void endFile();
+	void endFile() override;
 
-	void writeTypeDef(const Poco::CppParser::TypeDef*);
+	void writeTypeDef(const Poco::CppParser::TypeDef*) override;
 
-	void writeUsing(const Poco::CppParser::TypeAlias*);
+	void writeUsing(const Poco::CppParser::TypeAlias*) override;
 
 	static void addDocumentation(const Poco::CppParser::Symbol* pSymOld,Poco::CppParser::Symbol* pNew);
 		/// Takes the docu from the old symbol and adds it to the new one removing the remote property,
@@ -160,56 +159,56 @@ private:
 
 protected:
 	Poco::CodeGeneration::CppGenerator& _cppGen;
-	Poco::CppParser::Struct* _pStruct;
-	const Poco::CppParser::Struct* _pStructIn;
-	Poco::CppParser::NameSpace* _pNs;
+	Poco::CppParser::Struct* _pStruct = nullptr;
+	const Poco::CppParser::Struct* _pStructIn = nullptr;
+	Poco::CppParser::NameSpace* _pNs = nullptr;
 };
 
 
 //
 // inlines
 //
-inline void AbstractGenerator::writeDefaultHeader(const Poco::CppParser::Struct* pStruct, const std::string& className, const std::string& libraryName, const std::string& package)
+inline void AbstractGenerator::writeDefaultHeader(const Poco::CppParser::Struct* /*pStruct*/, const std::string& /*className*/, const std::string& /*libraryName*/, const std::string& /*package*/)
 {
 }
 
 
-inline void AbstractGenerator::writeInclude(const std::string& include, bool)
+inline void AbstractGenerator::writeInclude(const std::string& /*include*/, bool)
 {
 }
 
 
-inline void AbstractGenerator::writeSystemInclude(const std::string& include)
+inline void AbstractGenerator::writeSystemInclude(const std::string& /*include*/)
 {
 }
 
 
-inline void AbstractGenerator::writeNameSpaceBegin(const std::string& namespacePrefix)
+inline void AbstractGenerator::writeNameSpaceBegin(const std::string& /*namespacePrefix*/)
 {
 }
 
 
-inline void AbstractGenerator::writeFwdDecls(const CodeGenerator::FwdDecls& decl)
+inline void AbstractGenerator::writeFwdDecls(const CodeGenerator::FwdDecls& /*decl*/)
 {
 }
 
 
-inline void AbstractGenerator::writeNameSpaceEnd(const std::string& namespacePrefix)
+inline void AbstractGenerator::writeNameSpaceEnd(const std::string& /*namespacePrefix*/)
 {
 }
 
 
-inline void AbstractGenerator::writeMethodImplementation(const std::string& code)
+inline void AbstractGenerator::writeMethodImplementation(const std::string& /*code*/)
 {
 }
 
 
-inline void AbstractGenerator::writeImplementation(const std::string& code)
+inline void AbstractGenerator::writeImplementation(const std::string& /*code*/)
 {
 }
 
 
-inline void AbstractGenerator::methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties)
+inline void AbstractGenerator::methodEnd(const Poco::CppParser::Function* /*pFunc*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 

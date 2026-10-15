@@ -73,9 +73,7 @@ XSDGenerator::XSDGenerator(Poco::CodeGeneration::CppGenerator& cppGen, const std
 }
 
 
-XSDGenerator::~XSDGenerator()
-{
-}
+XSDGenerator::~XSDGenerator() = default;
 
 
 std::string XSDGenerator::generateFileName(const Poco::CppParser::Struct* pStruct)
@@ -90,7 +88,7 @@ std::string XSDGenerator::generateFileName(const std::string& structName)
 }
 
 
-void XSDGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties)
+void XSDGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& /*properties*/)
 {
 	_pStructIn = pStruct;
 	if (!_documentStarted)
@@ -236,7 +234,7 @@ void XSDGenerator::detectTypes(const Poco::CppParser::Function* pFuncOld, std::v
 						{
 							throw CodeGenerationException("Missing type info: " + type);
 						}
-						if (pType == 0)
+						if (pType == nullptr)
 						{
 							if (!pSym || pSym->kind() != Poco::CppParser::Symbol::SYM_ENUM) // treat enum as builtin type
 								throw CodeGenerationException("Missing class", type);
@@ -336,7 +334,7 @@ Poco::CppParser::Struct* XSDGenerator::convertToStruct(const Poco::CppParser::Fu
 		{
 			std::string retParamName (GenUtility::getReturnParameterName(pFunc));
 			rdecl.append(" " + retParamName);
-			Poco::CppParser::Parameter p(rdecl, 0);
+			Poco::CppParser::Parameter p(rdecl, nullptr);
 			Poco::CppParser::Variable* pVar = createVariable(&p, pStruct);
 			Poco::CppParser::Attributes attr;
 			attr["order"] = "0";
@@ -530,7 +528,7 @@ Poco::CppParser::Function* XSDGenerator::createGetFct(const Poco::CppParser::Par
 	std::string methodName("get");
 	methodName.append(pParam->name());
 	if (methodName.size() > 3)
-		methodName[3] = (char)std::toupper(methodName[3]);
+		methodName[3] = static_cast<char>(std::toupper(methodName[3]));
 
 	// we return either by value or by const &
 	std::string decl(createParameterTypeDecl(pParam->declType()));
@@ -549,7 +547,7 @@ Poco::CppParser::Function* XSDGenerator::createSetFct(const Poco::CppParser::Par
 	std::string methodName("set");
 	methodName.append(pParam->name());
 	if (methodName.size() > 3)
-		methodName[3] = (char)std::toupper(methodName[3]);
+		methodName[3] = static_cast<char>(std::toupper(methodName[3]));
 
 	// we return either by value or by const &
 	std::string decl("void ");
@@ -573,17 +571,17 @@ void XSDGenerator::generateTypes(const std::vector<const Poco::CppParser::Struct
 }
 
 
-void XSDGenerator::methodEnd(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+void XSDGenerator::methodEnd(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
 
-void XSDGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e)
+void XSDGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine& /*e*/)
 {
 }
 
 
-std::vector<std::string> XSDGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> XSDGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	std::vector<std::string> bases;
 
@@ -605,7 +603,7 @@ std::string XSDGenerator::generateComplexTypeName(const Poco::CppParser::Struct*
 			pNS = pOuter->nameSpace();
 		}
 		else
-			pNS = 0;
+			pNS = nullptr;
 	}
 
 	return newClassName;
@@ -680,10 +678,10 @@ std::string XSDGenerator::generateComplexType(const Poco::CppParser::Struct* pTy
 		Poco::CodeGeneration::GeneratorEngine::parseProperties(itElems->second->second.first, varProps);
 		detectProperties(itElems->second->second.first, isVector, isMandatory, isNullable, elemName, resolvedType);
 		const Poco::CppParser::Symbol* pSym = Poco::CppParser::NameSpace::root()->lookup(resolvedType);
-		if (pSym == 0)
+		if (pSym == nullptr)
 		{
 			pSym = pType->lookup(resolvedType); // for inner classes
-			if (pSym != 0) // 0 is ok for primitve types
+			if (pSym != nullptr) // 0 is ok for primitve types
 				resolvedType = pSym->fullName();
 		}
 		if (GenUtility::isPtrType(resolvedType) || GenUtility::isNullableType(resolvedType) || GenUtility::isOptionalType(resolvedType))
@@ -725,7 +723,7 @@ std::string XSDGenerator::generateComplexType(const Poco::CppParser::Struct* pTy
 		else
 		{
 			const Poco::CppParser::Struct* pResType = dynamic_cast<const Poco::CppParser::Struct*>(pSym);
-			if (pResType == 0)
+			if (pResType == nullptr)
 			{
 				if (pSym && pSym->kind() == Poco::CppParser::Symbol::SYM_ENUM)
 				{
@@ -777,10 +775,10 @@ std::string XSDGenerator::generateComplexType(const Poco::CppParser::Struct* pTy
 			throw CodeGenerationException("A Nullable cannot be serialized as an attribute.");
 
 		const Poco::CppParser::Symbol* pSym = Poco::CppParser::NameSpace::root()->lookup(resolvedType);
-		if (pSym == 0)
+		if (pSym == nullptr)
 		{
 			pSym = pType->lookup(resolvedType); // for inner classes
-			if (pSym != 0) // 0 is ok for primitve types
+			if (pSym != nullptr) // 0 is ok for primitve types
 				resolvedType = pSym->fullName();
 		}
 		Poco::XML::AttributesImpl attrAttrs;
@@ -800,7 +798,7 @@ std::string XSDGenerator::generateComplexType(const Poco::CppParser::Struct* pTy
 			if (pSym && pSym->kind() == Poco::CppParser::Symbol::SYM_ENUM)
 			{
 				// map to integer
-				const std::string& xsdType = mapToSchemaType("int");
+				const std::string xsdType = mapToSchemaType("int");
 				attrAttrs.addAttribute(EMPTYSTRING, TYPE, TYPE, EMPTYSTRING, SCHEMA_PREFIX+":"+xsdType);
 			}
 			else throw CodeGenerationException("An attribute can only have a simple content.");

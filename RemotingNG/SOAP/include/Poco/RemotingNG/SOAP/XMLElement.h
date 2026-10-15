@@ -23,9 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 struct RemotingNGSOAP_API XMLElement
@@ -136,7 +134,7 @@ inline std::vector<XMLElement>& XMLElement::children()
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP
 
 
 #endif // RemotingNG_SOAP_XMLElement_INCLUDED

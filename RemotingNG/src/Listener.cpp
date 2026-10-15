@@ -16,8 +16,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 Listener::Listener(const std::string& endPoint): _endPoint(endPoint)
@@ -26,9 +25,7 @@ Listener::Listener(const std::string& endPoint): _endPoint(endPoint)
 }
 
 
-Listener::~Listener()
-{
-}
+Listener::~Listener() = default;
 
 
 void Listener::setAuthenticator(Authenticator::Ptr pAuthenticator)
@@ -43,4 +40,4 @@ void Listener::setAuthorizer(Authorizer::Ptr pAuthorizer)
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

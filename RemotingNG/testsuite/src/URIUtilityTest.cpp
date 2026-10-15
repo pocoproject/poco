@@ -22,9 +22,7 @@ URIUtilityTest::URIUtilityTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-URIUtilityTest::~URIUtilityTest()
-{
-}
+URIUtilityTest::~URIUtilityTest() = default;
 
 
 void URIUtilityTest::testMatchPathBasic()

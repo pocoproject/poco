@@ -23,14 +23,14 @@ class CodeGenerationTest: public CppUnit::TestCase
 {
 public:
 	CodeGenerationTest(const std::string& name);
-	~CodeGenerationTest();
+	~CodeGenerationTest() override;
 
 	void testGenerateClass();
 	void testStdHeader();
 	void testCreateInclude();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

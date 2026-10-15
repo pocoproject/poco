@@ -64,7 +64,7 @@ namespace
 		{
 		}
 
-		void run()
+		void run() override
 		{
 			_letGo.wait();
 		}
@@ -107,9 +107,9 @@ namespace
 class MockAuthenticator: public Poco::RemotingNG::Authenticator
 {
 public:
-	typedef Poco::AutoPtr<MockAuthenticator> Ptr;
+	using Ptr = Poco::AutoPtr<MockAuthenticator>;
 
-	Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32 /*conversationID*/)
+	Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32 /*conversationID*/) override
 	{
 		std::string username = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "");
 		std::string password = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "");
@@ -122,7 +122,7 @@ public:
 			return Poco::RemotingNG::AuthenticateResult(Poco::RemotingNG::AuthenticateResult::AUTH_FAILED);
 	}
 
-	const std::string& lastUsername() const
+	[[nodiscard]] const std::string& lastUsername() const
 	{
 		return _lastUsername;
 	}
@@ -135,15 +135,15 @@ private:
 class MockSCRAMAuthenticator: public Poco::RemotingNG::TCP::SCRAMAuthenticator
 {
 public:
-	typedef Poco::AutoPtr<MockSCRAMAuthenticator> Ptr;
+	using Ptr = Poco::AutoPtr<MockSCRAMAuthenticator>;
 
-	const std::string& lastUsername() const
+	[[nodiscard]] const std::string& lastUsername() const
 	{
 		return _lastUsername;
 	}
 
 	// SCRAMAuthenticator
-	std::string saltForUser(const std::string& username, int& iterations)
+	std::string saltForUser(const std::string& username, int& iterations) override
 	{
 		if (username == "user" || username == "admin")
 		{
@@ -154,7 +154,7 @@ public:
 		else return "";
 	}
 
-	std::string hashForUser(const std::string& username)
+	std::string hashForUser(const std::string& username) override
 	{
 		std::string password;
 		if (username == "user")
@@ -188,7 +188,7 @@ private:
 class MockAuthorizer: public Poco::RemotingNG::Authorizer
 {
 public:
-	bool authorize(const std::string& method, const std::string& permission)
+	bool authorize(const std::string& /*method*/, const std::string& /*permission*/) override
 	{
 		Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
 
@@ -228,12 +228,12 @@ bool operator == (const Struct2& s1, const Struct2& s2)
 
 	if (!equal) return false;
 	if (s1.aVector.size() != s2.aVector.size()) return false;
-	for (int i = 0; i < s1.aVector.size(); i++)
+	for (std::size_t i = 0; i < s1.aVector.size(); i++)
 	{
 		if (!(s1.aVector[i] == s2.aVector[i])) return false;
 	}
 	if (s1.anotherVector.size() != s2.anotherVector.size()) return false;
-	for (int i = 0; i < s1.anotherVector.size(); i++)
+	for (std::size_t i = 0; i < s1.anotherVector.size(); i++)
 	{
 		if (!s1.anotherVector[i].isNull() && !s2.anotherVector[i].isNull())
 		{
@@ -251,7 +251,7 @@ bool operator == (const Struct3& s1, const Struct3& s2)
 	          && s1.aMultiSet == s2.aMultiSet;
 	if (!equal) return false;
 	if (s1.aComplexVector.size() != s2.aComplexVector.size()) return false;
-	for (int i = 0; i < s1.aComplexVector.size(); i++)
+	for (std::size_t i = 0; i < s1.aComplexVector.size(); i++)
 	{
 		if (!(s1.aComplexVector[i] == s2.aComplexVector[i])) return false;
 	}
@@ -264,7 +264,7 @@ bool operator == (const Struct4& s1, const Struct4& s2)
 	bool equal = s1.value == s2.value;
 	if (!equal) return false;
 	if (s1.vec.size() != s2.vec.size()) return false;
-	for (int i = 0; i < s1.vec.size(); i++)
+	for (std::size_t i = 0; i < s1.vec.size(); i++)
 	{
 		if (!(s1.vec[i] == s2.vec[i])) return false;
 	}
@@ -279,9 +279,7 @@ RemotingTest::RemotingTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-RemotingTest::~RemotingTest()
-{
-}
+RemotingTest::~RemotingTest() = default;
 
 
 void RemotingTest::setUp()
@@ -302,7 +300,7 @@ void RemotingTest::tearDown()
 	{
 		_pListener->connectionManager().shutdown();
 	}
-	_pListener = 0;
+	_pListener = nullptr;
 	Poco::ThreadPool::defaultPool().joinAll();
 }
 
@@ -787,8 +785,8 @@ void RemotingTest::testEvent()
 
 	pTester->testEvent -= Poco::delegate(this, &RemotingTest::onEvent);
 	pProxy->remoting__enableEvents(pEventListener, false);
-	pTester = 0;
-	pProxy = 0;
+	pTester = nullptr;
+	pProxy = nullptr;
 	Poco::Thread::sleep(1000); // wait for unsubscribe message
 }
 
@@ -811,8 +809,8 @@ void RemotingTest::testOneWayEvent()
 
 	pTester->testOneWayEvent -= Poco::delegate(this, &RemotingTest::onEvent);
 	pProxy->remoting__enableEvents(pEventListener, false);
-	pTester = 0;
-	pProxy = 0;
+	pTester = nullptr;
+	pProxy = nullptr;
 	Poco::Thread::sleep(1000); // wait for unsubscribe message
 }
 
@@ -835,20 +833,20 @@ void RemotingTest::testVoidEvent()
 
 	pTester->testVoidEvent -= Poco::delegate(this, &RemotingTest::onVoidEvent);
 	pProxy->remoting__enableEvents(pEventListener, false);
-	pTester = 0;
-	pProxy = 0;
+	pTester = nullptr;
+	pProxy = nullptr;
 	Poco::Thread::sleep(1000); // wait for unsubscribe message
 }
 
 
-void RemotingTest::onEvent(const void* pSender, std::string& arg)
+void RemotingTest::onEvent(const void* /*pSender*/, std::string& arg)
 {
 	_eventArg = arg;
 	_eventReceived.set();
 }
 
 
-void RemotingTest::onEventHeld(const void* pSender, std::string& arg)
+void RemotingTest::onEventHeld(const void* /*pSender*/, std::string& arg)
 {
 	_eventArg = arg;
 	_eventReceived.set();
@@ -1004,7 +1002,7 @@ void RemotingTest::testEventUnsubscribeNoThread()
 }
 
 
-void RemotingTest::onVoidEvent(const void* pSender)
+void RemotingTest::onVoidEvent(const void* /*pSender*/)
 {
 	_eventArg = "FIRED";
 	_eventReceived.set();
@@ -1288,14 +1286,14 @@ void RemotingTest::testStruct1Vec(ITester::Ptr pTester)
 
 	Struct1Vec vec2 = pTester->testStruct1Vec1(vec1);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
 
 	pTester->testStruct1Vec2(vec2);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
@@ -1303,7 +1301,7 @@ void RemotingTest::testStruct1Vec(ITester::Ptr pTester)
 	Struct1Vec vec3;
 	pTester->testStruct1Vec3(vec1, vec3);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
@@ -1366,9 +1364,7 @@ RemotingTestCompressed::RemotingTestCompressed(const std::string& name): Remotin
 }
 
 
-RemotingTestCompressed::~RemotingTestCompressed()
-{
-}
+RemotingTestCompressed::~RemotingTestCompressed() = default;
 
 
 ITester::Ptr RemotingTestCompressed::createProxy(const std::string& uri)

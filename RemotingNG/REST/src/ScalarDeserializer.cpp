@@ -21,19 +21,13 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
-ScalarDeserializer::ScalarDeserializer()
-{
-}
+ScalarDeserializer::ScalarDeserializer() = default;
 
 
-ScalarDeserializer::~ScalarDeserializer()
-{
-}
+ScalarDeserializer::~ScalarDeserializer() = default;
 
 
 Poco::RemotingNG::SerializerBase::MessageType ScalarDeserializer::findMessage(std::string&)
@@ -49,41 +43,41 @@ void ScalarDeserializer::deserializeMessageBegin(const std::string&, SerializerB
 }
 
 
-void ScalarDeserializer::deserializeMessageEnd(const std::string& name, SerializerBase::MessageType type)
+void ScalarDeserializer::deserializeMessageEnd(const std::string& /*name*/, SerializerBase::MessageType /*type*/)
 {
 	poco_bugcheck();
 }
 
 
-bool ScalarDeserializer::deserializeStructBegin(const std::string& name, bool isMandatory)
+bool ScalarDeserializer::deserializeStructBegin(const std::string& /*name*/, bool /*isMandatory*/)
 {
 	throw Poco::RemotingNG::DeserializerException("Cannot deserialize a structure from a header, form or path");
 }
 
 
-void ScalarDeserializer::deserializeStructEnd(const std::string& name)
+void ScalarDeserializer::deserializeStructEnd(const std::string& /*name*/)
 {
 }
 
 
-bool ScalarDeserializer::deserializeSequenceBegin(const std::string& name, bool isMandatory, Poco::UInt32& sizeHint)
+bool ScalarDeserializer::deserializeSequenceBegin(const std::string& /*name*/, bool /*isMandatory*/, Poco::UInt32& /*sizeHint*/)
 {
 	throw Poco::RemotingNG::DeserializerException("Cannot deserialize a sequence from a header, form or path");
 }
 
 
-void ScalarDeserializer::deserializeSequenceEnd(const std::string& name)
+void ScalarDeserializer::deserializeSequenceEnd(const std::string& /*name*/)
 {
 }
 
 
-bool ScalarDeserializer::deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull)
+bool ScalarDeserializer::deserializeNullableBegin(const std::string& /*name*/, bool /*isMandatory*/, bool& /*isNull*/)
 {
 	return false;
 }
 
 
-void ScalarDeserializer::deserializeNullableEnd(const std::string& name)
+void ScalarDeserializer::deserializeNullableEnd(const std::string& /*name*/)
 {
 }
 
@@ -224,7 +218,7 @@ bool ScalarDeserializer::deserialize(const std::string& name, bool isMandatory, 
 	const std::string& strVal = deserializeData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (float)Poco::NumberParser::parseFloat(strVal);
+		val = static_cast<float>(Poco::NumberParser::parseFloat(strVal));
 	}
 	return ret;
 }
@@ -328,4 +322,4 @@ void ScalarDeserializer::setupImpl(std::istream&)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

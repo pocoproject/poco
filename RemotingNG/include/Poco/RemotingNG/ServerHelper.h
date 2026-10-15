@@ -22,8 +22,7 @@
 #include "Poco/RemotingNG/ORB.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 template <class C>
@@ -55,7 +54,7 @@ class ServerHelper
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #define REMOTING_SPECIALIZE_SERVER_HELPER(namespc, clazz) \

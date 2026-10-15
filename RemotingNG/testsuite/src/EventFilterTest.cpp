@@ -20,9 +20,7 @@ EventFilterTest::EventFilterTest(const std::string& name): CppUnit::TestCase(nam
 }
 
 
-EventFilterTest::~EventFilterTest()
-{
-}
+EventFilterTest::~EventFilterTest() = default;
 
 
 void EventFilterTest::setUp()

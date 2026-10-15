@@ -23,9 +23,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 ServerTransport::ServerTransport(Listener& listener, CredentialsStore::Ptr pCredentialsStore, const Poco::SharedPtr<ChannelInputStream>& pRequestStream, const Poco::SharedPtr<ChannelOutputStream>& pReplyStream, bool compressed, bool authenticated):
@@ -34,8 +32,6 @@ ServerTransport::ServerTransport(Listener& listener, CredentialsStore::Ptr pCred
 	_pRequestStream(pRequestStream),
 	_pReplyStream(pReplyStream),
 	_authenticated(authenticated),
-	_pInflater(0),
-	_pDeflater(0),
 	_logger(Poco::Logger::get("RemotingNG.TCP.ServerTransport"s))
 {
 	if (compressed)
@@ -87,7 +83,7 @@ Deserializer& ServerTransport::beginRequest()
 }
 
 
-Serializer& ServerTransport::sendReply(SerializerBase::MessageType messageType)
+Serializer& ServerTransport::sendReply(SerializerBase::MessageType /*messageType*/)
 {
 	if (_logger.debug()) _logger.debug("Sending reply..."s);
 
@@ -170,7 +166,7 @@ void ServerTransport::run()
 		Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber = _listener.findEventSubscriber(path);
 		if (pEventSubscriber)
 		{
-			pEventSubscriber->invoke(*this, 0);
+			pEventSubscriber->invoke(*this, nullptr);
 		}
 		else
 		{
@@ -199,4 +195,4 @@ void ServerTransport::run()
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

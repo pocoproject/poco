@@ -15,8 +15,7 @@
 #include "Poco/RemotingNG/Credentials.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 const std::string Credentials::ATTR_USERNAME("n");
@@ -30,15 +29,10 @@ const std::string Credentials::ATTR_SIGNATURE("v");
 const std::string Credentials::ATTR_CREATED("c");
 
 
-Credentials::Credentials()
-{
-}
+Credentials::Credentials() = default;
 
 
-Credentials::Credentials(const Credentials& other):
-	AttributedObject(other)
-{
-}
+Credentials::Credentials(const Credentials& other) = default;
 
 
 Credentials::Credentials(Credentials&& other) noexcept:
@@ -47,11 +41,7 @@ Credentials::Credentials(Credentials&& other) noexcept:
 }
 
 	
-Credentials& Credentials::operator = (const Credentials& other)
-{
-	AttributedObject::operator = (other);
-	return *this;
-}
+Credentials& Credentials::operator = (const Credentials& other) = default;
 
 
 Credentials& Credentials::operator = (Credentials&& other) noexcept
@@ -61,9 +51,7 @@ Credentials& Credentials::operator = (Credentials&& other) noexcept
 }
 
 	
-Credentials::~Credentials()
-{
-}
+Credentials::~Credentials() = default;
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

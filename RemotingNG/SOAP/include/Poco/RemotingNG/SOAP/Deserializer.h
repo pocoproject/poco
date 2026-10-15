@@ -30,9 +30,7 @@
 #include <stack>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 class RemotingNGSOAP_API Deserializer: public Poco::RemotingNG::Deserializer
@@ -67,7 +65,7 @@ public:
 	Deserializer();
 		/// Creates the Deserializer.
 
-	~Deserializer();
+	~Deserializer() override;
 		/// Destroys the Deserializer.
 
 	void addHeaderInterceptor(HeaderInterceptor::Ptr pInterceptor);
@@ -92,44 +90,44 @@ public:
 		/// and content IDs.
 
 	// Poco::RemotingNG::Deserializer
-	Poco::RemotingNG::SerializerBase::MessageType findMessage(std::string& name);
-	void deserializeMessageBegin(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type);
-	void deserializeMessageEnd(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type);
-	bool deserializeStructBegin(const std::string& name, bool isMandatory);
-	void deserializeStructEnd(const std::string& name);
-	bool deserializeSequenceBegin(const std::string& name, bool isMandatory, Poco::UInt32& sizeHint);
-	void deserializeSequenceEnd(const std::string& name);
-	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull);
-	void deserializeNullableEnd(const std::string& name);
-	bool deserializeOptionalBegin(const std::string& name, bool isMandatory, bool& isSpecified);
-	void deserializeOptionalEnd(const std::string& name);
+	Poco::RemotingNG::SerializerBase::MessageType findMessage(std::string& name) override;
+	void deserializeMessageBegin(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type) override;
+	void deserializeMessageEnd(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type) override;
+	bool deserializeStructBegin(const std::string& name, bool isMandatory) override;
+	void deserializeStructEnd(const std::string& name) override;
+	bool deserializeSequenceBegin(const std::string& name, bool isMandatory, Poco::UInt32& sizeHint) override;
+	void deserializeSequenceEnd(const std::string& name) override;
+	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull) override;
+	void deserializeNullableEnd(const std::string& name) override;
+	bool deserializeOptionalBegin(const std::string& name, bool isMandatory, bool& isSpecified) override;
+	void deserializeOptionalEnd(const std::string& name) override;
 
-	bool deserialize(const std::string& name, bool isMandatory, Poco::Int8& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt8& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::Int16& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt16& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::Int32& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt32& value);
-	bool deserialize(const std::string& name, bool isMandatory, long& value);
-	bool deserialize(const std::string& name, bool isMandatory, unsigned long& value);
+	bool deserialize(const std::string& name, bool isMandatory, Poco::Int8& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt8& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::Int16& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt16& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::Int32& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt32& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, long& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, unsigned long& value) override;
 #ifndef POCO_INT64_IS_LONG
-	bool deserialize(const std::string& name, bool isMandatory, Poco::Int64& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt64& value);
+	bool deserialize(const std::string& name, bool isMandatory, Poco::Int64& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt64& value) override;
 #endif
-	bool deserialize(const std::string& name, bool isMandatory, float& value);
-	bool deserialize(const std::string& name, bool isMandatory, double& value);
-	bool deserialize(const std::string& name, bool isMandatory, bool& value);
-	bool deserialize(const std::string& name, bool isMandatory, char& value);
-	bool deserialize(const std::string& name, bool isMandatory, std::string& value);
-	bool deserialize(const std::string& name, bool isMandatory, std::vector<char>& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::DateTime& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::LocalDateTime& value);
+	bool deserialize(const std::string& name, bool isMandatory, float& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, double& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, bool& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, char& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, std::string& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, std::vector<char>& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::DateTime& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::LocalDateTime& value) override;
 
-	void pushAttribute(const std::string& ns, const std::string& attrName, bool isMandatory);
+	void pushAttribute(const std::string& ns, const std::string& attrName, bool isMandatory) override;
 
 protected:
-	void resetImpl();
-	void setupImpl(std::istream& istr);
+	void resetImpl() override;
+	void setupImpl(std::istream& istr) override;
 
 private:
 	Deserializer(const Deserializer&);
@@ -164,9 +162,9 @@ private:
 	using AttrMap = std::map<std::string, AttrInfo>;
 
 	std::vector<HeaderInterceptor::Ptr> _headerInterceptors;
-	Serializer::SOAPVersion _soapVersion;
-	bool _mtom;
-	const SOAPContentHandler::Node* _pRoot;
+	Serializer::SOAPVersion _soapVersion = Serializer::SOAP_1_1;
+	bool _mtom = false;
+	const SOAPContentHandler::Node* _pRoot = nullptr;
 	XML::SAXParser _internalReader;
 	XML::WhitespaceFilter _reader;
 	SOAPContentHandler _contentHandler;
@@ -190,7 +188,7 @@ inline Serializer::SOAPVersion Deserializer::soapVersion() const
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP
 
 
 #endif // RemotingNG_SOAP_Deserializer_INCLUDED

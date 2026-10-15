@@ -19,20 +19,13 @@
 using Poco::ErrorHandler;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
-TimerTask::TimerTask():
-	_isCancelled(false)
-{
-}
+TimerTask::TimerTask() = default;
 
 
-TimerTask::~TimerTask()
-{
-}
+TimerTask::~TimerTask() = default;
 
 
 void TimerTask::cancel()
@@ -49,9 +42,7 @@ public:
 	{
 	}
 	
-	~TimerNotification()
-	{
-	}
+	~TimerNotification() override = default;
 	
 	virtual bool execute() = 0;
 	
@@ -73,11 +64,9 @@ public:
 	{
 	}
 	
-	~StopNotification()
-	{
-	}
+	~StopNotification() override = default;
 	
-	bool execute()
+	bool execute() override
 	{
 		queue().clear();
 		return false;
@@ -93,11 +82,9 @@ public:
 	{
 	}
 	
-	~CancelNotification()
-	{
-	}
+	~CancelNotification() override = default;
 	
-	bool execute()
+	bool execute() override
 	{
 		queue().clear();
 		_finished.set();
@@ -123,16 +110,14 @@ public:
 	{
 	}
 	
-	~TaskNotification()
-	{
-	}
+	~TaskNotification() override = default;
 	
 	TimerTask::Ptr task()
 	{
 		return _pTask;	
 	}
 	
-	bool execute()
+	bool execute() override
 	{
 		if (!_pTask->isCancelled())
 		{
@@ -171,11 +156,9 @@ public:
 	{
 	}
 	
-	~FixedRateTaskNotification()
-	{
-	}
+	~FixedRateTaskNotification() override = default;
 	
-	bool execute()
+	bool execute() override
 	{	
 		TaskNotification::execute();
 
@@ -246,4 +229,4 @@ void Timer::run()
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

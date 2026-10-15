@@ -22,9 +22,7 @@
 #include "Poco/RemotingNG/TransportFactory.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class ConnectionManager;
@@ -40,11 +38,11 @@ public:
 	explicit TransportFactory(ConnectionManager& connectionManager);
 		/// Creates a TransportFactory using the given ConnectionManager instance.
 
-	~TransportFactory();
+	~TransportFactory() override;
 		/// Destroys the TransportFactory.
 
 	// TransportFactory
-	[[nodiscard]] Poco::RemotingNG::Transport* createTransport();
+	[[nodiscard]] Poco::RemotingNG::Transport* createTransport() override;
 
 	// Helpers
 	static void registerFactory();
@@ -62,7 +60,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_TransportFactory_INCLUDED

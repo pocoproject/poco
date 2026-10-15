@@ -21,9 +21,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 const std::string HeaderDeserializer::EMPTY;
@@ -35,12 +33,10 @@ HeaderDeserializer::HeaderDeserializer(const Poco::Net::HTTPMessage& message):
 }
 
 
-HeaderDeserializer::~HeaderDeserializer()
-{
-}
+HeaderDeserializer::~HeaderDeserializer() = default;
 
 
-bool HeaderDeserializer::deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull)
+bool HeaderDeserializer::deserializeNullableBegin(const std::string& name, bool /*isMandatory*/, bool& isNull)
 {
 	isNull = !_message.has(name);
 	return !isNull;
@@ -66,4 +62,4 @@ const std::string& HeaderDeserializer::deserializeData(const std::string& name, 
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

@@ -31,24 +31,17 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
-Deserializer::Deserializer():
-	_soapVersion(Serializer::SOAP_1_1),
-	_mtom(false),
-	_pRoot(0)
+Deserializer::Deserializer()
 {
 	_reader.setParent(&_internalReader);
 	_reader.setContentHandler(&_contentHandler);
 }
 
 
-Deserializer::~Deserializer()
-{
-}
+Deserializer::~Deserializer() = default;
 
 
 void Deserializer::addHeaderInterceptor(HeaderInterceptor::Ptr pInterceptor)
@@ -97,7 +90,7 @@ Poco::RemotingNG::SerializerBase::MessageType Deserializer::findMessage(std::str
 	poco_assert_dbg (_entries.size() == 1);
 
 	// the first child in the root element is the method name or the SOAP envelope or the SOAP fault inside the soap envelope
-	const SOAPContentHandler::Node* pCur = 0;
+	const SOAPContentHandler::Node* pCur = nullptr;
 	pCur = _entries.top().first;
 	pCur = &pCur->_children.at(0);
 	if (pCur->_name != Serializer::ENVELOPE) // we deliberately don't check namespaces!
@@ -395,7 +388,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (Poco::Int8)Poco::NumberParser::parse(strVal); //todo: overflow/underflow checks
+		val = static_cast<Poco::Int8>(Poco::NumberParser::parse(strVal)); //todo: overflow/underflow checks
 	}
 	return ret;
 }
@@ -407,7 +400,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (Poco::UInt8) Poco::NumberParser::parseUnsigned(strVal); //todo: overflow/underflow checks
+		val = static_cast<Poco::UInt8>(Poco::NumberParser::parseUnsigned(strVal)); //todo: overflow/underflow checks
 	}
 	return ret;
 }
@@ -419,7 +412,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (Poco::Int16)Poco::NumberParser::parse(strVal); //todo: overflow/underflow checks
+		val = static_cast<Poco::Int16>(Poco::NumberParser::parse(strVal)); //todo: overflow/underflow checks
 	}
 	return ret;
 }
@@ -431,7 +424,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (Poco::UInt16) Poco::NumberParser::parseUnsigned(strVal); //todo: overflow/underflow checks
+		val = static_cast<Poco::UInt16>(Poco::NumberParser::parseUnsigned(strVal)); //todo: overflow/underflow checks
 	}
 	return ret;
 }
@@ -525,7 +518,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, float&
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (float)Poco::NumberParser::parseFloat(strVal);
+		val = static_cast<float>(Poco::NumberParser::parseFloat(strVal));
 	}
 	return ret;
 }
@@ -839,4 +832,4 @@ void Deserializer::copyToVector(std::istream& istr, std::vector<char>& vec)
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

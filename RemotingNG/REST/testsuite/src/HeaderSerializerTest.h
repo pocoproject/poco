@@ -22,13 +22,13 @@ class HeaderSerializerTest: public CppUnit::TestCase
 {
 public:
 	HeaderSerializerTest(const std::string& name);
-	~HeaderSerializerTest();
+	~HeaderSerializerTest() override;
 
 	void testParams();
 	void testTypes();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

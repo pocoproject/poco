@@ -22,8 +22,7 @@
 #include "Poco/CodeGeneration/CodeGenerator.h"
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 class CodeGeneration_API MethodPropertyFilter: public CodeGenerator
@@ -41,71 +40,71 @@ public:
 		/// Creates a MethodPropertyFilter decorating another CodeGenerator. Takes ownership of the pointer which must not be 0.
 		/// Convenience constructor which takes exactly one property.
 
-	~MethodPropertyFilter();
+	~MethodPropertyFilter() override;
 		/// Destroys the MethodPropertyFilter.
 
-	void addIncludeFile(const std::string& incFile);
+	void addIncludeFile(const std::string& incFile) override;
 		/// Adds an include file to the CodeGenerator. A call to this method is only meaningful until structStart was not called.
 		/// Duplicate includes will be ignored. Contains the include path only, e.g. "include/MyClass.h" (without enclosing ")
 
-	void addSystemIncludeFile(const std::string& incFile);
+	void addSystemIncludeFile(const std::string& incFile) override;
 		/// Adds a system include file.
 
-	void addFwdDecl(const std::string& inclFile, const std::string& className, const std::string namespacePrefix);
+	void addFwdDecl(const std::string& inclFile, const std::string& className, const std::string namespacePrefix) override;
 		/// Adds a fwd decl.
 
-	void writeIncludes();
+	void writeIncludes() override;
 		/// Convenience Functions which calls for all include files writeInclude, also writes fwdDecls.
 
-	void writeDefaultHeader(const Poco::CppParser::Struct* pStruct, const std::string& className, const std::string& libraryName, const std::string& package);
+	void writeDefaultHeader(const Poco::CppParser::Struct* pStruct, const std::string& className, const std::string& libraryName, const std::string& package) override;
 		/// Writes the default header, e.g. copyright notice, no include namespace open or anything else is written
 		/// This is always the first method that is called!
 
-	void writeInclude(const std::string& include, bool toHeader);
+	void writeInclude(const std::string& include, bool toHeader) override;
 
-	void writeSystemInclude(const std::string& include);
+	void writeSystemInclude(const std::string& include) override;
 
-	void writeNameSpaceBegin(const std::string& ns);
+	void writeNameSpaceBegin(const std::string& ns) override;
 
-	void writeFwdDecls(const CodeGenerator::FwdDecls& decl);
+	void writeFwdDecls(const CodeGenerator::FwdDecls& decl) override;
 
-	void writeNameSpaceEnd(const std::string& ns);
+	void writeNameSpaceEnd(const std::string& ns) override;
 
-	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
+	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties) override;
 
-	void structEnd();
+	void structEnd() override;
 
-	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 
-	void writeMethodImplementation(const std::string& code);
+	void writeMethodImplementation(const std::string& code) override;
 
-	void writeImplementation(const std::string& code);
+	void writeImplementation(const std::string& code) override;
 
-	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 
-	void variablesStart();
+	void variablesStart() override;
 
-	void variable(const Poco::CppParser::Variable* pVar);
+	void variable(const Poco::CppParser::Variable* pVar) override;
 
-	void variablesEnd();
+	void variablesEnd() override;
 
-	[[nodiscard]] const CodeGenerator::IncludeSet& includes() const;
+	[[nodiscard]] const CodeGenerator::IncludeSet& includes() const override;
 
-	[[nodiscard]] const CodeGenerator::IncludeSet& systemIncludes() const;
+	[[nodiscard]] const CodeGenerator::IncludeSet& systemIncludes() const override;
 
-	[[nodiscard]] const std::string& nameSpace() const;
+	[[nodiscard]] const std::string& nameSpace() const override;
 
-	[[nodiscard]] const std::string& libraryName() const;
+	[[nodiscard]] const std::string& libraryName() const override;
 
-	[[nodiscard]] bool usePocoIncludeStyle() const;
+	[[nodiscard]] bool usePocoIncludeStyle() const override;
 
-	[[nodiscard]] const std::string& copyright() const;
+	[[nodiscard]] const std::string& copyright() const override;
 
-	void endFile();
+	void endFile() override;
 
-	void writeTypeDef(const Poco::CppParser::TypeDef* pType);
+	void writeTypeDef(const Poco::CppParser::TypeDef* pType) override;
 
-	void writeUsing(const Poco::CppParser::TypeAlias* pType);
+	void writeUsing(const Poco::CppParser::TypeAlias* pType) override;
 
 private:
 	[[nodiscard]] bool matches(const CodeGenerator::Properties& properties) const;
@@ -269,7 +268,7 @@ inline void MethodPropertyFilter::writeUsing(const Poco::CppParser::TypeAlias* p
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration
 
 
 #endif // CodeGeneration_MethodPropertyFilter_INCLUDED

@@ -25,8 +25,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 class CodeGenerator;
@@ -36,8 +35,8 @@ class CodeGeneration_API GeneratorEngine
 	/// A GeneratorEngine iterates over a Struct and calls the correct methods in a CodeGenerator.
 {
 public:
-	typedef void (*MethodGenerator)(const Poco::CppParser::Function*, const Poco::CppParser::Struct*, CodeGenerator&, void* param);
-	typedef std::map<std::string, MethodGenerator> Callbacks;
+	using MethodGenerator = void (*)(const Poco::CppParser::Function*, const Poco::CppParser::Struct*, CodeGenerator&, void* param);
+	using Callbacks = std::map<std::string, MethodGenerator>;
 
 	GeneratorEngine();
 		/// Creates the GeneratorEngine.
@@ -86,7 +85,7 @@ public:
 	void unregisterCallback(const std::string& methodName);
 		/// Unregisters a callback.
 
-	void generate(const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam = 0, bool isFirstClass = true, bool isLastClass = true);
+	void generate(const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam = nullptr, bool isFirstClass = true, bool isLastClass = true);
 		/// Generates code for the given struct using the given CodeGenerator, addParam can be used to provide a pointer to additional information, required for the
 		/// registered callbacks. If isFirstClass is true, the copyright header and the namespace begin is written, if isLastClass is true
 		/// the namespace is closed.
@@ -215,7 +214,7 @@ inline void GeneratorEngine::unregisterCallback(const std::string& methodName)
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration
 
 
 #endif // CodeGeneration_GeneratorEngine_INCLUDED

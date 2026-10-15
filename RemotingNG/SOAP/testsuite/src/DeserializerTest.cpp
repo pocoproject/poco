@@ -28,9 +28,7 @@ DeserializerTest::DeserializerTest(const std::string& name): CppUnit::TestCase(n
 }
 
 
-DeserializerTest::~DeserializerTest()
-{
-}
+DeserializerTest::~DeserializerTest() = default;
 
 
 void DeserializerTest::testRequestNoParams11()
@@ -1073,7 +1071,7 @@ void DeserializerTest::testInterceptor()
 	class TestDeserInterceptor: public Deserializer::HeaderInterceptor
 	{
 	public:
-		void interceptHeader(const XMLElement& header)
+		void interceptHeader(const XMLElement& header) override
 		{
 			if (header.children().size() > 0)
 			{
@@ -1085,7 +1083,7 @@ void DeserializerTest::testInterceptor()
 			}
 		}
 
-		const std::string& value() const
+		[[nodiscard]] const std::string& value() const
 		{
 			return _value;
 		}

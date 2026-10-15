@@ -23,9 +23,7 @@ JSONParserTest::JSONParserTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-JSONParserTest::~JSONParserTest()
-{
-}
+JSONParserTest::~JSONParserTest() = default;
 
 
 void JSONParserTest::testNull()

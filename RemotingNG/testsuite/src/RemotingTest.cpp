@@ -47,7 +47,7 @@ namespace
 		{
 		}
 
-		bool authorize(const std::string& method, const std::string& permission)
+		bool authorize(const std::string& method, const std::string& permission) override
 		{
 			if (_pAuthorizer)
 			{
@@ -56,19 +56,19 @@ namespace
 			return false;
 		}
 
-		Poco::RemotingNG::Deserializer& beginRequest()
+		Poco::RemotingNG::Deserializer& beginRequest() override
 		{
 			_deserializer.setup(_istr);
 			return _deserializer;
 		}
 
-		Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType)
+		Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType /*messageType*/) override
 		{
 			_serializer.setup(_ostr);
 			return _serializer;
 		}
 
-		void endRequest()
+		void endRequest() override
 		{
 		}
 
@@ -100,11 +100,9 @@ namespace
 		{
 		}
 
-		~MockListener()
-		{
-		}
+		~MockListener() override = default;
 
-		bool running() const
+		[[nodiscard]] bool running() const
 		{
 			return _running;
 		}
@@ -123,7 +121,7 @@ namespace
 			{
 				if (_pEventSubscriber)
 				{
-					_pEventSubscriber->invoke(transport, 0);
+					_pEventSubscriber->invoke(transport, nullptr);
 				}
 				else
 				{
@@ -147,22 +145,22 @@ namespace
 		}
 
 		// Listener
-		void start()
+		void start() override
 		{
 			_running = true;
 		}
 
-		void stop()
+		void stop() override
 		{
 			_running = false;
 		}
 
-		const std::string& protocol() const
+		[[nodiscard]] const std::string& protocol() const override
 		{
 			return _protocol;
 		}
 
-		std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId)
+		std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId) override
 		{
 			std::string uri("mock://localhost/");
 			uri += _protocol;
@@ -173,21 +171,21 @@ namespace
 			return uri;
 		}
 
-		bool handlesURI(const std::string& uri)
+		bool handlesURI(const std::string& /*uri*/) override
 		{
 			return false;
 		}
 
-		void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton)
+		void registerObject(Poco::RemotingNG::RemoteObject::Ptr /*pRemoteObject*/, Poco::RemotingNG::Skeleton::Ptr /*pSkeleton*/) override
 		{
 		}
 
-		void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject)
+		void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr /*pRemoteObject*/) override
 		{
 		}
 
 		// EventListener
-		std::string subscribeToEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber)
+		std::string subscribeToEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber) override
 		{
 			_pEventSubscriber = pEventSubscriber;
 			std::string subscriberURI = createURI("RemotingNG::EventSubscriber", "TheEventSubscriber");
@@ -195,11 +193,11 @@ namespace
 			return subscriberURI;
 		}
 
-		void unsubscribeFromEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber)
+		void unsubscribeFromEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber) override
 		{
 			std::string subscriberURI = createURI("RemotingNG::EventSubscriber", "TheEventSubscriber");
 			_pServerListener->unregisterSubscriber(pEventSubscriber->uri(), subscriberURI);
-			_pEventSubscriber = 0;
+			_pEventSubscriber = nullptr;
 		}
 
 	private:
@@ -226,59 +224,57 @@ namespace
 		{
 		}
 
-		~MockTransport()
-		{
-		}
+		~MockTransport() override = default;
 
-		const std::string& endPoint() const
+		[[nodiscard]] const std::string& endPoint() const override
 		{
 			return _pListener->endPoint();
 		}
 
-		void connect(const std::string& endPoint)
+		void connect(const std::string& /*endPoint*/) override
 		{
 			_connected = true;
 		}
 
-		void disconnect()
+		void disconnect() override
 		{
 			_connected = false;
 		}
 
-		bool connected() const
+		[[nodiscard]] bool connected() const override
 		{
 			return _connected;
 		}
 
-		Poco::RemotingNG::Serializer& beginMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType)
+		Poco::RemotingNG::Serializer& beginMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override
 		{
 			return beginRequest(oid, tid, messageName, messageType);
 		}
 
-		void sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType)
+		void sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override
 		{
 			sendRequest(oid, tid, messageName, messageType);
 		}
 
-		Poco::RemotingNG::Serializer& beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType)
+		Poco::RemotingNG::Serializer& beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/) override
 		{
 			_pRequestStream = new std::stringstream;
 			_serializer.setup(*_pRequestStream);
 			return _serializer;
 		}
 
-		Poco::RemotingNG::Deserializer& sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType)
+		Poco::RemotingNG::Deserializer& sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/) override
 		{
 			_pResponseStream = new std::stringstream;
 			_pListener->invoke(tid, oid, *_pRequestStream, *_pResponseStream);
 			_deserializer.setup(*_pResponseStream);
-			_pRequestStream = 0;
+			_pRequestStream = nullptr;
 			return _deserializer;
 		}
 
-		void endRequest()
+		void endRequest() override
 		{
-			_pResponseStream = 0;
+			_pResponseStream = nullptr;
 		}
 
 	private:
@@ -299,7 +295,7 @@ namespace
 		{
 		}
 
-		Poco::RemotingNG::Transport* createTransport()
+		Poco::RemotingNG::Transport* createTransport() override
 		{
 			return new MockTransport(_pListener);
 		}
@@ -326,11 +322,9 @@ namespace
 		{
 		}
 
-		~MockAuthorizer()
-		{
-		}
+		~MockAuthorizer() override = default;
 
-		bool authorize(const std::string& method, const std::string& permission)
+		bool authorize(const std::string& /*method*/, const std::string& permission) override
 		{
 			return permission == _permission;
 		}
@@ -368,12 +362,12 @@ bool operator == (const Struct2& s1, const Struct2& s2)
 
 	if (!equal) return false;
 	if (s1.aVector.size() != s2.aVector.size()) return false;
-	for (int i = 0; i < s1.aVector.size(); i++)
+	for (std::size_t i = 0; i < s1.aVector.size(); i++)
 	{
 		if (!(s1.aVector[i] == s2.aVector[i])) return false;
 	}
 	if (s1.anotherVector.size() != s2.anotherVector.size()) return false;
-	for (int i = 0; i < s1.anotherVector.size(); i++)
+	for (std::size_t i = 0; i < s1.anotherVector.size(); i++)
 	{
 		if (!s1.anotherVector[i].isNull() && !s2.anotherVector[i].isNull())
 		{
@@ -391,7 +385,7 @@ bool operator == (const Struct3& s1, const Struct3& s2)
 	          && s1.aMultiSet == s2.aMultiSet;
 	if (!equal) return false;
 	if (s1.aComplexVector.size() != s2.aComplexVector.size()) return false;
-	for (int i = 0; i < s1.aComplexVector.size(); i++)
+	for (std::size_t i = 0; i < s1.aComplexVector.size(); i++)
 	{
 		if (!(s1.aComplexVector[i] == s2.aComplexVector[i])) return false;
 	}
@@ -404,7 +398,7 @@ bool operator == (const Struct4& s1, const Struct4& s2)
 	bool equal = s1.value == s2.value;
 	if (!equal) return false;
 	if (s1.vec.size() != s2.vec.size()) return false;
-	for (int i = 0; i < s1.vec.size(); i++)
+	for (std::size_t i = 0; i < s1.vec.size(); i++)
 	{
 		if (!(s1.vec[i] == s2.vec[i])) return false;
 	}
@@ -415,15 +409,12 @@ bool operator == (const Struct4& s1, const Struct4& s2)
 
 
 RemotingTest::RemotingTest(const std::string& name):
-	CppUnit::TestCase(name),
-	_filteredArg(0)
+	CppUnit::TestCase(name)
 {
 }
 
 
-RemotingTest::~RemotingTest()
-{
-}
+RemotingTest::~RemotingTest() = default;
 
 
 void RemotingTest::setUp()
@@ -443,7 +434,7 @@ void RemotingTest::tearDown()
 	TestTransportFactory::unregisterFactory("mock");
 	TestTransportFactory::unregisterFactory("MOCK");
 	Poco::RemotingNG::ORB::instance().unregisterListener(_listener);
-	_pListener = 0;
+	_pListener = nullptr;
 }
 
 
@@ -1112,14 +1103,14 @@ void RemotingTest::testStruct1Vec(ITester::Ptr pTester)
 
 	Struct1Vec vec2 = pTester->testStruct1Vec1(vec1);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
 
 	pTester->testStruct1Vec2(vec2);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
@@ -1127,7 +1118,7 @@ void RemotingTest::testStruct1Vec(ITester::Ptr pTester)
 	Struct1Vec vec3;
 	pTester->testStruct1Vec3(vec1, vec3);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
@@ -1162,13 +1153,13 @@ void RemotingTest::testPermissions(ITester::Ptr pTester)
 }
 
 
-void RemotingTest::onEvent(const void* pSender, std::string& arg)
+void RemotingTest::onEvent(const void* /*pSender*/, std::string& arg)
 {
 	_eventArg = arg;
 }
 
 
-void RemotingTest::onVoidEvent(const void* pSender)
+void RemotingTest::onVoidEvent(const void* /*pSender*/)
 {
 	_eventArg = "FIRED";
 }

@@ -22,15 +22,15 @@ class PathDeserializerTest: public CppUnit::TestCase
 {
 public:
 	PathDeserializerTest(const std::string& name);
-	~PathDeserializerTest();
+	~PathDeserializerTest() override;
 
 	void testParams();
 	void testTypes();
 	void testAlternation();
 	void testAlternationMultiple();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 
