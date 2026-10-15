@@ -16,9 +16,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 std::size_t JSValue::size() const
@@ -63,4 +61,4 @@ bool JSValue::has(const std::string& name) const
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

@@ -24,9 +24,7 @@ HeaderDeserializerTest::HeaderDeserializerTest(const std::string& name): CppUnit
 }
 
 
-HeaderDeserializerTest::~HeaderDeserializerTest()
-{
-}
+HeaderDeserializerTest::~HeaderDeserializerTest() = default;
 
 
 void HeaderDeserializerTest::testParams()

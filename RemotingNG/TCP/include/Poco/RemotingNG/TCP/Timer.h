@@ -24,9 +24,7 @@
 #include "Poco/Runnable.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API TimerTask: public Poco::RefCountedObject, public Poco::Runnable
@@ -55,12 +53,12 @@ public:
 		/// to cancel().
 
 protected:
-	~TimerTask();
+	~TimerTask() override;
 		/// Destroys the TimerTask.
 
 private:
-	TimerTask(const TimerTask&);
-	TimerTask& operator = (const TimerTask&);
+	TimerTask(const TimerTask&) = delete;
+	TimerTask& operator = (const TimerTask&) = delete;
 
 	bool _isCancelled;
 
@@ -86,7 +84,7 @@ public:
 	Timer();
 		/// Creates the Timer.
 
-	~Timer();
+	~Timer() override;
 		/// Destroys the Timer, cancelling all pending tasks.
 
 	void cancel(bool wait = false);
@@ -111,11 +109,11 @@ public:
 		/// further executions are delayed.
 
 protected:
-	void run();
+	void run() override;
 
 private:
-	Timer(const Timer&);
-	Timer& operator = (const Timer&);
+	Timer(const Timer&) = delete;
+	Timer& operator = (const Timer&) = delete;
 
 	Poco::TimedNotificationQueue _queue;
 	Poco::Thread _thread;
@@ -131,7 +129,7 @@ inline bool TimerTask::isCancelled() const
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_Timer_INCLUDED

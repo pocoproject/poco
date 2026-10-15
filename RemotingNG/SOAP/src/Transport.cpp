@@ -35,9 +35,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 const std::string Transport::PROTOCOL("soap");
@@ -61,7 +59,7 @@ public:
 	{
 	}
 
-	void interceptHeader(XMLElement& headerElem)
+	void interceptHeader(XMLElement& headerElem) override
 	{
 		if (_transport.getAuthentication() == Transport::AUTH_WSSE_TEXT || _transport.getAuthentication() == Transport::AUTH_WSSE_DIGEST)
 		{
@@ -160,9 +158,7 @@ Transport::Transport(Serializer::SOAPVersion soapVersion):
 }
 
 
-Transport::~Transport()
-{
-}
+Transport::~Transport() = default;
 
 
 Poco::Timespan Transport::getTimeout() const
@@ -405,7 +401,7 @@ void Transport::connect(const std::string& endPoint)
 
 void Transport::disconnect()
 {
-	_pSession = 0;
+	_pSession = nullptr;
 	_endPoint.clear();
 	_endPointURI.clear();
 }
@@ -425,7 +421,7 @@ Poco::RemotingNG::Serializer& Transport::beginMessage(const Poco::RemotingNG::Id
 
 void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
-	_pDeflater = 0;
+	_pDeflater = nullptr;
 	if (!_chunkedTransferEncoding)
 	{
 		Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_POST, _endPointURI.getPathEtc(), Poco::Net::HTTPMessage::HTTP_1_1);
@@ -499,7 +495,7 @@ Poco::RemotingNG::Serializer& Transport::beginRequest(const Poco::RemotingNG::Id
 
 Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
-	_pDeflater = 0;
+	_pDeflater = nullptr;
 	Poco::Net::HTTPResponse response;
 	std::istream* pResponseStream;
 
@@ -572,8 +568,8 @@ void Transport::endRequest()
 {
 	_serializer.reset();
 	_deserializer.reset();
-	_pStream = 0;
-	_pDeflater = 0;
+	_pStream = nullptr;
+	_pDeflater = nullptr;
 }
 
 
@@ -650,4 +646,4 @@ void Transport::prepareRequest(Poco::Net::HTTPRequest& request, const std::strin
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

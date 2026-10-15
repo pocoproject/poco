@@ -17,9 +17,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 RESTRequestHandlerFactory::RESTRequestHandlerFactory(Listener& listener):
@@ -28,9 +26,7 @@ RESTRequestHandlerFactory::RESTRequestHandlerFactory(Listener& listener):
 }
 
 
-RESTRequestHandlerFactory::~RESTRequestHandlerFactory()
-{
-}
+RESTRequestHandlerFactory::~RESTRequestHandlerFactory() = default;
 
 
 Poco::Net::HTTPRequestHandler* RESTRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
@@ -39,4 +35,4 @@ Poco::Net::HTTPRequestHandler* RESTRequestHandlerFactory::createRequestHandler(c
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

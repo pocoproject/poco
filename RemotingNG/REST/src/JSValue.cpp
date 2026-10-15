@@ -16,9 +16,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 std::size_t JSValue::size() const
@@ -63,4 +61,4 @@ bool JSValue::has(const std::string& name) const
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

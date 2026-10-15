@@ -139,10 +139,10 @@ public:
 		/// Returns true if the function with the given name is an overrided virtual function.
 
 private:
-	GenUtility();
-	~GenUtility();
-	GenUtility(const GenUtility&);
-	GenUtility& operator = (const GenUtility&);
+	GenUtility() = delete;
+	~GenUtility() = delete;
+	GenUtility(const GenUtility&) = delete;
+	GenUtility& operator = (const GenUtility&) = delete;
 
 	static const std::string ATTR_INLINE;
 	static const std::string ATTR_NAME;

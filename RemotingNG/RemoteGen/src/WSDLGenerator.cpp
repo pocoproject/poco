@@ -76,9 +76,7 @@ WSDLGenerator::WSDLGenerator(Poco::CodeGeneration::CppGenerator& cppGen, const s
 }
 
 
-WSDLGenerator::~WSDLGenerator()
-{
-}
+WSDLGenerator::~WSDLGenerator() = default;
 
 
 std::string WSDLGenerator::generateFileName(const Poco::CppParser::Struct* pStruct)

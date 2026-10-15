@@ -22,14 +22,14 @@ class RawSerializerTest: public CppUnit::TestCase
 {
 public:
 	RawSerializerTest(const std::string& name);
-	~RawSerializerTest();
+	~RawSerializerTest() override;
 
 	void testInt();
 	void testString();
 	void testBinary();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

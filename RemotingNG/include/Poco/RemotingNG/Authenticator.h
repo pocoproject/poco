@@ -24,8 +24,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API AuthenticateResult
@@ -109,7 +108,7 @@ public:
 	Authenticator();
 		/// Creates the Authenticator.
 
-	virtual ~Authenticator();
+	~Authenticator() override;
 		/// Destroys the Authenticator.
 		
 	[[nodiscard]] virtual AuthenticateResult authenticate(const Credentials& credentials, Poco::UInt32 conversationID = 0) = 0;
@@ -175,7 +174,7 @@ inline Poco::UInt32 AuthenticateResult::conversationID() const
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Authenticator_INCLUDED

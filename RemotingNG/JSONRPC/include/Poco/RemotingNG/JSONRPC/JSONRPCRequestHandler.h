@@ -24,9 +24,7 @@
 #include "Poco/Logger.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 class RemotingNGJSONRPC_API JSONRPCRequestHandler: public Poco::Net::HTTPRequestHandler
@@ -36,24 +34,24 @@ public:
 	JSONRPCRequestHandler(Listener& listener);
 		/// Creates a JSONRPCRequestHandler, using the given Listener.
 
-	~JSONRPCRequestHandler();
+	~JSONRPCRequestHandler() override;
 		/// Destroys the JSONRPCRequestHandler.
 
 	// Poco::Net::HTTPRequestHandler
-	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
+	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
 
 protected:
 	[[nodiscard]] bool handleCORS(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
 	
 private:
-	JSONRPCRequestHandler();
+	JSONRPCRequestHandler() = delete;
 
 	Listener& _listener;
 	Poco::Logger& _logger;
 };
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC
 
 
 #endif // RemotingNG_JSONRPC_JSONRPCRequestHandler_INCLUDED

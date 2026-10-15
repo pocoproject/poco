@@ -44,7 +44,7 @@ namespace
 	class NoAuthRequestHandler: public Poco::Net::HTTPRequestHandler
 	{
 	public:
-		void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+		void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override
 		{
 			Poco::NullOutputStream nullStream;
 			Poco::StreamCopier::copyStream(request.stream(), nullStream);
@@ -63,7 +63,7 @@ namespace
 		{
 		}
 
-		Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override
 		{
 			if (request.hasCredentials())
 			{
@@ -84,9 +84,9 @@ namespace
 	class MockAuthenticator: public Poco::RemotingNG::Authenticator
 	{
 	public:
-		typedef Poco::AutoPtr<MockAuthenticator> Ptr;
+		using Ptr = Poco::AutoPtr<MockAuthenticator>;
 
-		Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32)
+		Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32) override
 		{
 			std::string username = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "");
 			std::string password = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "");
@@ -112,7 +112,7 @@ namespace
 	class MockAuthorizer: public Poco::RemotingNG::Authorizer
 	{
 	public:
-		bool authorize(const std::string& method, const std::string& permission)
+		bool authorize(const std::string& method, const std::string& permission) override
 		{
 			Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
 
@@ -204,9 +204,7 @@ RemotingTest::RemotingTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-RemotingTest::~RemotingTest()
-{
-}
+RemotingTest::~RemotingTest() = default;
 
 
 void RemotingTest::setUp()
@@ -223,7 +221,7 @@ void RemotingTest::tearDown()
 	TesterServerHelper::unregisterObject(_objectURI);
 	Poco::RemotingNG::JSONRPC::TransportFactory::unregisterFactory();
 	Poco::RemotingNG::ORB::instance().unregisterListener(_listener);
-	_pListener = 0;
+	_pListener = nullptr;
 }
 
 
@@ -778,9 +776,7 @@ RemotingTestJSONRPC::RemotingTestJSONRPC(const std::string& name): RemotingTest(
 }
 
 
-RemotingTestJSONRPC::~RemotingTestJSONRPC()
-{
-}
+RemotingTestJSONRPC::~RemotingTestJSONRPC() = default;
 
 
 void RemotingTestJSONRPC::setUp()
@@ -825,9 +821,7 @@ RemotingTestJSONRPCCompressed::RemotingTestJSONRPCCompressed(const std::string& 
 }
 
 
-RemotingTestJSONRPCCompressed::~RemotingTestJSONRPCCompressed()
-{
-}
+RemotingTestJSONRPCCompressed::~RemotingTestJSONRPCCompressed() = default;
 
 
 void RemotingTestJSONRPCCompressed::setUp()
@@ -881,9 +875,7 @@ RemotingTestJSONRPCNonChunked::RemotingTestJSONRPCNonChunked(const std::string& 
 }
 
 
-RemotingTestJSONRPCNonChunked::~RemotingTestJSONRPCNonChunked()
-{
-}
+RemotingTestJSONRPCNonChunked::~RemotingTestJSONRPCNonChunked() = default;
 
 
 ITester::Ptr RemotingTestJSONRPCNonChunked::createProxy(const std::string& uri)
@@ -938,9 +930,7 @@ RemotingTestJSONRPCAuth::RemotingTestJSONRPCAuth(const std::string& name): Remot
 }
 
 
-RemotingTestJSONRPCAuth::~RemotingTestJSONRPCAuth()
-{
-}
+RemotingTestJSONRPCAuth::~RemotingTestJSONRPCAuth() = default;
 
 
 void RemotingTestJSONRPCAuth::setUp()
@@ -963,7 +953,7 @@ void RemotingTestJSONRPCAuth::tearDown()
 	{
 		_pHTTPServer->stop();
 	}
-	_pHTTPServer = 0;
+	_pHTTPServer = nullptr;
 }
 
 
@@ -1037,9 +1027,7 @@ RemotingTestJSONRPCAuthChunked::RemotingTestJSONRPCAuthChunked(const std::string
 }
 
 
-RemotingTestJSONRPCAuthChunked::~RemotingTestJSONRPCAuthChunked()
-{
-}
+RemotingTestJSONRPCAuthChunked::~RemotingTestJSONRPCAuthChunked() = default;
 
 
 ITester::Ptr RemotingTestJSONRPCAuthChunked::createProxy(const std::string& uri)

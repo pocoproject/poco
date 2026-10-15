@@ -23,8 +23,7 @@
 #include <stack>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API SerializerBase
@@ -111,8 +110,8 @@ protected:
 		/// Clears all properties.
 
 private:
-	SerializerBase(const SerializerBase&);
-	SerializerBase& operator = (const SerializerBase&);
+	SerializerBase(const SerializerBase&) = delete;
+	SerializerBase& operator = (const SerializerBase&) = delete;
 
 	using ValueStack = std::stack<std::string>;
 	using Properties = std::map<std::string, ValueStack>;
@@ -131,7 +130,7 @@ inline void SerializerBase::reset()
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_SerializerBase_INCLUDED

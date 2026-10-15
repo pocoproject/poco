@@ -49,7 +49,7 @@ namespace
 	class NoAuthRequestHandler: public Poco::Net::HTTPRequestHandler
 	{
 	public:
-		void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+		void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override
 		{
 			Poco::NullOutputStream nullStream;
 			Poco::StreamCopier::copyStream(request.stream(), nullStream);
@@ -68,7 +68,7 @@ namespace
 		{
 		}
 
-		Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override
 		{
 			if (request.hasCredentials())
 			{
@@ -89,9 +89,9 @@ namespace
 	class MockAuthenticator: public Poco::RemotingNG::Authenticator
 	{
 	public:
-		typedef Poco::AutoPtr<MockAuthenticator> Ptr;
+		using Ptr = Poco::AutoPtr<MockAuthenticator>;
 
-		Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32)
+		Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32) override
 		{
 			std::string username = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "");
 			std::string password = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "");
@@ -117,7 +117,7 @@ namespace
 	class MockAuthorizer: public Poco::RemotingNG::Authorizer
 	{
 	public:
-		bool authorize(const std::string& method, const std::string& permission)
+		bool authorize(const std::string& method, const std::string& permission) override
 		{
 			Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
 
@@ -133,9 +133,9 @@ namespace
 	class MockWSSEAuthenticator: public Poco::RemotingNG::Authenticator
 	{
 	public:
-		typedef Poco::AutoPtr<MockAuthenticator> Ptr;
+		using Ptr = Poco::AutoPtr<MockAuthenticator>;
 
-		Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32)
+		Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32) override
 		{
 			std::string username = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "");
 			std::string password = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "");
@@ -266,9 +266,7 @@ RemotingTest::RemotingTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-RemotingTest::~RemotingTest()
-{
-}
+RemotingTest::~RemotingTest() = default;
 
 
 void RemotingTest::setUp()
@@ -285,7 +283,7 @@ void RemotingTest::tearDown()
 	TesterServerHelper::unregisterObject(_objectURI);
 	Poco::RemotingNG::SOAP::TransportFactory::unregisterFactory();
 	Poco::RemotingNG::ORB::instance().unregisterListener(_listener);
-	_pListener = 0;
+	_pListener = nullptr;
 }
 
 
@@ -625,7 +623,7 @@ void RemotingTest::testWSSEInterceptor()
 	class WSSEServerInterceptor: public Poco::RemotingNG::SOAP::Listener::RequestHeaderInterceptor
 	{
 	public:
-		void interceptHeader(const Poco::RemotingNG::SOAP::XMLElement& header)
+		void interceptHeader(const Poco::RemotingNG::SOAP::XMLElement& header) override
 		{
 			const Poco::RemotingNG::SOAP::XMLElement* pSecurityElem = header.findChild("Security"s, Serializer::WSSENAMESPACE);
 			if (pSecurityElem)
@@ -1029,9 +1027,7 @@ RemotingTestSOAP11::RemotingTestSOAP11(const std::string& name): RemotingTest(na
 }
 
 
-RemotingTestSOAP11::~RemotingTestSOAP11()
-{
-}
+RemotingTestSOAP11::~RemotingTestSOAP11() = default;
 
 
 void RemotingTestSOAP11::setUp()
@@ -1079,9 +1075,7 @@ RemotingTestSOAP12::RemotingTestSOAP12(const std::string& name): RemotingTest(na
 }
 
 
-RemotingTestSOAP12::~RemotingTestSOAP12()
-{
-}
+RemotingTestSOAP12::~RemotingTestSOAP12() = default;
 
 
 void RemotingTestSOAP12::setUp()
@@ -1138,9 +1132,7 @@ RemotingTestSOAP12Compressed::RemotingTestSOAP12Compressed(const std::string& na
 }
 
 
-RemotingTestSOAP12Compressed::~RemotingTestSOAP12Compressed()
-{
-}
+RemotingTestSOAP12Compressed::~RemotingTestSOAP12Compressed() = default;
 
 
 void RemotingTestSOAP12Compressed::setUp()
@@ -1198,9 +1190,7 @@ RemotingTestSOAP11NonChunked::RemotingTestSOAP11NonChunked(const std::string& na
 }
 
 
-RemotingTestSOAP11NonChunked::~RemotingTestSOAP11NonChunked()
-{
-}
+RemotingTestSOAP11NonChunked::~RemotingTestSOAP11NonChunked() = default;
 
 
 ITester::Ptr RemotingTestSOAP11NonChunked::createProxy(const std::string& uri)
@@ -1259,9 +1249,7 @@ RemotingTestSOAP12MTOM::RemotingTestSOAP12MTOM(const std::string& name): Remotin
 }
 
 
-RemotingTestSOAP12MTOM::~RemotingTestSOAP12MTOM()
-{
-}
+RemotingTestSOAP12MTOM::~RemotingTestSOAP12MTOM() = default;
 
 
 void RemotingTestSOAP12MTOM::setUp()
@@ -1312,9 +1300,7 @@ RemotingTestSOAP12Auth::RemotingTestSOAP12Auth(const std::string& name): Remotin
 }
 
 
-RemotingTestSOAP12Auth::~RemotingTestSOAP12Auth()
-{
-}
+RemotingTestSOAP12Auth::~RemotingTestSOAP12Auth() = default;
 
 
 void RemotingTestSOAP12Auth::setUp()
@@ -1337,7 +1323,7 @@ void RemotingTestSOAP12Auth::tearDown()
 	{
 		_pHTTPServer->stop();
 	}
-	_pHTTPServer = 0;
+	_pHTTPServer = nullptr;
 }
 
 
@@ -1411,9 +1397,7 @@ RemotingTestSOAP12AuthChunked::RemotingTestSOAP12AuthChunked(const std::string& 
 }
 
 
-RemotingTestSOAP12AuthChunked::~RemotingTestSOAP12AuthChunked()
-{
-}
+RemotingTestSOAP12AuthChunked::~RemotingTestSOAP12AuthChunked() = default;
 
 
 ITester::Ptr RemotingTestSOAP12AuthChunked::createProxy(const std::string& uri)

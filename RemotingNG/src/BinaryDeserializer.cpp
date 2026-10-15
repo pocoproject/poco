@@ -16,8 +16,7 @@
 #include "Poco/RemotingNG/BinarySerializer.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 BinaryDeserializer::BinaryDeserializer():
@@ -27,9 +26,7 @@ BinaryDeserializer::BinaryDeserializer():
 }
 
 
-BinaryDeserializer::~BinaryDeserializer()
-{
-}
+BinaryDeserializer::~BinaryDeserializer() = default;
 
 
 void BinaryDeserializer::deserializeEndPoint(std::string& oid, std::string& tid)
@@ -360,4 +357,4 @@ void BinaryDeserializer::findMessageImpl()
 }
 
 
-} } // namespace Poco::Remoting
+} // namespace Poco::Remoting

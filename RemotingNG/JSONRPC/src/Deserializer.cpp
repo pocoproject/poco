@@ -22,20 +22,16 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 Deserializer::Deserializer():
-	_pAssociatedSerializer(0)
+	_pAssociatedSerializer(nullptr)
 {
 }
 
 
-Deserializer::~Deserializer()
-{
-}
+Deserializer::~Deserializer() = default;
 
 
 Poco::RemotingNG::SerializerBase::MessageType Deserializer::findMessage(std::string& name)
@@ -470,4 +466,4 @@ void Deserializer::associateSerializer(Serializer& ser)
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

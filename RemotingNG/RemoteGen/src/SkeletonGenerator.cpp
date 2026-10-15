@@ -32,16 +32,14 @@ using namespace Poco::CodeGeneration;
 
 SkeletonGenerator::SkeletonGenerator(Poco::CodeGeneration::CppGenerator& cppGen):
 	AbstractGenerator(cppGen),
-	_pCurrent(0),
+	_pCurrent(nullptr),
 	_currentFctOneWayProperty(false),
 	_isEvent(false)
 {
 }
 
 
-SkeletonGenerator::~SkeletonGenerator()
-{
-}
+SkeletonGenerator::~SkeletonGenerator() = default;
 
 
 std::string SkeletonGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)
@@ -154,8 +152,8 @@ void SkeletonGenerator::structEnd()
 	e.generate(_pStruct, _cppGen, reinterpret_cast<void*>(pGen) ,false, false);
 	_cppGen.writeNameSpaceEnd(nameSpace());
 	_cppGen.endFile();
-	_pStruct = 0;
-	_pStructIn = 0;
+	_pStruct = nullptr;
+	_pStructIn = nullptr;
 }
 
 
@@ -195,9 +193,9 @@ void SkeletonGenerator::methodStart(const Poco::CppParser::Function* pFuncOld, c
 
 	// add: void invoke(Poco::RemotingNG::ServerTransport& remoting__trans, Poco::RemotingNG::Deserializer& remoting__deserializer, Poco::RemotingNG::RemoteObject::Ptr remoting__pRemoteObject)
 	Poco::CppParser::Function* pInvoke = new Poco::CppParser::Function("void invoke", pStruct);
-	Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter("Poco::RemotingNG::ServerTransport& remoting__trans", 0);
-	Poco::CppParser::Parameter* pParam2 = new Poco::CppParser::Parameter("Poco::RemotingNG::Deserializer& remoting__deser", 0);
-	Poco::CppParser::Parameter* pParam3 = new Poco::CppParser::Parameter("Poco::RemotingNG::RemoteObject::Ptr remoting__pRemoteObject", 0);
+	Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter("Poco::RemotingNG::ServerTransport& remoting__trans", nullptr);
+	Poco::CppParser::Parameter* pParam2 = new Poco::CppParser::Parameter("Poco::RemotingNG::Deserializer& remoting__deser", nullptr);
+	Poco::CppParser::Parameter* pParam3 = new Poco::CppParser::Parameter("Poco::RemotingNG::RemoteObject::Ptr remoting__pRemoteObject", nullptr);
 	pInvoke->addParameter(pParam1);
 	pInvoke->addParameter(pParam2);
 	pInvoke->addParameter(pParam3);
@@ -279,7 +277,7 @@ void SkeletonGenerator::invokeCodeGen(const Poco::CppParser::Function* pFuncNew,
 	std::map<std::string, const Poco::CppParser::Parameter*> outParams;
 	ProxyGenerator::detectOutParams(pFunc, outParams);
 
-	Poco::CppParser::Parameter retParam(pFunc->getReturnParameter() + " dummy", 0);
+	Poco::CppParser::Parameter retParam(pFunc->getReturnParameter() + " dummy", nullptr);
 	bool hasReturnParam = pFunc->getReturnParameter() != Poco::CodeGeneration::Utility::TYPE_VOID && !pFunc->getReturnParameter().empty();
 	bool isOneWay = outParams.empty() && !hasReturnParam && pGen->currentFctHasOneWayProperty();
 	std::string indentation;
@@ -1102,7 +1100,7 @@ void SkeletonGenerator::checkForEventMembers(const Poco::CppParser::Struct* pStr
 				paramDecl.append (" var");
 				{
 					Poco::CppParser::Function* pFunc = new Poco::CppParser::Function(funcDecl, _pStruct);
-					Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter(paramDecl, 0);
+					Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter(paramDecl, nullptr);
 					pFunc->addParameter(pParam);
 					CodeGenerator::Properties methodProperties;
 					Poco::CppParser::Attributes funcAttr;

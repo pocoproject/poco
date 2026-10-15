@@ -15,18 +15,13 @@
 #include "Poco/RemotingNG/Transport.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-Transport::Transport()
-{
-}
+Transport::Transport() = default;
 
 
-Transport::~Transport()
-{
-}
+Transport::~Transport() = default;
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

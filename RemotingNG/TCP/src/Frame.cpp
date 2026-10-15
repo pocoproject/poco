@@ -15,9 +15,7 @@
 #include "Poco/RemotingNG/TCP/Frame.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 Frame::Frame(Poco::UInt32 type, Poco::UInt32 channel, Poco::UInt16 flags, Poco::UInt16 bufferSize):
@@ -32,9 +30,7 @@ Frame::Frame(Poco::UInt32 type, Poco::UInt32 channel, Poco::UInt16 flags, Poco::
 }
 
 
-Frame::~Frame()
-{
-}
+Frame::~Frame() = default;
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

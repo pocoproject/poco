@@ -26,8 +26,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API AttributedObject
@@ -100,7 +99,7 @@ inline std::size_t AttributedObject::countAttributes() const
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_AttributedObject_INCLUDED

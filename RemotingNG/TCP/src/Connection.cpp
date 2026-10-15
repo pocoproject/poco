@@ -26,9 +26,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 Poco::AtomicCounter Connection::_idCounter;
@@ -61,9 +59,7 @@ Connection::Connection(const Poco::Net::StreamSocket& socket, ConnectionMode mod
 }
 
 
-Connection::~Connection()
-{
-}
+Connection::~Connection() = default;
 
 
 bool Connection::secure() const
@@ -612,4 +608,4 @@ int Connection::receiveNBytes(char* buffer, int bytes)
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

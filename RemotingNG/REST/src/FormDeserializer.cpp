@@ -23,9 +23,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class PartHandler: public Poco::Net::PartHandler
@@ -36,7 +34,7 @@ public:
 	{
 	}
 
-	void handlePart(const Poco::Net::MessageHeader& header, std::istream& stream)
+	void handlePart(const Poco::Net::MessageHeader& header, std::istream& stream) override
 	{
 		std::string name;
 		if (header.has(CONTENT_DISPOSITION))
@@ -88,9 +86,7 @@ FormDeserializer::FormDeserializer(Poco::Net::HTTPResponse& response, std::istre
 }
 
 
-FormDeserializer::~FormDeserializer()
-{
-}
+FormDeserializer::~FormDeserializer() = default;
 
 
 bool FormDeserializer::deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull)
@@ -143,4 +139,4 @@ void FormDeserializer::handlePart(const std::string& name, std::istream& stream)
 const std::string FormDeserializer::EMPTY;
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

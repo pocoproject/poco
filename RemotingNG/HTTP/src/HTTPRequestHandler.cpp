@@ -33,9 +33,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace HTTP {
+namespace Poco::RemotingNG::HTTP {
 
 
 class HTTPServerTransport: public Poco::RemotingNG::ServerTransport
@@ -47,7 +45,7 @@ public:
 	{
 	}
 
-	bool authenticate(const std::string& /*method*/)
+	bool authenticate(const std::string& /*method*/) override
 	{
 		Authenticator::Ptr pAuth = _listener.getAuthenticator();
 		if (pAuth)
@@ -57,7 +55,7 @@ public:
 		return false;
 	}
 
-	bool authorize(const std::string& method, const std::string& permission)
+	bool authorize(const std::string& method, const std::string& permission) override
 	{
 		Authorizer::Ptr pAuth = _listener.getAuthorizer();
 		if (pAuth)
@@ -81,19 +79,19 @@ public:
 		_request(request),
 		_response(response),
 		_enableCompression(listener.isCompressionEnabled()),
-		_pInflater(0),
-		_pDeflater(0),
+		_pInflater(nullptr),
+		_pDeflater(nullptr),
 		_replySent(false)
 	{
 	}
 
-	~ChunkedServerTransport()
+	~ChunkedServerTransport() override
 	{
 		delete _pInflater;
 		delete _pDeflater;
 	}
 
-	Poco::RemotingNG::Deserializer& beginRequest()
+	Poco::RemotingNG::Deserializer& beginRequest() override
 	{
 		if (_request.get("Content-Encoding"s, ""s) == "gzip")
 		{
@@ -107,7 +105,7 @@ public:
 		return _deserializer;
 	}
 
-	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType)
+	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType) override
 	{
 		// consume extra request content
 		std::istream& istr = _request.stream();
@@ -131,7 +129,7 @@ public:
 		return _serializer;
 	}
 
-	void endRequest()
+	void endRequest() override
 	{
 		if (!_replySent) // one-way message
 		{
@@ -159,16 +157,16 @@ public:
 		HTTPServerTransport(listener, credentials),
 		_request(request),
 		_response(response),
-		_pInflater(0)
+		_pInflater(nullptr)
 	{
 	}
 
-	~NonChunkedServerTransport()
+	~NonChunkedServerTransport() override
 	{
 		delete _pInflater;
 	}
 
-	Poco::RemotingNG::Deserializer& beginRequest()
+	Poco::RemotingNG::Deserializer& beginRequest() override
 	{
 		if (_request.get("Content-Encoding"s, ""s) == "gzip")
 		{
@@ -182,7 +180,7 @@ public:
 		return _deserializer;
 	}
 
-	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType)
+	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType) override
 	{
 		// consume extra request content
 		std::istream& istr = _request.stream();
@@ -194,7 +192,7 @@ public:
 		return _serializer;
 	}
 
-	void endRequest()
+	void endRequest() override
 	{
 		_response.setContentLength(static_cast<int>(_bufferStream.tellp()));
 		std::ostream& ostr = _response.send();
@@ -218,9 +216,7 @@ HTTPRequestHandler::HTTPRequestHandler(Listener& listener):
 }
 
 
-HTTPRequestHandler::~HTTPRequestHandler()
-{
-}
+HTTPRequestHandler::~HTTPRequestHandler() = default;
 
 
 void HTTPRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
@@ -312,4 +308,4 @@ void HTTPRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Po
 }
 
 
-} } } // namespace Poco::RemotingNG::HTTP
+} // namespace Poco::RemotingNG::HTTP

@@ -21,9 +21,7 @@
 #include "Poco/RemotingNG/JSONRPC/JSValue.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 class RemotingNGJSONRPC_API JSScalar: public JSValue
@@ -39,12 +37,12 @@ public:
 		/// Creates a JSScalar with the given value and type.
 
 	// JSValue
-	[[nodiscard]] Type type() const;
+	[[nodiscard]] Type type() const override;
 	
-	[[nodiscard]] const std::string& stringValue() const;
+	[[nodiscard]] const std::string& stringValue() const override;
 
 protected:
-	~JSScalar();
+	~JSScalar() override;
 		/// Destroys the JSScalar.
 	
 private:
@@ -53,7 +51,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC
 
 
 #endif // RemotingNG_JSONRPC_JSScalar_INCLUDED

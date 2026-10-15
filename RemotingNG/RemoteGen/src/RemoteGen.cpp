@@ -107,12 +107,10 @@ public:
 		new Poco::CppParser::BuiltIn("UIntPtr"s, pNS);
 	}
 
-	~RemoteGenApp()
-	{
-	}
+	~RemoteGenApp() override = default;
 
 protected:
-	void initialize(Application& self)
+	void initialize(Application& self) override
 	{
 		if (!_noGlobalConfig)
 		{
@@ -123,18 +121,18 @@ protected:
 		AbstractGenerator::EError += Poco::Delegate<RemoteGenApp, const std::string>(this, &RemoteGenApp::onError);
 	}
 
-	void uninitialize()
+	void uninitialize() override
 	{
 		AbstractGenerator::EError -= Poco::Delegate<RemoteGenApp, const std::string>(this, &RemoteGenApp::onError);
 		Application::uninitialize();
 	}
 
-	void reinitialize(Application& self)
+	void reinitialize(Application& self) override
 	{
 		Application::reinitialize(self);
 	}
 
-	void defineOptions(OptionSet& options)
+	void defineOptions(OptionSet& options) override
 	{
 		Application::defineOptions(options);
 
@@ -657,7 +655,7 @@ protected:
 		std::ofstream hOut;
 		std::ofstream cppOut;
 		std::ofstream implOut;
-		std::ostream* pImplOut(0);
+		std::ostream* pImplOut(nullptr);
 		openFiles(incPath, srcPath, _bundleActivator, hOut, cppOut);
 		Poco::File impl(implPath);
 		if (!impl.exists())
@@ -1054,7 +1052,7 @@ protected:
 		_errMsgs.push_back(errMsg);
 	}
 
-	int main(const std::vector<std::string>& args)
+	int main(const std::vector<std::string>& args) override
 	{
 		if (!_helpRequested)
 		{

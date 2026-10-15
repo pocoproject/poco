@@ -108,9 +108,7 @@ SwaggerGenerator::SwaggerGenerator(Poco::CodeGeneration::CppGenerator& generator
 }
 
 
-SwaggerGenerator::~SwaggerGenerator()
-{
-}
+SwaggerGenerator::~SwaggerGenerator() = default;
 
 
 Poco::JSON::Object::Ptr SwaggerGenerator::createInfo(const Info& info)

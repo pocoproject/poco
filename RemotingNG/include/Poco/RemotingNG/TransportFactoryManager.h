@@ -25,8 +25,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class Transport;
@@ -72,8 +71,8 @@ private:
 	~TransportFactoryManager();
 		/// Destroys the TransportFactoryManager.
 
-	TransportFactoryManager& operator = (const TransportFactoryManager&);
-	TransportFactoryManager(const TransportFactoryManager&);
+	TransportFactoryManager& operator = (const TransportFactoryManager&) = delete;
+	TransportFactoryManager(const TransportFactoryManager&) = delete;
 
 private:
 	using Factories = std::map<std::string, TransportFactory::Ptr>;
@@ -85,7 +84,7 @@ private:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_TransportFactoryManager_INCLUDED

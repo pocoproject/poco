@@ -32,8 +32,7 @@
 #endif
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 class CodeGenerator;
@@ -172,10 +171,10 @@ public:
 	static void writeAttributes(std::ostream& out, const Poco::CppParser::Attributes& attrs, int indent);
 
 private:
-	Utility();
-	~Utility();
-	Utility& operator = (const Utility&);
-	Utility(const Utility&);
+	Utility() = delete;
+	~Utility() = delete;
+	Utility& operator = (const Utility&) = delete;
+	Utility(const Utility&) = delete;
 };
 
 
@@ -198,7 +197,7 @@ private:
 };
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration
 
 
 #endif // CodeGeneration_Utility_INCLUDED

@@ -27,8 +27,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class ServerTransport;
@@ -46,7 +45,7 @@ public:
 	Skeleton();
 		/// Creates a Skeleton.
 
-	virtual ~Skeleton();
+	~Skeleton() override;
 		/// Destroys the Skeleton.
 
 	bool invoke(ServerTransport& transport, RemoteObject::Ptr pRemoteObject);
@@ -72,15 +71,15 @@ protected:
 		/// Takes ownership of the MethodHandler.
 
 private:
-	Skeleton(const Skeleton&);
-	Skeleton& operator = (const Skeleton&);
+	Skeleton(const Skeleton&) = delete;
+	Skeleton& operator = (const Skeleton&) = delete;
 
 	MethodHandlers _handlers;
 	Poco::Logger& _logger = Poco::Logger::get("RemotingNG.Skeleton");
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Skeleton_INCLUDED

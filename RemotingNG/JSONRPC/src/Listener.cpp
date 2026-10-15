@@ -19,9 +19,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 Listener::Listener(const std::string& endPoint, Protocol proto):
@@ -58,9 +56,7 @@ Listener::Listener(const std::string& endPoint, const Poco::Net::ServerSocket& s
 }
 
 
-Listener::~Listener()
-{
-}
+Listener::~Listener() = default;
 
 
 void Listener::enableChunkedTransferEncoding(bool enable)
@@ -135,4 +131,4 @@ void Listener::unregisterObject(Poco::RemotingNG::RemoteObject::Ptr /*pRemoteObj
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

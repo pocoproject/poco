@@ -25,9 +25,7 @@ PathSerializerTest::PathSerializerTest(const std::string& name): CppUnit::TestCa
 }
 
 
-PathSerializerTest::~PathSerializerTest()
-{
-}
+PathSerializerTest::~PathSerializerTest() = default;
 
 
 void PathSerializerTest::testParams()

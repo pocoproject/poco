@@ -32,15 +32,13 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class AuthResponseFrameHandler: public FrameHandler
 {
 public:
-	typedef Poco::AutoPtr<AuthResponseFrameHandler> Ptr;
+	using Ptr = Poco::AutoPtr<AuthResponseFrameHandler>;
 
 	explicit AuthResponseFrameHandler(Poco::UInt32 channel):
 		_channel(channel),
@@ -48,7 +46,7 @@ public:
 	{
 	}
 
-	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
+	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) override
 	{
 		if (pFrame->channel() == _channel && pFrame->type() == Frame::FRAME_TYPE_AUTR)
 		{
@@ -234,10 +232,10 @@ void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oi
 	if (_pDeflatingStream)
 	{
 		_pDeflatingStream->close();
-		_pDeflatingStream = 0;
+		_pDeflatingStream = nullptr;
 	}
 	_pRequestStream->close();
-	_pRequestStream = 0;
+	_pRequestStream = nullptr;
 	_pConnection->releaseChannel(_channel);
 	_channel = 0;
 }
@@ -285,10 +283,10 @@ Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::I
 	if (_pDeflatingStream)
 	{
 		_pDeflatingStream->close();
-		_pDeflatingStream = 0;
+		_pDeflatingStream = nullptr;
 	}
 	_pRequestStream->close();
-	_pRequestStream = 0;
+	_pRequestStream = nullptr;
 
 	Poco::Timestamp requestTime;
 	if (_pReplyStream->peek() < 0)
@@ -322,11 +320,11 @@ void Transport::endRequest()
 
 	_serializer.reset();
 	_deserializer.reset();
-	_pReplyStream = 0;
-	_pInflatingStream = 0;
+	_pReplyStream = nullptr;
+	_pInflatingStream = nullptr;
 	_pConnection->releaseChannel(_channel);
 	_channel = 0;
-	_pConnection = 0;
+	_pConnection = nullptr;
 }
 
 
@@ -499,4 +497,4 @@ bool Transport::verifyCredentials(const Credentials& creds)
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

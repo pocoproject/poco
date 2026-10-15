@@ -25,8 +25,7 @@
 #include <memory>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API BinaryDeserializer: public Deserializer
@@ -41,7 +40,7 @@ public:
 	BinaryDeserializer();
 		/// Creates a BinaryDeserializer.
 
-	~BinaryDeserializer();
+	~BinaryDeserializer() override;
 		/// Destroys the BinaryDeserializer.
 
 	void deserializeEndPoint(std::string& oid, std::string& tid);
@@ -58,37 +57,37 @@ public:
 	}
 
 	// Deserializer
-	SerializerBase::MessageType findMessage(std::string& name);
-	void deserializeMessageBegin(const std::string& name, SerializerBase::MessageType type);
-	void deserializeMessageEnd(const std::string& name, SerializerBase::MessageType type);
-	bool deserializeStructBegin(const std::string& name, bool isMandatory);
-	void deserializeStructEnd(const std::string& name);
-	bool deserializeSequenceBegin(const std::string& name, bool isMandatory, Poco::UInt32& lengthHint);
-	void deserializeSequenceEnd(const std::string& name);
-	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull);
-	void deserializeNullableEnd(const std::string& name);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::Int8& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt8& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::Int16& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt16& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::Int32& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt32& value);
-	bool deserialize(const std::string& name, bool isMandatory, long& value);
-	bool deserialize(const std::string& name, bool isMandatory, unsigned long& value);
+	SerializerBase::MessageType findMessage(std::string& name) override;
+	void deserializeMessageBegin(const std::string& name, SerializerBase::MessageType type) override;
+	void deserializeMessageEnd(const std::string& name, SerializerBase::MessageType type) override;
+	bool deserializeStructBegin(const std::string& name, bool isMandatory) override;
+	void deserializeStructEnd(const std::string& name) override;
+	bool deserializeSequenceBegin(const std::string& name, bool isMandatory, Poco::UInt32& lengthHint) override;
+	void deserializeSequenceEnd(const std::string& name) override;
+	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull) override;
+	void deserializeNullableEnd(const std::string& name) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::Int8& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt8& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::Int16& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt16& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::Int32& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt32& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, long& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, unsigned long& value) override;
 #ifndef POCO_INT64_IS_LONG
-	bool deserialize(const std::string& name, bool isMandatory, Poco::Int64& value);
-	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt64& value);
+	bool deserialize(const std::string& name, bool isMandatory, Poco::Int64& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, Poco::UInt64& value) override;
 #endif
-	bool deserialize(const std::string& name, bool isMandatory, float& value);
-	bool deserialize(const std::string& name, bool isMandatory, double& value);
-	bool deserialize(const std::string& name, bool isMandatory, bool& value);
-	bool deserialize(const std::string& name, bool isMandatory, char& value);
-	bool deserialize(const std::string& name, bool isMandatory, std::string& value);
-	bool deserialize(const std::string& name, bool isMandatory, std::vector<char>& value);
+	bool deserialize(const std::string& name, bool isMandatory, float& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, double& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, bool& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, char& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, std::string& value) override;
+	bool deserialize(const std::string& name, bool isMandatory, std::vector<char>& value) override;
 
 protected:
-	void resetImpl();
-	void setupImpl(std::istream& istr);
+	void resetImpl() override;
+	void setupImpl(std::istream& istr) override;
 
 private:
 	[[nodiscard]] bool handleVector();
@@ -119,7 +118,7 @@ inline bool BinaryDeserializer::checkStream()
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_BinaryDeserializer_INCLUDED

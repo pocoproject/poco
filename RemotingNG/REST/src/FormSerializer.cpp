@@ -18,9 +18,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class CharVectorPartSource: public Poco::Net::PartSource
@@ -35,21 +33,19 @@ public:
 	{
 	}
 
-	~CharVectorPartSource()
-	{
-	}
+	~CharVectorPartSource() override = default;
 
-	std::istream& stream()
+	std::istream& stream() override
 	{
 		return _stream;
 	}
 
-	const std::string& filename() const
+	const std::string& filename() const override
 	{
 		return _filename;
 	}
 
-	std::streamsize getContentLength() const
+	std::streamsize getContentLength() const override
 	{
 		return _data.size();
 	}
@@ -64,15 +60,15 @@ private:
 
 FormSerializer::FormSerializer(Poco::Net::HTTPRequest& request):
 	_pRequest(&request),
-	_pResponse(0),
-	_pStream(0)
+	_pResponse(nullptr),
+	_pStream(nullptr)
 {
 }
 
 
 FormSerializer::FormSerializer(Poco::Net::HTTPRequest& request, std::ostream& stream):
 	_pRequest(&request),
-	_pResponse(0),
+	_pResponse(nullptr),
 	_pStream(&stream)
 {
 	if (_pRequest->getContentType() == Poco::Net::HTMLForm::ENCODING_MULTIPART)
@@ -83,7 +79,7 @@ FormSerializer::FormSerializer(Poco::Net::HTTPRequest& request, std::ostream& st
 
 
 FormSerializer::FormSerializer(Poco::Net::HTTPResponse& response, std::ostream& stream):
-	_pRequest(0),
+	_pRequest(nullptr),
 	_pResponse(&response),
 	_pStream(&stream)
 {
@@ -94,9 +90,7 @@ FormSerializer::FormSerializer(Poco::Net::HTTPResponse& response, std::ostream& 
 }
 
 
-FormSerializer::~FormSerializer()
-{
-}
+FormSerializer::~FormSerializer() = default;
 
 
 void FormSerializer::close()
@@ -150,4 +144,4 @@ void FormSerializer::serializeBuffer(const std::string& name, const std::vector<
 const std::string FormSerializer::APPLICATION_OCTET_STREAM("application/octet-stream");
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

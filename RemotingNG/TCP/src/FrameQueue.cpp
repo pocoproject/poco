@@ -16,9 +16,7 @@
 #include "Poco/ScopedUnlock.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 FrameQueue::FrameQueue(Connection::Ptr pConnection, Poco::UInt32 frameType, Poco::UInt32 channel):
@@ -88,4 +86,4 @@ bool FrameQueue::handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

@@ -26,7 +26,7 @@ class RemotingTest: public CppUnit::TestCase
 {
 public:
 	RemotingTest(const std::string& name);
-	~RemotingTest();
+	~RemotingTest() override;
 	
 	void testRegistration();
 	void testInt();
@@ -53,8 +53,8 @@ public:
 	void testWSSEAuthenticatorPlain();
 	void testWSSEAuthenticatorDigest();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 protected:
 	void testInt(ITester::Ptr pTester);
@@ -82,9 +82,9 @@ class RemotingTestSOAP11: public RemotingTest
 {
 public:
 	RemotingTestSOAP11(const std::string& name);
-	~RemotingTestSOAP11();
+	~RemotingTestSOAP11() override;
 
-	void setUp();
+	void setUp() override;
 
 	static CppUnit::Test* suite();
 };
@@ -94,14 +94,14 @@ class RemotingTestSOAP12: public RemotingTest
 {
 public:
 	RemotingTestSOAP12(const std::string& name);
-	~RemotingTestSOAP12();
+	~RemotingTestSOAP12() override;
 
-	void setUp();
+	void setUp() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -109,14 +109,14 @@ class RemotingTestSOAP12Compressed: public RemotingTest
 {
 public:
 	RemotingTestSOAP12Compressed(const std::string& name);
-	~RemotingTestSOAP12Compressed();
+	~RemotingTestSOAP12Compressed() override;
 
-	void setUp();
+	void setUp() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -124,14 +124,14 @@ class RemotingTestSOAP11NonChunked: public RemotingTest
 {
 public:
 	RemotingTestSOAP11NonChunked(const std::string& name);
-	~RemotingTestSOAP11NonChunked();
+	~RemotingTestSOAP11NonChunked() override;
 
-	void setUp();
+	void setUp() override;
 
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -139,14 +139,14 @@ class RemotingTestSOAP12MTOM: public RemotingTest
 {
 public:
 	RemotingTestSOAP12MTOM(const std::string& name);
-	~RemotingTestSOAP12MTOM();
+	~RemotingTestSOAP12MTOM() override;
 
-	void setUp();
+	void setUp() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -154,17 +154,17 @@ class RemotingTestSOAP12Auth: public RemotingTest
 {
 public:
 	RemotingTestSOAP12Auth(const std::string& name);
-	~RemotingTestSOAP12Auth();
+	~RemotingTestSOAP12Auth() override;
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	void testUnauthorized();
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 	ITester::Ptr createUnauthorizedProxy(const std::string& uri);
 	
 private:
@@ -176,12 +176,12 @@ class RemotingTestSOAP12AuthChunked: public RemotingTestSOAP12Auth
 {
 public:
 	RemotingTestSOAP12AuthChunked(const std::string& name);
-	~RemotingTestSOAP12AuthChunked();
+	~RemotingTestSOAP12AuthChunked() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 

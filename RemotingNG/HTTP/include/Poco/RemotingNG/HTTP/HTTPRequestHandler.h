@@ -24,9 +24,7 @@
 #include "Poco/Logger.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace HTTP {
+namespace Poco::RemotingNG::HTTP {
 
 
 class RemotingNGHTTP_API HTTPRequestHandler: public Poco::Net::HTTPRequestHandler
@@ -36,21 +34,21 @@ public:
 	HTTPRequestHandler(Listener& listener);
 		/// Creates a HTTPRequestHandler, using the given Listener.
 
-	~HTTPRequestHandler();
+	~HTTPRequestHandler() override;
 		/// Destroys the HTTPRequestHandler.
 
 	// Poco::Net::HTTPRequestHandler
-	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
+	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
 	
 private:
-	HTTPRequestHandler();
+	HTTPRequestHandler() = delete;
 
 	Listener& _listener;
 	Poco::Logger& _logger;
 };
 
 
-} } } // namespace Poco::RemotingNG::HTTP
+} // namespace Poco::RemotingNG::HTTP
 
 
 #endif // RemotingNG_HTTP_HTTPRequestHandler_INCLUDED

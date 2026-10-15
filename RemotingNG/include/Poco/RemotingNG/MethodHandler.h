@@ -24,8 +24,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class ServerTransport;
@@ -45,7 +44,7 @@ public:
 	MethodHandler();
 		/// Creates a MethodHandler.
 
-	virtual ~MethodHandler();
+	~MethodHandler() override;
 		/// Destroys the MethodHandler.
 
 	virtual void invoke(ServerTransport& transport, Deserializer& deserializer, RemoteObject::Ptr pRemoteObject) = 0;
@@ -56,12 +55,12 @@ public:
 		/// method using the ServerTransport's Serializer.
 
 private:
-	MethodHandler(const MethodHandler&);
-	MethodHandler& operator = (const MethodHandler&);
+	MethodHandler(const MethodHandler&) = delete;
+	MethodHandler& operator = (const MethodHandler&) = delete;
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_MethodHandler_INCLUDED

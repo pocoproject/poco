@@ -64,7 +64,7 @@ namespace
 		{
 		}
 
-		void run()
+		void run() override
 		{
 			_letGo.wait();
 		}
@@ -107,9 +107,9 @@ namespace
 class MockAuthenticator: public Poco::RemotingNG::Authenticator
 {
 public:
-	typedef Poco::AutoPtr<MockAuthenticator> Ptr;
+	using Ptr = Poco::AutoPtr<MockAuthenticator>;
 
-	Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32 /*conversationID*/)
+	Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32 /*conversationID*/) override
 	{
 		std::string username = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "");
 		std::string password = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "");
@@ -135,7 +135,7 @@ private:
 class MockSCRAMAuthenticator: public Poco::RemotingNG::TCP::SCRAMAuthenticator
 {
 public:
-	typedef Poco::AutoPtr<MockSCRAMAuthenticator> Ptr;
+	using Ptr = Poco::AutoPtr<MockSCRAMAuthenticator>;
 
 	const std::string& lastUsername() const
 	{
@@ -143,7 +143,7 @@ public:
 	}
 
 	// SCRAMAuthenticator
-	std::string saltForUser(const std::string& username, int& iterations)
+	std::string saltForUser(const std::string& username, int& iterations) override
 	{
 		if (username == "user" || username == "admin")
 		{
@@ -154,7 +154,7 @@ public:
 		else return "";
 	}
 
-	std::string hashForUser(const std::string& username)
+	std::string hashForUser(const std::string& username) override
 	{
 		std::string password;
 		if (username == "user")
@@ -188,7 +188,7 @@ private:
 class MockAuthorizer: public Poco::RemotingNG::Authorizer
 {
 public:
-	bool authorize(const std::string& method, const std::string& permission)
+	bool authorize(const std::string& method, const std::string& permission) override
 	{
 		Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
 
@@ -279,9 +279,7 @@ RemotingTest::RemotingTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-RemotingTest::~RemotingTest()
-{
-}
+RemotingTest::~RemotingTest() = default;
 
 
 void RemotingTest::setUp()
@@ -302,7 +300,7 @@ void RemotingTest::tearDown()
 	{
 		_pListener->connectionManager().shutdown();
 	}
-	_pListener = 0;
+	_pListener = nullptr;
 	Poco::ThreadPool::defaultPool().joinAll();
 }
 
@@ -787,8 +785,8 @@ void RemotingTest::testEvent()
 
 	pTester->testEvent -= Poco::delegate(this, &RemotingTest::onEvent);
 	pProxy->remoting__enableEvents(pEventListener, false);
-	pTester = 0;
-	pProxy = 0;
+	pTester = nullptr;
+	pProxy = nullptr;
 	Poco::Thread::sleep(1000); // wait for unsubscribe message
 }
 
@@ -811,8 +809,8 @@ void RemotingTest::testOneWayEvent()
 
 	pTester->testOneWayEvent -= Poco::delegate(this, &RemotingTest::onEvent);
 	pProxy->remoting__enableEvents(pEventListener, false);
-	pTester = 0;
-	pProxy = 0;
+	pTester = nullptr;
+	pProxy = nullptr;
 	Poco::Thread::sleep(1000); // wait for unsubscribe message
 }
 
@@ -835,8 +833,8 @@ void RemotingTest::testVoidEvent()
 
 	pTester->testVoidEvent -= Poco::delegate(this, &RemotingTest::onVoidEvent);
 	pProxy->remoting__enableEvents(pEventListener, false);
-	pTester = 0;
-	pProxy = 0;
+	pTester = nullptr;
+	pProxy = nullptr;
 	Poco::Thread::sleep(1000); // wait for unsubscribe message
 }
 
@@ -1366,9 +1364,7 @@ RemotingTestCompressed::RemotingTestCompressed(const std::string& name): Remotin
 }
 
 
-RemotingTestCompressed::~RemotingTestCompressed()
-{
-}
+RemotingTestCompressed::~RemotingTestCompressed() = default;
 
 
 ITester::Ptr RemotingTestCompressed::createProxy(const std::string& uri)

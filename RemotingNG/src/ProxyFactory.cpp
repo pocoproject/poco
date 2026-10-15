@@ -15,18 +15,13 @@
 #include "Poco/RemotingNG/ProxyFactory.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-ProxyFactory::ProxyFactory()
-{
-}
+ProxyFactory::ProxyFactory() = default;
 
 
-ProxyFactory::~ProxyFactory()
-{
-}
+ProxyFactory::~ProxyFactory() = default;
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

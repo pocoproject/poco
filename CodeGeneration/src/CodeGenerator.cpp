@@ -15,8 +15,7 @@
 #include "Poco/CodeGeneration/CodeGenerator.h"
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 CodeGenerator::FwdDecl::FwdDecl(const std::string& inc, const std::string& cN, const std::string& ns):
@@ -52,9 +51,7 @@ CodeGenerator::CodeGenerator(const std::string& nameSpace, const std::string& li
 }
 
 
-CodeGenerator::~CodeGenerator()
-{
-}
+CodeGenerator::~CodeGenerator() = default;
 
 
 void CodeGenerator::writeIncludes()
@@ -85,4 +82,4 @@ void CodeGenerator::addFwdDecl(const std::string& inclFile, const std::string& c
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration

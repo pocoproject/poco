@@ -28,9 +28,7 @@ DeserializerTest::DeserializerTest(const std::string& name): CppUnit::TestCase(n
 }
 
 
-DeserializerTest::~DeserializerTest()
-{
-}
+DeserializerTest::~DeserializerTest() = default;
 
 
 void DeserializerTest::testGet()

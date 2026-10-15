@@ -15,8 +15,7 @@
 #include "Poco/RemotingNG/Identifiable.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 Identifiable::Identifiable(const Identifiable::ObjectId& oid): 
@@ -25,9 +24,7 @@ Identifiable::Identifiable(const Identifiable::ObjectId& oid):
 }
 
 
-Identifiable::~Identifiable()
-{
-}
+Identifiable::~Identifiable() = default;
 
 
 void Identifiable::remoting__setURI(const Poco::URI& uri)
@@ -42,4 +39,4 @@ void Identifiable::remoting__setURI(const Poco::URI& uri)
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

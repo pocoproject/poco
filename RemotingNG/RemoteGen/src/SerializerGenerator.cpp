@@ -39,9 +39,7 @@ SerializerGenerator::SerializerGenerator(Poco::CodeGeneration::CppGenerator& cpp
 }
 
 
-SerializerGenerator::~SerializerGenerator()
-{
-}
+SerializerGenerator::~SerializerGenerator() = default;
 
 
 void SerializerGenerator::setSerializationOrder(SerializationOrder order)
@@ -64,7 +62,7 @@ std::string SerializerGenerator::generateClassName(const Poco::CppParser::Struct
 			pNS = pOuter->nameSpace();
 		}
 		else
-			pNS = 0;
+			pNS = nullptr;
 	}
 
 	newClassName.append("Serializer");
@@ -125,7 +123,7 @@ void SerializerGenerator::structStart(const Poco::CppParser::Struct* pStruct, co
 		Poco::CppParser::Function* pFuncRef3 = new Poco::CppParser::Function("static void serializeAttributes", _pStruct);
 		addImplParameters(pFuncRef3, pStruct->fullName());
 		Poco::CppParser::Function* pFuncRef4 = new Poco::CppParser::Function("static void prepareSerializeAttributes", _pStruct);
-		pFuncRef4->addParameter(new Poco::CppParser::Parameter("Serializer& ser", 0));
+		pFuncRef4->addParameter(new Poco::CppParser::Parameter("Serializer& ser", nullptr));
 	}
 
 	// we must include TypeSerializer, and the file of the struct we serialize
@@ -205,13 +203,13 @@ void SerializerGenerator::methodStart(const Poco::CppParser::Function* pFunc, co
 void SerializerGenerator::addParameters(Poco::CppParser::Function* pFunc, const std::string& typeName)
 {
 	//serialize(const std::string& name, const T& value, RemotingNG::Serializer& ser)
-	pFunc->addParameter(new Poco::CppParser::Parameter("const std::string& name", 0));
+	pFunc->addParameter(new Poco::CppParser::Parameter("const std::string& name", nullptr));
 	std::string type("const ");
 	type.append(typeName);
 	type.append("&");
 	type.append(" value");
-	pFunc->addParameter(new Poco::CppParser::Parameter(type, 0));
-	pFunc->addParameter(new Poco::CppParser::Parameter("Serializer& ser", 0));
+	pFunc->addParameter(new Poco::CppParser::Parameter(type, nullptr));
+	pFunc->addParameter(new Poco::CppParser::Parameter("Serializer& ser", nullptr));
 }
 
 
@@ -222,19 +220,19 @@ void SerializerGenerator::addImplParameters(Poco::CppParser::Function* pFunc, co
 	type.append(typeName);
 	type.append("&");
 	type.append(" value");
-	pFunc->addParameter(new Poco::CppParser::Parameter(type, 0));
-	pFunc->addParameter(new Poco::CppParser::Parameter("Serializer& ser", 0));
+	pFunc->addParameter(new Poco::CppParser::Parameter(type, nullptr));
+	pFunc->addParameter(new Poco::CppParser::Parameter("Serializer& ser", nullptr));
 }
 
 
 void SerializerGenerator::serializeCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
-	if (addParam == 0)
+	if (addParam == nullptr)
 		return;
 
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
 	SerializerGenerator* pSer = dynamic_cast<SerializerGenerator*>(pAGen);
-	if (pSer == 0)
+	if (pSer == nullptr)
 		return;
 
 	const Poco::CppParser::Struct* pDataType = pSer->_pStructIn; // returns the data type for which pStruct was generated
@@ -274,12 +272,12 @@ void SerializerGenerator::serializeCodeGen(const Poco::CppParser::Function* pFun
 
 void SerializerGenerator::serializeImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
-	if (addParam == 0)
+	if (addParam == nullptr)
 		return;
 
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
 	SerializerGenerator* pSer = dynamic_cast<SerializerGenerator*>(pAGen);
-	if (pSer == 0)
+	if (pSer == nullptr)
 		return;
 
 	const Poco::CppParser::Struct* pDataType = pSer->_pStructIn; // returns the data type for which pStruct was generated
@@ -407,12 +405,12 @@ void SerializerGenerator::writeAll(const std::vector<std::string>& codeLines, Co
 
 void SerializerGenerator::serializeAttributesCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
-	if (addParam == 0)
+	if (addParam == nullptr)
 		return;
 
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
 	SerializerGenerator* pSer = dynamic_cast<SerializerGenerator*>(pAGen);
-	if (pSer == 0)
+	if (pSer == nullptr)
 		return;
 
 	const Poco::CppParser::Struct* pDataType = pSer->_pStructIn; // returns the data type for which pStruct was generated
@@ -465,12 +463,12 @@ void SerializerGenerator::serializeAttributesCodeGenImpl(const Poco::CppParser::
 
 void SerializerGenerator::prepareSerializeAttributesCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
-	if (addParam == 0)
+	if (addParam == nullptr)
 		return;
 
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
 	SerializerGenerator* pSer = dynamic_cast<SerializerGenerator*>(pAGen);
-	if (pSer == 0)
+	if (pSer == nullptr)
 		return;
 
 	const Poco::CppParser::Struct* pDataType = pSer->_pStructIn; // returns the data type for which pStruct was generated
@@ -595,7 +593,7 @@ void SerializerGenerator::matchVarsWithFunctions(const Poco::CppParser::Struct::
 			       && (flags & Poco::CppParser::Variable::VAR_CONST) == 0)
 			    {
 					//public: use directly, set 0 as funct pointer to indicate direct usage
-					Poco::CppParser::Function* pNullFct = 0;
+					Poco::CppParser::Function* pNullFct = nullptr;
 					bool ok = matches.insert(std::make_pair(itO->first, std::make_pair(static_cast<Poco::CppParser::Variable*>(itO->second), pNullFct))).second;
 					if (!ok)
 					{
@@ -672,7 +670,7 @@ void SerializerGenerator::matchVarsWithFunctions(const Poco::CppParser::Struct::
 					Poco::CppParser::Function* pFoundFct = *it;
 
 					std::string paramT = GenUtility::getResolvedReturnParameterType(pFoundFct->nameSpace(), pFoundFct);
-					Poco::CppParser::Parameter param(paramT + " dummy", 0);
+					Poco::CppParser::Parameter param(paramT + " dummy", nullptr);
 
 					std::string paramType = Poco::CodeGeneration::Utility::resolveType(pFoundFct->nameSpace(), param.declType());
 
@@ -695,7 +693,7 @@ void SerializerGenerator::matchVarsWithFunctions(const Poco::CppParser::Struct::
 	Poco::CppParser::NameSpace::SymbolTable::const_iterator itVEnd = varsCopy.end();
 	for (; itV != itVEnd; ++itV)
 	{
-		EError.notify(0, "Warning: Failed to find getter method for " + itV->second->nameSpace()->fullName() + ":" + itV->first);
+		EError.notify(nullptr, "Warning: Failed to find getter method for " + itV->second->nameSpace()->fullName() + ":" + itV->first);
 	}
 }
 
@@ -739,7 +737,7 @@ std::string SerializerGenerator::generateTypeSerializerLine(const Poco::CppParse
 {
 	std::string code("TypeSerializer<");
 
-	Poco::CppParser::Parameter ret(it->second.first->declType()+" dummy", 0);
+	Poco::CppParser::Parameter ret(it->second.first->declType()+" dummy", nullptr);
 	std::string retType (Poco::CodeGeneration::Utility::resolveType(pContext, ret.declType()));
 	Poco::CppParser::Symbol* pSym = pContext->lookup(it->second.first->declType());
 

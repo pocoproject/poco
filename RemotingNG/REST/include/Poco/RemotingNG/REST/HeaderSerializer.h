@@ -23,9 +23,7 @@
 #include "Poco/Net/HTTPMessage.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API HeaderSerializer: public ScalarSerializer
@@ -36,19 +34,19 @@ public:
 	HeaderSerializer(Poco::Net::HTTPMessage& message);
 		/// Creates the HeaderSerializer. 
 
-	~HeaderSerializer();
+	~HeaderSerializer() override;
 		/// Destroys the HeaderSerializer.
 	
 protected:
 	// ScalarSerializer
-	void serializeData(const std::string& name, const std::string& val);
+	void serializeData(const std::string& name, const std::string& val) override;
 
 private:
 	Poco::Net::HTTPMessage* _pMessage;
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_HeaderSerializer_INCLUDED

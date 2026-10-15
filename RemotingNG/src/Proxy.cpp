@@ -16,8 +16,7 @@
 #include "Poco/RemotingNG/TransportFactoryManager.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 Proxy::Proxy(const Identifiable::ObjectId& oid): 
@@ -26,9 +25,7 @@ Proxy::Proxy(const Identifiable::ObjectId& oid):
 }
 
 
-Proxy::~Proxy()
-{
-}
+Proxy::~Proxy() = default;
 
 
 void Proxy::remoting__connect(const std::string& protocol, const std::string& uri)
@@ -41,7 +38,7 @@ void Proxy::remoting__connect(const std::string& protocol, const std::string& ur
 
 void Proxy::remoting__disconnect()
 {
-	_pTransport = 0;
+	_pTransport = nullptr;
 }
 
 
@@ -51,4 +48,4 @@ void Proxy::remoting__setEventURI(const Poco::URI& eventURI)
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

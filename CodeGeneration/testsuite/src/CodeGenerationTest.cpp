@@ -32,9 +32,7 @@ CodeGenerationTest::CodeGenerationTest(const std::string& name): CppUnit::TestCa
 }
 
 
-CodeGenerationTest::~CodeGenerationTest()
-{
-}
+CodeGenerationTest::~CodeGenerationTest() = default;
 
 
 void CodeGenerationTest::testGenerateClass()

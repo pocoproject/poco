@@ -40,9 +40,7 @@ namespace Poco
 }
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API Transport: public Poco::RemotingNG::Transport
@@ -74,7 +72,7 @@ public:
 	Transport();
 		/// Creates a Transport for REST.
 
-	~Transport();
+	~Transport() override;
 		/// Destroys the Transport.
 
 	[[nodiscard]] Poco::Timespan getTimeout() const;
@@ -229,15 +227,15 @@ public:
 		/// the transport.
 
 	// Poco::RemotingNG::Transport
-	[[nodiscard]] const std::string& endPoint() const;
-	void connect(const std::string& endPoint);
-	void disconnect();
-	[[nodiscard]] bool connected() const;
-	Poco::RemotingNG::Serializer& beginMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
-	void sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
-	Poco::RemotingNG::Serializer& beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
-	Poco::RemotingNG::Deserializer& sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
-	void endRequest();
+	[[nodiscard]] const std::string& endPoint() const override;
+	void connect(const std::string& endPoint) override;
+	void disconnect() override;
+	[[nodiscard]] bool connected() const override;
+	Poco::RemotingNG::Serializer& beginMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override;
+	void sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override;
+	Poco::RemotingNG::Serializer& beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override;
+	Poco::RemotingNG::Deserializer& sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override;
+	void endRequest() override;
 
 protected:
 	[[nodiscard]] const Poco::Net::HTTPClientSession& requireSession() const;
@@ -290,7 +288,7 @@ inline const Poco::RemotingNG::Credentials& Transport::getCredentials() const
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_Transport_INCLUDED

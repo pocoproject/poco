@@ -31,9 +31,7 @@ ClientHelperGenerator::ClientHelperGenerator(Poco::CodeGeneration::CppGenerator&
 }
 
 
-ClientHelperGenerator::~ClientHelperGenerator()
-{
-}
+ClientHelperGenerator::~ClientHelperGenerator() = default;
 
 
 std::string ClientHelperGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)
@@ -77,12 +75,12 @@ void ClientHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	pFind->addDocumentation(" need for serialization/deserialization), or a Proxy.");
 	pFind->addDocumentation("");
 	pFind->addDocumentation(" The URI must have the following format: <scheme>://<authority>/<protocol>/<typeId>/<objectId>");
-	Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
+	Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 	pFind->addParameter(pParam1);
 
 	pFind = new Poco::CppParser::Function(iName + "::Ptr findImpl", _pStruct);
 	pFind->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
+	pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 	pFind->addParameter(pParam1);
 
 	pFind = new Poco::CppParser::Function("static " + iName + "::Ptr find", _pStruct);
@@ -92,15 +90,15 @@ void ClientHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	pFind->addDocumentation(" The given protocol name is used to determine the Transport used by");
 	pFind->addDocumentation(" the Proxy. This is used for objects identified by URIs that do not");
 	pFind->addDocumentation(" follow the standard Remoting URI structure.");
-	pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
-	Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const std::string& protocol", 0);
+	pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
+	Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const std::string& protocol", nullptr);
 	pFind->addParameter(pParam1);
 	pFind->addParameter(pParam2);
 
 	pFind = new Poco::CppParser::Function(iName + "::Ptr findImpl", _pStruct);
 	pFind->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
-	pParam2= new Poco::CppParser::Parameter("const std::string& protocol", 0);
+	pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
+	pParam2= new Poco::CppParser::Parameter("const std::string& protocol", nullptr);
 	pFind->addParameter(pParam1);
 	pFind->addParameter(pParam2);
 

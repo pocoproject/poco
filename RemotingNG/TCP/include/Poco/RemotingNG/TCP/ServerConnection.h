@@ -26,9 +26,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API ServerConnection: public Poco::Net::TCPServerConnection
@@ -38,11 +36,11 @@ public:
 	explicit ServerConnection(Listener::Ptr pListener, const Poco::Net::StreamSocket& socket);
 		/// Creates a ServerConnectionFactory using the given Listener instance.
 
-	~ServerConnection();
+	~ServerConnection() override;
 		/// Destroys the ServerConnectionFactory.
 
 	// TCPServerConnection
-	void run();
+	void run() override;
 
 private:
 	Listener::Ptr _pListener;
@@ -51,7 +49,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_ServerConnection_INCLUDED

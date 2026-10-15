@@ -22,9 +22,7 @@
 #include "Poco/RemotingNG/SOAP/XMLElement.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 class RemotingNGSOAP_API SOAPFaultException: public Poco::RemotingNG::RemoteException
@@ -38,22 +36,22 @@ public:
 	SOAPFaultException(const SOAPFaultException& exc);
 		/// Creates a new SOAPFaultException from another one.
 
-	~SOAPFaultException() noexcept;
+	~SOAPFaultException() noexcept override;
 		/// Destroy the exception.
 
 	SOAPFaultException& operator = (const SOAPFaultException& exc);
 		/// Assignment operator.
 
-	[[nodiscard]] const char* name() const noexcept;
+	[[nodiscard]] const char* name() const noexcept override;
 		/// Returns a static string describing the exception.
 
-	[[nodiscard]] const char* className() const noexcept;
+	[[nodiscard]] const char* className() const noexcept override;
 		/// Returns the name of the exception class.
 
-	[[nodiscard]] Poco::Exception* clone() const;
+	[[nodiscard]] Poco::Exception* clone() const override;
 		/// Creates an exact copy of the exception.
 
-	[[noreturn]] void rethrow() const;
+	[[noreturn]] void rethrow() const override;
 		/// (Re)Throws the exception.
 
 	[[nodiscard]] const XMLElement& fault() const;
@@ -96,7 +94,7 @@ inline const std::string& SOAPFaultException::namespaceURI() const
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP
 
 
 #endif // RemotingNG_SOAP_SOAPFaultException_INCLUDED

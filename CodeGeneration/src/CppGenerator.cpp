@@ -21,8 +21,7 @@
 #include "Poco/Path.h"
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 CppGenerator::CppGenerator(const std::string& nameSpace, const std::string& libraryName, bool usePocoIncludes, const std::string& copyright, std::ostream& hOut, std::ostream& cppOut):
@@ -34,17 +33,15 @@ CppGenerator::CppGenerator(const std::string& nameSpace, const std::string& libr
 	_isTemplate(false),
 	_inPureVirtualFct(false),
 	_lastAcc(Poco::CppParser::Symbol::ACC_PUBLIC),
-	_pStruct(0),
-	_pFunc(0),
+	_pStruct(nullptr),
+	_pFunc(nullptr),
 	_attributesEnabled(false),
 	_timestampsEnabled(true)
 {
 }
 
 
-CppGenerator::~CppGenerator()
-{
-}
+CppGenerator::~CppGenerator() = default;
 
 
 void CppGenerator::enableAttributes(bool enable)
@@ -492,7 +489,7 @@ void CppGenerator::methodEnd(const Poco::CppParser::Function* pFunc, const CodeG
 		methodEndImpl(pFunc, properties, _cppOut);
 	_inInlineFct = false;
 	_inPureVirtualFct = false;
-	_pFunc = 0;
+	_pFunc = nullptr;
 }
 
 
@@ -743,7 +740,7 @@ const Poco::CppParser::Parameter* CppGenerator::findParameter(const Poco::CppPar
 		if ((*it)->name() == paramName)
 			return *it;
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -777,4 +774,4 @@ void CppGenerator::endFile()
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration

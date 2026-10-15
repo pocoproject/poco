@@ -29,8 +29,7 @@
 #include <cctype>
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 const std::string Utility::HFILEEXTENSION(".h");
@@ -595,4 +594,4 @@ void Utility::writeDocumentation(std::ostream& out, const std::string& docu, int
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration

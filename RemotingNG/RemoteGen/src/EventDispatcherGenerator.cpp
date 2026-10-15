@@ -37,9 +37,7 @@ EventDispatcherGenerator::EventDispatcherGenerator(Poco::CodeGeneration::CppGene
 }
 
 
-EventDispatcherGenerator::~EventDispatcherGenerator()
-{
-}
+EventDispatcherGenerator::~EventDispatcherGenerator() = default;
 
 
 std::string EventDispatcherGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)
@@ -670,7 +668,7 @@ void EventDispatcherGenerator::writeDeserializeReturnParam(const Poco::CppParser
 	if (hasReturnParam)
 	{
 		std::string retParamType(GenUtility::getResolvedReturnParameterType(pFunc->nameSpace(), pFunc));
-		Poco::CppParser::Parameter retParam(pFunc->getReturnParameter() + " dummy", 0);
+		Poco::CppParser::Parameter retParam(pFunc->getReturnParameter() + " dummy", nullptr);
 		bool needsClear = (GenUtility::isVectorType(pFunc->nameSpace(), &retParam)
 			|| GenUtility::isNullableType(pFunc->nameSpace(), &retParam)
 			|| GenUtility::isOptionalType(pFunc->nameSpace(), &retParam))
@@ -914,12 +912,12 @@ void EventDispatcherGenerator::checkForEventMembersImpl(const Poco::CppParser::S
 			{
 				Poco::CppParser::Function* pFunc = new Poco::CppParser::Function(funcDecl, _pStruct);
 
-				Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter("const void* pSender", 0);
+				Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter("const void* pSender", nullptr);
 				pFunc->addParameter(pParam);
 
 				if (paramDecl != "void")
 				{
-					Poco::CppParser::Parameter* pParam2 = new Poco::CppParser::Parameter(paramDecl, 0);
+					Poco::CppParser::Parameter* pParam2 = new Poco::CppParser::Parameter(paramDecl, nullptr);
 					pFunc->addParameter(pParam2);
 				}
 				_outerEventFunctions.push_back(fctName);
@@ -941,11 +939,11 @@ void EventDispatcherGenerator::checkForEventMembersImpl(const Poco::CppParser::S
 			funcDecl.append("Impl");
 			{
 				Poco::CppParser::Function* pFunc = new Poco::CppParser::Function(funcDecl, _pStruct);
-				Poco::CppParser::Parameter* pParam0 = new Poco::CppParser::Parameter("const std::string& subscriberURI", 0);
+				Poco::CppParser::Parameter* pParam0 = new Poco::CppParser::Parameter("const std::string& subscriberURI", nullptr);
 				pFunc->addParameter(pParam0);
 				if (templTypes[0] != "void")
 				{
-					Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter(paramDecl, 0);
+					Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter(paramDecl, nullptr);
 					pFunc->addParameter(pParam1);
 				}
 				CodeGenerator::Properties methodProperties;

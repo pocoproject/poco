@@ -22,9 +22,7 @@
 #include "Poco/Format.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 const std::string SCRAMClientAuthenticator::SCRAM_SHA1("SCRAM-SHA-1");
@@ -37,9 +35,7 @@ SCRAMClientAuthenticator::SCRAMClientAuthenticator():
 }
 
 	
-SCRAMClientAuthenticator::~SCRAMClientAuthenticator()
-{
-}
+SCRAMClientAuthenticator::~SCRAMClientAuthenticator() = default;
 
 
 std::string SCRAMClientAuthenticator::startAuthentication(Credentials& creds)
@@ -115,4 +111,4 @@ std::string SCRAMClientAuthenticator::hashCredentials(const Credentials& creds)
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

@@ -23,9 +23,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API JSONParser
@@ -61,9 +59,9 @@ protected:
 	[[nodiscard]] static bool isEOF(int ch);
 
 private:
-	JSONParser();
-	JSONParser(const JSONParser&);
-	JSONParser& operator = (const JSONParser&);
+	JSONParser() = delete;
+	JSONParser(const JSONParser&) = delete;
+	JSONParser& operator = (const JSONParser&) = delete;
 
 	std::streambuf& _streambuf;
 	std::size_t _depth = 0;
@@ -98,7 +96,7 @@ inline bool JSONParser::isEOF(int ch)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_JSONParser_INCLUDED

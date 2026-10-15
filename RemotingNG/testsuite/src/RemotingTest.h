@@ -24,7 +24,7 @@ class RemotingTest: public CppUnit::TestCase
 {
 public:
 	RemotingTest(const std::string& name);
-	~RemotingTest();
+	~RemotingTest() override;
 
 	void testListeners();
 	void testRegistration();
@@ -54,8 +54,8 @@ public:
 	void testFilteredEvent();
 	void testPermissions();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

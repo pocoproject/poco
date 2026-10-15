@@ -17,9 +17,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 const std::string RawSerializer::VAL_TRUE("true");
@@ -32,9 +30,7 @@ RawSerializer::RawSerializer(std::ostream& stream):
 }
 
 
-RawSerializer::~RawSerializer()
-{
-}
+RawSerializer::~RawSerializer() = default;
 
 
 void RawSerializer::serializeMessageBegin(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type)
@@ -208,8 +204,8 @@ void RawSerializer::setupImpl(std::ostream& stream)
 
 void RawSerializer::resetImpl()
 {
-	_pStream = 0;
+	_pStream = nullptr;
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

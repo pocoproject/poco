@@ -43,9 +43,7 @@ BundleActivatorGenerator::BundleActivatorGenerator(
 }
 
 
-BundleActivatorGenerator::~BundleActivatorGenerator()
-{
-}
+BundleActivatorGenerator::~BundleActivatorGenerator() = default;
 
 
 void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties)
@@ -81,7 +79,7 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 	{
 		Poco::CppParser::Function* pStart = new Poco::CppParser::Function("void start", _pStruct);
 		pStart->addDocumentation(" Starts the services inside the bundle.");
-		Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", 0);
+		Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", nullptr);
 		pStart->addParameter(pParam1);
 	}
 
@@ -89,7 +87,7 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 	{
 		Poco::CppParser::Function* pStop = new Poco::CppParser::Function("void stop", _pStruct);
 		pStop->addDocumentation(" Stops the services inside the bundle.");
-		Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", 0);
+		Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", nullptr);
 		pStop->addParameter(pParam1);
 	}
 	
@@ -108,11 +106,11 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			Poco::CppParser::Function* pReg = new Poco::CppParser::Function("std::pair<std::string, Poco::OSP::ServiceRef::Ptr> registerRemoteService", _pStruct);
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Registers the service with the ORB and at the ServiceRegistry the bundle. Returns the Remoting URI and the serviceRef.");
-			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", 0);
-			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::Service::Ptr pService", 0);
-			Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const std::string& listener", 0);
-			Poco::CppParser::Parameter* pParam3= new Poco::CppParser::Parameter("const std::string& serviceName", 0);
-			Poco::CppParser::Parameter* pParam4= new Poco::CppParser::Parameter("Poco::OSP::Properties props = Poco::OSP::Properties()", 0);
+			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", nullptr);
+			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::Service::Ptr pService", nullptr);
+			Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const std::string& listener", nullptr);
+			Poco::CppParser::Parameter* pParam3= new Poco::CppParser::Parameter("const std::string& serviceName", nullptr);
+			Poco::CppParser::Parameter* pParam4= new Poco::CppParser::Parameter("Poco::OSP::Properties props = Poco::OSP::Properties()", nullptr);
 
 			pReg->addParameter(pParam0);
 			pReg->addParameter(pParam1);
@@ -126,8 +124,8 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			Poco::CppParser::Function* pReg = new Poco::CppParser::Function("std::string registerRemoteObject", _pStruct);
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Registers the service with the ORB only. Returns the Remoting URI for the remote object.");
-			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::RemotingNG::RemoteObject::Ptr pObj", 0);
-			Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const std::string& listener", 0);
+			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::RemotingNG::RemoteObject::Ptr pObj", nullptr);
+			Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const std::string& listener", nullptr);
 	
 			pReg->addParameter(pParam1);
 			pReg->addParameter(pParam2);
@@ -138,7 +136,7 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			Poco::CppParser::Function* pReg = new Poco::CppParser::Function("std::string registerListener", _pStruct);
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Registers the listener at the ORB. Returns the id of the endpoint. listener will be automatically unregistered with bundle stop");
-			Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter("Poco::RemotingNG::Listener::Ptr pListener", 0);
+			Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter("Poco::RemotingNG::Listener::Ptr pListener", nullptr);
 			pReg->addParameter(pParam1);
 		}
 
@@ -148,10 +146,10 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Registers the service at the serviceRegistry only. Stores the serviceRef for auto unregister");
 
-			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", 0);
-			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& serviceName", 0);
-			Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("Poco::OSP::Service::Ptr pService", 0);
-			Poco::CppParser::Parameter* pParam3= new Poco::CppParser::Parameter("Poco::OSP::Properties props = Poco::OSP::Properties()", 0);
+			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", nullptr);
+			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& serviceName", nullptr);
+			Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("Poco::OSP::Service::Ptr pService", nullptr);
+			Poco::CppParser::Parameter* pParam3= new Poco::CppParser::Parameter("Poco::OSP::Properties props = Poco::OSP::Properties()", nullptr);
 
 			pReg->addParameter(pParam0);
 			pReg->addParameter(pParam1);
@@ -165,9 +163,9 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Unregisters the service at the ORB and at the ServiceRegistry.");
 
-			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", 0);
-			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
-			Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("Poco::OSP::ServiceRef::Ptr pService", 0);
+			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", nullptr);
+			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
+			Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("Poco::OSP::ServiceRef::Ptr pService", nullptr);
 
 			pReg->addParameter(pParam0);
 			pReg->addParameter(pParam1);
@@ -180,7 +178,7 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Unregisters the service at the ORB only.");
 
-			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
+			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 
 			pReg->addParameter(pParam1);
 		}
@@ -191,8 +189,8 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Unregisters the service at the serviceRegistry only.");
 
-			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", 0);
-			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::ServiceRef::Ptr pService", 0);
+			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", nullptr);
+			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::ServiceRef::Ptr pService", nullptr);
 
 			pReg->addParameter(pParam0);
 			pReg->addParameter(pParam1);
@@ -203,7 +201,7 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			Poco::CppParser::Function* pReg = new Poco::CppParser::Function("void unregisterListener", _pStruct);
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Unregisters the listener at the ORB.");
-			Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter("const std::string& listener", 0);
+			Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter("const std::string& listener", nullptr);
 			pReg->addParameter(pParam1);
 		}
 
@@ -212,7 +210,7 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			Poco::CppParser::Function* pReg = new Poco::CppParser::Function("void unregisterAll", _pStruct);
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Unregisters all services and remoteobjects. Automatically called by stop method.");
-			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", 0);
+			Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", nullptr);
 			pReg->addParameter(pParam1);
 		}
 
@@ -221,7 +219,7 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			Poco::CppParser::Function* pReg = new Poco::CppParser::Function("void setupRemotingOSP", _pStruct);
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Initializes skeletons, proxyfactories and servicefactories.");
-			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", 0);
+			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", nullptr);
 			pReg->addParameter(pParam0);
 		}
 
@@ -230,7 +228,7 @@ void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruc
 			Poco::CppParser::Function* pReg = new Poco::CppParser::Function("void shutdownRemotingOSP", _pStruct);
 			pReg->setAccess(Poco::CppParser::Symbol::ACC_PROTECTED);
 			pReg->addDocumentation(" Deinitializes skeletons, proxyfactories and servicefactories for this bundle.");
-			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", 0);
+			Poco::CppParser::Parameter* pParam0= new Poco::CppParser::Parameter("Poco::OSP::BundleContext::Ptr pContext", nullptr);
 			pReg->addParameter(pParam0);
 		}
 

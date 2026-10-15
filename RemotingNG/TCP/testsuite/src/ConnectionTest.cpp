@@ -104,7 +104,7 @@ namespace
 		{
 		}
 
-		~WatchedConnection()
+		~WatchedConnection() override
 		{
 			_destroyed = true;
 		}
@@ -188,9 +188,7 @@ ConnectionTest::ConnectionTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-ConnectionTest::~ConnectionTest()
-{
-}
+ConnectionTest::~ConnectionTest() = default;
 
 
 void ConnectionTest::testHandshakeFailure()

@@ -43,9 +43,9 @@ const std::set<std::string> AbstractGenerator::BUILTIN_TYPES(initBuiltinTypes())
 AbstractGenerator::AbstractGenerator(Poco::CodeGeneration::CppGenerator& cppGen):
 	Poco::CodeGeneration::CodeGenerator(cppGen.nameSpace(), cppGen.libraryName(), cppGen.usePocoIncludeStyle(), cppGen.copyright()),
 	_cppGen(cppGen),
-	_pStruct(0),
-	_pStructIn(0),
-	_pNs(0)
+	_pStruct(nullptr),
+	_pStructIn(nullptr),
+	_pNs(nullptr)
 {
 	Poco::CppParser::Symbol* pS = Poco::CppParser::NameSpace::root();
 	if (!_cppGen.nameSpace().empty())
@@ -78,15 +78,13 @@ AbstractGenerator::AbstractGenerator(Poco::CodeGeneration::CppGenerator& cppGen)
 }
 
 
-AbstractGenerator::~AbstractGenerator()
-{
-}
+AbstractGenerator::~AbstractGenerator() = default;
 
 
 void AbstractGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties)
 {
-	poco_assert_dbg(_pStruct == 0);
-	poco_assert_dbg(_pStructIn == 0);
+	poco_assert_dbg(_pStruct == nullptr);
+	poco_assert_dbg(_pStructIn == nullptr);
 	_pStructIn = pStruct;
 	_pStruct = structClone(pStruct, newClassName(pStruct), newBaseClasses(pStruct));
 }
@@ -97,8 +95,8 @@ void AbstractGenerator::structEnd()
 	Poco::CodeGeneration::GeneratorEngine e;
 	registerCallbacks(e);
 	e.generate(_pStruct, _cppGen, reinterpret_cast<void*>(this));
-	_pStruct = 0;
-	_pStructIn = 0;
+	_pStruct = nullptr;
+	_pStructIn = nullptr;
 }
 
 
@@ -191,8 +189,8 @@ Poco::CppParser::Function* AbstractGenerator::methodClone(const Poco::CppParser:
 
 Poco::CppParser::Struct* AbstractGenerator::structClone(const Poco::CppParser::Struct* aStruct, const std::string& newClassName, const std::vector<std::string>& baseClasses)
 {
-	poco_assert_dbg (_pStruct == 0);
-	poco_assert_dbg (aStruct != 0);
+	poco_assert_dbg (_pStruct == nullptr);
+	poco_assert_dbg (aStruct != nullptr);
 
 	// generate the decl: class NS_API newClassName: public BaseNS::IbaseClass
 	std::string decl("class ");
@@ -283,11 +281,11 @@ void AbstractGenerator::handleParentFunctionsImpl(const Poco::CppParser::Struct*
 
 void AbstractGenerator::addDocumentation(const Poco::CppParser::Symbol* pSymOld,Poco::CppParser::Symbol* pNew)
 {
-	if (pSymOld != 0 && !pSymOld->getDocumentation().empty())
+	if (pSymOld != nullptr && !pSymOld->getDocumentation().empty())
 	{
 		pNew->addDocumentation(pSymOld->getDocumentation());
 	}
-	if (pSymOld != 0 && pNew != 0)
+	if (pSymOld != nullptr && pNew != nullptr)
 	{
 		pNew->setAttributes(pSymOld->getAttributes());
 	}
@@ -329,7 +327,7 @@ void AbstractGenerator::includeTypeSerializers(const Poco::CppParser::Function* 
 	}
 	if (!pFunc->getReturnParameter().empty() && pFunc->getReturnParameter() != Poco::CodeGeneration::Utility::TYPE_VOID)
 	{
-		Poco::CppParser::Parameter ret(pFunc->getReturnParameter() + " dummy", 0);
+		Poco::CppParser::Parameter ret(pFunc->getReturnParameter() + " dummy", nullptr);
 		std::string resType = Utility::resolveType(pFunc->nameSpace(), ret.declType());
 		Poco::CppParser::Symbol* pS = pFunc->nameSpace()->lookup(resType);
 		if (pS)
@@ -355,7 +353,7 @@ void AbstractGenerator::includeTypes(const Poco::CppParser::Function* pFunc, boo
 	}
 	if (!pFunc->getReturnParameter().empty() && pFunc->getReturnParameter() != Poco::CodeGeneration::Utility::TYPE_VOID)
 	{
-		Poco::CppParser::Parameter ret(pFunc->getReturnParameter() + " dummy", 0);
+		Poco::CppParser::Parameter ret(pFunc->getReturnParameter() + " dummy", nullptr);
 		handleIncludeTypes(&ret, toHFile, writeDirectly);
 	}
 }

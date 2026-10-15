@@ -26,9 +26,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace HTTP {
+namespace Poco::RemotingNG::HTTP {
 
 
 class RemotingNGHTTP_API Listener: public Poco::RemotingNG::Listener
@@ -76,7 +74,7 @@ public:
 		/// which must be bound to a socket address corresponding to
 		/// the given endPoint.
 
-	~Listener();
+	~Listener() override;
 		/// Destroys the Listener.
 
 	void enableChunkedTransferEncoding(bool enable = true);
@@ -97,13 +95,13 @@ public:
 		/// Returns true iff GZIP compression is enabled for responses.
 
 	// Poco::RemotingNG::Listener
-	void start();
-	void stop();
-	[[nodiscard]] const std::string& protocol() const;
-	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
-	[[nodiscard]] bool handlesURI(const std::string& uri);
-	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton);
-	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject);
+	void start() override;
+	void stop() override;
+	[[nodiscard]] const std::string& protocol() const override;
+	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId) override;
+	[[nodiscard]] bool handlesURI(const std::string& uri) override;
+	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton) override;
+	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject) override;
 
 private:
 	bool _secure;
@@ -129,7 +127,7 @@ inline bool Listener::isCompressionEnabled() const
 }
 
 
-} } } // namespace Poco::RemotingNG::HTTP
+} // namespace Poco::RemotingNG::HTTP
 
 
 #endif // RemotingNG_HTTP_Listener_INCLUDED

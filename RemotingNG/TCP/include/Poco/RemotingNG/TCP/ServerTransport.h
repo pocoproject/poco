@@ -33,9 +33,7 @@
 #include "Poco/Logger.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class Listener;
@@ -50,21 +48,21 @@ public:
 	ServerTransport(Listener& _listener, CredentialsStore::Ptr pCredentialsStore, const Poco::SharedPtr<ChannelInputStream>& pRequestStream, const Poco::SharedPtr<ChannelOutputStream>& pReplyStream, bool compressed, bool authenticated);
 		/// Creates a ServerTransport.
 
-	~ServerTransport();
+	~ServerTransport() override;
 		/// Destroys the ServerTransport().
 
 	void waitReady();
 		/// Waits until the server thread is ready.
 
 	// ServerTransport
-	[[nodiscard]] bool authenticate(const std::string& method);
-	[[nodiscard]] bool authorize(const std::string& method, const std::string& permission);
-	Deserializer& beginRequest();
-	Serializer& sendReply(SerializerBase::MessageType messageType);
-	void endRequest();
+	[[nodiscard]] bool authenticate(const std::string& method) override;
+	[[nodiscard]] bool authorize(const std::string& method, const std::string& permission) override;
+	Deserializer& beginRequest() override;
+	Serializer& sendReply(SerializerBase::MessageType messageType) override;
+	void endRequest() override;
 
 	// Runnable
-	void run();
+	void run() override;
 
 private:
 	Listener& _listener;
@@ -81,7 +79,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_ServerTransport_INCLUDED

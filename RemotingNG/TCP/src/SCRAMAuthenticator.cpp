@@ -31,9 +31,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 SCRAMAuthenticator::SCRAMAuthenticator():
@@ -42,9 +40,7 @@ SCRAMAuthenticator::SCRAMAuthenticator():
 }
 
 
-SCRAMAuthenticator::~SCRAMAuthenticator()
-{
-}
+SCRAMAuthenticator::~SCRAMAuthenticator() = default;
 
 
 AuthenticateResult SCRAMAuthenticator::authenticate(const Credentials& creds, Poco::UInt32 conversationID)
@@ -192,4 +188,4 @@ std::string SCRAMAuthenticator::computeServerSignature(const std::string& salted
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

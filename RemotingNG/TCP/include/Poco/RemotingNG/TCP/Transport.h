@@ -34,9 +34,7 @@
 #include "Poco/Logger.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class ConnectionManager;
@@ -51,7 +49,7 @@ public:
 	explicit Transport(ConnectionManager& connectionManager);
 		/// Creates a Transport using the given ConnectionManager.
 
-	~Transport();
+	~Transport() override;
 		/// Destroys the Transport.
 
 	[[nodiscard]] Poco::Timespan getTimeout() const;
@@ -80,15 +78,15 @@ public:
 		/// Returns the credentials for authentication.
 	
 	// Poco::RemotingNG::Transport
-	[[nodiscard]] const std::string& endPoint() const;
-	void connect(const std::string& endPoint);
-	void disconnect();
-	[[nodiscard]] bool connected() const;
-	Poco::RemotingNG::Serializer& beginMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
-	void sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
-	Poco::RemotingNG::Serializer& beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
-	Poco::RemotingNG::Deserializer& sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
-	void endRequest();
+	[[nodiscard]] const std::string& endPoint() const override;
+	void connect(const std::string& endPoint) override;
+	void disconnect() override;
+	[[nodiscard]] bool connected() const override;
+	Poco::RemotingNG::Serializer& beginMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override;
+	void sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override;
+	Poco::RemotingNG::Serializer& beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override;
+	Poco::RemotingNG::Deserializer& sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType) override;
+	void endRequest() override;
 
 protected:
 	void setupSerializer(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, Poco::RemotingNG::SerializerBase::MessageType messageType, Poco::UInt16 frameFlags);
@@ -96,7 +94,7 @@ protected:
 	[[nodiscard]] static bool verifyCredentials(const Credentials& credentials);
 
 private:
-	Transport();
+	Transport() = delete;
 
 	enum
 	{
@@ -124,7 +122,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_Transport_INCLUDED

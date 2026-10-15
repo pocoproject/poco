@@ -16,8 +16,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 const std::string SerializerBase::PROP_NAMESPACE("namespace");
@@ -37,14 +36,10 @@ const std::string SerializerBase::PROP_XSDTYPE("xsdType");
 const std::string SerializerBase::RETURN_PARAM("return");
 
 
-SerializerBase::SerializerBase()
-{
-}
+SerializerBase::SerializerBase() = default;
 
 
-SerializerBase::~SerializerBase()
-{
-}
+SerializerBase::~SerializerBase() = default;
 
 
 void SerializerBase::pushProperty(const std::string& name, const std::string& value)
@@ -101,4 +96,4 @@ void SerializerBase::clearProperties()
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

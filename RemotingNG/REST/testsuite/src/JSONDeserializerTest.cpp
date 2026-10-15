@@ -24,9 +24,7 @@ JSONDeserializerTest::JSONDeserializerTest(const std::string& name): CppUnit::Te
 }
 
 
-JSONDeserializerTest::~JSONDeserializerTest()
-{
-}
+JSONDeserializerTest::~JSONDeserializerTest() = default;
 
 
 void JSONDeserializerTest::testError()

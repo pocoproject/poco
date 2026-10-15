@@ -29,9 +29,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API CookieStore: public Poco::RefCountedObject
@@ -53,7 +51,7 @@ public:
 	CookieStore();
 		/// Creates an empty CookieStore.
 
-	~CookieStore();
+	~CookieStore() override;
 		/// Destroys the CookieStore.
 
 	void addCookies(Poco::Net::HTTPRequest& request);
@@ -69,14 +67,14 @@ private:
 		Poco::Net::HTTPCookie cookie;
 		Poco::Timestamp expireTime;
 	};
-	typedef std::map<std::string, CookieInfo> CookieMap;
+	using CookieMap = std::map<std::string, CookieInfo>;
 
 	CookieMap _cookies;
 	Poco::FastMutex _mutex;
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_CookieStore_INCLUDED

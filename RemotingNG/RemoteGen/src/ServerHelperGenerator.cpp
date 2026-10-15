@@ -34,9 +34,7 @@ ServerHelperGenerator::ServerHelperGenerator(Poco::CodeGeneration::CppGenerator&
 }
 
 
-ServerHelperGenerator::~ServerHelperGenerator()
-{
-}
+ServerHelperGenerator::~ServerHelperGenerator() = default;
 
 
 std::string ServerHelperGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)
@@ -91,17 +89,17 @@ void ServerHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	pRegObj->addDocumentation(" ");
 	pRegObj->addDocumentation("	Returns the URI created for the object.");
 
-	Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", 0);
-	Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", 0);
-	Poco::CppParser::Parameter* pParam3= new Poco::CppParser::Parameter("const std::string& listenerId", 0);
+	Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", nullptr);
+	Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", nullptr);
+	Poco::CppParser::Parameter* pParam3= new Poco::CppParser::Parameter("const std::string& listenerId", nullptr);
 	pRegObj->addParameter(pParam1);
 	pRegObj->addParameter(pParam2);
 	pRegObj->addParameter(pParam3);
 
 	pRegObj = new Poco::CppParser::Function("std::string registerObjectImpl", _pStruct);
 	pRegObj->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1 = new Poco::CppParser::Parameter("Poco::AutoPtr<" + roName + "> pRemoteObject", 0);
-	pParam3 = new Poco::CppParser::Parameter("const std::string& listenerId", 0);
+	pParam1 = new Poco::CppParser::Parameter("Poco::AutoPtr<" + roName + "> pRemoteObject", nullptr);
+	pParam3 = new Poco::CppParser::Parameter("const std::string& listenerId", nullptr);
 	pRegObj->addParameter(pParam1);
 	pRegObj->addParameter(pParam3);
 
@@ -112,34 +110,34 @@ void ServerHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	pRegObj->addDocumentation(" uniquely identified by the Listener's ID.");
 	pRegObj->addDocumentation(" ");
 	pRegObj->addDocumentation("	Returns the URI created for the object.");
-	pParam1 = new Poco::CppParser::Parameter("Poco::AutoPtr<" + roName + "> pRemoteObject", 0);
-	pParam3 = new Poco::CppParser::Parameter("const std::string& listenerId", 0);
+	pParam1 = new Poco::CppParser::Parameter("Poco::AutoPtr<" + roName + "> pRemoteObject", nullptr);
+	pParam3 = new Poco::CppParser::Parameter("const std::string& listenerId", nullptr);
 	pRegObj->addParameter(pParam1);
 	pRegObj->addParameter(pParam3);
 
 	Poco::CppParser::Function* pUnregObj = new Poco::CppParser::Function("static void unregisterObject", _pStruct);
 	pUnregObj->makeInline();
 	pUnregObj->addDocumentation(" Unregisters a service object identified by URI from the ORB.");
-	pParam1 = new Poco::CppParser::Parameter("const std::string& uri", 0);
+	pParam1 = new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 	pUnregObj->addParameter(pParam1);
 
 	pUnregObj = new Poco::CppParser::Function("void unregisterObjectImpl", _pStruct);
 	pUnregObj->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1 = new Poco::CppParser::Parameter("const std::string& uri", 0);
+	pParam1 = new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 	pUnregObj->addParameter(pParam1);
 
 	Poco::CppParser::Function* pCreateObj = new Poco::CppParser::Function("static Poco::AutoPtr<" + roName + "> createRemoteObject", _pStruct);
 	pCreateObj->makeInline();
 	pCreateObj->addDocumentation(" Creates and returns a RemoteObject wrapper for the given " + pStruct->fullName() + " instance.");
-	pParam1 = new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", 0);
-	pParam2 = new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", 0);
+	pParam1 = new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", nullptr);
+	pParam2 = new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", nullptr);
 	pCreateObj->addParameter(pParam1);
 	pCreateObj->addParameter(pParam2);
 
 	pCreateObj = new Poco::CppParser::Function("static Poco::AutoPtr<" + roName + "> createRemoteObjectImpl", _pStruct);
 	pCreateObj->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1 = new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", 0);
-	pParam2 = new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", 0);
+	pParam1 = new Poco::CppParser::Parameter("Poco::SharedPtr<" + pStruct->fullName() + "> pServiceObject", nullptr);
+	pParam2 = new Poco::CppParser::Parameter("const Poco::RemotingNG::Identifiable::ObjectId& oid", nullptr);
 	pCreateObj->addParameter(pParam1);
 	pCreateObj->addParameter(pParam2);
 
@@ -155,16 +153,16 @@ void ServerHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 		pEnableEvents->addDocumentation("");
 		pEnableEvents->addDocumentation(" Events will be delivered using the Transport for the given protocol.");
 		pEnableEvents->addDocumentation(" Can be called multiple times for the same URI with different protocols.");
-		pParam1 = new Poco::CppParser::Parameter("const std::string& uri", 0);
+		pParam1 = new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 		pEnableEvents->addParameter(pParam1);
-		pParam2 = new Poco::CppParser::Parameter("const std::string& protocol", 0);
+		pParam2 = new Poco::CppParser::Parameter("const std::string& protocol", nullptr);
 		pEnableEvents->addParameter(pParam2);
 
 		pEnableEvents = new Poco::CppParser::Function("void enableEventsImpl", _pStruct);
 		pEnableEvents->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-		pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
+		pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 		pEnableEvents->addParameter(pParam1);
-		pParam2= new Poco::CppParser::Parameter("const std::string& protocol", 0);
+		pParam2= new Poco::CppParser::Parameter("const std::string& protocol", nullptr);
 		pEnableEvents->addParameter(pParam2);
 	}
 

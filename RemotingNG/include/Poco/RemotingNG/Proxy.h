@@ -23,8 +23,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API Proxy: public Identifiable
@@ -42,7 +41,7 @@ public:
 	Proxy(const Poco::RemotingNG::Identifiable::ObjectId& oid);
 		/// Creates a Proxy.
 
-	virtual ~Proxy();
+	~Proxy() override;
 		/// Destroys the Proxy.
 
 	void remoting__connect(const std::string& protocol, const std::string& uri);
@@ -106,7 +105,7 @@ inline const Poco::URI& Proxy::remoting__getEventURI() const
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Proxy_INCLUDED

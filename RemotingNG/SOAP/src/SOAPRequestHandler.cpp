@@ -34,9 +34,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 const std::string SOAPRequestHandler::SOAPACTION("SOAPAction");
@@ -54,7 +52,7 @@ public:
 	{
 	}
 
-	void interceptHeader(const XMLElement& header);
+	void interceptHeader(const XMLElement& header) override;
 
 private:
 	SOAPServerTransport& _transport;
@@ -70,7 +68,7 @@ public:
 	{
 	}
 
-	bool authenticate(const std::string& /*method*/)
+	bool authenticate(const std::string& /*method*/) override
 	{
 		Authenticator::Ptr pAuth = _listener.getAuthenticator();
 		if (pAuth)
@@ -80,7 +78,7 @@ public:
 		return false;
 	}
 
-	bool authorize(const std::string& method, const std::string& permission)
+	bool authorize(const std::string& method, const std::string& permission) override
 	{
 		Authorizer::Ptr pAuth = _listener.getAuthorizer();
 		if (pAuth)
@@ -165,18 +163,18 @@ public:
 		_response(response),
 		_enableCompression(listener.isCompressionEnabled()),
 		_enableMTOM(listener.isMTOMEnabled()),
-		_pDeflater(0),
+		_pDeflater(nullptr),
 		_replySent(false)
 	{
 		applyRequestHeaderInterceptors(_deserializer);
 	}
 
-	~ChunkedServerTransport()
+	~ChunkedServerTransport() override
 	{
 		delete _pDeflater;
 	}
 
-	Poco::RemotingNG::Deserializer& beginRequest()
+	Poco::RemotingNG::Deserializer& beginRequest() override
 	{
 		if (Poco::icompare(_request.getContentType(), 0, 17, "Multipart/Related") == 0)
 		{
@@ -195,7 +193,7 @@ public:
 		return _deserializer;
 	}
 
-	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType)
+	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType) override
 	{
 		// consume extra request content
 		std::istream& istr = _request.stream();
@@ -234,7 +232,7 @@ public:
 		return _serializer;
 	}
 
-	void endRequest()
+	void endRequest() override
 	{
 		if (!_replySent) // one-way message
 		{
@@ -267,7 +265,7 @@ public:
 		applyRequestHeaderInterceptors(_deserializer);
 	}
 
-	Poco::RemotingNG::Deserializer& beginRequest()
+	Poco::RemotingNG::Deserializer& beginRequest() override
 	{
 		if (Poco::icompare(_request.getContentType(), 0, 17, "Multipart/Related") == 0)
 		{
@@ -286,7 +284,7 @@ public:
 		return _deserializer;
 	}
 
-	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType)
+	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType) override
 	{
 		// consume extra request content
 		std::istream& istr = _request.stream();
@@ -312,7 +310,7 @@ public:
 		return _serializer;
 	}
 
-	void endRequest()
+	void endRequest() override
 	{
 		_response.setContentLength(static_cast<int>(_bufferStream.tellp()));
 		std::ostream& ostr = _response.send();
@@ -336,9 +334,7 @@ SOAPRequestHandler::SOAPRequestHandler(Listener& listener):
 }
 
 
-SOAPRequestHandler::~SOAPRequestHandler()
-{
-}
+SOAPRequestHandler::~SOAPRequestHandler() = default;
 
 
 void SOAPRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
@@ -434,4 +430,4 @@ void SOAPRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Po
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

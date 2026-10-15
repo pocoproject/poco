@@ -22,9 +22,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 JSONDeserializer::JSONDeserializer(std::istream& stream):
@@ -34,9 +32,7 @@ JSONDeserializer::JSONDeserializer(std::istream& stream):
 }
 
 
-JSONDeserializer::~JSONDeserializer()
-{
-}
+JSONDeserializer::~JSONDeserializer() = default;
 
 
 void JSONDeserializer::deserializeError(const std::string& reason, int status)
@@ -497,4 +493,4 @@ void JSONDeserializer::setupImpl(std::istream& stream)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

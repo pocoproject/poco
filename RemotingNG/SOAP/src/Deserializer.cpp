@@ -31,24 +31,20 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 Deserializer::Deserializer():
 	_soapVersion(Serializer::SOAP_1_1),
 	_mtom(false),
-	_pRoot(0)
+	_pRoot(nullptr)
 {
 	_reader.setParent(&_internalReader);
 	_reader.setContentHandler(&_contentHandler);
 }
 
 
-Deserializer::~Deserializer()
-{
-}
+Deserializer::~Deserializer() = default;
 
 
 void Deserializer::addHeaderInterceptor(HeaderInterceptor::Ptr pInterceptor)
@@ -97,7 +93,7 @@ Poco::RemotingNG::SerializerBase::MessageType Deserializer::findMessage(std::str
 	poco_assert_dbg (_entries.size() == 1);
 
 	// the first child in the root element is the method name or the SOAP envelope or the SOAP fault inside the soap envelope
-	const SOAPContentHandler::Node* pCur = 0;
+	const SOAPContentHandler::Node* pCur = nullptr;
 	pCur = _entries.top().first;
 	pCur = &pCur->_children.at(0);
 	if (pCur->_name != Serializer::ENVELOPE) // we deliberately don't check namespaces!
@@ -839,4 +835,4 @@ void Deserializer::copyToVector(std::istream& istr, std::vector<char>& vec)
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

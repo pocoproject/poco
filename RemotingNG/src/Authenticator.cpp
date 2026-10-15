@@ -15,8 +15,7 @@
 #include "Poco/RemotingNG/Authenticator.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 //
@@ -46,17 +45,10 @@ AuthenticateResult::AuthenticateResult(State state, const Credentials& credentia
 }
 
 	
-AuthenticateResult::AuthenticateResult(const AuthenticateResult& other):
-	_state(other._state),
-	_credentials(other._credentials),
-	_conversationID(other._conversationID)
-{
-}
+AuthenticateResult::AuthenticateResult(const AuthenticateResult& other) = default;
 
 
-AuthenticateResult::~AuthenticateResult()
-{
-}
+AuthenticateResult::~AuthenticateResult() = default;
 
 	
 AuthenticateResult& AuthenticateResult::operator = (const AuthenticateResult& other)
@@ -76,14 +68,10 @@ AuthenticateResult& AuthenticateResult::operator = (const AuthenticateResult& ot
 //
 
 
-Authenticator::Authenticator()
-{
-}
+Authenticator::Authenticator() = default;
 
 
-Authenticator::~Authenticator()
-{
-}
+Authenticator::~Authenticator() = default;
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

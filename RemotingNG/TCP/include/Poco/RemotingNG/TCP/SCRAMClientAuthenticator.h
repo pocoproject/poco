@@ -21,9 +21,7 @@
 #include "Poco/RemotingNG/TCP/ClientAuthenticator.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API SCRAMClientAuthenticator: public ClientAuthenticator
@@ -52,12 +50,12 @@ public:
 	SCRAMClientAuthenticator();
 		/// Creates the SCRAMClientAuthenticator.
 
-	~SCRAMClientAuthenticator();
+	~SCRAMClientAuthenticator() override;
 		/// Destroys the SCRAMClientAuthenticator.
 
 	// ClientAuthenticator
-	[[nodiscard]] std::string startAuthentication(Credentials& clientCredentials);
-	[[nodiscard]] bool continueAuthentication(const Credentials& serverCredentials, Credentials& clientCredentials);
+	[[nodiscard]] std::string startAuthentication(Credentials& clientCredentials) override;
+	[[nodiscard]] bool continueAuthentication(const Credentials& serverCredentials, Credentials& clientCredentials) override;
 
 protected:
 	[[nodiscard]] std::string hashCredentials(const Credentials& creds);
@@ -80,7 +78,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_SCRAMClientAuthenticator_INCLUDED

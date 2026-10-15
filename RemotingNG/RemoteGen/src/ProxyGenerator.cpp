@@ -36,9 +36,7 @@ ProxyGenerator::ProxyGenerator(Poco::CodeGeneration::CppGenerator& cppGen): Abst
 }
 
 
-ProxyGenerator::~ProxyGenerator()
-{
-}
+ProxyGenerator::~ProxyGenerator() = default;
 
 
 std::string ProxyGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)
@@ -130,9 +128,9 @@ void ProxyGenerator::structStart(const Poco::CppParser::Struct* pStruct, const C
 	if (_hasEvents)
 	{
 		Poco::CppParser::Function* pEvents = new Poco::CppParser::Function("virtual std::string remoting__enableEvents", _pStruct);
-		Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter("Poco::RemotingNG::Listener::Ptr pListener", 0);
+		Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter("Poco::RemotingNG::Listener::Ptr pListener", nullptr);
 		pEvents->addParameter(pParam);
-		pParam = new Poco::CppParser::Parameter("bool enable = true", 0);
+		pParam = new Poco::CppParser::Parameter("bool enable = true", nullptr);
 		pEvents->addParameter(pParam);
 		Poco::CppParser::Variable* pEvSub = new Poco::CppParser::Variable("Poco::RemotingNG::EventSubscriber::Ptr _pEventSubscriber", _pStruct);
 		pEvSub->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
@@ -239,7 +237,7 @@ void ProxyGenerator::methodStartImpl(Poco::CppParser::Function* pFunc, const Cod
 	std::string retParamName = generateRetParamName(pFunc);
 	if (!retParamName.empty())
 	{
-		Poco::CppParser::Parameter p(pFunc->getReturnParameter() + " " + retParamName, 0);
+		Poco::CppParser::Parameter p(pFunc->getReturnParameter() + " " + retParamName, nullptr);
 		std::string decl("mutable " + p.declType());
 		if (p.isPointer())
 			decl.append("*");
@@ -1157,7 +1155,7 @@ void ProxyGenerator::writeDeserializeReturnParam(const Poco::CppParser::Function
 		}
 
 		std::string retParamType(GenUtility::getResolvedReturnParameterType(pFunc->nameSpace(), pFunc));
-		Poco::CppParser::Parameter retParam(pFunc->getReturnParameter() + " dummy", 0);
+		Poco::CppParser::Parameter retParam(pFunc->getReturnParameter() + " dummy", nullptr);
 		bool needsClear = (GenUtility::isVectorType(pFunc->nameSpace(), &retParam)
 			|| GenUtility::isNullableType(pFunc->nameSpace(), &retParam)
 			|| GenUtility::isOptionalType(pFunc->nameSpace(), &retParam))

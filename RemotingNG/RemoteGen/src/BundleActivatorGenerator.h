@@ -35,23 +35,23 @@ public:
 	BundleActivatorGenerator(Poco::CodeGeneration::CppGenerator& cppGen, std::ostream* pImplOut, const std::string& className, const std::vector<BundleService>& services);
 		/// Creates the BundleActivatorGenerator.
 
-	~BundleActivatorGenerator();
+	~BundleActivatorGenerator() override;
 		/// Destroys the BundleActivatorGenerator.
 
-	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
+	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties) override;
 		/// Must not write the namespace
 
-	void structEnd();
+	void structEnd() override;
 		/// generates the class
 
-	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 		/// Writes the method header. Properties contains the properties found in the functions docuementation and in the class documentation.
 
-	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
+	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e) override;
 
-	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct) override;
 
-	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct) override;
 
 private:
 	static void constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);

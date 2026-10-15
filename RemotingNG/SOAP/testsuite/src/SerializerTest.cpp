@@ -26,9 +26,7 @@ SerializerTest::SerializerTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-SerializerTest::~SerializerTest()
-{
-}
+SerializerTest::~SerializerTest() = default;
 
 
 void SerializerTest::testRequestNoParams11()
@@ -971,7 +969,7 @@ void SerializerTest::testInterceptor()
 	class TestSerInterceptor: public Serializer::HeaderInterceptor
 	{
 	public:
-		void interceptHeader(XMLElement& header)
+		void interceptHeader(XMLElement& header) override
 		{
 			header.addChild(XMLElement("simple"s, "urn:schemas-appinf-com:service:MyService:1.0"s, "value"s));
 		}
@@ -1005,7 +1003,7 @@ void SerializerTest::testInterceptorComplex()
 	class TestCmplSerInterceptor: public Serializer::HeaderInterceptor
 	{
 	public:
-		void interceptHeader(XMLElement& header)
+		void interceptHeader(XMLElement& header) override
 		{
 			XMLElement complex("complex"s, "urn:schemas-appinf-com:service:MyService:1.0"s);
 			complex.setAttribute("attr"s, "urn:schemas-appinf-com:service:MyService:1.0"s, "true"s);

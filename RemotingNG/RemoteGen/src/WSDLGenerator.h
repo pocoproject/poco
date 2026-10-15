@@ -108,31 +108,31 @@ public:
 	WSDLGenerator(Poco::CodeGeneration::CppGenerator& cppGen, const std::string& targetNamespace, Poco::XML::ContentHandler& wsdlOut);
 		/// Creates the WSDLGenerator.
 
-	~WSDLGenerator();
+	~WSDLGenerator() override;
 		/// Destroys the WSDLGenerator.
 
 	[[nodiscard]] static std::string generateFileName(const Poco::CppParser::Struct* pStruct);
 
 	[[nodiscard]] static std::string generateFileName(const std::string& structName);
 
-	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
+	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties) override;
 		/// Struct Start
 
-	void structEnd();
+	void structEnd() override;
 		// Struct End
 
-	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 		/// Method Start
 
-	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 		/// Method End
 
-	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
+	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e) override;
 
-	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct) override;
 		/// generates the new class name based on the old one
 
-	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct) override;
 
 	[[nodiscard]] static bool hasSoapHeader(const Poco::CppParser::Function* pFunc, bool request);
 		/// Checks whether this method has a soapHeader set. Either for request or for response
@@ -150,8 +150,8 @@ protected:
 	void writeExceptionMessage();
 
 private:
-	typedef std::vector<PortType> PortTypeVec;
-	typedef std::vector<BindingInfo> BindingInfoVec;
+	using PortTypeVec = std::vector<PortType>;
+	using BindingInfoVec = std::vector<BindingInfo>;
 
 	Poco::XML::ContentHandler& _wsdlOut;
 	std::string _targetNamespace;

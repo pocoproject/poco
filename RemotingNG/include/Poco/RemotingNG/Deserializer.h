@@ -30,8 +30,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API Deserializer: public SerializerBase
@@ -54,7 +53,7 @@ public:
 	Deserializer();
 		/// Creates a Deserializer.
 
-	virtual ~Deserializer();
+	~Deserializer() override;
 		/// Destroys the Deserializer.
 
 	void setup(std::istream& istr);
@@ -269,7 +268,7 @@ inline void Deserializer::setup(std::istream& istr)
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Deserializer_INCLUDED

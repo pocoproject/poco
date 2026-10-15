@@ -24,9 +24,7 @@
 #include "Poco/Logger.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 class RemotingNGSOAP_API SOAPRequestHandler: public Poco::Net::HTTPRequestHandler
@@ -36,25 +34,25 @@ public:
 	SOAPRequestHandler(Listener& listener);
 		/// Creates a SOAPRequestHandler, using the given Listener.
 
-	~SOAPRequestHandler();
+	~SOAPRequestHandler() override;
 		/// Destroys the SOAPRequestHandler.
 
 	// Poco::Net::HTTPSOAPRequestHandler
-	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
+	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
 
 protected:
 	static const std::string SOAPACTION;
 	static const std::string EMPTY;
 	
 private:
-	SOAPRequestHandler();
+	SOAPRequestHandler() = delete;
 
 	Listener& _listener;
 	Poco::Logger& _logger;
 };
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP
 
 
 #endif // RemotingNG_SOAP_SOAPRequestHandler_INCLUDED

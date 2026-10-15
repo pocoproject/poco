@@ -28,9 +28,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 class RemotingNGSOAP_API Listener: public Poco::RemotingNG::Listener
@@ -86,7 +84,7 @@ public:
 		/// WSDL documents. It can be empty if the WSDL documents are
 		/// located in the current working directory.
 
-	~Listener();
+	~Listener() override;
 		/// Destroys the Listener.
 
 	void enableChunkedTransferEncoding(bool enable = true);
@@ -139,13 +137,13 @@ public:
 	[[nodiscard]] const std::vector<Deserializer::HeaderInterceptor::Ptr>& requestHeaderInterceptors() const;
 
 	// Poco::RemotingNG::Listener
-	void start();
-	void stop();
-	[[nodiscard]] const std::string& protocol() const;
-	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
-	[[nodiscard]] bool handlesURI(const std::string& uri);
-	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton);
-	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject);
+	void start() override;
+	void stop() override;
+	[[nodiscard]] const std::string& protocol() const override;
+	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId) override;
+	[[nodiscard]] bool handlesURI(const std::string& uri) override;
+	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton) override;
+	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject) override;
 
 private:
 	bool _secure;
@@ -191,7 +189,7 @@ inline const std::vector<Deserializer::HeaderInterceptor::Ptr>& Listener::reques
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP
 
 
 #endif // RemotingNG_SOAP_Listener_INCLUDED

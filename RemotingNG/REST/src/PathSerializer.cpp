@@ -23,9 +23,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 const std::string PathSerializer::EMPTY;
@@ -38,9 +36,7 @@ PathSerializer::PathSerializer(const std::string& pathTemplate, Poco::Net::HTTPR
 }
 
 
-PathSerializer::~PathSerializer()
-{
-}
+PathSerializer::~PathSerializer() = default;
 
 
 void PathSerializer::close()
@@ -87,4 +83,4 @@ void PathSerializer::serializeData(const std::string& name, const std::string& v
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

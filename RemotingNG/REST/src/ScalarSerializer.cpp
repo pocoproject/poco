@@ -18,23 +18,17 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 const std::string ScalarSerializer::VAL_TRUE("true");
 const std::string ScalarSerializer::VAL_FALSE("false");
 
 
-ScalarSerializer::ScalarSerializer()
-{
-}
+ScalarSerializer::ScalarSerializer() = default;
 
 
-ScalarSerializer::~ScalarSerializer()
-{
-}
+ScalarSerializer::~ScalarSerializer() = default;
 
 
 void ScalarSerializer::serializeMessageBegin(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type)
@@ -209,4 +203,4 @@ void ScalarSerializer::resetImpl()
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

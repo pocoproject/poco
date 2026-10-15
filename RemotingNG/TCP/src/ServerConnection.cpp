@@ -36,15 +36,13 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class AuthFrameHandler: public FrameHandler
 {
 public:
-	typedef Poco::AutoPtr<AuthFrameHandler> Ptr;
+	using Ptr = Poco::AutoPtr<AuthFrameHandler>;
 
 	AuthFrameHandler(Listener::Ptr pListener, CredentialsStore::Ptr pCredentialsStore, Poco::Logger& logger):
 		_pListener(pListener),
@@ -53,7 +51,7 @@ public:
 	{
 	}
 
-	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
+	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) override
 	{
 		if (pFrame->type() == Frame::FRAME_TYPE_AUTH || pFrame->type() == Frame::FRAME_TYPE_AUTC)
 		{
@@ -243,7 +241,7 @@ public:
 		_closed = true;
 	}
 
-	void run()
+	void run() override
 	{
 		Ptr pSelf;
 		{
@@ -328,7 +326,7 @@ private:
 		{
 		}
 
-		void run()
+		void run() override
 		{
 			if (_pSubscriptionChanges->retry()) cancel();
 		}
@@ -411,7 +409,7 @@ private:
 class RequestFrameHandler: public FrameHandler
 {
 public:
-	typedef Poco::AutoPtr<RequestFrameHandler> Ptr;
+	using Ptr = Poco::AutoPtr<RequestFrameHandler>;
 
 	RequestFrameHandler(Listener::Ptr pListener, CredentialsStore::Ptr pCredentialsStore, SubscriptionChanges::Ptr pSubscriptionChanges):
 		_pListener(pListener),
@@ -420,7 +418,7 @@ public:
 	{
 	}
 
-	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
+	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) override
 	{
 		if (pFrame->type() == Frame::FRAME_TYPE_REQU && (pFrame->flags() & Frame::FRAME_FLAG_CONT) == 0)
 		{
@@ -460,14 +458,14 @@ private:
 class EventSubscriptionFrameHandler: public FrameHandler
 {
 public:
-	typedef Poco::AutoPtr<EventSubscriptionFrameHandler> Ptr;
+	using Ptr = Poco::AutoPtr<EventSubscriptionFrameHandler>;
 
 	explicit EventSubscriptionFrameHandler(SubscriptionChanges::Ptr pSubscriptionChanges):
 		_pSubscriptionChanges(pSubscriptionChanges)
 	{
 	}
 
-	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
+	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) override
 	{
 		if (pFrame->type() == Frame::FRAME_TYPE_EVSU || pFrame->type() == Frame::FRAME_TYPE_EVUN)
 		{
@@ -493,9 +491,7 @@ ServerConnection::ServerConnection(Listener::Ptr pListener, const Poco::Net::Str
 }
 
 
-ServerConnection::~ServerConnection()
-{
-}
+ServerConnection::~ServerConnection() = default;
 
 
 void ServerConnection::run()
@@ -541,4 +537,4 @@ void ServerConnection::run()
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

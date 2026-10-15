@@ -21,9 +21,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 RawDeserializer::RawDeserializer(std::istream& stream):
@@ -32,9 +30,7 @@ RawDeserializer::RawDeserializer(std::istream& stream):
 }
 
 
-RawDeserializer::~RawDeserializer()
-{
-}
+RawDeserializer::~RawDeserializer() = default;
 
 
 Poco::RemotingNG::SerializerBase::MessageType RawDeserializer::findMessage(std::string&)
@@ -320,7 +316,7 @@ const std::string& RawDeserializer::deserializeData(const std::string& name, boo
 void RawDeserializer::resetImpl()
 {
 	_data.clear();
-	_pStream = 0;
+	_pStream = nullptr;
 }
 
 
@@ -331,4 +327,4 @@ void RawDeserializer::setupImpl(std::istream& stream)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

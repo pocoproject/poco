@@ -15,18 +15,13 @@
 #include "Poco/RemotingNG/MethodHandler.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-MethodHandler::MethodHandler()
-{
-}
+MethodHandler::MethodHandler() = default;
 
 
-MethodHandler::~MethodHandler()
-{
-}
+MethodHandler::~MethodHandler() = default;
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

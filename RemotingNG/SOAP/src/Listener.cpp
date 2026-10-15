@@ -20,9 +20,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 class SOAPRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
@@ -34,7 +32,7 @@ public:
 	{
 	}
 	
-	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override
 	{
 		if (request.getMethod() == Poco::Net::HTTPRequest::HTTP_POST)
 			return new SOAPRequestHandler(_listener);
@@ -85,9 +83,7 @@ Listener::Listener(const std::string& endPoint, const std::string& wsdlPath, con
 }
 
 
-Listener::~Listener()
-{
-}
+Listener::~Listener() = default;
 
 
 void Listener::enableChunkedTransferEncoding(bool enable)
@@ -177,4 +173,4 @@ void Listener::unregisterObject(Poco::RemotingNG::RemoteObject::Ptr /*pRemoteObj
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

@@ -22,9 +22,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API JSArray: public JSValue
@@ -41,13 +39,13 @@ public:
 		/// Creates an empty JSArray.
 
 	// JSValue
-	[[nodiscard]] Type type() const;
-	[[nodiscard]] std::size_t size() const;
-	[[nodiscard]] const Ptr& operator [] (std::size_t index) const;
-	[[nodiscard]] Ptr& operator [] (std::size_t index);
+	[[nodiscard]] Type type() const override;
+	[[nodiscard]] std::size_t size() const override;
+	[[nodiscard]] const Ptr& operator [] (std::size_t index) const override;
+	[[nodiscard]] Ptr& operator [] (std::size_t index) override;
 
 protected:
-	~JSArray();
+	~JSArray() override;
 		/// Destroys the JSArray.
 
 private:
@@ -57,7 +55,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_JSArray_INCLUDED

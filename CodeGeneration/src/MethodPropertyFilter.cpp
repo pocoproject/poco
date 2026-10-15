@@ -17,8 +17,7 @@
 #include "Poco/CppParser/Function.h"
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 MethodPropertyFilter::MethodPropertyFilter(CodeGenerator* pGen, const CodeGenerator::Properties& properties):
@@ -92,4 +91,4 @@ bool MethodPropertyFilter::matches(const CodeGenerator::Properties& properties) 
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration

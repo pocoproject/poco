@@ -36,8 +36,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class ServerTransport;
@@ -273,8 +272,8 @@ private:
 
 	ORB();
 	~ORB();
-	ORB(const ORB&);
-	ORB& operator = (const ORB&);
+	ORB(const ORB&) = delete;
+	ORB& operator = (const ORB&) = delete;
 
 	[[nodiscard]] RemoteObjectInfo::Ptr findLocalObject(const Identifiable::TypeId& tid, const Identifiable::ObjectId& oid, const std::string& protocol) const;
 	[[nodiscard]] URIAliases::const_iterator findAlias(const std::string& path) const;
@@ -293,7 +292,7 @@ private:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_ORB_INCLUDED

@@ -18,9 +18,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 const std::string JSONSerializer::JSON_ERROR("error");
@@ -38,9 +36,7 @@ JSONSerializer::JSONSerializer(std::ostream& stream):
 }
 
 
-JSONSerializer::~JSONSerializer()
-{
-}
+JSONSerializer::~JSONSerializer() = default;
 
 
 void JSONSerializer::serializeMessageBegin(const std::string&, Poco::RemotingNG::SerializerBase::MessageType type)
@@ -343,4 +339,4 @@ std::string JSONSerializer::escapeString(const std::string& val)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

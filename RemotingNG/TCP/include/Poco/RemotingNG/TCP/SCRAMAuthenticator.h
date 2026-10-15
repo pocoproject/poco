@@ -25,9 +25,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API SCRAMAuthenticator: public Authenticator
@@ -60,11 +58,11 @@ public:
 	SCRAMAuthenticator();
 		/// Creates the SCRAMAuthenticator.
 
-	~SCRAMAuthenticator();
+	~SCRAMAuthenticator() override;
 		/// Destroys the SCRAMAuthenticator.
 
 	// Authenticator
-	[[nodiscard]] AuthenticateResult authenticate(const Credentials& credentials, Poco::UInt32 conversationID);
+	[[nodiscard]] AuthenticateResult authenticate(const Credentials& credentials, Poco::UInt32 conversationID) override;
 
 	// Utility methods
 	[[nodiscard]] static std::string createNonce();
@@ -123,7 +121,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_SCRAMAuthenticator_INCLUDED

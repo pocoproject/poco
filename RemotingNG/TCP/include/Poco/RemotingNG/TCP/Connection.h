@@ -40,9 +40,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class FrameHandler;
@@ -126,7 +124,7 @@ public:
 	Connection(const Poco::Net::StreamSocket& socket, ConnectionMode mode);
 		/// Creates the Connection for the given socket and endpoint mode.
 
-	~Connection();
+	~Connection() override;
 		/// Destroys the Connection.
 
 	[[nodiscard]] Poco::UInt32 id() const;
@@ -229,7 +227,7 @@ public:
 		/// Returns the frame to the pool.
 
 protected:
-	void run();
+	void run() override;
 		/// Handle incoming frames.
 
 	void runImpl();
@@ -266,9 +264,9 @@ protected:
 		/// connection has not been established.
 
 private:
-	Connection();
-	Connection(const Connection&);
-	Connection& operator = (const Connection&);
+	Connection() = delete;
+	Connection(const Connection&) = delete;
+	Connection& operator = (const Connection&) = delete;
 
 	enum Timeouts // microseconds
 	{
@@ -346,7 +344,7 @@ inline void Connection::returnFrame(Frame::Ptr pFrame)
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_Connection_INCLUDED

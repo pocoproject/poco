@@ -28,9 +28,7 @@ ProxyFactoryGenerator::ProxyFactoryGenerator(Poco::CodeGeneration::CppGenerator&
 }
 
 
-ProxyFactoryGenerator::~ProxyFactoryGenerator()
-{
-}
+ProxyFactoryGenerator::~ProxyFactoryGenerator() = default;
 
 
 std::string ProxyFactoryGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)

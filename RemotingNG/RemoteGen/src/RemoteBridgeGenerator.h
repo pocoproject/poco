@@ -26,7 +26,7 @@ public:
 	RemoteBridgeGenerator(Poco::CodeGeneration::CppGenerator& cppGen, bool forceSynchronized = true);
 		/// Creates the RemoteBridgeGenerator.
 
-	~RemoteBridgeGenerator();
+	~RemoteBridgeGenerator() override;
 		/// Destroys the RemoteBridgeGenerator.
 
 	[[nodiscard]] static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
@@ -37,18 +37,18 @@ public:
 
 	[[nodiscard]] static std::string generateEventFunctionName(const std::string& eventVarname);
 
-	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
+	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties) override;
 		/// Must not write the namespace
 
-	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 		/// Writes the method header. Properties contains the properties found in the functions docuementation and in the class documentation.
 
-	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
+	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e) override;
 
-	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct) override;
 		/// generates the new class name based on the old one
 
-	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct) override;
 
 	[[nodiscard]] bool eventsFound() const;
 		/// Returns true if events were found

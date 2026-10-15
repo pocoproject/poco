@@ -27,9 +27,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API ConnectionManager
@@ -120,8 +118,8 @@ private:
 		DEFAULT_HANDSHAKE_TIMEOUT = 8
 	};
 
-	ConnectionManager(const ConnectionManager&);
-	ConnectionManager& operator = (const ConnectionManager&);
+	ConnectionManager(const ConnectionManager&) = delete;
+	ConnectionManager& operator = (const ConnectionManager&) = delete;
 
 	using ConnectionMap = std::map<Poco::Net::SocketAddress, Connection::Ptr>;
 	using SocketAddressSet = std::set<Poco::Net::SocketAddress>;
@@ -157,7 +155,7 @@ inline Poco::ThreadPool& ConnectionManager::threadPool()
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_ConnectionManager_INCLUDED

@@ -26,7 +26,7 @@ class RemotingTest: public CppUnit::TestCase
 {
 public:
 	RemotingTest(const std::string& name);
-	~RemotingTest();
+	~RemotingTest() override;
 	
 	void testRegistration();
 	void testInt();
@@ -49,8 +49,8 @@ public:
 	void testPermission();
 	void testNoPermission();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 protected:
 	void testInt(ITester::Ptr pTester);
@@ -78,9 +78,9 @@ class RemotingTestHTTP: public RemotingTest
 {
 public:
 	RemotingTestHTTP(const std::string& name);
-	~RemotingTestHTTP();
+	~RemotingTestHTTP() override;
 
-	void setUp();
+	void setUp() override;
 
 	static CppUnit::Test* suite();
 };
@@ -90,14 +90,14 @@ class RemotingTestHTTPCompressed: public RemotingTest
 {
 public:
 	RemotingTestHTTPCompressed(const std::string& name);
-	~RemotingTestHTTPCompressed();
+	~RemotingTestHTTPCompressed() override;
 
-	void setUp();
+	void setUp() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -105,14 +105,14 @@ class RemotingTestHTTPNonChunked: public RemotingTest
 {
 public:
 	RemotingTestHTTPNonChunked(const std::string& name);
-	~RemotingTestHTTPNonChunked();
+	~RemotingTestHTTPNonChunked() override;
 
-	void setUp();
+	void setUp() override;
 
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -120,17 +120,17 @@ class RemotingTestHTTPAuth: public RemotingTest
 {
 public:
 	RemotingTestHTTPAuth(const std::string& name);
-	~RemotingTestHTTPAuth();
+	~RemotingTestHTTPAuth() override;
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	void testUnauthorized();
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 	ITester::Ptr createUnauthorizedProxy(const std::string& uri);
 	
 private:
@@ -142,12 +142,12 @@ class RemotingTestHTTPAuthChunked: public RemotingTestHTTPAuth
 {
 public:
 	RemotingTestHTTPAuthChunked(const std::string& name);
-	~RemotingTestHTTPAuthChunked();
+	~RemotingTestHTTPAuthChunked() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 

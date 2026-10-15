@@ -26,9 +26,7 @@ SerializerTest::SerializerTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-SerializerTest::~SerializerTest()
-{
-}
+SerializerTest::~SerializerTest() = default;
 
 
 void SerializerTest::testEmptyRequest()

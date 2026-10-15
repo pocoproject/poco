@@ -15,19 +15,13 @@
 #include "Poco/RemotingNG/SOAP/CookieStore.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
-CookieStore::CookieStore()
-{
-}
+CookieStore::CookieStore() = default;
 
 	
-CookieStore::~CookieStore()
-{
-}
+CookieStore::~CookieStore() = default;
 
 
 void CookieStore::addCookies(Poco::Net::HTTPRequest& request)
@@ -78,4 +72,4 @@ void CookieStore::updateCookies(const Poco::Net::HTTPResponse& response)
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

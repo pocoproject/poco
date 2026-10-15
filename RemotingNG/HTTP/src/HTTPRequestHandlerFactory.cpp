@@ -17,9 +17,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace HTTP {
+namespace Poco::RemotingNG::HTTP {
 
 
 HTTPRequestHandlerFactory::HTTPRequestHandlerFactory(Listener& listener):
@@ -28,9 +26,7 @@ HTTPRequestHandlerFactory::HTTPRequestHandlerFactory(Listener& listener):
 }
 
 
-HTTPRequestHandlerFactory::~HTTPRequestHandlerFactory()
-{
-}
+HTTPRequestHandlerFactory::~HTTPRequestHandlerFactory() = default;
 
 
 Poco::Net::HTTPRequestHandler* HTTPRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
@@ -39,4 +35,4 @@ Poco::Net::HTTPRequestHandler* HTTPRequestHandlerFactory::createRequestHandler(c
 }
 
 
-} } } // namespace Poco::RemotingNG::HTTP
+} // namespace Poco::RemotingNG::HTTP

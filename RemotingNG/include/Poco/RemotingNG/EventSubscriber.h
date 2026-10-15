@@ -29,8 +29,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API EventSubscriber: public Skeleton
@@ -48,7 +47,7 @@ public:
 		/// Usually, this will be the URI of the remote object
 		/// providing the events for this EventSubscriber.
 
-	virtual ~EventSubscriber();
+	~EventSubscriber() override;
 		/// Destroys the EventSubscriber.
 
 	[[nodiscard]] const std::string& uri() const;
@@ -56,8 +55,8 @@ public:
 		/// events for this EventSubscriber.
 
 private:
-	EventSubscriber(const EventSubscriber&);
-	EventSubscriber& operator = (const EventSubscriber&);
+	EventSubscriber(const EventSubscriber&) = delete;
+	EventSubscriber& operator = (const EventSubscriber&) = delete;
 
 	std::string _uri;
 };
@@ -72,7 +71,7 @@ inline const std::string& EventSubscriber::uri() const
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_EventSubscriber_INCLUDED

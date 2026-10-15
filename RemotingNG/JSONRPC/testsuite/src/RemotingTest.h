@@ -26,7 +26,7 @@ class RemotingTest: public CppUnit::TestCase
 {
 public:
 	RemotingTest(const std::string& name);
-	~RemotingTest();
+	~RemotingTest() override;
 	
 	void testRegistration();
 	void testInt();
@@ -50,8 +50,8 @@ public:
 	void testPermission();
 	void testNoPermission();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 protected:
 	void testInt(ITester::Ptr pTester);
@@ -79,9 +79,9 @@ class RemotingTestJSONRPC: public RemotingTest
 {
 public:
 	RemotingTestJSONRPC(const std::string& name);
-	~RemotingTestJSONRPC();
+	~RemotingTestJSONRPC() override;
 
-	void setUp();
+	void setUp() override;
 
 	static CppUnit::Test* suite();
 };
@@ -91,14 +91,14 @@ class RemotingTestJSONRPCCompressed: public RemotingTest
 {
 public:
 	RemotingTestJSONRPCCompressed(const std::string& name);
-	~RemotingTestJSONRPCCompressed();
+	~RemotingTestJSONRPCCompressed() override;
 
-	void setUp();
+	void setUp() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -106,14 +106,14 @@ class RemotingTestJSONRPCNonChunked: public RemotingTest
 {
 public:
 	RemotingTestJSONRPCNonChunked(const std::string& name);
-	~RemotingTestJSONRPCNonChunked();
+	~RemotingTestJSONRPCNonChunked() override;
 
-	void setUp();
+	void setUp() override;
 
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 
@@ -121,17 +121,17 @@ class RemotingTestJSONRPCAuth: public RemotingTest
 {
 public:
 	RemotingTestJSONRPCAuth(const std::string& name);
-	~RemotingTestJSONRPCAuth();
+	~RemotingTestJSONRPCAuth() override;
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	void testUnauthorized();
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 	ITester::Ptr createUnauthorizedProxy(const std::string& uri);
 	
 private:
@@ -143,12 +143,12 @@ class RemotingTestJSONRPCAuthChunked: public RemotingTestJSONRPCAuth
 {
 public:
 	RemotingTestJSONRPCAuthChunked(const std::string& name);
-	~RemotingTestJSONRPCAuthChunked();
+	~RemotingTestJSONRPCAuthChunked() override;
 	
 	static CppUnit::Test* suite();
 
 protected:
-	virtual ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 };
 
 

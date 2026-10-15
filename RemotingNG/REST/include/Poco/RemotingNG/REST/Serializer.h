@@ -28,9 +28,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class Deserializer;
@@ -44,7 +42,7 @@ public:
 	Serializer();
 		/// Creates the Serializer.
 
-	~Serializer();
+	~Serializer() override;
 		/// Destroys the Serializer.
 
 	void setRequest(Poco::Net::HTTPRequest& request);
@@ -54,39 +52,39 @@ public:
 		/// Sets the HTTP response object.
 
 	// Poco::RemotingNG::Serializer
-	void serializeMessageBegin(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type);
-	void serializeMessageEnd(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type);
-	void serializeFaultMessage(const std::string& name, const Poco::Exception& exc);
-	void serializeStructBegin(const std::string& name);
-	void serializeStructEnd(const std::string& name);
-	void serializeSequenceBegin(const std::string& name, Poco::UInt32 numElems);
-	void serializeSequenceEnd(const std::string& name);
-	void serializeNullableBegin(const std::string& name, bool isNull);
-	void serializeNullableEnd(const std::string& name);
-	void serializeOptionalBegin(const std::string& name, bool isSpecified);
-	void serializeOptionalEnd(const std::string& name);
-	void serialize(const std::string& name, Poco::Int8 val);
-	void serialize(const std::string& name, Poco::UInt8 val);
-	void serialize(const std::string& name, Poco::Int16 val);
-	void serialize(const std::string& name, Poco::UInt16 val);
-	void serialize(const std::string& name, Poco::Int32 val);
-	void serialize(const std::string& name, Poco::UInt32 val);
-	void serialize(const std::string& name, long val);
-	void serialize(const std::string& name, unsigned long val);
+	void serializeMessageBegin(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type) override;
+	void serializeMessageEnd(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type) override;
+	void serializeFaultMessage(const std::string& name, const Poco::Exception& exc) override;
+	void serializeStructBegin(const std::string& name) override;
+	void serializeStructEnd(const std::string& name) override;
+	void serializeSequenceBegin(const std::string& name, Poco::UInt32 numElems) override;
+	void serializeSequenceEnd(const std::string& name) override;
+	void serializeNullableBegin(const std::string& name, bool isNull) override;
+	void serializeNullableEnd(const std::string& name) override;
+	void serializeOptionalBegin(const std::string& name, bool isSpecified) override;
+	void serializeOptionalEnd(const std::string& name) override;
+	void serialize(const std::string& name, Poco::Int8 val) override;
+	void serialize(const std::string& name, Poco::UInt8 val) override;
+	void serialize(const std::string& name, Poco::Int16 val) override;
+	void serialize(const std::string& name, Poco::UInt16 val) override;
+	void serialize(const std::string& name, Poco::Int32 val) override;
+	void serialize(const std::string& name, Poco::UInt32 val) override;
+	void serialize(const std::string& name, long val) override;
+	void serialize(const std::string& name, unsigned long val) override;
 #ifndef POCO_INT64_IS_LONG
-	void serialize(const std::string& name, Poco::Int64 val);
-	void serialize(const std::string& name, Poco::UInt64 val);
+	void serialize(const std::string& name, Poco::Int64 val) override;
+	void serialize(const std::string& name, Poco::UInt64 val) override;
 #endif
-	void serialize(const std::string& name, float val);
-	void serialize(const std::string& name, double val);
-	void serialize(const std::string& name, bool val);
-	void serialize(const std::string& name, char val);
-	void serialize(const std::string& name, const std::string& val);
-	void serialize(const std::string& name, const std::vector<char>& val);
+	void serialize(const std::string& name, float val) override;
+	void serialize(const std::string& name, double val) override;
+	void serialize(const std::string& name, bool val) override;
+	void serialize(const std::string& name, char val) override;
+	void serialize(const std::string& name, const std::string& val) override;
+	void serialize(const std::string& name, const std::vector<char>& val) override;
 
 protected:
-	void resetImpl();
-	void setupImpl(std::ostream& out);
+	void resetImpl() override;
+	void setupImpl(std::ostream& out) override;
 	[[nodiscard]] Poco::SharedPtr<Poco::RemotingNG::Serializer> subSerializer();
 
 	static const std::string LOCATION_PATH;
@@ -99,8 +97,8 @@ protected:
 	static const std::string FORMAT_JSON;
 
 private:
-	Serializer(const Serializer&);
-	Serializer& operator = (const Serializer&);
+	Serializer(const Serializer&) = delete;
+	Serializer& operator = (const Serializer&) = delete;
 
 private:
 	std::ostream* _pStream;
@@ -132,7 +130,7 @@ inline void Serializer::setResponse(Poco::Net::HTTPResponse& response)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_Serializer_INCLUDED

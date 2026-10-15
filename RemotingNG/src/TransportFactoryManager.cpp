@@ -21,18 +21,13 @@ using Poco::SingletonHolder;
 using Poco::FastMutex;
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-TransportFactoryManager::TransportFactoryManager()
-{
-}
+TransportFactoryManager::TransportFactoryManager() = default;
 
 
-TransportFactoryManager::~TransportFactoryManager()
-{
-}
+TransportFactoryManager::~TransportFactoryManager() = default;
 
 
 Transport* TransportFactoryManager::createTransport(const std::string& protocol)
@@ -96,4 +91,4 @@ TransportFactoryManager& TransportFactoryManager::instance()
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

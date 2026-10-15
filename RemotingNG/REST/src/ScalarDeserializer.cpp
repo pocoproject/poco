@@ -21,19 +21,13 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
-ScalarDeserializer::ScalarDeserializer()
-{
-}
+ScalarDeserializer::ScalarDeserializer() = default;
 
 
-ScalarDeserializer::~ScalarDeserializer()
-{
-}
+ScalarDeserializer::~ScalarDeserializer() = default;
 
 
 Poco::RemotingNG::SerializerBase::MessageType ScalarDeserializer::findMessage(std::string&)
@@ -328,4 +322,4 @@ void ScalarDeserializer::setupImpl(std::istream&)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

@@ -23,8 +23,7 @@
 #include <memory>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API BinarySerializer: public Serializer
@@ -52,7 +51,7 @@ public:
 	BinarySerializer();
 		/// Creates a BinarySerializer.
 
-	~BinarySerializer();
+	~BinarySerializer() override;
 		/// Destroys the BinarySerializer.
 
 	void serializeEndPoint(const std::string& oid, const std::string& tid);
@@ -67,37 +66,37 @@ public:
 	}
 
 	// Serializer
-	void serializeMessageBegin(const std::string& name, SerializerBase::MessageType type);
-	void serializeMessageEnd(const std::string& name, SerializerBase::MessageType type);
-	void serializeFaultMessage(const std::string& name, const Poco::Exception& exc);
-	void serializeStructBegin(const std::string& name);
-	void serializeStructEnd(const std::string& name);
-	void serializeSequenceBegin(const std::string& name, Poco::UInt32 length);
-	void serializeSequenceEnd(const std::string& name);
-	void serializeNullableBegin(const std::string& name, bool isNull);
-	void serializeNullableEnd(const std::string& name);
-	void serialize(const std::string& name, Poco::Int8 value);
-	void serialize(const std::string& name, Poco::UInt8 value);
-	void serialize(const std::string& name, Poco::Int16 value);
-	void serialize(const std::string& name, Poco::UInt16 value);
-	void serialize(const std::string& name, Poco::Int32 value);
-	void serialize(const std::string& name, Poco::UInt32 value);
-	void serialize(const std::string& name, long value);
-	void serialize(const std::string& name, unsigned long value);
+	void serializeMessageBegin(const std::string& name, SerializerBase::MessageType type) override;
+	void serializeMessageEnd(const std::string& name, SerializerBase::MessageType type) override;
+	void serializeFaultMessage(const std::string& name, const Poco::Exception& exc) override;
+	void serializeStructBegin(const std::string& name) override;
+	void serializeStructEnd(const std::string& name) override;
+	void serializeSequenceBegin(const std::string& name, Poco::UInt32 length) override;
+	void serializeSequenceEnd(const std::string& name) override;
+	void serializeNullableBegin(const std::string& name, bool isNull) override;
+	void serializeNullableEnd(const std::string& name) override;
+	void serialize(const std::string& name, Poco::Int8 value) override;
+	void serialize(const std::string& name, Poco::UInt8 value) override;
+	void serialize(const std::string& name, Poco::Int16 value) override;
+	void serialize(const std::string& name, Poco::UInt16 value) override;
+	void serialize(const std::string& name, Poco::Int32 value) override;
+	void serialize(const std::string& name, Poco::UInt32 value) override;
+	void serialize(const std::string& name, long value) override;
+	void serialize(const std::string& name, unsigned long value) override;
 #ifndef POCO_INT64_IS_LONG
-	void serialize(const std::string& name, Poco::Int64 value);
-	void serialize(const std::string& name, Poco::UInt64 value);
+	void serialize(const std::string& name, Poco::Int64 value) override;
+	void serialize(const std::string& name, Poco::UInt64 value) override;
 #endif
-	void serialize(const std::string& name, float value);
-	void serialize(const std::string& name, double value);
-	void serialize(const std::string& name, bool value);
-	void serialize(const std::string& name, char value);
-	void serialize(const std::string& name, const std::string& value);
-	void serialize(const std::string& name, const std::vector<char>& value);
+	void serialize(const std::string& name, float value) override;
+	void serialize(const std::string& name, double value) override;
+	void serialize(const std::string& name, bool value) override;
+	void serialize(const std::string& name, char value) override;
+	void serialize(const std::string& name, const std::string& value) override;
+	void serialize(const std::string& name, const std::vector<char>& value) override;
 
 protected:
-	void resetImpl();
-	void setupImpl(std::ostream& ostr);
+	void resetImpl() override;
+	void setupImpl(std::ostream& ostr) override;
 
 	static const std::string MESSAGE_START_TAG;
 	static const std::string MESSAGE_END_TAG;
@@ -120,7 +119,7 @@ private:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_BinarySerializer_INCLUDED

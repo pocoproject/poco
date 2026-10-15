@@ -23,8 +23,7 @@
 #include "Poco/RemotingNG/AttributedObject.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class Serializer;
@@ -47,7 +46,7 @@ public:
 	ServerTransport();
 		/// Creates a ServerTransport.
 
-	virtual ~ServerTransport();
+	~ServerTransport() override;
 		/// Destroys the ServerTransport.
 
 	[[nodiscard]] virtual bool authenticate(const std::string& method);
@@ -113,12 +112,12 @@ public:
 		/// exception for diagnostic purposes.
 
 private:
-	ServerTransport(const ServerTransport&);
-	ServerTransport& operator = (const ServerTransport&);
+	ServerTransport(const ServerTransport&) = delete;
+	ServerTransport& operator = (const ServerTransport&) = delete;
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Transport_INCLUDED

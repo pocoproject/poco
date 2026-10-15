@@ -58,8 +58,8 @@ struct Struct1
 };
 
 
-typedef Struct1 AnotherStruct1;
-typedef std::vector<AnotherStruct1> Struct1Vec;
+using AnotherStruct1 = Struct1;
+using Struct1Vec = std::vector<AnotherStruct1>;
 
 
 //@ serialize

@@ -15,19 +15,13 @@
 #include "Poco/RemotingNG/JSONRPC/JSObject.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
-JSObject::JSObject()
-{
-}
+JSObject::JSObject() = default;
 
 
-JSObject::~JSObject()
-{
-}
+JSObject::~JSObject() = default;
 
 
 JSValue::Type JSObject::type() const
@@ -64,4 +58,4 @@ bool JSObject::has(const std::string& name) const
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

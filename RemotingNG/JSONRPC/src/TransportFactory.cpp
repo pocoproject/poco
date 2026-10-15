@@ -18,19 +18,13 @@
 #include "Poco/Net/HTTPSessionInstantiator.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
-TransportFactory::TransportFactory()
-{
-}
+TransportFactory::TransportFactory() = default;
 
 
-TransportFactory::~TransportFactory()
-{
-}
+TransportFactory::~TransportFactory() = default;
 
 
 Poco::RemotingNG::Transport* TransportFactory::createTransport()
@@ -53,4 +47,4 @@ void TransportFactory::unregisterFactory()
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

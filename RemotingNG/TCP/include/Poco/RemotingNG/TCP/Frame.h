@@ -25,9 +25,7 @@
 #include "Poco/ByteOrder.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API Frame: public Poco::RefCountedObject
@@ -177,7 +175,7 @@ public:
 		///
 		/// The initial payload size is 0.
 
-	~Frame();
+	~Frame() override;
 		/// Destroys the frame.
 
 	[[nodiscard]] Poco::UInt32 type() const;
@@ -354,7 +352,7 @@ inline const char* Frame::bufferEnd() const
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_Frame_INCLUDED

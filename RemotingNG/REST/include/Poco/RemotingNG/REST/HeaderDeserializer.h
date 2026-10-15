@@ -23,9 +23,7 @@
 #include "Poco/Net/HTTPMessage.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API HeaderDeserializer: public ScalarDeserializer
@@ -37,15 +35,15 @@ public:
 	HeaderDeserializer(const Poco::Net::HTTPMessage& message);
 		/// Creates the HeaderDeserializer.
 
-	~HeaderDeserializer();
+	~HeaderDeserializer() override;
 		/// Destroys the HeaderDeserializer.
 
 	// Poco::RemotingNG::Deserializer
-	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull);
+	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull) override;
 
 protected:
 	// ScalarDeserializer
-	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
+	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found) override;
 
 private:
 	const Poco::Net::HTTPMessage& _message;
@@ -54,7 +52,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_HeaderDeserializer_INCLUDED

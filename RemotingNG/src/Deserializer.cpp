@@ -17,18 +17,13 @@
 #include "Poco/DateTimeFormat.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-Deserializer::Deserializer()
-{
-}
+Deserializer::Deserializer() = default;
 
 
-Deserializer::~Deserializer()
-{
-}
+Deserializer::~Deserializer() = default;
 
 
 bool Deserializer::deserializeOptionalBegin(const std::string& name, bool isMandatory, bool& isSpecified)
@@ -140,4 +135,4 @@ void Deserializer::pushAttribute(const std::string& /*attrNamespace*/, const std
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

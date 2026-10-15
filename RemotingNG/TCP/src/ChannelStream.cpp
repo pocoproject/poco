@@ -15,9 +15,7 @@
 #include "Poco/RemotingNG/TCP/ChannelStream.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 //
@@ -73,7 +71,7 @@ void ChannelStreamBuf::close()
 		_pFrame->setPayloadSize(0);
 		_pConnection->sendFrame(_pFrame);
 	}
-	_pFrame = 0;
+	_pFrame = nullptr;
 }
 
 
@@ -104,7 +102,7 @@ std::streamsize ChannelStreamBuf::readFromDevice(char* buffer, std::streamsize l
 			if (eof)
 			{
 				_pConnection->popFrameHandler(_pQueue);
-				_pQueue = 0;
+				_pQueue = nullptr;
 			}
 			return n;
 		}
@@ -181,9 +179,7 @@ ChannelInputStream::ChannelInputStream(Connection::Ptr pConnection, Poco::UInt32
 }
 
 
-ChannelInputStream::~ChannelInputStream()
-{
-}
+ChannelInputStream::~ChannelInputStream() = default;
 
 
 //
@@ -198,9 +194,7 @@ ChannelOutputStream::ChannelOutputStream(Connection::Ptr pConnection, Poco::UInt
 }
 
 
-ChannelOutputStream::~ChannelOutputStream()
-{
-}
+ChannelOutputStream::~ChannelOutputStream() = default;
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

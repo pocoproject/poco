@@ -26,9 +26,7 @@ RawSerializerTest::RawSerializerTest(const std::string& name): CppUnit::TestCase
 }
 
 
-RawSerializerTest::~RawSerializerTest()
-{
-}
+RawSerializerTest::~RawSerializerTest() = default;
 
 
 void RawSerializerTest::testInt()

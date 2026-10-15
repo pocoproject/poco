@@ -28,9 +28,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace HTTP {
+namespace Poco::RemotingNG::HTTP {
 
 
 const std::string Transport::PROTOCOL("http");
@@ -50,9 +48,7 @@ Transport::Transport():
 }
 
 
-Transport::~Transport()
-{
-}
+Transport::~Transport() = default;
 
 
 Poco::Timespan Transport::getTimeout() const
@@ -217,7 +213,7 @@ void Transport::connect(const std::string& endPoint)
 
 void Transport::disconnect()
 {
-	_pSession = 0;
+	_pSession = nullptr;
 	_endPoint.clear();
 	_endPointURI.clear();
 }
@@ -240,7 +236,7 @@ void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oi
 	if (_pDeflater)
 	{
 		_pDeflater->close();
-		_pDeflater = 0;
+		_pDeflater = nullptr;
 	}
 	if (!_chunkedTransferEncoding)
 	{
@@ -297,7 +293,7 @@ Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::I
 	if (_pDeflater)
 	{
 		_pDeflater->close();
-		_pDeflater = 0;
+		_pDeflater = nullptr;
 	}
 	Poco::Net::HTTPResponse response;
 	std::istream* pResponseStream;
@@ -356,9 +352,9 @@ void Transport::endRequest()
 {
 	_serializer.reset();
 	_deserializer.reset();
-	_pStream = 0;
-	_pDeflater = 0;
-	_pInflater = 0;
+	_pStream = nullptr;
+	_pDeflater = nullptr;
+	_pInflater = nullptr;
 }
 
 
@@ -405,4 +401,4 @@ void Transport::prepareRequest(Poco::Net::HTTPRequest& request)
 }
 
 
-} } } // namespace Poco::RemotingNG::HTTP
+} // namespace Poco::RemotingNG::HTTP

@@ -16,9 +16,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 CredentialsStore::CredentialsStore()
@@ -27,9 +25,7 @@ CredentialsStore::CredentialsStore()
 }
 
 	
-CredentialsStore::~CredentialsStore()
-{
-}
+CredentialsStore::~CredentialsStore() = default;
 
 	
 Poco::UInt64 CredentialsStore::addCredentials(const Credentials& creds)
@@ -71,6 +67,6 @@ Poco::UInt64 CredentialsStore::generateAuthToken()
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 

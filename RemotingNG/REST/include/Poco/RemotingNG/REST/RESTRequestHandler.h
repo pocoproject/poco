@@ -24,9 +24,7 @@
 #include "Poco/Logger.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API RESTRequestHandler: public Poco::Net::HTTPRequestHandler
@@ -36,24 +34,24 @@ public:
 	RESTRequestHandler(Listener& listener);
 		/// Creates a RESTRequestHandler, using the given Listener.
 
-	~RESTRequestHandler();
+	~RESTRequestHandler() override;
 		/// Destroys the RESTRequestHandler.
 
 	// Poco::Net::HTTPRequestHandler
-	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
+	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
 
 protected:
 	[[nodiscard]] bool handleCORS(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
 	
 private:
-	RESTRequestHandler();
+	RESTRequestHandler() = delete;
 
 	Listener& _listener;
 	Poco::Logger& _logger;
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_RESTRequestHandler_INCLUDED

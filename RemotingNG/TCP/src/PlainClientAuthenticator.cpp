@@ -15,22 +15,16 @@
 #include "Poco/RemotingNG/TCP/PlainClientAuthenticator.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 const std::string PlainClientAuthenticator::PLAIN("PLAIN");
 
 
-PlainClientAuthenticator::PlainClientAuthenticator()
-{
-}
+PlainClientAuthenticator::PlainClientAuthenticator() = default;
 
 	
-PlainClientAuthenticator::~PlainClientAuthenticator()
-{
-}
+PlainClientAuthenticator::~PlainClientAuthenticator() = default;
 
 
 std::string PlainClientAuthenticator::startAuthentication(Credentials&)
@@ -45,4 +39,4 @@ bool PlainClientAuthenticator::continueAuthentication(const Credentials&, Creden
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

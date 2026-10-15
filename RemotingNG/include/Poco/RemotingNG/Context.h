@@ -29,8 +29,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API Context: public Poco::RefCountedObject
@@ -48,7 +47,7 @@ public:
 	Context();
 		/// Creates an empty Context. 
 
-	~Context();
+	~Context() override;
 		/// Destroys the Context.
 
 	static void set(Context::Ptr pContext);
@@ -166,7 +165,7 @@ inline Context::Ptr ScopedContext::context() const
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Context_INCLUDED

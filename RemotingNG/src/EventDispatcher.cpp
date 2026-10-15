@@ -42,8 +42,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 EventDispatcher::EventDispatcher(const std::string& protocol):
@@ -52,9 +51,7 @@ EventDispatcher::EventDispatcher(const std::string& protocol):
 }
 
 
-EventDispatcher::~EventDispatcher()
-{
-}
+EventDispatcher::~EventDispatcher() = default;
 
 
 void EventDispatcher::setOwner(const Poco::AutoPtr<Poco::RefCountedObject>& pOwner)
@@ -171,4 +168,4 @@ Transport& EventDispatcher::transportForSubscriber(const std::string& subscriber
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
