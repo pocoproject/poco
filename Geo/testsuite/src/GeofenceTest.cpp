@@ -44,9 +44,7 @@ GeofenceTest::GeofenceTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-GeofenceTest::~GeofenceTest()
-{
-}
+GeofenceTest::~GeofenceTest() = default;
 
 
 void GeofenceTest::testCircular()

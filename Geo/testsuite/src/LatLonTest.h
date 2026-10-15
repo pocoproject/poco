@@ -21,7 +21,7 @@ class LatLonTest: public CppUnit::TestCase
 {
 public:
 	LatLonTest(const std::string& name);
-	~LatLonTest();
+	~LatLonTest() override;
 
 	void testLatLon();
 	void testToCartesian();
@@ -46,8 +46,8 @@ public:
 	void testToCartesianInvalidReference();
 	void testFromCartesianNearPole();
 	void testEqualsAcrossAntimeridian();
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

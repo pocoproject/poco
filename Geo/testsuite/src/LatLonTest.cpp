@@ -25,9 +25,7 @@ LatLonTest::LatLonTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-LatLonTest::~LatLonTest()
-{
-}
+LatLonTest::~LatLonTest() = default;
 
 
 void LatLonTest::testLatLon()

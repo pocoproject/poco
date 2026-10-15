@@ -21,7 +21,7 @@ class AngleTest: public CppUnit::TestCase
 {
 public:
 	AngleTest(const std::string& name);
-	~AngleTest();
+	~AngleTest() override;
 
 	void testAngle();
 	void testCompass();
@@ -34,8 +34,8 @@ public:
 	void testComparisonOperators();
 	void testSinCos();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 
