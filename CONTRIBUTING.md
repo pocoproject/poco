@@ -16,14 +16,14 @@ If you're in a hurry, the fastest way to have bugs fixed or features added are c
 ---
 Before writing any code, please read the
 
-* [C++ Coding Style Guide](http://www.appinf.com/download/CppCodingStyleGuide.pdf) and
-* [Git branching model](http://nvie.com/posts/a-successful-git-branching-model/)
+* [C++ Coding Style Guide](CODING_STYLE.md) and
+* [Instructions for AI coding agents](AGENTS.md), which also describe the build, test and review procedures
 
 [Pull requests](https://help.github.com/articles/using-pull-requests/) are our favorite channel for code contributions and the quickest way to get your fix or feature upstreamed and released. Here's a quick guide.
 
 1. [Fork](https://help.github.com/articles/fork-a-repo/) the [POCO](https://github.com/pocoproject/poco) repo
 
-2. Keep your repo [synced](https://help.github.com/articles/syncing-a-fork/) with the upstream to ensure smooth progress (i.e. that your changes do not interfere or conflict with someone elses's work). Note that the [devel](https://github.com/pocoproject/poco/tree/devel) branch is where most of the ongoing development happens. For new features or libraries, create a new branch with a descriptive name. See the mentioned [branching model](http://nvie.com/posts/a-successful-git-branching-model/) for details.
+2. Keep your repo [synced](https://help.github.com/articles/syncing-a-fork/) with the upstream to ensure smooth progress (i.e. that your changes do not interfere or conflict with someone elses's work). The [main](https://github.com/pocoproject/poco/tree/main) branch is where the ongoing development happens; `poco-X.Y.Z` branches hold the maintained releases. Create a new branch with a descriptive name for your change.
 
 3. Write the code changes; make sure they compile
 
