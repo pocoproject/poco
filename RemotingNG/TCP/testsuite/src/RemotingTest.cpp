@@ -298,7 +298,10 @@ void RemotingTest::tearDown()
 	TesterServerHelper::unregisterObject(_objectURI);
 	Poco::RemotingNG::TCP::TransportFactory::unregisterFactory();
 	Poco::RemotingNG::ORB::instance().unregisterListener(_listener);
-	_pListener->connectionManager().shutdown();
+	if (_pListener != nullptr)
+	{
+		_pListener->connectionManager().shutdown();
+	}
 	_pListener = 0;
 	Poco::ThreadPool::defaultPool().joinAll();
 }

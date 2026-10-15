@@ -211,9 +211,9 @@ RemotingTest::~RemotingTest()
 
 void RemotingTest::setUp()
 {
+	Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
 	_pListener = new Poco::RemotingNG::HTTP::Listener("127.0.0.1:2280");
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-	Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
 }
 
@@ -931,9 +931,9 @@ RemotingTestHTTPAuth::~RemotingTestHTTPAuth()
 
 void RemotingTestHTTPAuth::setUp()
 {
+	Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
 	_pListener = new Poco::RemotingNG::HTTP::Listener("127.0.0.1:2280", Poco::RemotingNG::HTTP::Listener::PROTO_HTTP);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-	Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
 
 	Poco::Net::ServerSocket ss(2280);
@@ -945,7 +945,10 @@ void RemotingTestHTTPAuth::setUp()
 void RemotingTestHTTPAuth::tearDown()
 {
 	RemotingTest::tearDown();
-	_pHTTPServer->stop();
+	if (_pHTTPServer != nullptr)
+	{
+		_pHTTPServer->stop();
+	}
 	_pHTTPServer = 0;
 }
 
