@@ -122,6 +122,15 @@ public:
 	~TestCase() override;
 
 	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
+		/// Runs setUp(), runTest() and tearDown() and records an exception
+		/// thrown by any of them in result: a CppUnitException as a failure,
+		/// any other exception as an error. The message of a record from
+		/// setUp() or tearDown() starts with "setUp(): " or "tearDown(): ".
+		///
+		/// runTest() is skipped if setUp() throws. tearDown() runs even if
+		/// setUp() or runTest() throws, so it must cope with a fixture that
+		/// setUp() did not complete.
+
 	virtual TestResult* run();
 	[[nodiscard]] int countTestCases() const override;
 	[[nodiscard]] std::string toString() const override;
