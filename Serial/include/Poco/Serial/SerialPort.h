@@ -46,9 +46,16 @@ class Serial_API SerialPort: private SerialPortImpl
 	/// ports can be open on it at the same time, and the bytes arriving are
 	/// then split between their readers.
 	///
-	/// On Windows the operations on one port are serialised: a thread waiting
-	/// in read() also delays write(), poll(), drain() and setRTS() called
-	/// from another thread. On POSIX a blocked read does not delay a write.
+	/// This class is not thread-safe, and read(), poll() and available() all
+	/// work on the receive buffer, so one port must not be read from more
+	/// than one thread at a time: two such calls can interleave and advance
+	/// the buffer past its end. write(), drain() and setRTS() do not touch
+	/// the buffer and may be called while another thread reads.
+	///
+	/// On Windows the operations on one port are serialised, because the
+	/// handle is not overlapped: a thread waiting in read() also delays a
+	/// write(), drain() or setRTS() issued from another thread. On POSIX a
+	/// blocked read does not delay a write.
 {
 public:
 	enum FlowControl
@@ -142,9 +149,9 @@ public:
 		/// hardware (CTS/RTS) flow control.
 		///
 		/// Throws a Poco::IOException if the device cannot be opened or
-		/// configured, which includes a device that accepts the request but
-		/// does not apply the requested character size, parity or number of
-		/// stop bits.
+		/// configured, which includes, on POSIX platforms, a device that
+		/// accepts the request but does not apply the requested character
+		/// size, parity or number of stop bits.
 
 	void close();
 		/// Closes the serial port.

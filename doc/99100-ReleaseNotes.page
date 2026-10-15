@@ -22,6 +22,7 @@ libxml2-based Validator), previously part of macchina.io, is a group of POCO com
 Geo (geographic coordinates and angles, great-circle and rhumb-line calculations,
 conversions to and from local cartesian coordinates, and geofences), previously part of
 macchina.io, is a POCO component.
+Serial (serial port I/O), previously part of macchina.io, is a POCO component.
 
 !!Features
 
@@ -49,6 +50,10 @@ macchina.io, is a POCO component.
     circular and polygonal geofences, from macchina.io. Enable with cmake
     <*ENABLE_GEO*> (on by default; off with <*POCO_MINIMAL_BUILD*>); make component
     <*Geo*>.
+  - GH #5449 <*Serial*>: serial port I/O through <*Poco::Serial::SerialPort*>, from
+    macchina.io. Enable with cmake <*ENABLE_SERIAL*> (on by default; off with
+    <*POCO_MINIMAL_BUILD*>); make component <*Serial*>. The component is turned off
+    automatically for the emscripten target, which it does not support.
 
 !!Breaking Changes
 
@@ -73,6 +78,34 @@ macchina.io, is a POCO component.
     <*Poco/OrderedSet.h*>, <*Poco/OrderedMap.h*>, <*Poco/Net/SocketProactor.h*>,
     <*Poco/Data/Constants.h*>, <*Poco/Data/RecordSet.h*>, <*Poco/Data/RowIterator.h*>,
     <*Poco/MongoDB/ServerDescription.h*> and <*Poco/ActiveRecord/IDTraits.h*>. (PR #5453)
+  - GH #5449 <*Poco::Serial::SerialPort*> behaves differently from the macchina.io version it
+    comes from, in the following ways.
+    - <*drain()*>, <*setRTS()*>, <*getRTS()*> and <*configureRS485()*> on a port that is not open
+      throw <*Poco::IllegalStateException*>, where POSIX raised an assertion and Windows
+      <*getRTS()*> returned false.
+    - <*open("")*> throws <*Poco::InvalidArgumentException*> instead of <*Poco::IOException*>.
+    - <*open()*> sets <*VMIN*> to 1 and <*VTIME*> to 0, so a device that an external tool had
+      configured for a timed read (<*stty min 0 time 10*>) no longer returns early from a read.
+    - <*open()*> fails on POSIX platforms when the device does not apply the requested character
+      size, parity or number of stop bits, where it used to appear to succeed and run a different
+      frame.
+    - <*open()*> sets parity checking from the requested parity alone. It used to inherit
+      <*IGNPAR*> and <*INPCK*> on POSIX platforms, and <*fParity*> and <*fDsrSensitivity*> on
+      Windows, from whatever had configured the device before, so that opening a port with
+      <*8N1*> and then with <*8E1*> kept discarding bytes with parity errors.
+    - The four <*read()*> overloads throw <*Poco::IOException*> when the peer hangs up, where the
+      overload that takes a timeout used to loop.
+    - A buffer size of zero is rejected with <*Poco::InvalidArgumentException*>.
+    - <*drain()*> on Windows waits for the queued writes instead of returning at once.
+    - A negative <*poll()*> timeout means no wait, where POSIX reported an error.
+    - <*SerialPort*> is no longer copyable; it is movable instead.
+    - <*SerialPort::DEFAULT_BUFFER_SIZE*> is a <*std::size_t*> constant rather than an
+      enumerator, so an expression that mixes it with a signed value changes type without a
+      diagnostic: for example <*useDefault ? SerialPort::DEFAULT_BUFFER_SIZE : configured*> with
+      a negative <*int configured*> produced -1 and now produces a very large unsigned value.
+    - <*poll()*>, <*available()*>, <*device()*>, <*baudRate()*>, <*parameters()*>,
+      <*flowControl()*> and <*getRTS()*> are <*[[nodiscard]]*>, so discarding one of those
+      results is a warning.
 
 !!Bug Fixes and Improvements
 
