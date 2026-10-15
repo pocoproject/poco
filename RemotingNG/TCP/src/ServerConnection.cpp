@@ -179,10 +179,7 @@ class SubscriptionChanges: public Poco::Runnable, public Poco::RefCountedObject
 public:
 	using Ptr = Poco::AutoPtr<SubscriptionChanges>;
 
-	enum
-	{
-		RETRY_INTERVAL = 50 // milliseconds
-	};
+	static constexpr long RETRY_INTERVAL = 50; // milliseconds
 
 	SubscriptionChanges(Listener::Ptr pListener, Timer& timer, Poco::Logger& logger):
 		_pListener(pListener),

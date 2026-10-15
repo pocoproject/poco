@@ -37,6 +37,8 @@ public:
 	~SOAPRequestHandler() override;
 		/// Destroys the SOAPRequestHandler.
 
+	SOAPRequestHandler() = delete;
+
 	// Poco::Net::HTTPSOAPRequestHandler
 	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
 
@@ -45,8 +47,6 @@ protected:
 	static const std::string EMPTY;
 	
 private:
-	SOAPRequestHandler() = delete;
-
 	Listener& _listener;
 	Poco::Logger& _logger;
 };

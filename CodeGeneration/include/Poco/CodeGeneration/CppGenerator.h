@@ -149,18 +149,18 @@ private:
 	std::ostream&             _hOut;
 	std::ostream&             _cppOut;
 	std::string               _className;
-	bool                      _inInlineFct;
-	bool                      _isTemplate;
-	bool                      _inPureVirtualFct;
-	Poco::CppParser::Symbol::Access _lastAcc;
-	const Poco::CppParser::Struct*  _pStruct;
-	const Poco::CppParser::Function* _pFunc;
+	bool                      _inInlineFct = false;
+	bool                      _isTemplate = false;
+	bool                      _inPureVirtualFct = false;
+	Poco::CppParser::Symbol::Access _lastAcc = Poco::CppParser::Symbol::ACC_PUBLIC;
+	const Poco::CppParser::Struct*  _pStruct = nullptr;
+	const Poco::CppParser::Function* _pFunc = nullptr;
 	std::vector<InlineFunctionInfo> _inlineFunctions;
 	ConstructorMapping        _constrMapping;
 	SimpleConstructorMapping  _simpleConstrMapping;
 	std::string               _includeGuard;
-	bool                      _attributesEnabled;
-	bool                      _timestampsEnabled;
+	bool                      _attributesEnabled = false;
+	bool                      _timestampsEnabled = true;
 };
 
 

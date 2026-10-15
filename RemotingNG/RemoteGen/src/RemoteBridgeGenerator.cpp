@@ -28,8 +28,7 @@ using Poco::CodeGeneration::Utility;
 
 RemoteBridgeGenerator::RemoteBridgeGenerator(Poco::CodeGeneration::CppGenerator& cppGen, bool forceSynchronized): 
 	AbstractGenerator(cppGen), 
-	_forceSynchronized(forceSynchronized), 
-	_hasEvents(false)
+	_forceSynchronized(forceSynchronized)
 {
 }
 
@@ -174,7 +173,7 @@ std::vector<std::string> RemoteBridgeGenerator::newBaseClasses(const Poco::CppPa
 }
 
 
-void RemoteBridgeGenerator::fwdCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteBridgeGenerator::fwdCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	// we only write one line
 	// either _pInterface->method (params) or return _pInterface->method (params)
@@ -278,7 +277,7 @@ std::string RemoteBridgeGenerator::generateEventFunctionName(const std::string& 
 }
 
 
-void RemoteBridgeGenerator::constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteBridgeGenerator::constructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -304,7 +303,7 @@ void RemoteBridgeGenerator::constructorCodeGen(const Poco::CppParser::Function* 
 }
 
 
-void RemoteBridgeGenerator::destructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteBridgeGenerator::destructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -337,7 +336,7 @@ void RemoteBridgeGenerator::destructorCodeGen(const Poco::CppParser::Function* p
 }
 
 
-void RemoteBridgeGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteBridgeGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -364,19 +363,19 @@ void RemoteBridgeGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc,
 }
 
 
-void RemoteBridgeGenerator::hasEventsCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteBridgeGenerator::hasEventsCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("return true;");
 }
 
 
-void RemoteBridgeGenerator::enableEventsCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteBridgeGenerator::enableEventsCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("return std::string();");
 }
 
 
-void RemoteBridgeGenerator::enableRemoteEventsCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteBridgeGenerator::enableRemoteEventsCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);

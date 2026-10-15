@@ -162,12 +162,9 @@ protected:
 	void registerEventFrameHandler(Connection::Ptr pConnection);
 
 private:
-	enum
-	{
-		DEFAULT_TIMEOUT = 30,
-		DEFAULT_HANDSHAKE_TIMEOUT = 8,
-		DEFAULT_EVENT_SUBSCR_TIMEOUT = 60
-	};
+	static constexpr long DEFAULT_TIMEOUT = 30;
+	static constexpr long DEFAULT_HANDSHAKE_TIMEOUT = 8;
+	static constexpr long DEFAULT_EVENT_SUBSCR_TIMEOUT = 60;
 
 	class RemotingNGTCP_API EventSubscription: public TimerTask
 	{
@@ -176,8 +173,8 @@ private:
 
 		EventSubscription(Listener& listener, const std::string& uri, Poco::UInt32 id);
 		void run() override;
-		const std::string& uri() const;
-		const std::string& path() const;
+		[[nodiscard]] const std::string& uri() const;
+		[[nodiscard]] const std::string& path() const;
 
 	private:
 		Listener& _listener;

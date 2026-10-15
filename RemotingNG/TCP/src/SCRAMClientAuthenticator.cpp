@@ -29,10 +29,7 @@ const std::string SCRAMClientAuthenticator::SCRAM_SHA1("SCRAM-SHA-1");
 const std::string SCRAMClientAuthenticator::DEFAULT_CRED_MD5_SALT("poco");
 
 
-SCRAMClientAuthenticator::SCRAMClientAuthenticator():
-	_state(STATE_INIT)
-{
-}
+SCRAMClientAuthenticator::SCRAMClientAuthenticator() = default;
 
 	
 SCRAMClientAuthenticator::~SCRAMClientAuthenticator() = default;

@@ -76,7 +76,7 @@ Struct1 Tester::testStruct11(const Struct1& s1)
 }
 
 
-void Tester::testStruct12(Struct1& s1)
+void Tester::testStruct12(Struct1& /*s1*/)
 {
 }
 
@@ -93,7 +93,7 @@ Struct2 Tester::testStruct21(const Struct2& s1)
 }
 
 
-void Tester::testStruct22(Struct2& s1)
+void Tester::testStruct22(Struct2& /*s1*/)
 {
 }
 
@@ -110,7 +110,7 @@ Struct3 Tester::testStruct31(const Struct3& s1)
 }
 
 
-void Tester::testStruct32(Struct3& s1)
+void Tester::testStruct32(Struct3& /*s1*/)
 {
 }
 
@@ -127,7 +127,7 @@ Struct4 Tester::testStruct41(const Struct4& s1)
 }
 
 
-void Tester::testStruct42(Struct4& s1)
+void Tester::testStruct42(Struct4& /*s1*/)
 {
 }
 
@@ -144,7 +144,7 @@ Struct5 Tester::testStruct51(const Struct5& s1)
 }
 
 
-void Tester::testStruct52(Struct5& s1)
+void Tester::testStruct52(Struct5& /*s1*/)
 {
 }
 
@@ -161,7 +161,7 @@ Class1 Tester::testClass11(const Class1& c1)
 }
 
 
-void Tester::testClass12(Class1& c1)
+void Tester::testClass12(Class1& /*c1*/)
 {
 }
 
@@ -184,7 +184,7 @@ Struct1Vec Tester::testStruct1Vec1(const Struct1Vec& vec)
 }
 
 
-void Tester::testStruct1Vec2(Struct1Vec& vec)
+void Tester::testStruct1Vec2(Struct1Vec& /*vec*/)
 {
 }
 

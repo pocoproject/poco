@@ -37,6 +37,8 @@ public:
 	~JSONRPCRequestHandler() override;
 		/// Destroys the JSONRPCRequestHandler.
 
+	JSONRPCRequestHandler() = delete;
+
 	// Poco::Net::HTTPRequestHandler
 	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
 
@@ -44,8 +46,6 @@ protected:
 	[[nodiscard]] bool handleCORS(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
 	
 private:
-	JSONRPCRequestHandler() = delete;
-
 	Listener& _listener;
 	Poco::Logger& _logger;
 };

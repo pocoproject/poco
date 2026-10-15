@@ -150,7 +150,7 @@ void WSDLGenerator::writeExceptionMessage()
 }
 
 
-void WSDLGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties)
+void WSDLGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& /*properties*/)
 {
 	_pStructIn = pStruct;
 	_functions.clear();
@@ -494,17 +494,17 @@ void WSDLGenerator::writeServiceLocations(const std::string& ns, const std::stri
 }
 
 
-void WSDLGenerator::methodEnd(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+void WSDLGenerator::methodEnd(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
 
-void WSDLGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e)
+void WSDLGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine& /*e*/)
 {
 }
 
 
-std::vector<std::string> WSDLGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> WSDLGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	std::vector<std::string> bases;
 

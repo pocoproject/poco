@@ -71,7 +71,7 @@ std::string DeserializerGenerator::generateQualifiedClassName(const std::string&
 }
 
 
-void DeserializerGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties)
+void DeserializerGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& /*properties*/)
 {
 	_pStructIn = pStruct;
 	std::string newClassName (DeserializerGenerator::generateClassName(pStruct));
@@ -159,7 +159,7 @@ void DeserializerGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 }
 
 
-std::vector<std::string> DeserializerGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> DeserializerGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	// we extend from Skeleton or from a superclass skeleton
 	std::vector<std::string> bases;
@@ -179,7 +179,7 @@ void DeserializerGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEng
 }
 
 
-void DeserializerGenerator::methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties)
+void DeserializerGenerator::methodStart(const Poco::CppParser::Function* /*pFunc*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
@@ -208,7 +208,7 @@ void DeserializerGenerator::addImplParameters(Poco::CppParser::Function* pFunc, 
 }
 
 
-void DeserializerGenerator::deserializeCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void DeserializerGenerator::deserializeCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	if (addParam == nullptr)
 		return;
@@ -258,7 +258,7 @@ void DeserializerGenerator::deserializeCodeGen(const Poco::CppParser::Function* 
 }
 
 
-void DeserializerGenerator::deserializeImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void DeserializerGenerator::deserializeImplCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	if (addParam == nullptr)
 		return;
@@ -326,7 +326,7 @@ void DeserializerGenerator::deserializeImplCodeGenImpl(const Poco::CppParser::St
 }
 
 
-void DeserializerGenerator::prepareDeserializeAttributesCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void DeserializerGenerator::prepareDeserializeAttributesCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	if (addParam == nullptr)
 		return;
@@ -428,7 +428,7 @@ void DeserializerGenerator::prepareDeserializeAttributesCodeGenImpl(const Poco::
 }
 
 
-void DeserializerGenerator::deserializeAttributesCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void DeserializerGenerator::deserializeAttributesCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	if (addParam == nullptr)
 		return;
@@ -716,7 +716,7 @@ bool DeserializerGenerator::hasAttributes(const Poco::CppParser::Struct* pClass)
 
 void DeserializerGenerator::generateTypeDeserializerLines(const Poco::CppParser::Struct* pDataType, SerializerGenerator::VarGet::const_iterator it, int namePos, const std::string& suffix, std::vector<std::string>& lines, int& retUsageCount)
 {
-	bool isPublicMember = (it->second.second == 0);
+	bool isPublicMember = (it->second.second == nullptr);
 	const Poco::CppParser::Variable* pVar = it->second.first;
 	CodeGenerator::Properties varProps;
 	GeneratorEngine::parseProperties(pVar, varProps);

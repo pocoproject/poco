@@ -89,7 +89,7 @@ private:
 //
 // inlines
 //
-inline std::string BundleActivatorGenerator::newClassName(const Poco::CppParser::Struct* pStruct)
+inline std::string BundleActivatorGenerator::newClassName(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	throw Poco::NotImplementedException("Should never be called");
 }

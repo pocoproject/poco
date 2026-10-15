@@ -44,9 +44,6 @@ Poco::Net::HTTPSessionFactory Transport::_httpSessionFactory;
 
 
 Transport::Transport():
-	_keepAlive(false),
-	_compression(false),
-	_authMode(AUTH_NONE),
 	_pCookieStore(new CookieStore)
 {
 }
@@ -249,7 +246,7 @@ Poco::RemotingNG::Serializer& Transport::beginMessage(const Poco::RemotingNG::Id
 }
 
 
-void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
+void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
 	_pDeflater = nullptr;
 	_pRequest->setContentLength(static_cast<int>(_pStream->tellp()));
@@ -297,7 +294,7 @@ Poco::RemotingNG::Serializer& Transport::beginRequest(const Poco::RemotingNG::Id
 }
 
 
-Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
+Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
 	_pDeflater = nullptr;
 	std::istream* pResponseStream;

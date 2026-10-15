@@ -88,7 +88,7 @@ private:
 	std::string _objectURI;
 	Poco::RemotingNG::Listener::Ptr _pListener;
 	std::string _eventArg;
-	int _filteredArg;
+	int _filteredArg = 0;
 };
 
 

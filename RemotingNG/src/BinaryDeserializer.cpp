@@ -19,11 +19,7 @@
 namespace Poco::RemotingNG {
 
 
-BinaryDeserializer::BinaryDeserializer():
-	_messageType(SerializerBase::MESSAGE_REQUEST),
-	_curLevel(0)
-{
-}
+BinaryDeserializer::BinaryDeserializer() = default;
 
 
 BinaryDeserializer::~BinaryDeserializer() = default;

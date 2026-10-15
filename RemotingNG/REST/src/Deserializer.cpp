@@ -47,7 +47,7 @@ void Deserializer::deserializeMessageBegin(const std::string&, SerializerBase::M
 }
 
 
-void Deserializer::deserializeMessageEnd(const std::string& name, SerializerBase::MessageType type)
+void Deserializer::deserializeMessageEnd(const std::string& /*name*/, SerializerBase::MessageType /*type*/)
 {
 	// consume extra response content
 	int ch = _pStream->get();

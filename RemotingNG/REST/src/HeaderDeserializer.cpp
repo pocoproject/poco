@@ -36,7 +36,7 @@ HeaderDeserializer::HeaderDeserializer(const Poco::Net::HTTPMessage& message):
 HeaderDeserializer::~HeaderDeserializer() = default;
 
 
-bool HeaderDeserializer::deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull)
+bool HeaderDeserializer::deserializeNullableBegin(const std::string& name, bool /*isMandatory*/, bool& isNull)
 {
 	isNull = !_message.has(name);
 	return !isNull;

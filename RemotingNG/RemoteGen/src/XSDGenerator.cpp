@@ -88,7 +88,7 @@ std::string XSDGenerator::generateFileName(const std::string& structName)
 }
 
 
-void XSDGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties)
+void XSDGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& /*properties*/)
 {
 	_pStructIn = pStruct;
 	if (!_documentStarted)
@@ -528,7 +528,7 @@ Poco::CppParser::Function* XSDGenerator::createGetFct(const Poco::CppParser::Par
 	std::string methodName("get");
 	methodName.append(pParam->name());
 	if (methodName.size() > 3)
-		methodName[3] = (char)std::toupper(methodName[3]);
+		methodName[3] = static_cast<char>(std::toupper(methodName[3]));
 
 	// we return either by value or by const &
 	std::string decl(createParameterTypeDecl(pParam->declType()));
@@ -547,7 +547,7 @@ Poco::CppParser::Function* XSDGenerator::createSetFct(const Poco::CppParser::Par
 	std::string methodName("set");
 	methodName.append(pParam->name());
 	if (methodName.size() > 3)
-		methodName[3] = (char)std::toupper(methodName[3]);
+		methodName[3] = static_cast<char>(std::toupper(methodName[3]));
 
 	// we return either by value or by const &
 	std::string decl("void ");
@@ -571,17 +571,17 @@ void XSDGenerator::generateTypes(const std::vector<const Poco::CppParser::Struct
 }
 
 
-void XSDGenerator::methodEnd(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+void XSDGenerator::methodEnd(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
 
-void XSDGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e)
+void XSDGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine& /*e*/)
 {
 }
 
 
-std::vector<std::string> XSDGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> XSDGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	std::vector<std::string> bases;
 
@@ -798,7 +798,7 @@ std::string XSDGenerator::generateComplexType(const Poco::CppParser::Struct* pTy
 			if (pSym && pSym->kind() == Poco::CppParser::Symbol::SYM_ENUM)
 			{
 				// map to integer
-				const std::string& xsdType = mapToSchemaType("int");
+				const std::string xsdType = mapToSchemaType("int");
 				attrAttrs.addAttribute(EMPTYSTRING, TYPE, TYPE, EMPTYSTRING, SCHEMA_PREFIX+":"+xsdType);
 			}
 			else throw CodeGenerationException("An attribute can only have a simple content.");

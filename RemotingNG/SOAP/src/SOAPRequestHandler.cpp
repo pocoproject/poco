@@ -88,7 +88,7 @@ public:
 		return false;
 	}
 
-	const Listener& listener() const
+	[[nodiscard]] const Listener& listener() const
 	{
 		return _listener;
 	}
@@ -162,9 +162,7 @@ public:
 		_request(request),
 		_response(response),
 		_enableCompression(listener.isCompressionEnabled()),
-		_enableMTOM(listener.isMTOMEnabled()),
-		_pDeflater(nullptr),
-		_replySent(false)
+		_enableMTOM(listener.isMTOMEnabled())
 	{
 		applyRequestHeaderInterceptors(_deserializer);
 	}
@@ -248,8 +246,8 @@ private:
 	Poco::RemotingNG::SOAP::Deserializer _deserializer;
 	bool _enableCompression;
 	bool _enableMTOM;
-	Poco::DeflatingOutputStream* _pDeflater;
-	bool _replySent;
+	Poco::DeflatingOutputStream* _pDeflater = nullptr;
+	bool _replySent = false;
 };
 
 

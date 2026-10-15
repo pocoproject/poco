@@ -36,7 +36,7 @@ PathDeserializer::PathDeserializer(const std::string& pathTemplate, const Poco::
 PathDeserializer::~PathDeserializer() = default;
 
 
-bool PathDeserializer::deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull)
+bool PathDeserializer::deserializeNullableBegin(const std::string& name, bool /*isMandatory*/, bool& isNull)
 {
 	isNull = _values.find(name) == _values.end();
 	return !isNull;

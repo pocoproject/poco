@@ -46,41 +46,41 @@ void RawDeserializer::deserializeMessageBegin(const std::string&, SerializerBase
 }
 
 
-void RawDeserializer::deserializeMessageEnd(const std::string& name, SerializerBase::MessageType type)
+void RawDeserializer::deserializeMessageEnd(const std::string& /*name*/, SerializerBase::MessageType /*type*/)
 {
 	poco_bugcheck();
 }
 
 
-bool RawDeserializer::deserializeStructBegin(const std::string& name, bool isMandatory)
+bool RawDeserializer::deserializeStructBegin(const std::string& /*name*/, bool /*isMandatory*/)
 {
 	throw Poco::RemotingNG::DeserializerException("Cannot deserialize a structure using raw format");
 }
 
 
-void RawDeserializer::deserializeStructEnd(const std::string& name)
+void RawDeserializer::deserializeStructEnd(const std::string& /*name*/)
 {
 }
 
 
-bool RawDeserializer::deserializeSequenceBegin(const std::string& name, bool isMandatory, Poco::UInt32& sizeHint)
+bool RawDeserializer::deserializeSequenceBegin(const std::string& /*name*/, bool /*isMandatory*/, Poco::UInt32& /*sizeHint*/)
 {
 	throw Poco::RemotingNG::DeserializerException("Cannot deserialize a sequence using raw format");
 }
 
 
-void RawDeserializer::deserializeSequenceEnd(const std::string& name)
+void RawDeserializer::deserializeSequenceEnd(const std::string& /*name*/)
 {
 }
 
 
-bool RawDeserializer::deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull)
+bool RawDeserializer::deserializeNullableBegin(const std::string& /*name*/, bool /*isMandatory*/, bool& /*isNull*/)
 {
 	return false;
 }
 
 
-void RawDeserializer::deserializeNullableEnd(const std::string& name)
+void RawDeserializer::deserializeNullableEnd(const std::string& /*name*/)
 {
 }
 
@@ -221,7 +221,7 @@ bool RawDeserializer::deserialize(const std::string& name, bool isMandatory, flo
 	const std::string& strVal = deserializeData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (float)Poco::NumberParser::parseFloat(strVal);
+		val = static_cast<float>(Poco::NumberParser::parseFloat(strVal));
 	}
 	return ret;
 }
@@ -277,7 +277,7 @@ bool RawDeserializer::deserialize(const std::string& name, bool isMandatory, cha
 }
 
 
-bool RawDeserializer::deserialize(const std::string& name, bool isMandatory, std::string& val)
+bool RawDeserializer::deserialize(const std::string& /*name*/, bool /*isMandatory*/, std::string& val)
 {
 	poco_check_ptr (_pStream);
 
@@ -287,7 +287,7 @@ bool RawDeserializer::deserialize(const std::string& name, bool isMandatory, std
 }
 
 
-bool RawDeserializer::deserialize(const std::string& name, bool isMandatory, std::vector<char>& val)
+bool RawDeserializer::deserialize(const std::string& /*name*/, bool isMandatory, std::vector<char>& val)
 {
 	poco_check_ptr (_pStream);
 
@@ -302,7 +302,7 @@ bool RawDeserializer::deserialize(const std::string& name, bool isMandatory, std
 }
 
 
-const std::string& RawDeserializer::deserializeData(const std::string& name, bool isMandatory, bool& found)
+const std::string& RawDeserializer::deserializeData(const std::string& /*name*/, bool isMandatory, bool& found)
 {
 	poco_check_ptr (_pStream);
 

@@ -29,18 +29,16 @@ public:
 		/// The original name
 		std::string name;
 		/// The name after renaming.
-		int namePos;
+		int namePos = -1;
 		std::string nameSpace;
-		int nameSpacePos;
+		int nameSpacePos = -1;
 		const Poco::CppParser::Parameter* pParam;
 		bool mandatory;
 		std::string direction;
 		ExtParam(const std::string& origName, const std::string& aName, const std::string& aNS, const Poco::CppParser::Parameter* aParam, bool isMandatory, const std::string& aDirection):
 			varName(origName),
 			name(aName),
-			namePos(-1),
 			nameSpace(aNS),
-			nameSpacePos(-1),
 			pParam(aParam),
 			mandatory(isMandatory),
 			direction(aDirection)

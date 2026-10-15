@@ -40,6 +40,9 @@ public:
 	~Deserializer() override;
 		/// Destroys the Deserializer.
 
+	Deserializer(const Deserializer&) = delete;
+	Deserializer& operator=(const Deserializer&) = delete;
+
 	// Poco::RemotingNG::Deserializer
 	Poco::RemotingNG::SerializerBase::MessageType findMessage(std::string& name) override;
 	void deserializeMessageBegin(const std::string& name, SerializerBase::MessageType type) override;
@@ -76,16 +79,13 @@ protected:
 	void setupImpl(std::istream& inStream) override;
 
 private:
-	Deserializer(const Deserializer&) = delete;
-	Deserializer& operator=(const Deserializer&) = delete;
-
 	[[nodiscard]] JSValue::Ptr findValue(const std::string& name, bool isMandatory, bool& found);
 
 private:
 	std::vector<JSValue::Ptr> _objectStack;
 	std::vector<std::size_t> _indexStack;
 	int _id;
-	Serializer* _pAssociatedSerializer;
+	Serializer* _pAssociatedSerializer = nullptr;
 };
 
 

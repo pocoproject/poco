@@ -109,18 +109,14 @@ struct Struct5
 class Class1
 {
 public:
-	Class1():
-		_anEnum(VALUE_1),
-		_anInt(0)
-	{
-	}
+	Class1() = default;
 	
 	void setAnEnum(Enum1 anEnum)
 	{
 		_anEnum = anEnum;
 	}
 	
-	Enum1 getAnEnum() const
+	[[nodiscard]] Enum1 getAnEnum() const
 	{
 		return _anEnum;
 	}
@@ -130,7 +126,7 @@ public:
 		_anInt = anInt;
 	}
 	
-	int getAnInt() const
+	[[nodiscard]] int getAnInt() const
 	{
 		return _anInt;
 	}
@@ -140,16 +136,16 @@ public:
 		_aString = str;
 	}
 	
-	const std::string& getAString() const
+	[[nodiscard]] const std::string& getAString() const
 	{
 		return _aString;
 	}
 	
-	void write(Poco::BinaryWriter& writer)
+	void write(Poco::BinaryWriter& /*writer*/)
 	{
 	}
 	
-	void read(Poco::BinaryReader& reader)
+	void read(Poco::BinaryReader& /*reader*/)
 	{
 	}
 	
@@ -162,8 +158,8 @@ public:
 	static const int A_CONSTANT;
 		
 private:
-	Enum1 _anEnum;
-	int _anInt;
+	Enum1 _anEnum = VALUE_1;
+	int _anInt = 0;
 	std::string _aString;
 };
 

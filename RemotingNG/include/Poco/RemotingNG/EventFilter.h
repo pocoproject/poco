@@ -44,13 +44,12 @@ public:
 	~EventFilter() override = default;
 		/// Destroys the EventFilter.
 
+	EventFilter(const EventFilter&) = delete;
+	EventFilter& operator = (const EventFilter&) = delete;
+
 	[[nodiscard]] virtual bool accept(const T& value) = 0;
 		/// Returns true if the event should be delivered,
 		/// false otherwise.
-		
-private:
-	EventFilter(const EventFilter&) = delete;
-	EventFilter& operator = (const EventFilter&) = delete;	
 };
 
 

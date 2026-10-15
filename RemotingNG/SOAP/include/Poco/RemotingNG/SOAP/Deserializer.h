@@ -162,9 +162,9 @@ private:
 	using AttrMap = std::map<std::string, AttrInfo>;
 
 	std::vector<HeaderInterceptor::Ptr> _headerInterceptors;
-	Serializer::SOAPVersion _soapVersion;
-	bool _mtom;
-	const SOAPContentHandler::Node* _pRoot;
+	Serializer::SOAPVersion _soapVersion = Serializer::SOAP_1_1;
+	bool _mtom = false;
+	const SOAPContentHandler::Node* _pRoot = nullptr;
 	XML::SAXParser _internalReader;
 	XML::WhitespaceFilter _reader;
 	SOAPContentHandler _contentHandler;

@@ -969,12 +969,12 @@ void SwaggerGenerator::methodStart(const Poco::CppParser::Function* pFunc, const
 }
 
 
-void SwaggerGenerator::methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties)
+void SwaggerGenerator::methodEnd(const Poco::CppParser::Function* /*pFunc*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
 
-void SwaggerGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e)
+void SwaggerGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine& /*e*/)
 {
 }
 
@@ -985,7 +985,7 @@ std::string SwaggerGenerator::newClassName(const Poco::CppParser::Struct* pStruc
 }
 
 
-std::vector<std::string> SwaggerGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> SwaggerGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	std::vector<std::string> bases;
 	return bases;

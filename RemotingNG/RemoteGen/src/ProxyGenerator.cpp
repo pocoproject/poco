@@ -31,7 +31,7 @@
 using namespace Poco::CodeGeneration;
 
 
-ProxyGenerator::ProxyGenerator(Poco::CodeGeneration::CppGenerator& cppGen): AbstractGenerator(cppGen), _cacheVariableSet(false), _hasEvents(false)
+ProxyGenerator::ProxyGenerator(Poco::CodeGeneration::CppGenerator& cppGen): AbstractGenerator(cppGen)
 {
 }
 
@@ -278,7 +278,7 @@ std::vector<std::string> ProxyGenerator::newBaseClasses(const Poco::CppParser::S
 }
 
 
-void ProxyGenerator::serializeCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ProxyGenerator::serializeCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	OrderedParameters attrs;
 	OrderedParameters elems;
@@ -339,12 +339,12 @@ void ProxyGenerator::serializeCodeGen(const Poco::CppParser::Function* pFunc, co
 }
 
 
-void ProxyGenerator::constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ProxyGenerator::constructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& /*gen*/, void* /*addParam*/)
 {
 }
 
 
-void ProxyGenerator::destructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ProxyGenerator::destructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -370,7 +370,7 @@ void ProxyGenerator::destructorCodeGen(const Poco::CppParser::Function* pFunc, c
 }
 
 
-void ProxyGenerator::staticMembersInitializer(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ProxyGenerator::staticMembersInitializer(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	std::string code("const std::string ");
 	code.append(pStruct->name());
@@ -1450,7 +1450,7 @@ std::string ProxyGenerator::generateEventFunctionName(const std::string& eventVa
 }
 
 
-void ProxyGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ProxyGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -1463,7 +1463,7 @@ void ProxyGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc, const 
 }
 
 
-void ProxyGenerator::remotingEventsCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ProxyGenerator::remotingEventsCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 

@@ -40,12 +40,12 @@ public:
 		return _stream;
 	}
 
-	const std::string& filename() const override
+	[[nodiscard]] const std::string& filename() const override
 	{
 		return _filename;
 	}
 
-	std::streamsize getContentLength() const override
+	[[nodiscard]] std::streamsize getContentLength() const override
 	{
 		return _data.size();
 	}

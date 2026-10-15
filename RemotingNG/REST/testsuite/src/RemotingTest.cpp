@@ -99,7 +99,7 @@ namespace
 				return Poco::RemotingNG::AuthenticateResult(Poco::RemotingNG::AuthenticateResult::AUTH_FAILED);
 		}
 
-		const std::string& lastUsername() const
+		[[nodiscard]] const std::string& lastUsername() const
 		{
 			return _lastUsername;
 		}
@@ -128,7 +128,7 @@ namespace
 	class MockAuthorizer: public Poco::RemotingNG::Authorizer
 	{
 	public:
-		bool authorize(const std::string& method, const std::string& permission) override
+		bool authorize(const std::string& /*method*/, const std::string& /*permission*/) override
 		{
 			Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
 

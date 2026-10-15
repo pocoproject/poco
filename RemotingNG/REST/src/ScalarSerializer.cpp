@@ -31,49 +31,49 @@ ScalarSerializer::ScalarSerializer() = default;
 ScalarSerializer::~ScalarSerializer() = default;
 
 
-void ScalarSerializer::serializeMessageBegin(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type)
+void ScalarSerializer::serializeMessageBegin(const std::string& /*name*/, Poco::RemotingNG::SerializerBase::MessageType /*type*/)
 {
 	poco_bugcheck();
 }
 
 
-void ScalarSerializer::serializeMessageEnd(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type)
+void ScalarSerializer::serializeMessageEnd(const std::string& /*name*/, Poco::RemotingNG::SerializerBase::MessageType /*type*/)
 {
 	poco_bugcheck();
 }
 
 
-void ScalarSerializer::serializeFaultMessage(const std::string& methodName, const Poco::Exception& /* e */)
+void ScalarSerializer::serializeFaultMessage(const std::string& /*methodName*/, const Poco::Exception& /* e */)
 {
 	poco_bugcheck();
 }
 
 
-void ScalarSerializer::serializeStructBegin(const std::string& name)
+void ScalarSerializer::serializeStructBegin(const std::string& /*name*/)
 {
 	throw Poco::RemotingNG::SerializerException("Cannot serialize a structure to a header, form or path");
 }
 
 
-void ScalarSerializer::serializeStructEnd(const std::string& name)
+void ScalarSerializer::serializeStructEnd(const std::string& /*name*/)
 {
 	poco_bugcheck();
 }
 
 
-void ScalarSerializer::serializeSequenceBegin(const std::string& name, Poco::UInt32 numElems)
+void ScalarSerializer::serializeSequenceBegin(const std::string& /*name*/, Poco::UInt32 /*numElems*/)
 {
 	throw Poco::RemotingNG::SerializerException("Cannot serialize a sequence to a header, form or path");
 }
 
 
-void ScalarSerializer::serializeSequenceEnd(const std::string& name)
+void ScalarSerializer::serializeSequenceEnd(const std::string& /*name*/)
 {
 	poco_bugcheck();
 }
 
 
-void ScalarSerializer::serializeNullableBegin(const std::string& name, bool isNull)
+void ScalarSerializer::serializeNullableBegin(const std::string& /*name*/, bool /*isNull*/)
 {
 }
 

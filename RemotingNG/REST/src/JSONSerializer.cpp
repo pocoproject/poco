@@ -30,8 +30,7 @@ const std::string JSONSerializer::JSON_NULL("null");
 
 
 JSONSerializer::JSONSerializer(std::ostream& stream):
-	_pStream(&stream),
-	_indent(0)
+	_pStream(&stream)
 {
 }
 
@@ -39,17 +38,17 @@ JSONSerializer::JSONSerializer(std::ostream& stream):
 JSONSerializer::~JSONSerializer() = default;
 
 
-void JSONSerializer::serializeMessageBegin(const std::string&, Poco::RemotingNG::SerializerBase::MessageType type)
+void JSONSerializer::serializeMessageBegin(const std::string&, Poco::RemotingNG::SerializerBase::MessageType /*type*/)
 {
 }
 
 
-void JSONSerializer::serializeMessageEnd(const std::string&, Poco::RemotingNG::SerializerBase::MessageType type)
+void JSONSerializer::serializeMessageEnd(const std::string&, Poco::RemotingNG::SerializerBase::MessageType /*type*/)
 {
 }
 
 
-void JSONSerializer::serializeFaultMessage(const std::string& methodName, const Poco::Exception& e)
+void JSONSerializer::serializeFaultMessage(const std::string& /*methodName*/, const Poco::Exception& e)
 {
 	poco_assert_dbg(_pStream);
 
@@ -79,7 +78,7 @@ void JSONSerializer::serializeStructBegin(const std::string& name)
 }
 
 
-void JSONSerializer::serializeStructEnd(const std::string& name)
+void JSONSerializer::serializeStructEnd(const std::string& /*name*/)
 {
 	_state.pop_back();
 	--_indent;
@@ -89,7 +88,7 @@ void JSONSerializer::serializeStructEnd(const std::string& name)
 }
 
 
-void JSONSerializer::serializeSequenceBegin(const std::string& name, Poco::UInt32 numElems)
+void JSONSerializer::serializeSequenceBegin(const std::string& name, Poco::UInt32 /*numElems*/)
 {
 	if (!_state.empty())
 	{
@@ -105,7 +104,7 @@ void JSONSerializer::serializeSequenceBegin(const std::string& name, Poco::UInt3
 }
 
 
-void JSONSerializer::serializeSequenceEnd(const std::string& name)
+void JSONSerializer::serializeSequenceEnd(const std::string& /*name*/)
 {
 	_state.pop_back();
 	--_indent;

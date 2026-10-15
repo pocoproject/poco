@@ -89,7 +89,7 @@ FormDeserializer::FormDeserializer(Poco::Net::HTTPResponse& response, std::istre
 FormDeserializer::~FormDeserializer() = default;
 
 
-bool FormDeserializer::deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull)
+bool FormDeserializer::deserializeNullableBegin(const std::string& name, bool /*isMandatory*/, bool& isNull)
 {
 	isNull = !_form.has(name);
 	return !isNull;

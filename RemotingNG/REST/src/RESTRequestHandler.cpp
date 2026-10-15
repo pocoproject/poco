@@ -89,10 +89,7 @@ public:
 		RESTServerTransport(listener, credentials, logger),
 		_request(request),
 		_response(response),
-		_enableCompression(listener.isCompressionEnabled()),
-		_pInflater(nullptr),
-		_pDeflater(nullptr),
-		_replySent(false)
+		_enableCompression(listener.isCompressionEnabled())
 	{
 	}
 
@@ -172,10 +169,10 @@ private:
 	Poco::RemotingNG::REST::Serializer _serializer;
 	Poco::RemotingNG::REST::Deserializer _deserializer;
 	bool _enableCompression;
-	Poco::InflatingInputStream* _pInflater;
-	Poco::DeflatingOutputStream* _pDeflater;
+	Poco::InflatingInputStream* _pInflater = nullptr;
+	Poco::DeflatingOutputStream* _pDeflater = nullptr;
 	std::stringstream _faultStream;
-	bool _replySent;
+	bool _replySent = false;
 };
 
 
@@ -186,9 +183,7 @@ public:
 		RESTServerTransport(listener, credentials, logger),
 		_request(request),
 		_response(response),
-		_enableCompression(listener.isCompressionEnabled()),
-		_pInflater(nullptr),
-		_pDeflater(nullptr)
+		_enableCompression(listener.isCompressionEnabled())
 	{
 	}
 
@@ -255,8 +250,8 @@ private:
 	Poco::RemotingNG::REST::Serializer _serializer;
 	Poco::RemotingNG::REST::Deserializer _deserializer;
 	bool _enableCompression;
-	Poco::InflatingInputStream* _pInflater;
-	Poco::DeflatingOutputStream* _pDeflater;
+	Poco::InflatingInputStream* _pInflater = nullptr;
+	Poco::DeflatingOutputStream* _pDeflater = nullptr;
 	std::stringstream _bufferStream;
 };
 

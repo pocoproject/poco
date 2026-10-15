@@ -62,17 +62,15 @@ class TypeDeserializer
 	/// specializations of the TypeDeserializer class template.
 {
 public:
+	TypeDeserializer() = delete;
+	~TypeDeserializer() = delete;
+	TypeDeserializer(const TypeDeserializer&) = delete;
+	TypeDeserializer& operator = (const TypeDeserializer&) = delete;
+
 	static bool deserialize(const std::string& name, bool isMandatory, Deserializer& deser, T& value)
 	{
 		return deser.deserialize(name, isMandatory, value);
 	}
-
-private:
-	TypeDeserializer() = delete;
-	~TypeDeserializer() = delete;
-
-	TypeDeserializer(const TypeDeserializer&) = delete;
-	TypeDeserializer& operator = (const TypeDeserializer&) = delete;
 };
 
 

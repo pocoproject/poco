@@ -37,6 +37,8 @@ public:
 	~RESTRequestHandler() override;
 		/// Destroys the RESTRequestHandler.
 
+	RESTRequestHandler() = delete;
+
 	// Poco::Net::HTTPRequestHandler
 	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
 
@@ -44,8 +46,6 @@ protected:
 	[[nodiscard]] bool handleCORS(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
 	
 private:
-	RESTRequestHandler() = delete;
-
 	Listener& _listener;
 	Poco::Logger& _logger;
 };

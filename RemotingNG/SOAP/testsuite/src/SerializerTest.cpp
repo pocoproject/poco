@@ -842,7 +842,7 @@ void SerializerTest::testMTOM()
 	std::string result = ostr.str();
 	assert (result.size() == expectedResult.size());
 
-	for (int i = 0; i < result.size(); i++)
+	for (std::size_t i = 0; i < result.size(); i++)
 	{
 		assert (expectedResult[i] == '*' || result[i] == expectedResult[i]);
 	}

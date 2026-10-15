@@ -22,10 +22,7 @@ using Poco::ErrorHandler;
 namespace Poco::RemotingNG::TCP {
 
 
-TimerTask::TimerTask():
-	_isCancelled(false)
-{
-}
+TimerTask::TimerTask() = default;
 
 
 TimerTask::~TimerTask() = default;

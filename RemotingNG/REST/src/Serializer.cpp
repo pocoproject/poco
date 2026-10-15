@@ -34,12 +34,7 @@ const std::string Serializer::FORMAT_BINARY("binary");
 const std::string Serializer::FORMAT_JSON("json");
 
 
-Serializer::Serializer():
-	_pStream(nullptr),
-	_pRequest(nullptr),
-	_pResponse(nullptr)
-{
-}
+Serializer::Serializer() = default;
 
 
 Serializer::~Serializer() = default;
@@ -72,7 +67,7 @@ void Serializer::serializeMessageEnd(const std::string&, Poco::RemotingNG::Seria
 			_pPathSerializer->close();
 		if (_pQuerySerializer)
 			_pQuerySerializer->close();
-		// fallthrough
+		[[fallthrough]];
 
 	case Poco::RemotingNG::SerializerBase::MESSAGE_REPLY:
 		if (_pFormSerializer)

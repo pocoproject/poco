@@ -73,7 +73,7 @@ void ProxyFactoryGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 }
 
 
-void ProxyFactoryGenerator::methodStart(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+void ProxyFactoryGenerator::methodStart(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*properties*/)
 {
 	// ignore the other methods
 }
@@ -88,7 +88,7 @@ void ProxyFactoryGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEng
 }
 
 
-std::vector<std::string> ProxyFactoryGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> ProxyFactoryGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	// we extend from Proxy and from the Interface
 	std::vector<std::string> bases;
@@ -97,7 +97,7 @@ std::vector<std::string> ProxyFactoryGenerator::newBaseClasses(const Poco::CppPa
 }
 
 
-void ProxyFactoryGenerator::createCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ProxyFactoryGenerator::createCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);

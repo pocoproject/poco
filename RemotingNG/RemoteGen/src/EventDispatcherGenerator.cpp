@@ -129,13 +129,13 @@ void EventDispatcherGenerator::structStart(const Poco::CppParser::Struct* pStruc
 }
 
 
-void EventDispatcherGenerator::methodStart(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& methodProperties)
+void EventDispatcherGenerator::methodStart(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*methodProperties*/)
 {
 	// we don't handle the regular methods here, only events
 }
 
 
-void EventDispatcherGenerator::methodStartImpl(Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& methodProperties)
+void EventDispatcherGenerator::methodStartImpl(Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& /*methodProperties*/)
 {
 	includeTypeSerializers(pFunc, false, false);
 }
@@ -158,7 +158,7 @@ void EventDispatcherGenerator::registerCallbacks(Poco::CodeGeneration::Generator
 }
 
 
-std::vector<std::string> EventDispatcherGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> EventDispatcherGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	std::vector<std::string> bases;
 	bases.push_back("Poco::RemotingNG::EventDispatcher");
@@ -166,7 +166,7 @@ std::vector<std::string> EventDispatcherGenerator::newBaseClasses(const Poco::Cp
 }
 
 
-void EventDispatcherGenerator::serializeCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void EventDispatcherGenerator::serializeCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("using namespace std::string_literals;\n");
 
@@ -198,7 +198,7 @@ void EventDispatcherGenerator::serializeCodeGen(const Poco::CppParser::Function*
 }
 
 
-void EventDispatcherGenerator::constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void EventDispatcherGenerator::constructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -223,7 +223,7 @@ void EventDispatcherGenerator::constructorCodeGen(const Poco::CppParser::Functio
 }
 
 
-void EventDispatcherGenerator::destructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void EventDispatcherGenerator::destructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -255,7 +255,7 @@ void EventDispatcherGenerator::destructorCodeGen(const Poco::CppParser::Function
 }
 
 
-void EventDispatcherGenerator::staticMembersInitializer(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void EventDispatcherGenerator::staticMembersInitializer(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	std::string code("const std::string ");
 	code.append(pStruct->name());
@@ -996,7 +996,7 @@ std::string EventDispatcherGenerator::generateEventFunctionName(const std::strin
 }
 
 
-void EventDispatcherGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void EventDispatcherGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 

@@ -41,12 +41,11 @@ public:
 	using Ptr = Poco::AutoPtr<AuthResponseFrameHandler>;
 
 	explicit AuthResponseFrameHandler(Poco::UInt32 channel):
-		_channel(channel),
-		_authToken(0)
+		_channel(channel)
 	{
 	}
 
-	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) override
+	bool handleFrame(Connection::Ptr /*pConnection*/, Frame::Ptr pFrame) override
 	{
 		if (pFrame->channel() == _channel && pFrame->type() == Frame::FRAME_TYPE_AUTR)
 		{
@@ -79,12 +78,12 @@ public:
 		else return false;
 	}
 
-	Poco::UInt64 token() const
+	[[nodiscard]] Poco::UInt64 token() const
 	{
 		return _authToken;
 	}
 
-	const AuthenticateResult& result() const
+	[[nodiscard]] const AuthenticateResult& result() const
 	{
 		return _authResult;
 	}
@@ -99,7 +98,7 @@ private:
 	Poco::Event _received;
 
 	AuthenticateResult _authResult;
-	Poco::UInt64 _authToken;
+	Poco::UInt64 _authToken = 0;
 };
 
 
@@ -225,7 +224,7 @@ Poco::RemotingNG::Serializer& Transport::beginMessage(const Poco::RemotingNG::Id
 }
 
 
-void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
+void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
 	if (_logger.debug()) _logger.debug("Completing one-way request."s);
 

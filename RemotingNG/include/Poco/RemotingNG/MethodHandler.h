@@ -47,16 +47,15 @@ public:
 	~MethodHandler() override;
 		/// Destroys the MethodHandler.
 
+	MethodHandler(const MethodHandler&) = delete;
+	MethodHandler& operator = (const MethodHandler&) = delete;
+
 	virtual void invoke(ServerTransport& transport, Deserializer& deserializer, RemoteObject::Ptr pRemoteObject) = 0;
 		/// Deserializes the incoming request using the given Deserializer and
 		/// invokes the corresponding method on the service object, via the RemoteObject.
 		///
 		/// After the invocation, serializes the return value and output parameters (or exception) of the
 		/// method using the ServerTransport's Serializer.
-
-private:
-	MethodHandler(const MethodHandler&) = delete;
-	MethodHandler& operator = (const MethodHandler&) = delete;
 };
 
 

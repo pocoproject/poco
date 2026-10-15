@@ -29,7 +29,7 @@ HTTPRequestHandlerFactory::HTTPRequestHandlerFactory(Listener& listener):
 HTTPRequestHandlerFactory::~HTTPRequestHandlerFactory() = default;
 
 
-Poco::Net::HTTPRequestHandler* HTTPRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+Poco::Net::HTTPRequestHandler* HTTPRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& /*request*/)
 {
 	return new HTTPRequestHandler(_listener);
 }

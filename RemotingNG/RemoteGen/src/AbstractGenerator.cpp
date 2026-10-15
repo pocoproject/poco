@@ -42,10 +42,7 @@ const std::set<std::string> AbstractGenerator::BUILTIN_TYPES(initBuiltinTypes())
 
 AbstractGenerator::AbstractGenerator(Poco::CodeGeneration::CppGenerator& cppGen):
 	Poco::CodeGeneration::CodeGenerator(cppGen.nameSpace(), cppGen.libraryName(), cppGen.usePocoIncludeStyle(), cppGen.copyright()),
-	_cppGen(cppGen),
-	_pStruct(nullptr),
-	_pStructIn(nullptr),
-	_pNs(nullptr)
+	_cppGen(cppGen)
 {
 	Poco::CppParser::Symbol* pS = Poco::CppParser::NameSpace::root();
 	if (!_cppGen.nameSpace().empty())
@@ -81,7 +78,7 @@ AbstractGenerator::AbstractGenerator(Poco::CodeGeneration::CppGenerator& cppGen)
 AbstractGenerator::~AbstractGenerator() = default;
 
 
-void AbstractGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties)
+void AbstractGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& /*properties*/)
 {
 	poco_assert_dbg(_pStruct == nullptr);
 	poco_assert_dbg(_pStructIn == nullptr);
@@ -100,7 +97,7 @@ void AbstractGenerator::structEnd()
 }
 
 
-Poco::CppParser::Function* AbstractGenerator::methodClone(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+Poco::CppParser::Function* AbstractGenerator::methodClone(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& /*properties*/)
 {
 	poco_assert_dbg (_pStruct && _pStructIn);
 
@@ -300,7 +297,7 @@ void AbstractGenerator::addParamDocu(Poco::CppParser::Parameter* pParam, const C
 }
 
 
-void AbstractGenerator::typeIdCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void AbstractGenerator::typeIdCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -567,7 +564,7 @@ void AbstractGenerator::handleIncludeTypes(const Poco::CppParser::Parameter* pPa
 	std::vector<std::string> templType = GenUtility::getResolvedInnerTemplateTypes(_pStructIn, resType);
 	if (!templType.empty())
 	{
-		for (int i = 0; i < templType.size(); ++i)
+		for (std::size_t i = 0; i < templType.size(); ++i)
 		{
 			resType = templType[i];
 			if (resType.find("std::") != 0 &&

@@ -34,10 +34,7 @@ using namespace std::string_literals;
 namespace Poco::RemotingNG::SOAP {
 
 
-Deserializer::Deserializer():
-	_soapVersion(Serializer::SOAP_1_1),
-	_mtom(false),
-	_pRoot(nullptr)
+Deserializer::Deserializer()
 {
 	_reader.setParent(&_internalReader);
 	_reader.setContentHandler(&_contentHandler);
@@ -391,7 +388,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (Poco::Int8)Poco::NumberParser::parse(strVal); //todo: overflow/underflow checks
+		val = static_cast<Poco::Int8>(Poco::NumberParser::parse(strVal)); //todo: overflow/underflow checks
 	}
 	return ret;
 }
@@ -403,7 +400,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (Poco::UInt8) Poco::NumberParser::parseUnsigned(strVal); //todo: overflow/underflow checks
+		val = static_cast<Poco::UInt8>(Poco::NumberParser::parseUnsigned(strVal)); //todo: overflow/underflow checks
 	}
 	return ret;
 }
@@ -415,7 +412,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (Poco::Int16)Poco::NumberParser::parse(strVal); //todo: overflow/underflow checks
+		val = static_cast<Poco::Int16>(Poco::NumberParser::parse(strVal)); //todo: overflow/underflow checks
 	}
 	return ret;
 }
@@ -427,7 +424,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (Poco::UInt16) Poco::NumberParser::parseUnsigned(strVal); //todo: overflow/underflow checks
+		val = static_cast<Poco::UInt16>(Poco::NumberParser::parseUnsigned(strVal)); //todo: overflow/underflow checks
 	}
 	return ret;
 }
@@ -521,7 +518,7 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, float&
 	const std::string& strVal = getData(name, isMandatory, ret);
 	if (ret)
 	{
-		val = (float)Poco::NumberParser::parseFloat(strVal);
+		val = static_cast<float>(Poco::NumberParser::parseFloat(strVal));
 	}
 	return ret;
 }

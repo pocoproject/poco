@@ -116,7 +116,7 @@ protected:
 		return encStream.str();
 	}
 
-	std::string createNonce() const
+	[[nodiscard]] std::string createNonce() const
 	{
 		std::ostringstream nonce;
 		Poco::Base64Encoder enc(nonce, Poco::BASE64_URL_ENCODING | Poco::BASE64_NO_PADDING);

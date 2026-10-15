@@ -61,17 +61,15 @@ class TypeSerializer
 	/// specializations of the TypeSerializer class template.
 {
 public:
+	TypeSerializer() = delete;
+	~TypeSerializer() = delete;
+	TypeSerializer(const TypeSerializer&) = delete;
+	TypeSerializer& operator = (const TypeSerializer&) = delete;
+
 	static void serialize(const std::string& name, const T& value, Serializer& ser)
 	{
 		ser.serialize(name, value);
 	}
-
-private:
-	TypeSerializer() = delete;
-	~TypeSerializer() = delete;
-
-	TypeSerializer(const TypeSerializer&) = delete;
-	TypeSerializer& operator = (const TypeSerializer&) = delete;
 };
 
 

@@ -26,6 +26,7 @@
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/SharedPtr.h"
+#include <cstddef>
 #include <memory>
 #include <map>
 
@@ -96,10 +97,7 @@ public:
 		SOAP_1_2 = 12
 	};
 
-	enum
-	{
-		MIN_MTOM_SIZE = 64
-	};
+	static constexpr std::size_t MIN_MTOM_SIZE = 64;
 
 	enum Options
 	{

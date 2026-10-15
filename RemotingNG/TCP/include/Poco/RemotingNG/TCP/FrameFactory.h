@@ -35,20 +35,20 @@ public:
 		return new Frame(0, 0, 0, Frame::FRAME_MAX_SIZE);
 	}
 	
-	[[nodiscard]] bool validateObject(Frame::Ptr pFrame)
+	[[nodiscard]] bool validateObject(Frame::Ptr /*pFrame*/)
 	{
 		return true;
 	}
 	
-	void activateObject(Frame::Ptr pFrame)
+	void activateObject(Frame::Ptr /*pFrame*/)
 	{
 	}
 	
-	void deactivateObject(Frame::Ptr pFrame)
+	void deactivateObject(Frame::Ptr /*pFrame*/)
 	{
 	}
 	
-	void destroyObject(Frame::Ptr pFrame)
+	void destroyObject(Frame::Ptr /*pFrame*/)
 	{
 	}
 };

@@ -222,7 +222,7 @@ void InterfaceGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEngine
 }
 
 
-void InterfaceGenerator::ifaceTypeIdCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void InterfaceGenerator::ifaceTypeIdCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -237,7 +237,7 @@ void InterfaceGenerator::ifaceTypeIdCodeGen(const Poco::CppParser::Function* pFu
 }
 
 
-void InterfaceGenerator::ifaceTypeCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void InterfaceGenerator::ifaceTypeCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -252,7 +252,7 @@ void InterfaceGenerator::ifaceTypeCodeGen(const Poco::CppParser::Function* pFunc
 }
 
 
-void InterfaceGenerator::ifaceIsACodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void InterfaceGenerator::ifaceIsACodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 

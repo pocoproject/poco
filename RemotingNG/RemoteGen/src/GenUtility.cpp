@@ -409,7 +409,7 @@ std::vector<std::string> GenUtility::getInnerTemplateTypes(const std::string& ty
 	//a typical template def std::map<int, std::pair<int,int> >
 	int lvl = 0;
 	std::string temp;
-	for (int i = 0; i < typeDecl.size(); ++i)
+	for (std::size_t i = 0; i < typeDecl.size(); ++i)
 	{
 		char c = typeDecl[i];
 		if (c == '<')

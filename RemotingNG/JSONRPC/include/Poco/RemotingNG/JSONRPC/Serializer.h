@@ -112,9 +112,9 @@ private:
 	void writeSeparator();
 
 private:
-	std::ostream* _pStream;
-	int _indent;
-	int _id;
+	std::ostream* _pStream = nullptr;
+	int _indent = 0;
+	int _id = 0;
 	std::vector<int> _state;
 };
 

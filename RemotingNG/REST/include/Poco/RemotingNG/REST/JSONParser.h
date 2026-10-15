@@ -36,6 +36,10 @@ public:
 	~JSONParser();
 		/// Destroys the JSONParser.
 
+	JSONParser() = delete;
+	JSONParser(const JSONParser&) = delete;
+	JSONParser& operator = (const JSONParser&) = delete;
+
 	[[nodiscard]] JSValue::Ptr parse();
 		/// Reads a JSValue from the stream.
 
@@ -59,10 +63,6 @@ protected:
 	[[nodiscard]] static bool isEOF(int ch);
 
 private:
-	JSONParser() = delete;
-	JSONParser(const JSONParser&) = delete;
-	JSONParser& operator = (const JSONParser&) = delete;
-
 	std::streambuf& _streambuf;
 	std::size_t _depth = 0;
 	std::size_t _maxDepth = MAX_DEPTH;

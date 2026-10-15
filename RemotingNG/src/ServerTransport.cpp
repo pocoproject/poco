@@ -24,13 +24,13 @@ ServerTransport::ServerTransport() = default;
 ServerTransport::~ServerTransport() = default;
 
 
-bool ServerTransport::authorize(const std::string& method, const std::string& permission)
+bool ServerTransport::authorize(const std::string& /*method*/, const std::string& /*permission*/)
 {
 	return true;
 }
 
 
-bool ServerTransport::authenticate(const std::string& method)
+bool ServerTransport::authenticate(const std::string& /*method*/)
 {
 	return true;
 }

@@ -35,6 +35,9 @@ public:
 	~RawDeserializer() override;
 		/// Destroys the RawDeserializer.
 
+	RawDeserializer(const RawDeserializer&) = delete;
+	RawDeserializer& operator = (const RawDeserializer&) = delete;
+
 	// Poco::RemotingNG::Deserializer
 	Poco::RemotingNG::SerializerBase::MessageType findMessage(std::string& name) override;
 	void deserializeMessageBegin(const std::string& name, SerializerBase::MessageType type) override;
@@ -70,9 +73,6 @@ protected:
 	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
 
 private:
-	RawDeserializer(const RawDeserializer&) = delete;
-	RawDeserializer& operator = (const RawDeserializer&) = delete;
-
 	std::istream* _pStream;
 	std::string _data;
 };

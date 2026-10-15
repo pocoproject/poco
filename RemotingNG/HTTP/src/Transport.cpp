@@ -39,13 +39,7 @@ const std::string Transport::CONTENT_TYPE("application/octet-stream");
 Poco::Net::HTTPSessionFactory Transport::_httpSessionFactory;
 
 
-Transport::Transport():
-	_keepAlive(false),
-	_chunkedTransferEncoding(true),
-	_compression(false),
-	_authMode(AUTH_NONE)
-{
-}
+Transport::Transport() = default;
 
 
 Transport::~Transport() = default;
@@ -231,7 +225,7 @@ Poco::RemotingNG::Serializer& Transport::beginMessage(const Poco::RemotingNG::Id
 }
 
 
-void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
+void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
 	if (_pDeflater)
 	{
@@ -254,7 +248,7 @@ void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oi
 }
 
 
-Poco::RemotingNG::Serializer& Transport::beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType)
+Poco::RemotingNG::Serializer& Transport::beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType messageType)
 {
 	if (messageType == Poco::RemotingNG::SerializerBase::MESSAGE_REQUEST)
 	{
@@ -288,7 +282,7 @@ Poco::RemotingNG::Serializer& Transport::beginRequest(const Poco::RemotingNG::Id
 }
 
 
-Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
+Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
 	if (_pDeflater)
 	{

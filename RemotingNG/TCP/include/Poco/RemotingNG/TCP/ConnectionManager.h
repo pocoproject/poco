@@ -63,6 +63,9 @@ public:
 	~ConnectionManager();
 		/// Destroys the ConnectionManager.
 
+	ConnectionManager(const ConnectionManager&) = delete;
+	ConnectionManager& operator = (const ConnectionManager&) = delete;
+
 	void setIdleTimeout(Poco::Timespan timeout);
 		/// Sets the timeout after an idle connection is closed.
 
@@ -112,14 +115,8 @@ protected:
 	[[nodiscard]] Connection::Ptr createConnection(const Poco::URI& endpointURI);
 
 private:
-	enum
-	{
-		DEFAULT_IDLE_TIMEOUT      = 60,
-		DEFAULT_HANDSHAKE_TIMEOUT = 8
-	};
-
-	ConnectionManager(const ConnectionManager&) = delete;
-	ConnectionManager& operator = (const ConnectionManager&) = delete;
+	static constexpr long DEFAULT_IDLE_TIMEOUT      = 60;
+	static constexpr long DEFAULT_HANDSHAKE_TIMEOUT = 8;
 
 	using ConnectionMap = std::map<Poco::Net::SocketAddress, Connection::Ptr>;
 	using SocketAddressSet = std::set<Poco::Net::SocketAddress>;

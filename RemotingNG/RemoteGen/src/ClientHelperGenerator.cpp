@@ -127,7 +127,7 @@ void ClientHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 
 
 
-void ClientHelperGenerator::methodStart(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+void ClientHelperGenerator::methodStart(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
@@ -144,7 +144,7 @@ void ClientHelperGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEng
 }
 
 
-std::vector<std::string> ClientHelperGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> ClientHelperGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	// no base classes for this one
 	std::vector<std::string> bases;
@@ -153,7 +153,7 @@ std::vector<std::string> ClientHelperGenerator::newBaseClasses(const Poco::CppPa
 }
 
 
-void ClientHelperGenerator::singletonHolder(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::singletonHolder(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	std::string code("namespace\n");
 	code.append("{\n");
@@ -167,7 +167,7 @@ void ClientHelperGenerator::singletonHolder(const Poco::CppParser::Function* pFu
 }
 
 
-void ClientHelperGenerator::constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::constructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -191,13 +191,13 @@ void ClientHelperGenerator::constructorCodeGen(const Poco::CppParser::Function* 
 }
 
 
-void ClientHelperGenerator::instanceCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::instanceCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("return *sh" + pStruct->name() + ".get();");
 }
 
 
-void ClientHelperGenerator::findCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::findCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	if (pFunc->countParameters() == 1)
 		gen.writeMethodImplementation("return " + pStruct->name() + "::instance().findImpl(uri);");
@@ -206,7 +206,7 @@ void ClientHelperGenerator::findCodeGen(const Poco::CppParser::Function* pFunc, 
 }
 
 
-void ClientHelperGenerator::findImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::findImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);

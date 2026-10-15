@@ -1083,7 +1083,7 @@ void DeserializerTest::testInterceptor()
 			}
 		}
 
-		const std::string& value() const
+		[[nodiscard]] const std::string& value() const
 		{
 			return _value;
 		}

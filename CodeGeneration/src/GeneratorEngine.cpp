@@ -172,7 +172,7 @@ void GeneratorEngine::handleFunction(const Poco::CppParser::Function* pFunc, con
 }
 
 
-void GeneratorEngine::handleTypedefs(const Poco::CppParser::NameSpace::SymbolTable& typedefs, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen)
+void GeneratorEngine::handleTypedefs(const Poco::CppParser::NameSpace::SymbolTable& typedefs, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen)
 {
 	int cnt = 0;
 	Poco::CppParser::NameSpace::Iterator it = typedefs.begin();
@@ -186,7 +186,7 @@ void GeneratorEngine::handleTypedefs(const Poco::CppParser::NameSpace::SymbolTab
 }
 
 
-void GeneratorEngine::handleUsings(const Poco::CppParser::NameSpace::SymbolTable& usings, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen)
+void GeneratorEngine::handleUsings(const Poco::CppParser::NameSpace::SymbolTable& usings, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen)
 {
 	int cnt = 0;
 	Poco::CppParser::NameSpace::Iterator it = usings.begin();

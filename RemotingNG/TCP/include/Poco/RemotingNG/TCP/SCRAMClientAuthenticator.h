@@ -70,7 +70,7 @@ protected:
 	};
 
 private:
-	State _state;
+	State _state = STATE_INIT;
 	Credentials _creds;
 	std::string _nonce;
 	std::string _saltedPassword;

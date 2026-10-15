@@ -37,12 +37,12 @@ public:
 	~HTTPRequestHandler() override;
 		/// Destroys the HTTPRequestHandler.
 
+	HTTPRequestHandler() = delete;
+
 	// Poco::Net::HTTPRequestHandler
 	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
 	
 private:
-	HTTPRequestHandler() = delete;
-
 	Listener& _listener;
 	Poco::Logger& _logger;
 };

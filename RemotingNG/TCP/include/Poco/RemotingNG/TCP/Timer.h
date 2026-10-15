@@ -40,6 +40,9 @@ public:
 	TimerTask();
 		/// Creates the TimerTask.
 
+	TimerTask(const TimerTask&) = delete;
+	TimerTask& operator = (const TimerTask&) = delete;
+
 	void cancel();
 		/// Cancels the execution of the timer.
 		/// If the task has been scheduled for one-time execution and has
@@ -57,10 +60,7 @@ protected:
 		/// Destroys the TimerTask.
 
 private:
-	TimerTask(const TimerTask&) = delete;
-	TimerTask& operator = (const TimerTask&) = delete;
-
-	bool _isCancelled;
+	bool _isCancelled = false;
 
 	friend class TaskNotification;
 };
@@ -87,6 +87,9 @@ public:
 	~Timer() override;
 		/// Destroys the Timer, cancelling all pending tasks.
 
+	Timer(const Timer&) = delete;
+	Timer& operator = (const Timer&) = delete;
+
 	void cancel(bool wait = false);
 		/// Cancels all pending tasks.
 		///
@@ -112,9 +115,6 @@ protected:
 	void run() override;
 
 private:
-	Timer(const Timer&) = delete;
-	Timer& operator = (const Timer&) = delete;
-
 	Poco::TimedNotificationQueue _queue;
 	Poco::Thread _thread;
 };

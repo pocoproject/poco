@@ -98,25 +98,21 @@ protected:
 	{
 		using Ptr = Poco::SharedPtr<Conversation>;
 
-		Conversation():
-			state(STATE_INIT),
-			iterations(0)
-		{
-		}
+		Conversation() = default;
 
-		State state;
+		State state = STATE_INIT;
 		std::string username;
 		std::string clientNonce;
 		std::string serverNonce;
 		std::string salt;
-		int iterations;
+		int iterations = 0;
 	};
 
 	using ConversationCache = Poco::ExpireCache<Poco::UInt32, Conversation>;
 
 private:
 	ConversationCache _conversations;
-	Poco::UInt32 _nextConversationID;
+	Poco::UInt32 _nextConversationID = 0;
 	Poco::FastMutex _mutex;
 };
 

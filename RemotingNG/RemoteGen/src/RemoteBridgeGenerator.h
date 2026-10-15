@@ -76,7 +76,7 @@ private:
 	std::map<std::string, Poco::CodeGeneration::GeneratorEngine::MethodGenerator> _codeInjectors;
 	std::set<std::string> _functions;
 	std::vector<std::string> _events;
-	bool _hasEvents;
+	bool _hasEvents = false;
 };
 
 

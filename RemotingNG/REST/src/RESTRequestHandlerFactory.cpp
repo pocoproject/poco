@@ -29,7 +29,7 @@ RESTRequestHandlerFactory::RESTRequestHandlerFactory(Listener& listener):
 RESTRequestHandlerFactory::~RESTRequestHandlerFactory() = default;
 
 
-Poco::Net::HTTPRequestHandler* RESTRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+Poco::Net::HTTPRequestHandler* RESTRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& /*request*/)
 {
 	return new RESTRequestHandler(_listener);
 }

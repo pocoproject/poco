@@ -70,8 +70,8 @@ private:
 	Poco::SharedPtr<ChannelInputStream> _pRequestStream;
 	Poco::SharedPtr<ChannelOutputStream> _pReplyStream;
 	bool _authenticated;
-	Poco::InflatingInputStream* _pInflater;
-	Poco::DeflatingOutputStream* _pDeflater;
+	Poco::InflatingInputStream* _pInflater = nullptr;
+	Poco::DeflatingOutputStream* _pDeflater = nullptr;
 	Poco::RemotingNG::BinarySerializer _serializer;
 	Poco::RemotingNG::BinaryDeserializer _deserializer;
 	Poco::Event _ready;

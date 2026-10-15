@@ -45,6 +45,9 @@ public:
 	~Serializer() override;
 		/// Destroys the Serializer.
 
+	Serializer(const Serializer&) = delete;
+	Serializer& operator = (const Serializer&) = delete;
+
 	void setRequest(Poco::Net::HTTPRequest& request);
 		/// Sets the HTTP request object.
 
@@ -97,13 +100,9 @@ protected:
 	static const std::string FORMAT_JSON;
 
 private:
-	Serializer(const Serializer&) = delete;
-	Serializer& operator = (const Serializer&) = delete;
-
-private:
-	std::ostream* _pStream;
-	Poco::Net::HTTPRequest* _pRequest;
-	Poco::Net::HTTPResponse* _pResponse;
+	std::ostream* _pStream = nullptr;
+	Poco::Net::HTTPRequest* _pRequest = nullptr;
+	Poco::Net::HTTPResponse* _pResponse = nullptr;
 	Poco::SharedPtr<PathSerializer> _pPathSerializer;
 	Poco::SharedPtr<FormSerializer> _pQuerySerializer;
 	Poco::SharedPtr<HeaderSerializer> _pHeaderSerializer;

@@ -122,7 +122,7 @@ public:
 			return Poco::RemotingNG::AuthenticateResult(Poco::RemotingNG::AuthenticateResult::AUTH_FAILED);
 	}
 
-	const std::string& lastUsername() const
+	[[nodiscard]] const std::string& lastUsername() const
 	{
 		return _lastUsername;
 	}
@@ -137,7 +137,7 @@ class MockSCRAMAuthenticator: public Poco::RemotingNG::TCP::SCRAMAuthenticator
 public:
 	using Ptr = Poco::AutoPtr<MockSCRAMAuthenticator>;
 
-	const std::string& lastUsername() const
+	[[nodiscard]] const std::string& lastUsername() const
 	{
 		return _lastUsername;
 	}
@@ -188,7 +188,7 @@ private:
 class MockAuthorizer: public Poco::RemotingNG::Authorizer
 {
 public:
-	bool authorize(const std::string& method, const std::string& permission) override
+	bool authorize(const std::string& /*method*/, const std::string& /*permission*/) override
 	{
 		Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
 
@@ -228,12 +228,12 @@ bool operator == (const Struct2& s1, const Struct2& s2)
 
 	if (!equal) return false;
 	if (s1.aVector.size() != s2.aVector.size()) return false;
-	for (int i = 0; i < s1.aVector.size(); i++)
+	for (std::size_t i = 0; i < s1.aVector.size(); i++)
 	{
 		if (!(s1.aVector[i] == s2.aVector[i])) return false;
 	}
 	if (s1.anotherVector.size() != s2.anotherVector.size()) return false;
-	for (int i = 0; i < s1.anotherVector.size(); i++)
+	for (std::size_t i = 0; i < s1.anotherVector.size(); i++)
 	{
 		if (!s1.anotherVector[i].isNull() && !s2.anotherVector[i].isNull())
 		{
@@ -251,7 +251,7 @@ bool operator == (const Struct3& s1, const Struct3& s2)
 	          && s1.aMultiSet == s2.aMultiSet;
 	if (!equal) return false;
 	if (s1.aComplexVector.size() != s2.aComplexVector.size()) return false;
-	for (int i = 0; i < s1.aComplexVector.size(); i++)
+	for (std::size_t i = 0; i < s1.aComplexVector.size(); i++)
 	{
 		if (!(s1.aComplexVector[i] == s2.aComplexVector[i])) return false;
 	}
@@ -264,7 +264,7 @@ bool operator == (const Struct4& s1, const Struct4& s2)
 	bool equal = s1.value == s2.value;
 	if (!equal) return false;
 	if (s1.vec.size() != s2.vec.size()) return false;
-	for (int i = 0; i < s1.vec.size(); i++)
+	for (std::size_t i = 0; i < s1.vec.size(); i++)
 	{
 		if (!(s1.vec[i] == s2.vec[i])) return false;
 	}
@@ -839,14 +839,14 @@ void RemotingTest::testVoidEvent()
 }
 
 
-void RemotingTest::onEvent(const void* pSender, std::string& arg)
+void RemotingTest::onEvent(const void* /*pSender*/, std::string& arg)
 {
 	_eventArg = arg;
 	_eventReceived.set();
 }
 
 
-void RemotingTest::onEventHeld(const void* pSender, std::string& arg)
+void RemotingTest::onEventHeld(const void* /*pSender*/, std::string& arg)
 {
 	_eventArg = arg;
 	_eventReceived.set();
@@ -1002,7 +1002,7 @@ void RemotingTest::testEventUnsubscribeNoThread()
 }
 
 
-void RemotingTest::onVoidEvent(const void* pSender)
+void RemotingTest::onVoidEvent(const void* /*pSender*/)
 {
 	_eventArg = "FIRED";
 	_eventReceived.set();
@@ -1286,14 +1286,14 @@ void RemotingTest::testStruct1Vec(ITester::Ptr pTester)
 
 	Struct1Vec vec2 = pTester->testStruct1Vec1(vec1);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
 
 	pTester->testStruct1Vec2(vec2);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
@@ -1301,7 +1301,7 @@ void RemotingTest::testStruct1Vec(ITester::Ptr pTester)
 	Struct1Vec vec3;
 	pTester->testStruct1Vec3(vec1, vec3);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}

@@ -259,10 +259,10 @@ private:
 	Deserializer _deserializer;
 	std::string _endPoint;
 	Poco::URI _endPointURI;
-	bool _keepAlive;
-	bool _chunkedTransferEncoding;
-	bool _compression;
-	AuthMode _authMode;
+	bool _keepAlive = false;
+	bool _chunkedTransferEncoding = true;
+	bool _compression = false;
+	AuthMode _authMode = AUTH_NONE;
 	std::string _userAgent;
 	std::map<std::string, std::string> _customHeaders;
 	Poco::SharedPtr<std::stringstream> _pStream;

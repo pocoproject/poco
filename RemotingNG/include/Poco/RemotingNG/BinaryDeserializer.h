@@ -100,9 +100,9 @@ private:
 
 	BinaryReaderPtr _pReader;
 	std::string _messageName;
-	SerializerBase::MessageType _messageType;
+	SerializerBase::MessageType _messageType = SerializerBase::MESSAGE_REQUEST;
 	LevelLengthVec _sequenceLengths;
-	int _curLevel;
+	int _curLevel = 0;
 };
 
 

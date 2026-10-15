@@ -45,7 +45,7 @@ Object Tester::post(int id, const Object& object)
 }
 
 
-Object Tester::get(int id, const std::string& options)
+Object Tester::get(int id, const std::string& /*options*/)
 {
 	std::map<int, std::string>::const_iterator it = _data.find(id);
 	if (it != _data.end())
@@ -89,13 +89,13 @@ bool Tester::verifyCookie()
 }
 
 
-Object AuthTester::post(int id, const Object& object)
+Object AuthTester::post(int /*id*/, const Object& object)
 {
 	return object;
 }
 
 
-Object AuthTester::get(int id, const std::string& options)
+Object AuthTester::get(int /*id*/, const std::string& /*options*/)
 {
 	Object result;
 	return result;

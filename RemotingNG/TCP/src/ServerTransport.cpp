@@ -32,8 +32,6 @@ ServerTransport::ServerTransport(Listener& listener, CredentialsStore::Ptr pCred
 	_pRequestStream(pRequestStream),
 	_pReplyStream(pReplyStream),
 	_authenticated(authenticated),
-	_pInflater(nullptr),
-	_pDeflater(nullptr),
 	_logger(Poco::Logger::get("RemotingNG.TCP.ServerTransport"s))
 {
 	if (compressed)
@@ -85,7 +83,7 @@ Deserializer& ServerTransport::beginRequest()
 }
 
 
-Serializer& ServerTransport::sendReply(SerializerBase::MessageType messageType)
+Serializer& ServerTransport::sendReply(SerializerBase::MessageType /*messageType*/)
 {
 	if (_logger.debug()) _logger.debug("Sending reply..."s);
 

@@ -52,6 +52,8 @@ public:
 	~Transport() override;
 		/// Destroys the Transport.
 
+	Transport() = delete;
+
 	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the response timeout.
 		
@@ -94,12 +96,7 @@ protected:
 	[[nodiscard]] static bool verifyCredentials(const Credentials& credentials);
 
 private:
-	Transport() = delete;
-
-	enum
-	{
-		DEFAULT_TIMEOUT = 30 // Seconds
-	};
+	static constexpr long DEFAULT_TIMEOUT = 30; // Seconds
 	
 	ConnectionManager& _connectionManager;
 	BinarySerializer _serializer;

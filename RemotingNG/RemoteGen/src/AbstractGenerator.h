@@ -159,56 +159,56 @@ private:
 
 protected:
 	Poco::CodeGeneration::CppGenerator& _cppGen;
-	Poco::CppParser::Struct* _pStruct;
-	const Poco::CppParser::Struct* _pStructIn;
-	Poco::CppParser::NameSpace* _pNs;
+	Poco::CppParser::Struct* _pStruct = nullptr;
+	const Poco::CppParser::Struct* _pStructIn = nullptr;
+	Poco::CppParser::NameSpace* _pNs = nullptr;
 };
 
 
 //
 // inlines
 //
-inline void AbstractGenerator::writeDefaultHeader(const Poco::CppParser::Struct* pStruct, const std::string& className, const std::string& libraryName, const std::string& package)
+inline void AbstractGenerator::writeDefaultHeader(const Poco::CppParser::Struct* /*pStruct*/, const std::string& /*className*/, const std::string& /*libraryName*/, const std::string& /*package*/)
 {
 }
 
 
-inline void AbstractGenerator::writeInclude(const std::string& include, bool)
+inline void AbstractGenerator::writeInclude(const std::string& /*include*/, bool)
 {
 }
 
 
-inline void AbstractGenerator::writeSystemInclude(const std::string& include)
+inline void AbstractGenerator::writeSystemInclude(const std::string& /*include*/)
 {
 }
 
 
-inline void AbstractGenerator::writeNameSpaceBegin(const std::string& namespacePrefix)
+inline void AbstractGenerator::writeNameSpaceBegin(const std::string& /*namespacePrefix*/)
 {
 }
 
 
-inline void AbstractGenerator::writeFwdDecls(const CodeGenerator::FwdDecls& decl)
+inline void AbstractGenerator::writeFwdDecls(const CodeGenerator::FwdDecls& /*decl*/)
 {
 }
 
 
-inline void AbstractGenerator::writeNameSpaceEnd(const std::string& namespacePrefix)
+inline void AbstractGenerator::writeNameSpaceEnd(const std::string& /*namespacePrefix*/)
 {
 }
 
 
-inline void AbstractGenerator::writeMethodImplementation(const std::string& code)
+inline void AbstractGenerator::writeMethodImplementation(const std::string& /*code*/)
 {
 }
 
 
-inline void AbstractGenerator::writeImplementation(const std::string& code)
+inline void AbstractGenerator::writeImplementation(const std::string& /*code*/)
 {
 }
 
 
-inline void AbstractGenerator::methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties)
+inline void AbstractGenerator::methodEnd(const Poco::CppParser::Function* /*pFunc*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 

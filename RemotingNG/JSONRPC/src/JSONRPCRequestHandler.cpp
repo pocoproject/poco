@@ -78,9 +78,7 @@ public:
 		JSONRPCServerTransport(listener, credentials),
 		_request(request),
 		_response(response),
-		_enableCompression(listener.isCompressionEnabled()),
-		_pDeflater(nullptr),
-		_replySent(false)
+		_enableCompression(listener.isCompressionEnabled())
 	{
 		_deserializer.associateSerializer(_serializer);
 	}
@@ -104,7 +102,7 @@ public:
 		return _deserializer;
 	}
 
-	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType) override
+	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType /*messageType*/) override
 	{
 		// consume extra request content
 		std::istream& istr = _request.stream();
@@ -143,8 +141,8 @@ private:
 	Poco::RemotingNG::JSONRPC::Serializer _serializer;
 	Poco::RemotingNG::JSONRPC::Deserializer _deserializer;
 	bool _enableCompression;
-	Poco::DeflatingOutputStream* _pDeflater;
-	bool _replySent;
+	Poco::DeflatingOutputStream* _pDeflater = nullptr;
+	bool _replySent = false;
 };
 
 
@@ -173,7 +171,7 @@ public:
 		return _deserializer;
 	}
 
-	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType) override
+	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType /*messageType*/) override
 	{
 		// consume extra request content
 		std::istream& istr = _request.stream();

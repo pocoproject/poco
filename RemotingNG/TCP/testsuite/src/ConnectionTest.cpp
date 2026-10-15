@@ -77,12 +77,12 @@ namespace
 			_thread.join();
 		}
 
-		SocketAddress address() const
+		[[nodiscard]] SocketAddress address() const
 		{
 			return _socket.address();
 		}
 
-		Poco::URI uri() const
+		[[nodiscard]] Poco::URI uri() const
 		{
 			return Poco::URI(Poco::format("remoting.tcp://127.0.0.1:%hu", _socket.address().port()));
 		}
@@ -136,7 +136,7 @@ namespace
 			_pool.joinAll();
 		}
 
-		Poco::URI uri() const
+		[[nodiscard]] Poco::URI uri() const
 		{
 			return Poco::URI(Poco::format("remoting.tcp://%s", _socket.address().toString()));
 		}

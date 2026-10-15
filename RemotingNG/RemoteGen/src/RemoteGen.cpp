@@ -86,13 +86,7 @@ class RemoteGenApp: public Application
 {
 public:
 	RemoteGenApp():
-	  _helpRequested(false),
-	  _noGlobalConfig(false),
-	  _enableOSP(false),
-	  _enableBridge(false),
-	  _enableBridgeSync(true),
-	  _bundlePath("bundle"),
-	  _enableTimestamps(true)
+	  _bundlePath("bundle")
 	{
 		Poco::CppParser::NameSpace* pNS = new Poco::CppParser::NameSpace("Poco", Poco::CppParser::NameSpace::root());
 		new Poco::CppParser::BuiltIn("Int8"s, pNS);
@@ -198,22 +192,22 @@ protected:
 				.callback(OptionCallback<RemoteGenApp>(this, &RemoteGenApp::handleNoGlobal)));
 	}
 
-	void handleConfig(const std::string& name, const std::string& value)
+	void handleConfig(const std::string& /*name*/, const std::string& value)
 	{
 		loadConfiguration(value);
 	}
 
-	void handleCompiler(const std::string& name, const std::string& value)
+	void handleCompiler(const std::string& /*name*/, const std::string& value)
 	{
 		_compiler = value;
 	}
 
-	void handleNoGlobal(const std::string& name, const std::string& value)
+	void handleNoGlobal(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_noGlobalConfig = true;
 	}
 
-	void handleDefine(const std::string& name, const std::string& value)
+	void handleDefine(const std::string& /*name*/, const std::string& value)
 	{
 		defineProperty(value);
 	}
@@ -232,7 +226,7 @@ protected:
 		config().setString(name, value);
 	}
 
-	void handleMode(const std::string& name, const std::string& value)
+	void handleMode(const std::string& /*name*/, const std::string& value)
 	{
 		_mode = Poco::toLower(value);
 		if (_mode != BOTH && _mode != SERVER && _mode != CLIENT && _mode != INTERFACE && _mode != SKELETON)
@@ -242,7 +236,7 @@ protected:
 		}
 	}
 
-	void handleHelp(const std::string& name, const std::string& value)
+	void handleHelp(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_helpRequested = true;
 		displayHelp();
@@ -272,12 +266,12 @@ protected:
 		helpFormatter.format(std::cout);
 	}
 
-	void handleOSP(const std::string& name, const std::string& value)
+	void handleOSP(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_enableOSP = true;
 	}
 
-	void handleBridge(const std::string& name, const std::string& value)
+	void handleBridge(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_enableBridge = true;
 	}
@@ -634,7 +628,7 @@ protected:
 		cppOut.close();
 	}
 
-	void generateInternalInterface(const Poco::CppParser::Struct* pStruct, const Poco::Path& incPath, const Poco::Path& srcPath, const std::string& defaultNameSpace, const std::string& libraryName, bool usePocoIncludeStyle, const std::string& copyright, bool enableOSP)
+	void generateInternalInterface(const Poco::CppParser::Struct* pStruct, const Poco::Path& /*incPath*/, const Poco::Path& /*srcPath*/, const std::string& defaultNameSpace, const std::string& libraryName, bool usePocoIncludeStyle, const std::string& copyright, bool enableOSP)
 	{
 		Poco::NullOutputStream hOut;
 		Poco::NullOutputStream cppOut;
@@ -1088,11 +1082,11 @@ protected:
 	}
 
 private:
-	bool _helpRequested;
-	bool _noGlobalConfig;
-	bool _enableOSP;
-	bool _enableBridge;
-	bool _enableBridgeSync;
+	bool _helpRequested = false;
+	bool _noGlobalConfig = false;
+	bool _enableOSP = false;
+	bool _enableBridge = false;
+	bool _enableBridgeSync = true;
 	std::string _compiler;
 	std::string _bundleActivator;
 	std::string _bundlePath;
@@ -1102,7 +1096,7 @@ private:
 	std::vector<const Poco::CppParser::Struct*> _structsToProcess;
 	std::vector<BundleActivatorGenerator::BundleService> _bundleServices;
 	std::string  _mode;
-	bool _enableTimestamps;
+	bool _enableTimestamps = true;
 	static const std::string H_EXT;
 	static const std::string CPP_EXT;
 	static const std::string INCLUDE;

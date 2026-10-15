@@ -78,10 +78,7 @@ public:
 		HTTPServerTransport(listener, credentials),
 		_request(request),
 		_response(response),
-		_enableCompression(listener.isCompressionEnabled()),
-		_pInflater(nullptr),
-		_pDeflater(nullptr),
-		_replySent(false)
+		_enableCompression(listener.isCompressionEnabled())
 	{
 	}
 
@@ -105,7 +102,7 @@ public:
 		return _deserializer;
 	}
 
-	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType) override
+	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType /*messageType*/) override
 	{
 		// consume extra request content
 		std::istream& istr = _request.stream();
@@ -144,9 +141,9 @@ private:
 	Poco::RemotingNG::BinarySerializer _serializer;
 	Poco::RemotingNG::BinaryDeserializer _deserializer;
 	bool _enableCompression;
-	Poco::InflatingInputStream* _pInflater;
-	Poco::DeflatingOutputStream* _pDeflater;
-	bool _replySent;
+	Poco::InflatingInputStream* _pInflater = nullptr;
+	Poco::DeflatingOutputStream* _pDeflater = nullptr;
+	bool _replySent = false;
 };
 
 
@@ -156,8 +153,7 @@ public:
 	NonChunkedServerTransport(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, Listener& listener, const Poco::RemotingNG::Credentials& credentials):
 		HTTPServerTransport(listener, credentials),
 		_request(request),
-		_response(response),
-		_pInflater(nullptr)
+		_response(response)
 	{
 	}
 
@@ -180,7 +176,7 @@ public:
 		return _deserializer;
 	}
 
-	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType messageType) override
+	Poco::RemotingNG::Serializer& sendReply(Poco::RemotingNG::SerializerBase::MessageType /*messageType*/) override
 	{
 		// consume extra request content
 		std::istream& istr = _request.stream();
@@ -204,7 +200,7 @@ private:
 	Poco::Net::HTTPServerResponse& _response;
 	Poco::RemotingNG::BinarySerializer _serializer;
 	Poco::RemotingNG::BinaryDeserializer _deserializer;
-	Poco::InflatingInputStream* _pInflater;
+	Poco::InflatingInputStream* _pInflater = nullptr;
 	std::stringstream _bufferStream;
 };
 

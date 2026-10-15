@@ -26,7 +26,7 @@
 using Poco::CodeGeneration::Utility;
 
 
-RemoteObjectGenerator::RemoteObjectGenerator(Poco::CodeGeneration::CppGenerator& cppGen): AbstractGenerator(cppGen), _hasEvents(false)
+RemoteObjectGenerator::RemoteObjectGenerator(Poco::CodeGeneration::CppGenerator& cppGen): AbstractGenerator(cppGen)
 {
 }
 
@@ -171,7 +171,7 @@ std::vector<std::string> RemoteObjectGenerator::newBaseClasses(const Poco::CppPa
 }
 
 
-void RemoteObjectGenerator::fwdCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteObjectGenerator::fwdCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	// we only write one line
 	// either _pServiceObject->method (params) or return _pServiceObject->method (params)
@@ -275,7 +275,7 @@ std::string RemoteObjectGenerator::generateEventFunctionName(const std::string& 
 }
 
 
-void RemoteObjectGenerator::constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteObjectGenerator::constructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -301,7 +301,7 @@ void RemoteObjectGenerator::constructorCodeGen(const Poco::CppParser::Function* 
 }
 
 
-void RemoteObjectGenerator::destructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteObjectGenerator::destructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -334,7 +334,7 @@ void RemoteObjectGenerator::destructorCodeGen(const Poco::CppParser::Function* p
 }
 
 
-void RemoteObjectGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteObjectGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_check_ptr (addParam);
 
@@ -361,19 +361,19 @@ void RemoteObjectGenerator::eventCodeGen(const Poco::CppParser::Function* pFunc,
 }
 
 
-void RemoteObjectGenerator::hasEventsCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteObjectGenerator::hasEventsCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("return true;");
 }
 
 
-void RemoteObjectGenerator::enableEventsCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteObjectGenerator::enableEventsCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("return std::string();");
 }
 
 
-void RemoteObjectGenerator::enableRemoteEventsCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void RemoteObjectGenerator::enableRemoteEventsCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);

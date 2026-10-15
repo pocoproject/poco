@@ -34,10 +34,7 @@ using namespace std::string_literals;
 namespace Poco::RemotingNG::TCP {
 
 
-SCRAMAuthenticator::SCRAMAuthenticator():
-	_nextConversationID(0)
-{
-}
+SCRAMAuthenticator::SCRAMAuthenticator() = default;
 
 
 SCRAMAuthenticator::~SCRAMAuthenticator() = default;

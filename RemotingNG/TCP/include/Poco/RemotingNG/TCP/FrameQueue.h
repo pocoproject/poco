@@ -52,10 +52,7 @@ public:
 	[[nodiscard]] bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) override;
 
 private:
-	enum
-	{
-		MAX_QUEUE_SIZE = 256
-	};
+	static constexpr int MAX_QUEUE_SIZE = 256;
 
 	using FrameDeque = std::deque<Frame::Ptr>;
 

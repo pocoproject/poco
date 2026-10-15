@@ -46,6 +46,9 @@ public:
 	~Listener() override;
 		/// Destroys the Listener.
 
+	Listener(const Listener&) = delete;
+	Listener& operator = (const Listener&) = delete;
+
 	virtual void start() = 0;
 		/// Start accepting requests.
 
@@ -127,10 +130,6 @@ public:
 		
 	[[nodiscard]] Authorizer::Ptr getAuthorizer() const;
 		/// Returns the Authorizer instance for this Listener.
-
-private:
-	Listener(const Listener&) = delete;
-	Listener& operator = (const Listener&) = delete;
 
 private:
 	std::string _endPoint;

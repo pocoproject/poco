@@ -29,7 +29,7 @@ JSONRPCRequestHandlerFactory::JSONRPCRequestHandlerFactory(Listener& listener):
 JSONRPCRequestHandlerFactory::~JSONRPCRequestHandlerFactory() = default;
 
 
-Poco::Net::HTTPRequestHandler* JSONRPCRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+Poco::Net::HTTPRequestHandler* JSONRPCRequestHandlerFactory::createRequestHandler(const Poco::Net::HTTPServerRequest& /*request*/)
 {
 	return new JSONRPCRequestHandler(_listener);
 }

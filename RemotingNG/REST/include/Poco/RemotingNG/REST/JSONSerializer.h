@@ -96,7 +96,7 @@ private:
 
 private:
 	std::ostream* _pStream;
-	int _indent;
+	int _indent = 0;
 	std::vector<int> _state;
 };
 

@@ -33,49 +33,49 @@ RawSerializer::RawSerializer(std::ostream& stream):
 RawSerializer::~RawSerializer() = default;
 
 
-void RawSerializer::serializeMessageBegin(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type)
+void RawSerializer::serializeMessageBegin(const std::string& /*name*/, Poco::RemotingNG::SerializerBase::MessageType /*type*/)
 {
 	poco_bugcheck();
 }
 
 
-void RawSerializer::serializeMessageEnd(const std::string& name, Poco::RemotingNG::SerializerBase::MessageType type)
+void RawSerializer::serializeMessageEnd(const std::string& /*name*/, Poco::RemotingNG::SerializerBase::MessageType /*type*/)
 {
 	poco_bugcheck();
 }
 
 
-void RawSerializer::serializeFaultMessage(const std::string& methodName, const Poco::Exception& /* e */)
+void RawSerializer::serializeFaultMessage(const std::string& /*methodName*/, const Poco::Exception& /* e */)
 {
 	poco_bugcheck();
 }
 
 
-void RawSerializer::serializeStructBegin(const std::string& name)
+void RawSerializer::serializeStructBegin(const std::string& /*name*/)
 {
 	throw Poco::RemotingNG::SerializerException("Cannot serialize a structure using raw format");
 }
 
 
-void RawSerializer::serializeStructEnd(const std::string& name)
+void RawSerializer::serializeStructEnd(const std::string& /*name*/)
 {
 	poco_bugcheck();
 }
 
 
-void RawSerializer::serializeSequenceBegin(const std::string& name, Poco::UInt32 numElems)
+void RawSerializer::serializeSequenceBegin(const std::string& /*name*/, Poco::UInt32 /*numElems*/)
 {
 	throw Poco::RemotingNG::SerializerException("Cannot serialize a sequence using raw format");
 }
 
 
-void RawSerializer::serializeSequenceEnd(const std::string& name)
+void RawSerializer::serializeSequenceEnd(const std::string& /*name*/)
 {
 	poco_bugcheck();
 }
 
 
-void RawSerializer::serializeNullableBegin(const std::string& name, bool isNull)
+void RawSerializer::serializeNullableBegin(const std::string& /*name*/, bool /*isNull*/)
 {
 }
 
@@ -179,7 +179,7 @@ void RawSerializer::serialize(const std::string& name, char val)
 }
 
 
-void RawSerializer::serialize(const std::string& name, const std::vector<char>& val)
+void RawSerializer::serialize(const std::string& /*name*/, const std::vector<char>& val)
 {
 	poco_check_ptr (_pStream);
 
@@ -187,7 +187,7 @@ void RawSerializer::serialize(const std::string& name, const std::vector<char>& 
 }
 
 
-void RawSerializer::serializeData(const std::string& name, const std::string& val)
+void RawSerializer::serializeData(const std::string& /*name*/, const std::string& val)
 {
 	poco_check_ptr (_pStream);
 

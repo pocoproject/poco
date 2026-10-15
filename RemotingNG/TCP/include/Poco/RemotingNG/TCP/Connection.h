@@ -127,6 +127,10 @@ public:
 	~Connection() override;
 		/// Destroys the Connection.
 
+	Connection() = delete;
+	Connection(const Connection&) = delete;
+	Connection& operator = (const Connection&) = delete;
+
 	[[nodiscard]] Poco::UInt32 id() const;
 		/// Returns the ID of the connection. This is unique within the
 		/// server or client process among all connections.
@@ -264,10 +268,6 @@ protected:
 		/// connection has not been established.
 
 private:
-	Connection() = delete;
-	Connection(const Connection&) = delete;
-	Connection& operator = (const Connection&) = delete;
-
 	enum Timeouts // microseconds
 	{
 		TIMEOUT_POLL  =  200000,

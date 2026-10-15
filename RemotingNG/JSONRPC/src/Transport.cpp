@@ -40,10 +40,6 @@ Poco::Net::HTTPSessionFactory Transport::_httpSessionFactory;
 
 
 Transport::Transport():
-	_keepAlive(false),
-	_chunkedTransferEncoding(true),
-	_compression(false),
-	_authMode(AUTH_NONE),
 	_pCookieStore(new CookieStore)
 {
 }

@@ -59,7 +59,7 @@ Frame::Ptr FrameQueue::dequeueFrame(Poco::Timespan timeout)
 }
 
 
-bool FrameQueue::handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
+bool FrameQueue::handleFrame([[maybe_unused]] Connection::Ptr pConnection, Frame::Ptr pFrame)
 {
 	poco_assert_dbg (pConnection == _pConnection);
 

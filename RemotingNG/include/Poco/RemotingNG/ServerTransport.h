@@ -49,6 +49,9 @@ public:
 	~ServerTransport() override;
 		/// Destroys the ServerTransport.
 
+	ServerTransport(const ServerTransport&) = delete;
+	ServerTransport& operator = (const ServerTransport&) = delete;
+
 	[[nodiscard]] virtual bool authenticate(const std::string& method);
 		/// Verify that the request is properly authenticated.
 		///
@@ -110,10 +113,6 @@ public:
 		/// The default implementation does nothing.
 		/// Subclasses can override this method to log the
 		/// exception for diagnostic purposes.
-
-private:
-	ServerTransport(const ServerTransport&) = delete;
-	ServerTransport& operator = (const ServerTransport&) = delete;
 };
 
 

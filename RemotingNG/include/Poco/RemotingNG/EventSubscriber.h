@@ -50,14 +50,14 @@ public:
 	~EventSubscriber() override;
 		/// Destroys the EventSubscriber.
 
+	EventSubscriber(const EventSubscriber&) = delete;
+	EventSubscriber& operator = (const EventSubscriber&) = delete;
+
 	[[nodiscard]] const std::string& uri() const;
 		/// Returns the URI of the remote object providing the
 		/// events for this EventSubscriber.
 
 private:
-	EventSubscriber(const EventSubscriber&) = delete;
-	EventSubscriber& operator = (const EventSubscriber&) = delete;
-
 	std::string _uri;
 };
 

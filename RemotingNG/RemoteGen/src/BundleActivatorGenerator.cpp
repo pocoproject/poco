@@ -46,7 +46,7 @@ BundleActivatorGenerator::BundleActivatorGenerator(
 BundleActivatorGenerator::~BundleActivatorGenerator() = default;
 
 
-void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties)
+void BundleActivatorGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& /*properties*/)
 {
 	// we don't care about pStruct, we only care about our service members!
 	_pStruct = structClone(pStruct, _className, newBaseClasses(pStruct));
@@ -292,7 +292,7 @@ void BundleActivatorGenerator::structEnd()
 }
 
 
-void BundleActivatorGenerator::methodStart(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+void BundleActivatorGenerator::methodStart(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
@@ -318,7 +318,7 @@ void BundleActivatorGenerator::registerCallbacks(Poco::CodeGeneration::Generator
 }
 
 
-std::vector<std::string> BundleActivatorGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> BundleActivatorGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	// Poco::OSP::BundleActivator
 	std::vector<std::string> bases;
@@ -327,7 +327,7 @@ std::vector<std::string> BundleActivatorGenerator::newBaseClasses(const Poco::Cp
 }
 
 
-void BundleActivatorGenerator::constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::constructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("_pORB = &Poco::RemotingNG::ORB::instance();");
 }
@@ -342,7 +342,7 @@ void BundleActivatorGenerator::startCodeGen(const Poco::CppParser::Function* pFu
 }
 
 
-void BundleActivatorGenerator::stopCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::stopCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("stopImpl(pContext);");
 	gen.writeMethodImplementation("unregisterAll(pContext);");
@@ -350,7 +350,7 @@ void BundleActivatorGenerator::stopCodeGen(const Poco::CppParser::Function* pFun
 }
 
 
-void BundleActivatorGenerator::registerRemoteServiceCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::registerRemoteServiceCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -392,7 +392,7 @@ void BundleActivatorGenerator::registerRemoteServiceCodeGen(const Poco::CppParse
 }
 
 
-void BundleActivatorGenerator::unregisterRemoteServiceCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::unregisterRemoteServiceCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -404,7 +404,7 @@ void BundleActivatorGenerator::unregisterRemoteServiceCodeGen(const Poco::CppPar
 }
 
 
-void BundleActivatorGenerator::registerRemoteObjectCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::registerRemoteObjectCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -416,14 +416,14 @@ void BundleActivatorGenerator::registerRemoteObjectCodeGen(const Poco::CppParser
 }
 
 
-void BundleActivatorGenerator::unregisterRemoteObjectCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::unregisterRemoteObjectCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("_uris.erase(uri);");
 	gen.writeMethodImplementation("_pORB->unregisterObject(uri);");
 }
 
 
-void BundleActivatorGenerator::registerServiceCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::registerServiceCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("Poco::OSP::ServiceRef::Ptr pRef = pContext->registry().registerService(serviceName, pService, props);");
 	gen.writeMethodImplementation("_services.push_back(pRef);");
@@ -431,7 +431,7 @@ void BundleActivatorGenerator::registerServiceCodeGen(const Poco::CppParser::Fun
 }
 
 
-void BundleActivatorGenerator::unregisterServiceCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::unregisterServiceCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("std::vector<Poco::OSP::ServiceRef::Ptr>::iterator it = std::find(_services.begin(), _services.end(), pService);");
 	gen.writeMethodImplementation("if (it != _services.end())");
@@ -442,7 +442,7 @@ void BundleActivatorGenerator::unregisterServiceCodeGen(const Poco::CppParser::F
 }
 
 
-void BundleActivatorGenerator::registerListenerCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::registerListenerCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("std::string listener = _pORB->registerListener(pListener);");
 	gen.writeMethodImplementation("_listeners.insert(listener);");
@@ -450,14 +450,14 @@ void BundleActivatorGenerator::registerListenerCodeGen(const Poco::CppParser::Fu
 }
 
 
-void BundleActivatorGenerator::unregisterListenerCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::unregisterListenerCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("_listeners.erase(listener);");
 	gen.writeMethodImplementation("_pORB->unregisterListener(listener);");
 }
 
 
-void BundleActivatorGenerator::unregisterAllCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::unregisterAllCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -504,7 +504,7 @@ void BundleActivatorGenerator::unregisterAllCodeGen(const Poco::CppParser::Funct
 }
 
 
-void BundleActivatorGenerator::createServicesCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::createServicesCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -539,13 +539,13 @@ void BundleActivatorGenerator::createServicesCodeGen(const Poco::CppParser::Func
 }
 
 
-void BundleActivatorGenerator::orbCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::orbCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("return *_pORB;");
 }
 
 
-void BundleActivatorGenerator::setupRemotingOSPCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::setupRemotingOSPCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -584,7 +584,7 @@ void BundleActivatorGenerator::setupRemotingOSPCodeGen(const Poco::CppParser::Fu
 }
 
 
-void BundleActivatorGenerator::shutdownRemotingOSPCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void BundleActivatorGenerator::shutdownRemotingOSPCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);

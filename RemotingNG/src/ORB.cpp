@@ -31,7 +31,6 @@ namespace Poco::RemotingNG {
 
 
 ORB::ORB():
-	_enabled(true),
 	_logger(Poco::Logger::get("RemotingNG.ORB"s))
 {
 }

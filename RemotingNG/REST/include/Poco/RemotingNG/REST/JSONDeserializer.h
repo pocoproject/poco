@@ -87,7 +87,7 @@ private:
 private:
 	std::vector<JSValue::Ptr> _objectStack;
 	std::vector<std::size_t> _indexStack;
-	int _objectDepth;
+	int _objectDepth = 0;
 };
 
 

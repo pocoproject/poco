@@ -85,9 +85,9 @@ private:
 
 	using MethodHandlers = std::map<std::string, Poco::CppParser::Struct*>;
 
-	const Poco::CppParser::Function* _pCurrent;
-	bool                       _currentFctOneWayProperty;
-	bool                       _isEvent;
+	const Poco::CppParser::Function* _pCurrent = nullptr;
+	bool                       _currentFctOneWayProperty = false;
+	bool                       _isEvent = false;
 	MethodHandlers             _methodHandlers;
 	std::set<std::string>      _functions;
 };

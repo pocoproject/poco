@@ -35,6 +35,9 @@ public:
 	~ScalarDeserializer() override;
 		/// Destroys the ScalarDeserializer.
 
+	ScalarDeserializer(const ScalarDeserializer&) = delete;
+	ScalarDeserializer& operator = (const ScalarDeserializer&) = delete;
+
 	// Poco::RemotingNG::Deserializer
 	Poco::RemotingNG::SerializerBase::MessageType findMessage(std::string& name) override;
 	void deserializeMessageBegin(const std::string& name, SerializerBase::MessageType type) override;
@@ -69,10 +72,6 @@ protected:
 	void setupImpl(std::istream& inStream) override;
 	[[nodiscard]] virtual const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found) = 0;
 	virtual bool deserializeBuffer(const std::string& name, bool isMandatory, std::vector<char>& val);
-
-private:
-	ScalarDeserializer(const ScalarDeserializer&) = delete;
-	ScalarDeserializer& operator = (const ScalarDeserializer&) = delete;
 };
 
 
