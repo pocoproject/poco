@@ -21,7 +21,7 @@ class GeofenceTest: public CppUnit::TestCase
 {
 public:
 	GeofenceTest(const std::string& name);
-	~GeofenceTest();
+	~GeofenceTest() override;
 
 	void testCircular();
 	void testPolygonal();
@@ -35,8 +35,8 @@ public:
 	void testOutOfDomainPositionOutside();
 	void testGeofenceBase();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

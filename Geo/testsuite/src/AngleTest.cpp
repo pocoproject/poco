@@ -27,9 +27,7 @@ AngleTest::AngleTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-AngleTest::~AngleTest()
-{
-}
+AngleTest::~AngleTest() = default;
 
 
 void AngleTest::testAngle()
