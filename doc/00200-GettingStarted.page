@@ -353,7 +353,6 @@ Here is an overview of POCO build options:
     * ENABLE_MODULES                   Set to OFF|ON (default is OFF) to build C++ modules (requires C++20 and CMake 3.28+)
     * ENABLE_COMPILER_WARNINGS         Set to OFF|ON (default is OFF) to enable compiler warnings
     * POCO_UNBUNDLED                   Set to OFF|ON (default is OFF) to control linking dependencies as external
-    * POCO_ENABLE_CPP20                Set to OFF|ON (default is ON) to build with C++20 standard
 
 Windows only parameters:
 
