@@ -597,14 +597,16 @@ void Context::setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalid
 
 void Context::initContext(const Params& params, const SSL_METHOD *method) {
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-	if ( nullptr != params.libctx ) {
-		_pSSLContext = SSL_CTX_new_ex( params.libctx, params.providerName.empty() ? nullptr : params.providerName.c_str(), method );
+	if (nullptr != params.libctx)
+	{
+		_pSSLContext = SSL_CTX_new_ex(params.libctx, params.providerName.empty() ? nullptr : params.providerName.c_str(), method);
 	}
-	else {
-		_pSSLContext = SSL_CTX_new( method );
+	else
+	{
+		_pSSLContext = SSL_CTX_new(method);
 	}
 #else
-	_pSSLContext = SSL_CTX_new( method );
+	_pSSLContext = SSL_CTX_new(method);
 #endif
 }
 
