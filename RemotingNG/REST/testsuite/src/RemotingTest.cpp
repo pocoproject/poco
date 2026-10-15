@@ -155,11 +155,11 @@ RemotingTest::~RemotingTest()
 
 void RemotingTest::setUp()
 {
+	Poco::RemotingNG::REST::TransportFactory::registerFactory();
 	_publicURI = "http://127.0.0.1:2282/tester/{id}";
 	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2282");
 	_pListener->enableChunkedTransferEncoding(false);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-	Poco::RemotingNG::REST::TransportFactory::registerFactory();
 	Poco::SharedPtr<Tester> pTester = new Tester;
 	Poco::AutoPtr<TesterRemoteObject> pTesterRemoteObject = TesterServerHelper::createRemoteObject(pTester, "TheTester");
 	pTesterRemoteObject->remoting__setURI(Poco::URI(_publicURI));
@@ -469,10 +469,10 @@ RemotingTestRESTAuth::~RemotingTestRESTAuth()
 
 void RemotingTestRESTAuth::setUp()
 {
+	Poco::RemotingNG::REST::TransportFactory::registerFactory();
 	_publicURI = "http://127.0.0.1:2282/tester/{id}";
 	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2282", Poco::RemotingNG::REST::Listener::PROTO_HTTP);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-	Poco::RemotingNG::REST::TransportFactory::registerFactory();
 	Poco::SharedPtr<Tester> pTester = new Tester;
 	Poco::AutoPtr<TesterRemoteObject> pTesterRemoteObject = TesterServerHelper::createRemoteObject(pTester, "TheTester");
 	pTesterRemoteObject->remoting__setURI(Poco::URI(_publicURI));
@@ -487,7 +487,10 @@ void RemotingTestRESTAuth::setUp()
 void RemotingTestRESTAuth::tearDown()
 {
 	RemotingTest::tearDown();
-	_pHTTPServer->stop();
+	if (_pHTTPServer != nullptr)
+	{
+		_pHTTPServer->stop();
+	}
 	_pHTTPServer = 0;
 }
 
@@ -560,11 +563,11 @@ RemotingTestAuth::~RemotingTestAuth()
 
 void RemotingTestAuth::setUp()
 {
+	Poco::RemotingNG::REST::TransportFactory::registerFactory();
 	_publicURI = "http://127.0.0.1:2282/authtester/{id}";
 	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2282");
 	_pListener->enableChunkedTransferEncoding(false);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-	Poco::RemotingNG::REST::TransportFactory::registerFactory();
 	Poco::SharedPtr<AuthTester> pAuthTester = new AuthTester;
 	Poco::AutoPtr<AuthTesterRemoteObject> pAuthTesterRemoteObject = AuthTesterServerHelper::createRemoteObject(pAuthTester, "TheAuthTester");
 	pAuthTesterRemoteObject->remoting__setURI(Poco::URI(_publicURI));

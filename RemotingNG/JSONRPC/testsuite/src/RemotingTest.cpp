@@ -211,9 +211,9 @@ RemotingTest::~RemotingTest()
 
 void RemotingTest::setUp()
 {
+	Poco::RemotingNG::JSONRPC::TransportFactory::registerFactory();
 	_pListener = new Poco::RemotingNG::JSONRPC::Listener("127.0.0.1:2281");
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-	Poco::RemotingNG::JSONRPC::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
 }
 
@@ -945,9 +945,9 @@ RemotingTestJSONRPCAuth::~RemotingTestJSONRPCAuth()
 
 void RemotingTestJSONRPCAuth::setUp()
 {
+	Poco::RemotingNG::JSONRPC::TransportFactory::registerFactory();
 	_pListener = new Poco::RemotingNG::JSONRPC::Listener("127.0.0.1:2281", Poco::RemotingNG::JSONRPC::Listener::PROTO_HTTP);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-	Poco::RemotingNG::JSONRPC::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
 
 	Poco::Net::ServerSocket ss(2281);
@@ -959,7 +959,10 @@ void RemotingTestJSONRPCAuth::setUp()
 void RemotingTestJSONRPCAuth::tearDown()
 {
 	RemotingTest::tearDown();
-	_pHTTPServer->stop();
+	if (_pHTTPServer != nullptr)
+	{
+		_pHTTPServer->stop();
+	}
 	_pHTTPServer = 0;
 }
 
