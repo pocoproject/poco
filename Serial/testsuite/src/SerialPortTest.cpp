@@ -13,16 +13,16 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Logger.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/Timespan.h"
-#include "Poco/Timestamp.h"
 #include <type_traits>
+#include <utility>
+#include <vector>
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <termios.h>
 #include <cstdlib>
 #include <fcntl.h>
-#include <sys/select.h>
 #include <unistd.h>
-#include <cerrno>
 #endif
 
 
@@ -33,6 +33,10 @@ static_assert(!std::is_copy_constructible_v<Poco::Serial::SerialPort>,
 	"SerialPort owns an open port and must not be copy constructible");
 static_assert(!std::is_copy_assignable_v<Poco::Serial::SerialPort>,
 	"SerialPort owns an open port and must not be copy assignable");
+static_assert(std::is_move_constructible_v<Poco::Serial::SerialPort>,
+	"SerialPort must be move constructible, so that it can be returned by value and kept in a container");
+static_assert(std::is_move_assignable_v<Poco::Serial::SerialPort>,
+	"SerialPort must be move assignable, so that it can be returned by value and kept in a container");
 
 
 namespace
@@ -62,6 +66,14 @@ public:
 		if (_master == -1) return;
 
 		if (::grantpt(_master) == -1 || ::unlockpt(_master) == -1)
+		{
+			closeMaster();
+			return;
+		}
+
+		// readMaster() waits by looking for data again, so a read of the
+		// master side must report that there is none instead of blocking.
+		if (::fcntl(_master, F_SETFL, O_NONBLOCK) == -1)
 		{
 			closeMaster();
 			return;
@@ -120,33 +132,22 @@ public:
 		/// Returns 0 on a timeout rather than blocking, so that a test which
 		/// expects data fails instead of hanging.
 	{
-		Poco::Timespan remainingTime(timeout);
-		int rc;
-		do
+		ssize_t n = -1;
+		auto readOnce = [&]()
 		{
-			fd_set readable;
-			FD_ZERO(&readable);
-			FD_SET(_master, &readable);
-			struct timeval tv;
-			tv.tv_sec = static_cast<long>(remainingTime.totalSeconds());
-			tv.tv_usec = static_cast<long>(remainingTime.useconds());
-			Poco::Timestamp start;
-			rc = ::select(_master + 1, &readable, nullptr, nullptr, &tv);
-			if (rc < 0 && errno == EINTR)
-			{
-				Poco::Timestamp end;
-				Poco::Timespan waited = end - start;
-				if (waited < remainingTime)
-					remainingTime -= waited;
-				else
-					remainingTime = 0;
-			}
-		}
-		while (rc < 0 && errno == EINTR);
-		if (rc <= 0) return 0;
+			n = ::read(_master, buffer, size);
+			return n >= 0;
+		};
+		const long timeoutMillis = static_cast<long>(timeout.totalMilliseconds());
+		if (!CppUnit::waitForCondition(readOnce, timeoutMillis, POLL_INTERVAL_MS)) return 0;
+		return static_cast<std::size_t>(n);
+	}
 
-		ssize_t n = ::read(_master, buffer, size);
-		return n < 0 ? 0 : static_cast<std::size_t>(n);
+	void hangUp()
+		/// Closes the master side, which is what the slave side of the line
+		/// sees when a serial adapter is unplugged.
+	{
+		closeMaster();
 	}
 
 private:
@@ -168,10 +169,26 @@ private:
 		}
 	}
 
+	static constexpr long POLL_INTERVAL_MS = 10;
+		/// How often readMaster() looks for data from the slave side.
+
 	int _master;
 	int _slaveFd = -1;
 	std::string _slave;
 };
+
+
+namespace
+{
+	SerialPort openPort(const std::string& device)
+		/// Returns an open port by value, the pattern that needs the move
+		/// constructor even where the compiler elides the move itself.
+	{
+		SerialPort port;
+		port.open(device, 9600, "8N1");
+		return port;
+	}
+}
 
 
 #endif // POCO_OS_FAMILY_UNIX
@@ -216,6 +233,36 @@ void SerialPortTest::testConstructLogger()
 }
 
 
+void SerialPortTest::testConstructZeroBufferSize()
+{
+	try
+	{
+		SerialPort port(0);
+		fail("the constructor must reject a buffer size of zero");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		SerialPort port(Poco::Logger::get("SerialPortTest"), 0);
+		fail("the constructor taking a logger must reject a buffer size of zero");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+
+	try
+	{
+		// The buffer size is checked before the device is touched, so the
+		// device name below is never opened.
+		SerialPort port(NON_SERIAL_DEVICE, -1, "8N1", SerialPort::FLOW_NONE, 0);
+		fail("the constructor taking a device must reject a buffer size of zero");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+
+	SerialPort port(1);
+	assertInitialState(port);
+}
+
+
 void SerialPortTest::testOpenBadParameterLength()
 {
 	const std::string badParameters[] = { "", "8", "8N", "8N11" };
@@ -231,12 +278,7 @@ void SerialPortTest::testOpenBadParameterLength()
 		}
 		catch (const Poco::InvalidArgumentException&) { }
 
-		try
-		{
-			port.write(std::string("x"));
-			fail("port must still be closed after a rejected parameters string");
-		}
-		catch (const Poco::IllegalStateException&) { }
+		assertClosed(port);
 	}
 }
 
@@ -251,12 +293,7 @@ void SerialPortTest::testOpenEmptyDevice()
 	}
 	catch (const Poco::InvalidArgumentException&) { }
 
-	try
-	{
-		port.write(std::string("x"));
-		fail("port must still be closed after a rejected device name");
-	}
-	catch (const Poco::IllegalStateException&) { }
+	assertClosed(port);
 }
 
 
@@ -269,6 +306,8 @@ void SerialPortTest::testOpenNonexistentDevice()
 		fail("open() must throw for a device that does not exist");
 	}
 	catch (const Poco::IOException&) { }
+
+	assertClosed(port);
 }
 
 
@@ -281,6 +320,10 @@ void SerialPortTest::testOpenNotATerminal()
 		fail("open() must throw for a device that is not a serial line");
 	}
 	catch (const Poco::IOException&) { }
+
+	// A failed open must leave no descriptor or handle behind. On Windows this
+	// is the one case that reaches openImpl()'s cleanup with a live handle.
+	assertClosed(port);
 }
 
 
@@ -288,6 +331,7 @@ void SerialPortTest::testClosedPortThrows()
 {
 	SerialPort port;
 	char buffer[16];
+	assertClosed(port);
 
 	try
 	{
@@ -312,14 +356,14 @@ void SerialPortTest::testClosedPortThrows()
 
 	try
 	{
-		(void) port.read(buffer, sizeof(buffer));
+		port.read(buffer, sizeof(buffer));
 		fail("read(buffer) must throw on a port that is not open");
 	}
 	catch (const Poco::IllegalStateException&) { }
 
 	try
 	{
-		(void) port.read(buffer, sizeof(buffer), Poco::Timespan(0, 1000));
+		port.read(buffer, sizeof(buffer), Poco::Timespan(0, 1000));
 		fail("read(buffer, timeout) must throw on a port that is not open");
 	}
 	catch (const Poco::IllegalStateException&) { }
@@ -334,7 +378,7 @@ void SerialPortTest::testClosedPortThrows()
 
 	try
 	{
-		(void) port.read();
+		port.read();
 		fail("read() must throw on a port that is not open");
 	}
 	catch (const Poco::IllegalStateException&) { }
@@ -424,6 +468,87 @@ void SerialPortTest::testOpenClose()
 }
 
 
+void SerialPortTest::testIsOpen()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	SerialPort port;
+	assertTrue(!port.isOpen());
+
+	port.open(pty.slave(), 9600, "8N1");
+	assertTrue(port.isOpen());
+
+	port.close();
+	assertTrue(!port.isOpen());
+
+	try
+	{
+		port.open(NONEXISTENT_DEVICE);
+		fail("open() must throw for a device that does not exist");
+	}
+	catch (const Poco::IOException&) { }
+	assertTrue(!port.isOpen());
+}
+
+
+void SerialPortTest::testMove()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	SerialPort source;
+	source.open(pty.slave(), 9600, "8N1");
+
+	SerialPort constructed(std::move(source));
+	assertTrue(constructed.isOpen());
+	assertEqual(pty.slave(), constructed.device());
+	assertEqual(9600, constructed.baudRate());
+	assertEqual("8N1", constructed.parameters());
+	assertClosed(source);
+	assertInitialState(source);
+
+	// The descriptor must have moved with the port instead of having been
+	// closed together with the source, so the moved-to port can still read.
+	assertEqual(1, pty.writeMaster("A"));
+	assertTrue(constructed.poll(Poco::Timespan(2, 0)));
+	assertEqual('A', constructed.read());
+
+	SerialPort assigned;
+	assigned = std::move(constructed);
+	assertTrue(assigned.isOpen());
+	assertEqual(pty.slave(), assigned.device());
+	assertEqual(9600, assigned.baudRate());
+	assertEqual("8N1", assigned.parameters());
+	assertClosed(constructed);
+	assertInitialState(constructed);
+
+	assertEqual(1, pty.writeMaster("B"));
+	assertTrue(assigned.poll(Poco::Timespan(2, 0)));
+	assertEqual('B', assigned.read());
+
+	try
+	{
+		source.open(pty.slave(), 9600, "8N1");
+		fail("open() must throw on a port that has been moved from");
+	}
+	catch (const Poco::IllegalStateException&) { }
+
+	// Returning a port by value and keeping ports in a vector, which moves
+	// its elements when it grows, are the two patterns that need the move.
+	SerialPort returned = openPort(pty.slave());
+	assertTrue(returned.isOpen());
+	assertEqual(pty.slave(), returned.device());
+
+	std::vector<SerialPort> ports;
+	ports.emplace_back(pty.slave(), 9600, "8N1");
+	ports.emplace_back(64);
+	assertTrue(ports[0].isOpen());
+	assertEqual(pty.slave(), ports[0].device());
+	assertTrue(!ports[1].isOpen());
+}
+
+
 void SerialPortTest::testOpenDefaultSpeed()
 {
 	PseudoTerminal pty;
@@ -442,9 +567,7 @@ void SerialPortTest::testOpenSetsBlockingRead()
 
 	// Give the device the control characters of a non-blocking read, so that
 	// what is asserted below is what open() established and not what the
-	// device happened to carry. The descriptor stays open until the end of
-	// the case because a pseudo terminal returns its settings to the default
-	// when the last slave descriptor is closed.
+	// device happened to carry.
 	const int fd = pty.openSlave();
 	assertTrue(fd != -1);
 	struct termios term;
@@ -496,9 +619,84 @@ void SerialPortTest::testOpenCharacterSize5()
 	}
 	catch (const Poco::IOException&)
 	{
-		// A pseudo terminal need not support five bit characters; it
-		// rejects them in tcsetattr(), which is not an argument error.
+		// A pseudo terminal need not support five bit characters. open()
+		// reads the settings back and reports the device's refusal, which
+		// is the other outcome this case accepts.
+		assertClosed(port);
+		return;
 	}
+
+	// The device accepted the request, so it must really carry five bit
+	// characters. Termios settings belong to the device, not to the
+	// descriptor, so this descriptor sees what the library configured.
+	const int fd = pty.openSlave();
+	assertTrue(fd != -1);
+	struct termios term;
+	assertTrue(::tcgetattr(fd, &term) == 0);
+	assertTrue((term.c_cflag & CSIZE) == CS5);
+}
+
+
+void SerialPortTest::testOpenParityEven()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	SerialPort port;
+	try
+	{
+		port.open(pty.slave(), 9600, "8E1");
+	}
+	catch (const Poco::IOException&)
+	{
+		// A pseudo terminal need not support parity, which open() reports
+		// the same way as a refused character size.
+		assertClosed(port);
+		return;
+	}
+
+	const int fd = pty.openSlave();
+	assertTrue(fd != -1);
+	struct termios term;
+	assertTrue(::tcgetattr(fd, &term) == 0);
+	assertTrue((term.c_cflag & PARENB) != 0);
+	assertTrue((term.c_cflag & PARODD) == 0);
+}
+
+
+void SerialPortTest::testOpenClearsInheritedParityFlags()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	// Leave the device ignoring parity errors, as a previous user may have
+	// done; open() must not inherit that when it is asked for even parity.
+	const int previous = pty.openSlave();
+	assertTrue(previous != -1);
+	struct termios term;
+	assertTrue(::tcgetattr(previous, &term) == 0);
+	term.c_iflag |= IGNPAR;
+	term.c_iflag &= ~INPCK;
+	assertTrue(::tcsetattr(previous, TCSANOW, &term) == 0);
+
+	SerialPort port;
+	try
+	{
+		port.open(pty.slave(), 9600, "8E1");
+	}
+	catch (const Poco::IOException&)
+	{
+		// The pseudo terminal refused parity, which open() reports; nothing
+		// was configured, so there is nothing to check.
+		assertClosed(port);
+		return;
+	}
+
+	const int fd = pty.openSlave();
+	assertTrue(fd != -1);
+	assertTrue(::tcgetattr(fd, &term) == 0);
+	assertTrue((term.c_iflag & IGNPAR) == 0);
+	assertTrue((term.c_iflag & INPCK) != 0);
 }
 
 
@@ -514,6 +712,8 @@ void SerialPortTest::testBadCharacterSize()
 		fail("open() must reject an invalid character size");
 	}
 	catch (const Poco::InvalidArgumentException&) { }
+
+	assertClosed(port);
 }
 
 
@@ -529,6 +729,8 @@ void SerialPortTest::testBadParity()
 		fail("open() must reject an invalid parity setting");
 	}
 	catch (const Poco::InvalidArgumentException&) { }
+
+	assertClosed(port);
 }
 
 
@@ -544,6 +746,8 @@ void SerialPortTest::testBadStopBits()
 		fail("open() must reject an invalid number of stop bits");
 	}
 	catch (const Poco::InvalidArgumentException&) { }
+
+	assertClosed(port);
 }
 
 
@@ -559,28 +763,8 @@ void SerialPortTest::testBadSpeed()
 		fail("open() must reject an unsupported line speed");
 	}
 	catch (const Poco::InvalidArgumentException&) { }
-}
 
-
-void SerialPortTest::testClosedAfterFailedOpen()
-{
-	PseudoTerminal pty;
-	if (skipUnavailable(pty)) return;
-
-	SerialPort port;
-	try
-	{
-		port.open(pty.slave(), 9600, "9N1");
-		fail("open() must reject an invalid character size");
-	}
-	catch (const Poco::InvalidArgumentException&) { }
-
-	try
-	{
-		port.write(std::string("x"));
-		fail("port must be closed after a failed open()");
-	}
-	catch (const Poco::IllegalStateException&) { }
+	assertClosed(port);
 }
 
 
@@ -659,7 +843,81 @@ void SerialPortTest::testReadChar()
 	assertEqual(1, pty.writeMaster("A"));
 
 	assertTrue(port.poll(Poco::Timespan(2, 0)));
-	assertEqual(65, port.read());
+	assertEqual('A', port.read());
+}
+
+
+void SerialPortTest::testReadAfterHangup()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	SerialPort port;
+	port.open(pty.slave(), 9600, "8N1");
+
+	// Closing the master side hangs up the line, which is what unplugging a
+	// serial adapter does to it. Every read must then report the loss of the
+	// peer instead of returning nothing.
+	pty.hangUp();
+
+	char buffer[16];
+	try
+	{
+		port.read(buffer, sizeof(buffer));
+		fail("read(buffer) must throw after the peer has hung up");
+	}
+	catch (const Poco::IOException&) { }
+
+	// The timeout overload is timed as well as checked, because what it did
+	// wrong was to spin in a loop rather than to return a wrong value.
+	Poco::Stopwatch sw;
+	sw.start();
+	try
+	{
+		port.read(buffer, sizeof(buffer), Poco::Timespan(0, 100000));
+		fail("read(buffer, timeout) must throw after the peer has hung up");
+	}
+	catch (const Poco::IOException&) { }
+	assertTrue(sw.elapsed() < Poco::Timespan(0, 500000).totalMicroseconds());
+
+	try
+	{
+		std::string data;
+		port.read(data);
+		fail("read(string) must throw after the peer has hung up");
+	}
+	catch (const Poco::IOException&) { }
+
+	try
+	{
+		port.read();
+		fail("read() must throw after the peer has hung up");
+	}
+	catch (const Poco::IOException&) { }
+}
+
+
+void SerialPortTest::testReadZeroLength()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	SerialPort port;
+	port.open(pty.slave(), 9600, "8N1");
+
+	// Nothing has arrived, so a read that asks for nothing must return at
+	// once rather than wait for the first byte.
+	char buffer[4];
+	Poco::Stopwatch sw;
+	sw.start();
+	assertEqual(0, port.read(buffer, 0));
+	assertTrue(sw.elapsed() < Poco::Timespan(0, 500000).totalMicroseconds());
+
+	// Nor may it consume a byte that is waiting.
+	assertEqual(1, pty.writeMaster("Z"));
+	assertTrue(port.poll(Poco::Timespan(2, 0)));
+	assertEqual(0, port.read(buffer, 0));
+	assertEqual('Z', port.read());
 }
 
 
@@ -686,10 +944,27 @@ void SerialPortTest::testPollTimeout()
 	SerialPort port;
 	port.open(pty.slave(), 9600, "8N1");
 
-	Poco::Timestamp start;
+	Poco::Stopwatch sw;
+	sw.start();
 	assertTrue(!port.poll(Poco::Timespan(0, 200000)));
-	assertTrue(start.elapsed() >= Poco::Timespan(0, 150000).totalMicroseconds());
-	assertTrue(start.elapsed() < Poco::Timespan(2, 0).totalMicroseconds());
+	assertTrue(sw.elapsed() >= Poco::Timespan(0, 150000).totalMicroseconds());
+	assertTrue(sw.elapsed() < Poco::Timespan(2, 0).totalMicroseconds());
+}
+
+
+void SerialPortTest::testPollNegativeTimeout()
+{
+	PseudoTerminal pty;
+	if (skipUnavailable(pty)) return;
+
+	SerialPort port;
+	port.open(pty.slave(), 9600, "8N1");
+
+	// A negative timeout is no wait at all, not an endless one.
+	Poco::Stopwatch sw;
+	sw.start();
+	assertTrue(!port.poll(Poco::Timespan(-1, 0)));
+	assertTrue(sw.elapsed() < Poco::Timespan(0, 500000).totalMicroseconds());
 }
 
 
@@ -768,6 +1043,12 @@ void SerialPortTest::assertInitialState(const SerialPort& port)
 }
 
 
+void SerialPortTest::assertClosed(const SerialPort& port)
+{
+	assertTrue(!port.isOpen());
+}
+
+
 CppUnit::Test* SerialPortTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SerialPortTest");
@@ -775,6 +1056,7 @@ CppUnit::Test* SerialPortTest::suite()
 	CppUnit_addTest(pSuite, SerialPortTest, testConstructDefaults);
 	CppUnit_addTest(pSuite, SerialPortTest, testConstructBufferSize);
 	CppUnit_addTest(pSuite, SerialPortTest, testConstructLogger);
+	CppUnit_addTest(pSuite, SerialPortTest, testConstructZeroBufferSize);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenBadParameterLength);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenEmptyDevice);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenNonexistentDevice);
@@ -786,22 +1068,28 @@ CppUnit::Test* SerialPortTest::suite()
 
 #if defined(POCO_OS_FAMILY_UNIX)
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenClose);
+	CppUnit_addTest(pSuite, SerialPortTest, testIsOpen);
+	CppUnit_addTest(pSuite, SerialPortTest, testMove);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenDefaultSpeed);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenSetsBlockingRead);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenTwice);
 	CppUnit_addTest(pSuite, SerialPortTest, testOpenCharacterSize5);
+	CppUnit_addTest(pSuite, SerialPortTest, testOpenParityEven);
+	CppUnit_addTest(pSuite, SerialPortTest, testOpenClearsInheritedParityFlags);
 	CppUnit_addTest(pSuite, SerialPortTest, testBadCharacterSize);
 	CppUnit_addTest(pSuite, SerialPortTest, testBadParity);
 	CppUnit_addTest(pSuite, SerialPortTest, testBadStopBits);
 	CppUnit_addTest(pSuite, SerialPortTest, testBadSpeed);
-	CppUnit_addTest(pSuite, SerialPortTest, testClosedAfterFailedOpen);
 	CppUnit_addTest(pSuite, SerialPortTest, testWrite);
 	CppUnit_addTest(pSuite, SerialPortTest, testWriteEmptyString);
 	CppUnit_addTest(pSuite, SerialPortTest, testReadBuffer);
 	CppUnit_addTest(pSuite, SerialPortTest, testReadString);
 	CppUnit_addTest(pSuite, SerialPortTest, testReadChar);
+	CppUnit_addTest(pSuite, SerialPortTest, testReadAfterHangup);
+	CppUnit_addTest(pSuite, SerialPortTest, testReadZeroLength);
 	CppUnit_addTest(pSuite, SerialPortTest, testAvailable);
 	CppUnit_addTest(pSuite, SerialPortTest, testPollTimeout);
+	CppUnit_addTest(pSuite, SerialPortTest, testPollNegativeTimeout);
 	CppUnit_addTest(pSuite, SerialPortTest, testPollDoesNotConsume);
 	CppUnit_addTest(pSuite, SerialPortTest, testReadWithTimeout);
 	CppUnit_addTest(pSuite, SerialPortTest, testDrain);
