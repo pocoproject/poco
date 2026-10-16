@@ -879,6 +879,63 @@ void FileTest::testLongPathUNC()
 #endif
 }
 
+
+void FileTest::testLongPathDevice()
+{
+#if defined(_WIN32)
+	// A device path ("\\.\") must give the same result below and above the
+	// limit at which the extended-length prefix is added.
+	const std::string prefix("\\\\.\\pipe\\");
+	std::vector<std::string> results;
+	for (std::size_t len: {std::size_t(MAX_PATH - 12), std::size_t(MAX_PATH - 11), std::size_t(MAX_PATH + 40)})
+	{
+		const std::string path = prefix + std::string(len - prefix.size(), 'a');
+		try
+		{
+			results.push_back(Poco::File(path).exists() ? "exists" : "does not exist");
+		}
+		catch (const Poco::Exception& e)
+		{
+			results.push_back(e.name());
+		}
+	}
+	assertEqual ("does not exist", results[0]);
+	assertEqual (results[0], results[1]);
+	assertEqual (results[0], results[2]);
+#endif
+}
+
+
+void FileTest::testLongPathRooted()
+{
+#if defined(_WIN32)
+	// A rooted path without a drive letter ("\dir\...") must find the same
+	// directories as the full path, below and above the limit.
+	Poco::Path p("longpathtest");
+	p.makeAbsolute();
+	std::string longpath(p.toString());
+	std::vector<std::string> paths;
+	while (longpath.size() < MAX_PATH*2)
+	{
+		longpath.append("\\");
+		longpath.append(64, 'x');
+		paths.push_back(longpath);
+	}
+	Poco::File(longpath).createDirectories();
+
+	for (const auto& path: paths)
+	{
+		assertTrue (path.size() > 2 && path[1] == ':');
+		Poco::File rooted(path.substr(2));
+		assertTrue (rooted.exists());
+		assertTrue (rooted.isDirectory());
+	}
+
+	Poco::File f(p.toString());
+	f.remove(true);
+#endif
+}
+
 void FileTest::testUnixFileExtension()
 {
 	std::string filePath1 = "/a/b/c/.notextension";
@@ -1245,6 +1302,8 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
 	CppUnit_addTest(pSuite, FileTest, testLongPathUNC);
+	CppUnit_addTest(pSuite, FileTest, testLongPathDevice);
+	CppUnit_addTest(pSuite, FileTest, testLongPathRooted);
 	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
 	CppUnit_addTest(pSuite, FileTest, testTemporaryFile);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathNonExistent);

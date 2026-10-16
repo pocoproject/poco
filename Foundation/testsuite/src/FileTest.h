@@ -44,6 +44,8 @@ public:
 	void testRootDir();
 	void testLongPath();
 	void testLongPathUNC();
+	void testLongPathDevice();
+	void testLongPathRooted();
 	void testUnixFileExtension();
 	void testTemporaryFile();
 	void testGetExecutablePathNonExistent();
