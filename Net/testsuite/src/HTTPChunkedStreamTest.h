@@ -39,6 +39,7 @@ public:
 	void testWriteFailure();
 	void testWriteFailureKeepsCause();
 	void testWriteAfterPartialChunk();
+	void testDerivedStreamAllocation();
 
 	void setUp() override;
 	void tearDown() override;

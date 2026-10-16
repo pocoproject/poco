@@ -20,8 +20,6 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPBasicStreamBuf.h"
-#include "Poco/MemoryPool.h"
-#include <cstddef>
 #include <istream>
 #include <ostream>
 
@@ -117,12 +115,6 @@ class Net_API HTTPChunkedInputStream: public HTTPChunkedIOS, public std::istream
 public:
 	HTTPChunkedInputStream(HTTPSession& session, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedInputStream();
-
-	void* operator new(std::size_t size);
-	void operator delete(void* ptr);
-
-private:
-	static Poco::MemoryPool _pool;
 };
 
 
@@ -132,12 +124,6 @@ class Net_API HTTPChunkedOutputStream: public HTTPChunkedIOS, public std::ostrea
 public:
 	HTTPChunkedOutputStream(HTTPSession& session, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedOutputStream();
-
-	void* operator new(std::size_t size);
-	void operator delete(void* ptr);
-
-private:
-	static Poco::MemoryPool _pool;
 };
 
 

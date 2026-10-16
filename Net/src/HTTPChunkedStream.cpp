@@ -275,9 +275,6 @@ HTTPChunkedStreamBuf* HTTPChunkedIOS::rdbuf()
 //
 
 
-Poco::MemoryPool HTTPChunkedInputStream::_pool(sizeof(HTTPChunkedInputStream));
-
-
 HTTPChunkedInputStream::HTTPChunkedInputStream(HTTPSession& session, MessageHeader* pTrailer):
 	HTTPChunkedIOS(session, std::ios::in, pTrailer),
 	std::istream(&_buf)
@@ -290,31 +287,9 @@ HTTPChunkedInputStream::~HTTPChunkedInputStream()
 }
 
 
-void* HTTPChunkedInputStream::operator new(std::size_t size)
-{
-	return _pool.get();
-}
-
-
-void HTTPChunkedInputStream::operator delete(void* ptr)
-{
-	try
-	{
-		_pool.release(ptr);
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
-}
-
-
 //
 // HTTPChunkedOutputStream
 //
-
-
-Poco::MemoryPool HTTPChunkedOutputStream::_pool(sizeof(HTTPChunkedOutputStream));
 
 
 HTTPChunkedOutputStream::HTTPChunkedOutputStream(HTTPSession& session, MessageHeader* pTrailer):
@@ -326,25 +301,6 @@ HTTPChunkedOutputStream::HTTPChunkedOutputStream(HTTPSession& session, MessageHe
 
 HTTPChunkedOutputStream::~HTTPChunkedOutputStream()
 {
-}
-
-
-void* HTTPChunkedOutputStream::operator new(std::size_t size)
-{
-	return _pool.get();
-}
-
-
-void HTTPChunkedOutputStream::operator delete(void* ptr)
-{
-	try
-	{
-		_pool.release(ptr);
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
 }
 
 

@@ -13,6 +13,9 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPFixedLengthStream.h"
+#include "Poco/Net/HTTPHeaderStream.h"
+#include "Poco/Net/HTTPStream.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/ServerSocket.h"
@@ -22,13 +25,23 @@
 #include "Poco/Exception.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Timespan.h"
+#include <array>
+#include <cstddef>
+#include <memory>
 #include <string>
 #include <thread>
+#include <type_traits>
 
 
 using Poco::Net::HTTPChunkedInputStream;
 using Poco::Net::HTTPChunkedOutputStream;
 using Poco::Net::HTTPClientSession;
+using Poco::Net::HTTPFixedLengthInputStream;
+using Poco::Net::HTTPFixedLengthOutputStream;
+using Poco::Net::HTTPHeaderInputStream;
+using Poco::Net::HTTPHeaderOutputStream;
+using Poco::Net::HTTPInputStream;
+using Poco::Net::HTTPOutputStream;
 using Poco::Net::MessageException;
 using Poco::Net::MessageHeader;
 using Poco::Net::ServerSocket;
@@ -42,6 +55,34 @@ using Poco::Timespan;
 
 namespace
 {
+	template <typename S>
+	class PaddedStream: public S
+		/// A stream class that is larger than its base class.
+	{
+	public:
+		PaddedStream(HTTPClientSession& session, char fill):
+			S(session)
+		{
+			padding.fill(fill);
+		}
+
+		std::array<char, 4096> padding;
+	};
+
+
+	template <typename T, typename = void>
+	struct HasClassOperatorNew: std::false_type
+		/// True if T declares or inherits a class-specific operator new.
+	{
+	};
+
+
+	template <typename T>
+	struct HasClassOperatorNew<T, std::void_t<decltype(T::operator new(std::size_t{}))>>: std::true_type
+	{
+	};
+
+
 	enum class ReadResult
 	{
 		COMPLETE,
@@ -517,6 +558,27 @@ void HTTPChunkedStreamTest::testWriteAfterPartialChunk()
 }
 
 
+void HTTPChunkedStreamTest::testDerivedStreamAllocation()
+{
+	// A class-specific operator new that allocates sizeof(base) overflows for a
+	// derived class; without a sanitizer the padding check below may still pass.
+	static_assert(!HasClassOperatorNew<HTTPChunkedInputStream>::value);
+	static_assert(!HasClassOperatorNew<HTTPChunkedOutputStream>::value);
+	static_assert(!HasClassOperatorNew<HTTPFixedLengthInputStream>::value);
+	static_assert(!HasClassOperatorNew<HTTPFixedLengthOutputStream>::value);
+	static_assert(!HasClassOperatorNew<HTTPHeaderInputStream>::value);
+	static_assert(!HasClassOperatorNew<HTTPHeaderOutputStream>::value);
+	static_assert(!HasClassOperatorNew<HTTPInputStream>::value);
+	static_assert(!HasClassOperatorNew<HTTPOutputStream>::value);
+
+	HTTPClientSession session;
+	auto pInput = std::make_unique<PaddedStream<HTTPChunkedInputStream>>(session, 'i');
+	auto pOutput = std::make_unique<PaddedStream<HTTPChunkedOutputStream>>(session, 'o');
+	assertTrue (std::string(pInput->padding.data(), pInput->padding.size()) == std::string(pInput->padding.size(), 'i'));
+	assertTrue (std::string(pOutput->padding.data(), pOutput->padding.size()) == std::string(pOutput->padding.size(), 'o'));
+}
+
+
 void HTTPChunkedStreamTest::setUp()
 {
 }
@@ -546,6 +608,7 @@ CppUnit::Test* HTTPChunkedStreamTest::suite()
 	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testWriteFailure);
 	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testWriteFailureKeepsCause);
 	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testWriteAfterPartialChunk);
+	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testDerivedStreamAllocation);
 
 	return pSuite;
 }

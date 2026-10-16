@@ -28,6 +28,7 @@
 #include "Poco/Any.h"
 #include "Poco/Buffer.h"
 #include <ios>
+#include <memory>
 #include <optional>
 
 
@@ -280,19 +281,19 @@ private:
 	HTTPSession(const HTTPSession&);
 	HTTPSession& operator = (const HTTPSession&);
 
-	StreamSocket     _socket;
-	char*            _pBuffer;
-	char*            _pCurrent;
-	char*            _pEnd;
-	bool             _keepAlive;
-	Poco::Timespan   _connectionTimeout;
-	Poco::Timespan   _receiveTimeout;
-	Poco::Timespan   _sendTimeout;
-	std::optional<Poco::Clock> _readDeadline;
-	Poco::Exception* _pException;
-	MessageHeader    _requestTrailer;
-	MessageHeader    _responseTrailer;
-	Poco::Any        _data;
+	StreamSocket                   _socket;
+	std::unique_ptr<char[]>        _pBuffer;
+	char*                          _pCurrent;
+	char*                          _pEnd;
+	bool                           _keepAlive;
+	Poco::Timespan                 _connectionTimeout;
+	Poco::Timespan                 _receiveTimeout;
+	Poco::Timespan                 _sendTimeout;
+	std::optional<Poco::Clock>     _readDeadline;
+	Poco::Exception*               _pException;
+	MessageHeader                  _requestTrailer;
+	MessageHeader                  _responseTrailer;
+	Poco::Any                      _data;
 
 	friend class HTTPStreamBuf;
 	friend class HTTPHeaderStreamBuf;
