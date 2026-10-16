@@ -245,7 +245,8 @@ void HTTPSession::refill()
 	}
 	_pCurrent = _pEnd = _pBuffer;
 	int n = receive(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
-	_pEnd += n;
+	// A non-blocking socket returns a negative value when no data is available.
+	if (n > 0) _pEnd += n;
 }
 
 

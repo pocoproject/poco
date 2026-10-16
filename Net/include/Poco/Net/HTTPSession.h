@@ -232,6 +232,9 @@ protected:
 
 	void refill();
 		/// Refills the internal buffer.
+		///
+		/// A receive that returns no data, such as a non-blocking
+		/// receive with no data available, leaves the buffer empty.
 
 	virtual void connect(const SocketAddress& address);
 		/// Connects the underlying socket to the given address

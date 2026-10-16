@@ -27,6 +27,7 @@
 #include "Poco/Stopwatch.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
+#include "Poco/Buffer.h"
 #include "HTTPTestServer.h"
 #include <future>
 #include <istream>
@@ -109,6 +110,21 @@ namespace
 		HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&) override
 		{
 			return new KeepAliveRequestHandler;
+		}
+	};
+
+	class BufferedSession: public HTTPClientSession
+		/// Gives the test access to the buffered read of HTTPSession.
+	{
+	public:
+		explicit BufferedSession(const StreamSocket& socket):
+			HTTPClientSession(socket)
+		{
+		}
+
+		int nextChar()
+		{
+			return get();
 		}
 	};
 }
@@ -1159,6 +1175,24 @@ void HTTPClientSessionTest::testTimeoutAppliedToConnectedSocket()
 }
 
 
+void HTTPClientSessionTest::testNonBlockingReceiveWithoutData()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket client(server.address());
+	StreamSocket peer = server.acceptConnection();
+	client.setBlocking(false);
+	BufferedSession session(client);
+	assertTrue (session.nextChar() == std::char_traits<char>::eof());
+	Poco::Buffer<char> buffer(0);
+	session.drainBuffer(buffer);
+	assertTrue (buffer.size() == 0);
+
+	peer.sendBytes("abc", 3);
+	assertTrue (client.poll(Poco::Timespan(5, 0), Socket::SELECT_READ));
+	assertTrue (session.nextChar() == 'a');
+}
+
+
 void HTTPClientSessionTest::assertFramingRejected(const std::string& headers)
 {
 	ServerSocket server(SocketAddress("127.0.0.1", 0));
@@ -1314,6 +1348,7 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testHeadResponseIgnoresFramingHeaders);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testConnectResponseIgnoresFramingHeaders);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testTimeoutAppliedToConnectedSocket);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testNonBlockingReceiveWithoutData);
 
 	return pSuite;
 }

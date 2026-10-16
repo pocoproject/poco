@@ -79,6 +79,7 @@ public:
 	void testHeadResponseIgnoresFramingHeaders();
 	void testConnectResponseIgnoresFramingHeaders();
 	void testTimeoutAppliedToConnectedSocket();
+	void testNonBlockingReceiveWithoutData();
 
 	void setUp();
 	void tearDown();
