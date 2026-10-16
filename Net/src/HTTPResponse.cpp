@@ -267,6 +267,8 @@ void HTTPResponse::getCookies(std::vector<HTTPCookie>& cookies) const
 
 void HTTPResponse::write(std::ostream& ostr) const
 {
+	if (std::any_of(getVersion().begin(), getVersion().end(), isSpaceOrControl))
+		throw MessageException("Invalid HTTP version");
 	if (std::any_of(_reason.begin(), _reason.end(), isInvalidValueChar))
 		throw MessageException("Invalid character in HTTP reason phrase");
 	checkFields(*this, false);

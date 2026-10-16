@@ -58,13 +58,15 @@ public:
 		/// Assignment operator.
 
 	void setMethod(const std::string& method);
-		/// Sets the method.
+		/// Sets the method. write() rejects an empty method and
+		/// a method with a space or a control character.
 
 	[[nodiscard]] const std::string& getMethod() const;
 		/// Returns the method.
 
 	void setURI(const std::string& uri);
-		/// Sets the request URI.
+		/// Sets the request URI. write() rejects an empty URI and
+		/// a URI with a space or a control character.
 
 	[[nodiscard]] const std::string& getURI() const;
 		/// Returns the request URI.
@@ -141,9 +143,9 @@ public:
 		/// Removes any proxy credentials from the request.
 
 	void validate() const;
-		/// Throws a MessageException if the method, the URI or the
-		/// version contains a control character, or a header field
-		/// is invalid (see HTTPMessage::write()).
+		/// Throws a MessageException if the method or the URI is empty,
+		/// the method, the URI or the version contains a space or a control
+		/// character, or a header field is invalid (see HTTPMessage::write()).
 
 	void write(std::ostream& ostr) const override;
 		/// Writes the HTTP request to the given
@@ -155,6 +157,9 @@ public:
 	void read(std::istream& istr) override;
 		/// Reads the HTTP request from the
 		/// given input stream.
+		///
+		/// Throws a MessageException if the URI or the version
+		/// contains a control character.
 
 	static const std::string HTTP_GET;
 	static const std::string HTTP_HEAD;

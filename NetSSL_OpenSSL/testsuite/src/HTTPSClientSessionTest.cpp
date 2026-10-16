@@ -608,7 +608,7 @@ void HTTPSClientSessionTest::testMultipleSSLInit()
 		initSSL();
 
 		HTTPSClientSession session("secure.appinf.com");
-		HTTPRequest request(HTTPRequest::HTTP_GET, "", HTTPMessage::HTTP_1_1);
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
 		(void)session.sendRequest(request);
 		deinitSSL();
 	}
