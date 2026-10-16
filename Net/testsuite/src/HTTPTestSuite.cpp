@@ -14,6 +14,7 @@
 #include "HTTPCookieTest.h"
 #include "HTTPCredentialsTest.h"
 #include "NTLMCredentialsTest.h"
+#include "HTTPChunkedStreamTest.h"
 
 
 CppUnit::Test* HTTPTestSuite::suite()
@@ -25,6 +26,7 @@ CppUnit::Test* HTTPTestSuite::suite()
 	pSuite->addTest(HTTPCookieTest::suite());
 	pSuite->addTest(HTTPCredentialsTest::suite());
 	pSuite->addTest(NTLMCredentialsTest::suite());
+	pSuite->addTest(HTTPChunkedStreamTest::suite());
 
 	return pSuite;
 }

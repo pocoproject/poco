@@ -323,7 +323,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	_pResponseStream = nullptr;
 
 	bool keepAlive = getKeepAlive();
-	if (((connected() && !keepAlive) || mustReconnect()) && !_host.empty())
+	if (((connected() && !keepAlive) || mustReconnect() || networkException() != nullptr) && !_host.empty())
 	{
 		close();
 		_mustReconnect = false;

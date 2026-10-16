@@ -1,6 +1,10 @@
 #include "HTTPReactorServerSessionTest.h"
 #include "Poco/Net/HTTPReactorServerSession.h"
+#include "Poco/Net/HTTPChunkedStream.h"
+#include "Poco/Net/HTTPHeaderStream.h"
+#include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/StreamCopier.h"
 #include "CppUnit/TestSuite.h"
 #include "CppUnit/TestCaller.h"
 #include <chrono>
@@ -256,6 +260,22 @@ void HTTPReactorServerSessionTest::testCheckRequestCompleteChunkedMissingCRLF()
 	assertTrue(checkComplete(chunkedHead + "5\r\nHelloXX0\r\n\r\n").outcome == ParseOutcome::MALFORMED);
 }
 
+void HTTPReactorServerSessionTest::testChunkExtensionHighByte()
+{
+	// Where char is signed, a byte of value 0xFF must not read as end of file.
+	std::string buf(chunkedHead + "5;a=\"\xff\"\r\nhello\r\n0\r\n\r\n");
+	Poco::Net::HTTPReactorServerSession session(Poco::Net::StreamSocket(), buf, nullptr);
+	assertTrue(session.checkRequestComplete());
+	Poco::Net::HTTPRequest request;
+	Poco::Net::HTTPHeaderInputStream headerStream(session);
+	request.read(headerStream);
+	Poco::Net::HTTPChunkedInputStream bodyStream(session, nullptr);
+	std::string body;
+	Poco::StreamCopier::copyToString(bodyStream, body);
+	assertTrue(!bodyStream.bad());
+	assertTrue(body == "hello");
+}
+
 CppUnit::Test* HTTPReactorServerSessionTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPReactorServerSessionTest");
@@ -272,6 +292,7 @@ CppUnit::Test* HTTPReactorServerSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPReactorServerSessionTest, testCheckRequestCompleteChunkedMalformedSize);
 	CppUnit_addTest(pSuite, HTTPReactorServerSessionTest, testCheckRequestCompleteChunkedSizeExtension);
 	CppUnit_addTest(pSuite, HTTPReactorServerSessionTest, testCheckRequestCompleteChunkedMissingCRLF);
+	CppUnit_addTest(pSuite, HTTPReactorServerSessionTest, testChunkExtensionHighByte);
 
 	return pSuite;
 }

@@ -36,6 +36,14 @@ class MessageHeader;
 class Net_API HTTPChunkedStreamBuf: public HTTPBasicStreamBuf
 	/// This is the streambuf class used for reading and writing
 	/// HTTP message bodies in chunked transfer coding.
+	///
+	/// Malformed chunked framing makes readFromDevice() throw a
+	/// MessageException, so the input stream sets badbit. A body cut
+	/// short by the end of the stream ends the input stream after the
+	/// data received. In both cases, the cause is stored in the session
+	/// (see HTTPSession::networkException()).
+	///
+	/// A trailer section longer than 65536 bytes is rejected.
 {
 public:
 	using openmode = HTTPBasicStreamBuf::openmode;
@@ -49,9 +57,19 @@ protected:
 	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
 
 private:
+	enum class ReadState
+	{
+		SIZE,
+		DATA,
+		DATA_CRLF,
+		DONE,
+		FAILED
+	};
+
 	HTTPSession&    _session;
 	openmode        _mode;
 	std::streamsize _chunk;
+	ReadState       _readState;
 	std::string     _chunkBuffer;
 	MessageHeader*  _pTrailer;
 };

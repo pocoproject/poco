@@ -112,7 +112,7 @@ int HTTPSession::get()
 		refill();
 
 	if (_pCurrent < _pEnd)
-		return *_pCurrent++;
+		return static_cast<unsigned char>(*_pCurrent++);
 	else
 		return std::char_traits<char>::eof();
 }
@@ -124,7 +124,7 @@ int HTTPSession::peek()
 		refill();
 
 	if (_pCurrent < _pEnd)
-		return *_pCurrent;
+		return static_cast<unsigned char>(*_pCurrent);
 	else
 		return std::char_traits<char>::eof();
 }

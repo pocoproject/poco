@@ -18,6 +18,15 @@
 #include "CppUnit/TestCase.h"
 
 
+namespace Poco::Net {
+
+class HTTPClientSession;
+class HTTPRequest;
+class ServerSocket;
+
+} // namespace Poco::Net
+
+
 class HTTPClientSessionTest: public CppUnit::TestCase
 {
 public:
@@ -47,6 +56,7 @@ public:
 	void testProxyNonTunnel();
 	void testGlobalProxyConfig();
 	void testBypassProxyExtended();
+	void testChunkedFramingErrorReconnects();
 
 	void setUp();
 	void tearDown();
@@ -54,6 +64,9 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void assertNewConnectionServes(Poco::Net::HTTPClientSession& session, Poco::Net::ServerSocket& server, Poco::Net::HTTPRequest& request);
+		/// Sends request on session and checks that it arrives on a new
+		/// connection from server and that the response sent there is read.
 };
 
 

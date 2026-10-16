@@ -41,6 +41,7 @@ public:
 	void testFileKeepAlive();
 	void testEmptyFileKeepAlive();
 	void testChunkedTrailer();
+	void testChunkedFramingError();
 
 	void setUp();
 	void tearDown();

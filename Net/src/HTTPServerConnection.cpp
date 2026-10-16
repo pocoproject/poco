@@ -87,7 +87,7 @@ void HTTPServerConnection::run()
 							response.sendContinue();
 
 						pHandler->handleRequest(request, response);
-						session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
+						session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive() && session.networkException() == nullptr);
 					}
 					else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
 				}

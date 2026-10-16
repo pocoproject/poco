@@ -114,9 +114,11 @@ void HTTPTestServer::run()
 
 bool HTTPTestServer::requestComplete() const
 {
+	// The Content-Length request bodies of the tests end with "\r\n0\r\n".
+	const std::string bodyEnd(_lastRequest.find("chunked") != std::string::npos ? "\r\n0\r\n\r\n" : "\r\n0\r\n");
 	return ((_lastRequest.substr(0, 3) == "GET" || _lastRequest.substr(0, 4) == "HEAD") &&
 			(_lastRequest.find("\r\n\r\n") != std::string::npos)) ||
-			(_lastRequest.find("\r\n0\r\n") != std::string::npos);
+			(_lastRequest.find(bodyEnd) != std::string::npos);
 }
 
 
