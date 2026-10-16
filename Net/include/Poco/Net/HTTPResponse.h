@@ -198,7 +198,8 @@ public:
 		/// output stream.
 		///
 		/// Throws a MessageException, before anything is written,
-		/// if the reason phrase contains a control character other
+		/// if the version contains a space or a control character,
+		/// the reason phrase contains a control character other
 		/// than a horizontal tab, or a header field is invalid
 		/// (see HTTPMessage::write()).
 

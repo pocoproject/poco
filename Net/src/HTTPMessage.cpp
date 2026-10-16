@@ -16,6 +16,7 @@
 #include "Poco/Net/MediaType.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
+#include "Poco/Ascii.h"
 #include "Poco/String.h"
 
 
@@ -213,6 +214,12 @@ void HTTPMessage::writeTrailer(const MessageHeader& trailer, std::ostream& ostr)
 {
 	checkFields(trailer, false);
 	writeFields(trailer, ostr);
+}
+
+
+bool HTTPMessage::isSpaceOrControl(char c)
+{
+	return c == ' ' || Poco::Ascii::hasProperties(c, Poco::Ascii::ACP_CONTROL);
 }
 
 

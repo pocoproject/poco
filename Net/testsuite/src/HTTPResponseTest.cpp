@@ -244,12 +244,13 @@ void HTTPResponseTest::testRemoveCookie()
 
 void HTTPResponseTest::testWriteInvalid()
 {
+	HTTPResponse invalidVersion("HTTP/1.1\r\nSet-Cookie: injected=1\r\n", HTTPResponse::HTTP_OK);
 	HTTPResponse invalidReason(HTTPResponse::HTTP_OK, "OK\r\nSet-Cookie: injected=1");
 	HTTPResponse invalidCookie;
 	invalidCookie.addCookie(HTTPCookie("name", "value\r\nSet-Cookie: injected=1"));
 	HTTPResponse foldedField;
 	foldedField.set("X-Field", "a\r\n b");
-	for (const HTTPResponse* pResponse: {&invalidReason, &invalidCookie, &foldedField})
+	for (const HTTPResponse* pResponse: {&invalidVersion, &invalidReason, &invalidCookie, &foldedField})
 	{
 		std::ostringstream ostr;
 		try

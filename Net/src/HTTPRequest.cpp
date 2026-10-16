@@ -230,11 +230,10 @@ void HTTPRequest::removeProxyCredentials()
 
 void HTTPRequest::validate() const
 {
-	const auto isInvalid = [](char c) { return c == '\t' || isInvalidValueChar(c); };
-	const std::string& version = getVersion();
-	if (std::any_of(_method.begin(), _method.end(), isInvalid) || std::any_of(_uri.begin(), _uri.end(), isInvalid) ||
-		std::any_of(version.begin(), version.end(), isInvalid))
-		throw MessageException("Invalid character in HTTP request method, URI or version");
+	if (_method.empty() || _uri.empty() || std::any_of(_method.begin(), _method.end(), isSpaceOrControl) || std::any_of(_uri.begin(), _uri.end(), isSpaceOrControl))
+		throw MessageException("Invalid HTTP request method or URI");
+	if (std::any_of(getVersion().begin(), getVersion().end(), isSpaceOrControl))
+		throw MessageException("Invalid HTTP version");
 	checkFields(*this, false);
 }
 
@@ -268,9 +267,11 @@ void HTTPRequest::read(std::istream& istr)
 	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && uri.length() < MAX_URI_LENGTH) { uri += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP request URI invalid or too long");
+	if (std::any_of(uri.begin(), uri.end(), isSpaceOrControl)) throw MessageException("HTTP request URI contains control characters");
 	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("Invalid HTTP version string");
+	if (std::any_of(version.begin(), version.end(), isSpaceOrControl)) throw MessageException("HTTP version contains control characters");
 	while (ch != '\n' && ch != eof) { ch = istr.get(); }
 	HTTPMessage::read(istr);
 	ch = istr.get();

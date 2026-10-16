@@ -172,6 +172,10 @@ protected:
 	virtual ~HTTPMessage();
 		/// Destroys the HTTPMessage.
 
+	[[nodiscard]] static bool isSpaceOrControl(char c);
+		/// Returns true if c is a space or a control character, which
+		/// a method, a request target and a version must not contain.
+
 private:
 	std::string _version;
 };
