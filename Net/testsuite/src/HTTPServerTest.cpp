@@ -24,11 +24,14 @@
 #include "Poco/Net/HTTPServerSession.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/NumberFormatter.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Path.h"
 #include "Poco/FileStream.h"
 #include "Poco/File.h"
+#include <optional>
 #include <sstream>
+#include <utility>
 
 
 using Poco::Net::HTTPServer;
@@ -165,6 +168,30 @@ namespace
 		}
 	};
 
+	class NonBlockingRequestHandler: public BufferRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override
+		{
+			static_cast<Poco::Net::HTTPServerRequestImpl&>(request).socket().setBlocking(false);
+			BufferRequestHandler::handleRequest(request, response);
+		}
+	};
+
+	class ToggleBlockingRequestHandler: public BufferRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override
+		{
+			Poco::Net::StreamSocket& socket = static_cast<Poco::Net::HTTPServerRequestImpl&>(request).socket();
+			socket.setBlocking(false);
+			std::string body;
+			StreamCopier::copyToString(request.stream(), body);
+			socket.setBlocking(true);
+			BufferRequestHandler::handleRequest(request, response);
+		}
+	};
+
 	class RequestHandlerFactory: public HTTPRequestHandlerFactory
 	{
 	public:
@@ -186,6 +213,10 @@ namespace
 				return new FileRequestHandler;
 			else if (request.getURI() == "/emptyFile")
 				return new EmptyFileRequestHandler;
+			else if (request.getURI() == "/nonBlocking")
+				return new NonBlockingRequestHandler;
+			else if (request.getURI() == "/toggleBlocking")
+				return new ToggleBlockingRequestHandler;
 			else
 				return nullptr;
 		}
@@ -676,6 +707,85 @@ namespace
 		}
 		return response;
 	}
+
+	std::optional<std::string> receiveUntilClosed(Poco::Net::StreamSocket& ss)
+		/// Returns everything received until the server closes the connection, or
+		/// nothing if the connection is still open when the receive timeout expires.
+	{
+		std::string response;
+		char buffer[1024];
+		try
+		{
+			int n = ss.receiveBytes(buffer, sizeof(buffer));
+			while (n > 0)
+			{
+				response.append(buffer, n);
+				n = ss.receiveBytes(buffer, sizeof(buffer));
+			}
+		}
+		catch (Poco::Net::NetException&)
+		{
+			// A server that closes the connection with unread data resets or aborts it.
+		}
+		catch (Poco::TimeoutException&)
+		{
+			return std::nullopt;
+		}
+		return response;
+	}
+
+	std::optional<std::string> receiveUntil(Poco::Net::StreamSocket& ss, const std::string& marker)
+		/// Returns everything received once it contains the marker, or nothing if the
+		/// receive timeout expires or the server closes or resets the connection before that.
+	{
+		std::string response;
+		char buffer[1024];
+		try
+		{
+			int n = ss.receiveBytes(buffer, sizeof(buffer));
+			while (n > 0)
+			{
+				response.append(buffer, n);
+				if (response.find(marker) != std::string::npos) return response;
+				n = ss.receiveBytes(buffer, sizeof(buffer));
+			}
+		}
+		catch (Poco::Net::NetException&)
+		{
+		}
+		catch (Poco::TimeoutException&)
+		{
+		}
+		return std::nullopt;
+	}
+
+	std::optional<std::string> exchangeUntilClosed(HTTPServerParams* pParams, const std::string& request, bool shutdownSend)
+		/// Starts a server with the given parameters, sends the request on a new connection,
+		/// shuts down its sending side if shutdownSend is true and returns what receiveUntilClosed() returns.
+		/// A send that fails because the server closed the connection is not an error;
+		/// a send that times out returns nothing.
+	{
+		ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+		HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+		srv.start();
+
+		Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", svs.address().port()));
+		ss.setReceiveTimeout(Poco::Timespan(10, 0));
+		ss.setSendTimeout(Poco::Timespan(10, 0));
+		try
+		{
+			ss.sendBytes(request.data(), static_cast<int>(request.size()));
+			if (shutdownSend) ss.shutdownSend();
+		}
+		catch (Poco::TimeoutException&)
+		{
+			return std::nullopt;
+		}
+		catch (Poco::IOException&)
+		{
+		}
+		return receiveUntilClosed(ss);
+	}
 }
 
 
@@ -716,41 +826,121 @@ void HTTPServerTest::testFramingConflicts()
 
 void HTTPServerTest::testChunkedFramingError()
 {
+	const std::optional<std::string> response = exchangeUntilClosed(new HTTPServerParams,
+		"POST /echoBody HTTP/1.1\r\nHost: test\r\nTransfer-Encoding: chunked\r\n\r\n"
+		"0\n\n"
+		"GET /echoHeader HTTP/1.1\r\nHost: test\r\n\r\n", true);
+	assertTrue (response.has_value());
+	assertTrue (response->find("GET /echoHeader") == std::string::npos);
+}
+
+
+void HTTPServerTest::testUnreadRequestBody()
+{
+	const std::string body("GET /echoHeader HTTP/1.1\r\nHost: smuggled\r\n\r\n");
+	const std::optional<std::string> response = exchangeUntilClosed(new HTTPServerParams,
+		"POST /buffer HTTP/1.1\r\nHost: test\r\nContent-Length: " + std::to_string(body.size()) + "\r\n\r\n" + body +
+		"GET /echoHeader HTTP/1.1\r\nHost: test\r\nConnection: close\r\n\r\n", false);
+	assertTrue (response.has_value());
+	assertTrue (response->find("smuggled") == std::string::npos);
+	assertTrue (response->find("Host: test") != std::string::npos);
+}
+
+
+void HTTPServerTest::testUnreadChunkedRequestBody()
+{
+	const std::string body("GET /echoHeader HTTP/1.1\r\nHost: smuggled\r\n\r\n");
+	const std::optional<std::string> response = exchangeUntilClosed(new HTTPServerParams,
+		"POST /buffer HTTP/1.1\r\nHost: test\r\nTransfer-Encoding: chunked\r\n\r\n" +
+		Poco::NumberFormatter::formatHex(body.size()) + "\r\n" + body + "\r\n0\r\n\r\n"
+		"GET /echoHeader HTTP/1.1\r\nHost: test\r\nConnection: close\r\n\r\n", false);
+	assertTrue (response.has_value());
+	assertTrue (response->find("smuggled") == std::string::npos);
+	assertTrue (response->find("Host: test") != std::string::npos);
+}
+
+
+// Checks that the server drains an unread request body only up to a bound.
+void HTTPServerTest::testLargeUnreadRequestBody()
+{
+	const std::string body(10 * 1024 * 1024, 'x');
+	const std::optional<std::string> response = exchangeUntilClosed(new HTTPServerParams,
+		"POST /buffer HTTP/1.1\r\nHost: test\r\nContent-Length: " + std::to_string(body.size()) + "\r\n\r\n" + body, false);
+	assertTrue (response.has_value());
+}
+
+
+void HTTPServerTest::testResponseBeforeUnreadRequestBody()
+{
 	ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
 	HTTPServer srv(new RequestHandlerFactory, svs, new HTTPServerParams);
 	srv.start();
 
 	Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", svs.address().port()));
 	ss.setReceiveTimeout(Poco::Timespan(10, 0));
-	const std::string request(
-		"POST /echoBody HTTP/1.1\r\nHost: test\r\nTransfer-Encoding: chunked\r\n\r\n"
-		"0\n\n"
-		"GET /echoHeader HTTP/1.1\r\nHost: test\r\n\r\n");
-	ss.sendBytes(request.data(), static_cast<int>(request.size()));
-	ss.shutdownSend();
+	const std::string head("POST /buffer HTTP/1.1\r\nHost: test\r\nContent-Length: 10\r\n\r\nxxxxx");
+	ss.sendBytes(head.data(), static_cast<int>(head.size()));
+	if (!receiveUntil(ss, "\r\n\r\nxxxxxxxxxx").has_value()) failmsg("server held the response back until the request body was complete");
 
-	std::string response;
-	char buffer[1024];
-	try
-	{
-		int n = ss.receiveBytes(buffer, sizeof(buffer));
-		while (n > 0)
-		{
-			response.append(buffer, n);
-			n = ss.receiveBytes(buffer, sizeof(buffer));
-		}
-	}
-	catch (Poco::Net::ConnectionResetException&)
-	{
-		// A server that closes the connection with unread data resets it.
-	}
-	catch (Poco::TimeoutException&)
-	{
-		failmsg("server did not close the connection");
-	}
-	assertTrue (response.find("GET /echoHeader") == std::string::npos);
+	const std::string rest("xxxxxGET /echoHeader HTTP/1.1\r\nHost: test\r\nConnection: close\r\n\r\n");
+	ss.sendBytes(rest.data(), static_cast<int>(rest.size()));
+	const std::optional<std::string> next = receiveUntilClosed(ss);
+	assertTrue (next.has_value());
+	assertTrue (next->find("GET /echoHeader") != std::string::npos);
 
 	srv.stop();
+}
+
+
+void HTTPServerTest::testNonBlockingHandlerClosesConnection()
+{
+	const std::string framedBodies[] = {
+		"Transfer-Encoding: chunked\r\n\r\n40\r\n0123",
+		"Content-Length: 64\r\n\r\n0123"
+	};
+	for (const std::string& body: framedBodies)
+	{
+		HTTPServerParams* pParams = new HTTPServerParams;
+		pParams->setTimeout(Poco::Timespan(5, 0));
+		const std::optional<std::string> response = exchangeUntilClosed(pParams,
+			"POST /nonBlocking HTTP/1.1\r\nHost: test\r\n" + body, false);
+		assertTrue (response.has_value());
+		assertTrue (response->find("HTTP/1.1 200 OK") != std::string::npos);
+	}
+}
+
+
+void HTTPServerTest::testHandlerNonBlockingReadThenBlocking()
+{
+	std::string data("GET /echoHeader HTTP/1.1\r\nHost: smuggled\r\n\r\n");
+	data.resize(60, 'x');
+	const std::pair<std::string, std::string> framedBodies[] = {
+		{"Content-Length: 64\r\n\r\n0123", data},
+		{"Transfer-Encoding: chunked\r\n\r\n40\r\n0123", data + "\r\n0\r\n\r\n"}
+	};
+	for (const auto& [head, rest]: framedBodies)
+	{
+		HTTPServerParams* pParams = new HTTPServerParams;
+		pParams->setTimeout(Poco::Timespan(5, 0));
+		ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+		HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+		srv.start();
+
+		Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", svs.address().port()));
+		ss.setReceiveTimeout(Poco::Timespan(10, 0));
+		const std::string request("POST /toggleBlocking HTTP/1.1\r\nHost: test\r\n" + head);
+		ss.sendBytes(request.data(), static_cast<int>(request.size()));
+		if (!receiveUntil(ss, "\r\n\r\nxxxxxxxxxx").has_value()) failmsg("server did not respond to the request");
+
+		const std::string next(rest + "GET /echoHeader HTTP/1.1\r\nHost: test\r\nConnection: close\r\n\r\n");
+		ss.sendBytes(next.data(), static_cast<int>(next.size()));
+		const std::optional<std::string> response = receiveUntilClosed(ss);
+		assertTrue (response.has_value());
+		assertTrue (response->find("smuggled") == std::string::npos);
+		assertTrue (response->find("Host: test") != std::string::npos);
+
+		srv.stop();
+	}
 }
 
 
@@ -776,6 +966,12 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testEmptyFileKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedTrailer);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedFramingError);
+	CppUnit_addTest(pSuite, HTTPServerTest, testUnreadRequestBody);
+	CppUnit_addTest(pSuite, HTTPServerTest, testUnreadChunkedRequestBody);
+	CppUnit_addTest(pSuite, HTTPServerTest, testLargeUnreadRequestBody);
+	CppUnit_addTest(pSuite, HTTPServerTest, testResponseBeforeUnreadRequestBody);
+	CppUnit_addTest(pSuite, HTTPServerTest, testNonBlockingHandlerClosesConnection);
+	CppUnit_addTest(pSuite, HTTPServerTest, testHandlerNonBlockingReadThenBlocking);
 
 	return pSuite;
 }
