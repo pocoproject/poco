@@ -236,6 +236,35 @@ void HTTPRequestTest::testCookies()
 }
 
 
+void HTTPRequestTest::testTooManyCookies()
+{
+	std::string cookie = "c0=v";
+	for (int i = 1; i < 500; ++i)
+	{
+		cookie.append("; c");
+		cookie.append(std::to_string(i));
+		cookie.append("=v");
+	}
+	HTTPRequest request;
+	request.add("Cookie", cookie);
+	request.add("Cookie", cookie);
+	NameValueCollection cookies;
+	request.getCookies(cookies);
+	assertTrue (cookies.size() == 1000);
+
+	request.add("Cookie", "c500=v");
+	try
+	{
+		NameValueCollection tooMany;
+		request.getCookies(tooMany);
+		fail("more than 1000 cookies - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+
 void HTTPRequestTest::testWriteInvalid()
 {
 	HTTPRequest invalidURI(HTTPRequest::HTTP_GET, "/a\r\nX-Injected: 1", HTTPMessage::HTTP_1_1);
@@ -289,6 +318,7 @@ CppUnit::Test* HTTPRequestTest::suite()
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid3);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testCookies);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testTooManyCookies);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWriteInvalid);
 
 	return pSuite;

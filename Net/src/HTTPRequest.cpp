@@ -167,9 +167,13 @@ void HTTPRequest::setCookies(const NameValueCollection& cookies)
 
 void HTTPRequest::getCookies(NameValueCollection& cookies) const
 {
+	std::size_t count = 0;
 	NameValueCollection::ConstIterator it = find(COOKIE);
 	while (it != end() && Poco::icompare(it->first, COOKIE) == 0)
 	{
+		// The separators bound the number of entries before the value is split.
+		count += static_cast<std::size_t>(std::count(it->second.begin(), it->second.end(), ';')) + 1;
+		if (count > MAX_COOKIES) throw MessageException("Too many cookies");
 		splitParameters(it->second.begin(), it->second.end(), cookies);
 		++it;
 	}

@@ -92,6 +92,9 @@ public:
 	void getCookies(NameValueCollection& cookies) const;
 		/// Fills cookies with the cookies extracted
 		/// from the Cookie headers in the request.
+		///
+		/// Throws a MessageException if the Cookie headers
+		/// contain more than 1000 ';'-separated entries.
 
 	[[nodiscard]] bool hasCredentials() const;
 		/// Returns true iff the request contains authentication
@@ -187,7 +190,8 @@ private:
 	{
 		MAX_METHOD_LENGTH  = 32,
 		MAX_URI_LENGTH     = 16384,
-		MAX_VERSION_LENGTH = 8
+		MAX_VERSION_LENGTH = 8,
+		MAX_COOKIES        = 1000
 	};
 
 	std::string _method;
