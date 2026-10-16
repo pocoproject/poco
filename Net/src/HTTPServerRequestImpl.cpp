@@ -23,6 +23,8 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/StreamSocket.h"
+#include "Poco/Timespan.h"
+#include "Poco/Clock.h"
 
 
 namespace Poco::Net {
@@ -39,7 +41,24 @@ HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, H
 	HTTPHeaderInputStream hs(session);
 	setAutoDecode(_pParams->getAutoDecodeHeaders());
 	setStrictParsing(true);
-	read(hs);
+	const Poco::Timespan headerTimeout = _pParams->getRequestHeaderTimeout();
+	if (headerTimeout > 0)
+	{
+		// HTTPServerSession::hasMoreRequests() has just polled the socket readable,
+		// so the first receive runs without the deadline check.
+		if (session.buffered() == 0) static_cast<void>(session.peek());
+		session.setReadDeadline(Poco::Clock() + headerTimeout.totalMicroseconds());
+	}
+	try
+	{
+		read(hs);
+	}
+	catch (...)
+	{
+		session.clearReadDeadline();
+		throw;
+	}
+	session.clearReadDeadline();
 
 	// Now that we know socket is still connected, obtain addresses
 	_clientAddress = session.clientAddress();

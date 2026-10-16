@@ -23,10 +23,12 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Timespan.h"
+#include "Poco/Clock.h"
 #include "Poco/Exception.h"
 #include "Poco/Any.h"
 #include "Poco/Buffer.h"
 #include <ios>
+#include <optional>
 
 
 namespace Poco::Net {
@@ -252,6 +254,16 @@ protected:
 	void clearException();
 		/// Clears the stored exception.
 
+	void setReadDeadline(const Poco::Clock& deadline);
+		/// Sets a deadline for reading from the socket. A read
+		/// waits for data at most until the deadline, and a read
+		/// after it fails with a TimeoutException. Over TLS, the
+		/// deadline is checked between records; within a record,
+		/// each read waits up to the receive timeout.
+
+	void clearReadDeadline();
+		/// Removes the deadline set with setReadDeadline().
+
 private:
 	enum
 	{
@@ -270,6 +282,7 @@ private:
 	Poco::Timespan   _connectionTimeout;
 	Poco::Timespan   _receiveTimeout;
 	Poco::Timespan   _sendTimeout;
+	std::optional<Poco::Clock> _readDeadline;
 	Poco::Exception* _pException;
 	MessageHeader    _requestTrailer;
 	MessageHeader    _responseTrailer;
@@ -279,6 +292,8 @@ private:
 	friend class HTTPHeaderStreamBuf;
 	friend class HTTPFixedLengthStreamBuf;
 	friend class HTTPChunkedStreamBuf;
+	friend class HTTPServerRequestImpl;
+	friend class HTTPServerConnection;
 };
 
 

@@ -41,7 +41,8 @@ public:
 		///   - timeout:              60 seconds
 		///   - keepAlive:            true
 		///   - maxKeepAliveRequests: 0
-		///   - keepAliveTimeout:     10 seconds
+		///   - keepAliveTimeout:     15 seconds
+		///   - requestHeaderTimeout: 30 seconds
 
 	void setServerName(const std::string& serverName);
 		/// Sets the name and port (name:port) that the server uses to identify itself.
@@ -84,6 +85,18 @@ public:
 	[[nodiscard]] const Poco::Timespan& getKeepAliveTimeout() const;
 		/// Returns the keep-alive timeout for persistent HTTP connections.
 
+	void setRequestHeaderTimeout(const Poco::Timespan& timeout);
+		/// Sets the time a client has to send the request line and
+		/// the header fields of a request, counted from the start of
+		/// reading the request. The same limit applies to reading the
+		/// rest of a request body that the request handler left unread.
+		/// A timeout of 0 disables the limit. The connection timeout
+		/// also applies to each read.
+
+	[[nodiscard]] const Poco::Timespan& getRequestHeaderTimeout() const;
+		/// Returns the time a client has to send the request line and
+		/// the header fields of a request.
+
 	void setMaxKeepAliveRequests(int maxKeepAliveRequests);
 		/// Specifies the maximum number of requests allowed
 		/// during a persistent connection. 0 means unlimited
@@ -114,6 +127,7 @@ private:
 	bool           _keepAlive;
 	int            _maxKeepAliveRequests;
 	Poco::Timespan _keepAliveTimeout;
+	Poco::Timespan _requestHeaderTimeout;
 	bool           _autoDecodeHeaders;
 };
 
@@ -154,6 +168,12 @@ inline int HTTPServerParams::getMaxKeepAliveRequests() const
 inline const Poco::Timespan& HTTPServerParams::getKeepAliveTimeout() const
 {
 	return _keepAliveTimeout;
+}
+
+
+inline const Poco::Timespan& HTTPServerParams::getRequestHeaderTimeout() const
+{
+	return _requestHeaderTimeout;
 }
 
 

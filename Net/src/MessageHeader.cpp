@@ -115,7 +115,14 @@ void MessageHeader::read(std::istream& istr)
 			throw MessageException("Invalid character in header field name");
 		ch = buf.sbumpc(); // skip ':'
 		if (_strictParsing)
-			while (ch == ' ' || ch == '\t') ch = buf.sbumpc();
+		{
+			int skipped = 0;
+			while (ch == ' ' || ch == '\t')
+			{
+				if (++skipped > _valueLengthLimit) throw MessageException("Field value too long");
+				ch = buf.sbumpc();
+			}
+		}
 		else
 			while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
 		while (ch != eof && ch != '\r' && ch != '\n' && static_cast<int>(value.length()) < _valueLengthLimit)

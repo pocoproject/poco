@@ -21,6 +21,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Clock.h"
 #include "Poco/Delegate.h"
 #include <istream>
 #include <memory>
@@ -119,9 +120,16 @@ void HTTPServerConnection::run()
 						bool keepAlive = _pParams->getKeepAlive() && response->getKeepAlive() && session.canKeepAlive();
 						// Destroying the response sends its buffered rest before the drain waits for the body.
 						response.reset();
-						// On a socket that the handler made non-blocking, a would-block also ends the body stream,
-						// so the drain cannot tell whether the body was read to its end.
-						if (keepAlive) keepAlive = session.socket().getBlocking() && drainRequestBody(request.stream());
+						if (keepAlive)
+						{
+							const Poco::Timespan drainTimeout = _pParams->getRequestHeaderTimeout();
+							if (drainTimeout > 0)
+								session.setReadDeadline(Poco::Clock() + drainTimeout.totalMicroseconds());
+							// On a socket that the handler made non-blocking, a would-block also ends the body stream,
+							// so the drain cannot tell whether the body was read to its end.
+							keepAlive = session.socket().getBlocking() && drainRequestBody(request.stream());
+							session.clearReadDeadline();
+						}
 						session.setKeepAlive(keepAlive && session.networkException() == nullptr);
 					}
 					else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);

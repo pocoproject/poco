@@ -39,6 +39,7 @@ public:
 	void testCookies();
 	void testTooManyCookies();
 	void testWriteInvalid();
+	void testWhiteSpaceLimit();
 
 	void setUp();
 	void tearDown();

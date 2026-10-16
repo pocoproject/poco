@@ -54,6 +54,9 @@ public:
 	void testRedirectLineBreak();
 	void testSendLineBreak();
 	void testEchoDecodedLineBreak();
+	void testSlowRequestHeader();
+	void testSlowUnreadRequestBody();
+	void testInvalidRequestHeaderClearsDeadline();
 
 	void setUp();
 	void tearDown();

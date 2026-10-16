@@ -257,25 +257,32 @@ void HTTPRequest::read(std::istream& istr)
 	method.reserve(16);
 	uri.reserve(64);
 	version.reserve(16);
+	// The bytes around the tokens are bounded as well, so that the request header cannot grow without limit.
+	std::size_t skipped = 0;
+	const auto skip = [&istr, &skipped]()
+	{
+		if (++skipped > MAX_URI_LENGTH) throw MessageException("HTTP request header too long");
+		return istr.get();
+	};
 	int ch = istr.get();
 	if (istr.bad()) throw NetException("Error reading HTTP request header");
 	if (ch == eof) throw NoMessageException();
-	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
+	while (Poco::Ascii::isSpace(ch)) ch = skip();
 	if (ch == eof) throw MessageException("No HTTP request header");
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP request method invalid or too long");
-	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
+	while (Poco::Ascii::isSpace(ch)) ch = skip();
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && uri.length() < MAX_URI_LENGTH) { uri += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP request URI invalid or too long");
 	if (std::any_of(uri.begin(), uri.end(), isSpaceOrControl)) throw MessageException("HTTP request URI contains control characters");
-	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
+	while (Poco::Ascii::isSpace(ch)) ch = skip();
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("Invalid HTTP version string");
 	if (std::any_of(version.begin(), version.end(), isSpaceOrControl)) throw MessageException("HTTP version contains control characters");
-	while (ch != '\n' && ch != eof) { ch = istr.get(); }
+	while (ch != '\n' && ch != eof) { ch = skip(); }
 	HTTPMessage::read(istr);
 	ch = istr.get();
-	while (ch != '\n' && ch != eof) { ch = istr.get(); }
+	while (ch != '\n' && ch != eof) { ch = skip(); }
 	setMethod(method);
 	setURI(uri);
 	setVersion(version);

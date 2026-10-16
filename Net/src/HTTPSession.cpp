@@ -211,6 +211,15 @@ int HTTPSession::receive(char* buffer, int length)
 {
 	try
 	{
+		if (_readDeadline.has_value())
+		{
+			const Poco::Timespan remaining(*_readDeadline - Poco::Clock());
+			// poll() is needed only where the deadline comes before the receive timeout of the socket;
+			// available() counts data that TLS has already decrypted, which poll() does not see.
+			const bool deadlineFirst = _receiveTimeout == 0 || remaining < _receiveTimeout;
+			if (remaining <= 0 || (deadlineFirst && _socket.available() == 0 && !_socket.poll(remaining, Socket::SELECT_READ)))
+				throw TimeoutException("HTTP read deadline expired");
+		}
 		return _socket.receiveBytes(buffer, length);
 	}
 	catch (Poco::Exception& exc)
@@ -292,6 +301,18 @@ void HTTPSession::clearException()
 {
 	delete _pException;
 	_pException = nullptr;
+}
+
+
+void HTTPSession::setReadDeadline(const Poco::Clock& deadline)
+{
+	_readDeadline = deadline;
+}
+
+
+void HTTPSession::clearReadDeadline()
+{
+	_readDeadline.reset();
 }
 
 
