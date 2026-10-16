@@ -66,6 +66,7 @@ private:
 	HTTPSession&    _session;
 	ContentLength _length;
 	ContentLength _count;
+	bool _writeFailed = false;
 };
 
 

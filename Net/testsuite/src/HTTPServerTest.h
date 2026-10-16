@@ -57,6 +57,7 @@ public:
 	void testSlowRequestHeader();
 	void testSlowUnreadRequestBody();
 	void testInvalidRequestHeaderClearsDeadline();
+	void testFailedResponseWriteNotRepeated();
 
 	void setUp();
 	void tearDown();

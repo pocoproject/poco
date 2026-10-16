@@ -11,6 +11,7 @@
 #include "HTTPClientSessionTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Net/HTTPBufferAllocator.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -35,6 +36,7 @@
 #include <sstream>
 
 
+using Poco::Net::HTTPBufferAllocator;
 using Poco::Net::HTTPClientSession;
 using Poco::Net::HTTPSession;
 using Poco::Net::ProxyConfig;
@@ -126,6 +128,60 @@ namespace
 		{
 			return get();
 		}
+	};
+
+	class FailedSendSession: public HTTPClientSession
+		/// Lets the test record a send error as HTTPSession::write() does.
+		/// Every send after failSend() fails.
+	{
+	public:
+		FailedSendSession(const std::string& host, Poco::UInt16 port):
+			HTTPClientSession(host, port)
+		{
+		}
+
+		void failSend()
+		{
+			setException(Poco::TimeoutException("Send timed out"));
+			_failed = true;
+		}
+
+	protected:
+		int write(const char* buffer, std::streamsize length) override
+		{
+			if (_failed) throw Poco::TimeoutException("Send timed out");
+			return HTTPClientSession::write(buffer, length);
+		}
+
+	private:
+		bool _failed = false;
+	};
+
+	class ShortSendSession: public HTTPClientSession
+		/// Sends all but the last 5 bytes of the first write, as a send
+		/// on a non-blocking socket with a full send buffer does.
+	{
+	public:
+		ShortSendSession(const std::string& host, Poco::UInt16 port):
+			HTTPClientSession(host, port)
+		{
+		}
+
+		int shortWriteLength() const
+		{
+			return _shortWriteLength;
+		}
+
+	protected:
+		int write(const char* buffer, std::streamsize length) override
+		{
+			if (_shortWriteLength > 0) return HTTPClientSession::write(buffer, length);
+			_shortWriteLength = HTTPClientSession::write(buffer, length - 5);
+			return _shortWriteLength;
+		}
+
+	private:
+		int _shortWriteLength = 0;
 	};
 }
 
@@ -1193,6 +1249,271 @@ void HTTPClientSessionTest::testNonBlockingReceiveWithoutData()
 }
 
 
+void HTTPClientSessionTest::testFailedBodySendReconnects()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(1, 0));
+	cs.setKeepAliveTimeout(Poco::Timespan(30, 0));
+	StreamSocket first = sendBodyUntilFailure(cs, server);
+	HTTPResponse response;
+	try
+	{
+		cs.receiveResponse(response);
+		failmsg("must throw TimeoutException");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	assertTrue (!cs.connected());
+	assertBodyOnlyUntilClosed(first);
+
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/second", HTTPMessage::HTTP_1_1);
+	assertNewConnectionServes(cs, server, request);
+}
+
+
+void HTTPClientSessionTest::testFailedBodySendClosesAdoptedSocket()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket socket(server.address());
+	HTTPClientSession cs(socket);
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(2, 0));
+	StreamSocket first = sendBodyUntilFailure(cs, server);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/second", HTTPMessage::HTTP_1_1);
+	Stopwatch sw;
+	sw.start();
+	try
+	{
+		cs.sendRequest(request);
+		failmsg("must throw TimeoutException");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	// Sending the buffered body again on the stalled connection would take another send timeout.
+	assertTrue (sw.elapsedSeconds() < 1);
+	assertTrue (!cs.connected());
+	assertBodyOnlyUntilClosed(first);
+}
+
+
+void HTTPClientSessionTest::testIncompleteRequestBodyClosesAdoptedSocket()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket socket(server.address());
+	HTTPClientSession cs(socket);
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(5, 0));
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/upload", HTTPMessage::HTTP_1_1);
+	request.setContentLength(10);
+	cs.sendRequest(request) << "AAAAA";
+	StreamSocket first = server.acceptConnection();
+	const std::string early("HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\n\r\n");
+	first.sendBytes(early.data(), static_cast<int>(early.size()));
+	HTTPResponse response;
+	cs.receiveResponse(response);
+
+	HTTPRequest next(HTTPRequest::HTTP_GET, "/second", HTTPMessage::HTTP_1_1);
+	try
+	{
+		cs.sendRequest(next);
+		failmsg("must throw NetException");
+	}
+	catch (Poco::Net::NetException& exc)
+	{
+		assertTrue (exc.message().find("request body") != std::string::npos);
+	}
+	assertTrue (!cs.connected());
+	assertBodyOnlyUntilClosed(first);
+}
+
+
+void HTTPClientSessionTest::testUnreadResponseBodyClosesAdoptedSocket()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket socket(server.address());
+	HTTPClientSession cs(socket);
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(5, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/first", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket first = server.acceptConnection();
+	// The last byte of the body is not sent, so the client cannot skip the rest.
+	const std::string reply("HTTP/1.1 200 OK\r\nContent-Length: 11\r\n\r\n0123456789");
+	first.sendBytes(reply.data(), static_cast<int>(reply.size()));
+	HTTPResponse response;
+	cs.receiveResponse(response);
+
+	HTTPRequest next(HTTPRequest::HTTP_GET, "/second", HTTPMessage::HTTP_1_1);
+	try
+	{
+		cs.sendRequest(next);
+		failmsg("must throw NetException");
+	}
+	catch (Poco::Net::NetException& exc)
+	{
+		assertTrue (exc.message().find("response body") != std::string::npos);
+	}
+	assertTrue (!cs.connected());
+	const std::string received = receiveUntilClosed(first);
+	assertTrue (received.find("/first") != std::string::npos);
+	assertTrue (received.find("/second") == std::string::npos);
+}
+
+
+void HTTPClientSessionTest::testDataAfterResponseClosesAdoptedSocket()
+{
+	for (const bool peerCloses: {true, false})
+	{
+		ServerSocket server(SocketAddress("127.0.0.1", 0));
+		StreamSocket socket(server.address());
+		HTTPClientSession cs(socket);
+		cs.setKeepAlive(true);
+		cs.setTimeout(Poco::Timespan(5, 0));
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/first", HTTPMessage::HTTP_1_1);
+		cs.sendRequest(request).flush();
+		StreamSocket first = server.acceptConnection();
+		// Read before closing: closing a socket with unread data resets the connection instead of closing it.
+		receiveHeader(first);
+		const std::string reply("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello");
+		first.sendBytes(reply.data(), static_cast<int>(reply.size()));
+		HTTPResponse response;
+		std::istream& rs = cs.receiveResponse(response);
+		std::string body;
+		StreamCopier::copyToString(rs, body);
+		assertTrue (body == "hello");
+		if (peerCloses)
+		{
+			first.close();
+		}
+		else
+		{
+			const std::string unsolicited("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nbogus");
+			first.sendBytes(unsolicited.data(), static_cast<int>(unsolicited.size()));
+		}
+		assertTrue (cs.socket().poll(Poco::Timespan(5, 0), Socket::SELECT_READ));
+
+		HTTPRequest next(HTTPRequest::HTTP_GET, "/second", HTTPMessage::HTTP_1_1);
+		try
+		{
+			cs.sendRequest(next);
+			failmsg("must throw NetException");
+		}
+		catch (Poco::Net::NetException& exc)
+		{
+			assertTrue (exc.message().find("closed the connection after it") != std::string::npos);
+		}
+		assertTrue (!cs.connected());
+	}
+}
+
+
+void HTTPClientSessionTest::testPeekResponseAfterFailedSendCloses()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	FailedSendSession cs("127.0.0.1", server.address().port());
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/upload", HTTPMessage::HTTP_1_1);
+	request.setContentLength(5);
+	request.setExpectContinue(true);
+	cs.sendRequest(request);
+	StreamSocket peer = server.acceptConnection();
+	cs.failSend();
+	HTTPResponse response;
+	try
+	{
+		cs.peekResponse(response);
+		failmsg("must throw TimeoutException");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	assertTrue (!cs.connected());
+}
+
+
+void HTTPClientSessionTest::testFailedBodySendNotRepeated()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setTimeout(Poco::Timespan(2, 0));
+	StreamSocket peer = sendBodyUntilFailure(cs, server);
+	Stopwatch sw;
+	sw.start();
+	HTTPResponse response;
+	try
+	{
+		cs.receiveResponse(response);
+		failmsg("must throw TimeoutException");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	// Sending the buffered body again on the stalled connection would take another send timeout.
+	assertTrue (sw.elapsedSeconds() < 1);
+	assertTrue (!cs.connected());
+}
+
+
+void HTTPClientSessionTest::testIncompleteRequestBodyReconnects()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(5, 0));
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/upload", HTTPMessage::HTTP_1_1);
+	request.setContentLength(10);
+	cs.sendRequest(request) << "AAAAA";
+	StreamSocket first = server.acceptConnection();
+	const std::string early("HTTP/1.1 413 Payload Too Large\r\nContent-Length: 0\r\n\r\n");
+	first.sendBytes(early.data(), static_cast<int>(early.size()));
+	HTTPResponse response;
+	cs.receiveResponse(response);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE);
+
+	HTTPRequest next(HTTPRequest::HTTP_GET, "/second", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(next);
+	assertTrue (server.poll(Poco::Timespan(5, 0), Socket::SELECT_READ));
+	assertBodyOnlyUntilClosed(first);
+}
+
+
+void HTTPClientSessionTest::testIncompleteRequestBodyWithoutResponseReconnects()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(5, 0));
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/upload", HTTPMessage::HTTP_1_1);
+	request.setContentLength(10);
+	cs.sendRequest(request) << "AAAAA";
+	StreamSocket first = server.acceptConnection();
+
+	HTTPRequest next(HTTPRequest::HTTP_GET, "/second", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(next);
+	assertTrue (server.poll(Poco::Timespan(5, 0), Socket::SELECT_READ));
+	assertBodyOnlyUntilClosed(first);
+}
+
+
+void HTTPClientSessionTest::testShortRequestWriteClosesConnection()
+{
+	// The short write happens in the final flush.
+	assertTrue (sendWithShortWrite("0123456789") == "01234");
+
+	// A body larger than the stream buffer makes the short write happen when the buffer is full.
+	std::string body;
+	for (int i = 0; i < 2 * HTTPBufferAllocator::BUFFER_SIZE; ++i)
+		body += static_cast<char>('a' + i % 23);
+	const std::string received = sendWithShortWrite(body);
+	assertTrue (!received.empty() && received.size() < body.size());
+	assertTrue (received == body.substr(0, received.size()));
+}
+
+
 void HTTPClientSessionTest::assertFramingRejected(const std::string& headers)
 {
 	ServerSocket server(SocketAddress("127.0.0.1", 0));
@@ -1289,6 +1610,108 @@ void HTTPClientSessionTest::testFixedLengthResponseInPartsNonBlocking()
 }
 
 
+StreamSocket HTTPClientSessionTest::sendBodyUntilFailure(HTTPClientSession& session, ServerSocket& server)
+{
+	const Poco::Int64 contentLength = 64 * 1024 * 1024;
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/upload", HTTPMessage::HTTP_1_1);
+	request.setContentLength64(contentLength);
+	std::ostream& body = session.sendRequest(request);
+	StreamSocket peer = server.acceptConnection();
+	const std::string chunk(64 * 1024, 'A');
+	Poco::Int64 written = 0;
+	while (body.good() && written < contentLength)
+	{
+		body.write(chunk.data(), static_cast<std::streamsize>(chunk.size()));
+		written += static_cast<Poco::Int64>(chunk.size());
+	}
+	assertTrue (!body.good());
+	return peer;
+}
+
+
+std::string HTTPClientSessionTest::receiveUntilClosed(StreamSocket& peer)
+{
+	peer.setReceiveTimeout(Poco::Timespan(5, 0));
+	std::string received;
+	char buffer[64 * 1024];
+	try
+	{
+		int n = 0;
+		while ((n = peer.receiveBytes(buffer, sizeof(buffer))) > 0)
+			received.append(buffer, static_cast<std::size_t>(n));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		failmsg("the client did not close the connection");
+	}
+	return received;
+}
+
+
+void HTTPClientSessionTest::assertBodyOnlyUntilClosed(StreamSocket& peer)
+{
+	const std::string received = receiveUntilClosed(peer);
+	const std::size_t headerEnd = received.find("\r\n\r\n");
+	assertTrue (headerEnd != std::string::npos);
+	assertTrue (received.find_first_not_of('A', headerEnd + 4) == std::string::npos);
+}
+
+
+std::string HTTPClientSessionTest::sendWithShortWrite(const std::string& body)
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	ShortSendSession cs("127.0.0.1", server.address().port());
+	cs.setTimeout(Poco::Timespan(5, 0));
+	auto peer = std::async(std::launch::async, [&server]()
+	{
+		StreamSocket connection = server.acceptConnection();
+		connection.setReceiveTimeout(Poco::Timespan(2, 0));
+		std::string received;
+		char buffer[1024];
+		try
+		{
+			int n = 0;
+			while ((n = connection.receiveBytes(buffer, sizeof(buffer))) > 0)
+				received.append(buffer, static_cast<std::size_t>(n));
+		}
+		catch (Poco::TimeoutException&)
+		{
+		}
+		try
+		{
+			// A response that the client would accept if it kept the connection.
+			const std::string reply("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n");
+			connection.sendBytes(reply.data(), static_cast<int>(reply.size()));
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		return received;
+	});
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/upload", HTTPMessage::HTTP_1_1);
+	request.setContentLength(static_cast<std::streamsize>(body.size()));
+	cs.sendRequest(request) << body;
+	HTTPResponse response;
+	try
+	{
+		cs.receiveResponse(response);
+		failmsg("must throw NetException");
+	}
+	catch (Poco::Net::NetException& exc)
+	{
+		assertTrue (exc.message().find("Incomplete message write") != std::string::npos);
+	}
+	assertTrue (!cs.connected());
+	const std::string received = peer.get();
+	assertTrue (received.size() == static_cast<std::size_t>(cs.shortWriteLength()));
+	const std::size_t headerEnd = received.find("\r\n\r\n");
+	assertTrue (headerEnd != std::string::npos);
+	assertTrue (received.compare(0, 6, "POST /") == 0);
+	assertTrue (received.find("POST /", 1) == std::string::npos);
+	return received.substr(headerEnd + 4);
+}
+
+
 void HTTPClientSessionTest::setUp()
 {
 }
@@ -1349,6 +1772,16 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testConnectResponseIgnoresFramingHeaders);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testTimeoutAppliedToConnectedSocket);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testNonBlockingReceiveWithoutData);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testFailedBodySendReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testFailedBodySendClosesAdoptedSocket);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testIncompleteRequestBodyClosesAdoptedSocket);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testUnreadResponseBodyClosesAdoptedSocket);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testDataAfterResponseClosesAdoptedSocket);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testPeekResponseAfterFailedSendCloses);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testFailedBodySendNotRepeated);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testIncompleteRequestBodyReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testIncompleteRequestBodyWithoutResponseReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testShortRequestWriteClosesConnection);
 
 	return pSuite;
 }

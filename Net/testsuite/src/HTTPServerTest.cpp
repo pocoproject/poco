@@ -877,6 +877,31 @@ namespace
 		}
 		return false;
 	}
+
+	class TimeoutSendSession: public Poco::Net::HTTPServerSession
+		/// Sends half of the first write and then fails with a TimeoutException,
+		/// as a blocking send with a send timeout does after a partial send.
+	{
+	public:
+		TimeoutSendSession(const Poco::Net::StreamSocket& socket, HTTPServerParams::Ptr pParams):
+			HTTPServerSession(socket, pParams)
+		{
+		}
+
+	protected:
+		int write(const char* buffer, std::streamsize length) override
+		{
+			if (_failed) return HTTPServerSession::write(buffer, length);
+			_failed = true;
+			HTTPServerSession::write(buffer, length / 2);
+			const Poco::TimeoutException exc("Send timed out after a partial send");
+			setException(exc);
+			throw exc;
+		}
+
+	private:
+		bool _failed = false;
+	};
 }
 
 
@@ -1207,6 +1232,27 @@ void HTTPServerTest::testInvalidRequestHeaderClearsDeadline()
 }
 
 
+void HTTPServerTest::testFailedResponseWriteNotRepeated()
+{
+	ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+	Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", svs.address().port()));
+	ss.setReceiveTimeout(Poco::Timespan(2, 0));
+	HTTPServerParams::Ptr pParams = new HTTPServerParams;
+	TimeoutSendSession session(svs.acceptConnection(), pParams);
+	const std::string body("0123456789");
+	{
+		Poco::Net::HTTPFixedLengthOutputStream ostr(session, static_cast<Poco::Net::HTTPFixedLengthStreamBuf::ContentLength>(body.size()));
+		ostr << body;
+		ostr.flush();
+		assertTrue (ostr.bad());
+	}
+	session.socket().close();
+	const std::optional<std::string> received = receiveUntilClosed(ss);
+	assertTrue (received.has_value());
+	assertTrue (*received == "01234");
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
@@ -1244,6 +1290,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testSlowRequestHeader);
 	CppUnit_addTest(pSuite, HTTPServerTest, testSlowUnreadRequestBody);
 	CppUnit_addTest(pSuite, HTTPServerTest, testInvalidRequestHeaderClearsDeadline);
+	CppUnit_addTest(pSuite, HTTPServerTest, testFailedResponseWriteNotRepeated);
 
 	return pSuite;
 }
