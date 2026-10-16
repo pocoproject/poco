@@ -152,6 +152,60 @@ void HTTPResponseTest::testInvalid3()
 }
 
 
+void HTTPResponseTest::testNonNumericStatus()
+{
+	std::istringstream istr("HTTP/1.1 abc OK\r\n\r\n");
+	HTTPResponse response;
+	try
+	{
+		response.read(istr);
+		fail("non-numeric status - must throw");
+	}
+	catch (MessageException& exc)
+	{
+		assertTrue (exc.displayText().find("abc") != std::string::npos);
+	}
+}
+
+
+void HTTPResponseTest::testStatusNotThreeDigits()
+{
+	const std::string statuses[] = {"-1", "+20", "2,0", "20"};
+	for (const auto& status: statuses)
+	{
+		std::istringstream istr("HTTP/1.1 " + status + " OK\r\n\r\n");
+		HTTPResponse response;
+		try
+		{
+			response.read(istr);
+			fail("status " + status + " - must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+}
+
+
+void HTTPResponseTest::testStatusBelow100()
+{
+	const std::string statuses[] = {"000", "099"};
+	for (const auto& status: statuses)
+	{
+		std::istringstream istr("HTTP/1.1 " + status + " OK\r\n\r\n");
+		HTTPResponse response;
+		try
+		{
+			response.read(istr);
+			fail("status " + status + " - must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+}
+
+
 void HTTPResponseTest::testCookies()
 {
 	HTTPResponse response;
@@ -293,6 +347,9 @@ CppUnit::Test* HTTPResponseTest::suite()
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid1);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid2);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid3);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testNonNumericStatus);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testStatusNotThreeDigits);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testStatusBelow100);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testCookies);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testReplaceCookie);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testRemoveCookie);
