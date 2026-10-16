@@ -399,8 +399,12 @@ std::ostream& HTTPClientSession::sendRequestImpl(const HTTPRequest& request)
 	_connectRequest = request.getMethod() == HTTPRequest::HTTP_CONNECT;
 	if (request.getChunkedTransferEncoding())
 	{
-		HTTPHeaderOutputStream hos(*this);
-		request.write(hos);
+		{
+			// The destructor flushes the header and swallows a write error, which HTTPSession::write() records.
+			HTTPHeaderOutputStream hos(*this);
+			request.write(hos);
+		}
+		if (networkException() != nullptr) networkException()->rethrow();
 		_pRequestStream = new HTTPChunkedOutputStream(*this, &requestTrailer());
 	}
 	else if (request.hasContentLength())
@@ -573,12 +577,22 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 	{
 		if (_reconnect)
 		{
-			close();
-			reconnect();
-			int rc = HTTPSession::write(buffer, length);
-			clearException();
+			// One attempt per request: after a failed reconnect, a later write must not send body data on a new connection.
 			_reconnect = false;
-			return rc;
+			close();
+			try
+			{
+				reconnect();
+				int rc = HTTPSession::write(buffer, length);
+				clearException();
+				return rc;
+			}
+			catch (Exception&)
+			{
+				// A failed connect leaves a new, unconnected socket open; the check at the top needs it closed.
+				close();
+				throw;
+			}
 		}
 		else throw;
 	}
