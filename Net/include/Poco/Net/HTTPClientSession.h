@@ -223,6 +223,9 @@ public:
 	[[nodiscard]] const Poco::Timespan& getKeepAliveTimeout() const;
 		/// Returns the connection timeout for HTTP connections.
 
+	[[nodiscard]] const Poco::Timestamp& getLastRequest() const;
+		/// Returns the time the last request was sent.
+
 	virtual std::ostream& sendRequest(HTTPRequest& request);
 		/// Sends the header for the given HTTP request to
 		/// the server.
@@ -278,6 +281,9 @@ public:
 		/// holds the cause. Malformed chunked framing throws a
 		/// MessageException in the stream, which sets badbit.
 		/// A body delimited by the end of the connection ends normally.
+		///
+		/// After a 101 Switching Protocols response, or a 2xx response
+		/// to a CONNECT request, the next request sets up a new connection.
 
 	[[nodiscard]] bool responseComplete() const;
 		/// Returns true if the body of the last response has been received
@@ -322,6 +328,17 @@ public:
 		///
 		/// The session closes the connection itself after a network
 		/// error; reset() is needed only to force a new connection.
+
+	[[nodiscard]] bool canReuse();
+		/// Returns true if the connection can carry another request:
+		/// persistent connections are enabled, the body of the last request
+		/// has been sent to its end, the response to the last request
+		/// has been received and its body read from the connection
+		/// to its end, neither the server nor the keep-alive timeout ends
+		/// the connection, and the server has neither closed the connection
+		/// nor sent data that does not belong to a response.
+		///
+		/// Reads the terminator of a chunked body if the server has sent it.
 
 	[[nodiscard]] virtual bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
@@ -412,6 +429,9 @@ private:
 	HTTPDigestCredentials _proxyDigestCreds;
 	HTTPNTLMCredentials   _proxyNTLMCreds;
 	bool                  _ntlmProxyAuthenticated = false;
+	bool                  _connectionAuthenticated = false;
+		/// True if a request on the current connection carried NTLM, Negotiate or
+		/// Kerberos credentials, which authenticate the connection, not the request.
 
 	static ProxyConfig _globalProxyConfig;
 
@@ -429,10 +449,15 @@ private:
 		/// or skips the rest of a Content-Length body that is in the session
 		/// buffer, then returns responseComplete().
 
+	bool stateAllowsReuse();
+		/// Performs the checks of canReuse() except the check of the socket
+		/// for data or a close by the server.
+
 	HTTPClientSession(const HTTPClientSession&) = delete;
 	HTTPClientSession& operator = (const HTTPClientSession&) = delete;
 
 	friend class WebSocket;
+	friend class HTTPClientSessionPool;
 };
 
 
@@ -502,6 +527,12 @@ inline const ProxyConfig& HTTPClientSession::getGlobalProxyConfig()
 inline const Poco::Timespan& HTTPClientSession::getKeepAliveTimeout() const
 {
 	return _keepAliveTimeout;
+}
+
+
+inline const Poco::Timestamp& HTTPClientSession::getLastRequest() const
+{
+	return _lastRequest;
 }
 
 

@@ -11,7 +11,7 @@ objects = \
 	DatagramSocketTest HTTPStreamFactoryTest MultipartReaderTest SocketTest \
 	Driver HTTPTestServer MultipartWriterTest SocketsTestSuite \
 	EchoServer HTTPTestSuite NameValueCollectionTest TCPServerTest \
-	HTTPClientSessionTest IPAddressTest NetCoreTestSuite TCPServerTestSuite \
+	HTTPClientSessionTest HTTPClientSessionPoolTest IPAddressTest NetCoreTestSuite TCPServerTestSuite \
 	HTTPRequestTest MessageHeaderTest NetTestSuite UDPEchoServer \
 	HTTPResponseTest MessagesTestSuite NetworkInterfaceTest \
 	HTTPServerTest MulticastEchoServer SocketAddressTest \
