@@ -46,6 +46,9 @@ public:
 	void testDecodeWord();
 	void testNoDecodeFramingHeaders();
 	void testAutoDecode();
+	void testStrictFieldName();
+	void testStrictValueWhitespace();
+	void testFieldLimitLinesWithoutColon();
 
 	void setUp();
 	void tearDown();

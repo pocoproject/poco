@@ -81,7 +81,8 @@ public:
 		/// the stream.
 		///
 		/// Some basic sanity checking of the input stream is
-		/// performed.
+		/// performed. Lines without a colon are ignored, but
+		/// count towards the field limit.
 		///
 		/// Throws a MessageException if the input stream is
 		/// malformed.
@@ -93,6 +94,19 @@ public:
 	[[nodiscard]] bool getAutoDecode() const;
 		/// Returns true if automatic conversion of HTTP header values
 		/// when reading HTTP header.
+
+	void setStrictParsing(bool strict);
+		/// Enables or disables strict parsing in read().
+		///
+		/// In strict mode, read() throws a MessageException if a field
+		/// name is not a token as defined in RFC 9110, and removes only
+		/// spaces and horizontal tabs before and after a field value.
+		///
+		/// Strict parsing is disabled by default. The HTTP server
+		/// enables it for requests.
+
+	[[nodiscard]] bool getStrictParsing() const;
+		/// Returns true if strict parsing is enabled.
 
 	[[nodiscard]] std::string getDecoded(const std::string& name) const;
 		/// Get decoded header value. It does conversion if it was not
@@ -185,6 +199,9 @@ public:
 	[[nodiscard]] static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
 			/// Decode RFC2047 string.
 
+protected:
+	[[nodiscard]] static bool isValidFieldName(const std::string& name);
+		/// Returns true if name is a token as defined in RFC 9110.
 
 private:
 	enum Limits
@@ -200,6 +217,7 @@ private:
 	int _valueLengthLimit;
 	bool _autoDecode;
 	bool _decodedOnRead;
+	bool _strictParsing;
 
 };
 

@@ -944,6 +944,17 @@ void HTTPServerTest::testHandlerNonBlockingReadThenBlocking()
 }
 
 
+void HTTPServerTest::testFieldNameWhitespace()
+{
+	const std::string body("GET /echoHeader HTTP/1.1\r\nHost: smuggled\r\n\r\n");
+	const std::optional<std::string> response = exchangeUntilClosed(new HTTPServerParams,
+		"POST /echoBody HTTP/1.1\r\nHost: test\r\nContent-Length : " + std::to_string(body.size()) + "\r\n\r\n" + body, false);
+	assertTrue (response.has_value());
+	assertTrue (response->compare(0, 12, "HTTP/1.1 400") == 0);
+	assertTrue (response->find("smuggled") == std::string::npos);
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
@@ -972,6 +983,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testResponseBeforeUnreadRequestBody);
 	CppUnit_addTest(pSuite, HTTPServerTest, testNonBlockingHandlerClosesConnection);
 	CppUnit_addTest(pSuite, HTTPServerTest, testHandlerNonBlockingReadThenBlocking);
+	CppUnit_addTest(pSuite, HTTPServerTest, testFieldNameWhitespace);
 
 	return pSuite;
 }
