@@ -500,6 +500,83 @@ void MessageHeaderTest::testNoDecodeFramingHeaders()
 }
 
 
+void MessageHeaderTest::testStrictFieldName()
+{
+	const std::string invalid[] = {
+		"Content-Length : 5\r\n\r\n",
+		"Transfer-Encoding\t: chunked\r\n\r\n",
+		"Content-Length\r: 5\r\n\r\n",
+		"Na\x01me: value\r\n\r\n",
+		"N\xC3\xA4me: value\r\n\r\n",
+		"X(a): value\r\n\r\n",
+		"X/a: value\r\n\r\n",
+		": value\r\n\r\n"
+	};
+	for (const auto& s: invalid)
+	{
+		std::istringstream istr(s);
+		MessageHeader mh;
+		mh.setStrictParsing(true);
+		try
+		{
+			mh.read(istr);
+			failmsg("invalid field name must throw: " + s);
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+
+	std::istringstream istr("Content-Length: 5\r\nX-Name_1.~!#$%&'*+^`|: value\r\n\r\n");
+	MessageHeader mh;
+	mh.setStrictParsing(true);
+	mh.read(istr);
+	assertTrue (mh.size() == 2);
+	assertTrue (mh.get("Content-Length") == "5");
+	assertTrue (mh.get("X-Name_1.~!#$%&'*+^`|") == "value");
+
+	std::istringstream lenient("Content-Length : 5\r\n\r\n");
+	MessageHeader mhLenient;
+	mhLenient.read(lenient);
+	assertTrue (mhLenient.get("Content-Length ") == "5");
+}
+
+
+void MessageHeaderTest::testStrictValueWhitespace()
+{
+	std::istringstream istr("Transfer-Encoding:\vchunked\r\nContent-Length: \t5\f \r\n\r\n");
+	MessageHeader mh;
+	mh.setStrictParsing(true);
+	mh.read(istr);
+	assertTrue (mh.get("Transfer-Encoding") == "\vchunked");
+	assertTrue (mh.get("Content-Length") == "5\f");
+
+	std::istringstream lenient("Transfer-Encoding:\vchunked\r\nContent-Length: \t5\f \r\n\r\n");
+	MessageHeader mhLenient;
+	mhLenient.read(lenient);
+	assertTrue (mhLenient.get("Transfer-Encoding") == "chunked");
+	assertTrue (mhLenient.get("Content-Length") == "5");
+}
+
+
+void MessageHeaderTest::testFieldLimitLinesWithoutColon()
+{
+	std::string s;
+	for (int i = 0; i < 200; ++i) s += "x\r\n";
+	s += "name: value\r\n\r\n";
+	std::istringstream istr(s);
+	MessageHeader mh;
+	try
+	{
+		mh.read(istr);
+		fail("Field limit exceeded - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+
 CppUnit::Test* MessageHeaderTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MessageHeaderTest");
@@ -526,6 +603,9 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testNoDecodeFramingHeaders);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testAutoDecode);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictFieldName);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictValueWhitespace);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimitLinesWithoutColon);
 
 	return pSuite;
 }

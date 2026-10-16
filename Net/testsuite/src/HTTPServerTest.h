@@ -48,6 +48,7 @@ public:
 	void testResponseBeforeUnreadRequestBody();
 	void testNonBlockingHandlerClosesConnection();
 	void testHandlerNonBlockingReadThenBlocking();
+	void testFieldNameWhitespace();
 
 	void setUp();
 	void tearDown();

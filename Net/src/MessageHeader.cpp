@@ -20,7 +20,9 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/UTF8Encoding.h"
+#include <algorithm>
 #include <sstream>
+#include <string_view>
 
 
 namespace Poco::Net {
@@ -47,7 +49,8 @@ MessageHeader::MessageHeader():
 	_nameLengthLimit(DFL_NAME_LENGTH_LIMIT),
 	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT),
 	_autoDecode(true),
-	_decodedOnRead(false)
+	_decodedOnRead(false),
+	_strictParsing(false)
 {
 }
 
@@ -56,7 +59,8 @@ MessageHeader::MessageHeader(const MessageHeader& messageHeader):
 	NameValueCollection(messageHeader),
 	_fieldLimit(DFL_FIELD_LIMIT),
 	_nameLengthLimit(DFL_NAME_LENGTH_LIMIT),
-	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT)
+	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT),
+	_strictParsing(false)
 {
 }
 
@@ -106,10 +110,18 @@ void MessageHeader::read(std::istream& istr)
 			name += ch;
 			ch = buf.sbumpc();
 		}
-		if (ch == '\n') { ch = buf.sbumpc(); continue; } // ignore invalid header lines
+		if (ch == '\n') { ch = buf.sbumpc(); ++fields; continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
+		// White space or a control character in a name would hide a header
+		// such as "Content-Length : 5" from a lookup by name, while a front
+		// end may still frame the message on it.
+		if (_strictParsing && !isValidFieldName(name))
+			throw MessageException("Invalid character in header field name");
 		ch = buf.sbumpc(); // skip ':'
-		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
+		if (_strictParsing)
+			while (ch == ' ' || ch == '\t') ch = buf.sbumpc();
+		else
+			while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
 		while (ch != eof && ch != '\r' && ch != '\n' && static_cast<int>(value.length()) < _valueLengthLimit)
 		{
 			value += ch;
@@ -135,7 +147,10 @@ void MessageHeader::read(std::istream& istr)
 		}
 
 		// TODO: Add to the if below?
-		Poco::trimRightInPlace(value);
+		if (_strictParsing)
+			value.erase(value.find_last_not_of(" \t") + 1);
+		else
+			Poco::trimRightInPlace(value);
 
 		if (_autoDecode && !isFramingHeader(name))
 			add(name, decodeWord(value));
@@ -160,6 +175,18 @@ void MessageHeader::setAutoDecode(bool decode)
 bool MessageHeader::getAutoDecode() const
 {
 	return _autoDecode;
+}
+
+
+void MessageHeader::setStrictParsing(bool strict)
+{
+	_strictParsing = strict;
+}
+
+
+bool MessageHeader::getStrictParsing() const
+{
+	return _strictParsing;
 }
 
 
@@ -503,6 +530,14 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 	} while (true);
 
 	return outs;
+}
+
+
+bool MessageHeader::isValidFieldName(const std::string& name)
+{
+	static constexpr std::string_view tokenPunct("!#$%&'*+-.^_`|~");
+	return !name.empty() && std::all_of(name.begin(), name.end(),
+		[](char c) { return Poco::Ascii::isAlphaNumeric(c) || tokenPunct.find(c) != std::string_view::npos; });
 }
 
 
