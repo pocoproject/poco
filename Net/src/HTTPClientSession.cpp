@@ -320,10 +320,14 @@ void HTTPClientSession::setKeepAliveTimeout(const Poco::Timespan& timeout)
 std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 {
 	request.validate();
+	bool keepAlive = getKeepAlive();
+	// Unread bytes of the last response, or data the server sent after it, would be parsed as the next response.
+	bool responseDataUnread = keepAlive && connected() && networkException() == nullptr && _pResponseStream != nullptr && (!responseStreamComplete() || dataPending());
+	if (responseDataUnread)
+		_mustReconnect = true;
 	_pRequestStream = nullptr;
 	_pResponseStream = nullptr;
 
-	bool keepAlive = getKeepAlive();
 	if (((connected() && !keepAlive) || mustReconnect() || networkException() != nullptr) && !_host.empty())
 	{
 		close();
@@ -455,6 +459,17 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 }
 
 
+bool HTTPClientSession::responseComplete() const
+{
+	if (_pResponseStream == nullptr) return false;
+	const auto* pChunked = dynamic_cast<const HTTPChunkedStreamBuf*>(_pResponseStream->rdbuf());
+	if (pChunked != nullptr) return pChunked->isComplete();
+	const auto* pFixed = dynamic_cast<const HTTPFixedLengthStreamBuf*>(_pResponseStream->rdbuf());
+	if (pFixed != nullptr) return pFixed->isComplete();
+	return false;
+}
+
+
 bool HTTPClientSession::peekResponse(HTTPResponse& response)
 {
 	poco_assert (!_responseReceived);
@@ -560,6 +575,16 @@ std::string HTTPClientSession::proxyRequestPrefix() const
 		NumberFormatter::append(result, _port);
 	}
 	return result;
+}
+
+
+bool HTTPClientSession::responseStreamComplete()
+{
+	auto* pChunked = dynamic_cast<HTTPChunkedStreamBuf*>(_pResponseStream->rdbuf());
+	if (pChunked != nullptr) return pChunked->consumeTerminator();
+	auto* pFixed = dynamic_cast<HTTPFixedLengthStreamBuf*>(_pResponseStream->rdbuf());
+	if (pFixed != nullptr) return pFixed->skipBuffered();
+	return false;
 }
 
 
@@ -704,6 +729,9 @@ void HTTPClientSession::proxyTunnel()
 {
 	StreamSocket ss = proxyConnect();
 	attachSocket(ss);
+	// A response of the previous connection must not decide whether the tunnel is reused.
+	_pResponseStream = nullptr;
+	_mustReconnect = false;
 }
 
 

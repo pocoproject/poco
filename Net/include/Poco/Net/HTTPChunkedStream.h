@@ -52,6 +52,19 @@ public:
 	~HTTPChunkedStreamBuf();
 	void close();
 
+	[[nodiscard]] bool isComplete() const noexcept;
+		/// Returns true if the body has been read up to and including
+		/// the last chunk and the trailer without an error.
+
+	[[nodiscard]] bool consumeTerminator();
+		/// Reads the last chunk and the trailer of an input stream if no
+		/// chunk data is left unread. Returns at once if the peer has sent
+		/// nothing more. Waits up to the receive timeout for the rest of a
+		/// line the peer has begun, for the trailer after the last chunk,
+		/// and for data after a TLS record that carries none.
+		///
+		/// Returns isComplete().
+
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length);
 	std::streamsize writeToDevice(const char* buffer, std::streamsize length);

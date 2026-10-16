@@ -252,15 +252,16 @@ public:
 		///
 		/// The returned input stream can be used to read
 		/// the response body. The stream is valid until
-		/// sendRequest() is called or the session is
-		/// destroyed.
+		/// sendRequest() or proxyTunnel() is called or the
+		/// session is destroyed.
 		///
-		/// It must be ensured that the response stream
-		/// is fully consumed before sending a new request
-		/// and persistent connections are enabled. Otherwise,
-		/// the unread part of the response body may be treated as
-		/// part of the next request's response header, resulting
-		/// in a Poco::Net::MessageException being thrown.
+		/// If persistent connections are enabled and the response
+		/// body has not been fully read from the connection when
+		/// the next request is sent, a new connection is set up
+		/// for the next request. The unread rest of a body with a
+		/// Content-Length is skipped instead if it has already been
+		/// received. A new connection is also set up if the server
+		/// has sent data after the response or closed the connection.
 		///
 		/// In case a network or server failure happens
 		/// while reading the response body from the returned stream,
@@ -271,10 +272,20 @@ public:
 		/// for the next request.
 		///
 		/// A body with Content-Length or chunked transfer encoding that the
-		/// server cuts short ends with eof after the bytes received, and
-		/// networkException() holds the cause. Malformed chunked framing
-		/// throws a MessageException in the stream, which sets badbit.
+		/// server cuts short ends with eof after the bytes received;
+		/// responseComplete() then returns false and networkException()
+		/// holds the cause. Malformed chunked framing throws a
+		/// MessageException in the stream, which sets badbit.
 		/// A body delimited by the end of the connection ends normally.
+
+	[[nodiscard]] bool responseComplete() const;
+		/// Returns true if the body of the last response has been received
+		/// up to its announced end: all bytes given by the Content-Length
+		/// header, or the last chunk and the trailer of a chunked body.
+		///
+		/// Returns false for a body delimited by the end of the connection,
+		/// and if no response has been received since the last sendRequest().
+		/// Does not read from the connection.
 
 	virtual bool peekResponse(HTTPResponse& response);
 		/// If the request contains a "Expect: 100-continue" header,
@@ -372,6 +383,8 @@ protected:
 	void proxyTunnel();
 		/// Calls proxyConnect() and attaches the resulting StreamSocket
 		/// to the HTTPClientSession.
+		///
+		/// Destroys the stream returned by an earlier receiveResponse().
 
 	HTTPSessionFactory _proxySessionFactory;
 		/// Factory to create HTTPClientSession to proxy.
@@ -403,6 +416,11 @@ private:
 
 	void initProxySessionFactory();
 		/// Registers the "http" protocol with _proxySessionFactory.
+
+	bool responseStreamComplete();
+		/// Reads the terminator of a chunked body if the server has sent it,
+		/// or skips the rest of a Content-Length body that is in the session
+		/// buffer, then returns responseComplete().
 
 	HTTPClientSession(const HTTPClientSession&) = delete;
 	HTTPClientSession& operator = (const HTTPClientSession&) = delete;

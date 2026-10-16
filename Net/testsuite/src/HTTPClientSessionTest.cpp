@@ -13,14 +13,22 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPRequestHandler.h"
+#include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/HTTPServer.h"
+#include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Stopwatch.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "HTTPTestServer.h"
+#include <future>
 #include <istream>
 #include <ostream>
 #include <sstream>
@@ -31,7 +39,13 @@ using Poco::Net::HTTPSession;
 using Poco::Net::ProxyConfig;
 using Poco::Net::ProxyAuthentication;
 using Poco::Net::HTTPRequest;
+using Poco::Net::HTTPRequestHandler;
+using Poco::Net::HTTPRequestHandlerFactory;
 using Poco::Net::HTTPResponse;
+using Poco::Net::HTTPServer;
+using Poco::Net::HTTPServerParams;
+using Poco::Net::HTTPServerRequest;
+using Poco::Net::HTTPServerResponse;
 using Poco::Net::HTTPMessage;
 using Poco::Net::MessageException;
 using Poco::Net::ServerSocket;
@@ -39,10 +53,65 @@ using Poco::Net::Socket;
 using Poco::Net::SocketAddress;
 using Poco::Net::StreamSocket;
 using Poco::StreamCopier;
+using Poco::Stopwatch;
 using Poco::InvalidArgumentException;
 using Poco::IllegalStateException;
 using Poco::File;
 using Poco::Path;
+
+
+namespace
+{
+	class TunnelClientSession: public HTTPClientSession
+		/// Gives the tests access to proxyTunnel().
+	{
+	public:
+		using HTTPClientSession::HTTPClientSession;
+		using HTTPClientSession::proxyTunnel;
+	};
+
+	class KeepAliveRequestHandler: public HTTPRequestHandler
+		/// Answers HEAD /keepAlive, GET /small, GET /large and HEAD /large;
+		/// the last one closes the connection.
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override
+		{
+			const bool head = request.getMethod() == HTTPRequest::HTTP_HEAD;
+			if (head && request.getURI() == "/keepAlive")
+			{
+				response.setContentType("text/plain");
+				response.setContentLength(static_cast<std::streamsize>(HTTPTestServer::SMALL_BODY.size()));
+				response.send();
+			}
+			else if (!head && request.getURI() == "/small")
+			{
+				response.sendBuffer(HTTPTestServer::SMALL_BODY.data(), HTTPTestServer::SMALL_BODY.size());
+			}
+			else if (!head && request.getURI() == "/large")
+			{
+				response.setChunkedTransferEncoding(true);
+				response.send() << HTTPTestServer::LARGE_BODY;
+			}
+			else if (head && request.getURI() == "/large")
+			{
+				response.setContentType("text/plain");
+				response.setContentLength(static_cast<std::streamsize>(HTTPTestServer::LARGE_BODY.size()));
+				response.setKeepAlive(false);
+				response.send();
+			}
+		}
+	};
+
+	class KeepAliveRequestHandlerFactory: public HTTPRequestHandlerFactory
+	{
+	public:
+		HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&) override
+		{
+			return new KeepAliveRequestHandler;
+		}
+	};
+}
 
 
 HTTPClientSessionTest::HTTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
@@ -203,49 +272,61 @@ void HTTPClientSessionTest::testPostLargeChunked()
 
 void HTTPClientSessionTest::testKeepAlive()
 {
-	HTTPTestServer srv;
-	HTTPClientSession s("127.0.0.1", srv.port());
-	s.setKeepAlive(true);
-	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
-	s.sendRequest(request);
-	HTTPResponse response;
-	std::istream& rs1 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPTestServer::SMALL_BODY.length());
-	assertTrue (response.getContentType() == "text/plain");
-	assertTrue (response.getKeepAlive());
-	std::ostringstream ostr1;
-	assertTrue (StreamCopier::copyStream(rs1, ostr1) == 0);
+	ServerSocket svs(SocketAddress("127.0.0.1", 0));
+	HTTPServer srv(new KeepAliveRequestHandlerFactory, svs, new HTTPServerParams);
+	srv.start();
+	try
+	{
+		HTTPClientSession s("127.0.0.1", srv.port());
+		s.setKeepAlive(true);
+		HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs1 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPTestServer::SMALL_BODY.length());
+		assertTrue (response.getContentType() == "text/plain");
+		assertTrue (response.getKeepAlive());
+		std::ostringstream ostr1;
+		assertTrue (StreamCopier::copyStream(rs1, ostr1) == 0);
 
-	request.setMethod(HTTPRequest::HTTP_GET);
-	request.setURI("/small");
-	s.sendRequest(request);
-	std::istream& rs2 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPTestServer::SMALL_BODY.length());
-	assertTrue (response.getKeepAlive());
-	std::ostringstream ostr2;
-	StreamCopier::copyStream(rs2, ostr2);
-	assertTrue (ostr2.str() == HTTPTestServer::SMALL_BODY);
+		request.setMethod(HTTPRequest::HTTP_GET);
+		request.setURI("/small");
+		s.sendRequest(request);
+		std::istream& rs2 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPTestServer::SMALL_BODY.length());
+		assertTrue (response.getKeepAlive());
+		std::ostringstream ostr2;
+		StreamCopier::copyStream(rs2, ostr2);
+		assertTrue (ostr2.str() == HTTPTestServer::SMALL_BODY);
 
-	request.setMethod(HTTPRequest::HTTP_GET);
-	request.setURI("/large");
-	s.sendRequest(request);
-	std::istream& rs3 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assertTrue (response.getChunkedTransferEncoding());
-	assertTrue (response.getKeepAlive());
-	std::ostringstream ostr3;
-	StreamCopier::copyStream(rs3, ostr3);
-	assertTrue (ostr3.str() == HTTPTestServer::LARGE_BODY);
+		request.setMethod(HTTPRequest::HTTP_GET);
+		request.setURI("/large");
+		s.sendRequest(request);
+		std::istream& rs3 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+		assertTrue (response.getChunkedTransferEncoding());
+		assertTrue (response.getKeepAlive());
+		std::ostringstream ostr3;
+		StreamCopier::copyStream(rs3, ostr3);
+		assertTrue (ostr3.str() == HTTPTestServer::LARGE_BODY);
 
-	request.setMethod(HTTPRequest::HTTP_HEAD);
-	request.setURI("/large");
-	s.sendRequest(request);
-	std::istream& rs4= s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPTestServer::LARGE_BODY.length());
-	assertTrue (response.getContentType() == "text/plain");
-	assertTrue (!response.getKeepAlive());
-	std::ostringstream ostr4;
-	assertTrue (StreamCopier::copyStream(rs4, ostr4) == 0);
+		request.setMethod(HTTPRequest::HTTP_HEAD);
+		request.setURI("/large");
+		s.sendRequest(request);
+		std::istream& rs4 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPTestServer::LARGE_BODY.length());
+		assertTrue (response.getContentType() == "text/plain");
+		assertTrue (!response.getKeepAlive());
+		std::ostringstream ostr4;
+		assertTrue (StreamCopier::copyStream(rs4, ostr4) == 0);
+		assertTrue (srv.totalConnections() == 1);
+		srv.stop();
+	}
+	catch (...)
+	{
+		srv.stop();
+		throw;
+	}
 }
 
 
@@ -697,6 +778,28 @@ void HTTPClientSessionTest::assertNewConnectionServes(HTTPClientSession& session
 }
 
 
+std::string HTTPClientSessionTest::receiveHeader(StreamSocket& peer)
+{
+	peer.setReceiveTimeout(Poco::Timespan(5, 0));
+	std::string received;
+	char buffer[1024];
+	try
+	{
+		while (received.find("\r\n\r\n") == std::string::npos)
+		{
+			const int n = peer.receiveBytes(buffer, sizeof(buffer));
+			if (n <= 0) break;
+			received.append(buffer, static_cast<std::size_t>(n));
+		}
+	}
+	catch (Poco::TimeoutException&)
+	{
+		failmsg("the client did not send a request header");
+	}
+	return received;
+}
+
+
 void HTTPClientSessionTest::testIncompleteFixedLengthResponse()
 {
 	ServerSocket server(SocketAddress("127.0.0.1", 0));
@@ -714,6 +817,7 @@ void HTTPClientSessionTest::testIncompleteFixedLengthResponse()
 	assertTrue (StreamCopier::copyStream(rs, ostr) == 10);
 	assertTrue (ostr.str() == "0123456789");
 	assertTrue (dynamic_cast<const MessageException*>(cs.networkException()) != nullptr);
+	assertTrue (!cs.responseComplete());
 }
 
 
@@ -724,6 +828,7 @@ void HTTPClientSessionTest::testCompleteFixedLengthResponse()
 	cs.setTimeout(Poco::Timespan(10, 0));
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
 	cs.sendRequest(request);
+	assertTrue (!cs.responseComplete());
 	StreamSocket ss = server.acceptConnection();
 	const std::string complete("HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\n0123456789");
 	ss.sendBytes(complete.data(), static_cast<int>(complete.size()));
@@ -733,6 +838,229 @@ void HTTPClientSessionTest::testCompleteFixedLengthResponse()
 	assertTrue (StreamCopier::copyStream(rs, ostr) == 10);
 	assertTrue (ostr.str() == "0123456789");
 	assertTrue (cs.networkException() == nullptr);
+	assertTrue (cs.responseComplete());
+}
+
+
+void HTTPClientSessionTest::testUnreadFixedLengthResponseReconnects()
+{
+	// The last byte of the body is not sent, so the client cannot skip the rest.
+	const std::string embedded("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nstale");
+	assertReconnectAfterPartialRead("HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(embedded.size() + 1) + "\r\n\r\n" + embedded, 0);
+}
+
+
+void HTTPClientSessionTest::testUnreadBufferedFixedLengthResponseKeepsConnection()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket ss = server.acceptConnection();
+	// The body is sent with the header, so it is in the session buffer when the header has been read.
+	const std::string small("HTTP/1.1 404 Not Found\r\nContent-Length: 5\r\n\r\nstale");
+	ss.sendBytes(small.data(), static_cast<int>(small.size()));
+	HTTPResponse response;
+	cs.receiveResponse(response);
+	assertTrue (!cs.responseComplete());
+
+	cs.sendRequest(request);
+	assertTrue (!server.poll(Poco::Timespan(), Socket::SELECT_READ));
+	const std::string valid("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nfresh");
+	ss.sendBytes(valid.data(), static_cast<int>(valid.size()));
+	std::istream& rs = cs.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs, body);
+	assertTrue (body == "fresh");
+}
+
+
+void HTTPClientSessionTest::testStrayResponseAfterBodyReconnects()
+{
+	enum class StrayResponse
+	{
+		SAME_SEGMENT_BODY_UNREAD,
+		SAME_SEGMENT_BODY_READ,
+		SEPARATE_AFTER_BODY_READ
+	};
+	const std::string stale("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nstale");
+	const std::string bogus("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nbogus");
+	for (StrayResponse stray: {StrayResponse::SAME_SEGMENT_BODY_UNREAD, StrayResponse::SAME_SEGMENT_BODY_READ, StrayResponse::SEPARATE_AFTER_BODY_READ})
+	{
+		ServerSocket server(SocketAddress("127.0.0.1", 0));
+		HTTPClientSession cs("127.0.0.1", server.address().port());
+		cs.setKeepAlive(true);
+		cs.setTimeout(Poco::Timespan(10, 0));
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+		cs.sendRequest(request).flush();
+		StreamSocket first = server.acceptConnection();
+		receiveHeader(first);
+		// A second response without a request follows the body, in the same segment or after the body was read.
+		const std::string responses = stray == StrayResponse::SEPARATE_AFTER_BODY_READ ? stale : stale + bogus;
+		first.sendBytes(responses.data(), static_cast<int>(responses.size()));
+		HTTPResponse response;
+		std::istream& rs = cs.receiveResponse(response);
+		if (stray != StrayResponse::SAME_SEGMENT_BODY_UNREAD)
+		{
+			std::string body;
+			StreamCopier::copyToString(rs, body);
+			assertTrue (body == "stale");
+		}
+		if (stray == StrayResponse::SEPARATE_AFTER_BODY_READ)
+		{
+			first.sendBytes(bogus.data(), static_cast<int>(bogus.size()));
+			// The stray response is in the socket, not in the session buffer.
+			assertTrue (cs.socket().poll(Poco::Timespan(5, 0), Socket::SELECT_READ));
+		}
+
+		assertNewConnectionServes(cs, server, request);
+	}
+}
+
+
+void HTTPClientSessionTest::testServerCloseAfterResponseReconnects()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request).flush();
+	StreamSocket first = server.acceptConnection();
+	// Read before closing: closing a socket with unread data resets the connection instead of closing it.
+	receiveHeader(first);
+	const std::string valid("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nstale");
+	first.sendBytes(valid.data(), static_cast<int>(valid.size()));
+	HTTPResponse response;
+	std::istream& rs = cs.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs, body);
+	assertTrue (body == "stale");
+	first.close();
+	assertTrue (cs.socket().poll(Poco::Timespan(5, 0), Socket::SELECT_READ));
+
+	assertNewConnectionServes(cs, server, request);
+}
+
+
+void HTTPClientSessionTest::testUnreadChunkedResponseReconnects()
+{
+	// The server has not sent the next chunk yet; the client must not wait for it.
+	assertReconnectAfterPartialRead("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nhello\r\n", 5);
+}
+
+
+void HTTPClientSessionTest::testMalformedUnreadChunkReconnects()
+{
+	assertReconnectAfterPartialRead("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nhello\r\nzz\r\n", 5);
+}
+
+
+void HTTPClientSessionTest::testUnreadCloseDelimitedResponseReconnects()
+{
+	assertReconnectAfterPartialRead("HTTP/1.1 200 OK\r\n\r\nhello", 0);
+}
+
+
+void HTTPClientSessionTest::testUnreadChunkedTerminatorKeepsConnection()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket ss = server.acceptConnection();
+	const std::string chunked("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nhello\r\n0\r\nTrailer-1: Value 1\r\n\r\n");
+	ss.sendBytes(chunked.data(), static_cast<int>(chunked.size()));
+	HTTPResponse response;
+	std::istream& rs1 = cs.receiveResponse(response);
+	char buffer[5];
+	rs1.read(buffer, sizeof(buffer));
+	assertTrue (std::string(buffer, static_cast<std::size_t>(rs1.gcount())) == "hello");
+	assertTrue (!cs.responseComplete());
+
+	cs.sendRequest(request);
+	assertTrue (!server.poll(Poco::Timespan(), Socket::SELECT_READ));
+	assertTrue (cs.responseTrailer().get("Trailer-1", "") == "Value 1");
+	const std::string valid("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nfresh");
+	ss.sendBytes(valid.data(), static_cast<int>(valid.size()));
+	std::istream& rs2 = cs.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs2, body);
+	assertTrue (body == "fresh");
+}
+
+
+void HTTPClientSessionTest::testProxyTunnelIgnoresPreviousResponse()
+{
+	ServerSocket proxy(SocketAddress("127.0.0.1", 0));
+	TunnelClientSession cs("www.somehost.com", 80);
+	cs.setProxy("127.0.0.1", proxy.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request).flush();
+	StreamSocket first = proxy.acceptConnection();
+	// Read before closing: on Windows, closing a socket with unread data resets the connection.
+	receiveHeader(first);
+	// A close-delimited body and Connection: close; neither may close the next tunnel.
+	const std::string closing("HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\nno");
+	first.sendBytes(closing.data(), static_cast<int>(closing.size()));
+	first.close();
+	HTTPResponse response;
+	std::istream& rs = cs.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs, body);
+	assertTrue (body == "no");
+
+	cs.reset();
+	auto accepted = std::async(std::launch::async, [this, &proxy]()
+	{
+		StreamSocket connection;
+		if (proxy.poll(Poco::Timespan(5, 0), Socket::SELECT_READ))
+		{
+			connection = proxy.acceptConnection();
+			receiveHeader(connection);
+			const std::string established("HTTP/1.1 200 Connection established\r\n\r\n");
+			connection.sendBytes(established.data(), static_cast<int>(established.size()));
+		}
+		return connection;
+	});
+	cs.proxyTunnel();
+	StreamSocket tunnel = accepted.get();
+
+	cs.sendRequest(request).flush();
+	assertTrue (!proxy.poll(Poco::Timespan(), Socket::SELECT_READ));
+	char buffer[1024];
+	const int n = tunnel.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n).compare(0, 4, "GET ") == 0);
+}
+
+
+void HTTPClientSessionTest::assertReconnectAfterPartialRead(const std::string& firstResponse, std::streamsize bodyBytes)
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket first = server.acceptConnection();
+	first.sendBytes(firstResponse.data(), static_cast<int>(firstResponse.size()));
+	HTTPResponse response;
+	std::istream& rs1 = cs.receiveResponse(response);
+	std::string partial(static_cast<std::size_t>(bodyBytes), '\0');
+	rs1.read(partial.data(), bodyBytes);
+	assertTrue (rs1.gcount() == bodyBytes);
+
+	Stopwatch sw;
+	sw.start();
+	assertNewConnectionServes(cs, server, request);
+	assertTrue (sw.elapsedSeconds() < 2);
 }
 
 
@@ -805,6 +1133,15 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testIncompleteFixedLengthResponse);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testCompleteFixedLengthResponse);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testFixedLengthResponseInPartsNonBlocking);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testUnreadFixedLengthResponseReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testUnreadBufferedFixedLengthResponseKeepsConnection);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testStrayResponseAfterBodyReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testServerCloseAfterResponseReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testUnreadChunkedResponseReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testMalformedUnreadChunkReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testUnreadCloseDelimitedResponseReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testUnreadChunkedTerminatorKeepsConnection);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyTunnelIgnoresPreviousResponse);
 
 	return pSuite;
 }

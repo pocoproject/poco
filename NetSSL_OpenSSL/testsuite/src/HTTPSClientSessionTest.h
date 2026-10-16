@@ -55,6 +55,7 @@ public:
 	void testHttpsProxyTunnelCorruptedRecord();
 	void testHttpsProxyTunnelClosedInBody();
 	void testHttpsProxyTunnelCloseEndsHandshake();
+	void testChunkedTerminatorInPendingTLSDataKeepsConnection();
 
 	void setUp();
 	void tearDown();

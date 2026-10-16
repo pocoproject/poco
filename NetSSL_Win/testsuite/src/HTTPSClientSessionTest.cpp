@@ -77,6 +77,50 @@ public:
 };
 
 
+class KeepAliveRequestHandler: public HTTPRequestHandler
+	/// Answers HEAD /keepAlive, GET /small, GET /large and HEAD /large;
+	/// the last one closes the connection.
+{
+public:
+	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override
+	{
+		const bool head = request.getMethod() == HTTPRequest::HTTP_HEAD;
+		if (head && request.getURI() == "/keepAlive")
+		{
+			response.setContentType("text/plain");
+			response.setContentLength(static_cast<std::streamsize>(HTTPSTestServer::SMALL_BODY.size()));
+			response.send();
+		}
+		else if (!head && request.getURI() == "/small")
+		{
+			response.sendBuffer(HTTPSTestServer::SMALL_BODY.data(), HTTPSTestServer::SMALL_BODY.size());
+		}
+		else if (!head && request.getURI() == "/large")
+		{
+			response.setChunkedTransferEncoding(true);
+			response.send() << HTTPSTestServer::LARGE_BODY;
+		}
+		else if (head && request.getURI() == "/large")
+		{
+			response.setContentType("text/plain");
+			response.setContentLength(static_cast<std::streamsize>(HTTPSTestServer::LARGE_BODY.size()));
+			response.setKeepAlive(false);
+			response.send();
+		}
+	}
+};
+
+
+class KeepAliveRequestHandlerFactory: public HTTPRequestHandlerFactory
+{
+public:
+	HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&) override
+	{
+		return new KeepAliveRequestHandler;
+	}
+};
+
+
 HTTPSClientSessionTest::HTTPSClientSessionTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -280,49 +324,61 @@ void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
 
 void HTTPSClientSessionTest::testKeepAlive()
 {
-	HTTPSTestServer srv;
-	HTTPSClientSession s("127.0.0.1", srv.port());
-	s.setKeepAlive(true);
-	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
-	s.sendRequest(request);
-	HTTPResponse response;
-	std::istream& rs1 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assertTrue (response.getContentType() == "text/plain");
-	assertTrue (response.getKeepAlive());
-	std::ostringstream ostr1;
-	assertTrue (StreamCopier::copyStream(rs1, ostr1) == 0);
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	HTTPServer srv(new KeepAliveRequestHandlerFactory, svs, new HTTPServerParams);
+	srv.start();
+	try
+	{
+		HTTPSClientSession s("127.0.0.1", srv.port());
+		s.setKeepAlive(true);
+		HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs1 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+		assertTrue (response.getContentType() == "text/plain");
+		assertTrue (response.getKeepAlive());
+		std::ostringstream ostr1;
+		assertTrue (StreamCopier::copyStream(rs1, ostr1) == 0);
 
-	request.setMethod(HTTPRequest::HTTP_GET);
-	request.setURI("/small");
-	s.sendRequest(request);
-	std::istream& rs2 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assertTrue (response.getKeepAlive());
-	std::ostringstream ostr2;
-	StreamCopier::copyStream(rs2, ostr2);
-	assertTrue (ostr2.str() == HTTPSTestServer::SMALL_BODY);
+		request.setMethod(HTTPRequest::HTTP_GET);
+		request.setURI("/small");
+		s.sendRequest(request);
+		std::istream& rs2 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+		assertTrue (response.getKeepAlive());
+		std::ostringstream ostr2;
+		StreamCopier::copyStream(rs2, ostr2);
+		assertTrue (ostr2.str() == HTTPSTestServer::SMALL_BODY);
 
-	request.setMethod(HTTPRequest::HTTP_GET);
-	request.setURI("/large");
-	s.sendRequest(request);
-	std::istream& rs3 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assertTrue (response.getChunkedTransferEncoding());
-	assertTrue (response.getKeepAlive());
-	std::ostringstream ostr3;
-	StreamCopier::copyStream(rs3, ostr3);
-	assertTrue (ostr3.str() == HTTPSTestServer::LARGE_BODY);
+		request.setMethod(HTTPRequest::HTTP_GET);
+		request.setURI("/large");
+		s.sendRequest(request);
+		std::istream& rs3 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+		assertTrue (response.getChunkedTransferEncoding());
+		assertTrue (response.getKeepAlive());
+		std::ostringstream ostr3;
+		StreamCopier::copyStream(rs3, ostr3);
+		assertTrue (ostr3.str() == HTTPSTestServer::LARGE_BODY);
 
-	request.setMethod(HTTPRequest::HTTP_HEAD);
-	request.setURI("/large");
-	s.sendRequest(request);
-	std::istream& rs4 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
-	assertTrue (response.getContentType() == "text/plain");
-	assertTrue (!response.getKeepAlive());
-	std::ostringstream ostr4;
-	assertTrue (StreamCopier::copyStream(rs4, ostr4) == 0);
+		request.setMethod(HTTPRequest::HTTP_HEAD);
+		request.setURI("/large");
+		s.sendRequest(request);
+		std::istream& rs4 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
+		assertTrue (response.getContentType() == "text/plain");
+		assertTrue (!response.getKeepAlive());
+		std::ostringstream ostr4;
+		assertTrue (StreamCopier::copyStream(rs4, ostr4) == 0);
+		assertTrue (srv.totalConnections() == 1);
+		srv.stop();
+	}
+	catch (...)
+	{
+		srv.stop();
+		throw;
+	}
 }
 
 
