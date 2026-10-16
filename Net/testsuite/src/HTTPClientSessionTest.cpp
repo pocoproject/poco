@@ -132,7 +132,7 @@ namespace
 
 	class FailedSendSession: public HTTPClientSession
 		/// Lets the test record a send error as HTTPSession::write() does.
-		/// Every send after failSend() fails.
+		/// Every send after failSend() fails and records its error, because sendRequest() clears a recorded error.
 	{
 	public:
 		FailedSendSession(const std::string& host, Poco::UInt16 port):
@@ -149,7 +149,11 @@ namespace
 	protected:
 		int write(const char* buffer, std::streamsize length) override
 		{
-			if (_failed) throw Poco::TimeoutException("Send timed out");
+			if (_failed)
+			{
+				setException(Poco::TimeoutException("Send timed out"));
+				throw Poco::TimeoutException("Send timed out");
+			}
 			return HTTPClientSession::write(buffer, length);
 		}
 
@@ -182,6 +186,43 @@ namespace
 
 	private:
 		int _shortWriteLength = 0;
+	};
+
+	class SendTimeoutSession: public HTTPClientSession
+		/// Reports the first failed send as a TimeoutException and records it as HTTPSession::write()
+		/// records a send error, so that the test can tell it from a broken pipe of a later write.
+		/// Later sends are not changed.
+	{
+	public:
+		SendTimeoutSession(const std::string& host, Poco::UInt16 port):
+			HTTPClientSession(host, port)
+		{
+		}
+
+		int send(const char* buffer, std::streamsize length)
+			/// Writes through write(), as a request stream does.
+		{
+			return write(buffer, length);
+		}
+
+	protected:
+		int write(const char* buffer, std::streamsize length) override
+		{
+			if (_failed) return HTTPClientSession::write(buffer, length);
+			try
+			{
+				return HTTPClientSession::write(buffer, length);
+			}
+			catch (Poco::Exception&)
+			{
+				_failed = true;
+				setException(Poco::TimeoutException("Send timed out"));
+				throw Poco::TimeoutException("Send timed out");
+			}
+		}
+
+	private:
+		bool _failed = false;
 	};
 }
 
@@ -1514,6 +1555,80 @@ void HTTPClientSessionTest::testShortRequestWriteClosesConnection()
 }
 
 
+void HTTPClientSessionTest::testFailedChunkedHeaderSendThrows()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	FailedSendSession cs("127.0.0.1", server.address().port());
+	cs.failSend();
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/upload", HTTPMessage::HTTP_1_1);
+	request.setChunkedTransferEncoding(true);
+	try
+	{
+		cs.sendRequest(request);
+		failmsg("must throw TimeoutException");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	assertTrue (!cs.connected());
+}
+
+
+void HTTPClientSessionTest::testFailedReconnectIsNotRetried()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	const SocketAddress address = server.address();
+	SendTimeoutSession cs("127.0.0.1", address.port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(2, 0));
+	cs.setKeepAliveTimeout(Poco::Timespan(30, 0));
+	HTTPRequest first(HTTPRequest::HTTP_GET, "/first", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(first);
+	StreamSocket peer = server.acceptConnection();
+	const std::string reply("HTTP/1.1 200 OK\r\nContent-Length: 2\r\nConnection: Keep-Alive\r\n\r\nok");
+	peer.sendBytes(reply.data(), static_cast<int>(reply.size()));
+	HTTPResponse firstResponse;
+	std::string firstBody;
+	StreamCopier::copyToString(cs.receiveResponse(firstResponse), firstBody);
+	assertTrue (firstBody == "ok");
+
+	const std::string body(64 * 1024, 'A');
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/upload", HTTPMessage::HTTP_1_1);
+	request.setContentLength(static_cast<std::streamsize>(body.size()));
+	std::ostream& os = cs.sendRequest(request);
+	// Reset after sendRequest(), which reconnects up front when a reset is pending: the body write must fail
+	// on the reused connection and the closed listener must refuse the reconnect.
+	peer.setLinger(true, 0);
+	peer.close();
+	server.close();
+	assertTrue (cs.socket().poll(Poco::Timespan(5, 0), Socket::SELECT_READ));
+	os.write(body.data(), static_cast<std::streamsize>(body.size()));
+	assertTrue (!os.good());
+	assertTrue (cs.networkException() != nullptr);
+	ServerSocket restarted(address);
+	// The stream does not write again after a failed write, so the test writes through the session,
+	// which must not reconnect a second time for the same request.
+	try
+	{
+		cs.send("x", 1);
+		failmsg("must throw TimeoutException");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	assertTrue (!restarted.poll(Poco::Timespan(0, 100000), Socket::SELECT_READ));
+	HTTPResponse response;
+	try
+	{
+		cs.receiveResponse(response);
+		failmsg("must throw TimeoutException");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+}
+
+
 void HTTPClientSessionTest::assertFramingRejected(const std::string& headers)
 {
 	ServerSocket server(SocketAddress("127.0.0.1", 0));
@@ -1782,6 +1897,8 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testIncompleteRequestBodyReconnects);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testIncompleteRequestBodyWithoutResponseReconnects);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testShortRequestWriteClosesConnection);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testFailedChunkedHeaderSendThrows);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testFailedReconnectIsNotRetried);
 
 	return pSuite;
 }

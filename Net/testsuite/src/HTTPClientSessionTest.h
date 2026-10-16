@@ -90,6 +90,8 @@ public:
 	void testIncompleteRequestBodyReconnects();
 	void testIncompleteRequestBodyWithoutResponseReconnects();
 	void testShortRequestWriteClosesConnection();
+	void testFailedChunkedHeaderSendThrows();
+	void testFailedReconnectIsNotRetried();
 
 	void setUp();
 	void tearDown();
