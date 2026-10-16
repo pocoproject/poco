@@ -79,12 +79,8 @@ MessageHeader& MessageHeader::operator = (const MessageHeader& messageHeader)
 
 void MessageHeader::write(std::ostream& ostr) const
 {
-	NameValueCollection::ConstIterator it = begin();
-	while (it != end())
-	{
-		ostr << it->first << ": " << it->second << "\r\n";
-		++it;
-	}
+	checkFields(*this, true);
+	writeFields(*this, ostr);
 }
 
 
@@ -153,7 +149,14 @@ void MessageHeader::read(std::istream& istr)
 			Poco::trimRightInPlace(value);
 
 		if (_autoDecode && !isFramingHeader(name))
-			add(name, decodeWord(value));
+		{
+			// A decoded CR or LF would split the field when the value is written again.
+			const std::string decoded = decodeWord(value);
+			if (std::any_of(decoded.begin(), decoded.end(), isInvalidValueChar))
+				add(name, value);
+			else
+				add(name, decoded);
+		}
 		else
 			add(name, value);
 
@@ -538,6 +541,48 @@ bool MessageHeader::isValidFieldName(const std::string& name)
 	static constexpr std::string_view tokenPunct("!#$%&'*+-.^_`|~");
 	return !name.empty() && std::all_of(name.begin(), name.end(),
 		[](char c) { return Poco::Ascii::isAlphaNumeric(c) || tokenPunct.find(c) != std::string_view::npos; });
+}
+
+
+bool MessageHeader::isInvalidValueChar(char c)
+{
+	return c != '\t' && Poco::Ascii::hasProperties(c, Poco::Ascii::ACP_CONTROL);
+}
+
+
+void MessageHeader::checkFields(const NameValueCollection& fields, bool allowFolding)
+{
+	const auto isFieldTextChar = [](char c) { return Poco::Ascii::isPrintable(c) && c != ' ' && c != ':'; };
+	for (const auto& [name, value]: fields)
+	{
+		const bool validName = allowFolding
+			? !name.empty() && std::all_of(name.begin(), name.end(), isFieldTextChar)
+			: isValidFieldName(name);
+		if (!validName)
+			throw MessageException("Invalid header field name");
+		for (std::string::size_type i = 0; i < value.size(); ++i)
+		{
+			if (!isInvalidValueChar(value[i])) continue;
+			// CR LF folds the value, as MailMessage::encodeWord() writes it, only when
+			// white space and then other text follow; any other CR or LF would start
+			// a new field or, as a line of white space only, end the header.
+			const std::string::size_type text = value.find_first_not_of(" \t", i + 2);
+			const bool isFold = allowFolding && value.compare(i, 2, "\r\n") == 0
+				&& text != std::string::npos && text > i + 2
+				&& value[text] != '\r' && value[text] != '\n';
+			if (isFold)
+				++i;
+			else
+				throw MessageException("Invalid character in header field value", name);
+		}
+	}
+}
+
+
+void MessageHeader::writeFields(const NameValueCollection& fields, std::ostream& ostr)
+{
+	for (const auto& [name, value]: fields)
+		ostr << name << ": " << value << "\r\n";
 }
 
 

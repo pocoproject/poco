@@ -49,6 +49,9 @@ public:
 	void testNonBlockingHandlerClosesConnection();
 	void testHandlerNonBlockingReadThenBlocking();
 	void testFieldNameWhitespace();
+	void testRedirectLineBreak();
+	void testSendLineBreak();
+	void testEchoDecodedLineBreak();
 
 	void setUp();
 	void tearDown();

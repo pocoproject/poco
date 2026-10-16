@@ -125,6 +125,16 @@ public:
 		///   * the message is a HTTP/1.1 message and not Connection header is set
 		/// Returns false otherwise.
 
+	void write(std::ostream& ostr) const override;
+		/// Writes the header fields as MessageHeader::write() does,
+		/// but throws a MessageException if a field name is not a token
+		/// as defined in RFC 9110, or a field value contains a carriage
+		/// return or a linefeed, because HTTP does not allow folded lines
+		/// (RFC 9112, section 5.2).
+
+	static void writeTrailer(const MessageHeader& trailer, std::ostream& ostr);
+		/// Writes the fields of a chunked trailer with the checks of write().
+
 	static const std::string HTTP_1_0;
 	static const std::string HTTP_1_1;
 

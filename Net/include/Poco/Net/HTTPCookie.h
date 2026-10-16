@@ -98,6 +98,10 @@ public:
 
 	void setName(const std::string& name);
 		/// Sets the name of the cookie.
+		///
+		/// toString() writes the name as it is: a name containing
+		/// a semicolon must be escaped by calling escape(), or it
+		/// adds attributes to the cookie.
 
 	[[nodiscard]] const std::string& getName() const;
 		/// Returns the name of the cookie.
@@ -111,6 +115,9 @@ public:
 		/// Note: If value contains whitespace or non-alphanumeric
 		/// characters, the value should be escaped by calling escape()
 		/// prior to passing it to setName().
+		///
+		/// toString() writes a version 0 cookie value as it is, so an
+		/// unescaped semicolon adds attributes to the cookie.
 
 	[[nodiscard]] const std::string& getValue() const;
 		/// Returns the value of the cookie.

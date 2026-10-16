@@ -117,6 +117,11 @@ public:
 		///
 		/// Throws a SMTPException in case of a SMTP-specific error, or a
 		/// NetException in case of a general network communication failure.
+		///
+		/// Throws a MessageException, before any command is sent, if
+		/// MailMessage::validateHeaders() does. If writing the message fails
+		/// after the DATA command, the connection is closed without QUIT,
+		/// so that the server discards the incomplete message.
 
 	void sendMessage(const MailMessage& message, const Recipients& recipients);
 		/// Sends the given mail message by sending a MAIL FROM command,
@@ -126,6 +131,9 @@ public:
 		///
 		/// Throws a SMTPException in case of a SMTP-specific error, or a
 		/// NetException in case of a general network communication failure.
+		///
+		/// Header validation and a failed write are handled as in
+		/// sendMessage(const MailMessage&).
 
 	void sendMessage(std::istream& istr);
 		/// Sends the mail message from the supplied stream. Content of the stream

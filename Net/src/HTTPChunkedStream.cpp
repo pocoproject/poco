@@ -14,6 +14,7 @@
 
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/HTTPHeaderStream.h"
+#include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
@@ -60,7 +61,7 @@ void HTTPChunkedStreamBuf::close()
 		{
 			HTTPHeaderOutputStream hos(_session);
 			hos.write("0\r\n", 3);
-			_pTrailer->write(hos);
+			HTTPMessage::writeTrailer(*_pTrailer, hos);
 			hos.write("\r\n", 2);
 		}
 		else

@@ -15,13 +15,25 @@
 #include "Poco/Net/SMTPClientSession.h"
 #include "Poco/Net/MailMessage.h"
 #include "Poco/Net/MailRecipient.h"
+#include "Poco/Net/StringPartSource.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Stopwatch.h"
+#include "Poco/Thread.h"
 
 
 using Poco::Net::SMTPClientSession;
 using Poco::Net::MailMessage;
 using Poco::Net::MailRecipient;
+using Poco::Net::MessageException;
+using Poco::Net::MultipartSource;
+using Poco::Net::StringPartSource;
+using Poco::Net::StreamSocket;
+using Poco::Net::SocketAddress;
 using Poco::Net::SMTPException;
+using Poco::Stopwatch;
+using Poco::Thread;
 
 
 SMTPClientSessionTest::SMTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
@@ -305,6 +317,90 @@ void SMTPClientSessionTest::testSendFailed()
 }
 
 
+void SMTPClientSessionTest::testSendInvalidHeader()
+{
+	DialogServer server;
+	server.addResponse("220 localhost SMTP ready");
+	server.addResponse("250 Hello localhost");
+	server.addResponse("221 Bye");
+	SMTPClientSession session("127.0.0.1", server.port());
+	session.login("localhost");
+	// The server does not reply to every command; this bounds the wait for a reply.
+	session.setTimeout(Poco::Timespan(5, 0));
+
+	MailMessage message;
+	message.setSender("john.doe@no.where");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "jane.doe@no.where", "Jane Doe"));
+	message.setSubject("Test\nBcc: joe.doe@no.where");
+	message.setContent("Hello\r\n");
+	server.clearCommands();
+	try
+	{
+		session.sendMessage(message);
+		fail("invalid header field must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+
+	session.close();
+	assertTrue (server.popCommand() == "QUIT");
+}
+
+
+void SMTPClientSessionTest::testSendInvalidNestedPartHeader()
+{
+	DialogServer server;
+	server.addResponse("220 localhost SMTP ready");
+	server.addResponse("250 Hello localhost");
+	server.addResponse("250 OK");
+	server.addResponse("250 OK");
+	server.addResponse("354 Send data");
+	SMTPClientSession session("127.0.0.1", server.port());
+	session.login("localhost");
+	// The server does not reply to every command; this bounds the wait for a reply.
+	session.setTimeout(Poco::Timespan(5, 0));
+
+	MailMessage message;
+	message.setSender("john.doe@no.where");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "jane.doe@no.where", "Jane Doe"));
+	message.setSubject("Test Message");
+	StringPartSource* pInner = new StringPartSource("Hello\r\n", "text/plain");
+	pInner->headers().set("X-Field", "a\r\nBcc: joe.doe@no.where");
+	MultipartSource* pAlternative = new MultipartSource;
+	pAlternative->addPart("", pInner, MailMessage::CONTENT_INLINE, MailMessage::ENCODING_7BIT);
+	message.addContent(pAlternative, MailMessage::ENCODING_7BIT);
+	server.clearCommands();
+	try
+	{
+		session.sendMessage(message);
+		fail("invalid header field must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+
+	// The server reads one connection at a time, so a line sent on a second
+	// connection arrives only after the session's connection has ended.
+	StreamSocket probe(SocketAddress("127.0.0.1", server.port()));
+	probe.sendBytes("NOOP\r\n", 6);
+	Stopwatch sw;
+	sw.start();
+	std::string command = server.popCommand();
+	while (command != "NOOP")
+	{
+		assertTrue (command != ".");
+		assertTrue (sw.elapsedSeconds() < 5);
+		if (command.empty()) Thread::sleep(10);
+		command = server.popCommand();
+	}
+
+	sw.restart();
+	session.close();
+	assertTrue (sw.elapsedSeconds() < 1);
+}
+
+
 void SMTPClientSessionTest::setUp()
 {
 }
@@ -326,6 +422,8 @@ CppUnit::Test* SMTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendMultiRecipient);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testMultiSeparateRecipient);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendFailed);
+	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendInvalidHeader);
+	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendInvalidNestedPartHeader);
 
 	return pSuite;
 }

@@ -577,6 +577,102 @@ void MessageHeaderTest::testFieldLimitLinesWithoutColon()
 }
 
 
+void MessageHeaderTest::testWriteInvalidFieldValue()
+{
+	const std::string invalid[] = {
+		"a\r\nSet-Cookie: b",
+		"a\nb",
+		"a\rb",
+		"a\r\n",
+		"a\r\n ",
+		"a\r\n \r\n b",
+		"a\r\n\t\r\nb",
+		std::string("a\0b", 3),
+		"a\x01" "b",
+		"a\x7F"
+	};
+	for (const auto& value: invalid)
+	{
+		MessageHeader mh;
+		mh.set("Name1", "value1");
+		mh.set("Name2", value);
+		std::ostringstream ostr;
+		try
+		{
+			mh.write(ostr);
+			fail("invalid field value must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+		assertTrue (ostr.str().empty());
+	}
+}
+
+
+void MessageHeaderTest::testWriteInvalidFieldName()
+{
+	const std::string invalid[] = {
+		"",
+		"Na me",
+		"Name:",
+		"Na\tme",
+		"Na\x01me",
+		"N\xC3\xA4me"
+	};
+	for (const auto& name: invalid)
+	{
+		MessageHeader mh;
+		mh.set("Name1", "value1");
+		mh.set(name, "value");
+		std::ostringstream ostr;
+		try
+		{
+			mh.write(ostr);
+			failmsg("invalid field name must throw: " + name);
+		}
+		catch (MessageException&)
+		{
+		}
+		assertTrue (ostr.str().empty());
+	}
+}
+
+
+void MessageHeaderTest::testWriteValidFields()
+{
+	MessageHeader mh;
+	mh.set("X-Name_1.~!#$%&'*+^`|", "a\tb");
+	mh.set("Subject", "=?UTF-8?Q?a?=\r\n =?UTF-8?Q?b?=");
+	mh.set("Text", "N\xC3\xA4me");
+	mh.set("X-A/B(c)", "a\r\n \t b");
+	std::ostringstream ostr;
+	mh.write(ostr);
+	assertTrue (ostr.str() == "X-Name_1.~!#$%&'*+^`|: a\tb\r\nSubject: =?UTF-8?Q?a?=\r\n =?UTF-8?Q?b?=\r\nText: N\xC3\xA4me\r\nX-A/B(c): a\r\n \t b\r\n");
+}
+
+
+void MessageHeaderTest::testReadDecodedControlCharacters()
+{
+	std::istringstream istr(
+		"X-Q: =?UTF-8?Q?a=0D=0AY:_b?=\r\n"
+		"X-B: =?UTF-8?B?YQ0KWTogYg==?=\r\n"
+		"X-Nul: =?UTF-8?Q?a=00b?=\r\n"
+		"X-Tab: =?UTF-8?Q?a=09b?=\r\n"
+		"\r\n");
+	MessageHeader mh;
+	mh.read(istr);
+	assertTrue (mh.get("X-Q") == "=?UTF-8?Q?a=0D=0AY:_b?=");
+	assertTrue (mh.get("X-B") == "=?UTF-8?B?YQ0KWTogYg==?=");
+	assertTrue (mh.get("X-Nul") == "=?UTF-8?Q?a=00b?=");
+	assertTrue (mh.get("X-Tab") == "a\tb");
+
+	std::ostringstream ostr;
+	mh.write(ostr);
+	assertTrue (ostr.str().find("\r\nY:") == std::string::npos);
+}
+
+
 CppUnit::Test* MessageHeaderTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MessageHeaderTest");
@@ -606,6 +702,10 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictFieldName);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictValueWhitespace);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimitLinesWithoutColon);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteInvalidFieldValue);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteInvalidFieldName);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteValidFields);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testReadDecodedControlCharacters);
 
 	return pSuite;
 }

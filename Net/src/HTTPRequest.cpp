@@ -18,6 +18,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Ascii.h"
 #include "Poco/String.h"
+#include <algorithm>
 
 
 using Poco::NumberFormatter;
@@ -223,10 +224,22 @@ void HTTPRequest::removeProxyCredentials()
 }
 
 
+void HTTPRequest::validate() const
+{
+	const auto isInvalid = [](char c) { return c == '\t' || isInvalidValueChar(c); };
+	const std::string& version = getVersion();
+	if (std::any_of(_method.begin(), _method.end(), isInvalid) || std::any_of(_uri.begin(), _uri.end(), isInvalid) ||
+		std::any_of(version.begin(), version.end(), isInvalid))
+		throw MessageException("Invalid character in HTTP request method, URI or version");
+	checkFields(*this, false);
+}
+
+
 void HTTPRequest::write(std::ostream& ostr) const
 {
+	validate();
 	ostr << _method << " " << _uri << " " << getVersion() << "\r\n";
-	HTTPMessage::write(ostr);
+	writeFields(*this, ostr);
 	ostr << "\r\n";
 }
 

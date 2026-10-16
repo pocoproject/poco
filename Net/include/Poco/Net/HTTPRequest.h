@@ -137,11 +137,19 @@ public:
 	void removeProxyCredentials();
 		/// Removes any proxy credentials from the request.
 
-	void write(std::ostream& ostr) const;
+	void validate() const;
+		/// Throws a MessageException if the method, the URI or the
+		/// version contains a control character, or a header field
+		/// is invalid (see HTTPMessage::write()).
+
+	void write(std::ostream& ostr) const override;
 		/// Writes the HTTP request to the given
 		/// output stream.
+		///
+		/// Throws a MessageException, before anything is written,
+		/// if validate() does.
 
-	void read(std::istream& istr);
+	void read(std::istream& istr) override;
 		/// Reads the HTTP request from the
 		/// given input stream.
 

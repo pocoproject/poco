@@ -242,6 +242,34 @@ void HTTPResponseTest::testRemoveCookie()
 }
 
 
+void HTTPResponseTest::testWriteInvalid()
+{
+	HTTPResponse invalidReason(HTTPResponse::HTTP_OK, "OK\r\nSet-Cookie: injected=1");
+	HTTPResponse invalidCookie;
+	invalidCookie.addCookie(HTTPCookie("name", "value\r\nSet-Cookie: injected=1"));
+	HTTPResponse foldedField;
+	foldedField.set("X-Field", "a\r\n b");
+	for (const HTTPResponse* pResponse: {&invalidReason, &invalidCookie, &foldedField})
+	{
+		std::ostringstream ostr;
+		try
+		{
+			pResponse->write(ostr);
+			fail("invalid response must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+		assertTrue (ostr.str().empty());
+	}
+
+	HTTPResponse tabReason(HTTPResponse::HTTP_OK, "O\tK");
+	std::ostringstream ostr;
+	tabReason.write(ostr);
+	assertTrue (ostr.str() == "HTTP/1.0 200 O\tK\r\n\r\n");
+}
+
+
 void HTTPResponseTest::setUp()
 {
 }
@@ -267,6 +295,7 @@ CppUnit::Test* HTTPResponseTest::suite()
 	CppUnit_addTest(pSuite, HTTPResponseTest, testCookies);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testReplaceCookie);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testRemoveCookie);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testWriteInvalid);
 
 	return pSuite;
 }

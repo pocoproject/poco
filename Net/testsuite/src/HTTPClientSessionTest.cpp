@@ -14,6 +14,7 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/StreamCopier.h"
@@ -32,6 +33,7 @@ using Poco::Net::ProxyAuthentication;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPMessage;
+using Poco::Net::MessageException;
 using Poco::Net::ServerSocket;
 using Poco::Net::Socket;
 using Poco::Net::SocketAddress;
@@ -642,6 +644,44 @@ void HTTPClientSessionTest::testChunkedFramingErrorReconnects()
 }
 
 
+void HTTPClientSessionTest::testInvalidRequestKeepsConnection()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket connection = server.acceptConnection();
+	connection.setReceiveTimeout(Poco::Timespan(10, 0));
+	const std::string valid("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nfresh");
+	connection.sendBytes(valid.data(), static_cast<int>(valid.size()));
+	HTTPResponse response;
+	std::istream& rs = cs.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs, body);
+	char buffer[1024];
+	assertTrue (connection.receiveBytes(buffer, sizeof(buffer)) > 0);
+
+	HTTPRequest invalid(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	invalid.set("X-Field", "a\r\nX-Injected: 1");
+	try
+	{
+		cs.sendRequest(invalid);
+		fail("invalid request must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+	assertTrue (cs.connected());
+
+	cs.sendRequest(request).flush();
+	const int n = connection.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n).compare(0, 15, "GET / HTTP/1.1\r") == 0);
+}
+
+
 void HTTPClientSessionTest::assertNewConnectionServes(HTTPClientSession& session, ServerSocket& server, HTTPRequest& request)
 {
 	session.sendRequest(request);
@@ -695,6 +735,7 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testGlobalProxyConfig);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testBypassProxyExtended);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testChunkedFramingErrorReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testInvalidRequestKeepsConnection);
 
 	return pSuite;
 }
