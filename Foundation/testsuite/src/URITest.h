@@ -36,6 +36,7 @@ public:
 	void testFromPath();
 	void testQueryParameters();
 	void testQueryParametersPlus();
+	void testControlCharacters();
 
 	void setUp();
 	void tearDown();
