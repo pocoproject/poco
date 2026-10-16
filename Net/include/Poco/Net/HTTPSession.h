@@ -55,9 +55,19 @@ public:
 
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for the HTTP session.
+		///
+		/// If the session is connected, the send and receive
+		/// timeouts are also applied to the socket; see
+		/// setSendTimeout() for the exceptions.
 
 	void setTimeout(const Poco::Timespan& connectionTimeout, const Poco::Timespan& sendTimeout, const Poco::Timespan& receiveTimeout);
 		/// Sets different timeouts for the HTTP session.
+		///
+		/// If the session is connected, the send and receive
+		/// timeouts are also applied to the socket; see
+		/// setSendTimeout() for the exceptions. If the send
+		/// timeout is rejected, the receive timeout is still
+		/// applied and the send timeout's exception is rethrown.
 
 	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the timeout for the HTTP session.
@@ -70,12 +80,24 @@ public:
 
 	void setSendTimeout(const Poco::Timespan& timeout);
 		/// Sets the send timeout.
+		///
+		/// If the session is connected, the timeout is also
+		/// applied to the socket. Throws an InvalidArgumentException
+		/// or an IOException if the socket rejects the value.
+		/// A NetException is ignored: the socket has failed,
+		/// and the next send or receive reports it.
 
 	[[nodiscard]] Poco::Timespan getSendTimeout() const;
 		/// Gets the send timeout.
 
 	void setReceiveTimeout(const Poco::Timespan& timeout);
 		/// Sets the receive timeout.
+		///
+		/// If the session is connected, the timeout is also
+		/// applied to the socket. Throws an InvalidArgumentException
+		/// or an IOException if the socket rejects the value.
+		/// A NetException is ignored: the socket has failed,
+		/// and the next send or receive reports it.
 
 	[[nodiscard]] Poco::Timespan getReceiveTimeout() const;
 		/// Gets the receive timeout.
@@ -211,7 +233,7 @@ protected:
 
 	virtual void connect(const SocketAddress& address);
 		/// Connects the underlying socket to the given address
-		/// and sets the socket's receive timeout.
+		/// and sets the socket's send and receive timeouts.
 
 	void connect(const SocketAddress& targetAddress, const SocketAddress& sourceAddress);
 		/// Binds the underlying socket to the source address
@@ -287,21 +309,9 @@ inline Poco::Timespan HTTPSession::getConnectTimeout() const
 }
 
 
-inline void HTTPSession::setSendTimeout(const Poco::Timespan& timeout)
-{
-	_sendTimeout = timeout;
-}
-
-
 inline Poco::Timespan HTTPSession::getSendTimeout() const
 {
 	return _sendTimeout;
-}
-
-
-inline void HTTPSession::setReceiveTimeout(const Poco::Timespan& timeout)
-{
-	_receiveTimeout = timeout;
 }
 
 

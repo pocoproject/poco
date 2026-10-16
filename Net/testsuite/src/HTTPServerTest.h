@@ -49,6 +49,7 @@ public:
 	void testNonBlockingHandlerClosesConnection();
 	void testHandlerNonBlockingReadThenBlocking();
 	void testIncompleteFixedLengthRequest();
+	void testSocketTimeouts();
 	void testFieldNameWhitespace();
 	void testRedirectLineBreak();
 	void testSendLineBreak();
