@@ -247,6 +247,9 @@ protected:
 	void attachSocket(const StreamSocket& socket);
 		/// Attaches a socket to the session, replacing the
 		/// previously attached socket.
+		///
+		/// Data received from the previous socket and not yet
+		/// read from the session is discarded.
 
 	void close();
 		/// Closes the underlying socket.
