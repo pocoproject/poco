@@ -58,6 +58,7 @@ public:
 	void testSlowUnreadRequestBody();
 	void testInvalidRequestHeaderClearsDeadline();
 	void testFailedResponseWriteNotRepeated();
+	void testParallelKeepAliveSessions();
 
 	void setUp();
 	void tearDown();

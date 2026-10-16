@@ -34,7 +34,9 @@
 #include "Poco/Stopwatch.h"
 #include <optional>
 #include <sstream>
+#include <thread>
 #include <utility>
+#include <vector>
 
 
 using Poco::Net::HTTPServer;
@@ -74,6 +76,16 @@ namespace
 			std::istream& istr = request.stream();
 			std::ostream& ostr = response.send();
 			StreamCopier::copyStream(istr, ostr);
+		}
+	};
+
+	class EchoUntilCloseRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			response.setContentType(request.getContentType());
+			StreamCopier::copyStream(request.stream(), response.send());
 		}
 	};
 
@@ -256,6 +268,8 @@ namespace
 		{
 			if (request.getURI() == "/echoBody")
 				return new EchoBodyRequestHandler;
+			else if (request.getURI() == "/echoUntilClose")
+				return new EchoUntilCloseRequestHandler;
 			else if (request.getURI() == "/echoHeader")
 				return new EchoHeaderRequestHandler;
 			else if (request.getURI() == "/redirect")
@@ -902,6 +916,47 @@ namespace
 	private:
 		bool _failed = false;
 	};
+
+	std::string runKeepAliveSession(Poco::UInt16 port, char fill, int requests)
+		/// Sends requests whose responses have fixed-length, chunked and
+		/// until-close bodies over one keep-alive client session. Returns
+		/// a description of the first error, or an empty string.
+	{
+		try
+		{
+			HTTPClientSession cs("127.0.0.1", port);
+			cs.setKeepAlive(true);
+			cs.setTimeout(Poco::Timespan(10, 0));
+			for (int i = 0; i < requests; ++i)
+			{
+				const std::string body(3000 + 1000*(i % 7), fill);
+				const int framing = i % 3;
+				HTTPRequest request("POST", framing == 2 ? "/echoUntilClose" : "/echoBody", HTTPMessage::HTTP_1_1);
+				request.setContentType("text/plain");
+				if (framing == 1)
+					request.setChunkedTransferEncoding(true);
+				else
+					request.setContentLength(static_cast<std::streamsize>(body.length()));
+				cs.sendRequest(request) << body;
+				HTTPResponse response;
+				std::string rbody;
+				StreamCopier::copyToString(cs.receiveResponse(response), rbody);
+				if (rbody != body)
+					return "request " + std::to_string(i) + ": response body differs from the request body";
+				if (framing == 0 && response.getContentLength() != static_cast<std::streamsize>(body.length()))
+					return "request " + std::to_string(i) + ": response has no matching Content-Length";
+				if (framing == 1 && !response.getChunkedTransferEncoding())
+					return "request " + std::to_string(i) + ": response is not chunked";
+				if (framing == 2 && response.getKeepAlive())
+					return "request " + std::to_string(i) + ": until-close response keeps the connection alive";
+			}
+		}
+		catch (Poco::Exception& exc)
+		{
+			return exc.displayText();
+		}
+		return std::string();
+	}
 }
 
 
@@ -1253,6 +1308,36 @@ void HTTPServerTest::testFailedResponseWriteNotRepeated()
 }
 
 
+void HTTPServerTest::testParallelKeepAliveSessions()
+{
+	// Concurrency smoke test.
+	ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(true);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+
+	// Every client operation has a 10 second timeout, which bounds each thread.
+	constexpr int sessions = 8;
+	std::vector<std::string> errors(sessions);
+	std::vector<std::thread> clients;
+	for (int i = 0; i < sessions; ++i)
+	{
+		clients.emplace_back([&errors, i, port = svs.address().port()]()
+		{
+			errors[i] = runKeepAliveSession(port, static_cast<char>('a' + i), 60);
+		});
+	}
+	for (auto& client: clients) client.join();
+	srv.stop();
+
+	for (const auto& error: errors)
+	{
+		if (!error.empty()) failmsg(error);
+	}
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
@@ -1291,6 +1376,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testSlowUnreadRequestBody);
 	CppUnit_addTest(pSuite, HTTPServerTest, testInvalidRequestHeaderClearsDeadline);
 	CppUnit_addTest(pSuite, HTTPServerTest, testFailedResponseWriteNotRepeated);
+	CppUnit_addTest(pSuite, HTTPServerTest, testParallelKeepAliveSessions);
 
 	return pSuite;
 }

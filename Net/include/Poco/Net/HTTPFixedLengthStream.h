@@ -20,7 +20,6 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPBasicStreamBuf.h"
-#include <cstddef>
 #include <istream>
 #include <ostream>
 
@@ -89,12 +88,6 @@ class Net_API HTTPFixedLengthInputStream: public HTTPFixedLengthIOS, public std:
 public:
 	HTTPFixedLengthInputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
 	~HTTPFixedLengthInputStream();
-
-	void* operator new(std::size_t size);
-	void operator delete(void* ptr);
-
-private:
-	static Poco::MemoryPool _pool;
 };
 
 
@@ -104,12 +97,6 @@ class Net_API HTTPFixedLengthOutputStream: public HTTPFixedLengthIOS, public std
 public:
 	HTTPFixedLengthOutputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
 	~HTTPFixedLengthOutputStream();
-
-	void* operator new(std::size_t size);
-	void operator delete(void* ptr);
-
-private:
-	static Poco::MemoryPool _pool;
 };
 
 

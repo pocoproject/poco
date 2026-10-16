@@ -25,7 +25,6 @@ namespace Poco::Net {
 
 
 HTTPSession::HTTPSession():
-	_pBuffer(nullptr),
 	_pCurrent(nullptr),
 	_pEnd(nullptr),
 	_keepAlive(false),
@@ -39,7 +38,6 @@ HTTPSession::HTTPSession():
 
 HTTPSession::HTTPSession(const StreamSocket& socket):
 	_socket(socket),
-	_pBuffer(nullptr),
 	_pCurrent(nullptr),
 	_pEnd(nullptr),
 	_keepAlive(false),
@@ -53,7 +51,6 @@ HTTPSession::HTTPSession(const StreamSocket& socket):
 
 HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 	_socket(socket),
-	_pBuffer(nullptr),
 	_pCurrent(nullptr),
 	_pEnd(nullptr),
 	_keepAlive(keepAlive),
@@ -67,14 +64,6 @@ HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 
 HTTPSession::~HTTPSession()
 {
-	try
-	{
-		if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
 	try
 	{
 		close();
@@ -239,12 +228,12 @@ bool HTTPSession::dataPending() const
 
 void HTTPSession::refill()
 {
-	if (!_pBuffer)
+	if (_pBuffer == nullptr)
 	{
-		_pBuffer = HTTPBufferAllocator::allocate(HTTPBufferAllocator::BUFFER_SIZE);
+		_pBuffer.reset(new char[HTTPBufferAllocator::BUFFER_SIZE]);
 	}
-	_pCurrent = _pEnd = _pBuffer;
-	int n = receive(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
+	_pCurrent = _pEnd = _pBuffer.get();
+	int n = receive(_pBuffer.get(), HTTPBufferAllocator::BUFFER_SIZE);
 	// A non-blocking socket returns a negative value when no data is available.
 	if (n > 0) _pEnd += n;
 }
@@ -267,7 +256,7 @@ void HTTPSession::connect(const SocketAddress& address)
 		_socket.setNoDelay(true);
 	// There may be leftover data from a previous (failed) request in the buffer,
 	// so we clear it.
-	_pCurrent = _pEnd = _pBuffer;
+	_pCurrent = _pEnd = _pBuffer.get();
 }
 
 
@@ -329,7 +318,7 @@ StreamSocket HTTPSession::detachSocket()
 void HTTPSession::attachSocket(const StreamSocket& socket)
 {
 	_socket = socket;
-	_pCurrent = _pEnd = _pBuffer;
+	_pCurrent = _pEnd = _pBuffer.get();
 }
 
 

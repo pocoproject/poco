@@ -20,8 +20,6 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPBasicStreamBuf.h"
-#include "Poco/MemoryPool.h"
-#include <cstddef>
 #include <istream>
 #include <ostream>
 
@@ -71,12 +69,6 @@ class Net_API HTTPHeaderInputStream: public HTTPHeaderIOS, public std::istream
 public:
 	HTTPHeaderInputStream(HTTPSession& session);
 	~HTTPHeaderInputStream();
-
-	void* operator new(std::size_t size);
-	void operator delete(void* ptr);
-
-private:
-	static Poco::MemoryPool _pool;
 };
 
 
@@ -86,12 +78,6 @@ class Net_API HTTPHeaderOutputStream: public HTTPHeaderIOS, public std::ostream
 public:
 	HTTPHeaderOutputStream(HTTPSession& session);
 	~HTTPHeaderOutputStream();
-
-	void* operator new(std::size_t size);
-	void operator delete(void* ptr);
-
-private:
-	static Poco::MemoryPool _pool;
 };
 
 
