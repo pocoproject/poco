@@ -404,6 +404,7 @@ private:
 	bool                  _reconnect;
 	bool                  _mustReconnect;
 	bool                  _expectResponseBody;
+	bool                  _connectRequest = false;
 	bool                  _responseReceived;
 	OStreamPtr            _pRequestStream;
 	IStreamPtr            _pResponseStream;

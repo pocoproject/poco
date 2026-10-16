@@ -71,6 +71,13 @@ public:
 	void testUnreadCloseDelimitedResponseReconnects();
 	void testUnreadChunkedTerminatorKeepsConnection();
 	void testProxyTunnelIgnoresPreviousResponse();
+	void testMalformedContentLengthResponse();
+	void testDuplicateContentLengthResponse();
+	void testDuplicateTransferEncodingResponse();
+	void testContentLengthAndTransferEncodingResponse();
+	void testNonChunkedTransferEncodingResponseReadsToClose();
+	void testHeadResponseIgnoresFramingHeaders();
+	void testConnectResponseIgnoresFramingHeaders();
 
 	void setUp();
 	void tearDown();
@@ -90,6 +97,16 @@ private:
 		/// Reads bodyBytes of the body of firstResponse and checks
 		/// that the next request is sent on a new connection without
 		/// waiting for the rest of the body.
+
+	void assertFramingRejected(const std::string& headers);
+		/// Checks that a response with the given header fields is
+		/// refused with a MessageException, that the session is closed,
+		/// and that the next request is sent on a new connection.
+
+	void assertFramingIgnored(const std::string& method, const std::string& uri);
+		/// Checks that a 200 response with two Content-Length headers and
+		/// a Transfer-Encoding header to a request with the given method
+		/// is accepted with an empty body.
 };
 
 
