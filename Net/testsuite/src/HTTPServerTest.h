@@ -42,6 +42,12 @@ public:
 	void testEmptyFileKeepAlive();
 	void testChunkedTrailer();
 	void testChunkedFramingError();
+	void testUnreadRequestBody();
+	void testUnreadChunkedRequestBody();
+	void testLargeUnreadRequestBody();
+	void testResponseBeforeUnreadRequestBody();
+	void testNonBlockingHandlerClosesConnection();
+	void testHandlerNonBlockingReadThenBlocking();
 
 	void setUp();
 	void tearDown();
