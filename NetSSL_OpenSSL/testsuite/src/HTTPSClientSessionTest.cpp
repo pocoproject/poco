@@ -376,6 +376,48 @@ namespace
 		Poco::Event _bodyReleased;
 		Poco::Event _stopped;
 	};
+
+	class LoopbackHTTPSClientSession: public HTTPSClientSession
+		/// Connects to 127.0.0.1 on the port of the given address, so that
+		/// a host name that is not a loopback name reaches a local server.
+	{
+	public:
+		LoopbackHTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext):
+			HTTPSClientSession(host, port, pContext)
+		{
+		}
+
+		LoopbackHTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext, Session::Ptr pSession):
+			HTTPSClientSession(host, port, pContext, pSession)
+		{
+		}
+
+		LoopbackHTTPSClientSession(const SecureStreamSocket& socket, const std::string& host, Poco::UInt16 port):
+			HTTPSClientSession(socket, host, port)
+		{
+		}
+
+	protected:
+		void connect(const SocketAddress& address) override
+		{
+			HTTPSClientSession::connect(SocketAddress("127.0.0.1", address.port()));
+		}
+	};
+
+	Context::Ptr createSessionCachingServerContext()
+		/// Returns a server context that resumes sessions from its
+		/// session cache only, without session tickets.
+	{
+		Context::Ptr pContext = new Context(
+			Context::SERVER_USE,
+			Application::instance().config().getString("openSSL.server.privateKeyFile"),
+			Application::instance().config().getString("openSSL.server.privateKeyFile"),
+			Application::instance().config().getString("openSSL.server.caConfig"),
+			Context::VERIFY_NONE);
+		pContext->enableSessionCache(true, "TestSuite");
+		pContext->disableStatelessSessionResumption();
+		return pContext;
+	}
 }
 
 
@@ -1263,6 +1305,131 @@ void HTTPSClientSessionTest::testHttpsProxyTunnelReconnectDiscardsBufferedData()
 }
 
 
+void HTTPSClientSessionTest::testReconnectChecksNewHost()
+{
+	// The certificate is accepted for 127.0.0.1, a loopback name. After the
+	// host is changed, it is checked against the new host name.
+	HTTPSTestServer srv;
+	LoopbackHTTPSClientSession s("127.0.0.1", srv.port(), SSLManager::instance().defaultClientContext());
+	s.setTimeout(Poco::Timespan(5, 0));
+	HTTPRequest request1(HTTPRequest::HTTP_GET, "/small");
+	s.sendRequest(request1);
+	HTTPResponse response1;
+	std::istream& rs1 = s.receiveResponse(response1);
+	std::ostringstream ostr1;
+	StreamCopier::copyStream(rs1, ostr1);
+	assertTrue (ostr1.str() == HTTPSTestServer::SMALL_BODY);
+
+	s.reset();
+	s.setHost("192.0.2.1");
+	HTTPRequest request2(HTTPRequest::HTTP_GET, "/small");
+	try
+	{
+		s.sendRequest(request2);
+		fail("the certificate is not issued for 192.0.2.1");
+	}
+	catch (CertificateValidationException&)
+	{
+	}
+}
+
+
+void HTTPSClientSessionTest::testReconnectKeepsSocketPeerHostName()
+{
+	HTTPSTestServer srv;
+	SecureStreamSocket socket(SSLManager::instance().defaultClientContext());
+	socket.setPeerHostName("www.appinf.com");
+	LoopbackHTTPSClientSession s(socket, "192.0.2.1", srv.port());
+	s.setTimeout(Poco::Timespan(5, 0));
+	for (const char* host: {"192.0.2.1", "192.0.2.2"})
+	{
+		s.reset();
+		s.setHost(host);
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs = s.receiveResponse(response);
+		std::ostringstream ostr;
+		StreamCopier::copyStream(rs, ostr);
+		assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	}
+}
+
+
+void HTTPSClientSessionTest::testReconnectResumesSessionOfSameHost()
+{
+	HTTPSTestServer srv(createSessionCachingServerContext());
+
+	// The certificate of the server is self-signed and trusted as its own CA.
+	Context::Ptr pClientContext = new Context(
+		Context::CLIENT_USE,
+		Application::instance().config().getString("openSSL.server.privateKeyFile"),
+		Context::VERIFY_RELAXED);
+	pClientContext->enableSessionCache(true);
+	// TLS 1.3 delivers the session after the handshake.
+	pClientContext->disableProtocols(Context::PROTO_TLSV1_3);
+
+	LoopbackHTTPSClientSession s("127.0.0.1", srv.port(), pClientContext);
+	s.setTimeout(Poco::Timespan(5, 0));
+	assertFalse (getSmallReusesSession(s, "127.0.0.1"));
+	assertTrue (getSmallReusesSession(s, "127.0.0.1"));
+	assertFalse (getSmallReusesSession(s, "127.0.0.2"));
+}
+
+
+void HTTPSClientSessionTest::testReconnectOffersGivenSessionToSameHostOnly()
+{
+	HTTPSTestServer srv(createSessionCachingServerContext());
+
+	// TLS 1.3 delivers the session after the handshake.
+	Context::Ptr pCachingContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_NONE);
+	pCachingContext->enableSessionCache(true);
+	pCachingContext->disableProtocols(Context::PROTO_TLSV1_3);
+	// The sessions under test use a context without session caching.
+	Context::Ptr pClientContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_NONE);
+	pClientContext->disableProtocols(Context::PROTO_TLSV1_3);
+
+	HTTPSClientSession caching("127.0.0.1", srv.port(), pCachingContext);
+	caching.setTimeout(Poco::Timespan(5, 0));
+	assertFalse (getSmallReusesSession(caching, "127.0.0.1"));
+	Session::Ptr pSession = caching.sslSession();
+	assertTrue (pSession != nullptr);
+
+	LoopbackHTTPSClientSession direct("127.0.0.1", srv.port(), pClientContext, pSession);
+	direct.setTimeout(Poco::Timespan(5, 0));
+	assertTrue (getSmallReusesSession(direct, "127.0.0.1"));
+	assertTrue (getSmallReusesSession(direct, "127.0.0.1"));
+	assertFalse (getSmallReusesSession(direct, "127.0.0.2"));
+
+	// Each proxy serves one connection.
+	TLSConnectProxy proxy1(srv.port());
+	TLSConnectProxy proxy2(srv.port());
+	HTTPSClientSession tunneled("127.0.0.1", srv.port(), pClientContext, pSession);
+	tunneled.setTimeout(Poco::Timespan(5, 0));
+	tunneled.setProxy("127.0.0.1", proxy1.port(), "https", true);
+	assertTrue (getSmallReusesSession(tunneled, "127.0.0.1"));
+	tunneled.reset();
+	tunneled.setProxy("127.0.0.1", proxy2.port(), "https", true);
+	assertFalse (getSmallReusesSession(tunneled, "127.0.0.2"));
+}
+
+
+bool HTTPSClientSessionTest::getSmallReusesSession(HTTPSClientSession& session, const std::string& host)
+{
+	session.reset();
+	session.setHost(host);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+	session.sendRequest(request);
+	const bool reused = SecureStreamSocket(session.socket()).sessionWasReused();
+	HTTPResponse response;
+	std::istream& rs = session.receiveResponse(response);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	return reused;
+}
+
+
 void HTTPSClientSessionTest::setUp()
 {
 }
@@ -1310,6 +1477,10 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelCloseEndsHandshake);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testChunkedTerminatorInPendingTLSDataKeepsConnection);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelReconnectDiscardsBufferedData);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectChecksNewHost);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectKeepsSocketPeerHostName);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectResumesSessionOfSameHost);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectOffersGivenSessionToSameHostOnly);
 
 	return pSuite;
 }
