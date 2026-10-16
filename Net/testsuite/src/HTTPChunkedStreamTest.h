@@ -38,6 +38,7 @@ public:
 	void testWriteTrailerFailure();
 	void testWriteFailure();
 	void testWriteFailureKeepsCause();
+	void testWriteAfterPartialChunk();
 
 	void setUp() override;
 	void tearDown() override;

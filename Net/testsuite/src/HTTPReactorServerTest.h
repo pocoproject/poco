@@ -34,6 +34,8 @@ public:
 	void testStopClosesConnectionsSelfReactor();
 	void testReactorErrorClosesConnection();
 	void testIncompleteRequestSizeLimit();
+	void testNonBlockingRejected();
+	void testChunkedSendTimeoutNoLastChunk();
 
 	void setUp();
 	void tearDown();

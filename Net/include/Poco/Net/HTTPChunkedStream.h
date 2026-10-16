@@ -44,6 +44,10 @@ class Net_API HTTPChunkedStreamBuf: public HTTPBasicStreamBuf
 	/// (see HTTPSession::networkException()).
 	///
 	/// A trailer section longer than 65536 bytes is rejected.
+	///
+	/// After a failed or short write, the output stream writes nothing
+	/// more, not even the last chunk. A short write stores a NetException
+	/// in the session.
 {
 public:
 	using openmode = HTTPBasicStreamBuf::openmode;
@@ -90,6 +94,7 @@ private:
 	std::string     _chunkBuffer;
 	MessageHeader*  _pTrailer;
 	bool            _closed;
+	bool            _writeFailed;
 };
 
 

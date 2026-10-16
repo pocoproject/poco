@@ -168,6 +168,26 @@ namespace
 	private:
 		bool _timedOut = false;
 	};
+
+
+	class PartialTimeoutSocketImpl: public StreamSocketImpl
+		/// Sends half of the first write and then times out, as a blocking
+		/// socket with a send timeout may. Later writes are sent in full.
+	{
+	public:
+		using StreamSocketImpl::sendBytes;
+
+		int sendBytes(const void* buffer, int length, int flags = 0) override
+		{
+			if (_timedOut) return StreamSocketImpl::sendBytes(buffer, length, flags);
+			_timedOut = true;
+			StreamSocketImpl::sendBytes(buffer, length / 2, flags);
+			throw Poco::TimeoutException();
+		}
+
+	private:
+		bool _timedOut = false;
+	};
 }
 
 
@@ -414,6 +434,7 @@ void HTTPChunkedStreamTest::testWriteFailure()
 		HTTPChunkedOutputStream ostr(session);
 		ostr << "hello" << std::flush;
 		assertTrue (ostr.bad());
+		assertTrue (session.networkException() != nullptr);
 		try
 		{
 			ostr.rdbuf()->close();
@@ -422,7 +443,7 @@ void HTTPChunkedStreamTest::testWriteFailure()
 		catch (MessageException&)
 		{
 		}
-		assertTrue (dynamic_cast<const MessageException*>(session.networkException()) != nullptr);
+		assertTrue (dynamic_cast<const MessageException*>(session.networkException()) == nullptr);
 	}
 	{
 		HTTPChunkedOutputStream ostr(session);
@@ -469,6 +490,33 @@ void HTTPChunkedStreamTest::testWriteFailureKeepsCause()
 }
 
 
+void HTTPChunkedStreamTest::testWriteAfterPartialChunk()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket client(new PartialTimeoutSocketImpl);
+	StreamSocket peer = acceptPeer(server, client);
+	{
+		HTTPClientSession session(client);
+		HTTPChunkedOutputStream ostr(session);
+		ostr << "hello" << std::flush;
+		assertTrue (ostr.bad());
+		ostr.clear();
+		ostr << "world" << std::flush;
+		assertTrue (ostr.bad());
+		try
+		{
+			ostr.rdbuf()->close();
+			fail("must throw MessageException");
+		}
+		catch (MessageException&)
+		{
+		}
+		assertTrue (dynamic_cast<const TimeoutException*>(session.networkException()) != nullptr);
+	}
+	assertTrue (receiveAll(peer) == "5\r\nhe");
+}
+
+
 void HTTPChunkedStreamTest::setUp()
 {
 }
@@ -497,6 +545,7 @@ CppUnit::Test* HTTPChunkedStreamTest::suite()
 	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testWriteTrailerFailure);
 	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testWriteFailure);
 	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testWriteFailureKeepsCause);
+	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testWriteAfterPartialChunk);
 
 	return pSuite;
 }

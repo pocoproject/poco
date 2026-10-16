@@ -15,6 +15,7 @@
 #include "Poco/Net/TCPReactorServerConnection.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Event.h"
 #include "Poco/Thread.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
@@ -103,6 +104,49 @@ namespace
 			for (int i = 0; i < chunks; ++i) ostr.write(data.data(), data.size());
 			ostr.flush();
 		}
+	};
+
+	// Writes a chunked body until a write fails, then waits until the client has
+	// received everything sent, so that a write after the handler returns would
+	// reach the client.
+	class StalledChunkedRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		StalledChunkedRequestHandler(bool& failed, Poco::Event& stopped, Poco::Event& drained):
+			_failed(failed),
+			_stopped(stopped),
+			_drained(drained)
+		{
+		}
+
+		void handleRequest(HTTPServerRequest&, HTTPServerResponse& response) override
+		{
+			response.setChunkedTransferEncoding(true);
+			std::ostream& ostr = response.send();
+			const std::string data(64 * 1024, 'A');
+			for (int i = 0; i < 1024 && ostr.good(); ++i) ostr.write(data.data(), data.size());
+			_failed = ostr.bad();
+			_stopped.set();
+			_drained.tryWait(10000);
+		}
+
+	private:
+		bool& _failed;
+		Poco::Event& _stopped;
+		Poco::Event& _drained;
+	};
+
+	class StalledChunkedHandlerFactory: public HTTPRequestHandlerFactory
+	{
+	public:
+		HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&) override
+		{
+			return new StalledChunkedRequestHandler(failed, stopped, drained);
+		}
+
+		bool failed = false;
+		Poco::Event stopped;
+		Poco::Event drained;
 	};
 
 	class RequestHandlerFactory: public HTTPRequestHandlerFactory
@@ -995,6 +1039,82 @@ void HTTPReactorServerTest::testIncompleteRequestSizeLimit()
 }
 
 
+void HTTPReactorServerTest::testNonBlockingRejected()
+{
+	HTTPServerParams::Ptr pParams = new HTTPServerParams;
+	pParams->setReactorMode(true);
+	pParams->setNonBlocking(true);
+	try
+	{
+		Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+		fail("must throw InvalidArgumentException");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	try
+	{
+		Poco::Net::HTTPReactorServer srv(Poco::Net::SocketAddress("127.0.0.1", 0), pParams, new RequestHandlerFactory);
+		fail("must throw InvalidArgumentException");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+}
+
+void HTTPReactorServerTest::testChunkedSendTimeoutNoLastChunk()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setReactorMode(true);
+	pParams->setSendTimeout(Poco::Timespan(0, 200000));
+	auto* pFactory = new StalledChunkedHandlerFactory;
+
+	Poco::Net::HTTPReactorServer srv(0, pParams, pFactory);
+	srv.start();
+
+	// The client reads only after a write of the handler has timed out.
+	Poco::Net::StreamSocket s;
+	s.connect(Poco::Net::SocketAddress("127.0.0.1", srv.port()));
+	std::string req("GET / HTTP/1.1\r\nHost: x\r\n\r\n");
+	s.sendBytes(req.data(), static_cast<int>(req.size()));
+	assertTrue (pFactory->stopped.tryWait(10000));
+	assertTrue (pFactory->failed);
+
+	// The first receive timeout means that everything sent so far has been
+	// received; the handler then returns into an empty send buffer.
+	s.setReceiveTimeout(Poco::Timespan(1, 0));
+	std::string raw;
+	char buf[16 * 1024];
+	bool drained = false;
+	try
+	{
+		for (;;)
+		{
+			try
+			{
+				const int n = s.receiveBytes(buf, sizeof(buf));
+				if (n <= 0) break;
+				raw.append(buf, n);
+			}
+			catch (const Poco::TimeoutException&)
+			{
+				if (drained) break;
+				drained = true;
+				pFactory->drained.set();
+			}
+		}
+	}
+	catch (const Poco::Net::NetException&)
+	{
+		// A timed-out send may reset the connection.
+	}
+	pFactory->drained.set();
+	assertTrue (raw.find("\r\n0\r\n\r\n") == std::string::npos);
+
+	srv.stop();
+}
+
+
 void HTTPReactorServerTest::setUp()
 {
 }
@@ -1032,6 +1152,8 @@ CppUnit::Test* HTTPReactorServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testStopClosesConnectionsSelfReactor);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testReactorErrorClosesConnection);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testIncompleteRequestSizeLimit);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testNonBlockingRejected);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testChunkedSendTimeoutNoLastChunk);
 
 	return pSuite;
 }

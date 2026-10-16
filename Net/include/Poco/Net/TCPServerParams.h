@@ -165,8 +165,8 @@ public:
 		///
 		/// A read callback that writes to the connection must then be
 		/// prepared for sendBytes() to take less than it was given. The
-		/// request handlers of HTTPReactorServer are not, so this is not
-		/// for HTTPReactorServer.
+		/// request handlers of HTTPReactorServer are not, so HTTPReactorServer
+		/// rejects this mode with an InvalidArgumentException.
 		///
 		/// Default false.
 

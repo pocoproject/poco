@@ -42,7 +42,8 @@ HTTPChunkedStreamBuf::HTTPChunkedStreamBuf(HTTPSession& session, openmode mode, 
 	_chunk(0),
 	_readState(ReadState::SIZE),
 	_pTrailer(pTrailer),
-	_closed(false)
+	_closed(false),
+	_writeFailed(false)
 {
 }
 
@@ -61,7 +62,7 @@ void HTTPChunkedStreamBuf::close()
 		try
 		{
 			// Without the last chunk, the peer sees an incomplete body instead of a complete-looking truncated one.
-			if (sync() == -1) throw MessageException("Failed to write chunked transfer data");
+			if (_writeFailed || sync() == -1) throw MessageException("Failed to write chunked transfer data");
 			// Formatted before sending, so that an invalid trailer sends nothing
 			// and a short write is not followed by a second copy.
 			std::string lastChunk("0\r\n");
@@ -216,13 +217,26 @@ std::streamsize HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsi
 
 std::streamsize HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
+	// The peer may have received part of the failed chunk; anything written after it would be read as chunk data.
+	if (_writeFailed) return -1;
 	_chunkBuffer.clear();
 	NumberFormatter::appendHex(_chunkBuffer, length);
 	_chunkBuffer.append("\r\n", 2);
 	_chunkBuffer.append(buffer, static_cast<std::string::size_type>(length));
 	_chunkBuffer.append("\r\n", 2);
 	const auto size = static_cast<std::streamsize>(_chunkBuffer.size());
-	return _session.write(_chunkBuffer.data(), size) == size ? length : -1;
+	try
+	{
+		_writeFailed = _session.write(_chunkBuffer.data(), size) != size;
+	}
+	catch (...)
+	{
+		_writeFailed = true;
+		throw;
+	}
+	// Stored as for a thrown error, so that the connection is closed instead of reused.
+	if (_writeFailed && _session.networkException() == nullptr) _session.setException(NetException("Incomplete chunk write"));
+	return _writeFailed ? -1 : length;
 }
 
 
