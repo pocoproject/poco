@@ -58,6 +58,9 @@ public:
 	void testBypassProxyExtended();
 	void testChunkedFramingErrorReconnects();
 	void testInvalidRequestKeepsConnection();
+	void testIncompleteFixedLengthResponse();
+	void testCompleteFixedLengthResponse();
+	void testFixedLengthResponseInPartsNonBlocking();
 
 	void setUp();
 	void tearDown();

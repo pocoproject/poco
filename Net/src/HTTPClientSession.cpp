@@ -420,6 +420,9 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 			try
 			{
 				response.read(his);
+				// The header parser takes the end of the stream for the end of the header,
+				// so a header cut by a failed receive can look complete.
+				if (networkException() != nullptr) networkException()->rethrow();
 			}
 			catch (Exception&)
 			{
@@ -465,6 +468,9 @@ bool HTTPClientSession::peekResponse(HTTPResponse& response)
 	try
 	{
 		response.read(his);
+		// The header parser takes the end of the stream for the end of the header,
+		// so a header cut by a failed receive can look complete.
+		if (networkException() != nullptr) networkException()->rethrow();
 	}
 	catch (Exception&)
 	{

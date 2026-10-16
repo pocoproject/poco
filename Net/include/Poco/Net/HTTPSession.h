@@ -91,8 +91,9 @@ public:
 		/// If sending or receiving data over the underlying
 		/// socket connection resulted in an exception, a
 		/// pointer to this exception is returned.
-		/// A malformed or incomplete chunked message body is
-		/// reported here as a MessageException.
+		/// A malformed body is reported as a MessageException; a body
+		/// cut short is reported as a MessageException or as the network
+		/// error that ended it.
 		///
 		/// Otherwise, NULL is returned.
 

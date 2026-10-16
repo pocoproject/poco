@@ -697,6 +697,72 @@ void HTTPClientSessionTest::assertNewConnectionServes(HTTPClientSession& session
 }
 
 
+void HTTPClientSessionTest::testIncompleteFixedLengthResponse()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket ss = server.acceptConnection();
+	const std::string truncated("HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\n0123456789");
+	ss.sendBytes(truncated.data(), static_cast<int>(truncated.size()));
+	ss.shutdownSend();
+	HTTPResponse response;
+	std::istream& rs = cs.receiveResponse(response);
+	std::ostringstream ostr;
+	assertTrue (StreamCopier::copyStream(rs, ostr) == 10);
+	assertTrue (ostr.str() == "0123456789");
+	assertTrue (dynamic_cast<const MessageException*>(cs.networkException()) != nullptr);
+}
+
+
+void HTTPClientSessionTest::testCompleteFixedLengthResponse()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket ss = server.acceptConnection();
+	const std::string complete("HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\n0123456789");
+	ss.sendBytes(complete.data(), static_cast<int>(complete.size()));
+	HTTPResponse response;
+	std::istream& rs = cs.receiveResponse(response);
+	std::ostringstream ostr;
+	assertTrue (StreamCopier::copyStream(rs, ostr) == 10);
+	assertTrue (ostr.str() == "0123456789");
+	assertTrue (cs.networkException() == nullptr);
+}
+
+
+void HTTPClientSessionTest::testFixedLengthResponseInPartsNonBlocking()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket ss = server.acceptConnection();
+	const std::string head("HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\n01234");
+	ss.sendBytes(head.data(), static_cast<int>(head.size()));
+	HTTPResponse response;
+	std::istream& rs = cs.receiveResponse(response);
+	cs.socket().setBlocking(false);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (cs.networkException() == nullptr);
+
+	rs.clear();
+	cs.socket().setBlocking(true);
+	const std::string tail("56789");
+	ss.sendBytes(tail.data(), static_cast<int>(tail.size()));
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == "0123456789");
+	assertTrue (cs.networkException() == nullptr);
+}
+
+
 void HTTPClientSessionTest::setUp()
 {
 }
@@ -736,6 +802,9 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testBypassProxyExtended);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testChunkedFramingErrorReconnects);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testInvalidRequestKeepsConnection);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testIncompleteFixedLengthResponse);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testCompleteFixedLengthResponse);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testFixedLengthResponseInPartsNonBlocking);
 
 	return pSuite;
 }

@@ -100,7 +100,8 @@ std::streamsize HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsi
 
 	const auto truncated = [this]() -> std::streamsize
 	{
-		_session.setException(MessageException("Incomplete chunked transfer encoding"));
+		// A cause the session recorded, such as a TLS close without close_notify, is kept.
+		if (_session.networkException() == nullptr) _session.setException(MessageException("Incomplete chunked transfer encoding"));
 		_readState = ReadState::FAILED;
 		return 0;
 	};

@@ -201,6 +201,19 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 }
 
 
+int HTTPSClientSession::get()
+{
+	try
+	{
+		return HTTPSession::get();
+	}
+	catch (SSLConnectionUnexpectedlyClosedException&)
+	{
+		return std::char_traits<char>::eof();
+	}
+}
+
+
 int HTTPSClientSession::read(char* buffer, std::streamsize length)
 {
 	try

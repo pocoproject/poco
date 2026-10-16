@@ -41,6 +41,10 @@ public:
 	void testCachedSession();
 	void testUnknownContentLength();
 	void testServerAbort();
+	void testServerAbortContentLength();
+	void testServerAbortChunked();
+	void testServerAbortChunkedFraming();
+	void testServerAbortHeader();
 	void testProxyConfig();
 	void testProxySetters();
 	void testStalledPeerTimeout();

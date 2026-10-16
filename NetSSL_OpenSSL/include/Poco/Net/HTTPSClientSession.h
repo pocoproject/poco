@@ -149,7 +149,17 @@ protected:
 	void connect(const SocketAddress& address);
 	[[nodiscard]] std::string proxyRequestPrefix() const;
 	void proxyAuthenticate(HTTPRequest& request);
+	[[nodiscard]] int get();
 	int read(char* buffer, std::streamsize length);
+		/// Returns 0 when the server closes the TLS connection without
+		/// close_notify, and networkException() holds the
+		/// SSLConnectionUnexpectedlyClosedException. A response body delimited
+		/// by the end of the connection then ends normally; a body with
+		/// Content-Length or chunked transfer encoding ends with eof after the
+		/// bytes received, and networkException() holds the cause
+		/// (see HTTPClientSession::receiveResponse()).
+		/// get() returns eof in that case, and receiveResponse() and
+		/// peekResponse() throw the exception for a response header cut that way.
 
 private:
 	void initProxySessionFactory();
