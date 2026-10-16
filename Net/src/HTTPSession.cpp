@@ -329,6 +329,7 @@ StreamSocket HTTPSession::detachSocket()
 void HTTPSession::attachSocket(const StreamSocket& socket)
 {
 	_socket = socket;
+	_pCurrent = _pEnd = _pBuffer;
 }
 
 

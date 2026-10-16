@@ -1223,6 +1223,46 @@ void HTTPSClientSessionTest::testChunkedTerminatorInPendingTLSDataKeepsConnectio
 }
 
 
+void HTTPSClientSessionTest::testHttpsProxyTunnelReconnectDiscardsBufferedData()
+{
+	// The first target sends a second response in the same TLS record as
+	// the first one, so it is read into the buffer of the session. The
+	// response to the next request comes from the new tunnel, not from
+	// that buffer.
+	HeldBackHTTPSServer srv1("HTTP/1.1 200 OK\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok"
+		"HTTP/1.1 200 OK\r\nContent-Length: 8\r\n\r\nINJECTED", "");
+	HeldBackHTTPSServer srv2("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n", "REAL");
+	TLSConnectProxy proxy1(srv1.port());
+	TLSConnectProxy proxy2(srv2.port());
+	const Poco::Timespan timeout(5, 0);
+
+	HTTPSClientSession s("www.appinf.com", srv1.port());
+	s.setTimeout(timeout);
+	s.setProxy("127.0.0.1", proxy1.port(), "https", true);
+	srv1.sendHeader();
+	HTTPRequest request1(HTTPRequest::HTTP_GET, "/");
+	s.sendRequest(request1);
+	HTTPResponse response1;
+	std::istream& rs1 = s.receiveResponse(response1);
+	std::ostringstream ostr1;
+	StreamCopier::copyStream(rs1, ostr1);
+	assertTrue (ostr1.str() == "ok");
+
+	s.reset();
+	s.setPort(srv2.port());
+	s.setProxy("127.0.0.1", proxy2.port(), "https", true);
+	srv2.sendHeader();
+	srv2.sendBody();
+	HTTPRequest request2(HTTPRequest::HTTP_GET, "/");
+	s.sendRequest(request2);
+	HTTPResponse response2;
+	std::istream& rs2 = s.receiveResponse(response2);
+	std::ostringstream ostr2;
+	StreamCopier::copyStream(rs2, ostr2);
+	assertTrue (ostr2.str() == "REAL");
+}
+
+
 void HTTPSClientSessionTest::setUp()
 {
 }
@@ -1269,6 +1309,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelClosedInBody);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelCloseEndsHandshake);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testChunkedTerminatorInPendingTLSDataKeepsConnection);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelReconnectDiscardsBufferedData);
 
 	return pSuite;
 }
