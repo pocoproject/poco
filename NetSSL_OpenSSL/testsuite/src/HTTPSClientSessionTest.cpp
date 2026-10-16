@@ -12,6 +12,8 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPSClientSession.h"
+#include "Poco/Net/HTTPClientSessionPool.h"
+#include "Poco/Net/HTTPBufferAllocator.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
@@ -20,6 +22,8 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPSessionFactory.h"
+#include "Poco/Net/HTTPSSessionInstantiator.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/ServerSocket.h"
@@ -42,6 +46,7 @@
 #include "Poco/Event.h"
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
+#include "Poco/URI.h"
 #include "DialogServer.h"
 #include "HTTPSTestServer.h"
 #include <atomic>
@@ -1430,6 +1435,66 @@ bool HTTPSClientSessionTest::getSmallReusesSession(HTTPSClientSession& session, 
 }
 
 
+void HTTPSClientSessionTest::testSessionPool()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	HTTPServer srv(new TestRequestHandlerFactory(), svs, new HTTPServerParams());
+	srv.start();
+	try
+	{
+		Context::Ptr pContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_NONE);
+		HTTPSessionFactory factory;
+		factory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+		HTTPClientSessionPool pool(factory);
+		const Poco::URI uri("https://127.0.0.1:" + std::to_string(srv.port()) + "/");
+		for (int i = 0; i < 3; ++i)
+		{
+			HTTPClientSessionPool::Handle handle = pool.acquire(uri);
+			handle->setTimeout(Poco::Timespan(10, 0));
+			HTTPRequest request(HTTPRequest::HTTP_POST, "/", HTTPMessage::HTTP_1_1);
+			request.setContentLength(5);
+			handle->sendRequest(request) << "hello";
+			HTTPResponse response;
+			std::istream& rs = handle->receiveResponse(response);
+			std::ostringstream ostr;
+			StreamCopier::copyStream(rs, ostr);
+			assertTrue (ostr.str() == "hello");
+		}
+		assertTrue (pool.idleSessions() == 1);
+		assertTrue (srv.totalConnections() == 1);
+		srv.stop();
+	}
+	catch (...)
+	{
+		srv.stop();
+		throw;
+	}
+}
+
+
+void HTTPSClientSessionTest::testDecryptedStrayDataPreventsReuse()
+{
+	// The stray bytes follow the response in the same TLS record. The body is
+	// read past the buffer of the session, so they stay in the TLS layer.
+	const std::string body(2*HTTPBufferAllocator::BUFFER_SIZE, 'x');
+	HeldBackHTTPSServer srv("HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(body.size()) + "\r\n\r\n" + body + "stray", "");
+	Context::Ptr pContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_NONE);
+	HTTPSClientSession s("127.0.0.1", srv.port(), pContext);
+	s.setKeepAlive(true);
+	s.setTimeout(Poco::Timespan(5, 0));
+	srv.sendHeader();
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == body);
+	assertTrue (s.socket().available() > 0);
+	assertTrue (!s.canReuse());
+}
+
+
 void HTTPSClientSessionTest::setUp()
 {
 }
@@ -1481,6 +1546,8 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectKeepsSocketPeerHostName);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectResumesSessionOfSameHost);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectOffersGivenSessionToSameHostOnly);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testSessionPool);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testDecryptedStrayDataPreventsReuse);
 
 	return pSuite;
 }

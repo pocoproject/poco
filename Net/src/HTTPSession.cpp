@@ -221,8 +221,8 @@ int HTTPSession::receive(char* buffer, int length)
 
 bool HTTPSession::dataPending() const
 {
-	// available() counts decrypted TLS data, which poll() does not see.
-	return buffered() > 0 || _socket.available() > 0 || _socket.poll(Poco::Timespan(), Socket::SELECT_READ);
+	// Only a TLS socket holds data that poll() does not see: bytes decrypted but not yet read.
+	return buffered() > 0 || (_socket.secure() && _socket.available() > 0) || _socket.poll(Poco::Timespan(), Socket::SELECT_READ);
 }
 
 

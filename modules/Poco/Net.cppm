@@ -43,6 +43,7 @@ module;
 #include "Poco/Net/HTTPBufferAllocator.h"
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPClientSessionPool.h"
 #include "Poco/Net/HTTPCookie.h"
 #include "Poco/Net/HTTPCredentials.h"
 #include "Poco/Net/HTTPDigestCredentials.h"
@@ -252,6 +253,7 @@ export namespace Poco::Net {
 	using Poco::Net::HTTPChunkedOutputStream;
 	using Poco::Net::HTTPChunkedStreamBuf;
 	using Poco::Net::HTTPClientSession;
+	using Poco::Net::HTTPClientSessionPool;
 	using Poco::Net::HTTPCookie;
 	using Poco::Net::HTTPCredentials;
 	using Poco::Net::HTTPDigestCredentials;

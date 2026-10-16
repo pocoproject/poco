@@ -26,6 +26,8 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/CountingStream.h"
 #include "Poco/RegularExpression.h"
+#include "Poco/String.h"
+#include <algorithm>
 #include <sstream>
 
 
@@ -35,6 +37,35 @@ using Poco::InvalidArgumentException;
 
 
 namespace Poco::Net {
+
+
+namespace {
+
+
+bool isConnectionBoundCredentials(const std::string& credentials)
+{
+	const std::string::size_type begin = credentials.find_first_not_of(" \t");
+	if (begin == std::string::npos) return false;
+	const std::string::size_type end = credentials.find_first_of(" \t", begin);
+	const std::string::size_type length = (end == std::string::npos ? credentials.size() : end) - begin;
+	return Poco::icompare(credentials, begin, length, "NTLM") == 0 ||
+		Poco::icompare(credentials, begin, length, "Negotiate") == 0 ||
+		Poco::icompare(credentials, begin, length, "Kerberos") == 0;
+}
+
+
+bool sendsConnectionBoundCredentials(const HTTPRequest& request)
+{
+	// A request can carry several credential fields, and any one of them can authenticate the connection.
+	return std::any_of(request.begin(), request.end(), [](const auto& field)
+	{
+		return (Poco::icompare(field.first, HTTPRequest::AUTHORIZATION) == 0 || Poco::icompare(field.first, HTTPRequest::PROXY_AUTHORIZATION) == 0) &&
+			isConnectionBoundCredentials(field.second);
+	});
+}
+
+
+} // namespace
 
 
 ProxyConfig HTTPClientSession::_globalProxyConfig;
@@ -359,6 +390,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		if (!connected())
 		{
 			_ntlmProxyAuthenticated = false;
+			_connectionAuthenticated = false;
 			reconnect();
 		}
 		if (!keepAlive)
@@ -391,6 +423,8 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 
 std::ostream& HTTPClientSession::sendRequestImpl(const HTTPRequest& request)
 {
+	if (sendsConnectionBoundCredentials(request))
+		_connectionAuthenticated = true;
 	_pRequestStream = nullptr;
 	_pResponseStream = nullptr;
 	clearException();
@@ -470,10 +504,10 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 		while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
 	}
 
-	_mustReconnect = getKeepAlive() && !response.getKeepAlive();
-
 	// RFC 9112, 6.3: the framing headers of a response without a body, and of a 2xx response to CONNECT, are ignored.
 	const bool tunnelEstablished = _connectRequest && response.getStatus() >= 200 && response.getStatus() < 300;
+	// After a 101 response or an established tunnel, the connection no longer carries HTTP messages of this session.
+	_mustReconnect = (getKeepAlive() && !response.getKeepAlive()) || response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS || tunnelEstablished;
 	const bool hasBody = _expectResponseBody && !tunnelEstablished && response.getStatus() >= 200 && response.getStatus() != HTTPResponse::HTTP_NO_CONTENT && response.getStatus() != HTTPResponse::HTTP_NOT_MODIFIED;
 	if (hasBody)
 	{
@@ -554,6 +588,21 @@ bool HTTPClientSession::peekResponse(HTTPResponse& response)
 void HTTPClientSession::reset()
 {
 	close();
+}
+
+
+bool HTTPClientSession::canReuse()
+{
+	// Data without a pending response means the server has closed the connection or sent stray data.
+	return stateAllowsReuse() && !dataPending();
+}
+
+
+bool HTTPClientSession::stateAllowsReuse()
+{
+	if (!getKeepAlive() || !connected() || networkException() != nullptr) return false;
+	if (_pRequestStream != nullptr || !_requestBodyComplete || _pResponseStream == nullptr || mustReconnect()) return false;
+	return responseStreamComplete() && buffered() == 0;
 }
 
 

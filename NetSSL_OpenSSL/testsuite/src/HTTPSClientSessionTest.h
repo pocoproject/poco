@@ -68,6 +68,8 @@ public:
 	void testReconnectKeepsSocketPeerHostName();
 	void testReconnectResumesSessionOfSameHost();
 	void testReconnectOffersGivenSessionToSameHostOnly();
+	void testSessionPool();
+	void testDecryptedStrayDataPreventsReuse();
 
 	void setUp();
 	void tearDown();
