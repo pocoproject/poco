@@ -53,6 +53,8 @@ public:
 	void testWriteInvalidFieldName();
 	void testWriteValidFields();
 	void testReadDecodedControlCharacters();
+	void testAutoDecodeCopy();
+	void testStrictParsingCopy();
 
 	void setUp();
 	void tearDown();

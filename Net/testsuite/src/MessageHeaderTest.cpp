@@ -13,6 +13,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
+#include <cstring>
+#include <new>
 #include <sstream>
 
 
@@ -673,6 +675,57 @@ void MessageHeaderTest::testReadDecodedControlCharacters()
 }
 
 
+void MessageHeaderTest::testAutoDecodeCopy()
+{
+	const std::string header("X-A: =?UTF-8?B?SGVsbG8=?=\r\n\r\n");
+	// The storage is filled with the opposite of the source's decode flags,
+	// so the copy must take both from the source.
+	alignas(MessageHeader) unsigned char storage[sizeof(MessageHeader)];
+	for (const bool autoDecode: {false, true})
+	{
+		std::istringstream istr(header);
+		MessageHeader src;
+		src.setAutoDecode(autoDecode);
+		src.read(istr);
+
+		std::memset(storage, autoDecode ? 0x00 : 0x01, sizeof(storage));
+		MessageHeader* pCopy = new (storage) MessageHeader(src);
+		const bool copyAutoDecode = pCopy->getAutoDecode();
+		const std::string copyDecoded = pCopy->getDecoded("X-A");
+		pCopy->~MessageHeader();
+		assertTrue (copyAutoDecode == autoDecode);
+		assertTrue (copyDecoded == "Hello");
+
+		// The target holds a decode state that differs from the source.
+		std::istringstream assignedIstr(header);
+		MessageHeader assigned;
+		assigned.setAutoDecode(!autoDecode);
+		assigned.read(assignedIstr);
+		assigned = src;
+		assertTrue (assigned.getAutoDecode() == autoDecode);
+		assertTrue (assigned.getDecoded("X-A") == "Hello");
+	}
+}
+
+
+void MessageHeaderTest::testStrictParsingCopy()
+{
+	for (const bool strict: {false, true})
+	{
+		MessageHeader src;
+		src.setStrictParsing(strict);
+
+		MessageHeader copy(src);
+		assertTrue (copy.getStrictParsing() == strict);
+
+		MessageHeader assigned;
+		assigned.setStrictParsing(!strict);
+		assigned = src;
+		assertTrue (assigned.getStrictParsing() == strict);
+	}
+}
+
+
 CppUnit::Test* MessageHeaderTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MessageHeaderTest");
@@ -706,6 +759,8 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteInvalidFieldName);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteValidFields);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testReadDecodedControlCharacters);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testAutoDecodeCopy);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictParsingCopy);
 
 	return pSuite;
 }
