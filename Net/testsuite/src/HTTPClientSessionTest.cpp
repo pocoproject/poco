@@ -14,6 +14,8 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
@@ -30,6 +32,10 @@ using Poco::Net::ProxyAuthentication;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPMessage;
+using Poco::Net::ServerSocket;
+using Poco::Net::Socket;
+using Poco::Net::SocketAddress;
+using Poco::Net::StreamSocket;
 using Poco::StreamCopier;
 using Poco::InvalidArgumentException;
 using Poco::IllegalStateException;
@@ -612,6 +618,45 @@ void HTTPClientSessionTest::testBypassProxyExtended()
 }
 
 
+void HTTPClientSessionTest::testChunkedFramingErrorReconnects()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket first = server.acceptConnection();
+	const std::string malformed(
+		"HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n"
+		"5x\r\n"
+		"HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nstale");
+	first.sendBytes(malformed.data(), static_cast<int>(malformed.size()));
+	HTTPResponse response;
+	std::istream& rs1 = cs.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs1, body);
+	assertTrue (rs1.bad());
+
+	assertNewConnectionServes(cs, server, request);
+}
+
+
+void HTTPClientSessionTest::assertNewConnectionServes(HTTPClientSession& session, ServerSocket& server, HTTPRequest& request)
+{
+	session.sendRequest(request);
+	assertTrue (server.poll(Poco::Timespan(5, 0), Socket::SELECT_READ));
+	StreamSocket connection = server.acceptConnection();
+	const std::string valid("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nfresh");
+	connection.sendBytes(valid.data(), static_cast<int>(valid.size()));
+	HTTPResponse response;
+	std::istream& rs = session.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs, body);
+	assertTrue (body == "fresh");
+}
+
+
 void HTTPClientSessionTest::setUp()
 {
 }
@@ -649,6 +694,7 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyNonTunnel);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testGlobalProxyConfig);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testBypassProxyExtended);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testChunkedFramingErrorReconnects);
 
 	return pSuite;
 }

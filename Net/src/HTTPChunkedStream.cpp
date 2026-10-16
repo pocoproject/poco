@@ -15,14 +15,16 @@
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/HTTPHeaderStream.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
-#include "Poco/NumberParser.h"
 #include "Poco/Ascii.h"
+#include <algorithm>
+#include <charconv>
+#include <sstream>
 
 
 using Poco::NumberFormatter;
-using Poco::NumberParser;
 
 
 namespace Poco::Net {
@@ -38,6 +40,7 @@ HTTPChunkedStreamBuf::HTTPChunkedStreamBuf(HTTPSession& session, openmode mode, 
 	_session(session),
 	_mode(mode),
 	_chunk(0),
+	_readState(ReadState::SIZE),
 	_pTrailer(pTrailer)
 {
 }
@@ -53,7 +56,7 @@ void HTTPChunkedStreamBuf::close()
 	if (_mode & std::ios::out)
 	{
 		sync();
-		if (_pTrailer && !_pTrailer->empty())
+		if (_pTrailer != nullptr && !_pTrailer->empty())
 		{
 			HTTPHeaderOutputStream hos(_session);
 			hos.write("0\r\n", 3);
@@ -71,62 +74,100 @@ void HTTPChunkedStreamBuf::close()
 std::streamsize HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	static constexpr int eof = std::char_traits<char>::eof();
+	static constexpr std::size_t MAX_CHUNK_SIZE_DIGITS = 8;
+	static constexpr std::size_t MAX_SIZE_LINE_LENGTH = 4096;
+	static constexpr std::size_t MAX_TRAILER_LENGTH = 65536;
 
-	if (_chunk == 0)
+	// A line ends only with CR LF. A bare CR or LF is rejected, because another
+	// parser of the same message may end the line there. Returns false at end of stream.
+	const auto readLine = [this](std::string& line, std::size_t maxLength, const char* error)
 	{
+		line.clear();
 		int ch = _session.get();
-		while (Poco::Ascii::isSpace(ch)) ch = _session.get();
-		std::string chunkLen;
-		while (Poco::Ascii::isHexDigit(ch) && chunkLen.size() < 8) { chunkLen += (char) ch; ch = _session.get(); }
-		if (ch != eof && !(Poco::Ascii::isSpace(ch) || ch == ';')) return eof;
-		while (ch != eof && ch != '\n') ch = _session.get();
-		unsigned chunk;
-		if (NumberParser::tryParseHex(chunkLen, chunk))
+		while (ch != '\r')
 		{
-			_chunk = static_cast<std::streamsize>(chunk);
+			if (ch == eof) return false;
+			if (ch == '\n' || line.size() == maxLength) throw MessageException(error);
+			line += static_cast<char>(ch);
+			ch = _session.get();
 		}
-		else
-		{
-			_session.setException(MessageException("Incomplete chunked transfer encoding"));
-			_chunk = -1;
-			return eof;
-		}
-	}
-	if (_chunk > 0)
+		ch = _session.get();
+		if (ch == eof) return false;
+		if (ch != '\n') throw MessageException(error);
+		return true;
+	};
+
+	const auto truncated = [this]() -> std::streamsize
 	{
+		_session.setException(MessageException("Incomplete chunked transfer encoding"));
+		_readState = ReadState::FAILED;
+		return 0;
+	};
+
+	if (_readState == ReadState::DONE || _readState == ReadState::FAILED) return 0;
+
+	try
+	{
+		std::string line;
+		if (_readState == ReadState::DATA_CRLF)
+		{
+			if (!readLine(line, 0, "Missing CRLF after chunk data")) return truncated();
+			_readState = ReadState::SIZE;
+		}
+		if (_readState == ReadState::SIZE)
+		{
+			if (!readLine(line, MAX_SIZE_LINE_LENGTH, "Invalid chunk size line")) return truncated();
+			std::size_t digits = 0;
+			while (digits < line.size() && digits < MAX_CHUNK_SIZE_DIGITS && Poco::Ascii::isHexDigit(line[digits])) ++digits;
+			const std::size_t extension = line.find_first_not_of(" \t", digits);
+			const bool validExtension = extension == std::string::npos || (line[extension] == ';' &&
+				std::none_of(line.begin() + extension, line.end(), [](char c) { return c != '\t' && Poco::Ascii::hasProperties(c, Poco::Ascii::ACP_CONTROL); }));
+			if (digits == 0 || !validExtension || std::from_chars(line.data(), line.data() + digits, _chunk, 16).ec != std::errc())
+				throw MessageException("Invalid chunk size line");
+			if (_chunk == 0)
+			{
+				std::string fields;
+				if (!readLine(line, MAX_TRAILER_LENGTH, "Invalid chunked transfer trailer")) return truncated();
+				while (!line.empty())
+				{
+					fields.append(line).append("\r\n");
+					if (fields.size() > MAX_TRAILER_LENGTH) throw MessageException("Chunked transfer trailer too long");
+					if (!readLine(line, MAX_TRAILER_LENGTH, "Invalid chunked transfer trailer")) return truncated();
+				}
+				if (!fields.empty())
+				{
+					std::istringstream istr(fields);
+					if (_pTrailer != nullptr)
+					{
+						_pTrailer->read(istr);
+					}
+					else
+					{
+						MessageHeader trailer;
+						trailer.read(istr);
+					}
+				}
+				_readState = ReadState::DONE;
+				return 0;
+			}
+			_readState = ReadState::DATA;
+		}
 		if (length > _chunk) length = _chunk;
 		std::streamsize n = _session.read(buffer, length);
-		if (n > 0)
-			_chunk -= n;
-		else
-			_session.setException(MessageException("Incomplete chunked transfer encoding"));
+		// A negative result is no data yet on a non-blocking socket, not an end of file.
+		if (n < 0) return n;
+		if (n == 0) return truncated();
+		_chunk -= n;
+		if (_chunk == 0) _readState = ReadState::DATA_CRLF;
 		return n;
 	}
-	else if (_chunk == 0)
+	catch (Poco::Exception& exc)
 	{
-		int ch = _session.peek();
-		if (ch != eof && ch != '\r' && ch != '\n')
-		{
-			HTTPHeaderInputStream his(_session);
-			if (_pTrailer)
-			{
-				_pTrailer->read(his);
-			}
-			else
-			{
-				MessageHeader trailer;
-				trailer.read(his);
-			}
-		}
-		else
-		{
-			ch = _session.get();
-			while (ch != eof && ch != '\n') ch = _session.get();
-		}
-		_chunk = -1;
-		return 0;
+		// The rest of a line read in part must not be parsed as a new line.
+		if (_session.networkException() == nullptr) _session.setException(exc);
+		_readState = ReadState::FAILED;
+		throw;
 	}
-	else return eof;
 }
 
 

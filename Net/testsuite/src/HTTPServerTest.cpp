@@ -22,6 +22,7 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPServerSession.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Path.h"
@@ -713,6 +714,46 @@ void HTTPServerTest::testFramingConflicts()
 }
 
 
+void HTTPServerTest::testChunkedFramingError()
+{
+	ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+	HTTPServer srv(new RequestHandlerFactory, svs, new HTTPServerParams);
+	srv.start();
+
+	Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", svs.address().port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	const std::string request(
+		"POST /echoBody HTTP/1.1\r\nHost: test\r\nTransfer-Encoding: chunked\r\n\r\n"
+		"0\n\n"
+		"GET /echoHeader HTTP/1.1\r\nHost: test\r\n\r\n");
+	ss.sendBytes(request.data(), static_cast<int>(request.size()));
+	ss.shutdownSend();
+
+	std::string response;
+	char buffer[1024];
+	try
+	{
+		int n = ss.receiveBytes(buffer, sizeof(buffer));
+		while (n > 0)
+		{
+			response.append(buffer, n);
+			n = ss.receiveBytes(buffer, sizeof(buffer));
+		}
+	}
+	catch (Poco::Net::ConnectionResetException&)
+	{
+		// A server that closes the connection with unread data resets it.
+	}
+	catch (Poco::TimeoutException&)
+	{
+		failmsg("server did not close the connection");
+	}
+	assertTrue (response.find("GET /echoHeader") == std::string::npos);
+
+	srv.stop();
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
@@ -734,6 +775,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testFileKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testEmptyFileKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedTrailer);
+	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedFramingError);
 
 	return pSuite;
 }

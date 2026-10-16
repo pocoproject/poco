@@ -17,7 +17,7 @@ objects = \
 	HTTPServerTest MulticastEchoServer SocketAddressTest \
 	HTTPReactorServerSessionTest HTTPReactorServerTest HTTPReactorServerTestSuite \
 	TCPReactorServerTest \
-	HTTPCookieTest HTTPCredentialsTest HTMLFormTest HTMLTestSuite \
+	HTTPCookieTest HTTPCredentialsTest HTTPChunkedStreamTest HTMLFormTest HTMLTestSuite \
 	MediaTypeTest QuotedPrintableTest DialogSocketTest \
 	HTTPClientTestSuite FTPClientTestSuite FTPClientSessionTest \
 	FTPStreamFactoryTest DialogServer \
