@@ -1104,6 +1104,61 @@ void HTTPClientSessionTest::testConnectResponseIgnoresFramingHeaders()
 }
 
 
+void HTTPClientSessionTest::testTimeoutAppliedToConnectedSocket()
+{
+	HTTPTestServer srv;
+	HTTPClientSession s("127.0.0.1", srv.port());
+	s.setKeepAlive(true);
+	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
+	s.sendRequest(request);
+	HTTPResponse response;
+	s.receiveResponse(response);
+	assertTrue (response.getKeepAlive());
+	assertTrue (s.connected());
+
+	s.setTimeout(Poco::Timespan(3, 0), Poco::Timespan(4, 0), Poco::Timespan(5, 0));
+	assertTrue (s.socket().getSendTimeout() == Poco::Timespan(4, 0));
+	assertTrue (s.socket().getReceiveTimeout() == Poco::Timespan(5, 0));
+
+	s.setSendTimeout(Poco::Timespan(6, 0));
+	s.setReceiveTimeout(Poco::Timespan(7, 0));
+	assertTrue (s.socket().getSendTimeout() == Poco::Timespan(6, 0));
+	assertTrue (s.socket().getReceiveTimeout() == Poco::Timespan(7, 0));
+
+	// POSIX systems reject a negative microsecond part with EDOM; Windows takes whole milliseconds and accepts it.
+	const Poco::Timespan invalidTimeout(0, -1);
+	bool sendRejected = false;
+	try
+	{
+		s.setSendTimeout(invalidTimeout);
+	}
+	catch (Poco::IOException&)
+	{
+		sendRejected = true;
+	}
+	bool rejected = false;
+	try
+	{
+		s.setTimeout(Poco::Timespan(3, 0), invalidTimeout, Poco::Timespan(8, 0));
+	}
+	catch (Poco::IOException&)
+	{
+		rejected = true;
+	}
+	assertTrue (rejected == sendRejected);
+	assertTrue (s.socket().getReceiveTimeout() == Poco::Timespan(8, 0));
+
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket socket(SocketAddress("127.0.0.1", server.address().port()));
+	socket.setSendTimeout(Poco::Timespan(10, 0));
+	socket.setReceiveTimeout(Poco::Timespan(10, 0));
+	HTTPClientSession adopted(socket);
+	adopted.setTimeout(Poco::Timespan(60, 0));
+	assertTrue (adopted.socket().getSendTimeout() == Poco::Timespan(60, 0));
+	assertTrue (adopted.socket().getReceiveTimeout() == Poco::Timespan(60, 0));
+}
+
+
 void HTTPClientSessionTest::assertFramingRejected(const std::string& headers)
 {
 	ServerSocket server(SocketAddress("127.0.0.1", 0));
@@ -1258,6 +1313,7 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testNonChunkedTransferEncodingResponseReadsToClose);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testHeadResponseIgnoresFramingHeaders);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testConnectResponseIgnoresFramingHeaders);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testTimeoutAppliedToConnectedSocket);
 
 	return pSuite;
 }

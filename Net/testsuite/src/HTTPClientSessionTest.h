@@ -78,6 +78,7 @@ public:
 	void testNonChunkedTransferEncodingResponseReadsToClose();
 	void testHeadResponseIgnoresFramingHeaders();
 	void testConnectResponseIgnoresFramingHeaders();
+	void testTimeoutAppliedToConnectedSocket();
 
 	void setUp();
 	void tearDown();

@@ -235,6 +235,17 @@ namespace
 		}
 	};
 
+	class SocketTimeoutRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			Poco::Net::StreamSocket& socket = static_cast<Poco::Net::HTTPServerRequestImpl&>(request).socket();
+			const std::string timeouts(std::to_string(socket.getSendTimeout().totalSeconds()) + " " + std::to_string(socket.getReceiveTimeout().totalSeconds()));
+			response.sendBuffer(timeouts.data(), timeouts.length());
+		}
+	};
+
 	class RequestHandlerFactory: public HTTPRequestHandlerFactory
 	{
 	public:
@@ -268,6 +279,8 @@ namespace
 				return new ToggleBlockingRequestHandler;
 			else if (request.getURI() == "/bodyStatus")
 				return new BodyStatusRequestHandler;
+			else if (request.getURI() == "/socketTimeouts")
+				return new SocketTimeoutRequestHandler;
 			else
 				return nullptr;
 		}
@@ -1007,6 +1020,40 @@ void HTTPServerTest::testIncompleteFixedLengthRequest()
 }
 
 
+void HTTPServerTest::testSocketTimeouts()
+{
+	ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+	HTTPServer srv(new RequestHandlerFactory, svs, new HTTPServerParams);
+	srv.start();
+
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request("GET", "/socketTimeouts", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	HTTPResponse response;
+	std::string rbody;
+	StreamCopier::copyToString(cs.receiveResponse(response), rbody);
+	assertEqual ("60 60", rbody);
+
+	srv.stop();
+
+	ServerSocket svs2(Poco::Net::SocketAddress("127.0.0.1", 0));
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setTimeout(Poco::Timespan(7, 0));
+	HTTPServer srv2(new RequestHandlerFactory, svs2, pParams);
+	srv2.start();
+
+	HTTPClientSession cs2("127.0.0.1", svs2.address().port());
+	cs2.setTimeout(Poco::Timespan(10, 0));
+	cs2.sendRequest(request);
+	std::string rbody2;
+	StreamCopier::copyToString(cs2.receiveResponse(response), rbody2);
+	assertEqual ("7 7", rbody2);
+
+	srv2.stop();
+}
+
+
 void HTTPServerTest::testFieldNameWhitespace()
 {
 	const std::string body("GET /echoHeader HTTP/1.1\r\nHost: smuggled\r\n\r\n");
@@ -1084,6 +1131,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testNonBlockingHandlerClosesConnection);
 	CppUnit_addTest(pSuite, HTTPServerTest, testHandlerNonBlockingReadThenBlocking);
 	CppUnit_addTest(pSuite, HTTPServerTest, testIncompleteFixedLengthRequest);
+	CppUnit_addTest(pSuite, HTTPServerTest, testSocketTimeouts);
 	CppUnit_addTest(pSuite, HTTPServerTest, testFieldNameWhitespace);
 	CppUnit_addTest(pSuite, HTTPServerTest, testRedirectLineBreak);
 	CppUnit_addTest(pSuite, HTTPServerTest, testSendLineBreak);

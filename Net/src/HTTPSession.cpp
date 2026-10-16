@@ -100,9 +100,58 @@ void HTTPSession::setTimeout(const Poco::Timespan& timeout)
 
 void HTTPSession::setTimeout(const Poco::Timespan& connectionTimeout, const Poco::Timespan& sendTimeout, const Poco::Timespan& receiveTimeout)
 {
-	 _connectionTimeout = connectionTimeout;
-	 _sendTimeout = sendTimeout;
-	 _receiveTimeout = receiveTimeout;
+	_connectionTimeout = connectionTimeout;
+	try
+	{
+		setSendTimeout(sendTimeout);
+	}
+	catch (...)
+	{
+		try
+		{
+			setReceiveTimeout(receiveTimeout);
+		}
+		catch (...)
+		{
+			// The exception from the send timeout is the one reported.
+		}
+		throw;
+	}
+	setReceiveTimeout(receiveTimeout);
+}
+
+
+void HTTPSession::setSendTimeout(const Poco::Timespan& timeout)
+{
+	_sendTimeout = timeout;
+	if (connected())
+	{
+		try
+		{
+			_socket.setSendTimeout(timeout);
+		}
+		catch (NetException&)
+		{
+			// A socket that rejects the option has failed; the next send or receive reports it.
+		}
+	}
+}
+
+
+void HTTPSession::setReceiveTimeout(const Poco::Timespan& timeout)
+{
+	_receiveTimeout = timeout;
+	if (connected())
+	{
+		try
+		{
+			_socket.setReceiveTimeout(timeout);
+		}
+		catch (NetException&)
+		{
+			// A socket that rejects the option has failed; the next send or receive reports it.
+		}
+	}
 }
 
 
