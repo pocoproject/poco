@@ -80,6 +80,16 @@ public:
 	void testConnectResponseIgnoresFramingHeaders();
 	void testTimeoutAppliedToConnectedSocket();
 	void testNonBlockingReceiveWithoutData();
+	void testFailedBodySendReconnects();
+	void testFailedBodySendClosesAdoptedSocket();
+	void testIncompleteRequestBodyClosesAdoptedSocket();
+	void testUnreadResponseBodyClosesAdoptedSocket();
+	void testDataAfterResponseClosesAdoptedSocket();
+	void testPeekResponseAfterFailedSendCloses();
+	void testFailedBodySendNotRepeated();
+	void testIncompleteRequestBodyReconnects();
+	void testIncompleteRequestBodyWithoutResponseReconnects();
+	void testShortRequestWriteClosesConnection();
 
 	void setUp();
 	void tearDown();
@@ -109,6 +119,24 @@ private:
 		/// Checks that a 200 response with two Content-Length headers and
 		/// a Transfer-Encoding header to a request with the given method
 		/// is accepted with an empty body.
+
+	Poco::Net::StreamSocket sendBodyUntilFailure(Poco::Net::HTTPClientSession& session, Poco::Net::ServerSocket& server);
+		/// Sends a POST request with a 64 MiB body that the server does not read,
+		/// until writing the body fails. Returns the accepted connection.
+
+	std::string receiveUntilClosed(Poco::Net::StreamSocket& peer);
+		/// Returns the bytes received from peer until the client closes the connection.
+		/// Fails if the connection is not closed within 5 seconds.
+
+	void assertBodyOnlyUntilClosed(Poco::Net::StreamSocket& peer);
+		/// Reads the request from peer and checks that the client closes the connection
+		/// and that only body bytes follow the request header.
+
+	std::string sendWithShortWrite(const std::string& body);
+		/// Sends a POST request with body on a session whose first write sends only
+		/// part of its data. Checks that receiveResponse() throws a NetException,
+		/// that the connection is closed and that the server received only the bytes
+		/// of that write, with a single request header. Returns the body bytes received.
 };
 
 

@@ -240,11 +240,12 @@ public:
 		///
 		/// In case a network or server failure happens
 		/// while writing the request body to the returned stream,
-		/// the stream state will change to bad or fail. In this
-		/// case, reset() should be called if the session will
-		/// be reused and persistent connections are enabled
-		/// to ensure a new connection will be set up
-		/// for the next request.
+		/// the stream state will change to bad or fail, and the next
+		/// request sets up a new connection, as it does after a request
+		/// body that has not been written to its end. A session without
+		/// a host (created from a socket) cannot set up a new connection:
+		/// its next sendRequest() closes the socket and throws the
+		/// recorded exception or a NetException.
 
 	virtual std::istream& receiveResponse(HTTPResponse& response);
 		/// Receives the header for the response to the previous
@@ -262,14 +263,14 @@ public:
 		/// Content-Length is skipped instead if it has already been
 		/// received. A new connection is also set up if the server
 		/// has sent data after the response or closed the connection.
+		/// A session without a host (created from a socket) cannot set
+		/// up a new connection; its next sendRequest() closes the socket
+		/// and throws a NetException.
 		///
 		/// In case a network or server failure happens
 		/// while reading the response body from the returned stream,
-		/// the stream state will change to bad or fail. In this
-		/// case, reset() should be called if the session will
-		/// be reused and persistent connections are enabled
-		/// to ensure a new connection will be set up
-		/// for the next request.
+		/// the stream state will change to bad or fail, and the next
+		/// sendRequest() does not reuse the connection.
 		///
 		/// A body with Content-Length or chunked transfer encoding that the
 		/// server cuts short ends with eof after the bytes received;
@@ -319,11 +320,8 @@ public:
 		/// The next request will initiate a new connection,
 		/// even if persistent connections are enabled.
 		///
-		/// This should be called whenever something went
-		/// wrong when sending a request (e.g., sendRequest()
-		/// or receiveResponse() throws an exception, or
-		/// the request or response stream changes into
-		/// fail or bad state, but not eof state).
+		/// The session closes the connection itself after a network
+		/// error; reset() is needed only to force a new connection.
 
 	[[nodiscard]] virtual bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
@@ -406,6 +404,8 @@ private:
 	bool                  _expectResponseBody;
 	bool                  _connectRequest = false;
 	bool                  _responseReceived;
+	bool                  _requestBodyComplete = true;
+		/// False if the last request stream was dropped before its body was sent to its end.
 	OStreamPtr            _pRequestStream;
 	IStreamPtr            _pResponseStream;
 	HTTPBasicCredentials  _proxyBasicCreds;
@@ -417,6 +417,12 @@ private:
 
 	void initProxySessionFactory();
 		/// Registers the "http" protocol with _proxySessionFactory.
+
+	bool requestStreamComplete();
+		/// Sends the buffered data of the request stream and, for a chunked
+		/// body, the last chunk. Returns true if the request body has been
+		/// sent to its end. Returns false without sending if networkException()
+		/// is set.
 
 	bool responseStreamComplete();
 		/// Reads the terminator of a chunked body if the server has sent it,

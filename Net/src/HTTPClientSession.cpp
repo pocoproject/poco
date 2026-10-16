@@ -325,10 +325,31 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 	bool responseDataUnread = keepAlive && connected() && networkException() == nullptr && _pResponseStream != nullptr && (!responseStreamComplete() || dataPending());
 	if (responseDataUnread)
 		_mustReconnect = true;
+	if (_pRequestStream != nullptr)
+		_requestBodyComplete = requestStreamComplete();
+	bool requestBodyComplete = _requestBodyComplete;
+	_requestBodyComplete = true;
+	// A failed send or receive or an incomplete request body leaves the connection in an unknown state.
+	// Closed before the request stream is released, which would send its buffer again.
+	if (connected() && (networkException() != nullptr || !requestBodyComplete))
+		close();
 	_pRequestStream = nullptr;
 	_pResponseStream = nullptr;
 
-	if (((connected() && !keepAlive) || mustReconnect() || networkException() != nullptr) && !_host.empty())
+	if (_host.empty())
+	{
+		// A session without a host cannot set up a new connection.
+		if (networkException() != nullptr)
+			networkException()->rethrow();
+		if (!requestBodyComplete)
+			throw NetException("Cannot reconnect without a host", "the last request body was not sent to its end");
+		if (responseDataUnread)
+		{
+			close();
+			throw NetException("Cannot reconnect without a host", "the last response body was not read to its end, or the server sent data or closed the connection after it");
+		}
+	}
+	if (((connected() && !keepAlive) || mustReconnect()) && !_host.empty())
 	{
 		close();
 		_mustReconnect = false;
@@ -407,8 +428,12 @@ std::ostream& HTTPClientSession::sendRequestImpl(const HTTPRequest& request)
 
 void HTTPClientSession::flushRequest()
 {
+	if (_pRequestStream != nullptr)
+		_requestBodyComplete = requestStreamComplete();
+	// Closed before the request stream is released, which would send its buffer on the failed connection.
+	if (networkException() != nullptr) close();
 	_pRequestStream = nullptr;
-	if (networkException()) networkException()->rethrow();
+	if (networkException() != nullptr) networkException()->rethrow();
 }
 
 
@@ -432,7 +457,7 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 			catch (Exception&)
 			{
 				close();
-				if (networkException())
+				if (networkException() != nullptr)
 					networkException()->rethrow();
 				else
 					throw;
@@ -493,7 +518,11 @@ bool HTTPClientSession::peekResponse(HTTPResponse& response)
 
 	_pRequestStream->flush();
 
-	if (networkException()) networkException()->rethrow();
+	if (networkException() != nullptr)
+	{
+		close();
+		networkException()->rethrow();
+	}
 
 	response.clear();
 	HTTPHeaderInputStream his(*this);
@@ -507,7 +536,7 @@ bool HTTPClientSession::peekResponse(HTTPResponse& response)
 	catch (Exception&)
 	{
 		close();
-		if (networkException())
+		if (networkException() != nullptr)
 			networkException()->rethrow();
 		else
 			throw;
@@ -532,6 +561,8 @@ bool HTTPClientSession::secure() const
 
 int HTTPClientSession::write(const char* buffer, std::streamsize length)
 {
+	// A request stream flushed on a closed connection would replace the recorded cause with the error of this write.
+	if (!connected() && networkException() != nullptr) networkException()->rethrow();
 	try
 	{
 		int rc = HTTPSession::write(buffer, length);
@@ -592,6 +623,27 @@ std::string HTTPClientSession::proxyRequestPrefix() const
 		NumberFormatter::append(result, _port);
 	}
 	return result;
+}
+
+
+bool HTTPClientSession::requestStreamComplete()
+{
+	if (networkException() != nullptr) return false;
+	try
+	{
+		auto* pChunked = dynamic_cast<HTTPChunkedOutputStream*>(_pRequestStream.get());
+		if (pChunked != nullptr)
+		{
+			pChunked->rdbuf()->close();
+			return true;
+		}
+		auto* pFixed = dynamic_cast<HTTPFixedLengthOutputStream*>(_pRequestStream.get());
+		return pFixed != nullptr && pFixed->rdbuf()->pubsync() == 0 && pFixed->rdbuf()->isComplete();
+	}
+	catch (Exception&)
+	{
+		return false;
+	}
 }
 
 

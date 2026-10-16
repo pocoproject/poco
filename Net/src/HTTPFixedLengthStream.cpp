@@ -80,13 +80,30 @@ std::streamsize HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::stre
 
 std::streamsize HTTPFixedLengthStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
+	// The peer may have received part of the failed write; anything sent after it,
+	// including the buffer sent again by a later sync, would be read as body data.
+	if (_writeFailed) return -1;
 	std::streamsize n = 0;
 	if (_count < _length)
 	{
 		if (_count + length > _length)
 			length = static_cast<std::streamsize>(_length - _count);
-		n = _session.write(buffer, length);
+		try
+		{
+			n = _session.write(buffer, length);
+		}
+		catch (...)
+		{
+			_writeFailed = true;
+			throw;
+		}
 		if (n > 0) _count += n;
+		if (n != length)
+		{
+			_writeFailed = true;
+			// Stored as for a thrown error, so that the connection is closed instead of reused.
+			if (_session.networkException() == nullptr) _session.setException(NetException("Incomplete message write"));
+		}
 	}
 	return n;
 }
