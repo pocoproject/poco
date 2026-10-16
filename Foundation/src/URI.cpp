@@ -18,6 +18,7 @@
 #include "Poco/String.h"
 #include "Poco/NumberParser.h"
 #include "Poco/Path.h"
+#include "Poco/Ascii.h"
 
 
 namespace Poco {
@@ -62,7 +63,8 @@ URI::URI(const std::string& scheme, const std::string& pathEtc):
 
 
 URI::URI(const std::string& scheme, const std::string& authority, const std::string& pathEtc):
-	_scheme(scheme)
+	_scheme(scheme),
+	_port(0)
 {
 	toLowerInPlace(_scheme);
 	std::string::const_iterator beg = authority.begin();
@@ -76,9 +78,11 @@ URI::URI(const std::string& scheme, const std::string& authority, const std::str
 
 URI::URI(const std::string& scheme, const std::string& authority, const std::string& path, const std::string& query):
 	_scheme(scheme),
+	_port(0),
 	_path(path),
 	_query(query)
 {
+	checkControlChars(_query);
 	toLowerInPlace(_scheme);
 	std::string::const_iterator beg = authority.begin();
 	std::string::const_iterator end = authority.end();
@@ -88,10 +92,13 @@ URI::URI(const std::string& scheme, const std::string& authority, const std::str
 
 URI::URI(const std::string& scheme, const std::string& authority, const std::string& path, const std::string& query, const std::string& fragment):
 	_scheme(scheme),
+	_port(0),
 	_path(path),
 	_query(query),
 	_fragment(fragment)
 {
+	checkControlChars(_query);
+	checkControlChars(_fragment);
 	toLowerInPlace(_scheme);
 	std::string::const_iterator beg = authority.begin();
 	std::string::const_iterator end = authority.end();
@@ -272,13 +279,16 @@ void URI::setScheme(const std::string& scheme)
 
 void URI::setUserInfo(const std::string& userInfo)
 {
-	_userInfo.clear();
-	decode(userInfo, _userInfo);
+	std::string decodedUserInfo;
+	decode(userInfo, decodedUserInfo);
+	checkControlChars(decodedUserInfo);
+	_userInfo = std::move(decodedUserInfo);
 }
 
 
 void URI::setHost(const std::string& host)
 {
+	checkControlChars(host);
 	_host = host;
 }
 
@@ -342,6 +352,7 @@ void URI::setPath(const std::string& path)
 
 void URI::setRawQuery(const std::string& query)
 {
+	checkControlChars(query);
 	_query = query;
 }
 
@@ -437,6 +448,7 @@ void URI::setFragment(const std::string& fragment)
 
 void URI::setRawFragment(const std::string& fragment)
 {
+	checkControlChars(fragment);
 	_fragment = fragment;
 }
 
@@ -817,6 +829,7 @@ void URI::parseAuthority(std::string::const_iterator& it, const std::string::con
 		else part += *it;
 		++it;
 	}
+	checkControlChars(userInfo);
 	std::string::const_iterator pbeg = part.begin();
 	std::string::const_iterator pend = part.end();
 	parseHostAndPort(pbeg, pend);
@@ -856,6 +869,7 @@ void URI::parseHostAndPort(std::string::const_iterator& it, const std::string::c
 		else _port = 0;
 	}
 	else _port = 0;
+	checkControlChars(host);
 	_host = host;
 	if (_host.size() && _host[0] != '%')
 		toLowerInPlace(_host);
@@ -890,15 +904,19 @@ void URI::parsePathEtc(std::string::const_iterator& it, const std::string::const
 
 void URI::parseQuery(std::string::const_iterator& it, const std::string::const_iterator& end)
 {
-	_query.clear();
-	while (it != end && *it != '#') _query += *it++;
+	std::string query;
+	while (it != end && *it != '#') query += *it++;
+	checkControlChars(query);
+	_query = std::move(query);
 }
 
 
 void URI::parseFragment(std::string::const_iterator& it, const std::string::const_iterator& end)
 {
-	_fragment.clear();
-	while (it != end) _fragment += *it++;
+	std::string fragment;
+	while (it != end) fragment += *it++;
+	checkControlChars(fragment);
+	_fragment = std::move(fragment);
 }
 
 
@@ -957,6 +975,16 @@ void URI::buildPath(const std::vector<std::string>& segments, bool leadingSlash,
 	}
 	if (trailingSlash)
 		_path += '/';
+}
+
+
+void URI::checkControlChars(const std::string& str)
+{
+	for (auto c: str)
+	{
+		if (Ascii::hasProperties(c, Ascii::ACP_CONTROL))
+			throw URISyntaxException("URI contains control characters", str);
+	}
 }
 
 

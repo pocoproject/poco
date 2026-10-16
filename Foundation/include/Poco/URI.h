@@ -52,6 +52,10 @@ class Foundation_API URI
 	/// lead to ambiguities. See the descriptions of setQuery(), setRawQuery(), getQuery(),
 	/// getRawQuery(), setFragment(), setRawFragment(), getFragment() and getRawFragment()
 	/// for more information.
+	///
+	/// A host, user-info, query or fragment part that contains a control character
+	/// (0x00 to 0x1F or 0x7F) is rejected with a URISyntaxException. Such characters
+	/// in the path are accepted, as the path is percent-encoded on output.
 {
 public:
 	using QueryParameters = std::vector<std::pair<std::string, std::string>>;
@@ -368,6 +372,9 @@ protected:
 	static const std::string ILLEGAL;
 
 private:
+	static void checkControlChars(const std::string& str);
+		/// Throws a URISyntaxException if str contains a control character.
+
 	std::string    _scheme;
 	std::string    _userInfo;
 	std::string    _host;
