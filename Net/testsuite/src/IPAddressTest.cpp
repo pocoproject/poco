@@ -85,6 +85,14 @@ void IPAddressTest::testStringConv6()
 	assertTrue (ia4.family() == IPAddress::IPv6);
 	assertTrue (ia4.toString() == "::ffff:192.168.1.120");
 
+	// leading zero octet in the IPv4 part must not truncate the output
+	for (const char* str : {"::0.1.2.3", "::0.0.0.6", "::ffff:0.1.2.3", "::ffff:0.0.0.0", "::", "::1"})
+	{
+		IPAddress ia(str);
+		assertTrue (ia.toString() == str);
+		assertTrue (IPAddress(ia.toString()) == ia);
+	}
+
 	IPAddress ia5(64, IPAddress::IPv6);
 	assertTrue (ia5.family() == IPAddress::IPv6);
 	assertTrue (ia5.toString() == "ffff:ffff:ffff:ffff::");
