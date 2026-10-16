@@ -320,6 +320,51 @@ void HTTPRequestTest::testWriteInvalid()
 }
 
 
+void HTTPRequestTest::testWhiteSpaceLimit()
+{
+	const std::string padding(20000, ' ');
+	const std::string requests[] = {
+		std::string(20000, '\n') + "GET / HTTP/1.1\r\n\r\n",
+		"GET" + padding + "/ HTTP/1.1\r\n\r\n",
+		"GET /" + padding + "HTTP/1.1\r\n\r\n",
+		"GET / HTTP/1.1" + padding + "\r\n\r\n",
+		"GET / HTTP/1.1\r\nHost: test\r\n\r" + padding + "\n"
+	};
+	for (const auto& s: requests)
+	{
+		std::istringstream istr(s);
+		HTTPRequest request;
+		try
+		{
+			request.read(istr);
+			fail("request header of unlimited length - must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+
+	std::istringstream strict("GET / HTTP/1.1\r\nX:" + padding + "a\r\n\r\n");
+	HTTPRequest strictRequest;
+	strictRequest.setStrictParsing(true);
+	try
+	{
+		strictRequest.read(strict);
+		fail("white space of unlimited length after a colon - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+
+	std::istringstream istr("GET" + std::string(1000, ' ') + "/ HTTP/1.1\r\nHost: test\r\n\r\n");
+	HTTPRequest request;
+	request.read(istr);
+	assertTrue (request.getMethod() == HTTPRequest::HTTP_GET);
+	assertTrue (request.getURI() == "/");
+	assertTrue (request.getHost() == "test");
+}
+
+
 void HTTPRequestTest::setUp()
 {
 }
@@ -349,6 +394,7 @@ CppUnit::Test* HTTPRequestTest::suite()
 	CppUnit_addTest(pSuite, HTTPRequestTest, testCookies);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testTooManyCookies);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWriteInvalid);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testWhiteSpaceLimit);
 
 	return pSuite;
 }

@@ -19,6 +19,8 @@
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerRequestImpl.h"
+#include "Poco/Net/HTTPServerResponseImpl.h"
+#include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPServerSession.h"
@@ -29,6 +31,7 @@
 #include "Poco/Path.h"
 #include "Poco/FileStream.h"
 #include "Poco/File.h"
+#include "Poco/Stopwatch.h"
 #include <optional>
 #include <sstream>
 #include <utility>
@@ -850,6 +853,30 @@ namespace
 		}
 		return receiveUntilClosed(ss);
 	}
+
+	bool trickleUntilClosed(Poco::Net::StreamSocket& ss)
+		/// Sends one byte every 300 ms, which stays well within the connection timeout of each read,
+		/// and returns true once the server closes the connection, or false after 5 seconds.
+	{
+		const Poco::Timespan interval(0, 300000);
+		Poco::Stopwatch sw;
+		sw.start();
+		try
+		{
+			while (sw.elapsedSeconds() < 5)
+			{
+				if (ss.poll(interval, Poco::Net::Socket::SELECT_READ))
+					return receiveUntilClosed(ss).has_value();
+				ss.sendBytes("a", 1);
+			}
+		}
+		catch (Poco::IOException&)
+		{
+			// The server closed the connection before the last byte was sent.
+			return true;
+		}
+		return false;
+	}
 }
 
 
@@ -1102,6 +1129,84 @@ void HTTPServerTest::testEchoDecodedLineBreak()
 }
 
 
+void HTTPServerTest::testSlowRequestHeader()
+{
+	ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setRequestHeaderTimeout(Poco::Timespan(1, 0));
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+
+	Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", svs.address().port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	const std::string head("GET /echoHeader HTTP/1.1\r\nHost: test\r\nX-Slow: ");
+	ss.sendBytes(head.data(), static_cast<int>(head.size()));
+	if (!trickleUntilClosed(ss)) failmsg("server did not close a connection whose request header exceeded the timeout");
+
+	srv.stop();
+}
+
+
+void HTTPServerTest::testSlowUnreadRequestBody()
+{
+	ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setRequestHeaderTimeout(Poco::Timespan(1, 0));
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+
+	Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", svs.address().port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	const std::string head("POST /echoField HTTP/1.1\r\nHost: test\r\nContent-Length: 1000\r\n\r\n");
+	ss.sendBytes(head.data(), static_cast<int>(head.size()));
+
+	std::string response;
+	char buffer[1024];
+	while (response.find("\r\n\r\n") == std::string::npos)
+	{
+		const int n = ss.receiveBytes(buffer, sizeof(buffer));
+		if (n <= 0) failmsg("server closed the connection before the response");
+		response.append(buffer, n);
+	}
+	assertTrue (response.compare(0, 12, "HTTP/1.1 200") == 0);
+	if (!trickleUntilClosed(ss)) failmsg("server did not close a connection whose unread request body exceeded the timeout");
+
+	srv.stop();
+}
+
+
+void HTTPServerTest::testInvalidRequestHeaderClearsDeadline()
+{
+	ServerSocket svs(Poco::Net::SocketAddress("127.0.0.1", 0));
+	Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", svs.address().port()));
+	HTTPServerParams::Ptr pParams = new HTTPServerParams;
+	pParams->setTimeout(Poco::Timespan(5, 0));
+	pParams->setRequestHeaderTimeout(Poco::Timespan(1, 0));
+	Poco::Net::HTTPServerSession session(svs.acceptConnection(), pParams);
+	Poco::Net::HTTPServerResponseImpl response(session);
+
+	// A method one character longer than the limit; the header stream consumes the whole line.
+	const std::string invalid(std::string(33, 'X') + "\r\n");
+	ss.sendBytes(invalid.data(), static_cast<int>(invalid.size()));
+	try
+	{
+		Poco::Net::HTTPServerRequestImpl request(response, session, pParams.get());
+		fail("invalid request method - must throw");
+	}
+	catch (Poco::Net::MessageException&)
+	{
+	}
+
+	// A read after the request header deadline has passed.
+	Poco::Thread::sleep(1200);
+	ss.sendBytes("data", 4);
+	Poco::Net::HTTPFixedLengthInputStream istr(session, 4);
+	std::string data;
+	istr >> data;
+	assertTrue (data == "data");
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
@@ -1136,6 +1241,9 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testRedirectLineBreak);
 	CppUnit_addTest(pSuite, HTTPServerTest, testSendLineBreak);
 	CppUnit_addTest(pSuite, HTTPServerTest, testEchoDecodedLineBreak);
+	CppUnit_addTest(pSuite, HTTPServerTest, testSlowRequestHeader);
+	CppUnit_addTest(pSuite, HTTPServerTest, testSlowUnreadRequestBody);
+	CppUnit_addTest(pSuite, HTTPServerTest, testInvalidRequestHeaderClearsDeadline);
 
 	return pSuite;
 }
