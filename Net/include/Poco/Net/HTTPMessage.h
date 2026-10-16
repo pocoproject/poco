@@ -98,6 +98,13 @@ public:
 		/// Returns true if the Transfer-Encoding header is set
 		/// and its value is chunked.
 
+	void checkFramingHeaders() const;
+		/// Throws a MessageException if the Content-Length and
+		/// Transfer-Encoding headers do not determine the length
+		/// of the body unambiguously: either header occurs more
+		/// than once, both are present, or the Content-Length value
+		/// is not a decimal number that fits into a 64-bit integer.
+
 	void setContentType(const std::string& mediaType);
 		/// Sets the content type for this message.
 		///

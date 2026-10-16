@@ -863,6 +863,9 @@ void HTTPServerTest::testFramingConflicts()
 	response = sendRaw(port, head + "Content-Length: 5,5\r\n\r\nhello");
 	assertTrue (response.compare(0, 12, "HTTP/1.1 400") == 0);
 
+	response = sendRaw(port, head + "Content-Length: 99999999999999999999\r\n\r\nhello");
+	assertTrue (response.compare(0, 12, "HTTP/1.1 400") == 0);
+
 	// A transfer coding other than chunked does not frame the body.
 	response = sendRaw(port, head + "Transfer-Encoding: gzip, chunked\r\n\r\n");
 	assertTrue (response.compare(0, 12, "HTTP/1.1 400") == 0);

@@ -14,10 +14,13 @@
 
 #include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/MediaType.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
 #include "Poco/Ascii.h"
 #include "Poco/String.h"
+#include <algorithm>
+#include <charconv>
 
 
 using Poco::NumberFormatter;
@@ -160,6 +163,36 @@ void HTTPMessage::setChunkedTransferEncoding(bool flag)
 bool HTTPMessage::getChunkedTransferEncoding() const
 {
 	return icompare(getTransferEncoding(), CHUNKED_TRANSFER_ENCODING) == 0;
+}
+
+
+void HTTPMessage::checkFramingHeaders() const
+{
+	// A message with an ambiguous length is refused rather than framed on one
+	// of the competing values: an intermediary may pick the other one.
+	std::size_t contentLengths = 0;
+	std::size_t transferEncodings = 0;
+	for (const auto& [name, value]: *this)
+	{
+		if (icompare(name, CONTENT_LENGTH) == 0) ++contentLengths;
+		else if (icompare(name, TRANSFER_ENCODING) == 0) ++transferEncodings;
+	}
+	if (contentLengths > 1 || transferEncodings > 1)
+		throw MessageException("Duplicate Content-Length or Transfer-Encoding header");
+	if (transferEncodings == 1 && contentLengths == 1)
+		throw MessageException("Both Content-Length and Transfer-Encoding present");
+
+	// NumberParser skips thousands separators without checking their position,
+	// so "5,5" would be read as 55 while another recipient sees 5 or rejects it.
+	if (contentLengths == 1)
+	{
+		const std::string& value = get(CONTENT_LENGTH);
+		Poco::Int64 length = 0;
+		if (value.empty() || !std::all_of(value.begin(), value.end(),
+				[](char c) { return Poco::Ascii::isDigit(c); }) ||
+			std::from_chars(value.data(), value.data() + value.size(), length).ec != std::errc())
+			throw MessageException("Malformed Content-Length header");
+	}
 }
 
 

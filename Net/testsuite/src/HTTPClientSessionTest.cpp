@@ -1041,6 +1041,115 @@ void HTTPClientSessionTest::testProxyTunnelIgnoresPreviousResponse()
 }
 
 
+void HTTPClientSessionTest::testMalformedContentLengthResponse()
+{
+	assertFramingRejected("Content-Length: 1,0\r\n");
+	assertFramingRejected("Content-Length: -5\r\n");
+	assertFramingRejected("Content-Length: +10\r\n");
+	assertFramingRejected("Content-Length: \r\n");
+	assertFramingRejected("Content-Length: 99999999999999999999\r\n");
+}
+
+
+void HTTPClientSessionTest::testDuplicateContentLengthResponse()
+{
+	assertFramingRejected("Content-Length: 0\r\nContent-Length: 40\r\n");
+}
+
+
+void HTTPClientSessionTest::testDuplicateTransferEncodingResponse()
+{
+	assertFramingRejected("Transfer-Encoding: chunked\r\nTransfer-Encoding: chunked\r\n");
+	assertFramingRejected("transfer-encoding: chunked\r\nTRANSFER-ENCODING: gzip\r\n");
+}
+
+
+void HTTPClientSessionTest::testContentLengthAndTransferEncodingResponse()
+{
+	assertFramingRejected("Content-Length: 0\r\nTransfer-Encoding: chunked\r\n");
+}
+
+
+void HTTPClientSessionTest::testNonChunkedTransferEncodingResponseReadsToClose()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket first = server.acceptConnection();
+	const std::string gzipped("HTTP/1.1 200 OK\r\nTransfer-Encoding: gzip\r\n\r\nHTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nstale");
+	first.sendBytes(gzipped.data(), static_cast<int>(gzipped.size()));
+	first.shutdownSend();
+	HTTPResponse response;
+	std::istream& rs1 = cs.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs1, body);
+	assertTrue (body == "HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nstale");
+
+	assertNewConnectionServes(cs, server, request);
+}
+
+
+void HTTPClientSessionTest::testHeadResponseIgnoresFramingHeaders()
+{
+	assertFramingIgnored(HTTPRequest::HTTP_HEAD, "/");
+}
+
+
+void HTTPClientSessionTest::testConnectResponseIgnoresFramingHeaders()
+{
+	assertFramingIgnored(HTTPRequest::HTTP_CONNECT, "www.somehost.com:80");
+}
+
+
+void HTTPClientSessionTest::assertFramingRejected(const std::string& headers)
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket first = server.acceptConnection();
+	const std::string malformed("HTTP/1.1 200 OK\r\n" + headers + "\r\nHTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nstale");
+	first.sendBytes(malformed.data(), static_cast<int>(malformed.size()));
+	HTTPResponse response;
+	try
+	{
+		cs.receiveResponse(response);
+		failmsg("must throw MessageException: " + headers);
+	}
+	catch (MessageException&)
+	{
+	}
+	assertTrue (!cs.connected());
+
+	assertNewConnectionServes(cs, server, request);
+}
+
+
+void HTTPClientSessionTest::assertFramingIgnored(const std::string& method, const std::string& uri)
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(method, uri, HTTPMessage::HTTP_1_1);
+	cs.sendRequest(request);
+	StreamSocket connection = server.acceptConnection();
+	const std::string reply("HTTP/1.1 200 OK\r\nContent-Length: 5\r\nContent-Length: 7\r\nTransfer-Encoding: chunked\r\n\r\n");
+	connection.sendBytes(reply.data(), static_cast<int>(reply.size()));
+	HTTPResponse response;
+	std::istream& rs = cs.receiveResponse(response);
+	std::string body;
+	StreamCopier::copyToString(rs, body);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	assertTrue (body.empty());
+}
+
+
 void HTTPClientSessionTest::assertReconnectAfterPartialRead(const std::string& firstResponse, std::streamsize bodyBytes)
 {
 	ServerSocket server(SocketAddress("127.0.0.1", 0));
@@ -1142,6 +1251,13 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testUnreadCloseDelimitedResponseReconnects);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testUnreadChunkedTerminatorKeepsConnection);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyTunnelIgnoresPreviousResponse);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testMalformedContentLengthResponse);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testDuplicateContentLengthResponse);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testDuplicateTransferEncodingResponse);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testContentLengthAndTransferEncodingResponse);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testNonChunkedTransferEncodingResponseReadsToClose);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testHeadResponseIgnoresFramingHeaders);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testConnectResponseIgnoresFramingHeaders);
 
 	return pSuite;
 }
