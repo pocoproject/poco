@@ -98,6 +98,36 @@ namespace
 		}
 	};
 
+	class LineBreakRedirectRequestHandler: public AbstractHTTPRequestHandler
+	{
+	public:
+		void run()
+		{
+			response().redirect("/target\r\nSet-Cookie: injected=1");
+		}
+	};
+
+	class LineBreakSendRequestHandler: public AbstractHTTPRequestHandler
+	{
+	public:
+		void run()
+		{
+			response().set("X-Field", "a\r\nSet-Cookie: injected=1");
+			response().send();
+		}
+	};
+
+	class EchoFieldRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			response.set("X-Echo", request.get("X-Echo", ""));
+			response.setContentLength(0);
+			response.send();
+		}
+	};
+
 	class AuthRequestHandler: public HTTPRequestHandler
 	{
 	public:
@@ -203,6 +233,12 @@ namespace
 				return new EchoHeaderRequestHandler;
 			else if (request.getURI() == "/redirect")
 				return new RedirectRequestHandler;
+			else if (request.getURI() == "/lineBreakRedirect")
+				return new LineBreakRedirectRequestHandler;
+			else if (request.getURI() == "/lineBreakSend")
+				return new LineBreakSendRequestHandler;
+			else if (request.getURI() == "/echoField")
+				return new EchoFieldRequestHandler;
 			else if (request.getURI() == "/auth")
 				return new AuthRequestHandler;
 			else if (request.getURI() == "/buffer")
@@ -955,6 +991,43 @@ void HTTPServerTest::testFieldNameWhitespace()
 }
 
 
+void HTTPServerTest::testRedirectLineBreak()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	const std::optional<std::string> response = exchangeUntilClosed(pParams,
+		"GET /lineBreakRedirect HTTP/1.1\r\nHost: test\r\n\r\n", false);
+	assertTrue (response.has_value());
+	assertTrue (response->compare(0, 12, "HTTP/1.1 500") == 0);
+	assertTrue (response->find("injected") == std::string::npos);
+}
+
+
+void HTTPServerTest::testSendLineBreak()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	const std::optional<std::string> response = exchangeUntilClosed(pParams,
+		"GET /lineBreakSend HTTP/1.1\r\nHost: test\r\n\r\n", false);
+	assertTrue (response.has_value());
+	assertTrue (response->compare(0, 12, "HTTP/1.1 500") == 0);
+	assertTrue (response->find("injected") == std::string::npos);
+}
+
+
+void HTTPServerTest::testEchoDecodedLineBreak()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	const std::optional<std::string> response = exchangeUntilClosed(pParams,
+		"GET /echoField HTTP/1.1\r\nHost: test\r\nX-Echo: =?UTF-8?Q?x=0D=0ASet-Cookie:_injected=1?=\r\n\r\n", false);
+	assertTrue (response.has_value());
+	assertTrue (response->compare(0, 12, "HTTP/1.1 200") == 0);
+	assertTrue (response->find("\r\nX-Echo: =?UTF-8?Q?x=0D=0ASet-Cookie:_injected=1?=\r\n") != std::string::npos);
+	assertTrue (response->find("\r\nSet-Cookie") == std::string::npos);
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
@@ -984,6 +1057,9 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testNonBlockingHandlerClosesConnection);
 	CppUnit_addTest(pSuite, HTTPServerTest, testHandlerNonBlockingReadThenBlocking);
 	CppUnit_addTest(pSuite, HTTPServerTest, testFieldNameWhitespace);
+	CppUnit_addTest(pSuite, HTTPServerTest, testRedirectLineBreak);
+	CppUnit_addTest(pSuite, HTTPServerTest, testSendLineBreak);
+	CppUnit_addTest(pSuite, HTTPServerTest, testEchoDecodedLineBreak);
 
 	return pSuite;
 }

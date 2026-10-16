@@ -230,6 +230,9 @@ public:
 		/// The HTTPClientSession will set the request's
 		/// Host and Keep-Alive headers accordingly.
 		///
+		/// Throws a MessageException, without connecting or closing
+		/// the connection, if HTTPRequest::validate() does.
+		///
 		/// The returned output stream can be used to write
 		/// the request body. The stream is valid until
 		/// receiveResponse() is called or the session

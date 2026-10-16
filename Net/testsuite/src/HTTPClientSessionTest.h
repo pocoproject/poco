@@ -57,6 +57,7 @@ public:
 	void testGlobalProxyConfig();
 	void testBypassProxyExtended();
 	void testChunkedFramingErrorReconnects();
+	void testInvalidRequestKeepsConnection();
 
 	void setUp();
 	void tearDown();

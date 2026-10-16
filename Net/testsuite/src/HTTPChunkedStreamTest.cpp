@@ -26,6 +26,7 @@
 
 
 using Poco::Net::HTTPChunkedInputStream;
+using Poco::Net::HTTPChunkedOutputStream;
 using Poco::Net::HTTPClientSession;
 using Poco::Net::MessageException;
 using Poco::Net::MessageHeader;
@@ -264,6 +265,27 @@ void HTTPChunkedStreamTest::testTrailerTooLong()
 }
 
 
+void HTTPChunkedStreamTest::testWriteFoldedTrailer()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket client(server.address());
+	StreamSocket peer = server.acceptConnection();
+	HTTPClientSession session(client);
+	MessageHeader trailer;
+	trailer.set("X-Checksum", "abc\r\n def");
+	HTTPChunkedOutputStream ostr(session, &trailer);
+	ostr << "hello";
+	try
+	{
+		ostr.rdbuf()->close();
+		fail("folded trailer value must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+
 void HTTPChunkedStreamTest::setUp()
 {
 }
@@ -287,6 +309,7 @@ CppUnit::Test* HTTPChunkedStreamTest::suite()
 	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testReadAfterTimeout);
 	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testReadInPartsNonBlocking);
 	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testTrailerTooLong);
+	CppUnit_addTest(pSuite, HTTPChunkedStreamTest, testWriteFoldedTrailer);
 
 	return pSuite;
 }

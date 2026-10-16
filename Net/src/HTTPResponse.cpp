@@ -22,6 +22,7 @@
 #include "Poco/DateTimeParser.h"
 #include "Poco/Ascii.h"
 #include "Poco/String.h"
+#include <algorithm>
 
 
 using Poco::DateTime;
@@ -266,8 +267,11 @@ void HTTPResponse::getCookies(std::vector<HTTPCookie>& cookies) const
 
 void HTTPResponse::write(std::ostream& ostr) const
 {
+	if (std::any_of(_reason.begin(), _reason.end(), isInvalidValueChar))
+		throw MessageException("Invalid character in HTTP reason phrase");
+	checkFields(*this, false);
 	ostr << getVersion() << " " << static_cast<int>(_status) << " " << _reason << "\r\n";
-	HTTPMessage::write(ostr);
+	writeFields(*this, ostr);
 	ostr << "\r\n";
 }
 

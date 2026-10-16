@@ -33,6 +33,7 @@ public:
 	void testReadAfterTimeout();
 	void testReadInPartsNonBlocking();
 	void testTrailerTooLong();
+	void testWriteFoldedTrailer();
 
 	void setUp() override;
 	void tearDown() override;

@@ -35,7 +35,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 			MemoryInputStream stream(reinterpret_cast<const char*>(data), size);
 			HTTPRequest request;
 			request.read(stream);
-			request.write(null);
+			catchExceptions([&] { request.write(null); });
 
 			HTTPCredentials creds;
 			creds.fromURI(URI(request.getURI()));
@@ -50,7 +50,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 			MemoryInputStream stream(reinterpret_cast<const char*>(data), size);
 			HTTPResponse response;
 			response.read(stream);
-			response.write(null);
+			catchExceptions([&] { response.write(null); });
 
 			HTTPRequest request(HTTPRequest::HTTP_GET, "/");
 			request.setHost(DNS::encodeIDN(DNS::decodeIDN(response.get(HTTPRequest::HOST))));

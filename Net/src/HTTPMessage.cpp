@@ -202,4 +202,18 @@ bool HTTPMessage::getKeepAlive() const
 }
 
 
+void HTTPMessage::write(std::ostream& ostr) const
+{
+	checkFields(*this, false);
+	writeFields(*this, ostr);
+}
+
+
+void HTTPMessage::writeTrailer(const MessageHeader& trailer, std::ostream& ostr)
+{
+	checkFields(trailer, false);
+	writeFields(trailer, ostr);
+}
+
+
 } // namespace Poco::Net

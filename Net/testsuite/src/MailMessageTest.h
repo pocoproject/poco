@@ -48,6 +48,8 @@ public:
 	void testReadMultiPartTooManyParts();
 	void testReadMultiPartLargeWithContentLength();
 	void testReadMultiPartLargeWithoutContentLength();
+	void testWriteFoldedField();
+	void testValidateHeaders();
 
 	void setUp();
 	void tearDown();

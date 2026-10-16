@@ -36,6 +36,7 @@ public:
 	void testInvalid2();
 	void testInvalid3();
 	void testCookies();
+	void testWriteInvalid();
 
 	void setUp();
 	void tearDown();

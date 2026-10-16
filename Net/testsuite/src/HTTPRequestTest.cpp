@@ -236,6 +236,33 @@ void HTTPRequestTest::testCookies()
 }
 
 
+void HTTPRequestTest::testWriteInvalid()
+{
+	HTTPRequest invalidURI(HTTPRequest::HTTP_GET, "/a\r\nX-Injected: 1", HTTPMessage::HTTP_1_1);
+	HTTPRequest invalidMethod("GE\x01T", "/", HTTPMessage::HTTP_1_1);
+	HTTPRequest invalidField(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	invalidField.set("X-Field", "a\r\nX-Injected: 1");
+	HTTPRequest foldedField(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	foldedField.set("X-Field", "a\r\n b");
+	HTTPRequest invalidVersion(HTTPRequest::HTTP_GET, "/", "HTTP/1.1\r\nX-Injected: 1");
+	HTTPRequest invalidName(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	invalidName.set("Na(me)", "value");
+	for (const HTTPRequest* pRequest: {&invalidURI, &invalidMethod, &invalidField, &foldedField, &invalidVersion, &invalidName})
+	{
+		std::ostringstream ostr;
+		try
+		{
+			pRequest->write(ostr);
+			fail("invalid request must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+		assertTrue (ostr.str().empty());
+	}
+}
+
+
 void HTTPRequestTest::setUp()
 {
 }
@@ -262,6 +289,7 @@ CppUnit::Test* HTTPRequestTest::suite()
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid3);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testCookies);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testWriteInvalid);
 
 	return pSuite;
 }

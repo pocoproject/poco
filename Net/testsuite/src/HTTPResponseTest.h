@@ -35,6 +35,7 @@ public:
 	void testCookies();
 	void testReplaceCookie();
 	void testRemoveCookie();
+	void testWriteInvalid();
 
 	void setUp();
 	void tearDown();
