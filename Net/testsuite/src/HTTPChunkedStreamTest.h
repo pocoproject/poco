@@ -34,6 +34,10 @@ public:
 	void testReadInPartsNonBlocking();
 	void testTrailerTooLong();
 	void testWriteFoldedTrailer();
+	void testWriteCloseOnce();
+	void testWriteTrailerFailure();
+	void testWriteFailure();
+	void testWriteFailureKeepsCause();
 
 	void setUp() override;
 	void tearDown() override;

@@ -13,7 +13,6 @@
 
 
 #include "Poco/Net/HTTPChunkedStream.h"
-#include "Poco/Net/HTTPHeaderStream.h"
 #include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/MessageHeader.h"
@@ -42,7 +41,8 @@ HTTPChunkedStreamBuf::HTTPChunkedStreamBuf(HTTPSession& session, openmode mode, 
 	_mode(mode),
 	_chunk(0),
 	_readState(ReadState::SIZE),
-	_pTrailer(pTrailer)
+	_pTrailer(pTrailer),
+	_closed(false)
 {
 }
 
@@ -54,19 +54,33 @@ HTTPChunkedStreamBuf::~HTTPChunkedStreamBuf()
 
 void HTTPChunkedStreamBuf::close()
 {
-	if (_mode & std::ios::out)
+	if ((_mode & std::ios::out) && !_closed)
 	{
-		sync();
-		if (_pTrailer != nullptr && !_pTrailer->empty())
+		// Set first, so that ~HTTPChunkedIOS does not repeat a close() that threw.
+		_closed = true;
+		try
 		{
-			HTTPHeaderOutputStream hos(_session);
-			hos.write("0\r\n", 3);
-			HTTPMessage::writeTrailer(*_pTrailer, hos);
-			hos.write("\r\n", 2);
+			// Without the last chunk, the peer sees an incomplete body instead of a complete-looking truncated one.
+			if (sync() == -1) throw MessageException("Failed to write chunked transfer data");
+			// Formatted before sending, so that an invalid trailer sends nothing
+			// and a short write is not followed by a second copy.
+			std::string lastChunk("0\r\n");
+			if (_pTrailer != nullptr && !_pTrailer->empty())
+			{
+				std::ostringstream ostr;
+				HTTPMessage::writeTrailer(*_pTrailer, ostr);
+				lastChunk.append(ostr.str());
+			}
+			lastChunk.append("\r\n");
+			const auto size = static_cast<std::streamsize>(lastChunk.size());
+			if (_session.write(lastChunk.data(), size) != size) throw MessageException("Failed to write last chunk");
 		}
-		else
+		catch (MessageException& exc)
 		{
-			_session.write("0\r\n\r\n", 5); // If possible, send in one write
+			// Stored for HTTPClientSession::flushRequest(), as ~HTTPChunkedIOS discards the exception.
+			// An exception already stored is the cause of the failure and is kept.
+			if (_session.networkException() == nullptr) _session.setException(exc);
+			throw;
 		}
 	}
 }
@@ -207,8 +221,8 @@ std::streamsize HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::str
 	_chunkBuffer.append("\r\n", 2);
 	_chunkBuffer.append(buffer, static_cast<std::string::size_type>(length));
 	_chunkBuffer.append("\r\n", 2);
-	_session.write(_chunkBuffer.data(), static_cast<std::streamsize>(_chunkBuffer.size()));
-	return length;
+	const auto size = static_cast<std::streamsize>(_chunkBuffer.size());
+	return _session.write(_chunkBuffer.data(), size) == size ? length : -1;
 }
 
 

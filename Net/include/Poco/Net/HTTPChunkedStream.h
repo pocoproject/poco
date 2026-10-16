@@ -51,6 +51,10 @@ public:
 	HTTPChunkedStreamBuf(HTTPSession& session, openmode mode, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedStreamBuf();
 	void close();
+		/// Writes the last chunk and the trailer once. Throws a MessageException
+		/// if the body or the last chunk could not be written or the trailer
+		/// is invalid, and stores it in the session unless the session
+		/// already holds an exception.
 
 	[[nodiscard]] bool isComplete() const noexcept;
 		/// Returns true if the body has been read up to and including
@@ -85,6 +89,7 @@ private:
 	ReadState       _readState;
 	std::string     _chunkBuffer;
 	MessageHeader*  _pTrailer;
+	bool            _closed;
 };
 
 
