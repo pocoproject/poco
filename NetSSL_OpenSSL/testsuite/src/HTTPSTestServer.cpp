@@ -164,6 +164,49 @@ std::string HTTPSTestServer::handleRequest() const
 		if (_lastRequest.substr(0, 3) == "GET")
 			response.append(body);
 	}
+	else if (_lastRequest.substr(0, 14) == "GET /cutheader")
+	{
+		response.append("HTTP/1.1 200 OK\r\n");
+		response.append("Content-Type: text/plain\r\n");
+		response.append("Set-Cookie: id=1");
+	}
+	else if (_lastRequest.substr(0, 16) == "GET /shortlength")
+	{
+		response.append("HTTP/1.0 200 OK\r\n");
+		response.append("Content-Type: text/plain\r\n");
+		response.append("Content-Length: ");
+		response.append(NumberFormatter::format(SMALL_BODY.size() + 100));
+		response.append("\r\n");
+		response.append("Connection: Close\r\n");
+		response.append("\r\n");
+		response.append(SMALL_BODY);
+	}
+	else if (_lastRequest.substr(0, 15) == "GET /shortchunk")
+	{
+		response.append("HTTP/1.1 200 OK\r\n");
+		response.append("Content-Type: text/plain\r\n");
+		response.append("Transfer-Encoding: chunked\r\n");
+		response.append("Connection: Close\r\n");
+		response.append("\r\n");
+		response.append(NumberFormatter::formatHex(SMALL_BODY.size() + 100));
+		response.append("\r\n");
+		response.append(SMALL_BODY);
+	}
+	else if (_lastRequest.substr(0, 17) == "GET /cutchunkline" ||
+			 _lastRequest.substr(0, 17) == "GET /cutlastchunk")
+	{
+		response.append("HTTP/1.1 200 OK\r\n");
+		response.append("Content-Type: text/plain\r\n");
+		response.append("Transfer-Encoding: chunked\r\n");
+		response.append("Connection: Close\r\n");
+		response.append("\r\n");
+		response.append(NumberFormatter::formatHex(SMALL_BODY.size()));
+		response.append("\r\n");
+		response.append(SMALL_BODY);
+		response.append("\r\n");
+		if (_lastRequest.substr(0, 17) == "GET /cutlastchunk")
+			response.append("0\r\n");
+	}
 	else if (_lastRequest.substr(0, 4) == "POST")
 	{
 		std::string::size_type pos = _lastRequest.find("\r\n\r\n");

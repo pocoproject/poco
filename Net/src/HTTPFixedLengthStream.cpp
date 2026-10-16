@@ -14,6 +14,7 @@
 
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/NetException.h"
 
 
 using Poco::BufferedStreamBuf;
@@ -49,7 +50,11 @@ std::streamsize HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::stre
 		if (_count + length > _length)
 			length = static_cast<std::streamsize>(_length - _count);
 		n = _session.read(buffer, length);
+		// A negative result is no data yet on a non-blocking socket, not an end of file.
+		// A cause the session already recorded is kept: HTTPSClientSession::read()
+		// returns 0 for a TLS connection closed without close_notify.
 		if (n > 0) _count += n;
+		else if (n == 0 && _session.networkException() == nullptr) _session.setException(MessageException("Incomplete message body"));
 	}
 	return n;
 }

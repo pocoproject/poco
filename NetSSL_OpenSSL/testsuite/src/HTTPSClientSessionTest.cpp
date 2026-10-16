@@ -771,6 +771,94 @@ void HTTPSClientSessionTest::testServerAbort()
 }
 
 
+void HTTPSClientSessionTest::testServerAbortContentLength()
+{
+	HTTPSTestServer srv;
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/shortlength/connection/abort");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getContentLength() > static_cast<std::streamsize>(HTTPSTestServer::SMALL_BODY.size()));
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (rs.eof());
+	assertTrue (!rs.bad());
+	assertTrue (dynamic_cast<const SSLConnectionUnexpectedlyClosedException*>(s.networkException()) != nullptr);
+}
+
+
+void HTTPSClientSessionTest::testServerAbortChunked()
+{
+	HTTPSTestServer srv;
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/shortchunk/connection/abort");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getChunkedTransferEncoding());
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (rs.eof());
+	assertTrue (!rs.bad());
+	assertTrue (dynamic_cast<const SSLConnectionUnexpectedlyClosedException*>(s.networkException()) != nullptr);
+}
+
+
+void HTTPSClientSessionTest::testServerAbortChunkedFraming()
+{
+	for (const char* path: {"/cutchunkline/connection/abort", "/cutlastchunk/connection/abort"})
+	{
+		HTTPSTestServer srv;
+		HTTPSClientSession s("127.0.0.1", srv.port());
+		s.setTimeout(Poco::Timespan(10, 0));
+		HTTPRequest request(HTTPRequest::HTTP_GET, path);
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs = s.receiveResponse(response);
+		assertTrue (response.getChunkedTransferEncoding());
+		std::ostringstream ostr;
+		StreamCopier::copyStream(rs, ostr);
+		assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+		assertTrue (rs.eof());
+		assertTrue (!rs.bad());
+		assertTrue (dynamic_cast<const SSLConnectionUnexpectedlyClosedException*>(s.networkException()) != nullptr);
+	}
+}
+
+
+void HTTPSClientSessionTest::testServerAbortHeader()
+{
+	// The header is read by receiveResponse(), or by peekResponse() for a request that expects 100 Continue.
+	for (bool peek: {false, true})
+	{
+		HTTPSTestServer srv;
+		HTTPSClientSession s("127.0.0.1", srv.port());
+		s.setTimeout(Poco::Timespan(10, 0));
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/cutheader/connection/abort");
+		request.setExpectContinue(peek);
+		s.sendRequest(request);
+		HTTPResponse response;
+		try
+		{
+			if (peek)
+				s.peekResponse(response);
+			else
+				s.receiveResponse(response);
+			fail("a response with a cut header must not be returned");
+		}
+		catch (SSLConnectionUnexpectedlyClosedException&)
+		{
+		}
+		assertTrue (!s.connected());
+	}
+}
+
+
 void HTTPSClientSessionTest::testProxyConfig()
 {
 	HTTPSClientSession s("www.example.com");
@@ -1086,6 +1174,10 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testUnknownContentLength);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbort);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbortContentLength);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbortChunked);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbortChunkedFraming);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbortHeader);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxyConfig);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxySetters);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testStalledPeerTimeout);

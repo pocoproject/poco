@@ -148,6 +148,12 @@ protected:
 	[[nodiscard]] std::string proxyRequestPrefix() const;
 	void proxyAuthenticate(HTTPRequest& request);
 	int read(char* buffer, std::streamsize length);
+		/// Returns 0 when the server closes the TLS connection without
+		/// close_notify; Schannel records no exception for it. A response body
+		/// delimited by the end of the connection then ends normally; a body with
+		/// Content-Length or chunked transfer encoding ends with eof after the
+		/// bytes received, and networkException() holds a MessageException
+		/// (see HTTPClientSession::receiveResponse()).
 
 private:
 	HTTPSClientSession(const HTTPSClientSession&);

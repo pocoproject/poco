@@ -48,6 +48,7 @@ public:
 	void testResponseBeforeUnreadRequestBody();
 	void testNonBlockingHandlerClosesConnection();
 	void testHandlerNonBlockingReadThenBlocking();
+	void testIncompleteFixedLengthRequest();
 	void testFieldNameWhitespace();
 	void testRedirectLineBreak();
 	void testSendLineBreak();

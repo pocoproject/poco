@@ -222,6 +222,19 @@ namespace
 		}
 	};
 
+	class BodyStatusRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			std::string body;
+			StreamCopier::copyToString(request.stream(), body);
+			const bool incomplete = static_cast<Poco::Net::HTTPServerRequestImpl&>(request).session().networkException() != nullptr;
+			const std::string status(std::to_string(body.size()) + (incomplete ? " incomplete" : " complete"));
+			response.sendBuffer(status.data(), status.length());
+		}
+	};
+
 	class RequestHandlerFactory: public HTTPRequestHandlerFactory
 	{
 	public:
@@ -253,6 +266,8 @@ namespace
 				return new NonBlockingRequestHandler;
 			else if (request.getURI() == "/toggleBlocking")
 				return new ToggleBlockingRequestHandler;
+			else if (request.getURI() == "/bodyStatus")
+				return new BodyStatusRequestHandler;
 			else
 				return nullptr;
 		}
@@ -980,6 +995,15 @@ void HTTPServerTest::testHandlerNonBlockingReadThenBlocking()
 }
 
 
+void HTTPServerTest::testIncompleteFixedLengthRequest()
+{
+	const std::string request("POST /bodyStatus HTTP/1.1\r\nHost: test\r\nContent-Length: 100\r\n\r\n0123456789");
+	const std::optional<std::string> response = exchangeUntilClosed(new HTTPServerParams, request, true);
+	assertTrue (response.has_value());
+	assertTrue (response->find("\r\n\r\n10 incomplete") != std::string::npos);
+}
+
+
 void HTTPServerTest::testFieldNameWhitespace()
 {
 	const std::string body("GET /echoHeader HTTP/1.1\r\nHost: smuggled\r\n\r\n");
@@ -1056,6 +1080,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testResponseBeforeUnreadRequestBody);
 	CppUnit_addTest(pSuite, HTTPServerTest, testNonBlockingHandlerClosesConnection);
 	CppUnit_addTest(pSuite, HTTPServerTest, testHandlerNonBlockingReadThenBlocking);
+	CppUnit_addTest(pSuite, HTTPServerTest, testIncompleteFixedLengthRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testFieldNameWhitespace);
 	CppUnit_addTest(pSuite, HTTPServerTest, testRedirectLineBreak);
 	CppUnit_addTest(pSuite, HTTPServerTest, testSendLineBreak);

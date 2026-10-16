@@ -269,6 +269,12 @@ public:
 		/// be reused and persistent connections are enabled
 		/// to ensure a new connection will be set up
 		/// for the next request.
+		///
+		/// A body with Content-Length or chunked transfer encoding that the
+		/// server cuts short ends with eof after the bytes received, and
+		/// networkException() holds the cause. Malformed chunked framing
+		/// throws a MessageException in the stream, which sets badbit.
+		/// A body delimited by the end of the connection ends normally.
 
 	virtual bool peekResponse(HTTPResponse& response);
 		/// If the request contains a "Expect: 100-continue" header,
