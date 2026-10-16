@@ -296,6 +296,8 @@ void HTTPResponse::read(std::istream& istr)
 	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && status.length() < MAX_STATUS_LENGTH) { status += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("Invalid HTTP status code");
+	if (status.size() != 3 || status[0] == '0' || !std::all_of(status.begin(), status.end(), [](char c) { return Poco::Ascii::isDigit(c); }))
+		throw MessageException("Invalid HTTP status code", status);
 	while (Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n' && ch != eof) ch = istr.get();
 	while (ch != '\r' && ch != '\n' && ch != eof && reason.length() < MAX_REASON_LENGTH) { reason += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP reason string too long");
