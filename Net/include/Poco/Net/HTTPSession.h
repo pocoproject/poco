@@ -202,6 +202,10 @@ protected:
 	int buffered() const;
 		/// Returns the number of bytes in the buffer.
 
+	[[nodiscard]] bool dataPending() const;
+		/// Returns true if the buffer holds data, or if the socket has data
+		/// to read or has been closed by the peer. Does not block.
+
 	void refill();
 		/// Refills the internal buffer.
 

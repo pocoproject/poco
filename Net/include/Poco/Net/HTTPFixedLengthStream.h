@@ -49,6 +49,15 @@ public:
 	HTTPFixedLengthStreamBuf(HTTPSession& session, ContentLength length, openmode mode);
 	~HTTPFixedLengthStreamBuf();
 
+	[[nodiscard]] bool isComplete() const noexcept;
+		/// Returns true if all bytes of the body have been read or written.
+
+	[[nodiscard]] bool skipBuffered();
+		/// Discards the rest of an input body if all of it is in the
+		/// session buffer. Does not read from the socket.
+		///
+		/// Returns isComplete().
+
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length);
 	std::streamsize writeToDevice(const char* buffer, std::streamsize length);

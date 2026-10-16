@@ -15,6 +15,7 @@
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Buffer.h"
 
 
 using Poco::BufferedStreamBuf;
@@ -39,6 +40,23 @@ HTTPFixedLengthStreamBuf::HTTPFixedLengthStreamBuf(HTTPSession& session, Content
 
 HTTPFixedLengthStreamBuf::~HTTPFixedLengthStreamBuf()
 {
+}
+
+
+bool HTTPFixedLengthStreamBuf::isComplete() const noexcept
+{
+	return _count == _length;
+}
+
+
+bool HTTPFixedLengthStreamBuf::skipBuffered()
+{
+	if ((getMode() & std::ios::in) && _count < _length && _length - _count <= _session.buffered())
+	{
+		Poco::Buffer<char> rest(static_cast<std::size_t>(_length - _count));
+		_count += _session.read(rest.begin(), static_cast<std::streamsize>(rest.size()));
+	}
+	return isComplete();
 }
 
 

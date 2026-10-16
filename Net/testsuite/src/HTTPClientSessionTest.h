@@ -23,6 +23,7 @@ namespace Poco::Net {
 class HTTPClientSession;
 class HTTPRequest;
 class ServerSocket;
+class StreamSocket;
 
 } // namespace Poco::Net
 
@@ -61,6 +62,15 @@ public:
 	void testIncompleteFixedLengthResponse();
 	void testCompleteFixedLengthResponse();
 	void testFixedLengthResponseInPartsNonBlocking();
+	void testUnreadFixedLengthResponseReconnects();
+	void testUnreadBufferedFixedLengthResponseKeepsConnection();
+	void testStrayResponseAfterBodyReconnects();
+	void testServerCloseAfterResponseReconnects();
+	void testUnreadChunkedResponseReconnects();
+	void testMalformedUnreadChunkReconnects();
+	void testUnreadCloseDelimitedResponseReconnects();
+	void testUnreadChunkedTerminatorKeepsConnection();
+	void testProxyTunnelIgnoresPreviousResponse();
 
 	void setUp();
 	void tearDown();
@@ -71,6 +81,15 @@ private:
 	void assertNewConnectionServes(Poco::Net::HTTPClientSession& session, Poco::Net::ServerSocket& server, Poco::Net::HTTPRequest& request);
 		/// Sends request on session and checks that it arrives on a new
 		/// connection from server and that the response sent there is read.
+
+	std::string receiveHeader(Poco::Net::StreamSocket& peer);
+		/// Returns the bytes received from peer up to and including the empty line
+		/// that ends a request header. Fails if it does not arrive within 5 seconds.
+
+	void assertReconnectAfterPartialRead(const std::string& firstResponse, std::streamsize bodyBytes);
+		/// Reads bodyBytes of the body of firstResponse and checks
+		/// that the next request is sent on a new connection without
+		/// waiting for the rest of the body.
 };
 
 

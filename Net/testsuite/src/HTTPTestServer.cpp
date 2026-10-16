@@ -215,28 +215,6 @@ std::string HTTPTestServer::handleRequest() const
 		response.append("Content-Length: ");
 		response.append(NumberFormatter::format((int) body.size()));
 		response.append("\r\n\r\n");
-		response.append("HTTP/1.1 200 OK\r\n");
-		response.append("Connection: Keep-Alive\r\n");
-		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: ");
-		response.append(NumberFormatter::format((int) body.size()));
-		response.append("\r\n\r\n");
-		response.append(body);
-		body = LARGE_BODY;
-		response.append("HTTP/1.1 200 OK\r\n");
-		response.append("Connection: keep-alive\r\n");
-		response.append("Content-Type: text/plain\r\n");
-		response.append("Transfer-Encoding: chunked\r\n\r\n");
-		response.append(NumberFormatter::formatHex((unsigned) body.length()));
-		response.append("\r\n");
-		response.append(body);
-		response.append("\r\n0\r\n\r\n");
-		response.append("HTTP/1.1 200 OK\r\n");
-		response.append("Connection: close\r\n");
-		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: ");
-		response.append(NumberFormatter::format((int) body.size()));
-		response.append("\r\n\r\n");
 	}
 	else if (_lastRequest.substr(0, 12) == "GET /trailer")
 	{

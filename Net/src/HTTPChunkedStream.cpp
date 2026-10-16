@@ -72,6 +72,29 @@ void HTTPChunkedStreamBuf::close()
 }
 
 
+bool HTTPChunkedStreamBuf::isComplete() const noexcept
+{
+	return _readState == ReadState::DONE;
+}
+
+
+bool HTTPChunkedStreamBuf::consumeTerminator()
+{
+	if (_mode & std::ios::in)
+	{
+		try
+		{
+			readFromDevice(nullptr, 0);
+		}
+		catch (Poco::Exception&)
+		{
+			// The body stays incomplete; a read error is stored in the session.
+		}
+	}
+	return isComplete();
+}
+
+
 std::streamsize HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	static constexpr int eof = std::char_traits<char>::eof();
@@ -113,11 +136,14 @@ std::streamsize HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsi
 		std::string line;
 		if (_readState == ReadState::DATA_CRLF)
 		{
+			// With length 0 (see consumeTerminator()), a line is read only if the peer has sent data.
+			if (length == 0 && !_session.dataPending()) return 0;
 			if (!readLine(line, 0, "Missing CRLF after chunk data")) return truncated();
 			_readState = ReadState::SIZE;
 		}
 		if (_readState == ReadState::SIZE)
 		{
+			if (length == 0 && !_session.dataPending()) return 0;
 			if (!readLine(line, MAX_SIZE_LINE_LENGTH, "Invalid chunk size line")) return truncated();
 			std::size_t digits = 0;
 			while (digits < line.size() && digits < MAX_CHUNK_SIZE_DIGITS && Poco::Ascii::isHexDigit(line[digits])) ++digits;
@@ -154,6 +180,7 @@ std::streamsize HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsi
 			}
 			_readState = ReadState::DATA;
 		}
+		if (length == 0) return 0;
 		if (length > _chunk) length = _chunk;
 		std::streamsize n = _session.read(buffer, length);
 		// A negative result is no data yet on a non-blocking socket, not an end of file.
