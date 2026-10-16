@@ -174,8 +174,14 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 	if (useProxy && isProxyTunnel())
 	{
 		StreamSocket proxySocket(proxyConnect());
+		if (!_sessionHostName.empty() && _sessionHostName != getHost())
+		{
+			_pSession = nullptr;
+		}
+		_sessionHostName = getHost();
 		SecureStreamSocket secureSocket = SecureStreamSocket::attach(proxySocket, getHost(), _pContext, _pSession, true);
 		attachSocket(secureSocket);
+		_peerHostName = getHost();
 		if (_pContext->sessionCacheEnabled())
 		{
 			_pSession = secureSocket.currentSession();
@@ -184,14 +190,23 @@ void HTTPSClientSession::connect(const SocketAddress& address)
 	else
 	{
 		SecureStreamSocket sss(socket());
-		if (sss.getPeerHostName().empty())
+		// A peer host name that the caller set on the socket is kept.
+		if (sss.getPeerHostName().empty() || sss.getPeerHostName() == _peerHostName)
 		{
-			sss.setPeerHostName(useProxy ? getProxyHost() : getHost());
+			_peerHostName = useProxy ? getProxyHost() : getHost();
+			sss.setPeerHostName(_peerHostName);
+		}
+		if (!_sessionHostName.empty() && _sessionHostName != sss.getPeerHostName())
+		{
+			_pSession = nullptr;
+			// Without session caching the socket still holds a session given to the constructor.
+			sss.useSession(nullptr);
 		}
 		if (_pContext->sessionCacheEnabled())
 		{
 			sss.useSession(_pSession);
 		}
+		_sessionHostName = sss.getPeerHostName();
 		HTTPSession::connect(address);
 		if (_pContext->sessionCacheEnabled())
 		{
