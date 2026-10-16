@@ -16,6 +16,7 @@
 #include "Poco/MemoryStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include <sstream>
 
 using Poco::InflatingInputStream;
@@ -182,8 +183,18 @@ void ZLibTest::testInflateResetAfterError()
 
 	InflatingInputStream inflater(buffer, InflatingStreamBuf::STREAM_ZLIB);
 	std::string data;
-	inflater >> data;
-	assertTrue (inflater.bad());
+	bool failed = false;
+	try
+	{
+		inflater >> data;
+		failed = inflater.bad();
+	}
+	catch (Poco::IOException&)
+	{
+		// libc++ lets the exception escape from the istream sentry instead of setting badbit
+		failed = true;
+	}
+	assertTrue (failed);
 
 	// the underlying stream is now positioned at the start of a valid stream
 	buffer.clear();
