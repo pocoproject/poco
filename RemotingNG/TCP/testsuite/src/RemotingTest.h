@@ -53,6 +53,7 @@ public:
 	void testAuthenticatedBadSCRAMCredentials();
 	void testAuthenticatedUpdatedSCRAMCredentials();
 	void testAuthenticatedMultipleSCRAMCredentials();
+	void testSCRAMConversationOtherConnection();
 	void testPermission();
 	void testNoPermission();
 	void testTimeout();

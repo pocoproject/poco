@@ -106,6 +106,7 @@ protected:
 		std::string serverNonce;
 		std::string salt;
 		int iterations = 0;
+		Poco::UInt32 connectionID = 0;
 	};
 
 	using ConversationCache = Poco::ExpireCache<Poco::UInt32, Conversation>;
