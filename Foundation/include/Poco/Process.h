@@ -243,8 +243,9 @@ public:
 	static void kill(PID pid);
 		/// Kills the process with the given pid.
 
-	static void requestTermination(PID pid);
-		/// Requests termination of the process with the give PID.
+	static void requestTermination(PID pid, int options = 0);
+		/// Requests termination of the process with the given PID, which
+		/// was launched with the given options.
 		///
 		/// On Unix platforms, this will send a SIGINT to the
 		/// process and thus work with arbitrary processes.
@@ -253,21 +254,13 @@ public:
 		/// will be set. Setting the flag will cause
 		/// Util::ServerApplication::waitForTerminationRequest() to
 		/// return. Therefore this will only work with applications
-		/// based on Util::ServerApplication.
-
-	static void requestTermination(PID pid, int options);
-		/// Requests termination of the process with the given PID, which
-		/// was launched with the given options.
-		///
-		/// For a process launched with PROCESS_NEW_GROUP on Windows, a
-		/// CTRL_BREAK_EVENT is sent to its process group, which console
-		/// programs take as a request to end; when the calling process has
-		/// no console, it attaches to the console of that process for the
-		/// time it takes to send the event. The global event flag is set as
-		/// well, for applications based on Util::ServerApplication. As with
-		/// SIGINT, whether the process ends is for the process to decide.
-		///
-		/// In every other case this is the same as requestTermination(pid).
+		/// based on Util::ServerApplication. For a process launched with
+		/// PROCESS_NEW_GROUP on Windows, a CTRL_BREAK_EVENT is sent to its
+		/// process group as well, which console programs take as a request
+		/// to end; when the calling process has no console, it attaches to
+		/// the console of that process for the time it takes to send the
+		/// event. As with SIGINT, whether the process ends is for the
+		/// process to decide.
 };
 
 

@@ -506,17 +506,11 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 }
 
 
-void ProcessImpl::requestTerminationImpl(PIDImpl pid)
-{
-	NamedEvent ev(terminationEventName(pid));
-	ev.set();
-}
-
-
 void ProcessImpl::requestTerminationImpl(PIDImpl pid, int options)
 {
 	if (options & PROCESS_NEW_GROUP) sendBreak(pid);
-	requestTerminationImpl(pid);
+	NamedEvent ev(terminationEventName(pid));
+	ev.set();
 }
 
 

@@ -197,12 +197,6 @@ bool Process::isRunning(PID pid)
 }
 
 
-void Process::requestTermination(PID pid)
-{
-	requestTerminationImpl(pid);
-}
-
-
 void Process::requestTermination(PID pid, int options)
 {
 	requestTerminationImpl(pid, options);

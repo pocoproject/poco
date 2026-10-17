@@ -437,8 +437,10 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 }
 
 
-void ProcessImpl::requestTerminationImpl(PIDImpl pid)
+void ProcessImpl::requestTerminationImpl(PIDImpl pid, int /*options*/)
 {
+	// SIGINT is a request every process can handle, in a group of its own
+	// or not.
 	if (::kill(pid, SIGINT) != 0)
 	{
 		switch (errno)
@@ -451,14 +453,6 @@ void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 			throw SystemException("cannot terminate process");
 		}
 	}
-}
-
-
-void ProcessImpl::requestTerminationImpl(PIDImpl pid, int /*options*/)
-{
-	// SIGINT is a request every process can handle, in a group of its own
-	// or not.
-	requestTerminationImpl(pid);
 }
 
 

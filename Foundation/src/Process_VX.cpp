@@ -104,12 +104,6 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 }
 
 
-void ProcessImpl::requestTerminationImpl(PIDImpl pid)
-{
-	throw Poco::NotImplementedException("Process::requestTermination()");
-}
-
-
 void ProcessImpl::requestTerminationImpl(PIDImpl pid, int options)
 {
 	throw Poco::NotImplementedException("Process::requestTermination()");
