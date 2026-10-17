@@ -203,4 +203,10 @@ void Process::requestTermination(PID pid)
 }
 
 
+void Process::requestTermination(PID pid, int options)
+{
+	requestTerminationImpl(pid, options);
+}
+
+
 } // namespace Poco

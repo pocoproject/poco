@@ -71,7 +71,9 @@ public:
 		/// `Poco::Util::Application`
 		///
 		/// The `options` are passed to the process, defaulting to
-		/// closed stdio output pipes.
+		/// closed stdio output pipes. With PROCESS_NEW_GROUP, stop()
+		/// asks a console program on Windows to end with a
+		/// CTRL_BREAK_EVENT before it kills it after the timeout.
 		///
 		/// The `timeout` in seconds determines how long the ProcessRunner
 		/// waits for the process to start; if PID file name is provided or

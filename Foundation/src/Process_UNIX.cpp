@@ -226,7 +226,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		struct inheritance inherit;
 		std::memset(&inherit, 0, sizeof(inherit));
 		inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
-		if (options & PROCESS_KILL_TREE)
+		if (options & (PROCESS_KILL_TREE | PROCESS_NEW_GROUP))
 		{
 			inherit.flags |= SPAWN_SETGROUP;
 			inherit.pgroup = SPAWN_NEWPGROUP;
@@ -358,8 +358,9 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 				::close(j);
 			}
 
-			// Create a new process group so the entire tree can be signaled.
-			if (options & PROCESS_KILL_TREE)
+			// Create a new process group so the entire tree can be signaled,
+			// or so that the child is apart from the group of the parent.
+			if (options & (PROCESS_KILL_TREE | PROCESS_NEW_GROUP))
 			{
 				if (setpgid(0, 0) != 0)
 					_exit(PROCESS_EXIT_SETPGID_FAILED);
@@ -373,7 +374,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		// child reaches setpgid(0, 0). setpgid(pid, pid) is idempotent
 		// with the child's call; if the child already called it, this
 		// is a harmless no-op (EACCES after exec is also benign).
-		if (options & PROCESS_KILL_TREE)
+		if (options & (PROCESS_KILL_TREE | PROCESS_NEW_GROUP))
 			setpgid(pid, pid);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
@@ -450,6 +451,14 @@ void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 			throw SystemException("cannot terminate process");
 		}
 	}
+}
+
+
+void ProcessImpl::requestTerminationImpl(PIDImpl pid, int /*options*/)
+{
+	// SIGINT is a request every process can handle, in a group of its own
+	// or not.
+	requestTerminationImpl(pid);
 }
 
 

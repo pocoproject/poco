@@ -110,4 +110,10 @@ void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 }
 
 
+void ProcessImpl::requestTerminationImpl(PIDImpl pid, int options)
+{
+	throw Poco::NotImplementedException("Process::requestTermination()");
+}
+
+
 } // namespace Poco

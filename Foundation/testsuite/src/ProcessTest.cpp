@@ -18,6 +18,9 @@
 #include "Poco/Format.h"
 #include "Poco/Environment.h"
 #include "Poco/ProcessOptions.h"
+#include "Poco/File.h"
+#include "Poco/Stopwatch.h"
+#include "Poco/TemporaryFile.h"
 #include "Poco/Thread.h"
 #include "Poco/Timestamp.h"
 #include <atomic>
@@ -622,6 +625,70 @@ void ProcessTest::testIsRunningAfterWait()
 }
 
 
+namespace
+{
+	std::string testApp()
+	{
+		std::string name("TestApp");
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+		name += "d";
+#endif
+		return name;
+	}
+
+
+	bool appears(const std::string& path, int seconds)
+	{
+		Poco::Stopwatch sw;
+		sw.start();
+		while (!Poco::File(path).exists())
+		{
+			if (sw.elapsedSeconds() > seconds) return false;
+			Thread::sleep(10);
+		}
+		return true;
+	}
+}
+
+
+void ProcessTest::testRequestTerminationOfNewGroup()
+{
+#if POCO_OS != POCO_OS_ANDROID
+	// A child in a process group of its own is asked to end the way a
+	// console program understands: CTRL_BREAK on Windows, SIGINT on POSIX.
+	const std::string ready = Poco::TemporaryFile::tempName();
+	Process::Args args;
+	args.push_back("-wait-break");
+	args.push_back(ready);
+	ProcessHandle ph = Process::launch(testApp(), args, Poco::PROCESS_NEW_GROUP);
+	if (!appears(ready, 30))
+	{
+		Process::kill(ph);
+		fail("the child does not wait for the request to end");
+	}
+	Process::requestTermination(ph.id(), Poco::PROCESS_NEW_GROUP);
+	assertEqual (42, ph.wait());
+	Poco::File(ready).remove();
+#endif
+}
+
+
+void ProcessTest::testRequestTerminationWithoutConsole()
+{
+#if POCO_OS != POCO_OS_ANDROID
+	// The same from a parent without a console, which on Windows attaches to
+	// the console of the child for the moment it takes to send the event.
+	const std::string ready = Poco::TemporaryFile::tempName();
+	Process::Args args;
+	args.push_back("-break-own-child");
+	args.push_back(ready);
+	ProcessHandle ph = Process::launch(testApp(), args);
+	assertEqual (42, ph.wait());
+	Poco::File(ready).remove();
+#endif
+}
+
+
 void ProcessTest::setUp()
 {
 }
@@ -663,6 +730,8 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testSignalExitCode);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunningByPidThenWaitOnHandle);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunningAfterWait);
+	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationOfNewGroup);
+	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationWithoutConsole);
 
 	return pSuite;
 }

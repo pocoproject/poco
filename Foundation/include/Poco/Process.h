@@ -254,6 +254,20 @@ public:
 		/// Util::ServerApplication::waitForTerminationRequest() to
 		/// return. Therefore this will only work with applications
 		/// based on Util::ServerApplication.
+
+	static void requestTermination(PID pid, int options);
+		/// Requests termination of the process with the given PID, which
+		/// was launched with the given options.
+		///
+		/// For a process launched with PROCESS_NEW_GROUP on Windows, a
+		/// CTRL_BREAK_EVENT is sent to its process group, which console
+		/// programs take as a request to end; when the calling process has
+		/// no console, it attaches to the console of that process for the
+		/// time it takes to send the event. The global event flag is set as
+		/// well, for applications based on Util::ServerApplication. As with
+		/// SIGINT, whether the process ends is for the process to decide.
+		///
+		/// In every other case this is the same as requestTermination(pid).
 };
 
 
