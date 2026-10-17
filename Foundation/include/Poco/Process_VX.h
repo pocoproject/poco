@@ -71,7 +71,7 @@ public:
 	static void killImpl(PIDImpl pid);
 	[[nodiscard]] static bool isRunningImpl(const ProcessHandleImpl& handle);
 	[[nodiscard]] static bool isRunningImpl(PIDImpl pid);
-	static void requestTerminationImpl(PIDImpl pid);
+	static void requestTerminationImpl(PIDImpl pid, int options);
 };
 
 

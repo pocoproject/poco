@@ -23,10 +23,42 @@
 #include "Poco/Path.h"
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
+#include "Poco/Mutex.h"
 
 
 namespace
 {
+	Poco::FastMutex consoleMutex;
+		// The calling process attaches to the console of one child at a time.
+
+	bool hasConsole()
+		/// Whether the calling process is attached to a console, with a
+		/// window or without one.
+	{
+		DWORD pid = 0;
+		return GetConsoleProcessList(&pid, 1) > 0;
+	}
+
+	void sendBreak(DWORD group)
+		/// Sends a CTRL_BREAK_EVENT to a child that was created in a process
+		/// group of its own: on the console of the calling process, which
+		/// the child shares, or, when the calling process has no console,
+		/// on the console of the child, to which the calling process attaches
+		/// for that moment. The calling process is not in the group of the
+		/// child, so the event does not reach it.
+	{
+		Poco::FastMutex::ScopedLock lock(consoleMutex);
+		if (hasConsole())
+		{
+			GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, group);
+		}
+		else if (AttachConsole(group))
+		{
+			GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, group);
+			FreeConsole();
+		}
+	}
+
 	std::vector<wchar_t> getUnicodeEnvironmentVariablesBuffer(const Poco::Process::Env& env)
 	{
 		std::vector<wchar_t> envbuf;
@@ -371,6 +403,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 	PROCESS_INFORMATION processInfo;
 	DWORD creationFlags = GetConsoleWindow() ? 0 : CREATE_NO_WINDOW;
+	if (options & PROCESS_NEW_GROUP)
+	{
+		// A console control event reaches a process on the same console:
+		// the child shares the console of the parent where the parent has
+		// one, and has a console of its own, without a window, otherwise.
+		creationFlags = CREATE_NEW_PROCESS_GROUP | (hasConsole() ? 0 : CREATE_NO_WINDOW);
+	}
 	if (pEnv) creationFlags |= CREATE_UNICODE_ENVIRONMENT;
 	BOOL rc = CreateProcessW(
 		applicationName,
@@ -467,8 +506,9 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 }
 
 
-void ProcessImpl::requestTerminationImpl(PIDImpl pid)
+void ProcessImpl::requestTerminationImpl(PIDImpl pid, int options)
 {
+	if (options & PROCESS_NEW_GROUP) sendBreak(pid);
 	NamedEvent ev(terminationEventName(pid));
 	ev.set();
 }
