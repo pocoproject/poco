@@ -26,6 +26,7 @@ public:
 
 	void testStringConv();
 	void testStringConv6();
+	void testStringConv6IPv4();
 	void testParse();
 	void testClassification();
 	void testMCClassification();
