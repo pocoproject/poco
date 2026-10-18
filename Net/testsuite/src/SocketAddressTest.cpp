@@ -176,6 +176,15 @@ void SocketAddressTest::testSocketAddress6()
 	assertTrue (sa2.host().toString() == "fe80::e6ce:8fff:fe4a:edd0");
 	assertTrue (sa2.port() == 100);
 	assertTrue (sa2.toString() == "[fe80::e6ce:8fff:fe4a:edd0]:100");
+
+	// The IPv4 part of an IPv4-mapped or IPv4-compatible address starting
+	// with a zero octet is kept, so the address reads back the same.
+	for (const char* str: {"[::ffff:0.1.2.3]:100", "[::0.1.2.3]:100"})
+	{
+		SocketAddress sa(str);
+		assertEqual (std::string(str), sa.toString());
+		assertTrue (SocketAddress(sa.toString()) == sa);
+	}
 #else
 	std::cout << "[IPv6 DISABLED]" << std::endl;
 #endif

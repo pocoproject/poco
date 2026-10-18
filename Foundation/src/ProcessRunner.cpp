@@ -222,7 +222,7 @@ void ProcessRunner::run()
 			Poco::FastMutex::ScopedLock l(_mutex);
 
 #if !defined(POCO_OS_FAMILY_WINDOWS)
-			if ((_options & PROCESS_KILL_TREE) && _rc == PROCESS_EXIT_SETPGID_FAILED)
+			if ((_options & (PROCESS_KILL_TREE | PROCESS_NEW_GROUP)) && _rc == PROCESS_EXIT_SETPGID_FAILED)
 			{
 				Poco::format(_error, "ProcessRunner::run(%s): "
 					"child failed to create process group (setpgid failed, exit code %d)",
@@ -294,6 +294,10 @@ void ProcessRunner::stop()
 			// Windows has no equivalent of Unix process-group signals.
 			NamedEvent terminateEvent(Process::terminationEventName(pid));
 			terminateEvent.set();
+			// A console program that is no ServerApplication takes a
+			// CTRL_BREAK_EVENT to its process group as the request to end.
+			if (_options & PROCESS_NEW_GROUP)
+				Process::requestTermination(pid, _options);
 #else
 			if (_options & PROCESS_KILL_TREE)
 			{

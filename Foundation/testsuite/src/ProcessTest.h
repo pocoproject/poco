@@ -41,6 +41,11 @@ public:
 	void testSignalExitCode();
 	void testIsRunningByPidThenWaitOnHandle();
 	void testIsRunningAfterWait();
+	void testRequestTerminationOfNewGroup();
+	void testRequestTerminationWithoutConsole();
+	void testRequestTerminationKeepsStandardHandles();
+	void testInvalidPid();
+	void testRequestTerminationOfGroupZero();
 
 	void setUp();
 	void tearDown();

@@ -233,6 +233,9 @@ public:
 
 	[[nodiscard]] static bool isRunning(PID pid);
 		/// Check if the process specified by given pid is running or not.
+		///
+		/// Returns false for a PID that is not greater than 0, which
+		/// names no single process.
 
 	static void kill(ProcessHandle& handle);
 		/// Kills the process specified by handle.
@@ -242,9 +245,14 @@ public:
 
 	static void kill(PID pid);
 		/// Kills the process with the given pid.
+		///
+		/// Throws an InvalidArgumentException for a PID that is not
+		/// greater than 0, which on Unix platforms names a process group
+		/// or every process.
 
-	static void requestTermination(PID pid);
-		/// Requests termination of the process with the give PID.
+	static void requestTermination(PID pid, int options = 0);
+		/// Requests termination of the process with the given PID, which
+		/// was launched with the given options.
 		///
 		/// On Unix platforms, this will send a SIGINT to the
 		/// process and thus work with arbitrary processes.
@@ -253,7 +261,18 @@ public:
 		/// will be set. Setting the flag will cause
 		/// Util::ServerApplication::waitForTerminationRequest() to
 		/// return. Therefore this will only work with applications
-		/// based on Util::ServerApplication.
+		/// based on Util::ServerApplication. For a process launched with
+		/// PROCESS_NEW_GROUP on Windows, a CTRL_BREAK_EVENT is sent to its
+		/// process group as well, which console programs take as a request
+		/// to end; when the calling process has no console, it attaches to
+		/// the console of that process for the time it takes to send the
+		/// event. As with SIGINT, whether the process ends is for the
+		/// process to decide.
+		///
+		/// Throws an InvalidArgumentException for a PID that is not
+		/// greater than 0, which on Unix platforms names a process group
+		/// or every process, and on Windows, with PROCESS_NEW_GROUP, would
+		/// name every process on the console of the calling process.
 };
 
 

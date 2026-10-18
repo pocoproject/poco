@@ -57,6 +57,24 @@ enum ProcessOptions
 		/// the leader process only. Non-Poco children in the tree receive
 		/// no graceful signal — they are terminated when the Job Object
 		/// handle is closed after the leader exits or the timeout expires.
+
+	PROCESS_NEW_GROUP = 16,
+		/// Starts the child process in a process group of its own, so that
+		/// it does not get what the terminal or the console of the parent
+		/// sends to the group of the parent, such as Ctrl+C, and so that
+		/// Process::requestTermination(pid, options) can ask it to end the
+		/// way console programs understand.
+		///
+		/// On Unix/Linux, the child is placed in a new process group via
+		/// setpgid(0, 0). A termination request is SIGINT, as for any
+		/// process.
+		///
+		/// On Windows, the child is created with CREATE_NEW_PROCESS_GROUP.
+		/// It shares the console of the parent when the parent has one, and
+		/// has a console of its own, without a window, otherwise. A
+		/// termination request is a CTRL_BREAK_EVENT to its group, which
+		/// console programs take as a request to end, as they take Ctrl+C.
+		/// ProcessRunner::stop() sends it before the timeout.
 };
 
 
@@ -67,7 +85,7 @@ static constexpr int PROCESS_EXIT_EXEC_FAILED    = 72;
 	/// execvp() failed (command not found, permission denied, etc.)
 
 static constexpr int PROCESS_EXIT_SETPGID_FAILED = 73;
-	/// setpgid(0, 0) failed in child (PROCESS_KILL_TREE).
+	/// setpgid(0, 0) failed in child (PROCESS_KILL_TREE or PROCESS_NEW_GROUP).
 	/// The specific errno is lost (child address space).
 
 

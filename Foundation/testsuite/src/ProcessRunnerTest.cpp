@@ -611,6 +611,43 @@ void ProcessRunnerTest::checkTimeout(const Stopwatch& sw, const std::string& msg
 }
 
 
+void ProcessRunnerTest::testStopNewGroup()
+{
+#if POCO_OS != POCO_OS_ANDROID
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	// stop() asks a console program in a process group of its own to end
+	// before it kills it: the program ends by itself, with its exit code.
+	const std::string ready = Poco::TemporaryFile::tempName();
+	std::vector<std::string> args;
+	args.push_back("-wait-break");
+	args.push_back(ready);
+	ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT | PROCESS_NEW_GROUP, 10, false, {});
+	pr.start();
+	Stopwatch sw; sw.start();
+	while (!File(ready).exists())
+		checkTimeout(sw, "Waiting for the process to wait for the request to end", 30000, __LINE__);
+
+	pr.stop();
+	sw.restart();
+	while (pr.running())
+		checkTimeout(sw, "Waiting for process to stop", 30000, __LINE__);
+	assertEqual (42, pr.result());
+	File(ready).remove();
+#endif
+}
+
+
 void ProcessRunnerTest::setUp()
 {
 }
@@ -631,6 +668,7 @@ CppUnit::Test* ProcessRunnerTest::suite()
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testKillTreeWithChild);
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testPathResolution);
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testFailedStartJoinsMonitorThread);
+	CppUnit_addTest(pSuite, ProcessRunnerTest, testStopNewGroup);
 
 	return pSuite;
 }
