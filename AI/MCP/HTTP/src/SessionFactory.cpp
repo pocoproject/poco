@@ -1,7 +1,7 @@
 //
 // SessionFactory.cpp
 //
-// Library: AIMCPHTTP
+// Library: AI/MCP/HTTP
 // Package: HTTP
 // Module:  SessionFactory
 //
@@ -17,10 +17,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace AI {
-namespace MCP {
-namespace HTTP {
+namespace Poco::AI::MCP::HTTP {
 
 
 std::unique_ptr<Poco::Net::HTTPClientSession> createClientSession(const Poco::URI& uri)
@@ -28,11 +25,15 @@ std::unique_ptr<Poco::Net::HTTPClientSession> createClientSession(const Poco::UR
 	if (Poco::icompare(uri.getScheme(), std::string("http")) == 0)
 	{
 		auto pSession = std::make_unique<Poco::Net::HTTPClientSession>(uri.getHost(), uri.getPort());
-		pSession->setProxyConfig(Poco::Net::HTTPSessionFactory::defaultFactory().getProxyConfig());
+		// The constructor applied the global proxy; the factory's replaces it only when set.
+		if (!Poco::Net::HTTPSessionFactory::defaultFactory().getProxyConfig().host.empty())
+		{
+			pSession->setProxyConfig(Poco::Net::HTTPSessionFactory::defaultFactory().getProxyConfig());
+		}
 		return pSession;
 	}
 	return std::unique_ptr<Poco::Net::HTTPClientSession>(Poco::Net::HTTPSessionFactory::defaultFactory().createClientSession(uri));
 }
 
 
-} } } } // namespace Poco::AI::MCP::HTTP
+} // namespace Poco::AI::MCP::HTTP

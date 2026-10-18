@@ -1,7 +1,7 @@
 //
 // HTTP.h
 //
-// Library: AIMCPHTTP
+// Library: AI/MCP/HTTP
 // Package: HTTP
 // Module:  HTTP
 //

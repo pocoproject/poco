@@ -16,19 +16,31 @@
 
 
 class HTTPTest: public CppUnit::TestCase
-	/// Exercises the HTTP client transport against the in-test TestHTTPHost,
-	/// the server-side peer the library itself does not ship.
+	/// Exercises the HTTP client transport against the in-test TestHTTPHost.
 {
 public:
 	HTTPTest(const std::string& name);
 	~HTTPTest();
 
 	void testRoundTrip();
-	void testSessionRequired();
-	void testProtocolVersion();
+	void testStandardHeaders();
+	void testParamHeaders();
+	void testUnsafeValuesEncoded();
+	void testInvalidAnnotationsDropped();
+	void testErrorReplies();
+	void testHttpStatus();
 	void testEventStream();
+	void testCutEventStream();
+	void testResponseLimit();
+	void testTimeout();
+	void testEventStreamDeadline();
+	void testStaleKeepAlive();
+	void testRequestHook();
 	void testSessionFactory();
+	void testHostlessSession();
+	void testNullSession();
 	void testHttpsNeedsInstantiator();
+	void testEventStreamReader();
 
 	void setUp();
 	void tearDown();

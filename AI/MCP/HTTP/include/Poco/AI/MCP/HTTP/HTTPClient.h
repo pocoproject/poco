@@ -1,12 +1,11 @@
 //
 // HTTPClient.h
 //
-// Library: AIMCPHTTP
+// Library: AI/MCP/HTTP
 // Package: HTTP
 // Module:  HTTPClient
 //
-// An MCP client over the Streamable HTTP(S) transport. POSTs JSON-RPC messages
-// to a single endpoint and carries the Mcp-Session-Id across calls.
+// Definition of the HTTPClient class.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
@@ -21,97 +20,107 @@
 
 #include "Poco/AI/MCP/HTTP/HTTP.h"
 #include "Poco/AI/MCP/HTTP/SessionFactory.h"
-#include "Poco/AI/MCP/Content.h"
-#include "Poco/JSON/Object.h"
-#include "Poco/JSON/Array.h"
+#include "Poco/AI/MCP/Client.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Mutex.h"
 #include "Poco/URI.h"
+#include <functional>
+#include <map>
+#include <memory>
 #include <string>
+#include <vector>
 
 
-namespace Poco {
-namespace AI {
-namespace MCP {
-namespace HTTP {
+namespace Poco::AI::MCP::HTTP {
 
 
-class AIMCPHTTP_API HTTPClient
-	/// A synchronous MCP client speaking Streamable HTTP(S) to one endpoint.
+class AIMCPHTTP_API HTTPClient: public Poco::AI::MCP::Client
+	/// The Streamable HTTP transport of MCP protocol revision 2026-07-28: every
+	/// request is a POST of one JSON-RPC message to the MCP endpoint.
 	///
-	/// Every call opens its own session through the session factory, so the
-	/// client needs only Poco::Net: an http endpoint works as is, an https
-	/// endpoint works once the application has registered
-	/// Poco::Net::HTTPSSessionInstantiator (see createClientSession()), and
-	/// a caller-supplied factory can carry its own TLS context or proxy.
+	/// Each request carries the headers MCP-Protocol-Version, Mcp-Method and,
+	/// for tools/call, resources/read and prompts/get, Mcp-Name, and for a
+	/// tool call the Mcp-Param headers the tool's input schema asks for with
+	/// x-mcp-header. A value that is not plain printable ASCII, or that has
+	/// leading or trailing spaces, is sent in the base64 form the transport
+	/// defines. listTools() leaves out tools whose x-mcp-header annotations
+	/// are invalid.
 	///
-	/// The server may answer a request with a single JSON object or with an
-	/// event stream; the client reads either. From an event stream it takes
-	/// the response to its request and passes over the notifications and
-	/// requests the server sends ahead of it.
+	/// The reply is a JSON object or an event stream; on an event stream the
+	/// client passes over the notifications before the reply. A JSON-RPC error
+	/// in a 400 or 404 answer becomes an MCPException with the error's code;
+	/// any other status that is not 200 becomes a Poco::Net::HTTPException
+	/// with the status and the start of the body. Replies are limited in size,
+	/// and an event stream must deliver the reply within the client's timeout.
 	///
-	/// Not safe for concurrent use: one call at a time per client.
+	/// The client keeps its session for later requests. A request that fails
+	/// on a kept session before any answer arrives is sent once more on a new
+	/// one, since the server may have closed the idle connection.
 {
 public:
-	explicit HTTPClient(const Poco::URI& endpoint, SessionFactory sessionFactory = SessionFactory());
-		/// Creates a client targeting the given MCP endpoint URI. Sessions come
-		/// from sessionFactory, or from createClientSession() when none is given.
+	using RequestHook = std::function<void (Poco::Net::HTTPRequest& request)>;
+		/// Called for every request once the client has set its headers, e.g.
+		/// to add an Authorization header.
 
-	~HTTPClient();
+	explicit HTTPClient(const Poco::URI& endpoint, SessionFactory sessionFactory = SessionFactory());
+		/// Creates a client of the MCP endpoint. Sessions come from the given
+		/// factory, or from createClientSession() when it is empty.
+
+	~HTTPClient() override;
 		/// Destroys the client.
 
-	Poco::JSON::Object::Ptr initialize(const std::string& clientName, const std::string& clientVersion);
-		/// Performs the MCP handshake (initialize + notifications/initialized),
-		/// captures the Mcp-Session-Id and the protocol version the server
-		/// answers with, and sends both with every later request. Returns
-		/// the initialize result.
+	[[nodiscard]] const Poco::URI& endpoint() const;
+		/// Returns the MCP endpoint.
 
-	void ping();
-		/// Sends a ping and waits for the reply.
+	void setRequestHook(RequestHook hook);
+		/// Sets the hook called for every request.
 
-	Poco::JSON::Array::Ptr listTools();
-		/// Returns the array of tool descriptors from tools/list.
+	void setMaxResponseSize(std::size_t maxSize);
+		/// Sets the limit, in bytes, of a reply; 16 MB by default.
 
-	ToolResult callTool(const std::string& name, Poco::JSON::Object::Ptr arguments);
-		/// Invokes a tool via tools/call and returns its result.
+	[[nodiscard]] std::size_t getMaxResponseSize() const;
+		/// Returns the limit of a reply.
 
-	const std::string& sessionId() const;
-		/// Returns the current Mcp-Session-Id (empty before initialize).
-
-	const std::string& protocolVersion() const;
-		/// Returns the protocol version negotiated by initialize() (empty
-		/// before it).
+protected:
+	Poco::JSON::Object::Ptr exchange(const Poco::JSON::Object::Ptr& request) override;
+	void toolsListed(std::vector<Tool>& tools) override;
 
 private:
-	Poco::JSON::Object::Ptr call(const std::string& method, Poco::JSON::Object::Ptr params);
-	void notify(const std::string& method, Poco::JSON::Object::Ptr params);
-	Poco::JSON::Object::Ptr post(const Poco::JSON::Object::Ptr& message, bool expectReply);
+	struct ParamHeader
+	{
+		std::string name;
+		std::vector<std::string> path;
+	};
+
+	Poco::JSON::Object::Ptr post(const Poco::JSON::Object::Ptr& request, bool& retry);
+	void addHeaders(Poco::Net::HTTPRequest& httpRequest, const Poco::JSON::Object::Ptr& request);
+	Poco::Net::HTTPClientSession& session(bool& reused);
 
 	HTTPClient(const HTTPClient&) = delete;
 	HTTPClient& operator = (const HTTPClient&) = delete;
 
-	Poco::URI _uri;
-	SessionFactory _sessionFactory;
-	std::string _sessionId;
-	std::string _protocolVersion;
-	Poco::Int64 _nextId;
+	const Poco::URI _uri;
+	const SessionFactory _sessionFactory;
+	mutable Poco::FastMutex _mutex;
+	RequestHook _hook;
+	std::size_t _maxResponseSize;
+	std::map<std::string, std::vector<ParamHeader>> _paramHeaders;
+	std::unique_ptr<Poco::Net::HTTPClientSession> _pSession;
+	bool _sessionUsed;
 };
 
 
 //
 // inlines
 //
-inline const std::string& HTTPClient::sessionId() const
+inline const Poco::URI& HTTPClient::endpoint() const
 {
-	return _sessionId;
+	return _uri;
 }
 
 
-inline const std::string& HTTPClient::protocolVersion() const
-{
-	return _protocolVersion;
-}
-
-
-} } } } // namespace Poco::AI::MCP::HTTP
+} // namespace Poco::AI::MCP::HTTP
 
 
 #endif // AIMCPHTTP_HTTPClient_INCLUDED
