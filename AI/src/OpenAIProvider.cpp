@@ -13,506 +13,459 @@
 
 
 #include "Poco/AI/OpenAIProvider.h"
+#include "Poco/AI/ToolRegistry.h"
+#include "Poco/AI/MCP/HTTP/EventStreamReader.h"
+#include "ProviderCall.h"
 #include "ToolInput.h"
-#include "Poco/Net/HTTPRequest.h"
-#include "Poco/Net/HTTPResponse.h"
-#include "Poco/JSON/Parser.h"
-#include "Poco/JSON/Stringifier.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/URI.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Format.h"
+#include "Poco/Exception.h"
 #include <algorithm>
-#include <sstream>
 #include <map>
-#include <memory>
 #include <utility>
 
 
-using namespace Poco::Net;
-using namespace Poco::JSON;
-using Poco::Dynamic::Var;
+using Poco::JSON::Object;
+using Poco::JSON::Array;
 
 
-namespace Poco {
-namespace AI {
+namespace Poco::AI {
 
 
-OpenAIProvider::OpenAIProvider(
-	const std::string& baseUrl,
-	const std::string& apiKey,
-	const std::string& model,
-	int maxTokens,
-	int timeoutSeconds,
-	bool supportsTools,
-	SessionFactory sessionFactory):
-	_baseUrl(baseUrl),
-	_apiKey(apiKey),
-	_model(model),
-	_maxTokens(maxTokens),
-	_timeoutSeconds(timeoutSeconds),
-	_supportsTools(supportsTools),
+namespace
+{
+	struct ToolAccumulator
+		/// One tool call of a streamed response, assembled from its pieces.
+	{
+		std::string id;
+		std::string name;
+		std::string arguments;
+	};
+
+
+	StopReason stopReasonOf(const std::string& value)
+	{
+		if (value == "stop") return StopReason::END_TURN;
+		if (value == "tool_calls" || value == "function_call") return StopReason::TOOL_USE;
+		if (value == "length") return StopReason::MAX_TOKENS;
+		if (value == "content_filter") return StopReason::CONTENT_FILTER;
+		return StopReason::UNKNOWN;
+	}
+
+
+	void report(const ContentEventCallback& onEvent, ErrorCode code, const std::string& text)
+	{
+		ContentEvent event;
+		event.type = ContentEvent::Type::ERROR;
+		event.code = code;
+		event.text = text;
+		if (onEvent) onEvent(event);
+	}
+
+
+	ChatResult failed()
+	{
+		ChatResult result;
+		result.stopReason = StopReason::ERROR;
+		return result;
+	}
+
+
+	ChatResult cancelled()
+	{
+		ChatResult result;
+		result.stopReason = StopReason::CANCELLED;
+		return result;
+	}
+
+
+	void authorize(Poco::Net::HTTPRequest& request, const std::string& apiKey)
+	{
+		if (!apiKey.empty())
+		{
+			request.set("Authorization", "Bearer " + apiKey);
+		}
+	}
+
+
+	std::string errorText(const Object::Ptr& pError)
+		/// The message of an error object, which some servers send as a string.
+	{
+		const std::string message = stringOf(pError, "message");
+		return message.empty() ? serializeJSON(Poco::Dynamic::Var(pError)) : message;
+	}
+}
+
+
+OpenAIProvider::OpenAIProvider(const Params& params, SessionFactory sessionFactory):
+	_params(params),
 	_sessionFactory(std::move(sessionFactory))
 {
 }
 
 
+OpenAIProvider::~OpenAIProvider()
+{
+}
+
+
+OpenAIProvider::Params OpenAIProvider::params() const
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	return _params;
+}
+
+
 void OpenAIProvider::setModel(const std::string& model)
 {
-	_model = model;
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	_params.model = model;
 }
 
 
-std::unique_ptr<HTTPClientSession> OpenAIProvider::openSession(const Poco::URI& uri, long timeoutSeconds) const
+std::string OpenAIProvider::getModel() const
 {
-	std::unique_ptr<HTTPClientSession> pSession = _sessionFactory ? _sessionFactory(uri) : createClientSession(uri);
-	pSession->setTimeout(Poco::Timespan(timeoutSeconds, 0));
-	return pSession;
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	return _params.model;
 }
 
 
-void OpenAIProvider::chat(
-	const Poco::JSON::Array& messages,
-	const std::string& systemPrompt,
-	const Poco::JSON::Array& tools,
-	ContentEventCallback onEvent)
+Object::Ptr OpenAIProvider::requestBody(const ChatRequest& request, const Params& current) const
 {
-	// Build messages array with system prompt prepended
-	Array apiMessages;
-	if (!systemPrompt.empty())
+	Array::Ptr pMessages = new Array;
+	if (!request.systemPrompt.empty())
 	{
-		Object::Ptr pSystemMsg = new Object;
-		pSystemMsg->set("role", "system");
-		pSystemMsg->set("content", systemPrompt);
-		apiMessages.add(pSystemMsg);
+		Object::Ptr pSystem = new Object;
+		pSystem->set("role", "system");
+		pSystem->set("content", request.systemPrompt);
+		pMessages->add(pSystem);
 	}
-	for (unsigned int i = 0; i < messages.size(); ++i)
+	for (const auto& message: request.messages)
 	{
-		apiMessages.add(messages.get(i));
-	}
-
-	// Build request body
-	Object body;
-	body.set("model", _model);
-	body.set("max_tokens", _maxTokens);
-	body.set("messages", apiMessages);
-	body.set("stream", true);
-
-	if (_supportsTools && tools.size() > 0)
-	{
-		body.set("tools", toOpenAITools(tools));
+		pMessages->add(message);
 	}
 
-	std::ostringstream bodyStream;
-	Stringifier::stringify(body, bodyStream);
-	std::string bodyStr = bodyStream.str();
-
-	Poco::URI uri(_baseUrl + "/chat/completions");
-	std::unique_ptr<HTTPClientSession> pSession = openSession(uri, _timeoutSeconds);
-
+	Object::Ptr pBody = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+	pBody->set("model", current.model);
+	if (current.maxTokens > 0)
 	{
-		std::lock_guard<std::mutex> lock(_sessionMutex);
-		_pActiveSession = pSession.get();
+		pBody->set(current.maxTokensField.empty() ? std::string("max_tokens") : current.maxTokensField, current.maxTokens);
 	}
-
-	// Guard to clear active session on exit
-	struct SessionGuard
+	pBody->set("messages", pMessages);
+	pBody->set("stream", true);
+	if (current.supportsTools && !request.tools.empty())
 	{
-		OpenAIProvider& self;
-		~SessionGuard()
+		pBody->set("tools", toOpenAITools(request.tools));
+		if (request.toolChoice == ToolChoice::NONE)
 		{
-			std::lock_guard<std::mutex> lock(self._sessionMutex);
-			self._pActiveSession = nullptr;
+			pBody->set("tool_choice", "none");
 		}
-	} guard{*this};
-
-	if (cancelled()) return;
-
-	HTTPRequest request(HTTPRequest::HTTP_POST, uri.getPathAndQuery(), HTTPMessage::HTTP_1_1);
-	// The Host header names the endpoint, whatever the session is connected to
-	// (a factory may hand out a session through a proxy or a tunnel).
-	request.setHost(uri.getHost(), uri.getPort());
-	request.setContentType("application/json");
-	if (!_apiKey.empty())
-	{
-		request.set("Authorization", "Bearer " + _apiKey);
 	}
-	request.setContentLength(bodyStr.size());
+	return pBody;
+}
 
-	std::ostream& os = pSession->sendRequest(request);
-	os << bodyStr;
 
-	HTTPResponse response;
-	std::istream& rs = pSession->receiveResponse(response);
+ChatResult OpenAIProvider::chat(const ChatRequest& request, const ContentEventCallback& onEvent, Cancellation& cancellation)
+{
+	if (cancellation.cancelled()) return cancelled();
+	const Params current = params();
+	const std::string body = serializeJSON(requestBody(request, current));
 
-	if (response.getStatus() != HTTPResponse::HTTP_OK)
-	{
-		std::string responseBody;
-		Poco::StreamCopier::copyToString(rs, responseBody);
-
-		// If server doesn't support tools, retry without them
-		if (response.getStatus() == HTTPResponse::HTTP_INTERNAL_SERVER_ERROR
-			&& responseBody.find("Unsupported param: tools") != std::string::npos
-			&& tools.size() > 0)
-		{
-			Poco::JSON::Array emptyTools;
-			chat(messages, systemPrompt, emptyTools, onEvent);
-			return;
-		}
-		ContentEvent evt;
-		evt.type = ContentEvent::TYPE_ERROR;
-		evt.text = Poco::format("OpenAI API error %d: %s",
-			static_cast<int>(response.getStatus()), responseBody.substr(0, 500));
-		if (response.getStatus() == HTTPResponse::HTTP_UNAUTHORIZED
-			|| response.getStatus() == HTTPResponse::HTTP_FORBIDDEN)
-			evt.code = "unauthenticated";
-		onEvent(evt);
-		return;
-	}
-
-	// Stream the response as Chat Completions SSE. Each frame is a
-	//   data: {chat.completion.chunk}
-	// line, ending with data: [DONE]. Text arrives in choices[0].delta.content
-	// and is emitted immediately as a text event; tool calls arrive fragmented
-	// across deltas keyed by tool_calls[].index (id + function.name first, then
-	// function.arguments streamed in pieces), so accumulate and emit each once
-	// the stream ends.
-	struct ToolAccum { std::string id; std::string name; std::string args; };
-	std::map<int, ToolAccum> toolCalls;
-
-	std::string line;
+	ProviderCall call(_sessionFactory, joinURI(current.baseURI, "chat/completions"), Poco::Net::HTTPRequest::HTTP_POST, current.timeout);
+	call.request().setContentType("application/json");
+	call.request().set("Accept", "text/event-stream");
+	authorize(call.request(), current.apiKey);
 	try
 	{
-		while (std::getline(rs, line))
+		call.send(body);
+	}
+	catch (const Poco::Exception&)
+	{
+		if (cancellation.cancelled()) return cancelled();
+		throw;
+	}
+
+	// From here on a cancel shuts the connection down, so that the read that
+	// waits returns.
+	Cancellation::Request whileReceiving(cancellation, [&call]() { call.abort(); });
+	ChatResult result;
+	bool streaming = false;
+	try
+	{
+		std::istream& stream = call.receive();
+		const int status = static_cast<int>(call.response().getStatus());
+		if (status != Poco::Net::HTTPResponse::HTTP_OK)
 		{
-			if (cancelled()) return;
-			if (!line.empty() && line.back() == '\r') line.pop_back();
-			if (line.rfind("data:", 0) != 0) continue;
+			const std::string text = readAtMost(stream, 65536);
+			if (cancellation.cancelled()) return cancelled();
+			report(onEvent, errorCodeOf(status), Poco::format("OpenAI API error %d: %s", status, excerpt(text)));
+			return failed();
+		}
+		streaming = true;
 
-			std::string payload = line.substr(5);
-			std::size_t start = payload.find_first_not_of(" \t");
-			if (start == std::string::npos) continue;
-			payload = payload.substr(start);
-			if (payload == "[DONE]") break;
-
-			Object::Ptr pChunk;
-			try
+		// Each event is a chat.completion.chunk; the stream ends with [DONE].
+		// Text arrives in choices[0].delta.content and is reported at once;
+		// tool calls arrive in pieces keyed by tool_calls[].index (id and name
+		// first, then the arguments as JSON text) and are reported once the
+		// stream is complete.
+		std::map<int, ToolAccumulator> toolCalls;
+		bool complete = false;
+		Poco::AI::MCP::HTTP::EventStreamReader reader(stream, current.maxResponseSize);
+		Poco::AI::MCP::HTTP::EventStreamReader::Event event;
+		while (!complete && reader.next(event))
+		{
+			if (cancellation.cancelled()) return cancelled();
+			if (event.data == "[DONE]")
 			{
-				Parser parser;
-				pChunk = parser.parse(payload).extract<Object::Ptr>();
+				complete = true;
+				break;
 			}
-			catch (...) { continue; }  // skip a malformed frame
-			if (!pChunk) continue;
-
-			Array::Ptr pChoices = pChunk->getArray("choices");
-			if (!pChoices || pChoices->size() == 0) continue;
-			Object::Ptr pChoice = pChoices->getObject(0);
-			if (!pChoice) continue;
-			Object::Ptr pDelta = pChoice->getObject("delta");
-			if (!pDelta) continue;
-
-			// Text delta - emit immediately.
-			if (pDelta->has("content") && !pDelta->isNull("content"))
+			const Object::Ptr pChunk = parseObject(event.data);
+			if (pChunk.isNull()) continue;
+			if (pChunk->has("error"))
 			{
-				std::string content = pDelta->getValue<std::string>("content");
-				if (!content.empty())
+				// An error after the 200, as vLLM and llama.cpp send it.
+				const Object::Ptr pError = pChunk->getObject("error");
+				report(onEvent, ErrorCode::STREAM_ERROR, "OpenAI stream error: " + (pError.isNull() ? pChunk->get("error").toString() : errorText(pError)));
+				return failed();
+			}
+			const Object::Ptr pUsage = pChunk->getObject("usage");
+			if (!pUsage.isNull())
+			{
+				result.usage.inputTokens = countOf(pUsage, "prompt_tokens");
+				result.usage.outputTokens = countOf(pUsage, "completion_tokens");
+				result.usage.cachedInputTokens = countOf(pUsage->getObject("prompt_tokens_details"), "cached_tokens");
+			}
+			const Array::Ptr pChoices = pChunk->getArray("choices");
+			const Object::Ptr pChoice = (pChoices.isNull() || pChoices->size() == 0) ? Object::Ptr() : pChoices->getObject(0);
+			if (pChoice.isNull()) continue;
+
+			const Object::Ptr pDelta = pChoice->getObject("delta");
+			const std::string text = stringOf(pDelta, "content");
+			if (!text.empty())
+			{
+				result.text += text;
+				if (onEvent)
 				{
-					ContentEvent evt;
-					evt.type = ContentEvent::TYPE_TEXT;
-					evt.text = content;
-					onEvent(evt);
+					ContentEvent textEvent;
+					textEvent.text = text;
+					onEvent(textEvent);
 				}
 			}
-
-			// Tool-call deltas - accumulate by index.
-			if (pDelta->has("tool_calls"))
+			const Array::Ptr pToolCalls = pDelta.isNull() ? Array::Ptr() : pDelta->getArray("tool_calls");
+			for (std::size_t i = 0; !pToolCalls.isNull() && i < pToolCalls->size(); ++i)
 			{
-				Array::Ptr pTcs = pDelta->getArray("tool_calls");
-				if (pTcs)
-				{
-					for (unsigned int i = 0; i < pTcs->size(); ++i)
-					{
-						Object::Ptr pTc = pTcs->getObject(i);
-						if (!pTc) continue;
-						int idx = pTc->has("index") ? pTc->getValue<int>("index") : 0;
-						ToolAccum& acc = toolCalls[idx];
-						if (pTc->has("id")) acc.id = pTc->getValue<std::string>("id");
-						Object::Ptr pFn = pTc->getObject("function");
-						if (pFn)
-						{
-							if (pFn->has("name")) acc.name = pFn->getValue<std::string>("name");
-							if (pFn->has("arguments")) acc.args += pFn->getValue<std::string>("arguments");
-						}
-					}
-				}
+				const Object::Ptr pToolCall = pToolCalls->getObject(static_cast<unsigned>(i));
+				if (pToolCall.isNull()) continue;
+				const int index = memberOf(pToolCall, "index").isInteger() ? pToolCall->getValue<int>("index") : 0;
+				ToolAccumulator& accumulator = toolCalls[index];
+				// Continuation chunks may carry null or empty ids and names.
+				const std::string id = stringOf(pToolCall, "id");
+				if (!id.empty()) accumulator.id = id;
+				const Object::Ptr pFunction = pToolCall->getObject("function");
+				const std::string name = stringOf(pFunction, "name");
+				if (!name.empty()) accumulator.name = name;
+				accumulator.arguments += stringOf(pFunction, "arguments");
+			}
+			const std::string finishReason = stringOf(pChoice, "finish_reason");
+			if (!finishReason.empty())
+			{
+				result.stopDetail = finishReason;
+				result.stopReason = stopReasonOf(finishReason);
 			}
 		}
-	}
-	catch (const Poco::Exception& e)
-	{
-		if (cancelled()) return;  // user aborted mid-stream - stop quietly
-		ContentEvent evt;
-		evt.type = ContentEvent::TYPE_ERROR;
-		evt.text = "OpenAI stream error: " + e.displayText();
-		onEvent(evt);
-		return;
-	}
-
-	if (cancelled()) return;  // aborted after a clean read - drop partial tool calls
-
-	// Emit the assembled tool calls (arguments were streamed as a JSON string).
-	for (const auto& kv : toolCalls)
-	{
-		const ToolAccum& acc = kv.second;
-		ContentEvent evt;
-		if (parseToolInput(acc.args, evt.input))
+		if (cancellation.cancelled()) return cancelled();
+		if (!complete && result.stopDetail.empty())
 		{
-			evt.type = ContentEvent::TYPE_TOOL_USE;
-			evt.id = acc.id;
-			evt.name = acc.name;
+			// Without its end the response is incomplete: no tool call of it runs.
+			const std::string reason = call.networkError();
+			report(onEvent, ErrorCode::STREAM_INTERRUPTED, "OpenAI response stream ended before its end" + (reason.empty() ? std::string() : ": " + reason));
+			return failed();
+		}
+
+		Array::Ptr pCalls = new Array;
+		for (const auto& entry: toolCalls)
+		{
+			const ToolAccumulator& accumulator = entry.second;
+			ToolCall toolCall;
+			if (!parseToolInput(accumulator.arguments, toolCall.input))
+			{
+				// The tool does not run on arguments the model did not give.
+				report(onEvent, ErrorCode::MALFORMED_TOOL_INPUT, "OpenAI tool call '" + accumulator.name + "' has malformed arguments");
+				continue;
+			}
+			toolCall.id = accumulator.id;
+			toolCall.name = accumulator.name;
+			Object::Ptr pFunction = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+			pFunction->set("name", accumulator.name);
+			pFunction->set("arguments", serializeJSON(toolCall.input));
+			Object::Ptr pCall = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+			pCall->set("id", accumulator.id);
+			pCall->set("type", "function");
+			pCall->set("function", pFunction);
+			pCalls->add(pCall);
+			result.toolCalls.push_back(toolCall);
+			if (onEvent)
+			{
+				ContentEvent toolEvent;
+				toolEvent.type = ContentEvent::Type::TOOL_USE;
+				toolEvent.toolCall = toolCall;
+				onEvent(toolEvent);
+			}
+		}
+
+		result.assistantMessage = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+		result.assistantMessage->set("role", "assistant");
+		if (pCalls->size() > 0)
+		{
+			// The content is the text, or null alongside tool calls.
+			result.assistantMessage->set("content", result.text.empty() ? Poco::Dynamic::Var() : Poco::Dynamic::Var(result.text));
+			result.assistantMessage->set("tool_calls", pCalls);
 		}
 		else
 		{
-			// The tool is not called on arguments the model did not give.
-			evt.type = ContentEvent::TYPE_ERROR;
-			evt.text = "OpenAI tool call '" + acc.name + "' has malformed arguments";
-			evt.code = "malformed_tool_input";
+			result.assistantMessage->set("content", result.text);
 		}
-		onEvent(evt);
+		return result;
+	}
+	catch (const Poco::Exception& exc)
+	{
+		if (cancellation.cancelled()) return cancelled();
+		if (!streaming) throw;
+		report(onEvent, ErrorCode::STREAM_INTERRUPTED, "OpenAI response stream failed: " + exc.displayText());
+		return failed();
 	}
 }
 
 
 std::vector<std::string> OpenAIProvider::listModels()
 {
+	const Params current = params();
+	ProviderCall call(_sessionFactory, joinURI(current.baseURI, "models"), Poco::Net::HTTPRequest::HTTP_GET, current.timeout);
+	authorize(call.request(), current.apiKey);
+	call.send(std::string());
+	std::istream& stream = call.receive();
+	const int status = static_cast<int>(call.response().getStatus());
+	if (status != Poco::Net::HTTPResponse::HTTP_OK)
+	{
+		throw Poco::Net::HTTPException(Poco::format("OpenAI API error %d", status), excerpt(readAtMost(stream, 65536)));
+	}
+	const Object::Ptr pRoot = parseObject(readBody(stream, current.maxResponseSize));
+	if (pRoot.isNull() || !pRoot->isArray("data"))
+	{
+		throw Poco::DataFormatException("The model list is not an object with a data array");
+	}
 	std::vector<std::string> models;
-	try
+	const Array::Ptr pData = pRoot->getArray("data");
+	for (std::size_t i = 0; i < pData->size(); ++i)
 	{
-		Poco::URI uri(_baseUrl + "/models");
-		// Discovery runs while a user waits for the model list, so it uses
-		// a short deadline of its own rather than the chat timeout.
-		std::unique_ptr<HTTPClientSession> pSession = openSession(uri, 10);
-
-		HTTPRequest request(HTTPRequest::HTTP_GET, uri.getPathAndQuery(), HTTPMessage::HTTP_1_1);
-		request.setHost(uri.getHost(), uri.getPort());
-		if (!_apiKey.empty()) request.set("Authorization", "Bearer " + _apiKey);
-
-		pSession->sendRequest(request);
-
-		HTTPResponse response;
-		std::istream& rs = pSession->receiveResponse(response);
-		std::string responseBody;
-		Poco::StreamCopier::copyToString(rs, responseBody);
-		if (response.getStatus() != HTTPResponse::HTTP_OK) return models;
-
-		Parser parser;
-		Var parsed = parser.parse(responseBody);
-		Object::Ptr pRoot = parsed.extract<Object::Ptr>();
-		Poco::JSON::Array::Ptr pData = pRoot->getArray("data");
-		if (!pData) return models;
-
-		for (std::size_t i = 0; i < pData->size(); ++i)
-		{
-			Object::Ptr pModel = pData->getObject(static_cast<unsigned int>(i));
-			if (!pModel) continue;
-			const std::string id = pModel->optValue<std::string>("id", "");
-			if (id.empty()) continue;
-			// Embedding models share this listing but cannot serve a chat
-			// request, and picking one would only produce a puzzling error.
-			if (id.find("embed") != std::string::npos) continue;
-			models.push_back(id);
-		}
-		std::sort(models.begin(), models.end());
+		const std::string id = stringOf(pData->getObject(static_cast<unsigned>(i)), "id");
+		// Embedding models share this listing but cannot serve a chat request.
+		if (id.empty() || id.find("embed") != std::string::npos) continue;
+		models.push_back(id);
 	}
-	catch (Poco::Exception&)
-	{
-		models.clear();
-	}
-	catch (std::exception&)
-	{
-		models.clear();
-	}
+	std::sort(models.begin(), models.end());
 	return models;
 }
 
 
-std::vector<std::vector<float>> OpenAIProvider::embed(
-	const std::vector<std::string>& texts,
-	const std::string& model,
-	int dimensions)
+std::vector<std::vector<float>> OpenAIProvider::embed(const std::vector<std::string>& texts, const std::string& model, int dimensions)
 {
 	std::vector<std::vector<float>> result;
 	if (texts.empty()) return result;
 
-	Object body;
-	body.set("model", model);
-	Poco::JSON::Array input;
-	for (const auto& t: texts) input.add(t);
-	body.set("input", input);
-	if (dimensions > 0) body.set("dimensions", dimensions);
+	const Params current = params();
+	Object::Ptr pBody = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+	pBody->set("model", model);
+	Array::Ptr pInput = new Array;
+	for (const std::string& text: texts) pInput->add(text);
+	pBody->set("input", pInput);
+	if (dimensions > 0) pBody->set("dimensions", dimensions);
 
-	std::ostringstream bodyStream;
-	Stringifier::stringify(body, bodyStream);
-	const std::string bodyStr = bodyStream.str();
-
-	Poco::URI uri(_baseUrl + "/embeddings");
-	std::unique_ptr<HTTPClientSession> pSession = openSession(uri, _timeoutSeconds);
-
-	HTTPRequest request(HTTPRequest::HTTP_POST, uri.getPathAndQuery(), HTTPMessage::HTTP_1_1);
-	request.setHost(uri.getHost(), uri.getPort());
-	request.setContentType("application/json");
-	if (!_apiKey.empty())
+	ProviderCall call(_sessionFactory, joinURI(current.baseURI, "embeddings"), Poco::Net::HTTPRequest::HTTP_POST, current.timeout);
+	call.request().setContentType("application/json");
+	authorize(call.request(), current.apiKey);
+	call.send(serializeJSON(pBody));
+	std::istream& stream = call.receive();
+	const int status = static_cast<int>(call.response().getStatus());
+	if (status != Poco::Net::HTTPResponse::HTTP_OK)
 	{
-		request.set("Authorization", "Bearer " + _apiKey);
-	}
-	request.setContentLength(bodyStr.size());
-
-	pSession->sendRequest(request) << bodyStr;
-
-	HTTPResponse response;
-	std::istream& rs = pSession->receiveResponse(response);
-	std::string responseBody;
-	Poco::StreamCopier::copyToString(rs, responseBody);
-
-	if (response.getStatus() != HTTPResponse::HTTP_OK)
-	{
-		throw Poco::RuntimeException(Poco::format("embeddings API error %d: %s",
-			static_cast<int>(response.getStatus()), responseBody.substr(0, 500)));
+		throw Poco::Net::HTTPException(Poco::format("embeddings API error %d", status), excerpt(readAtMost(stream, 65536)));
 	}
 
+	const Object::Ptr pRoot = parseObject(readBody(stream, current.maxResponseSize));
+	const Array::Ptr pData = pRoot.isNull() ? Array::Ptr() : pRoot->getArray("data");
+	if (pData.isNull() || pData->size() != texts.size())
+	{
+		throw Poco::DataFormatException(Poco::format("embeddings response has %z vectors for %z inputs", std::size_t(pData.isNull() ? 0 : pData->size()), texts.size()));
+	}
 	try
 	{
-		Parser parser;
-		Var parsed = parser.parse(responseBody);
-		Object::Ptr pRoot = parsed.extract<Object::Ptr>();
-		Poco::JSON::Array::Ptr pData = pRoot->getArray("data");
-		if (!pData || pData->size() != texts.size())
-			throw Poco::DataFormatException(Poco::format(
-				"embeddings response has %z vectors for %z inputs",
-				std::size_t(pData ? pData->size() : 0), texts.size()));
-
 		// The API is free to reorder entries; index restores input order.
 		result.resize(texts.size());
 		for (std::size_t i = 0; i < pData->size(); ++i)
 		{
-			Object::Ptr pEntry = pData->getObject(static_cast<unsigned>(i));
-			const std::size_t idx = pEntry->optValue<std::size_t>("index", i);
-			if (idx >= result.size())
-				throw Poco::DataFormatException("embeddings response index out of range");
-			Poco::JSON::Array::Ptr pVec = pEntry->getArray("embedding");
-			if (!pVec || pVec->size() == 0)
-				throw Poco::DataFormatException("embeddings response entry has no embedding");
-			std::vector<float>& out = result[idx];
-			if (!out.empty())
-				throw Poco::DataFormatException(Poco::format("embeddings response repeats index %z", idx));
-			out.reserve(pVec->size());
-			for (std::size_t j = 0; j < pVec->size(); ++j)
-				out.push_back(static_cast<float>(pVec->getElement<double>(static_cast<unsigned>(j))));
+			const Object::Ptr pEntry = pData->getObject(static_cast<unsigned>(i));
+			if (pEntry.isNull()) throw Poco::DataFormatException("embeddings response entry is not an object");
+			const std::size_t index = pEntry->optValue<std::size_t>("index", i);
+			if (index >= result.size()) throw Poco::DataFormatException("embeddings response index out of range");
+			const Array::Ptr pVector = pEntry->getArray("embedding");
+			if (pVector.isNull() || pVector->size() == 0) throw Poco::DataFormatException("embeddings response entry has no embedding");
+			std::vector<float>& out = result[index];
+			if (!out.empty()) throw Poco::DataFormatException(Poco::format("embeddings response repeats index %z", index));
+			out.reserve(pVector->size());
+			for (std::size_t j = 0; j < pVector->size(); ++j)
+			{
+				// Converts through Dynamic::Var, which refuses a value outside the float range.
+				out.push_back(pVector->getElement<float>(static_cast<unsigned>(j)));
+			}
+		}
+		for (const std::vector<float>& vector: result)
+		{
+			if (vector.size() != result[0].size()) throw Poco::DataFormatException("embeddings response has vectors of different lengths");
 		}
 	}
-	catch (Poco::DataFormatException&)
+	catch (const Poco::DataFormatException&)
 	{
 		throw;
 	}
-	catch (Poco::Exception& ex)
+	catch (const Poco::Exception& exc)
 	{
-		throw Poco::DataFormatException("malformed embeddings response: " + ex.displayText());
+		throw Poco::DataFormatException("malformed embeddings response: " + exc.displayText());
 	}
 	return result;
 }
 
 
-void OpenAIProvider::cancel()
+void OpenAIProvider::appendToolResult(Array& messages, const std::string& toolCallId, const Poco::AI::MCP::ToolResult& result)
 {
-	LLMProvider::cancel();
-	std::lock_guard<std::mutex> lock(_sessionMutex);
-	if (_pActiveSession)
-	{
-		_pActiveSession->abort();
-	}
+	Object::Ptr pMessage = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+	pMessage->set("role", "tool");
+	pMessage->set("tool_call_id", toolCallId);
+	pMessage->set("content", toolResultText(result));
+	messages.add(pMessage);
 }
 
 
-void OpenAIProvider::appendAssistantMessage(
-	Poco::JSON::Array& messages,
-	const std::string& text,
-	const std::vector<ContentEvent>& toolCalls)
+Array::Ptr OpenAIProvider::toOpenAITools(const std::vector<Poco::AI::MCP::Tool>& tools)
 {
-	Object::Ptr pMsg = new Object;
-	pMsg->set("role", "assistant");
-
-	if (toolCalls.empty())
+	Array::Ptr pTools = new Array;
+	for (const Poco::AI::MCP::Tool& tool: tools)
 	{
-		pMsg->set("content", text);
+		// toObject() copies the schema, so that requests serialized on several
+		// threads share no object.
+		const Object::Ptr pListed = tool.toObject();
+		Object::Ptr pFunction = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+		pFunction->set("name", tool.name);
+		if (!tool.description.empty()) pFunction->set("description", tool.description);
+		pFunction->set("parameters", pListed->getObject("inputSchema"));
+		Object::Ptr pTool = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+		pTool->set("type", "function");
+		pTool->set("function", pFunction);
+		pTools->add(pTool);
 	}
-	else
-	{
-		// content can be text or null alongside tool_calls
-		if (!text.empty())
-			pMsg->set("content", text);
-		else
-			pMsg->set("content", Poco::Dynamic::Var()); // null
-
-		Array::Ptr pToolCalls = new Array;
-		for (const auto& tc : toolCalls)
-		{
-			Object::Ptr pToolCall = new Object;
-			pToolCall->set("id", tc.id);
-			pToolCall->set("type", "function");
-
-			Object::Ptr pFunction = new Object;
-			pFunction->set("name", tc.name);
-
-			// Serialize input object to JSON string
-			std::ostringstream oss;
-			Stringifier::stringify(tc.input, oss);
-			pFunction->set("arguments", oss.str());
-
-			pToolCall->set("function", pFunction);
-			pToolCalls->add(pToolCall);
-		}
-		pMsg->set("tool_calls", pToolCalls);
-	}
-
-	messages.add(pMsg);
+	return pTools;
 }
 
 
-void OpenAIProvider::appendToolResult(
-	Poco::JSON::Array& messages,
-	const std::string& toolCallId,
-	const std::string& result)
-{
-	// Each tool result is a separate message with role "tool"
-	Object::Ptr pMsg = new Object;
-	pMsg->set("role", "tool");
-	pMsg->set("tool_call_id", toolCallId);
-	pMsg->set("content", result);
-	messages.add(pMsg);
-}
-
-
-Poco::JSON::Array OpenAIProvider::toOpenAITools(const Poco::JSON::Array& tools)
-{
-	Array result;
-	for (unsigned int i = 0; i < tools.size(); ++i)
-	{
-		auto pTool = tools.getObject(i);
-
-		Object::Ptr pFunction = new Object;
-		pFunction->set("name", pTool->getValue<std::string>("name"));
-		pFunction->set("description", pTool->getValue<std::string>("description"));
-		if (pTool->has("parameters"))
-		{
-			pFunction->set("parameters", pTool->get("parameters"));
-		}
-
-		Object::Ptr pOpenAITool = new Object;
-		pOpenAITool->set("type", "function");
-		pOpenAITool->set("function", pFunction);
-		result.add(pOpenAITool);
-	}
-	return result;
-}
-
-
-} } // namespace Poco::AI
+} // namespace Poco::AI

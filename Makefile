@@ -131,7 +131,7 @@ endif
 
 libexecs =  Foundation-libexec Encodings-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Data/PostgreSQL-libexec ActiveRecord-libexec ActiveRecord/Compiler-libexec Zip-libexec JWT-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec CodeGeneration-libexec RemotingNG-libexec RemotingNG/TCP-libexec RemotingNG/HTTP-libexec RemotingNG/JSONRPC-libexec RemotingNG/REST-libexec RemotingNG/SOAP-libexec RemotingNG/RemoteGen-libexec XSD/Types-libexec XSD/Parser-libexec XSD/CodeGen-libexec Serial-libexec Geo-libexec PDF-libexec MongoDB-libexec Redis-libexec Prometheus-libexec AI/MCP-libexec AI/MCP/HTTP-libexec AI-libexec
 tests    =  Foundation-tests Encodings-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Data/PostgreSQL-tests ActiveRecord-tests JWT-tests Zip-tests CppParser-tests CodeGeneration-tests RemotingNG-tests RemotingNG/TCP-tests RemotingNG/HTTP-tests RemotingNG/JSONRPC-tests RemotingNG/REST-tests RemotingNG/SOAP-tests XSD/Types-tests XSD/Parser-tests Serial-tests Geo-tests PDF-tests MongoDB-tests Redis-tests Prometheus-tests AI/MCP-tests AI/MCP/HTTP-tests AI-tests
-samples  =  Foundation-samples Encodings-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples MongoDB-samples Prometheus-samples Zip-samples PageCompiler-samples RemotingNG-samples PDF-samples AI/MCP-samples
+samples  =  Foundation-samples Encodings-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples MongoDB-samples Prometheus-samples Zip-samples PageCompiler-samples RemotingNG-samples PDF-samples AI/MCP-samples AI-samples
 cleans   =  Foundation-clean Encodings-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean Data-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean Data/PostgreSQL-clean ActiveRecord-clean ActiveRecord/Compiler-clean JWT-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean CodeGeneration-clean RemotingNG-clean RemotingNG/TCP-clean RemotingNG/HTTP-clean RemotingNG/JSONRPC-clean RemotingNG/REST-clean RemotingNG/SOAP-clean RemotingNG/RemoteGen-clean XSD/Types-clean XSD/Parser-clean XSD/CodeGen-clean Serial-clean Geo-clean PDF-clean MongoDB-clean Redis-clean Prometheus-clean AI/MCP-clean AI/MCP/HTTP-clean AI-clean
 
 .PHONY: $(libexecs)
@@ -591,9 +591,13 @@ AI-libexec: AI/MCP/HTTP-libexec Net-libexec JSON-libexec
 AI-tests: AI-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/AI/testsuite
 
+AI-samples: AI-libexec
+	$(MAKE) -C $(POCO_BASE)/AI/samples
+
 AI-clean:
 	$(MAKE) -C $(POCO_BASE)/AI clean
 	$(MAKE) -C $(POCO_BASE)/AI/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/AI/samples clean
 
 clean: cleans cpptrace-clean CppUnit-clean
 

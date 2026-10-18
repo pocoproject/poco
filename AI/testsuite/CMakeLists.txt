@@ -26,3 +26,6 @@ else()
 	)
 endif()
 target_link_libraries(AI-testrunner PUBLIC Poco::AI CppUnit)
+# The MCPHost tests serve their MCP servers with the test host of the
+# AI/MCP/HTTP test suite.
+target_include_directories(AI-testrunner PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../MCP/HTTP/testsuite/src)

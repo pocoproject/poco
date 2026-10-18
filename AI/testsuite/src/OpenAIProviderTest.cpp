@@ -1,9 +1,6 @@
 //
 // OpenAIProviderTest.cpp
 //
-// Tests for OpenAIProvider's pure-JSON helper methods
-// (no network calls).
-//
 // Copyright (c) 2025-2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
 //
@@ -16,219 +13,499 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/OpenAIProvider.h"
-#include "Poco/JSON/Stringifier.h"
-#include "Poco/Net/HTTPServer.h"
-#include "Poco/Net/HTTPRequestHandler.h"
-#include "Poco/Net/HTTPRequestHandlerFactory.h"
-#include "Poco/Net/HTTPServerRequest.h"
-#include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/Net/ServerSocket.h"
-#include "Poco/StreamCopier.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/JSON/Object.h"
+#include "Poco/JSON/Array.h"
+#include "Poco/JSON/Parser.h"
+#include "Poco/Thread.h"
 #include "Poco/Exception.h"
-#include <sstream>
+#include <atomic>
 #include <string>
 #include <vector>
 
 
-using Poco::AI::OpenAIProvider;
-using Poco::AI::ContentEvent;
+using namespace Poco::AI;
 using Poco::JSON::Object;
 using Poco::JSON::Array;
 
 
-namespace {
-
-
-// Serves a canned /embeddings response; captures the request for assertions.
-// Entries are returned in reversed index order to prove the client restores
-// input order from the index field.
-struct EmbeddingsMock
+namespace
 {
-	std::string lastPath;
-	std::string lastBody;
-	bool respondError = false;
-};
+	const std::string SSE("text/event-stream");
 
 
-class EmbeddingsMockHandler: public Poco::Net::HTTPRequestHandler
-{
-public:
-	explicit EmbeddingsMockHandler(EmbeddingsMock& state): _state(state) {}
-
-	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override
+	std::string data(const std::string& json)
 	{
-		_state.lastPath = request.getURI();
-		Poco::StreamCopier::copyToString(request.stream(), _state.lastBody);
-		if (_state.respondError)
+		return "data: " + json + "\n\n";
+	}
+
+
+	Object::Ptr parse(const std::string& json)
+	{
+		Poco::JSON::Parser parser;
+		return parser.parse(json).extract<Object::Ptr>();
+	}
+
+
+	OpenAIProvider::Params params(const std::string& baseUrl)
+	{
+		OpenAIProvider::Params params;
+		params.baseURI = Poco::URI(baseUrl);
+		params.apiKey = "sk-test";
+		params.model = "test-model";
+		params.maxTokens = 50;
+		params.timeout = Poco::Timespan(30, 0);
+		return params;
+	}
+
+
+	ChatRequest userRequest(const std::string& text, const std::string& systemPrompt = std::string())
+	{
+		ChatRequest request;
+		request.systemPrompt = systemPrompt;
+		Object::Ptr pMessage = new Object;
+		pMessage->set("role", "user");
+		pMessage->set("content", text);
+		request.messages.add(pMessage);
+		return request;
+	}
+
+
+	Poco::AI::MCP::Tool weatherTool()
+	{
+		Poco::AI::MCP::Tool tool;
+		tool.name = "weather";
+		tool.description = "The weather of a city.";
+		tool.inputSchema = parse("{\"type\":\"object\",\"properties\":{\"city\":{\"type\":\"string\"}}}");
+		return tool;
+	}
+
+
+	struct Events
+	{
+		std::vector<ContentEvent> events;
+
+		ContentEventCallback callback()
 		{
-			response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-			response.send() << "boom";
-			return;
+			return [this](const ContentEvent& event) { events.push_back(event); };
 		}
-		response.setContentType("application/json");
-		response.send() <<
-			"{\"object\":\"list\",\"model\":\"mock\",\"data\":["
-			"{\"object\":\"embedding\",\"index\":1,\"embedding\":[0.5,0.6,0.7,0.8]},"
-			"{\"object\":\"embedding\",\"index\":0,\"embedding\":[0.1,0.2,0.3,0.4]}"
-			"]}";
-	}
 
-private:
-	EmbeddingsMock& _state;
-};
-
-
-class EmbeddingsMockFactory: public Poco::Net::HTTPRequestHandlerFactory
-{
-public:
-	explicit EmbeddingsMockFactory(EmbeddingsMock& state): _state(state) {}
-
-	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest&) override
-	{
-		return new EmbeddingsMockHandler(_state);
-	}
-
-private:
-	EmbeddingsMock& _state;
-};
-
-
-// Serves a canned /models response; captures the request for assertions.
-struct ModelsMock
-{
-	std::string lastPath;
-	bool respondError = false;
-	bool respondMalformed = false;
-};
-
-
-class ModelsMockHandler: public Poco::Net::HTTPRequestHandler
-{
-public:
-	explicit ModelsMockHandler(ModelsMock& state): _state(state) {}
-
-	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override
-	{
-		_state.lastPath = request.getURI();
-		if (_state.respondError)
+		const ContentEvent* firstError() const
 		{
-			response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR);
-			response.send() << "boom";
-			return;
+			for (const ContentEvent& event: events) if (event.type == ContentEvent::Type::ERROR) return &event;
+			return nullptr;
 		}
-		response.setContentType("application/json");
-		if (_state.respondMalformed)
+
+		std::string text() const
 		{
-			response.send() << "{\"data\": not json";
-			return;
+			std::string all;
+			for (const ContentEvent& event: events) if (event.type == ContentEvent::Type::TEXT) all += event.text;
+			return all;
 		}
-		// Unsorted on purpose, with two embedding models mixed in.
-		response.send() <<
-			"{\"object\":\"list\",\"data\":["
-			"{\"object\":\"model\",\"id\":\"zeta:7b\"},"
-			"{\"object\":\"model\",\"id\":\"nomic-embed-text:latest\"},"
-			"{\"object\":\"model\",\"id\":\"alpha:26b\"},"
-			"{\"object\":\"model\",\"id\":\"text-embedding-3-small\"},"
-			"{\"object\":\"model\",\"id\":\"mid:13b\"}"
-			"]}";
-	}
-
-private:
-	ModelsMock& _state;
-};
+	};
 
 
-class ModelsMockFactory: public Poco::Net::HTTPRequestHandlerFactory
-{
-public:
-	explicit ModelsMockFactory(ModelsMock& state): _state(state) {}
-
-	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest&) override
+	std::string textStream(bool done = true, bool finish = true)
 	{
-		return new ModelsMockHandler(_state);
+		std::string stream = data("{\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"Hel\"},\"finish_reason\":null}]}")
+			+ data("{\"choices\":[{\"index\":0,\"delta\":{\"content\":\"lo\"},\"finish_reason\":null}]}");
+		if (finish)
+		{
+			stream += data("{\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":11,\"completion_tokens\":2,\"prompt_tokens_details\":{\"cached_tokens\":3}}}");
+		}
+		if (done) stream += "data: [DONE]\n\n";
+		return stream;
 	}
 
-private:
-	ModelsMock& _state;
-};
 
-
-// One user message and one tool, for the chat tests.
-Array userMessage()
-{
-	Object::Ptr pMessage = new Object;
-	pMessage->set("role", "user");
-	pMessage->set("content", "What is the weather in Paris?");
-	Array messages;
-	messages.add(pMessage);
-	return messages;
-}
-
-
-Array lookupTool()
-{
-	Object::Ptr pTool = new Object;
-	pTool->set("name", "lookup");
-	pTool->set("description", "Looks up the weather of a city.");
-	Object::Ptr pParameters = new Object;
-	pParameters->set("type", "object");
-	pTool->set("parameters", pParameters);
-	Array tools;
-	tools.add(pTool);
-	return tools;
-}
-
-
-// The stream of a Chat Completions response that calls the lookup tool with
-// the given arguments, sent in the given fragments.
-std::string toolCallStream(const std::vector<std::string>& argumentFragments)
-{
-	std::string stream = R"(data: {"choices":[{"delta":{"content":"Let me check."}}]})" "\n\n";
-	bool first = true;
-	for (const auto& fragment: argumentFragments)
+	std::string toolStream(const std::string& arguments = "\\\"Paris\\\"}")
 	{
-		Object::Ptr pFunction = new Object;
-		if (first) pFunction->set("name", "lookup");
-		pFunction->set("arguments", fragment);
-		Object::Ptr pToolCall = new Object;
-		pToolCall->set("index", 0);
-		if (first) pToolCall->set("id", "call_1");
-		pToolCall->set("function", pFunction);
-		Array::Ptr pToolCalls = new Array;
-		pToolCalls->add(pToolCall);
-		Object::Ptr pDelta = new Object;
-		pDelta->set("tool_calls", pToolCalls);
-		Object::Ptr pChoice = new Object;
-		pChoice->set("delta", pDelta);
-		Array::Ptr pChoices = new Array;
-		pChoices->add(pChoice);
-		Object chunk;
-		chunk.set("choices", pChoices);
-		std::ostringstream text;
-		chunk.stringify(text);
-		stream += "data: " + text.str() + "\n\n";
-		first = false;
+		return data("{\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":null,\"tool_calls\":[{\"index\":0,\"id\":\"call_1\",\"type\":\"function\",\"function\":{\"name\":\"weather\",\"arguments\":\"\"}}]},\"finish_reason\":null}]}")
+			+ data("{\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":null,\"function\":{\"name\":null,\"arguments\":\"{\\\"city\\\":\"}}]},\"finish_reason\":null}]}")
+			+ data("{\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"\",\"function\":{\"arguments\":\"" + arguments + "\"}}]},\"finish_reason\":null}]}")
+			+ data("{\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"tool_calls\"}]}")
+			+ "data: [DONE]\n\n";
 	}
-	stream += "data: [DONE]\n\n";
-	return stream;
+
+
+	struct ChatThread
+		/// Runs one chat call on a thread of its own.
+	{
+		ChatThread(OpenAIProvider& provider, ChatRequest request):
+			_provider(provider),
+			_request(std::move(request))
+		{
+			_thread.startFunc([this]()
+			{
+				try
+				{
+					result = _provider.chat(_request, events.callback(), cancellation);
+				}
+				catch (const Poco::Exception& exc)
+				{
+					error = exc.displayText();
+				}
+			});
+		}
+
+		~ChatThread()
+		{
+			cancellation.cancel();
+			_thread.join();
+		}
+
+		void join()
+		{
+			_thread.join();
+		}
+
+		Cancellation cancellation;
+		Events events;
+		ChatResult result;
+		std::string error;
+
+	private:
+		OpenAIProvider& _provider;
+		ChatRequest _request;
+		Poco::Thread _thread;
+	};
 }
-
-
-std::vector<ContentEvent> chat(OpenAIProvider& provider)
-{
-	std::vector<ContentEvent> events;
-	provider.chat(userMessage(), "You are a test.", lookupTool(),
-		[&events](const ContentEvent& event) { events.push_back(event); });
-	return events;
-}
-
-
-} // namespace
 
 
 OpenAIProviderTest::OpenAIProviderTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
+}
+
+
+OpenAIProviderTest::~OpenAIProviderTest()
+{
+}
+
+
+void OpenAIProviderTest::testRequestBody()
+{
+	CannedServer server(SSE, textStream());
+	OpenAIProvider::Params settings = params(server.baseUrl());
+	settings.maxTokensField = "max_completion_tokens";
+	OpenAIProvider provider(settings);
+	ChatRequest request = userRequest("Hi", "Be brief.");
+	request.tools.push_back(weatherTool());
+	request.toolChoice = ToolChoice::NONE;
+	Cancellation cancellation;
+	(void) provider.chat(request, ContentEventCallback(), cancellation);
+
+	assertEqual(std::string("/v1/chat/completions"), server.path());
+	assertEqual(std::string("Bearer sk-test"), server.header("Authorization"));
+	Object::Ptr pBody = parse(server.request());
+	assertEqual(50, pBody->getValue<int>("max_completion_tokens"));
+	assertTrue(!pBody->has("max_tokens"));
+	Array::Ptr pMessages = pBody->getArray("messages");
+	assertEqual(std::string("system"), pMessages->getObject(0)->getValue<std::string>("role"));
+	assertEqual(std::string("Be brief."), pMessages->getObject(0)->getValue<std::string>("content"));
+	assertEqual(std::string("user"), pMessages->getObject(1)->getValue<std::string>("role"));
+	Object::Ptr pTool = pBody->getArray("tools")->getObject(0);
+	assertEqual(std::string("function"), pTool->getValue<std::string>("type"));
+	assertEqual(std::string("weather"), pTool->getObject("function")->getValue<std::string>("name"));
+	assertTrue(pTool->getObject("function")->getObject("parameters")->isObject("properties"));
+	assertEqual(std::string("none"), pBody->getValue<std::string>("tool_choice"));
+}
+
+
+void OpenAIProviderTest::testNoTools()
+{
+	CannedServer server(SSE, textStream());
+	OpenAIProvider::Params settings = params(server.baseUrl());
+	settings.supportsTools = false;
+	settings.apiKey.clear();
+	settings.maxTokens = 0;
+	OpenAIProvider provider(settings);
+	ChatRequest request = userRequest("Hi");
+	request.tools.push_back(weatherTool());
+	Cancellation cancellation;
+	(void) provider.chat(request, ContentEventCallback(), cancellation);
+	Object::Ptr pBody = parse(server.request());
+	assertTrue(!pBody->has("tools"));
+	assertTrue(!pBody->has("tool_choice"));
+	assertTrue(!pBody->has("max_tokens"));
+	assertEqual(1u, static_cast<unsigned>(pBody->getArray("messages")->size()));
+	assertTrue(server.header("Authorization").empty());
+}
+
+
+void OpenAIProviderTest::testStreamedText()
+{
+	CannedServer::Response response = CannedServer::makeResponse(200, SSE, textStream());
+	response.chunked = true;
+	CannedServer server(response);
+	OpenAIProvider provider(params(server.baseUrl()));
+	Events events;
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Hi"), events.callback(), cancellation);
+	assertEqual(std::string("Hello"), events.text());
+	assertTrue(events.firstError() == nullptr);
+	assertTrue(result.stopReason == StopReason::END_TURN);
+	assertEqual(std::string("stop"), result.stopDetail);
+	assertEqual(Poco::UInt64(11), result.usage.inputTokens);
+	assertEqual(Poco::UInt64(2), result.usage.outputTokens);
+	assertEqual(Poco::UInt64(3), result.usage.cachedInputTokens);
+	assertEqual(std::string("Hello"), result.assistantMessage->getValue<std::string>("content"));
+	assertTrue(!result.assistantMessage->has("tool_calls"));
+}
+
+
+void OpenAIProviderTest::testStreamedToolCalls()
+{
+	CannedServer server(SSE, toolStream());
+	OpenAIProvider provider(params(server.baseUrl()));
+	Events events;
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Weather?"), events.callback(), cancellation);
+	// Null and empty ids and names of later chunks keep those of the first.
+	assertEqual(1u, static_cast<unsigned>(result.toolCalls.size()));
+	assertEqual(std::string("call_1"), result.toolCalls[0].id);
+	assertEqual(std::string("weather"), result.toolCalls[0].name);
+	assertEqual(std::string("Paris"), result.toolCalls[0].input->getValue<std::string>("city"));
+	assertTrue(result.stopReason == StopReason::TOOL_USE);
+	assertTrue(events.firstError() == nullptr);
+	assertTrue(result.assistantMessage->isNull("content"));
+	Object::Ptr pCall = result.assistantMessage->getArray("tool_calls")->getObject(0);
+	assertEqual(std::string("call_1"), pCall->getValue<std::string>("id"));
+	assertEqual(std::string("{\"city\":\"Paris\"}"), pCall->getObject("function")->getValue<std::string>("arguments"));
+}
+
+
+void OpenAIProviderTest::testFinishWithoutDone()
+{
+	// A finish reason ends the answer, even without [DONE].
+	CannedServer server(SSE, textStream(false, true));
+	OpenAIProvider provider(params(server.baseUrl()));
+	Events events;
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Hi"), events.callback(), cancellation);
+	assertTrue(result.stopReason == StopReason::END_TURN);
+	assertTrue(events.firstError() == nullptr);
+}
+
+
+void OpenAIProviderTest::testCutStream()
+{
+	// Neither a finish reason nor [DONE]: the answer is incomplete.
+	std::string stream = toolStream();
+	stream = stream.substr(0, stream.find("data: {\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"tool_calls\""));
+	CannedServer server(SSE, stream);
+	OpenAIProvider provider(params(server.baseUrl()));
+	Events events;
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Weather?"), events.callback(), cancellation);
+	assertTrue(result.stopReason == StopReason::ERROR);
+	assertTrue(result.toolCalls.empty());
+	assertTrue(result.assistantMessage.isNull());
+	assertTrue(events.firstError()->code == ErrorCode::STREAM_INTERRUPTED);
+	assertEqual(1u, static_cast<unsigned>(events.events.size()));
+
+	// A call cut right after the header of a tool call does not run the tool with no arguments.
+	const std::string header = data("{\"choices\":[{\"index\":0,\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"call_9\",\"function\":{\"name\":\"weather\",\"arguments\":\"\"}}]},\"finish_reason\":null}]}");
+	CannedServer cutServer(SSE, header);
+	OpenAIProvider cutProvider(params(cutServer.baseUrl()));
+	ChatResult cut = cutProvider.chat(userRequest("Weather?"), ContentEventCallback(), cancellation);
+	assertTrue(cut.toolCalls.empty());
+	assertTrue(cut.stopReason == StopReason::ERROR);
+}
+
+
+void OpenAIProviderTest::testErrorInStream()
+{
+	const std::string stream = data("{\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Par\"}}]}")
+		+ data("{\"error\":{\"message\":\"model is overloaded\",\"type\":\"server_error\"}}");
+	CannedServer server(SSE, stream);
+	OpenAIProvider provider(params(server.baseUrl()));
+	Events events;
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Hi"), events.callback(), cancellation);
+	assertTrue(result.stopReason == StopReason::ERROR);
+	assertTrue(events.firstError()->code == ErrorCode::STREAM_ERROR);
+	assertTrue(events.firstError()->text.find("model is overloaded") != std::string::npos);
+}
+
+
+void OpenAIProviderTest::testHttpErrors()
+{
+	struct Case
+	{
+		int status;
+		ErrorCode code;
+	};
+	const Case cases[] = {
+		{401, ErrorCode::UNAUTHENTICATED},
+		{429, ErrorCode::RATE_LIMITED},
+		{503, ErrorCode::OVERLOADED},
+		{502, ErrorCode::SERVER_ERROR},
+		{404, ErrorCode::REQUEST_REJECTED}
+	};
+	for (const Case& c: cases)
+	{
+		// The old retry without tools on one server's wording is gone.
+		CannedServer server(CannedServer::makeResponse(c.status, "application/json", "{\"error\":\"Unsupported param: tools\"}"));
+		OpenAIProvider provider(params(server.baseUrl()));
+		ChatRequest request = userRequest("Hi");
+		request.tools.push_back(weatherTool());
+		Events events;
+		Cancellation cancellation;
+		ChatResult result = provider.chat(request, events.callback(), cancellation);
+		assertTrue(result.stopReason == StopReason::ERROR);
+		assertTrue(events.firstError()->code == c.code);
+		assertEqual(1, server.requests());
+	}
+}
+
+
+void OpenAIProviderTest::testMalformedArguments()
+{
+	CannedServer server(SSE, toolStream("[1,"));
+	OpenAIProvider provider(params(server.baseUrl()));
+	Events events;
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Weather?"), events.callback(), cancellation);
+	assertTrue(result.toolCalls.empty());
+	assertTrue(events.firstError()->code == ErrorCode::MALFORMED_TOOL_INPUT);
+	assertTrue(!result.assistantMessage->has("tool_calls"));
+}
+
+
+void OpenAIProviderTest::testAppendToolResult()
+{
+	OpenAIProvider provider(params("http://127.0.0.1:1/v1"));
+	Array messages;
+	Poco::AI::MCP::ToolResult result;
+	result.addText("line one").addText("line two");
+	provider.appendToolResult(messages, "call_1", result);
+	provider.appendToolResult(messages, "call_2", Poco::AI::MCP::ToolResult::error("failed"));
+	assertEqual(2u, static_cast<unsigned>(messages.size()));
+	assertEqual(std::string("tool"), messages.getObject(0)->getValue<std::string>("role"));
+	assertEqual(std::string("call_1"), messages.getObject(0)->getValue<std::string>("tool_call_id"));
+	assertEqual(std::string("line one\nline two"), messages.getObject(0)->getValue<std::string>("content"));
+	assertEqual(std::string("failed"), messages.getObject(1)->getValue<std::string>("content"));
+}
+
+
+void OpenAIProviderTest::testListModels()
+{
+	CannedServer server("application/json", "{\"object\":\"list\",\"data\":[{\"id\":\"zeta\"},{\"id\":\"text-embedding-3\"},{\"id\":\"alpha\"},{\"id\":null}]}");
+	OpenAIProvider provider(params(server.baseUrl()));
+	std::vector<std::string> models = provider.listModels();
+	assertEqual(2u, static_cast<unsigned>(models.size()));
+	assertEqual(std::string("alpha"), models[0]);
+	assertEqual(std::string("zeta"), models[1]);
+	assertEqual(std::string("/v1/models"), server.path());
+
+	CannedServer failing(CannedServer::makeResponse(500, "text/plain", "down"));
+	OpenAIProvider down(params(failing.baseUrl()));
+	try
+	{
+		(void) down.listModels();
+		fail("a failed listing must throw");
+	}
+	catch (const Poco::Net::HTTPException&)
+	{
+	}
+
+	CannedServer malformed("application/json", "[1,2]");
+	OpenAIProvider broken(params(malformed.baseUrl()));
+	try
+	{
+		(void) broken.listModels();
+		fail("a malformed listing must throw");
+	}
+	catch (const Poco::DataFormatException&)
+	{
+	}
+}
+
+
+void OpenAIProviderTest::testEmbeddings()
+{
+	CannedServer server("application/json",
+		"{\"data\":[{\"index\":1,\"embedding\":[0.5,0.25]},{\"index\":0,\"embedding\":[1,2]}]}");
+	OpenAIProvider provider(params(server.baseUrl()));
+	std::vector<std::vector<float>> vectors = provider.embed({"first", "second"}, "embed-model", 2);
+	assertEqual(2u, static_cast<unsigned>(vectors.size()));
+	assertEqual(1.0f, vectors[0][0]);
+	assertEqual(2.0f, vectors[0][1]);
+	assertEqual(0.5f, vectors[1][0]);
+	Object::Ptr pBody = parse(server.request());
+	assertEqual(std::string("embed-model"), pBody->getValue<std::string>("model"));
+	assertEqual(2, pBody->getValue<int>("dimensions"));
+	assertEqual(2u, static_cast<unsigned>(pBody->getArray("input")->size()));
+	assertTrue(provider.embed({}, "embed-model").empty());
+}
+
+
+void OpenAIProviderTest::testMalformedEmbeddings()
+{
+	const char* bodies[] = {
+		"{\"data\":[{\"index\":0,\"embedding\":[1]}]}",
+		"{\"data\":[{\"index\":0,\"embedding\":[1]},{\"index\":0,\"embedding\":[2]}]}",
+		"{\"data\":[{\"index\":0,\"embedding\":[1e300]},{\"index\":1,\"embedding\":[2]}]}",
+		"{\"data\":[{\"index\":0,\"embedding\":[1,2]},{\"index\":1,\"embedding\":[3]}]}",
+		"{\"data\":[{\"index\":5,\"embedding\":[1]},{\"index\":1,\"embedding\":[2]}]}",
+		"{\"data\":[{\"index\":0,\"embedding\":[]},{\"index\":1,\"embedding\":[2]}]}"
+	};
+	for (const char* body: bodies)
+	{
+		CannedServer server("application/json", body);
+		OpenAIProvider provider(params(server.baseUrl()));
+		try
+		{
+			(void) provider.embed({"a", "b"}, "m");
+			fail(std::string("must be refused: ") + body);
+		}
+		catch (const Poco::DataFormatException&)
+		{
+		}
+	}
+	CannedServer failing(CannedServer::makeResponse(400, "application/json", "{\"error\":\"bad\"}"));
+	OpenAIProvider provider(params(failing.baseUrl()));
+	try
+	{
+		(void) provider.embed({"a"}, "m");
+		fail("an error status must throw");
+	}
+	catch (const Poco::Net::HTTPException&)
+	{
+	}
+}
+
+
+void OpenAIProviderTest::testCancelBeforeHeaders()
+{
+	CannedServer::Response response;
+	response.waitBeforeHeaders = true;
+	CannedServer server(response);
+	OpenAIProvider provider(params(server.baseUrl()));
+	ChatThread chat(provider, userRequest("Hi"));
+	assertTrue(server.waitForRequest(10000));
+	chat.cancellation.cancel();
+	chat.join();
+	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
+	assertTrue(chat.error.empty());
+	assertTrue(chat.events.firstError() == nullptr);
+}
+
+
+void OpenAIProviderTest::testCancelDuringStream()
+{
+	CannedServer::Response response = CannedServer::makeResponse(200, SSE, textStream());
+	response.pauseAt = response.body.find("data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"lo\"}");
+	CannedServer server(response);
+	OpenAIProvider provider(params(server.baseUrl()));
+	ChatThread chat(provider, userRequest("Hi"));
+	assertTrue(server.waitForRequest(10000));
+	chat.cancellation.cancel();
+	chat.join();
+	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
+	assertTrue(chat.error.empty());
+	assertTrue(chat.events.firstError() == nullptr);
 }
 
 
@@ -242,370 +519,25 @@ void OpenAIProviderTest::tearDown()
 }
 
 
-void OpenAIProviderTest::testAppendAssistantTextOnly()
-{
-	OpenAIProvider provider("http://localhost:1/v1", "", "test-model", 1024, 30);
-
-	Array messages;
-	std::vector<ContentEvent> noToolCalls;
-
-	provider.appendAssistantMessage(messages, "Hello", noToolCalls);
-
-	assertEqual(1, static_cast<int>(messages.size()));
-
-	auto pMsg = messages.getObject(0);
-	assertNotNull(pMsg.get());
-	assertEqual(std::string("assistant"), pMsg->getValue<std::string>("role"));
-	assertEqual(std::string("Hello"), pMsg->getValue<std::string>("content"));
-
-	// No tool_calls key when there are no tool calls
-	assertTrue(!pMsg->has("tool_calls"));
-}
-
-
-void OpenAIProviderTest::testAppendAssistantWithToolCalls()
-{
-	OpenAIProvider provider("http://localhost:1/v1", "", "test-model", 1024, 30);
-
-	Array messages;
-
-	ContentEvent tc;
-	tc.type = ContentEvent::TYPE_TOOL_USE;
-	tc.id = "call_abc";
-	tc.name = "get_info";
-	tc.input.set("query", "status");
-
-	std::vector<ContentEvent> toolCalls = {tc};
-	provider.appendAssistantMessage(messages, "Let me check.", toolCalls);
-
-	auto pMsg = messages.getObject(0);
-	assertEqual(std::string("assistant"), pMsg->getValue<std::string>("role"));
-	assertEqual(std::string("Let me check."), pMsg->getValue<std::string>("content"));
-
-	// Check tool_calls array
-	assertTrue(pMsg->has("tool_calls"));
-	auto pToolCalls = pMsg->getArray("tool_calls");
-	assertNotNull(pToolCalls.get());
-	assertEqual(1, static_cast<int>(pToolCalls->size()));
-
-	auto pToolCall = pToolCalls->getObject(0);
-	assertEqual(std::string("call_abc"), pToolCall->getValue<std::string>("id"));
-	assertEqual(std::string("function"), pToolCall->getValue<std::string>("type"));
-
-	auto pFunction = pToolCall->getObject("function");
-	assertNotNull(pFunction.get());
-	assertEqual(std::string("get_info"), pFunction->getValue<std::string>("name"));
-
-	// Arguments should be a JSON string
-	std::string args = pFunction->getValue<std::string>("arguments");
-	assertTrue(args.find("query") != std::string::npos);
-	assertTrue(args.find("status") != std::string::npos);
-}
-
-
-void OpenAIProviderTest::testAppendToolResult()
-{
-	OpenAIProvider provider("http://localhost:1/v1", "", "test-model", 1024, 30);
-
-	Array messages;
-	provider.appendToolResult(messages, "call_xyz", "result data");
-
-	assertEqual(1, static_cast<int>(messages.size()));
-
-	auto pMsg = messages.getObject(0);
-	assertEqual(std::string("tool"), pMsg->getValue<std::string>("role"));
-	assertEqual(std::string("call_xyz"), pMsg->getValue<std::string>("tool_call_id"));
-	assertEqual(std::string("result data"), pMsg->getValue<std::string>("content"));
-}
-
-
-void OpenAIProviderTest::testAppendToolResultSeparateMessages()
-{
-	OpenAIProvider provider("http://localhost:1/v1", "", "test-model", 1024, 30);
-
-	Array messages;
-
-	// Two tool results should create TWO separate messages (not merge like Anthropic)
-	provider.appendToolResult(messages, "call_1", "result 1");
-	provider.appendToolResult(messages, "call_2", "result 2");
-
-	assertEqual(2, static_cast<int>(messages.size()));
-
-	auto pMsg1 = messages.getObject(0);
-	assertEqual(std::string("tool"), pMsg1->getValue<std::string>("role"));
-	assertEqual(std::string("call_1"), pMsg1->getValue<std::string>("tool_call_id"));
-	assertEqual(std::string("result 1"), pMsg1->getValue<std::string>("content"));
-
-	auto pMsg2 = messages.getObject(1);
-	assertEqual(std::string("tool"), pMsg2->getValue<std::string>("role"));
-	assertEqual(std::string("call_2"), pMsg2->getValue<std::string>("tool_call_id"));
-	assertEqual(std::string("result 2"), pMsg2->getValue<std::string>("content"));
-}
-
-
-void OpenAIProviderTest::testToOpenAITools()
-{
-	Object params;
-	params.set("type", "object");
-	Object props;
-	Object nameProp;
-	nameProp.set("type", "string");
-	props.set("name", nameProp);
-	params.set("properties", props);
-
-	Object::Ptr pToolDef = new Object;
-	pToolDef->set("name", "my_tool");
-	pToolDef->set("description", "A test tool");
-	pToolDef->set("parameters", params);
-
-	Array tools;
-	tools.add(pToolDef);
-
-	Array openaiTools = OpenAIProvider::toOpenAITools(tools);
-
-	assertEqual(1, static_cast<int>(openaiTools.size()));
-
-	auto pTool = openaiTools.getObject(0);
-	assertEqual(std::string("function"), pTool->getValue<std::string>("type"));
-
-	auto pFunction = pTool->getObject("function");
-	assertNotNull(pFunction.get());
-	assertEqual(std::string("my_tool"), pFunction->getValue<std::string>("name"));
-	assertEqual(std::string("A test tool"), pFunction->getValue<std::string>("description"));
-
-	// "parameters" should be present inside "function" (not renamed)
-	assertTrue(pFunction->has("parameters"));
-}
-
-
-void OpenAIProviderTest::testEmbed()
-{
-	EmbeddingsMock state;
-	Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
-	Poco::Net::HTTPServer server(new EmbeddingsMockFactory(state), socket, new Poco::Net::HTTPServerParams);
-	server.start();
-
-	OpenAIProvider provider(
-		"http://127.0.0.1:" + std::to_string(socket.address().port()) + "/v1",
-		"", "chat-model", 1024, 30);
-
-	std::vector<std::vector<float>> vecs = provider.embed({"first text", "second text"}, "embed-model", 4);
-
-	server.stop();
-
-	assertEqual(std::string("/v1/embeddings"), state.lastPath);
-	assertTrue(state.lastBody.find("\"model\":\"embed-model\"") != std::string::npos);
-	assertTrue(state.lastBody.find("\"dimensions\":4") != std::string::npos);
-	assertTrue(state.lastBody.find("first text") != std::string::npos);
-
-	assertEqual(2, static_cast<int>(vecs.size()));
-	assertEqual(4, static_cast<int>(vecs[0].size()));
-	assertEqual(4, static_cast<int>(vecs[1].size()));
-	// index field restores input order despite the reversed response
-	assertEqualDelta(0.1, vecs[0][0], 0.0001);
-	assertEqualDelta(0.5, vecs[1][0], 0.0001);
-}
-
-
-void OpenAIProviderTest::testEmbedRepeatedIndex()
-{
-	// Two entries for two inputs, but both claim index 0: the response does
-	// not hold one vector per input, whatever its length says.
-	CannedServer server("application/json",
-		R"({"object":"list","data":[)"
-		R"({"object":"embedding","index":0,"embedding":[0.1,0.2]},)"
-		R"({"object":"embedding","index":0,"embedding":[0.3,0.4]})"
-		R"(]})");
-	OpenAIProvider provider(server.baseUrl(), "", "chat-model", 1024, 30);
-
-	try
-	{
-		provider.embed({"first text", "second text"}, "embed-model");
-		fail("a repeated index must throw");
-	}
-	catch (Poco::DataFormatException&)
-	{
-	}
-}
-
-
-void OpenAIProviderTest::testChatToolCall()
-{
-	// The arguments arrive in two fragments and are parsed when the stream ends.
-	CannedServer server("text/event-stream", toolCallStream({R"({"city":)", R"("Paris"})"}));
-	OpenAIProvider provider(server.baseUrl(), "secret", "chat-model", 1024, 30);
-
-	const std::vector<ContentEvent> events = chat(provider);
-
-	assertEqual(std::string("/v1/chat/completions"), server.path());
-	assertEqual(std::string("Bearer secret"), server.header("Authorization"));
-	assertTrue(server.request().find("\"stream\":true") != std::string::npos);
-	assertTrue(server.request().find("\"lookup\"") != std::string::npos);
-
-	assertEqual(2, static_cast<int>(events.size()));
-	assertTrue(events[0].type == ContentEvent::TYPE_TEXT);
-	assertEqual(std::string("Let me check."), events[0].text);
-	assertTrue(events[1].type == ContentEvent::TYPE_TOOL_USE);
-	assertEqual(std::string("call_1"), events[1].id);
-	assertEqual(std::string("lookup"), events[1].name);
-	assertEqual(std::string("Paris"), events[1].input.getValue<std::string>("city"));
-}
-
-
-void OpenAIProviderTest::testChatMalformedToolArguments()
-{
-	// Arguments that are cut short, or are not an object, are an error: the
-	// tool call is not delivered, so the tool cannot run without them.
-	const std::vector<std::vector<std::string>> malformed{
-		{R"({"city":)"},
-		{R"({"city":"Par)"},
-		{R"(["Paris"])"},
-		{R"("Paris")"},
-		{"not json"}};
-	for (const auto& fragments: malformed)
-	{
-		CannedServer server("text/event-stream", toolCallStream(fragments));
-		OpenAIProvider provider(server.baseUrl(), "", "chat-model", 1024, 30);
-
-		const std::vector<ContentEvent> events = chat(provider);
-
-		assertEqual(2, static_cast<int>(events.size()));
-		assertTrue(events[0].type == ContentEvent::TYPE_TEXT);
-		assertTrue(events[1].type == ContentEvent::TYPE_ERROR);
-		assertEqual(std::string("malformed_tool_input"), events[1].code);
-		assertTrue(events[1].text.find("lookup") != std::string::npos);
-	}
-}
-
-
-void OpenAIProviderTest::testChatToolCallWithoutArguments()
-{
-	// No arguments, an empty object and null all stand for a call without
-	// arguments.
-	const std::vector<std::vector<std::string>> none{{""}, {"{}"}, {"null"}, {"  "}};
-	for (const auto& fragments: none)
-	{
-		CannedServer server("text/event-stream", toolCallStream(fragments));
-		OpenAIProvider provider(server.baseUrl(), "", "chat-model", 1024, 30);
-
-		const std::vector<ContentEvent> events = chat(provider);
-
-		assertEqual(2, static_cast<int>(events.size()));
-		assertTrue(events[1].type == ContentEvent::TYPE_TOOL_USE);
-		assertEqual(std::string("lookup"), events[1].name);
-		assertEqual(0, static_cast<int>(events[1].input.size()));
-	}
-}
-
-
-void OpenAIProviderTest::testListModels()
-{
-	ModelsMock state;
-	Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
-	Poco::Net::HTTPServer server(new ModelsMockFactory(state), socket, new Poco::Net::HTTPServerParams);
-	server.start();
-
-	OpenAIProvider provider(
-		"http://127.0.0.1:" + std::to_string(socket.address().port()) + "/v1",
-		"", "chat-model", 1024, 30);
-
-	std::vector<std::string> models = provider.listModels();
-
-	server.stop();
-
-	assertEqual(std::string("/v1/models"), state.lastPath);
-	// Sorted, with the embedding models filtered out.
-	assertEqual(3, static_cast<int>(models.size()));
-	assertEqual(std::string("alpha:26b"), models[0]);
-	assertEqual(std::string("mid:13b"), models[1]);
-	assertEqual(std::string("zeta:7b"), models[2]);
-}
-
-
-void OpenAIProviderTest::testListModelsError()
-{
-	// Discovery is an optimization: a failing server yields an empty list,
-	// never an exception.
-	ModelsMock state;
-	state.respondError = true;
-	Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
-	Poco::Net::HTTPServer server(new ModelsMockFactory(state), socket, new Poco::Net::HTTPServerParams);
-	server.start();
-
-	OpenAIProvider provider(
-		"http://127.0.0.1:" + std::to_string(socket.address().port()) + "/v1",
-		"", "chat-model", 1024, 30);
-
-	assertTrue(provider.listModels().empty());
-	server.stop();
-
-	// Nothing listening at all behaves the same.
-	OpenAIProvider unreachable("http://127.0.0.1:1/v1", "", "chat-model", 1024, 30);
-	assertTrue(unreachable.listModels().empty());
-}
-
-
-void OpenAIProviderTest::testListModelsMalformed()
-{
-	ModelsMock state;
-	state.respondMalformed = true;
-	Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
-	Poco::Net::HTTPServer server(new ModelsMockFactory(state), socket, new Poco::Net::HTTPServerParams);
-	server.start();
-
-	OpenAIProvider provider(
-		"http://127.0.0.1:" + std::to_string(socket.address().port()) + "/v1",
-		"", "chat-model", 1024, 30);
-
-	assertTrue(provider.listModels().empty());
-	server.stop();
-}
-
-
-void OpenAIProviderTest::testEmbedError()
-{
-	EmbeddingsMock state;
-	state.respondError = true;
-	Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
-	Poco::Net::HTTPServer server(new EmbeddingsMockFactory(state), socket, new Poco::Net::HTTPServerParams);
-	server.start();
-
-	OpenAIProvider provider(
-		"http://127.0.0.1:" + std::to_string(socket.address().port()) + "/v1",
-		"", "chat-model", 1024, 30);
-
-	try
-	{
-		provider.embed({"text"}, "embed-model");
-		server.stop();
-		fail ("must throw on a non-OK response");
-	}
-	catch (Poco::RuntimeException& ex)
-	{
-		server.stop();
-		assertTrue(ex.displayText().find("boom") != std::string::npos);
-	}
-}
-
-
 CppUnit::Test* OpenAIProviderTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("OpenAIProviderTest");
 
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testAppendAssistantTextOnly);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testAppendAssistantWithToolCalls);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testRequestBody);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testNoTools);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testStreamedText);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testStreamedToolCalls);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testFinishWithoutDone);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testCutStream);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testErrorInStream);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testHttpErrors);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testMalformedArguments);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testAppendToolResult);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testAppendToolResultSeparateMessages);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testToOpenAITools);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testEmbed);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testEmbedError);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testEmbedRepeatedIndex);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testChatToolCall);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testChatMalformedToolArguments);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testChatToolCallWithoutArguments);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testListModels);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testListModelsError);
-	CppUnit_addTest(pSuite, OpenAIProviderTest, testListModelsMalformed);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testEmbeddings);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testMalformedEmbeddings);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testCancelBeforeHeaders);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testCancelDuringStream);
 
 	return pSuite;
 }

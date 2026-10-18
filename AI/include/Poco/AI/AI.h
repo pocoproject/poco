@@ -9,6 +9,9 @@
 // This file must be the first file included by every other AI
 // header file.
 //
+// The AI library is experimental: its interface may change within 2.x, as
+// the vendor APIs it talks to change.
+//
 // Copyright (c) 2025-2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
 //

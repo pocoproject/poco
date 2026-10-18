@@ -13,173 +13,198 @@
 
 
 #include "Poco/AI/AgentLoop.h"
-#include "Poco/JSON/Stringifier.h"
-#include <sstream>
+#include "ProviderCall.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Exception.h"
+#include <exception>
+#include <utility>
 
 
-namespace Poco {
-namespace AI {
+namespace Poco::AI {
 
 
-AgentLoop::AgentLoop(
-	std::shared_ptr<LLMProvider> pProvider,
-	ToolRegistry& toolRegistry,
-	int maxRounds):
+namespace
+{
+	void emitError(const AgentEventCallback& onEvent, ErrorCode code, const std::string& text)
+	{
+		AgentEvent event;
+		event.type = AgentEvent::Type::ERROR;
+		event.code = code;
+		event.content = text;
+		if (onEvent) onEvent(event);
+	}
+
+
+	const Poco::AI::MCP::Tool* findTool(const std::vector<Poco::AI::MCP::Tool>& tools, const std::string& name)
+	{
+		for (const Poco::AI::MCP::Tool& tool: tools)
+		{
+			if (tool.name == name) return &tool;
+		}
+		return nullptr;
+	}
+}
+
+
+AgentLoop::AgentLoop(std::shared_ptr<LLMProvider> pProvider, ToolRegistry& toolRegistry, int maxRounds):
 	_pProvider(std::move(pProvider)),
 	_toolRegistry(toolRegistry),
-	_maxRounds(maxRounds)
+	_maxRounds(maxRounds),
+	_maxToolResultSize(DEFAULT_MAX_TOOL_RESULT_SIZE)
 {
-}
-
-
-void AgentLoop::setMaxToolResultSize(std::size_t size)
-{
-	_maxToolResultSize = size;
-}
-
-
-void AgentLoop::run(
-	const Poco::JSON::Array& messages,
-	const std::string& systemPrompt,
-	AgentEventCallback onEvent)
-{
-	Poco::JSON::Array apiMessages(messages);
-	Poco::JSON::Array tools = _toolRegistry.getToolDefinitions();
-
-	_pProvider->resetCancelled();
-
-	bool hadToolCalls = false;
-	for (int round = 0; round < _maxRounds; ++round)
+	if (_pProvider == nullptr)
 	{
-		if (_pProvider->cancelled()) break;
+		throw Poco::InvalidArgumentException("An agent loop needs a provider");
+	}
+	if (_maxRounds < 1)
+	{
+		throw Poco::InvalidArgumentException("An agent loop needs at least one round");
+	}
+}
 
-		std::vector<ContentEvent> toolCalls;
-		std::string textParts;
 
+AgentLoop::~AgentLoop()
+{
+}
+
+
+void AgentLoop::setMaxToolResultSize(std::size_t maxSize)
+{
+	_maxToolResultSize = maxSize;
+}
+
+
+void AgentLoop::setApprover(ToolApprover approver)
+{
+	_approver = std::move(approver);
+}
+
+
+void AgentLoop::setRequestContext(const Poco::AI::MCP::RequestContext& context)
+{
+	_context = context;
+}
+
+
+void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPrompt, const AgentEventCallback& onEvent)
+{
+	Cancellation cancellation;
+	run(conversation, systemPrompt, onEvent, cancellation);
+}
+
+
+void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPrompt, const AgentEventCallback& onEvent, Cancellation& cancellation)
+{
+	ChatRequest request;
+	request.systemPrompt = systemPrompt;
+	request.tools = _toolRegistry.tools();
+
+	const auto onContent = [&onEvent](const ContentEvent& contentEvent)
+	{
+		if (contentEvent.type == ContentEvent::Type::TEXT)
+		{
+			AgentEvent event;
+			event.content = contentEvent.text;
+			if (onEvent) onEvent(event);
+		}
+		else if (contentEvent.type == ContentEvent::Type::ERROR)
+		{
+			emitError(onEvent, contentEvent.code, contentEvent.text);
+		}
+		// A tool call is reported when the loop gets to it.
+	};
+
+	for (int round = 0; round <= _maxRounds && !cancellation.cancelled(); ++round)
+	{
+		// Rounds 0 to maxRounds - 1 may run tools; one more call asks for text.
+		const bool finalRound = round == _maxRounds;
+		request.messages = conversation;
+		request.toolChoice = finalRound ? ToolChoice::NONE : ToolChoice::AUTO;
+
+		ChatResult result;
 		try
 		{
-			_pProvider->chat(apiMessages, systemPrompt, tools,
-				[&](const ContentEvent& evt)
-				{
-					if (evt.type == ContentEvent::TYPE_TEXT)
-					{
-						textParts += evt.text;
-						AgentEvent ae;
-						ae.type = AgentEvent::TYPE_TEXT;
-						ae.content = evt.text;
-						onEvent(ae);
-					}
-					else if (evt.type == ContentEvent::TYPE_TOOL_USE)
-					{
-						toolCalls.push_back(evt);
-						AgentEvent ae;
-						ae.type = AgentEvent::TYPE_TOOL_CALL;
-						ae.toolName = evt.name;
-						std::ostringstream oss;
-						Poco::JSON::Stringifier::stringify(evt.input, oss);
-						ae.toolInput = oss.str();
-						onEvent(ae);
-					}
-					else if (evt.type == ContentEvent::TYPE_ERROR)
-					{
-						AgentEvent ae;
-						ae.type = AgentEvent::TYPE_ERROR;
-						ae.content = evt.text;
-						ae.code = evt.code;
-						onEvent(ae);
-					}
-				});
+			result = _pProvider->chat(request, onContent, cancellation);
 		}
-		catch (const Poco::Exception& e)
+		catch (const Poco::Exception& exc)
 		{
-			AgentEvent ae;
-			ae.type = AgentEvent::TYPE_ERROR;
-			ae.content = "LLM error: " + e.displayText();
-			onEvent(ae);
-			return;
-		}
-		catch (const std::exception& e)
-		{
-			AgentEvent ae;
-			ae.type = AgentEvent::TYPE_ERROR;
-			ae.content = std::string("LLM error: ") + e.what();
-			onEvent(ae);
-			return;
-		}
-
-		hadToolCalls = !toolCalls.empty();
-		if (!hadToolCalls)
+			emitError(onEvent, ErrorCode::PROVIDER_FAILED, "LLM error: " + exc.displayText());
 			break;
-
-		// Append assistant response
-		_pProvider->appendAssistantMessage(apiMessages, textParts, toolCalls);
-
-		// Execute tools and append results
-		for (const auto& tc : toolCalls)
-		{
-			if (_pProvider->cancelled()) break;
-			std::string result = _toolRegistry.executeTool(tc.name, tc.input);
-
-			if (result.size() > _maxToolResultSize)
-				result.resize(_maxToolResultSize);
-
-			AgentEvent ae;
-			ae.type = AgentEvent::TYPE_TOOL_RESULT;
-			ae.toolName = tc.name;
-			ae.content = result;
-			onEvent(ae);
-
-			_pProvider->appendToolResult(apiMessages, tc.id, result);
 		}
-	}
-
-	// If the loop used up its rounds while still making tool calls,
-	// one final call without tools asks the model for a text answer.
-	if (!_pProvider->cancelled() && hadToolCalls)
-	{
-		try
+		catch (const std::exception& exc)
 		{
-			Poco::JSON::Array noTools;
-			_pProvider->chat(apiMessages, systemPrompt, noTools,
-				[&](const ContentEvent& evt)
+			emitError(onEvent, ErrorCode::PROVIDER_FAILED, std::string("LLM error: ") + exc.what());
+			break;
+		}
+		if (result.stopReason == StopReason::CANCELLED || result.stopReason == StopReason::ERROR) break;
+		if (result.assistantMessage != nullptr)
+		{
+			conversation.add(result.assistantMessage);
+		}
+		if (result.toolCalls.empty()) break;
+
+		if (finalRound)
+		{
+			emitError(onEvent, ErrorCode::ROUND_LIMIT, "The model still called tools after " + Poco::NumberFormatter::format(_maxRounds) + " rounds");
+		}
+		for (const ToolCall& call: result.toolCalls)
+		{
+			Poco::AI::MCP::ToolResult toolResult;
+			if (finalRound)
+			{
+				toolResult = Poco::AI::MCP::ToolResult::error("The tool was not run: the round limit was reached.");
+			}
+			else if (cancellation.cancelled())
+			{
+				toolResult = Poco::AI::MCP::ToolResult::error("The tool was not run: the run was cancelled.");
+			}
+			else
+			{
+				AgentEvent callEvent;
+				callEvent.type = AgentEvent::Type::TOOL_CALL;
+				callEvent.toolName = call.name;
+				callEvent.toolInput = serializeJSON(call.input);
+				if (onEvent) onEvent(callEvent);
+
+				const Poco::AI::MCP::Tool* pTool = findTool(request.tools, call.name);
+				if (_approver && pTool != nullptr && !_approver(call, *pTool))
 				{
-					if (evt.type == ContentEvent::TYPE_TEXT)
-					{
-						AgentEvent ae;
-						ae.type = AgentEvent::TYPE_TEXT;
-						ae.content = evt.text;
-						onEvent(ae);
-					}
-					else if (evt.type == ContentEvent::TYPE_ERROR)
-					{
-						AgentEvent ae;
-						ae.type = AgentEvent::TYPE_ERROR;
-						ae.content = evt.text;
-						ae.code = evt.code;
-						onEvent(ae);
-					}
-				});
+					toolResult = Poco::AI::MCP::ToolResult::error("The tool call was refused.");
+				}
+				else
+				{
+					toolResult = _toolRegistry.executeTool(call.name, call.input, _context);
+				}
+			}
+
+			std::string text = toolResultText(toolResult);
+			if (text.size() > _maxToolResultSize)
+			{
+				// Cut at a character boundary: a partial UTF-8 sequence would make
+				// the next request body invalid.
+				cutAtCharacter(text, _maxToolResultSize);
+				text += "\n...(truncated)";
+				const bool isError = toolResult.isError();
+				toolResult = Poco::AI::MCP::ToolResult();
+				toolResult.addText(text).setError(isError);
+			}
+
+			AgentEvent resultEvent;
+			resultEvent.type = AgentEvent::Type::TOOL_RESULT;
+			resultEvent.toolName = call.name;
+			resultEvent.content = text;
+			resultEvent.toolError = toolResult.isError();
+			if (onEvent) onEvent(resultEvent);
+
+			_pProvider->appendToolResult(conversation, call.id, toolResult);
 		}
-		catch (const Poco::Exception& e)
-		{
-			AgentEvent ae;
-			ae.type = AgentEvent::TYPE_ERROR;
-			ae.content = "LLM error: " + e.displayText();
-			onEvent(ae);
-		}
-		catch (const std::exception& e)
-		{
-			AgentEvent ae;
-			ae.type = AgentEvent::TYPE_ERROR;
-			ae.content = std::string("LLM error: ") + e.what();
-			onEvent(ae);
-		}
+		if (finalRound) break;
 	}
 
-	AgentEvent ae;
-	ae.type = AgentEvent::TYPE_DONE;
-	onEvent(ae);
+	AgentEvent done;
+	done.type = AgentEvent::Type::DONE;
+	if (onEvent) onEvent(done);
 }
 
 
-} } // namespace Poco::AI
+} // namespace Poco::AI

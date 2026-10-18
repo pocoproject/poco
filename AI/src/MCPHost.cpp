@@ -13,81 +13,36 @@
 
 
 #include "Poco/AI/MCPHost.h"
-#include "Poco/AI/MCP/HTTP/HTTPClient.h"
-#include "Poco/AI/MCP/Content.h"
-#include "Poco/JSON/Object.h"
-#include "Poco/JSON/Array.h"
-#include "Poco/JSON/Stringifier.h"
-#include "Poco/Mutex.h"
 #include "Poco/Exception.h"
-#include <sstream>
 #include <utility>
 
 
-namespace Poco {
-namespace AI {
+namespace Poco::AI {
 
 
 struct MCPHost::Connection
-	/// One live MCP server: the HTTP client, a mutex serializing calls to it
-	/// (HTTPClient is not safe for concurrent use), and the cached tool list.
+	/// One MCP server: its client and its tools. The client serializes its
+	/// calls itself.
 {
 	std::string label;
-	std::unique_ptr<Poco::AI::MCP::HTTP::HTTPClient> pClient;
-	Poco::FastMutex mutex;
-	Poco::JSON::Array::Ptr pTools;
+	std::unique_ptr<Poco::AI::MCP::Client> pClient;
+	std::vector<Poco::AI::MCP::Tool> tools;
 };
 
 
 namespace
 {
-	std::string serializeJSON(const Poco::Dynamic::Var& value)
+	bool isModelToolName(const std::string& name)
+		/// Returns true if both model APIs take name as a tool name: 1 to 64
+		/// characters from A-Z, a-z, 0-9, '_' and '-'.
 	{
-		std::ostringstream os;
-		Poco::JSON::Stringifier::stringify(value, os);
-		return os.str();
-	}
-
-
-	std::string flattenToolResult(const Poco::AI::MCP::ToolResult& result)
-		/// Reduces an MCP tool result to the string the ToolRegistry expects:
-		/// the joined text blocks, or {"error": ...} when isError, or the raw
-		/// content array as JSON when it carries non-text blocks.
-	{
-		Poco::JSON::Array::Ptr pContent = result.content();
-		std::string text;
-		bool allText = true;
-		if (pContent)
+		if (name.empty() || name.size() > 64) return false;
+		for (const char c: name)
 		{
-			for (unsigned int i = 0; i < pContent->size(); ++i)
-			{
-				Poco::JSON::Object::Ptr pBlock = pContent->getObject(i);
-				if (pBlock && pBlock->optValue<std::string>("type", "") == "text" && pBlock->has("text"))
-				{
-					if (!text.empty())
-					{
-						text += "\n";
-					}
-					text += pBlock->getValue<std::string>("text");
-				}
-				else
-				{
-					allText = false;
-				}
-			}
+			const bool ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-';
+			if (!ok) return false;
 		}
-
-		if (result.isError())
-		{
-			Poco::JSON::Object::Ptr pErr = new Poco::JSON::Object;
-			pErr->set("error", text.empty() ? std::string("tool error") : text);
-			return serializeJSON(pErr);
-		}
-		if (allText)
-		{
-			return text;
-		}
-		return pContent ? serializeJSON(pContent) : std::string();
+		return true;
 	}
 }
 
@@ -102,68 +57,58 @@ MCPHost::~MCPHost()
 }
 
 
-void MCPHost::addServer(const std::string& label, const Poco::URI& endpoint,
-	const std::string& clientName, const std::string& clientVersion,
-	SessionFactory sessionFactory)
+void MCPHost::addServer(const std::string& label, std::unique_ptr<Poco::AI::MCP::Client> pClient)
 {
+	if (pClient == nullptr)
+	{
+		throw Poco::InvalidArgumentException("An MCP server needs a client", label);
+	}
+	for (const auto& pConnection: _connections)
+	{
+		if (pConnection->label == label)
+		{
+			throw Poco::InvalidArgumentException("An MCP server of that label is already added", label);
+		}
+	}
 	auto pConnection = std::make_shared<Connection>();
 	pConnection->label = label;
-	pConnection->pClient = std::make_unique<Poco::AI::MCP::HTTP::HTTPClient>(endpoint, std::move(sessionFactory));
-	pConnection->pClient->initialize(clientName, clientVersion);
-	pConnection->pTools = pConnection->pClient->listTools();
+	(void) pClient->discover();
+	pConnection->tools = pClient->listTools();
+	pConnection->pClient = std::move(pClient);
 	_connections.push_back(pConnection);
 }
 
 
-std::size_t MCPHost::registerInto(ToolRegistry& registry, std::vector<std::string>* pShadowed)
+std::size_t MCPHost::registerInto(ToolRegistry& registry, std::vector<std::string>* pSkipped)
 {
 	std::size_t count = 0;
-	for (auto& pConnection: _connections)
+	for (const auto& pConnection: _connections)
 	{
-		if (!pConnection->pTools)
+		for (const Poco::AI::MCP::Tool& remote: pConnection->tools)
 		{
-			continue;
-		}
-		for (unsigned int i = 0; i < pConnection->pTools->size(); ++i)
-		{
-			Poco::JSON::Object::Ptr pTool = pConnection->pTools->getObject(i);
-			if (!pTool || !pTool->has("name"))
+			if (!isModelToolName(remote.name))
 			{
+				if (pSkipped != nullptr) pSkipped->push_back(pConnection->label + ": " + remote.name + " (a name the model APIs refuse)");
 				continue;
 			}
-			const std::string name = pTool->getValue<std::string>("name");
-
-			if (registry.hasTool(name))
+			Poco::AI::MCP::Tool tool(remote);
+			const std::shared_ptr<Connection> pBound = pConnection;
+			const std::string name = remote.name;
+			tool.handler = [pBound, name](const Poco::JSON::Object::Ptr& input, const Poco::AI::MCP::RequestContext&)
 			{
-				if (pShadowed) pShadowed->push_back(name);
+				return pBound->pClient->callTool(name, input);
+			};
+			if (!registry.registerToolIfAbsent(tool))
+			{
+				if (pSkipped != nullptr)
+				{
+					const auto owner = _owners.find(name);
+					pSkipped->push_back(pConnection->label + ": " + name + (owner != _owners.end() && owner->second != pConnection->label
+						? " (the name is taken by " + owner->second + ")"
+						: std::string(" (the name is taken)")));
+				}
 				continue;
 			}
-
-			Poco::JSON::Object definition;
-			definition.set("name", name);
-			definition.set("description", pTool->optValue<std::string>("description", std::string()));
-			if (pTool->isObject("inputSchema"))
-			{
-				definition.set("parameters", pTool->getObject("inputSchema"));
-			}
-
-			std::shared_ptr<Connection> pBound = pConnection;
-			registry.registerTool(definition, [pBound, name](const Poco::JSON::Object& input) -> std::string
-			{
-				try
-				{
-					Poco::FastMutex::ScopedLock lock(pBound->mutex);
-					Poco::JSON::Object::Ptr pArgs = new Poco::JSON::Object(input);
-					return flattenToolResult(pBound->pClient->callTool(name, pArgs));
-				}
-				catch (Poco::Exception& exc)
-				{
-					Poco::JSON::Object::Ptr pErr = new Poco::JSON::Object;
-					pErr->set("error", exc.displayText());
-					return serializeJSON(pErr);
-				}
-			});
-
 			_owners[name] = pConnection->label;
 			++count;
 		}
@@ -172,4 +117,4 @@ std::size_t MCPHost::registerInto(ToolRegistry& registry, std::vector<std::strin
 }
 
 
-} } // namespace Poco::AI
+} // namespace Poco::AI

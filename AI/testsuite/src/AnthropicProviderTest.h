@@ -19,16 +19,24 @@ class AnthropicProviderTest: public CppUnit::TestCase
 {
 public:
 	AnthropicProviderTest(const std::string& name);
-	~AnthropicProviderTest() = default;
+	~AnthropicProviderTest();
 
-	void testAppendAssistantTextOnly();
-	void testAppendAssistantWithToolCalls();
+	void testRequestBody();
+	void testEmptySystemPrompt();
+	void testURIJoin();
+	void testStreamedText();
+	void testStreamedToolUse();
+	void testThinkingRoundTrip();
+	void testCutStream();
+	void testErrorEvent();
+	void testHttpErrors();
+	void testMalformedToolInput();
 	void testAppendToolResult();
-	void testAppendToolResultMerge();
-	void testToAnthropicTools();
-	void testChatToolUse();
-	void testChatMalformedToolInput();
-	void testChatToolUseWithoutInput();
+	void testListModels();
+	void testCancelBeforeHeaders();
+	void testCancelDuringStream();
+	void testConcurrentCalls();
+	void testCancelStress();
 
 	void setUp();
 	void tearDown();

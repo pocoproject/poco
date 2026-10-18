@@ -6,6 +6,10 @@
 
 include $(POCO_BASE)/build/rules/global
 
+# The MCPHost tests serve their MCP servers with the test host of the
+# AI/MCP/HTTP test suite.
+INCLUDE += -I$(POCO_BASE)/AI/MCP/HTTP/testsuite/src
+
 objects = \
 	Driver \
 	AITestSuite \
@@ -13,7 +17,6 @@ objects = \
 	AgentLoopTest \
 	AnthropicProviderTest \
 	OpenAIProviderTest \
-	ToolDispatchProviderTest \
 	MCPHostTest
 
 target         = testrunner

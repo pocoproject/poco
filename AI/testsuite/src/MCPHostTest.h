@@ -16,16 +16,18 @@
 
 
 class MCPHostTest: public CppUnit::TestCase
-	/// Exercises MCPHost against an in-test MCP server behind TestHTTPHost.
 {
 public:
 	MCPHostTest(const std::string& name);
 	~MCPHostTest();
 
-	void testRegisterAndCall();
-	void testToolErrorBecomesErrorString();
-	void testCollisionSkipped();
-	void testDeadServerThrows();
+	void testRegisterIntoOverHTTP();
+	void testRegisterIntoOverStreams();
+	void testNamesTheModelsRefuse();
+	void testCollisions();
+	void testResultPassesThrough();
+	void testAddServerFailure();
+	void testDuplicateLabel();
 
 	void setUp();
 	void tearDown();

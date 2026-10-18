@@ -19,15 +19,21 @@ class AgentLoopTest: public CppUnit::TestCase
 {
 public:
 	AgentLoopTest(const std::string& name);
-	~AgentLoopTest() = default;
+	~AgentLoopTest();
 
 	void testTextOnly();
-	void testToolCallAndResult();
-	void testMaxRounds();
-	void testProviderThrowsPoco();
-	void testProviderThrowsNullPointer();
-	void testProviderThrowsStd();
-	void testToolResultCap();
+	void testToolRound();
+	void testDoneOnEveryExit();
+	void testProviderError();
+	void testCancelled();
+	void testCancelDuringTools();
+	void testToolResultCutAtCharacter();
+	void testFinalRound();
+	void testToolsUnchangedAcrossRounds();
+	void testApprover();
+	void testRequestContext();
+	void testUnknownTool();
+	void testConstruction();
 
 	void setUp();
 	void tearDown();

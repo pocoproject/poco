@@ -20,100 +20,94 @@
 
 #include "Poco/AI/LLMProvider.h"
 #include "Poco/AI/SessionFactory.h"
-#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Mutex.h"
+#include "Poco/Timespan.h"
+#include "Poco/URI.h"
 #include <string>
-#include <mutex>
+#include <vector>
 
 
-namespace Poco {
-namespace AI {
+namespace Poco::AI {
 
 
 class AI_API AnthropicProvider: public LLMProvider
-	/// A provider for the Anthropic Messages API: streams the response
-	/// (server-sent events) and reports tool use blocks as tool calls.
-	/// The system prompt and the last tool definition carry prompt
-	/// caching markers.
+	/// A provider for the Anthropic Messages API: the response streams in as
+	/// server-sent events; tool use, thinking blocks and prompt caching
+	/// markers are supported.
+	///
+	/// The assistant turn a call returns carries the thinking and redacted
+	/// thinking blocks the model produced, with their signatures and in their
+	/// order, as the API requires them back in a tool-use turn. Keep the tools
+	/// unchanged across the calls of one turn: a changed tool list makes the
+	/// replayed thinking invalid.
 	///
 	/// Sessions come from the session factory, createClientSession() by
-	/// default; an https base URL needs Poco::Net::HTTPSSessionInstantiator
-	/// registered by the application. The base URL includes the API version
-	/// path, e.g. "https://api.anthropic.com/v1".
+	/// default; an https base URI needs Poco::Net::HTTPSSessionInstantiator
+	/// registered by the application.
 	///
-	/// This library is not affiliated with or endorsed by Anthropic; the
-	/// name identifies the API it speaks.
+	/// This library is not affiliated with or endorsed by Anthropic; the name
+	/// identifies the API it speaks.
 {
 public:
 	static constexpr char DEFAULT_API_VERSION[] = "2023-06-01";
 		/// The value of the anthropic-version header sent by default.
 
-	AnthropicProvider(
-		const std::string& baseUrl,
-		const std::string& apiKey,
-		const std::string& model,
-		int maxTokens,
-		int timeoutSeconds,
-		SessionFactory sessionFactory = SessionFactory());
-		/// Creates the provider for the API at baseUrl, authenticating with
-		/// apiKey. A call asks for at most maxTokens output tokens and waits
-		/// at most timeoutSeconds for the server.
+	struct Params
+		/// The settings of the provider.
+	{
+		Poco::URI baseURI{"https://api.anthropic.com/v1"};
+			/// The API base, with its version path.
+		std::string apiKey;
+		std::string model;
+		int maxTokens = 4096;
+			/// The most output tokens a call asks for.
+		Poco::Timespan timeout;
+			/// How long a read may wait for the server; zero leaves the
+			/// session's own timeout.
+		std::string apiVersion = DEFAULT_API_VERSION;
+		std::size_t maxResponseSize = 32*1024*1024;
+			/// The limit of a response body, and of one event of a stream.
+	};
 
-	~AnthropicProvider() = default;
+	explicit AnthropicProvider(const Params& params, SessionFactory sessionFactory = SessionFactory());
+		/// Creates the provider.
 
-	void setApiVersion(const std::string& version);
-		/// Sets the value of the anthropic-version header.
-
-	const std::string& apiVersion() const;
-		/// Returns the value of the anthropic-version header.
+	~AnthropicProvider() override;
+		/// Destroys the provider.
 
 	void setModel(const std::string& model) override;
 
-	void chat(
-		const Poco::JSON::Array& messages,
-		const std::string& systemPrompt,
-		const Poco::JSON::Array& tools,
-		ContentEventCallback onEvent) override;
+	[[nodiscard]] std::string getModel() const override;
 
-	void appendAssistantMessage(
-		Poco::JSON::Array& messages,
-		const std::string& text,
-		const std::vector<ContentEvent>& toolCalls) override;
+	[[nodiscard]] std::vector<std::string> listModels() override;
+		/// Returns the ids of the models the API serves (GET {baseURI}/models).
+		///
+		/// Throws Poco::Net::HTTPException for an HTTP error status and
+		/// Poco::DataFormatException for a malformed response.
 
-	void appendToolResult(
-		Poco::JSON::Array& messages,
-		const std::string& toolCallId,
-		const std::string& result) override;
+	ChatResult chat(const ChatRequest& request, const ContentEventCallback& onEvent, Cancellation& cancellation) override;
 
-	static Poco::JSON::Array toAnthropicTools(const Poco::JSON::Array& tools);
-		/// Converts tool definitions ({name, description, parameters}) to the
-		/// Messages API tool format and marks the last one for prompt caching.
+	void appendToolResult(Poco::JSON::Array& messages, const std::string& toolCallId, const Poco::AI::MCP::ToolResult& result) override;
+		/// Appends a tool_result block, with is_error set for an error result,
+		/// to the user message of tool results that ends the conversation, or
+		/// in a new one. Text and image blocks are passed on; other blocks and
+		/// structured content as JSON text.
 
-	void cancel() override;
+	[[nodiscard]] static Poco::JSON::Array::Ptr toAnthropicTools(const std::vector<Poco::AI::MCP::Tool>& tools);
+		/// Converts tools to the Messages API tool format, with the cache
+		/// marker on the last one. The schemas are copies.
 
 private:
-	std::string _baseUrl;
-	std::string _apiKey;
-	std::string _model;
-	int _maxTokens;
-	int _timeoutSeconds;
-	SessionFactory _sessionFactory;
-	std::string _apiVersion;
-	std::mutex _sessionMutex;
-	Poco::Net::HTTPClientSession* _pActiveSession = nullptr;
-		/// The session of the in-flight call, for cancel(); not owned.
+	Params params() const;
+	Poco::JSON::Object::Ptr requestBody(const ChatRequest& request, const Params& params) const;
+
+	mutable Poco::FastMutex _mutex;
+	Params _params;
+	const SessionFactory _sessionFactory;
 };
 
 
-//
-// inlines
-//
-inline const std::string& AnthropicProvider::apiVersion() const
-{
-	return _apiVersion;
-}
-
-
-} } // namespace Poco::AI
+} // namespace Poco::AI
 
 
 #endif // AI_AnthropicProvider_INCLUDED

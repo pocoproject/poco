@@ -13,32 +13,106 @@
 
 
 #include "Poco/AI/ToolRegistry.h"
+#include "Poco/JSON/Array.h"
+#include "Poco/JSON/Stringifier.h"
+#include "Poco/Exception.h"
+#include <exception>
 #include <sstream>
+#include <utility>
 
 
-namespace Poco {
-namespace AI {
+namespace Poco::AI {
 
 
 namespace
 {
-	std::string errorResult(const std::string& message)
-		/// Returns the JSON text of a tool result that reports an error.
+	std::string json(const Poco::Dynamic::Var& value)
 	{
-		Poco::JSON::Object error;
-		error.set("error", message);
-		std::ostringstream stream;
-		error.stringify(stream);
-		return stream.str();
+		std::ostringstream os;
+		Poco::JSON::Stringifier::stringify(value, os);
+		return os.str();
+	}
+
+
+	void check(const Poco::AI::MCP::Tool& tool)
+	{
+		if (tool.name.empty())
+		{
+			throw Poco::InvalidArgumentException("A tool needs a name");
+		}
+		if (!tool.handler)
+		{
+			throw Poco::InvalidArgumentException("A tool needs a handler", tool.name);
+		}
 	}
 }
 
 
-void ToolRegistry::registerTool(const Poco::JSON::Object& definition, ToolExecutor executor)
+std::string toolResultText(const Poco::AI::MCP::ToolResult& result)
 {
-	std::string name = definition.getValue<std::string>("name");
+	std::string text;
+	bool hasText = false;
+	const Poco::JSON::Array::Ptr pContent = result.content();
+	for (std::size_t i = 0; pContent != nullptr && i < pContent->size(); ++i)
+	{
+		const Poco::JSON::Object::Ptr pBlock = pContent->getObject(static_cast<unsigned>(i));
+		if (pBlock != nullptr && pBlock->optValue<std::string>("type", "") == "text")
+		{
+			if (hasText) text += '\n';
+			text += pBlock->optValue<std::string>("text", "");
+			hasText = true;
+		}
+	}
+	if (hasText) return text;
+	if (!result.structuredContent().isEmpty()) return json(result.structuredContent());
+	if (pContent != nullptr && pContent->size() > 0) return json(pContent);
+	return std::string();
+}
+
+
+ToolRegistry::ToolRegistry()
+{
+}
+
+
+ToolRegistry::~ToolRegistry()
+{
+}
+
+
+void ToolRegistry::registerTool(const Poco::AI::MCP::Tool& tool)
+{
+	check(tool);
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	_tools[name] = {definition, std::move(executor)};
+	_tools[tool.name] = tool;
+}
+
+
+bool ToolRegistry::registerToolIfAbsent(const Poco::AI::MCP::Tool& tool)
+{
+	check(tool);
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	return _tools.emplace(tool.name, tool).second;
+}
+
+
+void ToolRegistry::registerTool(const std::string& name, const std::string& description, const Poco::JSON::Object::Ptr& inputSchema, TextExecutor executor)
+{
+	if (!executor)
+	{
+		throw Poco::InvalidArgumentException("A tool needs an executor", name);
+	}
+	Poco::AI::MCP::Tool tool;
+	tool.name = name;
+	tool.description = description;
+	tool.inputSchema = inputSchema;
+	tool.handler = [executor = std::move(executor)](const Poco::JSON::Object::Ptr& input, const Poco::AI::MCP::RequestContext&)
+	{
+		Poco::AI::MCP::ToolResult result;
+		result.addText(executor(input));
+		return result;
+	};
+	registerTool(tool);
 }
 
 
@@ -49,41 +123,42 @@ void ToolRegistry::unregisterTool(const std::string& name)
 }
 
 
-Poco::JSON::Array ToolRegistry::getToolDefinitions() const
+std::vector<Poco::AI::MCP::Tool> ToolRegistry::tools() const
 {
-	Poco::JSON::Array result;
+	std::vector<Poco::AI::MCP::Tool> result;
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	for (const auto& [name, entry] : _tools)
+	result.reserve(_tools.size());
+	for (const auto& entry: _tools)
 	{
-		result.add(Poco::JSON::Object::Ptr(new Poco::JSON::Object(entry.definition)));
+		result.push_back(entry.second);
 	}
 	return result;
 }
 
 
-std::string ToolRegistry::executeTool(const std::string& name, const Poco::JSON::Object& input)
+Poco::AI::MCP::ToolResult ToolRegistry::executeTool(const std::string& name, const Poco::JSON::Object::Ptr& input, const Poco::AI::MCP::RequestContext& context)
 {
-	ToolExecutor executor;
+	Poco::AI::MCP::ContextToolHandler handler;
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		auto it = _tools.find(name);
+		const auto it = _tools.find(name);
 		if (it == _tools.end())
 		{
-			return errorResult("Unknown tool: " + name);
+			return Poco::AI::MCP::ToolResult::error("Unknown tool: " + name);
 		}
-		executor = it->second.executor;
+		handler = it->second.handler;
 	}
 	try
 	{
-		return executor(input);
+		return handler(input != nullptr ? input : Poco::JSON::Object::Ptr(new Poco::JSON::Object), context);
 	}
-	catch (const Poco::Exception& e)
+	catch (const Poco::Exception& exc)
 	{
-		return errorResult("Tool execution failed: " + e.displayText());
+		return Poco::AI::MCP::ToolResult::error("Tool execution failed: " + exc.displayText());
 	}
-	catch (const std::exception& e)
+	catch (const std::exception& exc)
 	{
-		return errorResult(std::string("Tool execution failed: ") + e.what());
+		return Poco::AI::MCP::ToolResult::error(std::string("Tool execution failed: ") + exc.what());
 	}
 }
 
@@ -95,4 +170,11 @@ bool ToolRegistry::hasTool(const std::string& name) const
 }
 
 
-} } // namespace Poco::AI
+std::size_t ToolRegistry::size() const
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	return _tools.size();
+}
+
+
+} // namespace Poco::AI

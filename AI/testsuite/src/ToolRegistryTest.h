@@ -19,14 +19,17 @@ class ToolRegistryTest: public CppUnit::TestCase
 {
 public:
 	ToolRegistryTest(const std::string& name);
-	~ToolRegistryTest() = default;
+	~ToolRegistryTest();
 
 	void testRegisterAndExecute();
-	void testGetDefinitions();
-	void testUnregister();
+	void testReplace();
+	void testRegisterIfAbsent();
 	void testUnknownTool();
-	void testExecutorException();
-	void testErrorsAreJSON();
+	void testExecutorThrows();
+	void testToolsInOrder();
+	void testRegistrationRefused();
+	void testToolResultText();
+	void testContextReachesTheHandler();
 
 	void setUp();
 	void tearDown();

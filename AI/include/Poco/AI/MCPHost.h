@@ -5,8 +5,8 @@
 // Package: Agent
 // Module:  MCPHost
 //
-// Connects to MCP servers over HTTP and mirrors their tools into a
-// ToolRegistry, so an AgentLoop calls them like native tools.
+// Connects to MCP servers and mirrors their tools into a ToolRegistry, so
+// an AgentLoop calls them like native tools.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
@@ -21,57 +21,58 @@
 
 #include "Poco/AI/AI.h"
 #include "Poco/AI/ToolRegistry.h"
-#include "Poco/AI/SessionFactory.h"
-#include "Poco/URI.h"
+#include "Poco/AI/MCP/Client.h"
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 
-namespace Poco {
-namespace AI {
+namespace Poco::AI {
 
 
 class AI_API MCPHost
-	/// Owns live connections to MCP servers and registers their tools into
-	/// ToolRegistry instances. Each registered tool's executor is bound to
-	/// its connection, so dispatch needs no name-to-server lookup; an owner
-	/// map is kept for diagnostics. The connections live as long as the
-	/// host, so the host must outlive every registry it populated.
+	/// Hosts the tools of MCP servers for an agent: addServer() takes a client
+	/// of any transport (Poco::AI::MCP::ProcessClient for a server process,
+	/// Poco::AI::MCP::HTTP::HTTPClient for a remote one), discovers the server
+	/// and fetches its tools; registerInto() registers them in a ToolRegistry,
+	/// each running its call through its server's client. A tool result keeps
+	/// what the server returned: its content, its structured content and its
+	/// error flag.
+	///
+	/// What a server returns is untrusted input: tool descriptions,
+	/// annotations and results. A tool runs with input the model chose; see
+	/// AgentLoop::setApprover().
 {
 public:
 	MCPHost();
-		/// Creates a host with no connections.
+		/// Creates a host without servers.
 
 	~MCPHost();
-		/// Destroys the host and closes all connections.
+		/// Destroys the host. Tools registered from it keep their clients alive.
 
-	void addServer(const std::string& label, const Poco::URI& endpoint,
-		const std::string& clientName, const std::string& clientVersion,
-		SessionFactory sessionFactory = SessionFactory());
-		/// Connects to the MCP server at endpoint, performs the handshake as
-		/// clientName/clientVersion and caches the server's tool list. The
-		/// sessions come from sessionFactory, or from createClientSession()
-		/// when none is given (an https endpoint then needs
-		/// Poco::Net::HTTPSSessionInstantiator registered by the application).
+	void addServer(const std::string& label, std::unique_ptr<Poco::AI::MCP::Client> pClient);
+		/// Discovers the server behind pClient and fetches its tools, all
+		/// pages. On failure the host is unchanged and the exception is passed
+		/// on, e.g. a Poco::AI::MCP::MCPException or the transport's.
 		///
-		/// Throws a Poco::Exception when the server cannot be reached or
-		/// refuses the handshake; the host is then unchanged, so one dead
-		/// server need not sink the others.
+		/// Throws Poco::InvalidArgumentException if pClient is null or the
+		/// label is taken.
 
-	std::size_t registerInto(ToolRegistry& registry, std::vector<std::string>* pShadowed = nullptr);
-		/// For every connected server, registers each of its tools under its
-		/// bare name into registry, with an executor bound to that server. A
-		/// name already present in registry (a native tool or another
-		/// server's tool) is skipped and, when pShadowed is given, appended
-		/// to it. Returns the number of tools registered.
+	std::size_t registerInto(ToolRegistry& registry, std::vector<std::string>* pSkipped = nullptr);
+		/// Registers the tools of every server under their own names and
+		/// returns how many it registered. A tool is skipped when its name is
+		/// not 1 to 64 characters from A-Z, a-z, 0-9, '_' and '-', which the
+		/// model APIs refuse, or when the registry has a tool of that name;
+		/// each skipped tool is added to pSkipped, if given, with its server
+		/// and the reason, naming the owner of the name when it is a server
+		/// of this host.
 
-	const std::map<std::string, std::string>& toolOwners() const;
-		/// Maps each registered tool name to the label of the server that owns it.
+	[[nodiscard]] const std::map<std::string, std::string>& toolOwners() const;
+		/// Returns the label of the server of every tool registerInto() registered.
 
-	std::size_t serverCount() const;
-		/// Returns the number of connected servers.
+	[[nodiscard]] std::size_t serverCount() const;
+		/// Returns the number of servers.
 
 private:
 	struct Connection;
@@ -99,7 +100,7 @@ inline std::size_t MCPHost::serverCount() const
 }
 
 
-} } // namespace Poco::AI
+} // namespace Poco::AI
 
 
 #endif // AI_MCPHost_INCLUDED

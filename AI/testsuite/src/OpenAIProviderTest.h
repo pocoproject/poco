@@ -19,22 +19,23 @@ class OpenAIProviderTest: public CppUnit::TestCase
 {
 public:
 	OpenAIProviderTest(const std::string& name);
-	~OpenAIProviderTest() = default;
+	~OpenAIProviderTest();
 
-	void testAppendAssistantTextOnly();
-	void testAppendAssistantWithToolCalls();
+	void testRequestBody();
+	void testNoTools();
+	void testStreamedText();
+	void testStreamedToolCalls();
+	void testFinishWithoutDone();
+	void testCutStream();
+	void testErrorInStream();
+	void testHttpErrors();
+	void testMalformedArguments();
 	void testAppendToolResult();
-	void testAppendToolResultSeparateMessages();
-	void testToOpenAITools();
-	void testEmbed();
-	void testEmbedError();
-	void testEmbedRepeatedIndex();
-	void testChatToolCall();
-	void testChatMalformedToolArguments();
-	void testChatToolCallWithoutArguments();
 	void testListModels();
-	void testListModelsError();
-	void testListModelsMalformed();
+	void testEmbeddings();
+	void testMalformedEmbeddings();
+	void testCancelBeforeHeaders();
+	void testCancelDuringStream();
 
 	void setUp();
 	void tearDown();

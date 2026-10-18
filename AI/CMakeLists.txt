@@ -44,6 +44,10 @@ if(ENABLE_AI)
 	POCO_INSTALL(AI)
 	POCO_GENERATE_PACKAGE(AI)
 
+	if(ENABLE_SAMPLES)
+		add_subdirectory(samples)
+	endif()
+
 	if(ENABLE_TESTS)
 		add_subdirectory(testsuite)
 	endif()

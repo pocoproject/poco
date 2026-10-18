@@ -24,8 +24,7 @@
 #include "Poco/AI/MCP/HTTP/SessionFactory.h"
 
 
-namespace Poco {
-namespace AI {
+namespace Poco::AI {
 
 
 using SessionFactory = Poco::AI::MCP::HTTP::SessionFactory;
@@ -39,7 +38,7 @@ using Poco::AI::MCP::HTTP::createClientSession;
 	/// Poco::Net::HTTPSSessionInstantiator registered by the application.
 
 
-} } // namespace Poco::AI
+} // namespace Poco::AI
 
 
 #endif // AI_SessionFactory_INCLUDED

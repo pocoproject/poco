@@ -12,14 +12,36 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/ToolRegistry.h"
+#include "Poco/JSON/Object.h"
+#include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
+#include "Poco/Exception.h"
 #include <stdexcept>
-#include <string>
 
 
 using Poco::AI::ToolRegistry;
+using Poco::AI::toolResultText;
+using Poco::AI::MCP::Tool;
+using Poco::AI::MCP::ToolResult;
+using Poco::AI::MCP::RequestContext;
 using Poco::JSON::Object;
 using Poco::JSON::Array;
+
+
+namespace
+{
+	Object::Ptr parse(const std::string& json)
+	{
+		Poco::JSON::Parser parser;
+		return parser.parse(json).extract<Object::Ptr>();
+	}
+
+
+	std::string firstText(const ToolResult& result)
+	{
+		return result.content()->getObject(0)->getValue<std::string>("text");
+	}
+}
 
 
 ToolRegistryTest::ToolRegistryTest(const std::string& name):
@@ -28,30 +50,165 @@ ToolRegistryTest::ToolRegistryTest(const std::string& name):
 }
 
 
-void ToolRegistryTest::testErrorsAreJSON()
+ToolRegistryTest::~ToolRegistryTest()
+{
+}
+
+
+void ToolRegistryTest::testRegisterAndExecute()
 {
 	ToolRegistry registry;
-
-	// The name of a tool comes from the model and the text of an exception
-	// from anywhere: quotes, backslashes and line breaks in either must
-	// still leave the error a JSON object.
-	const std::string name = "no \"such\" \\ tool";
-	Poco::JSON::Parser parser;
-	Object::Ptr pUnknown = parser.parse(registry.executeTool(name, Object())).extract<Object::Ptr>();
-	assertEqual("Unknown tool: " + name, pUnknown->getValue<std::string>("error"));
-
-	Object definition;
-	definition.set("name", "failing");
-	definition.set("description", "always fails");
-	definition.set("parameters", Object::Ptr(new Object));
-	const std::string reason = "line one\nsaid \"no\" at C:\\temp";
-	registry.registerTool(definition, [reason](const Object&) -> std::string
+	registry.registerTool("greet", "Greets.", parse("{\"type\":\"object\"}"), [](const Object::Ptr& pInput)
 	{
-		throw std::runtime_error(reason);
+		return "Hello, " + pInput->optValue<std::string>("name", "you");
 	});
-	parser.reset();
-	Object::Ptr pFailed = parser.parse(registry.executeTool("failing", Object())).extract<Object::Ptr>();
-	assertEqual("Tool execution failed: " + reason, pFailed->getValue<std::string>("error"));
+	assertTrue(registry.hasTool("greet"));
+	assertEqual(std::size_t(1), registry.size());
+	ToolResult result = registry.executeTool("greet", parse("{\"name\":\"Ann\"}"));
+	assertTrue(!result.isError());
+	assertEqual(std::string("Hello, Ann"), firstText(result));
+	// No input is an empty object.
+	assertEqual(std::string("Hello, you"), firstText(registry.executeTool("greet", Object::Ptr())));
+	registry.unregisterTool("greet");
+	assertTrue(!registry.hasTool("greet"));
+}
+
+
+void ToolRegistryTest::testReplace()
+{
+	ToolRegistry registry;
+	registry.registerTool("t", "first", nullptr, [](const Object::Ptr&) { return std::string("1"); });
+	registry.registerTool("t", "second", nullptr, [](const Object::Ptr&) { return std::string("2"); });
+	assertEqual(std::size_t(1), registry.size());
+	assertEqual(std::string("second"), registry.tools()[0].description);
+	assertEqual(std::string("2"), firstText(registry.executeTool("t", nullptr)));
+}
+
+
+void ToolRegistryTest::testRegisterIfAbsent()
+{
+	ToolRegistry registry;
+	Tool tool;
+	tool.name = "t";
+	tool.handler = [](const Object::Ptr&, const RequestContext&) { return ToolResult::error("first"); };
+	assertTrue(registry.registerToolIfAbsent(tool));
+	tool.handler = [](const Object::Ptr&, const RequestContext&) { return ToolResult::error("second"); };
+	assertTrue(!registry.registerToolIfAbsent(tool));
+	assertEqual(std::string("first"), firstText(registry.executeTool("t", nullptr)));
+}
+
+
+void ToolRegistryTest::testUnknownTool()
+{
+	ToolRegistry registry;
+	ToolResult result = registry.executeTool("nope \"quoted\"", nullptr);
+	assertTrue(result.isError());
+	assertEqual(std::string("Unknown tool: nope \"quoted\""), firstText(result));
+}
+
+
+void ToolRegistryTest::testExecutorThrows()
+{
+	ToolRegistry registry;
+	registry.registerTool("poco", "", nullptr, [](const Object::Ptr&) -> std::string
+	{
+		throw Poco::FileNotFoundException("missing.txt");
+	});
+	registry.registerTool("std", "", nullptr, [](const Object::Ptr&) -> std::string
+	{
+		throw std::runtime_error("line one\nline two");
+	});
+	ToolResult result = registry.executeTool("poco", nullptr);
+	assertTrue(result.isError());
+	assertTrue(firstText(result).find("missing.txt") != std::string::npos);
+	result = registry.executeTool("std", nullptr);
+	assertTrue(result.isError());
+	assertTrue(firstText(result).find("line one\nline two") != std::string::npos);
+}
+
+
+void ToolRegistryTest::testToolsInOrder()
+{
+	ToolRegistry registry;
+	registry.registerTool("zeta", "", nullptr, [](const Object::Ptr&) { return std::string(); });
+	registry.registerTool("alpha", "", parse("{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\"}}}"), [](const Object::Ptr&) { return std::string(); });
+	std::vector<Tool> tools = registry.tools();
+	assertEqual(2u, static_cast<unsigned>(tools.size()));
+	assertEqual(std::string("alpha"), tools[0].name);
+	assertEqual(std::string("zeta"), tools[1].name);
+	// A description is optional; a schema too.
+	assertTrue(tools[1].description.empty());
+	assertTrue(tools[1].inputSchema.isNull());
+	assertTrue(tools[0].inputSchema->isObject("properties"));
+}
+
+
+void ToolRegistryTest::testRegistrationRefused()
+{
+	ToolRegistry registry;
+	try
+	{
+		registry.registerTool("", "", nullptr, [](const Object::Ptr&) { return std::string(); });
+		fail("a tool without a name must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	try
+	{
+		registry.registerTool("t", "", nullptr, ToolRegistry::TextExecutor());
+		fail("a tool without an executor must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	Tool tool;
+	tool.name = "no-handler";
+	try
+	{
+		registry.registerTool(tool);
+		fail("a tool without a handler must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	assertEqual(std::size_t(0), registry.size());
+}
+
+
+void ToolRegistryTest::testToolResultText()
+{
+	ToolResult texts;
+	texts.addText("one").addImage("aW1n", "image/png").addText("two");
+	assertEqual(std::string("one\ntwo"), toolResultText(texts));
+
+	ToolResult structured;
+	structured.setStructuredContent(Poco::Dynamic::Var(parse("{\"n\":1}")));
+	assertEqual(std::string("{\"n\":1}"), toolResultText(structured));
+
+	ToolResult image;
+	image.addImage("aW1n", "image/png");
+	assertTrue(toolResultText(image).find("\"image\"") != std::string::npos);
+
+	assertEqual(std::string(), toolResultText(ToolResult()));
+}
+
+
+void ToolRegistryTest::testContextReachesTheHandler()
+{
+	ToolRegistry registry;
+	Tool tool;
+	tool.name = "who";
+	tool.handler = [](const Object::Ptr&, const RequestContext& context)
+	{
+		ToolResult result;
+		result.addText(context.identity.principal);
+		return result;
+	};
+	registry.registerTool(tool);
+	RequestContext context;
+	context.identity.principal = "bob";
+	assertEqual(std::string("bob"), firstText(registry.executeTool("who", nullptr, context)));
 }
 
 
@@ -65,120 +222,19 @@ void ToolRegistryTest::tearDown()
 }
 
 
-void ToolRegistryTest::testRegisterAndExecute()
-{
-	ToolRegistry registry;
-
-	Object def;
-	def.set("name", "echo");
-	def.set("description", "Echoes input");
-
-	registry.registerTool(def, [](const Object& input) -> std::string
-	{
-		return input.getValue<std::string>("text");
-	});
-
-	assertTrue(registry.hasTool("echo"));
-
-	Object input;
-	input.set("text", "hello");
-	std::string result = registry.executeTool("echo", input);
-	assertEqual("hello", result);
-}
-
-
-void ToolRegistryTest::testGetDefinitions()
-{
-	ToolRegistry registry;
-
-	Object def1;
-	def1.set("name", "tool_a");
-	def1.set("description", "Tool A");
-	registry.registerTool(def1, [](const Object&) { return "a"; });
-
-	Object def2;
-	def2.set("name", "tool_b");
-	def2.set("description", "Tool B");
-	registry.registerTool(def2, [](const Object&) { return "b"; });
-
-	Array defs = registry.getToolDefinitions();
-	assertEqual(2, static_cast<int>(defs.size()));
-
-	// Definitions are sorted by name (std::map)
-	auto p0 = defs.getObject(0);
-	auto p1 = defs.getObject(1);
-	assertEqual(std::string("tool_a"), p0->getValue<std::string>("name"));
-	assertEqual(std::string("tool_b"), p1->getValue<std::string>("name"));
-}
-
-
-void ToolRegistryTest::testUnregister()
-{
-	ToolRegistry registry;
-
-	Object def;
-	def.set("name", "temp");
-	def.set("description", "Temporary");
-	registry.registerTool(def, [](const Object&) { return "ok"; });
-
-	assertTrue(registry.hasTool("temp"));
-	registry.unregisterTool("temp");
-	assertTrue(!registry.hasTool("temp"));
-}
-
-
-void ToolRegistryTest::testUnknownTool()
-{
-	ToolRegistry registry;
-
-	Object input;
-	std::string result = registry.executeTool("nonexistent", input);
-
-	// Should return JSON error, not throw
-	Poco::JSON::Parser parser;
-	auto parsed = parser.parse(result);
-	auto pObj = parsed.extract<Object::Ptr>();
-	assertTrue(pObj->has("error"));
-	std::string error = pObj->getValue<std::string>("error");
-	assertTrue(error.find("nonexistent") != std::string::npos);
-}
-
-
-void ToolRegistryTest::testExecutorException()
-{
-	ToolRegistry registry;
-
-	Object def;
-	def.set("name", "crasher");
-	def.set("description", "Always throws");
-	registry.registerTool(def, [](const Object&) -> std::string
-	{
-		throw Poco::RuntimeException("boom");
-	});
-
-	Object input;
-	std::string result = registry.executeTool("crasher", input);
-
-	// Should return JSON error, not propagate the exception
-	Poco::JSON::Parser parser;
-	auto parsed = parser.parse(result);
-	auto pObj = parsed.extract<Object::Ptr>();
-	assertTrue(pObj->has("error"));
-	std::string error = pObj->getValue<std::string>("error");
-	assertTrue(error.find("boom") != std::string::npos);
-}
-
-
 CppUnit::Test* ToolRegistryTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ToolRegistryTest");
 
 	CppUnit_addTest(pSuite, ToolRegistryTest, testRegisterAndExecute);
-	CppUnit_addTest(pSuite, ToolRegistryTest, testGetDefinitions);
-	CppUnit_addTest(pSuite, ToolRegistryTest, testUnregister);
+	CppUnit_addTest(pSuite, ToolRegistryTest, testReplace);
+	CppUnit_addTest(pSuite, ToolRegistryTest, testRegisterIfAbsent);
 	CppUnit_addTest(pSuite, ToolRegistryTest, testUnknownTool);
-	CppUnit_addTest(pSuite, ToolRegistryTest, testExecutorException);
-	CppUnit_addTest(pSuite, ToolRegistryTest, testErrorsAreJSON);
+	CppUnit_addTest(pSuite, ToolRegistryTest, testExecutorThrows);
+	CppUnit_addTest(pSuite, ToolRegistryTest, testToolsInOrder);
+	CppUnit_addTest(pSuite, ToolRegistryTest, testRegistrationRefused);
+	CppUnit_addTest(pSuite, ToolRegistryTest, testToolResultText);
+	CppUnit_addTest(pSuite, ToolRegistryTest, testContextReachesTheHandler);
 
 	return pSuite;
 }

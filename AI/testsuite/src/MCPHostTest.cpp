@@ -15,60 +15,91 @@
 #include "Poco/AI/MCPHost.h"
 #include "Poco/AI/ToolRegistry.h"
 #include "Poco/AI/MCP/Server.h"
-#include "Poco/AI/MCP/Content.h"
+#include "Poco/AI/MCP/StreamClient.h"
+#include "Poco/AI/MCP/HTTP/HTTPClient.h"
 #include "Poco/JSON/Object.h"
-#include "Poco/JSON/Array.h"
-#include "Poco/Net/ServerSocket.h"
-#include "Poco/URI.h"
+#include "Poco/JSON/Parser.h"
+#include "Poco/Pipe.h"
+#include "Poco/PipeStream.h"
+#include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include <memory>
+#include <string>
 #include <vector>
 
 
 using Poco::AI::MCPHost;
 using Poco::AI::ToolRegistry;
-using Poco::JSON::Object;
-using Poco::JSON::Array;
+using Poco::AI::MCP::Server;
 using Poco::AI::MCP::ToolResult;
+using Poco::AI::MCP::RequestContext;
+using Poco::AI::MCP::HTTP::HTTPClient;
+using Poco::JSON::Object;
 
 
 namespace
 {
-	void buildServer(Poco::AI::MCP::Server& server)
+	ToolResult echo(const Object::Ptr& pArgs)
 	{
-		server.setServerInfo("test-mcp", "1.0");
-
-		Object::Ptr messageProp = new Object;
-		messageProp->set("type", "string");
-		Object::Ptr props = new Object;
-		props->set("message", messageProp);
-		Object::Ptr schema = new Object;
-		schema->set("type", "object");
-		schema->set("properties", props);
-
-		server.registerTool("echo", "Echo back the message.", schema,
-			[](Object::Ptr args)
-			{
-				ToolResult result;
-				result.addText(args && args->has("message") ? args->getValue<std::string>("message") : std::string());
-				return result;
-			});
-
-		server.registerTool("boom", "Always throws.", new Object,
-			[](Object::Ptr) -> ToolResult
-			{
-				throw Poco::RuntimeException("kaboom");
-			});
+		ToolResult result;
+		result.addText(pArgs->optValue<std::string>("message", ""));
+		return result;
 	}
 
-	Poco::URI endpoint(Poco::UInt16 port)
+
+	void buildServer(Server& server, const std::string& prefix)
 	{
-		Poco::URI uri;
-		uri.setScheme("http");
-		uri.setHost("127.0.0.1");
-		uri.setPort(port);
-		uri.setPath("/mcp");
-		return uri;
+		Poco::AI::MCP::Implementation info;
+		info.name = prefix + "-server";
+		info.version = "1";
+		server.setServerInfo(info);
+		server.registerTool(prefix + "_echo", "Echoes.", nullptr, echo);
 	}
+
+
+	class StreamServer
+		/// Serves a Server over a pair of pipes on a thread of its own, for a StreamClient.
+	{
+	public:
+		explicit StreamServer(Server& server):
+			_server(server)
+		{
+			_thread.startFunc([this]()
+			{
+				Poco::PipeInputStream in(_toServer);
+				Poco::PipeOutputStream out(_toClient);
+				try
+				{
+					_server.serve(in, out);
+				}
+				catch (const Poco::Exception&)
+				{
+				}
+			});
+			_pOut = std::make_unique<Poco::PipeOutputStream>(_toServer);
+			_pIn = std::make_unique<Poco::PipeInputStream>(_toClient);
+		}
+
+		~StreamServer()
+		{
+			_pOut.reset();
+			_toServer.close(Poco::Pipe::CLOSE_WRITE);
+			_thread.join();
+		}
+
+		std::unique_ptr<Poco::AI::MCP::Client> client()
+		{
+			return std::make_unique<Poco::AI::MCP::StreamClient>(*_pIn, *_pOut);
+		}
+
+	private:
+		Server& _server;
+		Poco::Pipe _toServer;
+		Poco::Pipe _toClient;
+		std::unique_ptr<Poco::PipeOutputStream> _pOut;
+		std::unique_ptr<Poco::PipeInputStream> _pIn;
+		Poco::Thread _thread;
+	};
 }
 
 
@@ -83,121 +114,162 @@ MCPHostTest::~MCPHostTest()
 }
 
 
-void MCPHostTest::testRegisterAndCall()
+void MCPHostTest::testRegisterIntoOverHTTP()
 {
-	Poco::AI::MCP::Server server;
-	buildServer(server);
-	TestHTTPHost http(server);
-	http.start();
+	Server server;
+	buildServer(server, "web");
+	TestHTTPHost host(server);
+	host.start();
+
+	MCPHost mcpHost;
+	mcpHost.addServer("web", std::make_unique<HTTPClient>(Poco::URI(host.url())));
+	assertEqual(std::size_t(1), mcpHost.serverCount());
+	ToolRegistry registry;
+	assertEqual(std::size_t(1), mcpHost.registerInto(registry));
+	assertTrue(registry.hasTool("web_echo"));
+	assertEqual(std::string("web"), mcpHost.toolOwners().at("web_echo"));
+	ToolResult result = registry.executeTool("web_echo", Poco::JSON::Parser().parse("{\"message\":\"over http\"}").extract<Object::Ptr>());
+	assertEqual(std::string("over http"), result.content()->getObject(0)->getValue<std::string>("text"));
+}
+
+
+void MCPHostTest::testRegisterIntoOverStreams()
+{
+	Server server;
+	buildServer(server, "local");
+	StreamServer streams(server);
+
+	MCPHost mcpHost;
+	mcpHost.addServer("local", streams.client());
+	ToolRegistry registry;
+	assertEqual(std::size_t(1), mcpHost.registerInto(registry));
+	ToolResult result = registry.executeTool("local_echo", Poco::JSON::Parser().parse("{\"message\":\"over streams\"}").extract<Object::Ptr>());
+	assertEqual(std::string("over streams"), result.content()->getObject(0)->getValue<std::string>("text"));
+}
+
+
+void MCPHostTest::testNamesTheModelsRefuse()
+{
+	Server server;
+	server.registerTool("fs.read", "Dots are fine for MCP.", nullptr, echo);
+	server.registerTool(std::string(65, 'n'), "Too long for a model.", nullptr, echo);
+	server.registerTool("good-name_1", "Fine.", nullptr, echo);
+	TestHTTPHost host(server);
+	host.start();
+
+	MCPHost mcpHost;
+	mcpHost.addServer("odd", std::make_unique<HTTPClient>(Poco::URI(host.url())));
+	ToolRegistry registry;
+	std::vector<std::string> skipped;
+	assertEqual(std::size_t(1), mcpHost.registerInto(registry, &skipped));
+	assertTrue(registry.hasTool("good-name_1"));
+	assertEqual(2u, static_cast<unsigned>(skipped.size()));
+	assertTrue(skipped[0].find("odd: fs.read") == 0 || skipped[1].find("odd: fs.read") == 0);
+}
+
+
+void MCPHostTest::testCollisions()
+{
+	Server first;
+	first.registerTool("shared", "From the first.", nullptr, echo);
+	Server second;
+	second.registerTool("shared", "From the second.", nullptr, echo);
+	second.registerTool("native", "Clashes with a native tool.", nullptr, echo);
+	TestHTTPHost firstHost(first);
+	firstHost.start();
+	TestHTTPHost secondHost(second);
+	secondHost.start();
 
 	ToolRegistry registry;
-	MCPHost host;
-	host.addServer("test", endpoint(http.port()), "test-client", "1.0");
-	assertEqual(1, static_cast<int>(host.serverCount()));
+	registry.registerTool("native", "", nullptr, [](const Object::Ptr&) { return std::string("native"); });
+	MCPHost mcpHost;
+	mcpHost.addServer("one", std::make_unique<HTTPClient>(Poco::URI(firstHost.url())));
+	mcpHost.addServer("two", std::make_unique<HTTPClient>(Poco::URI(secondHost.url())));
+	std::vector<std::string> skipped;
+	assertEqual(std::size_t(1), mcpHost.registerInto(registry, &skipped));
+	assertEqual(std::string("one"), mcpHost.toolOwners().at("shared"));
+	assertEqual(2u, static_cast<unsigned>(skipped.size()));
+	// The first server owns the name; the native tool is untouched.
+	assertEqual(std::string("two: native (the name is taken)"), skipped[0]);
+	assertEqual(std::string("two: shared (the name is taken by one)"), skipped[1]);
+	assertEqual(std::string("native"), registry.executeTool("native", nullptr).content()->getObject(0)->getValue<std::string>("text"));
+}
 
-	std::size_t registered = host.registerInto(registry);
-	assertEqual(2, static_cast<int>(registered));
-	assertTrue(registry.hasTool("echo"));
-	assertTrue(registry.hasTool("boom"));
 
-	// The MCP inputSchema becomes the registry "parameters" JSON Schema.
-	Array defs = registry.getToolDefinitions();
-	bool foundEcho = false;
-	for (unsigned int i = 0; i < defs.size(); ++i)
+void MCPHostTest::testResultPassesThrough()
+{
+	Server server;
+	Poco::AI::MCP::Tool tool;
+	tool.name = "structured";
+	tool.outputSchema = Poco::JSON::Parser().parse("{\"type\":\"object\"}").extract<Object::Ptr>();
+	tool.annotations = Poco::JSON::Parser().parse("{\"readOnlyHint\":true}").extract<Object::Ptr>();
+	tool.handler = [](const Object::Ptr&, const RequestContext&)
 	{
-		Object::Ptr def = defs.getObject(i);
-		if (def->getValue<std::string>("name") == "echo")
-		{
-			foundEcho = true;
-			assertTrue(def->isObject("parameters"));
-			assertTrue(def->getObject("parameters")->isObject("properties"));
-		}
-	}
-	assertTrue(foundEcho);
+		ToolResult result;
+		result.setStructuredContent(Poco::Dynamic::Var(Poco::JSON::Parser().parse("{\"answer\":42}").extract<Object::Ptr>()));
+		result.setError();
+		return result;
+	};
+	server.registerTool(tool);
+	TestHTTPHost host(server);
+	host.start();
 
-	// Full bridge: registry -> executor -> HTTPClient -> server -> back.
-	Object input;
-	input.set("message", "hi");
-	assertEqual(std::string("hi"), registry.executeTool("echo", input));
-
-	assertEqual(std::string("test"), host.toolOwners().at("echo"));
-
-	http.stop();
-}
-
-
-void MCPHostTest::testToolErrorBecomesErrorString()
-{
-	Poco::AI::MCP::Server server;
-	buildServer(server);
-	TestHTTPHost http(server);
-	http.start();
-
+	MCPHost mcpHost;
+	mcpHost.addServer("s", std::make_unique<HTTPClient>(Poco::URI(host.url())));
 	ToolRegistry registry;
-	MCPHost host;
-	host.addServer("test", endpoint(http.port()), "test-client", "1.0");
-	host.registerInto(registry);
-
-	// A throwing remote tool comes back as an isError result, flattened to a
-	// JSON error string, not as a thrown exception.
-	Object empty;
-	const std::string result = registry.executeTool("boom", empty);
-	assertTrue(result.find("error") != std::string::npos);
-
-	http.stop();
+	(void) mcpHost.registerInto(registry);
+	// The tool keeps its output schema and annotations.
+	const Poco::AI::MCP::Tool registered = registry.tools()[0];
+	assertTrue(!registered.outputSchema.isNull());
+	assertTrue(registered.annotations->getValue<bool>("readOnlyHint"));
+	// The result keeps its error flag and structured content.
+	ToolResult result = registry.executeTool("structured", nullptr);
+	assertTrue(result.isError());
+	assertEqual(42, result.structuredContent().extract<Object::Ptr>()->getValue<int>("answer"));
+	assertEqual(std::string("{\"answer\":42}"), Poco::AI::toolResultText(result));
 }
 
 
-void MCPHostTest::testCollisionSkipped()
+void MCPHostTest::testAddServerFailure()
 {
-	Poco::AI::MCP::Server server;
-	buildServer(server);
-	TestHTTPHost http(server);
-	http.start();
-
-	ToolRegistry registry;
-	// A local tool already owns the name "echo".
-	Object localDef;
-	localDef.set("name", "echo");
-	localDef.set("description", "local echo");
-	registry.registerTool(localDef, [](const Object&) -> std::string { return "local"; });
-
-	MCPHost host;
-	host.addServer("test", endpoint(http.port()), "test-client", "1.0");
-	std::vector<std::string> shadowed;
-	std::size_t registered = host.registerInto(registry, &shadowed);
-
-	// echo is shadowed and reported; only boom is added.
-	assertEqual(1, static_cast<int>(registered));
-	assertEqual(1, static_cast<int>(shadowed.size()));
-	assertEqual(std::string("echo"), shadowed[0]);
-	assertTrue(registry.hasTool("boom"));
-	assertEqual(std::string("local"), registry.executeTool("echo", Object()));
-	assertTrue(host.toolOwners().find("echo") == host.toolOwners().end());
-	assertEqual(std::string("test"), host.toolOwners().at("boom"));
-
-	http.stop();
-}
-
-
-void MCPHostTest::testDeadServerThrows()
-{
-	// Grab a free port, then nothing listens on it.
-	Poco::Net::ServerSocket probe(0);
-	Poco::UInt16 deadPort = probe.address().port();
-	probe.close();
-
-	MCPHost host;
+	MCPHost mcpHost;
 	try
 	{
-		host.addServer("dead", endpoint(deadPort), "test-client", "1.0");
-		fail("a server that cannot be reached must throw");
+		mcpHost.addServer("gone", std::make_unique<HTTPClient>(Poco::URI("http://127.0.0.1:1/mcp")));
+		fail("an unreachable server must throw");
 	}
-	catch (Poco::Exception&)
+	catch (const Poco::Exception&)
 	{
 	}
-	// The failed server left no trace.
-	assertEqual(0, static_cast<int>(host.serverCount()));
+	assertEqual(std::size_t(0), mcpHost.serverCount());
+	try
+	{
+		mcpHost.addServer("none", std::unique_ptr<Poco::AI::MCP::Client>());
+		fail("a null client must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+}
+
+
+void MCPHostTest::testDuplicateLabel()
+{
+	Server server;
+	buildServer(server, "dup");
+	TestHTTPHost host(server);
+	host.start();
+	MCPHost mcpHost;
+	mcpHost.addServer("same", std::make_unique<HTTPClient>(Poco::URI(host.url())));
+	try
+	{
+		mcpHost.addServer("same", std::make_unique<HTTPClient>(Poco::URI(host.url())));
+		fail("a label must be unique");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	assertEqual(std::size_t(1), mcpHost.serverCount());
 }
 
 
@@ -215,10 +287,13 @@ CppUnit::Test* MCPHostTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MCPHostTest");
 
-	CppUnit_addTest(pSuite, MCPHostTest, testRegisterAndCall);
-	CppUnit_addTest(pSuite, MCPHostTest, testToolErrorBecomesErrorString);
-	CppUnit_addTest(pSuite, MCPHostTest, testCollisionSkipped);
-	CppUnit_addTest(pSuite, MCPHostTest, testDeadServerThrows);
+	CppUnit_addTest(pSuite, MCPHostTest, testRegisterIntoOverHTTP);
+	CppUnit_addTest(pSuite, MCPHostTest, testRegisterIntoOverStreams);
+	CppUnit_addTest(pSuite, MCPHostTest, testNamesTheModelsRefuse);
+	CppUnit_addTest(pSuite, MCPHostTest, testCollisions);
+	CppUnit_addTest(pSuite, MCPHostTest, testResultPassesThrough);
+	CppUnit_addTest(pSuite, MCPHostTest, testAddServerFailure);
+	CppUnit_addTest(pSuite, MCPHostTest, testDuplicateLabel);
 
 	return pSuite;
 }
