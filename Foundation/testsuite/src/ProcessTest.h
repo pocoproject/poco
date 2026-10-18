@@ -44,6 +44,7 @@ public:
 	void testRequestTerminationOfNewGroup();
 	void testRequestTerminationWithoutConsole();
 	void testRequestTerminationKeepsStandardHandles();
+	void testInvalidPid();
 	void testRequestTerminationOfGroupZero();
 
 	void setUp();

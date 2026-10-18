@@ -233,6 +233,9 @@ public:
 
 	[[nodiscard]] static bool isRunning(PID pid);
 		/// Check if the process specified by given pid is running or not.
+		///
+		/// Returns false for a PID that is not greater than 0, which
+		/// names no single process.
 
 	static void kill(ProcessHandle& handle);
 		/// Kills the process specified by handle.
@@ -242,6 +245,10 @@ public:
 
 	static void kill(PID pid);
 		/// Kills the process with the given pid.
+		///
+		/// Throws an InvalidArgumentException for a PID that is not
+		/// greater than 0, which on Unix platforms names a process group
+		/// or every process.
 
 	static void requestTermination(PID pid, int options = 0);
 		/// Requests termination of the process with the given PID, which
@@ -260,9 +267,12 @@ public:
 		/// to end; when the calling process has no console, it attaches to
 		/// the console of that process for the time it takes to send the
 		/// event. As with SIGINT, whether the process ends is for the
-		/// process to decide. A PID of 0 with PROCESS_NEW_GROUP throws an
-		/// InvalidArgumentException on Windows, where process group 0 means
-		/// every process on the console of the calling process.
+		/// process to decide.
+		///
+		/// Throws an InvalidArgumentException for a PID that is not
+		/// greater than 0, which on Unix platforms names a process group
+		/// or every process, and on Windows, with PROCESS_NEW_GROUP, would
+		/// name every process on the console of the calling process.
 };
 
 

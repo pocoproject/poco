@@ -707,6 +707,20 @@ void ProcessTest::testRequestTerminationKeepsStandardHandles()
 }
 
 
+void ProcessTest::testInvalidPid()
+{
+#if POCO_OS != POCO_OS_ANDROID
+	// A PID of 0 or below names a process group on POSIX. The child checks it
+	// from a process group of its own, which a signal sent anyway would reach
+	// alone.
+	Process::Args args;
+	args.push_back("-signal-invalid-pids");
+	ProcessHandle ph = Process::launch(testApp(), args, Poco::PROCESS_NEW_GROUP);
+	assertEqual (42, ph.wait());
+#endif
+}
+
+
 void ProcessTest::testRequestTerminationOfGroupZero()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -767,6 +781,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationOfNewGroup);
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationWithoutConsole);
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationKeepsStandardHandles);
+	CppUnit_addTest(pSuite, ProcessTest, testInvalidPid);
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationOfGroupZero);
 
 	return pSuite;

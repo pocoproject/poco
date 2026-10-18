@@ -18,10 +18,12 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
+#include <vector>
 #include <signal.h>
 
 #include "Poco/FileStreamRWLock.h"
 #include "Poco/Event.h"
+#include "Poco/Exception.h"
 #include "Poco/File.h"
 #include "Poco/Process.h"
 #include "Poco/ProcessOptions.h"
@@ -332,6 +334,41 @@ int breakOwnChild(const std::string& self, const std::string& readyPath)
 }
 
 
+int signalInvalidPids()
+	/// Exits with 42 if Process::kill() and Process::requestTermination()
+	/// refuse a PID that names no single process, and Process::isRunning()
+	/// takes it as not running. Meant to run in a process group of its own,
+	/// which a signal sent to that group anyway would reach alone.
+{
+	std::vector<Poco::Process::PID> pids;
+	pids.push_back(0);
+#if defined(POCO_OS_FAMILY_UNIX)
+	pids.push_back(-Poco::Process::id()); // its own process group
+#endif
+	for (const auto pid: pids)
+	{
+		if (Poco::Process::isRunning(pid)) return 1;
+		try
+		{
+			Poco::Process::requestTermination(pid);
+			return 2;
+		}
+		catch (Poco::InvalidArgumentException&)
+		{
+		}
+		try
+		{
+			Poco::Process::kill(pid);
+			return 3;
+		}
+		catch (Poco::InvalidArgumentException&)
+		{
+		}
+	}
+	return 42;
+}
+
+
 int breakOwnChildWithoutStdHandles(const std::string& self, const std::string& readyPath)
 	/// Runs breakOwnChild() in a child that inherits no standard handles, and
 	/// exits with its exit code. On Windows, that child starts without
@@ -393,6 +430,10 @@ int main(int argc, char** argv)
 		else if (arg == "-break-own-child-without-std-handles" && argc > 2)
 		{
 			return breakOwnChildWithoutStdHandles(argv[0], argv[2]);
+		}
+		else if (arg == "-signal-invalid-pids")
+		{
+			return signalInvalidPids();
 		}
 		else if (arg == "-echo-args")
 		{

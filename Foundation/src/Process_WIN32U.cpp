@@ -526,13 +526,7 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 
 void ProcessImpl::requestTerminationImpl(PIDImpl pid, int options)
 {
-	if (options & PROCESS_NEW_GROUP)
-	{
-		// For group 0, GenerateConsoleCtrlEvent() sends the event to every process
-		// on the console of the calling process, the calling process included.
-		if (pid == 0) throw InvalidArgumentException("Cannot request termination of process group 0");
-		sendBreak(pid);
-	}
+	if (options & PROCESS_NEW_GROUP) sendBreak(pid);
 	NamedEvent ev(terminationEventName(pid));
 	ev.set();
 }
