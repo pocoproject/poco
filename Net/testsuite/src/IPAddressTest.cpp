@@ -16,6 +16,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Format.h"
 #include <iostream>
+#include <string>
 
 
 using Poco::Net::IPAddress;
@@ -104,6 +105,39 @@ void IPAddressTest::testStringConv6()
 	IPAddress ia7("::");
 	assertTrue (ia7.family() == IPAddress::IPv6);
 	assertTrue (ia7.toString() == "::");
+#endif
+}
+
+
+void IPAddressTest::testStringConv6IPv4()
+{
+#ifdef POCO_HAVE_IPv6
+	// IPv4-compatible and IPv4-mapped addresses are written with their IPv4
+	// part, zero octets in any position included, and read back as the same
+	// address: every combination of 0, 1 and 255 in the four octets.
+	const unsigned char octets[] = {0, 1, 255};
+	for (bool mapped: {false, true})
+	{
+		for (int n = 0; n < 81; ++n)
+		{
+			unsigned char bytes[16] = {};
+			if (mapped) bytes[10] = bytes[11] = 0xFF;
+			std::string ipv4;
+			for (int i = 0, rest = n; i < 4; ++i, rest /= 3)
+			{
+				bytes[12 + i] = octets[rest % 3];
+				if (i > 0) ipv4 += '.';
+				ipv4 += std::to_string(bytes[12 + i]);
+			}
+			std::string expected = (mapped ? "::ffff:" : "::") + ipv4;
+			if (!mapped && ipv4 == "0.0.0.0") expected = "::";
+			if (!mapped && ipv4 == "0.0.0.1") expected = "::1";
+
+			IPAddress ia(bytes, sizeof(bytes));
+			assertEqual (expected, ia.toString());
+			assertTrue (IPAddress(expected) == ia);
+		}
+	}
 #endif
 }
 
@@ -807,6 +841,7 @@ CppUnit::Test* IPAddressTest::suite()
 
 	CppUnit_addTest(pSuite, IPAddressTest, testStringConv);
 	CppUnit_addTest(pSuite, IPAddressTest, testStringConv6);
+	CppUnit_addTest(pSuite, IPAddressTest, testStringConv6IPv4);
 	CppUnit_addTest(pSuite, IPAddressTest, testParse);
 	CppUnit_addTest(pSuite, IPAddressTest, testClassification);
 	CppUnit_addTest(pSuite, IPAddressTest, testMCClassification);
