@@ -23,6 +23,10 @@ Geo (geographic coordinates and angles, great-circle and rhumb-line calculations
 conversions to and from local cartesian coordinates, and geofences), previously part of
 macchina.io, is a POCO component.
 Serial (serial port I/O), previously part of macchina.io, is a POCO component.
+AI/MCP and AI/MCP/HTTP implement the Model Context Protocol, revision 2026-07-28: a server
+any POCO application can expose tools, resources and prompts with, and clients over a stream,
+a server process and Streamable HTTP. AI (experimental) is a client library for large
+language model APIs with a minimal agent runtime.
 
 !!Features
 
@@ -54,6 +58,19 @@ Serial (serial port I/O), previously part of macchina.io, is a POCO component.
     macchina.io. Enable with cmake <*ENABLE_SERIAL*> (on by default; off with
     <*POCO_MINIMAL_BUILD*>); make component <*Serial*>. The component is turned off
     automatically for the emscripten target, which it does not support.
+  - GH #5532 <*AI/MCP*>, <*AI/MCP/HTTP*>: the Model Context Protocol, revision 2026-07-28,
+    the stateless one: a <*Server*> with message and stream ingress (tools, resources,
+    prompts, <*server/discover*>, cache hints), an abstract <*Client*> with the stream
+    transport <*StreamClient*>, the stdio transport to a server process <*ProcessClient*>
+    and the Streamable HTTP transport <*HTTPClient*>, which takes its sessions from
+    <*Poco::Net::HTTPSessionFactory*> and links Net only. Enable with cmake
+    <*ENABLE_AI_MCP*> and <*ENABLE_AI_MCP_HTTP*> (off by default); make components
+    <*AI/MCP*> and <*AI/MCP/HTTP*>.
+  - GH #5533 <*AI*> (experimental: the interface may change within 2.x): providers for the
+    Anthropic Messages API and the OpenAI Chat Completions format with per-call
+    cancellation, a tool registry of MCP tools, the agent loop, and <*MCPHost*>, which
+    mirrors the tools of MCP servers into the registry. Enable with cmake <*ENABLE_AI*> (off
+    by default); make component <*AI*>.
 
 !!Breaking Changes
 

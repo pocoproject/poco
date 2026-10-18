@@ -7,6 +7,7 @@
 				${PocoBuild}/*/include/Poco/*/*/*.h
 				${PocoBuild}/*/include/Poco/*/*.h
 				${PocoBuild}/*/*/include/Poco/*/*/*.h
+				${PocoBuild}/*/*/*/include/Poco/*/*/*/*.h
 			</include>
 			<exclude>
 				*_POSIX.h
@@ -29,6 +30,7 @@
 			${PocoBuild}/doc/*.page,
 			${PocoBuild}/*/doc/*.page
 			${PocoBuild}/*/*/doc/*.page
+			${PocoBuild}/*/*/*/doc/*.page
 		</pages>
 		<resources>
 			${PocoBase}/PocoDoc/resources/css,

@@ -638,6 +638,26 @@ jobs:
       - name: Build libraries and testsuites
         run: make -s -j$(nproc)
 
+  # The AI libraries are C++17 code, while CMake builds with C++20 where the
+  # compiler has it and the make job above uses Linux-c++20. This job builds
+  # them, with what they need, under the C++17 Linux config and runs their
+  # testsuites.
+  linux-gcc-make-cxx17-ai:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Configure (classic make, C++17)
+        run: ./configure --config=Linux --everything --no-samples
+      - name: Build the AI libraries and testsuites
+        run: make -s -j$(nproc) AI/MCP-tests AI/MCP/HTTP-tests AI-tests
+      - name: Run the AI testsuites
+        run: |
+          export POCO_BASE="${GITHUB_WORKSPACE}"
+          export LD_LIBRARY_PATH="${GITHUB_WORKSPACE}/lib/Linux/$(uname -m)"
+          for t in AI/MCP AI/MCP/HTTP AI; do
+            "$t/testsuite/bin/Linux/$(uname -m)/testrunner" -all
+          done
+
   # ------------------------------------------------------------------------
   # Linux cross-compile and other arch build-only probes
   # ------------------------------------------------------------------------

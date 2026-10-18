@@ -8,6 +8,7 @@ cmake -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=ON -DENABLE_FUZZING=ON \
       -DENABLE_PAGECOMPILER_FILE2PAGE=OFF -DENABLE_DATA_SQLITE=OFF \
       -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF -DENABLE_PROMETHEUS=OFF \
       -DENABLE_ACTIVERECORD_COMPILER=OFF \
+      -DENABLE_AI_MCP=ON -DENABLE_AI_MCP_HTTP=ON \
       ..
 
 make -j$(nproc)
@@ -20,6 +21,9 @@ cp bin/Foundation-misc-fuzzer $OUT/foundation_misc_fuzzer
 cp bin/JWT-decode-fuzzer $OUT/jwt_decode_fuzzer
 cp bin/Net-mail-parser-fuzzer $OUT/mail_message_fuzzer
 cp bin/Net-http-parser-fuzzer $OUT/http_message_fuzzer
+cp bin/AIMCP-server-fuzzer $OUT/mcp_server_fuzzer
+cp bin/AIMCP-client-fuzzer $OUT/mcp_client_fuzzer
+cp bin/AIMCPHTTP-eventstream-fuzzer $OUT/mcp_event_stream_fuzzer
 
 # Seed corpus
 zip -q -r -j $OUT/mail_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Mail
