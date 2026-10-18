@@ -260,7 +260,9 @@ public:
 		/// to end; when the calling process has no console, it attaches to
 		/// the console of that process for the time it takes to send the
 		/// event. As with SIGINT, whether the process ends is for the
-		/// process to decide.
+		/// process to decide. A PID of 0 with PROCESS_NEW_GROUP throws an
+		/// InvalidArgumentException on Windows, where process group 0 means
+		/// every process on the console of the calling process.
 };
 
 

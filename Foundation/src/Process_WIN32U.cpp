@@ -29,7 +29,9 @@
 namespace
 {
 	Poco::FastMutex consoleMutex;
-		// The calling process attaches to the console of one child at a time.
+		// The calling process attaches to the console of one child at a time,
+		// and not while it creates a child: a child created meanwhile would
+		// inherit that console and the standard handles it brings.
 
 	bool hasConsole()
 		/// Whether the calling process is attached to a console, with a
@@ -45,17 +47,28 @@ namespace
 		/// the child shares, or, when the calling process has no console,
 		/// on the console of the child, to which the calling process attaches
 		/// for that moment. The calling process is not in the group of the
-		/// child, so the event does not reach it.
+		/// child, so the event does not reach it. Attaching to a console can
+		/// replace the standard handles of the calling process and detaching
+		/// does not restore them, so they are restored here.
 	{
 		Poco::FastMutex::ScopedLock lock(consoleMutex);
 		if (hasConsole())
 		{
 			GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, group);
 		}
-		else if (AttachConsole(group))
+		else
 		{
-			GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, group);
-			FreeConsole();
+			const HANDLE stdInput = GetStdHandle(STD_INPUT_HANDLE);
+			const HANDLE stdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+			const HANDLE stdError = GetStdHandle(STD_ERROR_HANDLE);
+			if (AttachConsole(group))
+			{
+				GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, group);
+				FreeConsole();
+				SetStdHandle(STD_INPUT_HANDLE, stdInput);
+				SetStdHandle(STD_OUTPUT_HANDLE, stdOutput);
+				SetStdHandle(STD_ERROR_HANDLE, stdError);
+			}
 		}
 	}
 
@@ -319,6 +332,11 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	startupInfo.cbReserved2 = 0;
 	startupInfo.lpReserved2 = nullptr;
 
+	// A termination request may attach to the console of a child for a moment
+	// (sendBreak()): the standard handles and the console are read, and the
+	// child is created, before or after that moment.
+	Poco::FastMutex::ScopedLock lock(consoleMutex);
+
 	HANDLE hProc = GetCurrentProcess();
 	bool mustInheritHandles = false;
 	if (inPipe)
@@ -508,7 +526,13 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 
 void ProcessImpl::requestTerminationImpl(PIDImpl pid, int options)
 {
-	if (options & PROCESS_NEW_GROUP) sendBreak(pid);
+	if (options & PROCESS_NEW_GROUP)
+	{
+		// For group 0, GenerateConsoleCtrlEvent() sends the event to every process
+		// on the console of the calling process, the calling process included.
+		if (pid == 0) throw InvalidArgumentException("Cannot request termination of process group 0");
+		sendBreak(pid);
+	}
 	NamedEvent ev(terminationEventName(pid));
 	ev.set();
 }

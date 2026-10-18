@@ -290,10 +290,18 @@ int waitForBreak(const std::string& readyPath)
 
 int breakOwnChild(const std::string& self, const std::string& readyPath)
 	/// Without a console of its own, starts a child that waits for the
-	/// request to end, asks it to end, and exits with its exit code.
+	/// request to end, asks it to end, and exits with its exit code, or with
+	/// 3 if its own standard handles were not the same afterwards (Windows).
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	FreeConsole();
+	// Standard handles of its own, as a program without a console sets them.
+	HANDLE readEnd = nullptr;
+	HANDLE writeEnd = nullptr;
+	if (!CreatePipe(&readEnd, &writeEnd, nullptr, 0)) return 4;
+	SetStdHandle(STD_INPUT_HANDLE, readEnd);
+	SetStdHandle(STD_OUTPUT_HANDLE, writeEnd);
+	SetStdHandle(STD_ERROR_HANDLE, writeEnd);
 #endif
 	Poco::Process::Args args;
 	args.push_back("-wait-break");
@@ -311,6 +319,34 @@ int breakOwnChild(const std::string& self, const std::string& readyPath)
 		Poco::Thread::sleep(10);
 	}
 	Poco::Process::requestTermination(child.id(), Poco::PROCESS_NEW_GROUP);
+	const int rc = child.wait();
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	const bool kept = GetStdHandle(STD_INPUT_HANDLE) == readEnd
+		&& GetStdHandle(STD_OUTPUT_HANDLE) == writeEnd
+		&& GetStdHandle(STD_ERROR_HANDLE) == writeEnd;
+	CloseHandle(readEnd);
+	CloseHandle(writeEnd);
+	if (!kept) return 3;
+#endif
+	return rc;
+}
+
+
+int breakOwnChildWithoutStdHandles(const std::string& self, const std::string& readyPath)
+	/// Runs breakOwnChild() in a child that inherits no standard handles, and
+	/// exits with its exit code. On Windows, that child starts without
+	/// STARTF_USESTDHANDLES, whose standard handles attaching to a console
+	/// replaces.
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	SetStdHandle(STD_INPUT_HANDLE, nullptr);
+	SetStdHandle(STD_OUTPUT_HANDLE, nullptr);
+	SetStdHandle(STD_ERROR_HANDLE, nullptr);
+#endif
+	Poco::Process::Args args;
+	args.push_back("-break-own-child");
+	args.push_back(readyPath);
+	Poco::ProcessHandle child = Poco::Process::launch(self, args);
 	return child.wait();
 }
 
@@ -353,6 +389,10 @@ int main(int argc, char** argv)
 		else if (arg == "-break-own-child" && argc > 2)
 		{
 			return breakOwnChild(argv[0], argv[2]);
+		}
+		else if (arg == "-break-own-child-without-std-handles" && argc > 2)
+		{
+			return breakOwnChildWithoutStdHandles(argv[0], argv[2]);
 		}
 		else if (arg == "-echo-args")
 		{

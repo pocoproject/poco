@@ -43,6 +43,8 @@ public:
 	void testIsRunningAfterWait();
 	void testRequestTerminationOfNewGroup();
 	void testRequestTerminationWithoutConsole();
+	void testRequestTerminationKeepsStandardHandles();
+	void testRequestTerminationOfGroupZero();
 
 	void setUp();
 	void tearDown();
