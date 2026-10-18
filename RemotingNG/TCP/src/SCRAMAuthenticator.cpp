@@ -13,6 +13,7 @@
 
 
 #include "Poco/RemotingNG/TCP/SCRAMAuthenticator.h"
+#include "Poco/RemotingNG/Context.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/SHA1Engine.h"
 #include "Poco/PBKDF2Engine.h"
@@ -34,6 +35,21 @@ using namespace std::string_literals;
 namespace Poco::RemotingNG::TCP {
 
 
+namespace
+{
+	Poco::UInt32 currentConnectionID()
+		/// Returns the ID of the connection the authentication
+		/// request has been received on, or 0 if there is none.
+	{
+		Context::Ptr pContext = Context::get();
+		if (pContext)
+			return pContext->getValue<Poco::UInt32>("id"s, 0);
+		else
+			return 0;
+	}
+}
+
+
 SCRAMAuthenticator::SCRAMAuthenticator() = default;
 
 
@@ -51,6 +67,7 @@ AuthenticateResult SCRAMAuthenticator::authenticate(const Credentials& creds, Po
 		pConv->clientNonce = creds.getAttribute(Credentials::ATTR_NONCE);
 		pConv->serverNonce = createNonce();
 		pConv->salt = saltForUser(pConv->username, pConv->iterations);
+		pConv->connectionID = currentConnectionID();
 
 		if (!pConv->salt.empty())
 		{
@@ -68,7 +85,7 @@ AuthenticateResult SCRAMAuthenticator::authenticate(const Credentials& creds, Po
 	else
 	{
 		Conversation::Ptr pConv = _conversations.get(conversationID);
-		if (pConv)
+		if (pConv && pConv->connectionID == currentConnectionID())
 		{
 			if (pConv->state == STATE_START)
 			{

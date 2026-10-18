@@ -699,6 +699,53 @@ void RemotingTest::testAuthenticatedMultipleSCRAMCredentials()
 }
 
 
+void RemotingTest::testSCRAMConversationOtherConnection()
+{
+	MockSCRAMAuthenticator::Ptr pAuth = new MockSCRAMAuthenticator;
+	Poco::RemotingNG::TCP::SCRAMClientAuthenticator clientAuth;
+
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "admin");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+	std::string mechanism = clientAuth.startAuthentication(creds);
+	assert (mechanism == Poco::RemotingNG::TCP::SCRAMClientAuthenticator::SCRAM_SHA1);
+
+	Poco::RemotingNG::AuthenticateResult result;
+	{
+		Poco::RemotingNG::ScopedContext scopedContext;
+		scopedContext.context()->setValue("id", static_cast<Poco::UInt32>(1));
+		result = pAuth->authenticate(creds, 0);
+	}
+	assert (result.cont());
+	const Poco::UInt32 conversationID = result.conversationID();
+
+	Poco::RemotingNG::Credentials clientCreds;
+	assert (clientAuth.continueAuthentication(result.credentials(), clientCreds));
+	{
+		Poco::RemotingNG::ScopedContext scopedContext;
+		scopedContext.context()->setValue("id", static_cast<Poco::UInt32>(1));
+		result = pAuth->authenticate(clientCreds, conversationID);
+	}
+	assert (result.cont());
+
+	// A conversation can only be completed on the connection that started it.
+	{
+		Poco::RemotingNG::ScopedContext scopedContext;
+		scopedContext.context()->setValue("id", static_cast<Poco::UInt32>(2));
+		result = pAuth->authenticate(Poco::RemotingNG::Credentials(), conversationID);
+	}
+	assert (!result.done());
+
+	{
+		Poco::RemotingNG::ScopedContext scopedContext;
+		scopedContext.context()->setValue("id", static_cast<Poco::UInt32>(1));
+		result = pAuth->authenticate(Poco::RemotingNG::Credentials(), conversationID);
+	}
+	assert (result.done());
+	assert (result.credentials().getAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME) == "admin");
+}
+
+
 void RemotingTest::testPermission()
 {
 	ITester::Ptr pTester = createProxy(_objectURI);
@@ -1345,6 +1392,7 @@ CppUnit::Test* RemotingTest::suite()
 	CppUnit_addTest(pSuite, RemotingTest, testAuthenticatedNoSCRAMCredentials);
 	CppUnit_addTest(pSuite, RemotingTest, testAuthenticatedUpdatedSCRAMCredentials);
 	CppUnit_addTest(pSuite, RemotingTest, testAuthenticatedMultipleSCRAMCredentials);
+	CppUnit_addTest(pSuite, RemotingTest, testSCRAMConversationOtherConnection);
 	CppUnit_addTest(pSuite, RemotingTest, testPermission);
 	CppUnit_addTest(pSuite, RemotingTest, testNoPermission);
 	CppUnit_addTest(pSuite, RemotingTest, testTimeout);
