@@ -10,9 +10,7 @@
 #
 LINKMODE ?= SHARED
 
-# Architecture flags, e.g. -m32; none by default (-arch is a macOS driver option,
-# which clang on Linux rejects).
-ARCHFLAGS          ?=
+ARCHFLAGS          ?= -arch $(POCO_HOST_OSARCH)
 SANITIZEFLAGS      ?=
 OSFLAGS            ?=
 
