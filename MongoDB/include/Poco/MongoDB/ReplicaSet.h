@@ -99,15 +99,16 @@ public:
 			/// Applied when connecting to MongoDB servers during topology monitoring
 			/// and when creating connections via getConnection()/getPrimaryConnection()/
 			/// getSecondaryConnection(). When using a custom SocketFactory, the factory
-			/// is responsible for applying its own connect timeout.
+			/// receives the applicable connect timeout as an argument and must honor it.
+			/// A timeout of 0 means no connect timeout.
 
 		unsigned int socketTimeoutSeconds{30};
 			/// Socket send/receive timeout in seconds (default: 30).
 			///
 			/// Applied as the send and receive timeout on sockets after successful
 			/// connection. This affects how long sendRequest()/readResponse() will
-			/// wait before timing out. When using a custom SocketFactory, the factory
-			/// is responsible for applying its own socket timeout.
+			/// wait before timing out. This also applies to sockets returned by a
+			/// custom SocketFactory. A timeout of 0 leaves socket timeouts unchanged.
 
 		unsigned int heartbeatFrequencySeconds{10};
 			/// Topology monitoring interval in seconds (default: 10)
@@ -123,8 +124,11 @@ public:
 
 		Connection::SocketFactory* socketFactory{nullptr};
 			/// Optional socket factory for SSL/TLS connections.
+			/// Called with secure=true and the applicable connect timeout;
+			/// the default SocketFactory does not support secure sockets.
 			/// Can be set via config or later using setSocketFactory().
-			/// Custom factories can access timeout config via ReplicaSet::configuration().
+			/// ReplicaSet applies positive socket timeouts to the returned socket.
+			/// The factory must be thread-safe and must outlive the ReplicaSet.
 	};
 
 	explicit ReplicaSet(const Config& config);
@@ -233,9 +237,9 @@ public:
 		/// Stops the background monitoring thread.
 
 	void setSocketFactory(Connection::SocketFactory* factory);
-		/// Sets the socket factory for creating connections.
-		/// The factory can access timeout configuration via configuration().connectTimeoutSeconds
-		/// and configuration().socketTimeoutSeconds.
+		/// Sets the socket factory for creating SSL/TLS connections (secure=true).
+		/// The factory receives the connect timeout as an argument, and
+		/// ReplicaSet applies positive socket timeouts to the returned socket.
 		///
 		/// Example:
 		///   rs.setSocketFactory(&myCustomFactory);

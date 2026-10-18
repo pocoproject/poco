@@ -1,0 +1,113 @@
+Geo Overview
+Geo
+
+!!!Introduction
+
+The <*Geo*> library (<*PocoGeo*>, namespace <[Poco::Geo]>) works with geographic positions
+on the surface of a globe: angles and latitude/longitude positions, great-circle and
+rhumb-line distances and azimuths, conversions to and from local cartesian coordinates, and
+circular and polygonal geofences.
+
+Dependencies: Foundation.
+
+
+!!!Classes
+
+<[Angle]> represents a geometric angle. Angles are created with <[Angle::fromDegrees()]>,
+<[Angle::fromRadians()]>, the latitude and longitude variants of those, and
+<[Angle::fromXY()]>. The class provides the arithmetic and comparison operators,
+normalization to the latitude, longitude and [0, 360) intervals, the sine and cosine of the
+angle, and the compass direction (N, NNE, NE, ...) an angle points to.
+
+<[LatLon]> is a position on the surface of a globe, given as a latitude in [-90, 90]
+degrees and a longitude in [-180, 180] degrees. It computes the great-circle distance and
+azimuth between two positions and the end position of a great-circle arc, the same three for
+rhumb lines (lines of constant heading), and converts to and from cartesian coordinates
+relative to a reference position. Distances are returned as the angle between the two
+positions; multiply the angle in radians by the radius of the globe, for example
+<[LatLon::EARTH_MEAN_RADIUS]>, to obtain a distance in meters.
+
+<[Cartesian]> holds a pair of cartesian coordinates in meters, as used by
+<[LatLon::toCartesian()]> and <[LatLon::fromCartesian()]>.
+
+<[Geofence]> is the base class of the geofences. Its <[isInside()]> method returns true if the
+given position lies inside the geofence.
+
+<[CircularGeofence]> is a geofence around a center position with a radius in meters.
+
+<[PolygonalGeofence]> is a geofence defined by the polygon through a sequence of positions. It
+converts the polygon and the position to cartesian coordinates and tests the position with the
+even-odd rule. A position exactly on a vertex of the polygon counts as outside the geofence;
+the rest of the boundary is half-open.
+
+A position outside the domain of a computation, and a position with a NaN coordinate, yield
+NaN results. A geofence reports such a position as outside.
+
+
+!!!Building Geo
+
+!!CMake
+
+The CMake option <*ENABLE_GEO*> is on by default and off with <*POCO_MINIMAL_BUILD*>, where it
+must be enabled explicitly.
+
+    cmake -B build -DPOCO_MINIMAL_BUILD=ON -DENABLE_GEO=ON
+    cmake --build build
+
+!!GNU Make
+
+The component <*Geo*> is part of the default build.
+
+
+!!!Examples
+
+The following program tests two positions against a polygonal geofence with four vertices.
+
+    #include "Poco/Geo/PolygonalGeofence.h"
+    #include <iostream>
+    #include <vector>
+
+    using Poco::Geo::LatLon;
+    using Poco::Geo::PolygonalGeofence;
+
+    int main()
+    {
+        const std::vector<LatLon> polygon {
+            LatLon::fromDegrees(48.205000, 16.370000),
+            LatLon::fromDegrees(48.205000, 16.380000),
+            LatLon::fromDegrees(48.212000, 16.380000),
+            LatLon::fromDegrees(48.212000, 16.370000)
+        };
+        PolygonalGeofence geofence(polygon);
+        LatLon inside(LatLon::fromDegrees(48.208500, 16.375000));
+        LatLon outside(LatLon::fromDegrees(48.220000, 16.375000));
+        std::cout << (geofence.isInside(inside) ? "inside" : "outside") << std::endl;
+        std::cout << (geofence.isInside(outside) ? "inside" : "outside") << std::endl;
+        return 0;
+    }
+
+The following program tests a position against a circular geofence with a radius of
+500 meters.
+
+    #include "Poco/Geo/CircularGeofence.h"
+    #include <iostream>
+
+    using Poco::Geo::CircularGeofence;
+    using Poco::Geo::LatLon;
+
+    int main()
+    {
+        CircularGeofence geofence(LatLon::fromDegrees(48.208180, 16.373820), 500.0);
+        LatLon position(LatLon::fromDegrees(48.210000, 16.375000));
+        std::cout << (geofence.isInside(position) ? "inside" : "outside") << std::endl;
+        return 0;
+    }
+
+Both programs link with PocoGeo and PocoFoundation.
+
+
+!!!Note
+
+<[Angle]> and <[LatLon]> are compared for equality on their degree values, so the usual issues
+of comparing floating-point numbers apply. <[LatLon::equals()]> compares two positions with a
+delta in degrees.

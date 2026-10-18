@@ -15,6 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/SocketAddress.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -26,8 +27,11 @@ public:
 
 	void testSendReceive();
 	void testPeek();
+	void testBufVecAndBufferOverloadsRefused();
 	void testNB();
 	void testLazyHandshake();
+	void testBindClient();
+	void testBindClientIPv6();
 	void testSendFile();
 	void testSendFileLarge();
 	void testSendFileRange();
@@ -35,6 +39,39 @@ public:
 	void testPeerHostNameTooLong();
 	void testStaleErrorQueue();
 	void testHandshakeTimeout();
+	void testDefaultCipherListRefusesAnonymousServer();
+	void testClientRejectsAnonymousServer();
+	void testRelaxedServerAcceptsClientWithoutCertificate();
+	void testLoopbackPeerHostName();
+	void testTunneledLoopbackPeerIsVerified();
+	void testResolvedLoopbackNameIsVerified();
+	void testLocalhostNameOnOtherAddressIsVerified();
+	void testCompleteHandshakeVerifiesPeer();
+	void testCompleteHandshakeVerifiesPeerNB();
+	void testCompleteHandshakeAcceptsPeer();
+	void testServerCompleteHandshakeVerifiesClientCertificate();
+	void testServerHandshakeDripFeed();
+	void testClientHandshakeDripFeed();
+	void testHandshakeLeavesSocketBlocking();
+	void testCloseAfterSendTimeout();
+	void testCloseAfterSendAndReceiveTimeout();
+	void testCloseAfterReceiveTimeout();
+	void testCloseEndsBlockedReceive();
+	void testCloseWaitsForReceive();
+	void testShutdownWaitsForShortReceive();
+	void testShutdownWithoutPeerAnswer();
+	void testShutdownWaitsForSendBuffer();
+	void testShutdownWaitsForPeer();
+	void testShutdownAfterReceiveError();
+	void testShutdownAfterSendError();
+	void testShutdownOnResetConnection();
+	void testShutdownAfterReceiveTimeout();
+	void testReceiveAfterCloseNotifyStaleError();
+	void testSendAfterShutdownStaleError();
+	void testReceiveInterruptedNoTimeout();
+	void testReceiveInterruptedWithTimeout();
+	void testSendInterruptedNoTimeout();
+	void testHandshakeInterruptedNoTimeout();
 
 	void setUp();
 	void tearDown();
@@ -42,6 +79,10 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void bindAndConnect(const Poco::Net::SocketAddress& loopback, bool reuseAddress);
+		/// Binds a client socket to the given loopback address, connects it
+		/// to an echo server listening on that address and checks that the
+		/// connection uses the bound socket.
 };
 
 

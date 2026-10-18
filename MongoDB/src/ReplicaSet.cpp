@@ -29,6 +29,25 @@ using namespace std::string_literals;
 namespace Poco::MongoDB {
 
 
+namespace
+{
+	[[nodiscard]] Net::StreamSocket createFactorySocket(Connection::SocketFactory& factory,
+		const Net::SocketAddress& address, const Poco::Timespan& connectTimeout,
+		const Poco::Timespan& socketTimeout)
+		/// Socket timeouts keep an unresponsive member from blocking the
+		/// monitoring thread and ~ReplicaSet(), as in Connection::connect(uri, factory).
+	{
+		Net::StreamSocket socket = factory.createSocket(address.host().toString(), address.port(), connectTimeout, true);
+		if (socketTimeout > 0)
+		{
+			socket.setSendTimeout(socketTimeout);
+			socket.setReceiveTimeout(socketTimeout);
+		}
+		return socket;
+	}
+}
+
+
 //
 // ReplicaSet
 //
@@ -479,11 +498,9 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address)
 	{
 		if (factory != nullptr)
 		{
-			// Use custom socket factory (e.g., for SSL/TLS)
-			// Custom factories can be set via Config or using setSocketFactory().
-			// They can access timeout values via configuration().connectTimeoutSeconds
-			// and configuration().socketTimeoutSeconds to properly configure sockets.
-			conn->connect(address.toString(), *factory);
+			conn->connect(createFactorySocket(*factory, address,
+				Poco::Timespan(static_cast<long>(connectTimeoutSec), 0),
+				Poco::Timespan(static_cast<long>(socketTimeoutSec), 0)));
 		}
 		else
 		{
@@ -527,9 +544,7 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address,
 	{
 		if (factory != nullptr)
 		{
-			// Use custom socket factory (e.g., for SSL/TLS)
-			// Custom factories are responsible for applying their own timeouts.
-			conn->connect(address.toString(), *factory);
+			conn->connect(createFactorySocket(*factory, address, connectTimeout, socketTimeout));
 		}
 		else
 		{
@@ -574,9 +589,9 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address)
 
 		if (factory != nullptr)
 		{
-			// Custom factories can be set via Config or using setSocketFactory().
-			// They can access timeout values via configuration() to configure sockets.
-			conn->connect(address.toString(), *factory);
+			conn->connect(createFactorySocket(*factory, address,
+				Poco::Timespan(static_cast<long>(connectTimeoutSec), 0),
+				Poco::Timespan(static_cast<long>(socketTimeoutSec), 0)));
 		}
 		else
 		{

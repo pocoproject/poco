@@ -23,8 +23,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API Authorizer: public Poco::RefCountedObject
@@ -48,7 +47,7 @@ public:
 	Authorizer();
 		/// Creates the Authorizer.
 
-	virtual ~Authorizer();
+	~Authorizer() override;
 		/// Destroys the Authorizer.
 		
 	[[nodiscard]] virtual bool authorize(const std::string& method, const std::string& permission) = 0;
@@ -70,7 +69,7 @@ public:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Authorizer_INCLUDED

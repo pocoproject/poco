@@ -18,9 +18,7 @@
 #include "Poco/RemotingNG/TransportFactoryManager.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 TransportFactory::TransportFactory():
@@ -35,9 +33,7 @@ TransportFactory::TransportFactory(ConnectionManager& connectionManager):
 }
 
 
-TransportFactory::~TransportFactory()
-{
-}
+TransportFactory::~TransportFactory() = default;
 
 
 Poco::RemotingNG::Transport* TransportFactory::createTransport()
@@ -64,4 +60,4 @@ void TransportFactory::unregisterFactory()
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

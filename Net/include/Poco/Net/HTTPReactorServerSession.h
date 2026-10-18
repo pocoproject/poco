@@ -46,9 +46,9 @@ private:
 
 	int write(const char* buffer, std::streamsize length) override;
 
-	bool parseHeaders(std::size_t pos, std::size_t& bodyStart, std::size_t& contentLength, bool& isChunked);
+	[[nodiscard]] bool parseHeaders(std::size_t pos, std::size_t& bodyStart, std::size_t& contentLength, bool& isChunked);
 
-	bool parseChunkSize(std::size_t& pos, std::size_t& chunkSize, int&);
+	[[nodiscard]] bool parseChunkSize(std::size_t& pos, std::size_t& chunkSize, int&);
 
 private:
 	std::string&   _buf;

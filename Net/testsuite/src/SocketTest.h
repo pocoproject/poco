@@ -15,6 +15,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/SocketDefs.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -28,6 +29,8 @@ public:
 	void testPeek();
 	void testMoveStreamSocket();
 	void testPoll();
+	void testPollModes();
+	void testPollStress();
 	void testAvailable();
 	void testFIFOBuffer();
 	void testConnect();
@@ -54,6 +57,25 @@ public:
 	void testSendFile();
 	void testSendFileLarge();
 	void testSendFileRange();
+	void testSendFileTruncated();
+	void testCloseOnExec();
+	void testReceiveNonBlockingIgnoresTimeout();
+	void testPollNegativeTimeoutBelowOneMillisecond();
+#if defined(POCO_OS_FAMILY_UNIX)
+	void testReceiveInterruptedWithTimeout();
+	void testReceiveWaitAllInterruptedKeepsTimeout();
+	void testSendInterruptedWithTimeout();
+	void testReceiveFromInterruptedWithTimeout();
+	void testAcceptInterruptedWithTimeout();
+	void testReceiveInterruptedNoTimeout();
+	void testPollInterruptedNoTimeout();
+	void testPollClosedDescriptor();
+	void testPollAtFdLimit();
+#if defined(MSG_DONTWAIT)
+	void testReceiveDontWaitBlocking();
+	void testSendDontWaitBlocking();
+#endif
+#endif
 
 	void setUp() override;
 	void tearDown() override;

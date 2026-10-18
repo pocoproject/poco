@@ -1,0 +1,30 @@
+<%@ page class="TestHandlerNoForm" namespace="AI::Test" session="test" form="false" %>
+<%!
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTimeFormat.h"
+
+
+using Poco::DateTime;
+using Poco::DateTimeFormatter;
+using Poco::DateTimeFormat;
+%>
+
+<%%
+	(void)request;
+%>
+
+<%
+	DateTime now;
+	std::string dt(DateTimeFormatter::format(now, DateTimeFormat::SORTABLE_FORMAT));
+%>
+<html>
+<head>
+<title>Test Page</title>
+</head>
+<%-- This is a server-side comment --%>
+<body>
+<h1>Hello, World!</h1>
+<p><%= dt %></p>
+</body>
+</html>

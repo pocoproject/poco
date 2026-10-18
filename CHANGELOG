@@ -26,6 +26,23 @@ Breaking Changes:
   Poco/Dynamic/VarIterator.h, Poco/OrderedSet.h, Poco/OrderedMap.h, Poco/Net/SocketProactor.h,
   Poco/Data/Constants.h, Poco/Data/RecordSet.h, Poco/Data/RowIterator.h,
   Poco/MongoDB/ServerDescription.h and Poco/ActiveRecord/IDTraits.h.
+- GH #5449 Poco::Serial::SerialPort behaves differently from the macchina.io version it comes
+  from: drain(), setRTS(), getRTS() and configureRS485() on a port that is not open throw
+  Poco::IllegalStateException, where POSIX raised an assertion and Windows getRTS() returned
+  false; open("") throws Poco::InvalidArgumentException instead of Poco::IOException; open() sets
+  VMIN to 1 and VTIME to 0, so a device that an external tool had configured for a timed read
+  (stty min 0 time 10) no longer returns early from a read; open() fails on POSIX platforms when
+  the device does not apply the requested character size, parity or number of stop bits, where it
+  used to appear to succeed and run a different frame; open() sets parity checking from the
+  requested parity alone instead of inheriting IGNPAR and INPCK on POSIX, and fParity and
+  fDsrSensitivity on Windows, from the device's previous configuration; the four read() overloads
+  throw Poco::IOException when the peer hangs up, where the overload that takes a timeout used to
+  loop; a buffer size of zero is rejected; drain() on Windows waits for the queued writes instead
+  of returning at once; a negative poll() timeout means no wait, where POSIX reported an error;
+  SerialPort is movable and no longer copyable; DEFAULT_BUFFER_SIZE is a std::size_t constant
+  rather than an enumerator, so an expression that mixes it with a signed value changes type
+  without a diagnostic; and poll(), available(), device(), baudRate(), parameters(), flowControl()
+  and getRTS() are [[nodiscard]].
 
 Bundled Third-Party Library Upgrades:
 
@@ -63,6 +80,13 @@ New Components:
   ENABLE_XSD_VALIDATOR (off by default, requires libxml2); make components XSD/Types,
   XSD/Parser, XSD/CodeGen; XSD/Validator is built with make -C XSD/Validator and its headers
   are not installed by make install.
+- GH #5448 Geo (geographic coordinates and angles, great-circle and rhumb-line calculations,
+  conversions to and from local cartesian coordinates, and circular and polygonal geofences)
+  moved from macchina.io into POCO. CMake option ENABLE_GEO; make component Geo.
+- GH #5449 Serial (serial port I/O: Poco::Serial::SerialPort, depends on Foundation only) moved
+  from macchina.io into POCO. CMake option ENABLE_SERIAL (on by default, off with
+  POCO_MINIMAL_BUILD); make component Serial. The component is turned off automatically for the
+  emscripten target, which it does not support.
 - GH #5532 AI/MCP (Model Context Protocol, specification revision 2025-06-18: JSON-RPC 2.0
   envelope, dispatcher with tools, resources and prompts, server with stream and message
   ingress, stream client, stdio transport) and AI/MCP/HTTP (the Streamable HTTP client

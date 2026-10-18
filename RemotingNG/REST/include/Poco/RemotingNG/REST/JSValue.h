@@ -25,9 +25,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API JSValue: public Poco::RefCountedObject
@@ -128,7 +126,7 @@ inline bool JSValue::asBool() const
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_JSValue_INCLUDED

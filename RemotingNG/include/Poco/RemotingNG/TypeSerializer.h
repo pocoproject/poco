@@ -44,8 +44,7 @@
 #include <memory>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 template <typename T>
@@ -62,17 +61,15 @@ class TypeSerializer
 	/// specializations of the TypeSerializer class template.
 {
 public:
+	TypeSerializer() = delete;
+	~TypeSerializer() = delete;
+	TypeSerializer(const TypeSerializer&) = delete;
+	TypeSerializer& operator = (const TypeSerializer&) = delete;
+
 	static void serialize(const std::string& name, const T& value, Serializer& ser)
 	{
 		ser.serialize(name, value);
 	}
-
-private:
-	TypeSerializer();
-	~TypeSerializer();
-
-	TypeSerializer(const TypeSerializer&);
-	TypeSerializer& operator = (const TypeSerializer&);
 };
 
 
@@ -470,7 +467,7 @@ public:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_TypeSerializer_INCLUDED

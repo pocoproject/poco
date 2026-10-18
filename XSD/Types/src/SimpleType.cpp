@@ -62,7 +62,7 @@ void SimpleType::accept(Visitor& v) const
 }
 
 
-void SimpleType::createIterator(std::vector<OrderIterator>& seq) const
+void SimpleType::createIterator(std::vector<OrderIterator>& /*seq*/) const
 {
 	// a simple type has no children
 }

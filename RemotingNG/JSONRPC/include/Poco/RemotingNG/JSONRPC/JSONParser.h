@@ -23,9 +23,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 class RemotingNGJSONRPC_API JSONParser
@@ -37,6 +35,10 @@ public:
 	
 	~JSONParser();
 		/// Destroys the JSONParser.
+
+	JSONParser() = delete;
+	JSONParser(const JSONParser&) = delete;
+	JSONParser& operator = (const JSONParser&) = delete;
 		
 	[[nodiscard]] JSValue::Ptr parse();
 		/// Reads a JSValue from the stream.
@@ -61,10 +63,6 @@ protected:
 	[[nodiscard]] static bool isEOF(int ch);
 
 private:
-	JSONParser();
-	JSONParser(const JSONParser&);
-	JSONParser& operator = (const JSONParser&);
-	
 	std::streambuf& _streambuf;
 	std::size_t _depth = 0;
 	std::size_t _maxDepth = MAX_DEPTH;
@@ -98,7 +96,7 @@ inline bool JSONParser::isEOF(int ch)
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC
 
 
 #endif // RemotingNG_JSONRPC_JSONParser_INCLUDED

@@ -16,9 +16,7 @@
 #include "Poco/ScopedUnlock.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 FrameQueue::FrameQueue(Connection::Ptr pConnection, Poco::UInt32 frameType, Poco::UInt32 channel):
@@ -61,7 +59,7 @@ Frame::Ptr FrameQueue::dequeueFrame(Poco::Timespan timeout)
 }
 
 
-bool FrameQueue::handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
+bool FrameQueue::handleFrame([[maybe_unused]] Connection::Ptr pConnection, Frame::Ptr pFrame)
 {
 	poco_assert_dbg (pConnection == _pConnection);
 
@@ -88,4 +86,4 @@ bool FrameQueue::handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

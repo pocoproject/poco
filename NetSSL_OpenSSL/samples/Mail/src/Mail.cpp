@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 	{
 		// Note: we must create the passphrase handler prior Context
 		SharedPtr<InvalidCertificateHandler> pCert = new ConsoleCertificateHandler(false); // ask the user via console
-		Context::Ptr pContext = new Context(Context::CLIENT_USE, "", "", "", Context::VERIFY_RELAXED, 9, true, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		Context::Ptr pContext = new Context(Context::CLIENT_USE, "", "", "", Context::VERIFY_RELAXED, 9, true);
 		SSLManager::instance().initializeClient(0, pCert, pContext);
 
 		MailMessage message;

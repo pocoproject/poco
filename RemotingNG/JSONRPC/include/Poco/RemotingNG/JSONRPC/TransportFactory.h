@@ -23,9 +23,7 @@
 #include "Poco/RemotingNG/TransportFactory.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 class RemotingNGJSONRPC_API TransportFactory: public Poco::RemotingNG::TransportFactory
@@ -35,10 +33,10 @@ public:
 	TransportFactory();
 		/// Creates a TransportFactory.
 
-	~TransportFactory();
+	~TransportFactory() override;
 		/// Destroys the TransportFactory.
 
-	[[nodiscard]] Poco::RemotingNG::Transport* createTransport();
+	[[nodiscard]] Poco::RemotingNG::Transport* createTransport() override;
 
 	static void registerFactory();
 		/// Helper function to register the factory with the manager.
@@ -48,7 +46,7 @@ public:
 };
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC
 
 
 #endif // RemotingNG_JSONRPC_TransportFactory_INCLUDED

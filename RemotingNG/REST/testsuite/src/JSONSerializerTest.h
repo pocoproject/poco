@@ -22,7 +22,7 @@ class JSONSerializerTest: public CppUnit::TestCase
 {
 public:
 	JSONSerializerTest(const std::string& name);
-	~JSONSerializerTest();
+	~JSONSerializerTest() override;
 
 	void testError();
 	void testObject();
@@ -33,8 +33,8 @@ public:
 	void testScalarInt();
 	void testScalarString();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

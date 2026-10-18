@@ -28,15 +28,20 @@ public:
 	void testValidCipherConfiguration();
 	void testInvalidCipherList();
 	void testCipherListWithoutMatch();
+	void testDefaultCipherListExcludesWeak();
+	void testDefaultSecurityLevel();
+	void testConfiguredSecurityLevel();
 	void testInvalidCipherSuites();
 	void testInvalidECDHGroups();
 	void testDHParametersRejectedBySecurityLevel();
+	void testDefaultDHParametersRejectedBySecurityLevel();
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	void testBuiltInDHParameters();
 #endif
 	void testAddChainCertificateWithoutX509();
 	void testClientContextIgnoresDHParameters();
 	void testVerifyErrorWithoutCertificate();
+	void testDefaultCertificateHandler();
 
 	void setUp();
 	void tearDown();

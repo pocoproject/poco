@@ -18,19 +18,13 @@
 #include "Poco/Net/HTTPSessionInstantiator.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
-TransportFactory::TransportFactory()
-{
-}
+TransportFactory::TransportFactory() = default;
 
 
-TransportFactory::~TransportFactory()
-{
-}
+TransportFactory::~TransportFactory() = default;
 
 
 Poco::RemotingNG::Transport* TransportFactory::createTransport()
@@ -53,4 +47,4 @@ void TransportFactory::unregisterFactory()
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

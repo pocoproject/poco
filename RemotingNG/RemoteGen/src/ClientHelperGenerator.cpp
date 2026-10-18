@@ -31,9 +31,7 @@ ClientHelperGenerator::ClientHelperGenerator(Poco::CodeGeneration::CppGenerator&
 }
 
 
-ClientHelperGenerator::~ClientHelperGenerator()
-{
-}
+ClientHelperGenerator::~ClientHelperGenerator() = default;
 
 
 std::string ClientHelperGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)
@@ -77,12 +75,12 @@ void ClientHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	pFind->addDocumentation(" need for serialization/deserialization), or a Proxy.");
 	pFind->addDocumentation("");
 	pFind->addDocumentation(" The URI must have the following format: <scheme>://<authority>/<protocol>/<typeId>/<objectId>");
-	Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
+	Poco::CppParser::Parameter* pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 	pFind->addParameter(pParam1);
 
 	pFind = new Poco::CppParser::Function(iName + "::Ptr findImpl", _pStruct);
 	pFind->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
+	pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 	pFind->addParameter(pParam1);
 
 	pFind = new Poco::CppParser::Function("static " + iName + "::Ptr find", _pStruct);
@@ -92,15 +90,15 @@ void ClientHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	pFind->addDocumentation(" The given protocol name is used to determine the Transport used by");
 	pFind->addDocumentation(" the Proxy. This is used for objects identified by URIs that do not");
 	pFind->addDocumentation(" follow the standard Remoting URI structure.");
-	pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
-	Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const std::string& protocol", 0);
+	pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
+	Poco::CppParser::Parameter* pParam2= new Poco::CppParser::Parameter("const std::string& protocol", nullptr);
 	pFind->addParameter(pParam1);
 	pFind->addParameter(pParam2);
 
 	pFind = new Poco::CppParser::Function(iName + "::Ptr findImpl", _pStruct);
 	pFind->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
-	pParam1= new Poco::CppParser::Parameter("const std::string& uri", 0);
-	pParam2= new Poco::CppParser::Parameter("const std::string& protocol", 0);
+	pParam1= new Poco::CppParser::Parameter("const std::string& uri", nullptr);
+	pParam2= new Poco::CppParser::Parameter("const std::string& protocol", nullptr);
 	pFind->addParameter(pParam1);
 	pFind->addParameter(pParam2);
 
@@ -129,7 +127,7 @@ void ClientHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 
 
 
-void ClientHelperGenerator::methodStart(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+void ClientHelperGenerator::methodStart(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
@@ -146,7 +144,7 @@ void ClientHelperGenerator::registerCallbacks(Poco::CodeGeneration::GeneratorEng
 }
 
 
-std::vector<std::string> ClientHelperGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> ClientHelperGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	// no base classes for this one
 	std::vector<std::string> bases;
@@ -155,7 +153,7 @@ std::vector<std::string> ClientHelperGenerator::newBaseClasses(const Poco::CppPa
 }
 
 
-void ClientHelperGenerator::singletonHolder(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::singletonHolder(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	std::string code("namespace\n");
 	code.append("{\n");
@@ -169,7 +167,7 @@ void ClientHelperGenerator::singletonHolder(const Poco::CppParser::Function* pFu
 }
 
 
-void ClientHelperGenerator::constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::constructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -193,13 +191,13 @@ void ClientHelperGenerator::constructorCodeGen(const Poco::CppParser::Function* 
 }
 
 
-void ClientHelperGenerator::instanceCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::instanceCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	gen.writeMethodImplementation("return *sh" + pStruct->name() + ".get();");
 }
 
 
-void ClientHelperGenerator::findCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::findCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	if (pFunc->countParameters() == 1)
 		gen.writeMethodImplementation("return " + pStruct->name() + "::instance().findImpl(uri);");
@@ -208,7 +206,7 @@ void ClientHelperGenerator::findCodeGen(const Poco::CppParser::Function* pFunc, 
 }
 
 
-void ClientHelperGenerator::findImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void ClientHelperGenerator::findImplCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);

@@ -21,22 +21,20 @@
 #include "Poco/NumberFormatter.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class EventFrameHandler: public FrameHandler
 {
 public:
-	typedef Poco::AutoPtr<EventFrameHandler> Ptr;
+	using Ptr = Poco::AutoPtr<EventFrameHandler>;
 
 	EventFrameHandler(Listener::Ptr pListener):
 		_pListener(pListener)
 	{
 	}
 
-	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
+	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) override
 	{
 		if (pFrame->type() == Frame::FRAME_TYPE_EVNT && (pFrame->flags() & Frame::FRAME_FLAG_CONT) == 0)
 		{
@@ -50,7 +48,7 @@ public:
 				pReplyStream = new ChannelOutputStream(pConnection, Frame::FRAME_TYPE_EVNR, pFrame->channel(), flags);
 			}
 			ServerTransport::Ptr pServerTransport = new ServerTransport(
-				*_pListener, 0, pRequestStream, pReplyStream,
+				*_pListener, nullptr, pRequestStream, pReplyStream,
 				(pFrame->flags() & Frame::FRAME_FLAG_DEFLATE) != 0,
 				false);
 			_pListener->connectionManager().threadPool().start(*pServerTransport);
@@ -124,9 +122,7 @@ Listener::Listener(const std::string& endPoint, const Poco::Net::ServerSocket& s
 }
 
 
-Listener::~Listener()
-{
-}
+Listener::~Listener() = default;
 
 
 void Listener::setTimeout(Poco::Timespan timeout)
@@ -231,7 +227,7 @@ void Listener::start()
 void Listener::stop()
 {
 	if (_pTCPServer) _pTCPServer->stop();
-	_pTCPServer = 0;
+	_pTCPServer = nullptr;
 }
 
 
@@ -388,4 +384,4 @@ void Listener::makeDefaultListener()
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

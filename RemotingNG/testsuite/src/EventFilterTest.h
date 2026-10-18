@@ -22,7 +22,7 @@ class EventFilterTest: public CppUnit::TestCase
 {
 public:
 	EventFilterTest(const std::string& name);
-	~EventFilterTest();
+	~EventFilterTest() override;
 
 	void testIsGreaterThanFilter();
 	void testIsGreaterThanOrEqualToFilter();
@@ -36,8 +36,8 @@ public:
 	void testMinimumIntervalOrDeltaFilter();
 	void testHysteresisFilter();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 };

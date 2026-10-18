@@ -19,9 +19,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 SOAPFaultException::SOAPFaultException(const std::string& message, const XMLElement& fault):
@@ -31,16 +29,10 @@ SOAPFaultException::SOAPFaultException(const std::string& message, const XMLElem
 }
 
 
-SOAPFaultException::SOAPFaultException(const SOAPFaultException& exc):
-	Poco::RemotingNG::RemoteException(exc),
-	_fault(exc._fault)
-{
-}
+SOAPFaultException::SOAPFaultException(const SOAPFaultException& exc) = default;
 
 
-SOAPFaultException::~SOAPFaultException() noexcept
-{
-}
+SOAPFaultException::~SOAPFaultException() noexcept = default;
 
 
 SOAPFaultException& SOAPFaultException::operator = (const SOAPFaultException& exc)
@@ -131,4 +123,4 @@ const XMLElement* SOAPFaultException::faultDetail() const
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

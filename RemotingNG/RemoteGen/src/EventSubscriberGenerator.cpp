@@ -31,15 +31,12 @@ using namespace Poco::CodeGeneration;
 
 
 EventSubscriberGenerator::EventSubscriberGenerator(Poco::CodeGeneration::CppGenerator& cppGen):
-	AbstractGenerator(cppGen),
-	_pCurrent(0)
+	AbstractGenerator(cppGen)
 {
 }
 
 
-EventSubscriberGenerator::~EventSubscriberGenerator()
-{
-}
+EventSubscriberGenerator::~EventSubscriberGenerator() = default;
 
 
 std::string EventSubscriberGenerator::generateClassName(const Poco::CppParser::Struct* pStruct)
@@ -65,9 +62,9 @@ void EventSubscriberGenerator::structStart(const Poco::CppParser::Struct* pStruc
 	AbstractGenerator::structStart(pStruct, properties);
 	// add constructor/destructor
 	Poco::CppParser::Function* pConstr = new Poco::CppParser::Function(_pStruct->name(), _pStruct);
-	Poco::CppParser::Parameter* pConstr1 = new Poco::CppParser::Parameter("const std::string& uri", 0);
+	Poco::CppParser::Parameter* pConstr1 = new Poco::CppParser::Parameter("const std::string& uri", nullptr);
 	pConstr->addParameter(pConstr1);
-	Poco::CppParser::Parameter* pConstr2 = new Poco::CppParser::Parameter(ProxyGenerator::generateClassName(pStruct)+ "* pProxy", 0);
+	Poco::CppParser::Parameter* pConstr2 = new Poco::CppParser::Parameter(ProxyGenerator::generateClassName(pStruct)+ "* pProxy", nullptr);
 	pConstr->addParameter(pConstr2);
 	pConstr->addDocumentation(	" Creates a " + _pStruct->name() + ".");
 
@@ -142,12 +139,12 @@ void EventSubscriberGenerator::structEnd()
 	e.generate(_pStruct, _cppGen, reinterpret_cast<void*>(pGen) ,false, false);
 	_cppGen.writeNameSpaceEnd(nameSpace());
 	_cppGen.endFile();
-	_pStruct = 0;
-	_pStructIn = 0;
+	_pStruct = nullptr;
+	_pStructIn = nullptr;
 }
 
 
-void EventSubscriberGenerator::methodStart(const Poco::CppParser::Function* pFuncOld, const CodeGenerator::Properties& properties)
+void EventSubscriberGenerator::methodStart(const Poco::CppParser::Function* /*pFuncOld*/, const CodeGenerator::Properties& /*properties*/)
 {
 }
 
@@ -176,7 +173,7 @@ void EventSubscriberGenerator::generateEventFunction(const Poco::CppParser::Func
 		_isEvent = true;
 	}
 	Poco::CppParser::Function* pConstr = new Poco::CppParser::Function(className, pStruct);
-	Poco::CppParser::Parameter* pConstr1 = new Poco::CppParser::Parameter(ProxyGenerator::generateClassName(_pStructIn)+ "* pProxy", 0);
+	Poco::CppParser::Parameter* pConstr1 = new Poco::CppParser::Parameter(ProxyGenerator::generateClassName(_pStructIn)+ "* pProxy", nullptr);
 	pConstr->addParameter(pConstr1);
 	Poco::CppParser::Variable* pVar = new Poco::CppParser::Variable(ProxyGenerator::generateClassName(_pStructIn)+ "* _pProxy", pStruct);
 	pVar->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
@@ -184,9 +181,9 @@ void EventSubscriberGenerator::generateEventFunction(const Poco::CppParser::Func
 
 	// add: void invoke(Poco::RemotingNG::ServerTransport& remoting__trans, Poco::RemotingNG::Desrializer& remoting__deser, Poco::RemotingNG::RemoteObject::Ptr remoting__pRemoteObject)
 	Poco::CppParser::Function* pInvoke = new Poco::CppParser::Function("void invoke", pStruct);
-	Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter("Poco::RemotingNG::ServerTransport& remoting__trans", 0);
-	Poco::CppParser::Parameter* pParam2 = new Poco::CppParser::Parameter("Poco::RemotingNG::Deserializer& remoting__deser", 0);
-	Poco::CppParser::Parameter* pParam3 = new Poco::CppParser::Parameter("Poco::RemotingNG::RemoteObject::Ptr remoting__pRemoteObject", 0);
+	Poco::CppParser::Parameter* pParam1 = new Poco::CppParser::Parameter("Poco::RemotingNG::ServerTransport& remoting__trans", nullptr);
+	Poco::CppParser::Parameter* pParam2 = new Poco::CppParser::Parameter("Poco::RemotingNG::Deserializer& remoting__deser", nullptr);
+	Poco::CppParser::Parameter* pParam3 = new Poco::CppParser::Parameter("Poco::RemotingNG::RemoteObject::Ptr remoting__pRemoteObject", nullptr);
 	pInvoke->addParameter(pParam1);
 	pInvoke->addParameter(pParam2);
 	pInvoke->addParameter(pParam3);
@@ -215,7 +212,7 @@ void EventSubscriberGenerator::registerCallbacks(Poco::CodeGeneration::Generator
 }
 
 
-std::vector<std::string> EventSubscriberGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
+std::vector<std::string> EventSubscriberGenerator::newBaseClasses(const Poco::CppParser::Struct* /*pStruct*/)
 {
 	std::vector<std::string> bases;
 	bases.push_back("Poco::RemotingNG::EventSubscriber");
@@ -223,7 +220,7 @@ std::vector<std::string> EventSubscriberGenerator::newBaseClasses(const Poco::Cp
 }
 
 
-void EventSubscriberGenerator::constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void EventSubscriberGenerator::constructorCodeGen(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -247,7 +244,7 @@ void EventSubscriberGenerator::constructorCodeGen(const Poco::CppParser::Functio
 }
 
 
-void EventSubscriberGenerator::invokeCodeGen(const Poco::CppParser::Function* pFuncNew, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void EventSubscriberGenerator::invokeCodeGen(const Poco::CppParser::Function* /*pFuncNew*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
 {
 	poco_assert (addParam);
 	AbstractGenerator* pAGen = reinterpret_cast<AbstractGenerator*>(addParam);
@@ -269,7 +266,7 @@ void EventSubscriberGenerator::invokeCodeGen(const Poco::CppParser::Function* pF
 	std::map<std::string, const Poco::CppParser::Parameter*> outParams;
 	ProxyGenerator::detectOutParams(pFunc, outParams);
 
-	Poco::CppParser::Parameter retParam(pFunc->getReturnParameter() + " dummy", 0);
+	Poco::CppParser::Parameter retParam(pFunc->getReturnParameter() + " dummy", nullptr);
 	bool hasReturnParam = pFunc->getReturnParameter() != Poco::CodeGeneration::Utility::TYPE_VOID && !pFunc->getReturnParameter().empty();
 	bool isOneWay = (outParams.empty() && !hasReturnParam) || pGen->currentFctHasOneWayProperty();
 	std::string indentation;
@@ -528,7 +525,7 @@ void EventSubscriberGenerator::invokeCodeGen(const Poco::CppParser::Function* pF
 }
 
 
-void EventSubscriberGenerator::mhctorCodeGen(const Poco::CppParser::Function* pFuncNew, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void EventSubscriberGenerator::mhctorCodeGen(const Poco::CppParser::Function* /*pFuncNew*/, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen, void* /*addParam*/)
 {
 	// FIXME: the following should actually be done using
 	// constructor member variable initialization syntax.
@@ -539,7 +536,7 @@ void EventSubscriberGenerator::mhctorCodeGen(const Poco::CppParser::Function* pF
 
 
 void EventSubscriberGenerator::writePushAttributes(EventSubscriberGenerator* pGen,
-											const Poco::CppParser::Function* pFunc,
+											const Poco::CppParser::Function* /*pFunc*/,
 											const ProxyGenerator::OrderedParameters& attrs,
 											const std::map<std::string, const Poco::CppParser::Parameter*>& outParams,
 											const std::string& indentation,
@@ -735,7 +732,7 @@ void EventSubscriberGenerator::writeTypeSerializer(const Poco::CppParser::Functi
 }
 
 
-void EventSubscriberGenerator::staticMembersInitializer(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam)
+void EventSubscriberGenerator::staticMembersInitializer(const Poco::CppParser::Function* /*pFunc*/, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* /*addParam*/)
 {
 	std::string code("const std::string ");
 	code.append(pStruct->name());
@@ -804,7 +801,7 @@ void EventSubscriberGenerator::checkForEventMembersImpl(const Poco::CppParser::S
 				Poco::CppParser::Function* pFunc = new Poco::CppParser::Function(funcDecl, _pStruct);
 				if (paramDecl != "void")
 				{
-					Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter(paramDecl, 0);
+					Poco::CppParser::Parameter* pParam = new Poco::CppParser::Parameter(paramDecl, nullptr);
 					pFunc->addParameter(pParam);
 				}
 				Poco::CppParser::Attributes funcAttr;

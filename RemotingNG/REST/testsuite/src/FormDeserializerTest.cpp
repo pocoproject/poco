@@ -24,9 +24,7 @@ FormDeserializerTest::FormDeserializerTest(const std::string& name): CppUnit::Te
 }
 
 
-FormDeserializerTest::~FormDeserializerTest()
-{
-}
+FormDeserializerTest::~FormDeserializerTest() = default;
 
 
 void FormDeserializerTest::testGetRequest()

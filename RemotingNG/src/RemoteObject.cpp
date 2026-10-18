@@ -15,8 +15,7 @@
 #include "Poco/RemotingNG/RemoteObject.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 RemoteObject::RemoteObject(const Identifiable::ObjectId& oid):
@@ -25,9 +24,7 @@ RemoteObject::RemoteObject(const Identifiable::ObjectId& oid):
 }
 
 
-RemoteObject::~RemoteObject()
-{
-}
+RemoteObject::~RemoteObject() = default;
 
 
 bool RemoteObject::remoting__hasEvents() const
@@ -41,4 +38,4 @@ void RemoteObject::remoting__enableRemoteEvents(const std::string&)
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

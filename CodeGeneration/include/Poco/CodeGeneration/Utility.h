@@ -32,8 +32,7 @@
 #endif
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 class CodeGenerator;
@@ -43,6 +42,11 @@ class CodeGeneration_API Utility
 	/// Constants and utility functions for code generation.
 {
 public:
+	Utility() = delete;
+	~Utility() = delete;
+	Utility& operator = (const Utility&) = delete;
+	Utility(const Utility&) = delete;
+
 	static const std::string HFILEEXTENSION;
 	static const std::string CPPFILEEXTENSION;
 	static const std::string RETURN;
@@ -170,12 +174,6 @@ public:
 	static void writeDocumentation(std::ostream& out, const std::string& docu, int indent);
 
 	static void writeAttributes(std::ostream& out, const Poco::CppParser::Attributes& attrs, int indent);
-
-private:
-	Utility();
-	~Utility();
-	Utility& operator = (const Utility&);
-	Utility(const Utility&);
 };
 
 
@@ -198,7 +196,7 @@ private:
 };
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration
 
 
 #endif // CodeGeneration_Utility_INCLUDED

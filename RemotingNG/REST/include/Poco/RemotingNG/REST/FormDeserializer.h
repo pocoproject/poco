@@ -27,9 +27,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API FormDeserializer: public ScalarDeserializer
@@ -47,18 +45,18 @@ public:
 	FormDeserializer(Poco::Net::HTTPResponse& response, std::istream& stream);
 		/// Creates the FormDeserializer.
 
-	~FormDeserializer();
+	~FormDeserializer() override;
 		/// Destroys the FormDeserializer.
 
 	// Poco::RemotingNG::Deserializer
-	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull);
+	bool deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull) override;
 
 protected:
 	void handlePart(const std::string& name, std::istream& stream);
 
 	// ScalarDeserializer
-	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
-	bool deserializeBuffer(const std::string& name, bool isMandatory, std::vector<char>& val);
+	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found) override;
+	bool deserializeBuffer(const std::string& name, bool isMandatory, std::vector<char>& val) override;
 
 private:
 	using PartMap = std::map<std::string, std::vector<char>>;
@@ -72,7 +70,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_FormDeserializer_INCLUDED

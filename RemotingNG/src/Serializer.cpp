@@ -17,18 +17,13 @@
 #include "Poco/DateTimeFormat.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-Serializer::Serializer()
-{
-}
+Serializer::Serializer() = default;
 
 
-Serializer::~Serializer()
-{
-}
+Serializer::~Serializer() = default;
 
 
 void Serializer::serializeOptionalBegin(const std::string& name, bool isSpecified)
@@ -102,4 +97,4 @@ void Serializer::registerNamespace(const std::string&)
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

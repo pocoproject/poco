@@ -22,8 +22,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 POCO_DECLARE_EXCEPTION(RemotingNG_API, RemotingException, Poco::LogicException)
@@ -47,7 +46,7 @@ POCO_DECLARE_EXCEPTION(RemotingNG_API, UnexpectedMessageException, DeserializerE
 POCO_DECLARE_EXCEPTION(RemotingNG_API, MethodNotFoundException, DeserializerException)
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_RemotingException_INCLUDED

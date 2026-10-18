@@ -24,8 +24,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class Proxy;
@@ -40,7 +39,7 @@ public:
 	ProxyFactory();
 		/// Creates a ProxyFactory.
 
-	virtual ~ProxyFactory();
+	~ProxyFactory() override;
 		/// Destroys the ProxyFactory.
 
 	[[nodiscard]] virtual Proxy* createProxy(const RemotingNG::Identifiable::ObjectId& oid) const = 0;
@@ -49,7 +48,7 @@ public:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_ProxyFactory_INCLUDED

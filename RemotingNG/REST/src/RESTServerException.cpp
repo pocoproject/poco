@@ -19,9 +19,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 RESTServerException::RESTServerException(const std::string& reason, int status, JSValue::Ptr pContent):
@@ -47,9 +45,7 @@ RESTServerException::RESTServerException(const RESTServerException& exc):
 }
 
 
-RESTServerException::~RESTServerException() noexcept
-{
-}
+RESTServerException::~RESTServerException() noexcept = default;
 
 
 RESTServerException& RESTServerException::operator = (const RESTServerException& exc)
@@ -107,4 +103,4 @@ std::string RESTServerException::detail() const
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

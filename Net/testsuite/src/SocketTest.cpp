@@ -14,6 +14,7 @@
 #include "EchoServer.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/TCPServerConnection.h"
 #include "Poco/Net/TCPServerConnectionFactory.h"
@@ -29,12 +30,25 @@
 #include "Poco/FileStream.h"
 #include "Poco/Path.h"
 #include "Poco/Thread.h"
+#include "Poco/Event.h"
+#include "Poco/Clock.h"
+#include "Poco/Runnable.h"
 #include <iostream>
+#include <functional>
+#include <algorithm>
+#include <vector>
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <csignal>
+#include <pthread.h>
+#include <sys/resource.h>
+#include <unistd.h>
+#endif
 
 
 using Poco::Net::Socket;
 using Poco::Net::StreamSocket;
 using Poco::Net::ServerSocket;
+using Poco::Net::DatagramSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::ConnectionRefusedException;
 using Poco::Net::TCPServerConnection;
@@ -53,6 +67,127 @@ using Poco::delegate;
 
 namespace
 {
+#if defined(POCO_OS_FAMILY_UNIX)
+	extern "C" void ignoreSignal(int)
+	{
+	}
+
+	class InterruptingSignal
+		/// Installs a handler for SIGUSR1 that does not restart an
+		/// interrupted system call, for the lifetime of the object.
+	{
+	public:
+		InterruptingSignal()
+		{
+			struct sigaction action;
+			action.sa_handler = ignoreSignal;
+			sigemptyset(&action.sa_mask);
+			action.sa_flags = 0;
+			sigaction(SIGUSR1, &action, &_previous);
+		}
+
+		~InterruptingSignal()
+		{
+			sigaction(SIGUSR1, &_previous, nullptr);
+		}
+
+	private:
+		struct sigaction _previous;
+	};
+
+	class Interrupter: public Poco::Runnable
+		/// Sends a signal to a thread every 50 milliseconds, to interrupt
+		/// its blocking system calls, until it is stopped or three seconds
+		/// have passed.
+	{
+	public:
+		explicit Interrupter(pthread_t target):
+			_target(target)
+		{
+		}
+
+		void stop()
+		{
+			_stop.set();
+		}
+
+		void run() override
+		{
+			for (int i = 0; i < 60 && !_stop.tryWait(50); i++)
+			{
+				pthread_kill(_target, SIGUSR1);
+			}
+		}
+
+	private:
+		pthread_t _target;
+		Poco::Event _stop;
+	};
+
+	bool timesOutWhileInterrupted(const std::function<void()>& blockingCall, Timespan& elapsed)
+		/// Runs the call while signals interrupt the calling thread.
+		/// Returns true if the call ended with a TimeoutException; stores
+		/// the time the call took in elapsed.
+	{
+		InterruptingSignal signal;
+		Interrupter interrupter(pthread_self());
+		Poco::Thread interrupterThread;
+		interrupterThread.start(interrupter);
+
+		bool timedOut = false;
+		Poco::Clock start;
+		try
+		{
+			blockingCall();
+		}
+		catch (TimeoutException&)
+		{
+			timedOut = true;
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		elapsed = start.elapsed();
+
+		interrupter.stop();
+		interrupterThread.join();
+		return timedOut;
+	}
+
+	class NoFreeDescriptor
+		/// Uses up the file descriptors of the process for the
+		/// lifetime of the object, with duplicates of the given one.
+	{
+	public:
+		explicit NoFreeDescriptor(int descriptor)
+		{
+			// a low limit keeps the number of duplicates small
+			getrlimit(RLIMIT_NOFILE, &_previous);
+			struct rlimit lowered = _previous;
+			lowered.rlim_cur = std::min<rlim_t>(_previous.rlim_cur, 256);
+			setrlimit(RLIMIT_NOFILE, &lowered);
+
+			for (int fd = ::dup(descriptor); fd >= 0; fd = ::dup(descriptor))
+			{
+				_duplicates.push_back(fd);
+			}
+		}
+
+		~NoFreeDescriptor()
+		{
+			for (int fd: _duplicates)
+			{
+				::close(fd);
+			}
+			setrlimit(RLIMIT_NOFILE, &_previous);
+		}
+
+	private:
+		struct rlimit _previous;
+		std::vector<int> _duplicates;
+	};
+#endif
+
 	class CopyToStringConnection: public TCPServerConnection
 	{
 	public:
@@ -100,6 +235,21 @@ namespace
 
 	Poco::FastMutex CopyToStringConnection::_mutex;
 	std::string CopyToStringConnection::_data;
+
+	bool isInheritedByChildProcess(const Socket& socket)
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		DWORD flags = 0;
+		if (GetHandleInformation(reinterpret_cast<HANDLE>(socket.impl()->sockfd()), &flags) == 0)
+			throw Poco::SystemException("GetHandleInformation");
+		return (flags & HANDLE_FLAG_INHERIT) != 0;
+#else
+		int flags = ::fcntl(socket.impl()->sockfd(), F_GETFD);
+		if (flags == -1)
+			throw Poco::SystemException("fcntl(F_GETFD)");
+		return (flags & FD_CLOEXEC) == 0;
+#endif
+	}
 }
 
 
@@ -206,6 +356,47 @@ void SocketTest::testPoll()
 	assertTrue (n == 5);
 	assertTrue (std::string(buffer, n) == "hello");
 	ss.close();
+}
+
+
+void SocketTest::testPollModes()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	assertTrue (server.poll(Timespan(5, 0), Socket::SELECT_READ));
+	StreamSocket peer = server.acceptConnection();
+
+	const Timespan noWait;
+	assertTrue (ss.poll(noWait, Socket::SELECT_WRITE));
+	assertFalse (ss.poll(noWait, Socket::SELECT_READ));
+	assertFalse (ss.poll(noWait, Socket::SELECT_ERROR));
+	assertTrue (ss.poll(noWait, Socket::SELECT_READ | Socket::SELECT_WRITE));
+
+	peer.sendBytes("hello", 5);
+	assertTrue (ss.poll(Timespan(5, 0), Socket::SELECT_READ));
+	assertFalse (ss.poll(noWait, Socket::SELECT_ERROR));
+	char buffer[256];
+	assertEqual (5, ss.receiveBytes(buffer, sizeof(buffer)));
+	assertFalse (ss.poll(noWait, Socket::SELECT_READ));
+
+	// the end of the stream is readable
+	peer.close();
+	assertTrue (ss.poll(Timespan(5, 0), Socket::SELECT_READ));
+	assertEqual (0, ss.receiveBytes(buffer, sizeof(buffer)));
+}
+
+
+void SocketTest::testPollStress()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+
+	const Timespan noWait;
+	for (int i = 0; i < 10000; i++)
+	{
+		assertTrue (ss.poll(noWait, Socket::SELECT_WRITE));
+		assertFalse (ss.poll(noWait, Socket::SELECT_READ));
+	}
 }
 
 
@@ -968,6 +1159,518 @@ void SocketTest::testSendFileRange()
 }
 
 
+void SocketTest::testSendFileTruncated()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	assertTrue (server.poll(Timespan(5, 0), Socket::SELECT_READ));
+	StreamSocket peer = server.acceptConnection();
+	peer.setReceiveTimeout(Timespan(5, 0));
+
+	const std::string fileData(8000, 'x');
+	const std::string remainingData = fileData.substr(0, 3000);
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	ostr.write(fileData.data(), fileData.size());
+	ostr.close();
+
+	Poco::FileInputStream istr(file.path());
+	const auto count = static_cast<std::streamsize>(istr.size());
+	file.setSize(remainingData.size());
+
+	std::streamsize sent = -1;
+	Poco::Event done;
+	Poco::Thread sender;
+	sender.startFunc([&ss, &istr, &sent, &done, count]
+	{
+		try
+		{
+			sent = ss.sendFile(istr, 0, count);
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		done.set();
+	});
+	const bool returned = done.tryWait(5000);
+	// ends a send that does not return
+	if (!returned) ss.close();
+	sender.join();
+	assertTrue (returned);
+	assertTrue (sent == static_cast<std::streamsize>(remainingData.size()));
+
+	ss.shutdownSend();
+	std::string receivedData;
+	char buffer[1024];
+	int n = peer.receiveBytes(buffer, sizeof(buffer));
+	while (n > 0)
+	{
+		receivedData.append(buffer, n);
+		n = peer.receiveBytes(buffer, sizeof(buffer));
+	}
+	assertTrue (receivedData == remainingData);
+}
+
+
+void SocketTest::testCloseOnExec()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	assertFalse (isInheritedByChildProcess(server));
+
+	StreamSocket client(server.address());
+	assertFalse (isInheritedByChildProcess(client));
+
+	assertTrue (server.poll(Timespan(5, 0), Socket::SELECT_READ));
+	StreamSocket accepted = server.acceptConnection();
+	assertFalse (isInheritedByChildProcess(accepted));
+
+	DatagramSocket datagram(SocketAddress("127.0.0.1", 0), false);
+	assertFalse (isInheritedByChildProcess(datagram));
+}
+
+
+void SocketTest::testReceiveNonBlockingIgnoresTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	ss.setReceiveTimeout(Timespan(0, 500000));
+	ss.setBlocking(false);
+
+	// a non-blocking receive does not wait for the receive timeout, nor throw a TimeoutException
+	char buffer[256];
+	const Poco::Clock start;
+	const int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n < 0);
+	assertTrue (start.elapsed() < 250000);
+}
+
+
+void SocketTest::testPollNegativeTimeoutBelowOneMillisecond()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	const Poco::Clock start;
+	Poco::Thread peerThread;
+	peerThread.startFunc([&peer]
+		{
+			Poco::Thread::sleep(200);
+			try
+			{
+				peer.sendBytes("pong", 4);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	bool readable = false;
+	try
+	{
+		readable = ss.poll(Timespan(-1), Socket::SELECT_READ);
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	const Timespan elapsed = start.elapsed();
+	peerThread.join();
+
+	// a negative timeout of less than one millisecond also waits without limit
+	assertTrue (readable);
+	assertTrue (elapsed >= Timespan(0, 150000));
+}
+
+
+#if defined(POCO_OS_FAMILY_UNIX)
+void SocketTest::testReceiveInterruptedWithTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	ss.setReceiveTimeout(Timespan(0, 500000));
+
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&ss]
+		{
+			char buffer[256];
+			ss.receiveBytes(buffer, sizeof(buffer));
+		}, elapsed);
+
+	// the signals do not restart the receive timeout
+	assertTrue (timedOut);
+	assertTrue (elapsed < Timespan(2, 0));
+}
+
+
+void SocketTest::testReceiveWaitAllInterruptedKeepsTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+	ss.setReceiveTimeout(Timespan(0, 500000));
+	const Timespan configured = ss.getReceiveTimeout();
+
+	InterruptingSignal signal;
+
+	// the signal interrupts the receive, then only one of the two bytes arrives
+	const pthread_t receiver = pthread_self();
+	Poco::Thread peerThread;
+	peerThread.startFunc([&peer, receiver]
+		{
+			Poco::Thread::sleep(200);
+			pthread_kill(receiver, SIGUSR1);
+			Poco::Thread::sleep(200);
+			try
+			{
+				peer.sendBytes("x", 1);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	char buffer[2];
+	int n = -1;
+	bool timedOut = false;
+	const Poco::Clock start;
+	try
+	{
+		n = ss.receiveBytes(buffer, sizeof(buffer), MSG_WAITALL);
+	}
+	catch (TimeoutException&)
+	{
+		timedOut = true;
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	const Timespan elapsed = start.elapsed();
+	peerThread.join();
+
+	// the repeated receive waits only for the rest of the receive timeout
+	assertTrue (n == 1 || timedOut);
+	assertTrue (elapsed < Timespan(0, 750000));
+	assertTrue (ss.getReceiveTimeout() == configured);
+}
+
+
+void SocketTest::testSendInterruptedWithTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	ss.setSendTimeout(Timespan(0, 500000));
+
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&ss]
+		{
+			// the peer does not read, so a send blocks once the buffers are full
+			const Buffer<char> data(65536);
+			const Poco::Clock start;
+			while (start.elapsed() < 10000000)
+			{
+				ss.sendBytes(data.begin(), static_cast<int>(data.size()));
+			}
+		}, elapsed);
+
+	assertTrue (timedOut);
+	assertTrue (elapsed < Timespan(2, 0));
+}
+
+
+void SocketTest::testReceiveFromInterruptedWithTimeout()
+{
+	DatagramSocket ds(SocketAddress("127.0.0.1", 0), false);
+	ds.setReceiveTimeout(Timespan(0, 500000));
+
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&ds]
+		{
+			char buffer[256];
+			SocketAddress sender;
+			ds.receiveFrom(buffer, sizeof(buffer), sender);
+		}, elapsed);
+
+	assertTrue (timedOut);
+	assertTrue (elapsed < Timespan(2, 0));
+}
+
+
+void SocketTest::testAcceptInterruptedWithTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	server.setReceiveTimeout(Timespan(0, 500000));
+
+#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+	// Linux applies the receive timeout of the listening socket to accept()
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&server]
+		{
+			StreamSocket accepted = server.acceptConnection();
+		}, elapsed);
+
+	assertTrue (timedOut);
+	assertTrue (elapsed < Timespan(2, 0));
+
+	// without signals, the expired timeout is reported in the same way
+	const Poco::Clock start;
+	try
+	{
+		StreamSocket accepted = server.acceptConnection();
+		fail("accept must time out");
+	}
+	catch (TimeoutException&)
+	{
+	}
+	assertTrue (start.elapsed() < 2000000);
+#else
+	// accept() has no timeout here, so an interrupted accept keeps waiting:
+	// the client connects only after the receive timeout has passed
+	const SocketAddress address = server.address();
+	StreamSocket client;
+	Poco::Thread clientThread;
+	clientThread.startFunc([&client, &address]
+		{
+			Poco::Thread::sleep(1000);
+			try
+			{
+				client.connect(address);
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		});
+
+	bool accepted = false;
+	Timespan elapsed;
+	const bool timedOut = timesOutWhileInterrupted([&server, &accepted]
+		{
+			StreamSocket ss = server.acceptConnection();
+			accepted = true;
+		}, elapsed);
+	clientThread.join();
+
+	assertFalse (timedOut);
+	assertTrue (accepted);
+#endif
+}
+
+
+void SocketTest::testReceiveInterruptedNoTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	InterruptingSignal signal;
+
+	// the peer sends only after the receive was interrupted a number of times
+	const pthread_t receiver = pthread_self();
+	Poco::Thread peerThread;
+	peerThread.startFunc([&peer, receiver]
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				Poco::Thread::sleep(100);
+				pthread_kill(receiver, SIGUSR1);
+			}
+			try
+			{
+				peer.sendBytes("pong", 4);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	char buffer[256];
+	int n = -1;
+	try
+	{
+		n = ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	peerThread.join();
+
+	assertEqual (4, n);
+	assertEqual (std::string("pong"), std::string(buffer, n));
+}
+
+
+void SocketTest::testPollInterruptedNoTimeout()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	InterruptingSignal signal;
+
+	// the peer sends only after the poll was interrupted a number of times
+	const pthread_t poller = pthread_self();
+	Poco::Thread peerThread;
+	peerThread.startFunc([&peer, poller]
+		{
+			for (int i = 0; i < 5; i++)
+			{
+				Poco::Thread::sleep(100);
+				pthread_kill(poller, SIGUSR1);
+			}
+			try
+			{
+				peer.sendBytes("pong", 4);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	bool readable = false;
+	try
+	{
+		readable = ss.poll(Timespan(-1, 0), Socket::SELECT_READ);
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	peerThread.join();
+
+	// the signals do not end a poll without a timeout
+	assertTrue (readable);
+}
+
+
+void SocketTest::testPollClosedDescriptor()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	// The socket object closes the descriptor number again; no other thread of the test opens a descriptor in between.
+	::close(ss.impl()->sockfd());
+
+	try
+	{
+		ss.poll(Timespan(), Socket::SELECT_WRITE);
+		fail("a descriptor that is not open must throw");
+	}
+	catch (Poco::IOException&)
+	{
+	}
+}
+
+
+void SocketTest::testPollAtFdLimit()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+
+	bool exhausted = false;
+	bool writable = false;
+	std::string error;
+	{
+		const NoFreeDescriptor noFreeDescriptor(ss.impl()->sockfd());
+		exhausted = ::dup(ss.impl()->sockfd()) == -1;
+		try
+		{
+			writable = ss.poll(Timespan(), Socket::SELECT_WRITE);
+		}
+		catch (Poco::Exception& exc)
+		{
+			error = exc.displayText();
+		}
+	}
+
+	assertTrue (exhausted);
+	assertEqual (std::string(), error);
+	assertTrue (writable);
+}
+
+
+#if defined(MSG_DONTWAIT)
+void SocketTest::testReceiveDontWaitBlocking()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+	ss.setReceiveTimeout(Timespan(5, 0));
+
+	// nothing to receive: the calls return -1 and neither wait nor throw
+	char c = 0;
+	Buffer<char> buffer(16);
+	const Poco::Clock start;
+	assertEqual (-1, ss.receiveBytes(&c, 1, MSG_DONTWAIT));
+	assertEqual (-1, ss.receiveBytes(buffer, MSG_DONTWAIT, Timespan(5, 0)));
+	Buffer<char> empty(0);
+	assertEqual (-1, ss.receiveBytes(empty, MSG_DONTWAIT, Timespan(5, 0)));
+
+	DatagramSocket ds(SocketAddress("127.0.0.1", 0), false);
+	ds.setReceiveTimeout(Timespan(5, 0));
+	SocketAddress sender;
+	assertEqual (-1, ds.receiveFrom(&c, 1, sender, MSG_DONTWAIT));
+	assertTrue (start.elapsed() < 2000000);
+
+	assertEqual (1, peer.sendBytes("x", 1));
+	assertTrue (ss.poll(Timespan(5, 0), Socket::SELECT_READ));
+	assertEqual (1, ss.receiveBytes(&c, 1, MSG_DONTWAIT | MSG_PEEK));
+	assertEqual ('x', c);
+	assertEqual (1, ss.receiveBytes(&c, 1, MSG_DONTWAIT));
+}
+
+
+void SocketTest::testSendDontWaitBlocking()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+	// ends the test where a send waits although it must not
+	ss.setSendTimeout(Timespan(5, 0));
+
+	// The peer does not read, so a send fails once the buffers are full.
+	// A block this small is never sent in part with a wait for the rest.
+	Buffer<char> data(1024);
+	for (std::size_t i = 0; i < data.size(); i++) data[i] = static_cast<char>(i % 251);
+	std::vector<char> expected;
+	int rc = 0;
+	const Poco::Clock start;
+	while (rc >= 0 && start.elapsed() < 10000000)
+	{
+		rc = ss.sendBytes(data.begin(), static_cast<int>(data.size()), MSG_DONTWAIT);
+		if (rc > 0) expected.insert(expected.end(), data.begin(), data.begin() + rc);
+	}
+	assertEqual (-1, rc);
+	assertTrue (start.elapsed() < 2000000);
+	assertFalse (expected.empty());
+	ss.shutdownSend();
+
+	// what the calls reported as sent is what the peer receives
+	peer.setReceiveTimeout(Timespan(5, 0));
+	std::vector<char> received;
+	int n = 0;
+	do
+	{
+		n = peer.receiveBytes(data.begin(), static_cast<int>(data.size()));
+		if (n > 0) received.insert(received.end(), data.begin(), data.begin() + n);
+	}
+	while (n > 0);
+	assertTrue (expected == received);
+}
+#endif // MSG_DONTWAIT
+#endif
+
+
 void SocketTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1004,6 +1707,8 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testPeek);
 	CppUnit_addTest(pSuite, SocketTest, testMoveStreamSocket);
 	CppUnit_addTest(pSuite, SocketTest, testPoll);
+	CppUnit_addTest(pSuite, SocketTest, testPollModes);
+	CppUnit_addTest(pSuite, SocketTest, testPollStress);
 	CppUnit_addTest(pSuite, SocketTest, testAvailable);
 	CppUnit_addTest(pSuite, SocketTest, testFIFOBuffer);
 	CppUnit_addTest(pSuite, SocketTest, testConnect);
@@ -1030,6 +1735,25 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testSendFile);
 	CppUnit_addTest(pSuite, SocketTest, testSendFileLarge);
 	CppUnit_addTest(pSuite, SocketTest, testSendFileRange);
+	CppUnit_addTest(pSuite, SocketTest, testSendFileTruncated);
+	CppUnit_addTest(pSuite, SocketTest, testCloseOnExec);
+	CppUnit_addTest(pSuite, SocketTest, testReceiveNonBlockingIgnoresTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testPollNegativeTimeoutBelowOneMillisecond);
+#if defined(POCO_OS_FAMILY_UNIX)
+	CppUnit_addTest(pSuite, SocketTest, testReceiveInterruptedWithTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testReceiveWaitAllInterruptedKeepsTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testSendInterruptedWithTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testReceiveFromInterruptedWithTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testAcceptInterruptedWithTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testReceiveInterruptedNoTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testPollInterruptedNoTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testPollClosedDescriptor);
+	CppUnit_addTest(pSuite, SocketTest, testPollAtFdLimit);
+#if defined(MSG_DONTWAIT)
+	CppUnit_addTest(pSuite, SocketTest, testReceiveDontWaitBlocking);
+	CppUnit_addTest(pSuite, SocketTest, testSendDontWaitBlocking);
+#endif
+#endif
 
 	return pSuite;
 }

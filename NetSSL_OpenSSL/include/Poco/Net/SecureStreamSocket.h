@@ -42,12 +42,15 @@ class NetSSL_API SecureStreamSocket: public StreamSocket
 	/// ERR_SSL_WANT_READ is returned, receiveBytes() must be called
 	/// as soon as data is available for reading (indicated by select()).
 	///
-	/// The SSL handshake is delayed until the first sendBytes() or
-	/// receiveBytes() operation is performed on the socket. No automatic
-	/// post connection check (checking the peer certificate for a valid
-	/// hostname) is performed when using nonblocking I/O. To manually
-	/// perform peer certificate validation, call verifyPeerCertificate()
-	/// after the SSL handshake has been completed.
+	/// The SSL handshake is delayed until the first sendBytes(),
+	/// receiveBytes() or completeHandshake() call on the socket.
+	/// The post connection check (checking the peer certificate for a
+	/// valid hostname) is performed when the SSL handshake completes.
+	/// If the check fails, a CertificateValidationException is thrown
+	/// and no data can be sent or received over the connection.
+	///
+	/// The sendBytes() and receiveBytes() overloads taking a SocketBufVec
+	/// or a Poco::Buffer throw a Poco::InvalidAccessException.
 {
 public:
 	enum
@@ -174,6 +177,20 @@ public:
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
+		///
+		/// For a socket connected through a proxy tunnel, use the attach()
+		/// overload with the tunneled argument; its pSession can be null.
+		///
+		/// If the given socket is itself a SecureStreamSocket, the
+		/// TLS connection of the created socket runs inside the TLS
+		/// connection of the given socket. This holds for all
+		/// attach() functions.
+		///
+		/// NOTE: available() and poll() of a socket attached to a
+		/// SecureStreamSocket do not see data that the given socket
+		/// has received and the created socket has not processed, so
+		/// they can report no data although receiveBytes() would
+		/// return some.
 
 	[[nodiscard]] static SecureStreamSocket attach(const StreamSocket& streamSocket, Context::Ptr pContext);
 		/// Creates a SecureStreamSocket over an existing socket
@@ -199,7 +216,7 @@ public:
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
 
-	[[nodiscard]] static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession);
+	[[nodiscard]] static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession, bool tunneled = false);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
@@ -207,6 +224,10 @@ public:
 		/// The given Session is reused, if possible (client session
 		/// caching is enabled for the given Context, and the server
 		/// agrees to reuse the session).
+		///
+		/// If tunneled is true, the connection to peerHostName goes
+		/// through a proxy tunnel, and the host name check is never left
+		/// out for a loopback peer (see Context::VERIFY_RELAXED).
 
 	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
@@ -224,15 +245,18 @@ public:
 		/// using the peer host name set with setPeerHostName(), or the peer's
 		/// IP address string if no peer host name has been set.
 		///
-		/// Should only be used for non-blocking connections, after the
-		/// initial SSL handshake has been performed (see completeHandshake()).
+		/// This validation is performed automatically when the SSL handshake
+		/// completes.
 
 	void verifyPeerCertificate(const std::string& hostName);
 		/// Performs post-connect (or post-accept) peer certificate validation
 		/// using the given host name.
 		///
-		/// Should only be used for non-blocking connections, after the
-		/// initial SSL handshake has been performed (see completeHandshake()).
+		/// This method is an additional check against another host name; the
+		/// validation against the host name set with setPeerHostName() before
+		/// the SSL handshake is performed automatically. It can only be made
+		/// after the SSL handshake has completed and the automatic validation
+		/// has passed (see completeHandshake()).
 
 	int completeHandshake();
 		/// Completes the SSL handshake.
@@ -245,6 +269,18 @@ public:
 		/// ERR_SSL_WANT_WRITE if more data is required to complete the
 		/// handshake. In this case, completeHandshake() should be called
 		/// again, after the necessary condition has been met.
+		///
+		/// Once the handshake is complete, the peer certificate is validated
+		/// as in verifyPeerCertificate(). Throws a CertificateValidationException
+		/// if the certificate is not acceptable.
+		///
+		/// On the server side, no peer host name is set, so the certificate
+		/// of a client must match the IP address of the client if the Context
+		/// verifies client certificates (VERIFY_RELAXED or VERIFY_STRICT, with
+		/// extended certificate verification enabled). With VERIFY_RELAXED,
+		/// the address is not checked for a client on the local host.
+		/// Throws a NetException if the peer has closed the connection and
+		/// its address cannot be obtained.
 
 	[[nodiscard]] Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,

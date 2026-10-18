@@ -16,19 +16,13 @@
 #include "Poco/Net/SocketAddress.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
-SocketFactory::SocketFactory()
-{
-}
+SocketFactory::SocketFactory() = default;
 
 	
-SocketFactory::~SocketFactory()
-{
-}
+SocketFactory::~SocketFactory() = default;
 
 
 Poco::Net::StreamSocket SocketFactory::createSocket(const Poco::URI& uri)
@@ -48,4 +42,4 @@ Poco::Net::StreamSocket SocketFactory::createSocket(const Poco::URI& uri)
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

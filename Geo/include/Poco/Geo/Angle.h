@@ -1,0 +1,338 @@
+//
+// Angle.h
+//
+// Library: Geo
+// Package: Geo
+// Module:  Angle
+//
+// Definition of the Angle class.
+//
+// Copyright (c) 2010-2015, Günter Obiltschnig.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#ifndef Geo_Angle_INCLUDED
+#define Geo_Angle_INCLUDED
+
+
+#include "Poco/Geo/Geo.h"
+#include <algorithm>
+#include <string>
+
+
+namespace Poco::Geo {
+
+
+class Geo_API Angle
+	/// This class represents a geometric angle.
+	///
+	/// Based on code from the Angle (gov.nasa.worldwind.geom.Angle)  
+	/// class from the NASA WorldWind Java source code released
+	/// under the Apache License 2.0.
+	///
+	/// Note: when comparing Angles for equality, the usual
+	/// issues when comparing floating-point numbers should 
+	/// be considered.
+{
+public:
+	static constexpr double PI = 3.141592653589793238462643383279502884197;
+	static constexpr double DEGREES_TO_RADIANS = PI/180.0;
+	static constexpr double RADIANS_TO_DEGREES = 180.0/PI;
+	static constexpr double PI_OVER_2 = PI/2;
+	
+	static const Angle ZERO;   /// An Angle of zero degrees.
+	static const Angle POS90;  /// An Angle of positive 90 degrees.
+	static const Angle NEG90;  /// An Angle of negative 90 degrees.
+	static const Angle POS180; /// An Angle of positive 180 degrees.
+	static const Angle NEG180; /// An Angle of negative 180 degrees.
+	static const Angle POS360; /// An Angle of positive 360 degrees. 
+	
+	constexpr Angle();
+		/// Creates a zero Angle.
+		
+	Angle(const Angle& angle) = default;
+		/// Creates an Angle by copying another one.
+		
+	~Angle() = default;
+		/// Destroys the Angle.
+		
+	Angle& operator = (const Angle& angle) = default;
+		/// Assignment operator.
+		
+	void swap(Angle& other) noexcept;
+		/// Swaps the Angle with another one.
+	
+	[[nodiscard]] static constexpr Angle fromDegrees(double deg);
+		/// Creates an Angle from a number of degrees.
+		
+	[[nodiscard]] static constexpr Angle fromRadians(double rad);
+		/// Creates an Angle from a number of radians.
+		
+	[[nodiscard]] static constexpr Angle fromDegreesLatitude(double degrees);
+		/// Creates an Angle from a latitude in degrees.
+		///
+		/// Values outside [-90, 90] are clamped.
+
+	[[nodiscard]] static constexpr Angle fromRadiansLatitude(double radians);
+		/// Creates an Angle from a latitude in radians.
+		///
+		/// Values outside [-PI/2, PI/2] are clamped.
+
+	[[nodiscard]] static constexpr Angle fromDegreesLongitude(double degrees);
+		/// Creates an Angle from a longitude in degrees.
+		///
+		/// Values outside [-180, 180] are clamped.
+
+	[[nodiscard]] static constexpr Angle fromRadiansLongitude(double radians);
+		/// Creates an Angle from a longitude in radians.
+		///
+		/// Values outside [-PI, PI] are clamped.
+		
+	[[nodiscard]] static Angle fromXY(double x, double y);
+		/// Creates an Angle from rectangular coordinates.
+		///   - x is the abscissa coordinate
+		///   - y is the ordinate coordinate
+	
+	[[nodiscard]] constexpr double degrees() const;
+		/// Returns the Angle expressed in degrees.
+		
+	[[nodiscard]] constexpr double radians() const;
+		/// Returns the Angle expressed in radians.
+		
+	[[nodiscard]] Angle angularDistanceTo(const Angle& angle) const;
+		/// Returns the shortest distance between this and the 
+		/// given Angle.
+		
+	[[nodiscard]] Angle operator + (const Angle& angle) const;
+		/// Adds another Angle and returns the result.
+		
+	[[nodiscard]] Angle operator - (const Angle& angle) const;
+		/// Subtracts another Angle and returns the result.
+		
+	[[nodiscard]] Angle operator * (double multiplier) const;
+		/// Multiplies the Angle by the given multiplier
+		/// and returns the result.
+		
+	[[nodiscard]] Angle operator / (double divisor) const;
+		/// Divides the Angle by the given divisor
+		/// and returns the result.
+		
+	[[nodiscard]] double operator / (const Angle& angle) const;
+		/// Divides the Angle by the given angle
+		/// and returns the result.
+		
+	[[nodiscard]] double sin() const;
+		/// Returns the sine of this Angle.
+		
+	[[nodiscard]] double cos() const;
+		/// Returns the cosine of this Angle.
+		
+	[[nodiscard]] static double normalizedDegreesLatitude(double degrees);
+		/// Normalizes the given angle in degrees to a
+		/// latitude in the interval [-90, 90] and returns
+		/// the result.
+		
+	[[nodiscard]] static double normalizedDegreesLongitude(double degrees);
+		/// Normalizes the given angle in degrees to a
+		/// longitude in the interval [-180, 180] and returns
+		/// the result.
+
+	[[nodiscard]] static double normalizedDegrees(double degrees);
+		/// Normalizes the given angle in degrees to
+		/// the interval [0, 360) and returns
+		/// the result.
+	
+	[[nodiscard]] Angle normalizedLatitude() const;
+		/// Returns a normalized latitudinal Angle.
+		
+	[[nodiscard]] Angle normalizedLongitude() const;
+		/// Returns a normalized longitudinal Angle.
+		
+	[[nodiscard]] Angle normalized() const;
+		/// Returns a normalized Angle.
+		
+	[[nodiscard]] static const std::string& compassDirectionFromDegrees(double degrees);
+		/// Returns the corresponding compass direction (N, NNW, NW, etc.)
+		/// for the given angle.
+		
+	[[nodiscard]] const std::string& compassDirection() const;
+		/// Returns the corresponding compass direction (N, NNW, NW, etc.)
+		/// for the Angle.
+	
+	// Comparison
+	[[nodiscard]] bool operator == (const Angle& angle) const;
+	[[nodiscard]] bool operator != (const Angle& angle) const;
+	[[nodiscard]] bool operator >  (const Angle& angle) const;
+	[[nodiscard]] bool operator >= (const Angle& angle) const;
+	[[nodiscard]] bool operator <  (const Angle& angle) const;
+	[[nodiscard]] bool operator <= (const Angle& angle) const;
+
+	static const std::string COMPASS_N;
+	static const std::string COMPASS_NNE;
+	static const std::string COMPASS_NE;
+	static const std::string COMPASS_ENE;
+	static const std::string COMPASS_E;
+	static const std::string COMPASS_ESE;
+	static const std::string COMPASS_SE;
+	static const std::string COMPASS_SSE;
+	static const std::string COMPASS_S;
+	static const std::string COMPASS_SSW;
+	static const std::string COMPASS_SW;
+	static const std::string COMPASS_WSW;
+	static const std::string COMPASS_W;
+	static const std::string COMPASS_WNW;
+	static const std::string COMPASS_NW;
+	static const std::string COMPASS_NNW;
+	
+private:
+	constexpr Angle(double deg, double rad);
+		/// Creates an Angle.
+	
+	double _degrees;
+	double _radians;
+};
+
+
+//
+// inlines
+//
+constexpr Angle::Angle():
+	_degrees(0.0),
+	_radians(0.0)
+{
+}
+
+
+constexpr Angle::Angle(double deg, double rad):
+	_degrees(deg),
+	_radians(rad)
+{
+}
+
+
+constexpr Angle Angle::fromDegrees(double deg)
+{
+	return Angle(deg, DEGREES_TO_RADIANS*deg);
+}
+
+
+constexpr Angle Angle::fromRadians(double rad)
+{
+	return Angle(RADIANS_TO_DEGREES*rad, rad);
+}
+
+
+constexpr Angle Angle::fromDegreesLatitude(double degrees)
+{
+	return fromDegrees(std::clamp(degrees, -90.0, 90.0));
+}
+
+
+constexpr Angle Angle::fromRadiansLatitude(double radians)
+{
+	return fromRadians(std::clamp(radians, -PI_OVER_2, PI_OVER_2));
+}
+
+
+constexpr Angle Angle::fromDegreesLongitude(double degrees)
+{
+	return fromDegrees(std::clamp(degrees, -180.0, 180.0));
+}
+
+
+constexpr Angle Angle::fromRadiansLongitude(double radians)
+{
+	return fromRadians(std::clamp(radians, -PI, PI));
+}
+
+
+constexpr double Angle::degrees() const
+{
+	return _degrees;
+}
+
+
+constexpr double Angle::radians() const
+{
+	return _radians;
+}
+
+
+inline bool Angle::operator == (const Angle& angle) const
+{
+	return _degrees == angle._degrees;
+}
+
+
+inline bool Angle::operator != (const Angle& angle) const
+{
+	return _degrees != angle._degrees;
+}
+
+
+inline bool Angle::operator > (const Angle& angle) const
+{
+	return _degrees > angle._degrees;
+}
+
+
+inline bool Angle::operator >= (const Angle& angle) const
+{
+	return _degrees >= angle._degrees;
+}
+
+
+inline bool Angle::operator < (const Angle& angle) const
+{
+	return _degrees < angle._degrees;
+}
+
+
+inline bool Angle::operator <= (const Angle& angle) const
+{
+	return _degrees <= angle._degrees;
+}
+
+
+inline Angle Angle::operator + (const Angle& angle) const
+{
+	return fromDegrees(_degrees + angle._degrees);
+}
+
+
+inline Angle Angle::operator - (const Angle& angle) const
+{
+	return fromDegrees(_degrees - angle._degrees);
+}
+
+
+inline Angle Angle::operator * (double multiplier) const
+{
+	return fromDegrees(_degrees*multiplier);
+}
+
+
+inline Angle Angle::operator / (double divisor) const
+{
+	return fromDegrees(_degrees/divisor);
+}
+
+
+inline double Angle::operator / (const Angle& angle) const
+{
+	return _degrees/angle._degrees;
+}
+
+
+inline void swap(Angle& a1, Angle& a2) noexcept
+{
+	a1.swap(a2);
+}
+
+
+} // namespace Poco::Geo
+
+
+#endif // Geo_Angle_INCLUDED

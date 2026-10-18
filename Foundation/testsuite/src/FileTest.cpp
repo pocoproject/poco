@@ -854,6 +854,31 @@ void FileTest::testLongPath()
 #endif
 }
 
+
+void FileTest::testLongPathUNC()
+{
+#if defined(_WIN32)
+	// The extended-length prefix must not change how a UNC path is
+	// interpreted: a path below and a path above the limit fail the same way.
+	const std::string prefix("\\\\nohost.invalid\\share\\");
+	for (std::size_t len: {std::size_t(MAX_PATH - 12), std::size_t(MAX_PATH - 11)})
+	{
+		const std::string path = prefix + std::string(len - prefix.size(), 'a');
+		try
+		{
+			Poco::File(path).exists();
+		}
+		catch (const Poco::PathSyntaxException&)
+		{
+			failmsg("UNC path converted to an invalid extended-length path");
+		}
+		catch (const Poco::Exception&)
+		{
+		}
+	}
+#endif
+}
+
 void FileTest::testUnixFileExtension()
 {
 	std::string filePath1 = "/a/b/c/.notextension";
@@ -1219,6 +1244,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testRenameFailIfExists);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
+	CppUnit_addTest(pSuite, FileTest, testLongPathUNC);
 	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
 	CppUnit_addTest(pSuite, FileTest, testTemporaryFile);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathNonExistent);

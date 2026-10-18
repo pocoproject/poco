@@ -21,8 +21,7 @@
 #include "Poco/RemotingNG/Identifiable.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API URIUtility
@@ -65,7 +64,7 @@ private:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_URIUtility_INCLUDED

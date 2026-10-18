@@ -259,6 +259,13 @@
 #endif
 
 
+// Not on the BSDs: there accept() passes the O_NONBLOCK flag of the
+// listening socket on to the accepted socket and accept4() does not.
+#if defined(SOCK_CLOEXEC) && ((POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_ANDROID))
+	#define POCO_HAVE_ACCEPT4 1
+#endif
+
+
 #if defined(POCO_HAVE_ADDRINFO)
 	#ifndef AI_PASSIVE
 		#define AI_PASSIVE 0

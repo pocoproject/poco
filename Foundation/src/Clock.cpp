@@ -18,6 +18,7 @@
 #if defined(__APPLE__)
 #include <mach/mach.h>
 #include <mach/clock.h>
+#include <time.h>
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include <time.h>
 #include <unistd.h>
@@ -99,13 +100,11 @@ void Clock::update()
 
 #elif defined(__APPLE__)
 
-	clock_serv_t cs;
-	mach_timespec_t ts;
-
-	host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cs);
-	clock_get_time(cs, &ts);
-	mach_port_deallocate(mach_task_self(), cs);
-
+	// CLOCK_UPTIME_RAW does not advance while the system sleeps;
+	// CLOCK_MONOTONIC does on Apple platforms.
+	struct timespec ts;
+	if (clock_gettime(CLOCK_UPTIME_RAW, &ts))
+		throw SystemException("cannot get system clock");
 	_clock = ClockVal(ts.tv_sec)*resolution() + ts.tv_nsec/1000;
 
 #elif defined(POCO_VXWORKS)

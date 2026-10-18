@@ -61,9 +61,20 @@ public:
 		/// connection the socket is set to nonblocking mode.
 
 	void bind(const SocketAddress& address, bool reuseAddress = false) override;
-		/// Not supported by a SecureStreamSocket.
-		///
-		/// Throws a Poco::InvalidAccessException.
+		/// Binds the underlying TCP socket to a local address
+		/// before connect().
+
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort) override;
+		/// Binds the underlying TCP socket to a local address
+		/// before connect().
+
+	void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false) override;
+		/// Binds the underlying TCP socket to a local IPv6 address
+		/// before connect().
+
+	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only) override;
+		/// Binds the underlying TCP socket to a local IPv6 address
+		/// before connect().
 
 	void listen(int backlog = 64) override;
 		/// Not supported by a SecureStreamSocket.
@@ -80,18 +91,43 @@ public:
 		/// Returns the number of bytes sent, which may be
 		/// less than the number of bytes specified.
 
+	int sendBytes(const SocketBufVec& buffers, int flags = 0) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	int receiveBytes(void* buffer, int length, int flags = 0) override;
 		/// Receives data from the socket and stores it
 		/// in buffer. Up to length bytes are received.
 		///
 		/// Returns the number of bytes received.
 
+	int receiveBytes(SocketBufVec& buffers, int flags = 0) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
+	int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& timeout = 100000) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
+	int sendTo(const SocketBufVec& buffers, const SocketAddress& address, int flags = 0) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0) override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
+	int receiveFrom(SocketBufVec& buffers, SocketAddress& address, int flags = 0) override;
 		/// Not supported by a SecureStreamSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
@@ -148,6 +184,13 @@ public:
 
 	[[nodiscard]] const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
+
+	void setTunneled(bool tunneled);
+		/// Sets whether the connection reaches the peer host through
+		/// a proxy tunnel (see SecureSocketImpl::setTunneled()).
+
+	[[nodiscard]] bool getTunneled() const;
+		/// Returns true if the connection is tunneled.
 
 	[[nodiscard]] bool havePeerCertificate() const;
 		/// Returns true iff the peer has presented a
@@ -252,6 +295,18 @@ inline const std::string& SecureStreamSocketImpl::getPeerHostName() const
 inline void SecureStreamSocketImpl::setPeerHostName(const std::string& peerHostName)
 {
 	_impl.setPeerHostName(peerHostName);
+}
+
+
+inline void SecureStreamSocketImpl::setTunneled(bool tunneled)
+{
+	_impl.setTunneled(tunneled);
+}
+
+
+inline bool SecureStreamSocketImpl::getTunneled() const
+{
+	return _impl.getTunneled();
 }
 
 

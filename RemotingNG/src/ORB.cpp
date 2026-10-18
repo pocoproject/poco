@@ -27,20 +27,16 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 ORB::ORB():
-	_enabled(true),
 	_logger(Poco::Logger::get("RemotingNG.ORB"s))
 {
 }
 
 
-ORB::~ORB()
-{
-}
+ORB::~ORB() = default;
 
 
 ORB& ORB::instance()
@@ -204,7 +200,7 @@ ORB::RemoteObjectInfo::Ptr ORB::findLocalObject(const Identifiable::TypeId& tid,
 			}
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -636,4 +632,4 @@ ORB::URIAliases::const_iterator ORB::findAlias(const std::string& path) const
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

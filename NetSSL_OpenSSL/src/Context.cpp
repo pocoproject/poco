@@ -45,9 +45,9 @@ Context::Params::Params(KeyDHGroup dhBits):
 	verificationDepth(9),
 	loadDefaultCAs(false),
 	ocspStaplingVerification(false),
-	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
+	cipherList(DEFAULT_CIPHER_LIST),
 	dhGroup(dhBits),
-	securityLevel(SECURITY_LEVEL_NONE)
+	securityLevel(SECURITY_LEVEL_DEFAULT)
 {
 }
 
@@ -266,7 +266,14 @@ void Context::init(const Params& params)
 
 void Context::setSecurityLevel(SecurityLevel level)
 {
-	SSL_CTX_set_security_level(_pSSLContext, static_cast<int>(level));
+	if (level != SECURITY_LEVEL_DEFAULT)
+		SSL_CTX_set_security_level(_pSSLContext, static_cast<int>(level));
+}
+
+
+Context::SecurityLevel Context::getSecurityLevel() const
+{
+	return static_cast<SecurityLevel>(SSL_CTX_get_security_level(_pSSLContext));
 }
 
 void Context::ignoreUnexpectedEof(bool flag)
@@ -759,10 +766,8 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 	EVP_PKEY_CTX* pKeyCtx = nullptr;
 	OSSL_DECODER_CTX* pOSSLDecodeCtx = nullptr;
 	EVP_PKEY* pKey = nullptr;
-	bool freeEVPPKey = true;
 	if (!dhParamsFile.empty())
 	{
-		freeEVPPKey = false;
 		pOSSLDecodeCtx = OSSL_DECODER_CTX_new_for_pkey(&pKey, nullptr, nullptr, "DH",
 				OSSL_KEYMGMT_SELECT_DOMAIN_PARAMETERS, nullptr, nullptr);
 
@@ -881,9 +886,15 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 
 	if (!SSL_CTX_set0_tmp_dh_pkey(_pSSLContext, pKey))
 	{
-		if (freeEVPPKey) EVP_PKEY_free(pKey);
-		std::string err = "Context::initDH():SSL_CTX_set0_tmp_dh_pkey()\n";
-		throw SSLContextException(Poco::Crypto::getError(err));
+		EVP_PKEY_free(pKey);
+		// The security level rejects the default group, which the application
+		// has not chosen: OpenSSL selects the parameters instead.
+		if (!dhParamsFile.empty() || keyDHGroup != KEY_DH_GROUP_2048 || !SSL_CTX_set_dh_auto(_pSSLContext, 1))
+		{
+			std::string err = "Context::initDH():SSL_CTX_set0_tmp_dh_pkey()\n";
+			throw SSLContextException(Poco::Crypto::getError(err));
+		}
+		ERR_clear_error();
 	}
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
 
@@ -976,8 +987,15 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 	if (!SSL_CTX_set_tmp_dh(_pSSLContext, dh))
 	{
 		DH_free(dh);
-		std::string msg = Utility::getLastError();
-		throw SSLContextException("Cannot set Diffie-Hellman parameters", msg);
+		// The security level rejects the default group, which the application
+		// has not chosen: OpenSSL selects the parameters instead.
+		if (!dhParamsFile.empty() || keyDHGroup != KEY_DH_GROUP_2048 || !SSL_CTX_set_dh_auto(_pSSLContext, 1))
+		{
+			std::string msg = Utility::getLastError();
+			throw SSLContextException("Cannot set Diffie-Hellman parameters", msg);
+		}
+		ERR_clear_error();
+		dh = nullptr;
 	}
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
 	DH_free(dh);

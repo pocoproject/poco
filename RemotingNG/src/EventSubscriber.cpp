@@ -15,8 +15,7 @@
 #include "Poco/RemotingNG/EventSubscriber.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 EventSubscriber::EventSubscriber(const std::string& uri):
@@ -25,9 +24,7 @@ EventSubscriber::EventSubscriber(const std::string& uri):
 }
 
 
-EventSubscriber::~EventSubscriber()
-{
-}
+EventSubscriber::~EventSubscriber() = default;
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

@@ -15,19 +15,13 @@
 #include "Poco/RemotingNG/REST/JSObject.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
-JSObject::JSObject()
-{
-}
+JSObject::JSObject() = default;
 
 
-JSObject::~JSObject()
-{
-}
+JSObject::~JSObject() = default;
 
 
 JSValue::Type JSObject::type() const
@@ -64,4 +58,4 @@ bool JSObject::has(const std::string& name) const
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

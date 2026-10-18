@@ -26,9 +26,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API CredentialsStore: public Poco::RefCountedObject
@@ -42,7 +40,7 @@ public:
 	CredentialsStore();
 		/// Creates a CredentialsStore.
 
-	~CredentialsStore();
+	~CredentialsStore() override;
 		/// Destroys the CredentialsStore.
 
 	[[nodiscard]] Poco::UInt64 addCredentials(const Credentials& creds);
@@ -66,7 +64,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_CredentialsStore_INCLUDED

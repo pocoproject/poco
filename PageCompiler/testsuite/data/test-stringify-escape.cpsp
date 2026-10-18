@@ -1,0 +1,1 @@
+<%@ page class="StringifyEscapeHandler" namespace="AI::Test" stringify="true" form="true" escape="true" %><p><%= "<a&b>" %></p>

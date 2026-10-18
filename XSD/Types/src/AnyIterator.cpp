@@ -33,7 +33,7 @@ AnyIterator::AnyIterator(Any& any):
 AnyIterator::~AnyIterator() = default;
 
 
-OrderContent::Ptr AnyIterator::next(const std::string& name)
+OrderContent::Ptr AnyIterator::next(const std::string& /*name*/)
 {
 	if (_cnt < _max)
 	{
@@ -60,7 +60,7 @@ bool AnyIterator::end() const
 }
 
 
-bool AnyIterator::validNext(const std::string& name) const
+bool AnyIterator::validNext(const std::string& /*name*/) const
 {
 	return (_cnt < _max);
 }

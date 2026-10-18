@@ -18,9 +18,7 @@
 #include "Poco/Net/HTTPSessionInstantiator.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 TransportFactory::TransportFactory(Serializer::SOAPVersion soapVersion): 
@@ -29,9 +27,7 @@ TransportFactory::TransportFactory(Serializer::SOAPVersion soapVersion):
 }
 
 
-TransportFactory::~TransportFactory()
-{
-}
+TransportFactory::~TransportFactory() = default;
 
 
 Poco::RemotingNG::Transport* TransportFactory::createTransport()
@@ -58,4 +54,4 @@ void TransportFactory::unregisterFactory()
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

@@ -21,30 +21,19 @@
 #include "Poco/Path.h"
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 CppGenerator::CppGenerator(const std::string& nameSpace, const std::string& libraryName, bool usePocoIncludes, const std::string& copyright, std::ostream& hOut, std::ostream& cppOut):
 	CodeGenerator(nameSpace, libraryName, usePocoIncludes, copyright),
 	_hOut(hOut),
 	_cppOut(cppOut),
-	_className(),
-	_inInlineFct(false),
-	_isTemplate(false),
-	_inPureVirtualFct(false),
-	_lastAcc(Poco::CppParser::Symbol::ACC_PUBLIC),
-	_pStruct(0),
-	_pFunc(0),
-	_attributesEnabled(false),
-	_timestampsEnabled(true)
+	_className()
 {
 }
 
 
-CppGenerator::~CppGenerator()
-{
-}
+CppGenerator::~CppGenerator() = default;
 
 
 void CppGenerator::enableAttributes(bool enable)
@@ -126,7 +115,7 @@ void CppGenerator::writeNameSpaceBegin(const std::string& nameSpace, bool toHead
 	if (!nameSpace.empty())
 	{
 		Poco::StringTokenizer aTok(nameSpace, ":", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
-		int nsCnt = (int)aTok.count();
+		int nsCnt = static_cast<int>(aTok.count());
 		if (!_isTemplate && !toHeaderOnly)
 		{
 			_cppOut << "\n\n";
@@ -219,7 +208,7 @@ void CppGenerator::writeNameSpaceEnd(const std::string& nameSpace, bool toHeader
 	if (!nameSpace.empty())
 	{
 		Poco::StringTokenizer aTok(nameSpace, ":", Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
-		int nsCnt = (int)aTok.count();
+		int nsCnt = static_cast<int>(aTok.count());
 		for (int i = 0; i < nsCnt; ++i)
 		{
 			_hOut << "} // namespace " << aTok[nsCnt-1-i] << "\n";
@@ -239,7 +228,7 @@ void CppGenerator::writeNameSpaceEnd(const std::string& nameSpace, bool toHeader
 }
 
 
-void CppGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties)
+void CppGenerator::structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& /*properties*/)
 {
 	_pStruct = pStruct;
 	_className = pStruct->name();
@@ -304,7 +293,7 @@ void CppGenerator::methodStart(const Poco::CppParser::Function* pFunc, const Cod
 }
 
 
-void CppGenerator::writeMethodStartCpp(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties, std::ostream& out)
+void CppGenerator::writeMethodStartCpp(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& /*properties*/, std::ostream& out)
 {
 	poco_assert_dbg(!_inPureVirtualFct);
 	if (pFunc->flags() & Poco::CppParser::Function::FN_INLINE)
@@ -350,7 +339,7 @@ void CppGenerator::writeMethodStartCpp(const Poco::CppParser::Function* pFunc, c
 }
 
 
-void CppGenerator::writeMethodStartH(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties)
+void CppGenerator::writeMethodStartH(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& /*properties*/)
 {
 	writeFunctionHeader(pFunc, true, _hOut);
 	_hOut << ";\n";
@@ -422,7 +411,7 @@ void CppGenerator::writeFunctionHeader(const Poco::CppParser::Function* pFunc, b
 }
 
 
-void CppGenerator::writeMethodStartTemplate(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties)
+void CppGenerator::writeMethodStartTemplate(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& /*properties*/)
 {
 	std::ostream& out = _pStruct->isInline()? _cppOut : _hOut;
 	writeFunctionHeader(pFunc, true, out);
@@ -492,11 +481,11 @@ void CppGenerator::methodEnd(const Poco::CppParser::Function* pFunc, const CodeG
 		methodEndImpl(pFunc, properties, _cppOut);
 	_inInlineFct = false;
 	_inPureVirtualFct = false;
-	_pFunc = 0;
+	_pFunc = nullptr;
 }
 
 
-void CppGenerator::methodEndImpl(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties, std::ostream& out)
+void CppGenerator::methodEndImpl(const Poco::CppParser::Function* /*pFunc*/, const CodeGenerator::Properties& /*properties*/, std::ostream& out)
 {
 	out << "}\n\n\n";
 	_inInlineFct = false;
@@ -743,7 +732,7 @@ const Poco::CppParser::Parameter* CppGenerator::findParameter(const Poco::CppPar
 		if ((*it)->name() == paramName)
 			return *it;
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -777,4 +766,4 @@ void CppGenerator::endFile()
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration

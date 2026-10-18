@@ -21,9 +21,7 @@
 #include "Poco/RemotingNG/REST/JSValue.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API JSScalar: public JSValue
@@ -39,12 +37,12 @@ public:
 		/// Creates a JSScalar with the given value and type.
 
 	// JSValue
-	[[nodiscard]] Type type() const;
+	[[nodiscard]] Type type() const override;
 	
-	[[nodiscard]] const std::string& stringValue() const;
+	[[nodiscard]] const std::string& stringValue() const override;
 
 protected:
-	~JSScalar();
+	~JSScalar() override;
 		/// Destroys the JSScalar.
 	
 private:
@@ -53,7 +51,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_JSScalar_INCLUDED

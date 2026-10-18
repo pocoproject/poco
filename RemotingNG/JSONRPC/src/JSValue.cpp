@@ -16,9 +16,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 std::size_t JSValue::size() const
@@ -33,34 +31,34 @@ const std::string& JSValue::stringValue() const
 }
 
 
-const JSValue::Ptr& JSValue::operator [] (const std::string& name) const
+const JSValue::Ptr& JSValue::operator [] (const std::string& /*name*/) const
 {
 	throw Poco::InvalidAccessException("Named value access is only supported for JSObject");
 }
 
 
-JSValue::Ptr& JSValue::operator [] (const std::string& name)
+JSValue::Ptr& JSValue::operator [] (const std::string& /*name*/)
 {
 	throw Poco::InvalidAccessException("Named value access is only supported for JSObject");
 }
 
 
-const JSValue::Ptr& JSValue::operator [] (std::size_t index) const
+const JSValue::Ptr& JSValue::operator [] (std::size_t /*index*/) const
 {
 	throw Poco::InvalidAccessException("Ordered value access is only supported for JSArray");
 }
 
 
-JSValue::Ptr& JSValue::operator [] (std::size_t index)
+JSValue::Ptr& JSValue::operator [] (std::size_t /*index*/)
 {
 	throw Poco::InvalidAccessException("Ordered value access is only supported for JSArray");
 }
 
 
-bool JSValue::has(const std::string& name) const
+bool JSValue::has(const std::string& /*name*/) const
 {
 	return false;
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

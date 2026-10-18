@@ -22,7 +22,7 @@ class FormDeserializerTest: public CppUnit::TestCase
 {
 public:
 	FormDeserializerTest(const std::string& name);
-	~FormDeserializerTest();
+	~FormDeserializerTest() override;
 
 	void testGetRequest();
 	void testPostRequest();
@@ -30,8 +30,8 @@ public:
 	void testResponse();
 	void testTypes();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

@@ -16,21 +16,16 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 Poco::ThreadLocal<Context::Ptr> Context::_pContextHolder;
 
 
-Context::Context()
-{
-}
+Context::Context() = default;
 
 
-Context::~Context()
-{
-}
+Context::~Context() = default;
 
 
 void Context::set(Context::Ptr pContext)
@@ -106,7 +101,7 @@ ScopedContext::ScopedContext():
 
 ScopedContext::~ScopedContext()
 {
-	_pContext = 0;
+	_pContext = nullptr;
 	try
 	{
 		Context::set(_pContext);
@@ -118,4 +113,4 @@ ScopedContext::~ScopedContext()
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

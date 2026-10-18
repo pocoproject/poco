@@ -27,7 +27,7 @@ class RemotingTest: public CppUnit::TestCase
 {
 public:
 	RemotingTest(const std::string& name);
-	~RemotingTest();
+	~RemotingTest() override;
 	
 	void testRegistration();
 	void testInt();
@@ -63,8 +63,8 @@ public:
 	void testEventUnsubscribeOrder();
 	void testEventUnsubscribeNoThread();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 
@@ -105,9 +105,9 @@ class RemotingTestCompressed: public RemotingTest
 {
 public:
 	RemotingTestCompressed(const std::string& name);
-	~RemotingTestCompressed();
+	~RemotingTestCompressed() override;
 
-	ITester::Ptr createProxy(const std::string& uri);
+	ITester::Ptr createProxy(const std::string& uri) override;
 
 	static CppUnit::Test* suite();
 };

@@ -24,8 +24,13 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Format.h"
+#include "Poco/String.h"
 #include <openssl/x509v3.h>
 #include <openssl/err.h>
+#include <algorithm>
+#include <cerrno>
+#include <mutex>
+#include <utility>
 
 
 using Poco::IOException;
@@ -33,6 +38,43 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::NumberFormatter;
 using Poco::Timespan;
+
+
+namespace
+{
+	// The longest time that shutdown() of a blocking socket waits for the
+	// close_notify alert of the peer.
+	const Poco::Timespan SHUTDOWN_WAIT(1, 0);
+
+	// The longest time that shutdown() waits for another thread to leave
+	// its call on the socket before it takes that thread as blocked.
+	const Poco::Timespan LOCK_WAIT(0, 100000);
+
+	// The number of sends and receives on an underlying secure socket that
+	// SSL calls of this thread have in progress.
+	thread_local int nestedSocketIO = 0;
+
+	struct NestedSocketIO
+	{
+		NestedSocketIO() { ++nestedSocketIO; }
+		~NestedSocketIO() { --nestedSocketIO; }
+	};
+
+	// Called before an SSL operation, so that SocketImpl::lastError()
+	// afterwards cannot hold the error code of an unrelated earlier call.
+	void clearSSLErrors()
+	{
+		// An SSL call of a TLS connection that runs inside another one puts
+		// the reason of a fatal error on the queue before it sends the alert
+		// through the underlying secure socket: the queue is not cleared there.
+		if (nestedSocketIO == 0) ::ERR_clear_error();
+#if defined(_WIN32)
+		WSASetLastError(0);
+#else
+		errno = 0;
+#endif
+	}
+}
 
 
 namespace Poco::Net {
@@ -43,7 +85,11 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_pSocket(pSocketImpl),
 	_pContext(pContext),
 	_needHandshake(false),
-	_ticketPending(false)
+	_ticketPending(false),
+	_pendingWrite(false),
+	_fatalError(false),
+	_bioEOF(false),
+	_tunneled(false)
 {
 	poco_check_ptr (_pSocket);
 	poco_check_ptr (_pContext);
@@ -82,9 +128,8 @@ void SecureSocketImpl::acceptSSL()
 
 	LockT l(_mutex);
 
-	BIO* pBIO = ::BIO_new(BIO_s_socket());
+	BIO* pBIO = createBIO();
 	if (!pBIO) throw SSLException("Cannot create BIO object");
-	BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
 
 	_pSSL = ::SSL_new(_pContext->sslContext());
 	if (!_pSSL)
@@ -125,6 +170,9 @@ void SecureSocketImpl::acceptSSL()
 		throw SSLException("Cannot store the socket in the SSL object", Utility::getLastError());
 	}
 	_needHandshake = true;
+	_pendingWrite = false;
+	_fatalError = false;
+	_bioEOF = false;
 }
 
 
@@ -190,9 +238,8 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 
 	LockT l(_mutex);
 
-	::BIO* pBIO = ::BIO_new(BIO_s_socket());
+	::BIO* pBIO = createBIO();
 	if (!pBIO) throw SSLException("Cannot create SSL BIO object");
-	BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
 
 	_pSSL = ::SSL_new(_pContext->sslContext());
 	if (!_pSSL)
@@ -201,6 +248,9 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		throw SSLException("Cannot create SSL object");
 	}
 	::SSL_set_bio(_pSSL, pBIO, pBIO);
+	_pendingWrite = false;
+	_fatalError = false;
+	_bioEOF = false;
 
 	try
 	{
@@ -224,26 +274,10 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 			::SSL_set_session(_pSSL, _pSession->sslSession());
 		}
 
+		::SSL_set_connect_state(_pSSL);
 		if (performHandshake && _pSocket->getBlocking())
 		{
-			int ret;
-			const auto recvTimeout = _pSocket->getReceiveTimeout();
-			Poco::Timestamp tsStart;
-			while (true)
-			{
-				// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
-				// left there by unrelated code would turn a retry condition into a fatal error.
-				::ERR_clear_error();
-				ret = ::SSL_connect(_pSSL);
-				if (!mustRetry(ret))
-					break;
-
-				// As in completeHandshake(): without a receive timeout the first
-				// failed retry ends the handshake, so that a socket that has
-				// become invalid cannot keep the loop going (GH #3557).
-				if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
-					throw Poco::TimeoutException();
-			};
+			const int ret = handshakeWithDeadline(_pSocket->getReceiveTimeout());
 			// The peer is verified once the handshake is complete: anything
 			// else that handleError() lets pass is no connection.
 			if (handleError(ret) != 1)
@@ -252,7 +286,6 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		}
 		else
 		{
-			::SSL_set_connect_state(_pSSL);
 			_needHandshake = true;
 		}
 	}
@@ -261,6 +294,103 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		::SSL_free(_pSSL);
 		_pSSL = nullptr;
 		throw;
+	}
+}
+
+
+BIO* SecureSocketImpl::createBIO()
+{
+	if (!_pSocket->secure())
+	{
+		BIO* pBIO = ::BIO_new(BIO_s_socket());
+		if (pBIO != nullptr) BIO_set_fd(pBIO, static_cast<int>(_pSocket->sockfd()), BIO_NOCLOSE);
+		return pBIO;
+	}
+
+	// Created once and never freed: SSL objects may use it for as long as
+	// the process runs.
+	static BIO_METHOD* const pMethod = []
+	{
+		const int index = ::BIO_get_new_index();
+		if (index == -1) throw SSLException("Cannot create BIO type");
+		BIO_METHOD* pNewMethod = ::BIO_meth_new(index | BIO_TYPE_SOURCE_SINK, "Poco::Net::SocketImpl");
+		if (pNewMethod == nullptr) throw SSLException("Cannot create BIO method");
+		::BIO_meth_set_write(pNewMethod, &SecureSocketImpl::bioWrite);
+		::BIO_meth_set_read(pNewMethod, &SecureSocketImpl::bioRead);
+		::BIO_meth_set_ctrl(pNewMethod, &SecureSocketImpl::bioCtrl);
+		return pNewMethod;
+	}();
+
+	BIO* pBIO = ::BIO_new(pMethod);
+	if (pBIO != nullptr)
+	{
+		::BIO_set_data(pBIO, this);
+		::BIO_set_init(pBIO, 1);
+	}
+	return pBIO;
+}
+
+
+template <typename IO>
+int SecureSocketImpl::socketIO(BIO* pBIO, int direction, IO&& io)
+{
+	BIO_clear_retry_flags(pBIO);
+	try
+	{
+		NestedSocketIO nested;
+		const int rc = io();
+		if (rc == 0 && direction == BIO_FLAGS_READ) _bioEOF = true;
+		if (rc >= 0) return rc;
+
+		// The underlying socket is non-blocking: the SSL call ends with
+		// the same request to the caller.
+		if (rc == SecureStreamSocket::ERR_SSL_WANT_READ)
+			direction = BIO_FLAGS_READ;
+		else if (rc == SecureStreamSocket::ERR_SSL_WANT_WRITE)
+			direction = BIO_FLAGS_WRITE;
+		BIO_set_flags(pBIO, direction | BIO_FLAGS_SHOULD_RETRY);
+	}
+	catch (Poco::TimeoutException&)
+	{
+		// The caller of the SSL call counts the time and reports the timeout.
+		BIO_set_flags(pBIO, direction | BIO_FLAGS_SHOULD_RETRY);
+	}
+	catch (...)
+	{
+		// An exception must not pass through OpenSSL: handleError() rethrows it.
+		_bioException = std::current_exception();
+	}
+	return -1;
+}
+
+
+int SecureSocketImpl::bioWrite(BIO* pBIO, const char* buffer, int length)
+{
+	SecureSocketImpl* pThis = static_cast<SecureSocketImpl*>(::BIO_get_data(pBIO));
+	return pThis->socketIO(pBIO, BIO_FLAGS_WRITE, [&] { return pThis->_pSocket->sendBytes(buffer, length); });
+}
+
+
+int SecureSocketImpl::bioRead(BIO* pBIO, char* buffer, int length)
+{
+	SecureSocketImpl* pThis = static_cast<SecureSocketImpl*>(::BIO_get_data(pBIO));
+	return pThis->socketIO(pBIO, BIO_FLAGS_READ, [&] { return pThis->_pSocket->receiveBytes(buffer, length); });
+}
+
+
+long SecureSocketImpl::bioCtrl(BIO* pBIO, int cmd, long larg, void* parg)
+{
+	switch (cmd)
+	{
+	case BIO_CTRL_FLUSH:
+		// sendBytes() of the underlying socket does not buffer
+		return 1;
+	case BIO_CTRL_EOF:
+		// OpenSSL takes a read that returns 0 as an end of the stream only
+		// if the BIO confirms it, and otherwise as a failed read.
+		return static_cast<SecureSocketImpl*>(::BIO_get_data(pBIO))->_bioEOF ? 1 : 0;
+	default:
+		return 0;
 	}
 }
 
@@ -309,7 +439,40 @@ int SecureSocketImpl::shutdown()
 {
 	if (_pSSL)
 	{
-		UnLockT l(_mutex);
+		// The mutex is also held for a moment by a call that does not wait
+		// for the peer, so only a thread that keeps it counts as blocked.
+		if (!_mutex.tryLock(static_cast<long>(LOCK_WAIT.totalMilliseconds())))
+		{
+			// Another thread is inside an SSL call on this connection, so no
+			// close_notify alert can be sent. A TCP shutdown, unlike the TLS
+			// shutdown of an underlying secure socket, ends that call, which
+			// could otherwise hold the mutex as long as the peer likes.
+			_pSocket->SocketImpl::shutdown();
+			return 0;
+		}
+		UnLockT l(_mutex, std::adopt_lock);
+		if (_fatalError)
+		{
+			// OpenSSL does not allow SSL_shutdown() after a fatal error.
+			l.unlock();
+			try
+			{
+				_pSocket->shutdownSend();
+			}
+			catch (NetException&)
+			{
+				// the connection is gone, there is nothing left to shut down
+			}
+			return 0;
+		}
+		if (_needHandshake || ::SSL_in_init(_pSSL) != 0)
+		{
+			// No close_notify alert can be sent before the handshake is complete.
+			// With an underlying secure socket, the TCP connection is shut down,
+			// not only its TLS connection.
+			_pSocket->SocketImpl::shutdown();
+			return 0;
+		}
 
 		int shutdownState = ::SSL_get_shutdown(_pSSL);
 		bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
@@ -320,46 +483,132 @@ int SecureSocketImpl::shutdown()
 			{
 				// For blocking sockets, perform bidirectional shutdown
 				// to ensure all data is received by the peer before closing.
-				Poco::Timespan recvTimeout = _pSocket->getReceiveTimeout();
-				Poco::Timespan pollTimeout(0, 100000);
-				Poco::Timestamp tsStart;
-				do
+				// The wait for the close_notify alert of the peer has its own
+				// limit: a peer that never answers would otherwise hold close()
+				// and the destructor for the whole receive timeout.
+				const Poco::Timespan wait = std::min(_pSocket->getReceiveTimeout(), SHUTDOWN_WAIT);
+				// The own close_notify alert is sent on the blocking socket,
+				// so that the send timeout is its limit.
+				clearSSLErrors();
+				rc = ::SSL_shutdown(_pSSL);
+				/* The close_notify alert stays behind the unsent TLS record,
+				 * so the peer cannot answer it. */
+				if (rc == 0 && !_pendingWrite && wait > 0)
 				{
-					::ERR_clear_error();
-					rc = ::SSL_shutdown(_pSSL);
-					if (rc == 1) break;
-					if (rc < 0)
+					Poco::Timestamp tsStart;
+					// A blocking SSL_shutdown() returns only when a single read finds
+					// no data within the receive timeout, so the time is counted here.
+					_pSocket->setBlocking(false);
+					try
 					{
-						int err = ::SSL_get_error(_pSSL, rc);
-						if (err == SSL_ERROR_WANT_READ)
-							(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
-						else if (err == SSL_ERROR_WANT_WRITE)
-							(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
-						else
-							break;
+						// SSL_shutdown() comes before each wait: the alert of the peer
+						// may already be buffered, for example decrypted by an
+						// underlying secure socket, where poll() does not see it.
+						while (true)
+						{
+							clearSSLErrors();
+							rc = ::SSL_shutdown(_pSSL);
+							if (rc == 1) break;
+							int mode = Poco::Net::Socket::SELECT_READ;
+							if (rc < 0)
+							{
+								int err = ::SSL_get_error(_pSSL, rc);
+								if (err == SSL_ERROR_WANT_WRITE)
+									mode = Poco::Net::Socket::SELECT_WRITE;
+								else if (err != SSL_ERROR_WANT_READ)
+									break;
+							}
+							const Poco::Timespan remaining = wait - tsStart.elapsed();
+							if (remaining <= 0 || !_pSocket->poll(remaining, mode)) break;
+						}
+						_pSocket->setBlocking(true);
 					}
-					else
+					catch (Poco::IOException&)
 					{
-						(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+						// An I/O error during the wait, on Windows also a close() of
+						// another thread, is a fatal error.
+						try
+						{
+							_pSocket->setBlocking(true);
+						}
+						catch (Poco::Exception&)
+						{
+						}
+						_fatalError = true;
+						l.unlock();
+						try
+						{
+							_pSocket->shutdownSend();
+						}
+						catch (NetException&)
+						{
+							// the connection is gone, there is nothing left to shut down
+						}
+						return 0;
 					}
-				} while (!tsStart.isElapsed(recvTimeout.totalMicroseconds()));
+					catch (...)
+					{
+						try
+						{
+							_pSocket->setBlocking(true);
+						}
+						catch (Poco::Exception&)
+						{
+						}
+						throw;
+					}
+				}
 				if (rc < 0)
 				{
-					rc = handleError(rc);
+					// The close_notify alert was sent; only the one of the peer
+					// did not arrive in time, which SSL_shutdown() reports as 0.
+					if (::SSL_get_error(_pSSL, rc) == SSL_ERROR_WANT_READ)
+						rc = 0;
+					else
+					{
+						try
+						{
+							rc = handleError(rc);
+						}
+						catch (Poco::IOException&)
+						{
+						}
+						catch (Poco::TimeoutException&)
+						{
+						}
+					}
 				}
 			}
 			else
 			{
 				// For non-blocking sockets, call SSL_shutdown() once.
-				::ERR_clear_error();
+				clearSSLErrors();
 				rc = ::SSL_shutdown(_pSSL);
 				if (rc < 0)
 				{
 					if (SocketImpl::lastError() == POCO_EWOULDBLOCK)
 						rc = SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
 					else
-						rc = handleError(rc);
+					{
+						try
+						{
+							rc = handleError(rc);
+						}
+						catch (Poco::IOException&)
+						{
+						}
+						catch (Poco::TimeoutException&)
+						{
+							// ETIMEDOUT is reported as a TimeoutException, which is not an IOException
+						}
+					}
 				}
+			}
+			if (_fatalError)
+			{
+				// The connection failed in this call: take the fatal error path.
+				l.unlock();
+				return shutdown();
 			}
 
 			l.unlock();
@@ -388,6 +637,13 @@ void SecureSocketImpl::close()
 	catch (...)
 	{
 	}
+#if !defined(_WIN32)
+	// Close the descriptor only after a thread blocked on this socket has left
+	// the call that shutdown() ended: a descriptor opened in between could get
+	// the same number, and the call would continue on it. On Windows a shutdown
+	// does not end a call that waits in select(); closing the descriptor does.
+	LockT l(_mutex);
+#endif
 	_pSocket->close();
 }
 
@@ -403,12 +659,10 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 
 	if (_needHandshake)
 	{
-		rc = completeHandshake();
-		if (rc == 1)
-			verifyPeerCertificate();
-		else if (rc == 0)
+		rc = completeHandshakeLocked();
+		if (rc == 0)
 			throw SSLConnectionUnexpectedlyClosedException();
-		else
+		else if (rc != 1)
 			return rc;
 	}
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
@@ -425,19 +679,25 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	Poco::Timestamp tsStart;
 	while (true)
 	{
-		::ERR_clear_error();
+		clearSSLErrors();
 		rc = ::SSL_write(_pSSL, buffer, length);
-		if (!mustRetry(rc))
+		bool interrupted = false;
+		if (!mustRetry(rc, interrupted))
 			break;
 
-		if (tsStart.isElapsed(sendTimeout.totalMicroseconds()))
+		// a signal does not end a send that has no timeout
+		if (!(interrupted && sendTimeout == 0) && tsStart.isElapsed(sendTimeout.totalMicroseconds()))
+		{
+			_pendingWrite = true;
 			throw Poco::TimeoutException();
+		}
 	};
 	if (rc <= 0)
 	{
 		rc = handleError(rc);
 		if (rc == 0) throw SSLConnectionUnexpectedlyClosedException();
 	}
+	_pendingWrite = (rc == SecureStreamSocket::ERR_SSL_WANT_WRITE);
 	return rc;
 }
 
@@ -453,10 +713,8 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 
 	if (_needHandshake)
 	{
-		rc = completeHandshake();
-		if (rc == 1)
-			verifyPeerCertificate();
-		else
+		rc = completeHandshakeLocked();
+		if (rc != 1)
 			return rc;
 	}
 
@@ -464,12 +722,13 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	// the socket becomes invalid (e.g. closed by the OS during app
 	// backgrounding on mobile platforms). See GH #3557.
 	// With default (unset) receive timeout, isElapsed(0) returns
-	// true immediately, breaking the loop on the first failed retry.
+	// true immediately, breaking the loop on the first failed retry,
+	// unless a signal interrupted the read.
 	const auto recvTimeout = _pSocket->getReceiveTimeout();
 	Poco::Timestamp tsStart;
 	while (true)
 	{
-		::ERR_clear_error();
+		clearSSLErrors();
 		if (flags & MSG_PEEK)
 		{
 			rc = SSL_peek(_pSSL, buffer, length);
@@ -478,10 +737,11 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 		{
 			rc = SSL_read(_pSSL, buffer, length);
 		}
-		if (!mustRetry(rc))
+		bool interrupted = false;
+		if (!mustRetry(rc, interrupted))
 			break;
 
-		if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
+		if (!(interrupted && recvTimeout == 0) && tsStart.isElapsed(recvTimeout.totalMicroseconds()))
 			throw Poco::TimeoutException();
 	};
 	if (rc <= 0)
@@ -504,26 +764,25 @@ int SecureSocketImpl::available() const
 
 int SecureSocketImpl::completeHandshake()
 {
+	LockT l(_mutex);
+
+	return completeHandshakeLocked();
+}
+
+
+int SecureSocketImpl::completeHandshakeLocked()
+{
 	poco_assert (_pSocket->initialized());
 	poco_check_ptr (_pSSL);
 
-	int rc;
-	const auto recvTimeout = _pSocket->getReceiveTimeout();
-	Poco::Timestamp tsStart;
-	while (true)
-	{
-		::ERR_clear_error();
-		rc = ::SSL_do_handshake(_pSSL);
-		if (!mustRetry(rc))
-			break;
-
-		if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
-			throw Poco::TimeoutException();
-	};
+	const int rc = handshakeWithDeadline(_pSocket->getReceiveTimeout());
 	if (rc <= 0)
 	{
 		return handleError(rc);
 	}
+	// The handshake stays pending when the peer is not accepted, so that
+	// no later call sends or receives data on the connection.
+	verifyPeerCertificate();
 	_needHandshake = false;
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	/* Request the ticket suppressed in acceptSSL() only once, and only in
@@ -537,8 +796,94 @@ int SecureSocketImpl::completeHandshake()
 }
 
 
+int SecureSocketImpl::handshakeWithDeadline(const Poco::Timespan& timeout)
+{
+	int rc;
+	Poco::Timestamp tsStart;
+	if (timeout <= 0 || !_pSocket->getBlocking())
+	{
+		while (true)
+		{
+			// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
+			// left there by unrelated code would turn a retry condition into a fatal error.
+			clearSSLErrors();
+			rc = ::SSL_do_handshake(_pSSL);
+			bool interrupted = false;
+			if (!mustRetry(rc, interrupted))
+				break;
+
+			// Without a timeout the first failed retry ends the handshake,
+			// so that a socket that has become invalid cannot keep the
+			// loop going (GH #3557). A retry after a signal is not such
+			// a failure.
+			if (!(interrupted && timeout == 0) && tsStart.isElapsed(timeout.totalMicroseconds()))
+				throw Poco::TimeoutException();
+		};
+		return rc;
+	}
+
+	// A blocking SSL_do_handshake() returns only when a single read finds
+	// no data within the receive timeout: a peer that sends one byte at a
+	// time would keep it going. The time is therefore counted here.
+	_pSocket->setBlocking(false);
+	try
+	{
+		while (true)
+		{
+			clearSSLErrors();
+			rc = ::SSL_do_handshake(_pSSL);
+			if (rc > 0)
+				break;
+
+			bool interrupted = false;
+			int mode = 0;
+			const int sslError = ::SSL_get_error(_pSSL, rc);
+			if (sslError == SSL_ERROR_WANT_READ)
+				mode = Poco::Net::Socket::SELECT_READ;
+			else if (sslError == SSL_ERROR_WANT_WRITE)
+				mode = Poco::Net::Socket::SELECT_WRITE;
+			else if (!mustRetry(rc, interrupted))
+				break;
+
+			const Poco::Timespan remaining = timeout - tsStart.elapsed();
+			if (remaining <= 0)
+				throw Poco::TimeoutException();
+			if (mode != 0)
+			{
+#if defined(_WIN32)
+				// close() of another thread does not wait for this call, and a
+				// socket that is closed during poll() is not reported: the short
+				// wait lets the next poll() find the closed socket and throw.
+				(void) _pSocket->poll(std::min(remaining, LOCK_WAIT), mode);
+#else
+				(void) _pSocket->poll(remaining, mode);
+#endif
+			}
+		};
+	}
+	catch (...)
+	{
+		try
+		{
+			_pSocket->setBlocking(true);
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		throw;
+	}
+	_pSocket->setBlocking(true);
+	return rc;
+}
+
+
 void SecureSocketImpl::verifyPeerCertificate()
 {
+	// Without verification the peer address is not needed, and it is no
+	// longer available once the peer has reset the connection.
+	if (_pContext->verificationMode() == Context::VERIFY_NONE)
+		return;
+
 	if (_peerHostName.empty())
 		verifyPeerCertificate(_pSocket->peerAddress().host().toString());
 	else
@@ -560,8 +905,7 @@ void SecureSocketImpl::verifyPeerCertificate(const std::string& hostName)
 long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
-	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
-	   (mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
+	if (mode == Context::VERIFY_NONE)
 	{
 		return X509_V_OK;
 	}
@@ -571,26 +915,46 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 #else
 	::X509* pCert = ::SSL_get_peer_certificate(_pSSL);
 #endif
-	if (pCert)
+	if (pCert == nullptr)
 	{
-		X509Certificate cert(pCert);
-		return cert.verify(hostName) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
+		// OpenSSL does not run its verification when the peer sends no
+		// certificate. A client certificate is optional unless OpenSSL
+		// itself requires it (VERIFY_STRICT); a server without a
+		// certificate is not authenticated at all.
+		bool isServer = _pSSL != nullptr && ::SSL_is_server(_pSSL) == 1;
+		return isServer ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
 	}
-	else return X509_V_OK;
+	X509Certificate cert(pCert);
+
+	if (!_pContext->extendedCertificateVerificationEnabled())
+	{
+		return X509_V_OK;
+	}
+	if (mode != Context::VERIFY_STRICT && isLocalHost(hostName) && !_tunneled)
+	{
+		// The name alone does not say where the connection ends: the host name
+		// check is left out only for a loopback peer address, and never for a
+		// tunneled connection, whose peer address is the one of the proxy.
+		const SocketAddress peer = _pSocket->peerAddress();
+		if ((peer.family() == SocketAddress::IPv4 || peer.family() == SocketAddress::IPv6) && peer.host().isLoopback())
+		{
+			return X509_V_OK;
+		}
+	}
+	return cert.verify(hostName) ? X509_V_OK : X509_V_ERR_APPLICATION_VERIFICATION;
 }
 
 
 bool SecureSocketImpl::isLocalHost(const std::string& hostName)
 {
-	try
+	// No name resolution: an answer of the name service must not decide
+	// whether the host name of a certificate is checked.
+	if (Poco::icompare(hostName, "localhost") == 0)
 	{
-		SocketAddress addr(hostName, 0);
-		return addr.host().isLoopback();
+		return true;
 	}
-	catch (const Poco::Exception&)
-	{
-		return false;
-	}
+	IPAddress address;
+	return IPAddress::tryParse(hostName, address) && address.isLoopback();
 }
 
 
@@ -609,10 +973,14 @@ X509* SecureSocketImpl::peerCertificate() const
 }
 
 
-bool SecureSocketImpl::mustRetry(int rc)
+bool SecureSocketImpl::mustRetry(int rc, bool& interrupted)
 {
+	interrupted = false;
 	if (rc <= 0)
 	{
+		// an exception of the underlying secure socket is final
+		if (_bioException) return false;
+
 		static const Poco::Timespan pollTimeout(0, 100000);
 
 		int sslError = ::SSL_get_error(_pSSL, rc);
@@ -622,6 +990,7 @@ bool SecureSocketImpl::mustRetry(int rc)
 		case SSL_ERROR_WANT_READ:
 			if (_pSocket->getBlocking())
 			{
+				interrupted = socketError == POCO_EINTR;
 				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
 				return true;
 			}
@@ -629,14 +998,19 @@ bool SecureSocketImpl::mustRetry(int rc)
 		case SSL_ERROR_WANT_WRITE:
 			if (_pSocket->getBlocking())
 			{
+				interrupted = socketError == POCO_EINTR;
 				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
 				return true;
 			}
 			break;
 		case SSL_ERROR_SYSCALL:
-			return socketError == POCO_EAGAIN || socketError == POCO_EINTR;
+			// On POSIX systems, OpenSSL reports EINTR as a retry condition.
+			// On Windows, WSAEINTR means that closesocket() of another thread
+			// has cancelled the call, and a retry would use the closed socket.
+			return socketError == POCO_EAGAIN;
 		default:
-			return socketError == POCO_EINTR;
+			// every other result is final
+			break;
 		}
 	}
 	return false;
@@ -646,6 +1020,12 @@ bool SecureSocketImpl::mustRetry(int rc)
 int SecureSocketImpl::handleError(int rc)
 {
 	if (rc > 0) return rc;
+
+	if (_bioException)
+	{
+		_fatalError = true;
+		std::rethrow_exception(std::exchange(_bioException, nullptr));
+	}
 
 	int sslError = ::SSL_get_error(_pSSL, rc);
 	int socketError = SocketImpl::lastError();
@@ -662,6 +1042,7 @@ int SecureSocketImpl::handleError(int rc)
 	case SSL_ERROR_WANT_ACCEPT:
 	case SSL_ERROR_WANT_X509_LOOKUP:
 		// these should not occur
+		_fatalError = true;
 		poco_bugcheck();
 		return rc;
 	// SSL_GET_ERROR(3ossl):
@@ -676,6 +1057,15 @@ int SecureSocketImpl::handleError(int rc)
 		// fallthrough to handle socket errors first
 #endif
 	case SSL_ERROR_SYSCALL:
+#if defined(_WIN32)
+		// A send or receive that timed out leaves the connection usable. On
+		// Windows the timeout of a blocking socket is reported this way.
+		if (sslError != SSL_ERROR_SYSCALL || socketError != POCO_ETIMEDOUT)
+			_fatalError = true;
+#else
+		// ETIMEDOUT from a send or receive means that the TCP connection is dead.
+		_fatalError = true;
+#endif
 		if (socketError)
 		{
 			if (socketError == POCO_EWOULDBLOCK)
@@ -686,6 +1076,7 @@ int SecureSocketImpl::handleError(int rc)
 		// fallthrough
 	default:
 		{
+			_fatalError = true;
 			long lastError = ::ERR_peek_last_error();
 			::ERR_clear_error();
 			std::string msg;
@@ -700,8 +1091,10 @@ int SecureSocketImpl::handleError(int rc)
 			// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
 			// errno was 0.  Since OpenSSL 3.0 the returned error is
 			// SSL_ERROR_SSL with a meaningful error on the error stack.
+			// SSL_ERROR_SYSCALL without an error on the stack and without a
+			// socket error is an unexpected EOF with every version.
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-			if (sslError == SSL_ERROR_SSL)
+			if (sslError == SSL_ERROR_SSL || lastError == 0)
 #else
 			if (lastError == 0)
 #endif
@@ -750,13 +1143,18 @@ void SecureSocketImpl::reset()
 		::SSL_free(_pSSL);
 		_pSSL = nullptr;
 		_ticketPending = false;
+		_pendingWrite = false;
+		_fatalError = false;
+		_bioEOF = false;
+		_bioException = nullptr;
 	}
 }
 
 
 void SecureSocketImpl::abort()
 {
-	_pSocket->shutdown();
+	// the TCP connection, also under an underlying secure socket
+	_pSocket->SocketImpl::shutdown();
 }
 
 

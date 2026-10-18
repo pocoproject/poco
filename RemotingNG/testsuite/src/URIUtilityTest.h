@@ -22,7 +22,7 @@ class URIUtilityTest: public CppUnit::TestCase
 {
 public:
 	URIUtilityTest(const std::string& name);
-	~URIUtilityTest();
+	~URIUtilityTest() override;
 
 	void testMatchPathBasic();
 	void testMatchPathPlaceholder();
@@ -30,8 +30,8 @@ public:
 	void testMatchPathAlternationNamed();
 	void testMatchPathMixed();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

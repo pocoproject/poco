@@ -16,8 +16,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 POCO_IMPLEMENT_EXCEPTION(RemotingException, Poco::LogicException, "RemotingNG Exception")
@@ -41,4 +40,4 @@ POCO_IMPLEMENT_EXCEPTION(UnexpectedMessageException, DeserializerException, "Une
 POCO_IMPLEMENT_EXCEPTION(MethodNotFoundException, DeserializerException, "Method not found")
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

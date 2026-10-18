@@ -24,8 +24,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 class CodeGeneration_API CppGenerator: public CodeGenerator
@@ -35,7 +34,7 @@ public:
 	CppGenerator(const std::string& nameSpace, const std::string& libraryName, bool usePocoIncludeStyle, const std::string& copyright, std::ostream& hOut, std::ostream& cppOut);
 		/// Creates the CppGenerator.
 
-	~CppGenerator();
+	~CppGenerator() override;
 		/// Destroys the CppGenerator.
 
 	void enableAttributes(bool enable = true);
@@ -52,45 +51,45 @@ public:
 		/// Register a hint which tells us which constant value should be used to init
 		/// a given member variable.
 
-	void writeDefaultHeader(const Poco::CppParser::Struct* pStruct, const std::string& className, const std::string& libraryName, const std::string& package);
+	void writeDefaultHeader(const Poco::CppParser::Struct* pStruct, const std::string& className, const std::string& libraryName, const std::string& package) override;
 		/// Writes the default header, plus include guard
 
-	void endFile();
+	void endFile() override;
 		/// Closes the include guard
 
-	void writeInclude(const std::string& include, bool toHeader);
+	void writeInclude(const std::string& include, bool toHeader) override;
 
 	void writeSrcInclude(const std::string& include);
 
-	void writeSystemInclude(const std::string& include);
+	void writeSystemInclude(const std::string& include) override;
 
-	void writeNameSpaceBegin(const std::string& fullNameSpace);
+	void writeNameSpaceBegin(const std::string& fullNameSpace) override;
 
-	void writeFwdDecls(const CodeGenerator::FwdDecls& decl);
+	void writeFwdDecls(const CodeGenerator::FwdDecls& decl) override;
 
-	void writeNameSpaceEnd(const std::string& fullNameSpace);
+	void writeNameSpaceEnd(const std::string& fullNameSpace) override;
 
-	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
+	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties) override;
 
-	void structEnd();
+	void structEnd() override;
 
-	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 
-	void writeMethodImplementation(const std::string& code);
+	void writeMethodImplementation(const std::string& code) override;
 
-	void writeImplementation(const std::string& code);
+	void writeImplementation(const std::string& code) override;
 
-	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 
-	void variablesStart();
+	void variablesStart() override;
 
-	void variable(const Poco::CppParser::Variable* pVar);
+	void variable(const Poco::CppParser::Variable* pVar) override;
 
-	void variablesEnd();
+	void variablesEnd() override;
 
-	void writeTypeDef(const Poco::CppParser::TypeDef* pType);
+	void writeTypeDef(const Poco::CppParser::TypeDef* pType) override;
 
-	void writeUsing(const Poco::CppParser::TypeAlias* pType);
+	void writeUsing(const Poco::CppParser::TypeAlias* pType) override;
 
 	void writeToHeader(const std::string& jsCode);
 
@@ -136,8 +135,8 @@ private:
 		/// Matches fucntion declaration to a parameter declaration. Returns true on success,
 
 private:
-	typedef std::map<const Poco::CppParser::Variable*, const Poco::CppParser::Parameter*> ConstructorMapping;
-	typedef std::map<const Poco::CppParser::Variable*, std::string> SimpleConstructorMapping;
+	using ConstructorMapping = std::map<const Poco::CppParser::Variable*, const Poco::CppParser::Parameter*>;
+	using SimpleConstructorMapping = std::map<const Poco::CppParser::Variable*, std::string>;
 
 	struct InlineFunctionInfo
 	{
@@ -150,18 +149,18 @@ private:
 	std::ostream&             _hOut;
 	std::ostream&             _cppOut;
 	std::string               _className;
-	bool                      _inInlineFct;
-	bool                      _isTemplate;
-	bool                      _inPureVirtualFct;
-	Poco::CppParser::Symbol::Access _lastAcc;
-	const Poco::CppParser::Struct*  _pStruct;
-	const Poco::CppParser::Function* _pFunc;
+	bool                      _inInlineFct = false;
+	bool                      _isTemplate = false;
+	bool                      _inPureVirtualFct = false;
+	Poco::CppParser::Symbol::Access _lastAcc = Poco::CppParser::Symbol::ACC_PUBLIC;
+	const Poco::CppParser::Struct*  _pStruct = nullptr;
+	const Poco::CppParser::Function* _pFunc = nullptr;
 	std::vector<InlineFunctionInfo> _inlineFunctions;
 	ConstructorMapping        _constrMapping;
 	SimpleConstructorMapping  _simpleConstrMapping;
 	std::string               _includeGuard;
-	bool                      _attributesEnabled;
-	bool                      _timestampsEnabled;
+	bool                      _attributesEnabled = false;
+	bool                      _timestampsEnabled = true;
 };
 
 
@@ -183,7 +182,7 @@ inline void CppGenerator::writeToHeader(const std::string& jsCode)
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration
 
 
 #endif // CodeGeneration_CppGenerator_INCLUDED

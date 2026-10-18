@@ -24,9 +24,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 PathDeserializer::PathDeserializer(const std::string& pathTemplate, const Poco::Net::HTTPRequest& request)
@@ -35,12 +33,10 @@ PathDeserializer::PathDeserializer(const std::string& pathTemplate, const Poco::
 }
 
 
-PathDeserializer::~PathDeserializer()
-{
-}
+PathDeserializer::~PathDeserializer() = default;
 
 
-bool PathDeserializer::deserializeNullableBegin(const std::string& name, bool isMandatory, bool& isNull)
+bool PathDeserializer::deserializeNullableBegin(const std::string& name, bool /*isMandatory*/, bool& isNull)
 {
 	isNull = _values.find(name) == _values.end();
 	return !isNull;
@@ -112,4 +108,4 @@ void PathDeserializer::parsePath(const std::string& pathTemplate, const Poco::Ne
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

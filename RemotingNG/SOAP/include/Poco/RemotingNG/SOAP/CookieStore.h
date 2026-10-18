@@ -29,9 +29,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 class RemotingNGSOAP_API CookieStore: public Poco::RefCountedObject
@@ -53,7 +51,7 @@ public:
 	CookieStore();
 		/// Creates an empty CookieStore.
 
-	~CookieStore();
+	~CookieStore() override;
 		/// Destroys the CookieStore.
 
 	void addCookies(Poco::Net::HTTPRequest& request);
@@ -76,7 +74,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP
 
 
 #endif // RemotingNG_SOAP_CookieStore_INCLUDED

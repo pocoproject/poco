@@ -25,9 +25,7 @@ RawDeserializerTest::RawDeserializerTest(const std::string& name): CppUnit::Test
 }
 
 
-RawDeserializerTest::~RawDeserializerTest()
-{
-}
+RawDeserializerTest::~RawDeserializerTest() = default;
 
 
 void RawDeserializerTest::testInt()

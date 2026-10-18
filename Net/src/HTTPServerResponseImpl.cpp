@@ -115,25 +115,32 @@ void HTTPServerResponseImpl::sendFile(const std::string& path, const std::string
 
 	File f(path);
 	Timestamp dateTime    = f.getLastModified();
-	File::FileSize length = f.getSize();
 	set("Last-Modified"s, DateTimeFormatter::format(dateTime, DateTimeFormat::HTTP_FORMAT));
-#if defined(POCO_HAVE_INT64)
-	setContentLength64(length);
-#else
-	setContentLength(static_cast<int>(length));
-#endif
 	setContentType(mediaType);
 	setChunkedTransferEncoding(false);
 
 	Poco::FileInputStream istr(path);
 	if (istr.good())
 	{
+		// Content-Length is the size of the open file, and exactly that many bytes are sent,
+		// so the body matches it even if the file changes meanwhile.
+		const auto length = static_cast<std::streamsize>(istr.size());
+#if defined(POCO_HAVE_INT64)
+		setContentLength64(length);
+#else
+		setContentLength(static_cast<int>(length));
+#endif
 		_pStream = new HTTPHeaderOutputStream(_session);
 		write(*_pStream);
-		if (_pRequest && _pRequest->getMethod() != HTTPRequest::HTTP_HEAD)
+		// a count of 0 would send the whole file, which may no longer be empty
+		if (_pRequest != nullptr && _pRequest->getMethod() != HTTPRequest::HTTP_HEAD && length > 0)
 		{
 			_pStream->flush(); // flush the HTTP headers to the socket, required by HTTP 1.0 and above
-			_session.socket().sendFile(istr);
+			if (_session.socket().sendFile(istr, 0, length) < length)
+			{
+				setKeepAlive(false);
+				throw Poco::IOException("file truncated while sending", path);
+			}
 		}
 	}
 	else throw OpenFileException(path);

@@ -17,8 +17,8 @@
 #include "Poco/URI.h"
 #include "Poco/NumberFormatter.h"
 
-namespace Poco {
-namespace RemotingNG {
+
+namespace Poco::RemotingNG {
 
 
 bool URIUtility::matchAlternatives(const std::string& segment, std::string::const_iterator& itTempl, std::string::const_iterator endTempl)
@@ -149,4 +149,4 @@ bool URIUtility::matchPath(const std::string& path, const std::string& pathTempl
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

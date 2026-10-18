@@ -17,9 +17,7 @@
 #include "Poco/ScopedUnlock.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 ConnectionManager::ConnectionManager(Poco::ThreadPool& threadPool):
@@ -226,4 +224,4 @@ ConnectionManager& ConnectionManager::defaultManager()
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

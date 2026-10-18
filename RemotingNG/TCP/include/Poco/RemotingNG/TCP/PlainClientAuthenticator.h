@@ -21,9 +21,7 @@
 #include "Poco/RemotingNG/TCP/ClientAuthenticator.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API PlainClientAuthenticator: public ClientAuthenticator
@@ -42,16 +40,16 @@ public:
 	PlainClientAuthenticator();
 		/// Creates the PlainClientAuthenticator.
 
-	~PlainClientAuthenticator();
+	~PlainClientAuthenticator() override;
 		/// Destroys the PlainClientAuthenticator.
 
 	// ClientAuthenticator
-	[[nodiscard]] std::string startAuthentication(Credentials& clientCredentials);
-	[[nodiscard]] bool continueAuthentication(const Credentials& serverCredentials, Credentials& clientCredentials);
+	[[nodiscard]] std::string startAuthentication(Credentials& clientCredentials) override;
+	[[nodiscard]] bool continueAuthentication(const Credentials& serverCredentials, Credentials& clientCredentials) override;
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_PlainClientAuthenticator_INCLUDED

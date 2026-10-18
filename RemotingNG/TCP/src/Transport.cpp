@@ -32,23 +32,20 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class AuthResponseFrameHandler: public FrameHandler
 {
 public:
-	typedef Poco::AutoPtr<AuthResponseFrameHandler> Ptr;
+	using Ptr = Poco::AutoPtr<AuthResponseFrameHandler>;
 
 	explicit AuthResponseFrameHandler(Poco::UInt32 channel):
-		_channel(channel),
-		_authToken(0)
+		_channel(channel)
 	{
 	}
 
-	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame)
+	bool handleFrame(Connection::Ptr /*pConnection*/, Frame::Ptr pFrame) override
 	{
 		if (pFrame->channel() == _channel && pFrame->type() == Frame::FRAME_TYPE_AUTR)
 		{
@@ -81,12 +78,12 @@ public:
 		else return false;
 	}
 
-	Poco::UInt64 token() const
+	[[nodiscard]] Poco::UInt64 token() const
 	{
 		return _authToken;
 	}
 
-	const AuthenticateResult& result() const
+	[[nodiscard]] const AuthenticateResult& result() const
 	{
 		return _authResult;
 	}
@@ -101,7 +98,7 @@ private:
 	Poco::Event _received;
 
 	AuthenticateResult _authResult;
-	Poco::UInt64 _authToken;
+	Poco::UInt64 _authToken = 0;
 };
 
 
@@ -227,17 +224,17 @@ Poco::RemotingNG::Serializer& Transport::beginMessage(const Poco::RemotingNG::Id
 }
 
 
-void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
+void Transport::sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& /*oid*/, const Poco::RemotingNG::Identifiable::TypeId& /*tid*/, const std::string& /*messageName*/, Poco::RemotingNG::SerializerBase::MessageType /*messageType*/)
 {
 	if (_logger.debug()) _logger.debug("Completing one-way request."s);
 
 	if (_pDeflatingStream)
 	{
 		_pDeflatingStream->close();
-		_pDeflatingStream = 0;
+		_pDeflatingStream = nullptr;
 	}
 	_pRequestStream->close();
-	_pRequestStream = 0;
+	_pRequestStream = nullptr;
 	_pConnection->releaseChannel(_channel);
 	_channel = 0;
 }
@@ -285,10 +282,10 @@ Poco::RemotingNG::Deserializer& Transport::sendRequest(const Poco::RemotingNG::I
 	if (_pDeflatingStream)
 	{
 		_pDeflatingStream->close();
-		_pDeflatingStream = 0;
+		_pDeflatingStream = nullptr;
 	}
 	_pRequestStream->close();
-	_pRequestStream = 0;
+	_pRequestStream = nullptr;
 
 	Poco::Timestamp requestTime;
 	if (_pReplyStream->peek() < 0)
@@ -322,11 +319,11 @@ void Transport::endRequest()
 
 	_serializer.reset();
 	_deserializer.reset();
-	_pReplyStream = 0;
-	_pInflatingStream = 0;
+	_pReplyStream = nullptr;
+	_pInflatingStream = nullptr;
 	_pConnection->releaseChannel(_channel);
 	_channel = 0;
-	_pConnection = 0;
+	_pConnection = nullptr;
 }
 
 
@@ -499,4 +496,4 @@ bool Transport::verifyCredentials(const Credentials& creds)
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

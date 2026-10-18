@@ -23,8 +23,7 @@
 #include "Poco/NumberParser.h"
 
 
-namespace Poco {
-namespace CodeGeneration {
+namespace Poco::CodeGeneration {
 
 
 using Poco::CppParser::TypeDef;
@@ -44,9 +43,7 @@ GeneratorEngine::GeneratorEngine():_callbacks()
 }
 
 
-GeneratorEngine::~GeneratorEngine()
-{
-}
+GeneratorEngine::~GeneratorEngine() = default;
 
 
 
@@ -68,7 +65,7 @@ void GeneratorEngine::generate(const Poco::CppParser::Struct* pStruct, CodeGener
 		Callbacks::iterator itPreNS = _callbacks.find(PRENAMESPACE);
 		if (itPreNS != _callbacks.end())
 		{
-			(*(itPreNS->second))(0, pStruct, gen, addParam);
+			(*(itPreNS->second))(nullptr, pStruct, gen, addParam);
 		}
 
 		gen.writeNameSpaceBegin(gen.nameSpace());
@@ -77,7 +74,7 @@ void GeneratorEngine::generate(const Poco::CppParser::Struct* pStruct, CodeGener
 	Callbacks::iterator itPreC = _callbacks.find(PRECLASS);
 	if (itPreC != _callbacks.end())
 	{
-		(*(itPreC->second))(0, pStruct, gen, addParam);
+		(*(itPreC->second))(nullptr, pStruct, gen, addParam);
 	}
 
 	CodeGenerator::Properties classProperties;
@@ -96,7 +93,7 @@ void GeneratorEngine::generate(const Poco::CppParser::Struct* pStruct, CodeGener
 	pStruct->constructors(functions);
 	handleFunctions(functions, pStruct, addParam, classProperties, gen);
 	functions.clear();
-	if (pStruct->destructor() != 0)
+	if (pStruct->destructor() != nullptr)
 		handleFunction(pStruct->destructor(), pStruct, addParam, classProperties, gen);
 
 	pStruct->methods(Poco::CppParser::Symbol::ACC_PUBLIC, functions);
@@ -125,7 +122,7 @@ void GeneratorEngine::generate(const Poco::CppParser::Struct* pStruct, CodeGener
 	Callbacks::iterator itPostC = _callbacks.find(POSTCLASS);
 	if (itPostC != _callbacks.end())
 	{
-		(*(itPostC->second))(0, pStruct, gen, addParam);
+		(*(itPostC->second))(nullptr, pStruct, gen, addParam);
 	}
 
 	if (isLastClass)
@@ -135,7 +132,7 @@ void GeneratorEngine::generate(const Poco::CppParser::Struct* pStruct, CodeGener
 		Callbacks::iterator itPostNS = _callbacks.find(POSTNAMESPACE);
 		if (itPostNS != _callbacks.end())
 		{
-			(*(itPostNS->second))(0, pStruct, gen, addParam);
+			(*(itPostNS->second))(nullptr, pStruct, gen, addParam);
 		}
 
 		gen.endFile();
@@ -175,7 +172,7 @@ void GeneratorEngine::handleFunction(const Poco::CppParser::Function* pFunc, con
 }
 
 
-void GeneratorEngine::handleTypedefs(const Poco::CppParser::NameSpace::SymbolTable& typedefs, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen)
+void GeneratorEngine::handleTypedefs(const Poco::CppParser::NameSpace::SymbolTable& typedefs, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen)
 {
 	int cnt = 0;
 	Poco::CppParser::NameSpace::Iterator it = typedefs.begin();
@@ -185,11 +182,11 @@ void GeneratorEngine::handleTypedefs(const Poco::CppParser::NameSpace::SymbolTab
 		gen.writeTypeDef(pDef);
 	}
 	if (cnt > 0)
-		gen.writeTypeDef(0);
+		gen.writeTypeDef(nullptr);
 }
 
 
-void GeneratorEngine::handleUsings(const Poco::CppParser::NameSpace::SymbolTable& usings, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen)
+void GeneratorEngine::handleUsings(const Poco::CppParser::NameSpace::SymbolTable& usings, const Poco::CppParser::Struct* /*pStruct*/, CodeGenerator& gen)
 {
 	int cnt = 0;
 	Poco::CppParser::NameSpace::Iterator it = usings.begin();
@@ -199,7 +196,7 @@ void GeneratorEngine::handleUsings(const Poco::CppParser::NameSpace::SymbolTable
 		gen.writeUsing(pDef);
 	}
 	if (cnt > 0)
-		gen.writeUsing(0);
+		gen.writeUsing(nullptr);
 }
 
 
@@ -447,4 +444,4 @@ bool GeneratorEngine::isWhiteSpace(const char c)
 }
 
 
-} } // namespace Poco::CodeGeneration
+} // namespace Poco::CodeGeneration

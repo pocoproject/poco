@@ -23,11 +23,10 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Buffer.h"
 #include "Poco/ByteOrder.h"
+#include <cstddef>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API Frame: public Poco::RefCountedObject
@@ -177,7 +176,7 @@ public:
 		///
 		/// The initial payload size is 0.
 
-	~Frame();
+	~Frame() override;
 		/// Destroys the frame.
 
 	[[nodiscard]] Poco::UInt32 type() const;
@@ -234,14 +233,11 @@ public:
 		/// Returns a pointer to the end (one past last byte) of the buffer.
 
 private:
-	enum
-	{
-		FRAME_OFFSET_TYPE    = 0,
-		FRAME_OFFSET_CHANNEL = 4,
-		FRAME_OFFSET_FLAGS   = 8,
-		FRAME_OFFSET_SIZE    = 10,
-		FRAME_OFFSET_PAYLOAD = 12
-	};
+	static constexpr std::size_t FRAME_OFFSET_TYPE    = 0;
+	static constexpr std::size_t FRAME_OFFSET_CHANNEL = 4;
+	static constexpr std::size_t FRAME_OFFSET_FLAGS   = 8;
+	static constexpr std::size_t FRAME_OFFSET_SIZE    = 10;
+	static constexpr std::size_t FRAME_OFFSET_PAYLOAD = 12;
 
 	Poco::Buffer<char> _buffer;
 };
@@ -354,7 +350,7 @@ inline const char* Frame::bufferEnd() const
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_Frame_INCLUDED

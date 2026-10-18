@@ -84,9 +84,10 @@ public:
 			/// Server: The server will not send a client certificate
 			/// request to the client, so the client will not send a certificate.
 			///
-			/// Client: If not using an anonymous cipher (by default disabled),
-			/// the server will send a certificate which will be checked, but
-			/// the result of the check will be ignored.
+			/// Client: If not using an anonymous cipher, the server will
+			/// send a certificate which will be checked, but the result of
+			/// the check will be ignored. This is the only mode in which a
+			/// client accepts a server that sends no certificate.
 
 		VERIFY_RELAXED = SSL_VERIFY_PEER,
 			/// Server: The server sends a client certificate request to the
@@ -95,10 +96,19 @@ public:
 			/// immediately terminated with an alert message containing the
 			/// reason for the verification failure.
 			///
-			/// Client: The server certificate is verified, if one is provided.
+			/// Client: The server certificate is verified.
 			/// If the verification process fails, the TLS/SSL handshake is
 			/// immediately terminated with an alert message containing the
-			/// reason for the verification failure.
+			/// reason for the verification failure. A server that sends no
+			/// certificate (anonymous cipher) is rejected with a
+			/// CertificateValidationException once the handshake is complete.
+			///
+			/// With extended certificate verification, the certificate is not
+			/// checked against the peer host name if that name is "localhost" or
+			/// a loopback IP address literal (not resolved) and the socket is
+			/// connected to a loopback address, unless SecureStreamSocket::attach()
+			/// marks the socket as tunneled, as HTTPSClientSession does for a
+			/// proxy tunnel. VERIFY_STRICT always checks the host name.
 
 		VERIFY_STRICT  = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
 			/// Server: If the client did not return a certificate, the TLS/SSL
@@ -127,6 +137,9 @@ public:
 
 	enum SecurityLevel
 	{
+		SECURITY_LEVEL_DEFAULT  = -1,
+			/// The security level that OpenSSL and its configuration
+			/// (including a system-wide policy) define.
 		SECURITY_LEVEL_NONE     = 0,
 		SECURITY_LEVEL_80_BITS  = 1,
 		SECURITY_LEVEL_112_BITS = 2,
@@ -134,6 +147,12 @@ public:
 		SECURITY_LEVEL_192_BITS = 4,
 		SECURITY_LEVEL_256_BITS = 5
 	};
+
+	static constexpr const char* DEFAULT_CIPHER_LIST = "ALL:!aNULL:!LOW:!EXP:!MD5:!3DES:!IDEA:@STRENGTH";
+		/// The default cipher list excludes the cipher suites without
+		/// authentication (anonymous DH and ECDH), which accept a server
+		/// without a certificate, and those using 3DES or IDEA. It applies
+		/// only to TLS 1.2 and earlier.
 
 	enum KeyDHGroup
 	{
@@ -189,7 +208,7 @@ public:
 
 		std::string cipherList;
 			/// Specifies the supported ciphers in OpenSSL notation.
-			/// Defaults to "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH".
+			/// Defaults to DEFAULT_CIPHER_LIST.
 			/// Note: The cipher list only applies for TLS 1.2 and 
 			/// earlier versions. To configure TLS 1.3 cipher suites, 
 			/// please use the cipherSuites member variable.
@@ -214,8 +233,11 @@ public:
 			/// with 256-bit prime order subgroup) or KEY_DH_GROUP_1024 (1024-bit MODP
 			/// group with 160-bit prime order subgroup). OpenSSL rejects parameters
 			/// that are too small for the security level (KEY_DH_GROUP_1024 above
-			/// SECURITY_LEVEL_80_BITS, KEY_DH_GROUP_2048 above SECURITY_LEVEL_112_BITS);
-			/// a server Context constructor then throws an SSLContextException. Use
+			/// SECURITY_LEVEL_80_BITS, KEY_DH_GROUP_2048 above SECURITY_LEVEL_112_BITS).
+			/// For KEY_DH_GROUP_1024 and for the parameters of dhParamsFile a server
+			/// Context constructor then throws an SSLContextException. Instead of
+			/// KEY_DH_GROUP_2048, which is the default, the server then uses
+			/// parameters that OpenSSL selects (SSL_CTX_set_dh_auto()). Use
 			/// dhParamsFile for larger parameters. In FIPS mode dhGroup and
 			/// dhParamsFile are ignored.
 
@@ -241,6 +263,12 @@ public:
 		SecurityLevel securityLevel;
 			/// Defines minimal number of security bits allowed.
 			/// Requires OpenSSL >= 1.1 to be effective.
+			/// Defaults to SECURITY_LEVEL_DEFAULT.
+			/// A lower level admits protocol versions, signature algorithms
+			/// and key sizes of peers that the default level rejects.
+			/// The level in effect, including one that a system-wide policy
+			/// defines, applies to the Diffie-Hellman parameters of a server
+			/// (see dhGroup).
 
 	};
 
@@ -260,7 +288,7 @@ public:
 		VerificationMode verificationMode = VERIFY_RELAXED,
 		int verificationDepth = 9,
 		bool loadDefaultCAs = false,
-		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		const std::string& cipherList = DEFAULT_CIPHER_LIST);
 		/// Creates a Context.
 		///
 		///   * usage specifies whether the context is used by a client or server.
@@ -288,7 +316,7 @@ public:
 		VerificationMode verificationMode = VERIFY_RELAXED,
 		int verificationDepth = 9,
 		bool loadDefaultCAs = false,
-		const std::string& cipherList = "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+		const std::string& cipherList = DEFAULT_CIPHER_LIST);
 		/// Creates a Context.
 		///
 		///   * usage specifies whether the context is used by a client or server.
@@ -502,7 +530,11 @@ public:
 		/// or a null pointer if none has been set.
 
 	void setSecurityLevel(SecurityLevel level);
-		/// Sets the security level.
+		/// Sets the security level. SECURITY_LEVEL_DEFAULT
+		/// leaves the current security level unchanged.
+
+	[[nodiscard]] SecurityLevel getSecurityLevel() const;
+		/// Returns the security level in effect.
 
 	void ignoreUnexpectedEof(bool flag = true);
 		/// Enable or disable SSL/TLS SSL_OP_IGNORE_UNEXPECTED_EOF

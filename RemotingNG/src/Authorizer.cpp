@@ -15,18 +15,13 @@
 #include "Poco/RemotingNG/Authorizer.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-Authorizer::Authorizer()
-{
-}
+Authorizer::Authorizer() = default;
 
 
-Authorizer::~Authorizer()
-{
-}
+Authorizer::~Authorizer() = default;
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

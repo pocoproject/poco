@@ -60,7 +60,8 @@ int StreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	while (remaining > 0)
 	{
 		int n = SocketImpl::sendBytes(p, remaining, flags);
-		poco_assert_dbg (!blocking || n >= 0);
+		// nothing more can be sent without waiting
+		if (n < 0) return sent > 0 ? sent : n;
 		p += n;
 		sent += n;
 		remaining -= n;

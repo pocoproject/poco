@@ -22,7 +22,7 @@ class ConnectionTest: public CppUnit::TestCase
 {
 public:
 	ConnectionTest(const std::string& name);
-	~ConnectionTest();
+	~ConnectionTest() override;
 
 	void testHandshakeFailure();
 	void testHandshakeTimeout();
@@ -30,8 +30,8 @@ public:
 	void testStart();
 	void testListenerThreadPool();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 };

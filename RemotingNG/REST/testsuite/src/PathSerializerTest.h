@@ -22,7 +22,7 @@ class PathSerializerTest: public CppUnit::TestCase
 {
 public:
 	PathSerializerTest(const std::string& name);
-	~PathSerializerTest();
+	~PathSerializerTest() override;
 
 	void testParams();
 	void testParamsPreserveQuery();
@@ -30,8 +30,8 @@ public:
 	void testTypes();
 	void testEscaping();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

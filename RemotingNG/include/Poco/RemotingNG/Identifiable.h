@@ -24,8 +24,7 @@
 #include "Poco/URI.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API Identifiable: public virtual Poco::RefCountedObject
@@ -42,7 +41,7 @@ public:
 	Identifiable(const Identifiable::ObjectId& oid);
 		/// Creates the Identifiable using the given ObjectId.
 
-	virtual ~Identifiable();
+	~Identifiable() override;
 		/// Destroys the Identifiable.
 
 	[[nodiscard]] const Identifiable::ObjectId& remoting__objectId() const;
@@ -80,7 +79,7 @@ inline const Poco::URI& Identifiable::remoting__getURI() const
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_Identifiable_INCLUDED

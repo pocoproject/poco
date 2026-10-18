@@ -644,7 +644,7 @@ void CppWriter::writeClassStart(std::ostream& out, const ClassInfo& cinfo)
 }
 
 
-void CppWriter::writeClassEnd(std::ostream& out, const ClassInfo& cinfo)
+void CppWriter::writeClassEnd(std::ostream& out, const ClassInfo& /*cinfo*/)
 {
 	out << "};";
 	out << std::endl << std::endl << std::endl;

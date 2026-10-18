@@ -15,19 +15,13 @@
 #include "Poco/RemotingNG/REST/JSArray.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
-JSArray::JSArray()
-{
-}
+JSArray::JSArray() = default;
 
 
-JSArray::~JSArray()
-{
-}
+JSArray::~JSArray() = default;
 
 
 JSValue::Type JSArray::type() const
@@ -66,4 +60,4 @@ JSValue::Ptr& JSArray::operator [] (std::size_t index)
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

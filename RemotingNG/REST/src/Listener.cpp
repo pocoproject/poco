@@ -20,9 +20,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 const std::string Listener::CORS_ALLOWED_HEADERS("Accept, Content-Type");
@@ -68,9 +66,7 @@ Listener::Listener(const std::string& endPoint, const Poco::Net::ServerSocket& s
 }
 
 
-Listener::~Listener()
-{
-}
+Listener::~Listener() = default;
 
 
 void Listener::enableChunkedTransferEncoding(bool enable)
@@ -160,4 +156,4 @@ void Listener::unregisterObject(Poco::RemotingNG::RemoteObject::Ptr /*pRemoteObj
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

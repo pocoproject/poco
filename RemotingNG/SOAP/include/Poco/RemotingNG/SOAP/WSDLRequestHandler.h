@@ -22,9 +22,7 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 class RemotingNGSOAP_API WSDLRequestHandler: public Poco::Net::HTTPRequestHandler
@@ -37,10 +35,10 @@ public:
 		/// The path to the directory containing WSDL files 
 		/// must be given as argument.
 
-	~WSDLRequestHandler();
+	~WSDLRequestHandler() override;
 		/// Destroys the WSDLRequestHandler.
 
-	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response);
+	void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override;
 		/// Sends the WSDL file back to the client, or
 		/// sends a 404 response if the requested WSDL file
 		/// does not exist.
@@ -50,7 +48,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP
 
 
 #endif // RemotingNG_SOAP_SDLRequestHandler_INCLUDED

@@ -24,6 +24,11 @@ public:
 	ReplicaSetConnectionTest(const std::string& name);
 	~ReplicaSetConnectionTest() override;
 
+	void testCustomSocketFactoryDiscovery();
+	void testCustomSocketFactoryConnections();
+	void testCustomSocketFactoryFailure();
+	void testCustomSocketFactoryIPv6();
+	void testCustomSocketFactoryMonitoringTimeout();
 	void testServerHelloAndPing();
 	void testScriptedErrorReply();
 	void testNoReplyTimesOut();

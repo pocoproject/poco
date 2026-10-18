@@ -17,9 +17,7 @@ ExtensionsGenerator::ExtensionsGenerator(std::ostream& out):
 }
 
 
-ExtensionsGenerator::~ExtensionsGenerator()
-{
-}
+ExtensionsGenerator::~ExtensionsGenerator() = default;
 
 
 void ExtensionsGenerator::generate(const std::vector<BundleActivatorGenerator::BundleService>& bundleServices)

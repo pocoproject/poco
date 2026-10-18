@@ -17,19 +17,13 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
-Deserializer::Deserializer()
-{
-}
+Deserializer::Deserializer() = default;
 
 
-Deserializer::~Deserializer()
-{
-}
+Deserializer::~Deserializer() = default;
 
 
 Poco::RemotingNG::SerializerBase::MessageType Deserializer::findMessage(std::string& name)
@@ -53,7 +47,7 @@ void Deserializer::deserializeMessageBegin(const std::string&, SerializerBase::M
 }
 
 
-void Deserializer::deserializeMessageEnd(const std::string& name, SerializerBase::MessageType type)
+void Deserializer::deserializeMessageEnd(const std::string& /*name*/, SerializerBase::MessageType /*type*/)
 {
 	// consume extra response content
 	int ch = _pStream->get();
@@ -217,15 +211,15 @@ void Deserializer::setupImpl(std::istream& stream)
 
 void Deserializer::resetImpl()
 {
-	_pStream = 0;
-	_pRequest = 0;
-	_pResponse = 0;
-	_pPathDeserializer = 0;
-	_pQueryDeserializer = 0;
-	_pHeaderDeserializer = 0;
-	_pRawDeserializer = 0;
-	_pJSONDeserializer = 0;
-	_pFormDeserializer = 0;
+	_pStream = nullptr;
+	_pRequest = nullptr;
+	_pResponse = nullptr;
+	_pPathDeserializer = nullptr;
+	_pQueryDeserializer = nullptr;
+	_pHeaderDeserializer = nullptr;
+	_pRawDeserializer = nullptr;
+	_pJSONDeserializer = nullptr;
+	_pFormDeserializer = nullptr;
 }
 
 
@@ -306,4 +300,4 @@ Poco::SharedPtr<Poco::RemotingNG::Deserializer> Deserializer::subDeserializer()
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

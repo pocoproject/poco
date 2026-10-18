@@ -1,0 +1,47 @@
+//
+// GeofenceTest.h
+//
+// Definition of the GeofenceTest class.
+//
+// Copyright (c) 2025, Günter Obiltschnig.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#ifndef GeofenceTest_INCLUDED
+#define GeofenceTest_INCLUDED
+
+
+#include "Poco/Geo/Geo.h"
+#include "CppUnit/TestCase.h"
+
+
+class GeofenceTest: public CppUnit::TestCase
+{
+public:
+	GeofenceTest(const std::string& name);
+	~GeofenceTest() override;
+
+	void testCircular();
+	void testPolygonal();
+	void testPolygonalBoundary();
+	void testPolygonalDegenerate();
+	void testPolygonalConcave();
+	void testPolygonalAcrossAntimeridian();
+	void testPolygonalOutOfRangePosition();
+	void testCircularBoundary();
+	void testNaNPositionOutside();
+	void testOutOfDomainPositionOutside();
+	void testGeofenceBase();
+
+	void setUp() override;
+	void tearDown() override;
+
+	static CppUnit::Test* suite();
+
+private:
+};
+
+
+#endif // GeofenceTest_INCLUDED

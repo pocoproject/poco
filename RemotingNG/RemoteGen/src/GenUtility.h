@@ -32,6 +32,11 @@ class GenUtility
 	/// GenUtility functions
 {
 public:
+	GenUtility() = delete;
+	~GenUtility() = delete;
+	GenUtility(const GenUtility&) = delete;
+	GenUtility& operator = (const GenUtility&) = delete;
+
 	static const std::string ATTR_HEADER;
 	static const std::string ATTR_RETURN;
 
@@ -139,25 +144,14 @@ public:
 		/// Returns true if the function with the given name is an overrided virtual function.
 
 private:
-	GenUtility();
-	~GenUtility();
-	GenUtility(const GenUtility&);
-	GenUtility& operator = (const GenUtility&);
-
 	static const std::string ATTR_INLINE;
 	static const std::string ATTR_NAME;
 	static const std::string ATTR_REPLYNAME;
 	static const std::string VAL_REQUEST;
 	static const std::string VAL_REPLY;
 
-	enum
-	{
-		KEYS_VECTOR_SIZE = 8,
-		KEYS_UNIQUE_VECTOR_SIZE = 4
-	};
-
-	static const std::string KEYS_VECTOR[KEYS_VECTOR_SIZE];
-	static const std::string KEYS_UNIQUE_VECTOR[KEYS_UNIQUE_VECTOR_SIZE];
+	static const std::string KEYS_VECTOR[];
+	static const std::string KEYS_UNIQUE_VECTOR[];
 };
 
 

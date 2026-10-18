@@ -48,6 +48,9 @@ class NetSSL_Win_API SecureStreamSocket: public StreamSocket
 	/// hostname) is performed when using nonblocking I/O. To manually
 	/// perform peer certificate validation, call verifyPeerCertificate()
 	/// after the SSL handshake has been completed.
+	///
+	/// The sendBytes() and receiveBytes() overloads taking a SocketBufVec
+	/// or a Poco::Buffer throw a Poco::InvalidAccessException.
 {
 public:
 	enum
@@ -162,6 +165,9 @@ public:
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
+		///
+		/// For a socket connected through a proxy tunnel, use the attach()
+		/// overload with the tunneled argument; its pSession can be null.
 
 	static SecureStreamSocket attach(const StreamSocket& streamSocket, Context::Ptr pContext);
 		/// Creates a SecureStreamSocket over an existing socket
@@ -187,7 +193,7 @@ public:
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
 
-	static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession);
+	static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession, bool tunneled = false);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
@@ -195,6 +201,11 @@ public:
 		/// The given Session is reused, if possible (client session
 		/// caching is enabled for the given Context, and the server
 		/// agrees to reuse the session).
+		///
+		/// If tunneled is true, the connection to peerHostName goes
+		/// through a proxy tunnel, and verifyPeerCertificate() verifies
+		/// the certificate also when the peer is connected on a loopback
+		/// address (see Context::VERIFY_RELAXED).
 
 	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.

@@ -16,9 +16,7 @@
 #include "Poco/RemotingNG/TCP/ServerConnection.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 	
 ServerConnectionFactory::ServerConnectionFactory(Listener::Ptr pListener):
@@ -27,9 +25,7 @@ ServerConnectionFactory::ServerConnectionFactory(Listener::Ptr pListener):
 }
 
 
-ServerConnectionFactory::~ServerConnectionFactory()
-{
-}
+ServerConnectionFactory::~ServerConnectionFactory() = default;
 
 
 Poco::Net::TCPServerConnection* ServerConnectionFactory::createConnection(const Poco::Net::StreamSocket& socket)
@@ -38,4 +34,4 @@ Poco::Net::TCPServerConnection* ServerConnectionFactory::createConnection(const 
 }
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP

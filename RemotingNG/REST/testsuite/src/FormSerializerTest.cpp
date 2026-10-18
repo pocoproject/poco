@@ -25,9 +25,7 @@ FormSerializerTest::FormSerializerTest(const std::string& name): CppUnit::TestCa
 }
 
 
-FormSerializerTest::~FormSerializerTest()
-{
-}
+FormSerializerTest::~FormSerializerTest() = default;
 
 
 void FormSerializerTest::testGetRequest()

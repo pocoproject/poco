@@ -125,7 +125,6 @@ int main(int argc, char **argv)
 			params.verificationMode = Poco::Net::Context::VERIFY_NONE;
 			params.verificationDepth = 9;
 			params.loadDefaultCAs = true;
-			params.cipherList = "ALL";
 
 			Poco::Net::Context::Ptr context = new Poco::Net::Context(Poco::Net::Context::TLSV1_2_CLIENT_USE, params);
 

@@ -18,6 +18,47 @@ using namespace std;
 namespace CppUnit {
 
 
+namespace {
+
+
+template <typename Func>
+bool runProtected(TestResult* result, Test* test, const Test::Callback& callback,
+	const std::string& prefix, Func func)
+	/// Calls func and records an exception that it throws in result,
+	/// with prefix in front of the message.
+	/// Returns true if func did not throw.
+{
+	try
+	{
+		func();
+		return true;
+	}
+	catch (const CppUnitException& e)
+	{
+		result->addFailure(test, new CppUnitException(prefix + e.what(),
+			e.lineNumber(), e.data1LineNumber(), e.data2LineNumber(), e.fileName()));
+	}
+	catch (const std::exception& e)
+	{
+		std::string msg(prefix);
+		msg.append(TestResult::demangle(typeid(e).name()));
+		if (callback)
+		{
+			msg.append(": ").append(callback(e));
+		}
+		result->addError(test, new CppUnitException(msg));
+	}
+	catch (...)
+	{
+		result->addError(test, new CppUnitException(prefix + "unknown exception"));
+	}
+	return false;
+}
+
+
+} // namespace
+
+
 // Create a default TestResult
 TestResult* TestCase::defaultResult()
 {
@@ -125,31 +166,11 @@ void TestCase::run(TestResult *result, const Test::Callback& callback)
 {
 	result->startTest(this);
 
-	setUp();
-	try
+	if (runProtected(result, this, callback, "setUp(): ", [this]() { setUp(); }))
 	{
-		runTest();
+		runProtected(result, this, callback, "", [this]() { runTest(); });
 	}
-	catch (CppUnitException& e)
-	{
-		auto* copy = new CppUnitException(e);
-		result->addFailure(this, copy);
-	}
-	catch (std::exception& e)
-	{
-		std::string msg(TestResult::demangle(typeid(e).name()));
-		if (callback)
-		{
-			msg.append(": ").append(callback(e));
-		}
-		result->addError(this, new CppUnitException(msg));
-	}
-	catch (...)
-	{
-		auto* e = new CppUnitException ("unknown exception");
-		result->addError (this, e);
-	}
-	tearDown ();
+	runProtected(result, this, callback, "tearDown(): ", [this]() { tearDown(); });
 	result->endTest(this);
 }
 

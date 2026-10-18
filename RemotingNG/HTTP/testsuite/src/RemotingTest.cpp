@@ -44,7 +44,7 @@ namespace
 	class NoAuthRequestHandler: public Poco::Net::HTTPRequestHandler
 	{
 	public:
-		void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+		void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override
 		{
 			Poco::NullOutputStream nullStream;
 			Poco::StreamCopier::copyStream(request.stream(), nullStream);
@@ -63,7 +63,7 @@ namespace
 		{
 		}
 		
-		Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request)
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request) override
 		{
 			if (request.hasCredentials())
 			{
@@ -84,9 +84,9 @@ namespace
 	class MockAuthenticator: public Poco::RemotingNG::Authenticator
 	{
 	public:
-		typedef Poco::AutoPtr<MockAuthenticator> Ptr;
+		using Ptr = Poco::AutoPtr<MockAuthenticator>;
 
-		Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32)
+		Poco::RemotingNG::AuthenticateResult authenticate(const Poco::RemotingNG::Credentials& creds, Poco::UInt32) override
 		{
 			std::string username = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "");
 			std::string password = creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "");
@@ -99,7 +99,7 @@ namespace
 				return Poco::RemotingNG::AuthenticateResult(Poco::RemotingNG::AuthenticateResult::AUTH_FAILED);
 		}
 	
-		const std::string& lastUsername() const
+		[[nodiscard]] const std::string& lastUsername() const
 		{
 			return _lastUsername;
 		}
@@ -112,7 +112,7 @@ namespace
 	class MockAuthorizer: public Poco::RemotingNG::Authorizer
 	{
 	public:
-		bool authorize(const std::string& method, const std::string& permission)
+		bool authorize(const std::string& /*method*/, const std::string& /*permission*/) override
 		{
 			Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
 		
@@ -153,12 +153,12 @@ bool operator == (const Struct2& s1, const Struct2& s2)
 
 	if (!equal) return false;
 	if (s1.aVector.size() != s2.aVector.size()) return false;
-	for (int i = 0; i < s1.aVector.size(); i++)
+	for (std::size_t i = 0; i < s1.aVector.size(); i++)
 	{
 		if (!(s1.aVector[i] == s2.aVector[i])) return false;
 	}
 	if (s1.anotherVector.size() != s2.anotherVector.size()) return false;
-	for (int i = 0; i < s1.anotherVector.size(); i++)
+	for (std::size_t i = 0; i < s1.anotherVector.size(); i++)
 	{
 		if (!s1.anotherVector[i].isNull() && !s2.anotherVector[i].isNull())
 		{
@@ -176,7 +176,7 @@ bool operator == (const Struct3& s1, const Struct3& s2)
 	          && s1.aMultiSet == s2.aMultiSet;
 	if (!equal) return false;
 	if (s1.aComplexVector.size() != s2.aComplexVector.size()) return false;
-	for (int i = 0; i < s1.aComplexVector.size(); i++)
+	for (std::size_t i = 0; i < s1.aComplexVector.size(); i++)
 	{
 		if (!(s1.aComplexVector[i] == s2.aComplexVector[i])) return false;
 	}
@@ -189,7 +189,7 @@ bool operator == (const Struct4& s1, const Struct4& s2)
 	bool equal = s1.value == s2.value;
 	if (!equal) return false;
 	if (s1.vec.size() != s2.vec.size()) return false;
-	for (int i = 0; i < s1.vec.size(); i++)
+	for (std::size_t i = 0; i < s1.vec.size(); i++)
 	{
 		if (!(s1.vec[i] == s2.vec[i])) return false;
 	}
@@ -204,16 +204,14 @@ RemotingTest::RemotingTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-RemotingTest::~RemotingTest()
-{
-}
+RemotingTest::~RemotingTest() = default;
 
 
 void RemotingTest::setUp()
 {
+	Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
 	_pListener = new Poco::RemotingNG::HTTP::Listener("127.0.0.1:2280");
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-	Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
 }
 
@@ -223,7 +221,7 @@ void RemotingTest::tearDown()
 	TesterServerHelper::unregisterObject(_objectURI);
 	Poco::RemotingNG::HTTP::TransportFactory::unregisterFactory();
 	Poco::RemotingNG::ORB::instance().unregisterListener(_listener);
-	_pListener = 0;
+	_pListener = nullptr;
 }
 
 
@@ -731,14 +729,14 @@ void RemotingTest::testStruct1Vec(ITester::Ptr pTester)
 
 	Struct1Vec vec2 = pTester->testStruct1Vec1(vec1);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
 
 	pTester->testStruct1Vec2(vec2);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
@@ -746,7 +744,7 @@ void RemotingTest::testStruct1Vec(ITester::Ptr pTester)
 	Struct1Vec vec3;
 	pTester->testStruct1Vec3(vec1, vec3);
 	assert (vec2.size() == vec1.size());
-	for (int i = 0; i < vec1.size(); i++)
+	for (std::size_t i = 0; i < vec1.size(); i++)
 	{
 		assert (vec2[i] == vec1[i]);
 	}
@@ -767,9 +765,7 @@ RemotingTestHTTP::RemotingTestHTTP(const std::string& name): RemotingTest(name)
 }
 
 
-RemotingTestHTTP::~RemotingTestHTTP()
-{
-}
+RemotingTestHTTP::~RemotingTestHTTP() = default;
 
 
 void RemotingTestHTTP::setUp()
@@ -813,9 +809,7 @@ RemotingTestHTTPCompressed::RemotingTestHTTPCompressed(const std::string& name):
 }
 
 
-RemotingTestHTTPCompressed::~RemotingTestHTTPCompressed()
-{
-}
+RemotingTestHTTPCompressed::~RemotingTestHTTPCompressed() = default;
 
 
 void RemotingTestHTTPCompressed::setUp()
@@ -868,9 +862,7 @@ RemotingTestHTTPNonChunked::RemotingTestHTTPNonChunked(const std::string& name):
 }
 
 
-RemotingTestHTTPNonChunked::~RemotingTestHTTPNonChunked()
-{
-}
+RemotingTestHTTPNonChunked::~RemotingTestHTTPNonChunked() = default;
 
 
 ITester::Ptr RemotingTestHTTPNonChunked::createProxy(const std::string& uri)
@@ -924,16 +916,14 @@ RemotingTestHTTPAuth::RemotingTestHTTPAuth(const std::string& name): RemotingTes
 }
 
 
-RemotingTestHTTPAuth::~RemotingTestHTTPAuth()
-{
-}
+RemotingTestHTTPAuth::~RemotingTestHTTPAuth() = default;
 
 
 void RemotingTestHTTPAuth::setUp()
 {
+	Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
 	_pListener = new Poco::RemotingNG::HTTP::Listener("127.0.0.1:2280", Poco::RemotingNG::HTTP::Listener::PROTO_HTTP);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-	Poco::RemotingNG::HTTP::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
 
 	Poco::Net::ServerSocket ss(2280);
@@ -945,8 +935,11 @@ void RemotingTestHTTPAuth::setUp()
 void RemotingTestHTTPAuth::tearDown()
 {
 	RemotingTest::tearDown();
-	_pHTTPServer->stop();
-	_pHTTPServer = 0;
+	if (_pHTTPServer != nullptr)
+	{
+		_pHTTPServer->stop();
+	}
+	_pHTTPServer = nullptr;
 }
 
 
@@ -1021,9 +1014,7 @@ RemotingTestHTTPAuthChunked::RemotingTestHTTPAuthChunked(const std::string& name
 }
 
 
-RemotingTestHTTPAuthChunked::~RemotingTestHTTPAuthChunked()
-{
-}
+RemotingTestHTTPAuthChunked::~RemotingTestHTTPAuthChunked() = default;
 
 
 ITester::Ptr RemotingTestHTTPAuthChunked::createProxy(const std::string& uri)

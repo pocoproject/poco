@@ -28,9 +28,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API ChannelStreamBuf: public Poco::BufferedStreamBuf
@@ -40,15 +38,15 @@ class RemotingNGTCP_API ChannelStreamBuf: public Poco::BufferedStreamBuf
 public:
 	ChannelStreamBuf(Connection::Ptr pConnection, Poco::UInt32 frameType, Poco::UInt32 channel, Poco::Timespan timeout);
 	ChannelStreamBuf(Connection::Ptr pConnection, Poco::UInt32 frameType, Poco::UInt32 channel, Poco::UInt16 flags);
-	~ChannelStreamBuf();
+	~ChannelStreamBuf() override;
 	
 	void close();
 	[[nodiscard]] FrameQueue::Ptr queue();
 	[[nodiscard]] Connection::Ptr connection();
 	
 protected:
-	std::streamsize readFromDevice(char* buffer, std::streamsize length);
-	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	Connection::Ptr _pConnection;
@@ -64,7 +62,7 @@ class RemotingNGTCP_API ChannelIOS: public virtual std::ios
 public:
 	ChannelIOS(Connection::Ptr pConnection, Poco::UInt32 frameType, Poco::UInt32 channel, Poco::Timespan timeout);
 	ChannelIOS(Connection::Ptr pConnection, Poco::UInt32 frameType, Poco::UInt32 channel, Poco::UInt16 flags);
-	~ChannelIOS();
+	~ChannelIOS() override;
 	void close();
 	[[nodiscard]] ChannelStreamBuf* rdbuf();
 	
@@ -78,7 +76,7 @@ class RemotingNGTCP_API ChannelInputStream: public ChannelIOS, public std::istre
 {
 public:
 	ChannelInputStream(Connection::Ptr pConnection, Poco::UInt32 frameType, Poco::UInt32 channel, Poco::Timespan timeout);
-	~ChannelInputStream();
+	~ChannelInputStream() override;
 };
 
 
@@ -87,11 +85,11 @@ class RemotingNGTCP_API ChannelOutputStream: public ChannelIOS, public std::ostr
 {
 public:
 	ChannelOutputStream(Connection::Ptr pConnection, Poco::UInt32 frameType, Poco::UInt32 channel, Poco::UInt16 flags);
-	~ChannelOutputStream();
+	~ChannelOutputStream() override;
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_ChannelStream_INCLUDED

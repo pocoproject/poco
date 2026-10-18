@@ -16,6 +16,9 @@ public:
 	void testCheckRequestCompleteChunkedWithTrailerAndBody();
 	void testCheckRequestCompleteChunkedWithBody();
 	void testCheckRequestCompleteChunkedWithStickyBody();
+	void testCheckRequestCompleteChunkedMalformedSize();
+	void testCheckRequestCompleteChunkedSizeExtension();
+	void testCheckRequestCompleteChunkedMissingCRLF();
 	void testCheckRequestCompleteContentLength();
 	void testCheckRequestCompleteContentLengthIncomplete();
 	void testCheckRequestCompleteContentLengthWithStickyBody();

@@ -15,19 +15,13 @@
 #include "Poco/RemotingNG/JSONRPC/JSArray.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
-JSArray::JSArray()
-{
-}
+JSArray::JSArray() = default;
 
 
-JSArray::~JSArray()
-{
-}
+JSArray::~JSArray() = default;
 
 
 JSValue::Type JSArray::type() const
@@ -66,4 +60,4 @@ JSValue::Ptr& JSArray::operator [] (std::size_t index)
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

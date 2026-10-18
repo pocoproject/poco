@@ -26,9 +26,7 @@
 #include <deque>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace TCP {
+namespace Poco::RemotingNG::TCP {
 
 
 class RemotingNGTCP_API FrameQueue: public FrameHandler
@@ -41,7 +39,7 @@ public:
 		/// Creates the FrameQueue, accepting frames having the
 		/// given type and channel.
 
-	~FrameQueue();
+	~FrameQueue() override;
 		/// Destroys the FrameQueue.
 
 	[[nodiscard]] Frame::Ptr dequeueFrame(Poco::Timespan timeout);
@@ -51,13 +49,10 @@ public:
 		/// timeout expires.
 
 	// FrameHandler
-	[[nodiscard]] bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame);
+	[[nodiscard]] bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) override;
 
 private:
-	enum
-	{
-		MAX_QUEUE_SIZE = 256
-	};
+	static constexpr int MAX_QUEUE_SIZE = 256;
 
 	using FrameDeque = std::deque<Frame::Ptr>;
 
@@ -70,7 +65,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::TCP
+} // namespace Poco::RemotingNG::TCP
 
 
 #endif // RemotingNG_TCP_FrameQueue_INCLUDED

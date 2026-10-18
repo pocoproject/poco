@@ -15,9 +15,7 @@
 #include "Poco/RemotingNG/JSONRPC/JSScalar.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace JSONRPC {
+namespace Poco::RemotingNG::JSONRPC {
 
 
 JSScalar::JSScalar(Type type):
@@ -33,9 +31,7 @@ JSScalar::JSScalar(const std::string& value, Type type):
 }
 
 
-JSScalar::~JSScalar()
-{
-}
+JSScalar::~JSScalar() = default;
 
 
 JSValue::Type JSScalar::type() const
@@ -50,4 +46,4 @@ const std::string& JSScalar::stringValue() const
 }
 
 
-} } } // namespace Poco::RemotingNG::JSONRPC
+} // namespace Poco::RemotingNG::JSONRPC

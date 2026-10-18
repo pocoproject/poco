@@ -15,9 +15,7 @@
 #include "Poco/RemotingNG/REST/HeaderSerializer.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 HeaderSerializer::HeaderSerializer(Poco::Net::HTTPMessage& message):
@@ -26,9 +24,7 @@ HeaderSerializer::HeaderSerializer(Poco::Net::HTTPMessage& message):
 }
 
 
-HeaderSerializer::~HeaderSerializer()
-{
-}
+HeaderSerializer::~HeaderSerializer() = default;
 
 
 void HeaderSerializer::serializeData(const std::string& name, const std::string& val)
@@ -37,4 +33,4 @@ void HeaderSerializer::serializeData(const std::string& name, const std::string&
 }
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST

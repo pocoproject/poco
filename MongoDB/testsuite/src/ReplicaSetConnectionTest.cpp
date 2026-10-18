@@ -8,9 +8,10 @@
 //
 
 //
-// This suite verifies the re-send rules of ReplicaSetConnection and the cursor
-// release of OpMsgCursor::kill(). It needs no real MongoDB server: every test
-// runs against one or two instances of the in-process MongoDBTestServer, whose
+// This suite verifies the re-send rules of ReplicaSetConnection, the cursor
+// release of OpMsgCursor::kill(), and ReplicaSet socket factory dispatch and
+// timeouts. It needs no real MongoDB server: the transport tests
+// run against one or two instances of the in-process MongoDBTestServer, whose
 // replies are scripted per command (an error reply, no reply at all, a raw byte
 // sequence, or a closed connection).
 //
@@ -83,6 +84,47 @@ namespace
 		config.serverReconnectDelaySeconds = 0;
 		return config;
 	}
+
+	class RecordingSocketFactory: public Connection::SocketFactory
+		/// Records factory arguments and the returned plain loopback socket.
+		/// Leaves socket timeouts unset unless a test supplies one.
+	{
+	public:
+		Poco::Net::StreamSocket createSocket(const std::string& host, int port,
+			Poco::Timespan connectTimeout, bool secure) override
+		{
+			++calls;
+			lastHost = host;
+			lastPort = port;
+			lastConnectTimeout = connectTimeout;
+			secureRequested = secure;
+			if (fail)
+				throw Poco::IOException("Test socket factory failure");
+
+			// Plain loopback transport suffices to test factory dispatch.
+			Poco::Net::StreamSocket socket;
+			if (connectTimeout > 0)
+				socket.connect(Poco::Net::SocketAddress(host, port), connectTimeout);
+			else
+				socket.connect(Poco::Net::SocketAddress(host, port));
+			if (socketTimeout > 0)
+			{
+				socket.setSendTimeout(socketTimeout);
+				socket.setReceiveTimeout(socketTimeout);
+			}
+			lastSocket = socket;
+			return socket;
+		}
+
+		int calls = 0;
+		std::string lastHost;
+		int lastPort = 0;
+		Poco::Timespan lastConnectTimeout;
+		Poco::Timespan socketTimeout;
+		Poco::Net::StreamSocket lastSocket;
+		bool secureRequested = false;
+		bool fail = false;
+	};
 
 	class Fixture
 		/// Owns the test servers, the ReplicaSet, the ReplicaSetConnection and the
@@ -1288,6 +1330,165 @@ void ReplicaSetConnectionTest::testHandBuiltBodyClassifiedByFirstElement()
 }
 
 
+void ReplicaSetConnectionTest::testCustomSocketFactoryDiscovery()
+{
+	MongoDBTestServer server;
+	RecordingSocketFactory factory;
+	auto config = makeConfig({&server});
+	config.socketFactory = &factory;
+	config.connectTimeoutSeconds = 2;
+	config.socketTimeoutSeconds = 3;
+	ReplicaSet replicaSet(config);
+
+	assertEqual(1, factory.calls);
+	assertTrue(factory.secureRequested);
+	assertEqual("127.0.0.1"s, factory.lastHost);
+	assertEqual(static_cast<int>(server.address().port()), factory.lastPort);
+	assertEqual(Poco::Timespan(2, 0).totalMicroseconds(), factory.lastConnectTimeout.totalMicroseconds());
+	assertTrue(replicaSet.hasPrimary());
+	assertEqual(1, server.commandCount("hello"s));
+
+	replicaSet.refreshTopology();
+	assertEqual(2, factory.calls);
+	assertTrue(factory.secureRequested);
+	assertEqual(2, server.commandCount("hello"s));
+	assertTrue(replicaSet.hasPrimary());
+	assertEqual(0, server.errorCount());
+}
+
+
+void ReplicaSetConnectionTest::testCustomSocketFactoryConnections()
+{
+	MongoDBTestServer server;
+	RecordingSocketFactory factory;
+	auto config = makeConfig({&server});
+	config.connectTimeoutSeconds = 2;
+	config.socketTimeoutSeconds = 3;
+	ReplicaSet replicaSet(config);
+	replicaSet.setSocketFactory(&factory);
+
+	auto connection = replicaSet.getPrimaryConnection();
+	assertTrue (!connection.isNull());
+	assertEqual(1, factory.calls);
+	assertTrue(factory.secureRequested);
+	assertEqual(Poco::Timespan(2, 0).totalMicroseconds(), factory.lastConnectTimeout.totalMicroseconds());
+	Request request("ping"s);
+	OpMsgMessage response;
+	assertEqual(Poco::Timespan(3, 0).totalMicroseconds(), factory.lastSocket.getSendTimeout().totalMicroseconds());
+	assertEqual(Poco::Timespan(3, 0).totalMicroseconds(), factory.lastSocket.getReceiveTimeout().totalMicroseconds());
+	connection->sendRequest(request, response);
+	assertTrue(response.responseOk());
+
+	const Poco::Timespan timeout(0, 250000);
+	connection = replicaSet.getConnection(ReadPreference(ReadPreference::Primary), timeout, Poco::Timespan(5, 0));
+	assertTrue (!connection.isNull());
+	assertEqual(2, factory.calls);
+	assertTrue(factory.secureRequested);
+	assertEqual(timeout.totalMicroseconds(), factory.lastConnectTimeout.totalMicroseconds());
+	assertEqual("127.0.0.1"s, factory.lastHost);
+	assertEqual(static_cast<int>(server.address().port()), factory.lastPort);
+	assertEqual(Poco::Timespan(5, 0).totalMicroseconds(), factory.lastSocket.getSendTimeout().totalMicroseconds());
+	assertEqual(Poco::Timespan(5, 0).totalMicroseconds(), factory.lastSocket.getReceiveTimeout().totalMicroseconds());
+	connection->sendRequest(request, response);
+	assertTrue(response.responseOk());
+	// A zero socket timeout leaves any factory-supplied timeout unchanged.
+	factory.socketTimeout = SOCKET_TIMEOUT;
+	connection = replicaSet.getConnection(ReadPreference(ReadPreference::Primary), timeout, Poco::Timespan());
+	assertTrue (!connection.isNull());
+	assertEqual(SOCKET_TIMEOUT.totalMicroseconds(), factory.lastSocket.getSendTimeout().totalMicroseconds());
+	assertEqual(SOCKET_TIMEOUT.totalMicroseconds(), factory.lastSocket.getReceiveTimeout().totalMicroseconds());
+	connection->sendRequest(request, response);
+	assertTrue(response.responseOk());
+	assertEqual(3, server.commandCount("ping"s));
+	assertEqual(0, server.errorCount());
+}
+
+
+void ReplicaSetConnectionTest::testCustomSocketFactoryFailure()
+{
+	MongoDBTestServer server;
+	RecordingSocketFactory factory;
+	factory.fail = true;
+	ReplicaSet replicaSet(makeConfig({&server}));
+	replicaSet.setSocketFactory(&factory);
+
+	expectThrows<Poco::IOException>([&]() { replicaSet.getPrimaryConnection(); },
+		"the factory exception must propagate"s);
+	assertEqual(1, factory.calls);
+	assertTrue(factory.secureRequested);
+	assertFalse(replicaSet.hasPrimary());
+	assertTrue(replicaSet.topology().servers().front().error().find(Poco::IOException().what()) != std::string::npos);
+}
+
+
+void ReplicaSetConnectionTest::testCustomSocketFactoryIPv6()
+{
+#ifdef POCO_HAVE_IPv6
+	RecordingSocketFactory factory;
+	factory.fail = true;
+	ReplicaSet::Config config;
+	config.seeds.emplace_back("::1", 27017);
+	config.enableMonitoring = false;
+	config.socketFactory = &factory;
+	config.connectTimeoutSeconds = 0;
+	ReplicaSet replicaSet(config);
+
+	// The throwing factory avoids needing an IPv6 listener on the test host.
+	assertEqual(1, factory.calls);
+	assertTrue(factory.secureRequested);
+	assertEqual("::1"s, factory.lastHost);
+	assertEqual(27017, factory.lastPort);
+	assertEqual(Poco::Timespan().totalMicroseconds(), factory.lastConnectTimeout.totalMicroseconds());
+	assertFalse(replicaSet.hasPrimary());
+	assertTrue(replicaSet.topology().servers().front().error().find(Poco::IOException().what()) != std::string::npos);
+#endif
+}
+
+
+void ReplicaSetConnectionTest::testCustomSocketFactoryMonitoringTimeout()
+{
+	MongoDBTestServer server;
+	RecordingSocketFactory factory;
+	auto config = makeConfig({&server});
+	config.socketFactory = &factory;
+	auto replicaSet = std::make_unique<ReplicaSet>(config);
+	scriptAction(server, "hello"s, Action::NoReply);
+	replicaSet->startMonitoring();
+
+	const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(2);
+	while (server.commandCount("hello"s) < 2 && std::chrono::steady_clock::now() < deadline)
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	const bool monitorRequestedHello = server.commandCount("hello"s) >= 2;
+
+	std::mutex mutex;
+	std::condition_variable finished;
+	bool done = false;
+	bool watchdogFired = false;
+	// Closing stalled sockets bounds the test if destruction cannot join the monitor.
+	std::thread watchdog([&]()
+	{
+		std::unique_lock<std::mutex> lock(mutex);
+		if (!finished.wait_for(lock, std::chrono::seconds(3), [&done]() { return done; }))
+		{
+			watchdogFired = true;
+			server.closeConnections();
+		}
+	});
+	replicaSet.reset();
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		done = true;
+	}
+	finished.notify_one();
+	watchdog.join();
+
+	assertTrue(monitorRequestedHello);
+	assertFalse(watchdogFired);
+	assertEqual(2, server.commandCount("hello"s));
+	assertEqual(0, server.errorCount());
+}
+
+
 CppUnit::Test* ReplicaSetConnectionTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ReplicaSetConnectionTest"s);
@@ -1339,6 +1540,12 @@ CppUnit::Test* ReplicaSetConnectionTest::suite()
 	CppUnit_addTest(pSuite, ReplicaSetConnectionTest, testFindResentAfterNoReplyWithConfigTimeouts);
 	CppUnit_addTest(pSuite, ReplicaSetConnectionTest, testSocketTimeoutFallsBackToConfig);
 	CppUnit_addTest(pSuite, ReplicaSetConnectionTest, testHandBuiltBodyClassifiedByFirstElement);
+
+	CppUnit_addTest(pSuite, ReplicaSetConnectionTest, testCustomSocketFactoryDiscovery);
+	CppUnit_addTest(pSuite, ReplicaSetConnectionTest, testCustomSocketFactoryConnections);
+	CppUnit_addTest(pSuite, ReplicaSetConnectionTest, testCustomSocketFactoryFailure);
+	CppUnit_addTest(pSuite, ReplicaSetConnectionTest, testCustomSocketFactoryIPv6);
+	CppUnit_addTest(pSuite, ReplicaSetConnectionTest, testCustomSocketFactoryMonitoringTimeout);
 
 	return pSuite;
 }

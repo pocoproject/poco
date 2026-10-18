@@ -26,6 +26,7 @@
 #include "Poco/Mutex.h"
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
+#include <exception>
 
 
 namespace Poco::Net {
@@ -72,6 +73,9 @@ public:
 		/// If performHandshake is true, the SSL handshake is performed immediately
 		/// after establishing the connection. Otherwise, the handshake is performed
 		/// the first time sendBytes(), receiveBytes() or completeHandshake() is called.
+		///
+		/// If performHandshake is true, the timeout also limits the whole
+		/// handshake, not only the wait for a single read or write.
 
 	void connectNB(const SocketAddress& address);
 		/// Initializes the socket and establishes a secure connection to
@@ -153,9 +157,34 @@ public:
 		/// an orderly SSL shutdown, then actually
 		/// shutting down the TCP connection in the
 		/// send direction.
+		///
+		/// On a blocking socket, the send timeout limits sending the own
+		/// close_notify alert. If the socket has a receive timeout, the alert
+		/// of the peer is then awaited for that time, but at most one second.
+		///
+		/// Returns 1 if the alert of the peer was received, 0 if only
+		/// the own alert was sent, and a negative value
+		/// (SecureStreamSocket::ERR_SSL_WANT_WRITE) if the own alert
+		/// could not be sent within the send timeout.
+		///
+		/// If another thread is sending, receiving or completing the
+		/// handshake on this socket and does not return within a
+		/// short time, or the handshake is not complete, no alert
+		/// is sent: the TCP connection is shut down in both
+		/// directions, which ends the call of the other thread, and
+		/// 0 is returned.
+		///
+		/// After a fatal TLS or I/O error on the connection, including one
+		/// while the alert is sent or awaited, no further alert is sent: only
+		/// the send direction of the TCP connection is shut down, and 0 is
+		/// returned. A send or receive that timed out is not a fatal error.
 
 	void close();
 		/// Close the socket.
+		///
+		/// Except on Windows, the socket is closed only after a thread
+		/// that is sending, receiving or completing the handshake on
+		/// it has left that call.
 
 	void abort();
 		/// Aborts the connection by closing the
@@ -185,6 +214,16 @@ public:
 		/// If the SSL connection was the result of an accept(),
 		/// the server-side handshake is completed, otherwise
 		/// a client-side handshake is performed.
+		///
+		/// Once the handshake is complete, the peer certificate is verified
+		/// as in verifyPeerCertificate(), on the server side against the IP
+		/// address of the client. Throws a CertificateValidationException if
+		/// the certificate is not acceptable; the handshake then remains
+		/// incomplete.
+		///
+		/// On a blocking socket, the receive timeout, if set, limits the whole
+		/// handshake, not only the wait for a single read or write. Throws a
+		/// Poco::TimeoutException if the handshake does not complete in time.
 
 	[[nodiscard]] poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
@@ -211,6 +250,14 @@ public:
 
 	[[nodiscard]] const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
+
+	void setTunneled(bool tunneled);
+		/// Sets whether the connection is tunneled, that is, reaches the
+		/// peer host through a proxy whose address is the peer address of
+		/// the socket. Must be called before the handshake to be effective.
+
+	[[nodiscard]] bool getTunneled() const;
+		/// Returns true if the connection is tunneled.
 
 	[[nodiscard]] Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,
@@ -251,10 +298,11 @@ protected:
 		/// Performs post-connect (or post-accept) peer certificate validation.
 
 	[[nodiscard]] static bool isLocalHost(const std::string& hostName);
-		/// Returns true iff the given host name is the local host
-		/// (either "localhost" or "127.0.0.1").
+		/// Returns true iff the given host name is "localhost"
+		/// (in any letter case) or a loopback IP address literal.
+		/// The name is not resolved.
 
-	[[nodiscard]] bool mustRetry(int rc);
+	[[nodiscard]] bool mustRetry(int rc, bool& interrupted);
 		/// Returns true if the last operation should be retried,
 		/// otherwise false.
 		///
@@ -264,9 +312,12 @@ protected:
 		/// In case of an SSL_ERROR_WANT_WRITE error, and if the socket is
 		/// blocking, waits for the underlying socket to become writable.
 		///
-		/// Can also throw a Poco::TimeoutException if the socket does
-		/// not become readable or writable within the sockets
-		/// receive or send timeout.
+		/// The wait is short and does not throw: the caller enforces
+		/// the receive or send timeout of the socket.
+		///
+		/// Sets interrupted to true if the retry is due to a signal that
+		/// interrupted the operation on a blocking socket, otherwise
+		/// to false.
 
 	int handleError(int rc);
 		/// Handles an SSL error by throwing an appropriate exception.
@@ -291,12 +342,56 @@ private:
 	SecureSocketImpl(const SecureSocketImpl&);
 	SecureSocketImpl& operator = (const SecureSocketImpl&);
 
+	int completeHandshakeLocked();
+		/// Completes the SSL handshake as completeHandshake() does,
+		/// for a caller that holds the mutex.
+
+	int handshakeWithDeadline(const Poco::Timespan& timeout);
+		/// Runs the SSL handshake and returns the result of
+		/// SSL_do_handshake().
+		///
+		/// On a blocking socket and with a non-zero timeout, throws a
+		/// Poco::TimeoutException if the handshake does not complete
+		/// within the timeout, however the peer spreads its data.
+
+	[[nodiscard]] BIO* createBIO();
+		/// Creates the BIO of the SSL object, or returns a null pointer
+		/// if OpenSSL cannot create it.
+		///
+		/// The BIO of a socket that is not secure reads from and writes
+		/// to the socket descriptor. If the underlying socket is itself
+		/// a secure socket, the BIO calls its sendBytes() and
+		/// receiveBytes(), so that this TLS connection runs inside the
+		/// TLS connection of the underlying socket.
+
+	template <typename IO>
+	int socketIO(BIO* pBIO, int direction, IO&& io);
+		/// Runs a send or receive on the underlying socket for its BIO
+		/// and returns the result in the terms of a BIO.
+
+	static int bioWrite(BIO* pBIO, const char* buffer, int length);
+	static int bioRead(BIO* pBIO, char* buffer, int length);
+	static long bioCtrl(BIO* pBIO, int cmd, long larg, void* parg);
+
 	std::atomic<SSL*> _pSSL;
 	Poco::AutoPtr<SocketImpl> _pSocket;
 	Context::Ptr _pContext;
 	bool _needHandshake;
 	bool _ticketPending;
+	bool _pendingWrite;
+		/// A TLS record of an unfinished SSL_write() is unsent. A close_notify
+		/// alert cannot reach the peer before that record.
+	bool _fatalError;
+		/// A fatal TLS or I/O error has occurred on the connection.
+		/// A send or receive that timed out is not one.
+	bool _bioEOF;
+		/// A receive of the underlying secure socket has reached the end
+		/// of its data.
+	std::exception_ptr _bioException;
+		/// The exception that ended a send or receive of the underlying
+		/// secure socket inside an SSL call.
 	std::string _peerHostName;
+	bool _tunneled;
 	Session::Ptr _pSession;
 	mutable MutexT _mutex;
 
@@ -335,6 +430,18 @@ inline Context::Ptr SecureSocketImpl::context() const
 inline const std::string& SecureSocketImpl::getPeerHostName() const
 {
 	return _peerHostName;
+}
+
+
+inline void SecureSocketImpl::setTunneled(bool tunneled)
+{
+	_tunneled = tunneled;
+}
+
+
+inline bool SecureSocketImpl::getTunneled() const
+{
+	return _tunneled;
 }
 
 

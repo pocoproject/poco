@@ -57,6 +57,16 @@ public:
 		/// See WebSocket::receiveFrame() for more information, including
 		/// behavior if set to non-blocking.
 
+	virtual int sendBytes(const SocketBufVec& buffers, int flags = 0);
+		/// Not supported by a WebSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
+	virtual int receiveBytes(SocketBufVec& buffers, int flags = 0);
+		/// Not supported by a WebSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
 	virtual void connect(const SocketAddress& address);
 	virtual void connect(const SocketAddress& address, const Poco::Timespan& timeout);

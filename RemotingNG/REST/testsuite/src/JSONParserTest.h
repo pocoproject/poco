@@ -22,7 +22,7 @@ class JSONParserTest: public CppUnit::TestCase
 {
 public:
 	JSONParserTest(const std::string& name);
-	~JSONParserTest();
+	~JSONParserTest() override;
 
 	void testNull();
 	void testNullWithWhitespace();
@@ -46,8 +46,8 @@ public:
 	void testArray3();
 	void testComplexObject();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

@@ -21,18 +21,13 @@
 using Poco::FastMutex;
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-ProxyFactoryManager::ProxyFactoryManager()
-{
-}
+ProxyFactoryManager::ProxyFactoryManager() = default;
 
 
-ProxyFactoryManager::~ProxyFactoryManager()
-{
-}
+ProxyFactoryManager::~ProxyFactoryManager() = default;
 
 
 void ProxyFactoryManager::registerProxyFactory(const Identifiable::TypeId& tid, ProxyFactory::Ptr pProxyFactory)
@@ -82,4 +77,4 @@ Proxy* ProxyFactoryManager::createProxy(const Identifiable::TypeId& tid, const R
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

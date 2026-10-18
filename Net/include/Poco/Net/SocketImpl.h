@@ -22,6 +22,7 @@
 #include "Poco/Net/SocketDefs.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/Clock.h"
 #include "Poco/Timespan.h"
 #include "Poco/Buffer.h"
 #include <atomic>
@@ -41,6 +42,12 @@ class Net_API SocketImpl: public Poco::RefCountedObject
 	///
 	/// Subclasses implement specific socket types like
 	/// stream or datagram sockets.
+	///
+	/// A native socket that this class creates or accepts
+	/// is not inherited by a child process: it is
+	/// close-on-exec on POSIX platforms and not inheritable
+	/// on Windows. A native socket that is given to this
+	/// class is left as it is.
 	///
 	/// You should not create any instances of this class.
 {
@@ -304,8 +311,8 @@ public:
 		/// or the socket is a secure one (secure() returne true),
 		/// falls back to reading the file block by block and calling sendBytes().
 		///
-		/// Returns the number of bytes sent, which should be the same
-		/// as count, unless count is 0.
+		/// Returns the number of bytes sent, which is less than count
+		/// if the file ends before count bytes have been sent.
 		///
 		/// Throws NetException (or a subclass) in case of any errors.
 		/// Also throws a NetException if the socket has been set to
@@ -316,14 +323,20 @@ public:
 		/// without causing the socket to block.
 
 	[[nodiscard]] virtual bool poll(const Poco::Timespan& timeout, int mode);
-		/// Determines the status of the socket, using a
-		/// call to select().
+		/// Determines the status of the socket, using poll() where the
+		/// platform provides it, epoll_wait() of wepoll on Windows, or
+		/// select() otherwise.
 		///
 		/// The mode argument is constructed by combining the values
 		/// of the SelectMode enumeration.
 		///
+		/// A negative timeout waits without limit, also when a signal
+		/// interrupts the wait.
+		///
 		/// Returns true if the next operation corresponding to
 		/// mode will not block, false otherwise.
+		///
+		/// Throws an IOException if the socket descriptor is not open.
 
 	[[nodiscard]] Type type();
 		/// Returns the socket type.
@@ -584,6 +597,33 @@ protected:
 private:
 	SocketImpl(const SocketImpl&);
 	SocketImpl& operator = (const SocketImpl&);
+
+	class ShortenedTimeout;
+
+	void waitAfterInterrupt(const Poco::Clock& start, ShortenedTimeout& timeout);
+		/// Called when a signal has interrupted a blocking send,
+		/// receive or accept that was started at the given time.
+		/// Returns when the call can be repeated. Where the repeated
+		/// call can block again (a send() on a stream socket, a receive
+		/// with MSG_WAITALL), shortens the timeout of the socket to the
+		/// time that is left; the ShortenedTimeout restores it.
+		///
+		/// For accept(), called on Linux only: other systems do not
+		/// apply the receive timeout to accept().
+		///
+		/// Throws a TimeoutException if the send timeout (SELECT_WRITE)
+		/// or the receive timeout (SELECT_READ) of the socket has passed
+		/// since the start. Without this check, every repetition restarts
+		/// the timeout, and signals that arrive more often than the timeout
+		/// keep the call from ever timing out.
+		///
+		/// A system call that the operating system restarts after a
+		/// signal (SA_RESTART on macOS and BSD) does not return here,
+		/// so its timeout cannot be limited this way.
+
+	void setTimeoutOption(SelectMode mode, const Poco::Timespan& timeout);
+		/// Sets SO_RCVTIMEO (SELECT_READ) or SO_SNDTIMEO (SELECT_WRITE) on
+		/// the socket; does not change the stored timeouts.
 
 	std::atomic<poco_socket_t>  _sockfd;
 	Poco::Timespan _recvTimeout;

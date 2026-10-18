@@ -24,9 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace REST {
+namespace Poco::RemotingNG::REST {
 
 
 class RemotingNGREST_API PathSerializer: public ScalarSerializer
@@ -37,7 +35,7 @@ public:
 	PathSerializer(const std::string& pathTemplate, Poco::Net::HTTPRequest& request);
 		/// Creates the PathSerializer. 
 
-	~PathSerializer();
+	~PathSerializer() override;
 		/// Destroys the PathSerializer.
 		
 	void close();
@@ -48,7 +46,7 @@ protected:
 		/// Replaces the path item with a parameter if it's a placeholder.
 		
 	// ScalarSerializer
-	void serializeData(const std::string& name, const std::string& val);
+	void serializeData(const std::string& name, const std::string& val) override;
 
 private:
 	std::string _pathTemplate;
@@ -61,7 +59,7 @@ private:
 };
 
 
-} } } // namespace Poco::RemotingNG::REST
+} // namespace Poco::RemotingNG::REST
 
 
 #endif // RemotingNG_REST_PathSerializer_INCLUDED

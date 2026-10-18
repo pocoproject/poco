@@ -1,0 +1,1 @@
+<%@ page class="StringifyHandler" namespace="AI::Test" stringify="true" form="true" %><p>Hello, <%= form.get("name") %>!</p>

@@ -69,8 +69,13 @@ public:
 	static const epoll_event EPOLL_NULL_EVENT;
 
 	PollSetImpl(): _events(FD_SETSIZE, EPOLL_NULL_EVENT),
+#ifdef WEPOLL_H_
 		_eventfd(eventfd(0, 0)),
 		_epollfd(epoll_create(1))
+#else
+		_eventfd(eventfd(0, EFD_CLOEXEC)),
+		_epollfd(epoll_create1(EPOLL_CLOEXEC))
+#endif
 	{
 		int err = addFD(_eventfd, PollSet::POLL_READ, EPOLL_CTL_ADD);
 #ifdef WEPOLL_H_
@@ -149,16 +154,17 @@ public:
 
 			close(_epollfd);
 			_socketMap.clear();
-			_epollfd = epoll_create(1);
 #ifdef WEPOLL_H_
+			_epollfd = epoll_create(1);
 			if (!_epollfd) SocketImpl::error();
 #else
+			_epollfd = epoll_create1(EPOLL_CLOEXEC);
 			if (_epollfd < 0) SocketImpl::error();
 #endif
 		}
 #ifndef WEPOLL_H_
 		close(_eventfd.exchange(0));
-		_eventfd = eventfd(0, 0);
+		_eventfd = eventfd(0, EFD_CLOEXEC);
 #endif
 		addFD(_eventfd, PollSet::POLL_READ, EPOLL_CTL_ADD);
 	}
@@ -368,6 +374,15 @@ class PollSetImpl
 public:
 	PollSetImpl()
 	{
+#if defined(FD_CLOEXEC)
+		// Poco::Pipe creates inheritable descriptors, because a pipe is
+		// usually passed to a child process; the wake-up pipe is not.
+		if (::fcntl(_pipe.readHandle(), F_SETFD, FD_CLOEXEC) == -1 ||
+			::fcntl(_pipe.writeHandle(), F_SETFD, FD_CLOEXEC) == -1)
+		{
+			SocketImpl::error();
+		}
+#endif
 		pollfd fd{_pipe.readHandle(), POLLIN, 0};
 		_pollfds.push_back(fd);
 	}

@@ -654,8 +654,9 @@ void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 		{
 			if (utf16Path.compare(0, 4, L"\\\\?\\", 4) != 0)
 			{
+				// The prefix replaces the leading "\\" of a UNC path.
 				if (utf16Path[1] == '\\')
-					utf16Path.insert(0, L"\\\\?\\UNC\\", 8);
+					utf16Path.replace(0, 2, L"\\\\?\\UNC\\");
 				else
 					utf16Path.insert(0, L"\\\\?\\", 4);
 			}

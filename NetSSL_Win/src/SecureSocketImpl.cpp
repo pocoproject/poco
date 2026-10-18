@@ -21,6 +21,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Format.h"
+#include "Poco/String.h"
 #include "Poco/UnicodeConverter.h"
 #include <wininet.h>
 #include <cstring>
@@ -60,6 +61,7 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_pContext(pContext),
 	_mode(pContext->isForServerUse() ? MODE_SERVER : MODE_CLIENT),
 	_shutdownFlags(0),
+	_tunneled(false),
 	_clientAuthRequired(pContext->verificationMode() >= Context::VERIFY_STRICT),
 	_securityFunctions(SSLManager::instance().securityFunctions()),
 	_pOwnCertificate(nullptr),
@@ -79,6 +81,7 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_inSecBuffer(&_securityFunctions, false),
 	_extraSecBuffer(),
 	_securityStatus(SEC_E_INCOMPLETE_MESSAGE),
+	_inputConsumed(true),
 	_state(ST_INITIAL)
 {
 	SecInvalidateHandle(&_hCreds);
@@ -364,10 +367,20 @@ void SecureSocketImpl::verifyPeerCertificate()
 void SecureSocketImpl::verifyPeerCertificate(const std::string& hostName)
 {
 	Context::VerificationMode mode = _pContext->verificationMode();
-	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled() ||
-		(mode != Context::VERIFY_STRICT && isLocalHost(hostName)))
+	if (mode == Context::VERIFY_NONE || !_pContext->extendedCertificateVerificationEnabled())
 	{
 		return;
+	}
+	if (mode != Context::VERIFY_STRICT && isLocalHost(hostName) && !_tunneled)
+	{
+		// The name alone does not say where the connection ends: skip the
+		// verification only for a loopback peer address. The peer address of
+		// a tunneled connection is that of the proxy, not of the named host.
+		const SocketAddress peer = _pSocket->peerAddress();
+		if ((peer.family() == SocketAddress::IPv4 || peer.family() == SocketAddress::IPv6) && peer.host().isLoopback())
+		{
+			return;
+		}
 	}
 
 	if (_mode == MODE_SERVER)
@@ -406,8 +419,13 @@ int SecureSocketImpl::stateToReturnValue(State state)
 
 bool SecureSocketImpl::isLocalHost(const std::string& hostName)
 {
-	SocketAddress addr(hostName, 0);
-	return addr.host().isLoopback();
+	// The name service must not decide whether the certificate is verified.
+	if (Poco::icompare(hostName, "localhost") == 0)
+	{
+		return true;
+	}
+	IPAddress address;
+	return IPAddress::tryParse(hostName, address) && address.isLoopback();
 }
 
 
@@ -976,7 +994,13 @@ void SecureSocketImpl::stateClientHandshakeLoopInit()
 	_inSecBuffer.reset(false);
 	_outSecBuffer.reset(true);
 
-	if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_CONTINUE_NEEDED)
+	if (_securityStatus == SEC_I_CONTINUE_NEEDED && _inputConsumed && _recvBufferOffset > 0 && bufferHasCompleteRecords(_recvBuffer.begin(), _recvBufferOffset))
+	{
+		// The kept extra bytes hold the next records: a receive would wait for data that has
+		// already arrived. Input that was not consumed at all is not offered again without more data.
+		setState(ST_CLIENT_HSK_LOOP_PROCESS);
+	}
+	else if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_CONTINUE_NEEDED)
 	{
 		setState(ST_CLIENT_HSK_LOOP_RECV);
 	}
@@ -1119,13 +1143,19 @@ void SecureSocketImpl::sendOutSecBufferAndAdvanceState(State state)
 
 void SecureSocketImpl::drainExtraBuffer()
 {
-	if (_inSecBuffer[1].BufferType == SECBUFFER_EXTRA && _inSecBuffer[1].pvBuffer && _inSecBuffer[1].cbBuffer > 0)
+	// Schannel reports unprocessed input by BufferType and cbBuffer only: the extra bytes are
+	// the last cbBuffer bytes of the input token, and pvBuffer does not point to them.
+	if (_inSecBuffer[1].BufferType == SECBUFFER_EXTRA && _inSecBuffer[1].cbBuffer > 0)
 	{
+		if (_inSecBuffer[1].cbBuffer > _recvBufferOffset)
+			throw SSLException("Invalid extra buffer length from the security provider");
+		_inputConsumed = _inSecBuffer[1].cbBuffer < _recvBufferOffset;
 		std::memmove(_recvBuffer.begin(), _recvBuffer.begin() + (_recvBufferOffset - _inSecBuffer[1].cbBuffer), _inSecBuffer[1].cbBuffer);
 		_recvBufferOffset = _inSecBuffer[1].cbBuffer;
 	}
 	else 
 	{
+		_inputConsumed = true;
 		_recvBufferOffset = 0;
 	}
 }
@@ -1206,7 +1236,13 @@ void SecureSocketImpl::stateServerHandshakeLoopInit()
 {
 	if (_securityStatus == SEC_I_CONTINUE_NEEDED || _securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_INCOMPLETE_CREDENTIALS)
 	{
-		if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_CONTINUE_NEEDED)
+		if (_securityStatus == SEC_I_CONTINUE_NEEDED && _inputConsumed && _recvBufferOffset > 0 && bufferHasCompleteRecords(_recvBuffer.begin(), _recvBufferOffset))
+		{
+			// The kept extra bytes hold the next records: a receive would wait for data that has
+			// already arrived. Input that was not consumed at all is not offered again without more data.
+			setState(ST_SERVER_HSK_LOOP_PROCESS);
+		}
+		else if (_securityStatus == SEC_E_INCOMPLETE_MESSAGE || _securityStatus == SEC_I_CONTINUE_NEEDED)
 		{
 			setState(ST_SERVER_HSK_LOOP_RECV);
 		}

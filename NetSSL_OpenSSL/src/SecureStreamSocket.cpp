@@ -223,11 +223,12 @@ SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, 
 }
 
 
-SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession)
+SecureStreamSocket SecureStreamSocket::attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession, bool tunneled)
 {
 	SecureStreamSocketImpl* pImpl = new SecureStreamSocketImpl(static_cast<StreamSocketImpl*>(streamSocket.impl()), pContext);
 	SecureStreamSocket result(pImpl);
 	result.setPeerHostName(peerHostName);
+	pImpl->setTunneled(tunneled);
 	result.useSession(pSession);
 	if (pImpl->context()->isForServerUse())
 		pImpl->acceptSSL();

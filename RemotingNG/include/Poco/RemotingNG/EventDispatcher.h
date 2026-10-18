@@ -30,8 +30,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class ORB;
@@ -64,8 +63,11 @@ public:
 	EventDispatcher(const std::string& protocol);
 		/// Creates an EventDispatcher. 
 
-	virtual ~EventDispatcher();
+	~EventDispatcher() override;
 		/// Destroys the EventDispatcher.
+
+	EventDispatcher(const EventDispatcher&) = delete;
+	EventDispatcher& operator = (const EventDispatcher&) = delete;
 
 	void subscribe(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime = 0);
 		/// Registers a remote EventSubscriber identified by
@@ -169,9 +171,6 @@ protected:
 	Poco::FastMutex _mutex;
 
 private:
-	EventDispatcher(const EventDispatcher&);
-	EventDispatcher& operator = (const EventDispatcher&);
-
 	void addSubscriber(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime);
 		/// Registers the subscriber, or gives its subscription the new
 		/// expireTime. The mutex is locked by the caller.
@@ -212,7 +211,7 @@ inline AttributedObject& EventDispatcher::attributes(const std::string& subscrib
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_EventDispatcher_INCLUDED

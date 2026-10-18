@@ -53,7 +53,7 @@ public:
 	XSDGenerator(Poco::CodeGeneration::CppGenerator& cppGen, const std::string& targetNamespace, Poco::XML::ContentHandler& xsdOut, bool documentStarted = false);
 	/// Creates the XSDGenerator. Set documentStarted to true, if the XSD file is written as a sub document of another files (ie WSDL file)
 
-	~XSDGenerator();
+	~XSDGenerator() override;
 		/// Destroys the XSDGenerator.
 
 	[[nodiscard]] static std::string generateFileName(const Poco::CppParser::Struct* pStruct);
@@ -62,24 +62,24 @@ public:
 
 	[[nodiscard]] static std::string generateComplexTypeName(const Poco::CppParser::Struct* pStruct);
 
-	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
+	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties) override;
 		/// Struct Start
 
-	void structEnd();
+	void structEnd() override;
 		// Struct End
 
-	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 		/// Method Start
 
-	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
 		/// Method End
 
-	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
+	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e) override;
 
-	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct) override;
 		/// generates the new class name based on the old one
 
-	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct) override;
 
 	[[nodiscard]] static const std::string& mapToSchemaType(const std::string& type);
 
@@ -121,9 +121,9 @@ protected:
 	void deepCopyMembers(const Poco::CppParser::Struct* pIn, Poco::CppParser::Struct* pOut);
 
 private:
-	typedef std::set<std::string> HandledTypes;
-	typedef std::map<std::string, std::string> ExportedTypes;
-	typedef std::map<std::string, std::string> SoapHeaderTypes;
+	using HandledTypes = std::set<std::string>;
+	using ExportedTypes = std::map<std::string, std::string>;
+	using SoapHeaderTypes = std::map<std::string, std::string>;
 		// maps element names to type names
 
 	Poco::CppParser::NameSpace _ns;

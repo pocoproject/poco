@@ -20,9 +20,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 
 
-namespace Poco {
-namespace RemotingNG {
-namespace SOAP {
+namespace Poco::RemotingNG::SOAP {
 
 
 WSDLRequestHandler::WSDLRequestHandler(const std::string& wsdlPath):
@@ -31,9 +29,7 @@ WSDLRequestHandler::WSDLRequestHandler(const std::string& wsdlPath):
 }
 
 
-WSDLRequestHandler::~WSDLRequestHandler()
-{
-}
+WSDLRequestHandler::~WSDLRequestHandler() = default;
 
 
 void WSDLRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
@@ -77,4 +73,4 @@ void WSDLRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Po
 }
 
 
-} } } // namespace Poco::RemotingNG::SOAP
+} // namespace Poco::RemotingNG::SOAP

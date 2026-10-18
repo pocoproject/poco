@@ -21,6 +21,10 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerParams.h"
 #include "Poco/Net/SecureStreamSocket.h"
+#include "Poco/Net/SecureServerSocket.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/Context.h"
 #include "Poco/Net/Session.h"
 #include "Poco/Net/SSLManager.h"
@@ -34,9 +38,13 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/Event.h"
+#include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
 #include "DialogServer.h"
 #include "HTTPSTestServer.h"
+#include <atomic>
 #include <iostream>
 #include <sstream>
 
@@ -80,6 +88,253 @@ public:
 };
 
 
+class TLSConnectProxy: public Poco::Runnable
+	/// A proxy that serves one TLS connection. It answers the CONNECT
+	/// request with 200, then relays the decrypted bytes to the given
+	/// port on this host and the bytes from there back.
+{
+public:
+	enum Tunnel
+	{
+		TUNNEL_RELAY,
+			/// The proxy relays the bytes in both directions.
+		TUNNEL_CLOSE,
+			/// The proxy closes the connection after its answer,
+			/// without a close_notify alert.
+		TUNNEL_STALL,
+			/// The proxy keeps the connection open and relays nothing.
+		TUNNEL_CORRUPT,
+			/// As TUNNEL_RELAY, but after arm() it flips one bit in the
+			/// next bytes from the target.
+		TUNNEL_CUT
+			/// As TUNNEL_RELAY, but after arm() it relays the next bytes
+			/// from the target and then closes the TLS connection with a
+			/// close_notify alert.
+	};
+
+	explicit TLSConnectProxy(Poco::UInt16 targetPort, Tunnel tunnel = TUNNEL_RELAY):
+		_socket(SocketAddress("127.0.0.1", 0)),
+		_targetPort(targetPort),
+		_tunnel(tunnel),
+		_thread("TLSConnectProxy"),
+		_stop(false),
+		_armed(false)
+	{
+		_thread.start(*this);
+	}
+
+	~TLSConnectProxy()
+	{
+		_stop = true;
+		_thread.join();
+	}
+
+	Poco::UInt16 port() const
+	{
+		return _socket.address().port();
+	}
+
+	const std::string& connectRequest() const
+		/// Returns the request the proxy received. Valid once the
+		/// client has an answer from the target.
+	{
+		return _connectRequest;
+	}
+
+	void arm()
+		/// Starts the action of TUNNEL_CORRUPT or TUNNEL_CUT.
+	{
+		_armed = true;
+	}
+
+	bool waitForTunnelData(long milliseconds)
+		/// Waits until data from the client arrives through the
+		/// tunnel of TUNNEL_STALL.
+	{
+		return _tunnelData.tryWait(milliseconds);
+	}
+
+	void run()
+	{
+		const Poco::Timespan span(50000);
+		try
+		{
+			while (!_socket.poll(span, Socket::SELECT_READ))
+			{
+				if (_stop) return;
+			}
+			StreamSocket connection = _socket.acceptConnection();
+			connection.setReceiveTimeout(Poco::Timespan(5, 0));
+			SecureStreamSocket client = SecureStreamSocket::attach(connection, SSLManager::instance().defaultServerContext());
+			char buffer[4096];
+			while (_connectRequest.find("\r\n\r\n") == std::string::npos)
+			{
+				int n = client.receiveBytes(buffer, sizeof(buffer));
+				if (n <= 0) return;
+				_connectRequest.append(buffer, n);
+			}
+			StreamSocket target(SocketAddress("127.0.0.1", _targetPort));
+			const std::string established("HTTP/1.1 200 Connection established\r\n\r\n");
+			client.sendBytes(established.data(), static_cast<int>(established.size()));
+			if (_tunnel == TUNNEL_CLOSE)
+			{
+				// Only the sending direction is shut down: data that arrives
+				// after the receiving direction is shut down resets the
+				// connection on Linux and Windows.
+				connection.shutdownSend();
+				// The descriptor stays open: closing it could reset the
+				// connection, and the client would see that instead.
+				while (!_stop) Thread::sleep(static_cast<long>(span.totalMilliseconds()));
+				return;
+			}
+			if (_tunnel == TUNNEL_STALL)
+			{
+				// Nothing is read: the connection would end with a close_notify
+				// alert of the client.
+				while (!_stop && !client.poll(span, Socket::SELECT_READ))
+				{
+				}
+				_tunnelData.set();
+				while (!_stop) Thread::sleep(static_cast<long>(span.totalMilliseconds()));
+				return;
+			}
+			while (!_stop)
+			{
+				// decrypted data is not seen by poll()
+				if (client.available() > 0 || client.poll(span, Socket::SELECT_READ))
+				{
+					int n = client.receiveBytes(buffer, sizeof(buffer));
+					if (n <= 0) return;
+					target.sendBytes(buffer, n);
+				}
+				if (target.poll(span, Socket::SELECT_READ))
+				{
+					int n = target.receiveBytes(buffer, sizeof(buffer));
+					if (n <= 0) return;
+					// The flag is read before the bytes are relayed: the client
+					// may answer them with arm().
+					const bool armed = _armed.exchange(false);
+					if (armed && _tunnel == TUNNEL_CORRUPT) buffer[n - 1] ^= 1;
+					client.sendBytes(buffer, n);
+					if (armed && _tunnel == TUNNEL_CUT)
+					{
+						// the descriptor stays open, as with TUNNEL_CLOSE
+						client.shutdown();
+						while (!_stop) Thread::sleep(static_cast<long>(span.totalMilliseconds()));
+						return;
+					}
+				}
+			}
+		}
+		catch (Poco::Exception& exc)
+		{
+			std::cerr << "TLSConnectProxy: " << exc.displayText() << std::endl;
+		}
+	}
+
+private:
+	ServerSocket _socket;
+	Poco::UInt16 _targetPort;
+	Tunnel _tunnel;
+	Poco::Thread _thread;
+	std::atomic<bool> _stop;
+	std::atomic<bool> _armed;
+	Poco::Event _tunnelData;
+	std::string _connectRequest;
+};
+
+
+namespace
+{
+	class HeldBackHTTPSServer: public Poco::Runnable
+		/// An HTTPS server for one connection. It reads the request,
+		/// sends the header of its response after sendHeader() and the
+		/// body after sendBody(), and closes the connection when it is
+		/// destroyed, so that its close_notify alert does not follow the
+		/// body at once.
+	{
+	public:
+		HeldBackHTTPSServer(const std::string& header, const std::string& body):
+			_socket(SocketAddress("127.0.0.1", 0)),
+			_header(header),
+			_body(body),
+			_thread("HeldBackHTTPSServer"),
+			_stop(false)
+		{
+			_thread.start(*this);
+		}
+
+		~HeldBackHTTPSServer()
+		{
+			_stop = true;
+			_headerReleased.set();
+			_bodyReleased.set();
+			_stopped.set();
+			_thread.join();
+		}
+
+		Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		void sendHeader()
+		{
+			_headerReleased.set();
+		}
+
+		void sendBody()
+		{
+			_bodyReleased.set();
+		}
+
+		void run()
+		{
+			const Poco::Timespan span(50000);
+			const Poco::Timespan releaseTimeout(5, 0);
+			try
+			{
+				while (!_socket.poll(span, Socket::SELECT_READ))
+				{
+					if (_stop) return;
+				}
+				StreamSocket connection = _socket.acceptConnection();
+				connection.setReceiveTimeout(Poco::Timespan(5, 0));
+				SecureStreamSocket client = SecureStreamSocket::attach(connection, SSLManager::instance().defaultServerContext());
+				std::string request;
+				char buffer[1024];
+				while (request.find("\r\n\r\n") == std::string::npos)
+				{
+					int n = client.receiveBytes(buffer, sizeof(buffer));
+					if (n <= 0) return;
+					request.append(buffer, n);
+				}
+				const long releaseWait = static_cast<long>(releaseTimeout.totalMilliseconds());
+				if (!_headerReleased.tryWait(releaseWait) || _stop) return;
+				client.sendBytes(_header.data(), static_cast<int>(_header.size()));
+				if (!_bodyReleased.tryWait(releaseWait) || _stop) return;
+				client.sendBytes(_body.data(), static_cast<int>(_body.size()));
+				(void) _stopped.tryWait(releaseWait);
+			}
+			catch (Poco::Exception& exc)
+			{
+				std::cerr << "HeldBackHTTPSServer: " << exc.displayText() << std::endl;
+			}
+		}
+
+	private:
+		ServerSocket _socket;
+		std::string _header;
+		std::string _body;
+		Poco::Thread _thread;
+		std::atomic<bool> _stop;
+		Poco::Event _headerReleased;
+		Poco::Event _bodyReleased;
+		Poco::Event _stopped;
+	};
+}
+
+
 HTTPSClientSessionTest::HTTPSClientSessionTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -120,6 +375,26 @@ void HTTPSClientSessionTest::testGetSmall()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+}
+
+
+void HTTPSClientSessionTest::testSourceAddress()
+{
+	HTTPSTestServer srv;
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setSourceAddress(SocketAddress("127.0.0.1", 0));
+	// without keep-alive the second request binds and connects again
+	for (int i = 0; i < 2; ++i)
+	{
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs = s.receiveResponse(response);
+		assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+		std::ostringstream ostr;
+		StreamCopier::copyStream(rs, ostr);
+		assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	}
 }
 
 
@@ -552,6 +827,234 @@ void HTTPSClientSessionTest::testStalledPeerTimeout()
 }
 
 
+void HTTPSClientSessionTest::testHttpsProxyTunnel()
+{
+	// The TLS session with the target runs inside the TLS session with the
+	// proxy, which relays only what it decrypts: a handshake sent outside of
+	// that session reaches nobody.
+	HTTPSTestServer srv;
+	TLSConnectProxy proxy(srv.port());
+	const Poco::Timespan timeout(5, 0);
+
+	HTTPSClientSession s("www.appinf.com", srv.port());
+	s.setTimeout(timeout);
+	s.setProxy("127.0.0.1", proxy.port(), "https", true);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::LARGE_BODY);
+	assertTrue (proxy.connectRequest().find("CONNECT www.appinf.com:" + std::to_string(srv.port()) + " ") == 0);
+	assertTrue (srv.lastRequest().find("GET /large ") == 0);
+}
+
+
+void HTTPSClientSessionTest::testHttpsProxyTunnelVerifiesTargetName()
+{
+	// The target is named with a loopback address literal and the peer address
+	// is a loopback address as well, but it is the one of the proxy: the host
+	// name of the certificate of the target is still checked.
+	HTTPSTestServer srv;
+	TLSConnectProxy proxy(srv.port());
+	const Poco::Timespan timeout(5, 0);
+
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setTimeout(timeout);
+	s.setProxy("127.0.0.1", proxy.port(), "https", true);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
+	try
+	{
+		s.sendRequest(request);
+		fail("the certificate of the target is not issued for 127.0.0.1");
+	}
+	catch (CertificateValidationException&)
+	{
+	}
+}
+
+
+void HTTPSClientSessionTest::testHttpsProxyTunnelClosed()
+{
+	// The proxy closes the connection when the handshake with the target
+	// begins. The handshake ends with the exception of the TLS connection
+	// with the proxy, and does not wait for the timeout of the session.
+	HTTPSTestServer srv;
+	TLSConnectProxy proxy(srv.port(), TLSConnectProxy::TUNNEL_CLOSE);
+	const Poco::Timespan timeout(5, 0);
+
+	HTTPSClientSession s("www.appinf.com", srv.port());
+	s.setTimeout(timeout);
+	s.setProxy("127.0.0.1", proxy.port(), "https", true);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
+	Poco::Timestamp tsStart;
+	try
+	{
+		s.sendRequest(request);
+		fail("a closed tunnel must not accept a request");
+	}
+	catch (SSLConnectionUnexpectedlyClosedException&)
+	{
+	}
+	assertTrue (tsStart.elapsed() < timeout.totalMicroseconds());
+}
+
+
+void HTTPSClientSessionTest::testHttpsProxyTunnelStalled()
+{
+	// The proxy relays nothing, so the handshake with the target ends
+	// with the timeout of the session.
+	HTTPSTestServer srv;
+	TLSConnectProxy proxy(srv.port(), TLSConnectProxy::TUNNEL_STALL);
+	const Poco::Timespan timeout(1, 0);
+	const Poco::Timespan bound(5, 0);
+
+	HTTPSClientSession s("www.appinf.com", srv.port());
+	s.setTimeout(timeout);
+	s.setProxy("127.0.0.1", proxy.port(), "https", true);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
+	Poco::Timestamp tsStart;
+	try
+	{
+		s.sendRequest(request);
+		fail("a stalled tunnel must not accept a request");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	assertTrue (tsStart.elapsed() >= timeout.totalMicroseconds());
+	assertTrue (tsStart.elapsed() < bound.totalMicroseconds());
+}
+
+
+void HTTPSClientSessionTest::testHttpsProxyTunnelCorruptedRecord()
+{
+	// A record of the target that is corrupted in the tunnel is a TLS
+	// error of the connection with the target, not the end of the body.
+	const std::string body("corrupted in the tunnel");
+	HeldBackHTTPSServer srv("HTTP/1.0 200 OK\r\nContent-Length: " + std::to_string(body.size()) + "\r\n\r\n", body);
+	TLSConnectProxy proxy(srv.port(), TLSConnectProxy::TUNNEL_CORRUPT);
+	const Poco::Timespan timeout(5, 0);
+
+	HTTPSClientSession s("www.appinf.com", srv.port());
+	s.setTimeout(timeout);
+	s.setProxy("127.0.0.1", proxy.port(), "https", true);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
+	s.sendRequest(request);
+	srv.sendHeader();
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	proxy.arm();
+	srv.sendBody();
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str().empty());
+	assertTrue (dynamic_cast<const SSLException*>(s.networkException()) != nullptr);
+}
+
+
+void HTTPSClientSessionTest::testHttpsProxyTunnelClosedInBody()
+{
+	// The proxy closes the TLS connection with the client with a
+	// close_notify alert before the target has sent the whole body. The
+	// TLS connection with the target ends without its close_notify alert,
+	// which is an unexpected close, not the end of the body.
+	const std::string body("first half");
+	HeldBackHTTPSServer srv("HTTP/1.0 200 OK\r\nContent-Length: " + std::to_string(2*body.size()) + "\r\n\r\n", body);
+	TLSConnectProxy proxy(srv.port(), TLSConnectProxy::TUNNEL_CUT);
+	const Poco::Timespan timeout(5, 0);
+
+	HTTPSClientSession s("www.appinf.com", srv.port());
+	s.setTimeout(timeout);
+	s.setProxy("127.0.0.1", proxy.port(), "https", true);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
+	s.sendRequest(request);
+	srv.sendHeader();
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	proxy.arm();
+	srv.sendBody();
+	Poco::Timestamp tsStart;
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == body);
+	assertTrue (dynamic_cast<const SSLConnectionUnexpectedlyClosedException*>(s.networkException()) != nullptr);
+	assertTrue (tsStart.elapsed() < timeout.totalMicroseconds());
+}
+
+
+void HTTPSClientSessionTest::testHttpsProxyTunnelCloseEndsHandshake()
+{
+	// close() of another thread ends a handshake through a tunnel that
+	// waits for the answer of the target: the TCP connection with the
+	// proxy is shut down in both directions. A TLS shutdown of the
+	// connection with the proxy would not end the wait, and close() would
+	// wait for the receive timeout.
+	//
+	// HTTPSClientSession has the socket only once the handshake is complete,
+	// so the tunnel is set up here.
+	HTTPSTestServer srv;
+	TLSConnectProxy proxy(srv.port(), TLSConnectProxy::TUNNEL_STALL);
+	const Poco::Timespan timeout(30, 0);
+	const Poco::Timespan bound(3, 0);
+
+	SecureStreamSocket tunnel(SocketAddress("127.0.0.1", proxy.port()));
+	tunnel.setReceiveTimeout(timeout);
+	const std::string connectRequest("CONNECT 127.0.0.1:" + std::to_string(srv.port()) + " HTTP/1.1\r\n\r\n");
+	tunnel.sendBytes(connectRequest.data(), static_cast<int>(connectRequest.size()));
+	std::string answer;
+	char buffer[256];
+	while (answer.find("\r\n\r\n") == std::string::npos)
+	{
+		int n = tunnel.receiveBytes(buffer, sizeof(buffer));
+		assertTrue (n > 0);
+		answer.append(buffer, n);
+	}
+	assertTrue (answer.find("HTTP/1.1 200 ") == 0);
+
+	// attach() does not start the handshake on a non-blocking socket
+	tunnel.setBlocking(false);
+	SecureStreamSocket ss = SecureStreamSocket::attach(tunnel, SSLManager::instance().defaultClientContext());
+	ss.setBlocking(true);
+	ss.setReceiveTimeout(timeout);
+
+	Poco::Thread handshake;
+	handshake.startFunc([&ss]
+	{
+		try
+		{
+			(void) ss.completeHandshake();
+		}
+		catch (Poco::Exception&)
+		{
+		}
+	});
+	// The client hello has arrived at the proxy: the handshake waits for the answer.
+	const bool waiting = proxy.waitForTunnelData(static_cast<long>(bound.totalMilliseconds()));
+	Poco::Timestamp tsStart;
+	try
+	{
+		ss.close();
+	}
+	catch (...)
+	{
+		handshake.join();
+		throw;
+	}
+	const Poco::Timestamp::TimeDiff closeTime = tsStart.elapsed();
+	const bool ended = handshake.tryJoin(static_cast<long>(bound.totalMilliseconds()));
+	// bounded by the receive timeout
+	if (!ended) handshake.join();
+	assertTrue (waiting);
+	assertTrue (ended);
+	assertTrue (closeTime < bound.totalMicroseconds());
+}
+
+
 void HTTPSClientSessionTest::setUp()
 {
 }
@@ -568,6 +1071,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testFromSocket);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetSmall);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testSourceAddress);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetLarge);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHead);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostSmallIdentity);
@@ -585,6 +1089,13 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxyConfig);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxySetters);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testStalledPeerTimeout);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnel);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelVerifiesTargetName);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelClosed);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelStalled);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelCorruptedRecord);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelClosedInBody);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelCloseEndsHandshake);
 
 	return pSuite;
 }

@@ -37,6 +37,13 @@ class Net_API Socket
 	/// socket classes.
 	///
 	/// It provides operations common to all socket types.
+	///
+	/// A native socket that a socket class creates or accepts is
+	/// not inherited by child processes: it is close-on-exec on
+	/// POSIX platforms and not inheritable on Windows. To let a
+	/// child process inherit a socket, change the flag on the
+	/// native socket (impl()->sockfd()) before starting the
+	/// child process.
 {
 public:
 	using BufVec = SocketBufVec;
@@ -172,14 +179,20 @@ public:
 		/// the select() system call and is deprecated - use PollSet instead.
 
 	bool poll(const Poco::Timespan& timeout, int mode) const;
-		/// Determines the status of the socket, using a
-		/// call to poll() or select().
+		/// Determines the status of the socket, using poll() where the
+		/// platform provides it, epoll_wait() of wepoll on Windows, or
+		/// select() otherwise.
 		///
 		/// The mode argument is constructed by combining the values
 		/// of the SelectMode enumeration.
 		///
+		/// A negative timeout waits without limit, also when a signal
+		/// interrupts the wait.
+		///
 		/// Returns true if the next operation corresponding to
 		/// mode will not block, false otherwise.
+		///
+		/// Throws an IOException if the socket descriptor is not open.
 
 	[[nodiscard]] int available() const;
 		/// Returns the number of bytes available that can be read

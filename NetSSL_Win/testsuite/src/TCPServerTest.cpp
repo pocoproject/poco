@@ -24,6 +24,7 @@
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Thread.h"
 #include "Poco/Mutex.h"
+#include "Poco/Timespan.h"
 #include <iostream>
 
 
@@ -57,6 +58,7 @@ namespace
 		void run()
 		{
 			StreamSocket& ss = socket();
+			ss.setReceiveTimeout(Poco::Timespan(10, 0));
 			try
 			{
 				char buffer[256];

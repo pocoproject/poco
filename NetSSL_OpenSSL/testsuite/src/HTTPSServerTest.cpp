@@ -21,7 +21,12 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/SecureServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Thread.h"
+#include "Poco/Timespan.h"
+#include "Poco/Timestamp.h"
 #include <sstream>
 
 
@@ -36,7 +41,12 @@ using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPServerResponse;
 using Poco::Net::HTTPMessage;
 using Poco::Net::SecureServerSocket;
+using Poco::Net::StreamSocket;
+using Poco::Net::SocketAddress;
 using Poco::StreamCopier;
+using Poco::Thread;
+using Poco::Timespan;
+using Poco::Timestamp;
 
 
 namespace
@@ -322,6 +332,36 @@ void HTTPSServerTest::testNotImpl()
 }
 
 
+void HTTPSServerTest::testStopAllAbortsStalledHandshake()
+{
+	SecureServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setTimeout(Timespan(10, 0));
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+
+	// The header of a TLS handshake record of 16384 bytes and its first byte:
+	// the server starts the handshake and waits for the rest of the record.
+	StreamSocket ss(SocketAddress("127.0.0.1", svs.address().port()));
+	const unsigned char record[] = {0x16, 0x03, 0x01, 0x40, 0x00, 0x01};
+	ss.sendBytes(record, sizeof(record));
+
+	Timestamp connectStart;
+	while (srv.currentConnections() != 1 && !connectStart.isElapsed(Timespan(5, 0).totalMicroseconds()))
+		Thread::sleep(10);
+	assertEqual (1, srv.currentConnections());
+
+	Timestamp stopStart;
+	srv.stopAll(true);
+	assertTrue (stopStart.elapsed() < Timespan(2, 0).totalMicroseconds());
+
+	// The connection is aborted, not left to the timeout of the server.
+	ss.setReceiveTimeout(Timespan(2, 0));
+	char c;
+	assertEqual (0, ss.receiveBytes(&c, 1));
+}
+
+
 void HTTPSServerTest::setUp()
 {
 }
@@ -344,6 +384,7 @@ CppUnit::Test* HTTPSServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPSServerTest, testRedirect);
 	CppUnit_addTest(pSuite, HTTPSServerTest, testAuth);
 	CppUnit_addTest(pSuite, HTTPSServerTest, testNotImpl);
+	CppUnit_addTest(pSuite, HTTPSServerTest, testStopAllAbortsStalledHandshake);
 
 	return pSuite;
 }

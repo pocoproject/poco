@@ -48,18 +48,18 @@ public:
 	using PropMap = std::map<std::string, CodeGenerator::Properties>;
 
 	SwaggerGenerator(Poco::CodeGeneration::CppGenerator& generator, const Info& info, const std::vector<Server>& servers);
-	~SwaggerGenerator();
+	~SwaggerGenerator() override;
 
 	[[nodiscard]] Poco::JSON::Object::Ptr json() const;
 
 	// AbstractGenerator
-	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
-	void structEnd();
-	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
-	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
-	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
-	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
-	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties) override;
+	void structEnd() override;
+	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
+	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties) override;
+	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e) override;
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct) override;
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct) override;
 
 protected:
 	[[nodiscard]] static Poco::JSON::Object::Ptr createInfo(const Info& info);
@@ -80,11 +80,11 @@ protected:
 	[[nodiscard]] Poco::JSON::Object::Ptr createRequestBody(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Parameter* pParam, const CodeGenerator::Properties& paramProps, const CodeGenerator::Properties& funcProps);
 	[[nodiscard]] Poco::JSON::Object::Ptr createResponseBodyContent(const std::string& type, const CodeGenerator::Properties& paramProps, const CodeGenerator::Properties& funcProps);
 	[[nodiscard]] Poco::JSON::Object::Ptr createErrorResponse(const std::string& description);
-	void variableProperties(const Poco::CppParser::Variable* pVar, bool& isVector, bool& isMandatory, bool& isNullable, std::string& name, std::string& resolvedType);
+	void variableProperties(const Poco::CppParser::Variable* pVar, bool& isVector, bool& isUniqueVector, bool& isMandatory, bool& isNullable, std::string& name, std::string& resolvedType);
 	[[nodiscard]] static PropMap parseParameterProperties(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
 	[[nodiscard]] static CodeGenerator::Properties parseParameterProperties(const Poco::CppParser::Parameter* pParam, const CodeGenerator::Properties& funcProps);
 	void parameterProperties(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Parameter* pParam, bool& isVector, bool& isMandatory, bool& isNullable, std::string& name, std::string& resolvedType);
-	void typeProperties(const std::string& decl, bool& isVector, bool& isMandatory, bool& isNullable, std::string& resolvedType);
+	void typeProperties(const std::string& decl, bool& isVector, bool& isUniqueVector, bool& isMandatory, bool& isNullable, std::string& resolvedType);
 	void fillTypeAttributes(Poco::JSON::Object::Ptr pSchema, const CodeGenerator::Properties& properties, const std::string& name);
 
 private:

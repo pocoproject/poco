@@ -20,18 +20,13 @@
 #include "Poco/RemotingNG/RemotingException.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
-Skeleton::Skeleton()
-{
-}
+Skeleton::Skeleton() = default;
 
 
-Skeleton::~Skeleton()
-{
-}
+Skeleton::~Skeleton() = default;
 
 
 bool Skeleton::invoke(ServerTransport& transport, RemoteObject::Ptr pRemoteObject)
@@ -68,4 +63,4 @@ void Skeleton::addMethodHandler(const std::string& name, MethodHandler::Ptr pMet
 }
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG

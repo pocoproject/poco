@@ -27,8 +27,7 @@
 #include <limits>
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 template <typename T>
@@ -39,23 +38,18 @@ public:
 	using ArgType = T;
 	using Ptr = Poco::AutoPtr<EventFilter<T>>;
 
-	EventFilter()
+	EventFilter() = default;
 		/// Creates the EventFilter.
-	{
-	}
 	
-	virtual ~EventFilter()
+	~EventFilter() override = default;
 		/// Destroys the EventFilter.
-	{
-	}
+
+	EventFilter(const EventFilter&) = delete;
+	EventFilter& operator = (const EventFilter&) = delete;
 
 	[[nodiscard]] virtual bool accept(const T& value) = 0;
 		/// Returns true if the event should be delivered,
 		/// false otherwise.
-		
-private:
-	EventFilter(const EventFilter&);
-	EventFilter& operator = (const EventFilter&);	
 };
 
 
@@ -70,7 +64,7 @@ public:
 	}
 	
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		return value > _limit;
 	}
@@ -91,7 +85,7 @@ public:
 	}
 	
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		return value >= _limit;
 	}
@@ -112,7 +106,7 @@ public:
 	}
 	
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		return value < _limit;
 	}
@@ -133,7 +127,7 @@ public:
 	}
 	
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		return value <= _limit;
 	}
@@ -155,7 +149,7 @@ public:
 	}
 	
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		return _pFirst->accept(value) || _pSecond->accept(value);
 	}
@@ -178,7 +172,7 @@ public:
 	}
 	
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		return _pFirst->accept(value) && _pSecond->accept(value);
 	}
@@ -201,7 +195,7 @@ public:
 	}
 	
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		return _pFirst->accept(value) != _pSecond->accept(value);
 	}
@@ -231,7 +225,7 @@ public:
 	}
 
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		if (std::abs(value - _lastValue) >= _delta)
 		{
@@ -260,7 +254,7 @@ public:
 	}
 
 	// EventFilter
-	[[nodiscard]] bool accept(const T&)
+	[[nodiscard]] bool accept(const T&) override
 	{
 		if (_lastClock.isElapsed(_interval))
 		{
@@ -299,7 +293,7 @@ public:
 	}
 
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		if (_lastClock.isElapsed(_interval) || std::abs(value - _lastValue) >= _delta)
 		{
@@ -390,7 +384,7 @@ public:
 	}
 
 	// EventFilter
-	[[nodiscard]] bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value) override
 	{
 		switch (_state)
 		{
@@ -440,7 +434,7 @@ private:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_EventFilter_INCLUDED

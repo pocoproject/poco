@@ -32,6 +32,7 @@ public:
 	void testRedirect();
 	void testAuth();
 	void testNotImpl();
+	void testStopAllAbortsStalledHandshake();
 
 	void setUp();
 	void tearDown();

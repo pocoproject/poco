@@ -1,0 +1,1 @@
+<%@ page class="StringifyCompressedHandler" namespace="AI::Test" stringify="true" form="true" compressed="true" %><p>Hello, <%= form.get("name") %>!</p>

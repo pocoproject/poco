@@ -22,8 +22,7 @@
 #include "Poco/RemotingNG/EventSubscriber.h"
 
 
-namespace Poco {
-namespace RemotingNG {
+namespace Poco::RemotingNG {
 
 
 class RemotingNG_API EventListener: public Listener
@@ -37,7 +36,7 @@ public:
 	EventListener(const std::string& endPoint);
 		/// Creates an EventListener. 
 
-	virtual ~EventListener();
+	~EventListener() override;
 		/// Destroys the EventListener.
 
 	[[nodiscard]] virtual std::string subscribeToEvents(EventSubscriber::Ptr pEventSubscriber) = 0;
@@ -63,7 +62,7 @@ public:
 };
 
 
-} } // namespace Poco::RemotingNG
+} // namespace Poco::RemotingNG
 
 
 #endif // RemotingNG_EventListener_INCLUDED
