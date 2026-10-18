@@ -1,6 +1,6 @@
 # MCPServer sample
 
-A minimal [Model Context Protocol](https://modelcontextprotocol.io) server built on the POCO AI MCP library (`Poco::AI::MCP`). It exposes two trivial tools, `echo` and `ping`, over the stdio transport, and serves as a working reference and a smoke test for the library.
+A minimal [Model Context Protocol](https://modelcontextprotocol.io) server built on the POCO AI MCP library (`Poco::AI::MCP`), protocol revision 2026-07-28. It exposes two trivial tools, `echo` and `ping`, over the stdio transport, and serves as a working reference and a smoke test for the library.
 
 ## Build
 
@@ -21,7 +21,7 @@ With shared POCO libraries the binary needs the library directory on the loader 
 
 ### Self-test (no client needed)
 
-Drives an in-process client through the full handshake plus a tool call:
+Drives an in-process client through discovery, the tool list and a tool call:
 
 ```bash
 MCPServer --selftest
@@ -31,16 +31,18 @@ MCPServer --selftest
 
 This is a server, not a REPL. It reads newline-delimited JSON-RPC 2.0 messages from stdin and writes one JSON reply per line to stdout. Logs go to stderr, so stdout stays protocol-clean. Plain text such as `hello` is a parse error.
 
-Drive it by hand, a full handshake plus a tool call:
+The protocol is stateless: there is no handshake, and every request names the protocol revision and the client's capabilities in its `_meta` object. Drive it by hand, discovery plus a tool call:
 
 ```bash
+META='"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}'
 printf '%s\n' \
-  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"demo","version":"1.0"}}}' \
-  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
-  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
-  '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"echo","arguments":{"message":"hi"}}}' \
+  '{"jsonrpc":"2.0","id":1,"method":"server/discover","params":{'"$META"'}}' \
+  '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{'"$META"'}}' \
+  '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"echo","arguments":{"message":"hi"},'"$META"'}}' \
   | MCPServer
 ```
+
+A request without the `_meta` object gets an Invalid params error; one that names another revision, or an `initialize` request of an earlier revision, gets an Unsupported protocol version error that names the revision the server implements.
 
 ## Registering with an MCP client
 

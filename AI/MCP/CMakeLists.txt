@@ -21,7 +21,7 @@ set_target_properties(AIMCP
 	DEFINE_SYMBOL AIMCP_EXPORTS
 )
 
-# The core is the protocol plus the stdio transport: JSON and Foundation only.
+# The core is the protocol plus the stream transports: JSON and Foundation only.
 target_link_libraries(AIMCP PUBLIC Poco::JSON)
 target_include_directories(AIMCP
 	PUBLIC

@@ -16,19 +16,22 @@
 
 
 class FeaturesTest: public CppUnit::TestCase
-	/// Covers the core API added for the standalone MCP server: per-request context
-	/// threaded into tool handlers, structured tool output, and the generic
-	/// resources/prompts registries.
 {
 public:
 	FeaturesTest(const std::string& name);
 	~FeaturesTest();
 
-	void testContextHandlerIdentity();
-	void testStructuredContent();
-	void testResources();
-	void testPrompts();
-	void testToolsOnlyHasNoResourceCaps();
+	void testResourcesList();
+	void testResourceReadText();
+	void testResourceReadBlob();
+	void testResourceNotFound();
+	void testResourceReaderThrows();
+	void testResourceTemplatesEmpty();
+	void testPromptsList();
+	void testPromptGet();
+	void testPromptArgumentErrors();
+	void testCursorRefused();
+	void testRegistrationRefused();
 
 	void setUp();
 	void tearDown();

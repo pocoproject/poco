@@ -1,0 +1,15 @@
+#
+# Makefile
+#
+# Makefile for the server program of the Poco AI MCP ProcessClient tests
+#
+
+include $(POCO_BASE)/build/rules/global
+
+objects = TestServer
+
+target         = AIMCPTestServer
+target_version = 1
+target_libs    = PocoAIMCP PocoJSON PocoFoundation
+
+include $(POCO_BASE)/build/rules/exec

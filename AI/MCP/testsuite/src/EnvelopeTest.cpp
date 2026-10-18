@@ -12,13 +12,20 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/MCP/Message.h"
+#include "Poco/AI/MCP/MCPException.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/JSON/Array.h"
+#include "Poco/Exception.h"
+#include <sstream>
+#include <streambuf>
 
 
 using Poco::AI::MCP::Request;
 using Poco::AI::MCP::Response;
 using Poco::AI::MCP::Id;
+using Poco::AI::MCP::ErrorCode;
+using Poco::AI::MCP::MCPException;
 using Poco::JSON::Object;
 
 
@@ -28,6 +35,32 @@ namespace
 	{
 		Poco::JSON::Parser parser;
 		return parser.parse(Poco::AI::MCP::serialize(message)).extract<Object::Ptr>();
+	}
+
+
+	class FailingBuf: public std::streambuf
+		/// A stream buffer whose every write fails.
+	{
+	protected:
+		int_type overflow(int_type) override
+		{
+			return traits_type::eof();
+		}
+	};
+
+
+	int readError(std::istream& in, std::size_t maxSize)
+		/// The code of the MCPException readMessage() throws, or 0.
+	{
+		try
+		{
+			(void) Poco::AI::MCP::readMessage(in, maxSize);
+		}
+		catch (const MCPException& exc)
+		{
+			return exc.code();
+		}
+		return 0;
 	}
 }
 
@@ -58,11 +91,11 @@ void EnvelopeTest::testRequestBuild()
 
 void EnvelopeTest::testNotificationBuild()
 {
-	Object::Ptr note = roundTrip(Request::makeNotification("notifications/initialized", nullptr));
+	Object::Ptr note = roundTrip(Request::makeNotification("notifications/cancelled", nullptr));
 
 	assertEqual(std::string("2.0"), note->getValue<std::string>("jsonrpc"));
 	assertTrue(!note->has("id"));
-	assertEqual(std::string("notifications/initialized"), note->getValue<std::string>("method"));
+	assertEqual(std::string("notifications/cancelled"), note->getValue<std::string>("method"));
 }
 
 
@@ -81,7 +114,7 @@ void EnvelopeTest::testResultRoundTrip()
 
 void EnvelopeTest::testErrorRoundTrip()
 {
-	Object::Ptr resp = roundTrip(Response::error(Id(3), Poco::AI::MCP::ErrorCode::MethodNotFound, "nope"));
+	Object::Ptr resp = roundTrip(Response::error(Id(3), ErrorCode::METHOD_NOT_FOUND, "nope"));
 
 	assertEqual(3, resp->getValue<int>("id"));
 	assertTrue(resp->isObject("error"));
@@ -95,10 +128,10 @@ void EnvelopeTest::testErrorRoundTrip()
 void EnvelopeTest::testNullId()
 {
 	// A pre-dispatch error (parse error) has no request id, so id must be null.
-	const std::string text = Poco::AI::MCP::serialize(Response::error(Id(), Poco::AI::MCP::ErrorCode::ParseError, "x"));
+	const std::string text = Poco::AI::MCP::serialize(Response::error(Id(), ErrorCode::PARSE_ERROR, "x"));
 	assertTrue(text.find("\"id\":null") != std::string::npos);
 
-	Object::Ptr resp = roundTrip(Response::error(Id(), Poco::AI::MCP::ErrorCode::ParseError, "x"));
+	Object::Ptr resp = roundTrip(Response::error(Id(), ErrorCode::PARSE_ERROR, "x"));
 	assertTrue(resp->has("id"));
 	assertTrue(resp->isNull("id"));
 }
@@ -119,8 +152,96 @@ void EnvelopeTest::testSerializeIsSingleLine()
 {
 	Object::Ptr params = new Object;
 	params->set("a", "b");
-	const std::string text = Poco::AI::MCP::serialize(Request::make(Id(1), "ping", params));
+	params->set("text", "two\nlines");
+	const std::string text = Poco::AI::MCP::serialize(Request::make(Id(1), "tools/list", params));
 	assertTrue(text.find('\n') == std::string::npos);
+}
+
+
+void EnvelopeTest::testValidIds()
+{
+	using Poco::AI::MCP::isValidId;
+	assertTrue(isValidId(Id(1)));
+	assertTrue(isValidId(Id(Poco::Int64(-5))));
+	assertTrue(isValidId(Id(std::string("a"))));
+	assertTrue(isValidId(Id(std::string())));
+	assertTrue(!isValidId(Id()));
+	assertTrue(!isValidId(Id(true)));
+	assertTrue(!isValidId(Id(1.5)));
+	assertTrue(!isValidId(Id(Object::Ptr(new Object))));
+	assertTrue(!isValidId(Id(Poco::JSON::Array::Ptr(new Poco::JSON::Array))));
+}
+
+
+void EnvelopeTest::testIsResponseTo()
+{
+	using Poco::AI::MCP::isResponseTo;
+	const Object::Ptr pResult = roundTrip(Response::result(Id(7), Object::Ptr(new Object)));
+	assertTrue(isResponseTo(pResult, Id(7)));
+	assertTrue(isResponseTo(pResult, Id(Poco::Int64(7))));
+	assertTrue(!isResponseTo(pResult, Id(8)));
+	// A string id and a number id never match.
+	assertTrue(!isResponseTo(pResult, Id(std::string("7"))));
+
+	const Object::Ptr pError = roundTrip(Response::error(Id(std::string("x")), ErrorCode::INTERNAL_ERROR, "e"));
+	assertTrue(isResponseTo(pError, Id(std::string("x"))));
+	assertTrue(!isResponseTo(pError, Id(std::string("y"))));
+
+	// A request or a notification is not a response.
+	assertTrue(!isResponseTo(roundTrip(Request::make(Id(7), "tools/list")), Id(7)));
+	assertTrue(!isResponseTo(Object::Ptr(), Id(7)));
+}
+
+
+void EnvelopeTest::testReadMessage()
+{
+	std::istringstream in("\n  \r\n{\"a\":1}\r\n{\"b\":2}");
+	Object::Ptr pFirst = Poco::AI::MCP::readMessage(in);
+	assertTrue(!pFirst.isNull());
+	assertEqual(1, pFirst->getValue<int>("a"));
+	// The last line needs no newline.
+	Object::Ptr pSecond = Poco::AI::MCP::readMessage(in);
+	assertTrue(!pSecond.isNull());
+	assertEqual(2, pSecond->getValue<int>("b"));
+	assertTrue(Poco::AI::MCP::readMessage(in).isNull());
+	assertTrue(Poco::AI::MCP::readMessage(in).isNull());
+}
+
+
+void EnvelopeTest::testReadMessageLimit()
+{
+	// A line longer than the limit is refused and skipped; the next line is read.
+	std::istringstream in(std::string("{\"long\":\"") + std::string(100, 'x') + "\"}\n{\"short\":1}\n");
+	assertEqual(static_cast<int>(ErrorCode::INVALID_REQUEST), readError(in, 64));
+	Object::Ptr pNext = Poco::AI::MCP::readMessage(in, 64);
+	assertTrue(!pNext.isNull());
+	assertEqual(1, pNext->getValue<int>("short"));
+}
+
+
+void EnvelopeTest::testReadMessageNotAnObject()
+{
+	std::istringstream in("not json\n[1,2]\n\"text\"\n{\"ok\":true}\n");
+	assertEqual(static_cast<int>(ErrorCode::PARSE_ERROR), readError(in, 1024));
+	assertEqual(static_cast<int>(ErrorCode::INVALID_REQUEST), readError(in, 1024));
+	const int code = readError(in, 1024);
+	assertTrue(code == static_cast<int>(ErrorCode::INVALID_REQUEST) || code == static_cast<int>(ErrorCode::PARSE_ERROR));
+	assertTrue(Poco::AI::MCP::readMessage(in)->getValue<bool>("ok"));
+}
+
+
+void EnvelopeTest::testWriteMessageFailure()
+{
+	FailingBuf buf;
+	std::ostream out(&buf);
+	try
+	{
+		Poco::AI::MCP::writeMessage(out, Request::make(Id(1), "tools/list"));
+		fail("a failed stream must throw");
+	}
+	catch (const Poco::WriteFileException&)
+	{
+	}
 }
 
 
@@ -145,6 +266,12 @@ CppUnit::Test* EnvelopeTest::suite()
 	CppUnit_addTest(pSuite, EnvelopeTest, testNullId);
 	CppUnit_addTest(pSuite, EnvelopeTest, testIdTypeFidelity);
 	CppUnit_addTest(pSuite, EnvelopeTest, testSerializeIsSingleLine);
+	CppUnit_addTest(pSuite, EnvelopeTest, testValidIds);
+	CppUnit_addTest(pSuite, EnvelopeTest, testIsResponseTo);
+	CppUnit_addTest(pSuite, EnvelopeTest, testReadMessage);
+	CppUnit_addTest(pSuite, EnvelopeTest, testReadMessageLimit);
+	CppUnit_addTest(pSuite, EnvelopeTest, testReadMessageNotAnObject);
+	CppUnit_addTest(pSuite, EnvelopeTest, testWriteMessageFailure);
 
 	return pSuite;
 }

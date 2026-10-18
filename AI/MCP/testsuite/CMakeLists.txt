@@ -1,5 +1,7 @@
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
+# The server program the ProcessClient tests launch has its own target.
+list(FILTER SRCS_G EXCLUDE REGEX "/TestServer\\.cpp$")
 POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 
 # Headers
@@ -26,3 +28,11 @@ else()
 	)
 endif()
 target_link_libraries(AIMCP-testrunner PUBLIC Poco::AIMCP CppUnit)
+
+# The server program of the ProcessClient tests, built next to the test runner.
+poco_add_executable(AIMCPTestServer src/TestServer.cpp)
+set_target_properties(AIMCPTestServer PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+)
+target_link_libraries(AIMCPTestServer PUBLIC Poco::AIMCP)
+add_dependencies(AIMCP-testrunner AIMCPTestServer)

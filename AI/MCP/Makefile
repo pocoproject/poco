@@ -1,12 +1,12 @@
 #
 # Makefile
 #
-# Makefile for Poco AI MCP (Model Context Protocol core and stdio transport)
+# Makefile for Poco AI MCP (Model Context Protocol core and the stream transports)
 #
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Message Content Dispatcher Server Client StdIOServer
+objects = MCPException Message Implementation Content Resource Tool Server Client StreamClient ProcessClient
 
 target         = PocoAIMCP
 target_version = $(LIBVERSION)

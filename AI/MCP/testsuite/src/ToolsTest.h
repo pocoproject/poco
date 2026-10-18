@@ -22,10 +22,14 @@ public:
 	~ToolsTest();
 
 	void testToolsList();
+	void testSchemasAreCopied();
+	void testConcurrentReplies();
 	void testToolsCall();
-	void testUnknownTool();
-	void testBadArguments();
+	void testCallErrors();
 	void testHandlerThrowIsToolError();
+	void testRegistrationRefused();
+	void testToolResultForms();
+	void testToolResultFromObject();
 
 	void setUp();
 	void tearDown();

@@ -1,12 +1,11 @@
 //
 // Tool.h
 //
-// Library: AIMCP
+// Library: AI/MCP
 // Package: Core
 // Module:  Tool
 //
-// An MCP tool descriptor (name, description, JSON Schema input) and the handler
-// callback invoked for tools/call.
+// Definition of the Tool struct and the tool handler types.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
@@ -27,42 +26,54 @@
 #include <string>
 
 
-namespace Poco {
-namespace AI {
-namespace MCP {
-
-
-using ToolHandler = std::function<ToolResult (const Poco::JSON::Object::Ptr& arguments)>;
-	/// Invoked for tools/call. Receives the (never-null) arguments object and
-	/// returns the content to send back. Throwing is allowed - the dispatcher
-	/// turns an exception into a ToolResult with isError set.
+namespace Poco::AI::MCP {
 
 
 using ContextToolHandler = std::function<ToolResult (const Poco::JSON::Object::Ptr& arguments, const RequestContext& context)>;
-	/// Like ToolHandler, but also receives the per-request context (identity) so a
-	/// handler can make authorization decisions. A tool sets exactly one of the two
-	/// handler forms; when both are set the context form wins.
+	/// Invoked for tools/call with the never-null arguments object and the
+	/// context of the request, so that a handler can make authorization
+	/// decisions. Throwing is allowed: the server turns the exception into a
+	/// result with isError set.
+
+
+using ToolHandler = std::function<ToolResult (const Poco::JSON::Object::Ptr& arguments)>;
+	/// A handler that does not need the request context. Server::registerTool()
+	/// takes it in its short form and wraps it into a ContextToolHandler.
 
 
 struct AIMCP_API Tool
-	/// Describes a tool the server exposes via tools/list and tools/call.
+	/// Describes a tool the server lists in tools/list and runs for tools/call.
 {
 	std::string name;
+		/// Should be 1 to 128 characters from A-Z, a-z, 0-9, '_', '-' and '.'.
+	std::string title;
+		/// Optional name for display.
 	std::string description;
 	Poco::JSON::Object::Ptr inputSchema;
-		/// A JSON Schema object describing the tool's arguments.
+		/// A JSON Schema object describing the arguments, with type object at
+		/// its root. A tool without one is listed with {"type": "object"}.
 	Poco::JSON::Object::Ptr outputSchema;
-		/// Optional JSON Schema for the tool's structured result. Advertised in
-		/// tools/list when set.
+		/// Optional JSON Schema of the tool's structured content.
 	Poco::JSON::Object::Ptr annotations;
-		/// Optional tool annotations (e.g. readOnlyHint, destructiveHint,
-		/// idempotentHint). Advertised in tools/list when set.
-	ToolHandler handler;
-	ContextToolHandler contextHandler;
+		/// Optional hints, e.g. readOnlyHint or destructiveHint. Hints from a
+		/// remote server are untrusted.
+	ContextToolHandler handler;
+		/// Required when the tool is registered with a server.
+
+	[[nodiscard]] Poco::JSON::Object::Ptr toObject() const;
+		/// Returns the tools/list entry. The schema and annotation objects
+		/// are deep copies, so that replies serialized on different threads
+		/// share no object.
+
+	[[nodiscard]] static Tool fromObject(const Poco::JSON::Object::Ptr& object);
+		/// Reads a tools/list entry; the handler stays empty.
+		///
+		/// Throws Poco::DataFormatException if the name is not a non-empty
+		/// string or inputSchema is not an object.
 };
 
 
-} } } // namespace Poco::AI::MCP
+} // namespace Poco::AI::MCP
 
 
 #endif // AIMCP_Tool_INCLUDED

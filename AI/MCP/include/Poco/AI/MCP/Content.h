@@ -1,13 +1,11 @@
 //
 // Content.h
 //
-// Library: AIMCP
+// Library: AI/MCP
 // Package: Core
 // Module:  Content
 //
-// The result of a tool invocation: a list of MCP content blocks plus an error
-// flag. Per the spec, tool execution failures are reported here (isError = true)
-// rather than as JSON-RPC errors, so the model sees the failure text.
+// Definition of the ToolResult class.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
@@ -21,51 +19,84 @@
 
 
 #include "Poco/AI/MCP/MCP.h"
+#include "Poco/AI/MCP/Resource.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
+#include "Poco/Dynamic/Var.h"
 #include <string>
 
 
-namespace Poco {
-namespace AI {
-namespace MCP {
+namespace Poco::AI::MCP {
 
 
 class AIMCP_API ToolResult
-	/// The content blocks and error flag returned by a tool handler. Serializes
-	/// to {"content": [ ... ], "isError": bool}.
+	/// The result of a tool call: content blocks, optional structured content
+	/// and an error flag. Serializes to the tools/call result
+	/// {"content": [...], "structuredContent"?: value, "isError": bool}.
+	///
+	/// A tool that returns structured content should also return it serialized
+	/// in a text block, for clients that read only the content blocks. A tool
+	/// that declares an outputSchema must return structured content that
+	/// conforms to it.
 {
 public:
 	ToolResult();
-		/// Creates an empty, non-error result.
+		/// Creates an empty result that is not an error.
+
+	[[nodiscard]] static ToolResult error(const std::string& text);
+		/// Returns an error result with one text block.
 
 	ToolResult& addText(const std::string& text);
-		/// Appends a {"type": "text", "text": text} content block. Returns *this.
+		/// Appends a text block. Returns *this.
+
+	ToolResult& addImage(const std::string& data, const std::string& mimeType);
+		/// Appends an image block; data is the image in base64. Returns *this.
+
+	ToolResult& addAudio(const std::string& data, const std::string& mimeType);
+		/// Appends an audio block; data is the audio in base64. Returns *this.
+
+	ToolResult& addResourceLink(const std::string& uri, const std::string& name, const std::string& mimeType = std::string());
+		/// Appends a link to a resource the client can read. Returns *this.
+
+	ToolResult& addResource(const ResourceContents& contents);
+		/// Appends a resource embedded with its contents. Returns *this.
+
+	ToolResult& addContent(const Poco::JSON::Object::Ptr& block);
+		/// Appends a content block as it is, e.g. one taken from another
+		/// result. Returns *this.
+		///
+		/// Throws Poco::InvalidArgumentException if block is null or has no
+		/// string type.
 
 	ToolResult& setError(bool isError = true);
-		/// Marks the result as an error (or not). Returns *this.
+		/// Marks the result as an error, or not. Returns *this.
 
-	ToolResult& setStructuredContent(const Poco::JSON::Object::Ptr& structured);
-		/// Attaches a structured result object (serialized under "structuredContent").
-		/// Per the spec a tool that declares an outputSchema SHOULD also return the
-		/// serialized JSON in a text block for backwards compatibility, so callers
-		/// typically pair this with addText(). Returns *this.
+	ToolResult& setStructuredContent(const Poco::Dynamic::Var& structured);
+		/// Sets the structured content: any JSON value, e.g. a
+		/// Poco::JSON::Object::Ptr. An empty Var removes it. Returns *this.
 
-	bool isError() const;
-		/// Returns whether this result represents a tool execution error.
+	[[nodiscard]] bool isError() const;
+		/// Returns whether the result is a tool execution error.
 
-	Poco::JSON::Array::Ptr content() const;
+	[[nodiscard]] Poco::JSON::Array::Ptr content() const;
 		/// Returns the array of content blocks.
 
-	Poco::JSON::Object::Ptr toObject() const;
-		/// Serializes to the MCP tools/call result object.
+	[[nodiscard]] const Poco::Dynamic::Var& structuredContent() const;
+		/// Returns the structured content, or an empty Var if there is none.
 
-	static ToolResult fromObject(const Poco::JSON::Object::Ptr& object);
-		/// Parses a tools/call result object back into a ToolResult.
+	[[nodiscard]] Poco::JSON::Object::Ptr toObject() const;
+		/// Serializes the result to the tools/call result object.
+
+	[[nodiscard]] static ToolResult fromObject(const Poco::JSON::Object::Ptr& object);
+		/// Parses a tools/call result object.
+		///
+		/// Throws Poco::DataFormatException if content is missing or not an
+		/// array of objects with a string type, or if isError is present and
+		/// not a boolean.
 
 private:
-	Poco::JSON::Array::Ptr _content;
-	Poco::JSON::Object::Ptr _structuredContent;
+	Poco::JSON::Array::Ptr _pContent;
+	Poco::Dynamic::Var _structuredContent;
 	bool _isError;
 };
 
@@ -81,11 +112,17 @@ inline bool ToolResult::isError() const
 
 inline Poco::JSON::Array::Ptr ToolResult::content() const
 {
-	return _content;
+	return _pContent;
 }
 
 
-} } } // namespace Poco::AI::MCP
+inline const Poco::Dynamic::Var& ToolResult::structuredContent() const
+{
+	return _structuredContent;
+}
+
+
+} // namespace Poco::AI::MCP
 
 
 #endif // AIMCP_Content_INCLUDED

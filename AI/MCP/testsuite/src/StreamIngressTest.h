@@ -24,7 +24,8 @@ public:
 	void testFraming();
 	void testParseError();
 	void testBatchRejected();
-	void testClientRoundTrip();
+	void testOversizedLine();
+	void testOutputFailureStops();
 
 	void setUp();
 	void tearDown();

@@ -1,14 +1,11 @@
 //
 // Server.h
 //
-// Library: AIMCP
+// Library: AI/MCP
 // Package: Core
 // Module:  Server
 //
-// The MCP server facade: register tools, then accept messages either at the
-// message level (handleMessage, used by the HTTP transport) or as a stream pump
-// (serve, used by the stdio transport). Transport-agnostic - depends only on
-// Poco::JSON, never Poco::Net.
+// Definition of the Server class.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
@@ -22,85 +19,163 @@
 
 
 #include "Poco/AI/MCP/MCP.h"
-#include "Poco/AI/MCP/Dispatcher.h"
+#include "Poco/AI/MCP/Message.h"
 #include "Poco/AI/MCP/Tool.h"
 #include "Poco/AI/MCP/Resource.h"
 #include "Poco/AI/MCP/RequestContext.h"
+#include "Poco/AI/MCP/Implementation.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/Mutex.h"
+#include "Poco/Timespan.h"
 #include <iosfwd>
+#include <map>
 #include <string>
 
 
-namespace Poco {
-namespace AI {
-namespace MCP {
+namespace Poco::AI::MCP {
 
 
 class AIMCP_API Server
-	/// An MCP server. Register tools, set server info, then expose it through any
-	/// transport via the two ingress entry points.
+	/// An MCP server of protocol revision 2026-07-28. Register tools,
+	/// resources and prompts, then serve requests through any transport:
+	/// message by message with handle(), or as a newline-delimited stream
+	/// with serve() (the stdio transport serves std::cin and std::cout).
+	///
+	/// The protocol is stateless. Every request carries the protocol revision
+	/// and the client's capabilities in its _meta object, so one Server serves
+	/// any number of clients and connections at once. It answers:
+	///
+	///   - server/discover, with the supported revision, the capabilities and
+	///     the instructions;
+	///   - tools/list, tools/call, resources/list, resources/templates/list
+	///     (always empty), resources/read, prompts/list and prompts/get.
+	///
+	/// Every result carries resultType "complete" and, when set, the server
+	/// info in its _meta object. Lists come in one page, in name order.
+	/// Notifications get no reply; notifications/cancelled is accepted, and
+	/// has no effect because requests are served synchronously.
+	///
+	/// Registration is thread-safe. Handlers run on the thread that calls
+	/// handle() or serve(), outside the server's lock.
+	///
+	/// A stdio server must keep std::cout for the protocol: nothing else may
+	/// write to it, so the application sends its log output to std::cerr or
+	/// to a file.
 {
 public:
+	enum class CacheScope
+		/// Whether caches may share what the server lists and returns.
+	{
+		PUBLIC,  /// The same for every caller.
+		PRIVATE  /// May depend on the caller's authorization.
+	};
+
 	Server();
-		/// Creates an empty server.
+		/// Creates a server without tools, resources and prompts.
 
 	~Server();
 		/// Destroys the server.
 
-	void registerTool(const std::string& name, const std::string& description,
-		Poco::JSON::Object::Ptr inputSchema, ToolHandler handler);
-		/// Registers a tool exposed via tools/list and tools/call.
-
 	void registerTool(const Tool& tool);
-		/// Registers a fully-specified tool (e.g. with an outputSchema, annotations,
-		/// or a context-aware handler).
+		/// Registers a tool, replacing a tool of the same name. The schema and
+		/// annotation objects must not be changed after registration.
+		///
+		/// Throws Poco::InvalidArgumentException if the name is empty or the
+		/// tool has no handler.
+
+	void registerTool(const std::string& name, const std::string& description, Poco::JSON::Object::Ptr inputSchema, ToolHandler handler);
+		/// Registers a tool whose handler does not need the request context.
+		///
+		/// Throws Poco::InvalidArgumentException if the name is empty or the
+		/// handler is empty.
 
 	void registerResource(const Resource& resource, ResourceReader reader);
-		/// Registers a resource exposed via resources/list and read via resources/read.
+		/// Registers a resource, replacing one with the same URI.
+		///
+		/// Throws Poco::InvalidArgumentException if the URI is empty or the
+		/// reader is empty.
 
 	void registerPrompt(const Prompt& prompt, PromptRenderer renderer);
-		/// Registers a prompt exposed via prompts/list and rendered via prompts/get.
+		/// Registers a prompt, replacing one of the same name.
+		///
+		/// Throws Poco::InvalidArgumentException if the name is empty or the
+		/// renderer is empty.
 
-	void setServerInfo(const std::string& name, const std::string& version);
-		/// Sets the name/version reported during initialize.
+	void setServerInfo(const Implementation& info);
+		/// Sets the name and version the server reports in the _meta object
+		/// of every result. Without a name, results carry no server info.
 
 	void setInstructions(const std::string& instructions);
-		/// Sets the optional instructions returned by initialize.
+		/// Sets the instructions server/discover returns.
 
-	Poco::JSON::Object::Ptr handleMessage(const Poco::JSON::Object::Ptr& message);
-		/// Message-level ingress: handles one already-parsed JSON-RPC message and
-		/// returns the response envelope, or null for a notification.
+	void setCacheHints(const Poco::Timespan& ttl, CacheScope scope);
+		/// Sets the caching hints of the results of server/discover, the lists
+		/// and resources/read: how long a client may keep them, and whether
+		/// caches may share them. The default is zero, stale at once, and
+		/// PRIVATE.
 
-	Poco::JSON::Object::Ptr handleMessage(const Poco::JSON::Object::Ptr& message, const RequestContext& context);
-		/// Message-level ingress that threads a per-request context (identity) into
-		/// the tool handler. Used by authenticating transports.
+	[[nodiscard]] Poco::JSON::Object::Ptr handle(const Poco::JSON::Object::Ptr& message, const RequestContext& context = RequestContext());
+		/// Message-level ingress: handles one parsed JSON-RPC message and
+		/// returns the reply, or null for a notification. The transport sets
+		/// the identity of the context; the server adds what the request's
+		/// _meta object carries. Never throws: an exception of a handler or
+		/// of the server becomes an error reply.
 
-	void serve(std::istream& in, std::ostream& out);
-		/// Stream-level ingress: reads newline-delimited JSON-RPC messages from in,
-		/// writes the replies to out, and returns at end of stream. Malformed lines
-		/// and unsupported batch arrays produce JSON-RPC error replies.
-
-	Dispatcher& dispatcher();
-		/// Returns the underlying dispatcher (for advanced/transport use).
+	void serve(std::istream& in, std::ostream& out, std::size_t maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE);
+		/// Stream-level ingress: reads newline-delimited messages from in,
+		/// writes the replies to out, and returns at the end of in. A line
+		/// that is not JSON gets a Parse error reply; a line that is not an
+		/// object (a batch, for instance) or is longer than maxMessageSize
+		/// bytes gets an Invalid Request reply.
+		///
+		/// Throws Poco::WriteFileException when out fails, so that a server
+		/// whose client has gone away stops.
 
 private:
+	struct ResourceEntry
+	{
+		Resource resource;
+		ResourceReader reader;
+	};
+
+	struct PromptEntry
+	{
+		Prompt prompt;
+		PromptRenderer renderer;
+	};
+
+	struct Settings
+	{
+		Implementation serverInfo;
+		std::string instructions;
+		Poco::Timespan ttl;
+		CacheScope scope = CacheScope::PRIVATE;
+	};
+
+	Poco::JSON::Object::Ptr dispatch(const Id& id, const std::string& method, const Poco::JSON::Object::Ptr& params, const RequestContext& context);
+	Poco::JSON::Object::Ptr onDiscover(const Id& id);
+	Poco::JSON::Object::Ptr onToolsList(const Id& id, const Poco::JSON::Object::Ptr& params);
+	Poco::JSON::Object::Ptr onToolsCall(const Id& id, const Poco::JSON::Object::Ptr& params, const RequestContext& context);
+	Poco::JSON::Object::Ptr onResourcesList(const Id& id, const Poco::JSON::Object::Ptr& params);
+	Poco::JSON::Object::Ptr onResourceTemplatesList(const Id& id, const Poco::JSON::Object::Ptr& params);
+	Poco::JSON::Object::Ptr onResourcesRead(const Id& id, const Poco::JSON::Object::Ptr& params, const RequestContext& context);
+	Poco::JSON::Object::Ptr onPromptsList(const Id& id, const Poco::JSON::Object::Ptr& params);
+	Poco::JSON::Object::Ptr onPromptsGet(const Id& id, const Poco::JSON::Object::Ptr& params, const RequestContext& context);
+	Poco::JSON::Object::Ptr complete(const Id& id, Poco::JSON::Object::Ptr result, bool cacheable);
+	Settings settings() const;
+
 	Server(const Server&) = delete;
 	Server& operator = (const Server&) = delete;
 
-	Dispatcher _dispatcher;
+	mutable Poco::FastMutex _mutex;
+	std::map<std::string, Tool> _tools;
+	std::map<std::string, ResourceEntry> _resources;
+	std::map<std::string, PromptEntry> _prompts;
+	Settings _settings;
 };
 
 
-//
-// inlines
-//
-inline Dispatcher& Server::dispatcher()
-{
-	return _dispatcher;
-}
-
-
-} } } // namespace Poco::AI::MCP
+} // namespace Poco::AI::MCP
 
 
 #endif // AIMCP_Server_INCLUDED

@@ -9,59 +9,76 @@
 
 
 #include "ToolsTest.h"
+#include "MCPTestHelpers.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/MCP/Server.h"
 #include "Poco/AI/MCP/Message.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
+#include "Poco/JSON/Parser.h"
+#include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include <atomic>
+#include <string>
+#include <vector>
 
 
 using Poco::AI::MCP::Server;
 using Poco::AI::MCP::Request;
+using Poco::AI::MCP::Tool;
 using Poco::AI::MCP::ToolResult;
+using Poco::AI::MCP::ResourceContents;
+using Poco::AI::MCP::RequestContext;
+using Poco::AI::MCP::ErrorCode;
 using Poco::AI::MCP::Id;
 using Poco::JSON::Object;
 using Poco::JSON::Array;
+using MCPTest::request;
+using MCPTest::errorCode;
+using MCPTest::result;
+using MCPTest::code;
 
 
 namespace
 {
+	Object::Ptr parse(const std::string& json)
+	{
+		Poco::JSON::Parser parser;
+		return parser.parse(json).extract<Object::Ptr>();
+	}
+
+
 	void buildServer(Server& server)
 	{
-		Object::Ptr echoSchema = new Object;
-		echoSchema->set("type", "object");
-		server.registerTool("echo", "Echo back the message.", echoSchema,
-			[](Object::Ptr args)
+		server.registerTool("echo", "Echo back the message.", parse("{\"type\":\"object\",\"properties\":{\"message\":{\"type\":\"string\"}}}"),
+			[](const Object::Ptr& pArgs)
 			{
-				ToolResult result;
-				result.addText(args && args->has("message") ? args->getValue<std::string>("message") : std::string());
-				return result;
+				ToolResult toolResult;
+				toolResult.addText(pArgs->optValue<std::string>("message", ""));
+				return toolResult;
 			});
 
-		server.registerTool("boom", "Always throws.", new Object,
-			[](Object::Ptr) -> ToolResult
+		server.registerTool("boom", "Always throws.", nullptr,
+			[](const Object::Ptr&) -> ToolResult
 			{
 				throw Poco::RuntimeException("kaboom");
 			});
-
-		// Drive the handshake so tools/* are accepted.
-		Object::Ptr params = new Object;
-		params->set("protocolVersion", Poco::AI::MCP::PROTOCOL_VERSION);
-		params->set("capabilities", Object::Ptr(new Object));
-		server.handleMessage(Request::make(Id(1), "initialize", params));
 	}
 
-	Object::Ptr callTool(Server& server, int id, const std::string& name, Object::Ptr arguments)
+
+	Object::Ptr callTool(Server& server, int id, const Poco::Dynamic::Var& name, const Poco::Dynamic::Var& arguments = Poco::Dynamic::Var())
 	{
-		Object::Ptr params = new Object;
-		params->set("name", name);
-		if (arguments)
-		{
-			params->set("arguments", arguments);
-		}
-		return server.handleMessage(Request::make(Id(id), "tools/call", params));
+		Object::Ptr pParams = new Object;
+		pParams->set("name", name);
+		if (!arguments.isEmpty()) pParams->set("arguments", arguments);
+		return server.handle(request(Id(id), "tools/call", pParams));
+	}
+
+
+	std::string firstText(const Object::Ptr& pResult)
+	{
+		return pResult->getArray("content")->getObject(0)->getValue<std::string>("text");
 	}
 }
 
@@ -81,24 +98,73 @@ void ToolsTest::testToolsList()
 {
 	Server server;
 	buildServer(server);
+	Tool tool;
+	tool.name = "annotated";
+	tool.title = "Annotated tool";
+	tool.description = "Has every optional member.";
+	tool.inputSchema = parse("{\"type\":\"object\",\"additionalProperties\":false}");
+	tool.outputSchema = parse("{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"integer\"}}}");
+	tool.annotations = parse("{\"readOnlyHint\":true}");
+	tool.handler = [](const Object::Ptr&, const RequestContext&) { return ToolResult(); };
+	server.registerTool(tool);
 
-	Object::Ptr resp = server.handleMessage(Request::make(Id(2), "tools/list", nullptr));
-	assertTrue(resp->isObject("result"));
+	Array::Ptr pTools = result(server.handle(request(Id(1), "tools/list")))->getArray("tools");
+	assertEqual(3u, static_cast<unsigned>(pTools->size()));
+	// In name order.
+	assertEqual(std::string("annotated"), pTools->getObject(0)->getValue<std::string>("name"));
+	assertEqual(std::string("boom"), pTools->getObject(1)->getValue<std::string>("name"));
+	assertEqual(std::string("echo"), pTools->getObject(2)->getValue<std::string>("name"));
 
-	Array::Ptr tools = resp->getObject("result")->getArray("tools");
-	assertEqual(2, static_cast<int>(tools->size()));
+	Object::Ptr pAnnotated = pTools->getObject(0);
+	assertEqual(std::string("Annotated tool"), pAnnotated->getValue<std::string>("title"));
+	assertTrue(pAnnotated->getObject("outputSchema")->isObject("properties"));
+	assertTrue(pAnnotated->getObject("annotations")->getValue<bool>("readOnlyHint"));
 
-	bool foundEcho = false;
-	for (unsigned int i = 0; i < tools->size(); ++i)
+	// A tool registered without a schema takes no particular arguments.
+	Object::Ptr pBoomSchema = pTools->getObject(1)->getObject("inputSchema");
+	assertEqual(std::string("object"), pBoomSchema->getValue<std::string>("type"));
+	assertTrue(!pTools->getObject(1)->has("outputSchema"));
+	assertTrue(!pTools->getObject(1)->has("title"));
+}
+
+
+void ToolsTest::testSchemasAreCopied()
+{
+	Server server;
+	Object::Ptr pSchema = parse("{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\"}}}");
+	server.registerTool("t", "", pSchema, [](const Object::Ptr&) { return ToolResult(); });
+
+	Object::Ptr pListed = result(server.handle(request(Id(1), "tools/list")))->getArray("tools")->getObject(0)->getObject("inputSchema");
+	assertTrue(pListed.get() != pSchema.get());
+	assertTrue(pListed->getObject("properties").get() != pSchema->getObject("properties").get());
+	assertEqual(std::string("string"), pListed->getObject("properties")->getObject("a")->getValue<std::string>("type"));
+}
+
+
+void ToolsTest::testConcurrentReplies()
+{
+	// Replies serialized on several threads at once share no JSON object, so
+	// each serialization equals the one made alone.
+	Server server;
+	Object::Ptr pSchema = parse("{\"type\":\"object\",\"properties\":{\"text\":{\"type\":\"string\",\"description\":\"caf\\u00e9 \\u20ac \\u65e5\"}}}");
+	server.registerTool("unicode", "Unicode in the schema.", pSchema, [](const Object::Ptr&) { return ToolResult(); });
+	const std::string expected = Poco::AI::MCP::serialize(server.handle(request(Id(1), "tools/list")));
+
+	std::atomic<int> mismatches(0);
+	std::vector<std::unique_ptr<Poco::Thread>> threads;
+	for (int t = 0; t < 4; ++t)
 	{
-		Object::Ptr tool = tools->getObject(i);
-		assertTrue(tool->has("inputSchema"));
-		if (tool->getValue<std::string>("name") == "echo")
+		threads.push_back(std::make_unique<Poco::Thread>());
+		threads.back()->startFunc([&server, &expected, &mismatches]()
 		{
-			foundEcho = true;
-		}
+			for (int i = 0; i < 50; ++i)
+			{
+				if (Poco::AI::MCP::serialize(server.handle(request(Id(1), "tools/list"))) != expected) ++mismatches;
+			}
+		});
 	}
-	assertTrue(foundEcho);
+	for (auto& pThread: threads) pThread->join();
+	assertEqual(0, mismatches.load());
 }
 
 
@@ -106,47 +172,40 @@ void ToolsTest::testToolsCall()
 {
 	Server server;
 	buildServer(server);
+	Object::Ptr pArgs = new Object;
+	pArgs->set("message", "hello");
+	Object::Ptr pReply = callTool(server, 2, std::string("echo"), pArgs);
+	Object::Ptr pResult = result(pReply);
+	assertEqual(2, pReply->getValue<int>("id"));
+	assertTrue(!pResult->getValue<bool>("isError"));
+	assertEqual(std::string("hello"), firstText(pResult));
 
-	Object::Ptr args = new Object;
-	args->set("message", "hi");
-	Object::Ptr resp = callTool(server, 2, "echo", args);
-
-	assertTrue(resp->isObject("result"));
-	Object::Ptr result = resp->getObject("result");
-	assertTrue(!result->getValue<bool>("isError"));
-
-	Array::Ptr content = result->getArray("content");
-	assertEqual(1, static_cast<int>(content->size()));
-	Object::Ptr block = content->getObject(0);
-	assertEqual(std::string("text"), block->getValue<std::string>("type"));
-	assertEqual(std::string("hi"), block->getValue<std::string>("text"));
+	// Arguments may be left out.
+	pResult = result(callTool(server, 3, std::string("echo")));
+	assertEqual(std::string(""), firstText(pResult));
 }
 
 
-void ToolsTest::testUnknownTool()
+void ToolsTest::testCallErrors()
 {
 	Server server;
 	buildServer(server);
 
-	Object::Ptr resp = callTool(server, 2, "does-not-exist", new Object);
-	assertTrue(resp->isObject("error"));
-	assertEqual(-32602, resp->getObject("error")->getValue<int>("code"));
-}
+	// Unknown tool.
+	Object::Ptr pReply = callTool(server, 1, std::string("nope"));
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(pReply));
+	assertEqual(1, pReply->getValue<int>("id"));
 
+	// A name that is not a string, null included.
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(callTool(server, 2, 42)));
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(server.handle(MCPTest::request(Id(3), "tools/call", parse("{\"name\":null}")))));
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(server.handle(MCPTest::request(Id(4), "tools/call"))));
 
-void ToolsTest::testBadArguments()
-{
-	Server server;
-	buildServer(server);
-
-	// arguments present but not an object -> InvalidParams.
-	Object::Ptr params = new Object;
-	params->set("name", "echo");
-	params->set("arguments", "not-an-object");
-	Object::Ptr resp = server.handleMessage(Request::make(Id(2), "tools/call", params));
-
-	assertTrue(resp->isObject("error"));
-	assertEqual(-32602, resp->getObject("error")->getValue<int>("code"));
+	// Arguments that are not an object.
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(callTool(server, 5, std::string("echo"), std::string("not an object"))));
+	pReply = server.handle(MCPTest::request(Id(6), "tools/call", parse("{\"name\":\"echo\",\"arguments\":[1,2]}")));
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(pReply));
+	assertEqual(6, pReply->getValue<int>("id"));
 }
 
 
@@ -154,14 +213,114 @@ void ToolsTest::testHandlerThrowIsToolError()
 {
 	Server server;
 	buildServer(server);
+	Object::Ptr pResult = result(callTool(server, 1, std::string("boom")));
+	assertTrue(!pResult.isNull());
+	assertTrue(pResult->getValue<bool>("isError"));
+	assertTrue(firstText(pResult).find("kaboom") != std::string::npos);
+}
 
-	Object::Ptr resp = callTool(server, 2, "boom", new Object);
 
-	// A throwing handler is reported as a tool result with isError, NOT a
-	// JSON-RPC error.
-	assertTrue(resp->isObject("result"));
-	assertTrue(!resp->has("error"));
-	assertTrue(resp->getObject("result")->getValue<bool>("isError"));
+void ToolsTest::testRegistrationRefused()
+{
+	Server server;
+	try
+	{
+		server.registerTool("", "", nullptr, [](const Object::Ptr&) { return ToolResult(); });
+		fail("a tool without a name must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	try
+	{
+		server.registerTool("x", "", nullptr, Poco::AI::MCP::ToolHandler());
+		fail("a tool without a handler must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	Tool tool;
+	tool.name = "no-handler";
+	try
+	{
+		server.registerTool(tool);
+		fail("a tool without a handler must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	assertEqual(0u, static_cast<unsigned>(result(server.handle(request(Id(1), "tools/list")))->getArray("tools")->size()));
+}
+
+
+void ToolsTest::testToolResultForms()
+{
+	ResourceContents contents;
+	contents.uri = "test://doc";
+	contents.mimeType = "text/plain";
+	contents.text = "embedded";
+	ToolResult toolResult;
+	toolResult.addText("t").addImage("aW1n", "image/png").addAudio("YXVk", "audio/wav").addResourceLink("test://other", "other").addResource(contents);
+	toolResult.setStructuredContent(Poco::Dynamic::Var(42));
+
+	Object::Ptr pObject = toolResult.toObject();
+	Array::Ptr pContent = pObject->getArray("content");
+	assertEqual(5u, static_cast<unsigned>(pContent->size()));
+	assertEqual(std::string("text"), pContent->getObject(0)->getValue<std::string>("type"));
+	assertEqual(std::string("image"), pContent->getObject(1)->getValue<std::string>("type"));
+	assertEqual(std::string("image/png"), pContent->getObject(1)->getValue<std::string>("mimeType"));
+	assertEqual(std::string("audio"), pContent->getObject(2)->getValue<std::string>("type"));
+	assertEqual(std::string("resource_link"), pContent->getObject(3)->getValue<std::string>("type"));
+	assertEqual(std::string("resource"), pContent->getObject(4)->getValue<std::string>("type"));
+	assertEqual(std::string("embedded"), pContent->getObject(4)->getObject("resource")->getValue<std::string>("text"));
+	// Structured content may be any JSON value.
+	assertEqual(42, pObject->getValue<int>("structuredContent"));
+	assertTrue(!pObject->getValue<bool>("isError"));
+
+	ToolResult failed = ToolResult::error("went wrong");
+	assertTrue(failed.isError());
+	assertEqual(std::string("went wrong"), failed.content()->getObject(0)->getValue<std::string>("text"));
+
+	try
+	{
+		toolResult.addContent(parse("{\"text\":\"no type\"}"));
+		fail("a block without a type must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+}
+
+
+void ToolsTest::testToolResultFromObject()
+{
+	ToolResult structuredOnly = ToolResult::fromObject(parse("{\"content\":[],\"structuredContent\":{\"n\":1}}"));
+	assertTrue(!structuredOnly.isError());
+	assertEqual(0u, static_cast<unsigned>(structuredOnly.content()->size()));
+	assertEqual(1, structuredOnly.structuredContent().extract<Object::Ptr>()->getValue<int>("n"));
+
+	ToolResult arrayContent = ToolResult::fromObject(parse("{\"content\":[{\"type\":\"text\",\"text\":\"a\"}],\"structuredContent\":[1,2],\"isError\":true}"));
+	assertTrue(arrayContent.isError());
+	assertEqual(2u, static_cast<unsigned>(arrayContent.structuredContent().extract<Array::Ptr>()->size()));
+
+	const char* malformed[] = {
+		"{}",
+		"{\"content\":\"text\"}",
+		"{\"content\":[1]}",
+		"{\"content\":[{\"text\":\"no type\"}]}",
+		"{\"content\":[],\"isError\":\"yes\"}"
+	};
+	for (const char* text: malformed)
+	{
+		try
+		{
+			(void) ToolResult::fromObject(parse(text));
+			fail(std::string("must be refused: ") + text);
+		}
+		catch (const Poco::DataFormatException&)
+		{
+		}
+	}
 }
 
 
@@ -180,10 +339,14 @@ CppUnit::Test* ToolsTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ToolsTest");
 
 	CppUnit_addTest(pSuite, ToolsTest, testToolsList);
+	CppUnit_addTest(pSuite, ToolsTest, testSchemasAreCopied);
+	CppUnit_addTest(pSuite, ToolsTest, testConcurrentReplies);
 	CppUnit_addTest(pSuite, ToolsTest, testToolsCall);
-	CppUnit_addTest(pSuite, ToolsTest, testUnknownTool);
-	CppUnit_addTest(pSuite, ToolsTest, testBadArguments);
+	CppUnit_addTest(pSuite, ToolsTest, testCallErrors);
 	CppUnit_addTest(pSuite, ToolsTest, testHandlerThrowIsToolError);
+	CppUnit_addTest(pSuite, ToolsTest, testRegistrationRefused);
+	CppUnit_addTest(pSuite, ToolsTest, testToolResultForms);
+	CppUnit_addTest(pSuite, ToolsTest, testToolResultFromObject);
 
 	return pSuite;
 }

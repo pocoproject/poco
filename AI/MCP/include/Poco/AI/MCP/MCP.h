@@ -1,17 +1,18 @@
 //
 // MCP.h
 //
-// Library: AIMCP
+// Library: AI/MCP
 // Package: Core
 // Module:  MCP
 //
 // Basic definitions for the AI MCP (Model Context Protocol) library.
 // This file must be the first file included by every other AI MCP header.
 //
-// The core library is the protocol implementation, a generic ingress that
-// accepts a stream, and the stdio transport; it depends only on Poco::JSON
-// (no Poco::Net). The HTTP(S) client transport lives in the separate
-// PocoAIMCPHTTP library.
+// The core library is the protocol implementation of MCP revision 2026-07-28:
+// the server with its message and stream ingress, the client over any
+// transport, the stream client and the stdio transport to a server process.
+// It depends only on Poco::JSON and Foundation (no Poco::Net). The
+// Streamable HTTP client transport lives in the separate PocoAIMCPHTTP library.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
@@ -25,6 +26,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <cstddef>
 
 
 //
@@ -63,9 +65,7 @@
 #endif
 
 
-namespace Poco {
-namespace AI {
-namespace MCP {
+namespace Poco::AI::MCP {
 
 
 //
@@ -78,11 +78,29 @@ namespace MCP {
 inline constexpr char JSONRPC_VERSION[] = "2.0";
 	/// The JSON-RPC version every MCP message carries.
 
-inline constexpr char PROTOCOL_VERSION[] = "2025-06-18";
-	/// The MCP protocol revision this library implements and advertises.
+inline constexpr char PROTOCOL_VERSION[] = "2026-07-28";
+	/// The MCP protocol revision this library implements: the only one it
+	/// sends and the only one it accepts. The revision is stateless: every
+	/// request names the revision and the client's capabilities in its _meta
+	/// object, and there is no initialization handshake and no session.
+
+inline constexpr char META_PROTOCOL_VERSION[] = "io.modelcontextprotocol/protocolVersion";
+	/// The key of the protocol revision in the _meta object of a request.
+
+inline constexpr char META_CLIENT_CAPABILITIES[] = "io.modelcontextprotocol/clientCapabilities";
+	/// The key of the client's capabilities in the _meta object of a request.
+
+inline constexpr char META_CLIENT_INFO[] = "io.modelcontextprotocol/clientInfo";
+	/// The key of the client's name and version in the _meta object of a request.
+
+inline constexpr char META_SERVER_INFO[] = "io.modelcontextprotocol/serverInfo";
+	/// The key of the server's name and version in the _meta object of a result.
+
+inline constexpr std::size_t DEFAULT_MAX_MESSAGE_SIZE = 16*1024*1024;
+	/// The default limit, in bytes, of one message read from a peer.
 
 
-} } } // namespace Poco::AI::MCP
+} // namespace Poco::AI::MCP
 
 
 #endif // AIMCP_MCP_INCLUDED

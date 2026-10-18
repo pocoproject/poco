@@ -9,46 +9,110 @@
 
 
 #include "FeaturesTest.h"
+#include "MCPTestHelpers.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/MCP/Server.h"
-#include "Poco/AI/MCP/Message.h"
-#include "Poco/AI/MCP/Tool.h"
 #include "Poco/AI/MCP/Resource.h"
 #include "Poco/AI/MCP/RequestContext.h"
-#include "Poco/AI/MCP/Content.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
+#include "Poco/Exception.h"
 
 
 using Poco::AI::MCP::Server;
-using Poco::AI::MCP::Request;
-using Poco::AI::MCP::Response;
-using Poco::AI::MCP::Tool;
-using Poco::AI::MCP::ToolResult;
 using Poco::AI::MCP::Resource;
+using Poco::AI::MCP::ResourceContents;
 using Poco::AI::MCP::Prompt;
 using Poco::AI::MCP::PromptArgument;
 using Poco::AI::MCP::RequestContext;
-using Poco::AI::MCP::Identity;
+using Poco::AI::MCP::ErrorCode;
 using Poco::AI::MCP::Id;
 using Poco::JSON::Object;
 using Poco::JSON::Array;
+using MCPTest::request;
+using MCPTest::errorCode;
+using MCPTest::result;
+using MCPTest::code;
 
 
 namespace
 {
-	void initialize(Server& server)
+	void buildServer(Server& server)
 	{
-		Object::Ptr params = new Object;
-		params->set("protocolVersion", Poco::AI::MCP::PROTOCOL_VERSION);
-		params->set("capabilities", Object::Ptr(new Object));
-		server.handleMessage(Request::make(Id(1), "initialize", params));
+		Resource readme;
+		readme.uri = "test://readme";
+		readme.name = "readme";
+		readme.title = "Read me";
+		readme.description = "The read-me text.";
+		readme.mimeType = "text/plain";
+		server.registerResource(readme, [](const std::string&, const RequestContext& context)
+		{
+			ResourceContents contents;
+			contents.text = "Hello, " + (context.clientInfo.empty() ? std::string("stranger") : context.clientInfo.name);
+			return contents;
+		});
+
+		Resource logo;
+		logo.uri = "test://logo";
+		logo.name = "logo";
+		logo.mimeType = "image/png";
+		server.registerResource(logo, [](const std::string& uri, const RequestContext&)
+		{
+			ResourceContents contents;
+			contents.uri = uri;
+			contents.blob = "iVBORw0KGgo=";
+			return contents;
+		});
+
+		Resource broken;
+		broken.uri = "test://broken";
+		broken.name = "broken";
+		server.registerResource(broken, [](const std::string&, const RequestContext&) -> ResourceContents
+		{
+			throw Poco::IOException("disk on fire");
+		});
+
+		Prompt greet;
+		greet.name = "greet";
+		greet.title = "Greeting";
+		greet.description = "Greets someone.";
+		PromptArgument who;
+		who.name = "who";
+		who.description = "Whom to greet.";
+		who.required = true;
+		PromptArgument mood;
+		mood.name = "mood";
+		greet.arguments = {who, mood};
+		server.registerPrompt(greet, [](const Object::Ptr& pArgs, const RequestContext&)
+		{
+			Object::Ptr pText = new Object;
+			pText->set("type", "text");
+			pText->set("text", "Hello " + pArgs->getValue<std::string>("who") + " " + pArgs->optValue<std::string>("mood", "plainly"));
+			Object::Ptr pMessage = new Object;
+			pMessage->set("role", "user");
+			pMessage->set("content", pText);
+			Array::Ptr pMessages = new Array;
+			pMessages->add(pMessage);
+			return pMessages;
+		});
 	}
 
-	Object::Ptr result(const Object::Ptr& response)
+
+	Object::Ptr read(Server& server, int id, const Poco::Dynamic::Var& uri)
 	{
-		return response && response->isObject("result") ? response->getObject("result") : Object::Ptr();
+		Object::Ptr pParams = new Object;
+		pParams->set("uri", uri);
+		return server.handle(request(Id(id), "resources/read", pParams));
+	}
+
+
+	Object::Ptr getPrompt(Server& server, int id, const std::string& name, const Object::Ptr& pArgs)
+	{
+		Object::Ptr pParams = new Object;
+		pParams->set("name", name);
+		if (pArgs != nullptr) pParams->set("arguments", pArgs);
+		return server.handle(request(Id(id), "prompts/get", pParams));
 	}
 }
 
@@ -64,162 +128,188 @@ FeaturesTest::~FeaturesTest()
 }
 
 
-void FeaturesTest::testContextHandlerIdentity()
+void FeaturesTest::testResourcesList()
 {
 	Server server;
-	server.setServerInfo("ctx-server", "1.0.0");
+	buildServer(server);
+	Array::Ptr pResources = result(server.handle(request(Id(1), "resources/list")))->getArray("resources");
+	assertEqual(3u, static_cast<unsigned>(pResources->size()));
+	// In URI order.
+	assertEqual(std::string("test://broken"), pResources->getObject(0)->getValue<std::string>("uri"));
+	assertEqual(std::string("test://logo"), pResources->getObject(1)->getValue<std::string>("uri"));
+	Object::Ptr pReadme = pResources->getObject(2);
+	assertEqual(std::string("readme"), pReadme->getValue<std::string>("name"));
+	assertEqual(std::string("Read me"), pReadme->getValue<std::string>("title"));
+	assertEqual(std::string("text/plain"), pReadme->getValue<std::string>("mimeType"));
+}
 
-	// A context-aware tool that echoes back the caller's principal.
-	Tool whoami;
-	whoami.name = "whoami";
-	whoami.description = "Returns the caller principal.";
-	whoami.inputSchema = new Object;
-	whoami.contextHandler = [](const Object::Ptr&, const RequestContext& ctx)
+
+void FeaturesTest::testResourceReadText()
+{
+	Server server;
+	buildServer(server);
+	Object::Ptr pResult = result(read(server, 1, std::string("test://readme")));
+	assertEqual(std::string("complete"), pResult->getValue<std::string>("resultType"));
+	assertTrue(pResult->has("ttlMs"));
+	Object::Ptr pContents = pResult->getArray("contents")->getObject(0);
+	// The URI and the media type default to those of the registration.
+	assertEqual(std::string("test://readme"), pContents->getValue<std::string>("uri"));
+	assertEqual(std::string("text/plain"), pContents->getValue<std::string>("mimeType"));
+	assertEqual(std::string("Hello, stranger"), pContents->getValue<std::string>("text"));
+	assertTrue(!pContents->has("blob"));
+}
+
+
+void FeaturesTest::testResourceReadBlob()
+{
+	Server server;
+	buildServer(server);
+	Object::Ptr pContents = result(read(server, 1, std::string("test://logo")))->getArray("contents")->getObject(0);
+	assertEqual(std::string("iVBORw0KGgo="), pContents->getValue<std::string>("blob"));
+	assertEqual(std::string("image/png"), pContents->getValue<std::string>("mimeType"));
+	assertTrue(!pContents->has("text"));
+}
+
+
+void FeaturesTest::testResourceNotFound()
+{
+	Server server;
+	buildServer(server);
+	Object::Ptr pReply = read(server, 7, std::string("test://missing"));
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(pReply));
+	assertEqual(7, pReply->getValue<int>("id"));
+	assertEqual(std::string("test://missing"), pReply->getObject("error")->getObject("data")->getValue<std::string>("uri"));
+
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(read(server, 8, 5)));
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(server.handle(request(Id(9), "resources/read"))));
+}
+
+
+void FeaturesTest::testResourceReaderThrows()
+{
+	Server server;
+	buildServer(server);
+	Object::Ptr pReply = read(server, 3, std::string("test://broken"));
+	assertEqual(code(ErrorCode::INTERNAL_ERROR), errorCode(pReply));
+	assertEqual(3, pReply->getValue<int>("id"));
+	assertTrue(pReply->getObject("error")->getValue<std::string>("message").find("disk on fire") != std::string::npos);
+}
+
+
+void FeaturesTest::testResourceTemplatesEmpty()
+{
+	Server server;
+	buildServer(server);
+	Object::Ptr pResult = result(server.handle(request(Id(1), "resources/templates/list")));
+	assertEqual(0u, static_cast<unsigned>(pResult->getArray("resourceTemplates")->size()));
+	assertTrue(pResult->has("cacheScope"));
+}
+
+
+void FeaturesTest::testPromptsList()
+{
+	Server server;
+	buildServer(server);
+	Array::Ptr pPrompts = result(server.handle(request(Id(1), "prompts/list")))->getArray("prompts");
+	assertEqual(1u, static_cast<unsigned>(pPrompts->size()));
+	Object::Ptr pGreet = pPrompts->getObject(0);
+	assertEqual(std::string("greet"), pGreet->getValue<std::string>("name"));
+	assertEqual(std::string("Greeting"), pGreet->getValue<std::string>("title"));
+	Array::Ptr pArguments = pGreet->getArray("arguments");
+	assertEqual(2u, static_cast<unsigned>(pArguments->size()));
+	assertTrue(pArguments->getObject(0)->getValue<bool>("required"));
+	assertTrue(!pArguments->getObject(1)->getValue<bool>("required"));
+}
+
+
+void FeaturesTest::testPromptGet()
+{
+	Server server;
+	buildServer(server);
+	Object::Ptr pArgs = new Object;
+	pArgs->set("who", "world");
+	Object::Ptr pResult = result(getPrompt(server, 1, "greet", pArgs));
+	assertEqual(std::string("complete"), pResult->getValue<std::string>("resultType"));
+	assertEqual(std::string("Greets someone."), pResult->getValue<std::string>("description"));
+	assertTrue(!pResult->has("ttlMs"));
+	Object::Ptr pMessage = pResult->getArray("messages")->getObject(0);
+	assertEqual(std::string("user"), pMessage->getValue<std::string>("role"));
+	assertEqual(std::string("Hello world plainly"), pMessage->getObject("content")->getValue<std::string>("text"));
+}
+
+
+void FeaturesTest::testPromptArgumentErrors()
+{
+	Server server;
+	buildServer(server);
+
+	// The required argument is missing.
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(getPrompt(server, 1, "greet", nullptr)));
+	Object::Ptr pArgs = new Object;
+	pArgs->set("mood", "warmly");
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(getPrompt(server, 2, "greet", pArgs)));
+
+	// Argument values are strings.
+	pArgs = new Object;
+	pArgs->set("who", 42);
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(getPrompt(server, 3, "greet", pArgs)));
+
+	// Unknown prompt, and a name that is not a string.
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(getPrompt(server, 4, "nope", nullptr)));
+	Object::Ptr pParams = new Object;
+	pParams->set("name", true);
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(server.handle(request(Id(5), "prompts/get", pParams))));
+}
+
+
+void FeaturesTest::testCursorRefused()
+{
+	// Every list comes in one page, so no cursor is valid, the empty one included.
+	Server server;
+	buildServer(server);
+	const char* methods[] = {"tools/list", "resources/list", "resources/templates/list", "prompts/list"};
+	int id = 1;
+	for (const char* method: methods)
 	{
-		ToolResult r;
-		r.addText(ctx.identity.principal);
-		return r;
-	};
-	server.registerTool(whoami);
-	initialize(server);
-
-	Object::Ptr params = new Object;
-	params->set("name", "whoami");
-	params->set("arguments", Object::Ptr(new Object));
-
-	RequestContext ctx;
-	ctx.identity.principal = "alice";
-	ctx.identity.authenticated = true;
-
-	Object::Ptr response = server.handleMessage(Request::make(Id(2), "tools/call", params), ctx);
-	Object::Ptr res = result(response);
-	assertTrue(!res.isNull());
-	Array::Ptr content = res->getArray("content");
-	assertTrue(!content.isNull() && content->size() == 1);
-	assertEqual(std::string("alice"), content->getObject(0)->getValue<std::string>("text"));
+		Object::Ptr pParams = new Object;
+		pParams->set("cursor", "");
+		assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(server.handle(request(Id(id++), method, pParams))));
+	}
 }
 
 
-void FeaturesTest::testStructuredContent()
-{
-	ToolResult r;
-	Object::Ptr structured = new Object;
-	structured->set("rows", 3);
-	r.addText("{\"rows\":3}");
-	r.setStructuredContent(structured);
-
-	Object::Ptr o = r.toObject();
-	assertTrue(o->isObject("structuredContent"));
-	assertEqual(3, o->getObject("structuredContent")->getValue<int>("rows"));
-	// The text block is preserved for backwards compatibility.
-	assertTrue(o->isArray("content") && o->getArray("content")->size() == 1);
-
-	// Round-trips through fromObject.
-	ToolResult parsed = ToolResult::fromObject(o);
-	assertEqual(3, parsed.toObject()->getObject("structuredContent")->getValue<int>("rows"));
-}
-
-
-void FeaturesTest::testResources()
+void FeaturesTest::testRegistrationRefused()
 {
 	Server server;
-	server.setServerInfo("res-server", "1.0.0");
-
-	Resource doc;
-	doc.uri = "test://doc";
-	doc.name = "Doc";
-	doc.description = "A test document";
-	doc.mimeType = "text/markdown";
-	server.registerResource(doc, [](const std::string& uri) { return "# " + uri; });
-	initialize(server);
-
-	// initialize advertises the resources capability now that one is registered.
-	Object::Ptr init = result(server.handleMessage(Request::make(Id(9), "initialize",
-		Object::Ptr(new Object))));
-	assertTrue(init->getObject("capabilities")->isObject("resources"));
-
-	// resources/list
-	Object::Ptr list = result(server.handleMessage(Request::make(Id(2), "resources/list")));
-	Array::Ptr resources = list->getArray("resources");
-	assertTrue(!resources.isNull() && resources->size() == 1);
-	assertEqual(std::string("test://doc"), resources->getObject(0)->getValue<std::string>("uri"));
-
-	// resources/read
-	Object::Ptr params = new Object;
-	params->set("uri", "test://doc");
-	Object::Ptr read = result(server.handleMessage(Request::make(Id(3), "resources/read", params)));
-	Array::Ptr contents = read->getArray("contents");
-	assertTrue(!contents.isNull() && contents->size() == 1);
-	assertEqual(std::string("# test://doc"), contents->getObject(0)->getValue<std::string>("text"));
-
-	// Unknown resource is a JSON-RPC error.
-	Object::Ptr bad = new Object;
-	bad->set("uri", "test://missing");
-	Object::Ptr err = server.handleMessage(Request::make(Id(4), "resources/read", bad));
-	assertTrue(err->isObject("error"));
-}
-
-
-void FeaturesTest::testPrompts()
-{
-	Server server;
-	server.setServerInfo("prompt-server", "1.0.0");
-
-	Prompt p;
-	p.name = "greet";
-	p.description = "Greet someone";
-	p.arguments.push_back({"who", "Who to greet", true});
-	server.registerPrompt(p, [](const Object::Ptr& args)
+	Resource resource;
+	resource.name = "no uri";
+	try
 	{
-		Object::Ptr content = new Object;
-		content->set("type", "text");
-		content->set("text", "Hello " + args->optValue<std::string>("who", "world"));
-		Object::Ptr msg = new Object;
-		msg->set("role", "user");
-		msg->set("content", content);
-		Array::Ptr messages = new Array;
-		messages->add(msg);
-		return messages;
-	});
-	initialize(server);
-
-	// prompts/list includes the declared argument.
-	Object::Ptr list = result(server.handleMessage(Request::make(Id(2), "prompts/list")));
-	Array::Ptr prompts = list->getArray("prompts");
-	assertTrue(!prompts.isNull() && prompts->size() == 1);
-	Array::Ptr args = prompts->getObject(0)->getArray("arguments");
-	assertTrue(!args.isNull() && args->size() == 1);
-	assertEqual(std::string("who"), args->getObject(0)->getValue<std::string>("name"));
-
-	// prompts/get renders with the supplied argument.
-	Object::Ptr getParams = new Object;
-	getParams->set("name", "greet");
-	Object::Ptr argObj = new Object;
-	argObj->set("who", "World");
-	getParams->set("arguments", argObj);
-	Object::Ptr got = result(server.handleMessage(Request::make(Id(3), "prompts/get", getParams)));
-	Array::Ptr messages = got->getArray("messages");
-	assertTrue(!messages.isNull() && messages->size() == 1);
-	assertEqual(std::string("Hello World"),
-		messages->getObject(0)->getObject("content")->getValue<std::string>("text"));
-}
-
-
-void FeaturesTest::testToolsOnlyHasNoResourceCaps()
-{
-	// A tools-only server must not advertise resources/prompts capabilities, so
-	// existing tools-only servers are unaffected by the new registries.
-	Server server;
-	server.setServerInfo("tools-only", "1.0.0");
-	server.registerTool("noop", "Does nothing.", new Object,
-		[](Object::Ptr) { return ToolResult(); });
-
-	Object::Ptr init = result(server.handleMessage(Request::make(Id(1), "initialize",
-		Object::Ptr(new Object))));
-	Object::Ptr caps = init->getObject("capabilities");
-	assertTrue(caps->isObject("tools"));
-	assertTrue(!caps->has("resources"));
-	assertTrue(!caps->has("prompts"));
+		server.registerResource(resource, [](const std::string&, const RequestContext&) { return ResourceContents(); });
+		fail("a resource without a URI must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	resource.uri = "test://x";
+	try
+	{
+		server.registerResource(resource, Poco::AI::MCP::ResourceReader());
+		fail("a resource without a reader must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
+	Prompt prompt;
+	prompt.name = "p";
+	try
+	{
+		server.registerPrompt(prompt, Poco::AI::MCP::PromptRenderer());
+		fail("a prompt without a renderer must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
 }
 
 
@@ -237,11 +327,17 @@ CppUnit::Test* FeaturesTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FeaturesTest");
 
-	CppUnit_addTest(pSuite, FeaturesTest, testContextHandlerIdentity);
-	CppUnit_addTest(pSuite, FeaturesTest, testStructuredContent);
-	CppUnit_addTest(pSuite, FeaturesTest, testResources);
-	CppUnit_addTest(pSuite, FeaturesTest, testPrompts);
-	CppUnit_addTest(pSuite, FeaturesTest, testToolsOnlyHasNoResourceCaps);
+	CppUnit_addTest(pSuite, FeaturesTest, testResourcesList);
+	CppUnit_addTest(pSuite, FeaturesTest, testResourceReadText);
+	CppUnit_addTest(pSuite, FeaturesTest, testResourceReadBlob);
+	CppUnit_addTest(pSuite, FeaturesTest, testResourceNotFound);
+	CppUnit_addTest(pSuite, FeaturesTest, testResourceReaderThrows);
+	CppUnit_addTest(pSuite, FeaturesTest, testResourceTemplatesEmpty);
+	CppUnit_addTest(pSuite, FeaturesTest, testPromptsList);
+	CppUnit_addTest(pSuite, FeaturesTest, testPromptGet);
+	CppUnit_addTest(pSuite, FeaturesTest, testPromptArgumentErrors);
+	CppUnit_addTest(pSuite, FeaturesTest, testCursorRefused);
+	CppUnit_addTest(pSuite, FeaturesTest, testRegistrationRefused);
 
 	return pSuite;
 }

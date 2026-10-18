@@ -28,6 +28,12 @@ public:
 	void testNullId();
 	void testIdTypeFidelity();
 	void testSerializeIsSingleLine();
+	void testValidIds();
+	void testIsResponseTo();
+	void testReadMessage();
+	void testReadMessageLimit();
+	void testReadMessageNotAnObject();
+	void testWriteMessageFailure();
 
 	void setUp();
 	void tearDown();

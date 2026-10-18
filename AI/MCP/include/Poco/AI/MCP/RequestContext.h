@@ -1,16 +1,11 @@
 //
 // RequestContext.h
 //
-// Library: AIMCP
+// Library: AI/MCP
 // Package: Core
 // Module:  RequestContext
 //
-// Per-request context carried from a transport into a tool handler. The core
-// stays transport- and application-agnostic: a transport authenticates a request
-// however it likes, fills in an Identity, and the Dispatcher threads the context
-// down to the tool handler for that single call. Nothing here is stored on the
-// shared Server/Dispatcher, so concurrent requests with different identities are
-// independent.
+// Definition of the Identity and RequestContext structs.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
@@ -24,39 +19,50 @@
 
 
 #include "Poco/AI/MCP/MCP.h"
+#include "Poco/AI/MCP/Implementation.h"
+#include "Poco/JSON/Object.h"
 #include <string>
 
 
-namespace Poco {
-namespace AI {
-namespace MCP {
+namespace Poco::AI::MCP {
 
 
 struct AIMCP_API Identity
-	/// The authenticated principal behind a request, as resolved by the transport.
-	/// Generic on purpose - no token or application types leak in.
+	/// The caller of a request, as the transport authenticated it. The
+	/// library never fills it in itself: an authenticating transport sets
+	/// it, so that handlers can make authorization decisions.
 {
 	std::string principal;
-		/// The authenticated user/subject, or empty when unauthenticated.
-
+		/// The authenticated user or client, e.g. the subject of a token.
 	std::string scope;
-		/// An optional scope/role string the transport associated with the principal
-		/// (e.g. a token scope). May be empty.
-
+		/// Free-form authorization scope, e.g. the scopes of a token.
 	bool authenticated = false;
-		/// True when the transport positively authenticated the request.
+		/// Whether the transport authenticated the caller.
 };
 
 
 struct AIMCP_API RequestContext
-	/// Everything a tool handler may need to know about the request it is serving.
-	/// Passed by const reference for a single tools/call and never retained.
+	/// What a handler knows about the request it serves. The transport sets
+	/// the identity; the server adds what the request's _meta object carries,
+	/// since every request of the stateless protocol describes its client
+	/// anew.
 {
 	Identity identity;
+		/// Set by the transport.
+
+	std::string protocolVersion;
+		/// The protocol revision the request names.
+
+	Poco::JSON::Object::Ptr clientCapabilities;
+		/// The capabilities the client declared with the request; never
+		/// null within a handler.
+
+	Implementation clientInfo;
+		/// The client's name and version, if the request carried them.
 };
 
 
-} } } // namespace Poco::AI::MCP
+} // namespace Poco::AI::MCP
 
 
 #endif // AIMCP_RequestContext_INCLUDED
