@@ -14,6 +14,8 @@
 
 #include "Poco/Process.h"
 #include "Poco/Environment.h"
+#include "Poco/Exception.h"
+#include <string>
 
 
 namespace
@@ -43,6 +45,20 @@ namespace
 		envbuf[pos] = '\0';
 
 		return envbuf;
+	}
+
+	bool namesOneProcess(Poco::Process::PID pid)
+		/// Whether pid names a single process: kill() takes 0 and negative
+		/// values as process groups (POSIX), and GenerateConsoleCtrlEvent()
+		/// takes process group 0 as every process on the console (Windows).
+	{
+		return pid > 0;
+	}
+
+	void checkPID(Poco::Process::PID pid)
+	{
+		if (!namesOneProcess(pid))
+			throw Poco::InvalidArgumentException("No single process has the PID", std::to_string(pid));
 	}
 }
 
@@ -182,6 +198,7 @@ void Process::kill(ProcessHandle& handle)
 
 void Process::kill(PID pid)
 {
+	checkPID(pid);
 	killImpl(pid);
 }
 
@@ -193,13 +210,14 @@ bool Process::isRunning(const ProcessHandle& handle)
 
 bool Process::isRunning(PID pid)
 {
-	return isRunningImpl(pid);
+	return namesOneProcess(pid) && isRunningImpl(pid);
 }
 
 
-void Process::requestTermination(PID pid)
+void Process::requestTermination(PID pid, int options)
 {
-	requestTerminationImpl(pid);
+	checkPID(pid);
+	requestTerminationImpl(pid, options);
 }
 
 

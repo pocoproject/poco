@@ -23,10 +23,55 @@
 #include "Poco/Path.h"
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
+#include "Poco/Mutex.h"
 
 
 namespace
 {
+	Poco::FastMutex consoleMutex;
+		// The calling process attaches to the console of one child at a time,
+		// and not while it creates a child: a child created meanwhile would
+		// inherit that console and the standard handles it brings.
+
+	bool hasConsole()
+		/// Whether the calling process is attached to a console, with a
+		/// window or without one.
+	{
+		DWORD pid = 0;
+		return GetConsoleProcessList(&pid, 1) > 0;
+	}
+
+	void sendBreak(DWORD group)
+		/// Sends a CTRL_BREAK_EVENT to a child that was created in a process
+		/// group of its own: on the console of the calling process, which
+		/// the child shares, or, when the calling process has no console,
+		/// on the console of the child, to which the calling process attaches
+		/// for that moment. The calling process is not in the group of the
+		/// child, so the event does not reach it. Attaching to a console can
+		/// replace the standard handles of the calling process and detaching
+		/// does not restore them, so they are restored here.
+	{
+		Poco::FastMutex::ScopedLock lock(consoleMutex);
+		if (hasConsole())
+		{
+			GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, group);
+		}
+		else
+		{
+			const HANDLE stdInput = GetStdHandle(STD_INPUT_HANDLE);
+			const HANDLE stdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+			const HANDLE stdError = GetStdHandle(STD_ERROR_HANDLE);
+			if (AttachConsole(group))
+			{
+				GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, group);
+				FreeConsole();
+				SetStdHandle(STD_INPUT_HANDLE, stdInput);
+				SetStdHandle(STD_OUTPUT_HANDLE, stdOutput);
+				SetStdHandle(STD_ERROR_HANDLE, stdError);
+			}
+		}
+	}
+
 	std::vector<wchar_t> getUnicodeEnvironmentVariablesBuffer(const Poco::Process::Env& env)
 	{
 		std::vector<wchar_t> envbuf;
@@ -287,6 +332,11 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	startupInfo.cbReserved2 = 0;
 	startupInfo.lpReserved2 = nullptr;
 
+	// A termination request may attach to the console of a child for a moment
+	// (sendBreak()): the standard handles and the console are read, and the
+	// child is created, before or after that moment.
+	Poco::FastMutex::ScopedLock lock(consoleMutex);
+
 	HANDLE hProc = GetCurrentProcess();
 	bool mustInheritHandles = false;
 	if (inPipe)
@@ -371,6 +421,13 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 	PROCESS_INFORMATION processInfo;
 	DWORD creationFlags = GetConsoleWindow() ? 0 : CREATE_NO_WINDOW;
+	if (options & PROCESS_NEW_GROUP)
+	{
+		// A console control event reaches a process on the same console:
+		// the child shares the console of the parent where the parent has
+		// one, and has a console of its own, without a window, otherwise.
+		creationFlags = CREATE_NEW_PROCESS_GROUP | (hasConsole() ? 0 : CREATE_NO_WINDOW);
+	}
 	if (pEnv) creationFlags |= CREATE_UNICODE_ENVIRONMENT;
 	BOOL rc = CreateProcessW(
 		applicationName,
@@ -467,8 +524,9 @@ bool ProcessImpl::isRunningImpl(PIDImpl pid)
 }
 
 
-void ProcessImpl::requestTerminationImpl(PIDImpl pid)
+void ProcessImpl::requestTerminationImpl(PIDImpl pid, int options)
 {
+	if (options & PROCESS_NEW_GROUP) sendBreak(pid);
 	NamedEvent ev(terminationEventName(pid));
 	ev.set();
 }

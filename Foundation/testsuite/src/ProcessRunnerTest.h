@@ -33,6 +33,7 @@ public:
 	void testKillTreeWithChild();
 	void testPathResolution();
 	void testFailedStartJoinsMonitorThread();
+	void testStopNewGroup();
 
 	void setUp();
 	void tearDown();

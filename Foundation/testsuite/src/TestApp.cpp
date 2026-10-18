@@ -16,10 +16,19 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
+#include <vector>
 #include <signal.h>
 
 #include "Poco/FileStreamRWLock.h"
+#include "Poco/Event.h"
+#include "Poco/Exception.h"
+#include "Poco/File.h"
+#include "Poco/Process.h"
+#include "Poco/ProcessOptions.h"
+#include "Poco/Stopwatch.h"
+#include "Poco/Thread.h"
 
 #if defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/Thread.h"
@@ -238,6 +247,147 @@ HANDLE openFileWithRWAccess(const std::string& path)
 }
 #endif
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+Poco::Event breakArrived;
+
+
+BOOL WINAPI breakHandler(DWORD ctrlType)
+{
+	if (ctrlType != CTRL_BREAK_EVENT && ctrlType != CTRL_C_EVENT) return FALSE;
+	breakArrived.set();
+	return TRUE;
+}
+#endif
+
+
+int waitForBreak(const std::string& readyPath)
+	/// Exits with 42 when a CTRL_BREAK_EVENT (Windows) or SIGINT (POSIX)
+	/// arrives, the request to end a console program understands. The ready
+	/// file is written once that request is waited for.
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	SetConsoleCtrlHandler(breakHandler, TRUE);
+	{
+		std::ofstream ready(readyPath);
+		ready << "ready";
+	}
+	return breakArrived.tryWait(60000) ? 42 : 1;
+#elif defined(POCO_OS_FAMILY_UNIX)
+	sigset_t sset;
+	sigemptyset(&sset);
+	sigaddset(&sset, SIGINT);
+	sigprocmask(SIG_BLOCK, &sset, nullptr);
+	{
+		std::ofstream ready(readyPath);
+		ready << "ready";
+	}
+	int sig = 0;
+	sigwait(&sset, &sig);
+	return sig == SIGINT ? 42 : 1;
+#else
+	return 1;
+#endif
+}
+
+
+int breakOwnChild(const std::string& self, const std::string& readyPath)
+	/// Without a console of its own, starts a child that waits for the
+	/// request to end, asks it to end, and exits with its exit code, or with
+	/// 3 if its own standard handles were not the same afterwards (Windows).
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	FreeConsole();
+	// Standard handles of its own, as a program without a console sets them.
+	HANDLE readEnd = nullptr;
+	HANDLE writeEnd = nullptr;
+	if (!CreatePipe(&readEnd, &writeEnd, nullptr, 0)) return 4;
+	SetStdHandle(STD_INPUT_HANDLE, readEnd);
+	SetStdHandle(STD_OUTPUT_HANDLE, writeEnd);
+	SetStdHandle(STD_ERROR_HANDLE, writeEnd);
+#endif
+	Poco::Process::Args args;
+	args.push_back("-wait-break");
+	args.push_back(readyPath);
+	Poco::ProcessHandle child = Poco::Process::launch(self, args, Poco::PROCESS_NEW_GROUP);
+	Poco::Stopwatch sw;
+	sw.start();
+	while (!Poco::File(readyPath).exists())
+	{
+		if (sw.elapsedSeconds() > 30)
+		{
+			Poco::Process::kill(child);
+			return 2;
+		}
+		Poco::Thread::sleep(10);
+	}
+	Poco::Process::requestTermination(child.id(), Poco::PROCESS_NEW_GROUP);
+	const int rc = child.wait();
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	const bool kept = GetStdHandle(STD_INPUT_HANDLE) == readEnd
+		&& GetStdHandle(STD_OUTPUT_HANDLE) == writeEnd
+		&& GetStdHandle(STD_ERROR_HANDLE) == writeEnd;
+	CloseHandle(readEnd);
+	CloseHandle(writeEnd);
+	if (!kept) return 3;
+#endif
+	return rc;
+}
+
+
+int signalInvalidPids()
+	/// Exits with 42 if Process::kill() and Process::requestTermination()
+	/// refuse a PID that names no single process, and Process::isRunning()
+	/// takes it as not running. Meant to run in a process group of its own,
+	/// which a signal sent to that group anyway would reach alone.
+{
+	std::vector<Poco::Process::PID> pids;
+	pids.push_back(0);
+#if defined(POCO_OS_FAMILY_UNIX)
+	pids.push_back(-Poco::Process::id()); // its own process group
+#endif
+	for (const auto pid: pids)
+	{
+		if (Poco::Process::isRunning(pid)) return 1;
+		try
+		{
+			Poco::Process::requestTermination(pid);
+			return 2;
+		}
+		catch (Poco::InvalidArgumentException&)
+		{
+		}
+		try
+		{
+			Poco::Process::kill(pid);
+			return 3;
+		}
+		catch (Poco::InvalidArgumentException&)
+		{
+		}
+	}
+	return 42;
+}
+
+
+int breakOwnChildWithoutStdHandles(const std::string& self, const std::string& readyPath)
+	/// Runs breakOwnChild() in a child that inherits no standard handles, and
+	/// exits with its exit code. On Windows, that child starts without
+	/// STARTF_USESTDHANDLES, whose standard handles attaching to a console
+	/// replaces.
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	SetStdHandle(STD_INPUT_HANDLE, nullptr);
+	SetStdHandle(STD_OUTPUT_HANDLE, nullptr);
+	SetStdHandle(STD_ERROR_HANDLE, nullptr);
+#endif
+	Poco::Process::Args args;
+	args.push_back("-break-own-child");
+	args.push_back(readyPath);
+	Poco::ProcessHandle child = Poco::Process::launch(self, args);
+	return child.wait();
+}
+
+
 int main(int argc, char** argv)
 {
 	if (argc > 1)
@@ -268,6 +418,22 @@ int main(int argc, char** argv)
 		{
 			signal(SIGINT, SIG_DFL);
 			raise(SIGINT);
+		}
+		else if (arg == "-wait-break" && argc > 2)
+		{
+			return waitForBreak(argv[2]);
+		}
+		else if (arg == "-break-own-child" && argc > 2)
+		{
+			return breakOwnChild(argv[0], argv[2]);
+		}
+		else if (arg == "-break-own-child-without-std-handles" && argc > 2)
+		{
+			return breakOwnChildWithoutStdHandles(argv[0], argv[2]);
+		}
+		else if (arg == "-signal-invalid-pids")
+		{
+			return signalInvalidPids();
 		}
 		else if (arg == "-echo-args")
 		{
