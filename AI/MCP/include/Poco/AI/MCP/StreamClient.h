@@ -41,15 +41,17 @@ class AIMCP_API StreamClient: public Client
 public:
 	StreamClient(std::istream& in, std::ostream& out, std::size_t maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE);
 		/// Creates a client that writes its requests to out and reads the
-		/// replies from in. A line longer than maxMessageSize bytes is passed
-		/// over. Both streams must outlive the client.
+		/// replies from in. A line longer than maxMessageSize bytes fails the
+		/// request it arrives during: it may be the reply. Both streams must
+		/// outlive the client.
 
 	~StreamClient() override;
 		/// Destroys the client.
 
 protected:
 	Poco::JSON::Object::Ptr exchange(const Poco::JSON::Object::Ptr& request) override;
-		/// Throws Poco::IOException when the stream ends before the reply.
+		/// Throws Poco::IOException when the stream ends before the reply, and
+		/// Poco::ProtocolException for a line longer than the size limit.
 
 private:
 	std::istream& _in;

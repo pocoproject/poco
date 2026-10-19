@@ -23,7 +23,7 @@
 #include "Poco/AI/AI.h"
 #include "Poco/AI/Cancellation.h"
 #include "Poco/AI/MCP/Tool.h"
-#include "Poco/AI/MCP/Content.h"
+#include "Poco/AI/MCP/ToolResult.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include <functional>

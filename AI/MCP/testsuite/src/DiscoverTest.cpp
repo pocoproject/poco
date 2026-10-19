@@ -51,6 +51,28 @@ namespace
 	}
 
 
+	void addResourceAndPrompt(Server& server)
+		/// A resource and a prompt, so that their capabilities are advertised.
+	{
+		Poco::AI::MCP::Resource resource;
+		resource.uri = "doc://readme";
+		resource.name = "readme";
+		server.registerResource(resource, [](const std::string& uri, const Poco::AI::MCP::RequestContext&)
+		{
+			Poco::AI::MCP::ResourceContents contents;
+			contents.uri = uri;
+			contents.text = "read me";
+			return contents;
+		});
+		Poco::AI::MCP::Prompt prompt;
+		prompt.name = "greet";
+		server.registerPrompt(prompt, [](const Object::Ptr&, const Poco::AI::MCP::RequestContext&)
+		{
+			return Poco::JSON::Array::Ptr(new Poco::JSON::Array);
+		});
+	}
+
+
 	Implementation info(const std::string& name)
 	{
 		Implementation impl;
@@ -142,10 +164,19 @@ void DiscoverTest::testServerInfoOnEveryResult()
 {
 	Server server;
 	addEcho(server);
+	addResourceAndPrompt(server);
 
-	// Without server info, results carry no _meta.
+	// By default the server reports this library.
 	Object::Ptr pResult = result(server.handle(request(Id(1), "tools/list")));
 	assertEqual(std::string("complete"), pResult->getValue<std::string>("resultType"));
+	Object::Ptr pLibrary = pResult->getObject("_meta")->getObject(Poco::AI::MCP::META_SERVER_INFO);
+	assertEqual(Implementation::library().name, pLibrary->getValue<std::string>("name"));
+	assertEqual(Implementation::library().version, pLibrary->getValue<std::string>("version"));
+	assertTrue(!Implementation::library().version.empty());
+
+	// Told not to, results carry no _meta.
+	server.setServerInfo(Implementation());
+	pResult = result(server.handle(request(Id(2), "tools/list")));
 	assertTrue(!pResult->has("_meta"));
 
 	server.setServerInfo(info("everywhere"));
@@ -171,6 +202,7 @@ void DiscoverTest::testCacheHints()
 {
 	Server server;
 	addEcho(server);
+	addResourceAndPrompt(server);
 
 	Object::Ptr pResult = result(server.handle(request(Id(1), "tools/list")));
 	assertEqual(0, pResult->getValue<int>("ttlMs"));
@@ -265,6 +297,16 @@ void DiscoverTest::testInitializeRefused()
 	Object::Ptr pData = pReply->getObject("error")->getObject("data");
 	assertEqual(std::string(Poco::AI::MCP::PROTOCOL_VERSION), pData->getArray("supported")->getElement<std::string>(0));
 	assertEqual(std::string("2025-06-18"), pData->getValue<std::string>("requested"));
+	// The message names the revision too, for a client that shows only it.
+	assertTrue(pReply->getObject("error")->getValue<std::string>("message").find(Poco::AI::MCP::PROTOCOL_VERSION) != std::string::npos);
+
+	// An initialize that names no revision is told the same, with an empty
+	// requested revision.
+	pReply = server.handle(parse("{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":\"initialize\",\"params\":{}}"));
+	assertEqual(code(ErrorCode::UNSUPPORTED_PROTOCOL_VERSION), errorCode(pReply));
+	pData = pReply->getObject("error")->getObject("data");
+	assertTrue(pData->has("requested"));
+	assertEqual(std::string(""), pData->getValue<std::string>("requested"));
 
 	// ping went with the handshake.
 	assertEqual(code(ErrorCode::METHOD_NOT_FOUND), errorCode(server.handle(request(Id(2), "ping"))));
@@ -288,7 +330,7 @@ void DiscoverTest::testInvalidIds()
 		Object::Ptr pReply = server.handle(parse(text));
 		assertTrue(!pReply.isNull());
 		assertEqual(code(ErrorCode::INVALID_REQUEST), errorCode(pReply));
-		assertTrue(pReply->isNull("id"));
+		assertTrue(!pReply->has("id"));
 	}
 
 	// String ids are echoed as strings.
@@ -307,11 +349,25 @@ void DiscoverTest::testNotificationsGetNoReply()
 	assertTrue(server.handle(Request::makeNotification("notifications/cancelled", pParams)).isNull());
 	assertTrue(server.handle(Request::makeNotification("notifications/initialized")).isNull());
 	assertTrue(server.handle(Request::makeNotification("anything/else")).isNull());
-	// A malformed notification gets no reply either.
-	assertTrue(server.handle(parse("{\"jsonrpc\":\"2.0\",\"method\":42}")).isNull());
-	assertTrue(server.handle(parse("{\"jsonrpc\":\"1.0\",\"method\":\"tools/list\"}")).isNull());
-	// A malformed request does.
-	assertEqual(code(ErrorCode::INVALID_REQUEST), errorCode(server.handle(parse("{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":42}"))));
+	// A message without an id that is not a valid notification is an
+	// invalid request, answered without an id.
+	const char* malformed[] = {
+		"{\"jsonrpc\":\"2.0\",\"method\":42}",
+		"{\"jsonrpc\":\"1.0\",\"method\":\"tools/list\"}",
+		"{\"method\":\"tools/list\"}",
+		"{\"jsonrpc\":\"2.0\"}"
+	};
+	for (const char* text: malformed)
+	{
+		Object::Ptr pReply = server.handle(parse(text));
+		assertTrue(!pReply.isNull());
+		assertEqual(code(ErrorCode::INVALID_REQUEST), errorCode(pReply));
+		assertTrue(!pReply->has("id"));
+	}
+	// So is a malformed request, with its id.
+	Object::Ptr pReply = server.handle(parse("{\"jsonrpc\":\"2.0\",\"id\":3,\"method\":42}"));
+	assertEqual(code(ErrorCode::INVALID_REQUEST), errorCode(pReply));
+	assertEqual(3, pReply->getValue<int>("id"));
 	assertEqual(code(ErrorCode::INVALID_REQUEST), errorCode(server.handle(Object::Ptr())));
 }
 
@@ -323,6 +379,37 @@ void DiscoverTest::testUnknownMethod()
 	Object::Ptr pReply = server.handle(request(Id(9), "subscriptions/listen"));
 	assertEqual(code(ErrorCode::METHOD_NOT_FOUND), errorCode(pReply));
 	assertEqual(9, pReply->getValue<int>("id"));
+}
+
+
+void DiscoverTest::testUnadvertisedCapabilities()
+{
+	// The methods of a capability server/discover does not advertise are
+	// not found.
+	Server server;
+	addEcho(server);
+	Object::Ptr pCapabilities = result(server.handle(request(Id(1), "server/discover")))->getObject("capabilities");
+	assertTrue(!pCapabilities->has("resources"));
+	assertTrue(!pCapabilities->has("prompts"));
+	Object::Ptr pRead = new Object;
+	pRead->set("uri", "doc://readme");
+	Object::Ptr pGet = new Object;
+	pGet->set("name", "greet");
+	assertEqual(code(ErrorCode::METHOD_NOT_FOUND), errorCode(server.handle(request(Id(2), "resources/list"))));
+	assertEqual(code(ErrorCode::METHOD_NOT_FOUND), errorCode(server.handle(request(Id(3), "resources/templates/list"))));
+	assertEqual(code(ErrorCode::METHOD_NOT_FOUND), errorCode(server.handle(request(Id(4), "resources/read", pRead))));
+	assertEqual(code(ErrorCode::METHOD_NOT_FOUND), errorCode(server.handle(request(Id(5), "prompts/list"))));
+	assertEqual(code(ErrorCode::METHOD_NOT_FOUND), errorCode(server.handle(request(Id(6), "prompts/get", pGet))));
+
+	addResourceAndPrompt(server);
+	pCapabilities = result(server.handle(request(Id(7), "server/discover")))->getObject("capabilities");
+	assertTrue(pCapabilities->has("resources"));
+	assertTrue(pCapabilities->has("prompts"));
+	assertTrue(!result(server.handle(request(Id(8), "resources/list"))).isNull());
+	assertTrue(!result(server.handle(request(Id(9), "resources/templates/list"))).isNull());
+	assertTrue(!result(server.handle(request(Id(10), "resources/read", pRead))).isNull());
+	assertTrue(!result(server.handle(request(Id(11), "prompts/list"))).isNull());
+	assertTrue(!result(server.handle(request(Id(12), "prompts/get", pGet))).isNull());
 }
 
 
@@ -386,6 +473,7 @@ CppUnit::Test* DiscoverTest::suite()
 	CppUnit_addTest(pSuite, DiscoverTest, testInvalidIds);
 	CppUnit_addTest(pSuite, DiscoverTest, testNotificationsGetNoReply);
 	CppUnit_addTest(pSuite, DiscoverTest, testUnknownMethod);
+	CppUnit_addTest(pSuite, DiscoverTest, testUnadvertisedCapabilities);
 	CppUnit_addTest(pSuite, DiscoverTest, testContextFromMeta);
 
 	return pSuite;

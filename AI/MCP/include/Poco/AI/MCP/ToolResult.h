@@ -1,9 +1,9 @@
 //
-// Content.h
+// ToolResult.h
 //
 // Library: AI/MCP
 // Package: Core
-// Module:  Content
+// Module:  ToolResult
 //
 // Definition of the ToolResult class.
 //
@@ -14,8 +14,8 @@
 //
 
 
-#ifndef AIMCP_Content_INCLUDED
-#define AIMCP_Content_INCLUDED
+#ifndef AIMCP_ToolResult_INCLUDED
+#define AIMCP_ToolResult_INCLUDED
 
 
 #include "Poco/AI/MCP/MCP.h"
@@ -125,4 +125,4 @@ inline const Poco::Dynamic::Var& ToolResult::structuredContent() const
 } // namespace Poco::AI::MCP
 
 
-#endif // AIMCP_Content_INCLUDED
+#endif // AIMCP_ToolResult_INCLUDED

@@ -144,7 +144,9 @@ void ToolsTest::testSchemasAreCopied()
 void ToolsTest::testConcurrentReplies()
 {
 	// Replies serialized on several threads at once share no JSON object, so
-	// each serialization equals the one made alone.
+	// each serialization equals the one made alone. A shared schema object
+	// rarely shows here as a wrong reply: the data race it causes is what
+	// ThreadSanitizer reports, so the test catches it only in a TSan build.
 	Server server;
 	Object::Ptr pSchema = parse("{\"type\":\"object\",\"properties\":{\"text\":{\"type\":\"string\",\"description\":\"caf\\u00e9 \\u20ac \\u65e5\"}}}");
 	server.registerTool("unicode", "Unicode in the schema.", pSchema, [](const Object::Ptr&) { return ToolResult(); });
@@ -248,6 +250,20 @@ void ToolsTest::testRegistrationRefused()
 	}
 	catch (const Poco::InvalidArgumentException&)
 	{
+	}
+
+	// An input schema must describe an object.
+	const char* schemas[] = {"{}", "{\"type\":\"string\"}", "{\"type\":[\"object\",\"null\"]}"};
+	for (const char* schema: schemas)
+	{
+		try
+		{
+			server.registerTool("bad-schema", "", parse(schema), [](const Object::Ptr&) { return ToolResult(); });
+			fail(std::string("an input schema that is not of type object must be refused: ") + schema);
+		}
+		catch (const Poco::InvalidArgumentException&)
+		{
+		}
 	}
 	assertEqual(0u, static_cast<unsigned>(result(server.handle(request(Id(1), "tools/list")))->getArray("tools")->size()));
 }

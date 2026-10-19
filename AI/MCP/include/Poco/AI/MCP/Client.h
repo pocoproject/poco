@@ -22,7 +22,7 @@
 #include "Poco/AI/MCP/Message.h"
 #include "Poco/AI/MCP/Tool.h"
 #include "Poco/AI/MCP/Resource.h"
-#include "Poco/AI/MCP/Content.h"
+#include "Poco/AI/MCP/ToolResult.h"
 #include "Poco/AI/MCP/Implementation.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/Mutex.h"
@@ -60,6 +60,19 @@ class AIMCP_API Client
 	/// reply becomes an MCPException with the error's code. Lists are fetched
 	/// page by page up to a page limit.
 	///
+	/// The specification asks a client to send server/discover first: call
+	/// discover() before any other request. A server of an earlier revision
+	/// answers it with an error (METHOD_NOT_FOUND, for instance), or with a
+	/// result that does not list 2026-07-28, which discover() reports as an
+	/// MCPException with code UNSUPPORTED_PROTOCOL_VERSION. Requests sent
+	/// without it reach such a server and fail in its own terms.
+	///
+	/// A tools/call, resources/read or prompts/get the server answers with an
+	/// input_required result that asks for no input (under load, for instance)
+	/// is sent again, with a new id and the server's requestState, up to a
+	/// limit of rounds. The client declares no capabilities, so a server must
+	/// not ask it for input; one that does gets a Poco::ProtocolException.
+	///
 	/// Calls are serialized: a client runs one request at a time, whichever
 	/// thread calls it.
 	///
@@ -70,12 +83,18 @@ public:
 	static constexpr int DEFAULT_MAX_PAGES = 100;
 		/// The default limit of pages a list call fetches.
 
+	static constexpr int DEFAULT_MAX_INPUT_ROUNDS = 8;
+		/// The default limit of times a request is sent while the server
+		/// answers it with input_required.
+
 	virtual ~Client();
 		/// Destroys the client.
 
 	void setClientInfo(const Implementation& info);
-		/// Sets the name and version the client sends with every request.
-		/// Without a name, requests carry no client info.
+		/// Sets the name and version the client sends with every request,
+		/// Implementation::library() by default. Without a name, requests carry
+		/// no client info; the specification asks a client to send it unless it
+		/// is told not to.
 
 	[[nodiscard]] Implementation getClientInfo() const;
 		/// Returns the client info.
@@ -93,11 +112,21 @@ public:
 	[[nodiscard]] int getMaxPages() const;
 		/// Returns how many pages a list call fetches at most.
 
+	void setMaxInputRounds(int maxRounds);
+		/// Sets how many times a request is sent at most while the server
+		/// answers it with input_required.
+
+	[[nodiscard]] int getMaxInputRounds() const;
+		/// Returns how many times a request is sent at most while the server
+		/// answers it with input_required.
+
 	[[nodiscard]] ServerDescription discover();
 		/// Sends server/discover.
 		///
 		/// Throws MCPException with code UNSUPPORTED_PROTOCOL_VERSION if the
-		/// server does not implement this client's protocol revision.
+		/// server does not implement this client's protocol revision, and
+		/// Poco::ProtocolException if the result has no supportedVersions array
+		/// of strings.
 
 	[[nodiscard]] std::vector<Tool> listTools();
 		/// Returns the server's tools, all pages. Entries without a name or an
@@ -122,22 +151,24 @@ public:
 
 	[[nodiscard]] Poco::JSON::Object::Ptr call(const std::string& method, const Poco::JSON::Object::Ptr& params = nullptr);
 		/// Sends a request and returns its result object; for methods the
-		/// class does not wrap. The client adds the _meta object to a copy of
-		/// params.
+		/// class does not wrap. The request carries a copy of params whose
+		/// _meta object keeps what the caller put in it (a progressToken, for
+		/// instance) and gets the protocol revision, the client capabilities
+		/// and the client info from the client.
 		///
 		/// Throws MCPException for an error reply, Poco::ProtocolException for
-		/// a reply that breaks the protocol, and the transport's exceptions,
-		/// e.g. Poco::TimeoutException.
+		/// a reply that breaks the protocol, Poco::InvalidArgumentException if
+		/// params has a _meta member that is not an object, and the transport's
+		/// exceptions, e.g. Poco::TimeoutException.
 
 protected:
 	Client();
 		/// Creates the client.
 
 	virtual Poco::JSON::Object::Ptr exchange(const Poco::JSON::Object::Ptr& request) = 0;
-		/// Sends the request and returns its reply: the response with the
-		/// request's id, or an error response with a null id. Messages the
-		/// server sends before it are passed over. Implemented by the
-		/// transport.
+		/// Sends the request and returns its reply, the first message for
+		/// which isReply() is true. Messages the server sends before it are
+		/// passed over. Implemented by the transport.
 
 	virtual void toolsListed(std::vector<Tool>& tools);
 		/// Called by listTools() with the tools of all pages before they are
@@ -146,7 +177,9 @@ protected:
 
 	[[nodiscard]] static bool isReply(const Poco::JSON::Object::Ptr& message, const Id& id);
 		/// Returns true if message is the reply to the request with the given
-		/// id: its response, or an error response with a null id.
+		/// id: a message with that id that is not a request, or an error
+		/// response without an id (or with a null one). call() refuses a reply
+		/// that has neither a result nor an error.
 
 private:
 	std::vector<Poco::JSON::Object::Ptr> listAll(const std::string& method, const std::string& key);
@@ -159,6 +192,7 @@ private:
 	Implementation _clientInfo;
 	Poco::Timespan _timeout;
 	int _maxPages;
+	int _maxInputRounds;
 	Poco::Int64 _nextId;
 };
 

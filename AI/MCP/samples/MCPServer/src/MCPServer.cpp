@@ -14,7 +14,7 @@
 
 #include "Poco/AI/MCP/Server.h"
 #include "Poco/AI/MCP/StreamClient.h"
-#include "Poco/AI/MCP/Content.h"
+#include "Poco/AI/MCP/ToolResult.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"

@@ -54,12 +54,12 @@ namespace
 	{
 		if (value.type() == typeid(Poco::JSON::Object::Ptr))
 		{
-			const Poco::JSON::Object::Ptr pObject = value.extract<Poco::JSON::Object::Ptr>();
+			const Poco::JSON::Object::Ptr& pObject = value.extract<Poco::JSON::Object::Ptr>();
 			return pObject.isNull() ? value : Poco::Dynamic::Var(copyObject(*pObject));
 		}
 		if (value.type() == typeid(Poco::JSON::Array::Ptr))
 		{
-			const Poco::JSON::Array::Ptr pArray = value.extract<Poco::JSON::Array::Ptr>();
+			const Poco::JSON::Array::Ptr& pArray = value.extract<Poco::JSON::Array::Ptr>();
 			return pArray.isNull() ? value : Poco::Dynamic::Var(copyArray(*pArray));
 		}
 		if (value.type() == typeid(Poco::JSON::Object))

@@ -29,22 +29,23 @@ namespace Poco::AI::MCP {
 
 namespace
 {
-	Poco::JSON::Object::Ptr invalidParams(const Id& id, const std::string& message, Poco::JSON::Object::Ptr pData = nullptr)
+	Poco::JSON::Object::Ptr invalidParams(const Id& id, const std::string& message, const Poco::JSON::Object::Ptr& pData = nullptr)
 	{
 		return Response::error(id, ErrorCode::INVALID_PARAMS, message, pData);
 	}
 
 
 	Poco::JSON::Object::Ptr unsupportedVersion(const Id& id, const Poco::Dynamic::Var& requested)
-		/// The error that names the supported revision and, when it is a
-		/// string, the one the request asked for.
+		/// The error that names the supported revision, in its message and in
+		/// its data, and the one the request asked for: empty when it named
+		/// none.
 	{
 		Poco::JSON::Array::Ptr pSupported = new Poco::JSON::Array;
 		pSupported->add(std::string(PROTOCOL_VERSION));
 		Poco::JSON::Object::Ptr pData = new Poco::JSON::Object;
 		pData->set("supported", pSupported);
-		if (requested.isString()) pData->set("requested", requested);
-		return Response::error(id, ErrorCode::UNSUPPORTED_PROTOCOL_VERSION, "Unsupported protocol version", pData);
+		pData->set("requested", requested.isString() ? requested.extract<std::string>() : std::string());
+		return Response::error(id, ErrorCode::UNSUPPORTED_PROTOCOL_VERSION, std::string("Unsupported protocol version: this server implements ") + PROTOCOL_VERSION, pData);
 	}
 
 
@@ -64,6 +65,7 @@ namespace
 
 Server::Server()
 {
+	_settings.serverInfo = Implementation::library();
 }
 
 
@@ -82,12 +84,20 @@ void Server::registerTool(const Tool& tool)
 	{
 		throw Poco::InvalidArgumentException("A tool needs a handler", tool.name);
 	}
+	if (tool.inputSchema != nullptr)
+	{
+		const Poco::Dynamic::Var type = tool.inputSchema->get("type");
+		if (!type.isString() || type.extract<std::string>() != "object")
+		{
+			throw Poco::InvalidArgumentException("The input schema of a tool must have the type object", tool.name);
+		}
+	}
 	Poco::FastMutex::ScopedLock lock(_mutex);
 	_tools[tool.name] = tool;
 }
 
 
-void Server::registerTool(const std::string& name, const std::string& description, Poco::JSON::Object::Ptr inputSchema, ToolHandler handler)
+void Server::registerTool(const std::string& name, const std::string& description, const Poco::JSON::Object::Ptr& inputSchema, ToolHandler handler)
 {
 	if (!handler)
 	{
@@ -96,7 +106,7 @@ void Server::registerTool(const std::string& name, const std::string& descriptio
 	Tool tool;
 	tool.name = name;
 	tool.description = description;
-	tool.inputSchema = std::move(inputSchema);
+	tool.inputSchema = inputSchema;
 	tool.handler = [handler = std::move(handler)](const Poco::JSON::Object::Ptr& arguments, const RequestContext&)
 	{
 		return handler(arguments);
@@ -183,15 +193,14 @@ Poco::JSON::Object::Ptr Server::handle(const Poco::JSON::Object::Ptr& message, c
 	const Poco::Dynamic::Var method = message->get("method");
 	if (message->optValue<std::string>("jsonrpc", "") != JSONRPC_VERSION || !method.isString())
 	{
-		// A malformed notification gets no reply; a malformed request an error.
-		if (!hasId) return Poco::JSON::Object::Ptr();
+		// Only a well-formed notification goes without a reply.
 		return Response::error(id, ErrorCode::INVALID_REQUEST, "Invalid Request");
 	}
 	if (!hasId)
 	{
 		return Poco::JSON::Object::Ptr();
 	}
-	const std::string name = method.extract<std::string>();
+	const std::string& name = method.extract<std::string>();
 
 	if (message->has("params") && !message->isObject("params"))
 	{
@@ -253,11 +262,26 @@ Poco::JSON::Object::Ptr Server::dispatch(const Id& id, const std::string& method
 	if (method == "server/discover") return onDiscover(id);
 	if (method == "tools/list") return onToolsList(id, params);
 	if (method == "tools/call") return onToolsCall(id, params, context);
-	if (method == "resources/list") return onResourcesList(id, params);
-	if (method == "resources/templates/list") return onResourceTemplatesList(id, params);
-	if (method == "resources/read") return onResourcesRead(id, params, context);
-	if (method == "prompts/list") return onPromptsList(id, params);
-	if (method == "prompts/get") return onPromptsGet(id, params, context);
+	bool hasResources = false;
+	bool hasPrompts = false;
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		hasResources = !_resources.empty();
+		hasPrompts = !_prompts.empty();
+	}
+	// The methods of a capability server/discover does not advertise are not
+	// found.
+	if (hasResources)
+	{
+		if (method == "resources/list") return onResourcesList(id, params);
+		if (method == "resources/templates/list") return onResourceTemplatesList(id, params);
+		if (method == "resources/read") return onResourcesRead(id, params, context);
+	}
+	if (hasPrompts)
+	{
+		if (method == "prompts/list") return onPromptsList(id, params);
+		if (method == "prompts/get") return onPromptsGet(id, params, context);
+	}
 	return Response::error(id, ErrorCode::METHOD_NOT_FOUND, "Method not found: " + method);
 }
 
@@ -313,6 +337,7 @@ Poco::JSON::Object::Ptr Server::onToolsList(const Id& id, const Poco::JSON::Obje
 	std::vector<Tool> tools;
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
+		tools.reserve(_tools.size());
 		for (const auto& entry: _tools) tools.push_back(entry.second);
 	}
 	Poco::JSON::Array::Ptr pList = new Poco::JSON::Array;
@@ -335,7 +360,7 @@ Poco::JSON::Object::Ptr Server::onToolsCall(const Id& id, const Poco::JSON::Obje
 	{
 		return invalidParams(id, "The tool arguments must be an object");
 	}
-	const std::string toolName = name.extract<std::string>();
+	const std::string& toolName = name.extract<std::string>();
 
 	ContextToolHandler handler;
 	{
@@ -372,6 +397,7 @@ Poco::JSON::Object::Ptr Server::onResourcesList(const Id& id, const Poco::JSON::
 	std::vector<Resource> resources;
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
+		resources.reserve(_resources.size());
 		for (const auto& entry: _resources) resources.push_back(entry.second.resource);
 	}
 	Poco::JSON::Array::Ptr pList = new Poco::JSON::Array;
@@ -399,7 +425,7 @@ Poco::JSON::Object::Ptr Server::onResourcesRead(const Id& id, const Poco::JSON::
 	{
 		return invalidParams(id, "The resource URI must be a string");
 	}
-	const std::string resourceURI = uri.extract<std::string>();
+	const std::string& resourceURI = uri.extract<std::string>();
 
 	ResourceReader reader;
 	std::string mimeType;
@@ -434,6 +460,7 @@ Poco::JSON::Object::Ptr Server::onPromptsList(const Id& id, const Poco::JSON::Ob
 	std::vector<Prompt> prompts;
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
+		prompts.reserve(_prompts.size());
 		for (const auto& entry: _prompts) prompts.push_back(entry.second.prompt);
 	}
 	Poco::JSON::Array::Ptr pList = new Poco::JSON::Array;
@@ -456,7 +483,7 @@ Poco::JSON::Object::Ptr Server::onPromptsGet(const Id& id, const Poco::JSON::Obj
 	{
 		return invalidParams(id, "The prompt arguments must be an object");
 	}
-	const std::string promptName = name.extract<std::string>();
+	const std::string& promptName = name.extract<std::string>();
 
 	Prompt prompt;
 	PromptRenderer renderer;

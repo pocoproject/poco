@@ -20,6 +20,7 @@ namespace Poco::AI::MCP {
 
 
 POCO_IMPLEMENT_EXCEPTION(MCPException, Poco::RuntimeException, "MCP error")
+POCO_IMPLEMENT_EXCEPTION(MessageTooLargeException, MCPException, "MCP message too large")
 
 
 } // namespace Poco::AI::MCP

@@ -31,6 +31,7 @@ public:
 	void testInvalidIds();
 	void testNotificationsGetNoReply();
 	void testUnknownMethod();
+	void testUnadvertisedCapabilities();
 	void testContextFromMeta();
 
 	void setUp();

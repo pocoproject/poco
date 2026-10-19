@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = MCPException Message Implementation Content Resource Tool Server Client StreamClient ProcessClient
+objects = MCPException Message Implementation ToolResult Resource Tool Server Client StreamClient ProcessClient
 
 target         = PocoAIMCP
 target_version = $(LIBVERSION)

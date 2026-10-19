@@ -30,6 +30,14 @@ public:
 	void testEndOfStream();
 	void testPagination();
 	void testPageLimit();
+	void testInputRequiredIsSentAgain();
+	void testInputRequiredLimit();
+	void testCallerMeta();
+	void testClientInfo();
+	void testResourcesAndPrompts();
+	void testErrorReplyWithoutId();
+	void testOversizedReply();
+	void testDiscoverMalformed();
 	void testDiscoverChecksVersion();
 
 	void setUp();

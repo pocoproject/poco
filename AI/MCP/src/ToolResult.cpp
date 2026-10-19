@@ -1,9 +1,9 @@
 //
-// Content.cpp
+// ToolResult.cpp
 //
 // Library: AI/MCP
 // Package: Core
-// Module:  Content
+// Module:  ToolResult
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
@@ -12,7 +12,7 @@
 //
 
 
-#include "Poco/AI/MCP/Content.h"
+#include "Poco/AI/MCP/ToolResult.h"
 #include "Poco/Exception.h"
 
 

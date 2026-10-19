@@ -14,6 +14,7 @@
 
 #include "Poco/AI/MCP/Message.h"
 #include "Poco/AI/MCP/MCPException.h"
+#include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/Exception.h"
@@ -69,10 +70,28 @@ namespace
 		}
 		return tooLong ? LineResult::TOO_LONG : LineResult::LINE;
 	}
+
+
+	bool isScalar(const std::string& text)
+		/// Returns true if text is one JSON value that is neither an object
+		/// nor an array, which the parser does not take on its own.
+	{
+		try
+		{
+			Poco::JSON::Parser parser;
+			const Poco::Dynamic::Var parsed = parser.parse("[" + text + "]");
+			const Poco::JSON::Array::Ptr pArray = parsed.extract<Poco::JSON::Array::Ptr>();
+			return pArray->size() == 1 && !pArray->isObject(0) && !pArray->isArray(0);
+		}
+		catch (const Poco::Exception&)
+		{
+			return false;
+		}
+	}
 }
 
 
-Poco::JSON::Object::Ptr Request::make(const Id& id, const std::string& method, Poco::JSON::Object::Ptr params)
+Poco::JSON::Object::Ptr Request::make(const Id& id, const std::string& method, const Poco::JSON::Object::Ptr& params)
 {
 	Poco::JSON::Object::Ptr pRequest = new Poco::JSON::Object;
 	pRequest->set("jsonrpc", JSONRPC_VERSION);
@@ -86,7 +105,7 @@ Poco::JSON::Object::Ptr Request::make(const Id& id, const std::string& method, P
 }
 
 
-Poco::JSON::Object::Ptr Request::makeNotification(const std::string& method, Poco::JSON::Object::Ptr params)
+Poco::JSON::Object::Ptr Request::makeNotification(const std::string& method, const Poco::JSON::Object::Ptr& params)
 {
 	Poco::JSON::Object::Ptr pNotification = new Poco::JSON::Object;
 	pNotification->set("jsonrpc", JSONRPC_VERSION);
@@ -109,7 +128,7 @@ Poco::JSON::Object::Ptr Response::result(const Id& id, const Poco::Dynamic::Var&
 }
 
 
-Poco::JSON::Object::Ptr Response::error(const Id& id, ErrorCode code, const std::string& message, Poco::JSON::Object::Ptr data)
+Poco::JSON::Object::Ptr Response::error(const Id& id, ErrorCode code, const std::string& message, const Poco::JSON::Object::Ptr& data)
 {
 	Poco::JSON::Object::Ptr pError = new Poco::JSON::Object;
 	pError->set("code", static_cast<int>(code));
@@ -121,7 +140,10 @@ Poco::JSON::Object::Ptr Response::error(const Id& id, ErrorCode code, const std:
 
 	Poco::JSON::Object::Ptr pResponse = new Poco::JSON::Object;
 	pResponse->set("jsonrpc", JSONRPC_VERSION);
-	pResponse->set("id", id);
+	if (!id.isEmpty())
+	{
+		pResponse->set("id", id);
+	}
 	pResponse->set("error", pError);
 	return pResponse;
 }
@@ -136,20 +158,25 @@ bool isValidId(const Poco::Dynamic::Var& id)
 }
 
 
-bool isResponseTo(const Poco::JSON::Object::Ptr& message, const Id& id)
+bool sameId(const Id& first, const Id& second)
 {
-	if (message == nullptr || !(message->has("result") || message->has("error"))) return false;
-	const Poco::Dynamic::Var value = message->get("id");
-	if (!isValidId(value) || !isValidId(id)) return false;
+	if (!isValidId(first) || !isValidId(second)) return false;
 	try
 	{
-		if (id.isString()) return value.isString() && value.extract<std::string>() == id.extract<std::string>();
-		return !value.isString() && value.convert<Poco::Int64>() == id.convert<Poco::Int64>();
+		if (second.isString()) return first.isString() && first.extract<std::string>() == second.extract<std::string>();
+		return !first.isString() && first.convert<Poco::Int64>() == second.convert<Poco::Int64>();
 	}
 	catch (const Poco::Exception&)
 	{
 		return false;
 	}
+}
+
+
+bool isResponseTo(const Poco::JSON::Object::Ptr& message, const Id& id)
+{
+	if (message == nullptr || !(message->has("result") || message->has("error"))) return false;
+	return sameId(message->get("id"), id);
 }
 
 
@@ -185,7 +212,7 @@ Poco::JSON::Object::Ptr readMessage(std::istream& in, std::size_t maxSize)
 		}
 		if (result == LineResult::TOO_LONG)
 		{
-			throw MCPException("Message exceeds the size limit", static_cast<int>(ErrorCode::INVALID_REQUEST));
+			throw MessageTooLargeException("Message exceeds the size limit", static_cast<int>(ErrorCode::INVALID_REQUEST));
 		}
 		if (line.find_first_not_of(" \t\r") == std::string::npos)
 		{
@@ -199,6 +226,10 @@ Poco::JSON::Object::Ptr readMessage(std::istream& in, std::size_t maxSize)
 		}
 		catch (const Poco::Exception& exc)
 		{
+			if (isScalar(line))
+			{
+				throw MCPException("Message is not a JSON object", static_cast<int>(ErrorCode::INVALID_REQUEST));
+			}
 			throw MCPException("Parse error", exc.message(), static_cast<int>(ErrorCode::PARSE_ERROR));
 		}
 		if (parsed.type() != typeid(Poco::JSON::Object::Ptr))

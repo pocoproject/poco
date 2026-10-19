@@ -13,6 +13,8 @@
 
 
 #include "Poco/AI/MCP/Implementation.h"
+#include "Poco/Environment.h"
+#include "Poco/NumberFormatter.h"
 
 
 namespace Poco::AI::MCP {
@@ -49,6 +51,19 @@ Implementation Implementation::fromObject(const Poco::JSON::Object::Ptr& object)
 	impl.title = stringMember(object, "title");
 	impl.description = stringMember(object, "description");
 	impl.websiteUrl = stringMember(object, "websiteUrl");
+	return impl;
+}
+
+
+Implementation Implementation::library()
+{
+	const Poco::UInt32 version = Poco::Environment::libraryVersion();
+	Implementation impl;
+	impl.name = "poco-ai-mcp";
+	impl.version = Poco::NumberFormatter::format((version >> 24) & 0xFF) + "."
+		+ Poco::NumberFormatter::format((version >> 16) & 0xFF) + "."
+		+ Poco::NumberFormatter::format((version >> 8) & 0xFF);
+	impl.websiteUrl = "https://pocoproject.org";
 	return impl;
 }
 

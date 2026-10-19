@@ -31,8 +31,8 @@ namespace Poco::AI::MCP {
 
 using Id = Poco::Dynamic::Var;
 	/// A JSON-RPC request id: a string or an integer. An empty Var stands for
-	/// no id: a notification, or the null id of an error reply to a message
-	/// whose id cannot be read.
+	/// no id: a notification, or an error reply to a message whose id cannot
+	/// be read.
 
 
 enum class ErrorCode
@@ -57,10 +57,10 @@ class AIMCP_API Request
 	/// Builders for outbound JSON-RPC requests and notifications.
 {
 public:
-	[[nodiscard]] static Poco::JSON::Object::Ptr make(const Id& id, const std::string& method, Poco::JSON::Object::Ptr params = nullptr);
+	[[nodiscard]] static Poco::JSON::Object::Ptr make(const Id& id, const std::string& method, const Poco::JSON::Object::Ptr& params = nullptr);
 		/// Builds a request envelope {jsonrpc, id, method, params?}.
 
-	[[nodiscard]] static Poco::JSON::Object::Ptr makeNotification(const std::string& method, Poco::JSON::Object::Ptr params = nullptr);
+	[[nodiscard]] static Poco::JSON::Object::Ptr makeNotification(const std::string& method, const Poco::JSON::Object::Ptr& params = nullptr);
 		/// Builds a notification envelope {jsonrpc, method, params?} (no id).
 };
 
@@ -72,15 +72,23 @@ public:
 	[[nodiscard]] static Poco::JSON::Object::Ptr result(const Id& id, const Poco::Dynamic::Var& result);
 		/// Builds a success envelope {jsonrpc, id, result}.
 
-	[[nodiscard]] static Poco::JSON::Object::Ptr error(const Id& id, ErrorCode code, const std::string& message, Poco::JSON::Object::Ptr data = nullptr);
-		/// Builds an error envelope {jsonrpc, id, error: {code, message, data?}}.
-		/// An empty id is written as null.
+	[[nodiscard]] static Poco::JSON::Object::Ptr error(const Id& id, ErrorCode code, const std::string& message, const Poco::JSON::Object::Ptr& data = nullptr);
+		/// Builds an error envelope {jsonrpc, id?, error: {code, message, data?}}.
+		///
+		/// An empty id is left out. That is how the MCP schema has an error
+		/// reply to a message whose id cannot be read: its id is optional and
+		/// never null, while JSON-RPC 2.0 writes null. Client accepts both.
 };
 
 
 [[nodiscard]] AIMCP_API bool isValidId(const Poco::Dynamic::Var& id);
 	/// Returns true if id is a string or an integer, the two kinds of id a
 	/// request may carry. Null, booleans, fractions, arrays and objects are not.
+
+
+[[nodiscard]] AIMCP_API bool sameId(const Id& first, const Id& second);
+	/// Returns true if both are valid ids and equal: a string id equals the
+	/// same string, an integer id the same integer.
 
 
 [[nodiscard]] AIMCP_API bool isResponseTo(const Poco::JSON::Object::Ptr& message, const Id& id);
@@ -107,9 +115,10 @@ AIMCP_API void writeMessage(std::ostream& out, const Poco::JSON::Object::Ptr& me
 	/// its newline is read as well.
 	///
 	/// Throws MCPException with code PARSE_ERROR if the line is not JSON, and
-	/// with code INVALID_REQUEST if it is JSON but not an object, or longer than
-	/// maxSize bytes; in that case the rest of the line is skipped, so the
-	/// stream stays usable.
+	/// with code INVALID_REQUEST if it is JSON but not an object (a scalar or
+	/// an array), and MessageTooLargeException (an MCPException with code
+	/// INVALID_REQUEST) if it is longer than maxSize bytes. In each case the
+	/// rest of the line is skipped, so the stream stays usable.
 
 
 } // namespace Poco::AI::MCP

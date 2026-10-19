@@ -25,7 +25,7 @@ public:
 	void testNotificationBuild();
 	void testResultRoundTrip();
 	void testErrorRoundTrip();
-	void testNullId();
+	void testUnknownId();
 	void testIdTypeFidelity();
 	void testSerializeIsSingleLine();
 	void testValidIds();

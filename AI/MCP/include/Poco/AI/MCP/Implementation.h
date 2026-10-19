@@ -49,6 +49,11 @@ struct AIMCP_API Implementation
 	[[nodiscard]] static Implementation fromObject(const Poco::JSON::Object::Ptr& object);
 		/// Reads the JSON form. Members that are missing or not strings stay
 		/// empty; a null object gives an empty Implementation.
+
+	[[nodiscard]] static Implementation library();
+		/// Returns how this library reports itself: the name poco-ai-mcp and
+		/// the version of POCO. Client and Server report it until they are
+		/// given another one.
 };
 
 

@@ -14,7 +14,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/MCP/MCP.h"
 #include "Poco/AI/MCP/Server.h"
-#include "Poco/AI/MCP/Content.h"
+#include "Poco/AI/MCP/ToolResult.h"
 #include "Poco/AI/MCP/MCPException.h"
 #include "Poco/AI/MCP/HTTP/HTTPClient.h"
 #include "Poco/AI/MCP/HTTP/EventStreamReader.h"

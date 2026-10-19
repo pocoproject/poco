@@ -31,6 +31,11 @@ POCO_DECLARE_EXCEPTION(AIMCP_API, MCPException, Poco::RuntimeException)
 	/// to the message that caused the exception would carry.
 
 
+POCO_DECLARE_EXCEPTION(AIMCP_API, MessageTooLargeException, MCPException)
+	/// A message longer than the size limit of the reader. code() is
+	/// INVALID_REQUEST, what a server replies to it.
+
+
 } // namespace Poco::AI::MCP
 
 

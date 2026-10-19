@@ -125,15 +125,16 @@ void EnvelopeTest::testErrorRoundTrip()
 }
 
 
-void EnvelopeTest::testNullId()
+void EnvelopeTest::testUnknownId()
 {
-	// A pre-dispatch error (parse error) has no request id, so id must be null.
+	// An error before the id is known (a parse error) has no id: the MCP
+	// schema leaves it out, where JSON-RPC 2.0 writes null.
 	const std::string text = Poco::AI::MCP::serialize(Response::error(Id(), ErrorCode::PARSE_ERROR, "x"));
-	assertTrue(text.find("\"id\":null") != std::string::npos);
+	assertTrue(text.find("\"id\"") == std::string::npos);
 
 	Object::Ptr resp = roundTrip(Response::error(Id(), ErrorCode::PARSE_ERROR, "x"));
-	assertTrue(resp->has("id"));
-	assertTrue(resp->isNull("id"));
+	assertTrue(!resp->has("id"));
+	assertEqual(-32700, resp->getObject("error")->getValue<int>("code"));
 }
 
 
@@ -216,16 +217,39 @@ void EnvelopeTest::testReadMessageLimit()
 	Object::Ptr pNext = Poco::AI::MCP::readMessage(in, 64);
 	assertTrue(!pNext.isNull());
 	assertEqual(1, pNext->getValue<int>("short"));
+
+	// A line of exactly the limit is read, one byte more is refused: the
+	// limit counts the line without its newline.
+	const std::string atLimit = std::string("{\"k\":\"") + std::string(56, 'x') + "\"}";
+	assertEqual(64u, static_cast<unsigned>(atLimit.size()));
+	std::istringstream exact(atLimit + "\n");
+	assertTrue(!Poco::AI::MCP::readMessage(exact, 64).isNull());
+	std::istringstream over(std::string("{\"k\":\"") + std::string(57, 'x') + "\"}\n{\"after\":1}\n");
+	try
+	{
+		(void) Poco::AI::MCP::readMessage(over, 64);
+		fail("a line one byte over the limit must be refused");
+	}
+	catch (const Poco::AI::MCP::MessageTooLargeException& exc)
+	{
+		assertEqual(static_cast<int>(ErrorCode::INVALID_REQUEST), exc.code());
+	}
+	assertEqual(1, Poco::AI::MCP::readMessage(over, 64)->getValue<int>("after"));
 }
 
 
 void EnvelopeTest::testReadMessageNotAnObject()
 {
-	std::istringstream in("not json\n[1,2]\n\"text\"\n{\"ok\":true}\n");
+	// JSON that is not an object is not a valid request (-32600); what is
+	// not JSON at all cannot be parsed (-32700).
+	std::istringstream in("not json\n[1,2]\n\"text\"\n42\ntrue\nnull\n1,2\n{\"ok\":true}\n");
 	assertEqual(static_cast<int>(ErrorCode::PARSE_ERROR), readError(in, 1024));
 	assertEqual(static_cast<int>(ErrorCode::INVALID_REQUEST), readError(in, 1024));
-	const int code = readError(in, 1024);
-	assertTrue(code == static_cast<int>(ErrorCode::INVALID_REQUEST) || code == static_cast<int>(ErrorCode::PARSE_ERROR));
+	assertEqual(static_cast<int>(ErrorCode::INVALID_REQUEST), readError(in, 1024));
+	assertEqual(static_cast<int>(ErrorCode::INVALID_REQUEST), readError(in, 1024));
+	assertEqual(static_cast<int>(ErrorCode::INVALID_REQUEST), readError(in, 1024));
+	assertEqual(static_cast<int>(ErrorCode::INVALID_REQUEST), readError(in, 1024));
+	assertEqual(static_cast<int>(ErrorCode::PARSE_ERROR), readError(in, 1024));
 	assertTrue(Poco::AI::MCP::readMessage(in)->getValue<bool>("ok"));
 }
 
@@ -263,7 +287,7 @@ CppUnit::Test* EnvelopeTest::suite()
 	CppUnit_addTest(pSuite, EnvelopeTest, testNotificationBuild);
 	CppUnit_addTest(pSuite, EnvelopeTest, testResultRoundTrip);
 	CppUnit_addTest(pSuite, EnvelopeTest, testErrorRoundTrip);
-	CppUnit_addTest(pSuite, EnvelopeTest, testNullId);
+	CppUnit_addTest(pSuite, EnvelopeTest, testUnknownId);
 	CppUnit_addTest(pSuite, EnvelopeTest, testIdTypeFidelity);
 	CppUnit_addTest(pSuite, EnvelopeTest, testSerializeIsSingleLine);
 	CppUnit_addTest(pSuite, EnvelopeTest, testValidIds);

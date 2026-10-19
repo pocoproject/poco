@@ -15,6 +15,7 @@
 #include "Poco/AI/MCP/StreamClient.h"
 #include "Poco/AI/MCP/MCPException.h"
 #include "Poco/Exception.h"
+#include "Poco/NumberFormatter.h"
 #include <istream>
 #include <ostream>
 
@@ -45,6 +46,12 @@ Poco::JSON::Object::Ptr StreamClient::exchange(const Poco::JSON::Object::Ptr& re
 		try
 		{
 			pMessage = readMessage(_in, _maxMessageSize);
+		}
+		catch (const MessageTooLargeException&)
+		{
+			// It may be the reply, which is then lost: the request fails
+			// rather than waiting for the end of the stream.
+			throw Poco::ProtocolException("A message of the server exceeds the size limit of " + Poco::NumberFormatter::format(_maxMessageSize) + " bytes");
 		}
 		catch (const MCPException&)
 		{

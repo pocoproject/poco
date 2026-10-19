@@ -19,7 +19,7 @@
 
 
 #include "Poco/AI/MCP/MCP.h"
-#include "Poco/AI/MCP/Content.h"
+#include "Poco/AI/MCP/ToolResult.h"
 #include "Poco/AI/MCP/RequestContext.h"
 #include "Poco/JSON/Object.h"
 #include <functional>

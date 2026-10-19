@@ -47,8 +47,14 @@ class AIMCP_API Server
 	///
 	///   - server/discover, with the supported revision, the capabilities and
 	///     the instructions;
-	///   - tools/list, tools/call, resources/list, resources/templates/list
-	///     (always empty), resources/read, prompts/list and prompts/get.
+	///   - tools/list and tools/call;
+	///   - resources/list, resources/templates/list (always empty) and
+	///     resources/read, once a resource is registered;
+	///   - prompts/list and prompts/get, once a prompt is registered.
+	///
+	/// server/discover advertises the resources and prompts capabilities only
+	/// then, and their methods get METHOD_NOT_FOUND before, as the
+	/// specification has it for a capability the server does not advertise.
 	///
 	/// Every result carries resultType "complete" and, when set, the server
 	/// info in its _meta object. Lists come in one page, in name order.
@@ -78,16 +84,19 @@ public:
 
 	void registerTool(const Tool& tool);
 		/// Registers a tool, replacing a tool of the same name. The schema and
-		/// annotation objects must not be changed after registration.
+		/// annotation objects must not be changed after registration. A tool
+		/// without an input schema is listed with {"type": "object"}.
 		///
-		/// Throws Poco::InvalidArgumentException if the name is empty or the
-		/// tool has no handler.
+		/// Throws Poco::InvalidArgumentException if the name is empty, the
+		/// tool has no handler, or its input schema does not have the type
+		/// "object".
 
-	void registerTool(const std::string& name, const std::string& description, Poco::JSON::Object::Ptr inputSchema, ToolHandler handler);
+	void registerTool(const std::string& name, const std::string& description, const Poco::JSON::Object::Ptr& inputSchema, ToolHandler handler);
 		/// Registers a tool whose handler does not need the request context.
 		///
-		/// Throws Poco::InvalidArgumentException if the name is empty or the
-		/// handler is empty.
+		/// Throws Poco::InvalidArgumentException if the name is empty, the
+		/// handler is empty, or the input schema does not have the type
+		/// "object".
 
 	void registerResource(const Resource& resource, ResourceReader reader);
 		/// Registers a resource, replacing one with the same URI.
@@ -103,7 +112,9 @@ public:
 
 	void setServerInfo(const Implementation& info);
 		/// Sets the name and version the server reports in the _meta object
-		/// of every result. Without a name, results carry no server info.
+		/// of every result, Implementation::library() by default. Without a
+		/// name, results carry no server info; the specification asks a
+		/// server to send it unless it is told not to.
 
 	void setInstructions(const std::string& instructions);
 		/// Sets the instructions server/discover returns.
@@ -120,13 +131,19 @@ public:
 		/// the identity of the context; the server adds what the request's
 		/// _meta object carries. Never throws: an exception of a handler or
 		/// of the server becomes an error reply.
+		///
+		/// A message that is neither a valid request nor a valid notification
+		/// (no jsonrpc 2.0, no method, an id that is neither a string nor an
+		/// integer) gets an INVALID_REQUEST reply, without an id when it has
+		/// none that can be read. Only a valid notification gets no reply.
 
 	void serve(std::istream& in, std::ostream& out, std::size_t maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE);
 		/// Stream-level ingress: reads newline-delimited messages from in,
 		/// writes the replies to out, and returns at the end of in. A line
-		/// that is not JSON gets a Parse error reply; a line that is not an
-		/// object (a batch, for instance) or is longer than maxMessageSize
-		/// bytes gets an Invalid Request reply.
+		/// that is not JSON gets a Parse error reply; a line that is JSON but
+		/// not an object (a scalar, or a batch) or is longer than
+		/// maxMessageSize bytes gets an Invalid Request reply. These replies
+		/// carry no id.
 		///
 		/// Throws Poco::WriteFileException when out fails, so that a server
 		/// whose client has gone away stops.
