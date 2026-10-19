@@ -31,3 +31,15 @@ race:ThreadTest::testNotJoin
 # completes safely after close() removes the fd from the table.
 # See close(2) and PipeImpl::close() for details.
 race:PipeImpl::close
+
+#
+# AI
+#
+
+# ProviderCall::abort() shuts the connection of a model call down from the
+# thread that cancels it, so that a connect or a TLS handshake that hangs
+# ends at once. Until the request head is out, it reaches the connection
+# through the session's socket, whose descriptor the calling thread sets
+# when it connects and clears when it closes the socket. From the request
+# head on, it uses a descriptor of its own. See ProviderCall::abort().
+race:ProviderCall::abort

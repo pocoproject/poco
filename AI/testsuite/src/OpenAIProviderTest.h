@@ -36,6 +36,9 @@ public:
 	void testMalformedEmbeddings();
 	void testCancelBeforeHeaders();
 	void testCancelDuringStream();
+	void testRequestMembersAndHeaders();
+	void testCutByLength();
+	void testArgumentsAsTheyCame();
 
 	void setUp();
 	void tearDown();

@@ -22,6 +22,7 @@
 #include "Poco/AI/SessionFactory.h"
 #include "Poco/Mutex.h"
 #include "Poco/Timespan.h"
+#include "Poco/Net/NameValueCollection.h"
 #include "Poco/URI.h"
 #include <string>
 #include <vector>
@@ -35,11 +36,20 @@ class AI_API AnthropicProvider: public LLMProvider
 	/// server-sent events; tool use, thinking blocks and prompt caching
 	/// markers are supported.
 	///
-	/// The assistant turn a call returns carries the thinking and redacted
-	/// thinking blocks the model produced, with their signatures and in their
-	/// order, as the API requires them back in a tool-use turn. Keep the tools
-	/// unchanged across the calls of one turn: a changed tool list makes the
-	/// replayed thinking invalid.
+	/// The assistant turn a call returns carries every block the model
+	/// produced, in its order and with its members as they came: thinking and
+	/// redacted thinking with their signatures, citations, and blocks of types
+	/// this provider does not know. The API requires the turns back as they
+	/// came. Send the whole conversation back unchanged, with the same system
+	/// prompt and tools: a change makes replayed thinking invalid. Left out
+	/// is only what the API would refuse back: a thinking block without its
+	/// signature, and a text block with nothing but whitespace.
+	///
+	/// Requests carry cache markers on the system prompt, on the last tool
+	/// and on the last block of the last message, so that each call of an
+	/// agent loop reads the conversation so far from the prompt cache. The
+	/// API takes four markers at most; messages and request members that
+	/// bring their own count towards that.
 	///
 	/// Sessions come from the session factory, createClientSession() by
 	/// default; an https base URI needs Poco::Net::HTTPSSessionInstantiator
@@ -59,14 +69,20 @@ public:
 			/// The API base, with its version path.
 		std::string apiKey;
 		std::string model;
-		int maxTokens = 4096;
-			/// The most output tokens a call asks for.
+		int maxTokens = 16000;
+			/// The most output tokens a call asks for. Thinking counts towards
+			/// it.
 		Poco::Timespan timeout;
-			/// How long a read may wait for the server; zero leaves the
-			/// session's own timeout.
+			/// How long connecting, sending and each read may take; zero
+			/// leaves the session's own timeouts.
 		std::string apiVersion = DEFAULT_API_VERSION;
 		std::size_t maxResponseSize = 32*1024*1024;
 			/// The limit of a response body, and of one event of a stream.
+		Poco::JSON::Object::Ptr requestMembers;
+			/// Members set in every request body, replacing those of the same
+			/// name, e.g. {"thinking": {"type": "adaptive"}}.
+		Poco::Net::NameValueCollection headers;
+			/// Headers sent with every request, e.g. anthropic-beta.
 	};
 
 	explicit AnthropicProvider(const Params& params, SessionFactory sessionFactory = SessionFactory());

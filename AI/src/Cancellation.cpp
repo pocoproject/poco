@@ -20,13 +20,24 @@ namespace Poco::AI {
 
 
 Cancellation::Request::Request(Cancellation& cancellation, std::function<void()> abort):
-	_cancellation(cancellation)
+	_cancellation(cancellation),
+	_id(0)
 {
 	Poco::FastMutex::ScopedLock lock(_cancellation._mutex);
-	_cancellation._abort = std::move(abort);
-	if (_cancellation._cancelled && _cancellation._abort)
+	_id = ++_cancellation._nextId;
+	auto it = _cancellation._aborts.emplace(_id, std::move(abort)).first;
+	if (_cancellation._cancelled && it->second)
 	{
-		_cancellation._abort();
+		try
+		{
+			it->second();
+		}
+		catch (...)
+		{
+			// The destructor does not run when the constructor throws.
+			_cancellation._aborts.erase(it);
+			throw;
+		}
 	}
 }
 
@@ -34,7 +45,7 @@ Cancellation::Request::Request(Cancellation& cancellation, std::function<void()>
 Cancellation::Request::~Request()
 {
 	Poco::FastMutex::ScopedLock lock(_cancellation._mutex);
-	_cancellation._abort = nullptr;
+	_cancellation._aborts.erase(_id);
 }
 
 
@@ -52,9 +63,16 @@ void Cancellation::cancel()
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 	_cancelled = true;
-	if (_abort)
+	for (const auto& entry: _aborts)
 	{
-		_abort();
+		if (!entry.second) continue;
+		try
+		{
+			entry.second();
+		}
+		catch (...)
+		{
+		}
 	}
 }
 

@@ -10,6 +10,7 @@
 
 #include "AITestSuite.h"
 #include "ToolRegistryTest.h"
+#include "CancellationTest.h"
 #include "AgentLoopTest.h"
 #include "AnthropicProviderTest.h"
 #include "OpenAIProviderTest.h"
@@ -21,6 +22,7 @@ CppUnit::Test* AITestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("AITestSuite");
 
 	pSuite->addTest(ToolRegistryTest::suite());
+	pSuite->addTest(CancellationTest::suite());
 	pSuite->addTest(AgentLoopTest::suite());
 	pSuite->addTest(AnthropicProviderTest::suite());
 	pSuite->addTest(OpenAIProviderTest::suite());

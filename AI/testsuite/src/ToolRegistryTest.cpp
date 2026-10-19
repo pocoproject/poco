@@ -23,6 +23,7 @@ using Poco::AI::ToolRegistry;
 using Poco::AI::toolResultText;
 using Poco::AI::MCP::Tool;
 using Poco::AI::MCP::ToolResult;
+using Poco::AI::MCP::ResourceContents;
 using Poco::AI::MCP::RequestContext;
 using Poco::JSON::Object;
 using Poco::JSON::Array;
@@ -178,9 +179,10 @@ void ToolRegistryTest::testRegistrationRefused()
 
 void ToolRegistryTest::testToolResultText()
 {
+	// Media is described by its type and size, not pasted as base64.
 	ToolResult texts;
 	texts.addText("one").addImage("aW1n", "image/png").addText("two");
-	assertEqual(std::string("one\ntwo"), toolResultText(texts));
+	assertEqual(std::string("one\n[image image/png, 4 bytes of base64]\ntwo"), toolResultText(texts));
 
 	ToolResult structured;
 	structured.setStructuredContent(Poco::Dynamic::Var(parse("{\"n\":1}")));
@@ -188,7 +190,19 @@ void ToolRegistryTest::testToolResultText()
 
 	ToolResult image;
 	image.addImage("aW1n", "image/png");
-	assertTrue(toolResultText(image).find("\"image\"") != std::string::npos);
+	assertEqual(std::string("[image image/png, 4 bytes of base64]"), toolResultText(image));
+
+	// A resource link by its URI; an embedded resource by its text, or its
+	// URI and size when it is binary.
+	ResourceContents text;
+	text.uri = "file:///notes.txt";
+	text.text = "notes";
+	ResourceContents binary;
+	binary.uri = "file:///logo.png";
+	binary.blob = "aW1nZQ==";
+	ToolResult resources;
+	resources.addResourceLink("file:///report.pdf", "report").addResource(text).addResource(binary).addAudio("YXU=", "audio/wav");
+	assertEqual(std::string("[resource file:///report.pdf]\nnotes\n[resource file:///logo.png, 8 bytes of base64]\n[audio audio/wav, 4 bytes of base64]"), toolResultText(resources));
 
 	assertEqual(std::string(), toolResultText(ToolResult()));
 }

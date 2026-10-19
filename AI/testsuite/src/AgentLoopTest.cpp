@@ -40,7 +40,10 @@ namespace
 		std::vector<std::string> toolNames;
 		StopReason stopReason = StopReason::END_TURN;
 		bool throwException = false;
-		ErrorCode errorCode = ErrorCode::NONE;
+		FailureCode errorCode = FailureCode::NONE;
+		Usage usage;
+		std::string stopDetail;
+		std::string explanation;
 	};
 
 
@@ -81,7 +84,7 @@ namespace
 			}
 			const Step step = _script[_round++];
 			if (step.throwException) throw Poco::IOException("connection refused");
-			if (step.errorCode != ErrorCode::NONE)
+			if (step.errorCode != FailureCode::NONE)
 			{
 				ContentEvent event;
 				event.type = ContentEvent::Type::FAILURE;
@@ -110,6 +113,9 @@ namespace
 				pCalls->add(call.id);
 			}
 			result.stopReason = step.stopReason;
+			result.usage = step.usage;
+			result.stopDetail = step.stopDetail;
+			result.explanation = step.explanation;
 			result.assistantMessage = new Object;
 			result.assistantMessage->set("role", "assistant");
 			result.assistantMessage->set("text", step.text);
@@ -126,9 +132,12 @@ namespace
 			pMessage->set("text", toolResultText(result));
 			pMessage->set("error", result.isError());
 			messages.add(pMessage);
+			results.push_back(result);
 		}
 
 		std::vector<ChatRequest> requests;
+		std::vector<Poco::AI::MCP::ToolResult> results;
+			/// The tool results as the model got them.
 
 	private:
 		std::vector<Step> _script;
@@ -204,6 +213,18 @@ namespace
 			if (pRuns != nullptr) ++*pRuns;
 			return name + ":" + pInput->optValue<std::string>("arg", "");
 		});
+	}
+
+
+	std::string typeOf(const Poco::AI::MCP::ToolResult& result, unsigned index)
+	{
+		return result.content()->getObject(index)->getValue<std::string>("type");
+	}
+
+
+	std::string textOf(const Poco::AI::MCP::ToolResult& result, unsigned index)
+	{
+		return result.content()->getObject(index)->getValue<std::string>("text");
 	}
 
 
@@ -292,7 +313,7 @@ void AgentLoopTest::testDoneOnEveryExit()
 
 	const AgentEvent* pError = recorder.first(AgentEvent::Type::FAILURE);
 	assertTrue(pError != nullptr);
-	assertTrue(pError->code == ErrorCode::PROVIDER_FAILED);
+	assertTrue(pError->code == FailureCode::PROVIDER_FAILED);
 	assertTrue(pError->content.find("connection refused") != std::string::npos);
 	assertEqual(1, recorder.count(AgentEvent::Type::DONE));
 	assertTrue(recorder.events.back().type == AgentEvent::Type::DONE);
@@ -302,7 +323,7 @@ void AgentLoopTest::testDoneOnEveryExit()
 void AgentLoopTest::testProviderError()
 {
 	Step error;
-	error.errorCode = ErrorCode::RATE_LIMITED;
+	error.errorCode = FailureCode::RATE_LIMITED;
 	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{error, text("never")});
 	ToolRegistry registry;
 	AgentLoop loop(pProvider, registry);
@@ -310,7 +331,7 @@ void AgentLoopTest::testProviderError()
 	Recorder recorder;
 	loop.run(conversation, "", recorder.callback());
 
-	assertTrue(recorder.first(AgentEvent::Type::FAILURE)->code == ErrorCode::RATE_LIMITED);
+	assertTrue(recorder.first(AgentEvent::Type::FAILURE)->code == FailureCode::RATE_LIMITED);
 	assertEqual(1u, static_cast<unsigned>(pProvider->requests.size()));
 	assertEqual(1u, static_cast<unsigned>(conversation.size()));
 	assertTrue(recorder.events.back().type == AgentEvent::Type::DONE);
@@ -353,7 +374,11 @@ void AgentLoopTest::testCancelDuringTools()
 	assertEqual(4u, static_cast<unsigned>(conversation.size()));
 	assertTrue(conversation.getObject(2)->getValue<bool>("error"));
 	assertTrue(conversation.getObject(3)->getValue<bool>("error"));
+	// Every call is reported, with its result.
+	assertEqual(2, recorder.count(AgentEvent::Type::TOOL_CALL));
+	assertEqual(2, recorder.count(AgentEvent::Type::TOOL_RESULT));
 	assertEqual(1, recorder.count(AgentEvent::Type::DONE));
+	assertTrue(recorder.events.back().stopReason == StopReason::CANCELLED);
 }
 
 
@@ -410,7 +435,9 @@ void AgentLoopTest::testFinalRound()
 	// The final call sends the same tools.
 	assertEqual(1u, static_cast<unsigned>(pProvider->requests[2].tools.size()));
 	const AgentEvent* pError = recorder.first(AgentEvent::Type::FAILURE);
-	assertTrue(pError != nullptr && pError->code == ErrorCode::ROUND_LIMIT);
+	assertTrue(pError != nullptr && pError->code == FailureCode::ROUND_LIMIT);
+	assertEqual(3, recorder.count(AgentEvent::Type::TOOL_CALL));
+	assertEqual(3, recorder.count(AgentEvent::Type::TOOL_RESULT));
 	// The call of the final round has a result too.
 	const Object::Ptr pLast = conversation.getObject(static_cast<unsigned>(conversation.size() - 1));
 	assertEqual(std::string("tool"), pLast->getValue<std::string>("role"));
@@ -509,6 +536,251 @@ void AgentLoopTest::testUnknownTool()
 }
 
 
+void AgentLoopTest::testCutByTokenLimit()
+{
+	// The token limit cut the turn: its tool call may have lost input, so it
+	// does not run, gets an error result, and the run ends.
+	Step cut = tools({"echo"});
+	cut.stopReason = StopReason::MAX_TOKENS;
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{cut, text("never")});
+	ToolRegistry registry;
+	int runs = 0;
+	registerEcho(registry, "echo", &runs);
+	AgentLoop loop(pProvider, registry);
+	Array conversation = userTurn("go");
+	Recorder recorder;
+	loop.run(conversation, "", recorder.callback());
+
+	assertEqual(0, runs);
+	assertEqual(1u, static_cast<unsigned>(pProvider->requests.size()));
+	assertEqual(3u, static_cast<unsigned>(conversation.size()));
+	assertTrue(conversation.getObject(2)->getValue<bool>("error"));
+	assertTrue(conversation.getObject(2)->getValue<std::string>("text").find("token limit") != std::string::npos);
+	assertEqual(1, recorder.count(AgentEvent::Type::TOOL_CALL));
+	assertTrue(recorder.events.back().type == AgentEvent::Type::DONE);
+	assertTrue(recorder.events.back().stopReason == StopReason::MAX_TOKENS);
+}
+
+
+void AgentLoopTest::testToolAddedDuringRun()
+{
+	// A tool registered while the run is on is not one of the run's tools:
+	// a call of it is an unknown tool, and its handler does not run, so
+	// that an approver that refuses it cannot be passed by.
+	ToolRegistry registry;
+	int lateRuns = 0;
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"adder"}), tools({"late"}), text("ok")});
+	registry.registerTool("adder", "", nullptr, [&registry, &lateRuns](const Object::Ptr&)
+	{
+		registerEcho(registry, "late", &lateRuns);
+		return std::string("added");
+	});
+	AgentLoop loop(pProvider, registry);
+	std::vector<std::string> asked;
+	loop.setApprover([&asked](const ToolCall& call, const Poco::AI::MCP::Tool&)
+	{
+		asked.push_back(call.name);
+		return call.name != "late";
+	});
+	Array conversation = userTurn("go");
+	loop.run(conversation, "", AgentEventCallback());
+	assertEqual(0, lateRuns);
+	assertTrue(pProvider->results[1].isError());
+	assertEqual(std::string("Unknown tool: late"), textOf(pProvider->results[1], 0));
+	assertEqual(1u, static_cast<unsigned>(asked.size()));
+	assertEqual(std::string("adder"), asked[0]);
+}
+
+
+void AgentLoopTest::testApproverThrows()
+{
+	// An approver that throws refuses the call.
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"echo"}), text("ok")});
+	ToolRegistry registry;
+	int runs = 0;
+	registerEcho(registry, "echo", &runs);
+	AgentLoop loop(pProvider, registry);
+	loop.setApprover([](const ToolCall&, const Poco::AI::MCP::Tool&) -> bool
+	{
+		throw Poco::RuntimeException("no decision");
+	});
+	Array conversation = userTurn("go");
+	Recorder recorder;
+	loop.run(conversation, "", recorder.callback());
+	assertEqual(0, runs);
+	assertEqual(std::string("The tool call was refused."), textOf(pProvider->results[0], 0));
+	assertTrue(recorder.events.back().type == AgentEvent::Type::DONE);
+}
+
+
+void AgentLoopTest::testCallbackThrows()
+{
+	// The callback throws on the first of two results: run() passes the
+	// exception on, yet both calls have their result in the conversation,
+	// each before its event, and DONE was delivered.
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"echo", "echo"}), text("never")});
+	ToolRegistry registry;
+	int runs = 0;
+	registerEcho(registry, "echo", &runs);
+	AgentLoop loop(pProvider, registry);
+	Array conversation = userTurn("go");
+	std::vector<AgentEvent::Type> seen;
+	std::size_t sizeAtResult = 0;
+	try
+	{
+		loop.run(conversation, "", [&](const AgentEvent& event)
+		{
+			seen.push_back(event.type);
+			if (event.type == AgentEvent::Type::TOOL_RESULT)
+			{
+				sizeAtResult = conversation.size();
+				throw Poco::IllegalStateException("callback failed");
+			}
+		});
+		fail("the exception of the callback must reach the caller");
+	}
+	catch (const Poco::IllegalStateException&)
+	{
+	}
+	assertEqual(1, runs);
+	assertEqual(std::size_t(3), sizeAtResult);
+	assertEqual(4u, static_cast<unsigned>(conversation.size()));
+	assertTrue(!conversation.getObject(2)->getValue<bool>("error"));
+	assertTrue(conversation.getObject(3)->getValue<bool>("error"));
+	assertEqual(1u, static_cast<unsigned>(pProvider->requests.size()));
+	assertTrue(seen.back() == AgentEvent::Type::DONE);
+}
+
+
+void AgentLoopTest::testResultLimits()
+{
+	// Each kind of block has its limit: images of the types the APIs take
+	// stay whole up to the image limit, other media and binary resources are
+	// named, text is cut, structured content stays while it fits.
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"media", "big"}), text("ok")});
+	ToolRegistry registry;
+	Poco::AI::MCP::Tool media;
+	media.name = "media";
+	media.handler = [](const Object::Ptr&, const Poco::AI::MCP::RequestContext&)
+	{
+		Poco::AI::MCP::ResourceContents notes;
+		notes.uri = "file:///notes.txt";
+		notes.text = "notes";
+		Poco::AI::MCP::ResourceContents blob;
+		blob.uri = "file:///data.bin";
+		blob.mimeType = "application/octet-stream";
+		blob.blob = "AAAA";
+		Poco::AI::MCP::ToolResult result;
+		result.addImage("aW1n", "image/png")
+			.addImage(std::string(100, 'A'), "image/png")
+			.addImage("Qk0=", "image/bmp")
+			.addAudio("YXU=", "audio/wav")
+			.addResource(notes)
+			.addResource(blob)
+			.addResourceLink("file:///report.pdf", "report");
+		result.setStructuredContent(Poco::Dynamic::Var(std::string("fits")));
+		return result;
+	};
+	registry.registerTool(media);
+	Poco::AI::MCP::Tool big;
+	big.name = "big";
+	big.handler = [](const Object::Ptr&, const Poco::AI::MCP::RequestContext&)
+	{
+		Poco::AI::MCP::ToolResult result;
+		result.addText(std::string(300, 'x'));
+		result.setStructuredContent(Poco::Dynamic::Var(std::string(300, 'y')));
+		return result;
+	};
+	registry.registerTool(big);
+	AgentLoop loop(pProvider, registry);
+	loop.setMaxImageSize(50);
+	assertEqual(std::size_t(50), loop.getMaxImageSize());
+	loop.setMaxToolResultSize(250);
+	Array conversation = userTurn("go");
+	loop.run(conversation, "", AgentEventCallback());
+
+	const Poco::AI::MCP::ToolResult& first = pProvider->results[0];
+	assertEqual(7u, static_cast<unsigned>(first.content()->size()));
+	assertEqual(std::string("image"), typeOf(first, 0));
+	assertEqual(std::string("[image image/png of 100 bytes left out]"), textOf(first, 1));
+	assertEqual(std::string("[image image/bmp of 4 bytes left out]"), textOf(first, 2));
+	assertEqual(std::string("[audio audio/wav of 4 bytes left out]"), textOf(first, 3));
+	assertEqual(std::string("notes"), textOf(first, 4));
+	assertEqual(std::string("[resource file:///data.bin application/octet-stream of 4 bytes left out]"), textOf(first, 5));
+	assertEqual(std::string("resource_link"), typeOf(first, 6));
+	assertEqual(std::string("fits"), first.structuredContent().convert<std::string>());
+
+	// The text is cut to the limit; the structured content no longer fits.
+	const Poco::AI::MCP::ToolResult& second = pProvider->results[1];
+	assertEqual(2u, static_cast<unsigned>(second.content()->size()));
+	assertEqual(std::string(250, 'x'), textOf(second, 0));
+	assertEqual(std::string("...(truncated)"), textOf(second, 1));
+	assertTrue(second.structuredContent().isEmpty());
+}
+
+
+void AgentLoopTest::testDoneCarriesTheOutcome()
+{
+	// DONE tells how the run ended: the stop reason of the last call, its
+	// detail and explanation, and the tokens of all calls.
+	Step first = tools({"echo"});
+	first.usage.inputTokens = 10;
+	first.usage.outputTokens = 2;
+	first.usage.cachedInputTokens = 1;
+	Step second = text("Done");
+	second.usage.inputTokens = 20;
+	second.usage.outputTokens = 3;
+	second.usage.cachedInputTokens = 15;
+	second.stopDetail = "end_turn";
+	second.explanation = "finished";
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{first, second});
+	ToolRegistry registry;
+	registerEcho(registry, "echo");
+	AgentLoop loop(pProvider, registry);
+	Array conversation = userTurn("go");
+	Recorder recorder;
+	loop.run(conversation, "", recorder.callback());
+	const AgentEvent& done = recorder.events.back();
+	assertTrue(done.type == AgentEvent::Type::DONE);
+	assertTrue(done.stopReason == StopReason::END_TURN);
+	assertEqual(std::string("end_turn"), done.stopDetail);
+	assertEqual(std::string("finished"), done.explanation);
+	assertEqual(Poco::UInt64(30), done.usage.inputTokens);
+	assertEqual(Poco::UInt64(5), done.usage.outputTokens);
+	assertEqual(Poco::UInt64(16), done.usage.cachedInputTokens);
+}
+
+
+void AgentLoopTest::testToolSeesTheCancel()
+{
+	// A tool learns from its context that the run was cancelled, e.g. to end
+	// what it is doing.
+	Cancellation cancellation;
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"watch"}), text("never")});
+	ToolRegistry registry;
+	bool before = true;
+	bool after = false;
+	Poco::AI::MCP::Tool watch;
+	watch.name = "watch";
+	watch.handler = [&](const Object::Ptr&, const Poco::AI::MCP::RequestContext& context)
+	{
+		before = context.isCancelled();
+		cancellation.cancel();
+		after = context.isCancelled();
+		return Poco::AI::MCP::ToolResult();
+	};
+	registry.registerTool(watch);
+	AgentLoop loop(pProvider, registry);
+	Array conversation = userTurn("go");
+	Recorder recorder;
+	loop.run(conversation, "", recorder.callback(), cancellation);
+	assertTrue(!before);
+	assertTrue(after);
+	assertEqual(1u, static_cast<unsigned>(pProvider->requests.size()));
+	assertTrue(recorder.events.back().stopReason == StopReason::CANCELLED);
+}
+
+
 void AgentLoopTest::testConstruction()
 {
 	ToolRegistry registry;
@@ -558,6 +830,13 @@ CppUnit::Test* AgentLoopTest::suite()
 	CppUnit_addTest(pSuite, AgentLoopTest, testRequestContext);
 	CppUnit_addTest(pSuite, AgentLoopTest, testUnknownTool);
 	CppUnit_addTest(pSuite, AgentLoopTest, testConstruction);
+	CppUnit_addTest(pSuite, AgentLoopTest, testCutByTokenLimit);
+	CppUnit_addTest(pSuite, AgentLoopTest, testToolAddedDuringRun);
+	CppUnit_addTest(pSuite, AgentLoopTest, testApproverThrows);
+	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrows);
+	CppUnit_addTest(pSuite, AgentLoopTest, testResultLimits);
+	CppUnit_addTest(pSuite, AgentLoopTest, testDoneCarriesTheOutcome);
+	CppUnit_addTest(pSuite, AgentLoopTest, testToolSeesTheCancel);
 
 	return pSuite;
 }

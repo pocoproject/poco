@@ -17,8 +17,10 @@
 #include "ProviderCall.h"
 #include "ToolInput.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Ascii.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <map>
 #include <utility>
 
@@ -33,16 +35,16 @@ namespace Poco::AI {
 namespace
 {
 	struct Block
-		/// One content block of a streamed response, assembled from its events.
+		/// One content block of a streamed response: the block as its start
+		/// event gave it, and what its deltas added.
 	{
+		Object::Ptr pStart;
 		std::string type;
 		std::string text;
-		std::string id;
-		std::string name;
 		std::string arguments;
+		bool hasArguments = false;
 		std::string signature;
-		std::string data;
-		bool dropped = false;
+		Array::Ptr pCitations;
 	};
 
 
@@ -50,21 +52,11 @@ namespace
 	{
 		if (value == "end_turn") return StopReason::END_TURN;
 		if (value == "tool_use") return StopReason::TOOL_USE;
-		if (value == "max_tokens") return StopReason::MAX_TOKENS;
+		if (value == "max_tokens" || value == "model_context_window_exceeded") return StopReason::MAX_TOKENS;
 		if (value == "stop_sequence") return StopReason::STOP_SEQUENCE;
 		if (value == "refusal") return StopReason::REFUSAL;
 		if (value == "pause_turn") return StopReason::PAUSED;
 		return StopReason::UNKNOWN;
-	}
-
-
-	void report(const ContentEventCallback& onEvent, ErrorCode code, const std::string& text)
-	{
-		ContentEvent event;
-		event.type = ContentEvent::Type::FAILURE;
-		event.code = code;
-		event.text = text;
-		if (onEvent) onEvent(event);
 	}
 
 
@@ -84,31 +76,103 @@ namespace
 	}
 
 
-	Object::Ptr blockObject(const Block& block)
-		/// The block as the API sent it, for the assistant turn; null for a
-		/// block that is left out.
+	Object::Ptr cacheMarker()
 	{
-		Object::Ptr pBlock = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+		Object::Ptr pCacheControl = new Object;
+		pCacheControl->set("type", "ephemeral");
+		return pCacheControl;
+	}
+
+
+	Object::Ptr copyMembers(const Object::Ptr& pObject)
+		/// A copy of an object with the same members, in their order.
+	{
+		Object::Ptr pCopy = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+		if (!pObject.isNull())
+		{
+			for (const std::string& name: pObject->getNames()) pCopy->set(name, pObject->get(name));
+		}
+		return pCopy;
+	}
+
+
+	bool blank(const std::string& text)
+		/// Returns true if text holds nothing but whitespace.
+	{
+		return std::all_of(text.begin(), text.end(), [](char c) { return Poco::Ascii::isSpace(c); });
+	}
+
+
+	Object::Ptr blockObject(const Block& block, const Object::Ptr& pInput)
+		/// The block as the API sent it, for the assistant turn: what its start
+		/// event carried, in that order, with what its deltas added; blocks of
+		/// types this provider does not know as they came. Null for what the
+		/// API refuses in a request: a thinking block without its signature, and
+		/// a text block with nothing but whitespace.
+	{
+		Object::Ptr pBlock = copyMembers(block.pStart);
 		pBlock->set("type", block.type);
 		if (block.type == "text")
 		{
-			if (block.text.empty()) return Object::Ptr();
+			if (blank(block.text)) return Object::Ptr();
 			pBlock->set("text", block.text);
+			if (!block.pCitations.isNull()) pBlock->set("citations", block.pCitations);
 		}
 		else if (block.type == "thinking")
 		{
+			if (block.signature.empty()) return Object::Ptr();
 			pBlock->set("thinking", block.text);
 			pBlock->set("signature", block.signature);
 		}
-		else if (block.type == "redacted_thinking")
+		else if (!pInput.isNull())
 		{
-			pBlock->set("data", block.data);
-		}
-		else
-		{
-			return Object::Ptr();
+			pBlock->set("input", pInput);
 		}
 		return pBlock;
+	}
+
+
+	Array::Ptr withCacheMarker(const Array& messages)
+		/// The messages, with a cache marker on the last block of the last one,
+		/// so that every call of an agent loop reads the conversation so far
+		/// from the prompt cache instead of paying for all of it again. Only
+		/// that message and its last block are copied; the caller's objects
+		/// stay as they are.
+	{
+		Array::Ptr pMessages = new Array(messages);
+		if (pMessages->size() == 0) return pMessages;
+		const unsigned last = static_cast<unsigned>(pMessages->size() - 1);
+		const Object::Ptr pLast = pMessages->getObject(last);
+		if (pLast.isNull()) return pMessages;
+		Array::Ptr pContent = new Array;
+		const Poco::Dynamic::Var content = pLast->get("content");
+		if (content.isString())
+		{
+			Object::Ptr pText = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
+			pText->set("type", "text");
+			pText->set("text", content.extract<std::string>());
+			pContent->add(pText);
+		}
+		else if (pLast->isArray("content"))
+		{
+			for (const auto& block: *pLast->getArray("content")) pContent->add(block);
+		}
+		if (pContent->size() == 0) return pMessages;
+		const unsigned lastBlock = static_cast<unsigned>(pContent->size() - 1);
+		const Object::Ptr pBlock = pContent->getObject(lastBlock);
+		const std::string type = stringOf(pBlock, "type");
+		// Thinking blocks take no marker, nor does an empty text block.
+		if (pBlock.isNull() || type == "thinking" || type == "redacted_thinking" || (type == "text" && stringOf(pBlock, "text").empty()))
+		{
+			return pMessages;
+		}
+		Object::Ptr pMarked = copyMembers(pBlock);
+		pMarked->set("cache_control", cacheMarker());
+		pContent->set(lastBlock, pMarked);
+		Object::Ptr pCopy = copyMembers(pLast);
+		pCopy->set("content", pContent);
+		pMessages->set(last, pCopy);
+		return pMessages;
 	}
 
 
@@ -196,17 +260,23 @@ std::vector<std::string> AnthropicProvider::listModels()
 	const Params current = params();
 	Poco::URI uri = joinURI(current.baseURI, "models");
 	uri.addQueryParameter("limit", "1000");
-	ProviderCall call(_sessionFactory, uri, Poco::Net::HTTPRequest::HTTP_GET, current.timeout);
+	Cancellation cancellation;
+	ProviderCall call(_sessionFactory, uri, Poco::Net::HTTPRequest::HTTP_GET, current.timeout, current.headers);
 	call.request().set("x-api-key", current.apiKey);
 	call.request().set("anthropic-version", current.apiVersion);
-	call.send(std::string());
+	call.send(std::string(), cancellation);
 	std::istream& stream = call.receive();
 	const int status = static_cast<int>(call.response().getStatus());
 	if (status != Poco::Net::HTTPResponse::HTTP_OK)
 	{
-		throw Poco::Net::HTTPException(Poco::format("Anthropic API error %d", status), excerpt(readAtMost(stream, 65536)));
+		throw Poco::Net::HTTPException(Poco::format("Anthropic API error %d", status), excerpt(readAtMost(stream, 65536)), status);
 	}
-	const Object::Ptr pRoot = parseObject(readBody(stream, current.maxResponseSize));
+	const std::string text = readBody(stream, current.maxResponseSize);
+	if (call.brokeOff(text.size()))
+	{
+		throw Poco::IOException("The model list of the Anthropic API broke off", call.networkError());
+	}
+	const Object::Ptr pRoot = parseObject(text);
 	if (pRoot.isNull() || !pRoot->isArray("data"))
 	{
 		throw Poco::DataFormatException("The model list is not an object with a data array");
@@ -231,12 +301,10 @@ Object::Ptr AnthropicProvider::requestBody(const ChatRequest& request, const Par
 	if (!request.systemPrompt.empty())
 	{
 		// The system prompt is one text block with the cache marker.
-		Object::Ptr pCacheControl = new Object;
-		pCacheControl->set("type", "ephemeral");
 		Object::Ptr pSystemBlock = new Object;
 		pSystemBlock->set("type", "text");
 		pSystemBlock->set("text", request.systemPrompt);
-		pSystemBlock->set("cache_control", pCacheControl);
+		pSystemBlock->set("cache_control", cacheMarker());
 		Array::Ptr pSystem = new Array;
 		pSystem->add(pSystemBlock);
 		pBody->set("system", pSystem);
@@ -251,7 +319,8 @@ Object::Ptr AnthropicProvider::requestBody(const ChatRequest& request, const Par
 			pBody->set("tool_choice", pChoice);
 		}
 	}
-	pBody->set("messages", Array::Ptr(new Array(request.messages)));
+	pBody->set("messages", withCacheMarker(request.messages));
+	mergeMembers(*pBody, current.requestMembers);
 	return pBody;
 }
 
@@ -262,43 +331,34 @@ ChatResult AnthropicProvider::chat(const ChatRequest& request, const ContentEven
 	const Params current = params();
 	const std::string body = serializeJSON(requestBody(request, current));
 
-	ProviderCall call(_sessionFactory, joinURI(current.baseURI, "messages"), Poco::Net::HTTPRequest::HTTP_POST, current.timeout);
+	ProviderCall call(_sessionFactory, joinURI(current.baseURI, "messages"), Poco::Net::HTTPRequest::HTTP_POST, current.timeout, current.headers);
 	call.request().setContentType("application/json");
 	call.request().set("Accept", "text/event-stream");
 	call.request().set("x-api-key", current.apiKey);
 	call.request().set("anthropic-version", current.apiVersion);
-	try
-	{
-		call.send(body);
-	}
-	catch (const Poco::Exception&)
-	{
-		if (cancellation.cancelled()) return cancelled();
-		throw;
-	}
-
-	// From here on a cancel shuts the connection down, so that the read that
-	// waits returns.
-	Cancellation::Request whileReceiving(cancellation, [&call]() { call.abort(); });
 	ChatResult result;
 	bool streaming = false;
 	try
 	{
+		// From the send on, a cancel shuts the connection down, so that what
+		// waits returns.
+		call.send(body, cancellation);
 		std::istream& stream = call.receive();
 		const int status = static_cast<int>(call.response().getStatus());
 		if (status != Poco::Net::HTTPResponse::HTTP_OK)
 		{
 			const std::string text = readAtMost(stream, 65536);
 			if (cancellation.cancelled()) return cancelled();
-			report(onEvent, errorCodeOf(status), Poco::format("Anthropic API error %d: %s", status, excerpt(text)));
+			reportFailure(onEvent, failureCodeOf(status, text), Poco::format("Anthropic API error %d: %s", status, excerpt(text)), &call.response());
 			return failed();
 		}
 		streaming = true;
 
 		// The Messages API streams typed events. Text arrives in text_delta
-		// events and is reported at once; the other blocks are assembled by
-		// index: a tool call's arguments arrive as pieces of JSON text, a
-		// thinking block as its text and then its signature.
+		// events and is reported at once; every block is assembled by index
+		// from its start event and its deltas: a tool call's input arrives as
+		// pieces of JSON text, a thinking block as its text and then its
+		// signature, citations one by one.
 		std::map<int, Block> blocks;
 		bool complete = false;
 		Poco::AI::MCP::HTTP::EventStreamReader reader(stream, current.maxResponseSize);
@@ -306,7 +366,7 @@ ChatResult AnthropicProvider::chat(const ChatRequest& request, const ContentEven
 		while (!complete && reader.next(event))
 		{
 			if (cancellation.cancelled()) return cancelled();
-			const Object::Ptr pEvent = parseObject(event.data);
+			const Object::Ptr pEvent = parseOrderedObject(event.data);
 			const std::string type = stringOf(pEvent, "type");
 			const int index = memberOf(pEvent, "index").isInteger() ? pEvent->getValue<int>("index") : 0;
 
@@ -321,12 +381,14 @@ ChatResult AnthropicProvider::chat(const ChatRequest& request, const ContentEven
 			{
 				const Object::Ptr pBlock = pEvent->getObject("content_block");
 				Block& block = blocks[index];
+				block.pStart = pBlock;
 				block.type = stringOf(pBlock, "type");
-				block.id = stringOf(pBlock, "id");
-				block.name = stringOf(pBlock, "name");
-				block.data = stringOf(pBlock, "data");
 				block.signature = stringOf(pBlock, "signature");
 				block.text = block.type == "thinking" ? stringOf(pBlock, "thinking") : stringOf(pBlock, "text");
+				if (!pBlock.isNull() && pBlock->isArray("citations"))
+				{
+					block.pCitations = new Array(*pBlock->getArray("citations"));
+				}
 			}
 			else if (type == "content_block_delta")
 			{
@@ -348,6 +410,7 @@ ChatResult AnthropicProvider::chat(const ChatRequest& request, const ContentEven
 				else if (deltaType == "input_json_delta")
 				{
 					block.arguments += stringOf(pDelta, "partial_json");
+					block.hasArguments = true;
 				}
 				else if (deltaType == "thinking_delta")
 				{
@@ -357,12 +420,18 @@ ChatResult AnthropicProvider::chat(const ChatRequest& request, const ContentEven
 				{
 					block.signature += stringOf(pDelta, "signature");
 				}
+				else if (deltaType == "citations_delta")
+				{
+					if (block.pCitations.isNull()) block.pCitations = new Array;
+					block.pCitations->add(pDelta->get("citation"));
+				}
 			}
 			else if (type == "message_delta")
 			{
 				const Object::Ptr pDelta = pEvent->getObject("delta");
 				result.stopDetail = stringOf(pDelta, "stop_reason");
 				result.stopReason = stopReasonOf(result.stopDetail);
+				result.explanation = stringOf(pDelta.isNull() ? Object::Ptr() : pDelta->getObject("stop_details"), "explanation");
 				result.usage.outputTokens = countOf(pEvent->getObject("usage"), "output_tokens");
 			}
 			else if (type == "message_stop")
@@ -374,8 +443,8 @@ ChatResult AnthropicProvider::chat(const ChatRequest& request, const ContentEven
 				const Object::Ptr pError = pEvent->getObject("error");
 				const std::string errorType = stringOf(pError, "type");
 				const std::string message = stringOf(pError, "message");
-				report(onEvent, errorType == "overloaded_error" ? ErrorCode::OVERLOADED : ErrorCode::STREAM_ERROR,
-					"Anthropic stream error: " + (message.empty() ? errorType : message));
+				reportFailure(onEvent, errorType == "overloaded_error" ? FailureCode::OVERLOADED : FailureCode::STREAM_ERROR,
+					"Anthropic stream error: " + (message.empty() ? errorType : message), &call.response());
 				return failed();
 			}
 		}
@@ -384,31 +453,42 @@ ChatResult AnthropicProvider::chat(const ChatRequest& request, const ContentEven
 		{
 			// Without its end the response is incomplete: no tool call of it runs.
 			const std::string reason = call.networkError();
-			report(onEvent, ErrorCode::STREAM_INTERRUPTED, "Anthropic response stream ended before its end" + (reason.empty() ? std::string() : ": " + reason));
+			reportFailure(onEvent, FailureCode::STREAM_INTERRUPTED, "Anthropic response stream ended before its end" + (reason.empty() ? std::string() : ": " + reason));
 			return failed();
+		}
+		if (result.stopReason == StopReason::REFUSAL)
+		{
+			// A refused answer is not kept: no turn to append, no tool to run.
+			return result;
 		}
 
 		Array::Ptr pContent = new Array;
 		for (auto& entry: blocks)
 		{
-			Block& block = entry.second;
+			const Block& block = entry.second;
+			Object::Ptr pInput;
+			if (block.type == "tool_use" || block.hasArguments)
+			{
+				if (!parseToolInput(block.arguments, pInput))
+				{
+					pInput = nullptr;
+					if (block.type == "tool_use")
+					{
+						// The tool does not run on input the model did not give.
+						reportFailure(onEvent, FailureCode::MALFORMED_TOOL_INPUT, "Anthropic tool call '" + stringOf(block.pStart, "name") + "' has malformed input");
+						continue;
+					}
+				}
+			}
+			const Object::Ptr pBlock = blockObject(block, pInput);
+			if (pBlock.isNull()) continue;
+			pContent->add(pBlock);
 			if (block.type == "tool_use")
 			{
 				ToolCall toolCall;
-				if (!parseToolInput(block.arguments, toolCall.input))
-				{
-					// The tool does not run on input the model did not give.
-					report(onEvent, ErrorCode::MALFORMED_TOOL_INPUT, "Anthropic tool call '" + block.name + "' has malformed input");
-					continue;
-				}
-				toolCall.id = block.id;
-				toolCall.name = block.name;
-				Object::Ptr pToolUse = new Object(Poco::JSON_PRESERVE_KEY_ORDER);
-				pToolUse->set("type", "tool_use");
-				pToolUse->set("id", block.id);
-				pToolUse->set("name", block.name);
-				pToolUse->set("input", toolCall.input);
-				pContent->add(pToolUse);
+				toolCall.id = stringOf(block.pStart, "id");
+				toolCall.name = stringOf(block.pStart, "name");
+				toolCall.input = pInput;
 				result.toolCalls.push_back(toolCall);
 				if (onEvent)
 				{
@@ -417,11 +497,6 @@ ChatResult AnthropicProvider::chat(const ChatRequest& request, const ContentEven
 					toolEvent.toolCall = toolCall;
 					onEvent(toolEvent);
 				}
-			}
-			else
-			{
-				const Object::Ptr pBlock = blockObject(block);
-				if (!pBlock.isNull()) pContent->add(pBlock);
 			}
 		}
 		if (pContent->size() > 0)
@@ -436,14 +511,14 @@ ChatResult AnthropicProvider::chat(const ChatRequest& request, const ContentEven
 	{
 		if (cancellation.cancelled()) return cancelled();
 		if (!streaming) throw;
-		report(onEvent, ErrorCode::STREAM_INTERRUPTED, "Anthropic response stream timed out");
+		reportFailure(onEvent, FailureCode::STREAM_INTERRUPTED, "Anthropic response stream timed out");
 		return failed();
 	}
 	catch (const Poco::Exception& exc)
 	{
 		if (cancellation.cancelled()) return cancelled();
 		if (!streaming) throw;
-		report(onEvent, ErrorCode::STREAM_INTERRUPTED, "Anthropic response stream failed: " + exc.displayText());
+		reportFailure(onEvent, FailureCode::STREAM_INTERRUPTED, "Anthropic response stream failed: " + exc.displayText());
 		return failed();
 	}
 }
@@ -506,9 +581,7 @@ Array::Ptr AnthropicProvider::toAnthropicTools(const std::vector<Poco::AI::MCP::
 		if (i + 1 == tools.size())
 		{
 			// The cache marker on the last tool ends the cacheable prefix.
-			Object::Ptr pCacheControl = new Object;
-			pCacheControl->set("type", "ephemeral");
-			pTool->set("cache_control", pCacheControl);
+			pTool->set("cache_control", cacheMarker());
 		}
 		pTools->add(pTool);
 	}

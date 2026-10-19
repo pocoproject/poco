@@ -16,6 +16,7 @@
 #include "Poco/AI/ToolRegistry.h"
 #include "Poco/AI/MCP/Server.h"
 #include "Poco/AI/MCP/StreamClient.h"
+#include "Poco/AI/MCP/Client.h"
 #include "Poco/AI/MCP/HTTP/HTTPClient.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Parser.h"
@@ -55,6 +56,43 @@ namespace
 		server.setServerInfo(info);
 		server.registerTool(prefix + "_echo", "Echoes.", nullptr, echo);
 	}
+
+
+	class ToollessClient: public Poco::AI::MCP::Client
+		/// Talks to a server whose discover result names no tools capability,
+		/// and keeps the methods it is asked to send.
+	{
+	public:
+		std::vector<std::string> methods;
+
+	protected:
+		Object::Ptr exchange(const Object::Ptr& request) override
+		{
+			const std::string method = request->getValue<std::string>("method");
+			methods.push_back(method);
+			Object::Ptr pReply = new Object;
+			pReply->set("jsonrpc", "2.0");
+			pReply->set("id", request->get("id"));
+			if (method != "server/discover")
+			{
+				Object::Ptr pError = new Object;
+				pError->set("code", -32601);
+				pError->set("message", "Method not found: " + method);
+				pReply->set("error", pError);
+				return pReply;
+			}
+			Poco::JSON::Array::Ptr pVersions = new Poco::JSON::Array;
+			pVersions->add(std::string(Poco::AI::MCP::PROTOCOL_VERSION));
+			Object::Ptr pCapabilities = new Object;
+			pCapabilities->set("resources", Object::Ptr(new Object));
+			Object::Ptr pResult = new Object;
+			pResult->set("supportedVersions", pVersions);
+			pResult->set("capabilities", pCapabilities);
+			pResult->set("resultType", "complete");
+			pReply->set("result", pResult);
+			return pReply;
+		}
+	};
 
 
 	class StreamServer
@@ -273,6 +311,74 @@ void MCPHostTest::testDuplicateLabel()
 }
 
 
+void MCPHostTest::testServerWithoutTools()
+{
+	// A server that offers no tools is not asked for them.
+	auto pClient = std::make_unique<ToollessClient>();
+	ToollessClient& client = *pClient;
+	MCPHost mcpHost;
+	mcpHost.addServer("docs", std::move(pClient));
+	assertEqual(std::size_t(1), mcpHost.serverCount());
+	assertEqual(1u, static_cast<unsigned>(client.methods.size()));
+	assertEqual(std::string("server/discover"), client.methods[0]);
+	ToolRegistry registry;
+	assertEqual(std::size_t(0), mcpHost.registerInto(registry));
+}
+
+
+void MCPHostTest::testPrefixedNames()
+{
+	// Under PREFIXED naming, tools of the same name on two servers keep apart,
+	// and a name with a dot becomes one the models take; each still calls its
+	// server's tool by the server's name.
+	Server first;
+	first.registerTool("fs.read", "Reads.", nullptr, [](const Object::Ptr&) { ToolResult result; result.addText("first"); return result; });
+	Server second;
+	second.registerTool("fs.read", "Reads.", nullptr, [](const Object::Ptr&) { ToolResult result; result.addText("second"); return result; });
+	TestHTTPHost firstHost(first);
+	firstHost.start();
+	TestHTTPHost secondHost(second);
+	secondHost.start();
+
+	MCPHost mcpHost;
+	assertTrue(mcpHost.getNaming() == MCPHost::Naming::REMOTE);
+	mcpHost.setNaming(MCPHost::Naming::PREFIXED);
+	assertTrue(mcpHost.getNaming() == MCPHost::Naming::PREFIXED);
+	mcpHost.addServer("one", std::make_unique<HTTPClient>(Poco::URI(firstHost.url())));
+	mcpHost.addServer("two hosts", std::make_unique<HTTPClient>(Poco::URI(secondHost.url())));
+	ToolRegistry registry;
+	std::vector<std::string> skipped;
+	assertEqual(std::size_t(2), mcpHost.registerInto(registry, &skipped));
+	assertTrue(skipped.empty());
+	assertEqual(std::string("first"), registry.executeTool("one_fs_read", nullptr).content()->getObject(0)->getValue<std::string>("text"));
+	assertEqual(std::string("second"), registry.executeTool("two_hosts_fs_read", nullptr).content()->getObject(0)->getValue<std::string>("text"));
+	assertEqual(std::string("two hosts"), mcpHost.toolOwners().at("two_hosts_fs_read"));
+}
+
+
+void MCPHostTest::testCancelledRunCallsNoTool()
+{
+	// A tool of a run that is cancelled is not called on its server.
+	Server server;
+	int calls = 0;
+	server.registerTool("count", "Counts.", nullptr, [&calls](const Object::Ptr&) { ++calls; return ToolResult(); });
+	TestHTTPHost host(server);
+	host.start();
+	MCPHost mcpHost;
+	mcpHost.addServer("s", std::make_unique<HTTPClient>(Poco::URI(host.url())));
+	ToolRegistry registry;
+	(void) mcpHost.registerInto(registry);
+
+	RequestContext context;
+	context.cancelled = []() { return true; };
+	ToolResult result = registry.executeTool("count", nullptr, context);
+	assertTrue(result.isError());
+	assertEqual(0, calls);
+	(void) registry.executeTool("count", nullptr);
+	assertEqual(1, calls);
+}
+
+
 void MCPHostTest::setUp()
 {
 }
@@ -294,6 +400,9 @@ CppUnit::Test* MCPHostTest::suite()
 	CppUnit_addTest(pSuite, MCPHostTest, testResultPassesThrough);
 	CppUnit_addTest(pSuite, MCPHostTest, testAddServerFailure);
 	CppUnit_addTest(pSuite, MCPHostTest, testDuplicateLabel);
+	CppUnit_addTest(pSuite, MCPHostTest, testServerWithoutTools);
+	CppUnit_addTest(pSuite, MCPHostTest, testPrefixedNames);
+	CppUnit_addTest(pSuite, MCPHostTest, testCancelledRunCallsNoTool);
 
 	return pSuite;
 }

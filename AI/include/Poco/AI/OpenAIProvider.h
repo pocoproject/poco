@@ -23,6 +23,7 @@
 #include "Poco/AI/SessionFactory.h"
 #include "Poco/Mutex.h"
 #include "Poco/Timespan.h"
+#include "Poco/Net/NameValueCollection.h"
 #include "Poco/URI.h"
 #include <string>
 #include <vector>
@@ -61,17 +62,26 @@ public:
 		std::string model;
 		int maxTokens = 4096;
 			/// The most output tokens a call asks for; 0 sends no limit.
-		std::string maxTokensField = "max_tokens";
-			/// The request field of the limit. OpenAI's reasoning models take
-			/// only "max_completion_tokens", which some compatible servers
-			/// ignore.
+		std::string maxTokensField = "max_completion_tokens";
+			/// The request field of the limit. OpenAI takes this one, and its
+			/// reasoning models only this one; some compatible servers know
+			/// only the deprecated "max_tokens".
+		bool streamUsage = true;
+			/// Asks for the usage of a call at the end of its stream
+			/// (stream_options.include_usage), without which OpenAI reports
+			/// none; off for a server that refuses the option.
 		Poco::Timespan timeout;
-			/// How long a read may wait for the server; zero leaves the
-			/// session's own timeout.
+			/// How long connecting, sending and each read may take; zero
+			/// leaves the session's own timeouts.
 		bool supportsTools = true;
 			/// When false, no tools are sent, for servers that reject them.
 		std::size_t maxResponseSize = 32*1024*1024;
 			/// The limit of a response body, and of one event of a stream.
+		Poco::JSON::Object::Ptr requestMembers;
+			/// Members set in every chat request body, replacing those of the
+			/// same name, e.g. {"reasoning_effort": "low"}.
+		Poco::Net::NameValueCollection headers;
+			/// Headers sent with every request, e.g. OpenAI-Organization.
 	};
 
 	explicit OpenAIProvider(const Params& params, SessionFactory sessionFactory = SessionFactory());
@@ -97,8 +107,9 @@ public:
 
 	void appendToolResult(Poco::JSON::Array& messages, const std::string& toolCallId, const Poco::AI::MCP::ToolResult& result) override;
 		/// Appends a message with role "tool". Its content is the text of the
-		/// result (see toolResultText()); the format has no error flag, so an
-		/// error result is passed as its text.
+		/// result (see toolResultText()): the format takes no images in a tool
+		/// result, and has no error flag, so an error result is passed as its
+		/// text.
 
 	[[nodiscard]] std::vector<std::vector<float>> embed(const std::vector<std::string>& texts, const std::string& model, int dimensions = 0);
 		/// Returns one embedding vector per input text via the embeddings

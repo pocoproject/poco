@@ -19,6 +19,7 @@
 
 
 #include "Poco/JSON/Object.h"
+#include "Poco/JSON/ParseHandler.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/String.h"
@@ -31,17 +32,19 @@ namespace Poco::AI {
 
 inline bool parseToolInput(const std::string& json, Poco::JSON::Object::Ptr& pInput)
 	/// Parses the arguments of a tool call, which a model returns as JSON
-	/// text. No text and JSON null both stand for no arguments, an empty
-	/// object. Returns false, with pInput empty, when the text is anything but
-	/// a JSON object: a tool must not run on arguments the model did not give,
-	/// as it would if arguments cut short by the token limit became none.
+	/// text, keeping the order of their members, so that the turn goes back
+	/// as it came. No text and JSON null both stand for no arguments, an
+	/// empty object. Returns false, with pInput empty, when the text is
+	/// anything but a JSON object: a tool must not run on arguments the model
+	/// did not give. A call the token limit cut before its arguments has no
+	/// text either; the agent loop runs no tool call of a turn so cut.
 {
-	pInput = new Poco::JSON::Object;
+	pInput = new Poco::JSON::Object(Poco::JSON_PRESERVE_KEY_ORDER);
 	const std::string text = Poco::trim(json);
 	if (text.empty() || text == "null") return true;
 	try
 	{
-		Poco::JSON::Parser parser;
+		Poco::JSON::Parser parser(new Poco::JSON::ParseHandler(true));
 		const Poco::Dynamic::Var parsed = parser.parse(text);
 		if (parsed.type() != typeid(Poco::JSON::Object::Ptr) || parsed.extract<Poco::JSON::Object::Ptr>().isNull()) return false;
 		pInput = parsed.extract<Poco::JSON::Object::Ptr>();

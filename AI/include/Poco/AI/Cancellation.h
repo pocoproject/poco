@@ -22,6 +22,7 @@
 #include "Poco/Mutex.h"
 #include <atomic>
 #include <functional>
+#include <map>
 
 
 namespace Poco::AI {
@@ -33,8 +34,13 @@ class AI_API Cancellation
 	/// never touches another that shares the provider.
 	///
 	/// An operation that blocks registers an abort with a Request for as long
-	/// as it runs; cancel() sets the flag and calls the abort of the request
-	/// that is registered. Thread-safe.
+	/// as it runs; cancel() sets the flag and calls every abort that is
+	/// registered, e.g. those of the model call and of the tool that run at
+	/// the same time. Thread-safe.
+	///
+	/// An abort must not throw: cancel() passes over what one throws, so that
+	/// the others still run, and a Request whose abort throws in its
+	/// constructor unregisters it before the exception leaves.
 {
 public:
 	class AI_API Request
@@ -53,6 +59,7 @@ public:
 		Request& operator = (const Request&) = delete;
 
 		Cancellation& _cancellation;
+		Poco::UInt64 _id;
 	};
 
 	Cancellation();
@@ -62,7 +69,7 @@ public:
 		/// Destroys the token.
 
 	void cancel();
-		/// Cancels: sets the flag and calls the abort that is registered, if any.
+		/// Cancels: sets the flag and calls the aborts that are registered.
 		/// May be called more than once, from any thread.
 
 	[[nodiscard]] bool cancelled() const;
@@ -74,7 +81,8 @@ private:
 
 	mutable Poco::FastMutex _mutex;
 	std::atomic<bool> _cancelled{false};
-	std::function<void()> _abort;
+	std::map<Poco::UInt64, std::function<void()>> _aborts;
+	Poco::UInt64 _nextId = 0;
 };
 
 

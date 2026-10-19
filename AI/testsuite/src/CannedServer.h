@@ -54,6 +54,11 @@ public:
 		std::size_t pauseAt = std::string::npos;
 			/// Sends the body up to this offset, then waits until the server
 			/// stops or the client goes away.
+		bool stallBeforeBody = false;
+			/// Reads next to nothing of the request and sends nothing until the
+			/// server stops or the client goes away: an upload blocks.
+		std::vector<std::pair<std::string, std::string>> headers;
+			/// More headers of the response.
 	};
 
 	explicit CannedServer(const Response& response):
@@ -191,15 +196,21 @@ private:
 	private:
 		void serve(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
 		{
-			std::string requestBody;
-			Poco::StreamCopier::copyToString(request.stream(), requestBody);
 			Response canned;
+			{
+				Poco::FastMutex::ScopedLock lock(_pState->mutex);
+				canned = _pState->response;
+			}
+			std::string requestBody;
+			if (!canned.stallBeforeBody)
+			{
+				Poco::StreamCopier::copyToString(request.stream(), requestBody);
+			}
 			{
 				Poco::FastMutex::ScopedLock lock(_pState->mutex);
 				_pState->path = request.getURI();
 				_pState->bodies.push_back(requestBody);
 				_pState->headers = request;
-				canned = _pState->response;
 			}
 			{
 				Poco::Mutex::ScopedLock lock(_pState->activeMutex);
@@ -208,13 +219,17 @@ private:
 			}
 			_pState->arrived.set();
 
-			if (canned.waitBeforeHeaders)
+			if (canned.waitBeforeHeaders || canned.stallBeforeBody)
 			{
 				waitForEnd(request);
 				return;
 			}
 			response.setStatus(static_cast<Poco::Net::HTTPResponse::HTTPStatus>(canned.status));
 			response.setContentType(canned.contentType);
+			for (const auto& header: canned.headers)
+			{
+				response.set(header.first, header.second);
+			}
 			if (canned.chunked || canned.pauseAt != std::string::npos)
 			{
 				response.setChunkedTransferEncoding(true);

@@ -54,8 +54,23 @@ struct AI_API AgentEvent
 		/// The tool input as JSON text (TOOL_CALL).
 	bool toolError = false;
 		/// Whether the tool result is an error (TOOL_RESULT).
-	ErrorCode code = ErrorCode::NONE;
+	FailureCode code = FailureCode::NONE;
 		/// The kind of failure (FAILURE).
+	Poco::Timespan retryAfter;
+		/// How long to wait before a retry, when the API says it (FAILURE).
+	std::string requestId;
+		/// The API's id of the failed request (FAILURE).
+	StopReason stopReason = StopReason::UNKNOWN;
+		/// Why the last call of the run stopped (DONE): END_TURN for a
+		/// complete answer, MAX_TOKENS, REFUSAL, CONTENT_FILTER or PAUSED for
+		/// one that is not, CANCELLED or FAILURE for a run that got none.
+		/// UNKNOWN when the run made no call.
+	std::string stopDetail;
+		/// The provider's own stop value of that call (DONE).
+	std::string explanation;
+		/// Why that call stopped, where the provider says it (DONE).
+	Usage usage;
+		/// The tokens of all calls of the run, summed (DONE).
 };
 
 
@@ -72,22 +87,41 @@ using ToolApprover = std::function<bool (const ToolCall& call, const Poco::AI::M
 class AI_API AgentLoop
 	/// The agent loop: call the model, run the tools it calls, feed the
 	/// results back, repeat. The loop ends when the model answers without
-	/// tool calls, when the run is cancelled, when a call fails, or when the
-	/// round limit is reached; in the last case one final call, with the same
-	/// tools and tool choice none, asks the model for a text answer. Every
-	/// step is reported through the event callback, and DONE ends every run.
+	/// tool calls, when the run is cancelled, when a call fails, when an
+	/// answer is cut by the token limit, or when the round limit is reached;
+	/// in the last case one final call, with the same tools and tool choice
+	/// none, asks the model for a text answer. Every step is reported through
+	/// the event callback, and DONE, with the stop reason of the last call and
+	/// the usage of all, ends every run.
 	///
-	/// The tool list is taken once per run and sent unchanged in every call:
-	/// some models invalidate their replayed reasoning when it changes.
+	/// The tools are taken once per run, definitions and handlers, and sent
+	/// unchanged in every call: some models invalidate their replayed
+	/// reasoning when they change. Only those tools run, with those handlers,
+	/// and only after the approver allowed them: a tool registered during the
+	/// run is unknown to it.
+	///
+	/// Every tool call of the conversation gets its result, also one the loop
+	/// does not run: when the run is cancelled, when the round limit is
+	/// reached, when the call was cut by the token limit (its input may be
+	/// incomplete), and when the event callback throws, in which case the
+	/// exception leaves run() after the results and DONE.
+	///
+	/// The tools run with the request context of the loop, whose cancelled()
+	/// tells once the run is cancelled: a tool that runs long asks it.
 	///
 	/// Tool results, the descriptions of tools from remote servers and the
 	/// input the model gives a tool are untrusted input: a tool runs with
 	/// arguments the model chose, maybe after reading text an attacker wrote.
 	/// Use an approver to let a person, or a policy, decide which calls run.
+	///
+	/// A loop serves one run at a time, and is not configured while it runs.
 {
 public:
 	static constexpr std::size_t DEFAULT_MAX_TOOL_RESULT_SIZE = 20000;
 		/// The default limit, in bytes, of the text of a tool result.
+
+	static constexpr std::size_t DEFAULT_MAX_IMAGE_SIZE = 5*1024*1024;
+		/// The default limit, in bytes of base64, of one image of a tool result.
 
 	AgentLoop(std::shared_ptr<LLMProvider> pProvider, ToolRegistry& toolRegistry, int maxRounds = 10);
 		/// Creates the loop over pProvider and toolRegistry, which must outlive
@@ -101,14 +135,25 @@ public:
 
 	void setMaxToolResultSize(std::size_t maxSize);
 		/// Sets the limit, in bytes, of the text of a tool result that is
-		/// reported and passed back to the model. A longer result is cut at a
-		/// character boundary and marked as cut; its other content is dropped.
+		/// reported and passed back to the model: its text blocks, embedded
+		/// text resources and structured content together. Text beyond it is
+		/// cut at a character boundary, and the result says so.
 
 	[[nodiscard]] std::size_t getMaxToolResultSize() const;
 		/// Returns the limit of the text of a tool result.
 
+	void setMaxImageSize(std::size_t maxSize);
+		/// Sets the limit, in bytes of base64, of one image of a tool result.
+		/// An image of a type the APIs take (PNG, JPEG, GIF, WebP) is passed
+		/// back whole up to it; a larger one, one of another type, audio and
+		/// binary resources are replaced by a line that says what was left out.
+
+	[[nodiscard]] std::size_t getMaxImageSize() const;
+		/// Returns the limit of one image of a tool result.
+
 	void setApprover(ToolApprover approver);
-		/// Sets the approver of tool calls; without one every call runs.
+		/// Sets the approver of tool calls; without one every call runs. An
+		/// approver that throws refuses the call.
 
 	void setRequestContext(const Poco::AI::MCP::RequestContext& context);
 		/// Sets the request context the tools run with, e.g. the identity of
@@ -133,6 +178,7 @@ private:
 	ToolRegistry& _toolRegistry;
 	int _maxRounds;
 	std::size_t _maxToolResultSize;
+	std::size_t _maxImageSize;
 	ToolApprover _approver;
 	Poco::AI::MCP::RequestContext _context;
 };
@@ -144,6 +190,12 @@ private:
 inline std::size_t AgentLoop::getMaxToolResultSize() const
 {
 	return _maxToolResultSize;
+}
+
+
+inline std::size_t AgentLoop::getMaxImageSize() const
+{
+	return _maxImageSize;
 }
 
 

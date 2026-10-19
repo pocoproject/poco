@@ -34,6 +34,13 @@ public:
 	void testRequestContext();
 	void testUnknownTool();
 	void testConstruction();
+	void testCutByTokenLimit();
+	void testToolAddedDuringRun();
+	void testApproverThrows();
+	void testCallbackThrows();
+	void testResultLimits();
+	void testDoneCarriesTheOutcome();
+	void testToolSeesTheCancel();
 
 	void setUp();
 	void tearDown();

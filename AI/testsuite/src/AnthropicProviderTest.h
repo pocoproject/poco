@@ -37,6 +37,14 @@ public:
 	void testCancelDuringStream();
 	void testConcurrentCalls();
 	void testCancelStress();
+	void testCacheMarkers();
+	void testRequestMembersAndHeaders();
+	void testCancelDuringUpload();
+	void testCancelDuringConnect();
+	void testCutToolCall();
+	void testThinkingSignatures();
+	void testBlocksAsTheyCame();
+	void testRefusal();
 
 	void setUp();
 	void tearDown();

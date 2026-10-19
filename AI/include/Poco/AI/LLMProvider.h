@@ -26,6 +26,7 @@
 #include "Poco/AI/MCP/ToolResult.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
+#include "Poco/Timespan.h"
 #include <functional>
 #include <string>
 #include <vector>
@@ -34,12 +35,15 @@
 namespace Poco::AI {
 
 
-enum class ErrorCode
-	/// What an error event reports.
+enum class FailureCode
+	/// What a failure event reports. Named apart from the JSON-RPC
+	/// Poco::AI::MCP::ErrorCode, as code with both namespaces in use must
+	/// tell them apart.
 {
 	NONE,
 	UNAUTHENTICATED,      /// HTTP 401 or 403: the key is missing, wrong or lacks the permission.
-	RATE_LIMITED,         /// HTTP 429: too many requests; worth a retry later.
+	RATE_LIMITED,         /// HTTP 429 for too many requests: worth a retry after retryAfter.
+	QUOTA_EXCEEDED,       /// HTTP 402, or a 429 for a quota or spending limit: no retry helps until it is raised.
 	OVERLOADED,           /// HTTP 503 or 529, or an overloaded error in the stream; worth a retry later.
 	SERVER_ERROR,         /// Another HTTP 5xx.
 	REQUEST_REJECTED,     /// Another HTTP 4xx: the request itself is wrong.
@@ -120,12 +124,18 @@ struct AI_API ChatResult
 		/// The text of the answer.
 	std::vector<ToolCall> toolCalls;
 		/// The tool calls the model requests.
+	std::string explanation;
+		/// Why the model stopped, where the provider says it, e.g. the
+		/// explanation of a refusal.
 	Poco::JSON::Object::Ptr assistantMessage;
 		/// The model's turn in the provider's message format, with every block
-		/// the model returned, unchanged; reasoning blocks and their signatures
-		/// included, which some models require back in the next call. Append it
-		/// to the conversation as it is. Null when the call failed or was
-		/// cancelled, or returned nothing.
+		/// the model returned, as it returned them: reasoning blocks and their
+		/// signatures included, which some models require back. Append it to
+		/// the conversation as it is, and send every turn of the conversation
+		/// back unchanged, with the same system prompt and tools: a change
+		/// invalidates replayed reasoning. Null when the call failed, was
+		/// cancelled or refused, or returned nothing; a refused answer is not
+		/// to be kept, so the text that streamed in before is to be dropped.
 };
 
 
@@ -143,8 +153,12 @@ struct AI_API ContentEvent
 	std::string text;
 	ToolCall toolCall;
 		/// The tool call (TOOL_USE).
-	ErrorCode code = ErrorCode::NONE;
+	FailureCode code = FailureCode::NONE;
 		/// The kind of failure (FAILURE).
+	Poco::Timespan retryAfter;
+		/// How long to wait before a retry, when the API says it (FAILURE).
+	std::string requestId;
+		/// The API's id of the request, for its support (FAILURE).
 };
 
 

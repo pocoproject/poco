@@ -17,9 +17,11 @@
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
+#include "Poco/Event.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
 #include <atomic>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -84,10 +86,16 @@ namespace
 	struct Events
 	{
 		std::vector<ContentEvent> events;
+		Poco::Event textArrived;
+			/// Set once a piece of text has arrived.
 
 		ContentEventCallback callback()
 		{
-			return [this](const ContentEvent& event) { events.push_back(event); };
+			return [this](const ContentEvent& event)
+			{
+				events.push_back(event);
+				if (event.type == ContentEvent::Type::TEXT) textArrived.set();
+			};
 		}
 
 		const ContentEvent* firstError() const
@@ -111,7 +119,10 @@ namespace
 			+ data("{\"choices\":[{\"index\":0,\"delta\":{\"content\":\"lo\"},\"finish_reason\":null}]}");
 		if (finish)
 		{
-			stream += data("{\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":11,\"completion_tokens\":2,\"prompt_tokens_details\":{\"cached_tokens\":3}}}");
+			// With include_usage, the usage comes in a chunk of its own, with
+			// no choices, after the one with the finish reason.
+			stream += data("{\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}],\"usage\":null}");
+			stream += data("{\"choices\":[],\"usage\":{\"prompt_tokens\":11,\"completion_tokens\":2,\"prompt_tokens_details\":{\"cached_tokens\":3}}}");
 		}
 		if (done) stream += "data: [DONE]\n\n";
 		return stream;
@@ -187,7 +198,6 @@ void OpenAIProviderTest::testRequestBody()
 {
 	CannedServer server(SSE, textStream());
 	OpenAIProvider::Params settings = params(server.baseUrl());
-	settings.maxTokensField = "max_completion_tokens";
 	OpenAIProvider provider(settings);
 	ChatRequest request = userRequest("Hi", "Be brief.");
 	request.tools.push_back(weatherTool());
@@ -200,6 +210,7 @@ void OpenAIProviderTest::testRequestBody()
 	Object::Ptr pBody = parse(server.request());
 	assertEqual(50, pBody->getValue<int>("max_completion_tokens"));
 	assertTrue(!pBody->has("max_tokens"));
+	assertTrue(pBody->getObject("stream_options")->getValue<bool>("include_usage"));
 	Array::Ptr pMessages = pBody->getArray("messages");
 	assertEqual(std::string("system"), pMessages->getObject(0)->getValue<std::string>("role"));
 	assertEqual(std::string("Be brief."), pMessages->getObject(0)->getValue<std::string>("content"));
@@ -209,6 +220,34 @@ void OpenAIProviderTest::testRequestBody()
 	assertEqual(std::string("weather"), pTool->getObject("function")->getValue<std::string>("name"));
 	assertTrue(pTool->getObject("function")->getObject("parameters")->isObject("properties"));
 	assertEqual(std::string("none"), pBody->getValue<std::string>("tool_choice"));
+
+	// The deprecated field for a server that knows only it, and no usage
+	// option for one that refuses it.
+	settings.maxTokensField = "max_tokens";
+	settings.streamUsage = false;
+	OpenAIProvider older(settings);
+	(void) older.chat(userRequest("Hi"), ContentEventCallback(), cancellation);
+	Object::Ptr pOlder = parse(server.request());
+	assertEqual(50, pOlder->getValue<int>("max_tokens"));
+	assertTrue(!pOlder->has("max_completion_tokens"));
+	assertTrue(!pOlder->has("stream_options"));
+}
+
+
+void OpenAIProviderTest::testRequestMembersAndHeaders()
+{
+	CannedServer server(SSE, textStream());
+	OpenAIProvider::Params settings = params(server.baseUrl());
+	settings.requestMembers = parse("{\"reasoning_effort\":\"low\",\"max_completion_tokens\":99}");
+	settings.headers.set("OpenAI-Organization", "org-test");
+	OpenAIProvider provider(settings);
+	Cancellation cancellation;
+	(void) provider.chat(userRequest("Hi"), ContentEventCallback(), cancellation);
+	Object::Ptr pBody = parse(server.request());
+	assertEqual(std::string("low"), pBody->getValue<std::string>("reasoning_effort"));
+	assertEqual(99, pBody->getValue<int>("max_completion_tokens"));
+	assertEqual(std::string("org-test"), server.header("OpenAI-Organization"));
+	assertTrue(!settings.requestMembers->has("model"));
 }
 
 
@@ -301,7 +340,7 @@ void OpenAIProviderTest::testCutStream()
 	assertTrue(result.stopReason == StopReason::FAILURE);
 	assertTrue(result.toolCalls.empty());
 	assertTrue(result.assistantMessage.isNull());
-	assertTrue(events.firstError()->code == ErrorCode::STREAM_INTERRUPTED);
+	assertTrue(events.firstError()->code == FailureCode::STREAM_INTERRUPTED);
 	assertEqual(1u, static_cast<unsigned>(events.events.size()));
 
 	// A call cut right after the header of a tool call does not run the tool with no arguments.
@@ -324,7 +363,7 @@ void OpenAIProviderTest::testErrorInStream()
 	Cancellation cancellation;
 	ChatResult result = provider.chat(userRequest("Hi"), events.callback(), cancellation);
 	assertTrue(result.stopReason == StopReason::FAILURE);
-	assertTrue(events.firstError()->code == ErrorCode::STREAM_ERROR);
+	assertTrue(events.firstError()->code == FailureCode::STREAM_ERROR);
 	assertTrue(events.firstError()->text.find("model is overloaded") != std::string::npos);
 }
 
@@ -334,19 +373,22 @@ void OpenAIProviderTest::testHttpErrors()
 	struct Case
 	{
 		int status;
-		ErrorCode code;
+		FailureCode code;
 	};
 	const Case cases[] = {
-		{401, ErrorCode::UNAUTHENTICATED},
-		{429, ErrorCode::RATE_LIMITED},
-		{503, ErrorCode::OVERLOADED},
-		{502, ErrorCode::SERVER_ERROR},
-		{404, ErrorCode::REQUEST_REJECTED}
+		{401, FailureCode::UNAUTHENTICATED},
+		{429, FailureCode::RATE_LIMITED},
+		{503, FailureCode::OVERLOADED},
+		{502, FailureCode::SERVER_ERROR},
+		{404, FailureCode::REQUEST_REJECTED}
 	};
 	for (const Case& c: cases)
 	{
 		// The old retry without tools on one server's wording is gone.
-		CannedServer server(CannedServer::makeResponse(c.status, "application/json", "{\"error\":\"Unsupported param: tools\"}"));
+		CannedServer::Response response = CannedServer::makeResponse(c.status, "application/json", "{\"error\":\"Unsupported param: tools\"}");
+		response.headers.emplace_back("retry-after-ms", "1500");
+		response.headers.emplace_back("x-request-id", "req_abc");
+		CannedServer server(response);
 		OpenAIProvider provider(params(server.baseUrl()));
 		ChatRequest request = userRequest("Hi");
 		request.tools.push_back(weatherTool());
@@ -356,7 +398,60 @@ void OpenAIProviderTest::testHttpErrors()
 		assertTrue(result.stopReason == StopReason::FAILURE);
 		assertTrue(events.firstError()->code == c.code);
 		assertEqual(1, server.requests());
+		assertEqual(Poco::Timespan::TimeDiff(1500), events.firstError()->retryAfter.totalMilliseconds());
+		assertEqual(std::string("req_abc"), events.firstError()->requestId);
 	}
+
+	// A 429 for a used-up quota is no rate limit: waiting does not help.
+	CannedServer quota(CannedServer::makeResponse(429, "application/json", "{\"error\":{\"message\":\"quota\",\"type\":\"insufficient_quota\",\"code\":\"insufficient_quota\"}}"));
+	OpenAIProvider quotaProvider(params(quota.baseUrl()));
+	Events quotaEvents;
+	Cancellation cancellation;
+	(void) quotaProvider.chat(userRequest("Hi"), quotaEvents.callback(), cancellation);
+	assertTrue(quotaEvents.firstError()->code == FailureCode::QUOTA_EXCEEDED);
+}
+
+
+void OpenAIProviderTest::testCutByLength()
+{
+	// The token limit cut a tool call before its arguments: the call comes
+	// with no input and the stop reason says the answer is cut.
+	const std::string stream = data("{\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"tool_calls\":[{\"index\":0,\"id\":\"call_cut\",\"type\":\"function\",\"function\":{\"name\":\"weather\",\"arguments\":\"\"}}]},\"finish_reason\":null}]}")
+		+ data("{\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"length\"}]}")
+		+ "data: [DONE]\n\n";
+	CannedServer server(SSE, stream);
+	OpenAIProvider provider(params(server.baseUrl()));
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Weather?"), ContentEventCallback(), cancellation);
+	assertTrue(result.stopReason == StopReason::MAX_TOKENS);
+	assertEqual(std::string("length"), result.stopDetail);
+	assertEqual(1u, static_cast<unsigned>(result.toolCalls.size()));
+	assertEqual(0u, static_cast<unsigned>(result.toolCalls[0].input->size()));
+
+	// Text cut by the limit is kept as far as it came.
+	std::string text = textStream();
+	text.replace(text.find("\"stop\""), 6, "\"length\"");
+	CannedServer textServer(SSE, text);
+	OpenAIProvider textProvider(params(textServer.baseUrl()));
+	ChatResult cut = textProvider.chat(userRequest("Hi"), ContentEventCallback(), cancellation);
+	assertTrue(cut.stopReason == StopReason::MAX_TOKENS);
+	assertEqual(std::string("Hello"), cut.assistantMessage->getValue<std::string>("content"));
+}
+
+
+void OpenAIProviderTest::testArgumentsAsTheyCame()
+{
+	// The arguments go back in the turn as the model wrote them; the input
+	// keeps the order of their members.
+	CannedServer server(SSE, toolStream("\\\"Paris\\\", \\\"alpha\\\": 1}"));
+	OpenAIProvider provider(params(server.baseUrl()));
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Weather?"), ContentEventCallback(), cancellation);
+	Object::Ptr pFunction = result.assistantMessage->getArray("tool_calls")->getObject(0)->getObject("function");
+	assertEqual(std::string("{\"city\":\"Paris\", \"alpha\": 1}"), pFunction->getValue<std::string>("arguments"));
+	std::ostringstream input;
+	result.toolCalls[0].input->stringify(input);
+	assertEqual(std::string("{\"city\":\"Paris\",\"alpha\":1}"), input.str());
 }
 
 
@@ -368,7 +463,7 @@ void OpenAIProviderTest::testMalformedArguments()
 	Cancellation cancellation;
 	ChatResult result = provider.chat(userRequest("Weather?"), events.callback(), cancellation);
 	assertTrue(result.toolCalls.empty());
-	assertTrue(events.firstError()->code == ErrorCode::MALFORMED_TOOL_INPUT);
+	assertTrue(events.firstError()->code == FailureCode::MALFORMED_TOOL_INPUT);
 	assertTrue(!result.assistantMessage->has("tool_calls"));
 }
 
@@ -406,8 +501,9 @@ void OpenAIProviderTest::testListModels()
 		(void) down.listModels();
 		fail("a failed listing must throw");
 	}
-	catch (const Poco::Net::HTTPException&)
+	catch (const Poco::Net::HTTPException& exc)
 	{
+		assertEqual(500, exc.code());
 	}
 
 	CannedServer malformed("application/json", "[1,2]");
@@ -495,17 +591,20 @@ void OpenAIProviderTest::testCancelBeforeHeaders()
 
 void OpenAIProviderTest::testCancelDuringStream()
 {
+	// The stream stops after its first text; the cancel comes while the call
+	// waits for the rest.
 	CannedServer::Response response = CannedServer::makeResponse(200, SSE, textStream());
 	response.pauseAt = response.body.find("data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"lo\"}");
 	CannedServer server(response);
 	OpenAIProvider provider(params(server.baseUrl()));
 	ChatThread chat(provider, userRequest("Hi"));
-	assertTrue(server.waitForRequest(10000));
+	assertTrue(chat.events.textArrived.tryWait(10000));
 	chat.cancellation.cancel();
 	chat.join();
 	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
 	assertTrue(chat.error.empty());
 	assertTrue(chat.events.firstError() == nullptr);
+	assertEqual(std::string("Hel"), chat.events.text());
 }
 
 
@@ -538,6 +637,9 @@ CppUnit::Test* OpenAIProviderTest::suite()
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testMalformedEmbeddings);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testCancelBeforeHeaders);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testCancelDuringStream);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testRequestMembersAndHeaders);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testCutByLength);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testArgumentsAsTheyCame);
 
 	return pSuite;
 }

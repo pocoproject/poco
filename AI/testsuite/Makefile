@@ -14,6 +14,7 @@ objects = \
 	Driver \
 	AITestSuite \
 	ToolRegistryTest \
+	CancellationTest \
 	AgentLoopTest \
 	AnthropicProviderTest \
 	OpenAIProviderTest \

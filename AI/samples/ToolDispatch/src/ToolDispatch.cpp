@@ -44,11 +44,14 @@ class ToolDispatchProvider: public LLMProvider
 	///
 	/// A rule matches when all keywords of one of its groups occur in the
 	/// user's last message: a case-insensitive ASCII substring search, which
-	/// also matches inside words and does not see negation. A matched tool is
-	/// reported as a tool call, the AgentLoop runs it, and the results of the
-	/// current turn (those after the last user message) are given to the
-	/// wrapped provider as a delimited block of data, with the question. When
-	/// no rule matches, the wrapped provider gets the conversation as it is.
+	/// also matches inside words and does not see negation. While the request
+	/// lets the model call tools (ToolChoice::AUTO), a matched tool is reported
+	/// as a tool call, the AgentLoop runs it, and the results of the current
+	/// turn (those after the last user message) are given to the wrapped
+	/// provider as a delimited block of data, with the question; a tool that
+	/// returned nothing shows as "(no output)", and angle brackets in the data
+	/// are escaped, so that it cannot end the block. When no rule matches, the
+	/// wrapped provider gets the conversation as it is.
 {
 public:
 	struct DispatchRule
@@ -102,7 +105,7 @@ public:
 			return _pChatProvider->chat(answer, onEvent, cancellation);
 		}
 
-		if (!request.tools.empty())
+		if (!request.tools.empty() && request.toolChoice == ToolChoice::AUTO)
 		{
 			ChatResult matched = match(question, onEvent);
 			if (!matched.toolCalls.empty()) return matched;
@@ -193,9 +196,23 @@ private:
 		return messages.getObject(turn - 1)->optValue<std::string>("content", "");
 	}
 
+	static std::string escaped(const std::string& text)
+		/// text with its angle brackets escaped, so that it cannot close the
+		/// block of data it is put in.
+	{
+		std::string result;
+		for (const char c: text)
+		{
+			if (c == '<') result += "&lt;";
+			else if (c == '>') result += "&gt;";
+			else result += c;
+		}
+		return result;
+	}
+
 	std::string toolResults(const Array& messages, unsigned turn) const
 		/// The tool output of the current turn, cut to the data limit at a
-		/// character boundary.
+		/// character boundary; empty when no tool has run in it.
 	{
 		std::string data;
 		for (unsigned i = turn; i < messages.size(); ++i)
@@ -203,9 +220,8 @@ private:
 			const Object::Ptr pMessage = messages.getObject(i);
 			if (pMessage == nullptr || pMessage->optValue<std::string>("role", "") != "tool") continue;
 			const std::string content = pMessage->optValue<std::string>("content", "");
-			if (content.empty()) continue;
 			if (!data.empty()) data += "\n\n";
-			data += content;
+			data += content.empty() ? std::string("(no output)") : escaped(content);
 		}
 		if (data.size() > _maxDataSize)
 		{

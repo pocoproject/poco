@@ -28,6 +28,9 @@ public:
 	void testResultPassesThrough();
 	void testAddServerFailure();
 	void testDuplicateLabel();
+	void testServerWithoutTools();
+	void testPrefixedNames();
+	void testCancelledRunCallsNoTool();
 
 	void setUp();
 	void tearDown();

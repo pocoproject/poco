@@ -21,6 +21,7 @@
 #include "Poco/AI/MCP/MCP.h"
 #include "Poco/AI/MCP/Implementation.h"
 #include "Poco/JSON/Object.h"
+#include <functional>
 #include <string>
 
 
@@ -59,7 +60,26 @@ struct AIMCP_API RequestContext
 
 	Implementation clientInfo;
 		/// The client's name and version, if the request carried them.
+
+	std::function<bool ()> cancelled;
+		/// Returns true once the work for the request is to be abandoned; a
+		/// handler that runs long asks it now and then. Empty when nothing
+		/// can cancel the request, as on the Server, which serves requests
+		/// synchronously; an agent loop sets it from the Cancellation of its
+		/// run. isCancelled() asks it when it is set.
+
+	[[nodiscard]] bool isCancelled() const;
+		/// Returns cancelled(), or false when it is not set.
 };
+
+
+//
+// inlines
+//
+inline bool RequestContext::isCancelled() const
+{
+	return cancelled && cancelled();
+}
 
 
 } // namespace Poco::AI::MCP

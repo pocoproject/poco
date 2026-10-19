@@ -34,9 +34,11 @@ namespace Poco::AI {
 
 
 [[nodiscard]] AI_API std::string toolResultText(const Poco::AI::MCP::ToolResult& result);
-	/// The text of a tool result for a model: its text blocks joined with
-	/// newlines; without text blocks, its structured content as JSON, or else
-	/// its content blocks as JSON.
+	/// The text of a tool result for a model, one line for each block, in
+	/// their order: the text of a text block and of an embedded text resource;
+	/// for an image, audio or binary resource what it is and its size, not its
+	/// data; a resource link by its URI; another block as JSON. Without text,
+	/// the structured content as JSON, when there is some.
 
 
 class AI_API ToolRegistry
@@ -90,6 +92,11 @@ public:
 		/// Runs a tool with the given input (null for none) and request context.
 		/// An unknown tool and a handler that throws give an error result, never
 		/// an exception.
+
+	[[nodiscard]] static Poco::AI::MCP::ToolResult execute(const Poco::AI::MCP::Tool& tool, const Poco::JSON::Object::Ptr& input, const Poco::AI::MCP::RequestContext& context = Poco::AI::MCP::RequestContext());
+		/// Runs the handler of tool, e.g. one of a list tools() returned, with
+		/// the given input (null for none). A handler that throws, or a tool
+		/// without one, gives an error result, never an exception.
 
 	[[nodiscard]] bool hasTool(const std::string& name) const;
 		/// Returns true if a tool of that name is registered.

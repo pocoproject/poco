@@ -14,6 +14,7 @@
 
 #include "Poco/AI/MCPHost.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <utility>
 
 
@@ -32,22 +33,35 @@ struct MCPHost::Connection
 
 namespace
 {
+	bool isModelToolCharacter(char c)
+		/// Returns true if both model APIs take c in a tool name: A-Z, a-z,
+		/// 0-9, '_' and '-'.
+	{
+		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-';
+	}
+
+
 	bool isModelToolName(const std::string& name)
 		/// Returns true if both model APIs take name as a tool name: 1 to 64
-		/// characters from A-Z, a-z, 0-9, '_' and '-'.
+		/// of those characters.
 	{
-		if (name.empty() || name.size() > 64) return false;
-		for (const char c: name)
-		{
-			const bool ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-';
-			if (!ok) return false;
-		}
-		return true;
+		return !name.empty() && name.size() <= 64 && std::all_of(name.begin(), name.end(), isModelToolCharacter);
+	}
+
+
+	std::string usable(const std::string& text)
+		/// text with each character the model APIs refuse in a tool name
+		/// replaced by '_'.
+	{
+		std::string result(text);
+		std::replace_if(result.begin(), result.end(), [](char c) { return !isModelToolCharacter(c); }, '_');
+		return result;
 	}
 }
 
 
-MCPHost::MCPHost()
+MCPHost::MCPHost():
+	_naming(Naming::REMOTE)
 {
 }
 
@@ -72,10 +86,19 @@ void MCPHost::addServer(const std::string& label, std::unique_ptr<Poco::AI::MCP:
 	}
 	auto pConnection = std::make_shared<Connection>();
 	pConnection->label = label;
-	(void) pClient->discover();
-	pConnection->tools = pClient->listTools();
+	const Poco::AI::MCP::ServerDescription description = pClient->discover();
+	if (description.capabilities->has("tools"))
+	{
+		pConnection->tools = pClient->listTools();
+	}
 	pConnection->pClient = std::move(pClient);
 	_connections.push_back(pConnection);
+}
+
+
+void MCPHost::setNaming(Naming naming)
+{
+	_naming = naming;
 }
 
 
@@ -86,17 +109,23 @@ std::size_t MCPHost::registerInto(ToolRegistry& registry, std::vector<std::strin
 	{
 		for (const Poco::AI::MCP::Tool& remote: pConnection->tools)
 		{
-			if (!isModelToolName(remote.name))
+			const std::string name = _naming == Naming::PREFIXED ? usable(pConnection->label) + "_" + usable(remote.name) : remote.name;
+			if (!isModelToolName(name))
 			{
-				if (pSkipped != nullptr) pSkipped->push_back(pConnection->label + ": " + remote.name + " (a name the model APIs refuse)");
+				if (pSkipped != nullptr) pSkipped->push_back(pConnection->label + ": " + name + " (a name the model APIs refuse)");
 				continue;
 			}
 			Poco::AI::MCP::Tool tool(remote);
+			tool.name = name;
 			const std::shared_ptr<Connection> pBound = pConnection;
-			const std::string name = remote.name;
-			tool.handler = [pBound, name](const Poco::JSON::Object::Ptr& input, const Poco::AI::MCP::RequestContext&)
+			const std::string remoteName = remote.name;
+			tool.handler = [pBound, remoteName](const Poco::JSON::Object::Ptr& input, const Poco::AI::MCP::RequestContext& context)
 			{
-				return pBound->pClient->callTool(name, input);
+				if (context.isCancelled())
+				{
+					return Poco::AI::MCP::ToolResult::error("The tool was not called: the run was cancelled.");
+				}
+				return pBound->pClient->callTool(remoteName, input);
 			};
 			if (!registry.registerToolIfAbsent(tool))
 			{

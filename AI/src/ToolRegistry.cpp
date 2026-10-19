@@ -18,6 +18,7 @@
 #include "Poco/Exception.h"
 #include <exception>
 #include <sstream>
+#include <string>
 #include <utility>
 
 
@@ -52,21 +53,50 @@ std::string toolResultText(const Poco::AI::MCP::ToolResult& result)
 {
 	std::string text;
 	bool hasText = false;
+	const auto line = [&text](const std::string& part)
+	{
+		if (!text.empty()) text += '\n';
+		text += part;
+	};
 	const Poco::JSON::Array::Ptr pContent = result.content();
 	for (std::size_t i = 0; pContent != nullptr && i < pContent->size(); ++i)
 	{
 		const Poco::JSON::Object::Ptr pBlock = pContent->getObject(static_cast<unsigned>(i));
-		if (pBlock != nullptr && pBlock->optValue<std::string>("type", "") == "text")
+		if (pBlock == nullptr) continue;
+		const std::string type = pBlock->optValue<std::string>("type", "");
+		if (type == "text")
 		{
-			if (hasText) text += '\n';
-			text += pBlock->optValue<std::string>("text", "");
+			line(pBlock->optValue<std::string>("text", ""));
 			hasText = true;
 		}
+		else if (type == "image" || type == "audio")
+		{
+			line("[" + type + " " + pBlock->optValue<std::string>("mimeType", "") + ", " + std::to_string(pBlock->optValue<std::string>("data", "").size()) + " bytes of base64]");
+		}
+		else if (type == "resource_link")
+		{
+			line("[resource " + pBlock->optValue<std::string>("uri", "") + "]");
+		}
+		else if (type == "resource" && pBlock->isObject("resource"))
+		{
+			const Poco::JSON::Object::Ptr pResource = pBlock->getObject("resource");
+			if (pResource->has("text"))
+			{
+				line(pResource->optValue<std::string>("text", ""));
+				hasText = true;
+			}
+			else
+			{
+				line("[resource " + pResource->optValue<std::string>("uri", "") + ", " + std::to_string(pResource->optValue<std::string>("blob", "").size()) + " bytes of base64]");
+			}
+		}
+		else
+		{
+			line(json(pBlock));
+		}
 	}
-	if (hasText) return text;
-	if (!result.structuredContent().isEmpty()) return json(result.structuredContent());
-	if (pContent != nullptr && pContent->size() > 0) return json(pContent);
-	return std::string();
+	if (!hasText && !result.structuredContent().isEmpty()) return json(result.structuredContent());
+	return text;
 }
 
 
@@ -138,7 +168,7 @@ std::vector<Poco::AI::MCP::Tool> ToolRegistry::tools() const
 
 Poco::AI::MCP::ToolResult ToolRegistry::executeTool(const std::string& name, const Poco::JSON::Object::Ptr& input, const Poco::AI::MCP::RequestContext& context)
 {
-	Poco::AI::MCP::ContextToolHandler handler;
+	Poco::AI::MCP::Tool tool;
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		const auto it = _tools.find(name);
@@ -146,11 +176,21 @@ Poco::AI::MCP::ToolResult ToolRegistry::executeTool(const std::string& name, con
 		{
 			return Poco::AI::MCP::ToolResult::error("Unknown tool: " + name);
 		}
-		handler = it->second.handler;
+		tool = it->second;
+	}
+	return execute(tool, input, context);
+}
+
+
+Poco::AI::MCP::ToolResult ToolRegistry::execute(const Poco::AI::MCP::Tool& tool, const Poco::JSON::Object::Ptr& input, const Poco::AI::MCP::RequestContext& context)
+{
+	if (!tool.handler)
+	{
+		return Poco::AI::MCP::ToolResult::error("The tool has no handler: " + tool.name);
 	}
 	try
 	{
-		return handler(input != nullptr ? input : Poco::JSON::Object::Ptr(new Poco::JSON::Object), context);
+		return tool.handler(input != nullptr ? input : Poco::JSON::Object::Ptr(new Poco::JSON::Object), context);
 	}
 	catch (const Poco::Exception& exc)
 	{

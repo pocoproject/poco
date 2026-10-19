@@ -14,14 +14,21 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/AnthropicProvider.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/Event.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include "Poco/Format.h"
+#include "Poco/Timestamp.h"
 #include <atomic>
+#include <fstream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -73,6 +80,26 @@ namespace
 	}
 
 
+#if defined(__linux__)
+	bool connecting(Poco::UInt16 port)
+		/// Returns true if the kernel lists a connection to the loopback port
+		/// as SYN_SENT: a connect under way that nobody answers.
+	{
+		std::ifstream table("/proc/net/tcp");
+		const std::string remote = Poco::format(":%04X", static_cast<unsigned>(port));
+		std::string line;
+		while (std::getline(table, line))
+		{
+			std::istringstream fields(line);
+			std::string slot, local, peer, state;
+			fields >> slot >> local >> peer >> state;
+			if (state == "02" && peer.size() > remote.size() && peer.compare(peer.size() - remote.size(), remote.size(), remote) == 0) return true;
+		}
+		return false;
+	}
+#endif
+
+
 	Poco::AI::MCP::Tool weatherTool()
 	{
 		Poco::AI::MCP::Tool tool;
@@ -86,10 +113,16 @@ namespace
 	struct Events
 	{
 		std::vector<ContentEvent> events;
+		Poco::Event textArrived;
+			/// Set once a piece of text has arrived.
 
 		ContentEventCallback callback()
 		{
-			return [this](const ContentEvent& event) { events.push_back(event); };
+			return [this](const ContentEvent& event)
+			{
+				events.push_back(event);
+				if (event.type == ContentEvent::Type::TEXT) textArrived.set();
+			};
 		}
 
 		int errors() const
@@ -250,7 +283,61 @@ void AnthropicProviderTest::testRequestBody()
 	assertTrue(!pTools->getObject(1)->has("description"));
 	assertTrue(pTools->getObject(1)->has("cache_control"));
 	assertEqual(std::string("none"), pBody->getObject("tool_choice")->getValue<std::string>("type"));
-	assertEqual(std::string("Hi"), pBody->getArray("messages")->getObject(0)->getValue<std::string>("content"));
+	// The last block of the last message carries a cache marker too; the
+	// caller's message is not changed for it.
+	Object::Ptr pLastBlock = pBody->getArray("messages")->getObject(0)->getArray("content")->getObject(0);
+	assertEqual(std::string("Hi"), pLastBlock->getValue<std::string>("text"));
+	assertEqual(std::string("ephemeral"), pLastBlock->getObject("cache_control")->getValue<std::string>("type"));
+	assertEqual(std::string("Hi"), request.messages.getObject(0)->getValue<std::string>("content"));
+	assertEqual(16000, AnthropicProvider::Params().maxTokens);
+}
+
+
+void AnthropicProviderTest::testCacheMarkers()
+{
+	CannedServer server(SSE, textStream());
+	AnthropicProvider provider(params(server.baseUrl()));
+	Cancellation cancellation;
+
+	// On a tool result that ends the conversation.
+	ChatRequest request = userRequest("Weather?");
+	Object::Ptr pTurn = parse("{\"role\":\"assistant\",\"content\":[{\"type\":\"tool_use\",\"id\":\"t1\",\"name\":\"weather\",\"input\":{}}]}");
+	request.messages.add(pTurn);
+	Poco::AI::MCP::ToolResult toolResult;
+	toolResult.addText("Sunny");
+	provider.appendToolResult(request.messages, "t1", toolResult);
+	(void) provider.chat(request, ContentEventCallback(), cancellation);
+	Array::Ptr pMessages = parse(server.request())->getArray("messages");
+	Object::Ptr pResult = pMessages->getObject(2)->getArray("content")->getObject(0);
+	assertEqual(std::string("tool_result"), pResult->getValue<std::string>("type"));
+	assertTrue(pResult->has("cache_control"));
+	assertTrue(!pMessages->getObject(1)->getArray("content")->getObject(0)->has("cache_control"));
+	assertTrue(!request.messages.getObject(2)->getArray("content")->getObject(0)->has("cache_control"));
+
+	// Not on a thinking block.
+	ChatRequest thinking = userRequest("Hm");
+	thinking.messages.add(parse("{\"role\":\"assistant\",\"content\":[{\"type\":\"thinking\",\"thinking\":\"x\",\"signature\":\"s\"}]}"));
+	(void) provider.chat(thinking, ContentEventCallback(), cancellation);
+	Object::Ptr pThinking = parse(server.request())->getArray("messages")->getObject(1)->getArray("content")->getObject(0);
+	assertTrue(!pThinking->has("cache_control"));
+}
+
+
+void AnthropicProviderTest::testRequestMembersAndHeaders()
+{
+	CannedServer server(SSE, textStream());
+	AnthropicProvider::Params settings = params(server.baseUrl());
+	settings.requestMembers = parse("{\"thinking\":{\"type\":\"adaptive\"},\"max_tokens\":32000}");
+	settings.headers.set("anthropic-beta", "test-beta");
+	AnthropicProvider provider(settings);
+	Cancellation cancellation;
+	(void) provider.chat(userRequest("Hi"), ContentEventCallback(), cancellation);
+	Object::Ptr pBody = parse(server.request());
+	assertEqual(std::string("adaptive"), pBody->getObject("thinking")->getValue<std::string>("type"));
+	assertEqual(32000, pBody->getValue<int>("max_tokens"));
+	assertEqual(std::string("test-beta"), server.header("anthropic-beta"));
+	// The settings' object is not the one that went out.
+	assertTrue(!settings.requestMembers->has("model"));
 }
 
 
@@ -377,7 +464,7 @@ void AnthropicProviderTest::testCutStream()
 	assertTrue(result.toolCalls.empty());
 	assertTrue(result.assistantMessage.isNull());
 	assertEqual(1, events.errors());
-	assertTrue(events.firstError()->code == ErrorCode::STREAM_INTERRUPTED);
+	assertTrue(events.firstError()->code == FailureCode::STREAM_INTERRUPTED);
 	// No tool call was reported.
 	assertEqual(1u, static_cast<unsigned>(events.events.size()));
 }
@@ -393,7 +480,7 @@ void AnthropicProviderTest::testErrorEvent()
 	Cancellation cancellation;
 	ChatResult result = provider.chat(userRequest("Hi"), events.callback(), cancellation);
 	assertTrue(result.stopReason == StopReason::FAILURE);
-	assertTrue(events.firstError()->code == ErrorCode::OVERLOADED);
+	assertTrue(events.firstError()->code == FailureCode::OVERLOADED);
 	assertTrue(events.firstError()->text.find("Overloaded") != std::string::npos);
 }
 
@@ -403,20 +490,24 @@ void AnthropicProviderTest::testHttpErrors()
 	struct Case
 	{
 		int status;
-		ErrorCode code;
+		FailureCode code;
 	};
 	const Case cases[] = {
-		{401, ErrorCode::UNAUTHENTICATED},
-		{403, ErrorCode::UNAUTHENTICATED},
-		{429, ErrorCode::RATE_LIMITED},
-		{503, ErrorCode::OVERLOADED},
-		{500, ErrorCode::SERVER_ERROR},
-		{400, ErrorCode::REQUEST_REJECTED}
+		{401, FailureCode::UNAUTHENTICATED},
+		{403, FailureCode::UNAUTHENTICATED},
+		{402, FailureCode::QUOTA_EXCEEDED},
+		{429, FailureCode::RATE_LIMITED},
+		{503, FailureCode::OVERLOADED},
+		{500, FailureCode::SERVER_ERROR},
+		{400, FailureCode::REQUEST_REJECTED}
 	};
 	for (const Case& c: cases)
 	{
 		// The excerpt of the body is cut at a character boundary.
-		CannedServer server(CannedServer::makeResponse(c.status, "application/json", std::string(499, 'x') + "\xC3\xA9" + "rest"));
+		CannedServer::Response response = CannedServer::makeResponse(c.status, "application/json", std::string(499, 'x') + "\xC3\xA9" + "rest");
+		response.headers.emplace_back("retry-after", "7");
+		response.headers.emplace_back("request-id", "req_123");
+		CannedServer server(response);
 		AnthropicProvider provider(params(server.baseUrl()));
 		Events events;
 		Cancellation cancellation;
@@ -425,9 +516,19 @@ void AnthropicProviderTest::testHttpErrors()
 		assertTrue(events.firstError()->code == c.code);
 		const std::string text = events.firstError()->text;
 		assertTrue(text.find(std::to_string(c.status)) != std::string::npos);
-		assertTrue(text.size() >= 499);
-		assertTrue(text.compare(text.size() - 499, 499, std::string(499, 'x')) == 0);
+		assertTrue(text.size() >= 502);
+		assertTrue(text.compare(text.size() - 502, 502, std::string(499, 'x') + "...") == 0);
+		assertEqual(7, events.firstError()->retryAfter.totalSeconds());
+		assertEqual(std::string("req_123"), events.firstError()->requestId);
 	}
+
+	// A 429 for a used-up quota is no rate limit: waiting does not help.
+	CannedServer quota(CannedServer::makeResponse(429, "application/json", "{\"type\":\"error\",\"error\":{\"type\":\"billing_error\",\"message\":\"credit\"}}"));
+	AnthropicProvider quotaProvider(params(quota.baseUrl()));
+	Events quotaEvents;
+	Cancellation cancellation;
+	(void) quotaProvider.chat(userRequest("Hi"), quotaEvents.callback(), cancellation);
+	assertTrue(quotaEvents.firstError()->code == FailureCode::QUOTA_EXCEEDED);
 }
 
 
@@ -439,7 +540,7 @@ void AnthropicProviderTest::testMalformedToolInput()
 	Cancellation cancellation;
 	ChatResult result = provider.chat(userRequest("Weather?"), events.callback(), cancellation);
 	assertTrue(result.toolCalls.empty());
-	assertTrue(events.firstError()->code == ErrorCode::MALFORMED_TOOL_INPUT);
+	assertTrue(events.firstError()->code == FailureCode::MALFORMED_TOOL_INPUT);
 	// The turn leaves the call out, so that no call is left without a result.
 	assertTrue(result.assistantMessage.isNull());
 }
@@ -487,8 +588,9 @@ void AnthropicProviderTest::testListModels()
 		(void) unauthorized.listModels();
 		fail("a failed listing must throw");
 	}
-	catch (const Poco::Net::HTTPException&)
+	catch (const Poco::Net::HTTPException& exc)
 	{
+		assertEqual(401, exc.code());
 	}
 }
 
@@ -511,17 +613,73 @@ void AnthropicProviderTest::testCancelBeforeHeaders()
 
 void AnthropicProviderTest::testCancelDuringStream()
 {
+	// The stream stops after its text; the cancel comes while the call waits
+	// for the rest.
 	CannedServer::Response response = CannedServer::makeResponse(200, SSE, textStream());
 	response.pauseAt = response.body.find("event: content_block_stop");
 	CannedServer server(response);
 	AnthropicProvider provider(params(server.baseUrl()));
 	ChatThread chat(provider, userRequest("Hi"));
-	assertTrue(server.waitForRequest(10000));
+	assertTrue(chat.events.textArrived.tryWait(10000));
 	chat.cancellation.cancel();
 	chat.join();
 	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
 	assertTrue(chat.error.empty());
 	assertEqual(0, chat.events.errors());
+	// What arrived before the cancel stays reported: the first piece at
+	// least, the second too if it came before the cancel.
+	const std::string text = chat.events.text();
+	assertTrue(text == "Hel" || text == "Hello");
+}
+
+
+void AnthropicProviderTest::testCancelDuringUpload()
+{
+	// The server reads nothing of a large request: the cancel ends the call
+	// while it is still sending.
+	CannedServer::Response response;
+	response.stallBeforeBody = true;
+	CannedServer server(response);
+	AnthropicProvider provider(params(server.baseUrl()));
+	ChatThread chat(provider, userRequest(std::string(16*1024*1024, 'x')));
+	assertTrue(server.waitForRequest(10000));
+	const Poco::Timestamp cancelled;
+	chat.cancellation.cancel();
+	chat.join();
+	assertTrue(cancelled.elapsed() < 5 * Poco::Timestamp::resolution());
+	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
+	assertTrue(chat.error.empty());
+}
+
+
+void AnthropicProviderTest::testCancelDuringConnect()
+{
+#if defined(__linux__)
+	// A listener whose queue is full drops further connection requests, so
+	// a connect to it hangs: the cancel ends it, not the timeout.
+	Poco::Net::ServerSocket listener(Poco::Net::SocketAddress("127.0.0.1", 0), 0);
+	Poco::Net::StreamSocket queued;
+	queued.connect(listener.address());
+	const Poco::UInt16 port = listener.address().port();
+	AnthropicProvider::Params settings = params("http://127.0.0.1:" + std::to_string(port) + "/v1");
+	settings.timeout = Poco::Timespan(20, 0);
+	AnthropicProvider provider(settings);
+	ChatThread chat(provider, userRequest("Hi"));
+	const Poco::Timestamp started;
+	bool hanging = false;
+	while (!(hanging = connecting(port)) && started.elapsed() < 10 * Poco::Timestamp::resolution())
+	{
+		Poco::Thread::sleep(1);
+	}
+	const Poco::Timestamp cancelled;
+	chat.cancellation.cancel();
+	chat.join();
+	// Where the kernel takes the connection all the same, no connect hangs.
+	if (!hanging) return;
+	assertTrue(cancelled.elapsed() < 5 * Poco::Timestamp::resolution());
+	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
+	assertTrue(chat.error.empty());
+#endif
 }
 
 
@@ -548,21 +706,168 @@ void AnthropicProviderTest::testConcurrentCalls()
 void AnthropicProviderTest::testCancelStress()
 {
 	// A cancel that comes at any moment ends the call quietly, whatever
-	// phase it hits: before the request, while connecting and sending, while
-	// waiting for the headers or while reading the stream.
+	// phase it hits. The iterations take turns: at once, before the request;
+	// once the server has the request, while the call waits for the head;
+	// after a little spinning from there, which lands anywhere around the
+	// head and the first events; and after the first text, while the call
+	// reads the stream.
 	CannedServer::Response response = CannedServer::makeResponse(200, SSE, textStream());
 	response.pauseAt = response.body.find("event: content_block_stop");
 	CannedServer server(response);
 	AnthropicProvider provider(params(server.baseUrl()));
+	int afterText = 0;
 	for (int i = 0; i < 100; ++i)
 	{
+		const int requestsBefore = server.requests();
 		ChatThread chat(provider, userRequest("Hi"));
+		switch (i % 4)
+		{
+		case 1:
+			assertTrue(server.waitForRequests(requestsBefore + 1, 10000));
+			break;
+		case 2:
+			{
+				assertTrue(server.waitForRequests(requestsBefore + 1, 10000));
+				volatile unsigned spin = 0;
+				for (unsigned j = 0; j < static_cast<unsigned>((i * 7919) % 200000); ++j) spin = spin + 1;
+			}
+			break;
+		case 3:
+			assertTrue(chat.events.textArrived.tryWait(10000));
+			++afterText;
+			break;
+		default:
+			break;
+		}
 		chat.cancellation.cancel();
 		chat.join();
 		assertTrue(chat.result.stopReason == StopReason::CANCELLED);
 		assertTrue(chat.error.empty());
 		assertEqual(0, chat.events.errors());
 	}
+	// Three iterations in four reached the server, a quarter read text first.
+	assertTrue(server.requests() >= 75);
+	assertEqual(25, afterText);
+}
+
+
+void AnthropicProviderTest::testCutToolCall()
+{
+	// The token limit cut a tool call before any of its input: the call is
+	// returned with no input, and the stop reason says the answer is cut.
+	const std::string stream = sse("message_start", "{\"type\":\"message_start\",\"message\":{\"usage\":{\"input_tokens\":3}}}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":0,\"content_block\":{\"type\":\"tool_use\",\"id\":\"toolu_cut\",\"name\":\"weather\",\"input\":{}}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":0}")
+		+ sse("message_delta", "{\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"max_tokens\"},\"usage\":{\"output_tokens\":100}}")
+		+ sse("message_stop", "{\"type\":\"message_stop\"}");
+	CannedServer server(SSE, stream);
+	AnthropicProvider provider(params(server.baseUrl()));
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Weather?"), ContentEventCallback(), cancellation);
+	assertTrue(result.stopReason == StopReason::MAX_TOKENS);
+	assertEqual(1u, static_cast<unsigned>(result.toolCalls.size()));
+	assertEqual(0u, static_cast<unsigned>(result.toolCalls[0].input->size()));
+
+	// A context window that ran out cuts the answer as well.
+	std::string window = stream;
+	window.replace(window.find("max_tokens"), 10, "model_context_window_exceeded");
+	CannedServer windowServer(SSE, window);
+	AnthropicProvider windowProvider(params(windowServer.baseUrl()));
+	assertTrue(windowProvider.chat(userRequest("Weather?"), ContentEventCallback(), cancellation).stopReason == StopReason::MAX_TOKENS);
+}
+
+
+void AnthropicProviderTest::testThinkingSignatures()
+{
+	// A thinking block shown with its display omitted has a signature and no
+	// text: it is kept. One without a signature is not.
+	const std::string stream = sse("message_start", "{\"type\":\"message_start\",\"message\":{\"usage\":{\"input_tokens\":3}}}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":0,\"content_block\":{\"type\":\"thinking\",\"thinking\":\"\",\"signature\":\"\"}}")
+		+ sse("content_block_delta", "{\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"signature_delta\",\"signature\":\"sig-only\"}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":0}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":1,\"content_block\":{\"type\":\"thinking\",\"thinking\":\"\",\"signature\":\"\"}}")
+		+ sse("content_block_delta", "{\"type\":\"content_block_delta\",\"index\":1,\"delta\":{\"type\":\"thinking_delta\",\"thinking\":\"unsigned\"}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":1}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":2,\"content_block\":{\"type\":\"text\",\"text\":\"\"}}")
+		+ sse("content_block_delta", "{\"type\":\"content_block_delta\",\"index\":2,\"delta\":{\"type\":\"text_delta\",\"text\":\"Done.\"}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":2}")
+		+ sse("message_delta", "{\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"end_turn\"},\"usage\":{\"output_tokens\":9}}")
+		+ sse("message_stop", "{\"type\":\"message_stop\"}");
+	CannedServer server(SSE, stream);
+	AnthropicProvider provider(params(server.baseUrl()));
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Think"), ContentEventCallback(), cancellation);
+	Array::Ptr pContent = result.assistantMessage->getArray("content");
+	assertEqual(2u, static_cast<unsigned>(pContent->size()));
+	assertEqual(std::string("thinking"), pContent->getObject(0)->getValue<std::string>("type"));
+	assertEqual(std::string(""), pContent->getObject(0)->getValue<std::string>("thinking"));
+	assertEqual(std::string("sig-only"), pContent->getObject(0)->getValue<std::string>("signature"));
+	assertEqual(std::string("text"), pContent->getObject(1)->getValue<std::string>("type"));
+}
+
+
+void AnthropicProviderTest::testBlocksAsTheyCame()
+{
+	// Citations, a server tool and its result, and the members of a tool
+	// input in their order: the turn holds them as they came. A text block
+	// with nothing but whitespace is left out, as the API refuses it back.
+	const std::string stream = sse("message_start", "{\"type\":\"message_start\",\"message\":{\"usage\":{\"input_tokens\":3}}}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":0,\"content_block\":{\"type\":\"server_tool_use\",\"id\":\"srvtoolu_1\",\"name\":\"web_search\",\"input\":{}}}")
+		+ sse("content_block_delta", "{\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"input_json_delta\",\"partial_json\":\"{\\\"query\\\":\\\"poco\\\"}\"}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":0}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":1,\"content_block\":{\"type\":\"web_search_tool_result\",\"tool_use_id\":\"srvtoolu_1\",\"content\":[{\"type\":\"web_search_result\",\"url\":\"https://pocoproject.org\"}]}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":1}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":2,\"content_block\":{\"type\":\"text\",\"text\":\"\",\"citations\":[]}}")
+		+ sse("content_block_delta", "{\"type\":\"content_block_delta\",\"index\":2,\"delta\":{\"type\":\"citations_delta\",\"citation\":{\"type\":\"web_search_result_location\",\"url\":\"https://pocoproject.org\"}}}")
+		+ sse("content_block_delta", "{\"type\":\"content_block_delta\",\"index\":2,\"delta\":{\"type\":\"text_delta\",\"text\":\"POCO\"}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":2}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":3,\"content_block\":{\"type\":\"text\",\"text\":\"\"}}")
+		+ sse("content_block_delta", "{\"type\":\"content_block_delta\",\"index\":3,\"delta\":{\"type\":\"text_delta\",\"text\":\" \\n\"}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":3}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":4,\"content_block\":{\"type\":\"tool_use\",\"id\":\"toolu_2\",\"name\":\"weather\",\"input\":{}}}")
+		+ sse("content_block_delta", "{\"type\":\"content_block_delta\",\"index\":4,\"delta\":{\"type\":\"input_json_delta\",\"partial_json\":\"{\\\"zeta\\\":1,\\\"alpha\\\":2}\"}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":4}")
+		+ sse("message_delta", "{\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"tool_use\"},\"usage\":{\"output_tokens\":9}}")
+		+ sse("message_stop", "{\"type\":\"message_stop\"}");
+	CannedServer server(SSE, stream);
+	AnthropicProvider provider(params(server.baseUrl()));
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Search"), ContentEventCallback(), cancellation);
+
+	Array::Ptr pContent = result.assistantMessage->getArray("content");
+	assertEqual(4u, static_cast<unsigned>(pContent->size()));
+	assertEqual(std::string("server_tool_use"), pContent->getObject(0)->getValue<std::string>("type"));
+	assertEqual(std::string("poco"), pContent->getObject(0)->getObject("input")->getValue<std::string>("query"));
+	assertEqual(std::string("web_search_tool_result"), pContent->getObject(1)->getValue<std::string>("type"));
+	assertEqual(std::string("https://pocoproject.org"), pContent->getObject(1)->getArray("content")->getObject(0)->getValue<std::string>("url"));
+	assertEqual(std::string("POCO"), pContent->getObject(2)->getValue<std::string>("text"));
+	assertEqual(1u, static_cast<unsigned>(pContent->getObject(2)->getArray("citations")->size()));
+	// Only the tool of the client is a call to run.
+	assertEqual(1u, static_cast<unsigned>(result.toolCalls.size()));
+	assertEqual(std::string("toolu_2"), result.toolCalls[0].id);
+	std::ostringstream sent;
+	pContent->getObject(3)->getObject("input")->stringify(sent);
+	assertEqual(std::string("{\"zeta\":1,\"alpha\":2}"), sent.str());
+}
+
+
+void AnthropicProviderTest::testRefusal()
+{
+	// A refused answer is not kept, and the explanation comes with the result.
+	const std::string stream = sse("message_start", "{\"type\":\"message_start\",\"message\":{\"usage\":{\"input_tokens\":3}}}")
+		+ sse("content_block_start", "{\"type\":\"content_block_start\",\"index\":0,\"content_block\":{\"type\":\"text\",\"text\":\"\"}}")
+		+ sse("content_block_delta", "{\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"text_delta\",\"text\":\"Here is how to \"}}")
+		+ sse("content_block_stop", "{\"type\":\"content_block_stop\",\"index\":0}")
+		+ sse("message_delta", "{\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"refusal\",\"stop_details\":{\"type\":\"refusal\",\"explanation\":\"Declined by policy.\"}},\"usage\":{\"output_tokens\":4}}")
+		+ sse("message_stop", "{\"type\":\"message_stop\"}");
+	CannedServer server(SSE, stream);
+	AnthropicProvider provider(params(server.baseUrl()));
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Something"), ContentEventCallback(), cancellation);
+	assertTrue(result.stopReason == StopReason::REFUSAL);
+	assertTrue(result.assistantMessage.isNull());
+	assertTrue(result.toolCalls.empty());
+	assertEqual(std::string("Declined by policy."), result.explanation);
 }
 
 
@@ -596,6 +901,14 @@ CppUnit::Test* AnthropicProviderTest::suite()
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringStream);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testConcurrentCalls);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelStress);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testCacheMarkers);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testRequestMembersAndHeaders);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringUpload);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringConnect);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testCutToolCall);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testThinkingSignatures);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testBlocksAsTheyCame);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testRefusal);
 
 	return pSuite;
 }
