@@ -28,8 +28,15 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Channel.h"
+#include "Poco/Logger.h"
+#include "Poco/Message.h"
+#include "Poco/Mutex.h"
+#include "Poco/Timestamp.h"
 #include <memory>
 #include <sstream>
+#include <typeinfo>
 
 
 using Poco::AI::MCP::Server;
@@ -106,6 +113,28 @@ namespace
 	{
 		return parse(json);
 	}
+
+
+	class CapturingChannel: public Poco::Channel
+		/// Keeps the text of the messages logged through it.
+	{
+	public:
+		void log(const Poco::Message& message) override
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			_text += message.getText() + "\n";
+		}
+
+		std::string text() const
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _text;
+		}
+
+	private:
+		mutable Poco::FastMutex _mutex;
+		std::string _text;
+	};
 
 
 	std::vector<std::string> events(const std::string& stream, bool& cut)
@@ -224,6 +253,11 @@ void HTTPTest::testUnsafeValuesEncoded()
 	(void) client.callTool("m\xC3\xA9t\xC3\xA9o", args("{\"text\":\"=?base64?literal?=\"}"));
 	assertEqual(std::string("=?base64?literal?="), decoded(host.lastHeaders().get("Mcp-Param-Text")));
 
+	// The shortest value that starts and ends like the base64 form, where the
+	// two overlap, is encoded too.
+	(void) client.callTool("m\xC3\xA9t\xC3\xA9o", args("{\"text\":\"=?base64?=\"}"));
+	assertEqual(std::string("=?base64?="), decoded(host.lastHeaders().get("Mcp-Param-Text")));
+
 	(void) client.callTool("m\xC3\xA9t\xC3\xA9o", args("{\"text\":\"plain value\"}"));
 	assertEqual(std::string("plain value"), host.lastHeaders().get("Mcp-Param-Text"));
 }
@@ -337,9 +371,13 @@ void HTTPTest::testCutEventStream()
 		(void) client.listTools();
 		fail("a stream without the reply must throw");
 	}
-	catch (const Poco::IOException&)
+	catch (const Poco::IOException& exc)
 	{
+		// The end of the stream, not a failure of the connection or of HTTP.
+		assertTrue(typeid(exc) == typeid(Poco::IOException));
+		assertTrue(exc.message().find("ended before the reply to tools/list") != std::string::npos);
 	}
+	assertEqual(1, host.requests());
 }
 
 
@@ -424,8 +462,8 @@ void HTTPTest::testEventStreamDeadline()
 
 void HTTPTest::testStaleKeepAlive()
 {
-	// The host promises to keep the connection and closes it: the second
-	// request fails on the kept session and is sent once more on a new one.
+	// The host promises to keep the connection and closes it: the client does
+	// not use the closed connection again.
 	Server server;
 	buildServer(server);
 	TestHTTPHost host(server);
@@ -433,8 +471,236 @@ void HTTPTest::testStaleKeepAlive()
 	host.start();
 	HTTPClient client{Poco::URI(host.url())};
 	assertEqual(std::string("one"), firstText(client.callTool("echo", args("{\"message\":\"one\"}"))));
-	assertEqual(std::string("two"), firstText(client.callTool("echo", args("{\"message\":\"two\"}"))));
+	assertEqual(1u, static_cast<unsigned>(client.listTools().size()));
 	assertEqual(2, host.requests());
+}
+
+
+void HTTPTest::testLostAnswerNotRepeated()
+{
+	// The host reads the second request and closes the connection without
+	// answering. A tool call may have run: it is not sent again.
+	Server server;
+	buildServer(server);
+	TestHTTPHost host(server);
+	host.setFault(TestHTTPHost::FAULT_DROP_SECOND);
+	host.start();
+	HTTPClient client{Poco::URI(host.url())};
+	assertEqual(std::string("one"), firstText(client.callTool("echo", args("{\"message\":\"one\"}"))));
+	try
+	{
+		(void) client.callTool("echo", args("{\"message\":\"two\"}"));
+		fail("a tool call whose answer was lost must throw");
+	}
+	catch (const Poco::IOException&)
+	{
+	}
+	assertEqual(2, host.requests());
+
+	// A list changes nothing: it is sent again on a new connection.
+	Server listServer;
+	buildServer(listServer);
+	TestHTTPHost listHost(listServer);
+	listHost.setFault(TestHTTPHost::FAULT_DROP_SECOND);
+	listHost.start();
+	HTTPClient listClient{Poco::URI(listHost.url())};
+	assertEqual(1u, static_cast<unsigned>(listClient.listTools().size()));
+	assertEqual(1u, static_cast<unsigned>(listClient.listTools().size()));
+	assertEqual(3, listHost.requests());
+}
+
+
+void HTTPTest::testAnswersRefused()
+{
+	// A 202 to a request, the reply to another id, a body that is not JSON,
+	// and a 400 with the error of another request.
+	const TestHTTPHost::Fault faults[] = {
+		TestHTTPHost::FAULT_ACCEPTED, TestHTTPHost::FAULT_OTHER_ID, TestHTTPHost::FAULT_NOT_JSON, TestHTTPHost::FAULT_ERROR_OTHER_ID
+	};
+	for (const TestHTTPHost::Fault fault: faults)
+	{
+		Server server;
+		buildServer(server);
+		TestHTTPHost host(server);
+		host.setFault(fault);
+		host.start();
+		HTTPClient client{Poco::URI(host.url())};
+		try
+		{
+			(void) client.callTool("echo", args("{\"message\":\"x\"}"));
+			fail("an answer that is not the reply must throw");
+		}
+		catch (const Poco::ProtocolException& exc)
+		{
+			if (fault == TestHTTPHost::FAULT_NOT_JSON)
+			{
+				assertTrue(exc.displayText().find("Service temporarily moved") != std::string::npos);
+			}
+		}
+		assertEqual(1, host.requests());
+	}
+}
+
+
+void HTTPTest::testBodyBreaksOff()
+{
+	// A body shorter than its promised length broke off: an I/O failure, not
+	// an answer that is not JSON.
+	Server server;
+	buildServer(server);
+	TestHTTPHost host(server);
+	host.setFault(TestHTTPHost::FAULT_CUT_BODY);
+	host.start();
+	HTTPClient client{Poco::URI(host.url())};
+	try
+	{
+		(void) client.callTool("echo", args("{\"message\":\"x\"}"));
+		fail("a body that breaks off must throw");
+	}
+	catch (const Poco::IOException& exc)
+	{
+		assertTrue(dynamic_cast<const Poco::ProtocolException*>(&exc) == nullptr);
+	}
+	assertEqual(1, host.requests());
+}
+
+
+void HTTPTest::testHeaderMismatch()
+{
+	Server server;
+	buildServer(server);
+	registerTool(server, "regional", "{\"type\":\"object\",\"properties\":{\"region\":{\"type\":\"string\",\"x-mcp-header\":\"Region\"}}}");
+	TestHTTPHost host(server);
+	host.start();
+
+	// A tool called before it was listed has no Mcp-Param headers: the host
+	// refuses the call with HEADER_MISMATCH, and callTool() lists the tools
+	// and calls once more, now with the header.
+	HTTPClient client{Poco::URI(host.url())};
+	assertEqual(std::string("eu"), firstText(client.callTool("regional", args("{\"message\":\"eu\",\"region\":\"eu-west1\"}"))));
+	assertEqual(3, host.requests());
+	assertEqual(std::string("eu-west1"), host.lastHeaders().get("Mcp-Param-Region"));
+
+	// call() does not: the 400 with the error is an MCPException.
+	HTTPClient bare{Poco::URI(host.url())};
+	Object::Ptr pParams = new Object;
+	pParams->set("name", "regional");
+	pParams->set("arguments", args("{\"region\":\"eu-west1\"}"));
+	try
+	{
+		(void) bare.call("tools/call", pParams);
+		fail("a header mismatch must throw");
+	}
+	catch (const MCPException& exc)
+	{
+		assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), exc.code());
+	}
+
+	// An integer outside the safe range has no header, as a number would
+	// not: the host misses it.
+	registerTool(server, "counted", "{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"integer\",\"x-mcp-header\":\"N\"}}}");
+	(void) client.listTools();
+	try
+	{
+		(void) client.callTool("counted", args("{\"n\":9007199254740993}"));
+		fail("an integer outside the safe range must not be sent in a header");
+	}
+	catch (const MCPException& exc)
+	{
+		assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), exc.code());
+	}
+	assertTrue(!host.lastHeaders().has("Mcp-Param-N"));
+	(void) client.callTool("counted", args("{\"n\":9007199254740991}"));
+	assertEqual(std::string("9007199254740991"), host.lastHeaders().get("Mcp-Param-N"));
+}
+
+
+void HTTPTest::testReadsBoundedByTheTimeout()
+{
+	// A body that stops half way, and a body and an event line that trickle
+	// in, a byte every 20 ms: each read gets what is left of the timeout, so
+	// the request ends near it, not a socket timeout or more later.
+	const TestHTTPHost::Fault faults[] = {TestHTTPHost::FAULT_STALL_BODY, TestHTTPHost::FAULT_TRICKLE_BODY, TestHTTPHost::FAULT_TRICKLE_LINE};
+	for (const TestHTTPHost::Fault fault: faults)
+	{
+		Server server;
+		buildServer(server);
+		TestHTTPHost host(server);
+		host.setFault(fault);
+		host.start();
+		HTTPClient client{Poco::URI(host.url())};
+		client.setTimeout(Poco::Timespan(0, 600000));
+		const Poco::Timestamp start;
+		try
+		{
+			(void) client.listTools();
+			fail("a reply that takes longer than the timeout must throw");
+		}
+		catch (const Poco::TimeoutException&)
+		{
+		}
+		assertTrue(start.elapsed() < 3 * Poco::Timestamp::resolution());
+	}
+}
+
+
+void HTTPTest::testEventStreamFraming()
+{
+	// A byte order mark at the start of the stream is skipped.
+	Server server;
+	buildServer(server);
+	TestHTTPHost host(server);
+	host.setFault(TestHTTPHost::FAULT_BOM);
+	host.start();
+	HTTPClient client{Poco::URI(host.url())};
+	assertEqual(1u, static_cast<unsigned>(client.listTools().size()));
+
+	// A reply whose blank line never comes is not delivered.
+	Server cutServer;
+	buildServer(cutServer);
+	TestHTTPHost cutHost(cutServer);
+	cutHost.setFault(TestHTTPHost::FAULT_NO_BLANK_LINE);
+	cutHost.start();
+	HTTPClient cutClient{Poco::URI(cutHost.url())};
+	try
+	{
+		(void) cutClient.listTools();
+		fail("an event without its blank line must not be delivered");
+	}
+	catch (const Poco::IOException& exc)
+	{
+		assertTrue(exc.message().find("ended before the reply") != std::string::npos);
+	}
+}
+
+
+void HTTPTest::testLogShowsNoSecrets()
+{
+	// A tool left out is logged with its name made harmless, and with the
+	// endpoint without user info and query.
+	Server server;
+	buildServer(server);
+	registerTool(server, std::string("forged\nINFO all is well") + std::string(300, 'x'), "{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"number\",\"x-mcp-header\":\"N\"}}}");
+	TestHTTPHost host(server);
+	host.start();
+	Poco::AutoPtr<CapturingChannel> pChannel = new CapturingChannel;
+	Poco::Logger& logger = Poco::Logger::get("AI.MCP.HTTPClient");
+	Poco::Channel::Ptr pOldChannel = logger.getChannel();
+	const int oldLevel = logger.getLevel();
+	logger.setChannel(pChannel);
+	logger.setLevel(Poco::Message::PRIO_WARNING);
+	HTTPClient client{Poco::URI("http://user:secret@127.0.0.1:" + std::to_string(host.port()) + "/mcp?token=abc")};
+	(void) client.listTools();
+	logger.setChannel(pOldChannel);
+	logger.setLevel(oldLevel);
+
+	const std::string text = pChannel->text();
+	assertTrue(text.find("forged\\x0aINFO") != std::string::npos);
+	assertTrue(text.find("forged\nINFO") == std::string::npos);
+	assertTrue(text.find(std::string(200, 'x')) == std::string::npos);
+	assertTrue(text.find("secret") == std::string::npos);
+	assertTrue(text.find("token") == std::string::npos);
+	assertTrue(text.find("127.0.0.1") != std::string::npos);
 }
 
 
@@ -551,10 +817,24 @@ void HTTPTest::testEventStreamReader()
 	assertEqual(std::string("|\nc"), result[2]);
 	assertTrue(!cut);
 
-	// Complete lines without the closing blank line still make an event.
+	// An event whose blank line has not come at the end is dropped.
 	result = events("data: last\n", cut);
-	assertEqual(1u, static_cast<unsigned>(result.size()));
+	assertEqual(0u, static_cast<unsigned>(result.size()));
 	assertTrue(cut);
+
+	// One byte order mark at the start is skipped; bytes that only begin like
+	// one are text.
+	result = events("\xEF\xBB\xBF" "data: marked\n\n", cut);
+	assertEqual(1u, static_cast<unsigned>(result.size()));
+	assertEqual(std::string("|marked"), result[0]);
+	result = events("\xEF\xBB" "data: x\n\ndata: y\n\n", cut);
+	assertEqual(1u, static_cast<unsigned>(result.size()));
+	assertEqual(std::string("|y"), result[0]);
+
+	// Data of exactly the limit fits, with its field name in the line.
+	result = events("data: " + std::string(64, 'd') + "\n\n", cut);
+	assertEqual(1u, static_cast<unsigned>(result.size()));
+	assertEqual(std::string("|") + std::string(64, 'd'), result[0]);
 
 	// A line cut off at the end is dropped.
 	result = events("data: full\n\ndata: cut off", cut);
@@ -565,7 +845,7 @@ void HTTPTest::testEventStreamReader()
 	// A line beyond the limit throws.
 	try
 	{
-		(void) events("data: " + std::string(100, 'x') + "\n\n", cut);
+		(void) events("data: " + std::string(200, 'x') + "\n\n", cut);
 		fail("a line beyond the limit must throw");
 	}
 	catch (const Poco::DataFormatException&)
@@ -609,6 +889,13 @@ CppUnit::Test* HTTPTest::suite()
 	CppUnit_addTest(pSuite, HTTPTest, testTimeout);
 	CppUnit_addTest(pSuite, HTTPTest, testEventStreamDeadline);
 	CppUnit_addTest(pSuite, HTTPTest, testStaleKeepAlive);
+	CppUnit_addTest(pSuite, HTTPTest, testLostAnswerNotRepeated);
+	CppUnit_addTest(pSuite, HTTPTest, testAnswersRefused);
+	CppUnit_addTest(pSuite, HTTPTest, testBodyBreaksOff);
+	CppUnit_addTest(pSuite, HTTPTest, testHeaderMismatch);
+	CppUnit_addTest(pSuite, HTTPTest, testReadsBoundedByTheTimeout);
+	CppUnit_addTest(pSuite, HTTPTest, testEventStreamFraming);
+	CppUnit_addTest(pSuite, HTTPTest, testLogShowsNoSecrets);
 	CppUnit_addTest(pSuite, HTTPTest, testRequestHook);
 	CppUnit_addTest(pSuite, HTTPTest, testSessionFactory);
 	CppUnit_addTest(pSuite, HTTPTest, testHostlessSession);

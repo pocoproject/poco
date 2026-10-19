@@ -24,6 +24,7 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Mutex.h"
+#include "Poco/Timestamp.h"
 #include "Poco/URI.h"
 #include <functional>
 #include <map>
@@ -51,12 +52,22 @@ class AIMCPHTTP_API HTTPClient: public Poco::AI::MCP::Client
 	/// client passes over the notifications before the reply. A JSON-RPC error
 	/// in a 400 or 404 answer becomes an MCPException with the error's code;
 	/// any other status that is not 200 becomes a Poco::Net::HTTPException
-	/// with the status and the start of the body. Replies are limited in size,
-	/// and an event stream must deliver the reply within the client's timeout.
+	/// with the status and the start of the body. Replies are limited in size.
+	/// The whole request, from sending it to the end of its reply, must take
+	/// no longer than the client's timeout: every read that waits is bounded
+	/// by the time that is left, so a reply that trickles in times out too.
 	///
-	/// The client keeps its session for later requests. A request that fails
-	/// on a kept session before any answer arrives is sent once more on a new
-	/// one, since the server may have closed the idle connection.
+	/// The Mcp-Param headers of a tool come from its definition, which
+	/// listTools() reads. callTool() answered with HEADER_MISMATCH lists the
+	/// tools again and calls once more, as the specification asks of a client:
+	/// a tool called before it was listed, or whose definition changed, gets
+	/// its headers that way.
+	///
+	/// The client keeps its session for later requests, and opens a new one
+	/// when the server has closed the kept connection. A request that fails
+	/// on a kept session is sent once more on a new one only when it cannot
+	/// have reached the server, or when it only reads (server/discover and the
+	/// lists): a tool call the server may already have run is not repeated.
 {
 public:
 	using RequestHook = std::function<void (Poco::Net::HTTPRequest& request)>;
@@ -93,9 +104,10 @@ private:
 		std::vector<std::string> path;
 	};
 
-	Poco::JSON::Object::Ptr post(const Poco::JSON::Object::Ptr& request, bool& retry);
+	Poco::JSON::Object::Ptr post(const Poco::JSON::Object::Ptr& request, const Poco::Timestamp& deadline, bool& retry);
 	void addHeaders(Poco::Net::HTTPRequest& httpRequest, const Poco::JSON::Object::Ptr& request);
 	Poco::Net::HTTPClientSession& session(bool& reused);
+	std::string redactedEndpoint() const;
 
 	HTTPClient(const HTTPClient&) = delete;
 	HTTPClient& operator = (const HTTPClient&) = delete;

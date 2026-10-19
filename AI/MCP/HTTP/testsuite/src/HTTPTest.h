@@ -35,6 +35,13 @@ public:
 	void testTimeout();
 	void testEventStreamDeadline();
 	void testStaleKeepAlive();
+	void testLostAnswerNotRepeated();
+	void testAnswersRefused();
+	void testBodyBreaksOff();
+	void testHeaderMismatch();
+	void testReadsBoundedByTheTimeout();
+	void testEventStreamFraming();
+	void testLogShowsNoSecrets();
 	void testRequestHook();
 	void testSessionFactory();
 	void testHostlessSession();

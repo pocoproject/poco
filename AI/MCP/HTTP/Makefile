@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = SessionFactory EventStreamReader HTTPClient
+objects = SessionFactory Body EventStreamReader HTTPClient
 
 target         = PocoAIMCPHTTP
 target_version = $(LIBVERSION)

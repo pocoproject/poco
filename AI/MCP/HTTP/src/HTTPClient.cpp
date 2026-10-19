@@ -13,12 +13,14 @@
 
 
 #include "Poco/AI/MCP/HTTP/HTTPClient.h"
+#include "Poco/AI/MCP/HTTP/Body.h"
 #include "Poco/AI/MCP/HTTP/EventStreamReader.h"
 #include "Poco/AI/MCP/Message.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/Socket.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/Base64Encoder.h"
@@ -26,7 +28,9 @@
 #include "Poco/String.h"
 #include "Poco/Logger.h"
 #include "Poco/Format.h"
+#include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <cmath>
 #include <istream>
 #include <ostream>
@@ -41,6 +45,9 @@ namespace
 {
 	const std::string SENTINEL_PREFIX("=?base64?");
 	const std::string SENTINEL_SUFFIX("?=");
+	constexpr Poco::Int64 MAX_SAFE_INTEGER = 9007199254740991;
+		/// The largest integer a header may carry: the safe range of JavaScript.
+	constexpr std::size_t MAX_LOGGED_NAME = 128;
 
 
 	bool isToken(const std::string& name)
@@ -67,8 +74,10 @@ namespace
 			if (u < 0x20 || u > 0x7E) return false;
 		}
 		if (!value.empty() && (value.front() == ' ' || value.back() == ' ')) return false;
-		const bool sentinel = value.size() >= SENTINEL_PREFIX.size() + SENTINEL_SUFFIX.size()
-			&& value.compare(0, SENTINEL_PREFIX.size(), SENTINEL_PREFIX) == 0
+		// Starts like the base64 form and ends like it, even where the two
+		// overlap, as in "=?base64?=".
+		const bool sentinel = value.compare(0, SENTINEL_PREFIX.size(), SENTINEL_PREFIX) == 0
+			&& value.size() >= SENTINEL_SUFFIX.size()
 			&& value.compare(value.size() - SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX) == 0;
 		return !sentinel;
 	}
@@ -92,7 +101,7 @@ namespace
 	{
 		if (value.type() == typeid(Poco::JSON::Object::Ptr))
 		{
-			const Poco::JSON::Object::Ptr pObject = value.extract<Poco::JSON::Object::Ptr>();
+			const Poco::JSON::Object::Ptr& pObject = value.extract<Poco::JSON::Object::Ptr>();
 			if (pObject.isNull()) return false;
 			for (const std::string& key: pObject->getNames())
 			{
@@ -101,7 +110,7 @@ namespace
 		}
 		else if (value.type() == typeid(Poco::JSON::Array::Ptr))
 		{
-			const Poco::JSON::Array::Ptr pArray = value.extract<Poco::JSON::Array::Ptr>();
+			const Poco::JSON::Array::Ptr& pArray = value.extract<Poco::JSON::Array::Ptr>();
 			if (pArray.isNull()) return false;
 			for (const auto& element: *pArray)
 			{
@@ -143,7 +152,7 @@ namespace
 				{
 					throw Poco::DataFormatException("x-mcp-header on a parameter that is not a string, an integer or a boolean");
 				}
-				const std::string name = value.extract<std::string>();
+				const std::string& name = value.extract<std::string>();
 				for (const Annotation& annotation: annotations)
 				{
 					if (Poco::icompare(annotation.name, name) == 0)
@@ -188,21 +197,74 @@ namespace
 			text = value.extract<bool>() ? "true" : "false";
 			return true;
 		}
+		// An integer outside the safe range has no header, whether it came as
+		// an integer or as a number with no fraction.
 		if (value.isInteger())
 		{
-			text = value.toString();
+			Poco::Int64 number = 0;
+			try
+			{
+				number = value.convert<Poco::Int64>();
+			}
+			catch (const Poco::RangeException&)
+			{
+				return false;
+			}
+			if (number < -MAX_SAFE_INTEGER || number > MAX_SAFE_INTEGER) return false;
+			text = Poco::NumberFormatter::format(number);
 			return true;
 		}
 		if (value.isNumeric())
 		{
 			const double number = value.convert<double>();
-			if (std::floor(number) == number && std::fabs(number) <= 9007199254740991.0)
-			{
-				text = Poco::NumberFormatter::format(static_cast<Poco::Int64>(number));
-				return true;
-			}
+			if (std::fabs(number) > static_cast<double>(MAX_SAFE_INTEGER) || std::floor(number) != number) return false;
+			text = Poco::NumberFormatter::format(static_cast<Poco::Int64>(number));
+			return true;
 		}
 		return false;
+	}
+
+
+	std::string loggable(const std::string& text)
+		/// Text from the server as a log line may carry it: control bytes
+		/// escaped, at most MAX_LOGGED_NAME bytes.
+	{
+		static const char HEX[] = "0123456789abcdef";
+		std::string result;
+		for (const char c: text)
+		{
+			const unsigned char u = static_cast<unsigned char>(c);
+			if (u < 0x20 || u == 0x7F)
+			{
+				result += "\\x";
+				result += HEX[u >> 4];
+				result += HEX[u & 0x0F];
+			}
+			else result += c;
+			if (result.size() > MAX_LOGGED_NAME) break;
+		}
+		return excerpt(result, MAX_LOGGED_NAME);
+	}
+
+
+	bool readsOnly(const std::string& method)
+		/// The requests that change nothing on the server, which may be sent
+		/// again after an answer was lost.
+	{
+		return method == "server/discover" || (method.size() > 5 && method.compare(method.size() - 5, 5, "/list") == 0);
+	}
+
+
+	Poco::Timespan left(const Poco::Timestamp& deadline, const std::string& method)
+		/// The time left until deadline, at least a millisecond; throws
+		/// Poco::TimeoutException when it has passed.
+	{
+		const Poco::Timespan remaining(deadline - Poco::Timestamp());
+		if (remaining.totalMilliseconds() <= 0)
+		{
+			throw Poco::TimeoutException("No reply from the MCP endpoint to " + method + " within the timeout");
+		}
+		return std::max(remaining, Poco::Timespan(0, 1000));
 	}
 
 
@@ -217,50 +279,6 @@ namespace
 		}
 		if (pObject.isNull() || path.empty()) return Poco::Dynamic::Var();
 		return pObject->get(path.back());
-	}
-
-
-	Poco::JSON::Object::Ptr parseObject(const std::string& text)
-		/// The JSON object in text, or null.
-	{
-		try
-		{
-			Poco::JSON::Parser parser;
-			const Poco::Dynamic::Var parsed = parser.parse(text);
-			if (parsed.type() == typeid(Poco::JSON::Object::Ptr)) return parsed.extract<Poco::JSON::Object::Ptr>();
-		}
-		catch (const Poco::Exception&)
-		{
-		}
-		return Poco::JSON::Object::Ptr();
-	}
-
-
-	std::string readBody(std::istream& stream, std::size_t maxSize)
-		/// Reads the body, throwing when it exceeds maxSize bytes.
-	{
-		std::string body;
-		char buffer[8192];
-		while (stream.read(buffer, sizeof(buffer)) || stream.gcount() > 0)
-		{
-			if (body.size() + static_cast<std::size_t>(stream.gcount()) > maxSize)
-			{
-				throw Poco::DataFormatException("The MCP reply exceeds the size limit");
-			}
-			body.append(buffer, static_cast<std::size_t>(stream.gcount()));
-		}
-		return body;
-	}
-
-
-	std::string excerpt(const std::string& body)
-		/// The start of a body, cut at a character boundary.
-	{
-		static const std::size_t MAX_EXCERPT = 200;
-		if (body.size() <= MAX_EXCERPT) return body;
-		std::size_t n = MAX_EXCERPT;
-		while (n > 0 && (static_cast<unsigned char>(body[n]) & 0xC0) == 0x80) --n;
-		return body.substr(0, n) + "...";
 	}
 }
 
@@ -317,7 +335,7 @@ void HTTPClient::toolsListed(std::vector<Tool>& tools)
 			Poco::Logger& logger = Poco::Logger::get("AI.MCP.HTTPClient");
 			if (logger.warning())
 			{
-				logger.warning("Tool %s of %s left out: %s", tool.name, _uri.toString(), exc.displayText());
+				logger.warning("Tool %s of %s left out: %s", loggable(tool.name), redactedEndpoint(), exc.displayText());
 			}
 			continue;
 		}
@@ -376,6 +394,15 @@ void HTTPClient::addHeaders(Poco::Net::HTTPRequest& httpRequest, const Poco::JSO
 }
 
 
+std::string HTTPClient::redactedEndpoint() const
+{
+	// Without user info, query or fragment, which may carry credentials.
+	std::string text = _uri.getScheme() + "://" + _uri.getHost();
+	if (_uri.getSpecifiedPort() != 0) text += ":" + Poco::NumberFormatter::format(_uri.getSpecifiedPort());
+	return text + _uri.getPath();
+}
+
+
 Poco::Net::HTTPClientSession& HTTPClient::session(bool& reused)
 {
 	// A session without a host cannot reconnect by itself, e.g. one attached
@@ -384,13 +411,29 @@ Poco::Net::HTTPClientSession& HTTPClient::session(bool& reused)
 	{
 		_pSession.reset();
 	}
+	// A kept connection the server has closed, which shows as readable while
+	// no answer is due, is not used again.
+	if (_pSession != nullptr && _sessionUsed && _pSession->connected())
+	{
+		try
+		{
+			if (_pSession->socket().poll(Poco::Timespan(0), Poco::Net::Socket::SELECT_READ | Poco::Net::Socket::SELECT_ERROR))
+			{
+				_pSession.reset();
+			}
+		}
+		catch (const Poco::Exception&)
+		{
+			_pSession.reset();
+		}
+	}
 	reused = _pSession != nullptr && _sessionUsed;
 	if (_pSession == nullptr)
 	{
 		_pSession = _sessionFactory ? _sessionFactory(_uri) : createClientSession(_uri);
 		if (_pSession == nullptr)
 		{
-			throw Poco::NullPointerException("The session factory returned no session", _uri.toString());
+			throw Poco::NullPointerException("The session factory returned no session", redactedEndpoint());
 		}
 		_pSession->setKeepAlive(true);
 		_sessionUsed = false;
@@ -401,20 +444,23 @@ Poco::Net::HTTPClientSession& HTTPClient::session(bool& reused)
 
 Poco::JSON::Object::Ptr HTTPClient::exchange(const Poco::JSON::Object::Ptr& request)
 {
+	// One deadline for the request and the one time it may be sent again.
+	const Poco::Timestamp deadline = Poco::Timestamp() + getTimeout().totalMicroseconds();
 	bool retry = false;
-	Poco::JSON::Object::Ptr pReply = post(request, retry);
+	Poco::JSON::Object::Ptr pReply = post(request, deadline, retry);
 	if (retry)
 	{
-		pReply = post(request, retry);
+		pReply = post(request, deadline, retry);
 	}
 	return pReply;
 }
 
 
-Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request, bool& retry)
+Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request, const Poco::Timestamp& deadline, bool& retry)
 {
 	retry = false;
 	const Id id = request->get("id");
+	const std::string method = request->getValue<std::string>("method");
 	const std::string body = serialize(request);
 	std::string path = _uri.getPathAndQuery();
 	if (path.empty()) path = "/";
@@ -439,22 +485,45 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 
 	bool reused = false;
 	Poco::Net::HTTPClientSession& httpSession = session(reused);
-	const Poco::Timespan timeout = getTimeout();
-	httpSession.setTimeout(timeout);
+	// Every step that waits gets the time that is left: the connection, the
+	// request, the head of the answer and each read of its body.
+	const Poco::Timespan sendTime = left(deadline, method);
+	httpSession.setTimeout(sendTime);
+	const auto bound = [&httpSession, &deadline, &method]()
+	{
+		const Poco::Timespan remaining = left(deadline, method);
+		if (httpSession.connected()) httpSession.socket().setReceiveTimeout(remaining);
+	};
+	if (httpSession.connected())
+	{
+		httpSession.socket().setSendTimeout(sendTime);
+		httpSession.socket().setReceiveTimeout(sendTime);
+	}
 	Poco::Net::HTTPResponse response;
 	std::istream* pStream = nullptr;
+	bool sent = false;
 	try
 	{
 		std::ostream& os = httpSession.sendRequest(httpRequest);
 		os << body;
+		os.flush();
+		if (os.bad())
+		{
+			if (httpSession.networkException() != nullptr) httpSession.networkException()->rethrow();
+			throw Poco::IOException("Cannot send the request to the MCP endpoint");
+		}
+		sent = true;
+		bound();
 		pStream = &httpSession.receiveResponse(response);
 	}
 	catch (const Poco::IOException&)
 	{
 		_pSession.reset();
-		if (reused)
+		// Once more, on a new connection: a request that cannot have reached
+		// the server, or one that only reads. A tool call the server may have
+		// run is not repeated.
+		if (reused && (!sent || readsOnly(method)) && Poco::Timestamp() < deadline)
 		{
-			// The server may have closed the idle connection: once more, on a new one.
 			retry = true;
 			return Poco::JSON::Object::Ptr();
 		}
@@ -476,7 +545,7 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 		if (success && eventStream)
 		{
 			EventStreamReader reader(*pStream, maxSize);
-			reader.setDeadline(Poco::Timestamp() + timeout.totalMicroseconds());
+			reader.setReadGuard(bound);
 			EventStreamReader::Event event;
 			while (reader.next(event))
 			{
@@ -489,11 +558,21 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 					return pMessage;
 				}
 			}
+			// A chunked stream that broke off ends as if it were complete; the
+			// session knows better.
+			if (httpSession.networkException() != nullptr) httpSession.networkException()->rethrow();
 			_pSession.reset();
-			throw Poco::IOException("The MCP event stream ended before the reply to " + request->getValue<std::string>("method"));
+			throw Poco::IOException("The MCP event stream ended before the reply to " + method);
 		}
 
-		const std::string text = readBody(*pStream, maxSize);
+		const std::string text = readBody(*pStream, maxSize, bound);
+		// A body that broke off reads as a shorter one: the session or the
+		// length the answer promised tells.
+		if (httpSession.networkException() != nullptr) httpSession.networkException()->rethrow();
+		if (response.hasContentLength() && static_cast<Poco::Int64>(text.size()) < response.getContentLength64())
+		{
+			throw Poco::IOException("The answer of the MCP endpoint to " + method + " broke off");
+		}
 		if (status == Poco::Net::HTTPResponse::HTTP_ACCEPTED)
 		{
 			throw Poco::ProtocolException("The MCP endpoint accepted the request without a reply");
@@ -503,7 +582,7 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 		{
 			if (pMessage.isNull())
 			{
-				throw Poco::ProtocolException("The MCP endpoint did not answer with a JSON object", excerpt(text));
+				throw Poco::ProtocolException("The MCP endpoint did not answer with a JSON object", excerpt(text, 200));
 			}
 			if (!isReply(pMessage, id))
 			{
@@ -514,9 +593,13 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 		if ((status == Poco::Net::HTTPResponse::HTTP_BAD_REQUEST || status == Poco::Net::HTTPResponse::HTTP_NOT_FOUND)
 			&& !pMessage.isNull() && pMessage->isObject("error"))
 		{
+			if (!isReply(pMessage, id))
+			{
+				throw Poco::ProtocolException("The MCP endpoint answered another request");
+			}
 			return pMessage;
 		}
-		throw Poco::Net::HTTPException(Poco::format("The MCP endpoint answered HTTP %d %s", status, response.getReason()), excerpt(text));
+		throw Poco::Net::HTTPException(Poco::format("The MCP endpoint answered HTTP %d %s", status, response.getReason()), excerpt(text, 200));
 	}
 	catch (...)
 	{

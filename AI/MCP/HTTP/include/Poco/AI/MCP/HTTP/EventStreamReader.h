@@ -19,6 +19,7 @@
 
 
 #include "Poco/AI/MCP/HTTP/HTTP.h"
+#include "Poco/AI/MCP/HTTP/Body.h"
 #include "Poco/Timestamp.h"
 #include <istream>
 #include <string>
@@ -31,6 +32,7 @@ class AIMCPHTTP_API EventStreamReader
 	/// Reads server-sent events, the text/event-stream format of the HTML
 	/// Living Standard, from a stream:
 	///
+	///   - one byte order mark at the start of the stream is skipped;
 	///   - a line ends with CR LF, LF or CR;
 	///   - a line that starts with a colon is a comment;
 	///   - "field: value" sets a field, with one space after the colon
@@ -40,13 +42,17 @@ class AIMCPHTTP_API EventStreamReader
 	///   - a blank line ends the event, which is delivered if it had a data
 	///     line.
 	///
-	/// At the end of the stream, a last line without its line end is dropped
-	/// as cut; an event whose lines are complete but whose blank line is
-	/// missing is still delivered.
+	/// At the end of the stream, an event whose blank line has not come is
+	/// dropped, as the standard has it, and cut() tells so: a server that
+	/// stops in the middle of an event has not delivered it.
 {
 public:
 	static constexpr std::size_t DEFAULT_MAX_EVENT_SIZE = DEFAULT_MAX_MESSAGE_SIZE;
-		/// The default limit, in bytes, of one line and of the data of one event.
+		/// The default limit, in bytes, of the data of one event.
+
+	static constexpr std::size_t LINE_OVERHEAD = 64;
+		/// What a line may have beyond the limit of the data: its field name,
+		/// the colon and the space, so that data of exactly the limit fits.
 
 	struct Event
 		/// One event.
@@ -63,16 +69,22 @@ public:
 		/// Creates a reader of the given stream, which must outlive it.
 
 	void setDeadline(const Poco::Timestamp& deadline);
-		/// Sets the time after which next() throws Poco::TimeoutException.
-		/// It is checked between lines; a read that blocks is bounded by the
-		/// timeout of the stream's source.
+		/// Sets the time after which next() throws Poco::TimeoutException. It
+		/// is checked before every read that may block, as is the read guard;
+		/// a read that blocks is bounded by the timeout of the stream's source,
+		/// which the read guard may set to the time that is left.
+
+	void setReadGuard(ReadGuard guard);
+		/// Sets the function called before every read of the stream that may
+		/// block, because nothing is buffered.
 
 	[[nodiscard]] bool next(Event& event);
 		/// Reads the next event. Returns false at the end of the stream.
 		///
 		/// Throws Poco::DataFormatException when a line or the data of an
-		/// event exceeds the size limit, and Poco::TimeoutException after the
-		/// deadline.
+		/// event exceeds the size limit, Poco::TimeoutException after the
+		/// deadline, and what the read guard and the source of the stream
+		/// throw.
 
 	[[nodiscard]] bool ended() const;
 		/// Returns true if the end of the stream has been reached.
@@ -89,14 +101,18 @@ private:
 	};
 
 	LineResult readLine(std::string& line);
+	void beforeRead();
+	void append(std::string& line, int c) const;
 
 	std::istream& _in;
 	std::size_t _maxEventSize;
 	Poco::Timestamp _deadline;
+	ReadGuard _guard;
 	bool _hasDeadline;
 	bool _skipLF;
 	bool _ended;
 	bool _cut;
+	int _bomBytes;
 };
 
 

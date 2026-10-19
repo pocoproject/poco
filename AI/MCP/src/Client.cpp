@@ -324,6 +324,18 @@ ToolResult Client::callTool(const std::string& name, const Poco::JSON::Object::P
 	Poco::JSON::Object::Ptr pParams = new Poco::JSON::Object;
 	pParams->set("name", name);
 	pParams->set("arguments", arguments != nullptr ? arguments : Poco::JSON::Object::Ptr(new Poco::JSON::Object));
+	try
+	{
+		return ToolResult::fromObject(call("tools/call", pParams));
+	}
+	catch (const MCPException& exc)
+	{
+		if (exc.code() != static_cast<int>(ErrorCode::HEADER_MISMATCH)) throw;
+	}
+	// A transport that carries arguments in headers the tool's definition
+	// names (Streamable HTTP) had a definition that is missing or out of date:
+	// listed again, the tool is called once more.
+	(void) listTools();
 	return ToolResult::fromObject(call("tools/call", pParams));
 }
 

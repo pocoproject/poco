@@ -6,7 +6,8 @@
 // client (shared by the AIMCPHTTP and AI test suites). It accepts POST only
 // and checks the request headers against the body: MCP-Protocol-Version
 // against the _meta object, Mcp-Method against the method and Mcp-Name
-// against the name or URI, decoding the base64 form. It answers a missing
+// against the name or URI and the Mcp-Param headers against the arguments
+// the tool's definition names, decoding the base64 form. It answers a missing
 // _meta object or a header mismatch with 400, an unknown method with 404, a
 // notification with 202, and a request with one JSON object or an event
 // stream. Faults can be switched on to test the client's handling of them.
@@ -34,7 +35,9 @@
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/NameValueCollection.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/Base64Decoder.h"
@@ -68,7 +71,18 @@ public:
 		FAULT_OVERSIZED,        /// A reply with 64 KB of padding
 		FAULT_SLOW,             /// The reply comes after 2 seconds
 		FAULT_TRICKLE,          /// An event stream of comments, one every 50 ms, for 5 seconds
-		FAULT_STALE_KEEP_ALIVE  /// Promises to keep the connection, and closes it
+		FAULT_STALE_KEEP_ALIVE, /// Promises to keep the connection, and closes it
+		FAULT_DROP_SECOND,      /// Reads the second request, and closes the connection without an answer
+		FAULT_ACCEPTED,         /// Answers a request with 202 Accepted
+		FAULT_OTHER_ID,         /// Answers with the reply to another id
+		FAULT_ERROR_OTHER_ID,   /// Answers 400 with an error for another id
+		FAULT_NOT_JSON,         /// Answers 200 with a body that is not JSON
+		FAULT_STALL_BODY,       /// Sends the head and half of the body, then nothing
+		FAULT_TRICKLE_BODY,     /// Sends the body one byte every 20 ms
+		FAULT_TRICKLE_LINE,     /// Sends the event stream one byte every 20 ms
+		FAULT_BOM,              /// Starts the event stream with a byte order mark
+		FAULT_NO_BLANK_LINE,    /// Ends the event stream without the blank line after the reply
+		FAULT_CUT_BODY          /// Sends half of the body, and closes the connection
 	};
 
 	explicit TestHTTPHost(Poco::AI::MCP::Server& server, ReplyMode replyMode = REPLY_JSON):
@@ -209,6 +223,12 @@ private:
 			std::string body;
 			Poco::StreamCopier::copyToString(request.stream(), body);
 
+			if (_state.fault == FAULT_DROP_SECOND && _state.requests.load() == 2)
+			{
+				Poco::Net::StreamSocket socket = static_cast<Poco::Net::HTTPServerRequestImpl&>(request).detachSocket();
+				socket.close();
+				return;
+			}
 			switch (_state.fault)
 			{
 			case FAULT_HTML_502:
@@ -250,7 +270,26 @@ private:
 			}
 
 			const Poco::AI::MCP::Id id = pMessage->get("id");
-			const std::string mismatch = headerMismatch(request, pMessage);
+			if (_state.fault == FAULT_ACCEPTED)
+			{
+				response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_ACCEPTED);
+				response.setContentLength(0);
+				response.send();
+				return;
+			}
+			if (_state.fault == FAULT_NOT_JSON)
+			{
+				sendText(response, Poco::Net::HTTPResponse::HTTP_OK, "application/json", "Service temporarily moved: try again later");
+				return;
+			}
+			if (_state.fault == FAULT_ERROR_OTHER_ID)
+			{
+				sendJson(response, Poco::Net::HTTPResponse::HTTP_BAD_REQUEST,
+					Poco::AI::MCP::Response::error(Poco::AI::MCP::Id(std::string("someone-else")), Poco::AI::MCP::ErrorCode::INVALID_PARAMS, "Not yours"));
+				return;
+			}
+			std::string mismatch = headerMismatch(request, pMessage);
+			if (mismatch.empty()) mismatch = paramHeaderMismatch(_state.server, request, pMessage);
 			if (!mismatch.empty())
 			{
 				sendJson(response, Poco::Net::HTTPResponse::HTTP_BAD_REQUEST,
@@ -276,10 +315,38 @@ private:
 			{
 				pReply->getObject("result")->set("padding", std::string(65536, 'p'));
 			}
+			if (_state.fault == FAULT_OTHER_ID)
+			{
+				pReply->set("id", std::string("someone-else"));
+			}
 			if (_state.fault == FAULT_CUT_STREAM)
 			{
 				cutStream(response);
 				return;
+			}
+			const std::string text = Poco::AI::MCP::serialize(pReply);
+			switch (_state.fault)
+			{
+			case FAULT_STALL_BODY:
+				stallBody(response, text, _state.stopping);
+				return;
+			case FAULT_CUT_BODY:
+				cutBody(request, response, text);
+				return;
+			case FAULT_TRICKLE_BODY:
+				trickleBody(response, "application/json", text, _state.stopping);
+				return;
+			case FAULT_TRICKLE_LINE:
+				trickleBody(response, "text/event-stream", "data: " + text + "\n\n", _state.stopping);
+				return;
+			case FAULT_BOM:
+				sendText(response, Poco::Net::HTTPResponse::HTTP_OK, "text/event-stream", "\xEF\xBB\xBF" "data: " + text + "\n\n");
+				return;
+			case FAULT_NO_BLANK_LINE:
+				sendText(response, Poco::Net::HTTPResponse::HTTP_OK, "text/event-stream", ": a notification first\n\ndata: " + text + "\n");
+				return;
+			default:
+				break;
 			}
 			if (_state.replyMode == REPLY_EVENT_STREAM && status == Poco::Net::HTTPResponse::HTTP_OK)
 			{
@@ -333,6 +400,51 @@ private:
 				const Poco::JSON::Object::Ptr pParams = pMessage->getObject("params");
 				const std::string name = pParams->optValue<std::string>(method == "resources/read" ? "uri" : "name", "");
 				if (decoded(request.get("Mcp-Name")) != name) return "Mcp-Name does not match the body";
+			}
+			return std::string();
+		}
+
+		static std::string rendered(const Poco::Dynamic::Var& value)
+			/// An argument as its header carries it.
+		{
+			if (value.isBoolean()) return value.extract<bool>() ? "true" : "false";
+			return value.toString();
+		}
+
+		static std::string paramHeaderMismatch(Poco::AI::MCP::Server& server, const Poco::Net::HTTPServerRequest& request, const Poco::JSON::Object::Ptr& pMessage)
+			/// Checks the Mcp-Param headers of a tool call against the arguments
+			/// that the tool's definition, as the server lists it, names with
+			/// x-mcp-header at the top level of its input schema.
+		{
+			if (pMessage->optValue<std::string>("method", "") != "tools/call" || !pMessage->isObject("params")) return std::string();
+			const Poco::JSON::Object::Ptr pParams = pMessage->getObject("params");
+			const std::string name = pParams->optValue<std::string>("name", "");
+			const Poco::JSON::Object::Ptr pArguments = pParams->isObject("arguments") ? pParams->getObject("arguments") : Poco::JSON::Object::Ptr(new Poco::JSON::Object);
+
+			Poco::JSON::Object::Ptr pMeta = new Poco::JSON::Object;
+			pMeta->set(Poco::AI::MCP::META_PROTOCOL_VERSION, Poco::AI::MCP::PROTOCOL_VERSION);
+			pMeta->set(Poco::AI::MCP::META_CLIENT_CAPABILITIES, Poco::JSON::Object::Ptr(new Poco::JSON::Object));
+			Poco::JSON::Object::Ptr pListParams = new Poco::JSON::Object;
+			pListParams->set("_meta", pMeta);
+			const Poco::JSON::Object::Ptr pList = server.handle(Poco::AI::MCP::Request::make(Poco::AI::MCP::Id(0), "tools/list", pListParams));
+			const Poco::JSON::Array::Ptr pTools = pList->getObject("result")->getArray("tools");
+			for (std::size_t i = 0; i < pTools->size(); ++i)
+			{
+				const Poco::JSON::Object::Ptr pTool = pTools->getObject(static_cast<unsigned>(i));
+				if (pTool->optValue<std::string>("name", "") != name) continue;
+				const Poco::JSON::Object::Ptr pSchema = pTool->getObject("inputSchema");
+				if (!pSchema->isObject("properties")) return std::string();
+				const Poco::JSON::Object::Ptr pProperties = pSchema->getObject("properties");
+				for (const std::string& property: pProperties->getNames())
+				{
+					const Poco::JSON::Object::Ptr pProperty = pProperties->getObject(property);
+					if (pProperty.isNull() || !pProperty->has("x-mcp-header")) continue;
+					const std::string header = "Mcp-Param-" + pProperty->getValue<std::string>("x-mcp-header");
+					const Poco::Dynamic::Var value = pArguments->get(property);
+					if (value.isEmpty()) continue;
+					if (!request.has(header)) return "no " + header + " header";
+					if (decoded(request.get(header)) != rendered(value)) return header + " does not match the body";
+				}
 			}
 			return std::string();
 		}
@@ -395,6 +507,46 @@ private:
 			std::ostream& out = response.send();
 			out << "data: " << Poco::AI::MCP::serialize(Poco::AI::MCP::Request::makeNotification("notifications/progress")) << "\n\n";
 			out.flush();
+		}
+
+		static void stallBody(Poco::Net::HTTPServerResponse& response, const std::string& text, Poco::Event& stopping)
+			/// Promises the whole body and sends half of it.
+		{
+			response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
+			response.setContentType("application/json");
+			response.setContentLength(static_cast<std::streamsize>(text.size()));
+			std::ostream& out = response.send();
+			out << text.substr(0, text.size() / 2);
+			out.flush();
+			(void) stopping.tryWait(10000);
+		}
+
+		static void cutBody(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const std::string& text)
+			/// Promises the whole body, sends half of it and closes the connection.
+		{
+			response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
+			response.setContentType("application/json");
+			response.setContentLength(static_cast<std::streamsize>(text.size()));
+			std::ostream& out = response.send();
+			out << text.substr(0, text.size() / 2);
+			out.flush();
+			Poco::Net::StreamSocket socket = static_cast<Poco::Net::HTTPServerRequestImpl&>(request).detachSocket();
+			socket.close();
+		}
+
+		static void trickleBody(Poco::Net::HTTPServerResponse& response, const std::string& type, const std::string& text, Poco::Event& stopping)
+			/// Sends the body one byte every 20 ms.
+		{
+			response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_OK);
+			response.setContentType(type);
+			response.setContentLength(static_cast<std::streamsize>(text.size()));
+			std::ostream& out = response.send();
+			for (const char c: text)
+			{
+				out.put(c);
+				out.flush();
+				if (!out.good() || stopping.tryWait(20)) break;
+			}
 		}
 
 		static void trickle(Poco::Net::HTTPServerResponse& response, Poco::Event& stopping)

@@ -136,6 +136,10 @@ public:
 		/// Calls a tool. A tool that fails returns a result with isError set;
 		/// an MCPException means the call itself failed (an unknown tool, for
 		/// instance).
+		///
+		/// A HEADER_MISMATCH error, which the Streamable HTTP transport gets
+		/// when the definition of the tool it knows is missing or out of date,
+		/// makes the client list the tools again and call once more.
 
 	[[nodiscard]] std::vector<Resource> listResources();
 		/// Returns the server's resources, all pages.
