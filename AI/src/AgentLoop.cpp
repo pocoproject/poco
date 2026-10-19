@@ -121,7 +121,7 @@ namespace
 				addText(serializeJSON(pBlock));
 			}
 		}
-		if (!result.structuredContent().isEmpty())
+		if (result.hasStructuredContent())
 		{
 			const std::string text = serializeJSON(result.structuredContent());
 			if (text.size() <= left)

@@ -95,7 +95,7 @@ std::string toolResultText(const Poco::AI::MCP::ToolResult& result)
 			line(json(pBlock));
 		}
 	}
-	if (!hasText && !result.structuredContent().isEmpty()) return json(result.structuredContent());
+	if (!hasText && result.hasStructuredContent()) return json(result.structuredContent());
 	return text;
 }
 

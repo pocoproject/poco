@@ -187,6 +187,9 @@ void ToolRegistryTest::testToolResultText()
 	ToolResult structured;
 	structured.setStructuredContent(Poco::Dynamic::Var(parse("{\"n\":1}")));
 	assertEqual(std::string("{\"n\":1}"), toolResultText(structured));
+	ToolResult nullStructured;
+	nullStructured.setStructuredContent(Poco::Dynamic::Var());
+	assertEqual(std::string("null"), toolResultText(nullStructured));
 
 	ToolResult image;
 	image.addImage("aW1n", "image/png");

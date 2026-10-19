@@ -210,7 +210,7 @@ namespace
 			}
 			pContent->add(pOut);
 		}
-		if (pContent->size() == 0 && !result.structuredContent().isEmpty())
+		if (pContent->size() == 0 && result.hasStructuredContent())
 		{
 			Object::Ptr pOut = new Object;
 			pOut->set("type", "text");
