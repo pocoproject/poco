@@ -75,6 +75,18 @@ enum ProcessOptions
 		/// termination request is a CTRL_BREAK_EVENT to its group, which
 		/// console programs take as a request to end, as they take Ctrl+C.
 		/// ProcessRunner::stop() sends it before the timeout.
+
+	PROCESS_CLEAR_ENVIRONMENT = 32
+		/// Starts the child process with the environment variables given to
+		/// Process::launch() and no others, on every platform. Without it,
+		/// the child inherits the environment of the parent: on Unix/Linux
+		/// with the given variables added, on Windows replaced by them when
+		/// any are given.
+		///
+		/// On Unix/Linux, the child looks the command up in the PATH given,
+		/// or in the default search path of the system when none is given.
+		/// On Windows, a child usually needs some variables of the system,
+		/// such as SystemRoot, to run.
 };
 
 

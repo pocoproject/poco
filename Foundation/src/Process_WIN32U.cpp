@@ -413,9 +413,11 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 	const wchar_t* pEnv = 0;
 	std::vector<wchar_t> envChars;
-	if (!env.empty())
+	if (!env.empty() || (options & PROCESS_CLEAR_ENVIRONMENT))
 	{
 		envChars = getUnicodeEnvironmentVariablesBuffer(env);
+		// An empty block ends in two terminators, as one with variables does.
+		if (env.empty()) envChars.push_back(L'\0');
 		pEnv = &envChars[0];
 	}
 

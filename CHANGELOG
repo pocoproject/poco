@@ -102,6 +102,10 @@ New Components:
   repeat), and MCPHost, which mirrors the tools of MCP servers into the registry. HTTPS
   through Poco::Net::HTTPSessionFactory, so no NetSSL link. CMake option ENABLE_AI (off by
   default); make component AI.
+- GH #5573 Poco::Process::launch(): the option PROCESS_CLEAR_ENVIRONMENT starts the child with
+  only the environment variables given to launch(), on every platform. Without it the child
+  inherits the environment of the parent: on POSIX platforms with the given variables added, on
+  Windows replaced by them when any are given.
 
 Bug Fixes and Improvements:
 
