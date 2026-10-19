@@ -973,10 +973,11 @@ void MemoryDBTest::testHistoryView()
 
 void MemoryDBTest::testHistoryViewCountsResidentShardOnce()
 {
-	// A shard sealed in this run still has its rows in main (they leave only on
-	// a later flush, or never, depending on the mode). The history view must then
-	// take the shard from main and not from its file as well, or it shows every
-	// one of its rows twice.
+	// A shard sealed in this run can still have its rows in main: here the
+	// table has no AUTOINCREMENT and the active shard held no row of it when
+	// the shard was sealed, so its rows carry the numbering until a later flush
+	// finds a newer row. The history view must then take the shard from main
+	// and not from its file as well, or it shows every one of its rows twice.
 	MemoryDB::Options off;
 	off.loadArchivedShards = false;
 	{
@@ -988,11 +989,10 @@ void MemoryDBTest::testHistoryViewCountsResidentShardOnce()
 		db.flush();
 		std::string l("live");
 		for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(l), now;
-		db.flush();
 
 		int inMain = 0;
 		db << "SELECT count(*) FROM t", into(inMain), now;
-		assertTrue (inMain == 5); // the sealed rows are still in main in this run
+		assertTrue (inMain == 5); // the sealed rows are still in main: no flush has evicted them yet
 
 		db.attachAllArchived();
 		std::string view = db.historyView("t");
@@ -1020,6 +1020,180 @@ void MemoryDBTest::testHistoryViewCountsResidentShardOnce()
 	int total = 0;
 	db << ("SELECT count(*) FROM " + view), into(total), now;
 	assertTrue (total == 5);
+}
+
+
+void MemoryDBTest::testSealEvictsRowsFromMemory()
+{
+	// With loadArchivedShards off, a sealed shard's rows leave memory at the
+	// flush that writes its file. The history view then reads them from the
+	// file, and the table's AUTOINCREMENT sequence carries on above them.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+		std::string h("hist");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
+		db.sealActive();
+		db.flush();
+
+		int inMain = -1;
+		db << "SELECT count(*) FROM t", into(inMain), now;
+		assertTrue (inMain == 0);
+
+		std::vector<Poco::UInt32> ids = db.archivedShardIds();
+		assertTrue (ids.size() == 1);
+		std::string alias = db.attachArchived(ids[0]);
+		int onDisk = 0;
+		db << ("SELECT count(*) FROM " + alias + ".t"), into(onDisk), now;
+		assertTrue (onDisk == 3);
+		std::string view = db.historyView("t");
+		int total = 0;
+		db << ("SELECT count(*) FROM " + view), into(total), now;
+		assertTrue (total == 3);
+
+		std::string l("live");
+		for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(l), now;
+		Poco::Int64 maxId = 0;
+		db << "SELECT max(id) FROM t", into(maxId), now;
+		assertTrue (maxId == 5);
+		db << "SELECT count(*) FROM t", into(inMain), now;
+		assertTrue (inMain == 2);
+		view = db.historyView("t");
+		db << ("SELECT count(*) FROM " + view), into(total), now;
+		assertTrue (total == 5);
+		db.detachArchived(ids[0]);
+		db.flush();
+	}
+
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+	MemoryDB db(_dir, on);
+	int total = 0;
+	int distinct = 0;
+	db << "SELECT count(*), count(DISTINCT id) FROM t", into(total), into(distinct), now;
+	assertTrue (total == 5);
+	assertTrue (distinct == 5);
+}
+
+
+void MemoryDBTest::testSealKeepsNewestShardUntilActiveHasRows()
+{
+	// A table without AUTOINCREMENT numbers its next row after the newest row
+	// in memory. Right after a seal the active shard holds no row of it, so the
+	// sealed rows stay in memory until the active shard has one above them. An
+	// older sealed shard goes as soon as a newer one holds the numbering.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	std::string v("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 1..3
+	db.sealActive();
+	db.flush(); // shard 1 written; its rows stay: nothing is above them yet
+
+	int inMain = 0;
+	Poco::Int64 minId = 0;
+	Poco::Int64 maxId = 0;
+	db << "SELECT count(*) FROM t", into(inMain), now;
+	assertTrue (inMain == 3);
+
+	for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 4, 5
+	db.sealActive();
+	db.flush(); // shard 2 written; shard 1 goes, shard 2 holds the numbering
+
+	db << "SELECT count(*), IFNULL(min(id), 0), IFNULL(max(id), 0) FROM t",
+		into(inMain), into(minId), into(maxId), now;
+	assertTrue (inMain == 2);
+	assertTrue (minId == 4);
+	assertTrue (maxId == 5);
+
+	db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 6, in the active shard
+	db.flush(); // shard 2 goes
+	db << "SELECT count(*), IFNULL(min(id), 0), IFNULL(max(id), 0) FROM t",
+		into(inMain), into(minId), into(maxId), now;
+	assertTrue (inMain == 1);
+	assertTrue (minId == 6);
+	assertTrue (maxId == 6);
+
+	db.attachAllArchived();
+	std::string view = db.historyView("t");
+	int total = 0;
+	int distinct = 0;
+	db << ("SELECT count(*), count(DISTINCT id) FROM " + view), into(total), into(distinct), now;
+	assertTrue (total == 6);
+	assertTrue (distinct == 6);
+	db.detachAllArchived();
+}
+
+
+void MemoryDBTest::testSealEvictionDeferredWhileSessionBusy()
+{
+	// A statement stepping over main holds a read transaction on session(),
+	// which blocks the DELETE that removes the sealed rows from memory. The
+	// shard stays resident, its file written, and goes at a later flush.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+	std::string v("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+
+	std::string sealedFile = Poco::Path(_dir, "shard-000001.db").toString();
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << "SELECT id FROM t", into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on main
+
+		db.sealActive();
+		db.flush(); // writes shard 1; its rows cannot leave memory now
+
+		assertTrue (Poco::File(sealedFile).exists());
+		int inMain = 0;
+		db << "SELECT count(*) FROM t", into(inMain), now;
+		assertTrue (inMain == 3);
+	} // statement finalized; the read transaction is released
+
+	db.flush();
+	int inMain = -1;
+	db << "SELECT count(*) FROM t", into(inMain), now;
+	assertTrue (inMain == 0);
+}
+
+
+void MemoryDBTest::testSealEvictionFailureKeepsFlushWorking()
+{
+	// The rows leave memory after the flush has written them. A failure there -
+	// here a trigger that refuses the DELETE - leaves the shard resident and
+	// must not fail the flush; once the cause is gone, a later flush evicts.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+	db << "CREATE TRIGGER t_keep BEFORE DELETE ON t BEGIN SELECT RAISE(ABORT, 'kept'); END", now;
+	std::string v("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	db.sealActive();
+	try
+	{
+		db.flush();
+	}
+	catch (Poco::Exception& e)
+	{
+		failmsg("flush must not fail when evicting the sealed rows fails: " + e.displayText());
+	}
+
+	std::string sealedFile = Poco::Path(_dir, "shard-000001.db").toString();
+	assertTrue (Poco::File(sealedFile).exists());
+	int inMain = 0;
+	db << "SELECT count(*) FROM t", into(inMain), now;
+	assertTrue (inMain == 3);
+
+	db << "DROP TRIGGER t_keep", now;
+	db.flush();
+	db << "SELECT count(*) FROM t", into(inMain), now;
+	assertTrue (inMain == 0);
 }
 
 
@@ -2058,13 +2232,16 @@ void MemoryDBTest::testConcurrentAccess()
 			const std::size_t shardsCreated = db.shards().size();
 			assertTrue (shardsCreated > 1); // sharding actually happened during the run
 
-			// Sanity on the live db: with loadArchivedShards=false, sealing does
-			// not physically remove rows from the in-memory connection (it only
-			// persists them), so SELECT count(*) on the live db must equal
-			// `wrote`. If it doesn't, the trace or update hook lost track of
-			// a write under contention.
+			// Sanity on the live db: with loadArchivedShards=false a sealed
+			// shard's rows leave the in-memory connection once its file is
+			// written, so main alone holds the active shard and whatever has
+			// not been evicted yet. main plus every sealed shard, each counted
+			// once by the history view, must equal `wrote`. If it doesn't, the
+			// trace or update hook lost track of a write under contention.
+			db.attachAllArchived();
 			int liveCount = 0;
-			db << "SELECT count(*) FROM events", into(liveCount), now;
+			db << ("SELECT count(*) FROM " + db.historyView("events")), into(liveCount), now;
+			db.detachAllArchived();
 			assertTrue (liveCount == wrote);
 		}
 
@@ -2508,6 +2685,10 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testVecHistoryView);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryView);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewCountsResidentShardOnce);
+	CppUnit_addTest(pSuite, MemoryDBTest, testSealEvictsRowsFromMemory);
+	CppUnit_addTest(pSuite, MemoryDBTest, testSealKeepsNewestShardUntilActiveHasRows);
+	CppUnit_addTest(pSuite, MemoryDBTest, testSealEvictionDeferredWhileSessionBusy);
+	CppUnit_addTest(pSuite, MemoryDBTest, testSealEvictionFailureKeepsFlushWorking);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardLoaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardUnloaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeptWhileSessionWrites);

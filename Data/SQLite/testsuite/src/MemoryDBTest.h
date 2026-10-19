@@ -61,6 +61,10 @@ public:
 	void testVecHistoryView();
 	void testHistoryView();
 	void testHistoryViewCountsResidentShardOnce();
+	void testSealEvictsRowsFromMemory();
+	void testSealKeepsNewestShardUntilActiveHasRows();
+	void testSealEvictionDeferredWhileSessionBusy();
+	void testSealEvictionFailureKeepsFlushWorking();
 	void testDeleteSealedShardLoaded();
 	void testDeleteSealedShardUnloaded();
 	void testDeleteShardKeptWhileSessionWrites();

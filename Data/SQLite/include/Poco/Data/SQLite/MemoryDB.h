@@ -151,9 +151,16 @@ public:
 			/// Granularity of the background flush timer, in milliseconds.
 
 		bool           loadArchivedShards = false;
-			/// If false (the default), only the active shard is RAM-resident; sealed shards
-			/// stay on disk and are read on demand (the SQLite page cache handles paging
-			/// transparently when they are attached via attachArchived()/historyView()).
+			/// If false (the default), only the active shard is RAM-resident: a sealed
+			/// shard's rows leave memory once its file is written, at the flush that
+			/// seals it or at a later one if session() is busy then, or if a table
+			/// without AUTOINCREMENT has no row in the active shard yet (its next row is
+			/// numbered after the newest row in memory, which must stay above the sealed
+			/// ones). Sealed rows stay on disk and are read on demand (the SQLite page
+			/// cache handles paging transparently when they are attached via
+			/// attachArchived()/historyView()). Rows that have left memory are read-only,
+			/// as after a reopen: an UPDATE or DELETE on the base table no longer finds
+			/// them, and an INSERT into their rowid range poisons the instance.
 			/// This keeps memory bounded regardless of how much history accumulates and is
 			/// the right choice for any workload where data grows over time.
 			/// Set to true to merge every sealed shard into memory on open, so plain
@@ -426,7 +433,9 @@ private:
 		int             schemaVersion = 0;
 		Poco::UInt64    bytes = 0;    // size of the file as last written
 		bool            dirty = false;
-		bool            resident = true; // its rows are in the in-memory database
+		bool            resident = true; // its rows are in the in-memory database: the active
+		                                 // shard, every shard with loadArchivedShards, and a
+		                                 // sealed shard until evictSealedShards() removes them
 		std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges; // table -> (lo, hi]
 	};
 
@@ -504,15 +513,35 @@ private:
 	void rebuildActiveLo();                              // caller holds _stateMutex
 	bool tryDetach(Poco::UInt32 shardId);                // caller holds _attachMutex
 	void sweepDetached();                                // caller holds _attachMutex
-	[[nodiscard]] bool removeFromMemory(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
-		const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept);
-		// deletes the rowid ranges (table -> (lo, hi]) from the in-memory tables;
-		// false, deleting nothing, while session() has a transaction open.
+	enum class Removal
+	{
+		DONE,              // the rows are gone from the in-memory tables
+		SESSION_BUSY,      // nothing deleted: session() has a transaction open
+		NUMBERING_AT_RISK  // nothing deleted: a table without AUTOINCREMENT would be left
+		                   // with no row above the sealed ranges that stay
+	};
+	Removal removeRanges(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
+		const std::map<std::string, Poco::Int64>& floors, bool keepRows,
+		std::map<std::string, Poco::Int64>& kept);
+		// deletes the rowid ranges (table -> (lo, hi]) from the in-memory tables.
 		// floors: table -> the end of the newest sealed shard that keeps its range.
 		// A table without AUTOINCREMENT numbers its next row after the newest row
-		// in memory, so one must stay above that end: when none would, the range's
-		// newest row is left in place and reported in kept (table -> rowid);
-		// caller holds _flushMutex
+		// in memory, so one must stay above that end. When none would: with
+		// keepRows the range's newest row is left in place and reported in kept
+		// (table -> rowid), without keepRows nothing is deleted.
+		// caller holds _flushMutex and the connection mutex (DbMutexGuard)
+	[[nodiscard]] bool removeFromMemory(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
+		const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept);
+		// removeRanges() with keepRows, under the connection mutex; false, deleting
+		// nothing, while session() has a transaction open; caller holds _flushMutex
+	bool evictShard(Poco::UInt32 shardId);
+		// removes a sealed, written shard's rows from the in-memory tables and marks
+		// it non-resident; false when the shard is not eligible, session() is busy
+		// or the numbering would be at risk (see removeRanges); caller holds _flushMutex
+	void evictSealedShards();
+		// doFlush(), after the files and the catalog are committed: evictShard() on
+		// every sealed resident shard whose file is written, with loadArchivedShards
+		// off; caller holds _flushMutex
 	std::size_t deleteShards(const std::vector<Poco::UInt32>& ids);
 		// deleteShard() on each id, skipping the ones it has to keep; returns the
 		// number dropped; caller holds _flushMutex

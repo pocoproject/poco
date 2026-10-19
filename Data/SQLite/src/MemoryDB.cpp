@@ -1410,18 +1410,25 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 bool MemoryDB::removeFromMemory(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
 	const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept)
 {
+	DbMutexGuard dbm(_memHandle);
+	return removeRanges(ranges, floors, true, kept) != Removal::SESSION_BUSY;
+}
+
+
+MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
+	const std::map<std::string, Poco::Int64>& floors, bool keepRows, std::map<std::string, Poco::Int64>& kept)
+{
 	kept.clear();
-	if (ranges.empty()) return true;
+	if (ranges.empty()) return Removal::DONE;
 
 	// The rows are deleted on _persist so the update and trace hooks on
 	// _session do not fire. Shared-cache locks are per table: while session()
 	// has a transaction open - a write, or a statement still stepping over
 	// main - the DELETE fails with SQLITE_LOCKED, which the busy timeout does
-	// not cover. The held connection mutex keeps statements on session() from
-	// starting or completing, so a session found free stays free until the
-	// deletes are done.
-	DbMutexGuard dbm(_memHandle);
-	if (sqlite3_txn_state(_memHandle, "main") != SQLITE_TXN_NONE) return false;
+	// not cover. The connection mutex the caller holds keeps statements on
+	// session() from starting or completing, so a session found free stays
+	// free until the deletes are done.
+	if (sqlite3_txn_state(_memHandle, "main") != SQLITE_TXN_NONE) return Removal::SESSION_BUSY;
 
 	std::vector<std::string> tables = userTables(_persist);
 	_persist.begin();
@@ -1452,6 +1459,11 @@ bool MemoryDB::removeFromMemory(const std::map<std::string, std::pair<Poco::Int6
 					Poco::Int64 newest = 0;
 					_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
 						" WHERE " + inRange), into(newest), now;
+					if (newest > 0 && !keepRows)
+					{
+						_persist.rollback();
+						return Removal::NUMBERING_AT_RISK;
+					}
 					if (newest > f->second)
 					{
 						kept[t] = newest;
@@ -1469,7 +1481,74 @@ bool MemoryDB::removeFromMemory(const std::map<std::string, std::pair<Poco::Int6
 		kept.clear();
 		throw;
 	}
+	return Removal::DONE;
+}
+
+
+bool MemoryDB::evictShard(Poco::UInt32 shardId)
+{
+	// The connection mutex is held from the look at the shard to the flag that
+	// says its rows are gone: no statement on session() runs in between, so a
+	// write to one of its rows cannot dirty the shard while the rows go, and
+	// historyView(), which reads the flag under the same mutex, finds the shard
+	// either in main or in its file.
+	DbMutexGuard dbm(_memHandle);
+	std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges;
+	std::map<std::string, Poco::Int64> floors;
+	{
+		Poco::FastMutex::ScopedLock l(_stateMutex);
+		auto it = std::find_if(_shards.begin(), _shards.end(),
+			[shardId](const ShardInfo& s) { return s.id == shardId; });
+		if (it == _shards.end() || !it->sealed || !it->resident || it->dirty || it->file.empty())
+			return false;
+		ranges = it->ranges;
+		for (const auto& r: ranges)
+		{
+			auto lo = _activeLo.find(r.first);
+			floors[r.first] = (lo != _activeLo.end()) ? lo->second : 0;
+		}
+	}
+
+	std::map<std::string, Poco::Int64> kept;
+	if (removeRanges(ranges, floors, false, kept) != Removal::DONE) return false;
+
+	Poco::FastMutex::ScopedLock l(_stateMutex);
+	auto it = std::find_if(_shards.begin(), _shards.end(),
+		[shardId](const ShardInfo& s) { return s.id == shardId; });
+	if (it != _shards.end()) it->resident = false;
 	return true;
+}
+
+
+void MemoryDB::evictSealedShards()
+{
+	// With loadArchivedShards off, a sealed shard's rows leave the in-memory
+	// tables once its file is written. A shard that cannot go yet - session()
+	// is busy, or a table without AUTOINCREMENT has no row in the active shard
+	// above it to carry the numbering - stays resident and is tried again at
+	// the next flush; a newer shard's rows let an older one go.
+	if (_opts.loadArchivedShards) return;
+
+	std::vector<Poco::UInt32> ids;
+	{
+		Poco::FastMutex::ScopedLock l(_stateMutex);
+		for (const auto& s: _shards)
+			if (s.sealed && s.resident && !s.dirty && !s.file.empty()) ids.push_back(s.id);
+	}
+	// The flush has already succeeded: a failure here leaves the shard resident
+	// for the next flush and must not fail the flush itself.
+	for (Poco::UInt32 id: ids)
+	{
+		try
+		{
+			(void) evictShard(id);
+		}
+		catch (const Poco::Exception& e)
+		{
+			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").warning(
+				"shard %u kept in memory, removing its rows failed: %s", id, e.displayText());
+		}
+	}
 }
 
 
@@ -2632,6 +2711,10 @@ void MemoryDB::doFlush(bool allowSeal)
 
 	if (!ok)
 		throw Poco::IOException("MemoryDB flush failed");
+
+	// The files and the catalog are committed: the rows of the sealed shards
+	// may leave memory now. Skipped on the dtor path like the retention below.
+	if (allowSeal) evictSealedShards();
 
 	// Always run enforceRetention: the SQLITE_LIMIT_ATTACHED backstop on
 	// total shard count is unconditional, and age/bytes retention (if
