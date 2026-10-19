@@ -95,13 +95,13 @@ namespace
 		int errors() const
 		{
 			int n = 0;
-			for (const ContentEvent& event: events) if (event.type == ContentEvent::Type::ERROR) ++n;
+			for (const ContentEvent& event: events) if (event.type == ContentEvent::Type::FAILURE) ++n;
 			return n;
 		}
 
 		const ContentEvent* firstError() const
 		{
-			for (const ContentEvent& event: events) if (event.type == ContentEvent::Type::ERROR) return &event;
+			for (const ContentEvent& event: events) if (event.type == ContentEvent::Type::FAILURE) return &event;
 			return nullptr;
 		}
 
@@ -373,7 +373,7 @@ void AnthropicProviderTest::testCutStream()
 	Cancellation cancellation;
 	ChatResult result = provider.chat(userRequest("Weather?"), events.callback(), cancellation);
 
-	assertTrue(result.stopReason == StopReason::ERROR);
+	assertTrue(result.stopReason == StopReason::FAILURE);
 	assertTrue(result.toolCalls.empty());
 	assertTrue(result.assistantMessage.isNull());
 	assertEqual(1, events.errors());
@@ -392,7 +392,7 @@ void AnthropicProviderTest::testErrorEvent()
 	Events events;
 	Cancellation cancellation;
 	ChatResult result = provider.chat(userRequest("Hi"), events.callback(), cancellation);
-	assertTrue(result.stopReason == StopReason::ERROR);
+	assertTrue(result.stopReason == StopReason::FAILURE);
 	assertTrue(events.firstError()->code == ErrorCode::OVERLOADED);
 	assertTrue(events.firstError()->text.find("Overloaded") != std::string::npos);
 }
@@ -421,7 +421,7 @@ void AnthropicProviderTest::testHttpErrors()
 		Events events;
 		Cancellation cancellation;
 		ChatResult result = provider.chat(userRequest("Hi"), events.callback(), cancellation);
-		assertTrue(result.stopReason == StopReason::ERROR);
+		assertTrue(result.stopReason == StopReason::FAILURE);
 		assertTrue(events.firstError()->code == c.code);
 		const std::string text = events.firstError()->text;
 		assertTrue(text.find(std::to_string(c.status)) != std::string::npos);

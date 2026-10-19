@@ -28,7 +28,7 @@ namespace
 	void emitError(const AgentEventCallback& onEvent, ErrorCode code, const std::string& text)
 	{
 		AgentEvent event;
-		event.type = AgentEvent::Type::ERROR;
+		event.type = AgentEvent::Type::FAILURE;
 		event.code = code;
 		event.content = text;
 		if (onEvent) onEvent(event);
@@ -107,7 +107,7 @@ void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPr
 			event.content = contentEvent.text;
 			if (onEvent) onEvent(event);
 		}
-		else if (contentEvent.type == ContentEvent::Type::ERROR)
+		else if (contentEvent.type == ContentEvent::Type::FAILURE)
 		{
 			emitError(onEvent, contentEvent.code, contentEvent.text);
 		}
@@ -136,7 +136,7 @@ void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPr
 			emitError(onEvent, ErrorCode::PROVIDER_FAILED, std::string("LLM error: ") + exc.what());
 			break;
 		}
-		if (result.stopReason == StopReason::CANCELLED || result.stopReason == StopReason::ERROR) break;
+		if (result.stopReason == StopReason::CANCELLED || result.stopReason == StopReason::FAILURE) break;
 		if (result.assistantMessage != nullptr)
 		{
 			conversation.add(result.assistantMessage);

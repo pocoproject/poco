@@ -84,11 +84,11 @@ namespace
 			if (step.errorCode != ErrorCode::NONE)
 			{
 				ContentEvent event;
-				event.type = ContentEvent::Type::ERROR;
+				event.type = ContentEvent::Type::FAILURE;
 				event.code = step.errorCode;
 				event.text = "scripted error";
 				onEvent(event);
-				result.stopReason = StopReason::ERROR;
+				result.stopReason = StopReason::FAILURE;
 				return result;
 			}
 			if (!step.text.empty())
@@ -290,7 +290,7 @@ void AgentLoopTest::testDoneOnEveryExit()
 	Recorder recorder;
 	loop.run(conversation, "", recorder.callback());
 
-	const AgentEvent* pError = recorder.first(AgentEvent::Type::ERROR);
+	const AgentEvent* pError = recorder.first(AgentEvent::Type::FAILURE);
 	assertTrue(pError != nullptr);
 	assertTrue(pError->code == ErrorCode::PROVIDER_FAILED);
 	assertTrue(pError->content.find("connection refused") != std::string::npos);
@@ -310,7 +310,7 @@ void AgentLoopTest::testProviderError()
 	Recorder recorder;
 	loop.run(conversation, "", recorder.callback());
 
-	assertTrue(recorder.first(AgentEvent::Type::ERROR)->code == ErrorCode::RATE_LIMITED);
+	assertTrue(recorder.first(AgentEvent::Type::FAILURE)->code == ErrorCode::RATE_LIMITED);
 	assertEqual(1u, static_cast<unsigned>(pProvider->requests.size()));
 	assertEqual(1u, static_cast<unsigned>(conversation.size()));
 	assertTrue(recorder.events.back().type == AgentEvent::Type::DONE);
@@ -329,7 +329,7 @@ void AgentLoopTest::testCancelled()
 	cancellation.cancel();
 	loop.run(conversation, "", recorder.callback(), cancellation);
 	assertEqual(0u, static_cast<unsigned>(pProvider->requests.size()));
-	assertEqual(0, recorder.count(AgentEvent::Type::ERROR));
+	assertEqual(0, recorder.count(AgentEvent::Type::FAILURE));
 	assertEqual(1, recorder.count(AgentEvent::Type::DONE));
 }
 
@@ -409,7 +409,7 @@ void AgentLoopTest::testFinalRound()
 	assertTrue(pProvider->requests[2].toolChoice == ToolChoice::NONE);
 	// The final call sends the same tools.
 	assertEqual(1u, static_cast<unsigned>(pProvider->requests[2].tools.size()));
-	const AgentEvent* pError = recorder.first(AgentEvent::Type::ERROR);
+	const AgentEvent* pError = recorder.first(AgentEvent::Type::FAILURE);
 	assertTrue(pError != nullptr && pError->code == ErrorCode::ROUND_LIMIT);
 	// The call of the final round has a result too.
 	const Object::Ptr pLast = conversation.getObject(static_cast<unsigned>(conversation.size() - 1));

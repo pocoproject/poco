@@ -63,7 +63,7 @@ enum class StopReason
 	CONTENT_FILTER, /// A content filter cut the answer.
 	PAUSED,         /// The model paused a long turn; send the turn back to continue.
 	CANCELLED,      /// The call was cancelled.
-	ERROR           /// The call failed; an error event says why.
+	FAILURE         /// The call failed; a FAILURE event says why.
 };
 
 
@@ -136,7 +136,7 @@ struct AI_API ContentEvent
 	{
 		TEXT,     /// A piece of text.
 		TOOL_USE, /// A complete tool call.
-		ERROR     /// An error; text says what, code what kind.
+		FAILURE   /// A failure; text says what, code what kind.
 	};
 
 	Type type = Type::TEXT;
@@ -144,7 +144,7 @@ struct AI_API ContentEvent
 	ToolCall toolCall;
 		/// The tool call (TOOL_USE).
 	ErrorCode code = ErrorCode::NONE;
-		/// The kind of error (ERROR).
+		/// The kind of failure (FAILURE).
 };
 
 
@@ -186,7 +186,7 @@ public:
 		/// Makes one call of the model and delivers its content as events.
 		///
 		/// An error the API reports, before or within the response stream,
-		/// arrives as an ERROR event, and the result has stop reason ERROR; so
+		/// arrives as a FAILURE event, and the result has stop reason FAILURE; so
 		/// does a response stream that ends before its end. A cancelled call
 		/// returns quietly with stop reason CANCELLED.
 		///

@@ -42,7 +42,7 @@ struct AI_API AgentEvent
 		TOOL_CALL,   /// The model calls a tool.
 		TOOL_RESULT, /// A tool call has its result.
 		DONE,        /// The loop has finished; the last event of every run.
-		ERROR        /// An error; content says what, code what kind.
+		FAILURE      /// A failure; content says what, code what kind.
 	};
 
 	Type type = Type::TEXT;
@@ -55,7 +55,7 @@ struct AI_API AgentEvent
 	bool toolError = false;
 		/// Whether the tool result is an error (TOOL_RESULT).
 	ErrorCode code = ErrorCode::NONE;
-		/// The kind of error (ERROR).
+		/// The kind of failure (FAILURE).
 };
 
 

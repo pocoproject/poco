@@ -271,7 +271,7 @@ int main(int argc, char** argv)
 			case AgentEvent::Type::TOOL_RESULT:
 				std::cerr << "[result " << event.content << "]\n";
 				break;
-			case AgentEvent::Type::ERROR:
+			case AgentEvent::Type::FAILURE:
 				std::cerr << "[error " << event.content << "]\n";
 				break;
 			case AgentEvent::Type::DONE:

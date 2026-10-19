@@ -92,7 +92,7 @@ namespace
 
 		const ContentEvent* firstError() const
 		{
-			for (const ContentEvent& event: events) if (event.type == ContentEvent::Type::ERROR) return &event;
+			for (const ContentEvent& event: events) if (event.type == ContentEvent::Type::FAILURE) return &event;
 			return nullptr;
 		}
 
@@ -298,7 +298,7 @@ void OpenAIProviderTest::testCutStream()
 	Events events;
 	Cancellation cancellation;
 	ChatResult result = provider.chat(userRequest("Weather?"), events.callback(), cancellation);
-	assertTrue(result.stopReason == StopReason::ERROR);
+	assertTrue(result.stopReason == StopReason::FAILURE);
 	assertTrue(result.toolCalls.empty());
 	assertTrue(result.assistantMessage.isNull());
 	assertTrue(events.firstError()->code == ErrorCode::STREAM_INTERRUPTED);
@@ -310,7 +310,7 @@ void OpenAIProviderTest::testCutStream()
 	OpenAIProvider cutProvider(params(cutServer.baseUrl()));
 	ChatResult cut = cutProvider.chat(userRequest("Weather?"), ContentEventCallback(), cancellation);
 	assertTrue(cut.toolCalls.empty());
-	assertTrue(cut.stopReason == StopReason::ERROR);
+	assertTrue(cut.stopReason == StopReason::FAILURE);
 }
 
 
@@ -323,7 +323,7 @@ void OpenAIProviderTest::testErrorInStream()
 	Events events;
 	Cancellation cancellation;
 	ChatResult result = provider.chat(userRequest("Hi"), events.callback(), cancellation);
-	assertTrue(result.stopReason == StopReason::ERROR);
+	assertTrue(result.stopReason == StopReason::FAILURE);
 	assertTrue(events.firstError()->code == ErrorCode::STREAM_ERROR);
 	assertTrue(events.firstError()->text.find("model is overloaded") != std::string::npos);
 }
@@ -353,7 +353,7 @@ void OpenAIProviderTest::testHttpErrors()
 		Events events;
 		Cancellation cancellation;
 		ChatResult result = provider.chat(request, events.callback(), cancellation);
-		assertTrue(result.stopReason == StopReason::ERROR);
+		assertTrue(result.stopReason == StopReason::FAILURE);
 		assertTrue(events.firstError()->code == c.code);
 		assertEqual(1, server.requests());
 	}

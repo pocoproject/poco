@@ -56,7 +56,7 @@ namespace
 	void report(const ContentEventCallback& onEvent, ErrorCode code, const std::string& text)
 	{
 		ContentEvent event;
-		event.type = ContentEvent::Type::ERROR;
+		event.type = ContentEvent::Type::FAILURE;
 		event.code = code;
 		event.text = text;
 		if (onEvent) onEvent(event);
@@ -66,7 +66,7 @@ namespace
 	ChatResult failed()
 	{
 		ChatResult result;
-		result.stopReason = StopReason::ERROR;
+		result.stopReason = StopReason::FAILURE;
 		return result;
 	}
 
