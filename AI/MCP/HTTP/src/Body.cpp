@@ -33,6 +33,9 @@ namespace
 		char buffer[8192];
 		for (;;)
 		{
+			// A prefix that is complete needs nothing more: neither the guard
+			// nor a source that has no more yet holds the caller up.
+			if (!refuseMore && text.size() >= maxSize) break;
 			if (pBuf->in_avail() <= 0)
 			{
 				if (guard) guard();
@@ -41,7 +44,6 @@ namespace
 			std::streamsize wanted = std::max<std::streamsize>(1, std::min<std::streamsize>(sizeof(buffer), pBuf->in_avail()));
 			if (!refuseMore)
 			{
-				if (text.size() >= maxSize) break;
 				wanted = std::min<std::streamsize>(wanted, static_cast<std::streamsize>(maxSize - text.size()));
 			}
 			const std::streamsize n = pBuf->sgetn(buffer, wanted);

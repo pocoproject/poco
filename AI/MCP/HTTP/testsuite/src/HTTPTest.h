@@ -48,6 +48,7 @@ public:
 	void testNullSession();
 	void testHttpsNeedsInstantiator();
 	void testEventStreamReader();
+	void testReadAtMostStopsAtTheLimit();
 
 	void setUp();
 	void tearDown();

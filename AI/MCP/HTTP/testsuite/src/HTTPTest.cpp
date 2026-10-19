@@ -18,6 +18,7 @@
 #include "Poco/AI/MCP/MCPException.h"
 #include "Poco/AI/MCP/HTTP/HTTPClient.h"
 #include "Poco/AI/MCP/HTTP/EventStreamReader.h"
+#include "Poco/AI/MCP/HTTP/Body.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/NetException.h"
@@ -805,6 +806,37 @@ void HTTPTest::testHttpsNeedsInstantiator()
 }
 
 
+void HTTPTest::testReadAtMostStopsAtTheLimit()
+{
+	// Once the prefix is complete, nothing more is asked of the source: a
+	// guard that would throw, as for a deadline that has passed, is not
+	// called, and the prefix is returned.
+	int guardCalls = 0;
+	const Poco::AI::MCP::HTTP::ReadGuard guard = [&guardCalls]()
+	{
+		++guardCalls;
+		throw Poco::TimeoutException("no more input wanted");
+	};
+	std::istringstream exact("0123456789");
+	assertEqual(std::string("0123456789"), Poco::AI::MCP::HTTP::readAtMost(exact, 10, guard));
+	std::istringstream longer("0123456789abcdef");
+	assertEqual(std::string("0123456789"), Poco::AI::MCP::HTTP::readAtMost(longer, 10, guard));
+	assertEqual(0, guardCalls);
+
+	// A body that is not complete yet still asks the guard before it waits.
+	std::istringstream shorter("01234");
+	try
+	{
+		(void) Poco::AI::MCP::HTTP::readAtMost(shorter, 10, guard);
+		fail("a prefix that is not complete must wait for more input");
+	}
+	catch (const Poco::TimeoutException&)
+	{
+	}
+	assertEqual(1, guardCalls);
+}
+
+
 void HTTPTest::testEventStreamReader()
 {
 	bool cut = false;
@@ -902,6 +934,7 @@ CppUnit::Test* HTTPTest::suite()
 	CppUnit_addTest(pSuite, HTTPTest, testNullSession);
 	CppUnit_addTest(pSuite, HTTPTest, testHttpsNeedsInstantiator);
 	CppUnit_addTest(pSuite, HTTPTest, testEventStreamReader);
+	CppUnit_addTest(pSuite, HTTPTest, testReadAtMostStopsAtTheLimit);
 
 	return pSuite;
 }
