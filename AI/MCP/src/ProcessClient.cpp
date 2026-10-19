@@ -237,7 +237,10 @@ int ProcessClient::close()
 	{
 		try
 		{
-			Poco::Process::kill(*_pHandle);
+			// By its ID: on Windows, killing through the handle closes it, and
+			// the handle is still needed for the wait. While the handle is open
+			// (and on POSIX until the wait), the ID cannot name another process.
+			Poco::Process::kill(_pHandle->id());
 		}
 		catch (const Poco::Exception&)
 		{
