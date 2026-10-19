@@ -1,0 +1,4 @@
+{"jsonrpc":"2.0","id":1,"result":{"supportedVersions":["2026-07-28"],"capabilities":{"tools":{},"resources":{},"prompts":{}},"ttlMs":0,"cacheScope":"private","resultType":"complete"}}
+{"jsonrpc":"2.0","method":"notifications/message","params":{"level":"info","data":"x"}}
+{"jsonrpc":"2.0","id":99,"method":"ping"}
+{"jsonrpc":"2.0","id":2,"result":{"tools":[],"resultType":"complete"}}

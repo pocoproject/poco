@@ -46,6 +46,9 @@ A request without the `_meta` object gets an Invalid params error; one that name
 
 ## Registering with an MCP client
 
+> [!NOTE]
+> The client must implement MCP revision 2026-07-28: it sends `server/discover` and names the revision in the `_meta` object of every request. A client of an earlier revision starts with `initialize`, which this server answers with an Unsupported protocol version error.
+
 A client that supports the stdio transport launches the server as a subprocess and talks to it over its stdin and stdout; the client owns the process lifecycle. Most clients take a JSON configuration of this shape:
 
 ```json

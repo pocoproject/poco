@@ -1,0 +1,142 @@
+AI/MCP Overview
+AI
+
+!!!Introduction
+
+The <*AI/MCP*> library (<*PocoAIMCP*>, namespace <[Poco::AI::MCP]>) implements the
+Model Context Protocol (MCP), revision 2026-07-28: the server side, the client side over
+any transport, and the stdio transport. The <*AI/MCP/HTTP*> library (<*PocoAIMCPHTTP*>,
+namespace <[Poco::AI::MCP::HTTP]>) adds the Streamable HTTP client transport.
+
+Dependencies: AI/MCP needs Foundation and JSON; AI/MCP/HTTP needs Net as well, and NetSSL for
+https endpoints.
+
+
+!!!The Protocol
+
+MCP connects an application that uses a language model, the client, with programs that offer
+it tools, resources and prompts, the servers. Messages are JSON-RPC 2.0.
+
+Revision 2026-07-28 is stateless. There is no initialization handshake and no session: every
+request names the protocol revision, the client's capabilities and the client's info in its
+<*_meta*> object, and every result says it is complete and carries the server's info. A
+client sends <*server/discover*> first, to learn whether the server implements the revision
+and what it offers. These libraries implement no earlier revision; a server of an earlier
+revision answers <*server/discover*> with an error.
+
+
+!!!Servers
+
+<[Server]> holds the tools, resources and prompts an application registers, and answers
+requests through any transport: one message at a time with <[Server::handle()]>, or as
+newline-delimited JSON on a pair of streams with <[Server::serve()]>, which is the stdio
+transport when the streams are <*std::cin*> and <*std::cout*>.
+
+A tool is described by a <[Tool]>: its name, description, input schema, optional output
+schema and annotations, and the handler that runs it. A handler gets the arguments and a
+<[RequestContext]>, with the identity a transport established and the protocol revision and
+client of the request, and returns a <[ToolResult]>: content blocks (text, images, audio,
+resource links, embedded resources), optional structured content, and an error flag for a
+tool that failed. Resources are read by a reader that returns <[ResourceContents]>, prompts
+are rendered by a renderer that returns their messages.
+
+Registration is thread-safe, and handlers run on the thread that calls <[Server::handle()]>
+or <[Server::serve()]>. One server serves any number of clients at once.
+
+
+!!!Clients
+
+<[Client]> is the client side of the protocol, written once over the exchange of a
+transport: <[Client::discover()]>, <[Client::listTools()]>, <[Client::callTool()]>,
+<[Client::listResources()]>, <[Client::readResource()]>, <[Client::listPrompts()]>,
+<[Client::getPrompt()]>, and <[Client::call()]> for other methods. Lists are fetched page by
+page. An error reply becomes an <[MCPException]> with the JSON-RPC error code in
+<[Poco::Exception::code()]>.
+
+The transports:
+
+  - <[StreamClient]> exchanges newline-delimited JSON over a pair of streams.
+  - <[ProcessClient]> launches a server program and talks to it over its standard input and
+    output: the stdio transport. Closing it ends the server: it closes the server's standard
+    input, asks the server's process group to end, and kills it last.
+  - <[Poco::AI::MCP::HTTP::HTTPClient]> speaks the Streamable HTTP transport over one
+    keep-alive connection, with a byte limit on replies and a deadline for every request. A
+    request hook adds headers such as <*Authorization*>.
+
+Whatever a server returns is untrusted input: tool descriptions, annotations and results may
+have been written by an attacker, and a model that reads them may be led to call tools it
+should not.
+
+
+!!!Building AI/MCP
+
+!!CMake
+
+The CMake options <*ENABLE_AI_MCP*> and <*ENABLE_AI_MCP_HTTP*> are off by default.
+<*ENABLE_AI_MCP_HTTP*> turns on <*ENABLE_AI_MCP*>, and <*ENABLE_AI*> turns on both.
+
+    cmake -B build -DENABLE_AI_MCP_HTTP=ON
+    cmake --build build
+
+!!GNU Make
+
+The components <*AI/MCP*> and <*AI/MCP/HTTP*> are omitted from the typical configuration,
+together with <*AI*>. Configure with <*--everything*>, or with an <*--omit*> list that does
+not name <*AI*>.
+
+
+!!!Examples
+
+!!A Server
+
+The following program serves one tool over the stdio transport. Its log output, if any, must
+go to <*std::cerr*>: <*std::cout*> carries the protocol.
+
+    #include "Poco/AI/MCP/Server.h"
+    #include <iostream>
+
+    using namespace Poco::AI::MCP;
+
+    int main()
+    {
+        Server server;
+        Implementation info;
+        info.name = "greeter";
+        info.version = "1.0";
+        server.setServerInfo(info);
+        server.registerTool("greet", "Greets a person by name.", nullptr,
+            [](const Poco::JSON::Object::Ptr& pArgs)
+            {
+                ToolResult result;
+                result.addText("Hello, " + pArgs->optValue<std::string>("name", "stranger") + "!");
+                return result;
+            });
+        server.serve(std::cin, std::cout);
+        return 0;
+    }
+
+!!A Client
+
+The following program starts that server, lists its tools and calls one.
+
+    #include "Poco/AI/MCP/ProcessClient.h"
+    #include "Poco/JSON/Object.h"
+    #include <iostream>
+
+    using namespace Poco::AI::MCP;
+
+    int main()
+    {
+        ProcessClient client("./greeter", {});
+        const ServerDescription description = client.discover();
+        std::cout << "Server: " << description.serverInfo.name << std::endl;
+        for (const Tool& tool: client.listTools())
+        {
+            std::cout << tool.name << ": " << tool.description << std::endl;
+        }
+        Poco::JSON::Object::Ptr pArgs = new Poco::JSON::Object;
+        pArgs->set("name", "World");
+        const ToolResult result = client.callTool("greet", pArgs);
+        std::cout << result.content()->getObject(0)->getValue<std::string>("text") << std::endl;
+        return 0;
+    }

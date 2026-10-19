@@ -12,8 +12,6 @@
 
 
 #include "Poco/AI/MCP/Server.h"
-#include "Poco/Exception.h"
-#include <exception>
 #include <sstream>
 #include <string>
 
@@ -70,15 +68,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
 	std::istringstream in(std::string(reinterpret_cast<const char*>(data), size));
 	std::ostringstream out;
-	try
-	{
-		server().serve(in, out, 65536);
-	}
-	catch (const Poco::Exception&)
-	{
-	}
-	catch (const std::exception&)
-	{
-	}
+	// serve() answers every message, valid or not, and throws only when out
+	// fails, which a string stream does not: an exception is a finding. The
+	// limit is well below the inputs' length, so that long lines reach it.
+	server().serve(in, out, 512);
 	return 0;
 }

@@ -12,9 +12,10 @@
 
 
 #include "Poco/AI/MCP/StreamClient.h"
+#include "Poco/AI/MCP/MCPException.h"
 #include "Poco/JSON/Parser.h"
+#include "Poco/JSON/JSONException.h"
 #include "Poco/Exception.h"
-#include <exception>
 #include <sstream>
 #include <string>
 
@@ -26,17 +27,46 @@ namespace
 {
 	template <typename F>
 	void attempt(F f)
+		/// Runs f and passes over what the API says it throws for bad input:
+		/// an MCPException for an error reply or a message that is no JSON
+		/// object, a ProtocolException or another IOException for a reply that
+		/// breaks the protocol or never comes, and a DataFormatException from
+		/// the parsers. Anything else is a finding.
 	{
 		try
 		{
 			f();
 		}
-		catch (const Poco::Exception&)
+		catch (const MCPException&)
 		{
 		}
-		catch (const std::exception&)
+		catch (const Poco::IOException&)
 		{
 		}
+		catch (const Poco::DataFormatException&)
+		{
+		}
+	}
+
+
+	Poco::JSON::Object::Ptr parseObject(const std::string& input)
+		/// The JSON object in input, or null. What the JSON parser throws for
+		/// text that is no JSON, or holds a number out of range, is no finding
+		/// of this target.
+	{
+		try
+		{
+			Poco::JSON::Parser parser;
+			const Poco::Dynamic::Var parsed = parser.parse(input);
+			if (parsed.type() == typeid(Poco::JSON::Object::Ptr)) return parsed.extract<Poco::JSON::Object::Ptr>();
+		}
+		catch (const Poco::JSON::JSONException&)
+		{
+		}
+		catch (const Poco::SyntaxException&)
+		{
+		}
+		return nullptr;
 	}
 }
 
@@ -48,7 +78,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 	{
 		std::istringstream in(input);
 		std::ostringstream out;
-		StreamClient client(in, out, 65536);
+		// A limit well below the inputs' length, so that long lines reach it.
+		StreamClient client(in, out, 512);
 		client.setMaxPages(4);
 		attempt([&client]() { (void) client.discover(); });
 		attempt([&client]() { (void) client.listTools(); });
@@ -57,18 +88,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 		attempt([&client]() { (void) client.getPrompt("prompt"); });
 	}
 
-	attempt([&input]()
+	const Poco::JSON::Object::Ptr pObject = parseObject(input);
+	if (pObject != nullptr)
 	{
-		Poco::JSON::Parser parser;
-		const Poco::Dynamic::Var parsed = parser.parse(input);
-		if (parsed.type() != typeid(Poco::JSON::Object::Ptr)) return;
-		const Poco::JSON::Object::Ptr pObject = parsed.extract<Poco::JSON::Object::Ptr>();
 		attempt([&pObject]() { (void) ToolResult::fromObject(pObject).toObject(); });
 		attempt([&pObject]() { (void) Tool::fromObject(pObject).toObject(); });
 		attempt([&pObject]() { (void) Resource::fromObject(pObject).toObject(); });
 		attempt([&pObject]() { (void) ResourceContents::fromObject(pObject).toObject(); });
 		attempt([&pObject]() { (void) Prompt::fromObject(pObject).toObject(); });
 		attempt([&pObject]() { (void) Implementation::fromObject(pObject).toObject(); });
-	});
+	}
 	return 0;
 }

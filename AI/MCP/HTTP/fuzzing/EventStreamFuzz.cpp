@@ -12,7 +12,6 @@
 
 #include "Poco/AI/MCP/HTTP/EventStreamReader.h"
 #include "Poco/Exception.h"
-#include <exception>
 #include <sstream>
 #include <string>
 
@@ -20,7 +19,9 @@
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
 	std::istringstream in(std::string(reinterpret_cast<const char*>(data), size));
-	Poco::AI::MCP::HTTP::EventStreamReader reader(in, 4096);
+	// A limit well below the inputs' length, so that long lines and events
+	// reach it.
+	Poco::AI::MCP::HTTP::EventStreamReader reader(in, 256);
 	Poco::AI::MCP::HTTP::EventStreamReader::Event event;
 	try
 	{
@@ -28,11 +29,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 		{
 		}
 	}
-	catch (const Poco::Exception&)
+	catch (const Poco::DataFormatException&)
 	{
-	}
-	catch (const std::exception&)
-	{
+		// What next() throws for a line or an event over the limit; anything
+		// else is a finding.
 	}
 	return 0;
 }
