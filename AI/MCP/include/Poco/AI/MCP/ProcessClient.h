@@ -66,6 +66,13 @@ class AIMCP_API ProcessClient: public Client
 	/// close(): the reader thread is left to end when that process does.
 {
 public:
+	enum class Environment
+		/// The environment variables the server starts with.
+	{
+		INHERITED, /// Those of this process and the given ones, as Poco::Process::launch() combines them.
+		CLEARED    /// Only the given ones (Poco::PROCESS_CLEAR_ENVIRONMENT).
+	};
+
 	ProcessClient(const std::string& command, const std::vector<std::string>& args);
 		/// Launches the server.
 		///
@@ -75,19 +82,21 @@ public:
 		/// exit code PROCESS_EXIT_EXEC_FAILED (72), the first request throws
 		/// Poco::IOException, and close() returns 72.
 
-	ProcessClient(const std::string& command, const std::vector<std::string>& args, const std::string& initialDirectory, const Poco::Process::Env& env, std::size_t maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE);
+	ProcessClient(const std::string& command, const std::vector<std::string>& args, const std::string& initialDirectory, const Poco::Process::Env& env, Environment environment = Environment::INHERITED, std::size_t maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE);
 		/// Launches the server in initialDirectory (if not empty) with the
 		/// given environment variables. A line longer than maxMessageSize
 		/// bytes fails the request it arrives during, and is passed over
 		/// otherwise.
 		///
-		/// What env does differs, as it does for Poco::Process::launch(): on
-		/// POSIX platforms its variables are added to the environment of this
-		/// process, which the server inherits, secrets included; on Windows
-		/// a non-empty env is the whole environment of the server. A server
-		/// that is not trusted with the environment of the application is
-		/// started on POSIX platforms through a program that clears it, such
-		/// as env -i, with the variables it needs (PATH among them).
+		/// With Environment::INHERITED, what env does differs, as it does for
+		/// Poco::Process::launch(): on POSIX platforms its variables are added
+		/// to the environment of this process, which the server inherits,
+		/// secrets included; on Windows a non-empty env is the whole
+		/// environment of the server. A server that is not trusted with the
+		/// environment of the application is started with
+		/// Environment::CLEARED and the variables it needs: PATH among them on
+		/// POSIX platforms, where the command is looked up in it, and
+		/// SystemRoot on Windows.
 		///
 		/// Failures are reported as by the other constructor; on POSIX
 		/// platforms an initialDirectory that does not exist is one too.

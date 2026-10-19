@@ -57,7 +57,8 @@ The transports:
 
   - <[StreamClient]> exchanges newline-delimited JSON over a pair of streams.
   - <[ProcessClient]> launches a server program and talks to it over its standard input and
-    output: the stdio transport. Closing it ends the server: it closes the server's standard
+    output: the stdio transport. The server gets the environment of the application, or only
+    the variables it is given. Closing it ends the server: it closes the server's standard
     input, asks the server's process group to end, and kills it last.
   - <[Poco::AI::MCP::HTTP::HTTPClient]> speaks the Streamable HTTP transport over one
     keep-alive connection, with a byte limit on replies and a deadline for every request. A

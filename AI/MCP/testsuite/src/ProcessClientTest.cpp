@@ -18,6 +18,7 @@
 #include "Poco/File.h"
 #include "Poco/NumberParser.h"
 #include "Poco/Process.h"
+#include "Poco/Environment.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/Thread.h"
 #include "Poco/Timestamp.h"
@@ -193,11 +194,30 @@ void ProcessClientTest::testEnvironmentAndDirectory()
 }
 
 
+void ProcessClientTest::testClearedEnvironment()
+{
+	// A variable of this process does not reach a server started with a
+	// cleared environment; a given one does.
+	Poco::Environment::set("POCO_AI_MCP_INHERITED", "inherited");
+	Poco::Process::Env env;
+	// What the server needs to load the libraries.
+	for (const std::string variable: {"PATH", "LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "SystemRoot"})
+	{
+		if (Poco::Environment::has(variable)) env[variable] = Poco::Environment::get(variable);
+	}
+	env["POCO_AI_MCP_TEST"] = "forty-two";
+	ProcessClient client(serverPath(), std::vector<std::string>(), std::string(), env, ProcessClient::Environment::CLEARED);
+	assertEqual(std::string("forty-two"), text(client.callTool("getenv", args("name", "POCO_AI_MCP_TEST"))));
+	assertEqual(std::string(), text(client.callTool("getenv", args("name", "POCO_AI_MCP_INHERITED"))));
+	assertEqual(0, client.close());
+}
+
+
 void ProcessClientTest::testOversizedLine()
 {
 	// A line over the limit fails the request it comes during; the client
 	// stays usable.
-	ProcessClient client(serverPath(), std::vector<std::string>(), std::string(), Poco::Process::Env(), 1024);
+	ProcessClient client(serverPath(), std::vector<std::string>(), std::string(), Poco::Process::Env(), ProcessClient::Environment::INHERITED, 1024);
 	try
 	{
 		(void) client.callTool("big", args("bytes", 4096));
@@ -331,6 +351,7 @@ CppUnit::Test* ProcessClientTest::suite()
 	CppUnit_addTest(pSuite, ProcessClientTest, testStubbornServerIsKilled);
 	CppUnit_addTest(pSuite, ProcessClientTest, testTerminationRequest);
 	CppUnit_addTest(pSuite, ProcessClientTest, testEnvironmentAndDirectory);
+	CppUnit_addTest(pSuite, ProcessClientTest, testClearedEnvironment);
 	CppUnit_addTest(pSuite, ProcessClientTest, testOversizedLine);
 	CppUnit_addTest(pSuite, ProcessClientTest, testFloodBeforeTheReply);
 	CppUnit_addTest(pSuite, ProcessClientTest, testServerStopsReading);

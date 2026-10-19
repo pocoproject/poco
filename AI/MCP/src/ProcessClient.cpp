@@ -88,14 +88,15 @@ ProcessClient::ProcessClient(const std::string& command, const std::vector<std::
 }
 
 
-ProcessClient::ProcessClient(const std::string& command, const std::vector<std::string>& args, const std::string& initialDirectory, const Poco::Process::Env& env, std::size_t maxMessageSize):
+ProcessClient::ProcessClient(const std::string& command, const std::vector<std::string>& args, const std::string& initialDirectory, const Poco::Process::Env& env, Environment environment, std::size_t maxMessageSize):
 	_pReader(std::make_shared<Reader>()),
 	_pWriter(std::make_shared<Writer>()),
 	_grace(5, 0),
 	_closed(false),
 	_exitCode(-1)
 {
-	_pHandle = std::make_unique<Poco::ProcessHandle>(Poco::Process::launch(command, args, initialDirectory, &_inPipe, &_outPipe, nullptr, env, Poco::PROCESS_NEW_GROUP));
+	const int options = Poco::PROCESS_NEW_GROUP | (environment == Environment::CLEARED ? Poco::PROCESS_CLEAR_ENVIRONMENT : 0);
+	_pHandle = std::make_unique<Poco::ProcessHandle>(Poco::Process::launch(command, args, initialDirectory, &_inPipe, &_outPipe, nullptr, env, options));
 	start(maxMessageSize);
 }
 

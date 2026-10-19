@@ -29,6 +29,7 @@ public:
 	void testStubbornServerIsKilled();
 	void testTerminationRequest();
 	void testEnvironmentAndDirectory();
+	void testClearedEnvironment();
 	void testOversizedLine();
 	void testFloodBeforeTheReply();
 	void testServerStopsReading();
