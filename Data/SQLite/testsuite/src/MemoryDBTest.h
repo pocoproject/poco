@@ -62,6 +62,9 @@ public:
 	void testHistoryView();
 	void testDeleteSealedShardLoaded();
 	void testDeleteSealedShardUnloaded();
+	void testDeleteShardKeptWhileSessionWrites();
+	void testDeleteNewestShardKeepsNumberingRow();
+	void testDeleteNewestShardKeepsNoRowWhenNotNeeded();
 	void testDeleteActiveShardRefused();
 	void testDeleteNonexistentShardRefused();
 	void testShardDescriptors();
@@ -70,6 +73,7 @@ public:
 	void testDropOlderThan();
 	void testDropToFit();
 	void testRetentionDisabledIsNoop();
+	void testRetentionKeepsShardWhileSessionReads();
 	void testHistoryViewTimeRange();
 	void testHistoryViewTimeRangeOverflow();
 	void testDetachAllArchived();

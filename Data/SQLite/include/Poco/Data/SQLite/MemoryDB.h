@@ -334,9 +334,16 @@ public:
 		/// (seal it first if you really want to drop in-flight data). If the shard is
 		/// currently attached read-only via attachArchived(), it is force-detached;
 		/// any concurrent caller relying on its alias will see "no such table" errors
-		/// on subsequent steps. In loadArchivedShards=true mode the shard's rows are
-		/// also in main; they are deleted from the in-memory tables so the drop
-		/// actually removes the data, not just the disk copy. The removal is
+		/// on subsequent steps. If the shard's rows are in memory (always so in
+		/// loadArchivedShards=true mode), they are deleted from the in-memory tables
+		/// first, so the drop actually removes the data, not just the disk copy.
+		/// That cannot happen while session() has a transaction open (a write, or
+		/// a statement still stepping over the in-memory tables): if it stays open
+		/// past a short retry, throws TableLockedException and leaves the shard -
+		/// rows, catalog entry and file - as it was. One row may outlive the shard:
+		/// a table without AUTOINCREMENT numbers its next row after the newest row
+		/// in memory, so when none would remain above the sealed shards that stay,
+		/// the shard's newest row is left behind in the active shard. The removal is
 		/// crash-safe: the manifest transaction commits before the file is unlinked,
 		/// so a crash in the window leaves an orphan file that cleanOrphans() removes
 		/// on the next open. Thread-safe (serializes via the internal flush mutex).
@@ -345,7 +352,9 @@ public:
 		/// Applies the Options-driven retention policy (retentionMaxAge, retentionMaxBytes)
 		/// plus the always-on SQLITE_LIMIT_ATTACHED backstop on total shard count.
 		/// Called automatically at the end of every successful flush; safe to call
-		/// manually at any time. Returns the number of shards dropped. When the backstop
+		/// manually at any time. Returns the number of shards dropped. A shard that
+		/// deleteShard() has to keep because session() is busy is skipped, logged
+		/// and not counted; a later run drops it. When the backstop
 		/// fires, logs a warning to the "Poco.Data.SQLite.MemoryDB" logger naming the
 		/// cap and the four ways to avoid the auto-drop. Thread-safe (serializes via
 		/// the internal flush mutex; can transiently force-detach attached shards -
@@ -353,11 +362,13 @@ public:
 
 	std::size_t dropOlderThan(const Poco::Timestamp& cutoff);
 		/// Drops every sealed shard whose sealedAt is strictly before cutoff. Returns the
-		/// number of shards dropped. Thread-safe (see enforceRetention).
+		/// number of shards dropped; a shard kept because session() is busy is skipped
+		/// as in enforceRetention(). Thread-safe (see enforceRetention).
 
 	std::size_t dropToFit(Poco::UInt64 maxTotalBytes);
 		/// Drops oldest sealed shards until the sum of all shard files' bytes is at most
-		/// maxTotalBytes, or no more sealed shards remain. Returns the number dropped.
+		/// maxTotalBytes, or no more sealed shards remain. Returns the number dropped; a
+		/// shard kept because session() is busy is skipped as in enforceRetention().
 		/// Thread-safe (see enforceRetention).
 
 	std::string historyView(const std::string& table);
@@ -491,6 +502,18 @@ private:
 	void rebuildActiveLo();                              // caller holds _stateMutex
 	bool tryDetach(Poco::UInt32 shardId);                // caller holds _attachMutex
 	void sweepDetached();                                // caller holds _attachMutex
+	[[nodiscard]] bool removeFromMemory(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
+		const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept);
+		// deletes the rowid ranges (table -> (lo, hi]) from the in-memory tables;
+		// false, deleting nothing, while session() has a transaction open.
+		// floors: table -> the end of the newest sealed shard that keeps its range.
+		// A table without AUTOINCREMENT numbers its next row after the newest row
+		// in memory, so one must stay above that end: when none would, the range's
+		// newest row is left in place and reported in kept (table -> rowid);
+		// caller holds _flushMutex
+	std::size_t deleteShards(const std::vector<Poco::UInt32>& ids);
+		// deleteShard() on each id, skipping the ones it has to keep; returns the
+		// number dropped; caller holds _flushMutex
 	void throwIfRejected() const;
 	std::string shardPath(Poco::UInt32 id, const Poco::Timestamp& createdAt) const;
 	void cleanOrphans();

@@ -15,6 +15,7 @@
 #include "Poco/Data/SQLite/MemoryDB.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Utility.h"
+#include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/Session.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
@@ -1311,6 +1312,8 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 
 	std::string file;
 	std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges;
+	std::map<std::string, Poco::Int64> floors; // table -> end of the newest other sealed shard
+	bool resident = false;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
 		auto it = std::find_if(_shards.begin(), _shards.end(),
@@ -1324,6 +1327,16 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 			throw Poco::InvalidArgumentException("cannot delete the active shard; seal it first");
 		file = it->file;
 		ranges = it->ranges;
+		resident = it->resident;
+		for (const auto& s: _shards)
+		{
+			if (!s.sealed || s.id == shardId) continue;
+			for (const auto& r: s.ranges)
+			{
+				Poco::Int64& f = floors[r.first];
+				if (r.second.second > f) f = r.second.second;
+			}
+		}
 	}
 
 	// Force-detach if currently attached read-only. Bypass the reference count:
@@ -1346,18 +1359,22 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 		}
 	}
 
-	// In loaded mode the shard's rows are also in main; remove them so the next flush
-	// doesn't simply re-absorb them into the active shard. Done on _persist so the
-	// _session-side update/trace hooks don't fire (no spurious dirty marks).
-	if (_opts.loadArchivedShards)
+	// The shard's rows in main are removed before the shard leaves the catalog:
+	// dropped first, its file would be gone while the rows stay in memory,
+	// owned by no shard and never removed. If they cannot be removed now, the
+	// shard is kept whole for a later attempt.
+	std::map<std::string, Poco::Int64> kept;
+	if (resident)
 	{
-		for (const auto& r: ranges)
+		constexpr int maxAttempts = 10;
+		for (int attempt = 0; !removeFromMemory(ranges, floors, kept); ++attempt)
 		{
-			std::string sql = "DELETE FROM " + quoteIdent(r.first) +
-				" WHERE rowid > " + Poco::NumberFormatter::format(r.second.first) +
-				" AND rowid <= " + Poco::NumberFormatter::format(r.second.second);
-			try { _persist << sql, now; }
-			catch (...) {} // table may have been dropped since the shard was sealed
+			if (attempt + 1 >= maxAttempts)
+			{
+				throw TableLockedException("MemoryDB: shard " + Poco::NumberFormatter::format(shardId) +
+					" kept, its rows cannot be removed from memory while session() has a transaction open");
+			}
+			Poco::Thread::sleep(1);
 		}
 	}
 
@@ -1369,6 +1386,13 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 			[shardId](const ShardInfo& s) { return s.id == shardId; }),
 			_shards.end());
 		rebuildActiveLo();
+		// A row left in memory for the numbering lies above every sealed range
+		// now, so it is the active shard's; the next flush saves it there.
+		if (!kept.empty())
+		{
+			if (ShardInfo* a = activeShard()) a->dirty = true;
+			_dirty = true;
+		}
 		schemaVersion = _schemaVersion;
 		schemaLog = _schemaLog;
 	}
@@ -1380,6 +1404,91 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 		try { Poco::File(Poco::Path(_dir, file).toString()).remove(); }
 		catch (...) {}
 	}
+}
+
+
+bool MemoryDB::removeFromMemory(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
+	const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept)
+{
+	kept.clear();
+	if (ranges.empty()) return true;
+
+	// The rows are deleted on _persist so the update and trace hooks on
+	// _session do not fire. Shared-cache locks are per table: while session()
+	// has a transaction open - a write, or a statement still stepping over
+	// main - the DELETE fails with SQLITE_LOCKED, which the busy timeout does
+	// not cover. The held connection mutex keeps statements on session() from
+	// starting or completing, so a session found free stays free until the
+	// deletes are done.
+	DbMutexGuard dbm(_memHandle);
+	if (sqlite3_txn_state(_memHandle, "main") != SQLITE_TXN_NONE) return false;
+
+	std::vector<std::string> tables = userTables(_persist);
+	_persist.begin();
+	try
+	{
+		for (const auto& r: ranges)
+		{
+			const std::string& t = r.first;
+			if (std::find(tables.begin(), tables.end(), t) == tables.end())
+				continue; // dropped since the shard was sealed
+			const std::string inRange = "rowid > " + Poco::NumberFormatter::format(r.second.first) +
+				" AND rowid <= " + Poco::NumberFormatter::format(r.second.second);
+
+			// SQLite numbers the next row of a table without AUTOINCREMENT after
+			// the newest row in memory. Were none left above the sealed ranges
+			// that remain, the next row would be numbered inside one of them: an
+			// archived shard's row, or a rowid below the active range that no
+			// flush would ever save. The range's newest row then stays.
+			std::string keepClause;
+			auto f = floors.find(t);
+			if (f != floors.end() && f->second > 0 && !isAutoincrement(t))
+			{
+				Poco::Int64 above = 0;
+				_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
+					" WHERE NOT (" + inRange + ")"), into(above), now;
+				if (above < f->second)
+				{
+					Poco::Int64 newest = 0;
+					_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
+						" WHERE " + inRange), into(newest), now;
+					if (newest > f->second)
+					{
+						kept[t] = newest;
+						keepClause = " AND rowid < " + Poco::NumberFormatter::format(newest);
+					}
+				}
+			}
+			_persist << ("DELETE FROM " + quoteIdent(t) + " WHERE " + inRange + keepClause), now;
+		}
+		_persist.commit();
+	}
+	catch (...)
+	{
+		try { _persist.rollback(); } catch (...) {}
+		kept.clear();
+		throw;
+	}
+	return true;
+}
+
+
+std::size_t MemoryDB::deleteShards(const std::vector<Poco::UInt32>& ids)
+{
+	std::size_t dropped = 0;
+	for (Poco::UInt32 id: ids)
+	{
+		try
+		{
+			deleteShard(id);
+			++dropped;
+		}
+		catch (const TableLockedException& e)
+		{
+			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").information(e.message() + "; retried later");
+		}
+	}
+	return dropped;
 }
 
 
@@ -1540,8 +1649,7 @@ std::size_t MemoryDB::enforceRetention()
 
 	std::sort(drop.begin(), drop.end());
 	drop.erase(std::unique(drop.begin(), drop.end()), drop.end());
-	for (Poco::UInt32 id: drop) deleteShard(id);
-	return drop.size();
+	return deleteShards(drop);
 }
 
 
@@ -1551,8 +1659,7 @@ std::size_t MemoryDB::dropOlderThan(const Poco::Timestamp& cutoff)
 	std::vector<Poco::UInt32> drop;
 	for (const auto& d: shards())
 		if (d.sealed && d.sealedAt < cutoff) drop.push_back(d.id);
-	for (Poco::UInt32 id: drop) deleteShard(id);
-	return drop.size();
+	return deleteShards(drop);
 }
 
 
@@ -1568,8 +1675,7 @@ std::size_t MemoryDB::dropToFit(Poco::UInt64 maxTotalBytes)
 		if (total <= maxTotalBytes) break;
 		if (d.sealed) { drop.push_back(d.id); total -= d.bytes; }
 	}
-	for (Poco::UInt32 id: drop) deleteShard(id);
-	return drop.size();
+	return deleteShards(drop);
 }
 
 

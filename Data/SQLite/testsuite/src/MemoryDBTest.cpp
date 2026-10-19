@@ -14,6 +14,7 @@
 #include "Poco/Data/SQLite/MemoryDB.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Utility.h"
+#include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/File.h"
@@ -1058,6 +1059,175 @@ void MemoryDBTest::testDeleteSealedShardUnloaded()
 }
 
 
+void MemoryDBTest::testDeleteShardKeptWhileSessionWrites()
+{
+	// The shard's rows are removed from memory on a second connection to the
+	// shared-cache database. While session() has a write transaction open, that
+	// DELETE cannot run; the shard must then be kept whole - rows, catalog entry
+	// and file - instead of losing its file and leaving its rows in memory.
+	MemoryDB::Options o;
+	o.loadArchivedShards = true;
+	MemoryDB db(_dir, o);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	std::string h("hist");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
+	db.sealActive();
+	db.flush();
+	std::string l("live");
+	for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(l), now;
+	db.flush();
+
+	std::vector<Poco::UInt32> ids = db.archivedShardIds();
+	assertTrue (ids.size() == 1);
+	std::string sealedFile = Poco::Path(_dir, "shard-000001.db").toString();
+
+	db.session().begin();
+	db.session() << "INSERT INTO t(v) VALUES(:v)", use(l), now;
+	try
+	{
+		db.deleteShard(ids[0]);
+		failmsg("deleteShard must refuse while session() has a transaction open");
+	}
+	catch (Poco::Data::SQLite::TableLockedException&)
+	{
+	}
+	int hist = 0;
+	db.session() << "SELECT count(*) FROM t WHERE v=:v", use(h), into(hist), now;
+	db.session().commit();
+
+	assertTrue (hist == 3);
+	assertTrue (Poco::File(sealedFile).exists());
+	assertTrue (db.archivedShardIds().size() == 1);
+
+	db.deleteShard(ids[0]);
+	assertTrue (!Poco::File(sealedFile).exists());
+	assertTrue (db.archivedShardIds().empty());
+	db << "SELECT count(*) FROM t WHERE v=:v", use(h), into(hist), now;
+	assertTrue (hist == 0);
+	int all = 0;
+	db << "SELECT count(*) FROM t", into(all), now;
+	assertTrue (all == 3);
+}
+
+
+void MemoryDBTest::testDeleteNewestShardKeepsNumberingRow()
+{
+	// A table without AUTOINCREMENT numbers its next row after the newest row in
+	// memory. Deleting the newest sealed shard while the active shard holds no
+	// row of the table would leave none above the older, on-disk shard: the next
+	// row would be numbered inside that shard. The deleted shard's newest row
+	// stays behind, in the active shard, so the numbering continues above it.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+		std::string v("old");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.sealActive();
+		db.flush();
+	}
+	{
+		MemoryDB db(_dir, off); // shard 1 on disk; its newest row (3) is moved into the active shard
+		std::string v("new");
+		for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 4, 5
+		db.sealActive();
+		db.flush(); // shard 2 (3..5), sealed in this run: its rows are still in memory
+
+		std::vector<Poco::UInt32> ids = db.archivedShardIds();
+		assertTrue (ids.size() == 2);
+		db.deleteShard(ids.back());
+
+		int n = 0;
+		Poco::Int64 maxId = 0;
+		db << "SELECT count(*), IFNULL(max(id), 0) FROM t", into(n), into(maxId), now;
+		assertTrue (n == 1);      // only the newest row of shard 2 stays
+		assertTrue (maxId == 5);
+
+		db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // numbered above the kept row, not inside shard 1
+		db << "SELECT max(id) FROM t", into(maxId), now;
+		assertTrue (maxId == 6);
+		db.flush();
+	}
+
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+	MemoryDB db(_dir, on);
+	int total = 0;
+	int distinct = 0;
+	int oldRows = 0;
+	std::string o("old");
+	db << "SELECT count(*), count(DISTINCT id) FROM t", into(total), into(distinct), now;
+	db << "SELECT count(*) FROM t WHERE v=:v", use(o), into(oldRows), now;
+	assertTrue (total == 4);    // shard 1 (1, 2) + active (5, 6)
+	assertTrue (distinct == 4);
+	assertTrue (oldRows == 2);
+}
+
+
+void MemoryDBTest::testDeleteNewestShardKeepsNoRowWhenNotNeeded()
+{
+	// No row stays behind when the numbering is safe without it: when the
+	// newest remaining sealed shard is in memory, or when the table declares
+	// AUTOINCREMENT and so remembers its last rowid itself.
+	{
+		MemoryDB::Options on;
+		on.loadArchivedShards = true;
+		MemoryDB db(_dir, on);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+		std::string v("x");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.sealActive();
+		db.flush();
+		for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.sealActive();
+		db.flush();
+
+		std::vector<Poco::UInt32> ids = db.archivedShardIds();
+		assertTrue (ids.size() == 2);
+		db.deleteShard(ids.back());
+
+		int n = 0;
+		Poco::Int64 maxId = 0;
+		db << "SELECT count(*), max(id) FROM t", into(n), into(maxId), now;
+		assertTrue (n == 3);
+		assertTrue (maxId == 3);
+		db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db << "SELECT max(id) FROM t", into(maxId), now;
+		assertTrue (maxId == 4);
+	}
+
+	try { Poco::File(_dir).remove(true); } catch (...) {}
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+		std::string v("x");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.sealActive();
+		db.flush();
+	}
+	MemoryDB db(_dir, off);
+	std::string v("x");
+	for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 4, 5
+	db.sealActive();
+	db.flush();
+
+	std::vector<Poco::UInt32> ids = db.archivedShardIds();
+	assertTrue (ids.size() == 2);
+	db.deleteShard(ids.back());
+
+	int n = -1;
+	db << "SELECT count(*) FROM t", into(n), now;
+	assertTrue (n == 0);
+	db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	Poco::Int64 maxId = 0;
+	db << "SELECT max(id) FROM t", into(maxId), now;
+	assertTrue (maxId == 6); // the AUTOINCREMENT sequence carries on
+}
+
+
 void MemoryDBTest::testDeleteActiveShardRefused()
 {
 	MemoryDB db(_dir);
@@ -1313,6 +1483,45 @@ void MemoryDBTest::testRetentionDisabledIsNoop()
 	std::size_t dropped = db.enforceRetention();
 	assertTrue (dropped == 0);
 	assertTrue (db.shardCount() == before);
+}
+
+
+void MemoryDBTest::testRetentionKeepsShardWhileSessionReads()
+{
+	// A statement stepping over main holds a read transaction on session(),
+	// which blocks the DELETE that removes a dropped shard's rows from memory.
+	// The retention run at the end of a flush must keep that shard and drop it
+	// on a later run, instead of removing its file and leaving its rows behind.
+	MemoryDB::Options o;
+	o.loadArchivedShards = true;
+	o.retentionMaxBytes = 1; // every sealed shard is over budget
+	MemoryDB db(_dir, o);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	std::string h("hist");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
+
+	std::string sealedFile = Poco::Path(_dir, "shard-000001.db").toString();
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << "SELECT id FROM t", into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on main
+
+		db.sealActive();
+		db.flush(); // writes shard 1, then retention cannot remove its rows
+
+		assertTrue (Poco::File(sealedFile).exists());
+		assertTrue (db.archivedShardIds().size() == 1);
+	} // statement finalized; the read transaction is released
+
+	int hist = 0;
+	db << "SELECT count(*) FROM t WHERE v=:v", use(h), into(hist), now;
+	assertTrue (hist == 3);
+
+	assertTrue (db.enforceRetention() == 1);
+	assertTrue (!Poco::File(sealedFile).exists());
+	assertTrue (db.archivedShardIds().empty());
+	db << "SELECT count(*) FROM t WHERE v=:v", use(h), into(hist), now;
+	assertTrue (hist == 0);
 }
 
 
@@ -2248,6 +2457,9 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryView);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardLoaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardUnloaded);
+	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeptWhileSessionWrites);
+	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNumberingRow);
+	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteActiveShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNonexistentShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testShardDescriptors);
@@ -2256,6 +2468,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testDropOlderThan);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDropToFit);
 	CppUnit_addTest(pSuite, MemoryDBTest, testRetentionDisabledIsNoop);
+	CppUnit_addTest(pSuite, MemoryDBTest, testRetentionKeepsShardWhileSessionReads);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewTimeRange);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewTimeRangeOverflow);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDetachAllArchived);
