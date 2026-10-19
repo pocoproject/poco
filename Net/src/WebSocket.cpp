@@ -192,6 +192,18 @@ int WebSocket::getMaxPayloadSize() const
 }
 
 
+void WebSocket::setAllowedRSVBits(int allowedRSV)
+{
+	static_cast<WebSocketImpl*>(impl())->setAllowedRSVBits(allowedRSV);
+}
+
+
+int WebSocket::getAllowedRSVBits() const
+{
+	return static_cast<WebSocketImpl*>(impl())->getAllowedRSVBits();
+}
+
+
 WebSocketImpl* WebSocket::accept(HTTPServerRequest& request, HTTPServerResponse& response)
 {
 	if (request.hasToken("Connection"s, "upgrade"s) && icompare(request.get("Upgrade"s, ""s), "websocket"s) == 0)
