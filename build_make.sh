@@ -152,13 +152,27 @@ while IFS= read -r mk; do
 	ALL_DIRS+=("$dir")
 done < <(find "$POCO_BASE" -maxdepth 4 -name Makefile -type f 2>/dev/null)
 
-# 2. Honor OMIT from config.make (entries are top-level dirs).
+# 2. Honor OMIT from config.make. An entry omits the components below it as
+# well, as the filter of the Makefile does: AI omits AI/MCP and AI/MCP/HTTP.
 declare -A OMITTED
 if [[ -f config.make ]]; then
 	omit_line=$({ grep -E "^OMIT[[:space:]]*=" config.make 2>/dev/null || true; } \
 		| head -1 | sed 's/^OMIT[[:space:]]*=[[:space:]]*//')
 	for e in $omit_line; do OMITTED[$e]=1; done
 fi
+
+# Prints the OMIT entry that omits the component directory; fails when none does.
+omitted_by()
+{
+	local dir=$1 e
+	for e in "${!OMITTED[@]}"; do
+		if [[ "$dir" == "$e" || "$dir" == "$e"/* ]]; then
+			echo "$e"
+			return 0
+		fi
+	done
+	return 1
+}
 
 # 3. Topological walk via DFS.
 declare -A VISITED
@@ -169,7 +183,7 @@ walk()
 {
 	local dir=$1
 	[[ -n "${VISITED[$dir]:-}" ]] && return
-	[[ -n "${OMITTED[$dir]:-}" ]] && return
+	omitted_by "$dir" >/dev/null && return
 	[[ ! -f "$POCO_BASE/$dir/Makefile" ]] && return
 	VISITED[$dir]=1
 
@@ -185,8 +199,8 @@ walk()
 }
 
 if [[ -n "$COMPONENT" ]]; then
-	if [[ -n "${OMITTED[$COMPONENT]:-}" ]]; then
-		echo "error: $COMPONENT is omitted in config.make; run ./configure without it in --omit" >&2
+	if omission=$(omitted_by "$COMPONENT"); then
+		echo "error: $COMPONENT is omitted in config.make, by $omission; run ./configure without $omission in --omit" >&2
 		exit 1
 	fi
 	walk "$COMPONENT"
