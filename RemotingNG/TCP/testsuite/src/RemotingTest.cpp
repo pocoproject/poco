@@ -721,6 +721,17 @@ void RemotingTest::testSCRAMConversationOtherConnection()
 
 	Poco::RemotingNG::Credentials clientCreds;
 	assert (clientAuth.continueAuthentication(result.credentials(), clientCreds));
+
+	// A wrong proof sent on another connection does not end the conversation.
+	Poco::RemotingNG::Credentials wrongCreds(clientCreds);
+	wrongCreds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "wrong proof");
+	{
+		Poco::RemotingNG::ScopedContext scopedContext;
+		scopedContext.context()->setValue("id", static_cast<Poco::UInt32>(2));
+		result = pAuth->authenticate(wrongCreds, conversationID);
+	}
+	assert (result.failed());
+
 	{
 		Poco::RemotingNG::ScopedContext scopedContext;
 		scopedContext.context()->setValue("id", static_cast<Poco::UInt32>(1));
@@ -734,7 +745,7 @@ void RemotingTest::testSCRAMConversationOtherConnection()
 		scopedContext.context()->setValue("id", static_cast<Poco::UInt32>(2));
 		result = pAuth->authenticate(Poco::RemotingNG::Credentials(), conversationID);
 	}
-	assert (!result.done());
+	assert (result.failed());
 
 	{
 		Poco::RemotingNG::ScopedContext scopedContext;
