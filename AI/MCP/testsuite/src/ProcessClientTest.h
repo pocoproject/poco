@@ -27,6 +27,13 @@ public:
 	void testNoiseOnStandardOutput();
 	void testCloseEndsServer();
 	void testStubbornServerIsKilled();
+	void testTerminationRequest();
+	void testEnvironmentAndDirectory();
+	void testOversizedLine();
+	void testFloodBeforeTheReply();
+	void testServerStopsReading();
+	void testProcessKeepsOutputOpen();
+	void testCommandThatCannotRun();
 
 	void setUp();
 	void tearDown();
