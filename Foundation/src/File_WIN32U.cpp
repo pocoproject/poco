@@ -654,11 +654,11 @@ void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 		{
 			// A rooted path without a drive letter ("\dir\..."): the prefix
 			// requires a fully qualified path, so resolve it first.
-			DWORD size = GetFullPathNameW(utf16Path.c_str(), 0, nullptr, nullptr);
+			DWORD size = ::GetFullPathNameW(utf16Path.c_str(), 0, nullptr, nullptr);
 			if (size > 0)
 			{
 				std::wstring fullPath(size, L'\0');
-				size = GetFullPathNameW(utf16Path.c_str(), size, &fullPath[0], nullptr);
+				size = ::GetFullPathNameW(utf16Path.c_str(), size, &fullPath[0], nullptr);
 				if (size > 0 && size < fullPath.size())
 				{
 					fullPath.resize(size);

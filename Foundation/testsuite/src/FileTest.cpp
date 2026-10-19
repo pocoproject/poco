@@ -902,6 +902,35 @@ void FileTest::testLongPathDevice()
 	assertEqual ("does not exist", results[0]);
 	assertEqual (results[0], results[1]);
 	assertEqual (results[0], results[2]);
+
+	// A device path to an existing directory must be found below and above
+	// the limit, and above MAX_PATH.
+	const std::string device("\\\\.\\");
+	Poco::Path p("longpathdevice");
+	p.makeAbsolute();
+	const std::string base(p.toString());
+	if (base.size() > 2 && base[1] == ':' && device.size() + base.size() + 2 <= MAX_PATH - 12)
+	{
+		for (std::size_t len: {std::size_t(MAX_PATH - 12), std::size_t(MAX_PATH - 11), std::size_t(MAX_PATH + 40)})
+		{
+			// fill up to the wanted length with components that any file system accepts
+			std::string path(base);
+			while (device.size() + path.size() + 65 + 2 <= len)
+			{
+				path.append("\\");
+				path.append(64, 'x');
+			}
+			path.append("\\");
+			path.append(len - device.size() - path.size(), 'y');
+			Poco::File(path).createDirectories();
+
+			assertEqual (len, device.size() + path.size());
+			Poco::File dir(device + path);
+			assertTrue (dir.exists());
+			assertTrue (dir.isDirectory());
+		}
+		Poco::File(base).remove(true);
+	}
 #endif
 }
 
@@ -935,6 +964,7 @@ void FileTest::testLongPathRooted()
 	f.remove(true);
 #endif
 }
+
 
 void FileTest::testUnixFileExtension()
 {
