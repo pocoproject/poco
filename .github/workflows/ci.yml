@@ -115,6 +115,7 @@ jobs:
       data: ${{ steps.filter.outputs.data }}
       sqlparser: ${{ steps.filter.outputs.sqlparser }}
       crypto_netssl: ${{ steps.filter.outputs.crypto_netssl }}
+      ai: ${{ steps.filter.outputs.ai }}
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v4
@@ -644,6 +645,11 @@ jobs:
   # testsuites.
   linux-gcc-make-cxx17-ai:
     runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.ai == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
       - name: Configure (classic make, C++17)

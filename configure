@@ -113,7 +113,9 @@ $(ls -C "$base"/build/config/)
 
 
   --omit=<component>{,<component>}
-    Do not build the specified component(s).
+    Do not build the specified component(s). A component is omitted with
+    the components below it: --omit=Data also omits Data/SQLite and the
+    other connectors, --omit=AI also omits AI/MCP and AI/MCP/HTTP.
     Example: --omit=Data/MySQL,Data/ODBC,Zip
 
   --include-path=<path>

@@ -26,7 +26,10 @@
 #   ./build_make.sh debug asan Util test rebuild
 #
 # Configures the make build for $POCO_CONFIG (default Linux-clang-c++20) on
-# the first run. Sources poco_env.bash for POCO_BASE / OSNAME / OSARCH /
+# the first run, without the components in OMIT_DEFAULT: those that need
+# external libraries or servers, and the AI libraries, which are off by
+# default in CMake too. To build one of them, run ./configure without it in
+# --omit first. Sources poco_env.bash for POCO_BASE / OSNAME / OSARCH /
 # LD_LIBRARY_PATH. Pass 'rebuild' to make clean before building (use after
 # switching sanitizers).
 
@@ -39,7 +42,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 set -euo pipefail
 
 POCO_CONFIG="${POCO_CONFIG:-Linux-clang-c++20}"
-OMIT_DEFAULT=Data/ODBC,Data/MySQL,Data/PostgreSQL,MongoDB,Redis,PDF,DNSSD,DNSSD/Avahi,DNSSD/Bonjour,CppParser
+OMIT_DEFAULT=Data/ODBC,Data/MySQL,Data/PostgreSQL,MongoDB,Redis,PDF,DNSSD,DNSSD/Avahi,DNSSD/Bonjour,CppParser,AI,AI/MCP,AI/MCP/HTTP
 
 MODE=all
 SANITIZER=
@@ -88,7 +91,12 @@ esac
 
 cd "$POCO_BASE"
 
-if [[ ! -f config.make ]] || ! grep -qE "^POCO_CONFIG[[:space:]]*=[[:space:]]*${POCO_CONFIG}[[:space:]]*$" config.make; then
+# Compared as a string: config names such as Linux-clang-c++20 are no regex.
+configured=
+if [[ -f config.make ]]; then
+	configured=$(awk '/^POCO_CONFIG[[:space:]]*=/ { sub(/^POCO_CONFIG[[:space:]]*=[[:space:]]*/, ""); sub(/[[:space:]]+$/, ""); print; exit }' config.make)
+fi
+if [[ "$configured" != "$POCO_CONFIG" ]]; then
 	echo "==> configure --config=$POCO_CONFIG"
 	./configure --config="$POCO_CONFIG" --omit="$OMIT_DEFAULT"
 fi
@@ -124,8 +132,9 @@ parse_target_libs()
 		| tr '\n' ' '
 }
 
-# 1. Component discovery: find every component Makefile and build the
-# library-name -> directory index, caching target_libs at the same time.
+# 1. Component discovery: find every component Makefile, up to three levels
+# deep (AI/MCP/HTTP), and build the library-name -> directory index, caching
+# target_libs at the same time.
 declare -A LIB_TO_DIR
 declare -A DEPS_OF
 declare -a ALL_DIRS=()
@@ -141,7 +150,7 @@ while IFS= read -r mk; do
 	LIB_TO_DIR[$target]=$dir
 	DEPS_OF[$dir]=$(parse_target_libs "$mk")
 	ALL_DIRS+=("$dir")
-done < <(find "$POCO_BASE" -maxdepth 3 -name Makefile -type f 2>/dev/null)
+done < <(find "$POCO_BASE" -maxdepth 4 -name Makefile -type f 2>/dev/null)
 
 # 2. Honor OMIT from config.make (entries are top-level dirs).
 declare -A OMITTED
@@ -176,6 +185,10 @@ walk()
 }
 
 if [[ -n "$COMPONENT" ]]; then
+	if [[ -n "${OMITTED[$COMPONENT]:-}" ]]; then
+		echo "error: $COMPONENT is omitted in config.make; run ./configure without it in --omit" >&2
+		exit 1
+	fi
 	walk "$COMPONENT"
 else
 	for d in "${ALL_DIRS[@]}"; do walk "$d"; done
