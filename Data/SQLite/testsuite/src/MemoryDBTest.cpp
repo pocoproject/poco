@@ -971,6 +971,58 @@ void MemoryDBTest::testHistoryView()
 }
 
 
+void MemoryDBTest::testHistoryViewCountsResidentShardOnce()
+{
+	// A shard sealed in this run still has its rows in main (they leave only on
+	// a later flush, or never, depending on the mode). The history view must then
+	// take the shard from main and not from its file as well, or it shows every
+	// one of its rows twice.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+		std::string h("hist");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
+		db.sealActive();
+		db.flush();
+		std::string l("live");
+		for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(l), now;
+		db.flush();
+
+		int inMain = 0;
+		db << "SELECT count(*) FROM t", into(inMain), now;
+		assertTrue (inMain == 5); // the sealed rows are still in main in this run
+
+		db.attachAllArchived();
+		std::string view = db.historyView("t");
+		int total = 0;
+		int hist = 0;
+		db << ("SELECT count(*) FROM " + view), into(total), now;
+		db << ("SELECT count(*) FROM " + view + " WHERE v=:v"), use(h), into(hist), now;
+		assertTrue (total == 5);
+		assertTrue (hist == 3);
+
+		view = db.historyView("t", Poco::Timestamp(0), Poco::Timestamp());
+		db << ("SELECT count(*) FROM " + view), into(total), now;
+		assertTrue (total == 5);
+		db.detachAllArchived();
+	}
+
+	// After a reopen the sealed rows are on disk only; the view now takes them
+	// from the file, and still shows each once.
+	MemoryDB db(_dir, off);
+	int inMain = 0;
+	db << "SELECT count(*) FROM t", into(inMain), now;
+	assertTrue (inMain == 2);
+	db.attachAllArchived();
+	std::string view = db.historyView("t");
+	int total = 0;
+	db << ("SELECT count(*) FROM " + view), into(total), now;
+	assertTrue (total == 5);
+}
+
+
 void MemoryDBTest::testDeleteSealedShardLoaded()
 {
 	MemoryDB::Options o;
@@ -2455,6 +2507,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testVecShadowNameCollisionRejected);
 	CppUnit_addTest(pSuite, MemoryDBTest, testVecHistoryView);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryView);
+	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewCountsResidentShardOnce);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardLoaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardUnloaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeptWhileSessionWrites);

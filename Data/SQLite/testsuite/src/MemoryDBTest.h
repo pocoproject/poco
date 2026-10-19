@@ -60,6 +60,7 @@ public:
 	void testVecShadowNameCollisionRejected();
 	void testVecHistoryView();
 	void testHistoryView();
+	void testHistoryViewCountsResidentShardOnce();
 	void testDeleteSealedShardLoaded();
 	void testDeleteSealedShardUnloaded();
 	void testDeleteShardKeptWhileSessionWrites();

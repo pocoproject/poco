@@ -1751,8 +1751,20 @@ std::string MemoryDB::buildHistoryView(const std::string& table,
 	std::string viewName = table + "_history";
 	std::string sql = "SELECT * FROM main." + quoteIdent(table);
 
+	// Holding the SQLite connection mutex makes the whole "probe shards + drop
+	// old view + create new view" sequence atomic vs concurrent user steps.
+	// Without it a user's SELECT FROM <table>_history could see the view mid
+	// drop-and-recreate and fail with "no such table".
+	InternalGuard guard;
+	DbMutexGuard dbm(_memHandle);
+
 	// Virtual tables live whole in the active shard; copies in archived shard
 	// files are stale, so their history view is just the base table.
+	// Of the sealed shards, only those whose rows are not in main are read from
+	// their files: a resident shard's rows are already in the base table, and
+	// reading its file too would show them twice. Which shards are resident is
+	// looked up under the connection mutex, where a shard's rows leave main,
+	// so the view takes each shard from one place.
 	bool isVirtual = false;
 	std::map<Poco::UInt32, std::pair<Poco::Int64, Poco::Int64> > ranges; // shard id -> the table's (lo, hi]
 	{
@@ -1761,16 +1773,10 @@ std::string MemoryDB::buildHistoryView(const std::string& table,
 		for (const auto& s: _shards)
 		{
 			auto r = s.ranges.find(table);
-			if (s.sealed && r != s.ranges.end()) ranges[s.id] = r->second;
+			if (s.sealed && !s.resident && r != s.ranges.end()) ranges[s.id] = r->second;
 		}
 	}
 
-	// Holding the SQLite connection mutex makes the whole "probe shards + drop
-	// old view + create new view" sequence atomic vs concurrent user steps.
-	// Without it a user's SELECT FROM <table>_history could see the view mid
-	// drop-and-recreate and fail with "no such table".
-	InternalGuard guard;
-	DbMutexGuard dbm(_memHandle);
 	if (!isVirtual) for (auto id: shardIds)
 	{
 		// Only the rows of the shard's own range: a row that was moved to

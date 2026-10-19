@@ -376,7 +376,9 @@ public:
 		/// and every currently-attached sealed shard's same-named table via UNION ALL.
 		/// Returns the view name ("<table>_history"). The view is read-only by virtue of
 		/// being a SQLite view without INSTEAD OF triggers, so writes to it fail with a
-		/// clear SQLite error. If Options::loadArchivedShards is true, sealed data is
+		/// clear SQLite error. A sealed shard whose rows are still in main (one sealed
+		/// in this run) is read from main, not from its file, so the view shows each
+		/// row once. If Options::loadArchivedShards is true, sealed data is
 		/// already merged into main, so the view simply aliases the base table to keep
 		/// the call site uniform across modes. For a virtual table the view always
 		/// aliases only the base table: virtual tables live whole in the active shard,
