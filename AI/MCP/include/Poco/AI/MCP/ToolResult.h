@@ -73,7 +73,10 @@ public:
 
 	ToolResult& setStructuredContent(const Poco::Dynamic::Var& structured);
 		/// Sets the structured content: any JSON value, e.g. a
-		/// Poco::JSON::Object::Ptr. An empty Var removes it. Returns *this.
+		/// Poco::JSON::Object::Ptr; an empty Var is JSON null. Returns *this.
+
+	ToolResult& removeStructuredContent();
+		/// Removes the structured content. Returns *this.
 
 	[[nodiscard]] bool isError() const;
 		/// Returns whether the result is a tool execution error.
@@ -81,8 +84,13 @@ public:
 	[[nodiscard]] Poco::JSON::Array::Ptr content() const;
 		/// Returns the array of content blocks.
 
+	[[nodiscard]] bool hasStructuredContent() const;
+		/// Returns true if the result has structured content, also when it
+		/// is null.
+
 	[[nodiscard]] const Poco::Dynamic::Var& structuredContent() const;
-		/// Returns the structured content, or an empty Var if there is none.
+		/// Returns the structured content: an empty Var when there is none,
+		/// or when it is null; hasStructuredContent() tells them apart.
 
 	[[nodiscard]] Poco::JSON::Object::Ptr toObject() const;
 		/// Serializes the result to the tools/call result object.
@@ -97,6 +105,7 @@ public:
 private:
 	Poco::JSON::Array::Ptr _pContent;
 	Poco::Dynamic::Var _structuredContent;
+	bool _hasStructuredContent;
 	bool _isError;
 };
 
@@ -113,6 +122,12 @@ inline bool ToolResult::isError() const
 inline Poco::JSON::Array::Ptr ToolResult::content() const
 {
 	return _pContent;
+}
+
+
+inline bool ToolResult::hasStructuredContent() const
+{
+	return _hasStructuredContent;
 }
 
 

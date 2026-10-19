@@ -62,9 +62,15 @@ struct AIMCP_API ResourceContents
 	std::string blob;
 		/// The contents of a binary resource, in base64. When set, the
 		/// contents are binary and text is not sent.
+	bool binary = false;
+		/// Whether the contents are binary also when blob is empty: a
+		/// resource of zero bytes is sent with an empty blob, not as text.
+		/// fromObject() sets it for contents that carry a blob.
 
 	[[nodiscard]] Poco::JSON::Object::Ptr toObject() const;
-		/// Returns the JSON form: {uri, mimeType?, text} or {uri, mimeType?, blob}.
+		/// Returns the JSON form: {uri, mimeType?, blob} when the contents are
+		/// binary (binary set, or blob not empty), {uri, mimeType?, text}
+		/// otherwise.
 
 	[[nodiscard]] static ResourceContents fromObject(const Poco::JSON::Object::Ptr& object);
 		/// Reads the JSON form.

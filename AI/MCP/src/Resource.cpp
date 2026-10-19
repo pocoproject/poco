@@ -79,7 +79,7 @@ Poco::JSON::Object::Ptr ResourceContents::toObject() const
 	Poco::JSON::Object::Ptr pObject = new Poco::JSON::Object;
 	pObject->set("uri", uri);
 	if (!mimeType.empty()) pObject->set("mimeType", mimeType);
-	if (!blob.empty())
+	if (binary || !blob.empty())
 	{
 		pObject->set("blob", blob);
 	}
@@ -106,6 +106,7 @@ ResourceContents ResourceContents::fromObject(const Poco::JSON::Object::Ptr& obj
 	else if (blob.isString())
 	{
 		contents.blob = blob.extract<std::string>();
+		contents.binary = true;
 	}
 	else
 	{

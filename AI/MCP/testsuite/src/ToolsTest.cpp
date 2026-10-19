@@ -293,6 +293,20 @@ void ToolsTest::testToolResultForms()
 	assertEqual(42, pObject->getValue<int>("structuredContent"));
 	assertTrue(!pObject->getValue<bool>("isError"));
 
+	// A binary resource of zero bytes stays binary.
+	ResourceContents empty = ResourceContents::fromObject(parse("{\"uri\":\"test://empty\",\"blob\":\"\"}"));
+	assertTrue(empty.binary);
+	Object::Ptr pEmpty = empty.toObject();
+	assertEqual(std::string(""), pEmpty->getValue<std::string>("blob"));
+	assertTrue(!pEmpty->has("text"));
+	ResourceContents zeroBytes;
+	zeroBytes.uri = "test://zero";
+	zeroBytes.binary = true;
+	assertTrue(zeroBytes.toObject()->has("blob"));
+	ResourceContents textual = ResourceContents::fromObject(parse("{\"uri\":\"test://text\",\"text\":\"\"}"));
+	assertTrue(!textual.binary);
+	assertTrue(textual.toObject()->has("text"));
+
 	ToolResult failed = ToolResult::error("went wrong");
 	assertTrue(failed.isError());
 	assertEqual(std::string("went wrong"), failed.content()->getObject(0)->getValue<std::string>("text"));
@@ -318,6 +332,23 @@ void ToolsTest::testToolResultFromObject()
 	ToolResult arrayContent = ToolResult::fromObject(parse("{\"content\":[{\"type\":\"text\",\"text\":\"a\"}],\"structuredContent\":[1,2],\"isError\":true}"));
 	assertTrue(arrayContent.isError());
 	assertEqual(2u, static_cast<unsigned>(arrayContent.structuredContent().extract<Array::Ptr>()->size()));
+
+	// Null is structured content too, and stays; absence stays absence.
+	ToolResult nullContent = ToolResult::fromObject(parse("{\"content\":[],\"structuredContent\":null}"));
+	assertTrue(nullContent.hasStructuredContent());
+	assertTrue(nullContent.structuredContent().isEmpty());
+	Object::Ptr pNull = nullContent.toObject();
+	assertTrue(pNull->has("structuredContent"));
+	assertTrue(pNull->isNull("structuredContent"));
+	ToolResult none = ToolResult::fromObject(parse("{\"content\":[]}"));
+	assertTrue(!none.hasStructuredContent());
+	assertTrue(!none.toObject()->has("structuredContent"));
+	ToolResult built;
+	built.setStructuredContent(Poco::Dynamic::Var());
+	assertTrue(built.toObject()->isNull("structuredContent"));
+	built.removeStructuredContent();
+	assertTrue(!built.hasStructuredContent());
+	assertTrue(!built.toObject()->has("structuredContent"));
 
 	const char* malformed[] = {
 		"{}",

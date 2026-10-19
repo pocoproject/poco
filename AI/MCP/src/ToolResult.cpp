@@ -30,6 +30,7 @@ namespace
 
 ToolResult::ToolResult():
 	_pContent(new Poco::JSON::Array),
+	_hasStructuredContent(false),
 	_isError(false)
 {
 }
@@ -118,6 +119,15 @@ ToolResult& ToolResult::setError(bool isError)
 ToolResult& ToolResult::setStructuredContent(const Poco::Dynamic::Var& structured)
 {
 	_structuredContent = structured;
+	_hasStructuredContent = true;
+	return *this;
+}
+
+
+ToolResult& ToolResult::removeStructuredContent()
+{
+	_structuredContent.clear();
+	_hasStructuredContent = false;
 	return *this;
 }
 
@@ -126,7 +136,7 @@ Poco::JSON::Object::Ptr ToolResult::toObject() const
 {
 	Poco::JSON::Object::Ptr pObject = new Poco::JSON::Object;
 	pObject->set("content", _pContent);
-	if (!_structuredContent.isEmpty())
+	if (_hasStructuredContent)
 	{
 		pObject->set("structuredContent", _structuredContent);
 	}
@@ -162,6 +172,7 @@ ToolResult ToolResult::fromObject(const Poco::JSON::Object::Ptr& object)
 	ToolResult result;
 	result._pContent = pContent;
 	result._structuredContent = object->get("structuredContent");
+	result._hasStructuredContent = object->has("structuredContent");
 	result._isError = !isError.isEmpty() && isError.extract<bool>();
 	return result;
 }
