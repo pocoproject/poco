@@ -42,7 +42,7 @@ namespace
 		/// request has been received on, or 0 if there is none.
 	{
 		Context::Ptr pContext = Context::get();
-		if (pContext)
+		if (pContext != nullptr)
 			return pContext->getValue<Poco::UInt32>("id"s, 0);
 		else
 			return 0;
@@ -85,7 +85,7 @@ AuthenticateResult SCRAMAuthenticator::authenticate(const Credentials& creds, Po
 	else
 	{
 		Conversation::Ptr pConv = _conversations.get(conversationID);
-		if (pConv && pConv->connectionID == currentConnectionID())
+		if (pConv != nullptr && pConv->connectionID == currentConnectionID())
 		{
 			if (pConv->state == STATE_START)
 			{
