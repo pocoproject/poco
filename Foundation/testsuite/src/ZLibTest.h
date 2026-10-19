@@ -32,6 +32,7 @@ public:
 	void testGzip2();
 	void testGzip3();
 	void testInflateResetAfterError();
+	void testInflateResetAfterTrailerError();
 
 	void setUp();
 	void tearDown();

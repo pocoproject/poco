@@ -19,6 +19,28 @@
 #include <zlib.h>
 
 
+namespace
+{
+	bool isTrailerError(const z_stream* pZstr)
+		/// Returns true if inflate() failed because the checksum or length in the
+		/// stream trailer did not match, i.e. after the compressed data was decoded.
+		/// zlib reports these two errors only after reading the mismatching field.
+	{
+		return pZstr->msg &&
+			(std::strcmp(pZstr->msg, "incorrect data check") == 0 ||
+			 std::strcmp(pZstr->msg, "incorrect length check") == 0);
+	}
+
+	void watchHeader(z_stream* pZstr, gz_header* pHeader)
+		/// Lets zlib record in pHeader->done whether the current stream
+		/// has a gzip header (1) or not (-1).
+	{
+		pHeader->done = -1;
+		inflateGetHeader(pZstr, pHeader); // fails, leaving done at -1, if gzip is not accepted
+	}
+}
+
+
 namespace Poco {
 
 
@@ -26,10 +48,13 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
 	_pOstr(nullptr),
+	_pHeader(nullptr),
 	_eof(false),
-	_check(type != STREAM_ZIP)
+	_check(type != STREAM_ZIP),
+	_failed(false)
 {
 	std::unique_ptr<char[]> buffer(new char[INFLATE_BUFFER_SIZE]);
+	std::unique_ptr<gz_header> pHeader = std::make_unique<gz_header>(gz_header{});
 
 	std::unique_ptr<z_stream> pZstr = std::make_unique<z_stream>(z_stream{});
 	int rc = inflateInit2(pZstr.get(), 15 + (type == STREAM_GZIP ? 16 : 0));
@@ -39,7 +64,9 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	}
 
 	_pZstr = pZstr.release();
+	_pHeader = pHeader.release();
 	_buffer = buffer.release();
+	watchHeader(_pZstr, _pHeader);
 }
 
 
@@ -47,10 +74,13 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
 	_pOstr(nullptr),
+	_pHeader(nullptr),
 	_eof(false),
-	_check(false)
+	_check(false),
+	_failed(false)
 {
 	std::unique_ptr<char[]> buffer(new char[INFLATE_BUFFER_SIZE]);
+	std::unique_ptr<gz_header> pHeader = std::make_unique<gz_header>(gz_header{});
 
 	std::unique_ptr<z_stream> pZstr = std::make_unique<z_stream>(z_stream{});
 	int rc = inflateInit2(pZstr.get(), windowBits);
@@ -60,7 +90,9 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 	}
 
 	_pZstr = pZstr.release();
+	_pHeader = pHeader.release();
 	_buffer = buffer.release();
+	watchHeader(_pZstr, _pHeader);
 }
 
 
@@ -68,8 +100,10 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
 	_pIstr(nullptr),
 	_pOstr(&ostr),
+	_pHeader(nullptr),
 	_eof(false),
-	_check(type != STREAM_ZIP)
+	_check(type != STREAM_ZIP),
+	_failed(false)
 {
 	std::unique_ptr<char[]> buffer(new char[INFLATE_BUFFER_SIZE]);
 
@@ -89,8 +123,10 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
 	_pIstr(nullptr),
 	_pOstr(&ostr),
+	_pHeader(nullptr),
 	_eof(false),
-	_check(false)
+	_check(false),
+	_failed(false)
 {
 	std::unique_ptr<char[]> buffer(new char[INFLATE_BUFFER_SIZE]);
 
@@ -118,6 +154,7 @@ InflatingStreamBuf::~InflatingStreamBuf()
 	delete [] _buffer;
 	inflateEnd(_pZstr);
 	delete _pZstr;
+	delete _pHeader;
 }
 
 
@@ -134,7 +171,11 @@ void InflatingStreamBuf::reset()
 {
 	int rc = inflateReset(_pZstr);
 	if (rc == Z_OK)
+	{
 		_eof = false;
+		_failed = false;
+		if (_pHeader) watchHeader(_pZstr, _pHeader);
+	}
 	else
 		throw IOException(zError(rc));
 }
@@ -143,6 +184,7 @@ void InflatingStreamBuf::reset()
 std::streamsize InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (_eof || !_pIstr) return 0;
+	if (_failed) throw IOException("Cannot read after a decompression error, reset() must be called first");
 
 	if (_pZstr->avail_in == 0)
 	{
@@ -177,9 +219,30 @@ std::streamsize InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize
 		}
 		if (rc != Z_OK)
 		{
-			// The rest of the input belongs to the stream that failed. Drop it, so
-			// that after reset() the next stream is read from the underlying input.
-			_pZstr->avail_in = 0;
+			// Z_BUF_ERROR means that the input ended early, which is not a decompression error.
+			if (rc != Z_BUF_ERROR)
+			{
+				_failed = true;
+				if (rc == Z_DATA_ERROR && isTrailerError(_pZstr))
+				{
+					// The failed stream ends at its trailer, so the buffered input that follows
+					// belongs to the next stream and is kept. After a gzip CRC-32 mismatch, the
+					// 4-byte length field of the trailer has not been read yet; skip it.
+					if (_pHeader && _pHeader->done == 1 && std::strcmp(_pZstr->msg, "incorrect data check") == 0)
+					{
+						unsigned n = _pZstr->avail_in < 4 ? _pZstr->avail_in : 4;
+						_pZstr->next_in  += n;
+						_pZstr->avail_in -= n;
+						if (n < 4 && _pIstr->good()) _pIstr->ignore(4 - n);
+					}
+				}
+				else
+				{
+					// The decoder cannot tell where the failed stream ends. Drop the buffered input,
+					// so that reset() continues from the current position of the underlying stream.
+					_pZstr->avail_in = 0;
+				}
+			}
 			throw IOException(zError(rc));
 		}
 		if (_pZstr->avail_out == 0)

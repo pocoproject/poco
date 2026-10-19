@@ -24,6 +24,7 @@
 #include <ostream>
 
 struct z_stream_s;
+struct gz_header_s;
 
 
 namespace Poco {
@@ -75,7 +76,22 @@ public:
 		/// Must be called when inflating to an output stream.
 
 	void reset();
-		/// Resets the stream buffer.
+		/// Resets the stream buffer so that another stream can be read
+		/// from the same underlying input stream.
+		///
+		/// After a stream ended normally, buffered input that follows
+		/// the stream is kept and read as the start of the next stream.
+		///
+		/// After a decompression error, reads keep failing without
+		/// consuming more input until reset() is called. If the error was
+		/// a checksum or length mismatch in the stream trailer, the end of
+		/// the failed stream is known and buffered input that follows it
+		/// is kept, as after a normal end. For any other error, the end of
+		/// the failed stream cannot be determined, so buffered input is
+		/// discarded and the next stream is read from the current position
+		/// of the underlying input stream. Before calling reset(), the
+		/// caller may need to position the underlying stream at the start
+		/// of the next stream and call clear() on it.
 
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
@@ -93,8 +109,10 @@ private:
 	std::ostream*	_pOstr;
 	char*			_buffer;
 	z_stream_s*		_pZstr;
+	gz_header_s*	_pHeader;
 	bool			_eof;
 	bool			_check;
+	bool			_failed;
 };
 
 
@@ -198,7 +216,10 @@ public:
 
 	void reset();
 		/// Resets the zlib machinery so that another zlib stream can be read from
-		/// the same underlying input stream.
+		/// the same underlying input stream, and clears the stream state.
+		///
+		/// See InflatingStreamBuf::reset() for how buffered input is
+		/// handled after a decompression error.
 };
 
 
