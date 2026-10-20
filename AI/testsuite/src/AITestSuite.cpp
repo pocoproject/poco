@@ -15,6 +15,7 @@
 #include "AnthropicProviderTest.h"
 #include "OpenAIProviderTest.h"
 #include "MCPHostTest.h"
+#include "ChatServiceTest.h"
 
 
 CppUnit::Test* AITestSuite::suite()
@@ -27,6 +28,7 @@ CppUnit::Test* AITestSuite::suite()
 	pSuite->addTest(AnthropicProviderTest::suite());
 	pSuite->addTest(OpenAIProviderTest::suite());
 	pSuite->addTest(MCPHostTest::suite());
+	pSuite->addTest(ChatServiceTest::suite());
 
 	return pSuite;
 }

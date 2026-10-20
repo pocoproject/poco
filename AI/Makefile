@@ -6,7 +6,8 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Cancellation LLMProvider ProviderCall AgentLoop AnthropicProvider MCPHost OpenAIProvider ToolRegistry
+objects = Cancellation LLMProvider ProviderCall AgentLoop AnthropicProvider MCPHost OpenAIProvider ToolRegistry \
+	ChatSettings ChatService ChatEndpoint
 
 target         = PocoAI
 target_version = $(LIBVERSION)

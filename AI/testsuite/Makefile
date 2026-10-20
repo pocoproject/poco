@@ -18,7 +18,8 @@ objects = \
 	AgentLoopTest \
 	AnthropicProviderTest \
 	OpenAIProviderTest \
-	MCPHostTest
+	MCPHostTest \
+	ChatServiceTest
 
 target         = testrunner
 target_version = 1

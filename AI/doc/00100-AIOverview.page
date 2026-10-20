@@ -46,6 +46,24 @@ conversation stays one the model APIs accept. An approver decides which calls ru
 HTTP, and registers their tools in a <[ToolRegistry]>.
 
 
+!!!Chat
+
+<[ChatService]> is the chat of an application with a model, for any number of users at once.
+A turn runs through the agent loop with the tools of the application, and its events come as
+JSON objects: text, tool calls and results, failures with the name of their kind, and the end
+of the turn. A user stops a turn of a chat from another request. The providers the chat may
+use, kept in <[ChatSettings]>, and the provider and model in use, are changed while it runs;
+the application stores every change. A provider without a list of models offers those it lists
+itself, and one whose base URL has a placeholder for its server, such as
+http://[server]:11434/v1, is reached at the first of its servers that answers.
+
+<[ChatEndpoint]> is the HTTP interface of a chat service for a chat in a browser, below a base
+path the application chooses: the health with the providers and models, a turn as server-sent
+events with comments while the model works, cancelling, choosing the provider and model, and
+the settings and keys, which only a caller who may manage the chat changes. The application
+signs the caller in and says who it is and whether they may manage the chat.
+
+
 !!!Security
 
 Tool results, the descriptions of tools from remote servers and the input a model gives a tool

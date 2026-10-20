@@ -114,6 +114,14 @@ New Components:
   with the status the transport gives it; the application passes the identity of the caller in
   the RequestContext. ServerRequestHandlerFactory is an HTTP server of one endpoint. The sample
   MCPHTTPServer. AI/MCP: Server::findTool() and parseMessage().
+- GH #5577 AI: ChatService, the chat of an application with a model, for any number of users:
+  a turn runs through the agent loop with the tools of the application and the identity of its
+  user, its events come as JSON objects, and a user cancels a turn of a chat; the providers it
+  may use and the provider and model in use are settings an administrator changes while it runs
+  and the application stores, with model listing and failover among the servers of a provider.
+  ChatEndpoint is its HTTP interface for a chat in a browser: the health, a turn as server-sent
+  events with comments while the model works, cancelling, the choice of provider and model, and
+  the settings, whose keys are set there only where the application lets them be.
 
 Bug Fixes and Improvements:
 

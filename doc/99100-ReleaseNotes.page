@@ -27,7 +27,7 @@ AI/MCP and AI/MCP/HTTP implement the Model Context Protocol, revision 2026-07-28
 any POCO application can expose tools, resources and prompts with, over a stream or at an
 endpoint of its HTTP server, and clients over a stream, a server process and Streamable HTTP.
 AI (experimental) is a client library for large language model APIs with a minimal agent
-runtime.
+runtime, and a chat service an application serves its users with.
 
 !!Features
 
@@ -78,6 +78,10 @@ runtime.
     the method, the origin, the media types, the size of the body and the MCP headers against
     the message. <*ServerRequestHandlerFactory*> is a server of one endpoint; the sample
     <*MCPHTTPServer*>.
+  - GH #5577 <*AI*>: <*ChatService*>, the chat of an application with a model for any
+    number of users, with the tools of the application, cancelling, and the settings of its
+    providers, which an administrator changes while it runs; <*ChatEndpoint*>, its HTTP
+    interface for a chat in a browser, with server-sent events.
 
 !!Breaking Changes
 
