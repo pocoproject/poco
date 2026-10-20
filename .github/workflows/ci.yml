@@ -192,7 +192,8 @@ jobs:
       ASAN_OPTIONS: ${{ matrix.name == 'hidden-asan' && 'detect_odr_violation=2' || '' }}
     services:
       mongodb:
-        image: mongo:8
+        # mongo:8 refuses to start on the runner kernels 6.19 to 7.0.13 (SERVER-121912, #5575)
+        image: mongo:7
         ports:
           - 27017:27017
         options: >-
@@ -1228,7 +1229,8 @@ jobs:
       LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
     services:
       mongodb:
-        image: mongo:8
+        # mongo:8 refuses to start on the runner kernels 6.19 to 7.0.13 (SERVER-121912, #5575)
+        image: mongo:7
         ports:
           - 27017:27017
         options: >-
