@@ -306,6 +306,7 @@ ServerTransport::Reply ServerTransport::answer(Server& server, Poco::Net::HTTPSe
 {
 	try
 	{
+		if (request.getAutoDecode()) return closing(decodedHeaders());
 		Reply reply;
 		if (refuse(request, reply)) return closing(reply);
 		if (request.hasContentLength() && request.getContentLength64() > static_cast<Poco::Int64>(_params.maxMessageSize))
@@ -351,6 +352,7 @@ ServerTransport::Reply ServerTransport::answer(Server& server, const Poco::Net::
 {
 	try
 	{
+		if (request.getAutoDecode()) return decodedHeaders();
 		Reply reply;
 		if (refuse(request, reply)) return reply;
 		if (body.size() > _params.maxMessageSize) return tooLarge();
@@ -507,6 +509,19 @@ ServerTransport::Reply ServerTransport::tooLarge() const
 		logger.debug("MCP request refused with 413: the body is larger than %z bytes", _params.maxMessageSize);
 	}
 	return refusal(Poco::Net::HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE);
+}
+
+
+ServerTransport::Reply ServerTransport::decodedHeaders() const
+{
+	Poco::Logger& logger = Poco::Logger::get(_params.loggerName);
+	if (logger.error())
+	{
+		logger.error("MCP request refused: the HTTP server decodes RFC 2047 encoded words in request headers, "
+			"so the MCP headers cannot be checked as they were sent; turn it off with "
+			"Poco::Net::HTTPServerParams::setAutoDecodeHeaders(false)");
+	}
+	return errorReply(Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, Id(), ErrorCode::INTERNAL_ERROR, "Internal error");
 }
 
 

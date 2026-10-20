@@ -33,6 +33,8 @@ public:
 	void testStandardHeaders();
 	void testNameHeader();
 	void testParamHeaders();
+	void testEncodedWords();
+	void testDecodedHeadersRefused();
 	void testOtherRevisions();
 	void testReplyStatus();
 	void testContext();

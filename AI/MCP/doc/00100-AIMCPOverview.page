@@ -57,6 +57,11 @@ Accept header (406), the size of the body (413), and the headers <*MCP-Protocol-
 schema marks with <*x-mcp-header*>, which must match the message (400 with the error
 HEADER_MISMATCH).
 
+The <[Poco::Net::HTTPServer]> must pass the request headers on as they were sent, with
+<[Poco::Net::HTTPServerParams::setAutoDecodeHeaders()]> false. By default it decodes RFC 2047
+encoded words in every header, and the transport answers every request of such a server with
+500.
+
 The application signs the caller in first: it passes the identity in the
 <[RequestContext]> to <[Poco::AI::MCP::HTTP::ServerTransport::handle()]>, and the handlers
 make their decisions with it. <[Poco::AI::MCP::HTTP::ServerRequestHandlerFactory]> is the
@@ -168,7 +173,9 @@ The following program serves the same tool at http://127.0.0.1:8080/mcp until it
                     return result;
                 });
             Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 8080));
-            Poco::Net::HTTPServer http(new HTTP::ServerRequestHandlerFactory(server, "/mcp"), socket, new Poco::Net::HTTPServerParams);
+            Poco::Net::HTTPServerParams::Ptr pParams = new Poco::Net::HTTPServerParams;
+            pParams->setAutoDecodeHeaders(false);
+            Poco::Net::HTTPServer http(new HTTP::ServerRequestHandlerFactory(server, "/mcp"), socket, pParams);
             http.start();
             waitForTerminationRequest();
             http.stopAll(true);

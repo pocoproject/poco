@@ -120,12 +120,9 @@ bool isPlain(const std::string& value)
 		if (u < 0x20 || u > 0x7E) return false;
 	}
 	if (!value.empty() && (value.front() == ' ' || value.back() == ' ')) return false;
-	// Starts like the base64 form and ends like it, even where the two
-	// overlap, as in "=?base64?=".
-	const bool sentinel = value.compare(0, SENTINEL_PREFIX.size(), SENTINEL_PREFIX) == 0
-		&& value.size() >= SENTINEL_SUFFIX.size()
-		&& value.compare(value.size() - SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX) == 0;
-	return !sentinel;
+	// "=?" starts the base64 form, and an RFC 2047 encoded word, which a
+	// server that decodes its request headers would rewrite.
+	return value.find("=?") == std::string::npos;
 }
 
 
@@ -143,18 +140,14 @@ std::string headerValue(const std::string& value)
 
 bool decodeHeaderValue(const std::string& received, std::string& value)
 {
-	// The "=?" Poco::Net::MessageHeader drops goes back on.
-	const std::string text = received.compare(0, SENTINEL_PREFIX.size() - 2, SENTINEL_PREFIX, 2, std::string::npos) == 0
-		? "=?" + received
-		: received;
-	if (text.size() < SENTINEL_PREFIX.size() + SENTINEL_SUFFIX.size()
-		|| text.compare(0, SENTINEL_PREFIX.size(), SENTINEL_PREFIX) != 0
-		|| text.compare(text.size() - SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX) != 0)
+	if (received.size() < SENTINEL_PREFIX.size() + SENTINEL_SUFFIX.size()
+		|| received.compare(0, SENTINEL_PREFIX.size(), SENTINEL_PREFIX) != 0
+		|| received.compare(received.size() - SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX) != 0)
 	{
 		value = received;
 		return true;
 	}
-	const std::string payload = text.substr(SENTINEL_PREFIX.size(), text.size() - SENTINEL_PREFIX.size() - SENTINEL_SUFFIX.size());
+	const std::string payload = received.substr(SENTINEL_PREFIX.size(), received.size() - SENTINEL_PREFIX.size() - SENTINEL_SUFFIX.size());
 	if (!isCanonicalBase64(payload)) return false;
 	try
 	{

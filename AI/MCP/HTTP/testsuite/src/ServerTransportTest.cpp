@@ -39,6 +39,11 @@
 #include "Poco/Runnable.h"
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Channel.h"
+#include "Poco/Logger.h"
+#include "Poco/Message.h"
+#include "Poco/Mutex.h"
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -64,6 +69,28 @@ using Poco::JSON::Array;
 
 namespace
 {
+	class MessageCollector: public Poco::Channel
+		/// Keeps the texts of the messages logged to it.
+	{
+	public:
+		void log(const Poco::Message& msg) override
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			_texts.push_back(msg.getText());
+		}
+
+		std::vector<std::string> texts() const
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _texts;
+		}
+
+	private:
+		mutable Poco::FastMutex _mutex;
+		std::vector<std::string> _texts;
+	};
+
+
 	Object::Ptr parse(const std::string& json)
 	{
 		Poco::JSON::Parser parser;
@@ -186,14 +213,14 @@ namespace
 		/// request handler factory of the library, serving /mcp.
 	{
 	public:
-		explicit Endpoint(Server& server, const ServerTransport::Params& params = ServerTransport::Params())
+		explicit Endpoint(Server& server, const ServerTransport::Params& params = ServerTransport::Params(), bool autoDecodeHeaders = false)
 		{
-			start(new ServerRequestHandlerFactory(server, "/mcp", params));
+			start(new ServerRequestHandlerFactory(server, "/mcp", params), autoDecodeHeaders);
 		}
 
-		explicit Endpoint(const FunctionHandler::Function& function)
+		explicit Endpoint(const FunctionHandler::Function& function, bool autoDecodeHeaders = false)
 		{
-			start(new FunctionFactory(function));
+			start(new FunctionFactory(function), autoDecodeHeaders);
 		}
 
 		~Endpoint()
@@ -232,11 +259,13 @@ namespace
 		}
 
 	private:
-		void start(Poco::Net::HTTPRequestHandlerFactory::Ptr pFactory)
+		void start(Poco::Net::HTTPRequestHandlerFactory::Ptr pFactory, bool autoDecodeHeaders = false)
 		{
 			Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
 			_port = socket.address().port();
-			_pServer = std::make_unique<Poco::Net::HTTPServer>(pFactory, socket, new Poco::Net::HTTPServerParams);
+			Poco::Net::HTTPServerParams::Ptr pParams = new Poco::Net::HTTPServerParams;
+			pParams->setAutoDecodeHeaders(autoDecodeHeaders);
+			_pServer = std::make_unique<Poco::Net::HTTPServer>(pFactory, socket, pParams);
 			_pServer->start();
 		}
 
@@ -622,6 +651,101 @@ void ServerTransportTest::testParamHeaders()
 }
 
 
+void ServerTransportTest::testEncodedWords()
+{
+	Server server;
+	buildServer(server);
+	server.registerTool("route", "", parse("{\"type\":\"object\",\"properties\":{\"region\":{\"type\":\"string\",\"x-mcp-header\":\"Region\"}}}"), echo);
+	Poco::AI::MCP::Resource resource;
+	resource.uri = "db://t?filter=?x";
+	resource.name = "filtered";
+	server.registerResource(resource, [](const std::string& uri, const RequestContext&)
+		{
+			Poco::AI::MCP::ResourceContents contents;
+			contents.uri = uri;
+			contents.text = "rows";
+			return contents;
+		});
+	Endpoint endpoint(server);
+
+	// An RFC 2047 encoded word, or "=?" anywhere, is checked as it was sent:
+	// =?UTF-8?B?ZWNobw==?= does not name "echo".
+	const std::string call = request(Id(1), "tools/call", "{\"name\":\"echo\",\"arguments\":{\"message\":\"hi\"}}");
+	for (const std::string& name: {std::string("=?UTF-8?B?ZWNobw==?="), std::string("ec=?ho")})
+	{
+		const Answer answer = endpoint.post(call, headersOf("tools/call", name));
+		assertEqual(400, answer.status);
+		assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), answer.code());
+	}
+	NameValueCollection headers = headersOf("tools/call", "echo");
+	headers.set("MCP-Protocol-Version", "2026-=?07-28");
+	Answer answer = endpoint.post(call, headers);
+	assertEqual(400, answer.status);
+	assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), answer.code());
+
+	const std::string route = request(Id(2), "tools/call", "{\"name\":\"route\",\"arguments\":{\"message\":\"ok\",\"region\":\"eu\"}}");
+	headers = headersOf("tools/call", "route");
+	headers.set("Mcp-Param-Region", "=?UTF-8?B?ZXU=?=");
+	answer = endpoint.post(route, headers);
+	assertEqual(400, answer.status);
+	assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), answer.code());
+
+	// A value with "=?" in it matches as it is, and in the base64 form.
+	const std::string read = request(Id(3), "resources/read", "{\"uri\":\"db://t?filter=?x\"}");
+	assertEqual(200, endpoint.post(read, headersOf("resources/read", "db://t?filter=?x")).status);
+	assertEqual(200, endpoint.post(read, headersOf("resources/read", "=?base64?ZGI6Ly90P2ZpbHRlcj0/eA==?=")).status);
+
+	// Without its "=?", a value that looks like the base64 form is plain text.
+	const std::string lookalike = request(Id(4), "tools/call", "{\"name\":\"route\",\"arguments\":{\"message\":\"ok\",\"region\":\"base64?aGVsbG8=?=\"}}");
+	headers = headersOf("tools/call", "route");
+	headers.set("Mcp-Param-Region", "base64?aGVsbG8=?=");
+	assertEqual(200, endpoint.post(lookalike, headers).status);
+}
+
+
+void ServerTransportTest::testDecodedHeadersRefused()
+{
+	Server server;
+	buildServer(server);
+	ServerTransport::Params params;
+	params.loggerName = "ServerTransportTest.DecodedHeaders";
+	Poco::Logger& logger = Poco::Logger::get(params.loggerName);
+	const Poco::Channel::Ptr pChannel = logger.getChannel();
+	Poco::AutoPtr<MessageCollector> pCollector = new MessageCollector;
+	logger.setChannel(pCollector);
+	logger.setLevel(Poco::Message::PRIO_ERROR);
+
+	// A server that decodes encoded words in its request headers gets 500
+	// for every request, and the log says how to turn the decoding off.
+	{
+		Endpoint endpoint(server, params, true);
+		const Answer answer = endpoint.post(request(Id(1), "tools/list"), headersOf("tools/list"));
+		assertEqual(500, answer.status);
+		assertEqual(static_cast<int>(ErrorCode::INTERNAL_ERROR), answer.code());
+		assertEqual(std::string("close"), answer.headers.get("Connection", ""));
+	}
+
+	// Also when the host has read the body itself.
+	const ServerTransport transport(params);
+	{
+		Endpoint endpoint([&server, &transport](Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
+			{
+				std::string body;
+				Poco::StreamCopier::copyToString(request.stream(), body);
+				transport.send(transport.answer(server, request, body), response);
+			}, true);
+		const Answer answer = endpoint.post(request(Id(2), "tools/list"), headersOf("tools/list"));
+		assertEqual(500, answer.status);
+		assertEqual(static_cast<int>(ErrorCode::INTERNAL_ERROR), answer.code());
+	}
+
+	const std::vector<std::string> texts = pCollector->texts();
+	logger.setChannel(pChannel);
+	assertEqual(std::size_t(2), texts.size());
+	assertTrue(texts[0].find("setAutoDecodeHeaders(false)") != std::string::npos);
+}
+
+
 void ServerTransportTest::testOtherRevisions()
 {
 	Server server;
@@ -910,6 +1034,8 @@ CppUnit::Test* ServerTransportTest::suite()
 	CppUnit_addTest(pSuite, ServerTransportTest, testStandardHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testNameHeader);
 	CppUnit_addTest(pSuite, ServerTransportTest, testParamHeaders);
+	CppUnit_addTest(pSuite, ServerTransportTest, testEncodedWords);
+	CppUnit_addTest(pSuite, ServerTransportTest, testDecodedHeadersRefused);
 	CppUnit_addTest(pSuite, ServerTransportTest, testOtherRevisions);
 	CppUnit_addTest(pSuite, ServerTransportTest, testReplyStatus);
 	CppUnit_addTest(pSuite, ServerTransportTest, testContext);

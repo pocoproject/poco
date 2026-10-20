@@ -93,16 +93,14 @@ namespace
 
 	std::string decoded(const std::string& received)
 		/// Decodes the base64 form of a header value the host received; fails
-		/// on a plain one. Poco::Net::MessageHeader drops the "=?" of the form
-		/// when it reads it.
+		/// on a plain one.
 	{
 		const std::string prefix("=?base64?");
-		const std::string value = received.compare(0, prefix.size() - 2, prefix, 2, std::string::npos) == 0 ? "=?" + received : received;
-		if (value.compare(0, prefix.size(), prefix) != 0 || value.size() < prefix.size() + 2 || value.compare(value.size() - 2, 2, "?=") != 0)
+		if (received.compare(0, prefix.size(), prefix) != 0 || received.size() < prefix.size() + 2 || received.compare(received.size() - 2, 2, "?=") != 0)
 		{
-			return "(not encoded) " + value;
+			return "(not encoded) " + received;
 		}
-		std::istringstream encoded(value.substr(prefix.size(), value.size() - prefix.size() - 2));
+		std::istringstream encoded(received.substr(prefix.size(), received.size() - prefix.size() - 2));
 		Poco::Base64Decoder decoder(encoded);
 		std::string text;
 		Poco::StreamCopier::copyToString(decoder, text);
@@ -261,6 +259,30 @@ void HTTPTest::testUnsafeValuesEncoded()
 
 	(void) client.callTool("m\xC3\xA9t\xC3\xA9o", args("{\"text\":\"plain value\"}"));
 	assertEqual(std::string("plain value"), host.lastHeaders().get("Mcp-Param-Text"));
+
+	// "=?" anywhere, where an RFC 2047 encoded word would start, and a value
+	// that looks like the base64 form without its "=?", travel encoded and
+	// arrive as they were.
+	for (const std::string& text: {std::string("a=?b"), std::string("=?UTF-8?B?ZWNobw==?="), std::string("base64?aGVsbG8=?=")})
+	{
+		assertEqual(std::string("ok"), firstText(client.callTool("m\xC3\xA9t\xC3\xA9o", args("{\"message\":\"ok\",\"text\":\"" + text + "\"}"))));
+		assertEqual(text, decoded(host.lastHeaders().get("Mcp-Param-Text")));
+	}
+
+	// A resource URI with "=?" in it.
+	Poco::AI::MCP::Resource resource;
+	resource.uri = "db://t?filter=?x";
+	resource.name = "filtered";
+	server.registerResource(resource, [](const std::string& uri, const RequestContext&)
+		{
+			Poco::AI::MCP::ResourceContents contents;
+			contents.uri = uri;
+			contents.text = "rows";
+			return contents;
+		});
+	const std::vector<Poco::AI::MCP::ResourceContents> contents = client.readResource("db://t?filter=?x");
+	assertEqual(std::size_t(1), contents.size());
+	assertEqual(std::string("db://t?filter=?x"), decoded(host.lastHeaders().get("Mcp-Name")));
 }
 
 

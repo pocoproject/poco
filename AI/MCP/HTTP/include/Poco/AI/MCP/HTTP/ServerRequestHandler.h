@@ -60,6 +60,10 @@ class AIMCPHTTP_API ServerRequestHandlerFactory: public Poco::Net::HTTPRequestHa
 	/// The factory of an HTTPServer that serves one MCP endpoint and nothing
 	/// else: a ServerRequestHandler for the requests to the path of the
 	/// endpoint, and 404 for any other path.
+	///
+	/// The HTTPServer must leave the request headers as they were sent, with
+	/// Poco::Net::HTTPServerParams::setAutoDecodeHeaders(false); see
+	/// ServerTransport.
 {
 public:
 	ServerRequestHandlerFactory(Server& server, const std::string& path, const ServerTransport::Params& params = ServerTransport::Params());

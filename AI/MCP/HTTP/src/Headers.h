@@ -35,7 +35,8 @@ namespace Poco::AI::MCP::HTTP {
 
 [[nodiscard]] bool isPlain(const std::string& value);
 	/// Returns true if value can be sent as it is: printable ASCII without
-	/// leading or trailing spaces, and not looking like the base64 form.
+	/// leading or trailing spaces, and without "=?", which starts the base64
+	/// form and an RFC 2047 encoded word.
 
 
 [[nodiscard]] std::string headerValue(const std::string& value);

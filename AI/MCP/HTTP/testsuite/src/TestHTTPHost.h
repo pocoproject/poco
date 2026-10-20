@@ -91,6 +91,7 @@ public:
 	{
 		if (!_pHttpServer.isNull()) return;
 		Poco::Net::HTTPServerParams::Ptr pParams = new Poco::Net::HTTPServerParams;
+		pParams->setAutoDecodeHeaders(false);
 		if (_state.fault == FAULT_STALE_KEEP_ALIVE) pParams->setKeepAlive(false);
 		Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
 		_port = socket.address().port();

@@ -197,7 +197,10 @@ protected:
 		params.allowedOrigins = _origins;
 		Poco::Net::ServerSocket socket(Poco::Net::SocketAddress(_host, _selftest ? 0 : _port));
 		const Poco::UInt16 port = socket.address().port();
-		Poco::Net::HTTPServer httpServer(new Poco::AI::MCP::HTTP::ServerRequestHandlerFactory(server, ENDPOINT_PATH, params), socket, new Poco::Net::HTTPServerParams);
+		// The transport checks the MCP headers as they were sent.
+		Poco::Net::HTTPServerParams::Ptr pServerParams = new Poco::Net::HTTPServerParams;
+		pServerParams->setAutoDecodeHeaders(false);
+		Poco::Net::HTTPServer httpServer(new Poco::AI::MCP::HTTP::ServerRequestHandlerFactory(server, ENDPOINT_PATH, params), socket, pServerParams);
 		httpServer.start();
 
 		Poco::URI endpoint;

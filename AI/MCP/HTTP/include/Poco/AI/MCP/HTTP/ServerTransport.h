@@ -41,6 +41,13 @@ class AIMCPHTTP_API ServerTransport
 	/// transport opens no stream of its own and keeps no session, so every
 	/// other method, GET and DELETE among them, gets 405.
 	///
+	/// The host's HTTP server must pass the request headers on as they were
+	/// sent: Poco::Net::HTTPServerParams::setAutoDecodeHeaders(false). By
+	/// default it decodes RFC 2047 encoded words in every header, which would
+	/// have the MCP headers checked in a rewritten form; the transport answers
+	/// every request of such a server with 500 and INTERNAL_ERROR, and logs
+	/// why at the error level.
+	///
 	/// The host signs the caller in and passes the request context with the
 	/// identity. The transport checks what the protocol asks of a request, in
 	/// this order:
@@ -146,6 +153,7 @@ private:
 	[[nodiscard]] bool refuse(const Poco::Net::HTTPServerRequest& request, Reply& reply) const;
 	[[nodiscard]] Reply answerMessage(Server& server, const Poco::Net::HTTPServerRequest& request, const std::string& body, const RequestContext& context) const;
 	[[nodiscard]] Reply tooLarge() const;
+	[[nodiscard]] Reply decodedHeaders() const;
 	[[nodiscard]] Reply failed(const std::string& what) const;
 
 	Params _params;
