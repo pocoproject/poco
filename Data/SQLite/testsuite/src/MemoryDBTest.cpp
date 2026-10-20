@@ -1162,6 +1162,88 @@ void MemoryDBTest::testSealEvictionDeferredWhileSessionBusy()
 }
 
 
+void MemoryDBTest::testEvictionRefreshesAttachedShard()
+{
+	// A sealed shard that is still resident can be attached, its rows updated
+	// in memory and its file rewritten by the next flush. An attachment opened
+	// before that keeps reading the old file; once the rows leave memory the
+	// history view reads the shard through that attachment, so it must be
+	// opened again on the current file first.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	std::string old("old");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(old), now;
+	db.sealActive();
+	db.flush(); // shard 1 written; still resident, it carries the numbering
+
+	std::vector<Poco::UInt32> ids = db.archivedShardIds();
+	assertTrue (ids.size() == 1);
+	std::string alias = db.attachArchived(ids[0]);
+	db << "UPDATE t SET v = 'new' WHERE id = 1", now;
+	std::string l("live");
+	db << "INSERT INTO t(v) VALUES(:v)", use(l), now;
+	db.flush(); // rewrites shard 1, then evicts it: the active shard holds a newer row
+
+	int inMain = 0;
+	db << "SELECT count(*) FROM t", into(inMain), now;
+	assertTrue (inMain == 1);
+
+	std::string v;
+	db << ("SELECT v FROM " + db.historyView("t") + " WHERE id = 1"), into(v), now;
+	assertEqual (std::string("new"), v);
+	db << ("SELECT v FROM " + alias + ".t WHERE id = 1"), into(v), now;
+	assertEqual (std::string("new"), v);
+	db.detachArchived(ids[0]);
+}
+
+
+void MemoryDBTest::testRewriteWaitsForBusyAttachedShard()
+{
+	// While a statement reads an attached shard, its attachment cannot be
+	// renewed, so a rewrite of that shard waits for a later flush instead of
+	// failing this one; until then the shard keeps its rows in memory.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	std::string old("old");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(old), now;
+	db.sealActive();
+	db.flush();
+
+	std::vector<Poco::UInt32> ids = db.archivedShardIds();
+	std::string alias = db.attachArchived(ids[0]);
+	db << "UPDATE t SET v = 'new' WHERE id = 1", now;
+	std::string l("live");
+	db << "INSERT INTO t(v) VALUES(:v)", use(l), now;
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << ("SELECT id FROM " + alias + ".t"), into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on the attached shard
+		try
+		{
+			db.flush();
+		}
+		catch (Poco::Exception& e)
+		{
+			failmsg("flush must not fail while an attached shard is busy: " + e.displayText());
+		}
+		assertTrue (db.dirty()); // the shard is still to be written
+	}
+
+	db.flush();
+	int inMain = 0;
+	db << "SELECT count(*) FROM t", into(inMain), now;
+	assertTrue (inMain == 1);
+	std::string v;
+	db << ("SELECT v FROM " + db.historyView("t") + " WHERE id = 1"), into(v), now;
+	assertEqual (std::string("new"), v);
+	db.detachArchived(ids[0]);
+}
+
+
 void MemoryDBTest::testShardRemovalFiresNoTriggers()
 {
 	// Taking a shard's rows out of memory - on eviction, or when the shard is
@@ -2717,6 +2799,8 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testSealKeepsNewestShardUntilActiveHasRows);
 	CppUnit_addTest(pSuite, MemoryDBTest, testSealEvictionDeferredWhileSessionBusy);
 	CppUnit_addTest(pSuite, MemoryDBTest, testShardRemovalFiresNoTriggers);
+	CppUnit_addTest(pSuite, MemoryDBTest, testEvictionRefreshesAttachedShard);
+	CppUnit_addTest(pSuite, MemoryDBTest, testRewriteWaitsForBusyAttachedShard);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardLoaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardUnloaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeptWhileSessionWrites);

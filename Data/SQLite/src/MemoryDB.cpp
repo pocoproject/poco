@@ -29,6 +29,7 @@
 #include <atomic>
 #include <cctype>
 #include <iterator>
+#include <optional>
 #include <set>
 
 // Table classification is built on PRAGMA table_list (SQLite 3.37),
@@ -2549,6 +2550,42 @@ void MemoryDB::doFlush(bool allowSeal)
 
 	for (const auto& p: writes)
 	{
+		// A sealed shard attached through attachArchived() has its file open as
+		// arc_<id>. The file is replaced below by a rename, which Windows refuses
+		// for an open file and which elsewhere leaves the attachment reading the
+		// old one. It is detached for the write and attached again on the new
+		// file, with _attachMutex held so no caller finds the alias missing in
+		// between; while a statement keeps it busy, the shard waits for a later
+		// flush, still dirty and so still resident.
+		Poco::UInt32 shardId = 0;
+		bool sealed = false;
+		{
+			Poco::FastMutex::ScopedLock l(_stateMutex);
+			shardId = _shards[p.idx].id;
+			sealed = _shards[p.idx].sealed;
+		}
+		std::optional<Poco::Mutex::ScopedLock> attachLock;
+		bool reattach = false;
+		if (sealed)
+		{
+			attachLock.emplace(_attachMutex);
+			auto at = _attached.find(shardId);
+			if (at != _attached.end())
+			{
+				bool detached = false;
+				try { detached = tryDetach(shardId); }
+				catch (...) {}
+				if (!detached)
+				{
+					Poco::FastMutex::ScopedLock l(_stateMutex);
+					_shards[p.idx].dirty = true;
+					continue;
+				}
+				if (at->second > 0) reattach = true;
+				else _attached.erase(at); // a deferred detach, now completed
+			}
+		}
+
 		try
 		{
 			Poco::TemporaryFile tmp(_dir);
@@ -2608,6 +2645,24 @@ void MemoryDB::doFlush(bool allowSeal)
 		catch (...)
 		{
 			ok = false;
+		}
+
+		if (reattach)
+		{
+			std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
+			try
+			{
+				InternalGuard guard;
+				DbMutexGuard dbm(_memHandle);
+				execDirect(_memHandle, "ATTACH DATABASE " +
+					quoteLit("file:" + Poco::Path(_dir, p.finalName).toString() + "?mode=ro") + " AS " + alias);
+			}
+			catch (...)
+			{
+				// its holders now see "no such table", as after deleteShard's force-detach
+				_attached.erase(shardId);
+				ok = false;
+			}
 		}
 	}
 

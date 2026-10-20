@@ -65,6 +65,8 @@ public:
 	void testSealKeepsNewestShardUntilActiveHasRows();
 	void testSealEvictionDeferredWhileSessionBusy();
 	void testShardRemovalFiresNoTriggers();
+	void testEvictionRefreshesAttachedShard();
+	void testRewriteWaitsForBusyAttachedShard();
 	void testDeleteSealedShardLoaded();
 	void testDeleteSealedShardUnloaded();
 	void testDeleteShardKeptWhileSessionWrites();
