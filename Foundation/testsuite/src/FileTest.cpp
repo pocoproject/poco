@@ -938,30 +938,35 @@ void FileTest::testLongPathDevice()
 void FileTest::testLongPathRooted()
 {
 #if defined(_WIN32)
-	// A rooted path without a drive letter ("\dir\...") must find the same
-	// directories as the full path, below and above the limit.
-	Poco::Path p("longpathtest");
+	// A rooted path without a drive letter ("\dir\...") to an existing
+	// directory must be found below and above the limit, and above MAX_PATH.
+	Poco::Path p("longpathrooted");
 	p.makeAbsolute();
-	std::string longpath(p.toString());
-	std::vector<std::string> paths;
-	while (longpath.size() < MAX_PATH*2)
-	{
-		longpath.append("\\");
-		longpath.append(64, 'x');
-		paths.push_back(longpath);
-	}
-	Poco::File(longpath).createDirectories();
+	const std::string base(p.toString());
+	// needs a working directory with a drive letter, and room to pad
+	if (base.size() < 3 || base[1] != ':' || base.size() > MAX_PATH - 12)
+		return;
 
-	for (const auto& path: paths)
+	const std::string drive(base.substr(0, 2));
+	for (std::size_t len: {std::size_t(MAX_PATH - 12), std::size_t(MAX_PATH - 11), std::size_t(MAX_PATH + 40)})
 	{
-		assertTrue (path.size() > 2 && path[1] == ':');
-		Poco::File rooted(path.substr(2));
-		assertTrue (rooted.exists());
-		assertTrue (rooted.isDirectory());
-	}
+		// fill up to the wanted length with components that any file system accepts
+		std::string rooted(base.substr(2));
+		while (rooted.size() + 65 + 2 <= len)
+		{
+			rooted.append("\\");
+			rooted.append(64, 'x');
+		}
+		rooted.append("\\");
+		rooted.append(len - rooted.size(), 'y');
+		Poco::File(drive + rooted).createDirectories();
 
-	Poco::File f(p.toString());
-	f.remove(true);
+		assertEqual (len, rooted.size());
+		Poco::File dir(rooted);
+		assertTrue (dir.exists());
+		assertTrue (dir.isDirectory());
+	}
+	Poco::File(base).remove(true);
 #endif
 }
 

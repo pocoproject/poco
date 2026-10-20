@@ -653,7 +653,9 @@ void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 		if (utf16Path[0] == '\\' && utf16Path[1] != '\\')
 		{
 			// A rooted path without a drive letter ("\dir\..."): the prefix
-			// requires a fully qualified path, so resolve it first.
+			// requires a fully qualified path, so resolve it first. This binds
+			// the path to the current drive when it is set; a short rooted path
+			// is resolved against the current drive on every call.
 			DWORD size = ::GetFullPathNameW(utf16Path.c_str(), 0, nullptr, nullptr);
 			if (size > 0)
 			{
