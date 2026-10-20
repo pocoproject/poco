@@ -1350,20 +1350,29 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 	// Force-detach if currently attached read-only. Bypass the reference count:
 	// we are about to unlink the file, so any holder is going to break either
 	// way; better to detach cleanly now than to leave the SQLite ATTACH
-	// dangling on a deleted file. If DETACH itself fails (e.g., the shard is
-	// busy with a SELECT), keep _attached consistent and propagate so the
-	// caller can retry rather than silently leaving a stale alias around.
+	// dangling on a deleted file. While a statement still reads the attached
+	// shard SQLite refuses the DETACH: like a busy session below, that is
+	// retried briefly and then reported as TableLockedException with the shard
+	// left whole, so retention skips it. Other DETACH errors propagate.
 	{
-		Poco::Mutex::ScopedLock al(_attachMutex);
-		if (_attached.find(shardId) != _attached.end())
+		constexpr int maxAttempts = 10;
+		for (int attempt = 0; ; ++attempt)
 		{
-			std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
 			{
-				InternalGuard guard;
-				DbMutexGuard dbm(_memHandle);
-				execDirect(_memHandle, "DETACH DATABASE " + alias);
-			}
-			_attached.erase(shardId);
+				Poco::Mutex::ScopedLock al(_attachMutex);
+				if (_attached.find(shardId) == _attached.end()) break;
+				if (tryDetach(shardId))
+				{
+					_attached.erase(shardId);
+					break;
+				}
+				if (attempt + 1 >= maxAttempts)
+				{
+					throw TableLockedException("MemoryDB: shard " + Poco::NumberFormatter::format(shardId) +
+						" kept, it is attached and a statement is reading it");
+				}
+			} // release _attachMutex before sleeping
+			Poco::Thread::sleep(1);
 		}
 	}
 

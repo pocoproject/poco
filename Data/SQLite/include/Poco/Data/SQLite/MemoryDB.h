@@ -347,7 +347,9 @@ public:
 		/// That cannot happen while session() has a transaction open (a write, or
 		/// a statement still stepping over the in-memory tables): if it stays open
 		/// past a short retry, throws TableLockedException and leaves the shard -
-		/// rows, catalog entry and file - as it was. One row may outlive the shard:
+		/// rows, catalog entry and file - as it was. The same holds while a
+		/// statement reads the shard through its attachArchived() alias, which has
+		/// to be detached first. One row may outlive the shard:
 		/// a table without AUTOINCREMENT numbers its next row after the newest row
 		/// in memory, so when none would remain above the sealed shards that stay,
 		/// the shard's newest row is left behind in the active shard. The removal is

@@ -83,6 +83,7 @@ public:
 	void testRetentionKeepsShardWhileSessionReads();
 	void testBusyEvictionRetriedWithoutWrite();
 	void testBusyRetentionRetriedWithoutWrite();
+	void testRetentionSkipsBusyAttachedShard();
 	void testHistoryViewTimeRange();
 	void testHistoryViewTimeRangeOverflow();
 	void testDetachAllArchived();

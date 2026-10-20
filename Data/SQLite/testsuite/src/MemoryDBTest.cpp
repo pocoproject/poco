@@ -1892,6 +1892,53 @@ void MemoryDBTest::testBusyEvictionRetriedWithoutWrite()
 }
 
 
+void MemoryDBTest::testRetentionSkipsBusyAttachedShard()
+{
+	// Dropping an attached shard detaches it first. While a statement reads
+	// it, SQLite refuses the DETACH; retention must skip that shard, keep it
+	// whole and go on with the others, not stop at it.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+	std::string x("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(x), now;
+	db.sealActive();
+	db.flush(); // shard 1
+	for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(x), now;
+	db.sealActive();
+	db.flush(); // shard 2
+
+	std::string file1 = Poco::Path(_dir, "shard-000001.db").toString();
+	std::string file2 = Poco::Path(_dir, "shard-000002.db").toString();
+	std::string alias = db.attachArchived(1);
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << ("SELECT id FROM " + alias + ".t"), into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on the attached shard
+
+		std::size_t dropped = 0;
+		try
+		{
+			dropped = db.dropToFit(1);
+		}
+		catch (Poco::Exception& e)
+		{
+			failmsg("retention must skip a busy attached shard: " + e.displayText());
+		}
+		assertTrue (dropped == 1);
+		assertTrue (Poco::File(file1).exists());
+		assertTrue (!Poco::File(file2).exists());
+		std::vector<Poco::UInt32> ids = db.archivedShardIds();
+		assertTrue (ids.size() == 1 && ids[0] == 1);
+	} // the reader is done
+
+	assertTrue (db.dropToFit(1) == 1);
+	assertTrue (!Poco::File(file1).exists());
+	assertTrue (db.archivedShardIds().empty());
+}
+
+
 void MemoryDBTest::testBusyRetentionRetriedWithoutWrite()
 {
 	// A shard retention could not drop because session() was busy is dropped
@@ -2881,6 +2928,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testRetentionKeepsShardWhileSessionReads);
 	CppUnit_addTest(pSuite, MemoryDBTest, testBusyEvictionRetriedWithoutWrite);
 	CppUnit_addTest(pSuite, MemoryDBTest, testBusyRetentionRetriedWithoutWrite);
+	CppUnit_addTest(pSuite, MemoryDBTest, testRetentionSkipsBusyAttachedShard);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewTimeRange);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewTimeRangeOverflow);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDetachAllArchived);
