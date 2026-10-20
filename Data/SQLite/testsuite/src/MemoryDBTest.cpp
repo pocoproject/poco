@@ -1162,38 +1162,66 @@ void MemoryDBTest::testSealEvictionDeferredWhileSessionBusy()
 }
 
 
-void MemoryDBTest::testSealEvictionFailureKeepsFlushWorking()
+void MemoryDBTest::testShardRemovalFiresNoTriggers()
 {
-	// The rows leave memory after the flush has written them. A failure there -
-	// here a trigger that refuses the DELETE - leaves the shard resident and
-	// must not fail the flush; once the cause is gone, a later flush evicts.
-	MemoryDB::Options off;
-	off.loadArchivedShards = false;
-	MemoryDB db(_dir, off);
+	// Taking a shard's rows out of memory - on eviction, or when the shard is
+	// dropped - does not delete the data, so application DELETE triggers must
+	// not fire for it: an AFTER trigger would write rows nothing tracks, and a
+	// BEFORE trigger that ignores the DELETE would leave the rows in memory
+	// while the shard is read from its file as well. A DELETE the application
+	// issues itself still fires them.
+	const std::string audit =
+		"CREATE TRIGGER t_audit AFTER DELETE ON t BEGIN INSERT INTO audit(id) VALUES(OLD.id); END";
+	const std::string keep =
+		"CREATE TRIGGER t_keep BEFORE DELETE ON t WHEN OLD.v = 'hist' BEGIN SELECT RAISE(IGNORE); END";
+	std::string h("hist");
+	std::string l("live");
+	int n = -1;
+	{
+		MemoryDB::Options off;
+		off.loadArchivedShards = false;
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+		db << "CREATE TABLE audit(id INTEGER)", now;
+		db << audit, now;
+		db << keep, now;
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
+		db.sealActive();
+		db.flush(); // evicts shard 1
+
+		db << "SELECT count(*) FROM t", into(n), now;
+		assertTrue (n == 0);
+		db << "SELECT count(*) FROM audit", into(n), now;
+		assertTrue (n == 0);
+		db.attachAllArchived();
+		db << ("SELECT count(*) FROM " + db.historyView("t")), into(n), now;
+		assertTrue (n == 3);
+		db.detachAllArchived();
+
+		db << "INSERT INTO t(v) VALUES(:v)", use(l), now;
+		db << "DELETE FROM t WHERE v = 'live'", now;
+		db << "SELECT count(*) FROM audit", into(n), now;
+		assertTrue (n == 1); // the application's own DELETE fires them
+	}
+
+	try { Poco::File(_dir).remove(true); } catch (...) {}
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+	MemoryDB db(_dir, on);
 	db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
-	db << "CREATE TRIGGER t_keep BEFORE DELETE ON t BEGIN SELECT RAISE(ABORT, 'kept'); END", now;
-	std::string v("x");
-	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	db << "CREATE TABLE audit(id INTEGER)", now;
+	db << audit, now;
+	db << keep, now;
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
 	db.sealActive();
-	try
-	{
-		db.flush();
-	}
-	catch (Poco::Exception& e)
-	{
-		failmsg("flush must not fail when evicting the sealed rows fails: " + e.displayText());
-	}
-
-	std::string sealedFile = Poco::Path(_dir, "shard-000001.db").toString();
-	assertTrue (Poco::File(sealedFile).exists());
-	int inMain = 0;
-	db << "SELECT count(*) FROM t", into(inMain), now;
-	assertTrue (inMain == 3);
-
-	db << "DROP TRIGGER t_keep", now;
 	db.flush();
-	db << "SELECT count(*) FROM t", into(inMain), now;
-	assertTrue (inMain == 0);
+	std::vector<Poco::UInt32> ids = db.archivedShardIds();
+	assertTrue (ids.size() == 1);
+	db.deleteShard(ids[0]);
+	db << "SELECT count(*) FROM t", into(n), now;
+	assertTrue (n == 0);
+	db << "SELECT count(*) FROM audit", into(n), now;
+	assertTrue (n == 0);
 }
 
 
@@ -2688,7 +2716,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testSealEvictsRowsFromMemory);
 	CppUnit_addTest(pSuite, MemoryDBTest, testSealKeepsNewestShardUntilActiveHasRows);
 	CppUnit_addTest(pSuite, MemoryDBTest, testSealEvictionDeferredWhileSessionBusy);
-	CppUnit_addTest(pSuite, MemoryDBTest, testSealEvictionFailureKeepsFlushWorking);
+	CppUnit_addTest(pSuite, MemoryDBTest, testShardRemovalFiresNoTriggers);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardLoaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardUnloaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeptWhileSessionWrites);

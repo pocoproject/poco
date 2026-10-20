@@ -473,6 +473,13 @@ MemoryDB::MemoryDB(const std::string& dir, const Options& options):
 		throw Poco::NotImplementedException(
 			"MemoryDB requires SQLite serialized threading mode (see Utility::setThreadMode)");
 	_persist << "PRAGMA read_uncommitted = true", now;
+	// _persist moves rows between memory and the shard files; removing a
+	// shard's rows from memory is not a deletion of the data, so application
+	// triggers must not fire for it. Their writes on this connection would not
+	// be tracked either: the update and trace hooks are on _session.
+	int triggers = -1;
+	if (sqlite3_db_config(Utility::dbHandle(_persist), SQLITE_DBCONFIG_ENABLE_TRIGGER, 0, &triggers) != SQLITE_OK)
+		throw Poco::IllegalStateException("MemoryDB: cannot disable triggers on the internal connection");
 
 	open();
 
@@ -1472,6 +1479,17 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 				}
 			}
 			_persist << ("DELETE FROM " + quoteIdent(t) + " WHERE " + inRange + keepClause), now;
+
+			// The shard is marked non-resident on the strength of this, so a
+			// row left behind would be read twice by the history view.
+			int left = 0;
+			_persist << ("SELECT count(*) FROM " + quoteIdent(t) + " WHERE " + inRange + keepClause),
+				into(left), now;
+			if (left != 0)
+			{
+				throw Poco::IllegalStateException("MemoryDB: " + Poco::NumberFormatter::format(left) +
+					" row(s) of table '" + t + "' remain in memory after their removal");
+			}
 		}
 		_persist.commit();
 	}

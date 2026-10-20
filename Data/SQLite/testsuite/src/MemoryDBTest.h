@@ -64,7 +64,7 @@ public:
 	void testSealEvictsRowsFromMemory();
 	void testSealKeepsNewestShardUntilActiveHasRows();
 	void testSealEvictionDeferredWhileSessionBusy();
-	void testSealEvictionFailureKeepsFlushWorking();
+	void testShardRemovalFiresNoTriggers();
 	void testDeleteSealedShardLoaded();
 	void testDeleteSealedShardUnloaded();
 	void testDeleteShardKeptWhileSessionWrites();
