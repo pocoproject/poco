@@ -14,8 +14,8 @@
 
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/Struct.h"
+#include "Poco/Ascii.h"
 #include <algorithm>
-#include <cctype>
 #include <vector>
 #include <list>
 #include <deque>
@@ -388,11 +388,11 @@ std::string Var::toString() const
 Var Var::parse(const std::string& val)
 {
 	std::string::size_type t = 0;
-	return parse(val, t);
+	return parse(val, t, 0);
 }
 
 
-Var Var::parse(const std::string& val, std::string::size_type& pos)
+Var Var::parse(const std::string& val, std::string::size_type& pos, std::size_t depth)
 {
 	// { -> an Object==DynamicStruct
 	// [ -> an array
@@ -404,9 +404,9 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 		switch (val[pos])
 		{
 		case '{':
-			return parseObject(val, pos);
+			return parseObject(val, pos, depth + 1);
 		case '[':
-			return parseArray(val, pos);
+			return parseArray(val, pos, depth + 1);
 		case '"':
 			return parseJSONString(val, pos);
 		default:
@@ -475,9 +475,11 @@ Var Var::parse(const std::string& val, std::string::size_type& pos)
 }
 
 
-Var Var::parseObject(const std::string& val, std::string::size_type& pos)
+Var Var::parseObject(const std::string& val, std::string::size_type& pos, std::size_t depth)
 {
 	poco_assert_dbg (pos < val.size() && val[pos] == '{');
+	if (depth > MAX_PARSE_DEPTH)
+		throw DataFormatException("Objects and arrays nested too deeply");
 	++pos;
 	skipWhiteSpace(val, pos);
 	DynamicStruct aStruct;
@@ -488,7 +490,7 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 		if (val[pos] != ':')
 			throw DataFormatException("Incorrect object, must contain: key : value pairs");
 		++pos; // skip past :
-		Var value = parse(val, pos);
+		Var value = parse(val, pos, depth);
 		aStruct.insert(key, value);
 		skipWhiteSpace(val, pos);
 		if (val[pos] == ',')
@@ -496,6 +498,8 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 			++pos;
 			skipWhiteSpace(val, pos);
 		}
+		else if (pos < val.size() && val[pos] != '}')
+			throw DataFormatException("Incorrect object, expected ',' or '}'");
 	}
 	if (val[pos] != '}')
 		throw DataFormatException("Unterminated object");
@@ -504,21 +508,25 @@ Var Var::parseObject(const std::string& val, std::string::size_type& pos)
 }
 
 
-Var Var::parseArray(const std::string& val, std::string::size_type& pos)
+Var Var::parseArray(const std::string& val, std::string::size_type& pos, std::size_t depth)
 {
 	poco_assert_dbg (pos < val.size() && val[pos] == '[');
+	if (depth > MAX_PARSE_DEPTH)
+		throw DataFormatException("Objects and arrays nested too deeply");
 	++pos;
 	skipWhiteSpace(val, pos);
 	std::vector<Var> result;
 	while (val[pos] != ']' && pos < val.size())
 	{
-		result.push_back(parse(val, pos));
+		result.push_back(parse(val, pos, depth));
 		skipWhiteSpace(val, pos);
 		if (val[pos] == ',')
 		{
 			++pos;
 			skipWhiteSpace(val, pos);
 		}
+		else if (pos < val.size() && val[pos] != ']')
+			throw DataFormatException("Incorrect array, expected ',' or ']'");
 	}
 	if (val[pos] != ']')
 		throw DataFormatException("Unterminated array");
@@ -608,8 +616,7 @@ std::string Var::parseJSONString(const std::string& val, std::string::size_type&
 
 void Var::skipWhiteSpace(const std::string& val, std::string::size_type& pos)
 {
-	poco_assert_dbg (pos < val.size());
-	while (std::isspace(val[pos]) && pos < val.size())
+	while (pos < val.size() && Poco::Ascii::isSpace(val[pos]))
 		++pos;
 }
 

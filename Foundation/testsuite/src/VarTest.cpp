@@ -17,9 +17,12 @@
 #include "Poco/Dynamic/Struct.h"
 #include "Poco/Dynamic/Pair.h"
 #include "Poco/Dynamic/VarVisitor.h"
+#include "Poco/Thread.h"
 #include <map>
 #include <utility>
 #include <iostream>
+#include <atomic>
+#include <memory>
 
 
 #if defined(_MSC_VER) && _MSC_VER < 1400
@@ -2990,6 +2993,85 @@ void VarTest::testJSONRoundtripStruct()
 }
 
 
+void VarTest::testJSONDeserializeArrayWrongClose()
+{
+	// A parser that does not advance on '}' never returns; the worker thread bounds the test
+	// and may outlive it, so the flag is shared instead of living on the stack.
+	const std::string inputs[] = { "[}", "[a}" };
+	for (const auto& json: inputs)
+	{
+		auto pThrown = std::make_shared<std::atomic<bool>>(false);
+		Thread thread;
+		thread.startFunc([json, pThrown]()
+		{
+			try
+			{
+				Var v = Var::parse(json);
+			}
+			catch (DataFormatException&)
+			{
+				*pThrown = true;
+			}
+		});
+		if (!thread.tryJoin(5000))
+			failmsg("Var::parse did not return for " + json);
+		assertTrue (*pThrown);
+	}
+}
+
+
+void VarTest::testJSONDeserializeMalformed()
+{
+	const std::string inputs[] = { "[1 2]", "{\"a\":1 \"b\":2}", "[", "[1", "{", "{\"a\":1" };
+	for (const auto& json: inputs)
+	{
+		try
+		{
+			Var v = Var::parse(json);
+			failmsg("malformed JSON - must throw: " + json);
+		}
+		catch (DataFormatException&)
+		{
+		}
+	}
+}
+
+
+void VarTest::testJSONDeserializeNestingLimit()
+{
+	const std::string arrays128 = std::string(128, '[') + std::string(128, ']');
+	Var a = Var::parse(arrays128);
+	assertTrue (a.isArray());
+
+	std::string objects128;
+	for (int i = 0; i < 128; ++i)
+		objects128 += "{\"a\":";
+	objects128 += "1" + std::string(128, '}');
+	Var s = Var::parse(objects128);
+	assertTrue (s.isStruct());
+
+	const std::string arrays129 = std::string(129, '[') + std::string(129, ']');
+	try
+	{
+		Var v = Var::parse(arrays129);
+		failmsg("nesting deeper than 128 levels - must throw");
+	}
+	catch (DataFormatException&)
+	{
+	}
+
+	const std::string objects129 = "{\"a\":" + objects128 + "}";
+	try
+	{
+		Var v = Var::parse(objects129);
+		failmsg("nesting deeper than 128 levels - must throw");
+	}
+	catch (DataFormatException&)
+	{
+	}
+}
+
+
 void VarTest::testDate()
 {
 	Poco::DateTime dtNow(2007, 3, 13, 8, 12, 15);
@@ -3481,6 +3563,9 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeStruct);
 	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeComplex);
 	CppUnit_addTest(pSuite, VarTest, testJSONRoundtripStruct);
+	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeArrayWrongClose);
+	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeMalformed);
+	CppUnit_addTest(pSuite, VarTest, testJSONDeserializeNestingLimit);
 	CppUnit_addTest(pSuite, VarTest, testDate);
 	CppUnit_addTest(pSuite, VarTest, testUUID);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);

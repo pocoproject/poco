@@ -53,6 +53,9 @@ Breaking Changes:
   with another Registry, and Registry::unregisterCollector(Collector*) removes only that object,
   not another collector with the same name. A class derived from Collector must call unregister()
   at the start of its destructor, before any member that exportTo() uses is destroyed.
+- GH #5510 Poco::Dynamic::Var::parse() throws Poco::DataFormatException for an array or object
+  whose elements are not separated by a comma, such as [1 2], which it used to accept, and for
+  objects and arrays nested deeper than 128 levels.
 
 Bundled Third-Party Library Upgrades:
 
