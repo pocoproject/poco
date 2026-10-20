@@ -102,5 +102,21 @@ bool DigestEngine::constantTimeEquals(const Digest& d1, const Digest& d2)
 }
 
 
+bool DigestEngine::constantTimeEquals(const std::string& s1, const std::string& s2)
+{
+	if (s1.size() != s2.size()) return false;
+
+	int result = 0;
+	std::string::const_iterator it1 = s1.begin();
+	std::string::const_iterator it2 = s2.begin();
+	std::string::const_iterator end1 = s1.end();
+	while (it1 != end1)
+	{
+		result |= static_cast<unsigned char>(*it1++) ^ static_cast<unsigned char>(*it2++);
+	}
+	return result == 0;
+}
+
+
 } // namespace Poco
 
