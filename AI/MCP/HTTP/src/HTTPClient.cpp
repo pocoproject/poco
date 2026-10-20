@@ -15,6 +15,7 @@
 #include "Poco/AI/MCP/HTTP/HTTPClient.h"
 #include "Poco/AI/MCP/HTTP/Body.h"
 #include "Poco/AI/MCP/HTTP/EventStreamReader.h"
+#include "Headers.h"
 #include "Poco/AI/MCP/Message.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPMessage.h"
@@ -23,7 +24,6 @@
 #include "Poco/Net/Socket.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Array.h"
-#include "Poco/Base64Encoder.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/String.h"
 #include "Poco/Logger.h"
@@ -43,186 +43,7 @@ namespace Poco::AI::MCP::HTTP {
 
 namespace
 {
-	const std::string SENTINEL_PREFIX("=?base64?");
-	const std::string SENTINEL_SUFFIX("?=");
-	constexpr Poco::Int64 MAX_SAFE_INTEGER = 9007199254740991;
-		/// The largest integer a header may carry: the safe range of JavaScript.
 	constexpr std::size_t MAX_LOGGED_NAME = 128;
-
-
-	bool isToken(const std::string& name)
-		/// Returns true if name is an HTTP field name token (RFC 9110).
-	{
-		static const std::string SPECIALS("!#$%&'*+-.^_`|~");
-		if (name.empty()) return false;
-		for (const char c: name)
-		{
-			const bool alnum = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
-			if (!alnum && SPECIALS.find(c) == std::string::npos) return false;
-		}
-		return true;
-	}
-
-
-	bool isPlain(const std::string& value)
-		/// Returns true if value can be sent as it is: printable ASCII without
-		/// leading or trailing spaces, and not looking like the base64 form.
-	{
-		for (const char c: value)
-		{
-			const unsigned char u = static_cast<unsigned char>(c);
-			if (u < 0x20 || u > 0x7E) return false;
-		}
-		if (!value.empty() && (value.front() == ' ' || value.back() == ' ')) return false;
-		// Starts like the base64 form and ends like it, even where the two
-		// overlap, as in "=?base64?=".
-		const bool sentinel = value.compare(0, SENTINEL_PREFIX.size(), SENTINEL_PREFIX) == 0
-			&& value.size() >= SENTINEL_SUFFIX.size()
-			&& value.compare(value.size() - SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX) == 0;
-		return !sentinel;
-	}
-
-
-	std::string headerValue(const std::string& value)
-		/// The value as a header carries it: as it is, or in the base64 form.
-	{
-		if (isPlain(value)) return value;
-		std::ostringstream encoded;
-		Poco::Base64Encoder encoder(encoded);
-		encoder.rdbuf()->setLineLength(0);
-		encoder << value;
-		encoder.close();
-		return SENTINEL_PREFIX + encoded.str() + SENTINEL_SUFFIX;
-	}
-
-
-	bool hasAnnotation(const Poco::Dynamic::Var& value)
-		/// Returns true if an x-mcp-header annotation sits anywhere in value.
-	{
-		if (value.type() == typeid(Poco::JSON::Object::Ptr))
-		{
-			const Poco::JSON::Object::Ptr& pObject = value.extract<Poco::JSON::Object::Ptr>();
-			if (pObject.isNull()) return false;
-			for (const std::string& key: pObject->getNames())
-			{
-				if (key == "x-mcp-header" || hasAnnotation(pObject->get(key))) return true;
-			}
-		}
-		else if (value.type() == typeid(Poco::JSON::Array::Ptr))
-		{
-			const Poco::JSON::Array::Ptr& pArray = value.extract<Poco::JSON::Array::Ptr>();
-			if (pArray.isNull()) return false;
-			for (const auto& element: *pArray)
-			{
-				if (hasAnnotation(element)) return true;
-			}
-		}
-		return false;
-	}
-
-
-	struct Annotation
-	{
-		std::string name;
-		std::vector<std::string> path;
-	};
-
-
-	void collectAnnotations(const Poco::JSON::Object::Ptr& pSchema, std::vector<std::string>& path, std::vector<Annotation>& annotations)
-		/// Collects the x-mcp-header annotations of a schema object reached from
-		/// the root through properties keys only. Throws Poco::DataFormatException
-		/// for an invalid annotation, or one anywhere else.
-	{
-		for (const std::string& key: pSchema->getNames())
-		{
-			const Poco::Dynamic::Var value = pSchema->get(key);
-			if (key == "x-mcp-header")
-			{
-				if (path.empty())
-				{
-					throw Poco::DataFormatException("x-mcp-header at the root of the input schema");
-				}
-				if (!value.isString() || !isToken(value.extract<std::string>()))
-				{
-					throw Poco::DataFormatException("x-mcp-header that is not a header name");
-				}
-				const Poco::Dynamic::Var type = pSchema->get("type");
-				const std::string typeName = type.isString() ? type.extract<std::string>() : std::string();
-				if (typeName != "string" && typeName != "integer" && typeName != "boolean")
-				{
-					throw Poco::DataFormatException("x-mcp-header on a parameter that is not a string, an integer or a boolean");
-				}
-				const std::string& name = value.extract<std::string>();
-				for (const Annotation& annotation: annotations)
-				{
-					if (Poco::icompare(annotation.name, name) == 0)
-					{
-						throw Poco::DataFormatException("x-mcp-header name used twice", name);
-					}
-				}
-				annotations.push_back(Annotation{name, path});
-			}
-			else if (key == "properties" && pSchema->isObject(key))
-			{
-				const Poco::JSON::Object::Ptr pProperties = pSchema->getObject(key);
-				for (const std::string& property: pProperties->getNames())
-				{
-					if (!pProperties->isObject(property)) continue;
-					path.push_back(property);
-					collectAnnotations(pProperties->getObject(property), path, annotations);
-					path.pop_back();
-				}
-			}
-			else if (hasAnnotation(value))
-			{
-				// Below items, the composition and conditional keywords and $ref,
-				// a parameter is not statically reachable.
-				throw Poco::DataFormatException("x-mcp-header on a parameter that is not reached through properties alone");
-			}
-		}
-	}
-
-
-	bool render(const Poco::Dynamic::Var& value, std::string& text)
-		/// Renders a parameter value as a header value; false for no value.
-	{
-		if (value.isEmpty()) return false;
-		if (value.isString())
-		{
-			text = value.extract<std::string>();
-			return true;
-		}
-		if (value.isBoolean())
-		{
-			text = value.extract<bool>() ? "true" : "false";
-			return true;
-		}
-		// An integer outside the safe range has no header, whether it came as
-		// an integer or as a number with no fraction.
-		if (value.isInteger())
-		{
-			Poco::Int64 number = 0;
-			try
-			{
-				number = value.convert<Poco::Int64>();
-			}
-			catch (const Poco::RangeException&)
-			{
-				return false;
-			}
-			if (number < -MAX_SAFE_INTEGER || number > MAX_SAFE_INTEGER) return false;
-			text = Poco::NumberFormatter::format(number);
-			return true;
-		}
-		if (value.isNumeric())
-		{
-			const double number = value.convert<double>();
-			if (std::fabs(number) > static_cast<double>(MAX_SAFE_INTEGER) || std::floor(number) != number) return false;
-			text = Poco::NumberFormatter::format(static_cast<Poco::Int64>(number));
-			return true;
-		}
-		return false;
-	}
 
 
 	std::string loggable(const std::string& text)
@@ -267,19 +88,6 @@ namespace
 		return std::max(remaining, Poco::Timespan(0, 1000));
 	}
 
-
-	Poco::Dynamic::Var valueAt(const Poco::JSON::Object::Ptr& pArguments, const std::vector<std::string>& path)
-		/// The value at the property path, or an empty Var.
-	{
-		Poco::JSON::Object::Ptr pObject = pArguments;
-		for (std::size_t i = 0; i + 1 < path.size(); ++i)
-		{
-			if (pObject.isNull() || !pObject->isObject(path[i])) return Poco::Dynamic::Var();
-			pObject = pObject->getObject(path[i]);
-		}
-		if (pObject.isNull() || path.empty()) return Poco::Dynamic::Var();
-		return pObject->get(path.back());
-	}
 }
 
 
@@ -385,7 +193,7 @@ void HTTPClient::addHeaders(Poco::Net::HTTPRequest& httpRequest, const Poco::JSO
 		for (const ParamHeader& header: headers)
 		{
 			std::string text;
-			if (render(valueAt(pArguments, header.path), text))
+			if (renderParam(valueAt(pArguments, header.path), text))
 			{
 				httpRequest.set(header.name, headerValue(text));
 			}

@@ -115,6 +115,15 @@ void Server::registerTool(const std::string& name, const std::string& descriptio
 }
 
 
+std::optional<Tool> Server::findTool(const std::string& name) const
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	const auto it = _tools.find(name);
+	if (it == _tools.end()) return std::nullopt;
+	return it->second;
+}
+
+
 void Server::registerResource(const Resource& resource, ResourceReader reader)
 {
 	if (resource.uri.empty())

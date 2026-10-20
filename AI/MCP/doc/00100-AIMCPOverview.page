@@ -6,7 +6,8 @@ AI
 The <*AI/MCP*> library (<*PocoAIMCP*>, namespace <[Poco::AI::MCP]>) implements the
 Model Context Protocol (MCP), revision 2026-07-28: the server side, the client side over
 any transport, and the stdio transport. The <*AI/MCP/HTTP*> library (<*PocoAIMCPHTTP*>,
-namespace <[Poco::AI::MCP::HTTP]>) adds the Streamable HTTP client transport.
+namespace <[Poco::AI::MCP::HTTP]>) adds the Streamable HTTP transport: the client, and the
+server side for the HTTP server of an application.
 
 Dependencies: AI/MCP needs Foundation and JSON; AI/MCP/HTTP needs Net as well, and NetSSL for
 https endpoints.
@@ -44,6 +45,29 @@ Registration is thread-safe, and handlers run on the thread that calls <[Server:
 or <[Server::serve()]>. One server serves any number of clients at once.
 
 
+!!Servers over HTTP
+
+<[Poco::AI::MCP::HTTP::ServerTransport]> serves a <[Server]> at an endpoint of a
+<[Poco::Net::HTTPServer]>. Every request is a POST of one JSON-RPC message, and gets one JSON
+reply, or 202 Accepted for a notification; the transport opens no stream and keeps no session,
+so GET and DELETE get 405. It checks what the transport of the protocol asks of a request: the
+Origin header of a browser against the allowed origins (403), the Content-Type (415), the
+Accept header (406), the size of the body (413), and the headers <*MCP-Protocol-Version*>,
+<*Mcp-Method*>, <*Mcp-Name*> and the <*Mcp-Param*> headers of the arguments a tool's input
+schema marks with <*x-mcp-header*>, which must match the message (400 with the error
+HEADER_MISMATCH).
+
+The application signs the caller in first: it passes the identity in the
+<[RequestContext]> to <[Poco::AI::MCP::HTTP::ServerTransport::handle()]>, and the handlers
+make their decisions with it. <[Poco::AI::MCP::HTTP::ServerRequestHandlerFactory]> is the
+whole of an HTTP server that serves one endpoint to callers it does not sign in, e.g. on the
+loopback interface.
+
+A browser reads the reply to a request from a page of another origin only with CORS headers,
+after a preflight request: an application that serves such pages answers the preflight and
+adds the headers itself.
+
+
 !!!Clients
 
 <[Client]> is the client side of the protocol, written once over the exchange of a
@@ -62,7 +86,8 @@ The transports:
     input, asks the server's process group to end, and kills it last.
   - <[Poco::AI::MCP::HTTP::HTTPClient]> speaks the Streamable HTTP transport over one
     keep-alive connection, with a byte limit on replies and a deadline for every request. A
-    request hook adds headers such as <*Authorization*>.
+    request hook adds headers such as <*Authorization*>. It sends the headers the server
+    transport checks.
 
 Whatever a server returns is untrusted input: tool descriptions, annotations and results may
 have been written by an attacker, and a model that reads them may be led to call tools it
@@ -116,9 +141,46 @@ go to <*std::cerr*>: <*std::cout*> carries the protocol.
         return 0;
     }
 
+!!A Server over HTTP
+
+The following program serves the same tool at http://127.0.0.1:8080/mcp until it is stopped.
+
+    #include "Poco/AI/MCP/Server.h"
+    #include "Poco/AI/MCP/HTTP/ServerRequestHandler.h"
+    #include "Poco/Net/HTTPServer.h"
+    #include "Poco/Net/HTTPServerParams.h"
+    #include "Poco/Net/ServerSocket.h"
+    #include "Poco/Util/ServerApplication.h"
+
+    using namespace Poco::AI::MCP;
+
+    class Greeter: public Poco::Util::ServerApplication
+    {
+    protected:
+        int main(const std::vector<std::string>&) override
+        {
+            Server server;
+            server.registerTool("greet", "Greets a person by name.", nullptr,
+                [](const Poco::JSON::Object::Ptr& pArgs)
+                {
+                    ToolResult result;
+                    result.addText("Hello, " + pArgs->optValue<std::string>("name", "stranger") + "!");
+                    return result;
+                });
+            Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 8080));
+            Poco::Net::HTTPServer http(new HTTP::ServerRequestHandlerFactory(server, "/mcp"), socket, new Poco::Net::HTTPServerParams);
+            http.start();
+            waitForTerminationRequest();
+            http.stopAll(true);
+            return EXIT_OK;
+        }
+    };
+
+    POCO_SERVER_MAIN(Greeter)
+
 !!A Client
 
-The following program starts that server, lists its tools and calls one.
+The following program starts the stdio server, lists its tools and calls one.
 
     #include "Poco/AI/MCP/ProcessClient.h"
     #include "Poco/JSON/Object.h"

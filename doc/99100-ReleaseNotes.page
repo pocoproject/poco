@@ -24,9 +24,10 @@ conversions to and from local cartesian coordinates, and geofences), previously 
 macchina.io, is a POCO component.
 Serial (serial port I/O), previously part of macchina.io, is a POCO component.
 AI/MCP and AI/MCP/HTTP implement the Model Context Protocol, revision 2026-07-28: a server
-any POCO application can expose tools, resources and prompts with, and clients over a stream,
-a server process and Streamable HTTP. AI (experimental) is a client library for large
-language model APIs with a minimal agent runtime.
+any POCO application can expose tools, resources and prompts with, over a stream or at an
+endpoint of its HTTP server, and clients over a stream, a server process and Streamable HTTP.
+AI (experimental) is a client library for large language model APIs with a minimal agent
+runtime.
 
 !!Features
 
@@ -71,6 +72,12 @@ language model APIs with a minimal agent runtime.
     cancellation, a tool registry of MCP tools, the agent loop, and <*MCPHost*>, which
     mirrors the tools of MCP servers into the registry. Enable with cmake <*ENABLE_AI*> (off
     by default); make component <*AI*>.
+  - GH #5576 <*AI/MCP/HTTP*>: the server side of the Streamable HTTP transport,
+    <*ServerTransport*>, which serves a <*Poco::AI::MCP::Server*> at an endpoint of an
+    application's <*Poco::Net::HTTPServer*> and checks what the transport asks of a request:
+    the method, the origin, the media types, the size of the body and the MCP headers against
+    the message. <*ServerRequestHandlerFactory*> is a server of one endpoint; the sample
+    <*MCPHTTPServer*>.
 
 !!Breaking Changes
 

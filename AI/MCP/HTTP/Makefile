@@ -1,12 +1,13 @@
 #
 # Makefile
 #
-# Makefile for Poco AI MCP HTTP (Streamable HTTP client transport)
+# Makefile for Poco AI MCP HTTP (Streamable HTTP client and server transports)
 #
 
 include $(POCO_BASE)/build/rules/global
 
-objects = SessionFactory Body EventStreamReader HTTPClient
+objects = SessionFactory Body EventStreamReader Headers HTTPClient \
+	ServerTransport ServerRequestHandler
 
 target         = PocoAIMCPHTTP
 target_version = $(LIBVERSION)

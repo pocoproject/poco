@@ -10,6 +10,7 @@
 
 #include "HTTPTestSuite.h"
 #include "HTTPTest.h"
+#include "ServerTransportTest.h"
 
 
 CppUnit::Test* HTTPTestSuite::suite()
@@ -17,6 +18,7 @@ CppUnit::Test* HTTPTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPTestSuite");
 
 	pSuite->addTest(HTTPTest::suite());
+	pSuite->addTest(ServerTransportTest::suite());
 
 	return pSuite;
 }

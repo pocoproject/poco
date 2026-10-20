@@ -29,6 +29,7 @@
 #include "Poco/Timespan.h"
 #include <iosfwd>
 #include <map>
+#include <optional>
 #include <string>
 
 
@@ -97,6 +98,11 @@ public:
 		/// Throws Poco::InvalidArgumentException if the name is empty, the
 		/// handler is empty, or the input schema does not have the type
 		/// "object".
+
+	[[nodiscard]] std::optional<Tool> findTool(const std::string& name) const;
+		/// Returns the definition of the tool of that name, or nothing. A
+		/// transport checks with it what a call carries besides its message,
+		/// e.g. the headers the input schema asks of a call over HTTP.
 
 	void registerResource(const Resource& resource, ResourceReader reader);
 		/// Registers a resource, replacing one with the same URI.

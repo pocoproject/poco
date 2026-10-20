@@ -62,6 +62,21 @@ namespace
 		}
 		return 0;
 	}
+
+
+	int parseError(const std::string& text)
+		/// The code of the MCPException parseMessage() throws, or 0.
+	{
+		try
+		{
+			(void) Poco::AI::MCP::parseMessage(text);
+		}
+		catch (const MCPException& exc)
+		{
+			return exc.code();
+		}
+		return 0;
+	}
 }
 
 
@@ -254,6 +269,24 @@ void EnvelopeTest::testReadMessageNotAnObject()
 }
 
 
+void EnvelopeTest::testParseMessage()
+{
+	// The rules of readMessage() for a message that comes whole, as the
+	// body of an HTTP request.
+	assertTrue(Poco::AI::MCP::parseMessage(" {\"ok\":true} ")->getValue<bool>("ok"));
+	const std::string notJSON[] = {"", " ", "not json", "{\"a\":", "{\"a\":1} x", "{\"a\":1}{\"b\":2}"};
+	for (const std::string& text: notJSON)
+	{
+		assertEqual(static_cast<int>(ErrorCode::PARSE_ERROR), parseError(text));
+	}
+	const std::string notObject[] = {"[{\"a\":1}]", "[]", "\"text\"", "42", "true", "null"};
+	for (const std::string& text: notObject)
+	{
+		assertEqual(static_cast<int>(ErrorCode::INVALID_REQUEST), parseError(text));
+	}
+}
+
+
 void EnvelopeTest::testWriteMessageFailure()
 {
 	FailingBuf buf;
@@ -295,6 +328,7 @@ CppUnit::Test* EnvelopeTest::suite()
 	CppUnit_addTest(pSuite, EnvelopeTest, testReadMessage);
 	CppUnit_addTest(pSuite, EnvelopeTest, testReadMessageLimit);
 	CppUnit_addTest(pSuite, EnvelopeTest, testReadMessageNotAnObject);
+	CppUnit_addTest(pSuite, EnvelopeTest, testParseMessage);
 	CppUnit_addTest(pSuite, EnvelopeTest, testWriteMessageFailure);
 
 	return pSuite;

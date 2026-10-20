@@ -12,7 +12,8 @@
 // the server with its message and stream ingress, the client over any
 // transport, the stream client and the stdio transport to a server process.
 // It depends only on Poco::JSON and Foundation (no Poco::Net). The
-// Streamable HTTP client transport lives in the separate PocoAIMCPHTTP library.
+// Streamable HTTP transport, client and server, lives in the separate
+// PocoAIMCPHTTP library.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.

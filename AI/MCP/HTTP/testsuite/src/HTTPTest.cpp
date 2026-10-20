@@ -597,19 +597,11 @@ void HTTPTest::testHeaderMismatch()
 		assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), exc.code());
 	}
 
-	// An integer outside the safe range has no header, as a number would
-	// not: the host misses it.
+	// An integer outside the safe range has no header: the client sends
+	// none, and the server expects none.
 	registerTool(server, "counted", "{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"integer\",\"x-mcp-header\":\"N\"}}}");
 	(void) client.listTools();
-	try
-	{
-		(void) client.callTool("counted", args("{\"n\":9007199254740993}"));
-		fail("an integer outside the safe range must not be sent in a header");
-	}
-	catch (const MCPException& exc)
-	{
-		assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), exc.code());
-	}
+	(void) client.callTool("counted", args("{\"n\":9007199254740993}"));
 	assertTrue(!host.lastHeaders().has("Mcp-Param-N"));
 	(void) client.callTool("counted", args("{\"n\":9007199254740991}"));
 	assertEqual(std::string("9007199254740991"), host.lastHeaders().get("Mcp-Param-N"));

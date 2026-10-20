@@ -33,6 +33,7 @@ public:
 	void testReadMessage();
 	void testReadMessageLimit();
 	void testReadMessageNotAnObject();
+	void testParseMessage();
 	void testWriteMessageFailure();
 
 	void setUp();

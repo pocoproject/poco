@@ -5,9 +5,9 @@
 // Package: HTTP
 // Module:  HTTP
 //
-// Basic definitions for the AI MCP HTTP(S) client transport library
-// (PocoAIMCPHTTP). This file must be the first file included by every other
-// AI MCP HTTP header.
+// Basic definitions for the AI MCP HTTP(S) transport library (PocoAIMCPHTTP):
+// the Streamable HTTP client and server transports. This file must be the
+// first file included by every other AI MCP HTTP header.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.

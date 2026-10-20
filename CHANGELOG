@@ -106,6 +106,14 @@ New Components:
   only the environment variables given to launch(), on every platform. Without it the child
   inherits the environment of the parent: on POSIX platforms with the given variables added, on
   Windows replaced by them when any are given.
+- GH #5576 AI/MCP/HTTP: the server side of the Streamable HTTP transport. ServerTransport
+  serves a Poco::AI::MCP::Server at one endpoint of an application's Poco::Net::HTTPServer,
+  statelessly: POST only, the Origin of a browser against the allowed origins, the Content-Type,
+  the Accept header and a limit of the body checked, the MCP-Protocol-Version, Mcp-Method,
+  Mcp-Name and Mcp-Param headers checked against the message (HEADER_MISMATCH), and each reply
+  with the status the transport gives it; the application passes the identity of the caller in
+  the RequestContext. ServerRequestHandlerFactory is an HTTP server of one endpoint. The sample
+  MCPHTTPServer. AI/MCP: Server::findTool() and parseMessage().
 
 Bug Fixes and Improvements:
 

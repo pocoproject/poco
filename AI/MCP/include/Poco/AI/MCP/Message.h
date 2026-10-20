@@ -109,6 +109,14 @@ AIMCP_API void writeMessage(std::ostream& out, const Poco::JSON::Object::Ptr& me
 	/// transport whose peer has gone away stops serving.
 
 
+[[nodiscard]] AIMCP_API Poco::JSON::Object::Ptr parseMessage(const std::string& text);
+	/// Parses one message, which is a JSON object.
+	///
+	/// Throws MCPException with code PARSE_ERROR if text is not JSON, and
+	/// with code INVALID_REQUEST if it is JSON but not an object (a scalar or
+	/// an array).
+
+
 [[nodiscard]] AIMCP_API Poco::JSON::Object::Ptr readMessage(std::istream& in, std::size_t maxSize = DEFAULT_MAX_MESSAGE_SIZE);
 	/// Reads the next newline-delimited JSON object from the stream, skipping
 	/// blank lines. Returns null at the end of the stream; a last line without

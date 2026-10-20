@@ -200,6 +200,30 @@ void writeMessage(std::ostream& out, const Poco::JSON::Object::Ptr& message)
 }
 
 
+Poco::JSON::Object::Ptr parseMessage(const std::string& text)
+{
+	Poco::Dynamic::Var parsed;
+	try
+	{
+		Poco::JSON::Parser parser;
+		parsed = parser.parse(text);
+	}
+	catch (const Poco::Exception& exc)
+	{
+		if (isScalar(text))
+		{
+			throw MCPException("Message is not a JSON object", static_cast<int>(ErrorCode::INVALID_REQUEST));
+		}
+		throw MCPException("Parse error", exc.message(), static_cast<int>(ErrorCode::PARSE_ERROR));
+	}
+	if (parsed.type() != typeid(Poco::JSON::Object::Ptr))
+	{
+		throw MCPException("Message is not a JSON object", static_cast<int>(ErrorCode::INVALID_REQUEST));
+	}
+	return parsed.extract<Poco::JSON::Object::Ptr>();
+}
+
+
 Poco::JSON::Object::Ptr readMessage(std::istream& in, std::size_t maxSize)
 {
 	std::string line;
@@ -218,25 +242,7 @@ Poco::JSON::Object::Ptr readMessage(std::istream& in, std::size_t maxSize)
 		{
 			continue;
 		}
-		Poco::Dynamic::Var parsed;
-		try
-		{
-			Poco::JSON::Parser parser;
-			parsed = parser.parse(line);
-		}
-		catch (const Poco::Exception& exc)
-		{
-			if (isScalar(line))
-			{
-				throw MCPException("Message is not a JSON object", static_cast<int>(ErrorCode::INVALID_REQUEST));
-			}
-			throw MCPException("Parse error", exc.message(), static_cast<int>(ErrorCode::PARSE_ERROR));
-		}
-		if (parsed.type() != typeid(Poco::JSON::Object::Ptr))
-		{
-			throw MCPException("Message is not a JSON object", static_cast<int>(ErrorCode::INVALID_REQUEST));
-		}
-		return parsed.extract<Poco::JSON::Object::Ptr>();
+		return parseMessage(line);
 	}
 }
 

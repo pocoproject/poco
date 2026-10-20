@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Driver HTTPTestSuite HTTPTest
+objects = Driver HTTPTestSuite HTTPTest ServerTransportTest
 
 target         = testrunner
 target_version = 1
