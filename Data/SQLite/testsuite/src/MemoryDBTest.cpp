@@ -1023,6 +1023,39 @@ void MemoryDBTest::testHistoryViewCountsResidentShardOnce()
 }
 
 
+void MemoryDBTest::testHistoryViewSurvivesEviction()
+{
+	// A history view built while a shard's rows were still in memory must
+	// still show them once a later flush has moved them out of it.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	std::string x("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(x), now; // 1..3
+	db.sealActive();
+	db.flush(); // shard 1 written; still resident, it carries the numbering
+
+	db.attachAllArchived();
+	const std::string view = db.historyView("t");
+	int n = 0;
+	db << ("SELECT count(*) FROM " + view), into(n), now;
+	assertTrue (n == 3);
+
+	db << "INSERT INTO t(v) VALUES(:v)", use(x), now; // 4
+	db.flush(); // evicts shard 1
+
+	int inMain = 0;
+	db << "SELECT count(*) FROM t", into(inMain), now;
+	assertTrue (inMain == 1);
+	int distinct = 0;
+	db << ("SELECT count(*), count(DISTINCT id) FROM " + view), into(n), into(distinct), now; // the same view, not rebuilt
+	assertTrue (n == 4);
+	assertTrue (distinct == 4);
+	db.detachAllArchived();
+}
+
+
 void MemoryDBTest::testSealEvictsRowsFromMemory()
 {
 	// With loadArchivedShards off, a sealed shard's rows leave memory at the
@@ -2906,6 +2939,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testVecHistoryView);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryView);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewCountsResidentShardOnce);
+	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewSurvivesEviction);
 	CppUnit_addTest(pSuite, MemoryDBTest, testSealEvictsRowsFromMemory);
 	CppUnit_addTest(pSuite, MemoryDBTest, testSealKeepsNewestShardUntilActiveHasRows);
 	CppUnit_addTest(pSuite, MemoryDBTest, testSealEvictionDeferredWhileSessionBusy);

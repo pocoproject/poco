@@ -1859,7 +1859,6 @@ std::string MemoryDB::buildHistoryView(const std::string& table,
 	const std::vector<Poco::UInt32>& shardIds)
 {
 	std::string viewName = table + "_history";
-	std::string sql = "SELECT * FROM main." + quoteIdent(table);
 
 	// Holding the SQLite connection mutex makes the whole "probe shards + drop
 	// old view + create new view" sequence atomic vs concurrent user steps.
@@ -1870,11 +1869,6 @@ std::string MemoryDB::buildHistoryView(const std::string& table,
 
 	// Virtual tables live whole in the active shard; copies in archived shard
 	// files are stale, so their history view is just the base table.
-	// Of the sealed shards, only those whose rows are not in main are read from
-	// their files: a resident shard's rows are already in the base table, and
-	// reading its file too would show them twice. Which shards are resident is
-	// looked up under the connection mutex, where a shard's rows leave main,
-	// so the view takes each shard from one place.
 	bool isVirtual = false;
 	std::map<Poco::UInt32, std::pair<Poco::Int64, Poco::Int64> > ranges; // shard id -> the table's (lo, hi]
 	{
@@ -1883,24 +1877,34 @@ std::string MemoryDB::buildHistoryView(const std::string& table,
 		for (const auto& s: _shards)
 		{
 			auto r = s.ranges.find(table);
-			if (s.sealed && !s.resident && r != s.ranges.end()) ranges[s.id] = r->second;
+			if (s.sealed && r != s.ranges.end()) ranges[s.id] = r->second;
 		}
 	}
 
+	// An attached shard is always read from its file, and its range is left
+	// out of the base table. The view so reads each row once whether the
+	// shard's rows are still in main or have left it, and stays right when a
+	// flush moves them out after it was built. Only the shard's own range is
+	// read from the file: a row moved to another shard can linger there until
+	// it is purged.
+	std::string archives;
+	std::string excluded;
 	if (!isVirtual) for (auto id: shardIds)
 	{
-		// Only the rows of the shard's own range: a row that was moved to
-		// another shard can linger in the file until it is purged.
 		auto r = ranges.find(id);
 		if (r == ranges.end()) continue;
 		std::string alias = "arc_" + Poco::NumberFormatter::format(id);
 		if (tableExists(_memHandle, alias, table))
 		{
-			sql += " UNION ALL SELECT * FROM " + alias + "." + quoteIdent(table) +
-				" WHERE rowid > " + Poco::NumberFormatter::format(r->second.first) +
-				" AND rowid <= " + Poco::NumberFormatter::format(r->second.second);
+			const std::string inRange = "(rowid > " + Poco::NumberFormatter::format(r->second.first) +
+				" AND rowid <= " + Poco::NumberFormatter::format(r->second.second) + ")";
+			archives += " UNION ALL SELECT * FROM " + alias + "." + quoteIdent(table) + " WHERE " + inRange;
+			excluded += (excluded.empty() ? "" : " OR ") + inRange;
 		}
 	}
+	std::string sql = "SELECT * FROM main." + quoteIdent(table);
+	if (!excluded.empty()) sql += " WHERE NOT (" + excluded + ")";
+	sql += archives;
 
 	execDirect(_memHandle, "DROP VIEW IF EXISTS " + quoteIdent(viewName));
 	execDirect(_memHandle, "CREATE TEMP VIEW " + quoteIdent(viewName) + " AS " + sql);

@@ -61,6 +61,7 @@ public:
 	void testVecHistoryView();
 	void testHistoryView();
 	void testHistoryViewCountsResidentShardOnce();
+	void testHistoryViewSurvivesEviction();
 	void testSealEvictsRowsFromMemory();
 	void testSealKeepsNewestShardUntilActiveHasRows();
 	void testSealEvictionDeferredWhileSessionBusy();
