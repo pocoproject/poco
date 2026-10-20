@@ -81,6 +81,8 @@ public:
 	void testDropToFit();
 	void testRetentionDisabledIsNoop();
 	void testRetentionKeepsShardWhileSessionReads();
+	void testBusyEvictionRetriedWithoutWrite();
+	void testBusyRetentionRetriedWithoutWrite();
 	void testHistoryViewTimeRange();
 	void testHistoryViewTimeRangeOverflow();
 	void testDetachAllArchived();

@@ -1529,7 +1529,9 @@ bool MemoryDB::evictShard(Poco::UInt32 shardId)
 	}
 
 	std::map<std::string, Poco::Int64> kept;
-	if (removeRanges(ranges, floors, false, kept) != Removal::DONE) return false;
+	const Removal removal = removeRanges(ranges, floors, false, kept);
+	if (removal == Removal::SESSION_BUSY) _retryPending.store(true, std::memory_order_release);
+	if (removal != Removal::DONE) return false;
 
 	Poco::FastMutex::ScopedLock l(_stateMutex);
 	auto it = std::find_if(_shards.begin(), _shards.end(),
@@ -1583,6 +1585,7 @@ std::size_t MemoryDB::deleteShards(const std::vector<Poco::UInt32>& ids)
 		}
 		catch (const TableLockedException& e)
 		{
+			_retryPending.store(true, std::memory_order_release);
 			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").information(e.message() + "; retried later");
 		}
 	}
@@ -2270,6 +2273,30 @@ void MemoryDB::onTimer(Poco::Timer&)
 		try { doFlush(); }
 		catch (...) {}
 	}
+	else if (_retryPending.load(std::memory_order_acquire))
+	{
+		try { retryDeferredRemovals(); }
+		catch (...) {}
+	}
+}
+
+
+void MemoryDB::retryDeferredRemovals()
+{
+	// A removal deferred because session() was busy is otherwise retried only
+	// by the next flush, and with nothing written since, there would be none.
+	bool expected = false;
+	if (!_flushing.compare_exchange_strong(expected, true)) return;
+	struct Releaser
+	{
+		std::atomic<bool>& flag;
+		~Releaser() { flag.store(false); }
+	} releaser{_flushing};
+
+	Poco::Mutex::ScopedLock fl(_flushMutex);
+	_retryPending.store(false, std::memory_order_release);
+	evictSealedShards();
+	try { enforceRetention(); } catch (...) {}
 }
 
 
@@ -2787,7 +2814,11 @@ void MemoryDB::doFlush(bool allowSeal)
 
 	// The files and the catalog are committed: the rows of the sealed shards
 	// may leave memory now. Skipped on the dtor path like the retention below.
-	if (allowSeal) evictSealedShards();
+	if (allowSeal)
+	{
+		_retryPending.store(false, std::memory_order_release); // set again by whatever is deferred now
+		evictSealedShards();
+	}
 
 	// Always run enforceRetention: the SQLITE_LIMIT_ATTACHED backstop on
 	// total shard count is unconditional, and age/bytes retention (if

@@ -1861,6 +1861,70 @@ void MemoryDBTest::testRetentionKeepsShardWhileSessionReads()
 }
 
 
+void MemoryDBTest::testBusyEvictionRetriedWithoutWrite()
+{
+	// An eviction deferred because session() was busy is tried again by the
+	// timer once it is free, though nothing has been written since and so no
+	// flush would come.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	off.idleInterval = Poco::Timespan(3600, 0); // no flush of its own during the test
+	off.maxFlushInterval = Poco::Timespan(0);
+	off.checkIntervalMs = 10;
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+	std::string x("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(x), now;
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << "SELECT id FROM t", into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on main
+		db.sealActive();
+		db.flush(); // writes the shard; its rows cannot leave memory now
+		assertTrue (!db.dirty());
+	} // the reader is done; nothing else is written
+
+	assertTrue (waitUntil([&]() {
+		int inMain = -1;
+		db << "SELECT count(*) FROM t", into(inMain), now;
+		return inMain == 0;
+	}, Poco::Timespan(10, 0)));
+}
+
+
+void MemoryDBTest::testBusyRetentionRetriedWithoutWrite()
+{
+	// A shard retention could not drop because session() was busy is dropped
+	// by the timer once it is free, though nothing has been written since.
+	MemoryDB::Options o;
+	o.loadArchivedShards = true;
+	o.retentionMaxBytes = 1; // every sealed shard is over budget
+	o.idleInterval = Poco::Timespan(3600, 0);
+	o.maxFlushInterval = Poco::Timespan(0);
+	o.checkIntervalMs = 10;
+	MemoryDB db(_dir, o);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+	std::string x("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(x), now;
+
+	std::string sealedFile = Poco::Path(_dir, "shard-000001.db").toString();
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << "SELECT id FROM t", into(id), limit(1));
+		stmt.execute();
+		db.sealActive();
+		db.flush(); // writes shard 1; retention cannot drop it now
+		assertTrue (Poco::File(sealedFile).exists());
+	}
+
+	assertTrue (waitUntil([&]() { return !Poco::File(sealedFile).exists(); }, Poco::Timespan(10, 0)));
+	int inMain = -1;
+	db << "SELECT count(*) FROM t", into(inMain), now;
+	assertTrue (inMain == 0);
+	assertTrue (db.archivedShardIds().empty());
+}
+
+
 void MemoryDBTest::testHistoryViewTimeRange()
 {
 	// Populate in one session, then close so that on reopen with
@@ -2815,6 +2879,8 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testDropToFit);
 	CppUnit_addTest(pSuite, MemoryDBTest, testRetentionDisabledIsNoop);
 	CppUnit_addTest(pSuite, MemoryDBTest, testRetentionKeepsShardWhileSessionReads);
+	CppUnit_addTest(pSuite, MemoryDBTest, testBusyEvictionRetriedWithoutWrite);
+	CppUnit_addTest(pSuite, MemoryDBTest, testBusyRetentionRetriedWithoutWrite);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewTimeRange);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewTimeRangeOverflow);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDetachAllArchived);

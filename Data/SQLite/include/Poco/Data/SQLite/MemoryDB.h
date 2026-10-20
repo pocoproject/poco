@@ -542,6 +542,9 @@ private:
 		// doFlush(), after the files and the catalog are committed: evictShard() on
 		// every sealed resident shard whose file is written, with loadArchivedShards
 		// off; caller holds _flushMutex
+	void retryDeferredRemovals();
+		// onTimer(): evictSealedShards() and enforceRetention() again after
+		// session() was busy, without a flush; skipped while one is running
 	std::size_t deleteShards(const std::vector<Poco::UInt32>& ids);
 		// deleteShard() on each id, skipping the ones it has to keep; returns the
 		// number dropped; caller holds _flushMutex
@@ -652,6 +655,10 @@ private:
 	Poco::Mutex                _flushMutex;
 	mutable Poco::Mutex        _attachMutex;
 	std::atomic<bool>          _flushing{false};
+	std::atomic<bool>          _retryPending{false};
+		// a shard's rows could not leave memory, or a shard could not be
+		// dropped, because session() was busy; the timer tries again even
+		// when nothing has been written since
 };
 
 
