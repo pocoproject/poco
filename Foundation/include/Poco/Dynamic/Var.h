@@ -528,21 +528,27 @@ public:
 		/// Returns the stored value as string.
 
 	[[nodiscard]] static Var parse(const std::string& val);
-		/// Parses the string which must be in JSON format
+		/// Parses the string which must be in JSON format.
+		/// Throws a DataFormatException if a separator or a closing bracket is missing,
+		/// or if objects and arrays are nested deeper than 128 levels.
 
 	[[nodiscard]] static std::string toString(const Var& var);
 		/// Converts the Var to a string in JSON format. Note that toString(const Var&) will return
 		/// a different result than Var::convert<std::string>() and Var::toString()!
 
 private:
+	static constexpr std::size_t MAX_PARSE_DEPTH = 128;
+		/// Bounds the recursion of parse() so that nested input cannot exhaust the stack.
+
 	[[nodiscard]] Var& getAt(std::size_t n);
 	[[nodiscard]] Var& getAt(const std::string& n);
 
-	[[nodiscard]] static Var parse(const std::string& val, std::string::size_type& offset);
-		/// Parses the string which must be in JSON format
+	[[nodiscard]] static Var parse(const std::string& val, std::string::size_type& pos, std::size_t depth);
+		/// Parses the string which must be in JSON format.
+		/// The depth is the number of objects and arrays that enclose the value.
 
-	[[nodiscard]] static Var parseObject(const std::string& val, std::string::size_type& pos);
-	[[nodiscard]] static Var parseArray(const std::string& val, std::string::size_type& pos);
+	[[nodiscard]] static Var parseObject(const std::string& val, std::string::size_type& pos, std::size_t depth);
+	[[nodiscard]] static Var parseArray(const std::string& val, std::string::size_type& pos, std::size_t depth);
 	[[nodiscard]] static std::string parseString(const std::string& val, std::string::size_type& pos);
 	[[nodiscard]] static std::string parseJSONString(const std::string& val, std::string::size_type& pos);
 	static void skipWhiteSpace(const std::string& val, std::string::size_type& pos);

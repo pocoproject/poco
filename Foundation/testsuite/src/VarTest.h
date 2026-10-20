@@ -80,6 +80,9 @@ public:
 	void testJSONDeserializeStruct();
 	void testJSONRoundtripStruct();
 	void testJSONDeserializeComplex();
+	void testJSONDeserializeArrayWrongClose();
+	void testJSONDeserializeMalformed();
+	void testJSONDeserializeNestingLimit();
 	void testDate();
 	void testUUID();
 	void testEmpty();
