@@ -125,6 +125,46 @@ FileChannelTest::~FileChannelTest()
 }
 
 
+
+void FileChannelTest::testConcurrentPath()
+{
+	// One thread alternates setProperty("path", ...) between two paths
+	// while another thread calls path() and checks that the result is one of the two.
+	std::string path1 = filename() + ".1";
+	std::string path2 = filename() + ".2";
+
+	try
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(path1);
+		std::atomic<bool> stop{false};
+
+		std::thread reader([&]()
+		{
+			while (!stop.load(std::memory_order_relaxed))
+			{
+				std::string p = pChannel->path();
+				assertTrue (p == path1 || p == path2);
+			}
+		});
+
+		for (int i = 0; i < 2000; ++i)
+		{
+			pChannel->setProperty(FileChannel::PROP_PATH, (i % 2 == 0) ? path1 : path2);
+		}
+
+		stop.store(true);
+		reader.join();
+	}
+	catch (...)
+	{
+		remove(path1);
+		remove(path2);
+		throw;
+	}
+	remove(path1);
+	remove(path2);
+}
+
 void FileChannelTest::testRotateNever()
 {
 	std::string name = filename();
@@ -1182,6 +1222,7 @@ CppUnit::Test* FileChannelTest::suite()
 	CppUnit_addTest(pSuite, FileChannelTest, testOpenCalledByLog);
 	CppUnit_addTest(pSuite, FileChannelTest, testPurgeStrategyReplacedDuringPurge);
 	CppUnit_addTest(pSuite, FileChannelTest, testConcurrentOpenClose);
+	CppUnit_addTest(pSuite, FileChannelTest, testConcurrentPath);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySize);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateByAge);
 	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayUTC);

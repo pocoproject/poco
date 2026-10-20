@@ -62,8 +62,7 @@ private:
 
 AsyncChannel::AsyncChannel(Channel::Ptr pChannel, Thread::Priority prio):
 	_pChannel(pChannel),
-	_thread("AsyncChannel"),
-	_closed(false)
+	_thread("AsyncChannel")
 {
 	_thread.setPriority(prio);
 }
@@ -112,7 +111,11 @@ void AsyncChannel::close()
 {
 	if (!_closed.exchange(true))
 	{
-		FastMutex::ScopedLock lock(_threadMutex);
+		// Waits for an open() in progress. open() checks _closed under this
+		// mutex, so the thread is not started again after this point.
+		{
+			FastMutex::ScopedLock lock(_threadMutex);
+		}
 
 		if (_thread.isRunning())
 		{
@@ -139,10 +142,13 @@ void AsyncChannel::logImpl(M&& msg)
 		return;
 	}
 
-	std::size_t drop = _dropCount.exchange(0);
-	if (drop != 0)
+	if (_dropCount.load(std::memory_order_relaxed) != 0)
 	{
-		_queue.enqueueNotification(new MessageNotification(Message(msg, Poco::format("Dropped %z messages.", drop))));
+		std::size_t drop = _dropCount.exchange(0);
+		if (drop != 0)
+		{
+			_queue.enqueueNotification(new MessageNotification(Message(msg, Poco::format("Dropped %z messages.", drop))));
+		}
 	}
 
 	open();

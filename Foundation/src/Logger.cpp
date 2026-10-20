@@ -428,6 +428,8 @@ Logger::Ptr Logger::find(const std::string& name)
 
 void Logger::destroy(const std::string& name)
 {
+	// The logger is released when the mutex is free again: the destructor
+	// of its channel may wait for a thread that asks for a logger.
 	Logger::Ptr pLogger;
 	{
 		Mutex::ScopedLock lock(_mapMtx);
