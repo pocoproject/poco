@@ -43,6 +43,9 @@ Breaking Changes:
   rather than an enumerator, so an expression that mixes it with a signed value changes type
   without a diagnostic; and poll(), available(), device(), baudRate(), parameters(), flowControl()
   and getRTS() are [[nodiscard]].
+- GH #5510 Poco::Dynamic::Var::parse() throws Poco::DataFormatException for an array or object
+  whose elements are not separated by a comma, such as [1 2], which it used to accept, and for
+  objects and arrays nested deeper than 128 levels.
 
 Bundled Third-Party Library Upgrades:
 
