@@ -37,6 +37,8 @@
 #include "Poco/Timestamp.h"
 #include <memory>
 #include <sstream>
+#include <streambuf>
+#include <algorithm>
 #include <typeinfo>
 
 
@@ -136,11 +138,44 @@ namespace
 	};
 
 
-	std::vector<std::string> events(const std::string& stream, bool& cut)
-		/// The data of the events in stream.
+	class TrickleBuffer: public std::streambuf
+		/// Hands out its text a few bytes at a time: what it has buffered, and
+		/// so in_avail(), is never more.
 	{
-		std::istringstream in(stream);
-		EventStreamReader reader(in, 64);
+	public:
+		TrickleBuffer(const std::string& text, std::size_t piece):
+			_text(text),
+			_piece(piece)
+		{
+		}
+
+	protected:
+		int_type underflow() override
+		{
+			if (gptr() != nullptr && gptr() < egptr()) return traits_type::to_int_type(*gptr());
+			if (_offset >= _text.size()) return traits_type::eof();
+			const std::size_t n = std::min(_piece, _text.size() - _offset);
+			char* pBegin = &_text[_offset];
+			setg(pBegin, pBegin, pBegin + n);
+			_offset += n;
+			return traits_type::to_int_type(*gptr());
+		}
+
+	private:
+		std::string _text;
+		std::size_t _piece;
+		std::size_t _offset = 0;
+	};
+
+
+	std::vector<std::string> events(const std::string& stream, bool& cut, std::size_t piece = 0)
+		/// The data of the events in stream, read as a whole, or in pieces of
+		/// that many bytes.
+	{
+		std::istringstream whole(stream);
+		TrickleBuffer trickle(stream, piece > 0 ? piece : 1);
+		std::istream pieces(&trickle);
+		EventStreamReader reader(piece > 0 ? pieces : static_cast<std::istream&>(whole), 64);
 		std::vector<std::string> result;
 		EventStreamReader::Event event;
 		while (reader.next(event)) result.push_back(event.type + "|" + event.data);
@@ -905,6 +940,48 @@ void HTTPTest::testEventStreamReader()
 	catch (const Poco::DataFormatException&)
 	{
 	}
+
+	// Read in pieces of a few bytes, as a network may deliver them, the
+	// streams give the same events: a CR and its LF, a byte order mark and a
+	// line may be split between two reads.
+	const std::string streams[] = {
+		": hello\r\ndata: a\r\ndata:b\r\n\r\nevent: x\ndata:  two spaces\n\nevent: y\n\ndata\rdata: c\r\r",
+		"\xEF\xBB\xBF" "data: marked\n\n",
+		"\xEF\xBB" "data: x\n\ndata: y\n\n",
+		"data: " + std::string(64, 'd') + "\n\n",
+		"data: full\n\ndata: cut off",
+		"data: last\n"
+	};
+	for (const std::string& text: streams)
+	{
+		bool wholeCut = false;
+		const std::vector<std::string> whole = events(text, wholeCut);
+		for (const std::size_t piece: {std::size_t(1), std::size_t(2), std::size_t(3), std::size_t(5)})
+		{
+			bool pieceCut = false;
+			assertTrue(events(text, pieceCut, piece) == whole);
+			assertEqual(wholeCut, pieceCut);
+		}
+	}
+	try
+	{
+		(void) events("data: " + std::string(200, 'x') + "\n\n", cut, 3);
+		fail("a line beyond the limit must throw, also in pieces");
+	}
+	catch (const Poco::DataFormatException&)
+	{
+	}
+
+	// A line longer than what the reader takes from the stream at once.
+	std::istringstream longStream("data: " + std::string(20000, 'L') + "\r\n\r\ndata: next\n\n");
+	EventStreamReader longReader(longStream, 30000);
+	EventStreamReader::Event longEvent;
+	assertTrue(longReader.next(longEvent));
+	assertEqual(std::string(20000, 'L'), longEvent.data);
+	assertTrue(longReader.next(longEvent));
+	assertEqual(std::string("next"), longEvent.data);
+	assertTrue(!longReader.next(longEvent));
+	assertTrue(!longReader.cut());
 }
 
 

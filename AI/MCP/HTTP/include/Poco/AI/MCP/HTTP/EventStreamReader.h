@@ -45,6 +45,10 @@ class AIMCPHTTP_API EventStreamReader
 	/// At the end of the stream, an event whose blank line has not come is
 	/// dropped, as the standard has it, and cut() tells so: a server that
 	/// stops in the middle of an event has not delivered it.
+	///
+	/// The reader takes what the stream has buffered in blocks, ahead of the
+	/// event it returns: nothing else reads the stream while the reader is
+	/// used.
 {
 public:
 	static constexpr std::size_t DEFAULT_MAX_EVENT_SIZE = DEFAULT_MAX_MESSAGE_SIZE;
@@ -101,8 +105,9 @@ private:
 	};
 
 	LineResult readLine(std::string& line);
+	bool fill();
 	void beforeRead();
-	void append(std::string& line, int c) const;
+	void append(std::string& line, const char* pText, std::size_t size) const;
 
 	std::istream& _in;
 	std::size_t _maxEventSize;
@@ -113,6 +118,12 @@ private:
 	bool _ended;
 	bool _cut;
 	int _bomBytes;
+	char _buffer[8192];
+	std::size_t _begin;
+	std::size_t _end;
+		/// What the reader took from the stream and has not used yet:
+		/// _buffer[_begin, _end).
+	std::string _line;
 };
 
 
