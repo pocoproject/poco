@@ -29,37 +29,37 @@ namespace Poco::Data::PostgreSQL {
 /// Oid constants duplicated from PostgreSQL "include/postgresql/server/catalog/pg_type.h"
 /// because PostgreSQL compile time definitions are too onerous to reproduce for this module
 
-const Oid INVALIDOID     = 0;
+inline constexpr Oid INVALIDOID     = 0;
 
-const Oid BOOLOID        = 16;
+inline constexpr Oid BOOLOID        = 16;
 
-const Oid INT2OID        = 21;
-const Oid INT4OID        = 23;
-const Oid INT8OID        = 20;
+inline constexpr Oid INT2OID        = 21;
+inline constexpr Oid INT4OID        = 23;
+inline constexpr Oid INT8OID        = 20;
 
-const Oid FLOAT8OID      = 701; // double
-const Oid FLOAT4OID      = 700;
-const Oid NUMERICOID     = 1700;
+inline constexpr Oid FLOAT8OID      = 701; // double
+inline constexpr Oid FLOAT4OID      = 700;
+inline constexpr Oid NUMERICOID     = 1700;
 
-const Oid CHAROID        = 18;
-const Oid BPCHAROID      = 1042; // fixed length char
-const Oid VARCHAROID     = 1043;
+inline constexpr Oid CHAROID        = 18;
+inline constexpr Oid BPCHAROID      = 1042; // fixed length char
+inline constexpr Oid VARCHAROID     = 1043;
 
-const Oid BYTEAOID       = 17; // BLOB
-const Oid TEXTOID        = 25; // CLOB
+inline constexpr Oid BYTEAOID       = 17; // BLOB
+inline constexpr Oid TEXTOID        = 25; // CLOB
 
-const Oid DATEOID        = 1082;
-const Oid TIMEOID        = 1083;
-const Oid TIMETZOID      = 1266;
-const Oid TIMESTAMPOID   = 1114;
-const Oid TIMESTAMPTZOID = 1184;
+inline constexpr Oid DATEOID        = 1082;
+inline constexpr Oid TIMEOID        = 1083;
+inline constexpr Oid TIMETZOID      = 1266;
+inline constexpr Oid TIMESTAMPOID   = 1114;
+inline constexpr Oid TIMESTAMPTZOID = 1184;
 
 // future use
-const Oid BITOID         = 1560;
-const Oid VARYBITOID     = 1562;
-const Oid CASHOID        = 790;
-const Oid MACADDROID     = 829;
-const Oid UUIDOID        = 2950;
+inline constexpr Oid BITOID         = 1560;
+inline constexpr Oid VARYBITOID     = 1562;
+inline constexpr Oid CASHOID        = 790;
+inline constexpr Oid MACADDROID     = 829;
+inline constexpr Oid UUIDOID        = 2950;
 
 
 [[nodiscard]] Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID);
