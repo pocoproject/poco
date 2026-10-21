@@ -281,8 +281,9 @@ option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PDF "Enable PDF" OFF)
 
-if(POCO_ENABLE_CPP20)
-	option(ENABLE_MODULES "Build Poco.* C++ modules" OFF)
+option(ENABLE_MODULES "Build Poco.* C++ modules (requires C++20 and CMake 3.28+)" OFF)
+if(ENABLE_MODULES AND NOT CXX20_COMPILER)
+	message(FATAL_ERROR "ENABLE_MODULES requires a C++20 compiler.")
 endif()
 
 option(ENABLE_BENCHMARK

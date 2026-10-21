@@ -27,16 +27,7 @@ function(check_for_cxx17_compiler _VAR)
     set(${_VAR} PARENT_SCOPE)
     try_compile(_COMPILER_TEST_RESULT ${PROJECT_BINARY_DIR} ${_test_source} CMAKE_FLAGS -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON)
     if(NOT _COMPILER_TEST_RESULT AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        try_compile(
-            _COMPILER_TEST_RESULT ${PROJECT_BINARY_DIR} ${_test_source}
-            CMAKE_FLAGS
-                -DCMAKE_CXX_FLAGS="-stdlib=libc++" -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON
-        )
-        if(_COMPILER_TEST_RESULT)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-        else()
-            message(STATUS "To enable C++17 install libc++ standard library from https://libcxx.llvm.org/")
-        endif()
+        message(STATUS "C++17 with the default standard library failed; to use libc++, configure with -DCMAKE_CXX_FLAGS=-stdlib=libc++")
     endif()
 
     if(_COMPILER_TEST_RESULT AND ((MSVC AND (MSVC14)) OR
