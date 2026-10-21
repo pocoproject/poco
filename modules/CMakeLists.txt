@@ -23,6 +23,10 @@ if(ENABLE_ACTIVERECORD)
 	poco_modules_add(ENABLE_ACTIVERECORD ActiveRecord Poco/ActiveRecord.cppm)
 endif()
 
+if(ENABLE_CODEGENERATION)
+	poco_modules_add(ENABLE_CODEGENERATION CodeGeneration Poco/CodeGeneration.cppm)
+endif()
+
 if(ENABLE_CRYPTO)
 	poco_modules_add(ENABLE_CRYPTO Crypto Poco/Crypto.cppm)
 endif()
@@ -63,6 +67,10 @@ if(ENABLE_DNSSD)
 	endif()
 endif()
 
+if(ENABLE_GEO)
+	poco_modules_add(ENABLE_GEO Geo Poco/Geo.cppm)
+endif()
+
 if(ENABLE_JSON)
 	poco_modules_add(ENABLE_JSON JSON Poco/JSON.cppm)
 endif()
@@ -97,6 +105,38 @@ if(ENABLE_REDIS)
 	poco_modules_add(ENABLE_REDIS Redis Poco/Redis.cppm)
 endif()
 
+if(ENABLE_REMOTINGNG)
+	poco_modules_add(ENABLE_REMOTINGNG RemotingNG Poco/RemotingNG.cppm)
+
+	if(ENABLE_REMOTINGNG_HTTP)
+		poco_modules_add(ENABLE_REMOTINGNG_HTTP RemotingNGHTTP Poco/RemotingNG/HTTP.cppm)
+	endif()
+
+	if(ENABLE_REMOTINGNG_JSONRPC)
+		poco_modules_add(ENABLE_REMOTINGNG_JSONRPC RemotingNGJSONRPC Poco/RemotingNG/JSONRPC.cppm)
+	endif()
+
+	if(ENABLE_REMOTINGNG_REST)
+		poco_modules_add(ENABLE_REMOTINGNG_REST RemotingNGREST Poco/RemotingNG/REST.cppm)
+	endif()
+
+	if(ENABLE_REMOTINGNG_SOAP)
+		poco_modules_add(ENABLE_REMOTINGNG_SOAP RemotingNGSOAP Poco/RemotingNG/SOAP.cppm)
+	endif()
+
+	if(ENABLE_REMOTINGNG_TCP)
+		poco_modules_add(ENABLE_REMOTINGNG_TCP RemotingNGTCP Poco/RemotingNG/TCP.cppm)
+	endif()
+endif()
+
+if(ENABLE_SSH)
+	poco_modules_add(ENABLE_SSH SSH Poco/SSH.cppm)
+endif()
+
+if(ENABLE_SERIAL)
+	poco_modules_add(ENABLE_SERIAL Serial Poco/Serial.cppm)
+endif()
+
 if(ENABLE_SEVENZIP)
 	poco_modules_add(ENABLE_SEVENZIP SevenZip Poco/SevenZip.cppm)
 endif()
@@ -107,6 +147,18 @@ endif()
 
 if(ENABLE_XML)
 	poco_modules_add(ENABLE_XML XML Poco/XML.cppm)
+endif()
+
+if(ENABLE_XSD_PARSER)
+	poco_modules_add(ENABLE_XSD_PARSER XSDParser Poco/XSD/Parser.cppm)
+endif()
+
+if(ENABLE_XSD_TYPES)
+	poco_modules_add(ENABLE_XSD_TYPES XSDTypes Poco/XSD/Types.cppm)
+endif()
+
+if(ENABLE_XSD_VALIDATOR)
+	poco_modules_add(ENABLE_XSD_VALIDATOR XSDValidator Poco/XSD/Validator.cppm)
 endif()
 
 if(ENABLE_ZIP)
