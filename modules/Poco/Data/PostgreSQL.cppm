@@ -53,6 +53,30 @@ export namespace Poco::Data::PostgreSQL {
 	using Poco::Data::PostgreSQL::InputParameterVector;
 	using Poco::Data::PostgreSQL::OutputParameterVector;
 	using Poco::Data::PostgreSQL::SessionParametersMap;
+
+	using Poco::Data::PostgreSQL::BITOID;
+	using Poco::Data::PostgreSQL::BOOLOID;
+	using Poco::Data::PostgreSQL::BPCHAROID;
+	using Poco::Data::PostgreSQL::BYTEAOID;
+	using Poco::Data::PostgreSQL::CASHOID;
+	using Poco::Data::PostgreSQL::CHAROID;
+	using Poco::Data::PostgreSQL::DATEOID;
+	using Poco::Data::PostgreSQL::FLOAT4OID;
+	using Poco::Data::PostgreSQL::FLOAT8OID;
+	using Poco::Data::PostgreSQL::INT2OID;
+	using Poco::Data::PostgreSQL::INT4OID;
+	using Poco::Data::PostgreSQL::INT8OID;
+	using Poco::Data::PostgreSQL::INVALIDOID;
+	using Poco::Data::PostgreSQL::MACADDROID;
+	using Poco::Data::PostgreSQL::NUMERICOID;
+	using Poco::Data::PostgreSQL::TEXTOID;
+	using Poco::Data::PostgreSQL::TIMEOID;
+	using Poco::Data::PostgreSQL::TIMESTAMPOID;
+	using Poco::Data::PostgreSQL::TIMESTAMPTZOID;
+	using Poco::Data::PostgreSQL::TIMETZOID;
+	using Poco::Data::PostgreSQL::UUIDOID;
+	using Poco::Data::PostgreSQL::VARCHAROID;
+	using Poco::Data::PostgreSQL::VARYBITOID;
 	
 	using Poco::Data::PostgreSQL::oidToColumnDataType;
 	#endif

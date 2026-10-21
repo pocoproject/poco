@@ -82,3 +82,11 @@ export namespace Poco::Crypto {
 	using Poco::Crypto::uninitializeCrypto;
 	#endif
 }
+
+#ifdef ENABLE_CRYPTO
+export using ::RSAPaddingMode;
+
+export using ::RSA_PADDING_NONE;
+export using ::RSA_PADDING_PKCS1;
+export using ::RSA_PADDING_PKCS1_OAEP;
+#endif

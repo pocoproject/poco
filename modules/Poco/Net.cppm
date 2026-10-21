@@ -30,7 +30,7 @@ module;
 #include "Poco/Net/EscapeHTMLStream.h"
 #include "Poco/Net/FilePartSource.h"
 #include "Poco/Net/FTPClientSession.h"
-#ifdef ENABLE_SSL_OPENSSL
+#ifdef ENABLE_NETSSL_OPENSSL
 #include "Poco/Net/FTPSClientSession.h"
 #include "Poco/Net/FTPSStreamFactory.h"
 #endif
@@ -52,6 +52,9 @@ module;
 #include "Poco/Net/HTTPIOStream.h"
 #include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/HTTPNTLMCredentials.h"
+#include "Poco/Net/HTTPObserver.h"
+#include "Poco/Net/HTTPReactorServer.h"
+#include "Poco/Net/HTTPReactorServerSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPRequestHandler.h"
@@ -77,6 +80,11 @@ module;
 #endif
 #include "Poco/Net/HTTPStreamFactory.h"
 #include "Poco/Net/HTTPStream.h"
+#ifdef ENABLE_NETSSL_WIN
+// wincrypt.h, included by the NetSSL_Win headers above, defines TIMESTAMP_REQUEST,
+// which is an enumerator of ICMPv4PacketImpl::MessageType
+#undef TIMESTAMP_REQUEST
+#endif
 #include "Poco/Net/ICMPClient.h"
 #include "Poco/Net/ICMPEventArgs.h"
 #include "Poco/Net/ICMPPacket.h"
@@ -175,6 +183,9 @@ module;
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Net/StringPartSource.h"
+#include "Poco/Net/TCPReactorAcceptor.h"
+#include "Poco/Net/TCPReactorServerConnection.h"
+#include "Poco/Net/TCPReactorServer.h"
 #include "Poco/Net/TCPServerConnectionFactory.h"
 #include "Poco/Net/TCPServerConnection.h"
 #include "Poco/Net/TCPServerDispatcher.h"
@@ -209,6 +220,7 @@ export namespace Poco::Net {
 	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	#ifdef ENABLE_NETSSL_WIN
 	using Poco::Net::AutoSecBufferDesc;
+	using Poco::Net::CertificateException;
 	#endif
 	using Poco::Net::CertificateHandlerFactory;
 	using Poco::Net::CertificateHandlerFactoryImpl;
@@ -270,7 +282,10 @@ export namespace Poco::Net {
 	using Poco::Net::HTTPInputStream;
 	using Poco::Net::HTTPMessage;
 	using Poco::Net::HTTPNTLMCredentials;
+	using Poco::Net::HTTPObserver;
 	using Poco::Net::HTTPOutputStream;
+	using Poco::Net::HTTPReactorServer;
+	using Poco::Net::HTTPReactorServerSession;
 	using Poco::Net::HTTPRequest;
 	using Poco::Net::HTTPRequestHandler;
 	using Poco::Net::HTTPRequestHandlerFactory;
@@ -294,9 +309,7 @@ export namespace Poco::Net {
 	using Poco::Net::HTTPServerSession;
 	using Poco::Net::HTTPSession;
 	using Poco::Net::HTTPSessionFactory;
-	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
-	using Poco::Net::HTTPSSessionInstantiator;
-	#endif
+	using Poco::Net::HTTPSessionInstantiator;
 	using Poco::Net::HTTPStreamBuf;
 	using Poco::Net::HTTPStreamFactory;
 	using Poco::Net::HostEntry;
@@ -332,7 +345,10 @@ export namespace Poco::Net {
 	using Poco::Net::MediaType;
 	using Poco::Net::MessageException;
 	using Poco::Net::MessageHeader;
+	using Poco::Net::MultiSocketPoller;
+	#ifdef POCO_NET_HAS_INTERFACE
 	using Poco::Net::MulticastSocket;
+	#endif
 	using Poco::Net::MultipartException;
 	using Poco::Net::MultipartIOS;
 	using Poco::Net::MultipartInputStream;
@@ -348,8 +364,13 @@ export namespace Poco::Net {
 	using Poco::Net::NTPPacket;
 	using Poco::Net::NameValueCollection;
 	using Poco::Net::NetException;
+	#ifdef POCO_NET_HAS_INTERFACE
 	using Poco::Net::NetworkInterface;
+	#endif
 	using Poco::Net::NoAddressFoundException;
+	#ifdef ENABLE_NETSSL_WIN
+	using Poco::Net::NoCertificateException;
+	#endif
 	using Poco::Net::NoMessageException;
 	using Poco::Net::NotAuthenticatedException;
 	using Poco::Net::NullPartHandler;
@@ -371,9 +392,11 @@ export namespace Poco::Net {
 	using Poco::Net::PrivateKeyFactoryRegistrar;
 	using Poco::Net::PrivateKeyPassphraseHandler;
 	#endif
+	using Poco::Net::ProxyAuthentication;
+	using Poco::Net::ProxyConfig;
 	using Poco::Net::QuotedPrintableDecoder;
 	using Poco::Net::QuotedPrintableDecoderBuf;
-	using Poco::Net::QuotedPrintableEncoderIOS;
+	using Poco::Net::QuotedPrintableDecoderIOS;
 	using Poco::Net::QuotedPrintableEncoder;
 	using Poco::Net::QuotedPrintableEncoderBuf;
 	using Poco::Net::QuotedPrintableEncoderIOS;
@@ -395,6 +418,7 @@ export namespace Poco::Net {
 	using Poco::Net::SSLManager;
 	#endif
 	using Poco::Net::SSPINTLMCredentials;
+	using Poco::Net::ScopedSocketReactor;
 	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
 	using Poco::Net::SecureRemoteSyslogChannel;
 	using Poco::Net::SecureRemoteSyslogListener;
@@ -402,6 +426,7 @@ export namespace Poco::Net {
 	using Poco::Net::SecureServerSocket;
 	using Poco::Net::SecureServerSocketImpl;
 	using Poco::Net::SecureStreamSocket;
+	using Poco::Net::SecureStreamSocketImpl;
 	using Poco::Net::SecureSocketImpl;
 	#endif
 	using Poco::Net::ServerSocket;
@@ -411,6 +436,7 @@ export namespace Poco::Net {
 	using Poco::Net::Session;
 	#endif
 	using Poco::Net::ShutdownNotification;
+	using Poco::Net::SingleSocketPoller;
 	using Poco::Net::Socket;
 	using Poco::Net::SocketAcceptor;
 	using Poco::Net::SocketAddress;
@@ -428,6 +454,9 @@ export namespace Poco::Net {
 	using Poco::Net::StreamSocket;
 	using Poco::Net::StreamSocketImpl;
 	using Poco::Net::StringPartSource;
+	using Poco::Net::TCPReactorAcceptor;
+	using Poco::Net::TCPReactorServer;
+	using Poco::Net::TCPReactorServerConnection;
 	using Poco::Net::TCPServer;
 	using Poco::Net::TCPServerConnection;
 	using Poco::Net::TCPServerConnectionFactory;
@@ -437,6 +466,8 @@ export namespace Poco::Net {
 	using Poco::Net::TCPServerParams;
 	using Poco::Net::TimeoutNotification;
 	using Poco::Net::UDPClient;
+	using Poco::Net::UDPHandlerImpl;
+	using Poco::Net::UDPServerImpl;
 	using Poco::Net::UDPServerParams;
 	using Poco::Net::UDPSocketReader;
 	using Poco::Net::UnsupportedFamilyException;
@@ -453,7 +484,16 @@ export namespace Poco::Net {
 	using Poco::Net::X509Certificate;
 	#endif
 
+	using Poco::Net::AcceptCallback;
+	using Poco::Net::CloseCallback;
+	using Poco::Net::RecvMessageCallback;
+	#if defined(POCO_OS_FAMILY_WINDOWS) || defined(POCO_OS_FAMILY_UNIX)
+	using Poco::Net::SocketBuf;
+	#endif
 	using Poco::Net::SocketBufVec;
+	using Poco::Net::TcpReactorConnectionPtr;
+	using Poco::Net::TimeoutCallback;
+	using Poco::Net::UDPHandler;
 	using Poco::Net::UDPMsgSizeT;
 	
 	using Poco::Net::HTTPBasicStreamBuf;
@@ -478,10 +518,18 @@ export namespace Poco::Net {
 		using Poco::Net::Impl::IPAddressImpl;
 		using Poco::Net::Impl::IPv4AddressImpl;
 		using Poco::Net::Impl::IPv4SocketAddressImpl;
+		#ifdef POCO_HAVE_IPv6
 		using Poco::Net::Impl::IPv6AddressImpl;
 		using Poco::Net::Impl::IPv6SocketAddressImpl;
+		#endif
+		#ifdef POCO_HAS_UNIX_SOCKET
 		using Poco::Net::Impl::LocalSocketAddressImpl;
+		#endif
 		using Poco::Net::Impl::SocketAddressImpl;
 	}
 	#endif
 }
+
+#if defined(ENABLE_NET) && defined(POCO_NET_HAS_INTERFACE)
+export using ::operator<<;
+#endif

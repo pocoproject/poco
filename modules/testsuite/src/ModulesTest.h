@@ -13,7 +13,6 @@
 #ifndef ModulesTest_INCLUDED
 #define ModulesTest_INCLUDED
 
-#include <print>
 #include <string>
 
 #include "CppUnit/TestCase.h"
@@ -24,7 +23,33 @@ public:
 	ModulesTest(const std::string& name);
 	~ModulesTest();
 
-	void testModule();
+	void testFoundation();
+	void testEncodings();
+	void testXML();
+	void testJSON();
+	void testUtil();
+	void testNet();
+	void testNetSSL();
+	void testCrypto();
+	void testJWT();
+	void testData();
+	void testSQLite();
+	void testODBC();
+	void testMongoDB();
+	void testRedis();
+	void testPrometheus();
+	void testZip();
+	void testPDF();
+	void testDNSSD();
+	void testCppParser();
+	void testSevenZip();
+	void testActiveRecord();
+	void testSSH();
+	void testCodeGeneration();
+	void testRemotingNG();
+	void testXSD();
+	void testGeo();
+	void testSerial();
 
 	static CppUnit::Test* suite();
 };

@@ -15,6 +15,10 @@ module;
 #include "Poco/Data/SQLite/Binder.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Extractor.h"
+#ifndef POCO_DATA_NO_SQL_PARSER
+#include "Poco/Data/SQLite/MemoryDB.h"
+#include "Poco/Data/SQLite/MemoryDBInspector.h"
+#endif
 #include "Poco/Data/SQLite/Notifier.h"
 #include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
@@ -45,6 +49,10 @@ export namespace Poco::Data::SQLite {
 	using Poco::Data::SQLite::InvalidLibraryUseException;
 	using Poco::Data::SQLite::InvalidSQLStatementException;
 	using Poco::Data::SQLite::LockProtocolException;
+	#ifndef POCO_DATA_NO_SQL_PARSER
+	using Poco::Data::SQLite::MemoryDB;
+	using Poco::Data::SQLite::MemoryDBInspector;
+	#endif
 	using Poco::Data::SQLite::NoMemoryException;
 	using Poco::Data::SQLite::Notifier;
 	using Poco::Data::SQLite::OSFeaturesMissingException;

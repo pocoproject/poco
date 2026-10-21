@@ -57,6 +57,7 @@ export namespace Poco::CppParser {
 	using Poco::CppParser::Struct;
 	using Poco::CppParser::Symbol;
 	using Poco::CppParser::Tokenizer;
+	using Poco::CppParser::TypeAlias;
 	using Poco::CppParser::TypeDef;
 	using Poco::CppParser::Utility;
 	using Poco::CppParser::Variable;

@@ -98,6 +98,7 @@ module;
 #include "Poco/Expire.h"
 #include "Poco/ExpireLRUCache.h"
 #include "Poco/ExpireStrategy.h"
+#include "Poco/FastLogger.h"
 #include "Poco/FIFOBuffer.h"
 #include "Poco/FIFOBufferStream.h"
 #include "Poco/FileChannel.h"
@@ -121,6 +122,7 @@ module;
 #include "Poco/HMACEngine.h"
 #include "Poco/InflatingStream.h"
 #include "Poco/Instantiator.h"
+#include "Poco/IOLock.h"
 #ifdef ENABLE_ENCODINGS
 #include "Poco/ISO8859_10Encoding.h"
 #include "Poco/ISO8859_11Encoding.h"
@@ -152,6 +154,7 @@ module;
 #include "Poco/LogStream.h"
 #include "Poco/LRUCache.h"
 #include "Poco/LRUStrategy.h"
+#ifdef ENABLE_ENCODINGS
 #include "Poco/MacCentralEurRomanEncoding.h"
 #include "Poco/MacChineseSimpEncoding.h"
 #include "Poco/MacChineseTradEncoding.h"
@@ -159,6 +162,7 @@ module;
 #include "Poco/MacJapaneseEncoding.h"
 #include "Poco/MacKoreanEncoding.h"
 #include "Poco/MacRomanEncoding.h"
+#endif
 #include "Poco/Manifest.h"
 #include "Poco/MD4Engine.h"
 #include "Poco/MD5Engine.h"
@@ -167,6 +171,7 @@ module;
 #include "Poco/Message.h"
 #include "Poco/MetaObject.h"
 #include "Poco/MetaProgramming.h"
+#include "Poco/MPSCQueue.h"
 #include "Poco/Mutex.h"
 #include "Poco/NamedEvent.h"
 #include "Poco/NamedMutex.h"
@@ -185,6 +190,8 @@ module;
 #include "Poco/NumericString.h"
 #include "Poco/ObjectPool.h"
 #include "Poco/Optional.h"
+#include "Poco/OrderedMap.h"
+#include "Poco/OrderedSet.h"
 #include "Poco/Path.h"
 #include "Poco/PatternFormatter.h"
 #include "Poco/PBKDF2Engine.h"
@@ -223,6 +230,7 @@ module;
 #include "Poco/SingletonHolder.h"
 #include "Poco/SortedDirectoryIterator.h"
 #include "Poco/SplitterChannel.h"
+#include "Poco/SPSCQueue.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/StrategyCollection.h"
 #include "Poco/StreamChannel.h"
@@ -255,6 +263,8 @@ module;
 #include "Poco/Token.h"
 #include "Poco/Tuple.h"
 #include "Poco/Types.h"
+#include "Poco/ULIDGenerator.h"
+#include "Poco/ULID.h"
 #include "Poco/UnbufferedStreamBuf.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Unicode.h"
@@ -276,20 +286,24 @@ module;
 #include "Poco/UUID.h"
 #include "Poco/ValidArgs.h"
 #include "Poco/Void.h"
+#ifdef ENABLE_ENCODINGS
 #include "Poco/Windows874Encoding.h"
 #include "Poco/Windows932Encoding.h"
 #include "Poco/Windows936Encoding.h"
 #include "Poco/Windows949Encoding.h"
 #include "Poco/Windows950Encoding.h"
+#endif
 #include "Poco/Windows1250Encoding.h"
 #include "Poco/Windows1251Encoding.h"
 #include "Poco/Windows1252Encoding.h"
+#ifdef ENABLE_ENCODINGS
 #include "Poco/Windows1253Encoding.h"
 #include "Poco/Windows1254Encoding.h"
 #include "Poco/Windows1255Encoding.h"
 #include "Poco/Windows1256Encoding.h"
 #include "Poco/Windows1257Encoding.h"
 #include "Poco/Windows1258Encoding.h"
+#endif
 #ifdef _WIN32
 #include "Poco/WindowsConsoleChannel.h"
 #endif
@@ -349,12 +363,14 @@ export namespace Poco {
 	using Poco::Base32Encoder;
 	using Poco::Base32EncoderBuf;
 	using Poco::Base32EncoderIOS;
+	using Poco::Base32EncodingOptions;
 	using Poco::Base64Decoder;
 	using Poco::Base64DecoderBuf;
 	using Poco::Base64DecoderIOS;
 	using Poco::Base64Encoder;
 	using Poco::Base64EncoderBuf;
 	using Poco::Base64EncoderIOS;
+	using Poco::Base64EncodingOptions;
 	using Poco::BasicBufferedBidirectionalStreamBuf;
 	using Poco::BasicBufferedStreamBuf;
 	using Poco::BasicEvent;
@@ -388,6 +404,7 @@ export namespace Poco {
 	using Poco::CreateFileException;
 	using Poco::DataException;
 	using Poco::DataFormatException;
+	using Poco::DataNotification;
 	using Poco::DataURIStream;
 	using Poco::DataURIStreamFactory;
 	using Poco::DataURIStreamIOS;
@@ -410,7 +427,9 @@ export namespace Poco {
 	using Poco::DirectoryIterator;
 	using Poco::DirectoryIteratorImpl;
 	using Poco::DirectoryNotEmptyException;
+	#ifndef POCO_NO_INOTIFY
 	using Poco::DirectoryWatcher;
+	#endif
 	#ifdef ENABLE_ENCODINGS
 	using Poco::DoubleByteEncoding;
 	#endif
@@ -438,6 +457,9 @@ export namespace Poco {
 	using Poco::FIFOBufferStreamBuf;
 	using Poco::FIFOIOS;
 	using Poco::FPEnvironment;
+	#ifdef POCO_ENABLE_FASTLOGGER
+	using Poco::FastLogger;
+	#endif
 	using Poco::FastMemoryPool;
 	using Poco::FastMutex;
 	using Poco::File;
@@ -448,8 +470,12 @@ export namespace Poco {
 	using Poco::FileIOS;
 	using Poco::FileImpl;
 	using Poco::FileInputStream;
+	using Poco::FileNotFoundException;
+	using Poco::FileNotReadyException;
+	using Poco::FileOutputStream;
 	using Poco::FileReadOnlyException;
 	using Poco::FileStream;
+	using Poco::FileStreamBuf;
 	using Poco::FileStreamFactory;
 	using Poco::FileStreamRWLock;
 	using Poco::Formatter;
@@ -470,6 +496,7 @@ export namespace Poco {
 	using Poco::HexBinaryEncoderBuf;
 	using Poco::HexBinaryEncoderIOS;
 	using Poco::IOException;
+	using Poco::IOLock;
 	#ifdef ENABLE_ENCODINGS
 	using Poco::ISO8859_3Encoding;
 	using Poco::ISO8859_4Encoding;
@@ -498,6 +525,7 @@ export namespace Poco {
 	using Poco::IsConst;
 	using Poco::IsReference;
 	using Poco::JSONFormatter;
+	using Poco::JSONOptions;
 	using Poco::KeyValueArgs;
 	using Poco::LRUCache;
 	using Poco::LRUStrategy;
@@ -522,6 +550,8 @@ export namespace Poco {
 	using Poco::LogicException;
 	using Poco::MD4Engine;
 	using Poco::MD5Engine;
+	using Poco::MPSCQueue;
+	#ifdef ENABLE_ENCODINGS
 	using Poco::MacCentralEurRomanEncoding;
 	using Poco::MacChineseSimpEncoding;
 	using Poco::MacChineseTradEncoding;
@@ -529,6 +559,7 @@ export namespace Poco {
 	using Poco::MacJapaneseEncoding;
 	using Poco::MacKoreanEncoding;
 	using Poco::MacRomanEncoding;
+	#endif
 	using Poco::Manifest;
 	using Poco::ManifestBase;
 	using Poco::MemoryIOS;
@@ -599,6 +630,7 @@ export namespace Poco {
 	using Poco::ProcessHandle;
 	using Poco::ProcessHandleImpl;
 	using Poco::ProcessImpl;
+	using Poco::ProcessOptions;
 	using Poco::ProcessRunner;
 	using Poco::PropertyNotSupportedException;
 	using Poco::ProtocolException;
@@ -622,7 +654,7 @@ export namespace Poco {
 	using Poco::ReleasePolicy;
 	using Poco::ResourceLimitException;
 	using Poco::RotateAtTimeStrategy;
-	using Poco::RotateByIntervalStrategy;;
+	using Poco::RotateByIntervalStrategy;
 	using Poco::RotateBySizeStrategy;
 	using Poco::RotateStrategy;
 	using Poco::Runnable;
@@ -634,9 +666,11 @@ export namespace Poco {
 	using Poco::SHA2Engine256;
 	using Poco::SHA2Engine384;
 	using Poco::SHA2Engine512;
+	using Poco::SPSCQueue;
 	using Poco::ScopedFStreamRWLock;
 	using Poco::ScopedFStreamReadRWLock;
 	using Poco::ScopedFStreamWriteRWLock;
+	using Poco::ScopedIOLock;
 	using Poco::ScopedLock;
 	using Poco::ScopedLockWithUnlock;
 	using Poco::ScopedRWLock;
@@ -650,7 +684,9 @@ export namespace Poco {
 	using Poco::SharedPtr;
 	using Poco::SiblingsFirstTraverse;
 	using Poco::SignalException;
+	#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	using Poco::SignalHandler;
+	#endif
 	using Poco::SimpleFileChannel;
 	using Poco::SingletonHolder;
 	using Poco::SortedDirectoryIterator;
@@ -689,6 +725,7 @@ export namespace Poco {
 	using Poco::TextEncoding;
 	using Poco::TextIterator;
 	using Poco::Thread;
+	using Poco::ThreadInterruptedException;
 	using Poco::ThreadLocal;
 	using Poco::ThreadLocalStorage;
 	using Poco::ThreadPool;
@@ -704,9 +741,14 @@ export namespace Poco {
 	using Poco::TooManyURIRedirectsException;
 	using Poco::TraverseBase;
 	using Poco::Tuple;
+	using Poco::TypeGetter;
 	using Poco::TypeList;
 	using Poco::TypeListType;
+	using Poco::TypeSizeGT;
+	using Poco::TypeSizeLE;
 	using Poco::TypeWrapper;
+	using Poco::ULID;
+	using Poco::ULIDGenerator;
 	using Poco::URI;
 	using Poco::URIRedirection;
 	using Poco::URIStreamFactory;
@@ -733,17 +775,24 @@ export namespace Poco {
 	using Poco::ValidArgs;
 	using Poco::Void;
 	using Poco::WhitespaceToken;
+	#ifdef ENABLE_ENCODINGS
 	using Poco::Windows874Encoding;
 	using Poco::Windows932Encoding;
 	using Poco::Windows936Encoding;
 	using Poco::Windows949Encoding;
 	using Poco::Windows950Encoding;
+	#endif
 	using Poco::Windows1250Encoding;
 	using Poco::Windows1251Encoding;
 	using Poco::Windows1252Encoding;
+	#ifdef ENABLE_ENCODINGS
 	using Poco::Windows1253Encoding;
 	using Poco::Windows1254Encoding;
+	using Poco::Windows1255Encoding;
 	using Poco::Windows1256Encoding;
+	using Poco::Windows1257Encoding;
+	using Poco::Windows1258Encoding;
+	#endif
 	#ifdef _WIN32
 	using Poco::WindowsColorConsoleChannel;
 	using Poco::WindowsConsoleChannel;
@@ -757,6 +806,9 @@ export namespace Poco {
 	using Poco::MemoryBinaryWriter;
 	using Poco::MemoryStreamBuf;
 	using Poco::NDC;
+	using Poco::NotificationResult;
+	using Poco::OrderedMap;
+	using Poco::OrderedSet;
 	using Poco::SiblingsFirstRecursiveDirectoryIterator;
 	using Poco::SimpleRecursiveDirectoryIterator;
 	using Poco::UTF16Char;
@@ -765,10 +817,9 @@ export namespace Poco {
 	using Poco::UTF32String;
 	using Poco::istring;
 
-	using Poco::BasicBufferedBidirectionalStreamBuf;
+	using Poco::BufferedBidirectionalStreamBuf;
 	using Poco::BufferedStreamBuf;
-	using Poco::DynamicAny;
-	// using Poco::DynamicStruct;
+	using Poco::DynamicStruct;
 	using Poco::Int8;
 	using Poco::Int16;
 	using Poco::Int32;
@@ -776,13 +827,31 @@ export namespace Poco {
 	using Poco::IntPtr;
 	using Poco::LineNumber;
 	using Poco::NullType;
-	// using Poco::OrderedDynamicStruct;
+	using Poco::OrderedDynamicStruct;
 	using Poco::UInt8;
 	using Poco::UInt16;
 	using Poco::UInt32;
 	using Poco::UInt64;
 	using Poco::UIntPtr;
 	using Poco::UnbufferedStreamBuf;
+
+	using Poco::BASE32_NO_PADDING;
+	using Poco::BASE32_USE_CROCKFORD_ALPHABET;
+	using Poco::BASE32_USE_HEX_ALPHABET;
+	using Poco::BASE32_USE_PADDING;
+	using Poco::BASE64_NO_PADDING;
+	using Poco::BASE64_URL_ENCODING;
+	using Poco::JSON_ESCAPE_UNICODE;
+	using Poco::JSON_LOWERCASE_HEX;
+	using Poco::JSON_PRESERVE_KEY_ORDER;
+	using Poco::JSON_WRAP_STRINGS;
+	using Poco::PROCESS_CLOSE_STDERR;
+	using Poco::PROCESS_CLOSE_STDIN;
+	using Poco::PROCESS_CLOSE_STDOUT;
+	using Poco::PROCESS_EXIT_EXEC_FAILED;
+	using Poco::PROCESS_EXIT_SETPGID_FAILED;
+	using Poco::PROCESS_KILL_TREE;
+	using Poco::PROCESS_NEW_GROUP;
 
 	using Poco::AnyCast;
 	using Poco::AnyHoldsNullPtr;
@@ -793,6 +862,7 @@ export namespace Poco {
 	using Poco::decimalSeparator;
 	using Poco::delegate;
 	using Poco::demangle;
+	using Poco::demangleDot;
 	using Poco::doubleToFixedStr;
 	using Poco::doubleToStr;
 	using Poco::endsWith;
@@ -823,8 +893,10 @@ export namespace Poco {
 	using Poco::operator>=;
 	using Poco::operator|;
 	using Poco::operator|=;
-	// using Poco::priorityDelegate;
+	using Poco::priorityDelegate;
+	#ifdef ENABLE_ENCODINGS
 	using Poco::registerExtraEncodings;
+	#endif
 	using Poco::remove;
 	using Poco::removeInPlace;
 	using Poco::replace;
@@ -851,7 +923,6 @@ export namespace Poco {
 	using Poco::trimLeftInPlace;
 	using Poco::trimRight;
 	using Poco::trimRightInPlace;
-	using Poco::uIntToStr;
 
 	namespace Impl {
 		using Poco::Impl::Ptr;
@@ -897,3 +968,9 @@ export namespace Poco {
 		}
 	}
 }
+
+export using ::POCO_FLT_EXP;
+export using ::POCO_FLT_INF;
+export using ::POCO_FLT_NAN;
+export using ::POCO_MAX_FLT_STRING_LEN;
+export using ::POCO_MAX_INT_STRING_LEN;
