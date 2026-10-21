@@ -105,6 +105,11 @@ namespace
 			/// How many tools each call carried.
 		Poco::Event started{Poco::Event::EVENT_MANUALRESET};
 		std::atomic<int> cancelled{0};
+		bool holdListings = false;
+			/// A listing of the models waits for releaseListings, after it set
+			/// listingStarted.
+		Poco::Event listingStarted{Poco::Event::EVENT_MANUALRESET};
+		Poco::Event releaseListings{Poco::Event::EVENT_MANUALRESET};
 
 		std::vector<std::string> listed()
 		{
@@ -143,14 +148,24 @@ namespace
 
 		std::vector<std::string> listModels() override
 		{
-			Poco::FastMutex::ScopedLock lock(_pState->mutex);
-			_pState->listings.push_back(_baseUrl);
-			if (_pState->unreachable.count(_baseUrl) > 0)
+			bool hold = false;
 			{
-				// Named as a socket names the server it cannot reach.
-				const Poco::URI uri(_baseUrl);
-				throw Poco::Net::ConnectionRefusedException(uri.getHost() + ":" + std::to_string(uri.getPort()));
+				Poco::FastMutex::ScopedLock lock(_pState->mutex);
+				_pState->listings.push_back(_baseUrl);
+				if (_pState->unreachable.count(_baseUrl) > 0)
+				{
+					// Named as a socket names the server it cannot reach.
+					const Poco::URI uri(_baseUrl);
+					throw Poco::Net::ConnectionRefusedException(uri.getHost() + ":" + std::to_string(uri.getPort()));
+				}
+				hold = _pState->holdListings;
 			}
+			if (hold)
+			{
+				_pState->listingStarted.set();
+				(void) _pState->releaseListings.tryWait(20000);
+			}
+			Poco::FastMutex::ScopedLock lock(_pState->mutex);
 			return _pState->models;
 		}
 
@@ -1106,6 +1121,78 @@ void ChatServiceTest::testProviderDetail()
 }
 
 
+void ChatServiceTest::testOneProbeAtATime()
+{
+	class Asker: public Poco::Runnable
+		/// Asks the service for the models of its provider in use, or asks
+		/// the provider again.
+	{
+	public:
+		Asker(ChatService& service, bool retry): _service(service), _retry(retry)
+		{
+		}
+
+		void run() override
+		{
+			if (_retry) status = _service.retry("ollama");
+			else models = _service.models();
+		}
+
+		std::vector<std::string> models;
+		ProviderStatus status;
+
+	private:
+		ChatService& _service;
+		bool _retry;
+	};
+
+	// While a caller asks a provider for its models, the others get what is
+	// known, nothing yet here, without asking it again or waiting.
+	auto pState = std::make_shared<FakeState>();
+	pState->holdListings = true;
+	ProviderSettings ollama = entry("ollama", true);
+	ollama.baseUrl = "http://[server]:11434/v1";
+	ollama.servers = {"a"};
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({ollama}), fakeParams(pState));
+	Asker lister(service, false);
+	Poco::Thread thread;
+	thread.start(lister);
+	assertTrue(pState->listingStarted.tryWait(10000));
+	assertTrue(service.models().empty());
+	assertTrue(!service.retry("ollama").probed);
+	assertEqual(1u, static_cast<unsigned>(pState->listed().size()));
+	pState->releaseListings.set();
+	thread.join();
+	assertTrue(lister.models == std::vector<std::string>({"m1", "m2"}));
+	// What the one caller learnt serves the others.
+	assertTrue(service.models() == std::vector<std::string>({"m1", "m2"}));
+	assertEqual(1u, static_cast<unsigned>(pState->listed().size()));
+
+	// A turn that needs the server of its provider, while another caller
+	// looks for it, ends at once.
+	auto pFixedState = std::make_shared<FakeState>();
+	pFixedState->holdListings = true;
+	ollama.models = {"m1"};
+	ChatService fixed(std::make_shared<ToolRegistry>(), settingsOf({ollama}), fakeParams(pFixedState));
+	Asker retrier(fixed, true);
+	Poco::Thread retryThread;
+	retryThread.start(retrier);
+	assertTrue(pFixedState->listingStarted.tryWait(10000));
+	Array conversation = conversationOf("hi");
+	Events refused;
+	fixed.chat(conversation, who("alice"), "c1", refused.sink());
+	assertEqual(std::string("error,done"), refused.types());
+	assertTrue(refused.list[0]->getValue<std::string>("content").find("being asked") != std::string::npos);
+	pFixedState->releaseListings.set();
+	retryThread.join();
+	assertTrue(retrier.status.reachable);
+	Events answered;
+	fixed.chat(conversation, who("alice"), "c2", answered.sink());
+	assertEqual(std::string("text,done"), answered.types());
+	assertEqual(1u, static_cast<unsigned>(pFixedState->listed().size()));
+}
+
+
 void ChatServiceTest::testDefaultProvider()
 {
 	// The default factory: an Ollama server through the OpenAI API, found
@@ -1498,6 +1585,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testModels);
 	CppUnit_addTest(pSuite, ChatServiceTest, testFailover);
 	CppUnit_addTest(pSuite, ChatServiceTest, testProviderDetail);
+	CppUnit_addTest(pSuite, ChatServiceTest, testOneProbeAtATime);
 	CppUnit_addTest(pSuite, ChatServiceTest, testCancel);
 	CppUnit_addTest(pSuite, ChatServiceTest, testCancelOwnTurn);
 	CppUnit_addTest(pSuite, ChatServiceTest, testSelect);

@@ -28,6 +28,7 @@ public:
 	void testModels();
 	void testFailover();
 	void testProviderDetail();
+	void testOneProbeAtATime();
 	void testCancel();
 	void testCancelOwnTurn();
 	void testSelect();

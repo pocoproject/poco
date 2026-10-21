@@ -35,6 +35,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -185,7 +186,9 @@ public:
 		/// Returns the models of the provider in use: its list, else what it
 		/// listed itself, which is asked for when the service has none or the
 		/// one it has is older than modelsLifetime. A provider that did not
-		/// answer is asked again after ten seconds at the earliest.
+		/// answer is asked again after ten seconds at the earliest. One caller
+		/// at a time asks a provider: the others get what is known meanwhile,
+		/// maybe nothing, without waiting.
 
 	[[nodiscard]] std::vector<std::string> models(const std::string& provider);
 		/// Returns the models of a provider, as models() does for the one in
@@ -207,7 +210,8 @@ public:
 
 	ProviderStatus retry(const std::string& name);
 		/// Asks the provider for its models now, with failover among its
-		/// servers, and returns what came of it.
+		/// servers, and returns what came of it; while another caller asks
+		/// the provider, the status known so far.
 		///
 		/// Throws Poco::NotFoundException if the provider is not enabled.
 
@@ -290,6 +294,7 @@ private:
 	std::string keyOf(const ProviderSettings& settings) const;
 	std::shared_ptr<LLMProvider> createProvider(const ProviderSettings& settings, const std::string& baseUrl, const std::string& model, const Poco::Timespan& timeout) const;
 	std::vector<std::string> modelsOf(const std::string& name, bool refresh);
+	std::optional<ProviderStatus> probeOnce(const ProviderSettings& settings, Poco::UInt64 generation, std::string& server, std::vector<std::string>& models);
 	void connectionFailed(const std::string& name, const std::string& detail);
 	Poco::Timespan probeTimeoutOf(const ProviderSettings& settings) const;
 
@@ -306,6 +311,9 @@ private:
 		/// name, base URL and servers: where the key of its environment goes.
 	Poco::UInt64 _generation = 0;
 	std::map<std::string, Runtime> _runtime;
+	std::set<std::string> _probing;
+		/// The providers a caller asks for their models now: no other caller
+		/// asks them meanwhile.
 	Poco::FastMutex _turnsMutex;
 	std::vector<Turn> _turns;
 };

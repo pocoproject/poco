@@ -186,11 +186,15 @@ void ChatService::chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Ide
 		if (server.empty())
 		{
 			std::vector<std::string> models;
-			const ProviderStatus status = probe(*settings, server, models);
-			record(settings->name, generation, status, server, models);
-			if (!status.reachable)
+			const std::optional<ProviderStatus> status = probeOnce(*settings, generation, server, models);
+			if (!status)
 			{
-				refuse("No server of the provider " + settings->name + " answers: " + status.detail);
+				refuse("The servers of the provider " + settings->name + " are being asked which one answers; try again");
+				return;
+			}
+			if (!status->reachable)
+			{
+				refuse("No server of the provider " + settings->name + " answers: " + status->detail);
 				return;
 			}
 		}
@@ -351,9 +355,15 @@ ProviderStatus ChatService::retry(const std::string& name)
 	if (!settings || !settings->enabled) throw Poco::NotFoundException("No enabled provider of that name", name);
 	std::string server;
 	std::vector<std::string> models;
-	const ProviderStatus status = probe(*settings, server, models);
-	record(name, generation, status, server, models);
-	return status;
+	const std::optional<ProviderStatus> status = probeOnce(*settings, generation, server, models);
+	if (status) return *status;
+	// Another caller asks the provider now.
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	const auto it = _runtime.find(name);
+	if (it != _runtime.end()) return it->second.status;
+	ProviderStatus known;
+	known.name = name;
+	return known;
 }
 
 
@@ -740,9 +750,39 @@ std::vector<std::string> ChatService::modelsOf(const std::string& name, bool ref
 	}
 	std::string server;
 	std::vector<std::string> models;
-	const ProviderStatus status = probe(*settings, server, models);
-	record(name, generation, status, server, models);
+	if (!probeOnce(*settings, generation, server, models))
+	{
+		// Another caller asks the provider now: what is known meanwhile.
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		const auto it = _runtime.find(name);
+		return it != _runtime.end() ? it->second.models : std::vector<std::string>();
+	}
 	return models;
+}
+
+
+std::optional<ProviderStatus> ChatService::probeOnce(const ProviderSettings& settings, Poco::UInt64 generation, std::string& server, std::vector<std::string>& models)
+	/// Asks the provider for its models and records the answer, unless
+	/// another caller asks it already: then it returns nothing at once.
+{
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		if (!_probing.insert(settings.name).second) return std::nullopt;
+	}
+	struct Release
+	{
+		ChatService& service;
+		const std::string& name;
+
+		~Release()
+		{
+			Poco::FastMutex::ScopedLock lock(service._mutex);
+			service._probing.erase(name);
+		}
+	} release{*this, settings.name};
+	const ProviderStatus status = probe(settings, server, models);
+	record(settings.name, generation, status, server, models);
+	return status;
 }
 
 
