@@ -141,18 +141,14 @@ inline bool RowIterator::operator != (const RowIterator& other) const
 }
 
 
-} // namespace Poco::Data
-
-
-namespace std
+inline void swap(RowIterator& it1, RowIterator& it2) noexcept
+	/// Swaps it1 with it2.
 {
-	template <>
-	inline void swap<Poco::Data::RowIterator>(Poco::Data::RowIterator& s1, Poco::Data::RowIterator& s2) noexcept
-		/// Full template specalization of std:::swap for RowIterator
-	{
-		s1.swap(s2);
-	}
+	it1.swap(it2);
 }
+
+
+} // namespace Poco::Data
 
 
 #endif // Data_RowIterator_INCLUDED

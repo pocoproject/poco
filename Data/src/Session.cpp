@@ -92,7 +92,7 @@ Session& Session::operator = (Session&& other) noexcept
 }
 
 
-void Session::swap(Session& other)
+void Session::swap(Session& other) noexcept
 {
 	using std::swap;
 	swap(_statementCreator, other._statementCreator);

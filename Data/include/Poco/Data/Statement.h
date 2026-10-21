@@ -997,23 +997,13 @@ inline const RowFormatter::Ptr& Statement::getRowFormatter()
 
 
 inline void swap(Statement& s1, Statement& s2) noexcept
+	/// Swaps s1 with s2.
 {
 	s1.swap(s2);
 }
 
 
 } // namespace Poco::Data
-
-
-namespace std
-{
-	template<>
-	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1, Poco::Data::Statement& s2) noexcept
-		/// Full template specalization of std:::swap for Statement
-	{
-		s1.swap(s2);
-	}
-}
 
 
 #endif // Data_Statement_INCLUDED
