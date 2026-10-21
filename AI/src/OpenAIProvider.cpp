@@ -211,9 +211,10 @@ ChatResult OpenAIProvider::chat(const ChatRequest& request, const ContentEventCa
 			}
 			const Object::Ptr pChunk = parseObject(event.data);
 			if (pChunk.isNull()) continue;
-			if (pChunk->has("error"))
+			if (pChunk->has("error") && !pChunk->isNull("error"))
 			{
-				// An error after the 200, as vLLM and llama.cpp send it.
+				// An error after the 200, as vLLM and llama.cpp send it; a
+				// gateway may send a null one with every chunk.
 				const Object::Ptr pError = pChunk->getObject("error");
 				reportFailure(onEvent, FailureCode::STREAM_ERROR, "OpenAI stream error: " + (pError.isNull() ? pChunk->get("error").toString() : errorText(pError)), &call.response());
 				return failed();

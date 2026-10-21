@@ -365,6 +365,18 @@ void OpenAIProviderTest::testErrorInStream()
 	assertTrue(result.stopReason == StopReason::FAILURE);
 	assertTrue(events.firstError()->code == FailureCode::STREAM_ERROR);
 	assertTrue(events.firstError()->text.find("model is overloaded") != std::string::npos);
+
+	// A null error, which a gateway sends with every chunk, is none.
+	const std::string nullErrors = data("{\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Hi\"},\"finish_reason\":null}],\"error\":null}")
+		+ data("{\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}],\"error\":null}")
+		+ data("[DONE]");
+	CannedServer nullServer(SSE, nullErrors);
+	OpenAIProvider nullProvider(params(nullServer.baseUrl()));
+	Events answered;
+	ChatResult answer = nullProvider.chat(userRequest("Hi"), answered.callback(), cancellation);
+	assertTrue(answer.stopReason == StopReason::END_TURN);
+	assertEqual(std::string("Hi"), answer.text);
+	assertTrue(answered.firstError() == nullptr);
 }
 
 
