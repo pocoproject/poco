@@ -25,7 +25,7 @@ public:
 	void testResourceReadText();
 	void testResourceReadBlob();
 	void testResourceNotFound();
-	void testResourceReaderThrows();
+	void testHandlerExceptions();
 	void testResourceTemplatesEmpty();
 	void testPromptsList();
 	void testPromptGet();

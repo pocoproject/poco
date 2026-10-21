@@ -131,6 +131,11 @@ public:
 		/// caches may share them. The default is zero, stale at once, and
 		/// PRIVATE.
 
+	void setLoggerName(const std::string& name);
+		/// Sets the logger to which the server writes, at the error level,
+		/// why a request failed, "AI.MCP.Server" by default. The reply to
+		/// such a request says no more than "Internal error".
+
 	[[nodiscard]] Poco::JSON::Object::Ptr handle(const Poco::JSON::Object::Ptr& message, const RequestContext& context = RequestContext());
 		/// Message-level ingress: handles one parsed JSON-RPC message and
 		/// returns the reply, or null for a notification. The transport sets
@@ -173,9 +178,11 @@ private:
 		std::string instructions;
 		Poco::Timespan ttl;
 		CacheScope scope = CacheScope::PRIVATE;
+		std::string loggerName = "AI.MCP.Server";
 	};
 
 	Poco::JSON::Object::Ptr dispatch(const Id& id, const std::string& method, const Poco::JSON::Object::Ptr& params, const RequestContext& context);
+	Poco::JSON::Object::Ptr failed(const Id& id, const std::string& method, const std::string& what) const;
 	Poco::JSON::Object::Ptr onDiscover(const Id& id);
 	Poco::JSON::Object::Ptr onToolsList(const Id& id, const Poco::JSON::Object::Ptr& params);
 	Poco::JSON::Object::Ptr onToolsCall(const Id& id, const Poco::JSON::Object::Ptr& params, const RequestContext& context);

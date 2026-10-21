@@ -17,7 +17,15 @@
 #include "Poco/AI/MCP/RequestContext.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
+#include "Poco/AI/MCP/MCPException.h"
 #include "Poco/Exception.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Channel.h"
+#include "Poco/Logger.h"
+#include "Poco/Message.h"
+#include "Poco/Mutex.h"
+#include <stdexcept>
+#include <vector>
 
 
 using Poco::AI::MCP::Server;
@@ -38,6 +46,28 @@ using MCPTest::code;
 
 namespace
 {
+	class MessageCollector: public Poco::Channel
+		/// Keeps the texts of the messages logged to it.
+	{
+	public:
+		void log(const Poco::Message& msg) override
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			_texts.push_back(msg.getText());
+		}
+
+		std::vector<std::string> texts() const
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _texts;
+		}
+
+	private:
+		mutable Poco::FastMutex _mutex;
+		std::vector<std::string> _texts;
+	};
+
+
 	void buildServer(Server& server)
 	{
 		Resource readme;
@@ -185,14 +215,51 @@ void FeaturesTest::testResourceNotFound()
 }
 
 
-void FeaturesTest::testResourceReaderThrows()
+void FeaturesTest::testHandlerExceptions()
 {
 	Server server;
 	buildServer(server);
+	Prompt failing;
+	failing.name = "failing";
+	server.registerPrompt(failing, [](const Object::Ptr&, const RequestContext&) -> Array::Ptr
+	{
+		throw std::runtime_error("no template in /srv/prompts");
+	});
+	Resource refused;
+	refused.uri = "test://refused";
+	refused.name = "refused";
+	server.registerResource(refused, [](const std::string&, const RequestContext&) -> ResourceContents
+	{
+		throw Poco::AI::MCP::MCPException("The table is not shared", static_cast<int>(ErrorCode::INVALID_PARAMS));
+	});
+	server.setLoggerName("FeaturesTest.Server");
+	Poco::Logger& logger = Poco::Logger::get("FeaturesTest.Server");
+	const Poco::Channel::Ptr pChannel = logger.getChannel();
+	Poco::AutoPtr<MessageCollector> pCollector = new MessageCollector;
+	logger.setChannel(pCollector);
+	logger.setLevel(Poco::Message::PRIO_ERROR);
+
+	// What a reader or a renderer failed of goes to the log of the server; the
+	// client gets Internal error.
 	Object::Ptr pReply = read(server, 3, std::string("test://broken"));
 	assertEqual(code(ErrorCode::INTERNAL_ERROR), errorCode(pReply));
 	assertEqual(3, pReply->getValue<int>("id"));
-	assertTrue(pReply->getObject("error")->getValue<std::string>("message").find("disk on fire") != std::string::npos);
+	assertEqual(std::string("Internal error"), pReply->getObject("error")->getValue<std::string>("message"));
+	pReply = getPrompt(server, 4, "failing", nullptr);
+	assertEqual(code(ErrorCode::INTERNAL_ERROR), errorCode(pReply));
+	assertEqual(std::string("Internal error"), pReply->getObject("error")->getValue<std::string>("message"));
+
+	// An MCPException is an error meant for the client: its code and message
+	// stay, and the log has nothing to add.
+	pReply = read(server, 5, std::string("test://refused"));
+	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(pReply));
+	assertEqual(std::string("The table is not shared"), pReply->getObject("error")->getValue<std::string>("message"));
+
+	const std::vector<std::string> texts = pCollector->texts();
+	logger.setChannel(pChannel);
+	assertEqual(std::size_t(2), texts.size());
+	assertTrue(texts[0].find("resources/read") != std::string::npos && texts[0].find("disk on fire") != std::string::npos);
+	assertTrue(texts[1].find("prompts/get") != std::string::npos && texts[1].find("no template in /srv/prompts") != std::string::npos);
 }
 
 
@@ -331,7 +398,7 @@ CppUnit::Test* FeaturesTest::suite()
 	CppUnit_addTest(pSuite, FeaturesTest, testResourceReadText);
 	CppUnit_addTest(pSuite, FeaturesTest, testResourceReadBlob);
 	CppUnit_addTest(pSuite, FeaturesTest, testResourceNotFound);
-	CppUnit_addTest(pSuite, FeaturesTest, testResourceReaderThrows);
+	CppUnit_addTest(pSuite, FeaturesTest, testHandlerExceptions);
 	CppUnit_addTest(pSuite, FeaturesTest, testResourceTemplatesEmpty);
 	CppUnit_addTest(pSuite, FeaturesTest, testPromptsList);
 	CppUnit_addTest(pSuite, FeaturesTest, testPromptGet);

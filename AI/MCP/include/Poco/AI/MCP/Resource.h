@@ -82,7 +82,9 @@ struct AIMCP_API ResourceContents
 
 using ResourceReader = std::function<ResourceContents (const std::string& uri, const RequestContext& context)>;
 	/// Returns the contents of the resource identified by uri. Throwing is
-	/// allowed: the server turns the exception into an Internal error reply.
+	/// allowed: an MCPException becomes an error reply with its code and
+	/// message; any other exception becomes an Internal error reply without
+	/// its text, which the server logs (see Server::setLoggerName()).
 
 
 struct AIMCP_API PromptArgument
@@ -119,8 +121,10 @@ struct AIMCP_API Prompt
 using PromptRenderer = std::function<Poco::JSON::Array::Ptr (const Poco::JSON::Object::Ptr& arguments, const RequestContext& context)>;
 	/// Renders a prompt into the messages array prompts/get returns. Receives
 	/// the never-null arguments object, whose members are strings and include
-	/// every required argument. Throwing is allowed: the server turns the
-	/// exception into an Internal error reply.
+	/// every required argument. Throwing is allowed: an MCPException becomes
+	/// an error reply with its code and message; any other exception becomes
+	/// an Internal error reply without its text, which the server logs (see
+	/// Server::setLoggerName()).
 
 
 } // namespace Poco::AI::MCP

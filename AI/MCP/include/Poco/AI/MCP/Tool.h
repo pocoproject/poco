@@ -33,7 +33,9 @@ using ContextToolHandler = std::function<ToolResult (const Poco::JSON::Object::P
 	/// Invoked for tools/call with the never-null arguments object and the
 	/// context of the request, so that a handler can make authorization
 	/// decisions. Throwing is allowed: the server turns the exception into a
-	/// result with isError set.
+	/// result with isError set and the text of the exception, which the
+	/// client, and a model that reads the result, gets. A handler whose
+	/// exceptions may tell what a client must not know catches them itself.
 
 
 using ToolHandler = std::function<ToolResult (const Poco::JSON::Object::Ptr& arguments)>;

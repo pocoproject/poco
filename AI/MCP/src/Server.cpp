@@ -16,6 +16,7 @@
 #include "Poco/AI/MCP/MCPException.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/Exception.h"
+#include "Poco/Logger.h"
 #include <algorithm>
 #include <exception>
 #include <istream>
@@ -176,6 +177,13 @@ void Server::setCacheHints(const Poco::Timespan& ttl, CacheScope scope)
 }
 
 
+void Server::setLoggerName(const std::string& name)
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	_settings.loggerName = name;
+}
+
+
 Server::Settings Server::settings() const
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
@@ -251,18 +259,36 @@ Poco::JSON::Object::Ptr Server::handle(const Poco::JSON::Object::Ptr& message, c
 	{
 		return dispatch(id, name, pParams, requestContext);
 	}
+	catch (const MCPException& exc)
+	{
+		// An error a handler meant for the client.
+		return Response::error(id, exc.code() != 0 ? static_cast<ErrorCode>(exc.code()) : ErrorCode::INTERNAL_ERROR, exc.message());
+	}
 	catch (const Poco::Exception& exc)
 	{
-		return Response::error(id, ErrorCode::INTERNAL_ERROR, exc.displayText());
+		return failed(id, name, exc.displayText());
 	}
 	catch (const std::exception& exc)
 	{
-		return Response::error(id, ErrorCode::INTERNAL_ERROR, exc.what());
+		return failed(id, name, exc.what());
 	}
 	catch (...)
 	{
-		return Response::error(id, ErrorCode::INTERNAL_ERROR, "Internal error");
+		return failed(id, name, "unknown exception");
 	}
+}
+
+
+Poco::JSON::Object::Ptr Server::failed(const Id& id, const std::string& method, const std::string& what) const
+	/// The reply to a request that failed for a reason the client has no
+	/// business to know: the reason goes to the log.
+{
+	Poco::Logger& logger = Poco::Logger::get(settings().loggerName);
+	if (logger.error())
+	{
+		logger.error("MCP request %s failed: %s", method, what);
+	}
+	return Response::error(id, ErrorCode::INTERNAL_ERROR, "Internal error");
 }
 
 
