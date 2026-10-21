@@ -609,6 +609,25 @@ void ChatServiceTest::testToolCall()
 	service.chat(plain, who("alice"), "c1", answered.sink());
 	assertEqual(std::string("text,done"), answered.types());
 	assertEqual(0u, static_cast<unsigned>(pState->toolsGiven.back()));
+
+	// The approver of the host decides which calls of whose turns run; a
+	// refused call does not run, and the model reads an error result.
+	ChatService::Params params = fakeParams(pState);
+	params.approver = [](const Poco::AI::MCP::Identity& user, const ToolCall& call, const Poco::AI::MCP::Tool& tool)
+	{
+		return user.principal == "alice" && call.name == "probe" && tool.name == "probe";
+	};
+	ChatService approving(pTools, settingsOf({entry("ollama", true, {"m1"})}), params);
+	Array bobs = conversationOf("probe it");
+	Events refused;
+	approving.chat(bobs, who("bob"), "c2", refused.sink());
+	assertEqual(std::string("tool_call,tool_result,text,done"), refused.types());
+	assertTrue(refused.list[1]->optValue<bool>("error", false));
+	assertTrue(refused.list[1]->getValue<std::string>("content").find("probed") == std::string::npos);
+	Array alices = conversationOf("probe it");
+	Events allowed;
+	approving.chat(alices, who("alice"), "c3", allowed.sink());
+	assertEqual(std::string("probed for alice with watch"), allowed.list[1]->getValue<std::string>("content"));
 }
 
 

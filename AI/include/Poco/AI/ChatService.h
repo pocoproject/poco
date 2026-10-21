@@ -98,6 +98,11 @@ public:
 		/// gets: its own, or the key of the environment where that goes, else
 		/// none.
 
+	using Approver = std::function<bool (const Poco::AI::MCP::Identity& user, const ToolCall& call, const Poco::AI::MCP::Tool& tool)>;
+		/// Decides whether a tool call the model makes in a turn of the user
+		/// runs, as AgentLoop::setApprover() does: a refused call gets an
+		/// error result, which the model reads, and throwing refuses it.
+
 	struct Params
 		/// The settings of the service that are not an administrator's.
 	{
@@ -122,6 +127,11 @@ public:
 			/// as the kind says.
 		Store store;
 			/// Stores the settings; empty to keep them in memory only.
+		Approver approver;
+			/// Decides which tool calls of a turn run; empty for all. The tools
+			/// run with the identity of the user, and the input the model gives
+			/// them is untrusted (see AgentLoop): a host whose users may not run
+			/// every call a model makes for them decides here.
 		std::string loggerName = "AI.ChatService";
 			/// The logger of the service.
 	};

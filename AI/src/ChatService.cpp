@@ -215,6 +215,13 @@ void ChatService::chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Ide
 	Poco::AI::MCP::RequestContext context;
 	context.identity = user;
 	loop.setRequestContext(context);
+	if (_params.approver)
+	{
+		loop.setApprover([this, &user](const ToolCall& call, const Poco::AI::MCP::Tool& tool)
+			{
+				return _params.approver(user, call, tool);
+			});
+	}
 	loop.run(conversation, _params.systemPrompt, [this, &name, &onEvent](const AgentEvent& event)
 		{
 			if (event.type == AgentEvent::Type::FAILURE && event.code == FailureCode::PROVIDER_FAILED)

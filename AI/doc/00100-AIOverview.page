@@ -69,7 +69,8 @@ signs the caller in and says who it is and whether they may manage the chat.
 Tool results, the descriptions of tools from remote servers and the input a model gives a tool
 are untrusted input. A model may call a tool with arguments it chose after reading text an
 attacker wrote. Let a person or a policy decide, with an approver
-(<[AgentLoop::setApprover()]>), which calls run.
+(<[AgentLoop::setApprover()]>), which calls run; the approver of a chat service
+(<[ChatService::Params]>) also gets the user of the turn.
 
 
 !!!Building AI
