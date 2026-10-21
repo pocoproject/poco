@@ -90,11 +90,19 @@ class AIMCPHTTP_API ServerTransport
 	/// of all threads.
 {
 public:
+	static constexpr std::size_t DEFAULT_MAX_REQUEST_SIZE = 1024*1024;
+		/// The default limit of a request body, in bytes. It is smaller than
+		/// the limit of a message of the stdio transport, as a server answers
+		/// many requests at once.
+
 	struct Params
 		/// The settings of a transport.
 	{
-		std::size_t maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE;
-			/// The limit of a request body, in bytes.
+		std::size_t maxMessageSize = DEFAULT_MAX_REQUEST_SIZE;
+			/// The limit of a request body, in bytes. The transport holds the
+			/// body of a request in memory, and its JSON, which takes several
+			/// times as much, while it answers: each worker thread of the
+			/// HTTPServer may need that much at once.
 		std::vector<std::string> allowedOrigins;
 			/// The origins a browser may send a request from, as it names
 			/// them: scheme://host, and :port unless it is the default one.

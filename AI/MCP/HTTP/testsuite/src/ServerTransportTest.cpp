@@ -429,6 +429,22 @@ void ServerTransportTest::testBodyLimit()
 	answer = endpoint.send(HTTPRequest::HTTP_POST, headers, overLimit, "/mcp", true);
 	assertEqual(413, answer.status);
 	assertEqual(std::string("close"), answer.headers.get("Connection"));
+
+	// By default a request may have 1 MiB, less than a message of the stdio
+	// transport. A longer one is refused once its length is announced, before
+	// its body, which this client therefore does not send.
+	assertEqual(ServerTransport::DEFAULT_MAX_REQUEST_SIZE, ServerTransport::Params().maxMessageSize);
+	assertTrue(ServerTransport::DEFAULT_MAX_REQUEST_SIZE < Poco::AI::MCP::DEFAULT_MAX_MESSAGE_SIZE);
+	Endpoint defaults(server);
+	Poco::Net::HTTPClientSession session("127.0.0.1", Poco::URI(defaults.url()).getPort());
+	session.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest large(HTTPRequest::HTTP_POST, "/mcp", Poco::Net::HTTPMessage::HTTP_1_1);
+	for (const auto& header: headers) large.set(header.first, header.second);
+	large.setContentLength(static_cast<std::streamsize>(ServerTransport::DEFAULT_MAX_REQUEST_SIZE + 1));
+	session.sendRequest(large);
+	HTTPResponse response;
+	session.receiveResponse(response);
+	assertEqual(413, static_cast<int>(response.getStatus()));
 }
 
 
