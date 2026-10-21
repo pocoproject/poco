@@ -45,6 +45,7 @@ module;
 #include "Poco/Data/Preparation.h"
 #include "Poco/Data/Range.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/RenderingBinder.h"
 #include "Poco/Data/RowFilter.h"
 #include "Poco/Data/RowFormatter.h"
 #include "Poco/Data/Row.h"
@@ -63,6 +64,7 @@ module;
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/Transcoder.h"
 #include "Poco/Data/TypeHandler.h"
+#include "Poco/Data/Utility.h"
 #endif
 
 export module Poco:Data;
@@ -125,6 +127,7 @@ export namespace Poco::Data {
 	using Poco::Data::Preparation;
 	using Poco::Data::Range;
 	using Poco::Data::RecordSet;
+	using Poco::Data::RenderingBinder;
 	using Poco::Data::Row;
 	using Poco::Data::RowDataMissingException;
 	using Poco::Data::RowFilter;
@@ -147,8 +150,10 @@ export namespace Poco::Data {
 	using Poco::Data::TypeHandler;
 	using Poco::Data::UnknownDataBaseException;
 	using Poco::Data::UnknownTypeException;
+	using Poco::Data::Utility;
 
 	#ifdef POCO_MODULES_EXPORT_IMPL
+	using Poco::Data::AbstractSessionImpl;
 	using Poco::Data::PooledSessionImpl;
 	using Poco::Data::SessionImpl;
 	using Poco::Data::StatementImpl;
@@ -160,7 +165,6 @@ export namespace Poco::Data {
 	using Poco::Data::AbstractBindingVec;
 	using Poco::Data::AbstractExtractionDeq;
 	using Poco::Data::AbstractExtractionDeqVec;
-	using Poco::Data::AbstractExtractionLst;
 	using Poco::Data::AbstractExtractionLst;
 	using Poco::Data::AbstractExtractionLstVec;
 	using Poco::Data::AbstractExtractionVec;
@@ -194,6 +198,7 @@ export namespace Poco::Data {
 		using Poco::Data::Keywords::list;
 		using Poco::Data::Keywords::lowerLimit;
 		using Poco::Data::Keywords::now;
+		using Poco::Data::Keywords::null;
 		using Poco::Data::Keywords::out;
 		using Poco::Data::Keywords::range;
 		using Poco::Data::Keywords::reset;
@@ -202,10 +207,6 @@ export namespace Poco::Data {
 		using Poco::Data::Keywords::use;
 		using Poco::Data::Keywords::useRef;
 		using Poco::Data::Keywords::vector;
-	}
-
-	namespace Test {
-		// using Poco::Data::Test::SQLExecutor;
 	}
 	#endif
 }
