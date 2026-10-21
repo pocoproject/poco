@@ -115,6 +115,20 @@ namespace
 	}
 
 
+	void needsSameAddress(const ChatSettings& settings, const ProviderSettings& entry)
+		/// The address of a provider whose key comes from the host goes with
+		/// the key.
+	{
+		for (const ProviderSettings& current: settings.providers)
+		{
+			if (current.name == entry.name && !ChatService::sameAddress(current, entry))
+			{
+				throw Refusal{Poco::Net::HTTPResponse::HTTP_FORBIDDEN, "forbidden", "the base URL and the servers of a provider with a key come from the configuration of the host"};
+			}
+		}
+	}
+
+
 	std::string stringMember(const Poco::JSON::Object::Ptr& pObject, const std::string& name)
 	{
 		const Poco::Dynamic::Var value = pObject->get(name);
@@ -512,6 +526,7 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "the request has no providers"};
 	}
 	const Poco::JSON::Array::Ptr pProviders = pRequest->getArray("providers");
+	const ChatSettings current = _service.settings();
 	std::vector<ProviderSettings> providers;
 	for (std::size_t i = 0; i < pProviders->size(); ++i)
 	{
@@ -534,6 +549,7 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		entry.tools = tools.isBoolean() ? tools.extract<bool>() : true;
 		entry.apiKey = stringMember(pEntry, "apiKey");
 		if (!entry.apiKey.empty()) needsKeysFromRequests(_params);
+		if (!_params.keysFromRequests && ProviderSettings::usesApiKey(entry.name)) needsSameAddress(current, entry);
 		providers.push_back(std::move(entry));
 	}
 	_service.configure(providers);

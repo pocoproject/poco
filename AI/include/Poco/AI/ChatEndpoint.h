@@ -73,7 +73,8 @@ class AI_API ChatEndpoint
 	/// a caller who may manage the chat; others get 403. Keys are set here
 	/// only where the host lets them be (Params::keysFromRequests): by default
 	/// they come from its configuration or the environment, and a request that
-	/// sets one gets 403. Errors come as {"error", "detail"}, with 400, 403,
+	/// sets one, or that gives a provider with a key another base URL or other
+	/// servers, gets 403. Errors come as {"error", "detail"}, with 400, 403,
 	/// 404, 405, 413 or 500.
 	///
 	/// The host signs the caller in before, and says who it is.
@@ -105,7 +106,8 @@ public:
 			/// connection alive.
 		bool keysFromRequests = false;
 			/// Whether a caller who may manage the chat sets the keys of the
-			/// providers; else they come from the host alone.
+			/// providers, and the base URL and servers of a provider with a
+			/// key; else they come from the host alone.
 		std::string loggerName = "AI.ChatEndpoint";
 			/// The logger of the endpoint.
 	};

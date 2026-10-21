@@ -44,6 +44,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
+#include "Poco/Environment.h"
 #include <atomic>
 #include <functional>
 #include <istream>
@@ -265,6 +266,32 @@ namespace
 		identity.authenticated = true;
 		return identity;
 	}
+
+
+	class EnvironmentGuard
+		/// Sets an environment variable while it lives, and then puts back what
+		/// it was; a variable that was not set is left empty.
+	{
+	public:
+		EnvironmentGuard(const std::string& name, const std::string& value):
+			_name(name),
+			_old(Poco::Environment::get(name, ""))
+		{
+			Poco::Environment::set(_name, value);
+		}
+
+		~EnvironmentGuard()
+		{
+			Poco::Environment::set(_name, _old);
+		}
+
+		EnvironmentGuard(const EnvironmentGuard&) = delete;
+		EnvironmentGuard& operator = (const EnvironmentGuard&) = delete;
+
+	private:
+		std::string _name;
+		std::string _old;
+	};
 
 
 	Array conversationOf(const std::string& text)
@@ -812,6 +839,68 @@ void ChatServiceTest::testConfigure()
 }
 
 
+void ChatServiceTest::testKeyStaysAtItsAddress()
+{
+	auto pState = std::make_shared<FakeState>();
+	const auto lastKey = [&pState]()
+	{
+		Poco::FastMutex::ScopedLock lock(pState->mutex);
+		return pState->keys.empty() ? std::string("(no provider created)") : pState->keys.back();
+	};
+	const auto turn = [](ChatService& service)
+	{
+		Array conversation = conversationOf("hi");
+		Events events;
+		service.chat(conversation, who("alice"), "c1", events.sink());
+	};
+	const std::string variable = ProviderSettings::keyVariable("anthropic");
+	EnvironmentGuard noKey(variable, "");
+	const ProviderSettings anthropic = entry("anthropic", true, {"claude"});
+	ProviderSettings moved = anthropic;
+	moved.baseUrl = "http://elsewhere.test";
+	ProviderSettings withServers = anthropic;
+	withServers.servers = {"backup"};
+
+	// A key of the settings stays at the address it was given for, also when
+	// the provider comes back.
+	ProviderSettings keyed = anthropic;
+	keyed.apiKey = "k1";
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({keyed}), fakeParams(pState));
+	turn(service);
+	assertEqual(std::string("k1"), lastKey());
+	service.configure({moved});
+	assertTrue(!service.hasKey("anthropic"));
+	assertEqual(std::string(), service.settings().providers[0].apiKey);
+	turn(service);
+	assertEqual(std::string(), lastKey());
+	service.configure({anthropic});
+	assertTrue(!service.hasKey("anthropic"));
+	// Other servers are another address too; the same address keeps the key.
+	service.setKey("anthropic", "k2");
+	service.configure({withServers});
+	assertTrue(!service.hasKey("anthropic"));
+	service.setKey("anthropic", "k3");
+	service.configure({withServers});
+	assertTrue(service.hasKey("anthropic"));
+
+	// The key of the environment goes only to the address the service
+	// started with.
+	Poco::Environment::set(variable, "env-key");
+	ChatService fromEnvironment(std::make_shared<ToolRegistry>(), settingsOf({anthropic}), fakeParams(pState));
+	assertTrue(fromEnvironment.hasKey("anthropic"));
+	turn(fromEnvironment);
+	assertEqual(std::string("env-key"), lastKey());
+	fromEnvironment.configure({moved});
+	assertTrue(!fromEnvironment.hasKey("anthropic"));
+	turn(fromEnvironment);
+	assertEqual(std::string(), lastKey());
+	fromEnvironment.configure({anthropic});
+	assertTrue(fromEnvironment.hasKey("anthropic"));
+	turn(fromEnvironment);
+	assertEqual(std::string("env-key"), lastKey());
+}
+
+
 void ChatServiceTest::testStoreRefuses()
 {
 	auto pState = std::make_shared<FakeState>();
@@ -1076,6 +1165,44 @@ void ChatServiceTest::testEndpointManage()
 }
 
 
+void ChatServiceTest::testEndpointKeyAddress()
+{
+	auto pState = std::make_shared<FakeState>();
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({entry("ollama", true, {"m1"})}), fakeParams(pState));
+	const std::string defaultUrl = ProviderSettings::defaultBaseUrl("anthropic");
+	const auto settingsOfProvider = [&service](const std::string& name)
+	{
+		for (const ProviderSettings& provider: service.settings().providers)
+		{
+			if (provider.name == name) return provider;
+		}
+		throw Poco::NotFoundException("No provider of that name", name);
+	};
+
+	// By default a provider with a key keeps the address the host gave it:
+	// the key would go there.
+	Host host(service);
+	assertEqual(403, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":true},{\"name\":\"anthropic\",\"baseUrl\":\"http://elsewhere.test\"}]}", "root", true).status);
+	assertEqual(403, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":true},{\"name\":\"openai\",\"servers\":[\"elsewhere\"]}]}", "root", true).status);
+	assertEqual(std::string(), settingsOfProvider("anthropic").baseUrl);
+	assertTrue(settingsOfProvider("openai").servers.empty());
+	// Its address written out is no change, and a provider without a key moves.
+	assertEqual(200, host.send("POST", "config",
+		"{\"providers\":[{\"name\":\"ollama\",\"enabled\":true,\"models\":[\"m1\"],\"baseUrl\":\"http://[server]:11434/v1\",\"servers\":[\"lab\"]},{\"name\":\"anthropic\",\"baseUrl\":\"" + defaultUrl + "\"}]}", "root", true).status);
+	assertEqual(std::string("lab"), settingsOfProvider("ollama").servers.at(0));
+
+	// A host that lets a manager set the keys lets them move a provider, whose
+	// key stays behind.
+	ChatEndpoint::Params withKeys;
+	withKeys.keysFromRequests = true;
+	Host keyHost(service, withKeys);
+	assertEqual(200, keyHost.send("POST", "token", "{\"provider\":\"anthropic\",\"token\":\"k1\"}", "root", true).status);
+	assertTrue(service.hasKey("anthropic"));
+	assertEqual(200, keyHost.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":true,\"models\":[\"m1\"]},{\"name\":\"anthropic\",\"baseUrl\":\"http://elsewhere.test\"}]}", "root", true).status);
+	assertTrue(!service.hasKey("anthropic"));
+}
+
+
 void ChatServiceTest::testEndpointRefusals()
 {
 	auto pState = std::make_shared<FakeState>();
@@ -1178,6 +1305,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testCancel);
 	CppUnit_addTest(pSuite, ChatServiceTest, testSelect);
 	CppUnit_addTest(pSuite, ChatServiceTest, testConfigure);
+	CppUnit_addTest(pSuite, ChatServiceTest, testKeyStaysAtItsAddress);
 	CppUnit_addTest(pSuite, ChatServiceTest, testStoreRefuses);
 	CppUnit_addTest(pSuite, ChatServiceTest, testSettingsJSON);
 	CppUnit_addTest(pSuite, ChatServiceTest, testDefaultProvider);
@@ -1185,6 +1313,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointStream);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointCancel);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointManage);
+	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointKeyAddress);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointRefusals);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeat);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);

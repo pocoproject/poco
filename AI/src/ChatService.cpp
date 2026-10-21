@@ -80,6 +80,14 @@ ChatService::ChatService(std::shared_ptr<ToolRegistry> pTools, const ChatSetting
 	ChatSettings initial = complete(settings);
 	validate(initial, false);
 	normalize(initial);
+	for (const ProviderSettings& entry: initial.providers)
+	{
+		ProviderSettings address;
+		address.name = entry.name;
+		address.baseUrl = entry.baseUrl;
+		address.servers = entry.servers;
+		_startAddresses[entry.name] = address;
+	}
 	_settings = std::move(initial);
 }
 
@@ -340,7 +348,7 @@ void ChatService::configure(const std::vector<ProviderSettings>& providers)
 	{
 		if (!settings.apiKey.empty()) continue;
 		const std::optional<ProviderSettings> old = find(previous, settings.name);
-		if (old) settings.apiKey = old->apiKey;
+		if (old && sameAddress(*old, settings)) settings.apiKey = old->apiKey;
 	}
 	validate(next, true);
 	change(next);
@@ -366,10 +374,13 @@ bool ChatService::hasKey(const std::string& provider) const
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		settings = find(_settings, provider);
 	}
-	if (!settings) return false;
-	if (!settings->apiKey.empty()) return true;
-	const std::string variable = ProviderSettings::keyVariable(provider);
-	return !variable.empty() && !Poco::Environment::get(variable, "").empty();
+	return settings && !keyOf(*settings).empty();
+}
+
+
+bool ChatService::sameAddress(const ProviderSettings& first, const ProviderSettings& second)
+{
+	return baseUrlOf(first) == baseUrlOf(second) && first.servers == second.servers;
 }
 
 
@@ -632,17 +643,31 @@ void ChatService::record(const std::string& name, Poco::UInt64 generation, const
 }
 
 
+std::string ChatService::keyOf(const ProviderSettings& settings) const
+	/// The key a provider of the settings gets: its own, else the key of the
+	/// environment variable of its kind if the provider is where it was when
+	/// the service was created, else none.
+{
+	if (!settings.apiKey.empty()) return settings.apiKey;
+	const std::string variable = ProviderSettings::keyVariable(settings.name);
+	if (variable.empty()) return std::string();
+	const auto it = _startAddresses.find(settings.name);
+	if (it == _startAddresses.end() || !sameAddress(it->second, settings)) return std::string();
+	return Poco::Environment::get(variable, "");
+}
+
+
 std::shared_ptr<LLMProvider> ChatService::createProvider(const ProviderSettings& settings, const std::string& baseUrl, const std::string& model, const Poco::Timespan& timeout) const
 {
+	ProviderSettings keyed = settings;
+	keyed.apiKey = keyOf(settings);
 	if (_params.providerFactory)
 	{
-		std::shared_ptr<LLMProvider> pProvider = _params.providerFactory(settings, baseUrl, model, timeout);
+		std::shared_ptr<LLMProvider> pProvider = _params.providerFactory(keyed, baseUrl, model, timeout);
 		if (pProvider == nullptr) throw Poco::NullPointerException("The provider factory returned no provider", settings.name);
 		return pProvider;
 	}
-	std::string key = settings.apiKey;
-	const std::string variable = ProviderSettings::keyVariable(settings.name);
-	if (key.empty() && !variable.empty()) key = Poco::Environment::get(variable, "");
+	const std::string& key = keyed.apiKey;
 	const int maxTokens = settings.maxTokens > 0 ? settings.maxTokens : _params.maxTokens;
 	if (settings.name == "anthropic")
 	{

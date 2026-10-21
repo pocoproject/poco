@@ -59,6 +59,12 @@ class AI_API ChatService
 	/// http://[server]:11434/v1, is reached at the first of its servers that
 	/// answers, which the service keeps until a call fails to connect.
 	///
+	/// A key belongs to the address of its provider, the base URL and the
+	/// servers: configure() keeps the key of a provider only while its address
+	/// stays the same, and the key of the environment variable of a kind
+	/// (ANTHROPIC_API_KEY, OPENAI_API_KEY) goes only to the address the
+	/// provider has in the settings the service is created with.
+	///
 	/// The events of a turn:
 	///
 	///   - {"type": "text", "content"}: a piece of the answer;
@@ -87,7 +93,9 @@ public:
 		/// Creates a provider for a turn, or for the question for its models:
 		/// of the kind and with the key and limits of settings, at baseUrl,
 		/// with the model (empty for the question for models), and timeout as
-		/// the limit of a call.
+		/// the limit of a call. The key of settings is the one the provider
+		/// gets: its own, or the key of the environment where that goes, else
+		/// none.
 
 	struct Params
 		/// The settings of the service that are not an administrator's.
@@ -195,9 +203,11 @@ public:
 	void configure(const std::vector<ProviderSettings>& providers);
 		/// Replaces the providers and stores the settings. An entry without a
 		/// key keeps the key the provider had, as does a kind with defaults
-		/// left out, which comes back disabled: setKey() clears one. When the
-		/// provider in use is no longer enabled, the first enabled one is used;
-		/// when its model is no longer in its list, the first of the list.
+		/// left out, which comes back disabled, unless its base URL or servers
+		/// differ: a key does not go to another address. setKey() clears one.
+		/// When the provider in use is no longer enabled, the first enabled one
+		/// is used; when its model is no longer in its list, the first of the
+		/// list.
 		///
 		/// Throws Poco::InvalidArgumentException if a name is empty or used
 		/// twice, a provider of another kind than those with defaults has no
@@ -210,7 +220,12 @@ public:
 		/// Throws Poco::NotFoundException if the provider is not configured.
 
 	[[nodiscard]] bool hasKey(const std::string& provider) const;
-		/// Returns true if the provider has a key, set or in the environment.
+		/// Returns true if the provider has a key: its own, or the key of the
+		/// environment at the address the service started with.
+
+	[[nodiscard]] static bool sameAddress(const ProviderSettings& first, const ProviderSettings& second);
+		/// Returns true if both settings reach their provider at the same
+		/// base URL, the default of the kind for none, with the same servers.
 
 	[[nodiscard]] static std::string failureName(FailureCode code);
 		/// The name of a failure in an error event: unauthenticated,
@@ -256,6 +271,7 @@ private:
 	void change(const ChatSettings& settings);
 	ProviderStatus probe(const ProviderSettings& settings, std::string& server, std::vector<std::string>& models) const;
 	void record(const std::string& name, Poco::UInt64 generation, const ProviderStatus& status, const std::string& server, const std::vector<std::string>& models);
+	std::string keyOf(const ProviderSettings& settings) const;
 	std::shared_ptr<LLMProvider> createProvider(const ProviderSettings& settings, const std::string& baseUrl, const std::string& model, const Poco::Timespan& timeout) const;
 	std::vector<std::string> modelsOf(const std::string& name, bool refresh);
 	void connectionFailed(const std::string& name, const std::string& detail);
@@ -269,6 +285,9 @@ private:
 	Poco::FastMutex _changeMutex;
 	mutable Poco::FastMutex _mutex;
 	ChatSettings _settings;
+	std::map<std::string, ProviderSettings> _startAddresses;
+		/// Of every provider of the settings the service was created with, the
+		/// name, base URL and servers: where the key of its environment goes.
 	Poco::UInt64 _generation = 0;
 	std::map<std::string, Runtime> _runtime;
 	Poco::FastMutex _turnsMutex;

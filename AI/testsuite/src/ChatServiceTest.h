@@ -30,6 +30,7 @@ public:
 	void testCancel();
 	void testSelect();
 	void testConfigure();
+	void testKeyStaysAtItsAddress();
 	void testStoreRefuses();
 	void testSettingsJSON();
 	void testDefaultProvider();
@@ -37,6 +38,7 @@ public:
 	void testEndpointStream();
 	void testEndpointCancel();
 	void testEndpointManage();
+	void testEndpointKeyAddress();
 	void testEndpointRefusals();
 	void testEndpointHeartbeat();
 	void testEndpointClientGone();
