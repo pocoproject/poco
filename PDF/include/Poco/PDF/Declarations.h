@@ -97,18 +97,18 @@ using PatternVec = std::vector<float>;
 using TextWidth = HPDF_TextWidth;
 
 // Note: constants must match the ones in hpdf_consts.h
-static constexpr int HPDF_ENABLE_READ = 0;
-static constexpr int HPDF_ENABLE_PRINT = 4;
-static constexpr int HPDF_ENABLE_EDIT_ALL = 8;
-static constexpr int HPDF_ENABLE_COPY = 16;
-static constexpr int HPDF_ENABLE_EDIT = 32;
+inline constexpr int HPDF_ENABLE_READ = 0;
+inline constexpr int HPDF_ENABLE_PRINT = 4;
+inline constexpr int HPDF_ENABLE_EDIT_ALL = 8;
+inline constexpr int HPDF_ENABLE_COPY = 16;
+inline constexpr int HPDF_ENABLE_EDIT = 32;
 
 // Note: constants must match the ones in hpdf_consts.h
-static constexpr int HPDF_COMP_NONE		= 0x00;
-static constexpr int HPDF_COMP_TEXT		= 0x01;
-static constexpr int HPDF_COMP_IMAGE	= 0x02;
-static constexpr int HPDF_COMP_METADATA	= 0x04;
-static constexpr int HPDF_COMP_ALL		= 0x0F;
+inline constexpr int HPDF_COMP_NONE		= 0x00;
+inline constexpr int HPDF_COMP_TEXT		= 0x01;
+inline constexpr int HPDF_COMP_IMAGE	= 0x02;
+inline constexpr int HPDF_COMP_METADATA	= 0x04;
+inline constexpr int HPDF_COMP_ALL		= 0x0F;
 
 // Note: values must match the ones in hpdf_types.h
 enum LineCap {
