@@ -650,14 +650,36 @@ void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 	}
 	if (utf16Path.size() > MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
 	{
+		if (utf16Path[0] == '\\' && utf16Path[1] != '\\')
+		{
+			// A rooted path without a drive letter ("\dir\..."): the prefix
+			// requires a fully qualified path, so resolve it first. This binds
+			// the path to the current drive when it is set; a short rooted path
+			// is resolved against the current drive on every call.
+			DWORD size = ::GetFullPathNameW(utf16Path.c_str(), 0, nullptr, nullptr);
+			if (size > 0)
+			{
+				std::wstring fullPath(size, L'\0');
+				size = ::GetFullPathNameW(utf16Path.c_str(), size, &fullPath[0], nullptr);
+				if (size > 0 && size < fullPath.size())
+				{
+					fullPath.resize(size);
+					utf16Path.swap(fullPath);
+				}
+			}
+		}
 		if (utf16Path[0] == '\\' || utf16Path[1] == ':')
 		{
 			if (utf16Path.compare(0, 4, L"\\\\?\\", 4) != 0)
 			{
+				// A device path ("\\.\") addresses the same namespace as "\\?\",
+				// which also lifts the MAX_PATH limit.
+				if (utf16Path.compare(0, 4, L"\\\\.\\", 4) == 0)
+					utf16Path[2] = L'?';
 				// The prefix replaces the leading "\\" of a UNC path.
-				if (utf16Path[1] == '\\')
+				else if (utf16Path[1] == '\\')
 					utf16Path.replace(0, 2, L"\\\\?\\UNC\\");
-				else
+				else if (utf16Path[1] == ':')
 					utf16Path.insert(0, L"\\\\?\\", 4);
 			}
 		}
