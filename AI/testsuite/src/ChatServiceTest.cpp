@@ -33,6 +33,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/NameValueCollection.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
@@ -444,7 +445,9 @@ namespace
 			return _socket.address().port();
 		}
 
-		Answer send(const std::string& method, const std::string& route, const std::string& body = std::string(), const std::string& user = "alice", bool manage = false) const
+		Answer send(const std::string& method, const std::string& route, const std::string& body = std::string(), const std::string& user = "alice", bool manage = false, const Poco::Net::NameValueCollection& headers = Poco::Net::NameValueCollection()) const
+			/// Sends a request; headers are added last and replace those of the
+			/// same name, Content-Type application/json for a body among them.
 		{
 			Poco::Net::HTTPClientSession session("127.0.0.1", port());
 			session.setTimeout(Poco::Timespan(20, 0));
@@ -456,6 +459,7 @@ namespace
 				request.setContentType("application/json");
 				request.setContentLength(static_cast<std::streamsize>(body.size()));
 			}
+			for (const auto& header: headers) request.set(header.first, header.second);
 			std::ostream& out = session.sendRequest(request);
 			out << body;
 			Poco::Net::HTTPResponse response;
@@ -1203,6 +1207,49 @@ void ChatServiceTest::testEndpointKeyAddress()
 }
 
 
+void ChatServiceTest::testEndpointCrossSite()
+{
+	auto pState = std::make_shared<FakeState>();
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({entry("ollama", true, {"m1", "m2"})}), fakeParams(pState));
+	Host host(service);
+	const auto header = [](const std::string& name, const std::string& value)
+	{
+		Poco::Net::NameValueCollection headers;
+		headers.set(name, value);
+		return headers;
+	};
+
+	// What a form of another site sends, which needs no preflight request, is
+	// no JSON: 415, for a turn as for a change of the settings.
+	for (const std::string& type: {std::string("text/plain"), std::string("application/x-www-form-urlencoded"), std::string("multipart/form-data; boundary=x")})
+	{
+		assertEqual(415, host.send("POST", "models", "{\"model\":\"m2\"}", "root", true, header("Content-Type", type)).status);
+		assertEqual(415, host.send("POST", "chat/stream", HELLO, "alice", false, header("Content-Type", type)).status);
+	}
+	assertEqual(std::string("m1"), service.model());
+	assertEqual(200, host.send("POST", "models", "{\"model\":\"m2\"}", "root", true, header("Content-Type", "application/json; charset=utf-8")).status);
+	assertEqual(std::string("m2"), service.model());
+
+	// A page of another host gets 403, also on a route without a body; a page
+	// of the host the request goes to, and a client without an Origin header,
+	// do not.
+	const std::string self = "http://127.0.0.1:" + std::to_string(host.port());
+	assertEqual(403, host.send("POST", "chat/cancel?chat=c1", "", "alice", false, header("Origin", "https://site.example")).status);
+	assertEqual(403, host.send("POST", "models", "{\"model\":\"m1\"}", "root", true, header("Origin", "https://site.example")).status);
+	assertEqual(403, host.send("GET", "health", "", "alice", false, header("Origin", "null")).status);
+	assertEqual(std::string("m2"), service.model());
+	assertEqual(200, host.send("POST", "chat/cancel?chat=c1", "", "alice", false, header("Origin", self)).status);
+	assertEqual(200, host.send("POST", "chat/cancel?chat=c1").status);
+
+	// The pages of an origin the host allows.
+	ChatEndpoint::Params params;
+	params.allowedOrigins = {"https://ui.example"};
+	Host allowing(service, params);
+	assertEqual(200, allowing.send("POST", "chat/cancel?chat=c1", "", "alice", false, header("Origin", "https://UI.example")).status);
+	assertEqual(403, allowing.send("POST", "chat/cancel?chat=c1", "", "alice", false, header("Origin", "https://site.example")).status);
+}
+
+
 void ChatServiceTest::testEndpointRefusals()
 {
 	auto pState = std::make_shared<FakeState>();
@@ -1314,6 +1361,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointCancel);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointManage);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointKeyAddress);
+	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointCrossSite);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointRefusals);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeat);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);

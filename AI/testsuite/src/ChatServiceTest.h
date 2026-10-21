@@ -39,6 +39,7 @@ public:
 	void testEndpointCancel();
 	void testEndpointManage();
 	void testEndpointKeyAddress();
+	void testEndpointCrossSite();
 	void testEndpointRefusals();
 	void testEndpointHeartbeat();
 	void testEndpointClientGone();

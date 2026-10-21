@@ -16,6 +16,7 @@
 #include "Poco/AI/MCP/HTTP/Body.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/MediaType.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/Logger.h"
@@ -26,6 +27,7 @@
 #include "Poco/URI.h"
 #include "Poco/UUIDGenerator.h"
 #include "Poco/StringTokenizer.h"
+#include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <algorithm>
 #include <functional>
@@ -112,6 +114,27 @@ namespace
 		{
 			throw Refusal{Poco::Net::HTTPResponse::HTTP_FORBIDDEN, "forbidden", "the keys of the providers come from the configuration of the host"};
 		}
+	}
+
+
+	bool isJSON(const std::string& contentType)
+	{
+		return !contentType.empty() && Poco::Net::MediaType(contentType).matches("application", "json");
+	}
+
+
+	bool allowsOrigin(const ChatEndpoint::Params& params, const std::string& origin, const std::string& host)
+		/// Returns true if a page of origin may call the endpoint that a request
+		/// reaches at host, its Host header: a page of that host, or one of an
+		/// allowed origin.
+	{
+		const std::string::size_type scheme = origin.find("://");
+		if (scheme != std::string::npos && !host.empty() && Poco::icompare(origin.substr(scheme + 3), host) == 0) return true;
+		for (const std::string& allowed: params.allowedOrigins)
+		{
+			if (allowed == "*" || Poco::icompare(allowed, origin) == 0) return true;
+		}
+		return false;
 	}
 
 
@@ -261,6 +284,10 @@ void ChatEndpoint::handle(const std::string& route, Poco::Net::HTTPServerRequest
 	Poco::Logger& logger = Poco::Logger::get(_params.loggerName);
 	try
 	{
+		if (request.has("Origin") && !allowsOrigin(_params, request.get("Origin"), request.get(Poco::Net::HTTPRequest::HOST, "")))
+		{
+			throw Refusal{Poco::Net::HTTPResponse::HTTP_FORBIDDEN, "forbidden", "the origin of the page is not allowed"};
+		}
 		if (route == "health")
 		{
 			needsMethod(request, Poco::Net::HTTPRequest::HTTP_GET);
@@ -579,6 +606,10 @@ void ChatEndpoint::token(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPS
 
 Poco::JSON::Object::Ptr ChatEndpoint::readObject(Poco::Net::HTTPServerRequest& request, std::size_t maxSize) const
 {
+	if (!isJSON(request.getContentType()))
+	{
+		throw Refusal{Poco::Net::HTTPResponse::HTTP_UNSUPPORTED_MEDIA_TYPE, "unsupported media type", "the body is not JSON"};
+	}
 	if (request.hasContentLength() && request.getContentLength64() > static_cast<Poco::Int64>(maxSize))
 	{
 		throw Refusal{Poco::Net::HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE, "too large", "the body is larger than the limit"};

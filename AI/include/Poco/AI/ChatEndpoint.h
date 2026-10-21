@@ -25,6 +25,7 @@
 #include "Poco/Timespan.h"
 #include <cstddef>
 #include <string>
+#include <vector>
 
 
 namespace Poco::AI {
@@ -75,7 +76,16 @@ class AI_API ChatEndpoint
 	/// they come from its configuration or the environment, and a request that
 	/// sets one, or that gives a provider with a key another base URL or other
 	/// servers, gets 403. Errors come as {"error", "detail"}, with 400, 403,
-	/// 404, 405, 413 or 500.
+	/// 404, 405, 413, 415 or 500.
+	///
+	/// A page of another site cannot have the browser send what the endpoint
+	/// takes without a preflight request, which the endpoint does not answer:
+	/// a body that is not JSON (Content-Type application/json) gets 415, and a
+	/// request with an Origin header gets 403 unless it names the host the
+	/// request is sent to (its Host header) or one of Params::allowedOrigins.
+	/// A host that signs users in with cookies protects its routes against
+	/// requests of other sites as it does its other pages, e.g. with SameSite
+	/// cookies or a token header.
 	///
 	/// The host signs the caller in before, and says who it is.
 {
@@ -108,6 +118,12 @@ public:
 			/// Whether a caller who may manage the chat sets the keys of the
 			/// providers, and the base URL and servers of a provider with a
 			/// key; else they come from the host alone.
+		std::vector<std::string> allowedOrigins;
+			/// The origins of pages of other hosts that may call the endpoint,
+			/// as a browser names them: scheme://host, and :port unless it is
+			/// the default one. "*" allows every origin. A page of the host
+			/// the request is sent to needs none, and neither does a request
+			/// without an Origin header, from a client that is no browser.
 		std::string loggerName = "AI.ChatEndpoint";
 			/// The logger of the endpoint.
 	};
