@@ -16,6 +16,7 @@
 #include "Poco/MemoryStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include <sstream>
 
 using Poco::InflatingInputStream;
@@ -25,6 +26,34 @@ using Poco::DeflatingInputStream;
 using Poco::InflatingStreamBuf;
 using Poco::DeflatingStreamBuf;
 using Poco::StreamCopier;
+
+
+namespace
+{
+	std::string compress(const std::string& data, DeflatingStreamBuf::StreamType type)
+	{
+		std::stringstream buffer;
+		DeflatingOutputStream deflater(buffer, type);
+		deflater << data;
+		deflater.close();
+		return buffer.str();
+	}
+
+	bool readFails(std::istream& istr)
+	{
+		std::string data;
+		try
+		{
+			istr >> data;
+			return istr.bad();
+		}
+		catch (Poco::IOException&)
+		{
+			// libc++ lets the exception escape from the istream sentry instead of setting badbit
+			return true;
+		}
+	}
+}
 
 
 ZLibTest::ZLibTest(const std::string& name): CppUnit::TestCase(name)
@@ -174,6 +203,95 @@ void ZLibTest::testGzip3()
 }
 
 
+void ZLibTest::testInflateResetAfterError()
+{
+	// a header followed by an invalid deflate block
+	struct
+	{
+		InflatingStreamBuf::StreamType inflateType;
+		DeflatingStreamBuf::StreamType deflateType;
+		std::string corrupt;
+	} cases[] =
+	{
+		{InflatingStreamBuf::STREAM_ZLIB, DeflatingStreamBuf::STREAM_ZLIB, std::string("\x78\x9c\xff\xff\xff\xff\xff\xff\xff\xff", 10)},
+		{InflatingStreamBuf::STREAM_GZIP, DeflatingStreamBuf::STREAM_GZIP, std::string("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\x03\xff\xff\xff\xff\xff\xff\xff\xff", 18)}
+	};
+	for (const auto& c: cases)
+	{
+		std::stringstream buffer;
+		buffer << c.corrupt;
+		InflatingInputStream inflater(buffer, c.inflateType);
+		assertTrue (readFails(inflater));
+
+		// the underlying stream is now positioned at the start of a valid stream
+		buffer.clear();
+		buffer << compress("abcdefabcdefabcdefabcdefabcdefabcdef\n", c.deflateType);
+
+		// a retried read fails again without consuming the next stream
+		inflater.clear();
+		assertTrue (readFails(inflater));
+		assertTrue (buffer.tellg() == static_cast<std::streamoff>(c.corrupt.size()));
+
+		inflater.reset();
+		std::string data;
+		inflater >> data;
+		assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	}
+}
+
+
+void ZLibTest::testInflateResetAfterTrailerError()
+{
+	// two concatenated streams, the first one with a damaged checksum or length in its trailer
+	struct
+	{
+		InflatingStreamBuf::StreamType inflateType;
+		DeflatingStreamBuf::StreamType deflateType;
+		std::size_t damaged; // offset of the damaged byte from the end of the first stream
+	} cases[] =
+	{
+		{InflatingStreamBuf::STREAM_ZLIB, DeflatingStreamBuf::STREAM_ZLIB, 1}, // Adler-32
+		{InflatingStreamBuf::STREAM_GZIP, DeflatingStreamBuf::STREAM_GZIP, 8}, // CRC-32
+		{InflatingStreamBuf::STREAM_GZIP, DeflatingStreamBuf::STREAM_GZIP, 1}  // ISIZE
+	};
+	for (const auto& c: cases)
+	{
+		std::string first = compress("first\n", c.deflateType);
+		first[first.size() - c.damaged] ^= 0x01;
+		std::stringstream buffer(first + compress("second\n", c.deflateType));
+		InflatingInputStream inflater(buffer, c.inflateType);
+		assertTrue (readFails(inflater));
+
+		inflater.reset();
+		std::string data;
+		inflater >> data;
+		assertTrue (data == "second");
+		data.clear();
+		inflater >> data;
+		assertTrue (data.empty());
+		assertTrue (inflater.eof());
+	}
+
+	// a gzip stream with a damaged CRC-32 whose length field straddles the end of the
+	// first 32768-byte read from the underlying stream, inflated with header auto-detection
+	const std::size_t size = 32768 + 2; // the last 2 bytes of the length field are not in the first read
+	std::string first = compress("first\n", DeflatingStreamBuf::STREAM_GZIP);
+	const std::size_t extraLength = size - first.size() - 2; // XLEN takes 2 bytes
+	first[3] |= 0x04; // FEXTRA
+	first.insert(10, std::string(1, static_cast<char>(extraLength & 0xFF)) + static_cast<char>(extraLength >> 8) + std::string(extraLength, '\0'));
+	assertTrue (first.size() == size);
+	first[first.size() - 8] ^= 0x01;
+	std::stringstream buffer(first + compress("second\n", DeflatingStreamBuf::STREAM_GZIP));
+	InflatingInputStream inflater(buffer, 15 + 32);
+	assertTrue (readFails(inflater));
+
+	inflater.reset();
+	std::string data;
+	inflater >> data;
+	assertTrue (data == "second");
+}
+
+
 void ZLibTest::setUp()
 {
 }
@@ -195,6 +313,8 @@ CppUnit::Test* ZLibTest::suite()
 	CppUnit_addTest(pSuite, ZLibTest, testGzip1);
 	CppUnit_addTest(pSuite, ZLibTest, testGzip2);
 	CppUnit_addTest(pSuite, ZLibTest, testGzip3);
+	CppUnit_addTest(pSuite, ZLibTest, testInflateResetAfterError);
+	CppUnit_addTest(pSuite, ZLibTest, testInflateResetAfterTrailerError);
 
 	return pSuite;
 }
