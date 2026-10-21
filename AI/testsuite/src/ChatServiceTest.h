@@ -27,6 +27,7 @@ public:
 	void testNoProvider();
 	void testModels();
 	void testFailover();
+	void testProviderDetail();
 	void testCancel();
 	void testCancelOwnTurn();
 	void testSelect();

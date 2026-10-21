@@ -62,6 +62,24 @@ namespace
 	}
 
 
+	std::string withoutUserInfo(const std::string& url)
+		/// The URL without the user name and password it may carry, for the
+		/// status of a provider and the log.
+	{
+		try
+		{
+			Poco::URI uri(url);
+			if (uri.getUserInfo().empty()) return url;
+			uri.setUserInfo(std::string());
+			return uri.toString();
+		}
+		catch (const Poco::SyntaxException&)
+		{
+			return "(a URL that cannot be parsed)";
+		}
+	}
+
+
 	bool hasPlaceholder(const std::string& url)
 	{
 		std::size_t begin = 0;
@@ -609,7 +627,7 @@ ProviderStatus ChatService::probe(const ProviderSettings& settings, std::string&
 			models = createProvider(settings, candidate, std::string(), timeout)->listModels();
 			status.reachable = true;
 			status.modelCount = models.size();
-			if (candidates.size() > 1) status.detail = candidate;
+			if (candidates.size() > 1) status.detail = withoutUserInfo(candidate);
 			server = candidate;
 			return status;
 		}
@@ -617,10 +635,10 @@ ProviderStatus ChatService::probe(const ProviderSettings& settings, std::string&
 		{
 			if (logger.warning())
 			{
-				logger.warning("AI provider %s does not answer at %s: %s", settings.name, candidate, exc.displayText());
+				logger.warning("AI provider %s does not answer at %s: %s", settings.name, withoutUserInfo(candidate), exc.displayText());
 			}
 			if (!failures.empty()) failures += "; ";
-			failures += (candidates.size() > 1 ? candidate + ": " : std::string()) + exc.displayText();
+			failures += (candidates.size() > 1 ? withoutUserInfo(candidate) + ": " : std::string()) + exc.displayText();
 		}
 	}
 	models.clear();

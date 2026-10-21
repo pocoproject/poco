@@ -42,7 +42,10 @@ class AI_API ChatEndpoint
 	///     reachable, detail and modelCount are there once the provider was
 	///     asked for its models, manage tells whether the caller may manage the
 	///     chat, keys whether keys are set here, and the other features are
-	///     false;
+	///     false. detail, which may quote the answer of a server of the
+	///     provider, is what the service knows (see ProviderStatus) for a
+	///     caller who may manage the chat; others get only "the provider does
+	///     not answer" for a provider that does not;
 	///   - POST chat/stream with {"messages": [{"role", "content"}], "chat"}:
 	///     the events of the turn (see ChatService) as server-sent events, a
 	///     data line with the JSON of each, comments while the model works,
@@ -156,7 +159,7 @@ private:
 	void config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Caller& caller) const;
 	void token(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Caller& caller) const;
 	Poco::JSON::Object::Ptr readObject(Poco::Net::HTTPServerRequest& request, std::size_t maxSize) const;
-	Poco::JSON::Array::Ptr providerStatus() const;
+	Poco::JSON::Array::Ptr providerStatus(const Caller& caller) const;
 
 	ChatService& _service;
 	const Params _params;

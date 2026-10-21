@@ -46,6 +46,10 @@
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
 #include "Poco/Environment.h"
+#include "Poco/Message.h"
+#include "Poco/Logger.h"
+#include "Poco/Channel.h"
+#include "Poco/AutoPtr.h"
 #include <atomic>
 #include <functional>
 #include <istream>
@@ -141,7 +145,12 @@ namespace
 		{
 			Poco::FastMutex::ScopedLock lock(_pState->mutex);
 			_pState->listings.push_back(_baseUrl);
-			if (_pState->unreachable.count(_baseUrl) > 0) throw Poco::Net::ConnectionRefusedException(_baseUrl);
+			if (_pState->unreachable.count(_baseUrl) > 0)
+			{
+				// Named as a socket names the server it cannot reach.
+				const Poco::URI uri(_baseUrl);
+				throw Poco::Net::ConnectionRefusedException(uri.getHost() + ":" + std::to_string(uri.getPort()));
+			}
 			return _pState->models;
 		}
 
@@ -267,6 +276,28 @@ namespace
 		identity.authenticated = true;
 		return identity;
 	}
+
+
+	class MessageCollector: public Poco::Channel
+		/// Keeps the texts of the messages logged to it.
+	{
+	public:
+		void log(const Poco::Message& msg) override
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			_texts.push_back(msg.getText());
+		}
+
+		std::vector<std::string> texts() const
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _texts;
+		}
+
+	private:
+		mutable Poco::FastMutex _mutex;
+		std::vector<std::string> _texts;
+	};
 
 
 	class EnvironmentGuard
@@ -1003,6 +1034,59 @@ void ChatServiceTest::testSettingsJSON()
 }
 
 
+void ChatServiceTest::testProviderDetail()
+{
+	auto pState = std::make_shared<FakeState>();
+	pState->unreachable.insert("http://user:secret@a:11434/v1");
+	ProviderSettings ollama = entry("ollama", true, {"m1"});
+	ollama.baseUrl = "http://user:secret@[server]:11434/v1";
+	ollama.servers = {"a", "b"};
+	ChatService::Params params = fakeParams(pState);
+	params.loggerName = "ChatServiceTest.ProviderDetail";
+	Poco::Logger& logger = Poco::Logger::get(params.loggerName);
+	const Poco::Channel::Ptr pChannel = logger.getChannel();
+	Poco::AutoPtr<MessageCollector> pCollector = new MessageCollector;
+	logger.setChannel(pCollector);
+	logger.setLevel(Poco::Message::PRIO_WARNING);
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({ollama}), params);
+
+	// The URL of the server that answered, and of the one that did not, go
+	// into the status and the log without user name and password.
+	const ProviderStatus status = service.retry("ollama");
+	const std::vector<std::string> texts = pCollector->texts();
+	logger.setChannel(pChannel);
+	assertTrue(status.reachable);
+	assertEqual(std::string("http://b:11434/v1"), status.detail);
+	assertEqual(std::size_t(1), texts.size());
+	assertTrue(texts[0].find("http://a:11434/v1") != std::string::npos);
+	assertTrue(texts[0].find("secret") == std::string::npos);
+
+	// Through the endpoint only a caller who may manage the chat reads the
+	// detail; others get a fixed reason for a provider that does not answer.
+	Host host(service);
+	Object::Ptr pEntry = host.send("GET", "health").json()->getArray("providerStatus")->getObject(0);
+	assertTrue(pEntry->getValue<bool>("reachable"));
+	assertTrue(!pEntry->has("detail"));
+	pEntry = host.send("GET", "health", "", "root", true).json()->getArray("providerStatus")->getObject(0);
+	assertEqual(std::string("http://b:11434/v1"), pEntry->getValue<std::string>("detail"));
+
+	{
+		Poco::FastMutex::ScopedLock lock(pState->mutex);
+		pState->unreachable.insert("http://user:secret@b:11434/v1");
+	}
+	Answer answer = host.send("POST", "providers", "{\"op\":\"retry\",\"provider\":\"ollama\"}");
+	assertTrue(!answer.json()->getValue<bool>("reachable"));
+	assertEqual(std::string("the provider does not answer"), answer.json()->getValue<std::string>("detail"));
+	pEntry = host.send("GET", "providers").json()->getArray("providerStatus")->getObject(0);
+	assertEqual(std::string("the provider does not answer"), pEntry->getValue<std::string>("detail"));
+	answer = host.send("POST", "providers", "{\"op\":\"retry\",\"provider\":\"ollama\"}", "root", true);
+	const std::string detail = answer.json()->getValue<std::string>("detail");
+	assertTrue(detail.find("http://a:11434/v1") != std::string::npos);
+	assertTrue(detail.find("http://b:11434/v1") != std::string::npos);
+	assertTrue(detail.find("secret") == std::string::npos);
+}
+
+
 void ChatServiceTest::testDefaultProvider()
 {
 	// The default factory: an Ollama server through the OpenAI API, found
@@ -1394,6 +1478,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testNoProvider);
 	CppUnit_addTest(pSuite, ChatServiceTest, testModels);
 	CppUnit_addTest(pSuite, ChatServiceTest, testFailover);
+	CppUnit_addTest(pSuite, ChatServiceTest, testProviderDetail);
 	CppUnit_addTest(pSuite, ChatServiceTest, testCancel);
 	CppUnit_addTest(pSuite, ChatServiceTest, testCancelOwnTurn);
 	CppUnit_addTest(pSuite, ChatServiceTest, testSelect);

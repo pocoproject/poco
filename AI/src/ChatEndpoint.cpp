@@ -139,6 +139,17 @@ namespace
 	}
 
 
+	std::string detailFor(const ProviderStatus& status, const ChatEndpoint::Caller& caller)
+		/// The detail of the status of a provider as the caller gets it: what
+		/// the service knows for one who may manage the chat, which may quote
+		/// the answers of the servers of the provider, and a fixed reason for
+		/// others.
+	{
+		if (caller.mayManage) return status.detail;
+		return status.reachable ? std::string() : std::string("the provider does not answer");
+	}
+
+
 	void needsSameAddress(const ChatSettings& settings, const ProviderSettings& entry)
 		/// The address of a provider whose key comes from the host goes with
 		/// the key.
@@ -349,7 +360,7 @@ void ChatEndpoint::health(Poco::Net::HTTPServerResponse& response, const Caller&
 	pBody->set("model", _service.model());
 	pBody->set("models", toArray(models));
 	pBody->set("providers", toArray(_service.providers()));
-	pBody->set("providerStatus", providerStatus());
+	pBody->set("providerStatus", providerStatus(caller));
 	Poco::JSON::Object::Ptr pFeatures = new Poco::JSON::Object;
 	pFeatures->set("manage", caller.mayManage);
 	pFeatures->set("sessions", false);
@@ -488,7 +499,7 @@ void ChatEndpoint::providers(Poco::Net::HTTPServerRequest& request, Poco::Net::H
 		Poco::JSON::Object::Ptr pBody = ok();
 		pBody->set("provider", _service.provider());
 		pBody->set("providers", toArray(_service.providers()));
-		pBody->set("providerStatus", providerStatus());
+		pBody->set("providerStatus", providerStatus(caller));
 		sendJSON(response, Poco::Net::HTTPResponse::HTTP_OK, pBody);
 		return;
 	}
@@ -502,7 +513,8 @@ void ChatEndpoint::providers(Poco::Net::HTTPServerRequest& request, Poco::Net::H
 		const ProviderStatus status = _service.retry(provider);
 		pBody->set("provider", provider);
 		pBody->set("reachable", status.reachable);
-		if (!status.detail.empty()) pBody->set("detail", status.detail);
+		const std::string detail = detailFor(status, caller);
+		if (!detail.empty()) pBody->set("detail", detail);
 		if (status.reachable) pBody->set("models", toArray(_service.models(provider)));
 		sendJSON(response, Poco::Net::HTTPResponse::HTTP_OK, pBody);
 		return;
@@ -634,7 +646,7 @@ Poco::JSON::Object::Ptr ChatEndpoint::readObject(Poco::Net::HTTPServerRequest& r
 }
 
 
-Poco::JSON::Array::Ptr ChatEndpoint::providerStatus() const
+Poco::JSON::Array::Ptr ChatEndpoint::providerStatus(const Caller& caller) const
 {
 	Poco::JSON::Array::Ptr pStatus = new Poco::JSON::Array;
 	for (const ProviderStatus& status: _service.providerStatus())
@@ -644,7 +656,8 @@ Poco::JSON::Array::Ptr ChatEndpoint::providerStatus() const
 		if (status.probed)
 		{
 			pEntry->set("reachable", status.reachable);
-			if (!status.detail.empty()) pEntry->set("detail", status.detail);
+			const std::string detail = detailFor(status, caller);
+			if (!detail.empty()) pEntry->set("detail", detail);
 			pEntry->set("modelCount", static_cast<Poco::UInt64>(status.modelCount));
 		}
 		pStatus->add(pEntry);
