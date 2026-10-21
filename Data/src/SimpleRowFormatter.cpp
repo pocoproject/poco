@@ -52,8 +52,7 @@ void SimpleRowFormatter::swap(SimpleRowFormatter& other) noexcept
 {
 	using std::swap;
 
-	setPrefix(other.prefix());
-	setPostfix(other.postfix());
+	swapPrefixAndPostfix(other);
 	swap(_colWidth, other._colWidth);
 	swap(_spacing, other._spacing);
 }

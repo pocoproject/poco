@@ -68,6 +68,26 @@ using namespace Poco::Data::Keywords;
 using namespace std::string_literals;
 
 
+namespace
+{
+	class AffixRowFormatter: public SimpleRowFormatter
+		/// Sets the prefix and the postfix, which SimpleRowFormatter leaves empty.
+	{
+	public:
+		AffixRowFormatter() = delete;
+		AffixRowFormatter(const std::string& prefix, const std::string& postfix);
+		~AffixRowFormatter() override = default;
+	};
+
+
+	AffixRowFormatter::AffixRowFormatter(const std::string& prefix, const std::string& postfix)
+	{
+		setPrefix(prefix);
+		setPostfix(postfix);
+	}
+}
+
+
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
 {
 	Poco::Data::Test::Connector::addToFactory();
@@ -1320,6 +1340,14 @@ void DataTest::testSimpleRowFormatterSwap()
 	assertEqual (2, rf1.getSpacing());
 	assertEqual (20, rf2.getColumnWidth());
 	assertEqual (4, rf2.getSpacing());
+
+	AffixRowFormatter af1("prefix1", "postfix1");
+	AffixRowFormatter af2("prefix2", "postfix2");
+	Poco::Data::swap(af1, af2);
+	assertEqual ("prefix2"s, af1.prefix());
+	assertEqual ("postfix2"s, af1.postfix());
+	assertEqual ("prefix1"s, af2.prefix());
+	assertEqual ("postfix1"s, af2.postfix());
 }
 
 
