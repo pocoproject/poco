@@ -12,7 +12,7 @@ POCO_HEADERS_AUTO( Bonjour_SRCS ${HDRS_G})
 add_compile_definitions( ${Bonjour_CFLAGS} THREADSAFE)
 
 add_library( "${LIBNAME}" ${LIB_MODE} ${Bonjour_SRCS} )
-add_library( "${POCO_LIBNAME}" ALIAS "${LIBNAME}")
+add_library( "Poco::${LIBNAME}" ALIAS "${LIBNAME}")
 set_target_properties( "${LIBNAME}"
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
