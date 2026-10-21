@@ -23,6 +23,10 @@
 #include "Poco/Event.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include "Poco/Timespan.h"
+#include "Poco/DateTime.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/Format.h"
 #include "Poco/Timestamp.h"
 #include <atomic>
@@ -521,6 +525,26 @@ void AnthropicProviderTest::testHttpErrors()
 		assertEqual(7, events.firstError()->retryAfter.totalSeconds());
 		assertEqual(std::string("req_123"), events.firstError()->requestId);
 	}
+
+	// What a server asks to wait is taken up to a day, in seconds and as an
+	// HTTP date.
+	const auto retryAfter = [](const std::string& value)
+	{
+		CannedServer::Response response = CannedServer::makeResponse(429, "application/json", "{}");
+		response.headers.emplace_back("retry-after", value);
+		CannedServer server(response);
+		AnthropicProvider provider(params(server.baseUrl()));
+		Events events;
+		Cancellation cancellation;
+		(void) provider.chat(userRequest("Hi"), events.callback(), cancellation);
+		return events.firstError()->retryAfter;
+	};
+	const Poco::Timespan day(1, 0, 0, 0, 0);
+	assertTrue(retryAfter("99999999999999999999") == Poco::Timespan());
+	assertTrue(retryAfter("9223372036854775807") == day);
+	assertTrue(retryAfter(Poco::DateTimeFormatter::format(Poco::Timestamp() + 2*Poco::Timespan::HOURS, Poco::DateTimeFormat::HTTP_FORMAT)) > Poco::Timespan(0, 1, 59, 0, 0));
+	assertTrue(retryAfter(Poco::DateTimeFormatter::format(Poco::DateTime(2999, 1, 1), Poco::DateTimeFormat::HTTP_FORMAT)) == day);
+	assertTrue(retryAfter(Poco::DateTimeFormatter::format(Poco::DateTime(2000, 1, 1), Poco::DateTimeFormat::HTTP_FORMAT)) == Poco::Timespan());
 
 	// A 429 for a used-up quota is no rate limit: waiting does not help.
 	CannedServer quota(CannedServer::makeResponse(429, "application/json", "{\"type\":\"error\",\"error\":{\"type\":\"billing_error\",\"message\":\"credit\"}}"));

@@ -25,6 +25,7 @@
 #include "Poco/String.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <sstream>
 #if !defined(POCO_OS_FAMILY_WINDOWS)
 #include <unistd.h>
@@ -77,24 +78,27 @@ namespace
 
 	Poco::Timespan retryAfterOf(const Poco::Net::HTTPResponse& response)
 		/// How long the response asks to wait: retry-after-ms, or retry-after
-		/// in seconds or as an HTTP date; zero when it does not say.
+		/// in seconds or as an HTTP date; zero when it does not say. The value
+		/// comes from the server and is taken up to a day, before it is
+		/// multiplied, so that no value overflows.
 	{
+		const Poco::Timespan::TimeDiff maxWait = 24*Poco::Timespan::HOURS;
 		Poco::Int64 value = 0;
 		if (Poco::NumberParser::tryParse64(Poco::trim(response.get("retry-after-ms", "")), value) && value > 0)
 		{
-			return Poco::Timespan(value * 1000);
+			return Poco::Timespan(std::min(value, maxWait/Poco::Timespan::MILLISECONDS)*Poco::Timespan::MILLISECONDS);
 		}
 		const std::string text = Poco::trim(response.get("retry-after", ""));
 		if (Poco::NumberParser::tryParse64(text, value))
 		{
-			return value > 0 ? Poco::Timespan(value, 0) : Poco::Timespan();
+			return value > 0 ? Poco::Timespan(std::min(value, maxWait/Poco::Timespan::SECONDS)*Poco::Timespan::SECONDS) : Poco::Timespan();
 		}
 		Poco::DateTime date;
 		int timeZone = 0;
 		if (!text.empty() && Poco::DateTimeParser::tryParse(Poco::DateTimeFormat::HTTP_FORMAT, text, date, timeZone))
 		{
 			const Poco::Timestamp::TimeDiff wait = date.timestamp() - Poco::Timestamp();
-			return wait > 0 ? Poco::Timespan(wait) : Poco::Timespan();
+			return wait > 0 ? Poco::Timespan(std::min(wait, maxWait)) : Poco::Timespan();
 		}
 		return Poco::Timespan();
 	}

@@ -414,6 +414,16 @@ void OpenAIProviderTest::testHttpErrors()
 		assertEqual(std::string("req_abc"), events.firstError()->requestId);
 	}
 
+	// What a server asks to wait in milliseconds is taken up to a day.
+	CannedServer::Response longWait = CannedServer::makeResponse(429, "application/json", "{}");
+	longWait.headers.emplace_back("retry-after-ms", "9223372036854775807");
+	CannedServer longWaitServer(longWait);
+	OpenAIProvider longWaitProvider(params(longWaitServer.baseUrl()));
+	Events longWaitEvents;
+	Cancellation longWaitCancellation;
+	(void) longWaitProvider.chat(userRequest("Hi"), longWaitEvents.callback(), longWaitCancellation);
+	assertTrue(longWaitEvents.firstError()->retryAfter == Poco::Timespan(1, 0, 0, 0, 0));
+
 	// A 429 for a used-up quota is no rate limit: waiting does not help.
 	CannedServer quota(CannedServer::makeResponse(429, "application/json", "{\"error\":{\"message\":\"quota\",\"type\":\"insufficient_quota\",\"code\":\"insufficient_quota\"}}"));
 	OpenAIProvider quotaProvider(params(quota.baseUrl()));
