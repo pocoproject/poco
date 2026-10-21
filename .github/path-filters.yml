@@ -41,3 +41,8 @@ crypto_netssl:
   - 'Crypto/**'
   - 'NetSSL_OpenSSL/**'
   - 'JWT/**'
+
+modules:
+  - 'modules/**'
+  - '*/include/**'
+  - '*/*/include/**'
