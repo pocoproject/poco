@@ -17,9 +17,11 @@
 #include "Poco/Dynamic/Struct.h"
 #include "Poco/Dynamic/Pair.h"
 #include "Poco/Dynamic/VarVisitor.h"
+#include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Thread.h"
 #include <map>
 #include <utility>
+#include <type_traits>
 #include <iostream>
 #include <atomic>
 #include <memory>
@@ -3317,6 +3319,28 @@ void VarTest::testIterator()
 }
 
 
+void VarTest::testIteratorSwap()
+{
+	static_assert(std::is_nothrow_swappable_v<Poco::Dynamic::VarIterator>);
+
+	Poco::Dynamic::Array arr{1, 2, 3};
+	Var v = arr;
+	Var::Iterator it1 = v.begin();
+	Var::Iterator it2 = v.end();
+	static_assert(noexcept(it1.swap(it2)));
+	assertTrue (it1 != it2);
+
+	Poco::Dynamic::swap(it1, it2);
+	assertTrue (it1 == v.end());
+	assertTrue (it2 == v.begin());
+
+	using std::swap;
+	swap(it1, it2);
+	assertTrue (it1 == v.begin());
+	assertTrue (it2 == v.end());
+}
+
+
 void VarTest::testSharedPtr()
 {
 	Poco::SharedPtr<int> p = new int(42);
@@ -3570,6 +3594,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testUUID);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);
+	CppUnit_addTest(pSuite, VarTest, testIteratorSwap);
 	CppUnit_addTest(pSuite, VarTest, testVarVisitor);
 	CppUnit_addTest(pSuite, VarTest, testEnumType);
 

@@ -87,6 +87,7 @@ public:
 	void testUUID();
 	void testEmpty();
 	void testIterator();
+	void testIteratorSwap();
 	void testSharedPtr();
 	void testVarVisitor();
 

@@ -113,6 +113,7 @@ public:
 	void testNullableVector();
 	void testNulls();
 	void testRowIterator();
+	void testRowIteratorSwap();
 	void testAsync();
 
 	void testAny();

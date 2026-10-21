@@ -57,6 +57,8 @@
 #include <sstream>
 #include <iomanip>
 #include <set>
+#include <type_traits>
+#include <utility>
 
 
 using namespace Poco;
@@ -80,6 +82,8 @@ DataTest::~DataTest()
 
 void DataTest::testSession()
 {
+	static_assert(std::is_nothrow_swappable_v<Poco::Data::Session>);
+
 	Session sess(SessionFactory::instance().create("test", "cs"));
 	assertTrue ("test" == sess.impl()->connectorName());
 	assertTrue (sess.connector() == sess.impl()->connectorName());
@@ -95,6 +99,7 @@ void DataTest::testSession()
 	assertTrue ("test" == sess2.impl()->connectorName());
 	assertTrue ("Cs" == sess2.impl()->connectionString());
 	assertTrue ("test:///Cs" == sess2.uri());
+	static_assert(noexcept(sess.swap(sess2)));
 
 	sess << "DROP TABLE IF EXISTS Test", now;
 	int count;
@@ -180,6 +185,26 @@ void DataTest::testStatementMoveAssignment()
 	assertTrue (target.toString() == "SELEC * FROM Person");
 	assertTrue (target.parseError() == parseError);
 	assertTrue (source.parseError().empty());
+}
+
+
+void DataTest::testStatementSwap()
+{
+	static_assert(std::is_nothrow_swappable_v<Statement>);
+
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	Statement stmt1 = (sess << "SELECT 1");
+	Statement stmt2 = (sess << "SELECT 2");
+
+	Poco::Data::swap(stmt1, stmt2);
+	assertEqual ("SELECT 2"s, stmt1.toString());
+	assertEqual ("SELECT 1"s, stmt2.toString());
+
+	using std::swap;
+	swap(stmt1, stmt2);
+	assertEqual ("SELECT 1"s, stmt1.toString());
+	assertEqual ("SELECT 2"s, stmt2.toString());
 }
 
 
@@ -1273,6 +1298,28 @@ void DataTest::testSimpleRowFormatter()
 		<< spacer
 		<< std::setw(sz) << "4" << std::endl;
 	assertTrue (row1.valuesToString() == os.str());
+}
+
+
+void DataTest::testSimpleRowFormatterSwap()
+{
+	static_assert(std::is_nothrow_swappable_v<SimpleRowFormatter>);
+
+	SimpleRowFormatter rf1(10, 2);
+	SimpleRowFormatter rf2(20, 4);
+
+	Poco::Data::swap(rf1, rf2);
+	assertEqual (20, rf1.getColumnWidth());
+	assertEqual (4, rf1.getSpacing());
+	assertEqual (10, rf2.getColumnWidth());
+	assertEqual (2, rf2.getSpacing());
+
+	using std::swap;
+	swap(rf1, rf2);
+	assertEqual (10, rf1.getColumnWidth());
+	assertEqual (2, rf1.getSpacing());
+	assertEqual (20, rf2.getColumnWidth());
+	assertEqual (4, rf2.getSpacing());
 }
 
 
@@ -2734,6 +2781,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testSession);
 	CppUnit_addTest(pSuite, DataTest, testStatementFormatting);
 	CppUnit_addTest(pSuite, DataTest, testStatementMoveAssignment);
+	CppUnit_addTest(pSuite, DataTest, testStatementSwap);
 	CppUnit_addTest(pSuite, DataTest, testFeatures);
 	CppUnit_addTest(pSuite, DataTest, testProperties);
 	CppUnit_addTest(pSuite, DataTest, testLOB);
@@ -2746,6 +2794,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testRow);
 	CppUnit_addTest(pSuite, DataTest, testRowSort);
 	CppUnit_addTest(pSuite, DataTest, testSimpleRowFormatter);
+	CppUnit_addTest(pSuite, DataTest, testSimpleRowFormatterSwap);
 	CppUnit_addTest(pSuite, DataTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);

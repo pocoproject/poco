@@ -72,6 +72,13 @@ void ModulesTest::testFoundation()
 	const Poco::Dynamic::Var dateTime(Poco::DateTime(2025, 1, 2, 3, 4, 5));
 	assertEqual("2025-01-02T03:04:05Z", dateTime.convert<std::string>());
 
+	Poco::Dynamic::Var number(3);
+	Poco::Dynamic::Var::Iterator first = number.begin();
+	Poco::Dynamic::Var::Iterator second = number.end();
+	swap(first, second);
+	assertTrue(first == number.end());
+	assertTrue(second == number.begin());
+
 	assertEqual("a-1", Poco::format("%s-%d", std::string("a"), 1));
 	assertEqual("ab", Poco::cat(std::string("a"), std::string("b")));
 

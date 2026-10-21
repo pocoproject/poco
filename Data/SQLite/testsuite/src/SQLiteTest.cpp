@@ -17,6 +17,7 @@
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowFilter.h"
+#include "Poco/Data/RowIterator.h"
 #include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/SessionPool.h"
@@ -47,6 +48,8 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/Bugcheck.h"
 #include <iostream>
+#include <type_traits>
+#include <utility>
 
 
 using namespace std::string_literals;
@@ -2734,6 +2737,31 @@ void SQLiteTest::testRowIterator()
 }
 
 
+void SQLiteTest::testRowIteratorSwap()
+{
+	static_assert(std::is_nothrow_swappable_v<Poco::Data::RowIterator>);
+
+	Session ses (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	ses << "CREATE TABLE Ints (int0 INTEGER)", now;
+	std::vector<int> v{1, 2, 3};
+	ses << "INSERT INTO Ints VALUES (?)", use(v), now;
+
+	RecordSet rset(ses, "SELECT * FROM Ints");
+	RecordSet::Iterator it1 = rset.begin();
+	RecordSet::Iterator it2 = rset.end();
+	assertTrue (it1 != it2);
+
+	Poco::Data::swap(it1, it2);
+	assertTrue (it1 == rset.end());
+	assertTrue (it2 == rset.begin());
+
+	using std::swap;
+	swap(it1, it2);
+	assertTrue (it1 == rset.begin());
+	assertTrue (it2 == rset.end());
+}
+
+
 void SQLiteTest::testAsync()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -5082,6 +5110,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNullableVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
+	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorSwap);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 	CppUnit_addTest(pSuite, SQLiteTest, testAny);
 	CppUnit_addTest(pSuite, SQLiteTest, testDynamicAny);
