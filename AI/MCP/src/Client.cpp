@@ -56,7 +56,7 @@ namespace
 			throw Poco::ProtocolException(notAnError, "its code is out of range");
 		}
 		std::string message = pError->getValue<std::string>("message");
-		if (pError->has("data"))
+		if (pError->has("data") && !pError->isNull("data"))
 		{
 			message += " " + pError->get("data").toString();
 		}

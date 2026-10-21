@@ -196,6 +196,21 @@ void StreamClientTest::testErrorReply()
 		assertEqual(-32602, exc.code());
 		assertTrue(exc.message().find("Unknown tool: x") != std::string::npos);
 	}
+
+	// Data that is null adds nothing to the message.
+	std::istringstream nullData("{\"jsonrpc\":\"2.0\",\"id\":1,\"error\":{\"code\":-32602,\"message\":\"m\",\"data\":null}}\n");
+	std::ostringstream nullOut;
+	StreamClient nullClient(nullData, nullOut);
+	try
+	{
+		(void) nullClient.callTool("x");
+		fail("an error reply must throw");
+	}
+	catch (const MCPException& exc)
+	{
+		assertEqual(-32602, exc.code());
+		assertEqual(std::string("m"), exc.message());
+	}
 }
 
 

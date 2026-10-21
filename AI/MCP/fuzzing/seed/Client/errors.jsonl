@@ -1,2 +1,3 @@
 {"jsonrpc":"2.0","id":1,"error":{"code":-32022,"message":"Unsupported protocol version","data":{"supported":["2025-06-18"],"requested":"2026-07-28"}}}
 {"jsonrpc":"2.0","error":{"code":-32700,"message":"Parse error"}}
+{"jsonrpc":"2.0","id":1,"error":{"code":-32602,"message":"m","data":null}}
