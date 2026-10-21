@@ -51,7 +51,8 @@ class AI_API ChatEndpoint
 	///     cancelled;
 	///   - POST chat/cancel?chat=<id>: cancels the caller's turn in the chat,
 	///     or all of the caller's turns without the parameter: {"status": "ok",
-	///     "cancelled"};
+	///     "cancelled"}. A caller who is not signed in cancels none (see
+	///     ChatService::cancel()); their turn stops when they close its stream;
 	///   - GET models: {"status": "ok", "provider", "model", "models"};
 	///   - POST models with {"model"}: puts the model in use;
 	///   - GET providers: {"status": "ok", "provider", "providers",

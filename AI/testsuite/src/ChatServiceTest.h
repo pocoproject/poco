@@ -28,6 +28,7 @@ public:
 	void testModels();
 	void testFailover();
 	void testCancel();
+	void testCancelOwnTurn();
 	void testSelect();
 	void testConfigure();
 	void testKeyStaysAtItsAddress();

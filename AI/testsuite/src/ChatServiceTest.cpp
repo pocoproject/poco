@@ -338,17 +338,18 @@ namespace
 		/// Runs a turn on a thread of its own.
 	{
 	public:
-		Turn(ChatService& service, const std::string& user, const std::string& chatId):
+		Turn(ChatService& service, const std::string& user, const std::string& chatId, std::shared_ptr<Cancellation> pCancellation = nullptr):
 			_service(service),
 			_user(user),
 			_chatId(chatId),
+			_pCancellation(std::move(pCancellation)),
 			_conversation(conversationOf("wait"))
 		{
 		}
 
 		void run() override
 		{
-			_service.chat(_conversation, who(_user), _chatId, events.sink());
+			_service.chat(_conversation, who(_user), _chatId, events.sink(), _pCancellation);
 		}
 
 		Events events;
@@ -357,6 +358,7 @@ namespace
 		ChatService& _service;
 		std::string _user;
 		std::string _chatId;
+		std::shared_ptr<Cancellation> _pCancellation;
 		Array _conversation;
 	};
 
@@ -733,6 +735,36 @@ void ChatServiceTest::testCancel()
 }
 
 
+void ChatServiceTest::testCancelOwnTurn()
+{
+	auto pState = std::make_shared<FakeState>();
+	pState->block = true;
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({entry("ollama", true, {"m1"})}), fakeParams(pState));
+
+	// Two turns of users who are not signed in, in chats of the same id: the
+	// empty principal, everybody's who is not signed in, cancels neither, and
+	// the cancellation a turn was started with stops that turn alone.
+	auto pMine = std::make_shared<Cancellation>();
+	Turn mine(service, "", "c1", pMine);
+	Turn other(service, "", "c1");
+	Poco::Thread mineThread;
+	Poco::Thread otherThread;
+	mineThread.start(mine);
+	otherThread.start(other);
+	assertTrue(waitFor([&pState]() { return pState->called().size() == 2; }));
+	assertEqual(0, service.cancel("", "c1"));
+	assertEqual(0, service.cancel(""));
+	pMine->cancel();
+	mineThread.join();
+	assertEqual(std::string("cancelled"), mine.events.last()->getValue<std::string>("stopReason"));
+	assertEqual(1, pState->cancelled.load());
+	assertTrue(otherThread.isRunning());
+	service.cancelAll();
+	otherThread.join();
+	assertEqual(2, pState->cancelled.load());
+}
+
+
 void ChatServiceTest::testSelect()
 {
 	auto pState = std::make_shared<FakeState>();
@@ -1063,22 +1095,35 @@ void ChatServiceTest::testEndpointCancel()
 	class Streamer: public Poco::Runnable
 	{
 	public:
-		explicit Streamer(const Host& host): _host(host)
+		Streamer(const Host& host, const std::string& user): _host(host), _user(user)
 		{
 		}
 
 		void run() override
 		{
-			answer = _host.send("POST", "chat/stream", HELLO);
+			answer = _host.send("POST", "chat/stream", HELLO, _user);
 		}
 
 		Answer answer;
 
 	private:
 		const Host& _host;
+		std::string _user;
 	};
 
-	Streamer streamer(host);
+	// A caller who is not signed in cancels no turn, also not one of another
+	// caller who is not signed in.
+	Streamer anonymous(host, "");
+	Poco::Thread anonymousThread;
+	anonymousThread.start(anonymous);
+	assertTrue(pState->started.tryWait(10000));
+	assertEqual(0, host.send("POST", "chat/cancel?chat=c1", "", "").json()->getValue<int>("cancelled"));
+	assertEqual(0, host.send("POST", "chat/cancel", "", "").json()->getValue<int>("cancelled"));
+	service.cancelAll();
+	anonymousThread.join();
+	pState->started.reset();
+
+	Streamer streamer(host, "alice");
 	Poco::Thread thread;
 	thread.start(streamer);
 	assertTrue(pState->started.tryWait(10000));
@@ -1350,6 +1395,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testModels);
 	CppUnit_addTest(pSuite, ChatServiceTest, testFailover);
 	CppUnit_addTest(pSuite, ChatServiceTest, testCancel);
+	CppUnit_addTest(pSuite, ChatServiceTest, testCancelOwnTurn);
 	CppUnit_addTest(pSuite, ChatServiceTest, testSelect);
 	CppUnit_addTest(pSuite, ChatServiceTest, testConfigure);
 	CppUnit_addTest(pSuite, ChatServiceTest, testKeyStaysAtItsAddress);

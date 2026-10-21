@@ -20,6 +20,7 @@
 
 #include "Poco/AI/AI.h"
 #include "Poco/AI/AgentLoop.h"
+#include "Poco/AI/Cancellation.h"
 #include "Poco/AI/ChatSettings.h"
 #include "Poco/AI/LLMProvider.h"
 #include "Poco/AI/SessionFactory.h"
@@ -137,18 +138,23 @@ public:
 		/// turns with cancelAll() and waits until its request handlers have
 		/// ended.
 
-	void chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Identity& user, const std::string& chatId, const EventSink& onEvent);
+	void chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Identity& user, const std::string& chatId, const EventSink& onEvent, std::shared_ptr<Cancellation> pCancellation = nullptr);
 		/// Runs a turn on conversation, the messages of the user and the
 		/// answers so far as {"role", "content"} objects, and appends the turn
 		/// to it, in the format of the provider. The tools run with the
 		/// identity of the user in their request context, and decide with it
 		/// what the user may do. The turn can be cancelled by the principal of
-		/// the user and the id of the chat. Every turn ends with a done event,
-		/// also one that could not start, e.g. without a provider.
+		/// the user and the id of the chat, and through pCancellation, which
+		/// stops this turn alone; without one the service makes its own. Every
+		/// turn ends with a done event, also one that could not start, e.g.
+		/// without a provider.
 
 	int cancel(const std::string& user, const std::string& chatId = std::string());
 		/// Cancels the turns of the user that run in the chat, or all of the
-		/// user's for an empty chatId. Returns how many.
+		/// user's for an empty chatId. Returns how many. A user who is not
+		/// signed in, with an empty principal, cancels none: that principal
+		/// is everybody's who is not signed in. Their turns stop through the
+		/// cancellation they were started with, or cancelAll().
 
 	void cancelAll();
 		/// Cancels every turn that runs.

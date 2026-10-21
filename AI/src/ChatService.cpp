@@ -98,9 +98,9 @@ ChatService::~ChatService()
 }
 
 
-void ChatService::chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Identity& user, const std::string& chatId, const EventSink& onEvent)
+void ChatService::chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Identity& user, const std::string& chatId, const EventSink& onEvent, std::shared_ptr<Cancellation> pCancellation)
 {
-	const std::shared_ptr<Cancellation> pCancellation = std::make_shared<Cancellation>();
+	if (pCancellation == nullptr) pCancellation = std::make_shared<Cancellation>();
 	{
 		Poco::FastMutex::ScopedLock lock(_turnsMutex);
 		_turns.push_back(Turn{user.principal, chatId, pCancellation});
@@ -210,6 +210,7 @@ void ChatService::chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Ide
 
 int ChatService::cancel(const std::string& user, const std::string& chatId)
 {
+	if (user.empty()) return 0;
 	int cancelled = 0;
 	Poco::FastMutex::ScopedLock lock(_turnsMutex);
 	for (const Turn& turn: _turns)

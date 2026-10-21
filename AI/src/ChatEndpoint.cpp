@@ -13,6 +13,7 @@
 
 
 #include "Poco/AI/ChatEndpoint.h"
+#include "Poco/AI/Cancellation.h"
 #include "Poco/AI/MCP/HTTP/Body.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
@@ -404,11 +405,12 @@ void ChatEndpoint::stream(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 
 	Poco::FastMutex mutex;
 	bool gone = false;
-	const std::string user = caller.user;
-	const auto leave = [this, &user, &chatId]()
+	const std::shared_ptr<Cancellation> pCancellation = std::make_shared<Cancellation>();
+	const auto leave = [&pCancellation]()
 	{
-		// The client has gone away: nobody reads the rest of the turn.
-		(void) _service.cancel(user, chatId);
+		// The client has gone away: nobody reads the rest of this turn. Other
+		// turns of the user in the chat, e.g. in another tab, go on.
+		pCancellation->cancel();
 	};
 	{
 		Poco::FastMutex::ScopedLock lock(mutex);
@@ -434,7 +436,7 @@ void ChatEndpoint::stream(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 				gone = true;
 				leave();
 			}
-		});
+		}, pCancellation);
 	heartbeat.stop();
 	Poco::FastMutex::ScopedLock lock(mutex);
 	if (gone) return;
@@ -452,7 +454,7 @@ void ChatEndpoint::cancel(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		if (parameter.first == "chat") chatId = parameter.second;
 	}
 	Poco::JSON::Object::Ptr pBody = ok();
-	pBody->set("cancelled", caller.user.empty() && chatId.empty() ? 0 : _service.cancel(caller.user, chatId));
+	pBody->set("cancelled", _service.cancel(caller.user, chatId));
 	sendJSON(response, Poco::Net::HTTPResponse::HTTP_OK, pBody);
 }
 
