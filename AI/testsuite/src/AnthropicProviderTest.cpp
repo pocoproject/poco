@@ -546,13 +546,34 @@ void AnthropicProviderTest::testHttpErrors()
 	assertTrue(retryAfter(Poco::DateTimeFormatter::format(Poco::DateTime(2999, 1, 1), Poco::DateTimeFormat::HTTP_FORMAT)) == day);
 	assertTrue(retryAfter(Poco::DateTimeFormatter::format(Poco::DateTime(2000, 1, 1), Poco::DateTimeFormat::HTTP_FORMAT)) == Poco::Timespan());
 
-	// A 429 for a used-up quota is no rate limit: waiting does not help.
-	CannedServer quota(CannedServer::makeResponse(429, "application/json", "{\"type\":\"error\",\"error\":{\"type\":\"billing_error\",\"message\":\"credit\"}}"));
+	// The spend cap of the usage tier is a 429 of the type of a rate limit,
+	// without retry-after, that fails until the next month: no rate limit,
+	// as waiting does not help.
+	CannedServer quota(CannedServer::makeResponse(429, "application/json", "{\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"You have reached your API usage limits.\",\"details\":{\"error_code\":\"enforced_spend_limit_reached\"}},\"request_id\":\"req_1\"}"));
 	AnthropicProvider quotaProvider(params(quota.baseUrl()));
 	Events quotaEvents;
 	Cancellation cancellation;
 	(void) quotaProvider.chat(userRequest("Hi"), quotaEvents.callback(), cancellation);
 	assertTrue(quotaEvents.firstError()->code == FailureCode::QUOTA_EXCEEDED);
+	assertTrue(quotaEvents.firstError()->retryAfter == Poco::Timespan());
+
+	// The same type without the details is a rate limit.
+	CannedServer rateLimit(CannedServer::makeResponse(429, "application/json", "{\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"Number of requests has exceeded your rate limit.\"}}"));
+	AnthropicProvider rateLimitProvider(params(rateLimit.baseUrl()));
+	Events rateLimitEvents;
+	Cancellation rateLimitCancellation;
+	(void) rateLimitProvider.chat(userRequest("Hi"), rateLimitEvents.callback(), rateLimitCancellation);
+	assertTrue(rateLimitEvents.firstError()->code == FailureCode::RATE_LIMITED);
+
+	// A spend limit the organization set itself is a 400, a rejected
+	// request whose text says why.
+	CannedServer ownLimit(CannedServer::makeResponse(400, "application/json", "{\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"You have reached your specified API usage limits.\"}}"));
+	AnthropicProvider ownLimitProvider(params(ownLimit.baseUrl()));
+	Events ownLimitEvents;
+	Cancellation ownLimitCancellation;
+	(void) ownLimitProvider.chat(userRequest("Hi"), ownLimitEvents.callback(), ownLimitCancellation);
+	assertTrue(ownLimitEvents.firstError()->code == FailureCode::REQUEST_REJECTED);
+	assertTrue(ownLimitEvents.firstError()->text.find("You have reached your specified API usage limits.") != std::string::npos);
 }
 
 

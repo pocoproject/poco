@@ -244,9 +244,9 @@ FailureCode failureCodeOf(int status, const std::string& body)
 	{
 		const Poco::JSON::Object::Ptr pRoot = parseObject(body);
 		const Poco::JSON::Object::Ptr pError = pRoot.isNull() ? Poco::JSON::Object::Ptr() : pRoot->getObject("error");
-		const std::string type = stringOf(pError, "type");
-		const std::string code = stringOf(pError, "code");
-		if (type == "insufficient_quota" || code == "insufficient_quota" || type == "billing_error") return FailureCode::QUOTA_EXCEEDED;
+		const Poco::JSON::Object::Ptr pDetails = pError.isNull() ? Poco::JSON::Object::Ptr() : pError->getObject("details");
+		if (stringOf(pError, "type") == "insufficient_quota" || stringOf(pError, "code") == "insufficient_quota") return FailureCode::QUOTA_EXCEEDED;
+		if (stringOf(pDetails, "error_code") == "enforced_spend_limit_reached") return FailureCode::QUOTA_EXCEEDED;
 		return FailureCode::RATE_LIMITED;
 	}
 	if (status == Poco::Net::HTTPResponse::HTTP_SERVICE_UNAVAILABLE || status == 529) return FailureCode::OVERLOADED;

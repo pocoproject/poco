@@ -43,10 +43,10 @@ enum class FailureCode
 	NONE,
 	UNAUTHENTICATED,      /// HTTP 401 or 403: the key is missing, wrong or lacks the permission.
 	RATE_LIMITED,         /// HTTP 429 for too many requests: worth a retry after retryAfter.
-	QUOTA_EXCEEDED,       /// HTTP 402, or a 429 for a quota or spending limit: no retry helps until it is raised.
+	QUOTA_EXCEEDED,       /// HTTP 402, or a 429 for a used-up quota or a reached spend cap: no retry helps until it is raised or renewed.
 	OVERLOADED,           /// HTTP 503 or 529, or an overloaded error in the stream; worth a retry later.
 	SERVER_ERROR,         /// Another HTTP 5xx.
-	REQUEST_REJECTED,     /// Another HTTP 4xx: the request itself is wrong.
+	REQUEST_REJECTED,     /// Another HTTP 4xx: the request itself is wrong, or a spend limit the organization set itself is reached, which Anthropic answers with a 400; the text says which.
 	MALFORMED_TOOL_INPUT, /// A tool call whose input is not a JSON object; the tool is not called.
 	STREAM_INTERRUPTED,   /// The response stream ended before its end; what arrived is incomplete.
 	STREAM_ERROR,         /// The API reported an error inside the response stream.

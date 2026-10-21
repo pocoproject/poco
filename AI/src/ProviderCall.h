@@ -121,8 +121,10 @@ private:
 
 [[nodiscard]] FailureCode failureCodeOf(int status, const std::string& body);
 	/// The kind of failure an HTTP status that is not 200 reports. A 429
-	/// whose error says the quota or the credit is used up is QUOTA_EXCEEDED,
-	/// not RATE_LIMITED: waiting does not help.
+	/// whose error says that the quota is used up (OpenAI's
+	/// insufficient_quota) or that the spend cap is reached (Anthropic's
+	/// enforced_spend_limit_reached in error.details.error_code) is
+	/// QUOTA_EXCEEDED, not RATE_LIMITED: waiting does not help.
 
 
 void reportFailure(const ContentEventCallback& onEvent, FailureCode code, const std::string& text, const Poco::Net::HTTPResponse* pResponse = nullptr);
