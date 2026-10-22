@@ -776,6 +776,39 @@ void AgentLoopTest::testCallbackThrowsDuringCall()
 }
 
 
+void AgentLoopTest::testCallbackThrowsAtRoundLimit()
+{
+	// The callback throws on the failure of the round limit: the tool calls
+	// of the final answer still get their results, so that the conversation
+	// stays one the API takes.
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"echo"}), tools({"echo", "echo"})});
+	ToolRegistry registry;
+	int runs = 0;
+	registerEcho(registry, "echo", &runs);
+	AgentLoop loop(pProvider, registry, 1);
+	Array conversation = userTurn("go");
+	try
+	{
+		loop.run(conversation, "", [](const AgentEvent& event)
+		{
+			if (event.type == AgentEvent::Type::FAILURE && event.code == FailureCode::ROUND_LIMIT)
+			{
+				throw Poco::IllegalStateException("callback failed");
+			}
+		});
+		fail("the exception of the callback must reach the caller");
+	}
+	catch (const Poco::IllegalStateException&)
+	{
+	}
+	assertEqual(1, runs);
+	// user, call, result, final call with two tool calls, and their results
+	assertEqual(6u, static_cast<unsigned>(conversation.size()));
+	assertTrue(conversation.getObject(4)->getValue<bool>("error"));
+	assertTrue(conversation.getObject(5)->getValue<bool>("error"));
+}
+
+
 void AgentLoopTest::testResultLimits()
 {
 	// Each kind of block has its limit: images of the types the APIs take
@@ -961,6 +994,7 @@ CppUnit::Test* AgentLoopTest::suite()
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolReplacedDuringRun);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrows);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrowsDuringCall);
+	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrowsAtRoundLimit);
 	CppUnit_addTest(pSuite, AgentLoopTest, testResultLimits);
 	CppUnit_addTest(pSuite, AgentLoopTest, testDoneCarriesTheOutcome);
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolSeesTheCancel);

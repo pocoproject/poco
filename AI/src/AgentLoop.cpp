@@ -295,13 +295,13 @@ void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPr
 			// A call cut by the token limit may have lost part of its input:
 			// no tool call of that turn runs, and the run ends.
 			const bool cut = result.stopReason == StopReason::MAX_TOKENS;
-			if (finalRound)
-			{
-				emitFailure(onEvent, FailureCode::ROUND_LIMIT, "The model still called tools after " + Poco::NumberFormatter::format(_maxRounds) + " rounds");
-			}
 			std::size_t answered = 0;
 			try
 			{
+				if (finalRound)
+				{
+					emitFailure(onEvent, FailureCode::ROUND_LIMIT, "The model still called tools after " + Poco::NumberFormatter::format(_maxRounds) + " rounds");
+				}
 				for (const ToolCall& call: result.toolCalls)
 				{
 					AgentEvent callEvent;
