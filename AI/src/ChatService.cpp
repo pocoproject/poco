@@ -722,7 +722,7 @@ std::shared_ptr<LLMProvider> ChatService::createProvider(const ProviderSettings&
 		params.baseURI = Poco::URI(baseUrl);
 		params.apiKey = key;
 		params.model = model;
-		params.maxTokens = maxTokens;
+		if (maxTokens > 0) params.maxTokens = maxTokens;
 		params.timeout = timeout;
 		return std::make_shared<AnthropicProvider>(params, _params.sessionFactory);
 	}
@@ -730,7 +730,7 @@ std::shared_ptr<LLMProvider> ChatService::createProvider(const ProviderSettings&
 	params.baseURI = Poco::URI(baseUrl);
 	params.apiKey = key;
 	params.model = model;
-	params.maxTokens = maxTokens;
+	if (maxTokens > 0) params.maxTokens = maxTokens;
 	// OpenAI's reasoning models refuse max_tokens; other servers know only it.
 	params.maxTokensField = kind == "openai" ? "max_completion_tokens" : "max_tokens";
 	params.timeout = timeout;

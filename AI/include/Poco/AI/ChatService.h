@@ -109,10 +109,12 @@ public:
 	{
 		std::string systemPrompt;
 			/// The system prompt of every turn.
-		int maxRounds = 8;
+		int maxRounds = AgentLoop::DEFAULT_MAX_ROUNDS;
 			/// The rounds of tool calls of a turn; see AgentLoop.
-		int maxTokens = 4096;
-			/// The limit of an answer, for a provider without its own.
+		int maxTokens = 0;
+			/// The limit of an answer, for a provider without its own; 0 for
+			/// the default of the provider class (see AnthropicProvider and
+			/// OpenAIProvider).
 		Poco::Timespan timeout = Poco::Timespan(60, 0);
 			/// The limit of a call, for a provider without its own.
 		Poco::Timespan probeTimeout = Poco::Timespan(5, 0);

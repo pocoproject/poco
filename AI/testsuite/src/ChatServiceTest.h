@@ -49,6 +49,7 @@ public:
 	void testStaleConnectionFailure();
 	void testEndpointBodyBrokeOff();
 	void testProviderKind();
+	void testTokenLimit();
 	void testEndpointErrorClientGone();
 	void testEndpointClientGone();
 

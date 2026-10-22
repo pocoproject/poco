@@ -128,7 +128,10 @@ public:
 	static constexpr std::size_t DEFAULT_MAX_IMAGE_SIZE = 5*1024*1024;
 		/// The default limit, in bytes of base64, of one image of a tool result.
 
-	AgentLoop(std::shared_ptr<LLMProvider> pProvider, ToolRegistry& toolRegistry, int maxRounds = 10);
+	static constexpr int DEFAULT_MAX_ROUNDS = 10;
+		/// The default number of model calls of a run that may run tools.
+
+	AgentLoop(std::shared_ptr<LLMProvider> pProvider, ToolRegistry& toolRegistry, int maxRounds = DEFAULT_MAX_ROUNDS);
 		/// Creates the loop over pProvider and toolRegistry, which must outlive
 		/// it. maxRounds limits the number of model calls that may run tools.
 		///

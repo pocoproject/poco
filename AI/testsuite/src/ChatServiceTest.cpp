@@ -13,6 +13,8 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/ChatService.h"
+#include "Poco/AI/AgentLoop.h"
+#include "Poco/AI/AnthropicProvider.h"
 #include "Poco/AI/ChatEndpoint.h"
 #include "Poco/AI/ChatSettings.h"
 #include "Poco/AI/LLMProvider.h"
@@ -1412,6 +1414,30 @@ void ChatServiceTest::testProviderKind()
 }
 
 
+void ChatServiceTest::testTokenLimit()
+{
+	// Without a limit in the settings or the parameters, the provider class
+	// sends its own; else the one given.
+	CannedServer server(CannedServer::makeResponse(500, "application/json", "{}"));
+	EnvironmentGuard noKey(ProviderSettings::keyVariable("anthropic"), "");
+	ProviderSettings anthropic = entry("anthropic", true, {"claude"});
+	anthropic.baseUrl = server.baseUrl();
+	const auto sentLimit = [&server, &anthropic](const ChatService::Params& params)
+	{
+		ChatService service(std::make_shared<ToolRegistry>(), settingsOf({anthropic}), params);
+		Array conversation = conversationOf("hi");
+		Events events;
+		service.chat(conversation, who("alice"), "c1", events.sink());
+		return parse(server.request())->getValue<int>("max_tokens");
+	};
+	assertEqual(Poco::AI::AnthropicProvider::Params().maxTokens, sentLimit(ChatService::Params()));
+	ChatService::Params limited;
+	limited.maxTokens = 500;
+	assertEqual(500, sentLimit(limited));
+	assertEqual(Poco::AI::AgentLoop::DEFAULT_MAX_ROUNDS, ChatService::Params().maxRounds);
+}
+
+
 void ChatServiceTest::testEndpointHealth()
 {
 	auto pState = std::make_shared<FakeState>();
@@ -1950,6 +1976,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testStaleConnectionFailure);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointBodyBrokeOff);
 	CppUnit_addTest(pSuite, ChatServiceTest, testProviderKind);
+	CppUnit_addTest(pSuite, ChatServiceTest, testTokenLimit);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointErrorClientGone);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);
 
