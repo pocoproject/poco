@@ -29,6 +29,7 @@
 #include "Poco/Event.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Timespan.h"
+#include "Poco/Random.h"
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
@@ -1640,23 +1641,33 @@ void SyslogTest::testTCPChannelHostName()
 
 void SyslogTest::testTCPChannelSwitchTransport()
 {
-	// a port that is free for TCP and for UDP
+	// a port that is free for TCP and for UDP, picked at random from the
+	// dynamic range: the ports one protocol hands out to binds that follow
+	// each other can all be reserved for the other, as Windows reserves ports
+	// in blocks
+	Poco::Random rnd;
+	rnd.seed();
 	ServerSocket server;
 	DatagramSocket datagrams;
+	std::string error;
 	bool bound = false;
 	for (int i = 0; i < 100 && !bound; ++i)
 	{
-		server = ServerSocket(SocketAddress("127.0.0.1", 0));
+		const SocketAddress address("127.0.0.1", static_cast<Poco::UInt16>(49152 + rnd.next(16384)));
 		try
 		{
-			datagrams = DatagramSocket(server.address(), false);
+			server = ServerSocket();
+			server.bind(address, false);
+			server.listen();
+			datagrams = DatagramSocket(address, false);
 			bound = true;
 		}
-		catch (Poco::Exception&)
+		catch (Poco::Exception& exc)
 		{
+			error = exc.displayText();
 		}
 	}
-	assertTrue (bound);
+	if (!bound) fail("no port is free for TCP and for UDP: " + error);
 
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
 	channel->setProperty("loghost", server.address().toString());
