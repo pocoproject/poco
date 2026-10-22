@@ -67,11 +67,20 @@ namespace
 
 
 	void sendError(Poco::Net::HTTPServerResponse& response, Poco::Net::HTTPResponse::HTTPStatus status, const std::string& error, const std::string& detail)
+		/// Sends an error reply unless a reply has gone out already. A reply
+		/// that cannot be sent, as the client has gone away, is dropped.
 	{
-		Poco::JSON::Object::Ptr pBody = new Poco::JSON::Object;
-		pBody->set("error", error);
-		if (!detail.empty()) pBody->set("detail", detail);
-		sendJSON(response, status, pBody);
+		if (response.sent()) return;
+		try
+		{
+			Poco::JSON::Object::Ptr pBody = new Poco::JSON::Object;
+			pBody->set("error", error);
+			if (!detail.empty()) pBody->set("detail", detail);
+			sendJSON(response, status, pBody);
+		}
+		catch (const std::exception&)
+		{
+		}
 	}
 
 
@@ -311,42 +320,29 @@ void ChatEndpoint::handle(const std::string& route, Poco::Net::HTTPServerRequest
 		else if (route == "providers") providers(request, response, caller);
 		else if (route == "config") config(request, response, caller);
 		else if (route == "token") token(request, response, caller);
-		else sendError(response, Poco::Net::HTTPResponse::HTTP_NOT_FOUND, "not found", "no route " + route);
+		else throw Refusal{Poco::Net::HTTPResponse::HTTP_NOT_FOUND, "not found", "no route " + route};
 	}
 	catch (const Refusal& refusal)
 	{
-		if (!response.sent()) sendError(response, refusal.status, refusal.error, refusal.detail);
+		sendError(response, refusal.status, refusal.error, refusal.detail);
 	}
 	catch (const Poco::InvalidArgumentException& exc)
 	{
-		if (!response.sent()) sendError(response, Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", exc.message());
+		sendError(response, Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", exc.message());
 	}
 	catch (const Poco::NotFoundException& exc)
 	{
-		if (!response.sent()) sendError(response, Poco::Net::HTTPResponse::HTTP_NOT_FOUND, "not found", exc.message());
+		sendError(response, Poco::Net::HTTPResponse::HTTP_NOT_FOUND, "not found", exc.message());
 	}
 	catch (const Poco::Exception& exc)
 	{
 		if (logger.error()) logger.error("AI chat request %s failed: %s", route, exc.displayText());
-		try
-		{
-			if (!response.sent()) sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", exc.displayText());
-		}
-		catch (const Poco::Exception&)
-		{
-			// The client has gone away.
-		}
+		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", exc.displayText());
 	}
 	catch (const std::exception& exc)
 	{
 		if (logger.error()) logger.error("AI chat request %s failed: %s", route, std::string(exc.what()));
-		try
-		{
-			if (!response.sent()) sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", exc.what());
-		}
-		catch (const Poco::Exception&)
-		{
-		}
+		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", exc.what());
 	}
 }
 

@@ -526,6 +526,112 @@ namespace
 	};
 
 
+	class GoneResponse: public Poco::Net::HTTPServerResponse
+		/// The response to a client that has gone away: every send throws,
+		/// and the response counts as sent from the first try on, as that of
+		/// the HTTP server does.
+	{
+	public:
+		void sendContinue() override
+		{
+			++tries;
+			throw Poco::Net::ConnectionResetException("the client has gone away");
+		}
+
+		std::ostream& send() override
+		{
+			++tries;
+			throw Poco::Net::ConnectionResetException("the client has gone away");
+		}
+
+		void sendFile(const std::string&, const std::string&) override
+		{
+			++tries;
+			throw Poco::Net::ConnectionResetException("the client has gone away");
+		}
+
+		void sendBuffer(const void*, std::size_t) override
+		{
+			++tries;
+			throw Poco::Net::ConnectionResetException("the client has gone away");
+		}
+
+		void redirect(const std::string&, HTTPStatus) override
+		{
+			++tries;
+			throw Poco::Net::ConnectionResetException("the client has gone away");
+		}
+
+		void requireAuthentication(const std::string&) override
+		{
+			++tries;
+			throw Poco::Net::ConnectionResetException("the client has gone away");
+		}
+
+		bool sent() const override
+		{
+			return tries > 0;
+		}
+
+		int tries = 0;
+	};
+
+
+	class BareRequest: public Poco::Net::HTTPServerRequest
+		/// A request with a method and a JSON body, and no connection behind.
+	{
+	public:
+		BareRequest(const std::string& method, const std::string& body, Poco::Net::HTTPServerResponse& response):
+			_body(body),
+			_response(response),
+			_pParams(new Poco::Net::HTTPServerParams)
+		{
+			setMethod(method);
+			if (!body.empty())
+			{
+				setContentType("application/json");
+				setContentLength(static_cast<std::streamsize>(body.size()));
+			}
+		}
+
+		std::istream& stream() override
+		{
+			return _body;
+		}
+
+		const Poco::Net::SocketAddress& clientAddress() const override
+		{
+			return _address;
+		}
+
+		const Poco::Net::SocketAddress& serverAddress() const override
+		{
+			return _address;
+		}
+
+		const Poco::Net::HTTPServerParams& serverParams() const override
+		{
+			return *_pParams;
+		}
+
+		Poco::Net::HTTPServerResponse& response() const override
+		{
+			return _response;
+		}
+
+		bool secure() const override
+		{
+			return false;
+		}
+
+	private:
+		std::istringstream _body;
+		Poco::Net::SocketAddress _address;
+		Poco::Net::HTTPServerResponse& _response;
+		Poco::Net::HTTPServerParams::Ptr _pParams;
+	};
+
+
 	std::vector<Object::Ptr> streamEvents(const std::string& body)
 		/// The events of the data lines of an event stream, but [DONE].
 	{
@@ -1535,6 +1641,47 @@ void ChatServiceTest::testEndpointHeartbeat()
 }
 
 
+void ChatServiceTest::testEndpointErrorClientGone()
+{
+	// An error reply that cannot be sent, as the client has gone away, is
+	// dropped: handle() throws nothing, whatever the error.
+	auto pState = std::make_shared<FakeState>();
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({entry("ollama", true, {"m1"})}), fakeParams(pState));
+	ChatEndpoint endpoint(service);
+	ChatEndpoint::Caller manager;
+	manager.user = "root";
+	manager.mayManage = true;
+	struct Case
+	{
+		std::string method;
+		std::string route;
+		std::string body;
+		int status;
+	};
+	const Case cases[] = {
+		{Poco::Net::HTTPRequest::HTTP_GET, "chat/stream", "", 405},
+		{Poco::Net::HTTPRequest::HTTP_POST, "models", "{\"model\":\"\"}", 400},
+		{Poco::Net::HTTPRequest::HTTP_POST, "providers", "{\"provider\":\"nope\"}", 404},
+		{Poco::Net::HTTPRequest::HTTP_GET, "sessions", "", 404}
+	};
+	for (const Case& c: cases)
+	{
+		GoneResponse response;
+		BareRequest request(c.method, c.body, response);
+		try
+		{
+			endpoint.handle(c.route, request, response, manager);
+		}
+		catch (...)
+		{
+			fail("handle() threw for " + c.method + " " + c.route);
+		}
+		assertEqual(1, response.tries);
+		assertEqual(c.status, static_cast<int>(response.getStatus()));
+	}
+}
+
+
 void ChatServiceTest::testEndpointClientGone()
 {
 	auto pState = std::make_shared<FakeState>();
@@ -1602,6 +1749,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointCrossSite);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointRefusals);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeat);
+	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointErrorClientGone);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);
 
 	return pSuite;
