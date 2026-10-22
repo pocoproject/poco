@@ -33,9 +33,12 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cstddef>
+#include <exception>
 #include <iostream>
 #include <mutex>
 #include <random>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -86,6 +89,10 @@ namespace
 		public:
 			Collector() = default;
 			~Collector() override = default;
+			Collector(const Collector&) = delete;
+			Collector& operator = (const Collector&) = delete;
+			Collector(Collector&&) = delete;
+			Collector& operator = (Collector&&) = delete;
 
 			void log(const Poco::Message& msg) override;
 			[[nodiscard]] std::size_t count(const std::string& text) const;
@@ -1788,11 +1795,14 @@ void MemoryDBTest::testRewriteKeepsAttachedShardReadable()
 	// the connection mutex, so a reader can never run in between, however the
 	// threads are scheduled; a reader stepping the shard at that moment makes
 	// the flush leave it for a later one.
+	// Enough rows that writing the shard takes long; how long does not matter.
+	constexpr int ROWS = 100000;
+	constexpr std::size_t ROW_BYTES = 200;
 	MemoryDB db(_dir, flushedByTest(false));
 	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now; // keeps shard 1 in memory
-	std::string v(200, 'x');
+	std::string v(ROW_BYTES, 'x');
 	db.session().begin();
-	for (int i = 0; i < 100000; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	for (int i = 0; i < ROWS; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
 	db.session().commit();
 	db.sealActive();
 	db.flush();
