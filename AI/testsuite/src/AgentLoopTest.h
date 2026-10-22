@@ -38,6 +38,7 @@ public:
 	void testToolAddedDuringRun();
 	void testApproverThrows();
 	void testCallbackThrows();
+	void testCallbackThrowsDuringCall();
 	void testResultLimits();
 	void testDoneCarriesTheOutcome();
 	void testToolSeesTheCancel();

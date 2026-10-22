@@ -37,6 +37,8 @@ namespace
 		/// What the scripted provider answers in one call.
 	{
 		std::string text;
+		std::string moreText;
+			/// A second piece of the text, in an event of its own.
 		std::vector<std::string> toolNames;
 		StopReason stopReason = StopReason::END_TURN;
 		bool throwException = false;
@@ -100,6 +102,13 @@ namespace
 				event.text = step.text;
 				onEvent(event);
 				result.text = step.text;
+			}
+			if (!step.moreText.empty())
+			{
+				ContentEvent event;
+				event.text = step.moreText;
+				onEvent(event);
+				result.text += step.moreText;
 			}
 			Array::Ptr pCalls = new Array;
 			for (const std::string& name: step.toolNames)
@@ -652,6 +661,45 @@ void AgentLoopTest::testCallbackThrows()
 }
 
 
+void AgentLoopTest::testCallbackThrowsDuringCall()
+{
+	// The callback throws on the first piece of text: no event of the call
+	// follows, the tool of the answer does not run and its turn is not kept,
+	// and run() passes the exception on after DONE, which tells of the call.
+	Step step = tools({"echo"});
+	step.text = "first";
+	step.moreText = "second";
+	step.usage.outputTokens = 5;
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{step, text("never")});
+	ToolRegistry registry;
+	int runs = 0;
+	registerEcho(registry, "echo", &runs);
+	AgentLoop loop(pProvider, registry);
+	Array conversation = userTurn("go");
+	std::vector<AgentEvent> seen;
+	try
+	{
+		loop.run(conversation, "", [&](const AgentEvent& event)
+		{
+			seen.push_back(event);
+			if (event.type == AgentEvent::Type::TEXT) throw Poco::IllegalStateException("callback failed");
+		});
+		fail("the exception of the callback must reach the caller");
+	}
+	catch (const Poco::IllegalStateException&)
+	{
+	}
+	assertEqual(2u, static_cast<unsigned>(seen.size()));
+	assertEqual(std::string("first"), seen[0].content);
+	assertTrue(seen[1].type == AgentEvent::Type::DONE);
+	assertTrue(seen[1].stopReason == StopReason::TOOL_USE);
+	assertEqual(Poco::UInt64(5), seen[1].usage.outputTokens);
+	assertEqual(0, runs);
+	assertEqual(1u, static_cast<unsigned>(conversation.size()));
+	assertEqual(1u, static_cast<unsigned>(pProvider->requests.size()));
+}
+
+
 void AgentLoopTest::testResultLimits()
 {
 	// Each kind of block has its limit: images of the types the APIs take
@@ -834,6 +882,7 @@ CppUnit::Test* AgentLoopTest::suite()
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolAddedDuringRun);
 	CppUnit_addTest(pSuite, AgentLoopTest, testApproverThrows);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrows);
+	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrowsDuringCall);
 	CppUnit_addTest(pSuite, AgentLoopTest, testResultLimits);
 	CppUnit_addTest(pSuite, AgentLoopTest, testDoneCarriesTheOutcome);
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolSeesTheCancel);

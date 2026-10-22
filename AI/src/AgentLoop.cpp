@@ -208,19 +208,31 @@ void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPr
 	AgentEvent done;
 	done.type = AgentEvent::Type::DONE;
 
-	const auto onContent = [&onEvent](const ContentEvent& contentEvent)
+	// What the callback throws during a model call is kept, not passed to
+	// the provider, which would take it for a failure of the stream; no event
+	// of the call goes to the callback after it.
+	std::exception_ptr pCallbackFailure;
+	const auto onContent = [&onEvent, &pCallbackFailure](const ContentEvent& contentEvent)
 	{
-		if (contentEvent.type == ContentEvent::Type::TEXT)
+		if (pCallbackFailure) return;
+		try
 		{
-			AgentEvent event;
-			event.content = contentEvent.text;
-			if (onEvent) onEvent(event);
+			if (contentEvent.type == ContentEvent::Type::TEXT)
+			{
+				AgentEvent event;
+				event.content = contentEvent.text;
+				if (onEvent) onEvent(event);
+			}
+			else if (contentEvent.type == ContentEvent::Type::FAILURE)
+			{
+				emitFailure(onEvent, contentEvent.code, contentEvent.text, contentEvent.retryAfter, contentEvent.requestId);
+			}
+			// A tool call is reported when the loop gets to it.
 		}
-		else if (contentEvent.type == ContentEvent::Type::FAILURE)
+		catch (...)
 		{
-			emitFailure(onEvent, contentEvent.code, contentEvent.text, contentEvent.retryAfter, contentEvent.requestId);
+			pCallbackFailure = std::current_exception();
 		}
-		// A tool call is reported when the loop gets to it.
 	};
 
 	try
@@ -240,12 +252,14 @@ void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPr
 			catch (const Poco::Exception& exc)
 			{
 				done.stopReason = StopReason::FAILURE;
+				if (pCallbackFailure) std::rethrow_exception(pCallbackFailure);
 				emitFailure(onEvent, FailureCode::PROVIDER_FAILED, "LLM error: " + exc.displayText());
 				break;
 			}
 			catch (const std::exception& exc)
 			{
 				done.stopReason = StopReason::FAILURE;
+				if (pCallbackFailure) std::rethrow_exception(pCallbackFailure);
 				emitFailure(onEvent, FailureCode::PROVIDER_FAILED, std::string("LLM error: ") + exc.what());
 				break;
 			}
@@ -255,6 +269,10 @@ void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPr
 			done.usage.inputTokens += result.usage.inputTokens;
 			done.usage.outputTokens += result.usage.outputTokens;
 			done.usage.cachedInputTokens += result.usage.cachedInputTokens;
+			// The exception of the callback leaves run() after DONE, as on
+			// the tool path; the turn of the call is not kept, so that no tool
+			// call of it lacks its result.
+			if (pCallbackFailure) std::rethrow_exception(pCallbackFailure);
 			if (result.stopReason == StopReason::CANCELLED || result.stopReason == StopReason::FAILURE) break;
 			if (result.assistantMessage != nullptr)
 			{
