@@ -28,10 +28,11 @@
 # Configures the make build for $POCO_CONFIG (default Linux-clang-c++20) on
 # the first run, without the components in OMIT_DEFAULT: those that need
 # external libraries or servers, and the AI libraries, which are off by
-# default in CMake too. To build one of them, run ./configure without it in
-# --omit first. Sources poco_env.bash for POCO_BASE / OSNAME / OSARCH /
-# LD_LIBRARY_PATH. Pass 'rebuild' to make clean before building (use after
-# switching sanitizers).
+# default in CMake too. To build one of them, run ./configure with the same
+# --config and an --omit list without it first; asked for an omitted
+# component, the script prints that command. Sources poco_env.bash for
+# POCO_BASE / OSNAME / OSARCH / LD_LIBRARY_PATH. Pass 'rebuild' to make clean
+# before building (use after switching sanitizers).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # poco_env.bash references LD_LIBRARY_PATH/DYLD_LIBRARY_PATH, which may be unset;
@@ -161,17 +162,34 @@ if [[ -f config.make ]]; then
 	for e in $omit_line; do OMITTED[$e]=1; done
 fi
 
-# Prints the OMIT entry that omits the component directory; fails when none does.
+# Prints the OMIT entries that omit the component directory, sorted, one per
+# line; fails when none does.
 omitted_by()
 {
-	local dir=$1 e
-	for e in "${!OMITTED[@]}"; do
+	local dir=$1 e found=1
+	for e in $(printf '%s\n' "${!OMITTED[@]}" | sort); do
 		if [[ "$dir" == "$e" || "$dir" == "$e"/* ]]; then
 			echo "$e"
-			return 0
+			found=0
 		fi
 	done
-	return 1
+	return $found
+}
+
+# Prints the component directory and those it needs, omitted or not, one per
+# line.
+declare -A NEEDED
+needed_by()
+{
+	local dir=$1 lib depdir
+	[[ -n "${NEEDED[$dir]:-}" ]] && return
+	NEEDED[$dir]=1
+	echo "$dir"
+	for lib in ${DEPS_OF[$dir]:-}; do
+		depdir="${LIB_TO_DIR[$lib]:-}"
+		[[ -n "$depdir" ]] && needed_by "$depdir"
+	done
+	return 0
 }
 
 # 3. Topological walk via DFS.
@@ -200,7 +218,20 @@ walk()
 
 if [[ -n "$COMPONENT" ]]; then
 	if omission=$(omitted_by "$COMPONENT"); then
-		echo "error: $COMPONENT is omitted in config.make, by $omission; run ./configure without $omission in --omit" >&2
+		# The command keeps the configuration and the omitted entries that
+		# neither the component nor what it needs falls under.
+		needed=$(needed_by "$COMPONENT")
+		keep=()
+		for e in $(printf '%s\n' "${!OMITTED[@]}" | sort); do
+			covers=0
+			while IFS= read -r d; do
+				if [[ "$d" == "$e" || "$d" == "$e"/* ]]; then covers=1; fi
+			done <<< "$needed"
+			(( covers )) || keep+=("$e")
+		done
+		command="./configure --config=$POCO_CONFIG"
+		if (( ${#keep[@]} )); then command+=" --omit=$(IFS=,; echo "${keep[*]}")"; fi
+		echo "error: $COMPONENT is omitted in config.make, by $(echo $omission | sed 's/ /, /g'); run $command first" >&2
 		exit 1
 	fi
 	walk "$COMPONENT"
