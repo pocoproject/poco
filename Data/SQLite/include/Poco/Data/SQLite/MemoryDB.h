@@ -143,6 +143,11 @@ public:
 
 		Poco::UInt64   shardMaxBytes    = 256ULL * 1024 * 1024;
 			/// Seal the active shard once its on-disk size reaches this many bytes. Zero disables.
+			///
+			/// With loadArchivedShards false, the rows of a sealed shard leave memory in one
+			/// transaction, and SQLite keeps a copy of their pages until it commits: while
+			/// a shard is evicted, the memory SQLite uses peaks at about one more shard of
+			/// this size, and statements on session() wait until its rows are deleted.
 
 		Poco::Timespan shardMaxAge      = Poco::Timespan(3600, 0);
 			/// Seal the active shard once it is this old. Zero disables.
