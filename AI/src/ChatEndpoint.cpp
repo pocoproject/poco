@@ -388,11 +388,7 @@ void ChatEndpoint::stream(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		if (!out.good()) return;
 	}
 	Heartbeat heartbeat(out, mutex, _params.heartbeat, leave);
-	Poco::AI::MCP::Identity identity;
-	identity.principal = caller.user;
-	identity.scope = caller.scope;
-	identity.authenticated = !caller.user.empty();
-	_service.chat(conversation, identity, chatId, [&](const Poco::JSON::Object::Ptr& pEvent)
+	_service.chat(conversation, caller.identity, chatId, [&](const Poco::JSON::Object::Ptr& pEvent)
 		{
 			std::ostringstream text;
 			pEvent->stringify(text);
@@ -423,7 +419,7 @@ void ChatEndpoint::cancel(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		if (parameter.first == "chat") chatId = parameter.second;
 	}
 	Poco::JSON::Object::Ptr pBody = ok();
-	pBody->set("cancelled", _service.cancel(caller.user, chatId));
+	pBody->set("cancelled", _service.cancel(caller.identity.principal, chatId));
 	sendJSON(response, Poco::Net::HTTPResponse::HTTP_OK, pBody);
 }
 

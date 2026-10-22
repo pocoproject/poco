@@ -99,14 +99,14 @@ public:
 	struct Caller
 		/// Who calls, as the host signed them in.
 	{
-		std::string user;
-			/// The user, whose turns cancel requests cancel, and whom the tools
-			/// of a turn run for.
-		std::string scope;
-			/// What the user may do, in the terms of the host, e.g. the
-			/// permissions; the tools of a turn get it with the user.
+		Poco::AI::MCP::Identity identity;
+			/// The caller as the host authenticated them: the principal, whose
+			/// turns cancel requests cancel, and the scope, what the caller may
+			/// do in the terms of the host, e.g. the permissions. The tools of
+			/// a turn run with it. An empty principal is a caller who is not
+			/// signed in.
 		bool mayManage = false;
-			/// Whether the user may change the settings of the chat.
+			/// Whether the caller may change the settings of the chat.
 	};
 
 	struct Params

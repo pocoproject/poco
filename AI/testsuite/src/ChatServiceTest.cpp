@@ -434,6 +434,7 @@ namespace
 
 	class EndpointHandler: public Poco::Net::HTTPRequestHandler
 		/// Serves /api/ai/<route> with the endpoint; X-User names the caller,
+		/// signed in when it is not empty, X-Scope gives its scope, and
 		/// X-Manage: 1 lets it manage.
 	{
 	public:
@@ -445,7 +446,9 @@ namespace
 		void handleRequest(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response) override
 		{
 			ChatEndpoint::Caller caller;
-			caller.user = request.get("X-User", "");
+			caller.identity.principal = request.get("X-User", "");
+			caller.identity.scope = request.get("X-Scope", "");
+			caller.identity.authenticated = !caller.identity.principal.empty();
 			caller.mayManage = request.get("X-Manage", "") == "1";
 			const std::string path = Poco::URI(request.getURI()).getPath();
 			_endpoint.handle(path.substr(std::string("/api/ai/").size()), request, response, caller);
@@ -1440,6 +1443,33 @@ void ChatServiceTest::testTokenLimit()
 }
 
 
+void ChatServiceTest::testEndpointIdentity()
+{
+	// The identity the host gives the caller reaches the tools of the turn as
+	// it is.
+	auto pState = std::make_shared<FakeState>();
+	pState->tools.push_back("probe");
+	auto pTools = std::make_shared<ToolRegistry>();
+	Poco::AI::MCP::Tool probe;
+	probe.name = "probe";
+	probe.handler = [](const Object::Ptr&, const Poco::AI::MCP::RequestContext& context)
+	{
+		Poco::AI::MCP::ToolResult result;
+		result.addText(context.identity.principal + "|" + context.identity.scope + "|" + (context.identity.authenticated ? "signed in" : "anonymous"));
+		return result;
+	};
+	pTools->registerTool(probe);
+	ChatService service(pTools, settingsOf({entry("ollama", true, {"m1"})}), fakeParams(pState));
+	Host host(service);
+	Poco::Net::NameValueCollection scoped;
+	scoped.set("X-Scope", "s1");
+	const std::vector<Object::Ptr> events = streamEvents(host.send("POST", "chat/stream", HELLO, "alice", false, scoped).body);
+	const auto result = std::find_if(events.begin(), events.end(), [](const Object::Ptr& pEvent) { return pEvent->getValue<std::string>("type") == "tool_result"; });
+	assertTrue(result != events.end());
+	assertEqual(std::string("alice|s1|signed in"), (*result)->getValue<std::string>("content"));
+}
+
+
 void ChatServiceTest::testEndpointHealth()
 {
 	auto pState = std::make_shared<FakeState>();
@@ -1881,7 +1911,8 @@ void ChatServiceTest::testEndpointErrorClientGone()
 	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({entry("ollama", true, {"m1"})}), fakeParams(pState));
 	ChatEndpoint endpoint(service);
 	ChatEndpoint::Caller manager;
-	manager.user = "root";
+	manager.identity.principal = "root";
+	manager.identity.authenticated = true;
 	manager.mayManage = true;
 	struct Case
 	{
@@ -1986,6 +2017,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointBodyBrokeOff);
 	CppUnit_addTest(pSuite, ChatServiceTest, testProviderKind);
 	CppUnit_addTest(pSuite, ChatServiceTest, testTokenLimit);
+	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointIdentity);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointErrorClientGone);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);
 

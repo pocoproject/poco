@@ -162,12 +162,13 @@ public:
 		/// turn ends with a done event, also one that could not start, e.g.
 		/// without a provider.
 
-	int cancel(const std::string& user, const std::string& chatId = std::string());
-		/// Cancels the turns of the user that run in the chat, or all of the
-		/// user's for an empty chatId. Returns how many. A user who is not
-		/// signed in, with an empty principal, cancels none: that principal
-		/// is everybody's who is not signed in. Their turns stop through the
-		/// cancellation they were started with, or cancelAll().
+	int cancel(const std::string& principal, const std::string& chatId = std::string());
+		/// Cancels the turns of the principal, the one of the identity they
+		/// were started with, that run in the chat, or all of theirs for an
+		/// empty chatId. Returns how many. An empty principal, a caller who is
+		/// not signed in, cancels none: it is everybody's who is not signed
+		/// in. Their turns stop through the cancellation they were started
+		/// with, or cancelAll().
 
 	void cancelAll();
 		/// Cancels every turn that runs.
@@ -282,7 +283,7 @@ private:
 
 	struct Turn
 	{
-		std::string user;
+		std::string principal;
 		std::string chatId;
 		std::shared_ptr<Cancellation> pCancellation;
 	};

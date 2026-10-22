@@ -237,14 +237,14 @@ void ChatService::chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Ide
 }
 
 
-int ChatService::cancel(const std::string& user, const std::string& chatId)
+int ChatService::cancel(const std::string& principal, const std::string& chatId)
 {
-	if (user.empty()) return 0;
+	if (principal.empty()) return 0;
 	int cancelled = 0;
 	Poco::FastMutex::ScopedLock lock(_turnsMutex);
 	for (const Turn& turn: _turns)
 	{
-		if (turn.user == user && (chatId.empty() || turn.chatId == chatId))
+		if (turn.principal == principal && (chatId.empty() || turn.chatId == chatId))
 		{
 			turn.pCancellation->cancel();
 			++cancelled;

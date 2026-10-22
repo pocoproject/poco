@@ -50,6 +50,7 @@ public:
 	void testEndpointBodyBrokeOff();
 	void testProviderKind();
 	void testTokenLimit();
+	void testEndpointIdentity();
 	void testEndpointErrorClientGone();
 	void testEndpointClientGone();
 
