@@ -71,8 +71,9 @@ class AI_API ChatEndpoint
 	///     from the settings or the environment; usesApiKey whether one of its
 	///     kind can be set here;
 	///   - POST config with {"providers": [...]}: replaces the providers, as
-	///     ChatService::configure() does; an entry's kind may be left out, and
-	///     its apiKey sets its key, where keys may be set here;
+	///     ChatService::configure() does, each read by
+	///     ProviderSettings::fromJSON(), whose rules a wrong type breaks with
+	///     400; an entry's apiKey sets its key, where keys may be set here;
 	///   - POST token with {"provider", "token"}: sets the key of a provider,
 	///     where keys may be set here.
 	///

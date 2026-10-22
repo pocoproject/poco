@@ -27,7 +27,6 @@
 #include "Poco/Thread.h"
 #include "Poco/URI.h"
 #include "Poco/UUIDGenerator.h"
-#include "Poco/StringTokenizer.h"
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <algorithm>
@@ -179,46 +178,6 @@ namespace
 		if (value.isEmpty()) return std::string();
 		if (!value.isString()) throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", name + " is not a string"};
 		return value.extract<std::string>();
-	}
-
-
-	std::vector<std::string> listMember(const Poco::JSON::Object::Ptr& pObject, const std::string& name)
-		/// A list of strings, or the comma-separated items of one string.
-	{
-		std::vector<std::string> result;
-		const Poco::Dynamic::Var value = pObject->get(name);
-		if (value.isEmpty()) return result;
-		if (value.isString())
-		{
-			const Poco::StringTokenizer tokens(value.extract<std::string>(), ",", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
-			result.assign(tokens.begin(), tokens.end());
-			return result;
-		}
-		if (!pObject->isArray(name)) throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", name + " is not a list"};
-		const Poco::JSON::Array::Ptr pArray = pObject->getArray(name);
-		for (std::size_t i = 0; i < pArray->size(); ++i)
-		{
-			const Poco::Dynamic::Var element = pArray->get(static_cast<unsigned>(i));
-			if (!element.isString()) throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", name + " holds something else than strings"};
-			result.push_back(element.extract<std::string>());
-		}
-		return result;
-	}
-
-
-	int intMember(const Poco::JSON::Object::Ptr& pObject, const std::string& name)
-	{
-		const Poco::Dynamic::Var value = pObject->get(name);
-		if (value.isEmpty()) return 0;
-		if (!value.isNumeric() || value.isBoolean() || value.isString()) throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", name + " is not a number"};
-		try
-		{
-			return value.convert<int>();
-		}
-		catch (const Poco::RangeException&)
-		{
-			throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", name + " is out of range"};
-		}
 	}
 
 
@@ -545,18 +504,11 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		Poco::JSON::Array::Ptr pProviders = new Poco::JSON::Array;
 		for (const ProviderSettings& entry: settings.providers)
 		{
-			Poco::JSON::Object::Ptr pEntry = new Poco::JSON::Object;
-			pEntry->set("name", entry.name);
+			Poco::JSON::Object::Ptr pEntry = entry.toJSON();
+			// Never a key.
+			pEntry->remove("apiKey");
 			pEntry->set("kind", entry.effectiveKind());
-			pEntry->set("enabled", entry.enabled);
-			pEntry->set("baseUrl", entry.baseUrl);
 			pEntry->set("defaultBaseUrl", ProviderSettings::defaultBaseUrl(entry.effectiveKind()));
-			pEntry->set("servers", toArray(entry.servers));
-			pEntry->set("models", toArray(entry.models));
-			pEntry->set("maxTokens", entry.maxTokens);
-			pEntry->set("timeout", entry.timeout);
-			pEntry->set("probeTimeout", entry.probeTimeout);
-			pEntry->set("tools", entry.tools);
 			pEntry->set("hasApiKey", _service.hasKey(entry.name));
 			pEntry->set("usesApiKey", _params.keysFromRequests && ProviderSettings::usesApiKey(entry.effectiveKind()));
 			pEntry->set("usesServers", ProviderSettings::usesServers(entry.effectiveKind()));
@@ -581,21 +533,15 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		{
 			throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "a provider is not an object"};
 		}
-		const Poco::JSON::Object::Ptr pEntry = pProviders->getObject(static_cast<unsigned>(i));
 		ProviderSettings entry;
-		entry.name = stringMember(pEntry, "name");
-		entry.kind = stringMember(pEntry, "kind");
-		const Poco::Dynamic::Var enabled = pEntry->get("enabled");
-		entry.enabled = enabled.isBoolean() ? enabled.extract<bool>() : true;
-		entry.baseUrl = stringMember(pEntry, "baseUrl");
-		entry.servers = listMember(pEntry, "servers");
-		entry.models = listMember(pEntry, "models");
-		entry.maxTokens = intMember(pEntry, "maxTokens");
-		entry.timeout = intMember(pEntry, "timeout");
-		entry.probeTimeout = intMember(pEntry, "probeTimeout");
-		const Poco::Dynamic::Var tools = pEntry->get("tools");
-		entry.tools = tools.isBoolean() ? tools.extract<bool>() : true;
-		entry.apiKey = stringMember(pEntry, "apiKey");
+		try
+		{
+			entry = ProviderSettings::fromJSON(pProviders->getObject(static_cast<unsigned>(i)));
+		}
+		catch (const Poco::DataFormatException& exc)
+		{
+			throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", exc.message()};
+		}
 		if (!entry.apiKey.empty()) needsKeysFromRequests(_params);
 		if (!_params.keysFromRequests && ProviderSettings::usesApiKey(entry.effectiveKind())) needsSameAddress(current, entry);
 		providers.push_back(std::move(entry));

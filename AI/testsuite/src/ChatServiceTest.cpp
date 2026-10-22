@@ -1201,8 +1201,10 @@ void ChatServiceTest::testSettingsJSON()
 	assertEqual(std::string("secret"), back.apiKey);
 	assertTrue(ChatSettings::fromJSON(parse("{\"providers\":[{\"name\":\"x\"}]}")).providers[0].tools);
 	assertTrue(ChatSettings::fromJSON(parse("{}")).providers.empty());
+	// A list may also be one string of comma-separated items.
+	assertTrue(ChatSettings::fromJSON(parse("{\"providers\":[{\"name\":\"x\",\"models\":\"a, b\"}]}")).providers[0].models == std::vector<std::string>({"a", "b"}));
 
-	const std::string invalid[] = {"{\"providers\":\"x\"}", "{\"providers\":[{\"enabled\":\"yes\"}]}", "{\"providers\":[{\"models\":[1]}]}", "{\"model\":3}", "{\"providers\":[{\"tools\":1}]}", "{\"providers\":[{\"maxTokens\":9999999999}]}"};
+	const std::string invalid[] = {"{\"providers\":\"x\"}", "{\"providers\":[{\"enabled\":\"yes\"}]}", "{\"providers\":[{\"models\":[1]}]}", "{\"model\":3}", "{\"providers\":[{\"tools\":1}]}", "{\"providers\":[{\"maxTokens\":9999999999}]}", "{\"providers\":[{\"maxTokens\":1.5}]}"};
 	for (const std::string& json: invalid)
 	{
 		try
@@ -1629,6 +1631,12 @@ void ChatServiceTest::testEndpointManage()
 	assertEqual(400, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":false}]}", "root", true).status);
 	assertEqual(400, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"timeout\":\"long\"}]}", "root", true).status);
 	assertEqual(400, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":true,\"timeout\":1e12}]}", "root", true).status);
+	// The rules of the stored settings: a boolean is a boolean, a number an
+	// integer, and what is left out gets its default.
+	assertEqual(400, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":\"false\"}]}", "root", true).status);
+	assertEqual(400, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":true,\"maxTokens\":1.5}]}", "root", true).status);
+	assertEqual(200, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":true},{\"name\":\"lab\",\"baseUrl\":\"http://lab.test/v1\"}]}", "root", true).status);
+	assertTrue(!service.settings().providers[1].enabled);
 }
 
 

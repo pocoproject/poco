@@ -15,6 +15,7 @@
 #include "Poco/AI/ChatSettings.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/Exception.h"
+#include "Poco/StringTokenizer.h"
 #include <algorithm>
 
 
@@ -48,10 +49,27 @@ namespace
 	}
 
 
+	bool boolMember(const Poco::JSON::Object::Ptr& pObject, const std::string& name, bool defaultValue)
+	{
+		const Poco::Dynamic::Var value = pObject->get(name);
+		if (value.isEmpty()) return defaultValue;
+		if (!value.isBoolean()) throw Poco::DataFormatException("Not a boolean", name);
+		return value.extract<bool>();
+	}
+
+
 	std::vector<std::string> stringsMember(const Poco::JSON::Object::Ptr& pObject, const std::string& name)
+		/// An array of strings, or the comma-separated items of one string.
 	{
 		std::vector<std::string> result;
 		if (!pObject->has(name) || pObject->get(name).isEmpty()) return result;
+		const Poco::Dynamic::Var value = pObject->get(name);
+		if (value.isString())
+		{
+			const Poco::StringTokenizer items(value.extract<std::string>(), ",", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+			result.assign(items.begin(), items.end());
+			return result;
+		}
 		if (!pObject->isArray(name)) throw Poco::DataFormatException("Not an array", name);
 		const Poco::JSON::Array::Ptr pArray = pObject->getArray(name);
 		for (std::size_t i = 0; i < pArray->size(); ++i)
@@ -124,6 +142,43 @@ std::string ProviderSettings::keyVariable(const std::string& kind)
 }
 
 
+Poco::JSON::Object::Ptr ProviderSettings::toJSON() const
+{
+	Poco::JSON::Object::Ptr pEntry = new Poco::JSON::Object;
+	pEntry->set("name", name);
+	if (!kind.empty()) pEntry->set("kind", kind);
+	pEntry->set("enabled", enabled);
+	pEntry->set("baseUrl", baseUrl);
+	pEntry->set("servers", toArray(servers));
+	pEntry->set("models", toArray(models));
+	pEntry->set("maxTokens", maxTokens);
+	pEntry->set("timeout", timeout);
+	pEntry->set("probeTimeout", probeTimeout);
+	pEntry->set("tools", tools);
+	pEntry->set("apiKey", apiKey);
+	return pEntry;
+}
+
+
+ProviderSettings ProviderSettings::fromJSON(const Poco::JSON::Object::Ptr& pEntry)
+{
+	ProviderSettings entry;
+	if (pEntry.isNull()) return entry;
+	entry.name = stringMember(pEntry, "name");
+	entry.kind = stringMember(pEntry, "kind");
+	entry.enabled = boolMember(pEntry, "enabled", entry.enabled);
+	entry.baseUrl = stringMember(pEntry, "baseUrl");
+	entry.servers = stringsMember(pEntry, "servers");
+	entry.models = stringsMember(pEntry, "models");
+	entry.maxTokens = intMember(pEntry, "maxTokens");
+	entry.timeout = intMember(pEntry, "timeout");
+	entry.probeTimeout = intMember(pEntry, "probeTimeout");
+	entry.tools = boolMember(pEntry, "tools", entry.tools);
+	entry.apiKey = stringMember(pEntry, "apiKey");
+	return entry;
+}
+
+
 Poco::JSON::Object::Ptr ChatSettings::toJSON() const
 {
 	Poco::JSON::Object::Ptr pObject = new Poco::JSON::Object;
@@ -132,19 +187,7 @@ Poco::JSON::Object::Ptr ChatSettings::toJSON() const
 	Poco::JSON::Array::Ptr pProviders = new Poco::JSON::Array;
 	for (const ProviderSettings& settings: providers)
 	{
-		Poco::JSON::Object::Ptr pEntry = new Poco::JSON::Object;
-		pEntry->set("name", settings.name);
-		if (!settings.kind.empty()) pEntry->set("kind", settings.kind);
-		pEntry->set("enabled", settings.enabled);
-		pEntry->set("baseUrl", settings.baseUrl);
-		pEntry->set("servers", toArray(settings.servers));
-		pEntry->set("models", toArray(settings.models));
-		pEntry->set("maxTokens", settings.maxTokens);
-		pEntry->set("timeout", settings.timeout);
-		pEntry->set("probeTimeout", settings.probeTimeout);
-		pEntry->set("tools", settings.tools);
-		pEntry->set("apiKey", settings.apiKey);
-		pProviders->add(pEntry);
+		pProviders->add(settings.toJSON());
 	}
 	pObject->set("providers", pProviders);
 	return pObject;
@@ -163,23 +206,7 @@ ChatSettings ChatSettings::fromJSON(const Poco::JSON::Object::Ptr& pObject)
 	for (std::size_t i = 0; i < pProviders->size(); ++i)
 	{
 		if (!pProviders->isObject(static_cast<unsigned>(i))) throw Poco::DataFormatException("Not an object", "providers");
-		const Poco::JSON::Object::Ptr pEntry = pProviders->getObject(static_cast<unsigned>(i));
-		ProviderSettings entry;
-		entry.name = stringMember(pEntry, "name");
-		entry.kind = stringMember(pEntry, "kind");
-		const Poco::Dynamic::Var enabled = pEntry->get("enabled");
-		if (!enabled.isEmpty() && !enabled.isBoolean()) throw Poco::DataFormatException("Not a boolean", "enabled");
-		entry.enabled = !enabled.isEmpty() && enabled.extract<bool>();
-		entry.baseUrl = stringMember(pEntry, "baseUrl");
-		entry.servers = stringsMember(pEntry, "servers");
-		entry.models = stringsMember(pEntry, "models");
-		entry.maxTokens = intMember(pEntry, "maxTokens");
-		entry.timeout = intMember(pEntry, "timeout");
-		entry.probeTimeout = intMember(pEntry, "probeTimeout");
-		const Poco::Dynamic::Var tools = pEntry->get("tools");
-		if (!tools.isEmpty() && !tools.isBoolean()) throw Poco::DataFormatException("Not a boolean", "tools");
-		entry.tools = tools.isEmpty() || tools.extract<bool>();
-		entry.apiKey = stringMember(pEntry, "apiKey");
+		ProviderSettings entry = ProviderSettings::fromJSON(pProviders->getObject(static_cast<unsigned>(i)));
 		settings.providers.push_back(std::move(entry));
 	}
 	return settings;

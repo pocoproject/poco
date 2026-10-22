@@ -79,6 +79,21 @@ struct AI_API ProviderSettings
 		/// whose key is in the environment variable of its kind:
 		/// ANTHROPIC_API_KEY or OPENAI_API_KEY.
 
+	[[nodiscard]] Poco::JSON::Object::Ptr toJSON() const;
+		/// Returns the settings as a JSON object, the key included: {"name",
+		/// "kind", "enabled", "baseUrl", "servers", "models", "maxTokens",
+		/// "timeout", "probeTimeout", "tools", "apiKey"}, kind only when it
+		/// is set.
+
+	[[nodiscard]] static ProviderSettings fromJSON(const Poco::JSON::Object::Ptr& pObject);
+		/// Reads settings that toJSON() wrote, or that a client sent. A member
+		/// that is missing gets its default; strings are strings, booleans
+		/// booleans and numbers integers, and servers and models are arrays of
+		/// strings, or one string of comma-separated items.
+		///
+		/// Throws Poco::DataFormatException if a member has the wrong type,
+		/// or a number is beyond the range of its member.
+
 	[[nodiscard]] std::string effectiveKind() const;
 		/// The kind, or the one the name gives when it is empty.
 
@@ -121,12 +136,12 @@ struct AI_API ChatSettings
 
 	[[nodiscard]] Poco::JSON::Object::Ptr toJSON() const;
 		/// Returns the settings as a JSON object, keys included, for the host
-		/// to store: {"provider", "model", "providers": [{"name", "kind",
-		/// "enabled", "baseUrl", "servers", "models", "maxTokens", "timeout",
-		/// "probeTimeout", "tools", "apiKey"}]}, kind only when it is set.
+		/// to store: {"provider", "model", "providers": [...]}, each provider
+		/// as ProviderSettings::toJSON() writes it.
 
 	[[nodiscard]] static ChatSettings fromJSON(const Poco::JSON::Object::Ptr& pObject);
-		/// Reads settings toJSON() wrote. What is missing gets its default.
+		/// Reads settings toJSON() wrote, each provider as
+		/// ProviderSettings::fromJSON() does. What is missing gets its default.
 		///
 		/// Throws Poco::DataFormatException if a member has the wrong type,
 		/// or a number is beyond the range of its member.
