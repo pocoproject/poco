@@ -263,6 +263,10 @@ public:
 		///     while (db.lastFlushTime() < t) { db.flush(); Poco::Thread::sleep(1); }
 		///
 		/// guarantees every write before t has been persisted (or thrown).
+		///
+		/// A flush that puts off the write of a shard, because a statement is
+		/// reading the attached shard (see attachArchived()), does not count as
+		/// completed: lastFlushTime() advances only with the flush that saves it.
 
 	std::size_t shardCount() const;
 		/// Returns the total number of shards (sealed plus the active one).

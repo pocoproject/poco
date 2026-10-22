@@ -2805,6 +2805,7 @@ void MemoryDB::doFlush(bool allowSeal)
 
 	// heavy IO without the state lock (flushes are serialized by _flushMutex)
 	bool ok = true;
+	bool putOff = false; // a planned write waits for a later flush
 	std::vector<std::pair<std::size_t, std::pair<std::string, Poco::UInt64> > > written; // idx -> (file, bytes)
 	std::vector<std::pair<std::size_t, std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > > > newRanges;
 
@@ -2873,6 +2874,7 @@ void MemoryDB::doFlush(bool allowSeal)
 				// tmp removes the new file; the shard stays dirty, and so in memory
 				Poco::FastMutex::ScopedLock l(_stateMutex);
 				_shards[p.idx].dirty = true;
+				putOff = true;
 				continue;
 			}
 			if (installed == Install::DETACHED) ok = false;
@@ -2984,7 +2986,9 @@ void MemoryDB::doFlush(bool allowSeal)
 
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
-		_lastFlush.update();
+		// lastFlushTime() says that every write before it is saved, which a put
+		// off shard's changes are not.
+		if (!putOff) _lastFlush.update();
 		if (!ok)
 		{
 			// keep dirty so the next tick retries; re-mark the shards we attempted

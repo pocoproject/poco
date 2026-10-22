@@ -79,6 +79,7 @@ public:
 	void testRewriteKeepsAttachedShardReadable();
 	void testKeptShardReportedOncePerReason();
 	void testDeferredDropReportedOnce();
+	void testPutOffRewriteIsNoCompletedFlush();
 	void testDeleteNewestShardKeepsNoRowWhenNotNeeded();
 	void testDeleteActiveShardRefused();
 	void testDeleteNonexistentShardRefused();

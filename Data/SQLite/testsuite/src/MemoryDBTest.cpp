@@ -1398,6 +1398,42 @@ void MemoryDBTest::testRewriteWaitsForBusyAttachedShard()
 }
 
 
+void MemoryDBTest::testPutOffRewriteIsNoCompletedFlush()
+{
+	// lastFlushTime() promises that every write before it has been saved. A
+	// flush that puts off the rewrite of a shard, because a statement reads the
+	// shard, has not saved that shard's changes, so it must not count as one.
+	MemoryDB db(_dir, flushedByTest(false));
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now; // keeps shard 1 in memory
+	std::string v("old");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	db.sealActive();
+	db.flush();
+
+	const Poco::UInt32 id = db.archivedShardIds().front();
+	const std::string alias = db.attachArchived(id);
+	db << "UPDATE t SET v = 'new' WHERE id = 1", now; // shard 1 is to be rewritten
+	// The clock can be coarser than a flush: take a time strictly after the
+	// last flush, or the comparisons below could not tell the flushes apart.
+	const Poco::Timestamp last = db.lastFlushTime();
+	Poco::Timestamp before;
+	while (before <= last) before.update();
+	{
+		int n = 0;
+		Poco::Data::Statement stmt = (db.session() << ("SELECT id FROM " + alias + ".t"), into(n), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on the attached shard
+		db.flush(); // puts off the rewrite of shard 1
+		assertTrue (db.dirty());
+		assertTrue (db.lastFlushTime() < before);
+	}
+
+	db.flush();
+	assertTrue (!db.dirty());
+	assertTrue (db.lastFlushTime() >= before);
+	db.detachArchived(id);
+}
+
+
 void MemoryDBTest::testShardRemovalFiresNoTriggers()
 {
 	// Taking a shard's rows out of memory - on eviction, or when the shard is
@@ -3362,6 +3398,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testRewriteKeepsAttachedShardReadable);
 	CppUnit_addTest(pSuite, MemoryDBTest, testKeptShardReportedOncePerReason);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeferredDropReportedOnce);
+	CppUnit_addTest(pSuite, MemoryDBTest, testPutOffRewriteIsNoCompletedFlush);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteActiveShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNonexistentShardRefused);
