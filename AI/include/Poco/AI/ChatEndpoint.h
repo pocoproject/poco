@@ -57,7 +57,8 @@ class AI_API ChatEndpoint
 	///     "cancelled"}. A caller who is not signed in cancels none (see
 	///     ChatService::cancel()); their turn stops when they close its stream;
 	///   - GET models: {"status": "ok", "provider", "model", "models"};
-	///   - POST models with {"model"}: puts the model in use;
+	///   - POST models with {"model"}: puts the model in use; one that the
+	///     provider in use does not list, where it has a list, gets 404;
 	///   - GET providers: {"status": "ok", "provider", "providers",
 	///     "providerStatus"};
 	///   - POST providers with {"provider"}: puts the provider in use; with

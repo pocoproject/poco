@@ -961,6 +961,16 @@ void ChatServiceTest::testSelect()
 	assertEqual(std::string("lab"), service.provider());
 	// A provider comes with its first model.
 	assertEqual(std::string("x1"), service.model());
+	// A provider with a list of models offers no other.
+	try
+	{
+		service.selectModel("x3");
+		fail("a model the provider does not list cannot be selected");
+	}
+	catch (const Poco::NotFoundException&)
+	{
+	}
+	assertEqual(std::string("x1"), service.model());
 	try
 	{
 		service.selectModel("");
@@ -1028,7 +1038,10 @@ void ChatServiceTest::testConfigure()
 	assertEqual(std::string("k1"), pState->keys.back());
 
 	// A model no longer in the list of its provider gives way to the first.
+	anthropic.models = {"claude", "old"};
+	service.configure({anthropic});
 	service.selectModel("old");
+	assertEqual(std::string("old"), service.model());
 	anthropic.models = {"new"};
 	service.configure({anthropic});
 	assertEqual(std::string("new"), service.model());
@@ -1458,6 +1471,8 @@ void ChatServiceTest::testEndpointManage()
 	answer = host.send("POST", "models", "{\"model\":\"m2\"}", "root", true);
 	assertEqual(200, answer.status);
 	assertEqual(std::string("m2"), answer.json()->getValue<std::string>("model"));
+	assertEqual(404, host.send("POST", "models", "{\"model\":\"m3\"}", "root", true).status);
+	assertEqual(std::string("m2"), service.model());
 	assertEqual(404, host.send("POST", "providers", "{\"provider\":\"none\"}", "root", true).status);
 
 	// By default the keys are the host's: none is set over the endpoint, and

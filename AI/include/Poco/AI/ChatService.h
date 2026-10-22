@@ -206,7 +206,9 @@ public:
 	void selectModel(const std::string& model);
 		/// Puts the model in use and stores the settings.
 		///
-		/// Throws Poco::InvalidArgumentException if model is empty.
+		/// Throws Poco::InvalidArgumentException if model is empty, and
+		/// Poco::NotFoundException if the provider in use has a list of
+		/// models (ProviderSettings::models) that does not name it.
 
 	ProviderStatus retry(const std::string& name);
 		/// Asks the provider for its models now, with failover among its

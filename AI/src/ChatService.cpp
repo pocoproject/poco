@@ -338,6 +338,11 @@ void ChatService::selectModel(const std::string& model)
 	if (model.empty()) throw Poco::InvalidArgumentException("A model needs a name");
 	Poco::FastMutex::ScopedLock lock(_changeMutex);
 	ChatSettings next = current();
+	const std::optional<ProviderSettings> active = find(next, next.provider);
+	if (active && !active->models.empty() && std::find(active->models.begin(), active->models.end(), model) == active->models.end())
+	{
+		throw Poco::NotFoundException("The provider in use lists no model of that name", model);
+	}
 	next.model = model;
 	change(next);
 }
