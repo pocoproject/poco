@@ -28,8 +28,10 @@ using Poco::Net::StreamSocket;
 using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::ConnectionRefusedException;
+using Poco::Net::InvalidSocketException;
 using Poco::Net::PollSet;
 using Poco::Timespan;
+using Poco::IOException;
 using Poco::Stopwatch;
 using Poco::Thread;
 
@@ -526,6 +528,282 @@ void PollSetTest::testCloseOnExec()
 }
 
 
+void PollSetTest::testClosedSocketIsRejected()
+{
+	StreamSocket ss(SocketAddress::IPv4);
+	ss.close();
+
+	PollSet ps;
+	try
+	{
+		ps.add(ss, PollSet::POLL_READ);
+		fail("closed socket - must throw");
+	}
+	catch (InvalidSocketException&)
+	{
+	}
+	assertTrue (ps.empty());
+
+	try
+	{
+		ps.update(ss, PollSet::POLL_READ);
+		fail("closed socket - must throw");
+	}
+	catch (InvalidSocketException&)
+	{
+	}
+	assertTrue (ps.empty());
+}
+
+
+void PollSetTest::testClosedSocketIsNotReported()
+{
+	// The peers are accepted before the close, so that no new descriptor
+	// takes over the number of the closed one.
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss1(server.address());
+	StreamSocket peer1 = server.acceptConnection();
+	StreamSocket ss2(server.address());
+	StreamSocket peer2 = server.acceptConnection();
+
+	PollSet ps;
+	ps.add(ss1, PollSet::POLL_READ);
+	ps.add(ss2, PollSet::POLL_READ);
+	assertTrue (ps.poll(0).empty());
+
+	ss1.close();
+	Timespan timeout(1000000);
+	Stopwatch sw; sw.start();
+	PollSet::SocketModeMap sm = ps.poll(timeout);
+	sw.stop();
+	assertTrue (sm.empty());
+	assertTrue (sw.elapsed() >= 900000);
+	assertTrue (ps.has(ss1));
+	assertTrue (ps.size() == 2);
+
+	peer2.sendBytes("hello", 5);
+	sm = ps.poll(timeout);
+	assertTrue (sm.size() == 1);
+	assertTrue (sm.find(ss2) != sm.end());
+
+	ss2.close();
+	sw.restart();
+	sm = ps.poll(timeout);
+	sw.stop();
+	assertTrue (sm.empty());
+	assertTrue (sw.elapsed() >= 900000);
+}
+
+
+void PollSetTest::testReusedDescriptorIsNotReported()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_READ);
+	assertTrue (ps.poll(0).empty());
+
+	ss.close();
+	// On POSIX systems this socket gets the number of the closed descriptor.
+	StreamSocket other(server.address());
+	StreamSocket otherPeer = server.acceptConnection();
+	otherPeer.sendBytes("hello", 5);
+
+	Timespan timeout(1000000);
+	Stopwatch sw; sw.start();
+	PollSet::SocketModeMap sm = ps.poll(timeout);
+	sw.stop();
+	assertTrue (sm.empty());
+	assertTrue (sw.elapsed() >= 900000);
+}
+
+
+void PollSetTest::testReusedDescriptorGetsNewMode()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	for (bool pollBeforeClose: {false, true})
+	{
+		StreamSocket ss(server.address());
+		StreamSocket peer = server.acceptConnection();
+
+		PollSet ps;
+		ps.add(ss, PollSet::POLL_WRITE);
+		if (pollBeforeClose) assertTrue (ps.poll(0).size() == 1);
+
+		ss.close();
+		// On POSIX systems this socket gets the number of the closed descriptor.
+		StreamSocket other(server.address());
+		StreamSocket otherPeer = server.acceptConnection();
+		ps.add(other, PollSet::POLL_READ);
+		// A second add() keeps the mode of the closed socket out as well.
+		ps.add(other, PollSet::POLL_READ);
+		assertTrue (ps.poll(Timespan(200000)).empty());
+
+		otherPeer.sendBytes("hello", 5);
+		PollSet::SocketModeMap sm = ps.poll(Timespan(1000000));
+		assertTrue (sm.size() == 1);
+		assertTrue (sm.find(other) != sm.end());
+		assertTrue (sm.find(other)->second == PollSet::POLL_READ);
+	}
+}
+
+
+void PollSetTest::testAddAfterRemove()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_WRITE);
+	assertTrue (ps.poll(0).size() == 1);
+
+	ps.remove(ss);
+	ps.add(ss, PollSet::POLL_READ);
+	assertTrue (ps.poll(Timespan(200000)).empty());
+}
+
+
+void PollSetTest::testAddAfterClear()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_WRITE);
+	assertTrue (ps.poll(0).size() == 1);
+
+	ps.clear();
+	ps.add(ss, PollSet::POLL_READ);
+	assertTrue (ps.poll(Timespan(200000)).empty());
+}
+
+
+void PollSetTest::testHas()
+{
+	StreamSocket ss1(SocketAddress::IPv4);
+	StreamSocket ss2(SocketAddress::IPv4);
+
+	PollSet ps;
+	ps.add(ss1, PollSet::POLL_READ);
+	assertTrue (ps.has(ss1));
+	assertTrue (!ps.has(ss2));
+
+	ss1.close();
+	ss2.close();
+	assertTrue (ps.has(ss1));
+	assertTrue (!ps.has(ss2));
+}
+
+
+void PollSetTest::testRemoveClosedSocket()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_READ);
+	assertTrue (ps.poll(0).empty());
+
+	ss.close();
+	// On POSIX systems this socket gets the number of the closed descriptor.
+	StreamSocket other(server.address());
+	assertTrue (!ps.has(other));
+
+	ps.remove(ss);
+	assertTrue (!ps.has(ss));
+	assertTrue (ps.empty());
+}
+
+
+void PollSetTest::testUpdateWhilePolling()
+{
+	// ThreadSanitizer reports a data race if update() changes the
+	// descriptors that poll() waits on in the other thread. On macOS,
+	// ::poll() also writes them back when it returns, so the new mode
+	// is lost.
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_READ);
+	Poller poller(ps, Timespan(10, 0));
+	Thread t;
+	t.start(poller);
+	while (!poller.isRunning()) Thread::sleep(10);
+	Stopwatch sw;
+	sw.start();
+	while (sw.elapsed() < 100000)
+	{
+		ps.update(ss, PollSet::POLL_WRITE);
+	}
+	ps.wakeUp();
+	t.join();
+	assertFalse (poller.isRunning());
+
+	PollSet::SocketModeMap sm = ps.poll(Timespan(1000000));
+	assertTrue (sm.size() == 1);
+	assertTrue (sm.find(ss) != sm.end());
+	assertTrue (sm.find(ss)->second == PollSet::POLL_WRITE);
+}
+
+
+void PollSetTest::testUpdateBeforePoll()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_WRITE);
+	ps.update(ss, PollSet::POLL_READ);
+	assertTrue (ps.poll(Timespan(200000)).empty());
+
+	peer.sendBytes("hello", 5);
+	PollSet::SocketModeMap sm = ps.poll(Timespan(1000000));
+	assertTrue (sm.size() == 1);
+	assertTrue (sm.find(ss) != sm.end());
+	assertTrue (sm.find(ss)->second == PollSet::POLL_READ);
+}
+
+
+void PollSetTest::testUpdateNotInSet()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	PollSet ps;
+	try
+	{
+		ps.update(ss, PollSet::POLL_WRITE);
+		fail("socket not in the set - must throw");
+	}
+	catch (IOException&)
+	{
+	}
+	assertTrue (!ps.has(ss));
+	assertTrue (ps.empty());
+
+	ps.add(ss, PollSet::POLL_WRITE);
+	assertTrue (ps.poll(0).size() == 1);
+	ps.remove(ss);
+	try
+	{
+		ps.update(ss, PollSet::POLL_WRITE);
+		fail("removed socket - must throw");
+	}
+	catch (IOException&)
+	{
+	}
+	assertTrue (ps.poll(Timespan(200000)).empty());
+}
+
+
 void PollSetTest::setUp()
 {
 }
@@ -549,6 +827,17 @@ CppUnit::Test* PollSetTest::suite()
 	CppUnit_addTest(pSuite, PollSetTest, testPollSetWakeUp);
 	CppUnit_addTest(pSuite, PollSetTest, testClear);
 	CppUnit_addTest(pSuite, PollSetTest, testCloseOnExec);
+	CppUnit_addTest(pSuite, PollSetTest, testClosedSocketIsRejected);
+	CppUnit_addTest(pSuite, PollSetTest, testClosedSocketIsNotReported);
+	CppUnit_addTest(pSuite, PollSetTest, testReusedDescriptorIsNotReported);
+	CppUnit_addTest(pSuite, PollSetTest, testReusedDescriptorGetsNewMode);
+	CppUnit_addTest(pSuite, PollSetTest, testAddAfterRemove);
+	CppUnit_addTest(pSuite, PollSetTest, testAddAfterClear);
+	CppUnit_addTest(pSuite, PollSetTest, testHas);
+	CppUnit_addTest(pSuite, PollSetTest, testRemoveClosedSocket);
+	CppUnit_addTest(pSuite, PollSetTest, testUpdateWhilePolling);
+	CppUnit_addTest(pSuite, PollSetTest, testUpdateBeforePoll);
+	CppUnit_addTest(pSuite, PollSetTest, testUpdateNotInSet);
 
 	return pSuite;
 }

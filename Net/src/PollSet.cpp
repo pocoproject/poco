@@ -14,6 +14,7 @@
 
 #include "Poco/Net/PollSet.h"
 #include "Poco/Net/SocketImpl.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Mutex.h"
 #include "Poco/IOLock.h"
 #include <set>
@@ -30,6 +31,7 @@
 		#include <sys/eventfd.h>
 	#endif
 #elif defined(POCO_HAVE_FD_POLL)
+	#include <algorithm>
 	#ifndef _WIN32
 		#include <poll.h>
 		#include "Poco/Pipe.h"
@@ -127,8 +129,9 @@ public:
 		ev.events = 0;
 		ev.data.ptr = nullptr;
 
-		int err = epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &ev);
-		if (err) SocketImpl::error();
+		// Closing a socket has removed its descriptor from the epoll set.
+		if (fd != POCO_INVALID_SOCKET && epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &ev) != 0)
+			SocketImpl::error();
 		ScopedLock lock(_mutex);
 		_socketMap.erase(socket.impl());
 	}
@@ -390,8 +393,8 @@ public:
 	~PollSetImpl()
 	{
 		// Signal shutdown, close pipe to wake up poll(), then wait
-		// for poll() to exit before freeing memory (since ::poll()
-		// writes to _pollfds).
+		// for poll() to exit before freeing memory (since poll()
+		// uses the members until it returns).
 		_pollLock.markClosed();
 		try { _pipe.close(); } catch (...) { }
 		_pollLock.wait();
@@ -401,15 +404,24 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		poco_socket_t fd = socket.impl()->sockfd();
-		_addMap[fd] |= mode;
-		_removeSet.erase(fd);
+		if (auto it = _socketMap.find(fd); it != _socketMap.end() && it->second.impl() != socket.impl())
+		{
+			// The number belonged to a socket closed while in the set. Its pollfd
+			// is dropped, so that its mode is not polled for this socket.
+			_removeSet.insert(fd);
+			_addMap[fd] = mode;
+		}
+		else _addMap[fd] |= mode;
+		// A pending removal is kept: it drops the pollfd of a removed or replaced
+		// socket, while the new mode is added from _addMap after it.
 		_socketMap[fd] = socket;
 	}
 
 	void remove(const Socket& socket)
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		poco_socket_t fd = socket.impl()->sockfd();
+		poco_socket_t fd = descriptorInSet(socket);
+		if (fd == POCO_INVALID_SOCKET) return;
 		_removeSet.insert(fd);
 		_addMap.erase(fd);
 		_socketMap.erase(fd);
@@ -419,8 +431,7 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		SocketImpl* sockImpl = socket.impl();
-		return sockImpl &&
-			(_socketMap.find(sockImpl->sockfd()) != _socketMap.end());
+		return sockImpl != nullptr && descriptorInSet(socket) != POCO_INVALID_SOCKET;
 	}
 
 	bool empty() const
@@ -432,13 +443,16 @@ public:
 	void update(const Socket& socket, int mode)
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		poco_socket_t fd = socket.impl()->sockfd();
+		poco_socket_t fd = descriptorInSet(socket);
+		// As in the epoll implementation, where epoll_ctl() fails with ENOENT.
+		if (fd == POCO_INVALID_SOCKET) SocketImpl::error(ENOENT);
+		// A socket added since the last poll() has its mode in _addMap.
+		if (auto it = _addMap.find(fd); it != _addMap.end()) it->second = mode;
 		for (auto& _pollfd : _pollfds)
 		{
 			if (_pollfd.fd == fd)
 			{
 				_pollfd.events = 0;
-				_pollfd.revents = 0;
 				setMode(_pollfd.events, mode);
 			}
 		}
@@ -451,7 +465,7 @@ public:
 		_socketMap.clear();
 		_addMap.clear();
 		_removeSet.clear();
-		_pollfds.reserve(1);
+		_pollfds.resize(1);
 	}
 
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
@@ -489,9 +503,15 @@ public:
 				_pollfds.push_back(pfd);
 			}
 			_addMap.clear();
+
+			// A socket closed while in the set is not polled: its descriptor number
+			// may already belong to a socket outside the set.
+			_pollfds.erase(std::remove_if(_pollfds.begin() + 1, _pollfds.end(),
+				[this](const pollfd& pfd) { return polledSocket(pfd.fd) == nullptr; }), _pollfds.end());
+			_polledFds = _pollfds;
 		}
 
-		if (_pollfds.empty()) return result;
+		if (_polledFds.empty()) return result;
 
 		Poco::Timespan remainingTime(timeout);
 		int rc;
@@ -499,7 +519,7 @@ public:
 		do
 		{
 			Poco::Timestamp start;
-			rc = ::poll(_pollfds.data(), _pollfds.size(), remainingTime.totalMilliseconds());
+			rc = ::poll(_polledFds.data(), _polledFds.size(), remainingTime.totalMilliseconds());
 			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 			{
 				Poco::Timestamp end;
@@ -517,7 +537,7 @@ public:
 
 		if (rc < 0) SocketImpl::error();
 
-		if (_pollfds[0].revents & POLLIN)
+		if (_polledFds[0].revents & POLLIN)
 		{
 			char c;
 			(void) _pipe.readBytes(&c, 1);
@@ -527,19 +547,17 @@ public:
 
 		if (!_socketMap.empty())
 		{
-			for (auto it = _pollfds.begin() + 1; it != _pollfds.end(); ++it)
+			for (auto it = _polledFds.begin() + 1; it != _polledFds.end(); ++it)
 			{
-				auto its = _socketMap.find(it->fd);
-				if (its != _socketMap.end())
+				if (const Socket* pSocket = polledSocket(it->fd); pSocket != nullptr)
 				{
 					if (it->revents & POLLIN)
-						result[its->second] |= PollSet::POLL_READ;
+						result[*pSocket] |= PollSet::POLL_READ;
 					if (it->revents & POLLOUT)
-						result[its->second] |= PollSet::POLL_WRITE;
+						result[*pSocket] |= PollSet::POLL_WRITE;
 					if (it->revents & POLLERR || (it->revents & POLLHUP))
-						result[its->second] |= PollSet::POLL_ERROR;
+						result[*pSocket] |= PollSet::POLL_ERROR;
 				}
-				it->revents = 0;
 			}
 		}
 
@@ -561,6 +579,33 @@ public:
 	}
 
 private:
+	[[nodiscard]] poco_socket_t descriptorInSet(const Socket& socket) const
+	{
+		// Called with _mutex locked.
+		if (poco_socket_t fd = socket.impl()->sockfd(); fd != POCO_INVALID_SOCKET)
+		{
+			auto it = _socketMap.find(fd);
+			return (it != _socketMap.end() && it->second.impl() == socket.impl()) ? fd : POCO_INVALID_SOCKET;
+		}
+
+		// A socket without a descriptor, closed while in the set or never added,
+		// is looked up by a scan of the set. Only the lookup of a closed socket
+		// pays its linear cost, as a socket is to be removed before it is closed.
+		auto it = std::find_if(_socketMap.begin(), _socketMap.end(),
+			[&socket](const auto& entry) { return entry.second.impl() == socket.impl(); });
+		return it != _socketMap.end() ? it->first : POCO_INVALID_SOCKET;
+	}
+
+	[[nodiscard]] const Socket* polledSocket(poco_socket_t fd) const
+	{
+		// Called with _mutex locked.
+		// The socket added with the descriptor may have been closed since, and the
+		// number given to a socket outside the set.
+		auto it = _socketMap.find(fd);
+		if (it == _socketMap.end() || it->second.impl()->sockfd() != fd) return nullptr;
+		return &it->second;
+	}
+
 	void setMode(short& target, int mode)
 	{
 		if (mode & PollSet::POLL_READ)
@@ -575,6 +620,10 @@ private:
 	std::map<poco_socket_t, int>    _addMap;
 	std::set<poco_socket_t>         _removeSet;
 	std::vector<pollfd>             _pollfds;
+	// ::poll() waits on this copy of _pollfds without holding _mutex, so that
+	// update() can change _pollfds in the meantime. Only poll() uses it; as
+	// with _pollLock, one thread at a time may be in poll().
+	std::vector<pollfd>             _polledFds;
 	Poco::Pipe                      _pipe;
 	IOLock                         _pollLock;
 };
@@ -623,7 +672,10 @@ public:
 	void update(const Socket& socket, int mode)
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		_map[socket] = mode;
+		auto it = _map.find(socket);
+		// As in the epoll implementation, where epoll_ctl() fails with ENOENT.
+		if (it == _map.end()) SocketImpl::error(ENOENT);
+		it->second = mode;
 	}
 
 	void clear()
@@ -651,6 +703,10 @@ public:
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
 
+			// Only an empty set returns at once. A set whose sockets are all closed
+			// waits for the timeout, as select() does with empty descriptor sets.
+			if (_map.empty()) return result;
+
 			for (auto it = _map.begin(); it != _map.end(); ++it)
 			{
 				poco_socket_t fd = it->first.impl()->sockfd();
@@ -673,8 +729,6 @@ public:
 				}
 			}
 		}
-
-		if (nfd == 0) return result;
 
 		Poco::Timespan remainingTime(timeout);
 		int rc;
@@ -749,6 +803,19 @@ private:
 #endif
 
 
+namespace
+{
+	void checkDescriptor(const Socket& socket)
+	{
+		// The poll() and select() implementations ignore a socket without a
+		// descriptor, while epoll_ctl() fails; checking here makes all of them reject it.
+		const SocketImpl* pImpl = socket.impl();
+		poco_check_ptr (pImpl);
+		if (pImpl->sockfd() == POCO_INVALID_SOCKET) throw InvalidSocketException();
+	}
+}
+
+
 PollSet::PollSet():
 	_pImpl(new PollSetImpl)
 {
@@ -763,6 +830,7 @@ PollSet::~PollSet()
 
 void PollSet::add(const Socket& socket, int mode)
 {
+	checkDescriptor(socket);
 	_pImpl->add(socket, mode);
 }
 
@@ -775,6 +843,7 @@ void PollSet::remove(const Socket& socket)
 
 void PollSet::update(const Socket& socket, int mode)
 {
+	checkDescriptor(socket);
 	_pImpl->update(socket, mode);
 }
 
