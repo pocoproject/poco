@@ -15,6 +15,7 @@
 #include "Poco/AI/ChatSettings.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 
 
 namespace Poco::AI {
@@ -79,6 +80,21 @@ const std::vector<std::string>& ProviderSettings::kinds()
 }
 
 
+std::string ProviderSettings::effectiveKind() const
+{
+	if (!kind.empty()) return kind;
+	const std::vector<std::string>& known = kinds();
+	return std::find(known.begin(), known.end(), name) != known.end() ? name : std::string("openai-compatible");
+}
+
+
+bool ProviderSettings::isKind(const std::string& kind)
+{
+	const std::vector<std::string>& known = kinds();
+	return kind == "openai-compatible" || std::find(known.begin(), known.end(), kind) != known.end();
+}
+
+
 std::string ProviderSettings::defaultBaseUrl(const std::string& kind)
 {
 	if (kind == "anthropic") return "https://api.anthropic.com/v1";
@@ -118,6 +134,7 @@ Poco::JSON::Object::Ptr ChatSettings::toJSON() const
 	{
 		Poco::JSON::Object::Ptr pEntry = new Poco::JSON::Object;
 		pEntry->set("name", settings.name);
+		if (!settings.kind.empty()) pEntry->set("kind", settings.kind);
 		pEntry->set("enabled", settings.enabled);
 		pEntry->set("baseUrl", settings.baseUrl);
 		pEntry->set("servers", toArray(settings.servers));
@@ -149,6 +166,7 @@ ChatSettings ChatSettings::fromJSON(const Poco::JSON::Object::Ptr& pObject)
 		const Poco::JSON::Object::Ptr pEntry = pProviders->getObject(static_cast<unsigned>(i));
 		ProviderSettings entry;
 		entry.name = stringMember(pEntry, "name");
+		entry.kind = stringMember(pEntry, "kind");
 		const Poco::Dynamic::Var enabled = pEntry->get("enabled");
 		if (!enabled.isEmpty() && !enabled.isBoolean()) throw Poco::DataFormatException("Not a boolean", "enabled");
 		entry.enabled = !enabled.isEmpty() && enabled.extract<bool>();

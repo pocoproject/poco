@@ -31,13 +31,18 @@ namespace Poco::AI {
 struct AI_API ProviderSettings
 	/// A provider a chat may use, as an administrator configures it.
 	///
-	/// The name is the kind of the provider: "anthropic" for the Anthropic
-	/// Messages API, and "openai" and "ollama" for servers of the OpenAI Chat
-	/// Completions API, which have default base URLs. Any other name is a
-	/// server of the OpenAI Chat Completions API whose base URL must be set.
+	/// Its kind tells the API it speaks: "anthropic" for the Anthropic
+	/// Messages API, and "openai", "ollama" and "openai-compatible" for
+	/// servers of the OpenAI Chat Completions API. The kinds anthropic,
+	/// openai and ollama have default base URLs; an openai-compatible server
+	/// needs its base URL set. Without a kind, the name gives it: the name
+	/// when it is one of kinds(), else openai-compatible.
 {
 	std::string name;
-		/// The kind of the provider.
+		/// The name of the provider in the chat.
+
+	std::string kind;
+		/// The kind of the provider; empty for the one the name gives.
 
 	bool enabled = false;
 		/// Whether the chat offers the provider.
@@ -74,8 +79,14 @@ struct AI_API ProviderSettings
 		/// whose key is in the environment variable of its kind:
 		/// ANTHROPIC_API_KEY or OPENAI_API_KEY.
 
+	[[nodiscard]] std::string effectiveKind() const;
+		/// The kind, or the one the name gives when it is empty.
+
 	[[nodiscard]] static const std::vector<std::string>& kinds();
 		/// The kinds with defaults: anthropic, openai and ollama.
+
+	[[nodiscard]] static bool isKind(const std::string& kind);
+		/// Returns true for anthropic, openai, ollama and openai-compatible.
 
 	[[nodiscard]] static std::string defaultBaseUrl(const std::string& kind);
 		/// The base URL of a kind when none is set, or an empty string for a
@@ -110,9 +121,9 @@ struct AI_API ChatSettings
 
 	[[nodiscard]] Poco::JSON::Object::Ptr toJSON() const;
 		/// Returns the settings as a JSON object, keys included, for the host
-		/// to store: {"provider", "model", "providers": [{"name", "enabled",
-		/// "baseUrl", "servers", "models", "maxTokens", "timeout",
-		/// "probeTimeout", "tools", "apiKey"}]}.
+		/// to store: {"provider", "model", "providers": [{"name", "kind",
+		/// "enabled", "baseUrl", "servers", "models", "maxTokens", "timeout",
+		/// "probeTimeout", "tools", "apiKey"}]}, kind only when it is set.
 
 	[[nodiscard]] static ChatSettings fromJSON(const Poco::JSON::Object::Ptr& pObject);
 		/// Reads settings toJSON() wrote. What is missing gets its default.

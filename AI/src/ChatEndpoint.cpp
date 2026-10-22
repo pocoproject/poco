@@ -547,9 +547,10 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		{
 			Poco::JSON::Object::Ptr pEntry = new Poco::JSON::Object;
 			pEntry->set("name", entry.name);
+			pEntry->set("kind", entry.effectiveKind());
 			pEntry->set("enabled", entry.enabled);
 			pEntry->set("baseUrl", entry.baseUrl);
-			pEntry->set("defaultBaseUrl", ProviderSettings::defaultBaseUrl(entry.name));
+			pEntry->set("defaultBaseUrl", ProviderSettings::defaultBaseUrl(entry.effectiveKind()));
 			pEntry->set("servers", toArray(entry.servers));
 			pEntry->set("models", toArray(entry.models));
 			pEntry->set("maxTokens", entry.maxTokens);
@@ -557,8 +558,8 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 			pEntry->set("probeTimeout", entry.probeTimeout);
 			pEntry->set("tools", entry.tools);
 			pEntry->set("hasApiKey", _service.hasKey(entry.name));
-			pEntry->set("usesApiKey", _params.keysFromRequests && ProviderSettings::usesApiKey(entry.name));
-			pEntry->set("usesServers", ProviderSettings::usesServers(entry.name));
+			pEntry->set("usesApiKey", _params.keysFromRequests && ProviderSettings::usesApiKey(entry.effectiveKind()));
+			pEntry->set("usesServers", ProviderSettings::usesServers(entry.effectiveKind()));
 			pProviders->add(pEntry);
 		}
 		pBody->set("providers", pProviders);
@@ -583,6 +584,7 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		const Poco::JSON::Object::Ptr pEntry = pProviders->getObject(static_cast<unsigned>(i));
 		ProviderSettings entry;
 		entry.name = stringMember(pEntry, "name");
+		entry.kind = stringMember(pEntry, "kind");
 		const Poco::Dynamic::Var enabled = pEntry->get("enabled");
 		entry.enabled = enabled.isBoolean() ? enabled.extract<bool>() : true;
 		entry.baseUrl = stringMember(pEntry, "baseUrl");
@@ -595,7 +597,7 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		entry.tools = tools.isBoolean() ? tools.extract<bool>() : true;
 		entry.apiKey = stringMember(pEntry, "apiKey");
 		if (!entry.apiKey.empty()) needsKeysFromRequests(_params);
-		if (!_params.keysFromRequests && ProviderSettings::usesApiKey(entry.name)) needsSameAddress(current, entry);
+		if (!_params.keysFromRequests && ProviderSettings::usesApiKey(entry.effectiveKind())) needsSameAddress(current, entry);
 		providers.push_back(std::move(entry));
 	}
 	_service.configure(providers);

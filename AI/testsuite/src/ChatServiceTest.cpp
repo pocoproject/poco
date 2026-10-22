@@ -1360,6 +1360,58 @@ void ChatServiceTest::testDefaultProvider()
 }
 
 
+void ChatServiceTest::testProviderKind()
+{
+	// The kind, not the name, tells the API: a second Anthropic endpoint.
+	CannedServer server("application/json", "{\"data\":[{\"id\":\"claude-x\",\"type\":\"model\"}]}");
+	EnvironmentGuard noKey(ProviderSettings::keyVariable("anthropic"), "");
+	ProviderSettings eu = entry("eu", true);
+	eu.kind = "anthropic";
+	eu.baseUrl = server.baseUrl();
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({eu}), ChatService::Params());
+	assertTrue(service.retry("eu").reachable);
+	assertTrue(!server.header("anthropic-version").empty());
+	assertTrue(service.models() == std::vector<std::string>({"claude-x"}));
+	assertEqual(std::string("anthropic"), ChatSettings::fromJSON(service.settings().toJSON()).providers[0].kind);
+
+	// Without a kind, the name gives it.
+	assertEqual(std::string("anthropic"), entry("anthropic", true).effectiveKind());
+	assertEqual(std::string("ollama"), entry("ollama", true).effectiveKind());
+	assertEqual(std::string("openai-compatible"), entry("eu", true).effectiveKind());
+
+	// A kind that is not known is refused, and one without a default base
+	// URL needs one.
+	ProviderSettings unknown = entry("x", true);
+	unknown.kind = "gemini";
+	unknown.baseUrl = "http://x.test/v1";
+	ProviderSettings compatible = entry("y", true);
+	compatible.kind = "openai-compatible";
+	for (const ProviderSettings& refused: {unknown, compatible})
+	{
+		try
+		{
+			service.configure({refused});
+			fail("settings that cannot work must be refused: " + refused.name);
+		}
+		catch (const Poco::InvalidArgumentException&)
+		{
+		}
+	}
+	ProviderSettings local = entry("local", true);
+	local.kind = "ollama";
+	service.configure({local});
+	assertEqual(std::string("local"), service.provider());
+
+	// The endpoint shows the kind and takes it.
+	Host host(service);
+	assertEqual(200, host.send("POST", "config", "{\"providers\":[{\"name\":\"local\",\"kind\":\"ollama\",\"enabled\":true},{\"name\":\"lab\",\"kind\":\"openai-compatible\",\"baseUrl\":\"http://lab.test/v1\"}]}", "root", true).status);
+	const Array::Ptr pProviders = host.send("GET", "config", "", "root", true).json()->getArray("providers");
+	assertEqual(std::string("ollama"), pProviders->getObject(0)->getValue<std::string>("kind"));
+	assertEqual(std::string("openai-compatible"), pProviders->getObject(1)->getValue<std::string>("kind"));
+	assertEqual(400, host.send("POST", "config", "{\"providers\":[{\"name\":\"local\",\"kind\":\"gemini\",\"enabled\":true}]}", "root", true).status);
+}
+
+
 void ChatServiceTest::testEndpointHealth()
 {
 	auto pState = std::make_shared<FakeState>();
@@ -1897,6 +1949,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeatBounds);
 	CppUnit_addTest(pSuite, ChatServiceTest, testStaleConnectionFailure);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointBodyBrokeOff);
+	CppUnit_addTest(pSuite, ChatServiceTest, testProviderKind);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointErrorClientGone);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);
 

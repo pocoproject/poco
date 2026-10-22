@@ -48,6 +48,7 @@ public:
 	void testEndpointHeartbeatBounds();
 	void testStaleConnectionFailure();
 	void testEndpointBodyBrokeOff();
+	void testProviderKind();
 	void testEndpointErrorClientGone();
 	void testEndpointClientGone();
 

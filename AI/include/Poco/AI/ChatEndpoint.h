@@ -63,15 +63,16 @@ class AI_API ChatEndpoint
 	///     "providerStatus"};
 	///   - POST providers with {"provider"}: puts the provider in use; with
 	///     {"op": "retry", "provider"}: asks it for its models again;
-	///   - GET config: {"current", "providers": [{"name", "enabled", "baseUrl",
-	///     "defaultBaseUrl", "servers", "models", "maxTokens", "timeout",
-	///     "probeTimeout", "tools", "hasApiKey", "usesApiKey", "usesServers"}]},
-	///     never a key. hasApiKey tells whether the provider has one, from the
-	///     settings or the environment; usesApiKey whether one of its kind can
-	///     be set here;
+	///   - GET config: {"current", "providers": [{"name", "kind", "enabled",
+	///     "baseUrl", "defaultBaseUrl", "servers", "models", "maxTokens",
+	///     "timeout", "probeTimeout", "tools", "hasApiKey", "usesApiKey",
+	///     "usesServers"}]}, never a key. kind is the effective one (see
+	///     ProviderSettings); hasApiKey tells whether the provider has a key,
+	///     from the settings or the environment; usesApiKey whether one of its
+	///     kind can be set here;
 	///   - POST config with {"providers": [...]}: replaces the providers, as
-	///     ChatService::configure() does; an entry's apiKey sets its key, where
-	///     keys may be set here;
+	///     ChatService::configure() does; an entry's kind may be left out, and
+	///     its apiKey sets its key, where keys may be set here;
 	///   - POST token with {"provider", "token"}: sets the key of a provider,
 	///     where keys may be set here.
 	///

@@ -58,7 +58,7 @@ namespace
 
 	std::string baseUrlOf(const ProviderSettings& settings)
 	{
-		return settings.baseUrl.empty() ? ProviderSettings::defaultBaseUrl(settings.name) : settings.baseUrl;
+		return settings.baseUrl.empty() ? ProviderSettings::defaultBaseUrl(settings.effectiveKind()) : settings.baseUrl;
 	}
 
 
@@ -517,16 +517,19 @@ ChatSettings ChatService::complete(ChatSettings settings)
 
 void ChatService::validate(const ChatSettings& settings, bool needsProvider)
 {
-	const std::vector<std::string>& kinds = ProviderSettings::kinds();
 	std::set<std::string> names;
 	bool enabled = false;
 	for (const ProviderSettings& entry: settings.providers)
 	{
 		if (entry.name.empty()) throw Poco::InvalidArgumentException("A provider needs a name");
 		if (!names.insert(entry.name).second) throw Poco::InvalidArgumentException("A provider is listed twice", entry.name);
-		if (entry.baseUrl.empty() && std::find(kinds.begin(), kinds.end(), entry.name) == kinds.end())
+		if (!entry.kind.empty() && !ProviderSettings::isKind(entry.kind))
 		{
-			throw Poco::InvalidArgumentException("A provider of another kind needs a base URL", entry.name);
+			throw Poco::InvalidArgumentException("A provider has a kind that is not known", entry.name + ": " + entry.kind);
+		}
+		if (entry.baseUrl.empty() && ProviderSettings::defaultBaseUrl(entry.effectiveKind()).empty())
+		{
+			throw Poco::InvalidArgumentException("A provider of a kind without a default base URL needs one", entry.name);
 		}
 		if (entry.maxTokens < 0 || entry.timeout < 0 || entry.probeTimeout < 0)
 		{
@@ -568,6 +571,7 @@ std::optional<ProviderSettings> ChatService::find(const ChatSettings& settings, 
 bool ChatService::sameConnection(const ProviderSettings& first, const ProviderSettings& second)
 {
 	return first.enabled == second.enabled
+		&& first.effectiveKind() == second.effectiveKind()
 		&& first.baseUrl == second.baseUrl
 		&& first.servers == second.servers
 		&& first.models == second.models
@@ -691,7 +695,7 @@ std::string ChatService::keyOf(const ProviderSettings& settings) const
 	/// the service was created, else none.
 {
 	if (!settings.apiKey.empty()) return settings.apiKey;
-	const std::string variable = ProviderSettings::keyVariable(settings.name);
+	const std::string variable = ProviderSettings::keyVariable(settings.effectiveKind());
 	if (variable.empty()) return std::string();
 	const auto it = _startAddresses.find(settings.name);
 	if (it == _startAddresses.end() || !sameAddress(it->second, settings)) return std::string();
@@ -711,7 +715,8 @@ std::shared_ptr<LLMProvider> ChatService::createProvider(const ProviderSettings&
 	}
 	const std::string& key = keyed.apiKey;
 	const int maxTokens = settings.maxTokens > 0 ? settings.maxTokens : _params.maxTokens;
-	if (settings.name == "anthropic")
+	const std::string kind = settings.effectiveKind();
+	if (kind == "anthropic")
 	{
 		AnthropicProvider::Params params;
 		params.baseURI = Poco::URI(baseUrl);
@@ -727,7 +732,7 @@ std::shared_ptr<LLMProvider> ChatService::createProvider(const ProviderSettings&
 	params.model = model;
 	params.maxTokens = maxTokens;
 	// OpenAI's reasoning models refuse max_tokens; other servers know only it.
-	params.maxTokensField = settings.name == "openai" ? "max_completion_tokens" : "max_tokens";
+	params.maxTokensField = kind == "openai" ? "max_completion_tokens" : "max_tokens";
 	params.timeout = timeout;
 	return std::make_shared<OpenAIProvider>(params, _params.sessionFactory);
 }
