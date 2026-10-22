@@ -758,7 +758,9 @@ void AnthropicProviderTest::testCancelDuringUpload()
 	CannedServer server(response);
 	AnthropicProvider provider(params(server.baseUrl()));
 	ChatThread chat(provider, userRequest(std::string(16*1024*1024, 'x')));
-	assertTrue(server.waitForRequest(10000));
+	// The request is serialized before it is sent, which takes a loaded
+	// machine a while; only the time after the cancel counts.
+	assertTrue(server.waitForRequest(60000));
 	const Poco::Timestamp cancelled;
 	chat.cancellation.cancel();
 	chat.join();
