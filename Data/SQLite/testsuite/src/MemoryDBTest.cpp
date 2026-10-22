@@ -26,6 +26,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Bugcheck.h"
 #include "Poco/Channel.h"
 #include "Poco/Logger.h"
 #include "Poco/Message.h"
@@ -47,45 +48,47 @@ using Poco::Timespan;
 
 namespace
 {
+	constexpr long NO_TIMER_FLUSH_MS = 3600 * 1000;
+		/// A timer interval longer than any test runs.
+
+
+	MemoryDB::Options flushedByTest(bool loadArchivedShards)
+		/// Options under which only the test's own flush() calls write: the
+		/// timer, which would otherwise start a flush between sealActive() and
+		/// the next flush(), does not fire while the test runs.
+	{
+		MemoryDB::Options options;
+		options.loadArchivedShards = loadArchivedShards;
+		options.checkIntervalMs = NO_TIMER_FLUSH_MS;
+		return options;
+	}
+
+
 	class LogCapture
 		/// Collects what a logger writes for as long as it lives, then gives
 		/// the logger its channel back.
 	{
 	public:
-		explicit LogCapture(const std::string& name):
-			_logger(Poco::Logger::get(name)),
-			_previous(_logger.getChannel()),
-			_channel(new Collector)
-		{
-			_logger.setChannel(_channel);
-		}
+		LogCapture() = delete;
+		explicit LogCapture(const std::string& name);
+		~LogCapture();
+		LogCapture(const LogCapture&) = delete;
+		LogCapture& operator = (const LogCapture&) = delete;
+		LogCapture(LogCapture&&) = delete;
+		LogCapture& operator = (LogCapture&&) = delete;
 
-		~LogCapture()
-		{
-			_logger.setChannel(_previous);
-		}
-
-		std::size_t count(const std::string& text) const
-		{
-			return _channel->count(text);
-		}
+		[[nodiscard]] std::size_t count(const std::string& text) const;
+			/// Returns the number of messages written so far that contain text.
 
 	private:
 		class Collector: public Poco::Channel
 		{
 		public:
-			void log(const Poco::Message& msg) override
-			{
-				std::lock_guard<std::mutex> lock(_mutex);
-				_texts.push_back(msg.getText());
-			}
+			Collector() = default;
+			~Collector() override = default;
 
-			std::size_t count(const std::string& text) const
-			{
-				std::lock_guard<std::mutex> lock(_mutex);
-				return static_cast<std::size_t>(std::count_if(_texts.begin(), _texts.end(),
-					[&text](const std::string& t) { return t.find(text) != std::string::npos; }));
-			}
+			void log(const Poco::Message& msg) override;
+			[[nodiscard]] std::size_t count(const std::string& text) const;
 
 		private:
 			mutable std::mutex _mutex;
@@ -96,6 +99,49 @@ namespace
 		Poco::Channel::Ptr _previous;
 		Poco::AutoPtr<Collector> _channel;
 	};
+
+
+	LogCapture::LogCapture(const std::string& name):
+		_logger(Poco::Logger::get(name)),
+		_previous(_logger.getChannel()),
+		_channel(new Collector)
+	{
+		_logger.setChannel(_channel);
+	}
+
+
+	LogCapture::~LogCapture()
+	{
+		try
+		{
+			_logger.setChannel(_previous);
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
+	}
+
+
+	std::size_t LogCapture::count(const std::string& text) const
+	{
+		return _channel->count(text);
+	}
+
+
+	void LogCapture::Collector::log(const Poco::Message& msg)
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		_texts.push_back(msg.getText());
+	}
+
+
+	std::size_t LogCapture::Collector::count(const std::string& text) const
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		return static_cast<std::size_t>(std::count_if(_texts.begin(), _texts.end(),
+			[&text](const std::string& t) { return t.find(text) != std::string::npos; }));
+	}
 }
 
 
@@ -1598,11 +1644,8 @@ void MemoryDBTest::testEmptiedShardStaysForNumbering()
 	// row in memory to carry the numbering. Its shard must not leave memory
 	// then: the next row would be numbered inside the shard's range, in a
 	// shard that is no longer loaded, and every call after it would fail.
-	MemoryDB::Options off;
-	off.loadArchivedShards = false;
-	off.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
 	{
-		MemoryDB db(_dir, off);
+		MemoryDB db(_dir, flushedByTest(false));
 		db << "CREATE TABLE q(id INTEGER PRIMARY KEY, v TEXT)", now;
 		std::string v("x");
 		for (int i = 0; i < 3; ++i) db << "INSERT INTO q(v) VALUES(:v)", use(v), now;
@@ -1636,11 +1679,8 @@ void MemoryDBTest::testDeleteShardKeepsNumberingAtEmptyNewerRange()
 	for (bool load: {false, true})
 	{
 		try { Poco::File(_dir).remove(true); } catch (...) {}
-		MemoryDB::Options o;
-		o.loadArchivedShards = load;
-		o.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
 		{
-			MemoryDB db(_dir, o);
+			MemoryDB db(_dir, flushedByTest(load));
 			db << "CREATE TABLE q(id INTEGER PRIMARY KEY, v TEXT)", now;
 			std::string v("old");
 			for (int i = 0; i < 3; ++i) db << "INSERT INTO q(v) VALUES(:v)", use(v), now; // 1..3
@@ -1676,10 +1716,7 @@ void MemoryDBTest::testInsertBelowActiveRangeRejected()
 	// A rowid at or below the active shard's range that no sealed shard holds,
 	// here the range of a deleted shard, belongs to no shard that is ever
 	// written. An INSERT there must poison the instance, not be lost silently.
-	MemoryDB::Options off;
-	off.loadArchivedShards = false;
-	off.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
-	MemoryDB db(_dir, off);
+	MemoryDB db(_dir, flushedByTest(false));
 	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
 	std::string v("x");
 	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 1..3
@@ -1712,10 +1749,7 @@ void MemoryDBTest::testBlockedEvictionLeavesOtherTablesAlone()
 	// touched: deleting their rows and rolling the deletes back costs a shard's
 	// worth of work at every flush. A reader on a second connection holds the
 	// big table, so a DELETE of it fails, and the failure is logged.
-	MemoryDB::Options off;
-	off.loadArchivedShards = false;
-	off.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
-	MemoryDB db(_dir, off);
+	MemoryDB db(_dir, flushedByTest(false));
 	db << "CREATE TABLE a_events(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
 	db << "CREATE TABLE z_cfg(id INTEGER PRIMARY KEY, v TEXT)", now; // checked after a_events
 	std::string v("x");
@@ -1729,7 +1763,10 @@ void MemoryDBTest::testBlockedEvictionLeavesOtherTablesAlone()
 	{
 		// The same shared-cache in-memory database, on a connection of its own.
 		const std::string uri = db.session().uri();
-		Poco::Data::Session reader(Poco::Data::SQLite::Connector::KEY, uri.substr(uri.find(":///") + 4));
+		const std::string separator(":///"); // between the connector and the connection string
+		const std::string::size_type at = uri.find(separator);
+		assertTrue (at != std::string::npos);
+		Poco::Data::Session reader(Poco::Data::SQLite::Connector::KEY, uri.substr(at + separator.size()));
 		int id = 0;
 		Poco::Data::Statement stmt = (reader << "SELECT id FROM a_events", into(id), limit(1));
 		stmt.execute(); // partially stepped: holds a read lock on a_events
@@ -1751,10 +1788,7 @@ void MemoryDBTest::testRewriteKeepsAttachedShardReadable()
 	// the connection mutex, so a reader can never run in between, however the
 	// threads are scheduled; a reader stepping the shard at that moment makes
 	// the flush leave it for a later one.
-	MemoryDB::Options off;
-	off.loadArchivedShards = false;
-	off.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
-	MemoryDB db(_dir, off);
+	MemoryDB db(_dir, flushedByTest(false));
 	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now; // keeps shard 1 in memory
 	std::string v(200, 'x');
 	db.session().begin();
@@ -1784,6 +1818,15 @@ void MemoryDBTest::testRewriteKeepsAttachedShardReadable()
 				if (e.displayText().find("no such table") != std::string::npos) ++missing;
 				else if (failure.empty()) failure = e.displayText();
 			}
+			catch (const std::exception& e)
+			{
+				// an exception that left the thread would end the whole runner
+				if (failure.empty()) failure = e.what();
+			}
+			catch (...)
+			{
+				if (failure.empty()) failure = "unknown exception";
+			}
 		}
 	});
 	db.flush();
@@ -1792,8 +1835,10 @@ void MemoryDBTest::testRewriteKeepsAttachedShardReadable()
 	assertTrue (missing.load() == 0);
 	assertTrue (failure.empty());
 
-	// A rewrite left for later because the reader was stepping goes now.
-	while (db.dirty()) db.flush();
+	// A rewrite left for later because the reader was stepping goes now: with
+	// the reader gone, one more flush is enough.
+	if (db.dirty()) db.flush();
+	assertTrue (!db.dirty());
 	std::string y;
 	db << ("SELECT v FROM " + alias + ".t WHERE id = 1"), into(y), now;
 	assertTrue (y == "y"); // the alias reads the new file
