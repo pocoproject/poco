@@ -195,10 +195,12 @@ ChatResult OpenAIProvider::chat(const ChatRequest& request, const ContentEventCa
 
 		// Each event is a chat.completion.chunk; the stream ends with [DONE].
 		// Text arrives in choices[0].delta.content and is reported at once;
-		// tool calls arrive in pieces keyed by tool_calls[].index (id and name
-		// first, then the arguments as JSON text) and are reported once the
-		// stream is complete.
+		// a refusal arrives in delta.refusal instead; tool calls arrive in
+		// pieces keyed by tool_calls[].index (id and name first, then the
+		// arguments as JSON text) and are reported once the stream is
+		// complete.
 		std::map<int, ToolAccumulator> toolCalls;
+		std::string refusal;
 		bool complete = false;
 		Poco::AI::MCP::HTTP::EventStreamReader reader(stream, current.maxResponseSize);
 		Poco::AI::MCP::HTTP::EventStreamReader::Event event;
@@ -243,6 +245,7 @@ ChatResult OpenAIProvider::chat(const ChatRequest& request, const ContentEventCa
 					onEvent(textEvent);
 				}
 			}
+			refusal += stringOf(pDelta, "refusal");
 			const Array::Ptr pToolCalls = pDelta.isNull() ? Array::Ptr() : pDelta->getArray("tool_calls");
 			for (std::size_t i = 0; !pToolCalls.isNull() && i < pToolCalls->size(); ++i)
 			{
@@ -272,6 +275,13 @@ ChatResult OpenAIProvider::chat(const ChatRequest& request, const ContentEventCa
 			const std::string reason = call.networkError();
 			reportFailure(onEvent, FailureCode::STREAM_INTERRUPTED, "OpenAI response stream ended before its end" + (reason.empty() ? std::string() : ": " + reason));
 			return failed();
+		}
+		if (!refusal.empty())
+		{
+			// A refused answer is not kept: no turn to append, no tool to run.
+			result.stopReason = StopReason::REFUSAL;
+			result.explanation = refusal;
+			return result;
 		}
 
 		Array::Ptr pCalls = new Array;

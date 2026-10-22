@@ -37,7 +37,9 @@ class AI_API OpenAIProvider: public LLMProvider
 	/// and by the servers that implement the same wire format (ollama,
 	/// llama.cpp, vLLM and others). Streams the response (server-sent
 	/// events) and reports function calls as tool calls; also lists the
-	/// models the server offers and computes embeddings.
+	/// models the server offers and computes embeddings. A refusal the model
+	/// streams in place of the content ends the call with StopReason::REFUSAL
+	/// and the refusal as ChatResult::explanation.
 	///
 	/// Chat Completions carries no reasoning items across tool turns, which
 	/// OpenAI's reasoning models keep in its Responses API; with those models

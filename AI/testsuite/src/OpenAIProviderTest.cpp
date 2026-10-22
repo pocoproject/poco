@@ -115,7 +115,8 @@ namespace
 
 	std::string textStream(bool done = true, bool finish = true)
 	{
-		std::string stream = data("{\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"Hel\"},\"finish_reason\":null}]}")
+		// OpenAI sends a null refusal with the first piece of an answer.
+		std::string stream = data("{\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"Hel\",\"refusal\":null},\"finish_reason\":null}]}")
 			+ data("{\"choices\":[{\"index\":0,\"delta\":{\"content\":\"lo\"},\"finish_reason\":null}]}");
 		if (finish)
 		{
@@ -614,6 +615,30 @@ void OpenAIProviderTest::testMalformedEmbeddings()
 }
 
 
+void OpenAIProviderTest::testRefusal()
+{
+	// A refusal streams in delta.refusal with a null content: the answer is
+	// not kept, and the refusal comes as the explanation.
+	const std::string stream = data("{\"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":null,\"refusal\":\"\"},\"finish_reason\":null}]}")
+		+ data("{\"choices\":[{\"index\":0,\"delta\":{\"refusal\":\"I can't help \"},\"finish_reason\":null}]}")
+		+ data("{\"choices\":[{\"index\":0,\"delta\":{\"refusal\":\"with that.\"},\"finish_reason\":null}]}")
+		+ data("{\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}")
+		+ "data: [DONE]\n\n";
+	CannedServer server(SSE, stream);
+	OpenAIProvider provider(params(server.baseUrl()));
+	Events events;
+	Cancellation cancellation;
+	ChatResult result = provider.chat(userRequest("Something"), events.callback(), cancellation);
+	assertTrue(result.stopReason == StopReason::REFUSAL);
+	assertEqual(std::string("stop"), result.stopDetail);
+	assertEqual(std::string("I can't help with that."), result.explanation);
+	assertTrue(result.assistantMessage.isNull());
+	assertTrue(result.toolCalls.empty());
+	assertTrue(events.text().empty());
+	assertTrue(events.firstError() == nullptr);
+}
+
+
 void OpenAIProviderTest::testCancelBeforeHeaders()
 {
 	CannedServer::Response response;
@@ -678,6 +703,7 @@ CppUnit::Test* OpenAIProviderTest::suite()
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testMalformedEmbeddings);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testCancelBeforeHeaders);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testCancelDuringStream);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testRefusal);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testRequestMembersAndHeaders);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testCutByLength);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testArgumentsAsTheyCame);
