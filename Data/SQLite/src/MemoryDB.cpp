@@ -842,7 +842,7 @@ void MemoryDB::load()
 }
 
 
-bool MemoryDB::sampleSequences(std::map<std::string, Poco::Int64>& sequences)
+bool MemoryDB::sampleSequences(TableRowids& sequences)
 {
 	// sqlite_sequence exists once a table has been declared AUTOINCREMENT
 	int exists = 0;
@@ -869,13 +869,13 @@ bool MemoryDB::isAutoincrement(const std::string& table)
 
 void MemoryDB::restoreSequences()
 {
-	std::map<std::string, Poco::Int64> current;
+	TableRowids current;
 	if (!sampleSequences(current)) return;
 
 	std::vector<std::string> names;
 	std::vector<Poco::Int64> seqs;
 	_catalog << "SELECT tbl, seq FROM sequences", into(names), into(seqs), now;
-	std::map<std::string, Poco::Int64> stored;
+	TableRowids stored;
 	for (std::size_t i = 0; i < names.size(); ++i) stored[names[i]] = seqs[i];
 
 	std::vector<std::string> tables = userTables(_persist);
@@ -1451,8 +1451,8 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 	Poco::Mutex::ScopedLock fl(_flushMutex);
 
 	std::string file;
-	std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges;
-	std::map<std::string, Poco::Int64> floors; // table -> end of the newest other sealed shard
+	RowidRanges ranges;
+	TableRowids floors; // table -> end of the newest other sealed shard
 	bool resident = false;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
@@ -1490,8 +1490,8 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 	// A busy session or alias is retried briefly and then reported as
 	// TableLockedException with the shard left whole, so retention skips it.
 	// Other errors propagate.
-	std::map<std::string, Poco::Int64> kept;
-	retryBriefly(BUSY_RETRY_ATTEMPTS, [this, shardId, resident, &ranges, &floors, &kept](bool last)
+	Removal removal = Removal::DONE;
+	retryBriefly(BUSY_RETRY_ATTEMPTS, [this, shardId, resident, &ranges, &floors, &removal](bool last)
 	{
 		Poco::Mutex::ScopedLock al(_attachMutex);
 		DbMutexGuard dbm(_memHandle);
@@ -1500,8 +1500,9 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 		if (!sessionBusy && (!attached || tryDetach(shardId)))
 		{
 			_attached.erase(shardId);
+			if (resident) removal = removeFromMemory(ranges, floors);
 			// session() cannot have opened a transaction since the check
-			if (resident && !removeFromMemory(ranges, floors, kept))
+			if (removal == Removal::SESSION_BUSY)
 				throw Poco::IllegalStateException("MemoryDB: session() became busy under the connection mutex");
 			return true;
 		}
@@ -1524,7 +1525,7 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 		rebuildActiveLo();
 		// A row left in memory for the numbering lies above every sealed range
 		// now, so it is the active shard's; the next flush saves it there.
-		if (!kept.empty())
+		if (removal == Removal::KEPT_NEWEST)
 		{
 			if (ShardInfo* a = activeShard(); a != nullptr) a->dirty = true;
 			_dirty = true;
@@ -1543,22 +1544,17 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 }
 
 
-bool MemoryDB::removeFromMemory(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
-	const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept)
+MemoryDB::Removal MemoryDB::removeFromMemory(const RowidRanges& ranges, const TableRowids& floors)
 {
 	DbMutexGuard dbm(_memHandle);
-	std::string atRisk; // stays empty: with keepRows a row is kept instead
-	return removeRanges(ranges, floors, true, kept, atRisk) != Removal::SESSION_BUSY;
+	return removeRanges(ranges, floors, OnNumberingRisk::KEEP_NEWEST_ROW).outcome;
 }
 
 
-MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
-	const std::map<std::string, Poco::Int64>& floors, bool keepRows, std::map<std::string, Poco::Int64>& kept,
-	std::string& atRisk)
+MemoryDB::RemovalResult MemoryDB::removeRanges(const RowidRanges& ranges, const TableRowids& floors,
+	OnNumberingRisk onRisk)
 {
-	kept.clear();
-	atRisk.clear();
-	if (ranges.empty()) return Removal::DONE;
+	if (ranges.empty()) return {};
 
 	// The rows are deleted on _persist so the update and trace hooks on
 	// _session do not fire. Shared-cache locks are per table: while session()
@@ -1567,7 +1563,7 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 	// not cover. The connection mutex the caller holds keeps statements on
 	// session() from starting or completing, so a session found free stays
 	// free until the deletes are done.
-	if (sqlite3_txn_state(_memHandle, "main") != SQLITE_TXN_NONE) return Removal::SESSION_BUSY;
+	if (sqlite3_txn_state(_memHandle, "main") != SQLITE_TXN_NONE) return {Removal::SESSION_BUSY, {}};
 
 	// The numbering of every table is settled before any row is deleted: one
 	// table at risk keeps the whole shard, and deleting the other tables' rows
@@ -1575,62 +1571,50 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 	// The connection mutex the caller holds keeps the tables as they are from
 	// these reads to the deletes.
 	std::vector<std::pair<std::string, std::string> > deletes; // table -> WHERE
-	try
+	bool keptNewest = false;
+	std::vector<std::string> tables = userTables(_persist);
+	for (const auto& [t, range]: ranges)
 	{
-		std::vector<std::string> tables = userTables(_persist);
-		for (const auto& [t, range]: ranges)
-		{
-			const auto& [lo, hi] = range;
-			if (std::find(tables.begin(), tables.end(), t) == tables.end())
-				continue; // dropped since the shard was sealed
-			const std::string inRange = "rowid > " + Poco::NumberFormatter::format(lo) +
-				" AND rowid <= " + Poco::NumberFormatter::format(hi);
+		const auto& [lo, hi] = range;
+		if (std::find(tables.begin(), tables.end(), t) == tables.end())
+			continue; // dropped since the shard was sealed
+		const std::string inRange = "rowid > " + Poco::NumberFormatter::format(lo) +
+			" AND rowid <= " + Poco::NumberFormatter::format(hi);
 
-			// The numbering of a table without AUTOINCREMENT needs a row above
-			// the sealed ranges that remain (see the class documentation); when
-			// none would stay, the range's newest row does.
-			std::string where = inRange;
-			if (auto f = floors.find(t); f != floors.end() && f->second > 0 && !isAutoincrement(t))
+		// The numbering of a table without AUTOINCREMENT needs a row above
+		// the sealed ranges that remain (see the class documentation); when
+		// none would stay, the range's newest row does.
+		std::string where = inRange;
+		if (auto f = floors.find(t); f != floors.end() && f->second > 0 && !isAutoincrement(t))
+		{
+			// The newest row outside the range: two seeks on the rowid, where
+			// a NOT over the range would walk every row of it.
+			Poco::Int64 above = 0;
+			_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
+				" WHERE rowid > " + Poco::NumberFormatter::format(hi)), into(above), now;
+			if (above == 0)
 			{
-				// The newest row outside the range: two seeks on the rowid, where
-				// a NOT over the range would walk every row of it.
-				Poco::Int64 above = 0;
 				_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
-					" WHERE rowid > " + Poco::NumberFormatter::format(hi)), into(above), now;
-				if (above == 0)
+					" WHERE rowid <= " + Poco::NumberFormatter::format(lo)), into(above), now;
+			}
+			if (above < f->second)
+			{
+				// Even with no row of the range left, the next row would be
+				// numbered inside the sealed ranges.
+				if (onRisk == OnNumberingRisk::KEEP_SHARD) return {Removal::NUMBERING_AT_RISK, t};
+				// A newer shard may hold an empty range (floor, floor] of the
+				// table, so a row at the floor itself carries the numbering too.
+				Poco::Int64 newest = 0;
+				_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
+					" WHERE " + inRange), into(newest), now;
+				if (newest >= f->second)
 				{
-					_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
-						" WHERE rowid <= " + Poco::NumberFormatter::format(lo)), into(above), now;
-				}
-				if (above < f->second)
-				{
-					// Even with no row of the range left, the next row would be
-					// numbered inside the sealed ranges.
-					if (!keepRows)
-					{
-						kept.clear();
-						atRisk = t;
-						return Removal::NUMBERING_AT_RISK;
-					}
-					// A newer shard may hold an empty range (floor, floor] of the
-					// table, so a row at the floor itself carries the numbering too.
-					Poco::Int64 newest = 0;
-					_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
-						" WHERE " + inRange), into(newest), now;
-					if (newest >= f->second)
-					{
-						kept[t] = newest;
-						where += " AND rowid < " + Poco::NumberFormatter::format(newest);
-					}
+					keptNewest = true;
+					where += " AND rowid < " + Poco::NumberFormatter::format(newest);
 				}
 			}
-			deletes.emplace_back(t, where);
 		}
-	}
-	catch (...)
-	{
-		kept.clear();
-		throw;
+		deletes.emplace_back(t, where);
 	}
 
 	_persist.begin();
@@ -1656,10 +1640,9 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 	catch (...)
 	{
 		try { _persist.rollback(); } catch (...) {}
-		kept.clear();
 		throw;
 	}
-	return Removal::DONE;
+	return {keptNewest ? Removal::KEPT_NEWEST : Removal::DONE, {}};
 }
 
 
@@ -1671,8 +1654,8 @@ bool MemoryDB::evictShard(Poco::UInt32 shardId)
 	// historyView(), which reads the flag under the same mutex, finds the shard
 	// either in main or in its file.
 	DbMutexGuard dbm(_memHandle);
-	std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges;
-	std::map<std::string, Poco::Int64> floors;
+	RowidRanges ranges;
+	TableRowids floors;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
 		const ShardInfo* shard = findShard(shardId);
@@ -1686,9 +1669,7 @@ bool MemoryDB::evictShard(Poco::UInt32 shardId)
 		}
 	}
 
-	std::map<std::string, Poco::Int64> kept;
-	std::string atRisk;
-	const Removal removal = removeRanges(ranges, floors, false, kept, atRisk);
+	const auto [removal, atRisk] = removeRanges(ranges, floors, OnNumberingRisk::KEEP_SHARD);
 	if (removal == Removal::SESSION_BUSY) _retryPending.store(true, std::memory_order_release);
 
 	// A shard kept in memory is reported once per reason, so that an operator
@@ -1792,7 +1773,7 @@ std::size_t MemoryDB::deleteShards(const std::vector<Poco::UInt32>& ids)
 
 
 void MemoryDB::writeCatalog(int schemaVersion, const std::vector<std::string>& schemaLog,
-	const std::map<std::string, Poco::Int64>* pSequences)
+	const TableRowids* pSequences)
 {
 	// Snapshot the shard list under the lock so the catalog write itself doesn't have
 	// to hold _stateMutex (which would block hook callbacks for the duration).
@@ -2633,7 +2614,7 @@ std::vector<std::string> MemoryDB::virtualTables(Session& s, const std::string& 
 
 
 void MemoryDB::maybeSeal(const std::vector<std::string>& tables,
-	const std::map<std::string, Poco::Int64>& maxRowids)
+	const TableRowids& maxRowids)
 {
 	// caller holds _stateMutex; tables/maxRowids were sampled on _persist by the
 	// caller WITHOUT holding _stateMutex. Issuing SQL on _persist here would
@@ -2651,7 +2632,7 @@ void MemoryDB::maybeSeal(const std::vector<std::string>& tables,
 	if (!seal) return;
 
 	// freeze the active shard's per-table ranges (a is not yet sealed -> excluded below)
-	std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > frozen;
+	RowidRanges frozen;
 	for (const auto& t: tables)
 	{
 		Poco::Int64 lo = 0;
@@ -2725,7 +2706,7 @@ void MemoryDB::doFlush(bool allowSeal)
 	// open-range slice of the new active shard (see maybeSeal note).
 	std::vector<std::string> tables = userTables(_persist);
 	std::vector<std::string> vtabs = virtualTables(_persist);
-	std::map<std::string, Poco::Int64> maxRowids;
+	TableRowids maxRowids;
 	for (const auto& t: tables) maxRowids[t] = maxRowid(t);
 
 	struct Slice { std::string table; Poco::Int64 lo; Poco::Int64 hi; bool open; };
@@ -2806,7 +2787,7 @@ void MemoryDB::doFlush(bool allowSeal)
 	bool ok = true;
 	bool putOff = false; // a planned write waits for a later flush
 	std::vector<std::pair<std::size_t, std::pair<std::string, Poco::UInt64> > > written; // idx -> (file, bytes)
-	std::vector<std::pair<std::size_t, std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > > > newRanges;
+	std::vector<std::pair<std::size_t, RowidRanges > > newRanges;
 
 	for (const auto& p: writes)
 	{
@@ -2822,7 +2803,7 @@ void MemoryDB::doFlush(bool allowSeal)
 		{
 			Poco::TemporaryFile tmp(_dir);
 			std::string tmpPath = tmp.path();
-			std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges;
+			RowidRanges ranges;
 
 			{
 				Session ss(Connector::KEY, tmpPath);
@@ -2930,7 +2911,7 @@ void MemoryDB::doFlush(bool allowSeal)
 		// shard dirty again, and the flush that follows saves the sequence. Read
 		// before the plan, a key handed out and deleted again in between would
 		// leave nothing dirty and a catalog that does not know of it.
-		std::map<std::string, Poco::Int64> sequences;
+		TableRowids sequences;
 		(void) sampleSequences(sequences);
 		writeCatalog(schemaVersion, schemaLog, &sequences);
 		committed = true;

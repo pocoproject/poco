@@ -40,6 +40,7 @@
 #include <string_view>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 
@@ -452,12 +453,28 @@ public:
 private:
 	static constexpr int BUSY_RETRY_ATTEMPTS = 10; // a busy session() or alias is tried this often, 1 ms apart
 
+	using RowidRanges = std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >; // table -> (lo, hi]
+	using TableRowids = std::map<std::string, Poco::Int64>;                          // table -> rowid
+
 	enum class Removal
 	{
 		DONE,              // the rows are gone from the in-memory tables
+		KEPT_NEWEST,       // as DONE, but the newest row of a range stays for the numbering
 		SESSION_BUSY,      // nothing deleted: session() has a transaction open
 		NUMBERING_AT_RISK  // nothing deleted: a table without AUTOINCREMENT would be left
 		                   // with no row above the sealed ranges that stay
+	};
+
+	enum class OnNumberingRisk
+	{
+		KEEP_NEWEST_ROW, // leave the range's newest row in memory and remove the others
+		KEEP_SHARD       // remove nothing: the shard stays in memory
+	};
+
+	struct RemovalResult
+	{
+		Removal     outcome = Removal::DONE;
+		std::string table;   // NUMBERING_AT_RISK: the table whose numbering keeps the shard
 	};
 
 	struct ShardInfo
@@ -475,7 +492,7 @@ private:
 		                                 // sealed shard until evictSealedShards() removes them
 		Removal         deferral = Removal::DONE; // why its eviction was last put off; logged once per reason
 		bool            dropDeferred = false;     // its drop was put off, and that was logged
-		std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges; // table -> (lo, hi]
+		RowidRanges     ranges;
 	};
 
 	struct MovedRow
@@ -514,7 +531,7 @@ private:
 	void registerHooks();
 	void doFlush(bool allowSeal = true);
 	void writeCatalog(int schemaVersion, const std::vector<std::string>& schemaLog,
-		const std::map<std::string, Poco::Int64>* pSequences = nullptr);
+		const TableRowids* pSequences = nullptr);
 		// pSequences: the AUTOINCREMENT sequences to store; null leaves the stored ones as they are.
 		// A sealed shard a row was moved out of is recorded with the range it had
 		// before, until the shard the row is in now has been written: the catalog
@@ -527,12 +544,12 @@ private:
 	void purgeMovedRows(const std::vector<MovedRow>& rows);
 		// removes rows unsealNewestRows() moved, and a flush has saved, from their
 		// sealed shard files; caller holds _flushMutex
-	[[nodiscard]] bool sampleSequences(std::map<std::string, Poco::Int64>& sequences);
+	[[nodiscard]] bool sampleSequences(TableRowids& sequences);
 		// false when no table is declared AUTOINCREMENT
 	[[nodiscard]] bool isAutoincrement(const std::string& table);
 	std::string buildHistoryView(const std::string& table, const std::vector<Poco::UInt32>& shardIds);
 	void maybeSeal(const std::vector<std::string>& tables,
-		const std::map<std::string, Poco::Int64>& maxRowids); // caller holds _stateMutex
+		const TableRowids& maxRowids); // caller holds _stateMutex
 	void migrateShardFile(ShardInfo& shard, int toVersion, const std::vector<std::string>& schemaLog);
 	[[nodiscard]] std::vector<std::string> userTables(Session& s); // ordinary rowid tables (no virtual, no shadow)
 	[[nodiscard]] std::vector<std::string> virtualTables(Session& s, const std::string& schema = "main");
@@ -564,20 +581,19 @@ private:
 		// moves a shard file written by doFlush() into place; a sealed shard that
 		// is attached is detached, replaced and attached again under the
 		// connection mutex. caller holds _flushMutex
-	[[nodiscard]] Removal removeRanges(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
-		const std::map<std::string, Poco::Int64>& floors, bool keepRows,
-		std::map<std::string, Poco::Int64>& kept, std::string& atRisk);
-		// deletes the rowid ranges (table -> (lo, hi]) from the in-memory tables.
+	[[nodiscard]] RemovalResult removeRanges(const RowidRanges& ranges, const TableRowids& floors,
+		OnNumberingRisk onRisk);
+		// deletes the rowid ranges from the in-memory tables.
 		// floors: table -> the end of the newest sealed shard that keeps its range.
 		// When no row of a table without AUTOINCREMENT would stay above that end
-		// (see the numbering of rows in the class documentation): with keepRows the
-		// range's newest row is left in place and reported in kept (table -> rowid),
-		// without keepRows nothing is deleted and atRisk names the table.
+		// (see the numbering of rows in the class documentation), onRisk decides:
+		// KEEP_NEWEST_ROW leaves the range's newest row in place (KEPT_NEWEST),
+		// KEEP_SHARD deletes nothing (NUMBERING_AT_RISK, with the table).
 		// caller holds _flushMutex and the connection mutex (DbMutexGuard)
-	[[nodiscard]] bool removeFromMemory(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
-		const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept);
-		// removeRanges() with keepRows, under the connection mutex; false, deleting
-		// nothing, while session() has a transaction open; caller holds _flushMutex
+	[[nodiscard]] Removal removeFromMemory(const RowidRanges& ranges, const TableRowids& floors);
+		// removeRanges() with KEEP_NEWEST_ROW, under the connection mutex: DONE,
+		// KEPT_NEWEST, or SESSION_BUSY, deleting nothing, while session() has a
+		// transaction open; caller holds _flushMutex
 	[[nodiscard]] bool evictShard(Poco::UInt32 shardId);
 		// removes a sealed, written shard's rows from the in-memory tables and marks
 		// it non-resident; false when the shard is not eligible, session() is busy
