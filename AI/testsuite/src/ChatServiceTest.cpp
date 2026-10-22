@@ -1458,8 +1458,9 @@ void ChatServiceTest::testEndpointHealth()
 	assertTrue(!pHealth->getArray("providerStatus")->getObject(0)->has("reachable"));
 	const Object::Ptr pFeatures = pHealth->getObject("features");
 	assertTrue(!pFeatures->getValue<bool>("manage"));
-	assertTrue(!pFeatures->getValue<bool>("sessions") && !pFeatures->getValue<bool>("prompts") && !pFeatures->getValue<bool>("tools"));
 	assertTrue(!pFeatures->getValue<bool>("keys"));
+	// Only what the endpoint knows: no features of a user interface.
+	assertEqual(std::size_t(2), pFeatures->size());
 	assertTrue(host.send("GET", "health", "", "root", true).json()->getObject("features")->getValue<bool>("manage"));
 
 	assertEqual(405, host.send("POST", "health", "{}").status);

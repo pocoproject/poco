@@ -38,14 +38,13 @@ class AI_API ChatEndpoint
 	///
 	///   - GET health: {"status": "ok", "provider", "model", "models",
 	///     "providers", "providerStatus": [{"name", "reachable", "detail",
-	///     "modelCount"}], "features": {"manage", "keys", ...}}, where
-	///     reachable, detail and modelCount are there once the provider was
-	///     asked for its models, manage tells whether the caller may manage the
-	///     chat, keys whether keys are set here, and the other features are
-	///     false. detail, which may quote the answer of a server of the
-	///     provider, is what the service knows (see ProviderStatus) for a
-	///     caller who may manage the chat; others get only "the provider does
-	///     not answer" for a provider that does not;
+	///     "modelCount"}], "features": {"manage", "keys"}}, where reachable,
+	///     detail and modelCount are there once the provider was asked for its
+	///     models, manage tells whether the caller may manage the chat, and
+	///     keys whether keys are set here. detail, which may quote the answer
+	///     of a server of the provider, is what the service knows (see
+	///     ProviderStatus) for a caller who may manage the chat; others get
+	///     only "the provider does not answer" for a provider that does not;
 	///   - POST chat/stream with {"messages": [{"role", "content"}], "chat"}:
 	///     the events of the turn (see ChatService) as server-sent events, a
 	///     data line with the JSON of each, comments while the model works,

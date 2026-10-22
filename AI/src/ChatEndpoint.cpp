@@ -327,12 +327,6 @@ void ChatEndpoint::health(Poco::Net::HTTPServerResponse& response, const Caller&
 	pBody->set("providerStatus", providerStatus(caller));
 	Poco::JSON::Object::Ptr pFeatures = new Poco::JSON::Object;
 	pFeatures->set("manage", caller.mayManage);
-	pFeatures->set("sessions", false);
-	pFeatures->set("prompts", false);
-	pFeatures->set("tools", false);
-	pFeatures->set("documents", false);
-	pFeatures->set("documentsWrite", false);
-	pFeatures->set("memory", false);
 	pFeatures->set("keys", _params.keysFromRequests);
 	pBody->set("features", pFeatures);
 	sendJSON(response, Poco::Net::HTTPResponse::HTTP_OK, pBody);
