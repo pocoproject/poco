@@ -258,15 +258,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		if (!env.empty() || (options & PROCESS_CLEAR_ENVIRONMENT))
 		{
 			envChars = getEnvironmentVariablesBuffer(env);
-			envPtrs.reserve(env.size() + 1);
-			char* p = &envChars[0];
-			while (*p)
-			{
-				envPtrs.push_back(p);
-				while (*p) ++p;
-				++p;
-			}
-			envPtrs.push_back(0);
+			envPtrs = getEnvironmentPointers(envChars);
 			envPtr = &envPtrs[0];
 		}
 
@@ -312,15 +304,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		std::vector<char*> envPtrs;
 		if (clearEnvironment)
 		{
-			envPtrs.reserve(env.size() + 1);
-			char* p = &envChars[0];
-			while (*p)
-			{
-				envPtrs.push_back(p);
-				while (*p) ++p;
-				++p;
-			}
-			envPtrs.push_back(nullptr);
+			envPtrs = getEnvironmentPointers(envChars);
 		}
 #if defined(__APPLE__)
 		char*** pEnviron = _NSGetEnviron();

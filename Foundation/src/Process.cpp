@@ -16,6 +16,7 @@
 #include "Poco/Environment.h"
 #include "Poco/Exception.h"
 #include <string>
+#include <vector>
 
 
 namespace
@@ -45,6 +46,23 @@ namespace
 		envbuf[pos] = '\0';
 
 		return envbuf;
+	}
+
+	std::vector<char*> getEnvironmentPointers(std::vector<char>& buffer)
+		/// The variables of a buffer that getEnvironmentVariablesBuffer()
+		/// made, as an array of pointers that ends with a null pointer, as
+		/// execve() and spawn() take it.
+	{
+		std::vector<char*> pointers;
+		char* p = &buffer[0];
+		while (*p)
+		{
+			pointers.push_back(p);
+			while (*p) ++p;
+			++p;
+		}
+		pointers.push_back(nullptr);
+		return pointers;
 	}
 
 	bool namesOneProcess(Poco::Process::PID pid)
