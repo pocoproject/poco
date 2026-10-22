@@ -109,6 +109,13 @@ class SQLite_API MemoryDB
 	///     the active shard at open, so that SQLite numbers the next row above it. A
 	///     table that is emptied and filled again reuses rowids; declare its key
 	///     AUTOINCREMENT if it is to be archived.
+	///   * The numbering of rows: SQLite numbers the next row of a table without
+	///     AUTOINCREMENT after the newest row in memory, so one row of such a table must
+	///     stay in memory above the sealed shards, or the next row would be numbered
+	///     inside one of them. With loadArchivedShards false, the newest sealed shard
+	///     therefore keeps its rows in memory until the active shard holds a row of the
+	///     table, and deleteShard() leaves the newest row of the deleted shard behind in
+	///     the active shard when no other row would stay above the remaining ones.
 	///   * Do not run the VACUUM command against the database (see PRAGMA notes in the docs);
 	///     it can renumber rowids and break shard ownership.
 	///   * Total shard count is capped at sqlite3_limit(SQLITE_LIMIT_ATTACHED) on the
@@ -158,18 +165,24 @@ public:
 		bool           loadArchivedShards = false;
 			/// If false (the default), only the active shard is RAM-resident: a sealed
 			/// shard's rows leave memory once its file is written, at the flush that
-			/// seals it or at a later one if session() is busy then, or if a table
-			/// without AUTOINCREMENT has no row in the active shard yet (its next row is
-			/// numbered after the newest row in memory, which must stay above the sealed
-			/// ones). One such table keeps the rows of every table of that shard in memory;
-			/// a shard that stays is logged once per reason, at information level.
-			/// Sealed rows stay on disk and are read on demand (the SQLite page
-			/// cache handles paging transparently when they are attached via
+			/// seals it or at a later one.
+			///
+			/// They stay in memory while session() has a transaction open, and while a
+			/// table without AUTOINCREMENT has no row in the active shard yet (see the
+			/// numbering of rows in the class documentation). One such table keeps the
+			/// rows of every table of that shard in memory. A shard that stays is logged
+			/// once per reason, at information level.
+			///
+			/// An eviction briefly needs memory for about one more shard (see shardMaxBytes).
+			///
+			/// Sealed rows stay on disk and are read on demand (the SQLite page cache
+			/// handles paging transparently when they are attached via
 			/// attachArchived()/historyView()). Rows that have left memory are read-only,
 			/// as after a reopen: an UPDATE or DELETE on the base table no longer finds
-			/// them, and an INSERT into their rowid range poisons the instance.
-			/// This keeps memory bounded regardless of how much history accumulates and is
-			/// the right choice for any workload where data grows over time.
+			/// them, and an INSERT into their rowid range poisons the instance. This keeps
+			/// memory bounded regardless of how much history accumulates and is the right
+			/// choice for any workload where data grows over time.
+			///
 			/// Set to true to merge every sealed shard into memory on open, so plain
 			/// SELECTs see the full dataset without attaching anything. Only safe when the
 			/// total dataset comfortably fits in RAM.
@@ -360,10 +373,9 @@ public:
 		/// past a short retry, throws TableLockedException and leaves the shard -
 		/// rows, catalog entry, file and attachment - as it was. The same holds while a
 		/// statement reads the shard through its attachArchived() alias, which has
-		/// to be detached first. One row may outlive the shard:
-		/// a table without AUTOINCREMENT numbers its next row after the newest row
-		/// in memory, so when none would remain above the sealed shards that stay,
-		/// the shard's newest row is left behind in the active shard. The removal is
+		/// to be detached first. One row may outlive the shard: the newest row of a
+		/// table without AUTOINCREMENT can be left behind in the active shard (see the
+		/// numbering of rows in the class documentation). The removal is
 		/// crash-safe: the manifest transaction commits before the file is unlinked,
 		/// so a crash in the window leaves an orphan file that cleanOrphans() removes
 		/// on the next open. Thread-safe (serializes via the internal flush mutex).
@@ -554,11 +566,10 @@ private:
 		std::map<std::string, Poco::Int64>& kept, std::string& atRisk);
 		// deletes the rowid ranges (table -> (lo, hi]) from the in-memory tables.
 		// floors: table -> the end of the newest sealed shard that keeps its range.
-		// A table without AUTOINCREMENT numbers its next row after the newest row
-		// in memory, so one must stay above that end. When none would: with
-		// keepRows the range's newest row is left in place and reported in kept
-		// (table -> rowid), without keepRows nothing is deleted and atRisk names
-		// the table.
+		// When no row of a table without AUTOINCREMENT would stay above that end
+		// (see the numbering of rows in the class documentation): with keepRows the
+		// range's newest row is left in place and reported in kept (table -> rowid),
+		// without keepRows nothing is deleted and atRisk names the table.
 		// caller holds _flushMutex and the connection mutex (DbMutexGuard)
 	[[nodiscard]] bool removeFromMemory(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
 		const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept);
@@ -668,8 +679,10 @@ private:
 	//      guards _attached's lifetime alongside the SQLite-side attachment
 	//      state. Recursion is load-bearing: attachAllArchived and
 	//      historyView(table,from,to) call attachArchived under their own
-	//      lock. Held for ms-scale ATTACH/DETACH; merging into _flushMutex
-	//      would block history queries behind every flush's IO loop.
+	//      lock. Held for ATTACH/DETACH, for the rename of an attached shard's
+	//      file in doFlush, and in deleteShard while the shard's rows leave
+	//      memory under the connection mutex; merging into _flushMutex would
+	//      block history queries behind every flush's IO loop.
 	//
 	//   _flushing - skip-on-concurrent-flush gate at doFlush entry. NOT a
 	//      try_lock on _flushMutex: deleteShard / enforceRetention also hold
@@ -677,10 +690,12 @@ private:
 	//      is not the contract flush() advertises.
 	//
 	// Lock-acquisition order (outer -> inner):
-	//   _flushMutex -> _attachMutex -> _stateMutex -> sqlite3_db_mutex
-	// The hook path inverts: sqlite3_db_mutex -> _stateMutex, deliberately
-	// kept disjoint from _flushMutex/_attachMutex (doFlush samples _persist
-	// BEFORE taking _stateMutex - see comment at the top of doFlush).
+	//   _flushMutex -> _attachMutex -> sqlite3_db_mutex -> _stateMutex
+	// The hooks, evictShard() and buildHistoryView() take _stateMutex while
+	// sqlite3_db_mutex is held; no code takes sqlite3_db_mutex while it holds
+	// _stateMutex. The hooks never take _flushMutex or _attachMutex (doFlush
+	// samples _persist BEFORE taking _stateMutex - see comment at the top of
+	// doFlush).
 	mutable Poco::FastMutex    _stateMutex;
 	Poco::Mutex                _flushMutex;
 	mutable Poco::Mutex        _attachMutex;

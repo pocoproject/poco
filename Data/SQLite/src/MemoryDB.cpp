@@ -1180,7 +1180,11 @@ namespace
 	// 3.53.4), the connection mutex. Running such a statement while the
 	// connection mutex is already held inverts that order and deadlocks against
 	// a concurrent user statement, so every DbMutexGuard region below issues its
-	// SQL through these two helpers, which stay on the C API and never take the
+	// SQL on the in-memory connection through these two helpers, which stay on
+	// the C API and never take the session mutex. Poco::Data statements on
+	// _persist inside such a region (removeRanges(), copyVirtualTables()) are
+	// safe: _persist is a connection of its own and is used only while the
+	// database is opened and under _flushMutex, so no other thread holds its
 	// session mutex.
 	void execDirect(sqlite3* db, const std::string& sql)
 	{
@@ -1575,11 +1579,9 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 			const std::string inRange = "rowid > " + Poco::NumberFormatter::format(r.second.first) +
 				" AND rowid <= " + Poco::NumberFormatter::format(r.second.second);
 
-			// SQLite numbers the next row of a table without AUTOINCREMENT after
-			// the newest row in memory. Were none left above the sealed ranges
-			// that remain, the next row would be numbered inside one of them: an
-			// archived shard's row, or a rowid below the active range that no
-			// flush would ever save. The range's newest row then stays.
+			// The numbering of a table without AUTOINCREMENT needs a row above
+			// the sealed ranges that remain (see the class documentation); when
+			// none would stay, the range's newest row does.
 			std::string where = inRange;
 			auto f = floors.find(t);
 			if (f != floors.end() && f->second > 0 && !isAutoincrement(t))
@@ -1719,10 +1721,9 @@ bool MemoryDB::evictShard(Poco::UInt32 shardId)
 void MemoryDB::evictSealedShards()
 {
 	// With loadArchivedShards off, a sealed shard's rows leave the in-memory
-	// tables once its file is written. A shard that cannot go yet - session()
-	// is busy, or a table without AUTOINCREMENT has no row in the active shard
-	// above it to carry the numbering - stays resident and is tried again at
-	// the next flush; a newer shard's rows let an older one go.
+	// tables once its file is written. A shard that cannot go yet (see the
+	// loadArchivedShards documentation) stays resident and is tried again at
+	// the next flush.
 	if (_opts.loadArchivedShards) return;
 
 	std::vector<Poco::UInt32> ids;
