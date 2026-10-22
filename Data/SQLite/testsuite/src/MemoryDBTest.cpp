@@ -1568,6 +1568,82 @@ void MemoryDBTest::testEmptiedShardStaysForNumbering()
 }
 
 
+void MemoryDBTest::testDeleteShardKeepsNumberingAtEmptyNewerRange()
+{
+	// A newer sealed shard that holds no row of a table records an empty range
+	// (h, h] for it. Deleting the older shard whose newest row is h must still
+	// leave a row at or above h in memory: without one the next row is numbered
+	// from 1, below every range the shards save, and is lost at the next flush.
+	for (bool load: {false, true})
+	{
+		try { Poco::File(_dir).remove(true); } catch (...) {}
+		MemoryDB::Options o;
+		o.loadArchivedShards = load;
+		{
+			MemoryDB db(_dir, o);
+			db << "CREATE TABLE q(id INTEGER PRIMARY KEY, v TEXT)", now;
+			std::string v("old");
+			for (int i = 0; i < 3; ++i) db << "INSERT INTO q(v) VALUES(:v)", use(v), now; // 1..3
+			db.sealActive();
+			db.flush();
+			db.sealActive(); // shard 2 records q as (3, 3]
+			db.flush();
+			db.deleteShard(db.archivedShardIds().front());
+
+			std::string n("new");
+			db << "INSERT INTO q(v) VALUES(:v)", use(n), now;
+			Poco::Int64 maxId = 0;
+			db << "SELECT max(id) FROM q", into(maxId), now;
+			assertTrue (maxId == 4);
+			db.flush();
+		}
+
+		MemoryDB::Options on;
+		on.loadArchivedShards = true;
+		MemoryDB db(_dir, on);
+		int total = 0;
+		Poco::Int64 id = 0;
+		std::string n("new");
+		db << "SELECT count(*), IFNULL(max(id), 0) FROM q WHERE v=:v", use(n), into(total), into(id), now;
+		assertTrue (total == 1);
+		assertTrue (id == 4);
+	}
+}
+
+
+void MemoryDBTest::testInsertBelowActiveRangeRejected()
+{
+	// A rowid at or below the active shard's range that no sealed shard holds,
+	// here the range of a deleted shard, belongs to no shard that is ever
+	// written. An INSERT there must poison the instance, not be lost silently.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	std::string v("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 1..3
+	db.sealActive();
+	db.flush();
+	for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 4, 5
+	db.sealActive();
+	db.flush();
+	db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 6, carries the numbering
+	db.flush();
+	db.deleteShard(db.archivedShardIds().front()); // (0, 3] belongs to no shard now
+
+	std::string intruder("intruder");
+	db << "INSERT INTO t(id, v) VALUES(2, :v)", use(intruder), now;
+	try
+	{
+		db.flush();
+		failmsg("a row inserted below the active range into no shard must poison the instance");
+	}
+	catch (Poco::NotImplementedException&)
+	{
+	}
+}
+
+
 void MemoryDBTest::testDeleteNewestShardKeepsNoRowWhenNotNeeded()
 {
 	// No row stays behind when the numbering is safe without it: when the
@@ -2985,6 +3061,8 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeptWhileSessionWrites);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNumberingRow);
 	CppUnit_addTest(pSuite, MemoryDBTest, testEmptiedShardStaysForNumbering);
+	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeepsNumberingAtEmptyNewerRange);
+	CppUnit_addTest(pSuite, MemoryDBTest, testInsertBelowActiveRangeRejected);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteActiveShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNonexistentShardRefused);

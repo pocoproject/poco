@@ -73,6 +73,8 @@ public:
 	void testDeleteShardKeptWhileSessionWrites();
 	void testDeleteNewestShardKeepsNumberingRow();
 	void testEmptiedShardStaysForNumbering();
+	void testDeleteShardKeepsNumberingAtEmptyNewerRange();
+	void testInsertBelowActiveRangeRejected();
 	void testDeleteNewestShardKeepsNoRowWhenNotNeeded();
 	void testDeleteActiveShardRefused();
 	void testDeleteNonexistentShardRefused();

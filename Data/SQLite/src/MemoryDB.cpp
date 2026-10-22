@@ -1480,10 +1480,12 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 						_persist.rollback();
 						return Removal::NUMBERING_AT_RISK;
 					}
+					// A newer shard may hold an empty range (floor, floor] of the
+					// table, so a row at the floor itself carries the numbering too.
 					Poco::Int64 newest = 0;
 					_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
 						" WHERE " + inRange), into(newest), now;
-					if (newest > f->second)
+					if (newest >= f->second)
 					{
 						kept[t] = newest;
 						keepClause = " AND rowid < " + Poco::NumberFormatter::format(newest);
@@ -2237,13 +2239,22 @@ void MemoryDB::onRowChange(int op, const char* table, Poco::Int64 row)
 	_dirty = true;
 	_lastChange.update();
 	ShardInfo* s = owningShard(table, row);
-	if (!s) return;
-	if (s->sealed && !s->resident)
+	if (s == nullptr) return;
+	// The active shard saves only the rowids above every sealed range of the
+	// table; one at or below them that no sealed shard holds, the range of a
+	// deleted shard, is saved by none.
+	bool orphan = false;
+	if (!s->sealed)
+	{
+		auto lo = _activeLo.find(table);
+		orphan = lo != _activeLo.end() && row <= lo->second;
+	}
+	if ((s->sealed && !s->resident) || orphan)
 	{
 		// The row falls into the range of a sealed shard whose rows are on disk
-		// only. That shard cannot be rebuilt from memory, and the active shard
-		// does not hold rowids this low, so the row has no shard to be saved in.
-		// SQLite has already made the change; all that is left is to refuse to go on.
+		// only, which cannot be rebuilt from memory, or into no shard at all, so
+		// it has no shard to be saved in. SQLite has already made the change;
+		// all that is left is to refuse to go on.
 		if (op == SQLITE_INSERT)
 		{
 			_poisoned.store(true, std::memory_order_release);
@@ -2252,13 +2263,14 @@ void MemoryDB::onRowChange(int op, const char* table, Poco::Int64 row)
 				if (_rejected.empty())
 				{
 					_rejected = "MemoryDB: a row inserted into table '" + std::string(table) +
-						"' has rowid " + Poco::NumberFormatter::format(row) +
-						", which belongs to an archived shard that is not loaded";
+						"' has rowid " + Poco::NumberFormatter::format(row) + (orphan ?
+						", which lies below the active shard's range and in no archived shard" :
+						", which belongs to an archived shard that is not loaded");
 				}
 			}
 			catch (...) {} // _poisoned is already set
 		}
-		return;
+		if (!orphan) return;
 	}
 	s->dirty = true;
 }
