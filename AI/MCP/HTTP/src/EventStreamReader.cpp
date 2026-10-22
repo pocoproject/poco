@@ -32,7 +32,6 @@ namespace
 EventStreamReader::EventStreamReader(std::istream& in, std::size_t maxEventSize):
 	_in(in),
 	_maxEventSize(maxEventSize),
-	_hasDeadline(false),
 	_skipLF(false),
 	_ended(false),
 	_cut(false),
@@ -40,13 +39,6 @@ EventStreamReader::EventStreamReader(std::istream& in, std::size_t maxEventSize)
 	_begin(0),
 	_end(0)
 {
-}
-
-
-void EventStreamReader::setDeadline(const Poco::Timestamp& deadline)
-{
-	_deadline = deadline;
-	_hasDeadline = true;
 }
 
 
@@ -58,10 +50,6 @@ void EventStreamReader::setReadGuard(ReadGuard guard)
 
 void EventStreamReader::beforeRead()
 {
-	if (_hasDeadline && _deadline.isElapsed(0))
-	{
-		throw Poco::TimeoutException("Event stream deadline passed");
-	}
 	if (_guard) _guard();
 }
 

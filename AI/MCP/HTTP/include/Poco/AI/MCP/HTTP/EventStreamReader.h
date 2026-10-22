@@ -20,7 +20,6 @@
 
 #include "Poco/AI/MCP/HTTP/HTTP.h"
 #include "Poco/AI/MCP/HTTP/Body.h"
-#include "Poco/Timestamp.h"
 #include <istream>
 #include <string>
 
@@ -54,10 +53,6 @@ public:
 	static constexpr std::size_t DEFAULT_MAX_EVENT_SIZE = DEFAULT_MAX_MESSAGE_SIZE;
 		/// The default limit, in bytes, of the data of one event.
 
-	static constexpr std::size_t LINE_OVERHEAD = 64;
-		/// What a line may have beyond the limit of the data: its field name,
-		/// the colon and the space, so that data of exactly the limit fits.
-
 	struct Event
 		/// One event.
 	{
@@ -72,23 +67,18 @@ public:
 	explicit EventStreamReader(std::istream& in, std::size_t maxEventSize = DEFAULT_MAX_EVENT_SIZE);
 		/// Creates a reader of the given stream, which must outlive it.
 
-	void setDeadline(const Poco::Timestamp& deadline);
-		/// Sets the time after which next() throws Poco::TimeoutException. It
-		/// is checked before every read that may block, as is the read guard;
-		/// a read that blocks is bounded by the timeout of the stream's source,
-		/// which the read guard may set to the time that is left.
-
 	void setReadGuard(ReadGuard guard);
 		/// Sets the function called before every read of the stream that may
-		/// block, because nothing is buffered.
+		/// block, because nothing is buffered: it bounds the reading, e.g. by
+		/// throwing Poco::TimeoutException once a deadline has passed and by
+		/// setting the timeout of the stream's source to the time that is left.
 
 	[[nodiscard]] bool next(Event& event);
 		/// Reads the next event. Returns false at the end of the stream.
 		///
 		/// Throws Poco::DataFormatException when a line or the data of an
-		/// event exceeds the size limit, Poco::TimeoutException after the
-		/// deadline, and what the read guard and the source of the stream
-		/// throw.
+		/// event exceeds the size limit, and what the read guard and the
+		/// source of the stream throw.
 
 	[[nodiscard]] bool ended() const;
 		/// Returns true if the end of the stream has been reached.
@@ -98,6 +88,10 @@ public:
 		/// event.
 
 private:
+	static constexpr std::size_t LINE_OVERHEAD = 64;
+		// What a line may have beyond the limit of the data: its field name,
+		// the colon and the space, so that data of exactly the limit fits.
+
 	enum class LineResult
 	{
 		LINE,
@@ -111,9 +105,7 @@ private:
 
 	std::istream& _in;
 	std::size_t _maxEventSize;
-	Poco::Timestamp _deadline;
 	ReadGuard _guard;
-	bool _hasDeadline;
 	bool _skipLF;
 	bool _ended;
 	bool _cut;
