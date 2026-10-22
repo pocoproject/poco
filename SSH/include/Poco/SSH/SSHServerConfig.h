@@ -20,6 +20,7 @@
 
 #include "Poco/SSH/SSH.h"
 #include "Poco/Types.h"
+#include <chrono>
 #include <string>
 #include <functional>
 
@@ -51,6 +52,16 @@ struct SSH_API SSHServerConfig
 
 	int maxAuthAttempts = 3;
 		/// Maximum failed authentication attempts before disconnect.
+
+	std::chrono::milliseconds loginGraceTime = std::chrono::seconds(120);
+		/// Time limit for a client to complete the key exchange, the
+		/// authentication, the opening of the session channel and its
+		/// shell or exec request. It starts when the thread of the session
+		/// starts, right after the server has accepted the connection. The
+		/// server closes a session that has not opened its session channel
+		/// and sent its shell or exec request within this time. A password
+		/// authenticator that has not returned delays the close until it returns.
+		/// Zero or a negative value sets no time limit.
 
 	bool enablePasswordAuth = true;
 		/// Allow SSH password authentication.

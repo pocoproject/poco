@@ -28,7 +28,8 @@
 #include "Poco/Mutex.h"
 #include "Poco/Event.h"
 #include <atomic>
-#include <set>
+#include <chrono>
+#include <map>
 #include <functional>
 
 #if defined(_WIN32)
@@ -59,38 +60,81 @@ public:
 	using SessionFactory = std::function<SSHSession*(ssh_session, const SSHServerConfig&, SSHServer&)>;
 		/// Factory function that creates an SSHSession for each accepted connection.
 
+	static constexpr std::chrono::milliseconds DEFAULT_STOP_TIMEOUT = std::chrono::seconds(10);
+		/// Default time limit for stop() to wait for active sessions.
+
 	SSHServer(const SSHServerConfig& config, SessionFactory factory);
 	~SSHServer();
+		/// Stops the server. Waits without a time limit for sessions
+		/// that are still running, because they use this object.
 
 	void start();
 		/// Starts listening for SSH connections.
 
-	void stop();
-		/// Stops the server and waits for active sessions to finish.
+	void stop(std::chrono::milliseconds timeout = DEFAULT_STOP_TIMEOUT);
+		/// Stops the server, asks the active sessions to end and waits
+		/// up to the given timeout for them to finish. A timeout that is
+		/// too long for std::chrono::steady_clock, such as
+		/// std::chrono::milliseconds::max(), sets no time limit.
+		/// A zero or negative timeout does not wait for the sessions.
+		///
+		/// A session ends within SSHSession::STOP_CHECK_INTERVAL while it
+		/// logs in, and while its handler waits only as
+		/// SSHSession::stopRequested() describes. On POSIX systems, stop()
+		/// also ends every other wait of a session for its client at once,
+		/// for example a read without a timeout in its handler; on Windows,
+		/// stop() itself does not end such a wait. On every system, a
+		/// session does not end while its handler or the password
+		/// authenticator of the configuration waits for something other
+		/// than the client.
+		///
+		/// Throws a Poco::TimeoutException if sessions are still running
+		/// after the timeout. Such sessions still use this object; calling
+		/// stop() again waits for them again.
 
-	void registerSession(ssh_session session);
-		/// Register an active session for tracking.
-
-	void unregisterSession(ssh_session session);
-		/// Unregister a session on exit.
+	[[nodiscard]] Poco::UInt16 port() const;
+		/// Returns the port the server listens on, valid after start().
+		/// If the configured port is 0, this is the port that the
+		/// system chose.
 
 private:
+	struct ActiveSession
+	{
+		SSHSession* pSession;
+		ssh_socket_t wakeFd;
+	};
+
 	void acceptLoop();
-	void disconnectAllSessions();
+	void registerSession(ssh_session session, SSHSession* pSession, ssh_socket_t wakeFd);
+	void unregisterSession(ssh_session session);
+	void requestStopAll();
 
 	SSHServerConfig _config;
 	SessionFactory _sessionFactory;
 	ssh_bind _sshBind;
 	std::atomic<ssh_socket_t> _listenFd;
+	Poco::UInt16 _port = 0;
 	Poco::RunnableAdapter<SSHServer> _acceptAdapter;
 	Poco::Thread _acceptThread;
 	Poco::ThreadPool _threadPool;
 	std::atomic<bool> _stopped;
+	Poco::FastMutex _stopMutex;
 	Poco::FastMutex _sessionsMutex;
-	std::set<ssh_session> _activeSessions;
+	std::map<ssh_session, ActiveSession> _activeSessions;
 	Poco::Event _noSessions;
 	Poco::Logger& _logger;
+
+	friend class SSHSession;
 };
+
+
+//
+// inlines
+//
+inline Poco::UInt16 SSHServer::port() const
+{
+	return _port;
+}
 
 
 } } // namespace Poco::SSH

@@ -32,7 +32,7 @@ class SSH_API SSHClient
 	/// SSH client for connecting to an SSH server.
 	///
 	/// Provides connect, authenticate (password or public key),
-	/// and channel management. RAII — disconnects on destruction.
+	/// and channel management. RAII - disconnects on destruction.
 {
 public:
 	SSHClient();

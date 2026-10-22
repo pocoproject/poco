@@ -46,7 +46,7 @@ std::string SSHHostKeyManager::ensureHostKey(const std::string& keyDir, const st
 			return fullPath;
 		}
 		if (key) ssh_key_free(key);
-		// Key file is corrupt — regenerate
+		// Key file is corrupt - regenerate
 	}
 
 	// Ensure directory exists

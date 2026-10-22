@@ -25,16 +25,106 @@
 #include "Poco/SSH/SSHSession.h"
 #include "Poco/SSH/SSHServer.h"
 #include "Poco/SSH/SSHException.h"
+#include "SSHDeadline.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
+#include "Poco/Format.h"
 #include <libssh/libssh.h>
 #include <libssh/server.h>
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <chrono>
 #include <fstream>
+#include <optional>
 #include <sstream>
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <netdb.h>
+#include <sys/socket.h>
+#endif
 
 
 namespace Poco {
 namespace SSH {
+
+
+namespace {
+
+
+[[nodiscard]] bool replyAuthSuccess(ssh_session session, ssh_message msg)
+	/// Accepts the authentication request and frees msg.
+	/// Returns false if the reply could not be sent.
+{
+	// libssh ignores a failed write of the reply: it closes the socket and marks the session as not connected,
+	// but returns SSH_OK. A later ssh_message_get() then waits in poll() without a timeout for the closed socket
+	// and never returns, so ssh_is_connected() is checked after the reply.
+	const bool sent = ssh_message_auth_reply_success(msg, 0) == SSH_OK && ssh_is_connected(session) != 0;
+	ssh_message_free(msg);
+	return sent;
+}
+
+
+[[nodiscard]] bool limitWait(ssh_session session, const std::optional<std::chrono::steady_clock::time_point>& deadline)
+	/// Limits the time that the next libssh call waits for the client to SSHSession::STOP_CHECK_INTERVAL, or to
+	/// the time left until the deadline if that is shorter. Returns false if the deadline has passed.
+	///
+	/// The session checks after each interval whether it is stopped, and libssh can end a wait shortly before its
+	/// timeout (its clock is coarse on Windows), so a call that timed out is repeated until this function returns
+	/// false.
+{
+	auto wait = SSHSession::STOP_CHECK_INTERVAL;
+	if (deadline.has_value())
+	{
+		const auto remaining = remainingWait(*deadline);
+		if (remaining == std::chrono::milliseconds::zero())
+			return false;
+		wait = std::min(wait, remaining);
+	}
+	return setSessionTimeout(session, wait);
+}
+
+
+[[nodiscard]] ssh_message nextMessage(ssh_session session,
+	const std::optional<std::chrono::steady_clock::time_point>& deadline, const std::atomic<bool>& stopRequested)
+	/// Waits for the next message from the client until the deadline. Returns nullptr if the connection has
+	/// ended, the session is stopped or the deadline has passed.
+{
+	while (!stopRequested && limitWait(session, deadline))
+	{
+		ssh_message msg = ssh_message_get(session);
+		// A wait that ends without a message while the connection is open timed out
+		if (msg != nullptr || ssh_is_connected(session) == 0 ||
+			(ssh_get_status(session) & (SSH_CLOSED | SSH_CLOSED_ERROR)) != 0)
+		{
+			return msg;
+		}
+	}
+	return nullptr;
+}
+
+
+[[nodiscard]] std::string clientAddress(ssh_session session)
+	/// Returns the address and port of the client, for log messages.
+{
+	struct sockaddr_storage addr{};
+	socklen_t length = sizeof(addr);
+	std::array<char, NI_MAXHOST> host{};
+	std::array<char, NI_MAXSERV> port{};
+	if (::getpeername(ssh_get_fd(session), reinterpret_cast<struct sockaddr*>(&addr), &length) != 0 ||
+		::getnameinfo(reinterpret_cast<const struct sockaddr*>(&addr), length, host.data(), NI_MAXHOST,
+			port.data(), NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV) != 0)
+	{
+		return "an unknown address";
+	}
+	return Poco::format("%s port %s", std::string(host.data()), std::string(port.data()));
+}
+
+
+} // namespace
 
 
 SSHSession::SSHSession(
@@ -54,28 +144,42 @@ SSHSession::~SSHSession() = default;
 
 void SSHSession::run()
 {
-	_server.registerSession(_session);
-
 	if (_logger.trace())
 		_logger.trace("Session started");
 
+	// libssh closes the socket when the connection ends, so the address is taken while it is open
+	const std::string address = clientAddress(_session);
+
+	// The login grace time limits the waits of libssh in this thread: closing the socket from another thread
+	// would close a handle that libssh still uses.
+	std::optional<std::chrono::steady_clock::time_point> loginDeadline;
+	if (_config.loginGraceTime > std::chrono::milliseconds::zero())
+		loginDeadline = deadlineAfter(_config.loginGraceTime);
+	bool loggedIn = false;
 	try
 	{
 		if (_logger.trace())
 			_logger.trace("Starting key exchange");
 
-		if (ssh_handle_key_exchange(_session) == SSH_OK)
+		int rc = SSH_AGAIN;
+		while (rc == SSH_AGAIN && !stopRequested() && limitWait(_session, loginDeadline))
+			rc = ssh_handle_key_exchange(_session);
+		if (rc == SSH_OK)
 		{
 			if (_logger.trace())
 				_logger.trace("Key exchange succeeded, authenticating");
 
-			if (authenticate())
+			if (authenticate(loginDeadline))
 			{
 				_logger.information("Authenticated user: %s", _authenticatedUser);
 
-				ssh_channel channel = negotiateChannel();
+				ssh_channel channel = negotiateChannel(loginDeadline);
 				if (channel)
 				{
+					loggedIn = true;
+					// Zero is the timeout of a new session: the login grace time does not limit the rest of the session
+					// (libssh rejects only a negative timeout, so the result needs no check)
+					static_cast<void>(setSessionTimeout(_session, std::chrono::milliseconds::zero()));
 					if (_logger.trace())
 						_logger.trace("Channel open, starting session handler");
 
@@ -112,6 +216,17 @@ void SSHSession::run()
 		_logger.error("SSH session: unknown exception");
 	}
 
+	if (stopRequested())
+	{
+		_logger.information("SSH session from %s stopped by the server", address);
+	}
+	else if (!loggedIn && loginDeadline.has_value() &&
+		remainingWait(*loginDeadline) == std::chrono::milliseconds::zero())
+	{
+		_logger.information("Closing the SSH connection from %s: login not completed within %?d ms",
+			address, _config.loginGraceTime.count());
+	}
+
 	if (_logger.trace())
 		_logger.trace("Session cleanup");
 
@@ -123,7 +238,7 @@ void SSHSession::run()
 }
 
 
-bool SSHSession::authenticate()
+bool SSHSession::authenticate(const std::optional<std::chrono::steady_clock::time_point>& loginDeadline)
 {
 	int authAttempts = 0;
 	int authMethods = 0;
@@ -142,8 +257,8 @@ bool SSHSession::authenticate()
 	while (authAttempts < _config.maxAuthAttempts && messagesSeen < maxMessages)
 	{
 		++messagesSeen;
-		ssh_message msg = ssh_message_get(_session);
-		if (!msg)
+		ssh_message msg = nextMessage(_session, loginDeadline, _stopRequested);
+		if (msg == nullptr)
 			return false;
 
 		int type = ssh_message_type(msg);
@@ -158,9 +273,7 @@ bool SSHSession::authenticate()
 				if (user && pass && _config.passwordAuthenticator(user, pass))
 				{
 					_authenticatedUser = user;
-					ssh_message_auth_reply_success(msg, 0);
-					ssh_message_free(msg);
-					return true;
+					return replyAuthSuccess(_session, msg);
 				}
 				authAttempts++;
 				if (_logger.trace())
@@ -190,9 +303,7 @@ bool SSHSession::authenticate()
 						if (checkAuthorizedKey(user, clientKey))
 						{
 							_authenticatedUser = user;
-							ssh_message_auth_reply_success(msg, 0);
-							ssh_message_free(msg);
-							return true;
+							return replyAuthSuccess(_session, msg);
 						}
 						authAttempts++;
 						ssh_message_reply_default(msg);
@@ -225,13 +336,13 @@ bool SSHSession::authenticate()
 }
 
 
-ssh_channel SSHSession::negotiateChannel()
+ssh_channel SSHSession::negotiateChannel(const std::optional<std::chrono::steady_clock::time_point>& loginDeadline)
 {
 	ssh_channel channel = nullptr;
 
 	for (int i = 0; i < 10; ++i)
 	{
-		ssh_message msg = ssh_message_get(_session);
+		ssh_message msg = nextMessage(_session, loginDeadline, _stopRequested);
 		if (!msg) return nullptr;
 
 		if (ssh_message_type(msg) == SSH_REQUEST_CHANNEL_OPEN &&
@@ -250,7 +361,7 @@ ssh_channel SSHSession::negotiateChannel()
 
 	for (int i = 0; i < 10; ++i)
 	{
-		ssh_message msg = ssh_message_get(_session);
+		ssh_message msg = nextMessage(_session, loginDeadline, _stopRequested);
 		if (!msg)
 		{
 			ssh_channel_free(channel);
