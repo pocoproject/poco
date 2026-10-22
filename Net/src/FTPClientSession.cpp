@@ -605,21 +605,20 @@ void FTPClientSession::parseAddress(const std::string& str, SocketAddress& addr)
 	std::string::const_iterator end = str.end();
 	while (it != end && *it != '(') ++it;
 	if (it != end) ++it;
-	std::string host;
-	while (it != end && Poco::Ascii::isDigit(*it)) host += *it++;
-	if (it != end && *it == ',') { host += '.'; ++it; }
-	while (it != end && Poco::Ascii::isDigit(*it)) host += *it++;
-	if (it != end && *it == ',') { host += '.'; ++it; }
-	while (it != end && Poco::Ascii::isDigit(*it)) host += *it++;
-	if (it != end && *it == ',') { host += '.'; ++it; }
-	while (it != end && Poco::Ascii::isDigit(*it)) host += *it++;
-	if (it != end && *it == ',') ++it;
+	// The host in the PASV response is skipped. The data connection goes to
+	// the host of the control connection, as for EPSV, so that the server
+	// cannot direct the client to another host.
+	for (int i = 0; i < 4; ++i)
+	{
+		while (it != end && Poco::Ascii::isDigit(*it)) ++it;
+		if (it != end && *it == ',') ++it;
+	}
 	Poco::UInt16 portHi = 0;
 	while (it != end && Poco::Ascii::isDigit(*it)) { portHi *= 10; portHi += *it++ - '0'; }
 	if (it != end && *it == ',') ++it;
 	Poco::UInt16 portLo = 0;
 	while (it != end && Poco::Ascii::isDigit(*it)) { portLo *= 10; portLo += *it++ - '0'; }
-	addr = SocketAddress(host, portHi*256 + portLo);
+	addr = SocketAddress(_pControlSocket->peerAddress().host(), portHi*256 + portLo);
 }
 
 
