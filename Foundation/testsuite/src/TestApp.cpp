@@ -422,7 +422,7 @@ int main(int argc, char** argv)
 		else if (arg == "-env")
 		{
 			const char* s = std::getenv("TESTENV");
-			if (s)
+			if (s != nullptr)
 			{
 				std::cout << s;
 				return 0;
@@ -432,7 +432,7 @@ int main(int argc, char** argv)
 		else if (arg == "-getenv" && argc > 2)
 		{
 			const char* s = std::getenv(argv[2]);
-			if (s)
+			if (s != nullptr)
 			{
 				std::cout << s;
 				return 0;
