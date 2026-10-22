@@ -1467,49 +1467,40 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 	// Force-detach if currently attached read-only. Bypass the reference count:
 	// we are about to unlink the file, so any holder is going to break either
 	// way; better to detach cleanly now than to leave the SQLite ATTACH
-	// dangling on a deleted file. While a statement still reads the attached
-	// shard SQLite refuses the DETACH: like a busy session below, that is
-	// retried briefly and then reported as TableLockedException with the shard
-	// left whole, so retention skips it. Other DETACH errors propagate.
-	{
-		constexpr int maxAttempts = 10;
-		for (int attempt = 0; ; ++attempt)
-		{
-			{
-				Poco::Mutex::ScopedLock al(_attachMutex);
-				if (_attached.find(shardId) == _attached.end()) break;
-				if (tryDetach(shardId))
-				{
-					_attached.erase(shardId);
-					break;
-				}
-				if (attempt + 1 >= maxAttempts)
-				{
-					throw TableLockedException("MemoryDB: shard " + Poco::NumberFormatter::format(shardId) +
-						" kept, it is attached and a statement is reading it");
-				}
-			} // release _attachMutex before sleeping
-			Poco::Thread::sleep(1);
-		}
-	}
-
-	// The shard's rows in main are removed before the shard leaves the catalog:
-	// dropped first, its file would be gone while the rows stay in memory,
-	// owned by no shard and never removed. If they cannot be removed now, the
-	// shard is kept whole for a later attempt.
+	// dangling on a deleted file. The shard's rows in main are removed before
+	// the shard leaves the catalog: dropped first, its file would be gone while
+	// the rows stay in memory, owned by no shard and never removed.
+	// Both happen in one step under the connection mutex, after checking that
+	// session() has no transaction open and no statement reads the alias, so
+	// that either both happen or neither: a shard that is kept stays attached.
+	// A busy session or alias is retried briefly and then reported as
+	// TableLockedException with the shard left whole, so retention skips it.
+	// Other errors propagate.
 	std::map<std::string, Poco::Int64> kept;
-	if (resident)
+	constexpr int maxAttempts = 10;
+	for (int attempt = 0; ; ++attempt)
 	{
-		constexpr int maxAttempts = 10;
-		for (int attempt = 0; !removeFromMemory(ranges, floors, kept); ++attempt)
 		{
+			Poco::Mutex::ScopedLock al(_attachMutex);
+			DbMutexGuard dbm(_memHandle);
+			const bool sessionBusy = resident && sqlite3_txn_state(_memHandle, "main") != SQLITE_TXN_NONE;
+			const bool attached = _attached.find(shardId) != _attached.end();
+			if (!sessionBusy && (!attached || tryDetach(shardId)))
+			{
+				_attached.erase(shardId);
+				// session() cannot have opened a transaction since the check
+				if (resident && !removeFromMemory(ranges, floors, kept))
+					throw Poco::IllegalStateException("MemoryDB: session() became busy under the connection mutex");
+				break;
+			}
 			if (attempt + 1 >= maxAttempts)
 			{
-				throw TableLockedException("MemoryDB: shard " + Poco::NumberFormatter::format(shardId) +
-					" kept, its rows cannot be removed from memory while session() has a transaction open");
+				throw TableLockedException("MemoryDB: shard " + Poco::NumberFormatter::format(shardId) + (sessionBusy ?
+					" kept, its rows cannot be removed from memory while session() has a transaction open" :
+					" kept, it is attached and a statement is reading it"));
 			}
-			Poco::Thread::sleep(1);
-		}
+		} // release the mutexes before sleeping
+		Poco::Thread::sleep(1);
 	}
 
 	int schemaVersion;

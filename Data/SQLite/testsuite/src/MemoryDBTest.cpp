@@ -1434,6 +1434,40 @@ void MemoryDBTest::testPutOffRewriteIsNoCompletedFlush()
 }
 
 
+void MemoryDBTest::testKeptShardStaysAttached()
+{
+	// deleteShard() that cannot remove a shard's rows from memory keeps the
+	// shard as it was. That includes its attachment: holders of the alias must
+	// go on reading it, not find no such table.
+	MemoryDB db(_dir, flushedByTest(false));
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now; // keeps shard 1 in memory
+	std::string v("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	db.sealActive();
+	db.flush();
+	const Poco::UInt32 id = db.archivedShardIds().front();
+	const std::string alias = db.attachArchived(id);
+
+	db.session().begin();
+	db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // a write transaction on main only
+	try
+	{
+		db.deleteShard(id);
+		failmsg("deleteShard must keep a shard whose rows cannot leave memory");
+	}
+	catch (Poco::Data::SQLite::TableLockedException&)
+	{
+	}
+	db.session().rollback();
+
+	int n = 0;
+	db << ("SELECT count(*) FROM " + alias + ".t"), into(n), now;
+	assertTrue (n == 3);
+	assertTrue (db.archivedShardIds().size() == 1);
+	db.detachArchived(id);
+}
+
+
 void MemoryDBTest::testShardRemovalFiresNoTriggers()
 {
 	// Taking a shard's rows out of memory - on eviction, or when the shard is
@@ -3445,6 +3479,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeferredDropReportedOnce);
 	CppUnit_addTest(pSuite, MemoryDBTest, testPutOffRewriteIsNoCompletedFlush);
 	CppUnit_addTest(pSuite, MemoryDBTest, testFlushNotSkippedByRetry);
+	CppUnit_addTest(pSuite, MemoryDBTest, testKeptShardStaysAttached);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteActiveShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNonexistentShardRefused);

@@ -81,6 +81,7 @@ public:
 	void testDeferredDropReportedOnce();
 	void testPutOffRewriteIsNoCompletedFlush();
 	void testFlushNotSkippedByRetry();
+	void testKeptShardStaysAttached();
 	void testDeleteNewestShardKeepsNoRowWhenNotNeeded();
 	void testDeleteActiveShardRefused();
 	void testDeleteNonexistentShardRefused();
