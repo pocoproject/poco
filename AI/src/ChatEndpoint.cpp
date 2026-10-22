@@ -217,16 +217,18 @@ namespace
 
 	class Heartbeat: public Poco::Runnable
 		/// Writes a comment to an event stream at an interval, until it is
-		/// stopped or the stream fails.
+		/// stopped or the stream fails. An interval of zero or less writes
+		/// none; another is taken between 10 milliseconds and a day.
 	{
 	public:
 		Heartbeat(std::ostream& out, Poco::FastMutex& mutex, const Poco::Timespan& interval, std::function<void ()> onFailure):
 			_out(out),
 			_mutex(mutex),
-			_interval(static_cast<long>(interval.totalMilliseconds())),
-			_onFailure(std::move(onFailure))
+			_interval(static_cast<long>(std::clamp<Poco::Timespan::TimeDiff>(interval.totalMilliseconds(), 10, 24*60*60*1000))),
+			_onFailure(std::move(onFailure)),
+			_stopped(interval <= Poco::Timespan())
 		{
-			_thread.start(*this);
+			if (!_stopped) _thread.start(*this);
 		}
 
 		~Heartbeat()

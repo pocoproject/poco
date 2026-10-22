@@ -45,6 +45,7 @@ public:
 	void testEndpointCrossSite();
 	void testEndpointRefusals();
 	void testEndpointHeartbeat();
+	void testEndpointHeartbeatBounds();
 	void testEndpointErrorClientGone();
 	void testEndpointClientGone();
 

@@ -1656,6 +1656,53 @@ void ChatServiceTest::testEndpointHeartbeat()
 }
 
 
+void ChatServiceTest::testEndpointHeartbeatBounds()
+{
+	// A heartbeat of zero or less sends no comment, and one below the minimum
+	// sends no more than one in 10 milliseconds.
+	for (const Poco::Timespan& heartbeat: {Poco::Timespan(), Poco::Timespan(-1, 0), Poco::Timespan(0, 1)})
+	{
+		auto pState = std::make_shared<FakeState>();
+		pState->block = true;
+		ChatService service(std::make_shared<ToolRegistry>(), settingsOf({entry("ollama", true, {"m1"})}), fakeParams(pState));
+		ChatEndpoint::Params params;
+		params.heartbeat = heartbeat;
+		Host host(service, params);
+
+		Poco::Net::HTTPClientSession session("127.0.0.1", host.port());
+		session.setTimeout(Poco::Timespan(20, 0));
+		Poco::Net::HTTPRequest request("POST", "/api/ai/chat/stream", Poco::Net::HTTPMessage::HTTP_1_1);
+		request.set("X-User", "alice");
+		request.setContentType("application/json");
+		request.setContentLength(static_cast<std::streamsize>(HELLO.size()));
+		session.sendRequest(request) << HELLO;
+		Poco::Net::HTTPResponse response;
+		std::istream& in = session.receiveResponse(response);
+		std::string line;
+		std::getline(in, line);
+		assertEqual(std::string(": connected"), line);
+		assertTrue(pState->started.tryWait(10000));
+		if (heartbeat > Poco::Timespan())
+		{
+			// The comments of a fifth of a second.
+			int comments = 0;
+			const Poco::Timestamp reading;
+			while (reading.elapsed() < 200000 && std::getline(in, line))
+			{
+				if (line == ": working") ++comments;
+			}
+			assertTrue(comments > 0);
+			assertTrue(comments <= static_cast<int>(reading.elapsed() / 10000) + 2);
+		}
+		assertEqual(1, service.cancel("alice", "c1"));
+		std::string rest;
+		Poco::StreamCopier::copyToString(in, rest);
+		if (heartbeat <= Poco::Timespan()) assertTrue(rest.find(": working") == std::string::npos);
+		assertTrue(rest.find("data: [DONE]") != std::string::npos);
+	}
+}
+
+
 void ChatServiceTest::testEndpointErrorClientGone()
 {
 	// An error reply that cannot be sent, as the client has gone away, is
@@ -1764,6 +1811,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointCrossSite);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointRefusals);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeat);
+	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeatBounds);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointErrorClientGone);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);
 

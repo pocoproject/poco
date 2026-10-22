@@ -118,7 +118,8 @@ public:
 		Poco::Timespan heartbeat = Poco::Timespan(5, 0);
 			/// The interval of the comments of an event stream while nothing
 			/// else comes, so that the client and the proxies between see the
-			/// connection alive.
+			/// connection alive. Zero or less sends none; another interval is
+			/// taken between 10 milliseconds and a day.
 		bool keysFromRequests = false;
 			/// Whether a caller who may manage the chat sets the keys of the
 			/// providers, and the base URL and servers of a provider with a
