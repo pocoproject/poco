@@ -61,15 +61,16 @@ struct AIMCP_API RequestContext
 	Implementation clientInfo;
 		/// The client's name and version, if the request carried them.
 
-	std::function<bool ()> cancelled;
+	std::function<bool ()> cancelled = [] { return false; };
 		/// Returns true once the work for the request is to be abandoned; a
-		/// handler that runs long asks it now and then. Empty when nothing
-		/// can cancel the request, as on the Server, which serves requests
-		/// synchronously; an agent loop sets it from the Cancellation of its
-		/// run. isCancelled() asks it when it is set.
+		/// handler that runs long asks it now and then, best through
+		/// isCancelled(). It returns false unless a transport or an agent
+		/// loop sets it: the Server serves a request synchronously, and an
+		/// agent loop asks the Cancellation of its run besides the function it
+		/// was given. It is valid while the handler runs, not after.
 
 	[[nodiscard]] bool isCancelled() const;
-		/// Returns cancelled(), or false when it is not set.
+		/// Returns what cancelled returns; false when it is empty.
 };
 
 

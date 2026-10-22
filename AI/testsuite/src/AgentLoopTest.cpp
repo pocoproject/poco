@@ -554,6 +554,27 @@ void AgentLoopTest::testRequestContext()
 	Array conversation = userTurn("go");
 	loop.run(conversation, "", AgentEventCallback());
 	assertEqual(std::string("alice"), seen);
+
+	// A tool may ask cancelled() itself; besides the run's Cancellation it
+	// asks what the given context asks.
+	auto pAgain = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"asks"}), text("ok")});
+	bool askedCancelled = false;
+	Poco::AI::MCP::Tool asks;
+	asks.name = "asks";
+	asks.handler = [&askedCancelled](const Object::Ptr&, const Poco::AI::MCP::RequestContext& context)
+	{
+		askedCancelled = context.cancelled();
+		return Poco::AI::MCP::ToolResult();
+	};
+	ToolRegistry asking;
+	asking.registerTool(asks);
+	AgentLoop askingLoop(pAgain, asking);
+	Poco::AI::MCP::RequestContext cancelling;
+	cancelling.cancelled = []() { return true; };
+	askingLoop.setRequestContext(cancelling);
+	Array again = userTurn("go");
+	askingLoop.run(again, "", AgentEventCallback());
+	assertTrue(askedCancelled);
 }
 
 

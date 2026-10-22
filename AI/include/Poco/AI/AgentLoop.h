@@ -109,8 +109,10 @@ class AI_API AgentLoop
 	/// incomplete), and when the event callback throws, in which case the
 	/// exception leaves run() after the results and DONE.
 	///
-	/// The tools run with the request context of the loop, whose cancelled()
-	/// tells once the run is cancelled: a tool that runs long asks it.
+	/// The tools run with the request context of the loop, whose
+	/// isCancelled() tells once the run is cancelled, or the context that
+	/// setRequestContext() set tells so: a tool that runs long asks it. The
+	/// context is valid while the tool runs, not after.
 	///
 	/// Tool results, the descriptions of tools from remote servers and the
 	/// input the model gives a tool are untrusted input: a tool runs with

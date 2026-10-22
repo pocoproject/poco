@@ -40,7 +40,7 @@ class AI_API MCPHost
 	/// what the server returned: its content, its structured content and its
 	/// error flag.
 	///
-	/// A tool checks the cancelled() of its request context before it calls
+	/// A tool checks the isCancelled() of its request context before it calls
 	/// its server; a call already sent runs to its end, or to the timeout of
 	/// the client.
 	///

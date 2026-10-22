@@ -204,7 +204,8 @@ void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPr
 	// Definitions and handlers: only these run in this run.
 	request.tools = _toolRegistry.tools();
 	Poco::AI::MCP::RequestContext context(_context);
-	context.cancelled = [&cancellation]() { return cancellation.cancelled(); };
+	// The run's Cancellation, and what the given context asks.
+	context.cancelled = [&cancellation, given = _context.cancelled]() { return cancellation.cancelled() || (given && given()); };
 
 	AgentEvent done;
 	done.type = AgentEvent::Type::DONE;

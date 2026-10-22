@@ -186,6 +186,21 @@ void ToolsTest::testToolsCall()
 	// Arguments may be left out.
 	pResult = result(callTool(server, 3, std::string("echo")));
 	assertEqual(std::string(""), firstText(pResult));
+
+	// A handler may ask cancelled() itself: nothing cancels a request the
+	// server serves.
+	Tool asks;
+	asks.name = "asks";
+	asks.handler = [](const Object::Ptr&, const Poco::AI::MCP::RequestContext& context)
+	{
+		ToolResult answer;
+		answer.addText(context.cancelled() ? "cancelled" : "running");
+		return answer;
+	};
+	server.registerTool(asks);
+	pResult = result(callTool(server, 4, std::string("asks")));
+	assertTrue(!pResult->getValue<bool>("isError"));
+	assertEqual(std::string("running"), firstText(pResult));
 }
 
 
