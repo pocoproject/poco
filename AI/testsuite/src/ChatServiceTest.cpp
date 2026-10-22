@@ -1597,7 +1597,7 @@ void ChatServiceTest::testEndpointManage()
 	assertEqual(403, host.send("POST", "providers", "{\"provider\":\"ollama\"}").status);
 	assertEqual(403, host.send("GET", "config").status);
 	assertEqual(403, host.send("POST", "config", "{\"providers\":[]}").status);
-	assertEqual(403, host.send("POST", "token", "{\"provider\":\"anthropic\",\"token\":\"t\"}").status);
+	assertEqual(403, host.send("POST", "key", "{\"provider\":\"anthropic\",\"apiKey\":\"t\"}").status);
 	assertEqual(std::string("m1"), service.model());
 	// Asking a provider again changes nothing.
 	Answer answer = host.send("POST", "providers", "{\"op\":\"retry\",\"provider\":\"ollama\"}");
@@ -1616,7 +1616,7 @@ void ChatServiceTest::testEndpointManage()
 
 	// By default the keys are the host's: none is set over the endpoint, and
 	// the settings offer none to set.
-	assertEqual(403, host.send("POST", "token", "{\"provider\":\"anthropic\",\"token\":\"s3cr3t\"}", "root", true).status);
+	assertEqual(403, host.send("POST", "key", "{\"provider\":\"anthropic\",\"apiKey\":\"s3cr3t\"}", "root", true).status);
 	assertEqual(403, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":true},{\"name\":\"openai\",\"apiKey\":\"k\"}]}", "root", true).status);
 	assertTrue(!service.hasKey("anthropic") && !service.hasKey("openai"));
 	Array::Ptr pDefaults = host.send("GET", "config", "", "root", true).json()->getArray("providers");
@@ -1630,7 +1630,7 @@ void ChatServiceTest::testEndpointManage()
 	ChatEndpoint::Params withKeys;
 	withKeys.keysFromRequests = true;
 	Host keyHost(service, withKeys);
-	answer = keyHost.send("POST", "token", "{\"provider\":\"anthropic\",\"token\":\"s3cr3t\"}", "root", true);
+	answer = keyHost.send("POST", "key", "{\"provider\":\"anthropic\",\"apiKey\":\"s3cr3t\"}", "root", true);
 	assertEqual(200, answer.status);
 	answer = keyHost.send("GET", "config", "", "root", true);
 	assertEqual(200, answer.status);
@@ -1702,7 +1702,7 @@ void ChatServiceTest::testEndpointKeyAddress()
 	ChatEndpoint::Params withKeys;
 	withKeys.keysFromRequests = true;
 	Host keyHost(service, withKeys);
-	assertEqual(200, keyHost.send("POST", "token", "{\"provider\":\"anthropic\",\"token\":\"k1\"}", "root", true).status);
+	assertEqual(200, keyHost.send("POST", "key", "{\"provider\":\"anthropic\",\"apiKey\":\"k1\"}", "root", true).status);
 	assertTrue(service.hasKey("anthropic"));
 	assertEqual(200, keyHost.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":true,\"models\":[\"m1\"]},{\"name\":\"anthropic\",\"baseUrl\":\"http://elsewhere.test\"}]}", "root", true).status);
 	assertTrue(!service.hasKey("anthropic"));
@@ -1764,6 +1764,9 @@ void ChatServiceTest::testEndpointRefusals()
 	assertEqual(404, host.send("GET", "sessions").status);
 	assertTrue(!ChatEndpoint::isRoute("sessions"));
 	assertTrue(ChatEndpoint::isRoute("chat/stream"));
+	// The key of a provider goes by the name POST config gives it.
+	assertTrue(ChatEndpoint::isRoute("key"));
+	assertTrue(!ChatEndpoint::isRoute("token"));
 	assertEqual(413, host.send("POST", "models", "{\"model\":\"" + std::string(100, 'm') + "\"}", "root", true).status);
 	assertEqual(413, host.send("POST", "chat/stream", "{\"messages\":[{\"role\":\"user\",\"content\":\"" + std::string(300, 'x') + "\"}]}").status);
 	assertEqual(400, host.send("POST", "models", "[1]", "root", true).status);

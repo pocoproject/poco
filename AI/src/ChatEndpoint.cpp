@@ -40,7 +40,7 @@ namespace Poco::AI {
 
 namespace
 {
-	const std::vector<std::string> ROUTES = {"health", "chat/stream", "chat/cancel", "models", "providers", "config", "token"};
+	const std::vector<std::string> ROUTES = {"health", "chat/stream", "chat/cancel", "models", "providers", "config", "key"};
 
 
 	struct Refusal
@@ -287,7 +287,7 @@ void ChatEndpoint::handle(const std::string& route, Poco::Net::HTTPServerRequest
 		else if (route == "models") models(request, response, caller);
 		else if (route == "providers") providers(request, response, caller);
 		else if (route == "config") config(request, response, caller);
-		else if (route == "token") token(request, response, caller);
+		else if (route == "key") key(request, response, caller);
 		else throw Refusal{Poco::Net::HTTPResponse::HTTP_NOT_FOUND, "not found", "no route " + route};
 	}
 	catch (const Refusal& refusal)
@@ -547,14 +547,14 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 }
 
 
-void ChatEndpoint::token(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Caller& caller) const
+void ChatEndpoint::key(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Caller& caller) const
 {
 	needsMethod(request, Poco::Net::HTTPRequest::HTTP_POST);
 	needsManager(caller);
 	needsKeysFromRequests(_params);
 	const Poco::JSON::Object::Ptr pRequest = readObject(request, _params.maxBodySize);
 	const std::string provider = stringMember(pRequest, "provider");
-	_service.setKey(provider, stringMember(pRequest, "token"));
+	_service.setKey(provider, stringMember(pRequest, "apiKey"));
 	Poco::JSON::Object::Ptr pBody = ok();
 	pBody->set("provider", provider);
 	sendJSON(response, Poco::Net::HTTPResponse::HTTP_OK, pBody);

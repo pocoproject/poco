@@ -73,8 +73,8 @@ class AI_API ChatEndpoint
 	///     ChatService::configure() does, each read by
 	///     ProviderSettings::fromJSON(), whose rules a wrong type breaks with
 	///     400; an entry's apiKey sets its key, where keys may be set here;
-	///   - POST token with {"provider", "token"}: sets the key of a provider,
-	///     where keys may be set here.
+	///   - POST key with {"provider", "apiKey"}: sets the key of a provider,
+	///     where keys may be set here, under the name POST config gives it.
 	///
 	/// Putting a provider or model in use, the configuration and the keys need
 	/// a caller who may manage the chat; others get 403. Keys are set here
@@ -160,7 +160,7 @@ private:
 	void models(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Caller& caller) const;
 	void providers(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Caller& caller) const;
 	void config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Caller& caller) const;
-	void token(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Caller& caller) const;
+	void key(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response, const Caller& caller) const;
 	Poco::JSON::Object::Ptr readObject(Poco::Net::HTTPServerRequest& request, std::size_t maxSize) const;
 	Poco::JSON::Array::Ptr providerStatus(const Caller& caller) const;
 
