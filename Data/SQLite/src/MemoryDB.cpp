@@ -1473,9 +1473,16 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 			auto f = floors.find(t);
 			if (f != floors.end() && f->second > 0 && !isAutoincrement(t))
 			{
+				// The newest row outside the range: two seeks on the rowid, where
+				// a NOT over the range would walk every row of it.
 				Poco::Int64 above = 0;
 				_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
-					" WHERE NOT (" + inRange + ")"), into(above), now;
+					" WHERE rowid > " + Poco::NumberFormatter::format(r.second.second)), into(above), now;
+				if (above == 0)
+				{
+					_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
+						" WHERE rowid <= " + Poco::NumberFormatter::format(r.second.first)), into(above), now;
+				}
 				if (above < f->second)
 				{
 					// Even with no row of the range left, the next row would be
