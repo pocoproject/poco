@@ -133,7 +133,7 @@ namespace
 	}
 
 
-	bool sameParam(const Annotation& annotation, const Poco::Dynamic::Var& value, const std::string& rendered, const std::string& received)
+	bool sameParam(const Tool::HeaderAnnotation& annotation, const Poco::Dynamic::Var& value, const std::string& rendered, const std::string& received)
 		/// Returns true if a header received carries the value of the
 		/// parameter: an integer as the same number, 42.0 as well as 42, any
 		/// other value as the same text.
@@ -220,20 +220,18 @@ namespace
 		const std::optional<Tool> tool = server.findTool(pParams->getValue<std::string>("name"));
 		if (!tool || tool->inputSchema.isNull()) return std::string();
 
-		std::vector<Annotation> annotations;
-		std::vector<std::string> path;
+		std::vector<Tool::HeaderAnnotation> annotations;
 		try
 		{
-			collectAnnotations(tool->inputSchema, path, annotations);
+			annotations = tool->headerAnnotations();
 		}
 		catch (const Poco::DataFormatException&)
 		{
-			// Clients leave a tool whose annotations are not valid out; one
-			// that calls it nevertheless sends no header for them.
+			// The server takes no such tool (Server::registerTool()).
 			return std::string();
 		}
 		const Poco::JSON::Object::Ptr pArguments = pParams->isObject("arguments") ? pParams->getObject("arguments") : Poco::JSON::Object::Ptr();
-		for (const Annotation& annotation: annotations)
+		for (const Tool::HeaderAnnotation& annotation: annotations)
 		{
 			const std::string name = PARAM_HEADER_PREFIX + annotation.name;
 			std::string received;

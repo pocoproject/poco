@@ -132,11 +132,10 @@ void HTTPClient::toolsListed(std::vector<Tool>& tools)
 	std::vector<Tool> valid;
 	for (Tool& tool: tools)
 	{
-		std::vector<Annotation> annotations;
-		std::vector<std::string> path;
+		std::vector<Tool::HeaderAnnotation> annotations;
 		try
 		{
-			collectAnnotations(tool.inputSchema, path, annotations);
+			annotations = tool.headerAnnotations();
 		}
 		catch (const Poco::DataFormatException& exc)
 		{
@@ -148,7 +147,7 @@ void HTTPClient::toolsListed(std::vector<Tool>& tools)
 			continue;
 		}
 		std::vector<ParamHeader>& headers = paramHeaders[tool.name];
-		for (Annotation& annotation: annotations)
+		for (Tool::HeaderAnnotation& annotation: annotations)
 		{
 			headers.push_back(ParamHeader{"Mcp-Param-" + annotation.name, std::move(annotation.path)});
 		}

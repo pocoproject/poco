@@ -28,6 +28,7 @@ public:
 	void testCallErrors();
 	void testHandlerThrowIsToolError();
 	void testRegistrationRefused();
+	void testHeaderAnnotations();
 	void testToolResultForms();
 	void testToolResultFromObject();
 

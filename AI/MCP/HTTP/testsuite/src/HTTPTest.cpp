@@ -87,6 +87,18 @@ namespace
 	}
 
 
+	std::string toolEntry(const std::string& name, const std::string& schema)
+		/// A tools/list entry.
+	{
+		Object::Ptr pTool = new Object;
+		pTool->set("name", name);
+		pTool->set("inputSchema", parse(schema));
+		std::ostringstream text;
+		pTool->stringify(text);
+		return text.str();
+	}
+
+
 	std::string firstText(const ToolResult& result)
 	{
 		return result.content()->getObject(0)->getValue<std::string>("text");
@@ -326,13 +338,14 @@ void HTTPTest::testInvalidAnnotationsDropped()
 	Server server;
 	buildServer(server);
 	registerTool(server, "good", "{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"A\"}}}");
-	registerTool(server, "number", "{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"number\",\"x-mcp-header\":\"N\"}}}");
-	registerTool(server, "in-items", "{\"type\":\"object\",\"properties\":{\"list\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"x-mcp-header\":\"Item\"}}}}");
-	registerTool(server, "in-oneof", "{\"type\":\"object\",\"oneOf\":[{\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"A\"}}}]}");
-	registerTool(server, "twice", "{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"Name\"},\"b\":{\"type\":\"string\",\"x-mcp-header\":\"name\"}}}");
-	registerTool(server, "bad-name", "{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"Bad Name\"}}}");
-	registerTool(server, "at-root", "{\"type\":\"object\",\"x-mcp-header\":\"Root\"}");
+	// Tools another server may list, which this one would not take.
 	TestHTTPHost host(server);
+	host.addListedTool(toolEntry("number", "{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"number\",\"x-mcp-header\":\"N\"}}}"));
+	host.addListedTool(toolEntry("in-items", "{\"type\":\"object\",\"properties\":{\"list\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"x-mcp-header\":\"Item\"}}}}"));
+	host.addListedTool(toolEntry("in-oneof", "{\"type\":\"object\",\"oneOf\":[{\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"A\"}}}]}"));
+	host.addListedTool(toolEntry("twice", "{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"Name\"},\"b\":{\"type\":\"string\",\"x-mcp-header\":\"name\"}}}"));
+	host.addListedTool(toolEntry("bad-name", "{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"Bad Name\"}}}"));
+	host.addListedTool(toolEntry("at-root", "{\"type\":\"object\",\"x-mcp-header\":\"Root\"}"));
 	host.start();
 	HTTPClient client{Poco::URI(host.url())};
 
@@ -730,8 +743,8 @@ void HTTPTest::testLogShowsNoSecrets()
 	// endpoint without user info and query.
 	Server server;
 	buildServer(server);
-	registerTool(server, std::string("forged\nINFO all is well") + std::string(300, 'x'), "{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"number\",\"x-mcp-header\":\"N\"}}}");
 	TestHTTPHost host(server);
+	host.addListedTool(toolEntry(std::string("forged\nINFO all is well") + std::string(300, 'x'), "{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"number\",\"x-mcp-header\":\"N\"}}}"));
 	host.start();
 	Poco::AutoPtr<CapturingChannel> pChannel = new CapturingChannel;
 	Poco::Logger& logger = Poco::Logger::get("AI.MCP.HTTPClient");

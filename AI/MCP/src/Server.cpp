@@ -92,6 +92,15 @@ void Server::registerTool(const Tool& tool)
 		{
 			throw Poco::InvalidArgumentException("The input schema of a tool must have the type object", tool.name);
 		}
+		try
+		{
+			(void) tool.headerAnnotations();
+		}
+		catch (const Poco::DataFormatException& exc)
+		{
+			// A client leaves such a tool out of its list.
+			throw Poco::InvalidArgumentException("The input schema of the tool " + tool.name + " has an x-mcp-header annotation that is not valid", exc.message());
+		}
 	}
 	Poco::FastMutex::ScopedLock lock(_mutex);
 	_tools[tool.name] = tool;

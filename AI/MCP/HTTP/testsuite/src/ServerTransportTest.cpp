@@ -654,7 +654,6 @@ void ServerTransportTest::testParamHeaders()
 		"\"count\":{\"type\":\"integer\",\"x-mcp-header\":\"Count\"},"
 		"\"verbose\":{\"type\":\"boolean\",\"x-mcp-header\":\"Verbose\"},"
 		"\"nested\":{\"type\":\"object\",\"properties\":{\"zone\":{\"type\":\"string\",\"x-mcp-header\":\"Zone\"}}}}}"), echo);
-	server.registerTool("invalid", "", parse("{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"number\",\"x-mcp-header\":\"N\"}}}"), echo);
 	Endpoint endpoint(server);
 
 	const std::string call = request(Id(1), "tools/call", "{\"name\":\"route\",\"arguments\":{\"message\":\"ok\",\"region\":\"eu\",\"count\":42,\"verbose\":true,\"nested\":{\"zone\":\"b\"}}}");
@@ -716,8 +715,15 @@ void ServerTransportTest::testParamHeaders()
 	assertEqual(400, answer.status);
 	assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), answer.code());
 
-	// A tool whose annotations are not valid has no header to check.
-	assertEqual(200, endpoint.post(request(Id(3), "tools/call", "{\"name\":\"invalid\",\"arguments\":{\"n\":1.5}}"), headersOf("tools/call", "invalid")).status);
+	// A tool whose annotations are not valid is not taken.
+	try
+	{
+		server.registerTool("invalid", "", parse("{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"number\",\"x-mcp-header\":\"N\"}}}"), echo);
+		fail("a tool whose annotations are not valid must be refused");
+	}
+	catch (const Poco::InvalidArgumentException&)
+	{
+	}
 }
 
 

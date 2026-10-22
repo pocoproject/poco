@@ -90,14 +90,15 @@ public:
 		///
 		/// Throws Poco::InvalidArgumentException if the name is empty, the
 		/// tool has no handler, or its input schema does not have the type
-		/// "object".
+		/// "object" or has an x-mcp-header annotation that is not valid (see
+		/// Tool::headerAnnotations()), which clients would leave out.
 
 	void registerTool(const std::string& name, const std::string& description, const Poco::JSON::Object::Ptr& inputSchema, ToolHandler handler);
 		/// Registers a tool whose handler does not need the request context.
 		///
 		/// Throws Poco::InvalidArgumentException if the name is empty, the
 		/// handler is empty, or the input schema does not have the type
-		/// "object".
+		/// "object" or has an x-mcp-header annotation that is not valid.
 
 	[[nodiscard]] std::optional<Tool> findTool(const std::string& name) const;
 		/// Returns the definition of the tool of that name, or nothing. A

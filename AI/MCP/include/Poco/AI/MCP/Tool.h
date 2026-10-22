@@ -24,6 +24,7 @@
 #include "Poco/JSON/Object.h"
 #include <functional>
 #include <string>
+#include <vector>
 
 
 namespace Poco::AI::MCP {
@@ -61,6 +62,27 @@ struct AIMCP_API Tool
 		/// remote server are untrusted.
 	ContextToolHandler handler;
 		/// Required when the tool is registered with a server.
+
+	struct HeaderAnnotation
+		/// A parameter the input schema marks with x-mcp-header: the header
+		/// name without the Mcp-Param- prefix, the property path from the
+		/// root of the arguments, and the type of the parameter: string,
+		/// integer or boolean.
+	{
+		std::string name;
+		std::vector<std::string> path;
+		std::string type;
+	};
+
+	[[nodiscard]] std::vector<HeaderAnnotation> headerAnnotations() const;
+		/// Returns the x-mcp-header annotations of the input schema; none
+		/// without a schema.
+		///
+		/// Throws Poco::DataFormatException for an annotation that is not
+		/// valid: at the root of the schema, not a header name (a token), on
+		/// a parameter that is not a string, an integer or a boolean, a name
+		/// used twice (compared without case), or on a parameter reached
+		/// through other keywords than properties, e.g. items, oneOf or $ref.
 
 	[[nodiscard]] Poco::JSON::Object::Ptr toObject() const;
 		/// Returns the tools/list entry. The schema and annotation objects

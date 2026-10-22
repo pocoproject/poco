@@ -35,6 +35,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/JSON/Parser.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Thread.h"
 #include "Poco/Event.h"
@@ -43,6 +44,7 @@
 #include <atomic>
 #include <ostream>
 #include <string>
+#include <vector>
 
 
 class TestHTTPHost
@@ -138,6 +140,14 @@ public:
 		return _state.requests.load();
 	}
 
+	void addListedTool(const std::string& entry)
+		/// Lists the tools/list entry, JSON text, after the tools of the
+		/// server, e.g. one the server would not take; call before start().
+	{
+		Poco::FastMutex::ScopedLock lock(_state.mutex);
+		_state.listedTools.push_back(entry);
+	}
+
 	Poco::Net::NameValueCollection lastHeaders() const
 		/// The headers of the last request.
 	{
@@ -161,6 +171,7 @@ private:
 		std::atomic<int> requests{0};
 		mutable Poco::FastMutex mutex;
 		Poco::Net::NameValueCollection lastHeaders;
+		std::vector<std::string> listedTools;
 		Poco::Event stopping{Poco::Event::EVENT_MANUALRESET};
 		Poco::Mutex activeMutex;
 		Poco::Condition idle;
@@ -236,6 +247,17 @@ private:
 			}
 
 			Poco::AI::MCP::HTTP::ServerTransport::Reply reply = _state.transport.answer(_state.server, request, body);
+			if (!reply.message.isNull() && reply.message->isObject("result") && reply.message->getObject("result")->isArray("tools"))
+			{
+				// Each reply gets entries of its own.
+				Poco::JSON::Array::Ptr pTools = reply.message->getObject("result")->getArray("tools");
+				Poco::FastMutex::ScopedLock lock(_state.mutex);
+				for (const std::string& entry: _state.listedTools)
+				{
+					Poco::JSON::Parser parser;
+					pTools->add(parser.parse(entry));
+				}
+			}
 			// The faults below change the reply to a request.
 			if (reply.message.isNull() || !reply.message->has("id"))
 			{

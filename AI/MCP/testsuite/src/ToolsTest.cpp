@@ -21,6 +21,7 @@
 #include "Poco/Exception.h"
 #include <atomic>
 #include <string>
+#include <algorithm>
 #include <vector>
 
 
@@ -265,7 +266,63 @@ void ToolsTest::testRegistrationRefused()
 		{
 		}
 	}
+
+	// So must its x-mcp-header annotations, which clients would leave out.
+	const char* annotated[] = {
+		"{\"type\":\"object\",\"x-mcp-header\":\"Root\"}",
+		"{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"\"}}}",
+		"{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"Not a token\"}}}",
+		"{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"number\",\"x-mcp-header\":\"A\"}}}",
+		"{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"string\",\"x-mcp-header\":\"Same\"},\"b\":{\"type\":\"string\",\"x-mcp-header\":\"SAME\"}}}",
+		"{\"type\":\"object\",\"properties\":{\"a\":{\"type\":\"array\",\"items\":{\"type\":\"string\",\"x-mcp-header\":\"Item\"}}}}",
+		"{\"type\":\"object\",\"properties\":{\"a\":{\"oneOf\":[{\"type\":\"string\",\"x-mcp-header\":\"One\"}]}}}"
+	};
+	for (const char* schema: annotated)
+	{
+		try
+		{
+			server.registerTool("bad-annotation", "", parse(schema), [](const Object::Ptr&) { return ToolResult(); });
+			fail(std::string("an x-mcp-header annotation that is not valid must be refused: ") + schema);
+		}
+		catch (const Poco::InvalidArgumentException&)
+		{
+		}
+	}
 	assertEqual(0u, static_cast<unsigned>(result(server.handle(request(Id(1), "tools/list")))->getArray("tools")->size()));
+}
+
+
+void ToolsTest::testHeaderAnnotations()
+{
+	Tool tool;
+	tool.name = "route";
+	assertTrue(tool.headerAnnotations().empty());
+	tool.inputSchema = parse(
+		"{\"type\":\"object\",\"properties\":{"
+		"\"region\":{\"type\":\"string\",\"x-mcp-header\":\"Region\"},"
+		"\"plain\":{\"type\":\"string\"},"
+		"\"nested\":{\"type\":\"object\",\"properties\":{\"count\":{\"type\":\"integer\",\"x-mcp-header\":\"Count\"}}}}}");
+	const std::vector<Tool::HeaderAnnotation> annotations = tool.headerAnnotations();
+	assertEqual(2u, static_cast<unsigned>(annotations.size()));
+	const auto named = [&annotations](const std::string& name)
+	{
+		const auto it = std::find_if(annotations.begin(), annotations.end(), [&name](const Tool::HeaderAnnotation& annotation) { return annotation.name == name; });
+		return it == annotations.end() ? Tool::HeaderAnnotation() : *it;
+	};
+	assertTrue(named("Region").path == std::vector<std::string>({"region"}));
+	assertEqual(std::string("string"), named("Region").type);
+	assertTrue(named("Count").path == std::vector<std::string>({"nested", "count"}));
+	assertEqual(std::string("integer"), named("Count").type);
+
+	tool.inputSchema = parse("{\"type\":\"object\",\"properties\":{\"n\":{\"type\":\"number\",\"x-mcp-header\":\"N\"}}}");
+	try
+	{
+		(void) tool.headerAnnotations();
+		fail("an annotation on a number is not valid");
+	}
+	catch (const Poco::DataFormatException&)
+	{
+	}
 }
 
 
@@ -392,6 +449,7 @@ CppUnit::Test* ToolsTest::suite()
 	CppUnit_addTest(pSuite, ToolsTest, testCallErrors);
 	CppUnit_addTest(pSuite, ToolsTest, testHandlerThrowIsToolError);
 	CppUnit_addTest(pSuite, ToolsTest, testRegistrationRefused);
+	CppUnit_addTest(pSuite, ToolsTest, testHeaderAnnotations);
 	CppUnit_addTest(pSuite, ToolsTest, testToolResultForms);
 	CppUnit_addTest(pSuite, ToolsTest, testToolResultFromObject);
 

@@ -29,10 +29,6 @@
 namespace Poco::AI::MCP::HTTP {
 
 
-[[nodiscard]] bool isToken(const std::string& name);
-	/// Returns true if name is an HTTP field name token (RFC 9110).
-
-
 [[nodiscard]] bool isPlain(const std::string& value);
 	/// Returns true if value can be sent as it is: printable ASCII without
 	/// leading or trailing spaces, and without "=?", which starts the base64
@@ -60,26 +56,6 @@ namespace Poco::AI::MCP::HTTP {
 	/// header it reads, and drops the "=?" of a value that only starts like
 	/// one, as the base64 form does: a value that starts with "base64?" and
 	/// ends with "?=" is taken as the base64 form without its "=?".
-
-
-struct Annotation
-	/// An x-mcp-header annotation of an input schema: the header name, the
-	/// property path from the root of the arguments to the parameter, and
-	/// the type of the parameter: string, integer or boolean.
-{
-	std::string name;
-	std::vector<std::string> path;
-	std::string type;
-};
-
-
-void collectAnnotations(const Poco::JSON::Object::Ptr& pSchema, std::vector<std::string>& path, std::vector<Annotation>& annotations);
-	/// Collects the x-mcp-header annotations of a schema object reached from
-	/// the root through properties keys only.
-	///
-	/// Throws Poco::DataFormatException for an invalid annotation (at the
-	/// root, not a header name, on a parameter that is not a string, an
-	/// integer or a boolean, a name used twice), or for one anywhere else.
 
 
 [[nodiscard]] bool renderParam(const Poco::Dynamic::Var& value, std::string& text);
