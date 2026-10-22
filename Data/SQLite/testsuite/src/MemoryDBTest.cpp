@@ -2435,8 +2435,9 @@ void MemoryDBTest::testBusyEvictionRetriedWithoutWrite()
 		Poco::Data::Statement stmt = (db.session() << "SELECT id FROM t", into(id), limit(1));
 		stmt.execute(); // partially stepped: holds a read transaction on main
 		db.sealActive();
-		db.flush(); // writes the shard; its rows cannot leave memory now
-		assertTrue (!db.dirty());
+		// Writes the shard; its rows cannot leave memory now. The timer may be
+		// flushing already, and flush() then returns at once.
+		assertTrue (waitUntil([&]() { db.flush(); return !db.dirty(); }, Poco::Timespan(10, 0)));
 	} // the reader is done; nothing else is written
 
 	assertTrue (waitUntil([&]() {
@@ -2515,7 +2516,9 @@ void MemoryDBTest::testBusyRetentionRetriedWithoutWrite()
 		Poco::Data::Statement stmt = (db.session() << "SELECT id FROM t", into(id), limit(1));
 		stmt.execute();
 		db.sealActive();
-		db.flush(); // writes shard 1; retention cannot drop it now
+		// Writes shard 1; retention cannot drop it now. The timer may be
+		// flushing already, and flush() then returns at once.
+		assertTrue (waitUntil([&]() { db.flush(); return !db.dirty(); }, Poco::Timespan(10, 0)));
 		assertTrue (Poco::File(sealedFile).exists());
 	}
 
