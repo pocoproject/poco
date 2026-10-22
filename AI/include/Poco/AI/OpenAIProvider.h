@@ -78,14 +78,18 @@ public:
 		std::size_t maxResponseSize = 32*1024*1024;
 			/// The limit of a response body, and of one event of a stream.
 		Poco::JSON::Object::Ptr requestMembers;
-			/// Members set in every chat request body, replacing those of the
-			/// same name, e.g. {"reasoning_effort": "low"}.
+			/// Members added to every chat request body, e.g.
+			/// {"reasoning_effort": "low"}. The members the provider builds
+			/// itself from Params and the ChatRequest are refused: model,
+			/// messages, max_tokens, max_completion_tokens, stream,
+			/// stream_options, tools and tool_choice.
 		Poco::Net::NameValueCollection headers;
 			/// Headers sent with every request, e.g. OpenAI-Organization.
 	};
 
 	explicit OpenAIProvider(const Params& params, SessionFactory sessionFactory = SessionFactory());
-		/// Creates the provider.
+		/// Creates the provider. Throws a Poco::InvalidArgumentException if
+		/// params.requestMembers has a member the provider builds itself.
 
 	~OpenAIProvider() override;
 		/// Destroys the provider.

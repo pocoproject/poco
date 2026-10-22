@@ -322,6 +322,16 @@ Poco::UInt64 countOf(const Poco::JSON::Object::Ptr& pObject, const std::string& 
 }
 
 
+void refuseRequestMembers(const Poco::JSON::Object::Ptr& pMembers, std::initializer_list<const char*> names)
+{
+	if (pMembers.isNull()) return;
+	for (const char* name: names)
+	{
+		if (pMembers->has(name)) throw Poco::InvalidArgumentException("The provider builds this request member itself", name);
+	}
+}
+
+
 void mergeMembers(Poco::JSON::Object& body, const Poco::JSON::Object::Ptr& pMembers)
 {
 	if (pMembers.isNull()) return;

@@ -331,17 +331,36 @@ void AnthropicProviderTest::testRequestMembersAndHeaders()
 {
 	CannedServer server(SSE, textStream());
 	AnthropicProvider::Params settings = params(server.baseUrl());
-	settings.requestMembers = parse("{\"thinking\":{\"type\":\"adaptive\"},\"max_tokens\":32000}");
+	settings.requestMembers = parse("{\"thinking\":{\"type\":\"adaptive\"},\"metadata\":{\"user_id\":\"u1\"}}");
 	settings.headers.set("anthropic-beta", "test-beta");
 	AnthropicProvider provider(settings);
 	Cancellation cancellation;
 	(void) provider.chat(userRequest("Hi"), ContentEventCallback(), cancellation);
 	Object::Ptr pBody = parse(server.request());
 	assertEqual(std::string("adaptive"), pBody->getObject("thinking")->getValue<std::string>("type"));
-	assertEqual(32000, pBody->getValue<int>("max_tokens"));
+	assertEqual(std::string("u1"), pBody->getObject("metadata")->getValue<std::string>("user_id"));
+	assertEqual(100, pBody->getValue<int>("max_tokens"));
 	assertEqual(std::string("test-beta"), server.header("anthropic-beta"));
 	// The settings' object is not the one that went out.
 	assertTrue(!settings.requestMembers->has("model"));
+
+	// The members the provider builds itself are refused.
+	const std::vector<std::string> built = {"model", "max_tokens", "messages", "system", "stream", "tools", "tool_choice"};
+	for (const std::string& name: built)
+	{
+		AnthropicProvider::Params reserved = params(server.baseUrl());
+		reserved.requestMembers = new Object;
+		reserved.requestMembers->set(name, 1);
+		try
+		{
+			AnthropicProvider refused(reserved);
+			fail("a member the provider builds must be refused: " + name);
+		}
+		catch (const Poco::InvalidArgumentException& exc)
+		{
+			assertMessageEqual("The provider builds this request member itself: " + name, exc.message());
+		}
+	}
 }
 
 

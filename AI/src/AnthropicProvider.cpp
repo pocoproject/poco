@@ -226,6 +226,7 @@ AnthropicProvider::AnthropicProvider(const Params& params, SessionFactory sessio
 	_params(params),
 	_sessionFactory(std::move(sessionFactory))
 {
+	refuseRequestMembers(_params.requestMembers, {"model", "max_tokens", "messages", "system", "stream", "tools", "tool_choice"});
 }
 
 

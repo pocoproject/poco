@@ -35,6 +35,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Timespan.h"
 #include "Poco/URI.h"
+#include <initializer_list>
 #include <istream>
 #include <memory>
 #include <string>
@@ -154,6 +155,12 @@ void reportFailure(const ContentEventCallback& onEvent, FailureCode code, const 
 [[nodiscard]] Poco::UInt64 countOf(const Poco::JSON::Object::Ptr& pObject, const std::string& key);
 	/// A count member of an object that may be null; 0 when absent or not a
 	/// non-negative integer.
+
+
+void refuseRequestMembers(const Poco::JSON::Object::Ptr& pMembers, std::initializer_list<const char*> names);
+	/// Throws a Poco::InvalidArgumentException naming the first of names
+	/// that pMembers has: the members of the request body a provider builds
+	/// itself.
 
 
 void mergeMembers(Poco::JSON::Object& body, const Poco::JSON::Object::Ptr& pMembers);

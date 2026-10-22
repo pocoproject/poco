@@ -79,14 +79,18 @@ public:
 		std::size_t maxResponseSize = 32*1024*1024;
 			/// The limit of a response body, and of one event of a stream.
 		Poco::JSON::Object::Ptr requestMembers;
-			/// Members set in every request body, replacing those of the same
-			/// name, e.g. {"thinking": {"type": "adaptive"}}.
+			/// Members added to every request body, e.g.
+			/// {"thinking": {"type": "adaptive"}}. The members the provider
+			/// builds itself from Params and the ChatRequest are refused:
+			/// model, max_tokens, messages, system, stream, tools and
+			/// tool_choice.
 		Poco::Net::NameValueCollection headers;
 			/// Headers sent with every request, e.g. anthropic-beta.
 	};
 
 	explicit AnthropicProvider(const Params& params, SessionFactory sessionFactory = SessionFactory());
-		/// Creates the provider.
+		/// Creates the provider. Throws a Poco::InvalidArgumentException if
+		/// params.requestMembers has a member the provider builds itself.
 
 	~AnthropicProvider() override;
 		/// Destroys the provider.

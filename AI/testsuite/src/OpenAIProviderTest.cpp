@@ -238,16 +238,35 @@ void OpenAIProviderTest::testRequestMembersAndHeaders()
 {
 	CannedServer server(SSE, textStream());
 	OpenAIProvider::Params settings = params(server.baseUrl());
-	settings.requestMembers = parse("{\"reasoning_effort\":\"low\",\"max_completion_tokens\":99}");
+	settings.requestMembers = parse("{\"reasoning_effort\":\"low\",\"parallel_tool_calls\":false}");
 	settings.headers.set("OpenAI-Organization", "org-test");
 	OpenAIProvider provider(settings);
 	Cancellation cancellation;
 	(void) provider.chat(userRequest("Hi"), ContentEventCallback(), cancellation);
 	Object::Ptr pBody = parse(server.request());
 	assertEqual(std::string("low"), pBody->getValue<std::string>("reasoning_effort"));
-	assertEqual(99, pBody->getValue<int>("max_completion_tokens"));
+	assertTrue(!pBody->getValue<bool>("parallel_tool_calls"));
+	assertTrue(pBody->getValue<bool>("stream"));
 	assertEqual(std::string("org-test"), server.header("OpenAI-Organization"));
 	assertTrue(!settings.requestMembers->has("model"));
+
+	// The members the provider builds itself are refused.
+	const std::vector<std::string> built = {"model", "messages", "max_tokens", "max_completion_tokens", "stream", "stream_options", "tools", "tool_choice"};
+	for (const std::string& name: built)
+	{
+		OpenAIProvider::Params reserved = params(server.baseUrl());
+		reserved.requestMembers = new Object;
+		reserved.requestMembers->set(name, 1);
+		try
+		{
+			OpenAIProvider refused(reserved);
+			fail("a member the provider builds must be refused: " + name);
+		}
+		catch (const Poco::InvalidArgumentException& exc)
+		{
+			assertMessageEqual("The provider builds this request member itself: " + name, exc.message());
+		}
+	}
 }
 
 

@@ -92,6 +92,7 @@ OpenAIProvider::OpenAIProvider(const Params& params, SessionFactory sessionFacto
 	_params(params),
 	_sessionFactory(std::move(sessionFactory))
 {
+	refuseRequestMembers(_params.requestMembers, {"model", "messages", "max_tokens", "max_completion_tokens", "stream", "stream_options", "tools", "tool_choice"});
 }
 
 
