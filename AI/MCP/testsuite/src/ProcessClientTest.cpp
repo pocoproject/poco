@@ -421,6 +421,22 @@ void ProcessClientTest::testProcessKeepsOutputOpen()
 }
 
 
+void ProcessClientTest::testReaderOutlivesClient()
+{
+	// A process of a group of its own keeps the standard output of the server
+	// open past the server: close() returns, and the reader is left to end
+	// when that process does.
+	ProcessClient client(serverPath(), mode("--stubborn"));
+	client.setGracePeriod(Poco::Timespan(0, 200000));
+	const Poco::Process::PID lingering = static_cast<Poco::Process::PID>(Poco::NumberParser::parse64(text(client.callTool("spawn", args("group", "own")))));
+	const Poco::Timestamp closing;
+	(void) client.close();
+	assertTrue(closing.elapsed() < 10 * Poco::Timestamp::resolution());
+	assertTrue(Poco::Process::isRunning(lingering));
+	Poco::Process::kill(lingering);
+}
+
+
 void ProcessClientTest::testCommandThatCannotRun()
 {
 	const std::string missing = Poco::Path(serverPath()).setFileName("no-such-mcp-server").toString();
@@ -472,6 +488,7 @@ CppUnit::Test* ProcessClientTest::suite()
 	CppUnit_addTest(pSuite, ProcessClientTest, testServerEndsMidRequest);
 	CppUnit_addTest(pSuite, ProcessClientTest, testWriteToEndedServer);
 	CppUnit_addTest(pSuite, ProcessClientTest, testWriteTimeoutCancels);
+	CppUnit_addTest(pSuite, ProcessClientTest, testReaderOutlivesClient);
 	CppUnit_addTest(pSuite, ProcessClientTest, testNoiseOnStandardOutput);
 	CppUnit_addTest(pSuite, ProcessClientTest, testCloseEndsServer);
 	CppUnit_addTest(pSuite, ProcessClientTest, testStubbornServerIsKilled);

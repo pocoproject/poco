@@ -14,7 +14,8 @@
 //   big     returns a text of bytes bytes
 //   flood   writes count notifications before its reply, "flooded"
 //   spawn   starts this program with --linger, which keeps the standard
-//           output it inherits open, and returns its process id
+//           output it inherits open, and returns its process id; with the
+//           group argument "own" the process leads a group of its own
 //
 // With the environment variable MCP_TEST_INPUT_LOG it copies what it reads
 // to the file it names, so that a test can see what reached the server.
@@ -37,6 +38,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Path.h"
 #include "Poco/Process.h"
+#include "Poco/ProcessOptions.h"
 #include "Poco/Thread.h"
 #include "Poco/TeeStream.h"
 #include <csignal>
@@ -151,11 +153,12 @@ int main(int argc, char** argv)
 		result.addText("flooded");
 		return result;
 	});
-	server.registerTool("spawn", "Starts a process that keeps the standard output open.", nullptr, [](const Object::Ptr&)
+	server.registerTool("spawn", "Starts a process that keeps the standard output open.", nullptr, [](const Object::Ptr& pArgs)
 	{
 		std::vector<std::string> arguments;
 		arguments.push_back("--linger");
-		Poco::ProcessHandle handle = Poco::Process::launch(Poco::Path::self(), arguments);
+		const int options = pArgs->optValue<std::string>("group", "") == "own" ? Poco::PROCESS_NEW_GROUP : 0;
+		Poco::ProcessHandle handle = Poco::Process::launch(Poco::Path::self(), arguments, options);
 		ToolResult result;
 		result.addText(Poco::NumberFormatter::format(handle.id()));
 		return result;

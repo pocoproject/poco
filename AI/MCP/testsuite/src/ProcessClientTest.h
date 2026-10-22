@@ -26,6 +26,7 @@ public:
 	void testServerEndsMidRequest();
 	void testWriteToEndedServer();
 	void testWriteTimeoutCancels();
+	void testReaderOutlivesClient();
 	void testNoiseOnStandardOutput();
 	void testCloseEndsServer();
 	void testStubbornServerIsKilled();
