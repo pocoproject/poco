@@ -1475,59 +1475,53 @@ void MemoryDBTest::testShardRemovalFiresNoTriggers()
 	// not fire for it: an AFTER trigger would write rows nothing tracks, and a
 	// BEFORE trigger that ignores the DELETE would leave the rows in memory
 	// while the shard is read from its file as well. A DELETE the application
-	// issues itself still fires them.
+	// issues itself still fires them. Each trigger is tried on its own: a
+	// BEFORE trigger that ignores a DELETE keeps SQLite from running the AFTER
+	// trigger for that row too.
 	const std::string audit =
 		"CREATE TRIGGER t_audit AFTER DELETE ON t BEGIN INSERT INTO audit(id) VALUES(OLD.id); END";
 	const std::string keep =
 		"CREATE TRIGGER t_keep BEFORE DELETE ON t WHEN OLD.v = 'hist' BEGIN SELECT RAISE(IGNORE); END";
 	std::string h("hist");
 	std::string l("live");
-	int n = -1;
+	for (const std::string& trigger: {audit, keep})
 	{
-		MemoryDB::Options off;
-		off.loadArchivedShards = false;
-		MemoryDB db(_dir, off);
-		db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
-		db << "CREATE TABLE audit(id INTEGER)", now;
-		db << audit, now;
-		db << keep, now;
-		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
-		db.sealActive();
-		db.flush(); // evicts shard 1
+		for (bool load: {false, true})
+		{
+			try { Poco::File(_dir).remove(true); } catch (...) {}
+			MemoryDB db(_dir, flushedByTest(load));
+			db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+			db << "CREATE TABLE audit(id INTEGER)", now;
+			db << trigger, now;
+			for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
+			db.sealActive();
+			db.flush(); // without loadArchivedShards, evicts shard 1
+			if (load)
+			{
+				std::vector<Poco::UInt32> ids = db.archivedShardIds();
+				assertTrue (ids.size() == 1);
+				db.deleteShard(ids[0]);
+			}
 
-		db << "SELECT count(*) FROM t", into(n), now;
-		assertTrue (n == 0);
-		db << "SELECT count(*) FROM audit", into(n), now;
-		assertTrue (n == 0);
-		db.attachAllArchived();
-		db << ("SELECT count(*) FROM " + db.historyView("t")), into(n), now;
-		assertTrue (n == 3);
-		db.detachAllArchived();
+			int n = -1;
+			db << "SELECT count(*) FROM t", into(n), now;
+			assertTrue (n == 0);
+			db << "SELECT count(*) FROM audit", into(n), now;
+			assertTrue (n == 0);
+			if (!load)
+			{
+				db.attachAllArchived();
+				db << ("SELECT count(*) FROM " + db.historyView("t")), into(n), now;
+				assertTrue (n == 3);
+				db.detachAllArchived();
+			}
 
-		db << "INSERT INTO t(v) VALUES(:v)", use(l), now;
-		db << "DELETE FROM t WHERE v = 'live'", now;
-		db << "SELECT count(*) FROM audit", into(n), now;
-		assertTrue (n == 1); // the application's own DELETE fires them
+			db << "INSERT INTO t(v) VALUES(:v)", use(l), now;
+			db << "DELETE FROM t WHERE v = 'live'", now;
+			db << "SELECT count(*) FROM audit", into(n), now;
+			assertTrue (n == (trigger == audit ? 1 : 0)); // the application's own DELETE fires it
+		}
 	}
-
-	try { Poco::File(_dir).remove(true); } catch (...) {}
-	MemoryDB::Options on;
-	on.loadArchivedShards = true;
-	MemoryDB db(_dir, on);
-	db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
-	db << "CREATE TABLE audit(id INTEGER)", now;
-	db << audit, now;
-	db << keep, now;
-	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
-	db.sealActive();
-	db.flush();
-	std::vector<Poco::UInt32> ids = db.archivedShardIds();
-	assertTrue (ids.size() == 1);
-	db.deleteShard(ids[0]);
-	db << "SELECT count(*) FROM t", into(n), now;
-	assertTrue (n == 0);
-	db << "SELECT count(*) FROM audit", into(n), now;
-	assertTrue (n == 0);
 }
 
 
