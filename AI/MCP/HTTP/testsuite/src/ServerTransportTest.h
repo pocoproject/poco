@@ -35,6 +35,7 @@ public:
 	void testRepeatedHeaders();
 	void testClientGoneCancels();
 	void testBodyBrokeOff();
+	void testBodyCannotBeRead();
 	void testParamHeaders();
 	void testEncodedWords();
 	void testDecodedHeadersRefused();

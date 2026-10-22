@@ -53,6 +53,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
 
@@ -223,6 +224,12 @@ namespace
 			start(new ServerRequestHandlerFactory(server, "/mcp", params), autoDecodeHeaders);
 		}
 
+		Endpoint(Server& server, const Poco::Timespan& timeout)
+			/// An endpoint whose HTTP server waits for a read at most timeout.
+		{
+			start(new ServerRequestHandlerFactory(server, "/mcp", ServerTransport::Params()), false, timeout);
+		}
+
 		explicit Endpoint(const FunctionHandler::Function& function, bool autoDecodeHeaders = false)
 		{
 			start(new FunctionFactory(function), autoDecodeHeaders);
@@ -264,12 +271,13 @@ namespace
 		}
 
 	private:
-		void start(Poco::Net::HTTPRequestHandlerFactory::Ptr pFactory, bool autoDecodeHeaders = false)
+		void start(Poco::Net::HTTPRequestHandlerFactory::Ptr pFactory, bool autoDecodeHeaders = false, const Poco::Timespan& timeout = Poco::Timespan())
 		{
 			Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
 			_port = socket.address().port();
 			Poco::Net::HTTPServerParams::Ptr pParams = new Poco::Net::HTTPServerParams;
 			pParams->setAutoDecodeHeaders(autoDecodeHeaders);
+			if (timeout.totalMicroseconds() > 0) pParams->setTimeout(timeout);
 			_pServer = std::make_unique<Poco::Net::HTTPServer>(pFactory, socket, pParams);
 			_pServer->start();
 		}
@@ -612,6 +620,31 @@ void ServerTransportTest::testBodyBrokeOff()
 	Poco::Net::HTTPResponse response;
 	response.read(stream);
 	assertEqual(400, static_cast<int>(response.getStatus()));
+}
+
+
+void ServerTransportTest::testBodyCannotBeRead()
+{
+	// A body that does not come within the timeout of the HTTP server gets
+	// 400, and the connection, whose request was not read whole, ends.
+	Server server;
+	buildServer(server);
+	Endpoint endpoint(server, Poco::Timespan(0, 500000));
+	const std::string body = request(Id(1), "tools/list");
+	std::ostringstream text;
+	text << "POST /mcp HTTP/1.1\r\nHost: 127.0.0.1\r\n";
+	for (const auto& header: headersOf("tools/list")) text << header.first << ": " << header.second << "\r\n";
+	text << "Content-Length: " << body.size() + 50 << "\r\n\r\n" << body;
+	const std::string bytes = text.str();
+	Poco::Net::StreamSocket socket(Poco::Net::SocketAddress("127.0.0.1", Poco::URI(endpoint.url()).getPort()));
+	socket.setReceiveTimeout(Poco::Timespan(10, 0));
+	socket.sendBytes(bytes.data(), static_cast<int>(bytes.size()));
+	// The rest of the body does not come, and the connection stays open.
+	Poco::Net::SocketStream stream(socket);
+	Poco::Net::HTTPResponse response;
+	response.read(stream);
+	assertEqual(400, static_cast<int>(response.getStatus()));
+	assertEqual(std::string("close"), response.get("Connection", ""));
 }
 
 
@@ -1140,6 +1173,19 @@ void ServerTransportTest::testConcurrentRequests()
 		std::atomic<int>& _failures;
 	};
 
+	// Tools are registered while the calls run, so that the locks of the
+	// server are exercised under TSan too.
+	std::atomic<bool> calling{true};
+	std::thread registrar([&server, &calling]()
+	{
+		int round = 0;
+		while (calling.load())
+		{
+			server.registerTool("route", "", parse("{\"type\":\"object\",\"properties\":{\"region\":{\"type\":\"string\",\"x-mcp-header\":\"Region\"}}}"), echo);
+			server.registerTool("extra-" + std::to_string(round++ % 10), "", nullptr, echo);
+			Poco::Thread::yield();
+		}
+	});
 	std::atomic<int> failures{0};
 	std::vector<std::unique_ptr<Caller>> callers;
 	std::vector<std::unique_ptr<Poco::Thread>> threads;
@@ -1150,6 +1196,8 @@ void ServerTransportTest::testConcurrentRequests()
 		threads.back()->start(*callers.back());
 	}
 	for (auto& pThread: threads) pThread->join();
+	calling = false;
+	registrar.join();
 	assertEqual(0, failures.load());
 }
 
@@ -1180,6 +1228,7 @@ CppUnit::Test* ServerTransportTest::suite()
 	CppUnit_addTest(pSuite, ServerTransportTest, testRepeatedHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testClientGoneCancels);
 	CppUnit_addTest(pSuite, ServerTransportTest, testBodyBrokeOff);
+	CppUnit_addTest(pSuite, ServerTransportTest, testBodyCannotBeRead);
 	CppUnit_addTest(pSuite, ServerTransportTest, testParamHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testEncodedWords);
 	CppUnit_addTest(pSuite, ServerTransportTest, testDecodedHeadersRefused);
