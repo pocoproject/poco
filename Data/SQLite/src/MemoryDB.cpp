@@ -1584,19 +1584,19 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 	_persist.begin();
 	try
 	{
-		for (const auto& d: deletes)
+		for (const auto& [table, where]: deletes)
 		{
-			_persist << ("DELETE FROM " + quoteIdent(d.first) + " WHERE " + d.second), now;
+			_persist << ("DELETE FROM " + quoteIdent(table) + " WHERE " + where), now;
 
 			// The shard is marked non-resident on the strength of this, so a
 			// row left behind would be read twice by the history view.
 			int left = 0;
-			_persist << ("SELECT count(*) FROM " + quoteIdent(d.first) + " WHERE " + d.second),
+			_persist << ("SELECT count(*) FROM " + quoteIdent(table) + " WHERE " + where),
 				into(left), now;
 			if (left != 0)
 			{
 				throw Poco::IllegalStateException("MemoryDB: " + Poco::NumberFormatter::format(left) +
-					" row(s) of table '" + d.first + "' remain in memory after their removal");
+					" row(s) of table '" + table + "' remain in memory after their removal");
 			}
 		}
 		_persist.commit();
@@ -2340,8 +2340,7 @@ void MemoryDB::onRowChange(int op, const char* table, Poco::Int64 row)
 	bool orphan = false;
 	if (!s->sealed)
 	{
-		auto lo = _activeLo.find(table);
-		orphan = lo != _activeLo.end() && row <= lo->second;
+		if (auto lo = _activeLo.find(table); lo != _activeLo.end()) orphan = (row <= lo->second);
 	}
 	if ((s->sealed && !s->resident) || orphan)
 	{
