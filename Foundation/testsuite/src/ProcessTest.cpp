@@ -215,6 +215,22 @@ void ProcessTest::testLaunchClearedEnvironment()
 	// Without the option, the child inherits the variables of this process.
 	assertEqual(std::string("inherited"), childValue("POCO_TEST_INHERITED", 0));
 #endif
+
+	// Without any variable given, the child has none.
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	ProcessHandle bare = Process::launch(name, {"-getenv", "PATH"}, nullptr, nullptr, nullptr, Process::Env(), Poco::PROCESS_CLEAR_ENVIRONMENT);
+	assertEqual(1, bare.wait());
+#elif defined(POCO_OS_FAMILY_UNIX) && (POCO_OS != POCO_OS_QNX)
+	// env is found through the default search path, and prints what it has.
+	Pipe outPipe;
+	ProcessHandle bare = Process::launch("env", Process::Args(), nullptr, &outPipe, nullptr, Process::Env(), Poco::PROCESS_CLEAR_ENVIRONMENT);
+	PipeInputStream istr(outPipe);
+	std::string output;
+	int c = istr.get();
+	while (c != -1) { output += static_cast<char>(c); c = istr.get(); }
+	assertEqual(0, bare.wait());
+	assertEqual(std::string(), output);
+#endif
 }
 
 
