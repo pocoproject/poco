@@ -578,6 +578,13 @@ void HTTPTest::testLostAnswerNotRepeated()
 	assertEqual(1u, static_cast<unsigned>(listClient.listTools().size()));
 	assertEqual(1u, static_cast<unsigned>(listClient.listTools().size()));
 	assertEqual(3, listHost.requests());
+	// It goes again as a new request, with an id of its own.
+	const std::vector<std::string> bodies = listHost.bodies();
+	assertEqual(3u, static_cast<unsigned>(bodies.size()));
+	const Object::Ptr pLost = parse(bodies[1]);
+	const Object::Ptr pAgain = parse(bodies[2]);
+	assertEqual(std::string("tools/list"), pAgain->getValue<std::string>("method"));
+	assertTrue(pLost->get("id") != pAgain->get("id"));
 }
 
 

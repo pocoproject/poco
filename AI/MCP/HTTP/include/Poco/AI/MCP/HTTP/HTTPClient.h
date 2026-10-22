@@ -65,9 +65,10 @@ class AIMCPHTTP_API HTTPClient: public Poco::AI::MCP::Client
 	///
 	/// The client keeps its session for later requests, and opens a new one
 	/// when the server has closed the kept connection. A request that fails
-	/// on a kept session is sent once more on a new one only when it cannot
-	/// have reached the server, or when it only reads (server/discover and the
-	/// lists): a tool call the server may already have run is not repeated.
+	/// on a kept session is sent once more on a new one, as a new request
+	/// with an id of its own, only when it cannot have reached the server, or
+	/// when it only reads (server/discover and the lists): a tool call the
+	/// server may already have run is not repeated.
 {
 public:
 	using RequestHook = std::function<void (Poco::Net::HTTPRequest& request)>;

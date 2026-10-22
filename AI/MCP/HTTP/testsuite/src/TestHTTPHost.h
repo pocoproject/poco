@@ -148,6 +148,13 @@ public:
 		_state.listedTools.push_back(entry);
 	}
 
+	std::vector<std::string> bodies() const
+		/// The bodies of the requests the host has read, in order.
+	{
+		Poco::FastMutex::ScopedLock lock(_state.mutex);
+		return _state.bodies;
+	}
+
 	Poco::Net::NameValueCollection lastHeaders() const
 		/// The headers of the last request.
 	{
@@ -172,6 +179,7 @@ private:
 		mutable Poco::FastMutex mutex;
 		Poco::Net::NameValueCollection lastHeaders;
 		std::vector<std::string> listedTools;
+		std::vector<std::string> bodies;
 		Poco::Event stopping{Poco::Event::EVENT_MANUALRESET};
 		Poco::Mutex activeMutex;
 		Poco::Condition idle;
@@ -220,6 +228,10 @@ private:
 
 			std::string body;
 			Poco::StreamCopier::copyToString(request.stream(), body);
+			{
+				Poco::FastMutex::ScopedLock lock(_state.mutex);
+				_state.bodies.push_back(body);
+			}
 
 			if (_state.fault == FAULT_DROP_SECOND && _state.requests.load() == 2)
 			{

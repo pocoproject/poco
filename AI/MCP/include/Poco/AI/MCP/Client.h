@@ -179,6 +179,11 @@ protected:
 		/// returned. A transport may drop tools it cannot call, or remember
 		/// what it needs to call them. Does nothing by default.
 
+	[[nodiscard]] Id nextId();
+		/// Returns an id no request of the client had yet, for a transport
+		/// that sends a request again as a new one. For exchange() only,
+		/// which call() calls with the lock this needs held.
+
 	[[nodiscard]] static bool isReply(const Poco::JSON::Object::Ptr& message, const Id& id);
 		/// Returns true if message is the reply to the request with the given
 		/// id: a message with that id that is not a request, or an error

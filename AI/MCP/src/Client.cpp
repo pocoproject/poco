@@ -143,6 +143,12 @@ int Client::getMaxInputRounds() const
 }
 
 
+Id Client::nextId()
+{
+	return Id(_nextId++);
+}
+
+
 bool Client::isReply(const Poco::JSON::Object::Ptr& message, const Id& id)
 {
 	if (message == nullptr || message->has("method")) return false;
@@ -184,7 +190,7 @@ Poco::JSON::Object::Ptr Client::call(const std::string& method, const Poco::JSON
 	Poco::FastMutex::ScopedLock lock(_callMutex);
 	for (int round = 1;; ++round)
 	{
-		const Id id(_nextId++);
+		const Id id = nextId();
 		const Poco::JSON::Object::Ptr pResponse = exchange(Request::make(id, method, pParams));
 		if (pResponse == nullptr)
 		{

@@ -257,7 +257,11 @@ Poco::JSON::Object::Ptr HTTPClient::exchange(const Poco::JSON::Object::Ptr& requ
 	Poco::JSON::Object::Ptr pReply = post(request, deadline, retry);
 	if (retry)
 	{
-		pReply = post(request, deadline, retry);
+		// As a new request, with an id of its own: the server may have the
+		// first one.
+		Poco::JSON::Object::Ptr pAgain = new Poco::JSON::Object(*request);
+		pAgain->set("id", nextId());
+		pReply = post(pAgain, deadline, retry);
 	}
 	return pReply;
 }
