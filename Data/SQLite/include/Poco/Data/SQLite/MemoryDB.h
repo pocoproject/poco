@@ -450,6 +450,8 @@ public:
 		/// Thread-safe (see attachArchived).
 
 private:
+	static constexpr int BUSY_RETRY_ATTEMPTS = 10; // a busy session() or alias is tried this often, 1 ms apart
+
 	enum class Removal
 	{
 		DONE,              // the rows are gone from the in-memory tables
@@ -546,6 +548,7 @@ private:
 	[[nodiscard]] ColumnCopy columnCopy(Session& s, const std::string& table, bool isVirtual = false); // cached by table name
 	void markTableDirty(const std::string& table);      // caller holds _stateMutex
 	ShardInfo* activeShard();                            // caller holds _stateMutex
+	ShardInfo* findShard(Poco::UInt32 shardId);          // caller holds _stateMutex; null if there is none
 	ShardInfo* owningShard(const std::string& table, Poco::Int64 row); // caller holds _stateMutex
 	void rebuildActiveLo();                              // caller holds _stateMutex
 	bool tryDetach(Poco::UInt32 shardId);                // caller holds _attachMutex

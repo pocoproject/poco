@@ -32,6 +32,7 @@
 #include <iterator>
 #include <mutex>
 #include <set>
+#include <type_traits>
 
 // Table classification is built on PRAGMA table_list (SQLite 3.37),
 // independently of POCO_ENABLE_SQLITE_VEC.
@@ -92,6 +93,23 @@ namespace
 		catch (...)
 		{
 			return "unknown exception";
+		}
+	}
+
+
+	template <typename Attempt>
+	void retryBriefly(int attempts, Attempt attempt)
+		// Calls attempt(last) until it returns true, at most attempts times, 1 ms
+		// apart. On the last call (last is true) the attempt gives up itself, under
+		// the locks it took, so that nothing changes between the try and giving up.
+		// The attempt takes its locks itself: none is held across the sleep.
+	{
+		static_assert(std::is_invocable_r_v<bool, Attempt&, bool>, "retryBriefly() requires a callable bool(bool)");
+		for (int n = 1; ; ++n)
+		{
+			const bool last = (n >= attempts);
+			if (attempt(last) || last) return;
+			Poco::Thread::sleep(1);
 		}
 	}
 
@@ -1410,28 +1428,21 @@ void MemoryDB::detachArchived(Poco::UInt32 shardId)
 	// force-detach, or detachAllArchived completes the DETACH.
 	// _attachMutex is released across the sleep so a deleteShard() waiting
 	// on it (while holding _flushMutex) does not stall the flush IO loop.
-	constexpr int maxAttempts = 10;
-	for (int attempt = 0; ; ++attempt)
+	retryBriefly(BUSY_RETRY_ATTEMPTS, [this, shardId](bool last)
 	{
+		Poco::Mutex::ScopedLock al(_attachMutex);
+		auto it = _attached.find(shardId);
+		if (it == _attached.end()) return true;
+		if (it->second > 1) { --it->second; return true; }
+		// last detacher (refcount 1) or completing a deferred detach (0)
+		if (tryDetach(shardId))
 		{
-			Poco::Mutex::ScopedLock al(_attachMutex);
-			auto it = _attached.find(shardId);
-			if (it == _attached.end()) return;
-			if (it->second > 1) { --it->second; return; }
-			// last detacher (refcount 1) or completing a deferred detach (0)
-			if (tryDetach(shardId))
-			{
-				_attached.erase(it);
-				return;
-			}
-			if (attempt + 1 >= maxAttempts)
-			{
-				it->second = 0; // defer the physical DETACH
-				return;
-			}
-		} // release _attachMutex before sleeping
-		Poco::Thread::sleep(1);
-	}
+			_attached.erase(it);
+			return true;
+		}
+		if (last) it->second = 0; // defer the physical DETACH
+		return false;
+	});
 }
 
 
@@ -1445,18 +1456,17 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 	bool resident = false;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
-		auto it = std::find_if(_shards.begin(), _shards.end(),
-			[shardId](const ShardInfo& s) { return s.id == shardId; });
+		const ShardInfo* shard = findShard(shardId);
 		// Idempotent on a vanished shard: a concurrent retention sweep (or
 		// another deleteShard) may have already dropped it between when the
 		// caller sampled shards() and now. Silently return rather than throw
 		// so user retention loops over a stale snapshot stay correct.
-		if (it == _shards.end()) return;
-		if (!it->sealed)
+		if (shard == nullptr) return;
+		if (!shard->sealed)
 			throw Poco::InvalidArgumentException("cannot delete the active shard; seal it first");
-		file = it->file;
-		ranges = it->ranges;
-		resident = it->resident;
+		file = shard->file;
+		ranges = shard->ranges;
+		resident = shard->resident;
 		for (const auto& s: _shards)
 		{
 			if (!s.sealed || s.id == shardId) continue;
@@ -1481,31 +1491,28 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 	// TableLockedException with the shard left whole, so retention skips it.
 	// Other errors propagate.
 	std::map<std::string, Poco::Int64> kept;
-	constexpr int maxAttempts = 10;
-	for (int attempt = 0; ; ++attempt)
+	retryBriefly(BUSY_RETRY_ATTEMPTS, [this, shardId, resident, &ranges, &floors, &kept](bool last)
 	{
+		Poco::Mutex::ScopedLock al(_attachMutex);
+		DbMutexGuard dbm(_memHandle);
+		const bool sessionBusy = resident && sqlite3_txn_state(_memHandle, "main") != SQLITE_TXN_NONE;
+		const bool attached = _attached.find(shardId) != _attached.end();
+		if (!sessionBusy && (!attached || tryDetach(shardId)))
 		{
-			Poco::Mutex::ScopedLock al(_attachMutex);
-			DbMutexGuard dbm(_memHandle);
-			const bool sessionBusy = resident && sqlite3_txn_state(_memHandle, "main") != SQLITE_TXN_NONE;
-			const bool attached = _attached.find(shardId) != _attached.end();
-			if (!sessionBusy && (!attached || tryDetach(shardId)))
-			{
-				_attached.erase(shardId);
-				// session() cannot have opened a transaction since the check
-				if (resident && !removeFromMemory(ranges, floors, kept))
-					throw Poco::IllegalStateException("MemoryDB: session() became busy under the connection mutex");
-				break;
-			}
-			if (attempt + 1 >= maxAttempts)
-			{
-				throw TableLockedException("MemoryDB: shard " + Poco::NumberFormatter::format(shardId) + (sessionBusy ?
-					" kept, its rows cannot be removed from memory while session() has a transaction open" :
-					" kept, it is attached and a statement is reading it"));
-			}
-		} // release the mutexes before sleeping
-		Poco::Thread::sleep(1);
-	}
+			_attached.erase(shardId);
+			// session() cannot have opened a transaction since the check
+			if (resident && !removeFromMemory(ranges, floors, kept))
+				throw Poco::IllegalStateException("MemoryDB: session() became busy under the connection mutex");
+			return true;
+		}
+		if (last)
+		{
+			throw TableLockedException("MemoryDB: shard " + Poco::NumberFormatter::format(shardId) + (sessionBusy ?
+				" kept, its rows cannot be removed from memory while session() has a transaction open" :
+				" kept, it is attached and a statement is reading it"));
+		}
+		return false;
+	});
 
 	int schemaVersion;
 	std::vector<std::string> schemaLog;
@@ -1669,11 +1676,10 @@ bool MemoryDB::evictShard(Poco::UInt32 shardId)
 	std::map<std::string, Poco::Int64> floors;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
-		auto it = std::find_if(_shards.begin(), _shards.end(),
-			[shardId](const ShardInfo& s) { return s.id == shardId; });
-		if (it == _shards.end() || !it->sealed || !it->resident || it->dirty || it->file.empty())
+		const ShardInfo* shard = findShard(shardId);
+		if (shard == nullptr || !shard->sealed || !shard->resident || shard->dirty || shard->file.empty())
 			return false;
-		ranges = it->ranges;
+		ranges = shard->ranges;
 		for (const auto& r: ranges)
 		{
 			auto lo = _activeLo.find(r.first);
@@ -1692,16 +1698,15 @@ bool MemoryDB::evictShard(Poco::UInt32 shardId)
 	bool changed = false;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
-		auto it = std::find_if(_shards.begin(), _shards.end(),
-			[shardId](const ShardInfo& s) { return s.id == shardId; });
-		if (it == _shards.end()) return false;
+		ShardInfo* shard = findShard(shardId);
+		if (shard == nullptr) return false;
 		if (removal == Removal::DONE)
 		{
-			it->resident = false;
+			shard->resident = false;
 			return true;
 		}
-		changed = (it->deferral != removal);
-		it->deferral = removal;
+		changed = (shard->deferral != removal);
+		shard->deferral = removal;
 	}
 
 	Poco::Logger& logger = Poco::Logger::get("Poco.Data.SQLite.MemoryDB");
@@ -1772,12 +1777,10 @@ std::size_t MemoryDB::deleteShards(const std::vector<Poco::UInt32>& ids)
 			bool first = false;
 			{
 				Poco::FastMutex::ScopedLock l(_stateMutex);
-				auto it = std::find_if(_shards.begin(), _shards.end(),
-					[id](const ShardInfo& s) { return s.id == id; });
-				if (it != _shards.end())
+				if (ShardInfo* shard = findShard(id); shard != nullptr)
 				{
-					first = !it->dropDeferred;
-					it->dropDeferred = true;
+					first = !shard->dropDeferred;
+					shard->dropDeferred = true;
 				}
 			}
 			Poco::Logger& logger = Poco::Logger::get("Poco.Data.SQLite.MemoryDB");
@@ -2533,6 +2536,14 @@ MemoryDB::ShardInfo* MemoryDB::activeShard()
 	for (auto& s: _shards)
 		if (!s.sealed) return &s;
 	return nullptr;
+}
+
+
+MemoryDB::ShardInfo* MemoryDB::findShard(Poco::UInt32 shardId)
+{
+	auto it = std::find_if(_shards.begin(), _shards.end(),
+		[shardId](const ShardInfo& s) { return s.id == shardId; });
+	return (it != _shards.end()) ? &*it : nullptr;
 }
 
 
