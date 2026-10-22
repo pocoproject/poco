@@ -52,7 +52,10 @@ Counter::Counter(const std::string& name, const Params& params, Registry* pRegis
 }
 
 
-Counter::~Counter() = default;
+Counter::~Counter()
+{
+	unregister();
+}
 
 
 double Counter::value() const

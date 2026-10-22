@@ -52,7 +52,10 @@ ThreadPoolCollector::ThreadPoolCollector(const std::string& name, const Poco::Th
 }
 
 
-ThreadPoolCollector::~ThreadPoolCollector() = default;
+ThreadPoolCollector::~ThreadPoolCollector()
+{
+	unregister();
+}
 
 
 void ThreadPoolCollector::exportTo(Exporter& exporter) const

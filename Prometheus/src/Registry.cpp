@@ -15,6 +15,7 @@
 #include "Poco/Prometheus/Registry.h"
 #include "Poco/Prometheus/Collector.h"
 #include "Poco/Exception.h"
+#include "Poco/Bugcheck.h"
 
 
 using namespace std::string_literals;
@@ -26,7 +27,17 @@ namespace Poco::Prometheus {
 Registry::Registry() = default;
 
 
-Registry::~Registry() = default;
+Registry::~Registry()
+{
+	try
+	{
+		clear();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
+}
 
 
 void Registry::registerCollector(Collector* pCollector)
@@ -38,8 +49,20 @@ void Registry::registerCollector(Collector* pCollector)
 	const auto it = _collectors.find(pCollector->name());
 	if (it == _collectors.end())
 	{
-		// CodeQL [cpp/local-address-stored]: collector lifetime managed by caller
-		_collectors[pCollector->name()] = pCollector;
+		Registry* pRegistry = nullptr;
+		if (!pCollector->_pRegistry.compare_exchange_strong(pRegistry, this))
+			throw Poco::ExistsException("collector registered with another registry"s, pCollector->name());
+
+		try
+		{
+			// CodeQL [cpp/local-address-stored]: collector lifetime managed by caller
+			_collectors[pCollector->name()] = pCollector;
+		}
+		catch (...)
+		{
+			pCollector->_pRegistry = nullptr;
+			throw;
+		}
 	}
 	else
 	{
@@ -52,7 +75,14 @@ void Registry::unregisterCollector(Collector* pCollector)
 {
 	poco_check_ptr (pCollector);
 
-	unregisterCollector(pCollector->name());
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	const auto it = _collectors.find(pCollector->name());
+	if (it != _collectors.end() && it->second == pCollector)
+	{
+		pCollector->_pRegistry = nullptr;
+		_collectors.erase(it);
+	}
 }
 
 
@@ -60,7 +90,12 @@ void Registry::unregisterCollector(const std::string& collectorName)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
-	_collectors.erase(collectorName);
+	const auto it = _collectors.find(collectorName);
+	if (it != _collectors.end())
+	{
+		it->second->_pRegistry = nullptr;
+		_collectors.erase(it);
+	}
 }
 
 
@@ -80,6 +115,10 @@ void Registry::clear()
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
+	for (const auto& p: _collectors)
+	{
+		p.second->_pRegistry = nullptr;
+	}
 	_collectors.clear();
 }
 

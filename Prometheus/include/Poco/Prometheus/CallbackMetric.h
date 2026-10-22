@@ -103,8 +103,11 @@ public:
 		setHelp(help);
 	}
 
-	~CallbackMetric() = default;
-		/// Destroys the CallbackMetric.
+	~CallbackMetric() override
+		/// Unregisters and destroys the CallbackMetric.
+	{
+		unregister();
+	}
 
 	using Metric::help;
 	CallbackMetric& help(const std::string& text)

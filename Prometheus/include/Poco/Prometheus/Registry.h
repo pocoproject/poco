@@ -37,31 +37,31 @@ class Prometheus_API Registry
 	/// The Registry internally stores plain pointers to Collector
 	/// objects. Collector objects automatically register themselves
 	/// with the default Registry (unless a nullptr is passed to the
-	/// constructor's pRegistry parameter), but do not automatically
-	/// unregister. This brings the danger of dangling pointers if
-	/// Collector instances are destroyed without being explicitly
-	/// unregistered first. In most practical cases this is not an
-	/// issue as Collector instances will be alive for the entire
-	/// run time of the process. However, it can be an issue if
-	/// Collector instances are created and destroyed dynamically
-	/// during the run time of the process.
+	/// constructor's pRegistry parameter), and unregister themselves
+	/// when they are destroyed. A Registry that is destroyed before
+	/// its Collectors removes them first, so that they do not
+	/// refer to it afterwards.
 {
 public:
 	Registry();
 		/// Creates the Registry.
 
 	~Registry();
-		/// Destroys the Registry.
+		/// Removes all Collector instances and destroys the Registry.
 
 	void registerCollector(Collector* pCollector);
 		/// Registers a Collector with the Registry.
 		///
 		/// An attempt to register a collector with the name
-		/// of an already registered collector will fail with
-		/// a Poco::ExistsException.
+		/// of an already registered collector, or a collector
+		/// that is registered with another Registry, will fail
+		/// with a Poco::ExistsException.
 
 	void unregisterCollector(Collector* pCollector);
 		/// Removes a Collector from the Registry.
+		///
+		/// Does nothing if the given collector is not registered
+		/// with the Registry.
 
 	void unregisterCollector(const std::string& collectorName);
 		/// Removes the Collector with the given name from the Registry.

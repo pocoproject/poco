@@ -86,7 +86,10 @@ Histogram::Histogram(const std::string& name, const Params& params, Registry* pR
 }
 
 
-Histogram::~Histogram() = default;
+Histogram::~Histogram()
+{
+	unregister();
+}
 
 
 Histogram& Histogram::buckets(const std::vector<double>& bucketBounds)

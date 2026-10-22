@@ -46,6 +46,13 @@ Breaking Changes:
 - On Windows, the environment variables given to Poco::Process::launch() are added to the
   environment of the parent instead of replacing it. A caller that wants the child to get only
   those variables passes PROCESS_CLEAR_ENVIRONMENT.
+- Poco::Prometheus::Collector unregisters itself from its Registry when it is destroyed, and a
+  Registry that is destroyed first removes its collectors. Collector has a new data member, which
+  changes its layout and that of every class derived from it: recompile against the new headers.
+  Registry::registerCollector() throws Poco::ExistsException for a collector that is registered
+  with another Registry, and Registry::unregisterCollector(Collector*) removes only that object,
+  not another collector with the same name. A class derived from Collector must call unregister()
+  at the start of its destructor, before any member that exportTo() uses is destroyed.
 
 Bundled Third-Party Library Upgrades:
 

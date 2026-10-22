@@ -20,7 +20,10 @@
 namespace Poco::Prometheus {
 
 
-IntCounter::~IntCounter() = default;
+IntCounter::~IntCounter()
+{
+	unregister();
+}
 
 
 void IntCounter::exportTo(Exporter& exporter) const
