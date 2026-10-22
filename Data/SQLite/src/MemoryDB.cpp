@@ -1676,6 +1676,11 @@ void MemoryDB::evictSealedShards()
 			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").warning(
 				"shard %u kept in memory, removing its rows failed: %s", id, e.displayText());
 		}
+		catch (const std::exception& e)
+		{
+			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").warning(
+				"shard %u kept in memory, removing its rows failed: %s", id, std::string(e.what()));
+		}
 	}
 }
 
@@ -2395,8 +2400,25 @@ void MemoryDB::onTimer(Poco::Timer&)
 	}
 	else if (_retryPending.load(std::memory_order_acquire))
 	{
-		try { retryDeferredRemovals(); }
-		catch (...) {}
+		try
+		{
+			retryDeferredRemovals();
+		}
+		catch (const Poco::Exception& e)
+		{
+			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").warning(
+				"retrying the deferred shard removals failed, the next flush tries again: %s", e.displayText());
+		}
+		catch (const std::exception& e)
+		{
+			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").warning(
+				"retrying the deferred shard removals failed, the next flush tries again: %s", std::string(e.what()));
+		}
+		catch (...)
+		{
+			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").warning(
+				"retrying the deferred shard removals failed, the next flush tries again");
+		}
 	}
 }
 
@@ -2416,7 +2438,7 @@ void MemoryDB::retryDeferredRemovals()
 	Poco::Mutex::ScopedLock fl(_flushMutex);
 	_retryPending.store(false, std::memory_order_release);
 	evictSealedShards();
-	try { enforceRetention(); } catch (...) {}
+	enforceRetention(); // an error is logged by onTimer()
 }
 
 
