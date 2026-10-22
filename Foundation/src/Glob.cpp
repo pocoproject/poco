@@ -98,54 +98,63 @@ void Glob::glob(const Path& pathPattern, const Path& basePath, std::set<std::str
 
 bool Glob::match(TextIterator& itp, const TextIterator& endp, TextIterator& its, const TextIterator& ends)
 {
-	while (itp != endp)
+	// After a mismatch, only the last '*' takes one more subject character. The last '*'
+	// can take any characters that an earlier one could, so going back to an earlier '*'
+	// finds no other match and makes the time exponential in the number of '*'.
+	TextIterator itpAfterStar(endp);
+	TextIterator itsAfterStar(ends);
+	while (its != ends)
 	{
-		if (its == ends)
+		// The element matches unless the pattern has ended or a case below finds a mismatch.
+		bool matched = itp != endp;
+		if (matched)
 		{
-			while (itp != endp && *itp == '*') ++itp;
-			break;
-		}
-		switch (*itp)
-		{
-		case '?':
-			++itp; ++its;
-			break;
-		case '*':
-			if (++itp != endp)
+			switch (*itp)
 			{
-				while (its != ends && !matchAfterAsterisk(itp, endp, its, ends)) ++its;
-				return its != ends;
-			}
-			return true;
-		case '[':
-			if (++itp != endp)
-			{
-				bool invert = *itp == '!';
-				if (invert) ++itp;
-				if (itp != endp)
+			case '?':
+				++itp; ++its;
+				break;
+			case '*':
+				if (++itp == endp) return true;
+				itpAfterStar = itp;
+				itsAfterStar = its;
+				break;
+			case '[':
+				if (++itp != endp)
 				{
-					bool mtch = matchSet(itp, endp, *its++);
-					if ((invert && mtch) || (!invert && !mtch)) return false;
-					break;
+					bool invert = *itp == '!';
+					if (invert) ++itp;
+					if (itp != endp)
+					{
+						bool mtch = matchSet(itp, endp, *its++);
+						if ((invert && mtch) || (!invert && !mtch)) matched = false;
+						break;
+					}
+				}
+				throw SyntaxException("bad range syntax in glob pattern");
+			case '\\':
+				if (++itp == endp) throw SyntaxException("backslash must be followed by character in glob pattern");
+				[[fallthrough]];
+			default:
+				if (_options & GLOB_CASELESS)
+					matched = Unicode::toLower(*itp) == Unicode::toLower(*its);
+				else
+					matched = *itp == *its;
+				if (matched)
+				{
+					++itp; ++its;
 				}
 			}
-			throw SyntaxException("bad range syntax in glob pattern");
-		case '\\':
-			if (++itp == endp) throw SyntaxException("backslash must be followed by character in glob pattern");
-			// fallthrough
-		default:
-			if (_options & GLOB_CASELESS)
-			{
-				if (Unicode::toLower(*itp) != Unicode::toLower(*its)) return false;
-			}
-			else
-			{
-				if (*itp != *its) return false;
-			}
-			++itp; ++its;
+		}
+		if (!matched)
+		{
+			if (itpAfterStar == endp) return false;
+			itp = itpAfterStar;
+			its = ++itsAfterStar;
 		}
 	}
-	return itp == endp && its == ends;
+	while (itp != endp && *itp == '*') ++itp;
+	return itp == endp;
 }
 
 

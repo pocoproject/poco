@@ -85,7 +85,7 @@ private:
 	int         _maxAlloc;
 	int         _allocated;
 	BlockVec    _blocks;
-	FastMutex   _mutex;
+	mutable FastMutex _mutex;
 };
 
 
@@ -305,8 +305,9 @@ public:
 			if(_firstBlock == nullptr) resize();
 			ret = _firstBlock;
 			_firstBlock = _firstBlock->_memory.next;
+			// under the mutex, because resize() reads and writes _available in two steps
+			--_available;
 		}
-		--_available;
 		return ret;
 	}
 
@@ -320,8 +321,8 @@ public:
 	{
 		if (!ptr) return;
 		reinterpret_cast<P*>(ptr)->~P();
-		++_available;
 		ScopedLock l(_mutex);
+		++_available;
 		_firstBlock = new (ptr) Block(_firstBlock);
 	}
 
@@ -332,13 +333,14 @@ public:
 	}
 
 	[[nodiscard]] std::size_t allocated() const
-		/// Returns the total amount of memory allocated, in bytes.
+		/// Returns the total number of blocks allocated.
 	{
+		ScopedLock l(_mutex);
 		return _buckets.size() * _blocksPerBucket;
 	}
 
 	[[nodiscard]] std::size_t available() const
-		/// Returns currently available amount of memory in bytes.
+		/// Returns the number of currently available blocks.
 	{
 		return _available;
 	}
@@ -393,12 +395,14 @@ inline std::size_t MemoryPool::blockSize() const
 
 inline int MemoryPool::allocated() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _allocated;
 }
 
 
 inline int MemoryPool::available() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return (int) _blocks.size();
 }
 

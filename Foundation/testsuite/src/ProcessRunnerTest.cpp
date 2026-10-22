@@ -30,7 +30,7 @@
 
 namespace
 {
-	int changeDir(const char* path)
+	[[nodiscard]] int changeDir(const char* path)
 	{
 #if defined(POCO_OS_FAMILY_WINDOWS)
 		return _chdir(path);
@@ -285,7 +285,7 @@ void ProcessRunnerTest::testProcessRunner()
 
 	// non-existent executable with no PID file created
 	{
-		std::string cmd = "nonexistent_123-xyz";
+		std::string missingCmd = "nonexistent_123-xyz";
 		std::vector<std::string> args;
 		char c = Path::separator();
 		std::string pidFile = Poco::format("run%c%s.pid", c, name);
@@ -293,7 +293,7 @@ void ProcessRunnerTest::testProcessRunner()
 			std::unique_ptr<ProcessRunner> pr;
 			try
 			{
-				pr.reset(new ProcessRunner(cmd, args));
+				pr.reset(new ProcessRunner(missingCmd, args));
 				failmsg("ProcessRunner should throw an exception.");
 			} catch(const Poco::FileException&) {}
 		}
@@ -302,7 +302,7 @@ void ProcessRunnerTest::testProcessRunner()
 
 	// non-existent executable with PID file created
 	{
-		std::string cmd = "nonexistent_123-xyz";
+		std::string missingCmd = "nonexistent_123-xyz";
 		std::vector<std::string> args;
 		char c = Path::separator();
 		std::string pidFile = Poco::format("run%c%s.pid", c, name);
@@ -311,7 +311,7 @@ void ProcessRunnerTest::testProcessRunner()
 			std::unique_ptr<ProcessRunner> pr;
 			try
 			{
-				pr.reset(new ProcessRunner(cmd, args));
+				pr.reset(new ProcessRunner(missingCmd, args));
 				failmsg("ProcessRunner should throw an exception.");
 			} catch(const Poco::FileException&) {}
 		}
@@ -417,6 +417,11 @@ void ProcessRunnerTest::testKillTreeWithChild()
 	args.push_back(std::string("--pidfile=").append(pidFile));
 	args.push_back(std::string("--spawn-child=").append(childPidFile));
 
+	// A child PID file left by an earlier run would end the wait for the
+	// child PID at once, with the PID of a process that is gone.
+	File cf(childPidFile);
+	if (cf.exists()) cf.remove();
+
 	{
 		ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT | PROCESS_KILL_TREE, 10, false);
 		assertFalse (pr.running());
@@ -426,16 +431,18 @@ void ProcessRunnerTest::testKillTreeWithChild()
 			checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
 		assertTrue (pr.running());
 
-		// Wait for child PID file to appear
-		sw.restart();
-		while (!File(childPidFile).exists())
-			checkTimeout(sw, "Waiting for child PID file", 5000, __LINE__);
-
-		// Read child PID
+		// Wait for the child PID; the child creates its PID file before
+		// it writes the PID into it, so the file can be empty at first.
 		ProcessRunner::PID childPid = 0;
+		sw.restart();
+		while (childPid == 0)
 		{
-			FileInputStream fis(childPidFile);
-			fis >> childPid;
+			checkTimeout(sw, "Waiting for child PID", 5000, __LINE__);
+			if (File(childPidFile).exists())
+			{
+				FileInputStream fis(childPidFile);
+				fis >> childPid;
+			}
 		}
 		assertTrue (childPid > 0);
 		assertTrue (Process::isRunning(childPid));
@@ -443,7 +450,7 @@ void ProcessRunnerTest::testKillTreeWithChild()
 		ProcessRunner::PID parentPid = pr.pid();
 		assertTrue (parentPid > 0);
 
-		// Stop with PROCESS_KILL_TREE — should kill both parent and child
+		// Stop with PROCESS_KILL_TREE - should kill both parent and child
 		pr.stop();
 		sw.restart();
 		while (pr.running())
@@ -464,7 +471,6 @@ void ProcessRunnerTest::testKillTreeWithChild()
 	//  child's PID file is managed by child's PIDFile RAII)
 	assertFalse (File(pidFile).exists());
 	// Child PID file may still exist if child was killed before PIDFile destructor ran
-	File cf(childPidFile);
 	if (cf.exists()) cf.remove();
 #endif
 }
@@ -498,7 +504,7 @@ void ProcessRunnerTest::testPathResolution()
 	{
 		// bare command name found via PATH should resolve and run
 		{
-			changeDir(tmpDir.c_str());
+			assertEqual (0, changeDir(tmpDir.c_str()));
 			ProcessRunner pr(name, {}, "", ProcessRunner::NO_OUT, 10, false, {});
 			pr.start();
 			Stopwatch sw; sw.start();
@@ -511,7 +517,7 @@ void ProcessRunnerTest::testPathResolution()
 		// shadow the real executable on PATH
 		{
 			File(tmpDir + name).createDirectories();
-			changeDir(tmpDir.c_str());
+			assertEqual (0, changeDir(tmpDir.c_str()));
 			ProcessRunner pr(name, {}, "", ProcessRunner::NO_OUT, 10, false, {});
 			pr.start();
 			Stopwatch sw; sw.start();
@@ -522,14 +528,16 @@ void ProcessRunnerTest::testPathResolution()
 	}
 	catch (...)
 	{
-		changeDir(savedCwd.c_str());
+		// Report the original failure, not a failure to restore the directory.
+		(void) changeDir(savedCwd.c_str());
 		Environment::set("PATH", savedPath);
 		File(tmpDir).remove(true);
 		throw;
 	}
-	changeDir(savedCwd.c_str());
+	const int restored = changeDir(savedCwd.c_str());
 	Environment::set("PATH", savedPath);
 	File(tmpDir).remove(true);
+	assertEqual (0, restored);
 }
 
 

@@ -17,6 +17,8 @@
 #include <vector>
 #include <cstring>
 #include <iostream>
+#include <atomic>
+#include <thread>
 
 
 using Poco::MemoryPool;
@@ -167,6 +169,35 @@ struct CustomGrandChild: public CustomChild1, CustomChild2
 	int l;
 };
 
+constexpr int THREAD_COUNT = 4;
+constexpr int ITERATIONS = 1000;
+constexpr int BLOCKS_PER_ITERATION = 8;
+
+template <typename Work, typename Observe>
+bool observeWhileRunning(Work work, Observe observe)
+	/// Runs work in THREAD_COUNT threads and calls observe until all of them
+	/// have finished. Returns false if any call of observe returned false.
+{
+	std::atomic<int> running{THREAD_COUNT};
+	std::vector<std::thread> threads;
+	threads.reserve(THREAD_COUNT);
+	for (int i = 0; i < THREAD_COUNT; ++i)
+	{
+		threads.emplace_back([&work, &running]()
+		{
+			work();
+			--running;
+		});
+	}
+	bool consistent = true;
+	while (running > 0)
+	{
+		consistent = observe() && consistent;
+	}
+	for (auto& t: threads) t.join();
+	return consistent;
+}
+
 }
 
 
@@ -232,6 +263,62 @@ void MemoryPoolTest::testFastMemoryPool()
 	assert (strlen(pC) == elements - 1);
 	assert (std::strcmp(pC, pStr) == 0);
 	fastArrayPool.release(pC);
+}
+
+
+void MemoryPoolTest::testMemoryPoolObserversDuringGetAndRelease()
+{
+	constexpr std::size_t BLOCK_SIZE = 32;
+	MemoryPool pool(BLOCK_SIZE);
+	const bool consistent = observeWhileRunning(
+		[&pool]()
+		{
+			std::vector<void*> blocks(BLOCKS_PER_ITERATION);
+			for (int i = 0; i < ITERATIONS; ++i)
+			{
+				for (auto& p: blocks) p = pool.get();
+				for (auto* p: blocks) pool.release(p);
+			}
+		},
+		[&pool]()
+		{
+			// available() first: a later allocated() can only be larger
+			const int available = pool.available();
+			const int allocated = pool.allocated();
+			return available <= allocated && allocated <= THREAD_COUNT * BLOCKS_PER_ITERATION;
+		});
+	assertTrue (consistent);
+	assertEqual (pool.allocated(), pool.available());
+}
+
+
+void MemoryPoolTest::testFastMemoryPoolObserversDuringGetAndRelease()
+{
+	// the smallest bucket that FastMemoryPool accepts, so that get() calls resize() as often as possible
+	// while the other threads release blocks
+	constexpr std::size_t BLOCKS_PER_BUCKET = 2;
+	Poco::FastMemoryPool<int> pool(BLOCKS_PER_BUCKET);
+	std::size_t lastAllocated = 0;
+	const bool consistent = observeWhileRunning(
+		[&pool]()
+		{
+			std::vector<int*> blocks(BLOCKS_PER_ITERATION);
+			for (int i = 0; i < ITERATIONS; ++i)
+			{
+				for (auto& p: blocks) p = new (pool.get()) int(i);
+				for (auto* p: blocks) pool.release(p);
+			}
+		},
+		[&pool, &lastAllocated]()
+		{
+			// buckets are never freed, so allocated() never decreases
+			const std::size_t allocated = pool.allocated();
+			const bool grown = allocated >= lastAllocated;
+			lastAllocated = allocated;
+			return grown;
+		});
+	assertTrue (consistent);
+	assertEqual (pool.allocated(), pool.available());
 }
 
 
@@ -304,6 +391,8 @@ CppUnit::Test* MemoryPoolTest::suite()
 
 	CppUnit_addTest(pSuite, MemoryPoolTest, testMemoryPool);
 	CppUnit_addTest(pSuite, MemoryPoolTest, testFastMemoryPool);
+	CppUnit_addTest(pSuite, MemoryPoolTest, testMemoryPoolObserversDuringGetAndRelease);
+	CppUnit_addTest(pSuite, MemoryPoolTest, testFastMemoryPoolObserversDuringGetAndRelease);
 	//CppUnit_addTest(pSuite, MemoryPoolTest, memoryPoolBenchmark);
 
 	return pSuite;

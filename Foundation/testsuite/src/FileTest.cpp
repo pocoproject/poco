@@ -1108,9 +1108,9 @@ void FileTest::testGetExecutablePathDirectoryShadow()
 	try
 	{
 #if defined(POCO_OS_FAMILY_WINDOWS)
-		_chdir(tmpDir.c_str());
+		assertEqual (0, _chdir(tmpDir.c_str()));
 #else
-		chdir(tmpDir.c_str());
+		assertEqual (0, chdir(tmpDir.c_str()));
 #endif
 		std::string resolved = File(exeName).getExecutablePath();
 		assertFalse (resolved.empty());
@@ -1119,17 +1119,17 @@ void FileTest::testGetExecutablePathDirectoryShadow()
 	catch (...)
 	{
 #if defined(POCO_OS_FAMILY_WINDOWS)
-		_chdir(savedCwd.c_str());
+		assertEqual (0, _chdir(savedCwd.c_str()));
 #else
-		chdir(savedCwd.c_str());
+		assertEqual (0, chdir(savedCwd.c_str()));
 #endif
 		File(tmpDir).remove(true);
 		throw;
 	}
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	_chdir(savedCwd.c_str());
+	assertEqual (0, _chdir(savedCwd.c_str()));
 #else
-	chdir(savedCwd.c_str());
+	assertEqual (0, chdir(savedCwd.c_str()));
 #endif
 	File(tmpDir).remove(true);
 }
@@ -1144,7 +1144,7 @@ void FileTest::testGetExecutablePathRelative()
 	TemporaryFile tmpDir;
 	tmpDir.createDirectories();
 	std::string linkPath = tmpDir.path() + "/myls";
-	symlink(lsPath.c_str(), linkPath.c_str());
+	assertEqual (0, symlink(lsPath.c_str(), linkPath.c_str()));
 	File f(linkPath);
 	std::string execPath = f.getExecutablePath();
 	assertFalse (execPath.empty());

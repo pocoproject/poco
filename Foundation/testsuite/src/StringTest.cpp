@@ -1444,7 +1444,7 @@ void StringTest::benchmarkStrToInt()
 
 	constexpr int N = 1000000;
 	Poco::Stopwatch sw;
-	static volatile int gSink = 0;
+	static volatile unsigned gSink = 0;
 
 	std::mt19937 rng(42);
 	std::vector<std::string> smallStrs(N), decStrs(N), hexStrs(N), hexPrefStrs(N);
@@ -1603,7 +1603,7 @@ void StringTest::benchmarkStrToFloat()
 
 	constexpr int N = 1000000;
 	Poco::Stopwatch sw;
-	static volatile int gSink = 0;
+	static volatile unsigned gSink = 0;
 
 	std::mt19937 rng(42);
 	std::vector<double> dvals(N);

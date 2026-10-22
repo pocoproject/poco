@@ -26,6 +26,8 @@ public:
 
 	void testMemoryPool();
 	void testFastMemoryPool();
+	void testMemoryPoolObserversDuringGetAndRelease();
+	void testFastMemoryPoolObserversDuringGetAndRelease();
 	void memoryPoolBenchmark();
 
 	void setUp();
