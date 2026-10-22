@@ -23,6 +23,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Thread.h"
 #include "Poco/Logger.h"
+#include "Poco/Format.h"
 #include "Poco/Exception.h"
 #include <sqlite3.h>
 #include <algorithm>
@@ -1543,14 +1544,17 @@ bool MemoryDB::removeFromMemory(const std::map<std::string, std::pair<Poco::Int6
 	const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept)
 {
 	DbMutexGuard dbm(_memHandle);
-	return removeRanges(ranges, floors, true, kept) != Removal::SESSION_BUSY;
+	std::string atRisk; // stays empty: with keepRows a row is kept instead
+	return removeRanges(ranges, floors, true, kept, atRisk) != Removal::SESSION_BUSY;
 }
 
 
 MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
-	const std::map<std::string, Poco::Int64>& floors, bool keepRows, std::map<std::string, Poco::Int64>& kept)
+	const std::map<std::string, Poco::Int64>& floors, bool keepRows, std::map<std::string, Poco::Int64>& kept,
+	std::string& atRisk)
 {
 	kept.clear();
+	atRisk.clear();
 	if (ranges.empty()) return Removal::DONE;
 
 	// The rows are deleted on _persist so the update and trace hooks on
@@ -1605,6 +1609,7 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 					if (!keepRows)
 					{
 						kept.clear();
+						atRisk = t;
 						return Removal::NUMBERING_AT_RISK;
 					}
 					// A newer shard may hold an empty range (floor, floor] of the
@@ -1683,15 +1688,39 @@ bool MemoryDB::evictShard(Poco::UInt32 shardId)
 	}
 
 	std::map<std::string, Poco::Int64> kept;
-	const Removal removal = removeRanges(ranges, floors, false, kept);
+	std::string atRisk;
+	const Removal removal = removeRanges(ranges, floors, false, kept, atRisk);
 	if (removal == Removal::SESSION_BUSY) _retryPending.store(true, std::memory_order_release);
-	if (removal != Removal::DONE) return false;
 
-	Poco::FastMutex::ScopedLock l(_stateMutex);
-	auto it = std::find_if(_shards.begin(), _shards.end(),
-		[shardId](const ShardInfo& s) { return s.id == shardId; });
-	if (it != _shards.end()) it->resident = false;
-	return true;
+	// A shard kept in memory is reported once per reason, so that an operator
+	// sees when memory is not bounded; the flushes that keep it again are
+	// reported at debug level only.
+	bool changed = false;
+	{
+		Poco::FastMutex::ScopedLock l(_stateMutex);
+		auto it = std::find_if(_shards.begin(), _shards.end(),
+			[shardId](const ShardInfo& s) { return s.id == shardId; });
+		if (it == _shards.end()) return false;
+		if (removal == Removal::DONE)
+		{
+			it->resident = false;
+			return true;
+		}
+		changed = (it->deferral != removal);
+		it->deferral = removal;
+	}
+
+	Poco::Logger& logger = Poco::Logger::get("Poco.Data.SQLite.MemoryDB");
+	if (!changed && !logger.debug()) return false;
+	const std::string text = (removal == Removal::SESSION_BUSY) ?
+		Poco::format("shard %u stays in memory: a statement on session() has a transaction open; "
+			"it leaves memory once the session is free", shardId) :
+		Poco::format("shard %u stays in memory with the rows of all its tables: table '%s' has no row "
+			"in the active shard yet, and the shard's rows carry its numbering; it leaves memory once "
+			"'%s' gets a new row", shardId, atRisk, atRisk);
+	if (changed) logger.information(text);
+	else logger.debug(text);
+	return false;
 }
 
 
@@ -1745,7 +1774,22 @@ std::size_t MemoryDB::deleteShards(const std::vector<Poco::UInt32>& ids)
 		catch (const TableLockedException& e)
 		{
 			_retryPending.store(true, std::memory_order_release);
-			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").information(e.message() + "; retried later");
+			// Retried at every timer tick while session() stays busy: reported
+			// once per shard, the retries at debug level only.
+			bool first = false;
+			{
+				Poco::FastMutex::ScopedLock l(_stateMutex);
+				auto it = std::find_if(_shards.begin(), _shards.end(),
+					[id](const ShardInfo& s) { return s.id == id; });
+				if (it != _shards.end())
+				{
+					first = !it->dropDeferred;
+					it->dropDeferred = true;
+				}
+			}
+			Poco::Logger& logger = Poco::Logger::get("Poco.Data.SQLite.MemoryDB");
+			if (first) logger.information(e.message() + "; retried later");
+			else if (logger.debug()) logger.debug(e.message() + "; retried later");
 		}
 	}
 	return dropped;

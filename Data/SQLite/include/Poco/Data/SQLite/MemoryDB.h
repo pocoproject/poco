@@ -156,7 +156,9 @@ public:
 			/// seals it or at a later one if session() is busy then, or if a table
 			/// without AUTOINCREMENT has no row in the active shard yet (its next row is
 			/// numbered after the newest row in memory, which must stay above the sealed
-			/// ones). Sealed rows stay on disk and are read on demand (the SQLite page
+			/// ones). One such table keeps the rows of every table of that shard in memory;
+			/// a shard that stays is logged once per reason, at information level.
+			/// Sealed rows stay on disk and are read on demand (the SQLite page
 			/// cache handles paging transparently when they are attached via
 			/// attachArchived()/historyView()). Rows that have left memory are read-only,
 			/// as after a reopen: an UPDATE or DELETE on the base table no longer finds
@@ -427,6 +429,14 @@ public:
 		/// Thread-safe (see attachArchived).
 
 private:
+	enum class Removal
+	{
+		DONE,              // the rows are gone from the in-memory tables
+		SESSION_BUSY,      // nothing deleted: session() has a transaction open
+		NUMBERING_AT_RISK  // nothing deleted: a table without AUTOINCREMENT would be left
+		                   // with no row above the sealed ranges that stay
+	};
+
 	struct ShardInfo
 	{
 		Poco::UInt32    id = 0;
@@ -440,6 +450,8 @@ private:
 		bool            resident = true; // its rows are in the in-memory database: the active
 		                                 // shard, every shard with loadArchivedShards, and a
 		                                 // sealed shard until evictSealedShards() removes them
+		Removal         deferral = Removal::DONE; // why its eviction was last put off; logged once per reason
+		bool            dropDeferred = false;     // its drop was put off, and that was logged
 		std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges; // table -> (lo, hi]
 	};
 
@@ -528,22 +540,16 @@ private:
 		// moves a shard file written by doFlush() into place; a sealed shard that
 		// is attached is detached, replaced and attached again under the
 		// connection mutex. caller holds _flushMutex
-	enum class Removal
-	{
-		DONE,              // the rows are gone from the in-memory tables
-		SESSION_BUSY,      // nothing deleted: session() has a transaction open
-		NUMBERING_AT_RISK  // nothing deleted: a table without AUTOINCREMENT would be left
-		                   // with no row above the sealed ranges that stay
-	};
 	[[nodiscard]] Removal removeRanges(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
 		const std::map<std::string, Poco::Int64>& floors, bool keepRows,
-		std::map<std::string, Poco::Int64>& kept);
+		std::map<std::string, Poco::Int64>& kept, std::string& atRisk);
 		// deletes the rowid ranges (table -> (lo, hi]) from the in-memory tables.
 		// floors: table -> the end of the newest sealed shard that keeps its range.
 		// A table without AUTOINCREMENT numbers its next row after the newest row
 		// in memory, so one must stay above that end. When none would: with
 		// keepRows the range's newest row is left in place and reported in kept
-		// (table -> rowid), without keepRows nothing is deleted.
+		// (table -> rowid), without keepRows nothing is deleted and atRisk names
+		// the table.
 		// caller holds _flushMutex and the connection mutex (DbMutexGuard)
 	[[nodiscard]] bool removeFromMemory(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
 		const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept);

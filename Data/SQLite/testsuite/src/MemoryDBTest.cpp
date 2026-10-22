@@ -40,6 +40,7 @@
 #include <random>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 
@@ -68,8 +69,8 @@ namespace
 
 
 	class LogCapture
-		/// Collects what a logger writes for as long as it lives, then gives
-		/// the logger its channel back.
+		/// Collects everything a logger writes, at any level, for as long as it
+		/// lives, then gives the logger its channel and level back.
 	{
 	public:
 		LogCapture() = delete;
@@ -80,8 +81,10 @@ namespace
 		LogCapture(LogCapture&&) = delete;
 		LogCapture& operator = (LogCapture&&) = delete;
 
-		[[nodiscard]] std::size_t count(const std::string& text) const;
-			/// Returns the number of messages written so far that contain text.
+		[[nodiscard]] std::size_t count(const std::string& text,
+			Poco::Message::Priority lowest = Poco::Message::PRIO_TRACE) const;
+			/// Returns the number of messages written so far that contain text,
+			/// at priority lowest or a more severe one.
 
 	private:
 		class Collector: public Poco::Channel
@@ -95,15 +98,16 @@ namespace
 			Collector& operator = (Collector&&) = delete;
 
 			void log(const Poco::Message& msg) override;
-			[[nodiscard]] std::size_t count(const std::string& text) const;
+			[[nodiscard]] std::size_t count(const std::string& text, Poco::Message::Priority lowest) const;
 
 		private:
 			mutable std::mutex _mutex;
-			std::vector<std::string> _texts;
+			std::vector<std::pair<Poco::Message::Priority, std::string>> _messages;
 		};
 
 		Poco::Logger& _logger;
 		Poco::Channel::Ptr _previous;
+		int _previousLevel;
 		Poco::AutoPtr<Collector> _channel;
 	};
 
@@ -111,9 +115,11 @@ namespace
 	LogCapture::LogCapture(const std::string& name):
 		_logger(Poco::Logger::get(name)),
 		_previous(_logger.getChannel()),
+		_previousLevel(_logger.getLevel()),
 		_channel(new Collector)
 	{
 		_logger.setChannel(_channel);
+		_logger.setLevel(Poco::Message::PRIO_TRACE);
 	}
 
 
@@ -121,6 +127,7 @@ namespace
 	{
 		try
 		{
+			_logger.setLevel(_previousLevel);
 			_logger.setChannel(_previous);
 		}
 		catch (...)
@@ -130,24 +137,27 @@ namespace
 	}
 
 
-	std::size_t LogCapture::count(const std::string& text) const
+	std::size_t LogCapture::count(const std::string& text, Poco::Message::Priority lowest) const
 	{
-		return _channel->count(text);
+		return _channel->count(text, lowest);
 	}
 
 
 	void LogCapture::Collector::log(const Poco::Message& msg)
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		_texts.push_back(msg.getText());
+		_messages.emplace_back(msg.getPriority(), msg.getText());
 	}
 
 
-	std::size_t LogCapture::Collector::count(const std::string& text) const
+	std::size_t LogCapture::Collector::count(const std::string& text, Poco::Message::Priority lowest) const
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		return static_cast<std::size_t>(std::count_if(_texts.begin(), _texts.end(),
-			[&text](const std::string& t) { return t.find(text) != std::string::npos; }));
+		return static_cast<std::size_t>(std::count_if(_messages.begin(), _messages.end(),
+			[&text, lowest](const std::pair<Poco::Message::Priority, std::string>& m)
+			{
+				return m.first <= lowest && m.second.find(text) != std::string::npos;
+			}));
 	}
 }
 
@@ -1856,6 +1866,79 @@ void MemoryDBTest::testRewriteKeepsAttachedShardReadable()
 }
 
 
+void MemoryDBTest::testKeptShardReportedOncePerReason()
+{
+	// A shard whose rows stay in memory means memory is not bounded, so the
+	// operator is told, naming the reason, and the table where there is one.
+	// The flushes that keep it for the same reason do not repeat that.
+	MemoryDB db(_dir, flushedByTest(false));
+	db << "CREATE TABLE a_events(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+	db << "CREATE TABLE z_cfg(id INTEGER PRIMARY KEY, v TEXT)", now;
+	std::string v("x");
+	db << "INSERT INTO a_events(v) VALUES(:v)", use(v), now;
+	db << "INSERT INTO z_cfg(v) VALUES(:v)", use(v), now;
+
+	const std::string kept("stays in memory");
+	LogCapture capture("Poco.Data.SQLite.MemoryDB");
+	db.sealActive();
+	db.flush(); // z_cfg keeps shard 1 in memory
+	assertTrue (capture.count(kept, Poco::Message::PRIO_INFORMATION) == 1);
+	assertTrue (capture.count("'z_cfg'", Poco::Message::PRIO_INFORMATION) == 1);
+	for (int i = 0; i < 2; ++i)
+	{
+		db << "INSERT INTO a_events(v) VALUES(:v)", use(v), now;
+		db.flush(); // the same reason again
+	}
+	assertTrue (capture.count(kept, Poco::Message::PRIO_INFORMATION) == 1);
+
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << "SELECT id FROM a_events", into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on main
+		db << "INSERT INTO a_events(v) VALUES(:v)", use(v), now;
+		db.flush(); // another reason: session() is busy
+	}
+	assertTrue (capture.count(kept, Poco::Message::PRIO_INFORMATION) == 2);
+
+	db << "INSERT INTO z_cfg(v) VALUES(:v)", use(v), now;
+	db.flush(); // shard 1 leaves memory
+	assertTrue (capture.count(kept, Poco::Message::PRIO_INFORMATION) == 2);
+	int inMain = 0;
+	db << "SELECT count(*) FROM z_cfg", into(inMain), now;
+	assertTrue (inMain == 1);
+}
+
+
+void MemoryDBTest::testDeferredDropReportedOnce()
+{
+	// Retention that cannot drop a shard while session() is busy tries again at
+	// every timer tick. The operator is told once; the retries are not repeated
+	// at information level.
+	MemoryDB::Options o = flushedByTest(true);
+	o.retentionMaxBytes = 1; // every sealed shard is over budget
+	MemoryDB db(_dir, o);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	std::string v("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+
+	const std::string retried("retried later");
+	LogCapture capture("Poco.Data.SQLite.MemoryDB");
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << "SELECT id FROM t", into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on main
+		db.sealActive();
+		db.flush(); // retention cannot drop shard 1
+		assertTrue (db.enforceRetention() == 0);
+		assertTrue (db.enforceRetention() == 0);
+	}
+	assertTrue (capture.count(retried, Poco::Message::PRIO_INFORMATION) == 1);
+	assertTrue (capture.count(retried) == 3); // the two retries at debug level
+
+	assertTrue (db.enforceRetention() == 1); // the session is free again
+}
+
+
 void MemoryDBTest::testDeleteNewestShardKeepsNoRowWhenNotNeeded()
 {
 	// No row stays behind when the numbering is safe without it: when the
@@ -3277,6 +3360,8 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testInsertBelowActiveRangeRejected);
 	CppUnit_addTest(pSuite, MemoryDBTest, testBlockedEvictionLeavesOtherTablesAlone);
 	CppUnit_addTest(pSuite, MemoryDBTest, testRewriteKeepsAttachedShardReadable);
+	CppUnit_addTest(pSuite, MemoryDBTest, testKeptShardReportedOncePerReason);
+	CppUnit_addTest(pSuite, MemoryDBTest, testDeferredDropReportedOnce);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteActiveShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNonexistentShardRefused);
