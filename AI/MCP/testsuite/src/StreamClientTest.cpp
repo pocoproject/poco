@@ -209,7 +209,7 @@ void StreamClientTest::testErrorReply()
 	catch (const MCPException& exc)
 	{
 		assertEqual(-32602, exc.code());
-		assertEqual(std::string("m"), exc.message());
+		assertMessageEqual("m", exc.message());
 	}
 }
 

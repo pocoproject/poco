@@ -253,7 +253,7 @@ void FeaturesTest::testHandlerExceptions()
 	// stay, and the log has nothing to add.
 	pReply = read(server, 5, std::string("test://refused"));
 	assertEqual(code(ErrorCode::INVALID_PARAMS), errorCode(pReply));
-	assertEqual(std::string("The table is not shared"), pReply->getObject("error")->getValue<std::string>("message"));
+	assertMessageEqual("The table is not shared", pReply->getObject("error")->getValue<std::string>("message"));
 
 	const std::vector<std::string> texts = pCollector->texts();
 	logger.setChannel(pChannel);
