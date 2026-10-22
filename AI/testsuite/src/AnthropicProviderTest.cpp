@@ -14,6 +14,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/AnthropicProvider.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
@@ -659,6 +661,56 @@ void AnthropicProviderTest::testListModels()
 }
 
 
+void AnthropicProviderTest::testUnreachable()
+{
+	// A request that does not go out, here as connecting times out, is a
+	// network failure; a server that does not answer in time was reached.
+	class TimingOutSession: public Poco::Net::HTTPClientSession
+	{
+	public:
+		using Poco::Net::HTTPClientSession::HTTPClientSession;
+
+		std::ostream& sendRequest(Poco::Net::HTTPRequest&) override
+		{
+			throw Poco::TimeoutException("connect timed out", "192.0.2.1:443");
+		}
+	};
+	AnthropicProvider unreachable(params("http://192.0.2.1:443/v1"), [](const Poco::URI& uri)
+		{
+			return std::unique_ptr<Poco::Net::HTTPClientSession>(new TimingOutSession(uri.getHost(), uri.getPort()));
+		});
+	Cancellation cancellation;
+	try
+	{
+		(void) unreachable.chat(userRequest("Hi"), ContentEventCallback(), cancellation);
+		fail("a request that does not go out must throw");
+	}
+	catch (const Poco::Net::NetException& exc)
+	{
+		assertTrue(exc.message().find("connect timed out") != std::string::npos);
+	}
+
+	CannedServer::Response response;
+	response.waitBeforeHeaders = true;
+	CannedServer server(response);
+	AnthropicProvider::Params slow = params(server.baseUrl());
+	slow.timeout = Poco::Timespan(0, 300000);
+	AnthropicProvider slowProvider(slow);
+	try
+	{
+		(void) slowProvider.chat(userRequest("Hi"), ContentEventCallback(), cancellation);
+		fail("a server that does not answer must make the call throw");
+	}
+	catch (const Poco::Net::NetException& exc)
+	{
+		fail("a server that does not answer in time was reached: " + exc.displayText());
+	}
+	catch (const Poco::TimeoutException&)
+	{
+	}
+}
+
+
 void AnthropicProviderTest::testCancelBeforeHeaders()
 {
 	CannedServer::Response response;
@@ -973,6 +1025,7 @@ CppUnit::Test* AnthropicProviderTest::suite()
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testThinkingSignatures);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testBlocksAsTheyCame);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testRefusal);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testUnreachable);
 
 	return pSuite;
 }

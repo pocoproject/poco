@@ -21,6 +21,7 @@
 #include "Poco/UTF8Encoding.h"
 #include "Poco/TextIterator.h"
 #include "Poco/Exception.h"
+#include "Poco/Net/NetException.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -42,6 +43,9 @@ namespace
 		std::vector<std::string> toolNames;
 		StopReason stopReason = StopReason::END_TURN;
 		bool throwException = false;
+			/// The provider cannot be reached.
+		bool throwTimeout = false;
+			/// The server does not answer in time.
 		FailureCode errorCode = FailureCode::NONE;
 		Usage usage;
 		std::string stopDetail;
@@ -85,7 +89,8 @@ namespace
 				return result;
 			}
 			const Step step = _script[_round++];
-			if (step.throwException) throw Poco::IOException("connection refused");
+			if (step.throwException) throw Poco::Net::ConnectionRefusedException("connection refused");
+			if (step.throwTimeout) throw Poco::TimeoutException("no answer in time");
 			if (step.errorCode != FailureCode::NONE)
 			{
 				ContentEvent event;
@@ -326,6 +331,27 @@ void AgentLoopTest::testDoneOnEveryExit()
 	assertTrue(pError->content.find("connection refused") != std::string::npos);
 	assertEqual(1, recorder.count(AgentEvent::Type::DONE));
 	assertTrue(recorder.events.back().type == AgentEvent::Type::DONE);
+}
+
+
+void AgentLoopTest::testNoAnswer()
+{
+	// A call that throws something else than a network failure got no answer,
+	// e.g. in time: the provider was reached.
+	Step timeout;
+	timeout.throwTimeout = true;
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{timeout});
+	ToolRegistry registry;
+	AgentLoop loop(pProvider, registry);
+	Array conversation = userTurn("go");
+	Recorder recorder;
+	loop.run(conversation, "", recorder.callback());
+	const AgentEvent* pError = recorder.first(AgentEvent::Type::FAILURE);
+	assertTrue(pError != nullptr);
+	assertTrue(pError->code == FailureCode::NO_ANSWER);
+	assertTrue(pError->content.find("no answer in time") != std::string::npos);
+	assertTrue(recorder.events.back().type == AgentEvent::Type::DONE);
+	assertTrue(recorder.events.back().stopReason == StopReason::FAILURE);
 }
 
 
@@ -869,6 +895,7 @@ CppUnit::Test* AgentLoopTest::suite()
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolRound);
 	CppUnit_addTest(pSuite, AgentLoopTest, testDoneOnEveryExit);
 	CppUnit_addTest(pSuite, AgentLoopTest, testProviderError);
+	CppUnit_addTest(pSuite, AgentLoopTest, testNoAnswer);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCancelled);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCancelDuringTools);
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolResultCutAtCharacter);

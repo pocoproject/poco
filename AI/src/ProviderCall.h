@@ -76,7 +76,9 @@ public:
 		/// cancel ends the connect, the TLS handshake and the upload too.
 		///
 		/// Throws Poco::IOException when the call is cancelled before it is
-		/// sent, and the exceptions of the session.
+		/// sent, a Poco::Net::NetException when the request does not go out
+		/// (connecting, the TLS handshake or sending the head fails), and the
+		/// exceptions of the session.
 
 	std::istream& receive();
 		/// Receives the response head and returns the body stream.

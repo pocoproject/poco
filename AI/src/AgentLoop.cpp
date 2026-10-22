@@ -16,6 +16,7 @@
 #include "ProviderCall.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
+#include "Poco/Net/NetException.h"
 #include <exception>
 #include <utility>
 
@@ -245,22 +246,32 @@ void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPr
 			request.toolChoice = finalRound ? ToolChoice::NONE : ToolChoice::AUTO;
 
 			ChatResult result;
+			FailureCode failure = FailureCode::NONE;
+			std::string failureText;
 			try
 			{
 				result = _pProvider->chat(request, onContent, cancellation);
 			}
+			catch (const Poco::Net::NetException& exc)
+			{
+				failure = FailureCode::PROVIDER_FAILED;
+				failureText = exc.displayText();
+			}
 			catch (const Poco::Exception& exc)
 			{
-				done.stopReason = StopReason::FAILURE;
-				if (pCallbackFailure) std::rethrow_exception(pCallbackFailure);
-				emitFailure(onEvent, FailureCode::PROVIDER_FAILED, "LLM error: " + exc.displayText());
-				break;
+				failure = FailureCode::NO_ANSWER;
+				failureText = exc.displayText();
 			}
 			catch (const std::exception& exc)
 			{
+				failure = FailureCode::NO_ANSWER;
+				failureText = exc.what();
+			}
+			if (failure != FailureCode::NONE)
+			{
 				done.stopReason = StopReason::FAILURE;
 				if (pCallbackFailure) std::rethrow_exception(pCallbackFailure);
-				emitFailure(onEvent, FailureCode::PROVIDER_FAILED, std::string("LLM error: ") + exc.what());
+				emitFailure(onEvent, failure, "LLM error: " + failureText);
 				break;
 			}
 			done.stopReason = result.stopReason;

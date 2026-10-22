@@ -226,11 +226,11 @@ void ChatService::chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Ide
 				return _params.approver(user, call, tool);
 			});
 	}
-	loop.run(conversation, _params.systemPrompt, [this, &name, &onEvent](const AgentEvent& event)
+	loop.run(conversation, _params.systemPrompt, [this, &name, generation, &onEvent](const AgentEvent& event)
 		{
 			if (event.type == AgentEvent::Type::FAILURE && event.code == FailureCode::PROVIDER_FAILED)
 			{
-				connectionFailed(name, event.content);
+				connectionFailed(name, generation, event.content);
 			}
 			onEvent(toJSON(event));
 		}, *pCancellation);
@@ -440,6 +440,7 @@ std::string ChatService::failureName(FailureCode code)
 	case FailureCode::STREAM_INTERRUPTED: return "stream_interrupted";
 	case FailureCode::STREAM_ERROR: return "stream_error";
 	case FailureCode::PROVIDER_FAILED: return "provider_unreachable";
+	case FailureCode::NO_ANSWER: return "no_answer";
 	case FailureCode::ROUND_LIMIT: return "round_limit";
 	}
 	return std::string();
@@ -791,9 +792,12 @@ std::optional<ProviderStatus> ChatService::probeOnce(const ProviderSettings& set
 }
 
 
-void ChatService::connectionFailed(const std::string& name, const std::string& detail)
+void ChatService::connectionFailed(const std::string& name, Poco::UInt64 generation, const std::string& detail)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
+	// A turn that began before the settings changed tells nothing of the
+	// present ones.
+	if (generation != _generation || !find(_settings, name)) return;
 	Runtime& runtime = _runtime[name];
 	runtime.server.clear();
 	runtime.status.name = name;

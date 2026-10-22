@@ -50,7 +50,8 @@ enum class FailureCode
 	MALFORMED_TOOL_INPUT, /// A tool call whose input is not a JSON object; the tool is not called.
 	STREAM_INTERRUPTED,   /// The response stream ended before its end; what arrived is incomplete.
 	STREAM_ERROR,         /// The API reported an error inside the response stream.
-	PROVIDER_FAILED,      /// A call of the provider failed, e.g. it could not connect.
+	PROVIDER_FAILED,      /// The provider could not be reached: connecting, the TLS handshake or sending the request failed, or the connection broke before an answer.
+	NO_ANSWER,            /// The request went out, but the call failed before an answer came, e.g. the server did not answer in time.
 	ROUND_LIMIT           /// The model still called tools when the agent loop had no rounds left.
 };
 
@@ -204,8 +205,10 @@ public:
 		/// does a response stream that ends before its end. A cancelled call
 		/// returns quietly with stop reason CANCELLED.
 		///
-		/// Throws when the call fails before an answer arrives, e.g. when the
-		/// endpoint cannot be reached.
+		/// Throws when the call fails before an answer arrives: a
+		/// Poco::Net::NetException when the endpoint cannot be reached or the
+		/// connection breaks, another exception otherwise, e.g. a
+		/// Poco::TimeoutException when the server does not answer in time.
 
 	virtual void appendToolResult(Poco::JSON::Array& messages, const std::string& toolCallId, const Poco::AI::MCP::ToolResult& result) = 0;
 		/// Appends a tool result to the conversation in the provider's format.

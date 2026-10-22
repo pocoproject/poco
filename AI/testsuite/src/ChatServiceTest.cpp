@@ -58,6 +58,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
 
@@ -97,8 +98,13 @@ namespace
 		std::vector<std::string> keys;
 			/// The keys the providers were created with.
 		bool connectFails = false;
+		bool noAnswer = false;
+			/// A call times out before an answer comes.
 		bool block = false;
 			/// A call waits until it is cancelled.
+		bool holdCall = false;
+			/// A call waits for releaseCall, after it set started.
+		Poco::Event releaseCall{Poco::Event::EVENT_MANUALRESET};
 		std::vector<std::string> tools;
 			/// The tools the model calls in the first round of a turn.
 		std::vector<std::size_t> toolsGiven;
@@ -172,14 +178,18 @@ namespace
 		ChatResult chat(const ChatRequest& request, const ContentEventCallback& onEvent, Cancellation& cancellation) override
 		{
 			bool connectFails = false;
+			bool noAnswer = false;
 			bool block = false;
+			bool hold = false;
 			std::vector<std::string> tools;
 			{
 				Poco::FastMutex::ScopedLock lock(_pState->mutex);
 				_pState->calls.push_back(_baseUrl + "|" + _model);
 				_pState->toolsGiven.push_back(request.tools.size());
 				connectFails = _pState->connectFails;
+				noAnswer = _pState->noAnswer;
 				block = _pState->block;
+				hold = _pState->holdCall;
 				// The model calls only what it was given.
 				for (const std::string& name: _pState->tools)
 				{
@@ -190,6 +200,8 @@ namespace
 			}
 			++_round;
 			_pState->started.set();
+			if (hold) (void) _pState->releaseCall.tryWait(20000);
+			if (noAnswer) throw Poco::TimeoutException("no answer in time");
 			ChatResult result;
 			if (connectFails)
 			{
@@ -853,6 +865,20 @@ void ChatServiceTest::testFailover()
 	Events recovered;
 	service.chat(conversation, who("alice"), "c1", recovered.sink());
 	assertEqual(std::string("text,done"), recovered.types());
+	assertEqual(4u, static_cast<unsigned>(pState->listed().size()));
+
+	// A call that gets no answer in time does not make the provider look
+	// unreachable, and its server is kept.
+	pState->noAnswer = true;
+	Events late;
+	service.chat(conversation, who("alice"), "c1", late.sink());
+	assertEqual(std::string("error,done"), late.types());
+	assertEqual(std::string("no_answer"), late.list[0]->getValue<std::string>("code"));
+	assertTrue(service.providerStatus()[0].reachable);
+	pState->noAnswer = false;
+	Events afterLate;
+	service.chat(conversation, who("alice"), "c1", afterLate.sink());
+	assertEqual(std::string("text,done"), afterLate.types());
 	assertEqual(4u, static_cast<unsigned>(pState->listed().size()));
 
 	// Settings that do not change keep the server; others look for one anew.
@@ -1657,6 +1683,36 @@ void ChatServiceTest::testEndpointHeartbeat()
 }
 
 
+void ChatServiceTest::testStaleConnectionFailure()
+{
+	// A call that began before the settings changed, and then cannot connect,
+	// tells nothing of the present settings.
+	auto pState = std::make_shared<FakeState>();
+	ProviderSettings ollama = entry("ollama", true, {"m1"});
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({ollama}), fakeParams(pState));
+	pState->holdCall = true;
+	pState->connectFails = true;
+	Array conversation = conversationOf("hi");
+	Events events;
+	std::thread turn([&]()
+		{
+			service.chat(conversation, who("alice"), "c1", events.sink());
+		});
+	const bool started = pState->started.tryWait(10000);
+	if (started)
+	{
+		ollama.timeout = 7;
+		service.configure({ollama});
+	}
+	pState->releaseCall.set();
+	turn.join();
+	assertTrue(started);
+	assertEqual(std::string("error,done"), events.types());
+	assertEqual(std::string("provider_unreachable"), events.list[0]->getValue<std::string>("code"));
+	assertTrue(!service.providerStatus()[0].probed);
+}
+
+
 void ChatServiceTest::testEndpointHeartbeatBounds()
 {
 	// A heartbeat of zero or less sends no comment, and one below the minimum
@@ -1813,6 +1869,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointRefusals);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeat);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeatBounds);
+	CppUnit_addTest(pSuite, ChatServiceTest, testStaleConnectionFailure);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointErrorClientGone);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);
 

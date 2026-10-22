@@ -46,6 +46,7 @@ public:
 	void testEndpointRefusals();
 	void testEndpointHeartbeat();
 	void testEndpointHeartbeatBounds();
+	void testStaleConnectionFailure();
 	void testEndpointErrorClientGone();
 	void testEndpointClientGone();
 

@@ -253,7 +253,8 @@ public:
 		/// The name of a failure in an error event: unauthenticated,
 		/// rate_limited, quota_exceeded, overloaded, server_error,
 		/// request_rejected, malformed_tool_input, stream_interrupted,
-		/// stream_error, provider_unreachable or round_limit; empty for NONE.
+		/// stream_error, provider_unreachable, no_answer or round_limit;
+		/// empty for NONE.
 
 	[[nodiscard]] static std::string stopReasonName(StopReason reason);
 		/// The name of a stop reason in a done event: unknown, end_turn,
@@ -297,7 +298,7 @@ private:
 	std::shared_ptr<LLMProvider> createProvider(const ProviderSettings& settings, const std::string& baseUrl, const std::string& model, const Poco::Timespan& timeout) const;
 	std::vector<std::string> modelsOf(const std::string& name, bool refresh);
 	std::optional<ProviderStatus> probeOnce(const ProviderSettings& settings, Poco::UInt64 generation, std::string& server, std::vector<std::string>& models);
-	void connectionFailed(const std::string& name, const std::string& detail);
+	void connectionFailed(const std::string& name, Poco::UInt64 generation, const std::string& detail);
 	Poco::Timespan probeTimeoutOf(const ProviderSettings& settings) const;
 
 	ChatService(const ChatService&) = delete;

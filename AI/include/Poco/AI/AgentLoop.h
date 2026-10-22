@@ -90,7 +90,10 @@ class AI_API AgentLoop
 	/// tool calls, when the run is cancelled, when a call fails, when an
 	/// answer is cut by the token limit, or when the round limit is reached;
 	/// in the last case one final call, with the same tools and tool choice
-	/// none, asks the model for a text answer. Every step is reported through
+	/// none, asks the model for a text answer. A call that throws is a
+	/// FAILURE event: PROVIDER_FAILED for a Poco::Net::NetException, as the
+	/// provider could not be reached, NO_ANSWER for another exception (see
+	/// LLMProvider::chat()). Every step is reported through
 	/// the event callback, and DONE, with the stop reason of the last call and
 	/// the usage of all, ends every run.
 	///

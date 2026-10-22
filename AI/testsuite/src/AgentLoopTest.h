@@ -25,6 +25,7 @@ public:
 	void testToolRound();
 	void testDoneOnEveryExit();
 	void testProviderError();
+	void testNoAnswer();
 	void testCancelled();
 	void testCancelDuringTools();
 	void testToolResultCutAtCharacter();

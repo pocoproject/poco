@@ -45,6 +45,7 @@ public:
 	void testThinkingSignatures();
 	void testBlocksAsTheyCame();
 	void testRefusal();
+	void testUnreachable();
 
 	void setUp();
 	void tearDown();

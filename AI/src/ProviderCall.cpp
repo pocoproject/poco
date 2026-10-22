@@ -25,6 +25,7 @@
 #include "Poco/String.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
+#include "Poco/Net/NetException.h"
 #include <algorithm>
 #include <sstream>
 #if !defined(POCO_OS_FAMILY_WINDOWS)
@@ -158,9 +159,23 @@ void ProviderCall::send(const std::string& body, Cancellation& cancellation)
 	{
 		_request.setContentLength(static_cast<std::streamsize>(body.size()));
 	}
-	std::ostream& out = _pSession->sendRequest(_request);
+	std::ostream* pOut = nullptr;
+	try
+	{
+		pOut = &_pSession->sendRequest(_request);
+	}
+	catch (const Poco::Net::NetException&)
+	{
+		throw;
+	}
+	catch (const Poco::Exception& exc)
+	{
+		// The request did not go out, e.g. connecting timed out: the server
+		// was not reached.
+		throw Poco::Net::NetException(exc.message(), exc, exc.code());
+	}
 	keepDescriptor();
-	out << body;
+	*pOut << body;
 }
 
 
