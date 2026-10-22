@@ -47,7 +47,7 @@ public:
 		/// Registers an abort with a token for the lifetime of the object.
 	{
 	public:
-		Request(Cancellation& cancellation, std::function<void()> abort);
+		POCO_NODISCARD_CTOR Request(Cancellation& cancellation, std::function<void()> abort);
 			/// Registers abort. If the token is cancelled already, calls it at once.
 
 		~Request();
