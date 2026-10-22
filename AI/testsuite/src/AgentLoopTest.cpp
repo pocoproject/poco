@@ -648,6 +648,35 @@ void AgentLoopTest::testToolAddedDuringRun()
 }
 
 
+void AgentLoopTest::testToolReplacedDuringRun()
+{
+	// A tool registered anew while the run is on keeps, for the run, the
+	// handler the run took at its start, the one the approver approves.
+	ToolRegistry registry;
+	int oldRuns = 0;
+	int newRuns = 0;
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"replacer"}), tools({"second"}), text("ok")});
+	registerEcho(registry, "second", &oldRuns);
+	registry.registerTool("replacer", "", nullptr, [&registry, &newRuns](const Object::Ptr&)
+	{
+		registerEcho(registry, "second", &newRuns);
+		return std::string("replaced");
+	});
+	AgentLoop loop(pProvider, registry);
+	std::vector<std::string> asked;
+	loop.setApprover([&asked](const ToolCall& call, const Poco::AI::MCP::Tool&)
+	{
+		asked.push_back(call.name);
+		return true;
+	});
+	Array conversation = userTurn("go");
+	loop.run(conversation, "", AgentEventCallback());
+	assertEqual(1, oldRuns);
+	assertEqual(0, newRuns);
+	assertTrue(asked == std::vector<std::string>({"replacer", "second"}));
+}
+
+
 void AgentLoopTest::testApproverThrows()
 {
 	// An approver that throws refuses the call.
@@ -929,6 +958,7 @@ CppUnit::Test* AgentLoopTest::suite()
 	CppUnit_addTest(pSuite, AgentLoopTest, testCutByTokenLimit);
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolAddedDuringRun);
 	CppUnit_addTest(pSuite, AgentLoopTest, testApproverThrows);
+	CppUnit_addTest(pSuite, AgentLoopTest, testToolReplacedDuringRun);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrows);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrowsDuringCall);
 	CppUnit_addTest(pSuite, AgentLoopTest, testResultLimits);
