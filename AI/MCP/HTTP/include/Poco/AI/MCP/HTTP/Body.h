@@ -20,6 +20,8 @@
 
 #include "Poco/AI/MCP/HTTP/HTTP.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/Net/HTTPMessage.h"
+#include "Poco/Net/HTTPSession.h"
 #include <functional>
 #include <istream>
 #include <string>
@@ -45,8 +47,11 @@ namespace Impl {
 	///
 	/// Throws Poco::DataFormatException when it holds more than maxSize
 	/// bytes. What the source of the stream throws, a timeout or a reset
-	/// connection, is passed on: a body that breaks off is not taken for a
-	/// whole one.
+	/// connection, is passed on. A body that ends early without an error,
+	/// as when the peer closes the connection before the Content-Length is
+	/// reached, comes back shorter: the caller asks brokeOff(). A chunked
+	/// body that ends between two chunks reads as complete; its content has
+	/// to tell.
 
 
 [[nodiscard]] AIMCPHTTP_API std::string readAtMost(std::istream& stream, std::size_t maxSize, const ReadGuard& guard = ReadGuard());
@@ -65,6 +70,16 @@ AIMCPHTTP_API void cutAtCharacter(std::string& text, std::size_t maxSize);
 
 [[nodiscard]] AIMCPHTTP_API Poco::JSON::Object::Ptr parseObject(const std::string& text);
 	/// The JSON object in text, or null when text is not a JSON object.
+
+
+[[nodiscard]] AIMCPHTTP_API bool brokeOff(const Poco::Net::HTTPMessage& message, std::size_t received);
+	/// Returns true if the message promised more bytes in its Content-Length
+	/// than the received ones of its body.
+
+
+[[nodiscard]] AIMCPHTTP_API bool brokeOff(const Poco::Net::HTTPSession& session, const Poco::Net::HTTPMessage& message, std::size_t received);
+	/// Returns true if the session met a network error while it read the
+	/// body, or the message promised more bytes than received.
 
 
 } // namespace Impl

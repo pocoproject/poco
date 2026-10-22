@@ -34,6 +34,7 @@ public:
 	void testNameHeader();
 	void testRepeatedHeaders();
 	void testClientGoneCancels();
+	void testBodyBrokeOff();
 	void testParamHeaders();
 	void testEncodedWords();
 	void testDecodedHeadersRefused();

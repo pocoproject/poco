@@ -108,6 +108,18 @@ Poco::JSON::Object::Ptr parseObject(const std::string& text)
 }
 
 
+bool brokeOff(const Poco::Net::HTTPMessage& message, std::size_t received)
+{
+	return message.hasContentLength() && static_cast<Poco::Int64>(received) < message.getContentLength64();
+}
+
+
+bool brokeOff(const Poco::Net::HTTPSession& session, const Poco::Net::HTTPMessage& message, std::size_t received)
+{
+	return session.networkException() != nullptr || brokeOff(message, received);
+}
+
+
 } // namespace Impl
 
 

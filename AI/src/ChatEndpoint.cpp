@@ -642,6 +642,10 @@ Poco::JSON::Object::Ptr ChatEndpoint::readObject(Poco::Net::HTTPServerRequest& r
 	{
 		throw Refusal{Poco::Net::HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE, "too large", "the body is larger than the limit"};
 	}
+	if (Poco::AI::MCP::HTTP::Impl::brokeOff(request, body.size()))
+	{
+		throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "the body broke off"};
+	}
 	const Poco::JSON::Object::Ptr pObject = Poco::AI::MCP::HTTP::Impl::parseObject(body);
 	if (pObject.isNull())
 	{

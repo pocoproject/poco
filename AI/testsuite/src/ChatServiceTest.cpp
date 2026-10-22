@@ -32,6 +32,8 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/SocketStream.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/JSON/Object.h"
@@ -1683,6 +1685,30 @@ void ChatServiceTest::testEndpointHeartbeat()
 }
 
 
+void ChatServiceTest::testEndpointBodyBrokeOff()
+{
+	// A body that ends before its Content-Length is refused, even when what
+	// came is a whole object.
+	auto pState = std::make_shared<FakeState>();
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({entry("ollama", true, {"m1", "m2"})}), fakeParams(pState));
+	Host host(service);
+	const std::string body = "{\"model\":\"m2\"}";
+	std::ostringstream text;
+	text << "POST /api/ai/models HTTP/1.1\r\nHost: 127.0.0.1\r\nX-User: root\r\nX-Manage: 1\r\nContent-Type: application/json\r\n";
+	text << "Content-Length: " << body.size() + 50 << "\r\n\r\n" << body;
+	const std::string bytes = text.str();
+	Poco::Net::StreamSocket socket(Poco::Net::SocketAddress("127.0.0.1", host.port()));
+	socket.setReceiveTimeout(Poco::Timespan(10, 0));
+	socket.sendBytes(bytes.data(), static_cast<int>(bytes.size()));
+	socket.shutdownSend();
+	Poco::Net::SocketStream stream(socket);
+	Poco::Net::HTTPResponse response;
+	response.read(stream);
+	assertEqual(400, static_cast<int>(response.getStatus()));
+	assertEqual(std::string("m1"), service.model());
+}
+
+
 void ChatServiceTest::testStaleConnectionFailure()
 {
 	// A call that began before the settings changed, and then cannot connect,
@@ -1870,6 +1896,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeat);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointHeartbeatBounds);
 	CppUnit_addTest(pSuite, ChatServiceTest, testStaleConnectionFailure);
+	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointBodyBrokeOff);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointErrorClientGone);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);
 

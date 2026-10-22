@@ -379,9 +379,9 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 		const std::string text = Impl::readBody(*pStream, maxSize, bound);
 		// A body that broke off reads as a shorter one: the session or the
 		// length the answer promised tells.
-		if (httpSession.networkException() != nullptr) httpSession.networkException()->rethrow();
-		if (response.hasContentLength() && static_cast<Poco::Int64>(text.size()) < response.getContentLength64())
+		if (Impl::brokeOff(httpSession, response, text.size()))
 		{
+			if (httpSession.networkException() != nullptr) httpSession.networkException()->rethrow();
 			throw Poco::IOException("The answer of the MCP endpoint to " + method + " broke off");
 		}
 		if (status == Poco::Net::HTTPResponse::HTTP_ACCEPTED)

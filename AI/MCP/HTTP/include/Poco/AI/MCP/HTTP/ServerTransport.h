@@ -59,8 +59,9 @@ class AIMCPHTTP_API ServerTransport
 	///   - the Accept header, when there is one: a range that takes
 	///     application/json, else 406;
 	///   - the size of the body: at most maxMessageSize bytes, else 413;
-	///   - the body: JSON, else 400 with PARSE_ERROR; one object, not a batch,
-	///     else 400 with INVALID_REQUEST;
+	///   - the body: as long as its Content-Length, and JSON, else 400 with
+	///     PARSE_ERROR; one object, not a batch, else 400 with
+	///     INVALID_REQUEST;
 	///   - the MCP headers: each comes once at most, and an
 	///     MCP-Protocol-Version or Mcp-Method header that is sent matches
 	///     the message. A request whose _meta object names

@@ -32,6 +32,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketStream.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
@@ -587,6 +588,30 @@ void ServerTransportTest::testRepeatedHeaders()
 	headers.add("Mcp-Name", "other");
 	assertTrue(refused(call, headers));
 	assertEqual(200, endpoint.post(call, headersOf("tools/call", "echo")).status);
+}
+
+
+void ServerTransportTest::testBodyBrokeOff()
+{
+	// A body that ends before its Content-Length is refused, even when what
+	// came is a whole message.
+	Server server;
+	buildServer(server);
+	Endpoint endpoint(server);
+	const std::string body = request(Id(1), "tools/list");
+	std::ostringstream text;
+	text << "POST /mcp HTTP/1.1\r\nHost: 127.0.0.1\r\n";
+	for (const auto& header: headersOf("tools/list")) text << header.first << ": " << header.second << "\r\n";
+	text << "Content-Length: " << body.size() + 50 << "\r\n\r\n" << body;
+	const std::string bytes = text.str();
+	Poco::Net::StreamSocket socket(Poco::Net::SocketAddress("127.0.0.1", Poco::URI(endpoint.url()).getPort()));
+	socket.setReceiveTimeout(Poco::Timespan(10, 0));
+	socket.sendBytes(bytes.data(), static_cast<int>(bytes.size()));
+	socket.shutdownSend();
+	Poco::Net::SocketStream stream(socket);
+	Poco::Net::HTTPResponse response;
+	response.read(stream);
+	assertEqual(400, static_cast<int>(response.getStatus()));
 }
 
 
@@ -1154,6 +1179,7 @@ CppUnit::Test* ServerTransportTest::suite()
 	CppUnit_addTest(pSuite, ServerTransportTest, testNameHeader);
 	CppUnit_addTest(pSuite, ServerTransportTest, testRepeatedHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testClientGoneCancels);
+	CppUnit_addTest(pSuite, ServerTransportTest, testBodyBrokeOff);
 	CppUnit_addTest(pSuite, ServerTransportTest, testParamHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testEncodedWords);
 	CppUnit_addTest(pSuite, ServerTransportTest, testDecodedHeadersRefused);

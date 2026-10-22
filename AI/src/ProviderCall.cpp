@@ -235,8 +235,7 @@ std::string ProviderCall::networkError() const
 
 bool ProviderCall::brokeOff(std::size_t received) const
 {
-	if (_pSession->networkException() != nullptr) return true;
-	return _response.hasContentLength() && static_cast<Poco::Int64>(received) < _response.getContentLength64();
+	return Poco::AI::MCP::HTTP::Impl::brokeOff(*_pSession, _response, received);
 }
 
 

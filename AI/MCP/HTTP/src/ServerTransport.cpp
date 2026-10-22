@@ -391,6 +391,10 @@ ServerTransport::Reply ServerTransport::answer(Server& server, Poco::Net::HTTPSe
 			}
 			return closing(errorReply(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, Id(), ErrorCode::PARSE_ERROR, "Parse error: the body cannot be read"));
 		}
+		if (Impl::brokeOff(request, body.size()))
+		{
+			return closing(errorReply(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, Id(), ErrorCode::PARSE_ERROR, "Parse error: the body broke off"));
+		}
 		return answerMessage(server, request, body, context);
 	}
 	catch (const Poco::Exception& exc)
