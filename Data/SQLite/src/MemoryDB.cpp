@@ -29,9 +29,11 @@
 #include <algorithm>
 #include <atomic>
 #include <cctype>
+#include <exception>
 #include <iterator>
 #include <mutex>
 #include <set>
+#include <string>
 #include <type_traits>
 
 // Table classification is built on PRAGMA table_list (SQLite 3.37),
