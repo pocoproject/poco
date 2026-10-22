@@ -76,6 +76,7 @@ public:
 	void testDeleteShardKeepsNumberingAtEmptyNewerRange();
 	void testInsertBelowActiveRangeRejected();
 	void testBlockedEvictionLeavesOtherTablesAlone();
+	void testRewriteKeepsAttachedShardReadable();
 	void testDeleteNewestShardKeepsNoRowWhenNotNeeded();
 	void testDeleteActiveShardRefused();
 	void testDeleteNonexistentShardRefused();

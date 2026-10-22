@@ -1743,6 +1743,64 @@ void MemoryDBTest::testBlockedEvictionLeavesOtherTablesAlone()
 }
 
 
+void MemoryDBTest::testRewriteKeepsAttachedShardReadable()
+{
+	// A flush that rewrites an attached sealed shard must leave its alias in
+	// place for every statement on session(): one that runs while the shard
+	// is detached for the rename finds no such table. The swap happens under
+	// the connection mutex, so a reader can never run in between, however the
+	// threads are scheduled; a reader stepping the shard at that moment makes
+	// the flush leave it for a later one.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	off.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now; // keeps shard 1 in memory
+	std::string v(200, 'x');
+	db.session().begin();
+	for (int i = 0; i < 100000; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	db.session().commit();
+	db.sealActive();
+	db.flush();
+
+	const Poco::UInt32 id = db.archivedShardIds().front();
+	const std::string alias = db.attachArchived(id);
+	db << "UPDATE t SET v = 'y' WHERE id = 1", now; // the next flush rewrites shard 1
+
+	std::atomic<bool> done(false);
+	std::atomic<int> missing(0);
+	std::string failure;
+	std::thread reader([&]()
+	{
+		while (!done.load())
+		{
+			try
+			{
+				int n = 0;
+				db << ("SELECT count(*) FROM " + alias + ".t"), into(n), now;
+			}
+			catch (const Poco::Exception& e)
+			{
+				if (e.displayText().find("no such table") != std::string::npos) ++missing;
+				else if (failure.empty()) failure = e.displayText();
+			}
+		}
+	});
+	db.flush();
+	done.store(true);
+	reader.join();
+	assertTrue (missing.load() == 0);
+	assertTrue (failure.empty());
+
+	// A rewrite left for later because the reader was stepping goes now.
+	while (db.dirty()) db.flush();
+	std::string y;
+	db << ("SELECT v FROM " + alias + ".t WHERE id = 1"), into(y), now;
+	assertTrue (y == "y"); // the alias reads the new file
+	db.detachArchived(id);
+}
+
+
 void MemoryDBTest::testDeleteNewestShardKeepsNoRowWhenNotNeeded()
 {
 	// No row stays behind when the numbering is safe without it: when the
@@ -3163,6 +3221,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeepsNumberingAtEmptyNewerRange);
 	CppUnit_addTest(pSuite, MemoryDBTest, testInsertBelowActiveRangeRejected);
 	CppUnit_addTest(pSuite, MemoryDBTest, testBlockedEvictionLeavesOtherTablesAlone);
+	CppUnit_addTest(pSuite, MemoryDBTest, testRewriteKeepsAttachedShardReadable);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteActiveShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNonexistentShardRefused);

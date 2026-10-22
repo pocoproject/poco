@@ -517,6 +517,17 @@ private:
 	void rebuildActiveLo();                              // caller holds _stateMutex
 	bool tryDetach(Poco::UInt32 shardId);                // caller holds _attachMutex
 	void sweepDetached();                                // caller holds _attachMutex
+	enum class Install
+	{
+		DONE,     // the new file is in place, and attached again if it was
+		DETACHED, // the new file is in place, but attaching it again failed
+		BUSY      // nothing moved: a statement is reading the attached shard
+	};
+	[[nodiscard]] Install installShardFile(Poco::UInt32 shardId, bool sealed,
+		const std::string& tmpPath, const std::string& path);
+		// moves a shard file written by doFlush() into place; a sealed shard that
+		// is attached is detached, replaced and attached again under the
+		// connection mutex. caller holds _flushMutex
 	enum class Removal
 	{
 		DONE,              // the rows are gone from the in-memory tables

@@ -29,7 +29,6 @@
 #include <atomic>
 #include <cctype>
 #include <iterator>
-#include <optional>
 #include <set>
 
 // Table classification is built on PRAGMA table_list (SQLite 3.37),
@@ -1203,6 +1202,75 @@ bool MemoryDB::tryDetach(Poco::UInt32 shardId)
 		return false; // a busy statement holds a transaction; defer
 	execDirect(_memHandle, "DETACH DATABASE " + alias); // unexpected failures propagate
 	return true;
+}
+
+
+MemoryDB::Install MemoryDB::installShardFile(Poco::UInt32 shardId, bool sealed,
+	const std::string& tmpPath, const std::string& path)
+{
+	if (!sealed)
+	{
+		Poco::File(tmpPath).renameTo(path);
+		return Install::DONE;
+	}
+
+	// A sealed shard attached through attachArchived() has its file open as
+	// arc_<id>. Windows refuses to rename over an open file, and elsewhere the
+	// attachment would go on reading the old one. The DETACH, the rename and
+	// the ATTACH of the new file run under the connection mutex, so no
+	// statement on session() runs in between and finds the alias missing;
+	// _attachMutex keeps attachArchived() from attaching the old file meanwhile.
+	Poco::Mutex::ScopedLock al(_attachMutex);
+	auto at = _attached.find(shardId);
+	if (at == _attached.end())
+	{
+		Poco::File(tmpPath).renameTo(path);
+		return Install::DONE;
+	}
+
+	const std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
+	const std::string attach = "ATTACH DATABASE " + quoteLit("file:" + path + "?mode=ro") + " AS " + alias;
+	InternalGuard guard;
+	DbMutexGuard dbm(_memHandle);
+	const int txn = sqlite3_txn_state(_memHandle, alias.c_str());
+	// A statement still reading the shard keeps it attached: the new file is
+	// dropped, and the shard waits for a later flush.
+	if (txn > SQLITE_TXN_NONE) return Install::BUSY;
+	if (txn == SQLITE_TXN_NONE) execDirect(_memHandle, "DETACH DATABASE " + alias);
+	// txn < 0: detached out-of-band through session(); nothing to detach
+
+	try
+	{
+		Poco::File(tmpPath).renameTo(path);
+	}
+	catch (...)
+	{
+		// the old file is still in place: give its holders their alias back
+		if (at->second > 0)
+		{
+			try { execDirect(_memHandle, attach); }
+			catch (...) { _attached.erase(at); }
+		}
+		else _attached.erase(at);
+		throw;
+	}
+
+	if (at->second == 0)
+	{
+		_attached.erase(at); // a deferred detach, now completed
+		return Install::DONE;
+	}
+	try
+	{
+		execDirect(_memHandle, attach);
+	}
+	catch (...)
+	{
+		// its holders now see "no such table", as after deleteShard's force-detach
+		_attached.erase(at);
+		return Install::DETACHED;
+	}
+	return Install::DONE;
 }
 
 
@@ -2630,40 +2698,12 @@ void MemoryDB::doFlush(bool allowSeal)
 
 	for (const auto& p: writes)
 	{
-		// A sealed shard attached through attachArchived() has its file open as
-		// arc_<id>. The file is replaced below by a rename, which Windows refuses
-		// for an open file and which elsewhere leaves the attachment reading the
-		// old one. It is detached for the write and attached again on the new
-		// file, with _attachMutex held so no caller finds the alias missing in
-		// between; while a statement keeps it busy, the shard waits for a later
-		// flush, still dirty and so still resident.
 		Poco::UInt32 shardId = 0;
 		bool sealed = false;
 		{
 			Poco::FastMutex::ScopedLock l(_stateMutex);
 			shardId = _shards[p.idx].id;
 			sealed = _shards[p.idx].sealed;
-		}
-		std::optional<Poco::Mutex::ScopedLock> attachLock;
-		bool reattach = false;
-		if (sealed)
-		{
-			attachLock.emplace(_attachMutex);
-			auto at = _attached.find(shardId);
-			if (at != _attached.end())
-			{
-				bool detached = false;
-				try { detached = tryDetach(shardId); }
-				catch (...) {}
-				if (!detached)
-				{
-					Poco::FastMutex::ScopedLock l(_stateMutex);
-					_shards[p.idx].dirty = true;
-					continue;
-				}
-				if (at->second > 0) reattach = true;
-				else _attached.erase(at); // a deferred detach, now completed
-			}
 		}
 
 		try
@@ -2714,10 +2754,17 @@ void MemoryDB::doFlush(bool allowSeal)
 			if (p.copyVtabs)
 				copyVirtualTables(tmpPath, "shardtmp", true, vtabs);
 
-			Poco::File tf(tmpPath);
-			Poco::Path fp(_dir, p.finalName);
-			tf.renameTo(fp.toString());
-			Poco::UInt64 bytes = Poco::File(fp.toString()).getSize();
+			const std::string path = Poco::Path(_dir, p.finalName).toString();
+			const Install installed = installShardFile(shardId, sealed, tmpPath, path);
+			if (installed == Install::BUSY)
+			{
+				// tmp removes the new file; the shard stays dirty, and so in memory
+				Poco::FastMutex::ScopedLock l(_stateMutex);
+				_shards[p.idx].dirty = true;
+				continue;
+			}
+			if (installed == Install::DETACHED) ok = false;
+			Poco::UInt64 bytes = Poco::File(path).getSize();
 
 			written.push_back(std::make_pair(p.idx, std::make_pair(p.finalName, bytes)));
 			newRanges.push_back(std::make_pair(p.idx, ranges));
@@ -2725,24 +2772,6 @@ void MemoryDB::doFlush(bool allowSeal)
 		catch (...)
 		{
 			ok = false;
-		}
-
-		if (reattach)
-		{
-			std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
-			try
-			{
-				InternalGuard guard;
-				DbMutexGuard dbm(_memHandle);
-				execDirect(_memHandle, "ATTACH DATABASE " +
-					quoteLit("file:" + Poco::Path(_dir, p.finalName).toString() + "?mode=ro") + " AS " + alias);
-			}
-			catch (...)
-			{
-				// its holders now see "no such table", as after deleteShard's force-detach
-				_attached.erase(shardId);
-				ok = false;
-			}
 		}
 	}
 
