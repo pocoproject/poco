@@ -49,8 +49,8 @@ class AIMCP_API ProcessClient: public Client
 	/// timeout, counted from the moment it is handed to the writer: a server
 	/// that stops reading its standard input times a request out too, and
 	/// does not hold up close(). After a timeout the client sends
-	/// notifications/cancelled for the request and throws
-	/// Poco::TimeoutException. Only the reply to the request in flight is
+	/// notifications/cancelled for the request, unless it took the request
+	/// back before any of it was written, and throws Poco::TimeoutException. Only the reply to the request in flight is
 	/// kept; notifications and late replies are passed over. A request to a
 	/// server that has ended fails with a Poco::IOException; on POSIX
 	/// platforms the writer blocks SIGPIPE, whatever the signal mask of the
@@ -134,7 +134,8 @@ private:
 	static void read(const std::shared_ptr<Reader>& pReader, Poco::Pipe pipe, std::size_t maxMessageSize);
 	static void write(const std::shared_ptr<Writer>& pWriter, Poco::Pipe pipe);
 	void start(std::size_t maxMessageSize);
-	void send(const std::string& line, const Poco::Timestamp& start, const Poco::Timespan& timeout, bool wait);
+	bool send(const std::string& line, const Poco::Timestamp& start, const Poco::Timespan& timeout, bool wait);
+	void abandon(const Id& id);
 	void requestTermination();
 	void kill();
 	int waitForExit(const Poco::Timespan& timeout);

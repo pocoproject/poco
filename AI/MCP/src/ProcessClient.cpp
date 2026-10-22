@@ -278,7 +278,7 @@ Poco::Process::PID ProcessClient::id() const
 }
 
 
-void ProcessClient::send(const std::string& line, const Poco::Timestamp& start, const Poco::Timespan& timeout, bool wait)
+bool ProcessClient::send(const std::string& line, const Poco::Timestamp& start, const Poco::Timespan& timeout, bool wait)
 {
 	Poco::Mutex::ScopedLock lock(_pWriter->mutex);
 	if (_pWriter->failed)
@@ -296,7 +296,7 @@ void ProcessClient::send(const std::string& line, const Poco::Timestamp& start, 
 	const Poco::UInt64 ticket = ++_pWriter->issued;
 	_pWriter->lines.emplace_back(ticket, line);
 	_pWriter->ready.broadcast();
-	if (!wait) return;
+	if (!wait) return true;
 
 	while (_pWriter->done < ticket)
 	{
@@ -307,12 +307,14 @@ void ProcessClient::send(const std::string& line, const Poco::Timestamp& start, 
 		const Poco::Timespan left = timeout - Poco::Timespan(start.elapsed());
 		if (left.totalMilliseconds() <= 0)
 		{
-			// A line that is not being written yet is taken back.
+			// A line that is not being written yet is taken back; one that
+			// is goes out whole once the server reads again.
 			const auto it = std::find_if(_pWriter->lines.begin(), _pWriter->lines.end(), [ticket](const std::pair<Poco::UInt64, std::string>& entry)
 			{
 				return entry.first == ticket;
 			});
-			if (it != _pWriter->lines.end()) _pWriter->lines.erase(it);
+			if (it == _pWriter->lines.end()) return false;
+			_pWriter->lines.erase(it);
 			throw Poco::TimeoutException("The MCP server process does not read its standard input");
 		}
 		(void) _pWriter->ready.tryWait(_pWriter->mutex, static_cast<long>(left.totalMilliseconds()));
@@ -320,6 +322,22 @@ void ProcessClient::send(const std::string& line, const Poco::Timestamp& start, 
 	if (_pWriter->failed && _pWriter->done == ticket)
 	{
 		throw Poco::IOException("Cannot write to the MCP server process");
+	}
+	return true;
+}
+
+
+void ProcessClient::abandon(const Id& id)
+{
+	Poco::JSON::Object::Ptr pParams = new Poco::JSON::Object;
+	pParams->set("requestId", id);
+	pParams->set("reason", "timeout");
+	try
+	{
+		(void) send(serialize(Request::makeNotification("notifications/cancelled", pParams)) + '\n', Poco::Timestamp(), Poco::Timespan(), false);
+	}
+	catch (const Poco::Exception&)
+	{
 	}
 }
 
@@ -343,15 +361,26 @@ Poco::JSON::Object::Ptr ProcessClient::exchange(const Poco::JSON::Object::Ptr& r
 		_pReader->pReply = nullptr;
 		_pReader->tooLarge = false;
 	}
+	bool written = false;
 	try
 	{
-		send(serialize(request) + '\n', start, timeout, true);
+		written = send(serialize(request) + '\n', start, timeout, true);
 	}
 	catch (...)
 	{
 		Poco::Mutex::ScopedLock lock(_pReader->mutex);
 		_pReader->outstanding = Id();
 		throw;
+	}
+	if (!written)
+	{
+		// The server gets the request once it reads again, and runs it.
+		{
+			Poco::Mutex::ScopedLock lock(_pReader->mutex);
+			_pReader->outstanding = Id();
+		}
+		abandon(id);
+		throw Poco::TimeoutException("The MCP server process does not read its standard input");
 	}
 
 	{
@@ -382,16 +411,7 @@ Poco::JSON::Object::Ptr ProcessClient::exchange(const Poco::JSON::Object::Ptr& r
 		_pReader->outstanding = Id();
 	}
 
-	Poco::JSON::Object::Ptr pParams = new Poco::JSON::Object;
-	pParams->set("requestId", id);
-	pParams->set("reason", "timeout");
-	try
-	{
-		send(serialize(Request::makeNotification("notifications/cancelled", pParams)) + '\n', start, timeout, false);
-	}
-	catch (const Poco::Exception&)
-	{
-	}
+	abandon(id);
 	throw Poco::TimeoutException("No reply from the MCP server process to " + method);
 }
 

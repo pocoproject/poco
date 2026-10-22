@@ -16,6 +16,9 @@
 //   spawn   starts this program with --linger, which keeps the standard
 //           output it inherits open, and returns its process id
 //
+// With the environment variable MCP_TEST_INPUT_LOG it copies what it reads
+// to the file it names, so that a test can see what reached the server.
+//
 // With --stubborn it ignores the end of its input and the termination
 // request (SIGINT, and SIGBREAK on Windows), so that only a kill ends it.
 // With --interruptible it ignores the end of its input, and ends with exit
@@ -35,8 +38,10 @@
 #include "Poco/Path.h"
 #include "Poco/Process.h"
 #include "Poco/Thread.h"
+#include "Poco/TeeStream.h"
 #include <csignal>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -158,7 +163,18 @@ int main(int argc, char** argv)
 
 	try
 	{
-		server.serve(std::cin, std::cout);
+		const std::string inputLog = Poco::Environment::get("MCP_TEST_INPUT_LOG", "");
+		if (inputLog.empty())
+		{
+			server.serve(std::cin, std::cout);
+		}
+		else
+		{
+			std::ofstream log(inputLog, std::ios::binary);
+			Poco::TeeInputStream input(std::cin);
+			input.addStream(log);
+			server.serve(input, std::cout);
+		}
 	}
 	catch (...)
 	{

@@ -14,6 +14,7 @@
 #include "Poco/AI/MCP/ProcessClient.h"
 #include "Poco/AI/MCP/MCPException.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/JSON/Parser.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/NumberParser.h"
@@ -24,6 +25,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
 #include "Poco/String.h"
+#include <fstream>
 #include <string>
 #include <vector>
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -174,6 +176,61 @@ void ProcessClientTest::testWriteToEndedServer()
 	}
 	assertTrue(refused);
 	assertEqual(7, client.close());
+}
+
+
+void ProcessClientTest::testWriteTimeoutCancels()
+{
+	// A request that times out while it is being written reaches the server
+	// whole once it reads again, so the client cancels it.
+	Poco::TemporaryFile inputLog;
+	Poco::Process::Env env;
+	env["MCP_TEST_INPUT_LOG"] = inputLog.path();
+	ProcessClient client(serverPath(), std::vector<std::string>(), std::string(), env);
+	client.setGracePeriod(Poco::Timespan(20, 0));
+	// While the server sleeps it reads nothing.
+	client.setTimeout(Poco::Timespan(0, 100000));
+	try
+	{
+		(void) client.callTool("sleep", args("ms", 2000));
+		fail("a call without a reply in time must time out");
+	}
+	catch (const Poco::TimeoutException&)
+	{
+	}
+	// More than a pipe holds, so the line is still being written when the
+	// call times out.
+	client.setTimeout(Poco::Timespan(0, 200000));
+	try
+	{
+		(void) client.callTool("echo", args("message", std::string(1024 * 1024, 'x')));
+		fail("a call that cannot be written in time must time out");
+	}
+	catch (const Poco::TimeoutException&)
+	{
+	}
+	// The next call goes out after the cancel, and gets its own reply once
+	// the server has read the rest of the request.
+	client.setTimeout(Poco::Timespan(30, 0));
+	assertEqual(std::string("after"), text(client.callTool("echo", args("message", "after"))));
+	assertEqual(0, client.close());
+
+	// The input of the server: the echo request, and a cancel of its id.
+	std::ifstream in(inputLog.path(), std::ios::binary);
+	Poco::Dynamic::Var echoId;
+	bool cancelled = false;
+	std::string line;
+	while (std::getline(in, line))
+	{
+		Poco::JSON::Parser parser;
+		const Object::Ptr pMessage = parser.parse(line).extract<Object::Ptr>();
+		const std::string method = pMessage->optValue<std::string>("method", "");
+		const Object::Ptr pParams = pMessage->getObject("params");
+		if (method == "tools/call" && pParams->optValue<std::string>("name", "") == "echo") echoId = pMessage->get("id");
+		if (method == "notifications/cancelled" && !echoId.isEmpty() && pParams->get("requestId") == echoId) cancelled = true;
+	}
+	assertTrue(!echoId.isEmpty());
+	assertTrue(cancelled);
 }
 
 
@@ -414,6 +471,7 @@ CppUnit::Test* ProcessClientTest::suite()
 	CppUnit_addTest(pSuite, ProcessClientTest, testTimeout);
 	CppUnit_addTest(pSuite, ProcessClientTest, testServerEndsMidRequest);
 	CppUnit_addTest(pSuite, ProcessClientTest, testWriteToEndedServer);
+	CppUnit_addTest(pSuite, ProcessClientTest, testWriteTimeoutCancels);
 	CppUnit_addTest(pSuite, ProcessClientTest, testNoiseOnStandardOutput);
 	CppUnit_addTest(pSuite, ProcessClientTest, testCloseEndsServer);
 	CppUnit_addTest(pSuite, ProcessClientTest, testStubbornServerIsKilled);
