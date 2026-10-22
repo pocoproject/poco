@@ -25,6 +25,10 @@
 #include "Poco/Timestamp.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
+#include "Poco/AutoPtr.h"
+#include "Poco/Channel.h"
+#include "Poco/Logger.h"
+#include "Poco/Message.h"
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -39,6 +43,60 @@ using namespace Poco::Data::Keywords;
 using Poco::Data::SQLite::MemoryDB;
 using Poco::Data::SQLite::Utility;
 using Poco::Timespan;
+
+
+namespace
+{
+	class LogCapture
+		/// Collects what a logger writes for as long as it lives, then gives
+		/// the logger its channel back.
+	{
+	public:
+		explicit LogCapture(const std::string& name):
+			_logger(Poco::Logger::get(name)),
+			_previous(_logger.getChannel()),
+			_channel(new Collector)
+		{
+			_logger.setChannel(_channel);
+		}
+
+		~LogCapture()
+		{
+			_logger.setChannel(_previous);
+		}
+
+		std::size_t count(const std::string& text) const
+		{
+			return _channel->count(text);
+		}
+
+	private:
+		class Collector: public Poco::Channel
+		{
+		public:
+			void log(const Poco::Message& msg) override
+			{
+				std::lock_guard<std::mutex> lock(_mutex);
+				_texts.push_back(msg.getText());
+			}
+
+			std::size_t count(const std::string& text) const
+			{
+				std::lock_guard<std::mutex> lock(_mutex);
+				return static_cast<std::size_t>(std::count_if(_texts.begin(), _texts.end(),
+					[&text](const std::string& t) { return t.find(text) != std::string::npos; }));
+			}
+
+		private:
+			mutable std::mutex _mutex;
+			std::vector<std::string> _texts;
+		};
+
+		Poco::Logger& _logger;
+		Poco::Channel::Ptr _previous;
+		Poco::AutoPtr<Collector> _channel;
+	};
+}
 
 
 MemoryDBTest::MemoryDBTest(const std::string& name): CppUnit::TestCase(name)
@@ -1542,6 +1600,7 @@ void MemoryDBTest::testEmptiedShardStaysForNumbering()
 	// shard that is no longer loaded, and every call after it would fail.
 	MemoryDB::Options off;
 	off.loadArchivedShards = false;
+	off.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
 	{
 		MemoryDB db(_dir, off);
 		db << "CREATE TABLE q(id INTEGER PRIMARY KEY, v TEXT)", now;
@@ -1579,6 +1638,7 @@ void MemoryDBTest::testDeleteShardKeepsNumberingAtEmptyNewerRange()
 		try { Poco::File(_dir).remove(true); } catch (...) {}
 		MemoryDB::Options o;
 		o.loadArchivedShards = load;
+		o.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
 		{
 			MemoryDB db(_dir, o);
 			db << "CREATE TABLE q(id INTEGER PRIMARY KEY, v TEXT)", now;
@@ -1618,6 +1678,7 @@ void MemoryDBTest::testInsertBelowActiveRangeRejected()
 	// written. An INSERT there must poison the instance, not be lost silently.
 	MemoryDB::Options off;
 	off.loadArchivedShards = false;
+	off.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
 	MemoryDB db(_dir, off);
 	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
 	std::string v("x");
@@ -1641,6 +1702,44 @@ void MemoryDBTest::testInsertBelowActiveRangeRejected()
 	catch (Poco::NotImplementedException&)
 	{
 	}
+}
+
+
+void MemoryDBTest::testBlockedEvictionLeavesOtherTablesAlone()
+{
+	// A table without AUTOINCREMENT that has no row in the active shard keeps
+	// its whole shard in memory. The shard's other tables must then not be
+	// touched: deleting their rows and rolling the deletes back costs a shard's
+	// worth of work at every flush. A reader on a second connection holds the
+	// big table, so a DELETE of it fails, and the failure is logged.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	off.checkIntervalMs = 3600 * 1000; // only the flushes below; no timer flush in between
+	MemoryDB db(_dir, off);
+	db << "CREATE TABLE a_events(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+	db << "CREATE TABLE z_cfg(id INTEGER PRIMARY KEY, v TEXT)", now; // checked after a_events
+	std::string v("x");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO a_events(v) VALUES(:v)", use(v), now;
+	db << "INSERT INTO z_cfg(v) VALUES(:v)", use(v), now;
+	db.sealActive();
+	db.flush(); // z_cfg keeps shard 1 in memory
+	db << "INSERT INTO a_events(v) VALUES(:v)", use(v), now; // the next flush tries shard 1 again
+
+	LogCapture capture("Poco.Data.SQLite.MemoryDB");
+	{
+		// The same shared-cache in-memory database, on a connection of its own.
+		const std::string uri = db.session().uri();
+		Poco::Data::Session reader(Poco::Data::SQLite::Connector::KEY, uri.substr(uri.find(":///") + 4));
+		int id = 0;
+		Poco::Data::Statement stmt = (reader << "SELECT id FROM a_events", into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read lock on a_events
+		db.flush();
+	}
+
+	assertTrue (capture.count("removing its rows failed") == 0);
+	int inMain = 0;
+	db << "SELECT count(*) FROM a_events", into(inMain), now;
+	assertTrue (inMain == 4); // shard 1 is still in memory
 }
 
 
@@ -3063,6 +3162,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testEmptiedShardStaysForNumbering);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeepsNumberingAtEmptyNewerRange);
 	CppUnit_addTest(pSuite, MemoryDBTest, testInsertBelowActiveRangeRejected);
+	CppUnit_addTest(pSuite, MemoryDBTest, testBlockedEvictionLeavesOtherTablesAlone);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteActiveShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNonexistentShardRefused);

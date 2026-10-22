@@ -1447,10 +1447,15 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 	// free until the deletes are done.
 	if (sqlite3_txn_state(_memHandle, "main") != SQLITE_TXN_NONE) return Removal::SESSION_BUSY;
 
-	std::vector<std::string> tables = userTables(_persist);
-	_persist.begin();
+	// The numbering of every table is settled before any row is deleted: one
+	// table at risk keeps the whole shard, and deleting the other tables' rows
+	// only to roll them back would cost a shard's worth of work at every flush.
+	// The connection mutex the caller holds keeps the tables as they are from
+	// these reads to the deletes.
+	std::vector<std::pair<std::string, std::string> > deletes; // table -> WHERE
 	try
 	{
+		std::vector<std::string> tables = userTables(_persist);
 		for (const auto& r: ranges)
 		{
 			const std::string& t = r.first;
@@ -1464,7 +1469,7 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 			// that remain, the next row would be numbered inside one of them: an
 			// archived shard's row, or a rowid below the active range that no
 			// flush would ever save. The range's newest row then stays.
-			std::string keepClause;
+			std::string where = inRange;
 			auto f = floors.find(t);
 			if (f != floors.end() && f->second > 0 && !isAutoincrement(t))
 			{
@@ -1477,7 +1482,7 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 					// numbered inside the sealed ranges.
 					if (!keepRows)
 					{
-						_persist.rollback();
+						kept.clear();
 						return Removal::NUMBERING_AT_RISK;
 					}
 					// A newer shard may hold an empty range (floor, floor] of the
@@ -1488,21 +1493,35 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 					if (newest >= f->second)
 					{
 						kept[t] = newest;
-						keepClause = " AND rowid < " + Poco::NumberFormatter::format(newest);
+						where += " AND rowid < " + Poco::NumberFormatter::format(newest);
 					}
 				}
 			}
-			_persist << ("DELETE FROM " + quoteIdent(t) + " WHERE " + inRange + keepClause), now;
+			deletes.emplace_back(t, where);
+		}
+	}
+	catch (...)
+	{
+		kept.clear();
+		throw;
+	}
+
+	_persist.begin();
+	try
+	{
+		for (const auto& d: deletes)
+		{
+			_persist << ("DELETE FROM " + quoteIdent(d.first) + " WHERE " + d.second), now;
 
 			// The shard is marked non-resident on the strength of this, so a
 			// row left behind would be read twice by the history view.
 			int left = 0;
-			_persist << ("SELECT count(*) FROM " + quoteIdent(t) + " WHERE " + inRange + keepClause),
+			_persist << ("SELECT count(*) FROM " + quoteIdent(d.first) + " WHERE " + d.second),
 				into(left), now;
 			if (left != 0)
 			{
 				throw Poco::IllegalStateException("MemoryDB: " + Poco::NumberFormatter::format(left) +
-					" row(s) of table '" + t + "' remain in memory after their removal");
+					" row(s) of table '" + d.first + "' remain in memory after their removal");
 			}
 		}
 		_persist.commit();
