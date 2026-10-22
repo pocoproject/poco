@@ -26,6 +26,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Thread.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 #include "Poco/Buffer.h"
 #include "Poco/Event.h"
 #include "Poco/Mutex.h"
@@ -115,6 +116,23 @@ namespace
 	private:
 		std::size_t _bufSize;
 	};
+
+	template <typename Receive>
+	int receiveFrameNB(WebSocket& ws, Receive receive)
+		/// Calls receive(), which receives a frame from the non-blocking
+		/// WebSocket ws, until it returns a complete frame or no data arrives
+		/// within 10 seconds. Returns the result of the last call, or -1 if
+		/// no call was made.
+	{
+		const Poco::Timespan timeout(10, 0);
+		int n = -1;
+		Poco::Timestamp start;
+		while (n < 0 && !start.isElapsed(timeout.totalMicroseconds()) && ws.poll(timeout, Poco::Net::Socket::SELECT_READ))
+		{
+			n = receive();
+		}
+		return n;
+	}
 
 	struct SingleFrameState: public Poco::RefCountedObject
 		/// Shared with SingleFrameRequestHandler: the WebSocket it reads from,
@@ -214,6 +232,67 @@ namespace
 	private:
 		SingleFrameState::Ptr _pState;
 	};
+
+	struct UpgradeState: public Poco::RefCountedObject
+		/// Shared with UpgradeRequestHandler: the server-side WebSocket it
+		/// creates, for the test to receive from. Reference counted, because
+		/// the handler may still be returning when the test ends.
+	{
+		using Ptr = Poco::AutoPtr<UpgradeState>;
+
+		Poco::SharedPtr<WebSocket> pWebSocket;
+		Poco::Event upgraded;
+	};
+
+	class UpgradeRequestHandler: public Poco::Net::HTTPRequestHandler
+		/// Upgrades the connection and hands the WebSocket to the test.
+	{
+	public:
+		explicit UpgradeRequestHandler(UpgradeState::Ptr pState): _pState(pState)
+		{
+		}
+
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override
+		{
+			_pState->pWebSocket = new WebSocket(request, response);
+			_pState->upgraded.set();
+		}
+
+	private:
+		UpgradeState::Ptr _pState;
+	};
+
+	class UpgradeRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
+	{
+	public:
+		explicit UpgradeRequestHandlerFactory(UpgradeState::Ptr pState): _pState(pState)
+		{
+		}
+
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&) override
+		{
+			return new UpgradeRequestHandler(_pState);
+		}
+
+	private:
+		UpgradeState::Ptr _pState;
+	};
+
+	std::string maskedTextFrame(const std::string& payload)
+		/// Returns a text frame with the given payload of at most 125 bytes,
+		/// masked as a client sends it.
+	{
+		constexpr char mask[] = {'\x01', '\x02', '\x03', '\x04'};
+		std::string frame;
+		frame.push_back('\x81');
+		frame.push_back(static_cast<char>(0x80 | payload.size()));
+		frame.append(mask, sizeof(mask));
+		for (std::size_t i = 0; i < payload.size(); i++)
+		{
+			frame.push_back(static_cast<char>(payload[i] ^ mask[i % sizeof(mask)]));
+		}
+		return frame;
+	}
 }
 
 
@@ -582,6 +661,186 @@ void WebSocketTest::testWebSocketNB()
 }
 
 
+void WebSocketTest::testBlockingThenNonBlockingReceive()
+{
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+	HTTPResponse response;
+	WebSocket ws(cs, request, response);
+
+	char buffer[1024] = {};
+	int flags = 0;
+	std::string payload("blocking");
+	ws.sendFrame(payload.data(), static_cast<int>(payload.size()));
+	int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+	assertEqual (static_cast<int>(payload.size()), n);
+
+	ws.setBlocking(false);
+	payload = "non-blocking";
+	ws.sendFrame(payload.data(), static_cast<int>(payload.size()));
+	n = receiveFrameNB(ws, [&] { return ws.receiveFrame(buffer, sizeof(buffer), flags); });
+	assertEqual (static_cast<int>(payload.size()), n);
+	assertTrue (payload.compare(0, payload.size(), buffer, n) == 0);
+	assertTrue (flags == WebSocket::FRAME_TEXT);
+
+	ws.setBlocking(true);
+	payload = "blocking into a Buffer";
+	ws.sendFrame(payload.data(), static_cast<int>(payload.size()));
+	Poco::Buffer<char> pocoBuffer(0);
+	n = ws.receiveFrame(pocoBuffer, flags);
+	assertEqual (static_cast<int>(payload.size()), n);
+
+	ws.setBlocking(false);
+	payload = "non-blocking into a Buffer";
+	ws.sendFrame(payload.data(), static_cast<int>(payload.size()));
+	pocoBuffer.resize(0);
+	n = receiveFrameNB(ws, [&] { return ws.receiveFrame(pocoBuffer, flags); });
+	assertEqual (static_cast<int>(payload.size()), n);
+	assertTrue (payload.compare(0, payload.size(), pocoBuffer.begin(), n) == 0);
+	assertTrue (flags == WebSocket::FRAME_TEXT);
+
+	ws.close();
+	server.stop();
+}
+
+
+void WebSocketTest::testNonBlockingReceiveRetryWithLargerBuffer()
+{
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+	HTTPResponse response;
+	WebSocket ws(cs, request, response);
+	ws.setBlocking(false);
+
+	char buffer[1024] = {};
+	constexpr int smallBufferSize = 16;
+	int flags = 0;
+	// A frame of the same size is received first, so that a retry which
+	// wrongly continues the next frame writes into a buffer of that size and
+	// fails the checks below instead of crashing.
+	std::string payload(32, 'a');
+	ws.sendFrame(payload.data(), static_cast<int>(payload.size()));
+	int n = receiveFrameNB(ws, [&] { return ws.receiveFrame(buffer, sizeof(buffer), flags); });
+	assertEqual (static_cast<int>(payload.size()), n);
+
+	payload = "a payload larger than the buffer";
+	ws.sendFrame(payload.data(), static_cast<int>(payload.size()));
+	try
+	{
+		n = receiveFrameNB(ws, [&] { return ws.receiveFrame(buffer, smallBufferSize, flags); });
+		failmsg("must throw WebSocketException, but received " + std::to_string(n));
+	}
+	catch (WebSocketException& exc)
+	{
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_PAYLOAD_TOO_BIG), exc.code());
+	}
+
+	n = receiveFrameNB(ws, [&] { return ws.receiveFrame(buffer, sizeof(buffer), flags); });
+	assertEqual (static_cast<int>(payload.size()), n);
+	assertEqual (payload, std::string(buffer, n));
+	assertTrue (flags == WebSocket::FRAME_TEXT);
+
+	ws.close();
+	server.stop();
+}
+
+
+void WebSocketTest::testNonBlockingThenBlockingReceive()
+{
+	UpgradeState::Ptr pState = new UpgradeState;
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new UpgradeRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	// The client side is a plain socket, so that a frame can be sent in two
+	// parts.
+	Poco::Net::StreamSocket sock = connectWebSocket(ss.address());
+	assertTrue (pState->upgraded.tryWait(10000));
+	WebSocket& ws = *pState->pWebSocket;
+
+	const Poco::Timespan timeout(10, 0);
+	// The first part is the frame header and four payload bytes. The payload
+	// byte after them has an RSV bit set, so that a receive which takes the
+	// rest for a frame header fails.
+	constexpr int firstPartLength = 10;
+	char buffer[256] = {};
+	Poco::Buffer<char> pocoBuffer(0);
+	int flags = 0;
+	for (bool intoBuffer: {false, true})
+	{
+		const std::string payload = intoBuffer ? "second frame into a Buffer" : "first part, then the rest";
+		const std::string frame = maskedTextFrame(payload);
+		ws.setBlocking(false);
+		sock.sendBytes(frame.data(), firstPartLength);
+		assertTrue (ws.poll(timeout, Poco::Net::Socket::SELECT_READ));
+		assertEqual (-1, intoBuffer ? ws.receiveFrame(pocoBuffer, flags) : ws.receiveFrame(buffer, sizeof(buffer), flags));
+		sock.sendBytes(frame.data() + firstPartLength, static_cast<int>(frame.size()) - firstPartLength);
+		ws.setBlocking(true);
+		int n = intoBuffer ? ws.receiveFrame(pocoBuffer, flags) : ws.receiveFrame(buffer, sizeof(buffer), flags);
+		assertEqual (static_cast<int>(payload.size()), n);
+		assertEqual (payload, intoBuffer ? std::string(pocoBuffer.begin(), pocoBuffer.size()) : std::string(buffer, n));
+		assertTrue (flags == WebSocket::FRAME_TEXT);
+	}
+
+	sock.close();
+	ws.close();
+	server.stop();
+}
+
+
+void WebSocketTest::testNonBlockingThenBlockingReceiveCutShort()
+{
+	for (bool intoBuffer: {false, true})
+	{
+		UpgradeState::Ptr pState = new UpgradeState;
+		Poco::Net::ServerSocket ss(0);
+		Poco::Net::HTTPServer server(new UpgradeRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+		server.start();
+
+		Poco::Net::StreamSocket sock = connectWebSocket(ss.address());
+		assertTrue (pState->upgraded.tryWait(10000));
+		WebSocket& ws = *pState->pWebSocket;
+
+		const Poco::Timespan timeout(10, 0);
+		constexpr int firstPartLength = 10;
+		constexpr int secondPartLength = 4;
+		char buffer[256] = {};
+		Poco::Buffer<char> pocoBuffer(0);
+		int flags = 0;
+		const std::string frame = maskedTextFrame("first part, then less than the rest");
+		ws.setBlocking(false);
+		sock.sendBytes(frame.data(), firstPartLength);
+		assertTrue (ws.poll(timeout, Poco::Net::Socket::SELECT_READ));
+		assertEqual (-1, intoBuffer ? ws.receiveFrame(pocoBuffer, flags) : ws.receiveFrame(buffer, sizeof(buffer), flags));
+		// A part of the rest, then the end of the connection
+		sock.sendBytes(frame.data() + firstPartLength, secondPartLength);
+		sock.shutdownSend();
+		ws.setBlocking(true);
+		try
+		{
+			int n = intoBuffer ? ws.receiveFrame(pocoBuffer, flags) : ws.receiveFrame(buffer, sizeof(buffer), flags);
+			failmsg("must throw WebSocketException, but received " + std::to_string(n));
+		}
+		catch (WebSocketException& exc)
+		{
+			assertEqual (static_cast<int>(WebSocket::WS_ERR_INCOMPLETE_FRAME), exc.code());
+		}
+
+		sock.close();
+		ws.close();
+		server.stop();
+	}
+}
+
+
 int WebSocketTest::sendServerFrame(const std::string& frameBytes, int allowedRSV, int bufferSize, int* pFlags, int* pReceived)
 {
 	SingleFrameState::Ptr pState = new SingleFrameState;
@@ -840,6 +1099,10 @@ CppUnit::Test* WebSocketTest::suite()
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLarge);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLargeInOneFrame);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketNB);
+	CppUnit_addTest(pSuite, WebSocketTest, testBlockingThenNonBlockingReceive);
+	CppUnit_addTest(pSuite, WebSocketTest, testNonBlockingReceiveRetryWithLargerBuffer);
+	CppUnit_addTest(pSuite, WebSocketTest, testNonBlockingThenBlockingReceive);
+	CppUnit_addTest(pSuite, WebSocketTest, testNonBlockingThenBlockingReceiveCutShort);
 	CppUnit_addTest(pSuite, WebSocketTest, testPeerCloseAfterPartialHeader);
 	CppUnit_addTest(pSuite, WebSocketTest, testPeerCloseAfterPartialHeaderNB);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameUnmaskedClient);

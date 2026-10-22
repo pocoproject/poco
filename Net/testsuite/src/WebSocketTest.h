@@ -31,6 +31,10 @@ public:
 	void testWebSocketLarge();
 	void testWebSocketLargeInOneFrame();
 	void testWebSocketNB();
+	void testBlockingThenNonBlockingReceive();
+	void testNonBlockingReceiveRetryWithLargerBuffer();
+	void testNonBlockingThenBlockingReceive();
+	void testNonBlockingThenBlockingReceiveCutShort();
 	void testPeerCloseAfterPartialHeader();
 	void testPeerCloseAfterPartialHeaderNB();
 	void testMalformedFrameUnmaskedClient();
