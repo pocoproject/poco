@@ -268,8 +268,9 @@ public:
 		/// Receives a frame from the socket and stores it
 		/// in buffer. Up to length bytes are received. If
 		/// the frame's payload is larger, a WebSocketException
-		/// is thrown and the WebSocket connection must be
-		/// terminated.
+		/// (WS_ERR_PAYLOAD_TOO_BIG) is thrown and the frame stays
+		/// unread; calling receiveFrame() again with a large enough
+		/// buffer receives it.
 		///
 		/// The frame's payload size must not exceed the
 		/// maximum payload size set with setMaxPayloadSize().
@@ -320,6 +321,9 @@ public:
 		/// Eventually, receiveFrame() will return the complete frame.
 		/// The given buffer will not be modified until the full frame has 
 		/// been received.
+		/// If the socket is made blocking while a frame is partly
+		/// received, the next receiveFrame() waits for the rest of that
+		/// frame and returns the complete frame.
 
 	int receiveFrame(Poco::Buffer<char>& buffer, int& flags);
 		/// Receives a frame from the socket and stores it
@@ -383,6 +387,9 @@ public:
 		/// Eventually, receiveFrame() will return the complete frame.
 		/// The given buffer will not be modified until the full frame has 
 		/// been received.
+		/// If the socket is made blocking while a frame is partly
+		/// received, the next receiveFrame() waits for the rest of that
+		/// frame and returns the complete frame.
 
 	[[nodiscard]] Mode mode() const;
 		/// Returns WS_SERVER if the WebSocket is a server-side

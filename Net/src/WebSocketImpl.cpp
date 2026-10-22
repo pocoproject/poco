@@ -349,13 +349,19 @@ int WebSocketImpl::receivePayload(char *buffer, int payloadLength, char mask[MAS
 
 int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 {
-	if (getBlocking())
+	// A frame that a non-blocking receive has started is finished by the
+	// non-blocking path also in blocking mode, because only that path keeps
+	// the payload received so far.
+	if (getBlocking() && _receiveState.remainingPayloadLength == 0)
 	{
 		int payloadLength = -1;
 		while (payloadLength < 0)
 		{
 			payloadLength = peekHeader(_receiveState);
 		}
+		// The blocking path never leaves a partly received frame, so a
+		// non-blocking receive that follows starts with a frame header.
+		_receiveState.remainingPayloadLength = 0;
 		if (payloadLength <= 0)
 		{
 			skipHeader(_receiveState.headerLength);
@@ -385,6 +391,9 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 			}
 			else if (payloadLength > length)
 			{
+				// The header is still unread, so that a retry with a larger
+				// buffer receives this frame from its start.
+				_receiveState.remainingPayloadLength = 0;
 				throw WebSocketException(Poco::format("Insufficient buffer for payload size %d", payloadLength), WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 			}
 
@@ -410,6 +419,10 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 			else
 			{
 				_receiveState.maskOffset += n;
+				// In blocking mode, the rest of the payload is missing only if
+				// the peer has closed the connection.
+				if (getBlocking())
+					throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
 				return -1;
 			}
 		}
@@ -427,13 +440,19 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 
 int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Timespan&)
 {
-	if (getBlocking())
+	// A frame that a non-blocking receive has started is finished by the
+	// non-blocking path also in blocking mode, because only that path keeps
+	// the payload received so far.
+	if (getBlocking() && _receiveState.remainingPayloadLength == 0)
 	{
 		int payloadLength = -1;
 		while (payloadLength < 0)
 		{
 			payloadLength = peekHeader(_receiveState);
 		}
+		// The blocking path never leaves a partly received frame, so a
+		// non-blocking receive that follows starts with a frame header.
+		_receiveState.remainingPayloadLength = 0;
 		if (payloadLength <= 0)
 		{
 			skipHeader(_receiveState.headerLength);
@@ -482,6 +501,10 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 			else
 			{
 				_receiveState.maskOffset += n;
+				// In blocking mode, the rest of the payload is missing only if
+				// the peer has closed the connection.
+				if (getBlocking())
+					throw WebSocketException("Incomplete frame received", WebSocket::WS_ERR_INCOMPLETE_FRAME);
 				return -1;
 			}
 		}
