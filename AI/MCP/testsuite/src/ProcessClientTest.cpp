@@ -23,8 +23,13 @@
 #include "Poco/Thread.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <string>
 #include <vector>
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <pthread.h>
+#include <signal.h>
+#endif
 
 
 using Poco::AI::MCP::ProcessClient;
@@ -34,6 +39,30 @@ using Poco::JSON::Object;
 
 namespace
 {
+#if defined(POCO_OS_FAMILY_UNIX)
+	class PipeSignalLetThrough
+		/// Lets SIGPIPE through to the calling thread while it lives.
+	{
+	public:
+		PipeSignalLetThrough()
+		{
+			sigset_t pipeSignal;
+			sigemptyset(&pipeSignal);
+			sigaddset(&pipeSignal, SIGPIPE);
+			pthread_sigmask(SIG_UNBLOCK, &pipeSignal, &_saved);
+		}
+
+		~PipeSignalLetThrough()
+		{
+			pthread_sigmask(SIG_SETMASK, &_saved, nullptr);
+		}
+
+	private:
+		sigset_t _saved;
+	};
+#endif
+
+
 	std::string text(const ToolResult& result)
 	{
 		return result.content()->getObject(0)->getValue<std::string>("text");
@@ -107,6 +136,44 @@ void ProcessClientTest::testTimeout()
 	// The next call gets its own reply, not the late one.
 	client.setTimeout(Poco::Timespan(30, 0));
 	assertEqual(std::string("after the timeout"), text(client.callTool("echo", args("message", "after the timeout"))));
+}
+
+
+void ProcessClientTest::testWriteToEndedServer()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	// The threads of the client take over the signal mask of the thread that
+	// makes it, which lets SIGPIPE through unless Foundation made it.
+	PipeSignalLetThrough letThrough;
+#endif
+	ProcessClient client(serverPath(), std::vector<std::string>());
+	try
+	{
+		(void) client.callTool("exit", args("code", 7));
+		fail("a server that ends before the reply must throw");
+	}
+	catch (const Poco::IOException&)
+	{
+	}
+	// The write to the server that has ended fails, and this process lives
+	// on. Until the server has closed its standard input as well, a line may
+	// still go into the pipe, and the call fails as the server has ended.
+	bool refused = false;
+	const Poco::Timestamp writing;
+	while (!refused && writing.elapsed() < 10 * Poco::Timestamp::resolution())
+	{
+		try
+		{
+			(void) client.callTool("echo");
+			fail("a call to a server that has ended must throw");
+		}
+		catch (const Poco::IOException& exc)
+		{
+			refused = Poco::startsWith(exc.message(), std::string("Cannot write to the MCP server process"));
+		}
+	}
+	assertTrue(refused);
+	assertEqual(7, client.close());
 }
 
 
@@ -346,6 +413,7 @@ CppUnit::Test* ProcessClientTest::suite()
 	CppUnit_addTest(pSuite, ProcessClientTest, testRoundTrip);
 	CppUnit_addTest(pSuite, ProcessClientTest, testTimeout);
 	CppUnit_addTest(pSuite, ProcessClientTest, testServerEndsMidRequest);
+	CppUnit_addTest(pSuite, ProcessClientTest, testWriteToEndedServer);
 	CppUnit_addTest(pSuite, ProcessClientTest, testNoiseOnStandardOutput);
 	CppUnit_addTest(pSuite, ProcessClientTest, testCloseEndsServer);
 	CppUnit_addTest(pSuite, ProcessClientTest, testStubbornServerIsKilled);

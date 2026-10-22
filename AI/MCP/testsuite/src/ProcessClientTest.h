@@ -24,6 +24,7 @@ public:
 	void testRoundTrip();
 	void testTimeout();
 	void testServerEndsMidRequest();
+	void testWriteToEndedServer();
 	void testNoiseOnStandardOutput();
 	void testCloseEndsServer();
 	void testStubbornServerIsKilled();

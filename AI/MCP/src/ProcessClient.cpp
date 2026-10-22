@@ -23,6 +23,7 @@
 #include <deque>
 #include <utility>
 #if defined(POCO_OS_FAMILY_UNIX)
+#include <pthread.h>
 #include <signal.h>
 #include <sys/types.h>
 #endif
@@ -186,6 +187,16 @@ void ProcessClient::read(const std::shared_ptr<Reader>& pReader, Poco::Pipe pipe
 
 void ProcessClient::write(const std::shared_ptr<Writer>& pWriter, Poco::Pipe pipe)
 {
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	// A write to a server that has ended fails with EPIPE instead of ending
+	// the process with SIGPIPE. The thread takes over the signal mask of the
+	// one that made the client, which need not block it as a Poco::Thread
+	// does.
+	sigset_t pipeSignal;
+	sigemptyset(&pipeSignal);
+	sigaddset(&pipeSignal, SIGPIPE);
+	pthread_sigmask(SIG_BLOCK, &pipeSignal, nullptr);
+#endif
 	for (;;)
 	{
 		std::string line;

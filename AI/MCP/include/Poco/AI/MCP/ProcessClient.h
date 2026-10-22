@@ -51,7 +51,10 @@ class AIMCP_API ProcessClient: public Client
 	/// does not hold up close(). After a timeout the client sends
 	/// notifications/cancelled for the request and throws
 	/// Poco::TimeoutException. Only the reply to the request in flight is
-	/// kept; notifications and late replies are passed over.
+	/// kept; notifications and late replies are passed over. A request to a
+	/// server that has ended fails with a Poco::IOException; on POSIX
+	/// platforms the writer blocks SIGPIPE, whatever the signal mask of the
+	/// thread that makes the client.
 	///
 	/// close(), which the destructor calls, ends the server as the stdio
 	/// transport describes it: it closes the server's standard input, waits
