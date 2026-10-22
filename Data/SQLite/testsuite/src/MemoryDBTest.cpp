@@ -2048,15 +2048,21 @@ void MemoryDBTest::testDeleteNewestShardKeepsNoRowWhenNotNeeded()
 		db.sealActive();
 		db.flush();
 	}
-	MemoryDB db(_dir, off);
+	MemoryDB db(_dir, flushedByTest(false));
 	std::string v("x");
 	for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // 4, 5
-	db.sealActive();
-	db.flush();
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << "SELECT id FROM t", into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on main
+		db.sealActive();
+		db.flush(); // writes shard 2; its rows cannot leave memory now
+	}
 
 	std::vector<Poco::UInt32> ids = db.archivedShardIds();
 	assertTrue (ids.size() == 2);
-	db.deleteShard(ids.back());
+	db.deleteShard(ids.back()); // removes shard 2's rows from memory itself
+	assertTrue (!db.dirty());
 
 	int n = -1;
 	db << "SELECT count(*) FROM t", into(n), now;
