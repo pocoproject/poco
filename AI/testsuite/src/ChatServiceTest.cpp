@@ -1773,7 +1773,11 @@ void ChatServiceTest::testEndpointRefusals()
 	assertEqual(413, host.send("POST", "chat/stream", "{\"messages\":[{\"role\":\"user\",\"content\":\"" + std::string(300, 'x') + "\"}]}").status);
 	assertEqual(400, host.send("POST", "models", "[1]", "root", true).status);
 	assertEqual(400, host.send("POST", "models", "{\"model\":7}", "root", true).status);
-	assertEqual(405, host.send("DELETE", "models", "", "root", true).status);
+	const Answer notAllowed = host.send("DELETE", "models", "", "root", true);
+	assertEqual(405, notAllowed.status);
+	// The error follows from the status, the detail tells why.
+	assertEqual(std::string("method not allowed"), notAllowed.json()->getValue<std::string>("error"));
+	assertMessageEqual("the route takes POST", notAllowed.json()->getValue<std::string>("detail"));
 }
 
 

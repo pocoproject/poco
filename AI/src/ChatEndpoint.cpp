@@ -18,6 +18,7 @@
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/MediaType.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/Logger.h"
@@ -43,14 +44,27 @@ namespace
 	const std::vector<std::string> ROUTES = {"health", "chat/stream", "chat/cancel", "models", "providers", "config", "key"};
 
 
-	struct Refusal
-		/// A request the endpoint refuses: the status of its answer, and the
-		/// error and detail the answer carries.
+	POCO_DECLARE_EXCEPTION(, Refusal, Poco::Net::HTTPException)
+		/// A request the endpoint refuses: code() is the status of the answer,
+		/// message() the detail it carries.
+
+	POCO_IMPLEMENT_EXCEPTION(Refusal, Poco::Net::HTTPException, "Request refused")
+
+
+	std::string errorOf(Poco::Net::HTTPResponse::HTTPStatus status)
+		/// The error of an answer with the status.
 	{
-		Poco::Net::HTTPResponse::HTTPStatus status;
-		std::string error;
-		std::string detail;
-	};
+		switch (status)
+		{
+		case Poco::Net::HTTPResponse::HTTP_BAD_REQUEST: return "bad request";
+		case Poco::Net::HTTPResponse::HTTP_FORBIDDEN: return "forbidden";
+		case Poco::Net::HTTPResponse::HTTP_NOT_FOUND: return "not found";
+		case Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED: return "method not allowed";
+		case Poco::Net::HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE: return "too large";
+		case Poco::Net::HTTPResponse::HTTP_UNSUPPORTED_MEDIA_TYPE: return "unsupported media type";
+		default: return "internal error";
+		}
+	}
 
 
 	void sendJSON(Poco::Net::HTTPServerResponse& response, Poco::Net::HTTPResponse::HTTPStatus status, const Poco::JSON::Object::Ptr& pBody)
@@ -103,7 +117,7 @@ namespace
 	{
 		if (request.getMethod() != method)
 		{
-			throw Refusal{Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED, "method not allowed", "the route takes " + method};
+			throw Refusal("the route takes " + method, Poco::Net::HTTPResponse::HTTP_METHOD_NOT_ALLOWED);
 		}
 	}
 
@@ -112,7 +126,7 @@ namespace
 	{
 		if (!caller.mayManage)
 		{
-			throw Refusal{Poco::Net::HTTPResponse::HTTP_FORBIDDEN, "forbidden", "the caller may not manage the chat"};
+			throw Refusal("the caller may not manage the chat", Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
 		}
 	}
 
@@ -121,7 +135,7 @@ namespace
 	{
 		if (!params.keysFromRequests)
 		{
-			throw Refusal{Poco::Net::HTTPResponse::HTTP_FORBIDDEN, "forbidden", "the keys of the providers come from the configuration of the host"};
+			throw Refusal("the keys of the providers come from the configuration of the host", Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
 		}
 	}
 
@@ -166,7 +180,7 @@ namespace
 		{
 			if (current.name == entry.name && !ChatService::sameAddress(current, entry))
 			{
-				throw Refusal{Poco::Net::HTTPResponse::HTTP_FORBIDDEN, "forbidden", "the base URL and the servers of a provider with a key come from the configuration of the host"};
+				throw Refusal("the base URL and the servers of a provider with a key come from the configuration of the host", Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
 			}
 		}
 	}
@@ -176,7 +190,7 @@ namespace
 	{
 		const Poco::Dynamic::Var value = pObject->get(name);
 		if (value.isEmpty()) return std::string();
-		if (!value.isString()) throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", name + " is not a string"};
+		if (!value.isString()) throw Refusal(name + " is not a string", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 		return value.extract<std::string>();
 	}
 
@@ -275,7 +289,7 @@ void ChatEndpoint::handle(const std::string& route, Poco::Net::HTTPServerRequest
 	{
 		if (request.has("Origin") && !allowsOrigin(_params, request.get("Origin"), request.get(Poco::Net::HTTPRequest::HOST, "")))
 		{
-			throw Refusal{Poco::Net::HTTPResponse::HTTP_FORBIDDEN, "forbidden", "the origin of the page is not allowed"};
+			throw Refusal("the origin of the page is not allowed", Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
 		}
 		if (route == "health")
 		{
@@ -288,19 +302,20 @@ void ChatEndpoint::handle(const std::string& route, Poco::Net::HTTPServerRequest
 		else if (route == "providers") providers(request, response, caller);
 		else if (route == "config") config(request, response, caller);
 		else if (route == "key") key(request, response, caller);
-		else throw Refusal{Poco::Net::HTTPResponse::HTTP_NOT_FOUND, "not found", "no route " + route};
+		else throw Refusal("no route " + route, Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
 	}
 	catch (const Refusal& refusal)
 	{
-		sendError(response, refusal.status, refusal.error, refusal.detail);
+		const auto status = static_cast<Poco::Net::HTTPResponse::HTTPStatus>(refusal.code());
+		sendError(response, status, errorOf(status), refusal.message());
 	}
 	catch (const Poco::InvalidArgumentException& exc)
 	{
-		sendError(response, Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", exc.message());
+		sendError(response, Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, errorOf(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST), exc.message());
 	}
 	catch (const Poco::NotFoundException& exc)
 	{
-		sendError(response, Poco::Net::HTTPResponse::HTTP_NOT_FOUND, "not found", exc.message());
+		sendError(response, Poco::Net::HTTPResponse::HTTP_NOT_FOUND, errorOf(Poco::Net::HTTPResponse::HTTP_NOT_FOUND), exc.message());
 	}
 	catch (const Poco::Exception& exc)
 	{
@@ -339,7 +354,7 @@ void ChatEndpoint::stream(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 	const Poco::JSON::Object::Ptr pRequest = readObject(request, _params.maxChatBodySize);
 	if (!pRequest->isArray("messages"))
 	{
-		throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "the request has no messages"};
+		throw Refusal("the request has no messages", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 	}
 	// Only text messages of the user and the assistant: what the provider
 	// gets beyond them is the service's.
@@ -351,7 +366,7 @@ void ChatEndpoint::stream(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		const std::string role = pMessage.isNull() ? std::string() : pMessage->optValue<std::string>("role", "");
 		if (pMessage.isNull() || (role != "user" && role != "assistant") || !pMessage->get("content").isString())
 		{
-			throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "a message is not an object with the role user or assistant and a text"};
+			throw Refusal("a message is not an object with the role user or assistant and a text", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 		}
 		Poco::JSON::Object::Ptr pCopy = new Poco::JSON::Object;
 		pCopy->set("role", role);
@@ -360,7 +375,7 @@ void ChatEndpoint::stream(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 	}
 	if (conversation.size() == 0)
 	{
-		throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "the request has no messages"};
+		throw Refusal("the request has no messages", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 	}
 	std::string chatId = stringMember(pRequest, "chat");
 	if (chatId.empty()) chatId = Poco::UUIDGenerator::defaultGenerator().createRandom().toString();
@@ -512,7 +527,7 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 	const Poco::JSON::Object::Ptr pRequest = readObject(request, _params.maxBodySize);
 	if (!pRequest->isArray("providers"))
 	{
-		throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "the request has no providers"};
+		throw Refusal("the request has no providers", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 	}
 	const Poco::JSON::Array::Ptr pProviders = pRequest->getArray("providers");
 	const ChatSettings current = _service.settings();
@@ -521,7 +536,7 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 	{
 		if (!pProviders->isObject(static_cast<unsigned>(i)))
 		{
-			throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "a provider is not an object"};
+			throw Refusal("a provider is not an object", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 		}
 		ProviderSettings entry;
 		try
@@ -530,7 +545,7 @@ void ChatEndpoint::config(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTP
 		}
 		catch (const Poco::DataFormatException& exc)
 		{
-			throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", exc.message()};
+			throw Refusal(exc.message(), Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 		}
 		if (!entry.apiKey.empty()) needsKeysFromRequests(_params);
 		if (!_params.keysFromRequests && ProviderSettings::usesApiKey(entry.effectiveKind())) needsSameAddress(current, entry);
@@ -565,11 +580,11 @@ Poco::JSON::Object::Ptr ChatEndpoint::readObject(Poco::Net::HTTPServerRequest& r
 {
 	if (!isJSON(request.getContentType()))
 	{
-		throw Refusal{Poco::Net::HTTPResponse::HTTP_UNSUPPORTED_MEDIA_TYPE, "unsupported media type", "the body is not JSON"};
+		throw Refusal("the body is not JSON", Poco::Net::HTTPResponse::HTTP_UNSUPPORTED_MEDIA_TYPE);
 	}
 	if (request.hasContentLength() && request.getContentLength64() > static_cast<Poco::Int64>(maxSize))
 	{
-		throw Refusal{Poco::Net::HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE, "too large", "the body is larger than the limit"};
+		throw Refusal("the body is larger than the limit", Poco::Net::HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE);
 	}
 	std::string body;
 	try
@@ -578,16 +593,16 @@ Poco::JSON::Object::Ptr ChatEndpoint::readObject(Poco::Net::HTTPServerRequest& r
 	}
 	catch (const Poco::DataFormatException&)
 	{
-		throw Refusal{Poco::Net::HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE, "too large", "the body is larger than the limit"};
+		throw Refusal("the body is larger than the limit", Poco::Net::HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE);
 	}
 	if (Poco::AI::MCP::HTTP::Impl::brokeOff(request, body.size()))
 	{
-		throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "the body broke off"};
+		throw Refusal("the body broke off", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 	}
 	const Poco::JSON::Object::Ptr pObject = Poco::AI::MCP::HTTP::Impl::parseObject(body);
 	if (pObject.isNull())
 	{
-		throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "the body is not a JSON object"};
+		throw Refusal("the body is not a JSON object", Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
 	}
 	return pObject;
 }
