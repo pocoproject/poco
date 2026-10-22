@@ -72,6 +72,28 @@ namespace
 	};
 
 
+	std::string currentExceptionText()
+		// The text of the exception being handled; call only inside a catch block.
+	{
+		try
+		{
+			throw;
+		}
+		catch (const Poco::Exception& e)
+		{
+			return e.displayText();
+		}
+		catch (const std::exception& e)
+		{
+			return e.what();
+		}
+		catch (...)
+		{
+			return "unknown exception";
+		}
+	}
+
+
 	std::string quoteIdent(const std::string& s)
 	{
 		std::string r("\"");
@@ -1236,8 +1258,21 @@ MemoryDB::Install MemoryDB::installShardFile(Poco::UInt32 shardId, bool sealed,
 	// A statement still reading the shard keeps it attached: the new file is
 	// dropped, and the shard waits for a later flush.
 	if (txn > SQLITE_TXN_NONE) return Install::BUSY;
-	if (txn == SQLITE_TXN_NONE) execDirect(_memHandle, "DETACH DATABASE " + alias);
 	// txn < 0: detached out-of-band through session(); nothing to detach
+	if (txn == SQLITE_TXN_NONE)
+	{
+		try
+		{
+			execDirect(_memHandle, "DETACH DATABASE " + alias);
+		}
+		catch (...)
+		{
+			Poco::Logger::get("Poco.Data.SQLite.MemoryDB").error(
+				"shard %u not written, the flush fails: detaching %s for the rewrite failed: %s",
+				shardId, alias, currentExceptionText());
+			throw;
+		}
+	}
 
 	try
 	{
@@ -1248,8 +1283,17 @@ MemoryDB::Install MemoryDB::installShardFile(Poco::UInt32 shardId, bool sealed,
 		// the old file is still in place: give its holders their alias back
 		if (at->second > 0)
 		{
-			try { execDirect(_memHandle, attach); }
-			catch (...) { _attached.erase(at); }
+			try
+			{
+				execDirect(_memHandle, attach);
+			}
+			catch (...)
+			{
+				Poco::Logger::get("Poco.Data.SQLite.MemoryDB").warning(
+					"shard %u: attaching its old file as %s again failed, statements on %s find no such table: %s",
+					shardId, alias, alias, currentExceptionText());
+				_attached.erase(at);
+			}
 		}
 		else _attached.erase(at);
 		throw;
@@ -1267,6 +1311,9 @@ MemoryDB::Install MemoryDB::installShardFile(Poco::UInt32 shardId, bool sealed,
 	catch (...)
 	{
 		// its holders now see "no such table", as after deleteShard's force-detach
+		Poco::Logger::get("Poco.Data.SQLite.MemoryDB").warning(
+			"shard %u written, but attaching its new file as %s failed, statements on %s find no such table: %s",
+			shardId, alias, alias, currentExceptionText());
 		_attached.erase(at);
 		return Install::DETACHED;
 	}
