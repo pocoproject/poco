@@ -25,6 +25,7 @@ public:
 	~DialogSocketTest();
 
 	void testDialogSocket();
+	void testReceiveStatusMessageAtEndOfConnection();
 
 	void setUp();
 	void tearDown();

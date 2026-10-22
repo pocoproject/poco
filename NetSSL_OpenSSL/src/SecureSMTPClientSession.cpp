@@ -27,6 +27,12 @@ SecureSMTPClientSession::SecureSMTPClientSession(const StreamSocket& socket):
 }
 
 
+SecureSMTPClientSession::SecureSMTPClientSession(const StreamSocket& socket, const std::string& host):
+	SMTPClientSession(socket, host)
+{
+}
+
+
 SecureSMTPClientSession::SecureSMTPClientSession(const std::string& host, Poco::UInt16 port):
 	SMTPClientSession(host, port)
 {

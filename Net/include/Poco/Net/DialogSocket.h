@@ -127,6 +127,10 @@ public:
 		/// The response contains all response lines, separated by a newline
 		/// character, including the status code. The status code is returned.
 		/// If the response line does not contain a status code, 0 is returned.
+		///
+		/// If the peer closes the connection before the last line of a
+		/// multi-line response, 0 is returned and the response contains
+		/// the lines received so far.
 
 	[[nodiscard]] int get();
 		/// Reads one character from the connection.

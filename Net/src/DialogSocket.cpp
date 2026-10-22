@@ -160,7 +160,16 @@ int DialogSocket::receiveStatusMessage(std::string& message)
 		while (status <= 0)
 		{
 			message += '\n';
-			status = receiveStatusLine(message, message.length() + MAX_LINE_LENGTH);
+			const std::size_t length = message.length();
+			status = receiveStatusLine(message, length + MAX_LINE_LENGTH);
+			// receiveStatusLine() appends the first character it reads unless the
+			// connection has ended, so nothing appended means that the peer closed
+			// the connection.
+			if (message.length() == length)
+			{
+				message.pop_back();
+				return 0;
+			}
 		}
 	}
 	return status;

@@ -16,6 +16,7 @@
 #include "HTTPSServerTestSuite.h"
 #include "WebSocketTestSuite.h"
 #include "SecureSyslogTest.h"
+#include "SecureSMTPClientSessionTest.h"
 
 
 CppUnit::Test* NetSSLTestSuite::suite()
@@ -29,6 +30,7 @@ CppUnit::Test* NetSSLTestSuite::suite()
 	pSuite->addTest(HTTPSServerTestSuite::suite());
 	pSuite->addTest(WebSocketTestSuite::suite());
 	pSuite->addTest(SecureSyslogTest::suite());
+	pSuite->addTest(SecureSMTPClientSessionTest::suite());
 
 	return pSuite;
 }

@@ -27,6 +27,7 @@ public:
 	void testLoginEHLO();
 	void testLoginHELO();
 	void testLoginFailed();
+	void testLoginConnectedSocketWithHost();
 	void testSend();
 	void testSendMultiRecipient();
 	void testMultiSeparateRecipient();

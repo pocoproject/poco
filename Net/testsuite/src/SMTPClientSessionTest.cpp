@@ -100,6 +100,23 @@ void SMTPClientSessionTest::testLoginFailed()
 }
 
 
+void SMTPClientSessionTest::testLoginConnectedSocketWithHost()
+{
+	DialogServer server;
+	server.addResponse("220 localhost SMTP ready");
+	server.addResponse("250 Hello localhost");
+	server.addResponse("221 Bye");
+	StreamSocket socket(SocketAddress("127.0.0.1", server.port()));
+	SMTPClientSession session(socket, "localhost");
+	session.login("localhost");
+	std::string cmd = server.popCommand();
+	assertTrue (cmd == "EHLO localhost");
+	session.close();
+	cmd = server.popCommand();
+	assertTrue (cmd == "QUIT");
+}
+
+
 void SMTPClientSessionTest::testSend()
 {
 	DialogServer server;
@@ -458,6 +475,7 @@ CppUnit::Test* SMTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testLoginEHLO);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testLoginHELO);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testLoginFailed);
+	CppUnit_addTest(pSuite, SMTPClientSessionTest, testLoginConnectedSocketWithHost);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSend);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendMultiRecipient);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testMultiSeparateRecipient);
