@@ -59,6 +59,15 @@ public:
 		/// the given socket, which must be connected
 		/// to a SMTP server.
 
+	SMTPClientSession(const StreamSocket& socket, const std::string& host);
+		/// Creates the SMTPClientSession using
+		/// the given socket, which must be connected
+		/// to the SMTP server with the given host name.
+		///
+		/// The host name is used for NTLM authentication with SSPI
+		/// and, in SecureSMTPClientSession, to verify the server
+		/// certificate after STARTTLS.
+
 	SMTPClientSession(const std::string& host, Poco::UInt16 port = SMTP_PORT);
 		/// Creates the SMTPClientSession using a socket connected
 		/// to the given host and port.

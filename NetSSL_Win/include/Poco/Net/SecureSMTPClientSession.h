@@ -50,6 +50,14 @@ public:
 		/// the given socket, which must be connected
 		/// to a SMTP server.
 
+	SecureSMTPClientSession(const StreamSocket& socket, const std::string& host);
+		/// Creates the SecureSMTPClientSession using
+		/// the given socket, which must be connected
+		/// to the SMTP server with the given host name.
+		///
+		/// startTLS() verifies the server certificate
+		/// against the given host name.
+
 	SecureSMTPClientSession(const std::string& host, Poco::UInt16 port = SMTP_PORT);
 		/// Creates the SecureSMTPClientSession using a socket connected
 		/// to the given host and port.

@@ -68,6 +68,14 @@ SMTPClientSession::SMTPClientSession(const StreamSocket& socket):
 }
 
 
+SMTPClientSession::SMTPClientSession(const StreamSocket& socket, const std::string& host):
+	_host(host),
+	_socket(socket),
+	_isOpen(false)
+{
+}
+
+
 SMTPClientSession::SMTPClientSession(const std::string& host, Poco::UInt16 port):
 	_host(host),
 	_socket(SocketAddress(host, port)),

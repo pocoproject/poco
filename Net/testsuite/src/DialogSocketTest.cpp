@@ -13,12 +13,21 @@
 #include "CppUnit/TestSuite.h"
 #include "EchoServer.h"
 #include "Poco/Net/DialogSocket.h"
+#include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/StreamSocket.h"
+#include <chrono>
 #include <cstring>
+#include <future>
+#include <memory>
+#include <thread>
+#include <utility>
 
 
 using Poco::Net::DialogSocket;
+using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
+using Poco::Net::StreamSocket;
 
 
 DialogSocketTest::DialogSocketTest(const std::string& name): CppUnit::TestCase(name)
@@ -90,6 +99,36 @@ void DialogSocketTest::testDialogSocket()
 }
 
 
+void DialogSocketTest::testReceiveStatusMessageAtEndOfConnection()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	const auto pDS = std::make_shared<DialogSocket>(server.address());
+	StreamSocket peer = server.acceptConnection();
+	const std::string reply("100-x\r\n");
+	peer.sendBytes(reply.data(), static_cast<int>(reply.size()));
+	peer.close();
+
+	std::packaged_task<std::pair<int, std::string>()> task([pDS]()
+		{
+			std::string message;
+			const int status = pDS->receiveStatusMessage(message);
+			return std::make_pair(status, message);
+		});
+	std::future<std::pair<int, std::string>> done = task.get_future();
+	std::thread worker(std::move(task));
+	if (done.wait_for(std::chrono::seconds(5)) != std::future_status::ready)
+	{
+		// The call cannot be interrupted; the worker owns the socket and is left running.
+		worker.detach();
+		failmsg("receiveStatusMessage() does not return after the peer closed the connection");
+	}
+	worker.join();
+	const auto [status, message] = done.get();
+	assertEqual (0, status);
+	assertEqual ("100-x", message);
+}
+
+
 void DialogSocketTest::setUp()
 {
 }
@@ -105,6 +144,7 @@ CppUnit::Test* DialogSocketTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DialogSocketTest");
 
 	CppUnit_addTest(pSuite, DialogSocketTest, testDialogSocket);
+	CppUnit_addTest(pSuite, DialogSocketTest, testReceiveStatusMessageAtEndOfConnection);
 
 	return pSuite;
 }

@@ -142,7 +142,7 @@ void DialogServer::run()
 					std::string command;
 					while (ds.receiveMessage(command))
 					{
-						if ((command == "AUTH TLS") || (command == "AUTH SSL"))
+						if ((command == "AUTH TLS") || (command == "AUTH SSL") || (command == "STARTTLS"))
 						{
 							handleSSLrequest(ds, _ssl, _SSLsession);
 							continue;
