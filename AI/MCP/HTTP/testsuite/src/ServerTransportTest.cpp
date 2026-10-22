@@ -31,10 +31,13 @@
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Event.h"
+#include "Poco/Timestamp.h"
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include "Poco/URI.h"
@@ -47,6 +50,7 @@
 #include <atomic>
 #include <functional>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -586,6 +590,45 @@ void ServerTransportTest::testRepeatedHeaders()
 }
 
 
+void ServerTransportTest::testClientGoneCancels()
+{
+	// A handler that runs long learns from isCancelled() that the client has
+	// closed its connection.
+	Server server;
+	buildServer(server);
+	Poco::Event started;
+	Poco::Event cancelled;
+	Poco::AI::MCP::Tool waiting;
+	waiting.name = "wait";
+	waiting.handler = [&started, &cancelled](const Object::Ptr&, const Poco::AI::MCP::RequestContext& context)
+	{
+		started.set();
+		const Poco::Timestamp waitingSince;
+		while (!context.isCancelled() && waitingSince.elapsed() < 10 * Poco::Timestamp::resolution())
+		{
+			Poco::Thread::sleep(10);
+		}
+		if (context.isCancelled()) cancelled.set();
+		return Poco::AI::MCP::ToolResult();
+	};
+	server.registerTool(waiting);
+	Endpoint endpoint(server);
+	{
+		const std::string body = request(Id(1), "tools/call", "{\"name\":\"wait\"}");
+		std::ostringstream text;
+		text << "POST /mcp HTTP/1.1\r\nHost: 127.0.0.1\r\n";
+		for (const auto& header: headersOf("tools/call", "wait")) text << header.first << ": " << header.second << "\r\n";
+		text << "Content-Length: " << body.size() << "\r\n\r\n" << body;
+		const std::string bytes = text.str();
+		Poco::Net::StreamSocket socket(Poco::Net::SocketAddress("127.0.0.1", Poco::URI(endpoint.url()).getPort()));
+		socket.sendBytes(bytes.data(), static_cast<int>(bytes.size()));
+		assertTrue(started.tryWait(10000));
+		socket.close();
+	}
+	assertTrue(cancelled.tryWait(10000));
+}
+
+
 void ServerTransportTest::testNameHeader()
 {
 	Server server;
@@ -1110,6 +1153,7 @@ CppUnit::Test* ServerTransportTest::suite()
 	CppUnit_addTest(pSuite, ServerTransportTest, testStandardHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testNameHeader);
 	CppUnit_addTest(pSuite, ServerTransportTest, testRepeatedHeaders);
+	CppUnit_addTest(pSuite, ServerTransportTest, testClientGoneCancels);
 	CppUnit_addTest(pSuite, ServerTransportTest, testParamHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testEncodedWords);
 	CppUnit_addTest(pSuite, ServerTransportTest, testDecodedHeadersRefused);

@@ -77,6 +77,11 @@ class AIMCPHTTP_API ServerTransport
 	/// The refusals before the body carry no message, and a request refused
 	/// before its body was read ends its connection.
 	///
+	/// The RequestContext a handler gets tells with isCancelled() what the
+	/// context of the host tells, and that the client has closed its
+	/// connection, which counts as a cancel; a handler that runs long asks
+	/// it now and then. Over TLS only the context of the host tells.
+	///
 	/// The server then answers the message. Its reply goes out with 200, but
 	/// for the errors that refuse a request before its method runs:
 	/// METHOD_NOT_FOUND gets 404; INVALID_REQUEST, UNSUPPORTED_PROTOCOL_VERSION,

@@ -19,13 +19,17 @@
 #include "Poco/AI/MCP/MCPException.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/MediaType.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
 #include "Poco/Logger.h"
 #include "Poco/Exception.h"
+#include <functional>
 #include <optional>
 #include <set>
+#include <typeinfo>
 
 
 namespace Poco::AI::MCP::HTTP {
@@ -74,6 +78,40 @@ namespace
 		if (it == request.end()) return false;
 		value = Poco::trim(it->second);
 		return true;
+	}
+
+
+	std::function<bool ()> clientGone(const Poco::Net::HTTPServerRequest& request)
+		/// Returns a function that tells, without waiting, whether the client
+		/// of the request has closed its connection: whether its socket reads
+		/// the end, or fails. A request sent behind this one is no end. Over
+		/// TLS, where looking ahead may wait for a whole record, and for a
+		/// request that does not give its socket, the function returns false.
+	{
+		if (request.secure()) return [] { return false; };
+		try
+		{
+			// socket() is not const; the request the HTTP server made is not
+			// either.
+			Poco::Net::StreamSocket socket = const_cast<Poco::Net::HTTPServerRequestImpl&>(dynamic_cast<const Poco::Net::HTTPServerRequestImpl&>(request)).socket();
+			return [socket]() mutable
+			{
+				try
+				{
+					if (!socket.poll(Poco::Timespan(), Poco::Net::Socket::SELECT_READ)) return false;
+					char next = 0;
+					return socket.receiveBytes(&next, 1, MSG_PEEK) <= 0;
+				}
+				catch (const Poco::Exception&)
+				{
+					return true;
+				}
+			};
+		}
+		catch (const std::bad_cast&)
+		{
+			return [] { return false; };
+		}
 	}
 
 
@@ -511,8 +549,12 @@ ServerTransport::Reply ServerTransport::answerMessage(Server& server, const Poco
 		return errorReply(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, isValidId(id) ? id : Id(), ErrorCode::HEADER_MISMATCH, "Header mismatch: " + mismatch);
 	}
 
+	// A handler learns from isCancelled() that the client has gone, besides
+	// what the context of the host tells.
+	RequestContext handled(context);
+	handled.cancelled = [given = context.cancelled, gone = clientGone(request)]() { return (given && given()) || gone(); };
 	Reply reply;
-	reply.message = server.handle(pMessage, context);
+	reply.message = server.handle(pMessage, handled);
 	if (reply.message.isNull())
 	{
 		reply.status = Poco::Net::HTTPResponse::HTTP_ACCEPTED;
