@@ -20,6 +20,7 @@
 
 #include "Poco/Prometheus/Prometheus.h"
 #include "Poco/Prometheus/Registry.h"
+#include <atomic>
 
 
 namespace Poco::Prometheus {
@@ -35,14 +36,16 @@ class Prometheus_API Collector
 	///
 	/// Collector objects automatically register themselves
 	/// with the default Registry (unless a nullptr is passed to the
-	/// constructor's pRegistry parameter), but do not automatically
-	/// unregister. This brings the danger of dangling pointers if
-	/// Collector instances are destroyed without being explicitly
-	/// unregistered first. In most practical cases this is not an
-	/// issue as Collector instances will be alive for the entire
-	/// run time of the process. However, it can be an issue if
-	/// Collector instances are created and destroyed dynamically
-	/// during the run time of the process.
+	/// constructor's pRegistry parameter), and unregister themselves
+	/// when they are destroyed. A Collector is registered with
+	/// at most one Registry at a time.
+	///
+	/// A class derived from Collector must call unregister() at the
+	/// start of its destructor, before any member that exportTo()
+	/// uses is destroyed; otherwise a Registry::exportTo() running
+	/// in another thread can use a partially destroyed object.
+	/// The Collector destructor calls it as well, but too late for
+	/// this.
 {
 public:
 	[[nodiscard]] const std::string& name() const;
@@ -52,7 +55,7 @@ public:
 		/// Writes the given Metric to the Exporter.
 
 	virtual ~Collector();
-		/// Destroys the Collector.
+		/// Unregisters and destroys the Collector.
 
 protected:
 	Collector(const std::string& name);
@@ -69,16 +72,24 @@ protected:
 		/// The name must be a valid metric name and match the regular
 		/// expression [a-zA-Z_:][a-zA-Z0-9_:]*.
 
+	void unregister();
+		/// Removes the Collector from the Registry it is registered with.
+		///
+		/// Does nothing if the Collector is not registered with a Registry.
+
 	[[nodiscard]] static const std::string& validateName(const std::string& name);
 
 private:
 	const std::string _name;
+	std::atomic<Registry*> _pRegistry{nullptr};
 
 	Collector() = delete;
 	Collector(const Collector&) = delete;
 	Collector(Collector&&) = delete;
 	Collector& operator = (const Collector&) = delete;
 	Collector& operator = (Collector&&) = delete;
+
+	friend class Registry;
 };
 
 

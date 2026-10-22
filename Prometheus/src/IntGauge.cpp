@@ -20,7 +20,10 @@
 namespace Poco::Prometheus {
 
 
-IntGauge::~IntGauge() = default;
+IntGauge::~IntGauge()
+{
+	unregister();
+}
 
 
 void IntGauge::exportTo(Exporter& exporter) const

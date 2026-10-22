@@ -16,6 +16,7 @@
 #include "CallbackMetricTest.h"
 #include "HistogramTest.h"
 #include "ProcessCollectorTest.h"
+#include "RegistryTest.h"
 
 
 CppUnit::Test* PrometheusTestSuite::suite()
@@ -29,6 +30,7 @@ CppUnit::Test* PrometheusTestSuite::suite()
 	pSuite->addTest(CallbackMetricTest::suite());
 	pSuite->addTest(HistogramTest::suite());
 	pSuite->addTest(ProcessCollectorTest::suite());
+	pSuite->addTest(RegistryTest::suite());
 
 	return pSuite;
 }

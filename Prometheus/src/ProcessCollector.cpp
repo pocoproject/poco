@@ -50,7 +50,10 @@ ProcessCollector::ProcessCollector(const std::string& name, Registry* pRegistry)
 }
 
 
-ProcessCollector::~ProcessCollector() = default;
+ProcessCollector::~ProcessCollector()
+{
+	unregister();
+}
 
 
 void ProcessCollector::exportTo(Exporter& exporter) const

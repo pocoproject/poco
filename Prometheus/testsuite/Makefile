@@ -15,7 +15,8 @@ objects = \
 	IntCounterTest \
 	IntGaugeTest \
 	ProcessCollectorTest \
-	PrometheusTestSuite
+	PrometheusTestSuite \
+	RegistryTest
 
 target         = testrunner
 target_version = 1

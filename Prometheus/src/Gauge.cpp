@@ -52,7 +52,10 @@ Gauge::Gauge(const std::string& name, const Params& params, Registry* pRegistry)
 }
 
 
-Gauge::~Gauge() = default;
+Gauge::~Gauge()
+{
+	unregister();
+}
 
 
 double Gauge::value() const
