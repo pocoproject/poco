@@ -1473,14 +1473,16 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 					" WHERE NOT (" + inRange + ")"), into(above), now;
 				if (above < f->second)
 				{
-					Poco::Int64 newest = 0;
-					_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
-						" WHERE " + inRange), into(newest), now;
-					if (newest > 0 && !keepRows)
+					// Even with no row of the range left, the next row would be
+					// numbered inside the sealed ranges.
+					if (!keepRows)
 					{
 						_persist.rollback();
 						return Removal::NUMBERING_AT_RISK;
 					}
+					Poco::Int64 newest = 0;
+					_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
+						" WHERE " + inRange), into(newest), now;
 					if (newest > f->second)
 					{
 						kept[t] = newest;

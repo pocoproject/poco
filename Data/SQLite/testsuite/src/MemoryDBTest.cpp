@@ -1534,6 +1534,40 @@ void MemoryDBTest::testDeleteNewestShardKeepsNumberingRow()
 }
 
 
+void MemoryDBTest::testEmptiedShardStaysForNumbering()
+{
+	// A table without AUTOINCREMENT whose sealed rows were all deleted has no
+	// row in memory to carry the numbering. Its shard must not leave memory
+	// then: the next row would be numbered inside the shard's range, in a
+	// shard that is no longer loaded, and every call after it would fail.
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE q(id INTEGER PRIMARY KEY, v TEXT)", now;
+		std::string v("x");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO q(v) VALUES(:v)", use(v), now;
+		db.sealActive();
+		db.flush(); // shard 1 stays in memory for the numbering
+		db << "DELETE FROM q WHERE id > 0", now;
+		db.flush(); // rewrites shard 1 empty
+		db << "INSERT INTO q(v) VALUES(:v)", use(v), now;
+		db.flush();
+		db << "INSERT INTO q(v) VALUES(:v)", use(v), now;
+		db.flush();
+	}
+
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+	MemoryDB db(_dir, on);
+	int total = 0;
+	int distinct = 0;
+	db << "SELECT count(*), count(DISTINCT id) FROM q", into(total), into(distinct), now;
+	assertTrue (total == 2);
+	assertTrue (distinct == 2);
+}
+
+
 void MemoryDBTest::testDeleteNewestShardKeepsNoRowWhenNotNeeded()
 {
 	// No row stays behind when the numbering is safe without it: when the
@@ -2950,6 +2984,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardUnloaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteShardKeptWhileSessionWrites);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNumberingRow);
+	CppUnit_addTest(pSuite, MemoryDBTest, testEmptiedShardStaysForNumbering);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteActiveShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNonexistentShardRefused);
