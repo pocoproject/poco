@@ -1690,7 +1690,9 @@ void MemoryDBTest::testDeleteNewestShardKeepsNumberingRow()
 
 		std::vector<Poco::UInt32> ids = db.archivedShardIds();
 		assertTrue (ids.size() == 2);
+		assertTrue (!db.dirty());
 		db.deleteShard(ids.back());
+		assertTrue (db.dirty()); // the kept row is the active shard's now, to be saved there
 
 		int n = 0;
 		Poco::Int64 maxId = 0;
