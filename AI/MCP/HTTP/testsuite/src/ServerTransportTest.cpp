@@ -636,6 +636,11 @@ void ServerTransportTest::testNameHeader()
 	answer = endpoint.post(request(Id(4), "tools/call", "{\"name\":42}"), headersOf("tools/call"));
 	assertEqual(200, answer.status);
 	assertEqual(static_cast<int>(ErrorCode::INVALID_PARAMS), answer.code());
+
+	// A name that is not ASCII goes in the base64 form, not as raw UTF-8.
+	answer = endpoint.post(request(Id(5), "tools/call", "{\"name\":\"\xC3\xA9" "cho\"}"), headersOf("tools/call", "\xC3\xA9" "cho"));
+	assertEqual(400, answer.status);
+	assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), answer.code());
 }
 
 
@@ -689,12 +694,27 @@ void ServerTransportTest::testParamHeaders()
 	}
 
 	// A parameter without a value, absent or null, needs no header, and a
-	// header for it is ignored.
+	// header for it is checked for its characters only.
 	const std::string sparse = request(Id(2), "tools/call", "{\"name\":\"route\",\"arguments\":{\"message\":\"ok\",\"count\":null}}");
 	assertEqual(200, endpoint.post(sparse, headersOf("tools/call", "route")).status);
 	NameValueCollection headers = headersOf("tools/call", "route");
 	headers.set("Mcp-Param-Region", "anything");
 	assertEqual(200, endpoint.post(sparse, headers).status);
+	headers.set("Mcp-Param-Region", "a\x01" "b");
+	answer = endpoint.post(sparse, headers);
+	assertEqual(400, answer.status);
+	assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), answer.code());
+
+	// A plain value holds printable ASCII and tabs only.
+	NameValueCollection tabbed = withParams();
+	const std::string tabCall = request(Id(4), "tools/call", "{\"name\":\"route\",\"arguments\":{\"message\":\"ok\",\"region\":\"e\\tu\",\"count\":42,\"verbose\":true,\"nested\":{\"zone\":\"b\"}}}");
+	tabbed.set("Mcp-Param-Region", "e\tu");
+	assertEqual(200, endpoint.post(tabCall, tabbed).status);
+	NameValueCollection raw = withParams();
+	raw.set("Mcp-Param-Region", "e\xC3\xBC");
+	answer = endpoint.post(request(Id(5), "tools/call", "{\"name\":\"route\",\"arguments\":{\"message\":\"ok\",\"region\":\"e\xC3\xBC\",\"count\":42,\"verbose\":true,\"nested\":{\"zone\":\"b\"}}}"), raw);
+	assertEqual(400, answer.status);
+	assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), answer.code());
 
 	// A tool whose annotations are not valid has no header to check.
 	assertEqual(200, endpoint.post(request(Id(3), "tools/call", "{\"name\":\"invalid\",\"arguments\":{\"n\":1.5}}"), headersOf("tools/call", "invalid")).status);

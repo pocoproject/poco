@@ -200,7 +200,7 @@ namespace
 		std::string decoded;
 		if (!decodeHeaderValue(received, decoded))
 		{
-			return "the Mcp-Name header is not valid base64";
+			return isHeaderText(received) ? "the Mcp-Name header is not valid base64" : "the Mcp-Name header has invalid characters";
 		}
 		if (name.isString() && decoded != name.extract<std::string>())
 		{
@@ -213,7 +213,8 @@ namespace
 	std::string paramMismatch(const Server& server, const Poco::Net::HTTPServerRequest& request, const Poco::JSON::Object::Ptr& pParams)
 		/// Checks the Mcp-Param headers of a tool call against the arguments
 		/// the input schema of the tool marks with x-mcp-header. A parameter
-		/// without a value needs no header, and a header for it is ignored.
+		/// without a value needs no header, and a header for it is checked
+		/// for its characters only.
 	{
 		if (pParams.isNull() || !pParams->get("name").isString()) return std::string();
 		const std::optional<Tool> tool = server.findTool(pParams->getValue<std::string>("name"));
@@ -234,19 +235,20 @@ namespace
 		const Poco::JSON::Object::Ptr pArguments = pParams->isObject("arguments") ? pParams->getObject("arguments") : Poco::JSON::Object::Ptr();
 		for (const Annotation& annotation: annotations)
 		{
+			const std::string name = PARAM_HEADER_PREFIX + annotation.name;
+			std::string received;
+			const bool sent = header(request, name, received);
+			std::string decoded;
+			if (sent && !decodeHeaderValue(received, decoded))
+			{
+				return isHeaderText(received) ? "the " + name + " header is not valid base64" : "the " + name + " header has invalid characters";
+			}
 			const Poco::Dynamic::Var value = valueAt(pArguments, annotation.path);
 			std::string rendered;
 			if (!renderParam(value, rendered)) continue;
-			const std::string name = PARAM_HEADER_PREFIX + annotation.name;
-			std::string received;
-			if (!header(request, name, received))
+			if (!sent)
 			{
 				return "the request has no " + name + " header";
-			}
-			std::string decoded;
-			if (!decodeHeaderValue(received, decoded))
-			{
-				return "the " + name + " header is not valid base64";
 			}
 			if (!sameParam(annotation, value, rendered, decoded))
 			{

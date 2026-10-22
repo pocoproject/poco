@@ -39,6 +39,11 @@ namespace Poco::AI::MCP::HTTP {
 	/// form and an RFC 2047 encoded word.
 
 
+[[nodiscard]] bool isHeaderText(const std::string& value);
+	/// Returns true if value holds only characters a header value may hold:
+	/// printable ASCII and horizontal tabs.
+
+
 [[nodiscard]] std::string headerValue(const std::string& value);
 	/// The value as a header carries it: as it is, or in the base64 form
 	/// =?base64?<base64>?=.
@@ -46,9 +51,10 @@ namespace Poco::AI::MCP::HTTP {
 
 [[nodiscard]] bool decodeHeaderValue(const std::string& received, std::string& value);
 	/// Sets value to what a header received carries: the decoded text of
-	/// the base64 form, else the header as it is. Returns false for a base64
-	/// form whose payload is not canonical base64 (padded, without line
-	/// breaks or other characters) or does not decode to UTF-8.
+	/// the base64 form, else the header as it is. Returns false for a header
+	/// that is not header text (see isHeaderText()), and for a base64 form
+	/// whose payload is not canonical base64 (padded, without line breaks or
+	/// other characters) or does not decode to UTF-8.
 	///
 	/// Poco::Net::MessageHeader decodes RFC 2047 encoded words in every
 	/// header it reads, and drops the "=?" of a value that only starts like

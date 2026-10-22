@@ -67,8 +67,11 @@ class AIMCPHTTP_API ServerTransport
 	///     this revision carries both, the Mcp-Name header of tools/call,
 	///     prompts/get and resources/read, with the name or the URI, and the
 	///     Mcp-Param headers of the arguments with a value that the input
-	///     schema of the tool marks with x-mcp-header. A value in the base64
-	///     form is decoded first; an integer argument is compared as a number.
+	///     schema of the tool marks with x-mcp-header. A value with other
+	///     characters than printable ASCII and tabs is refused, also in the
+	///     Mcp-Param header of an argument without a value; a value in the
+	///     base64 form is decoded first; an integer argument is compared as a
+	///     number.
 	///     A mismatch gets 400 with HEADER_MISMATCH.
 	///
 	/// The refusals before the body carry no message, and a request refused

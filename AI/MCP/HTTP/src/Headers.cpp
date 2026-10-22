@@ -126,6 +126,17 @@ bool isPlain(const std::string& value)
 }
 
 
+bool isHeaderText(const std::string& value)
+{
+	for (const char c: value)
+	{
+		const unsigned char u = static_cast<unsigned char>(c);
+		if ((u < 0x20 && u != '\t') || u > 0x7E) return false;
+	}
+	return true;
+}
+
+
 std::string headerValue(const std::string& value)
 {
 	if (isPlain(value)) return value;
@@ -144,6 +155,7 @@ bool decodeHeaderValue(const std::string& received, std::string& value)
 		|| received.compare(0, SENTINEL_PREFIX.size(), SENTINEL_PREFIX) != 0
 		|| received.compare(received.size() - SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX.size(), SENTINEL_SUFFIX) != 0)
 	{
+		if (!isHeaderText(received)) return false;
 		value = received;
 		return true;
 	}
