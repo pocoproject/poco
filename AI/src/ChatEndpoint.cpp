@@ -211,7 +211,14 @@ namespace
 		const Poco::Dynamic::Var value = pObject->get(name);
 		if (value.isEmpty()) return 0;
 		if (!value.isNumeric() || value.isBoolean() || value.isString()) throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", name + " is not a number"};
-		return value.convert<int>();
+		try
+		{
+			return value.convert<int>();
+		}
+		catch (const Poco::RangeException&)
+		{
+			throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", name + " is out of range"};
+		}
 	}
 
 

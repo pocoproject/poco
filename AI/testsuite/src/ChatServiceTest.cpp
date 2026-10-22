@@ -1172,7 +1172,7 @@ void ChatServiceTest::testSettingsJSON()
 	assertTrue(ChatSettings::fromJSON(parse("{\"providers\":[{\"name\":\"x\"}]}")).providers[0].tools);
 	assertTrue(ChatSettings::fromJSON(parse("{}")).providers.empty());
 
-	const std::string invalid[] = {"{\"providers\":\"x\"}", "{\"providers\":[{\"enabled\":\"yes\"}]}", "{\"providers\":[{\"models\":[1]}]}", "{\"model\":3}", "{\"providers\":[{\"tools\":1}]}"};
+	const std::string invalid[] = {"{\"providers\":\"x\"}", "{\"providers\":[{\"enabled\":\"yes\"}]}", "{\"providers\":[{\"models\":[1]}]}", "{\"model\":3}", "{\"providers\":[{\"tools\":1}]}", "{\"providers\":[{\"maxTokens\":9999999999}]}"};
 	for (const std::string& json: invalid)
 	{
 		try
@@ -1522,6 +1522,7 @@ void ChatServiceTest::testEndpointManage()
 	assertEqual(std::string("s3cr3t"), service.settings().providers[2].apiKey);
 	assertEqual(400, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":false}]}", "root", true).status);
 	assertEqual(400, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"timeout\":\"long\"}]}", "root", true).status);
+	assertEqual(400, host.send("POST", "config", "{\"providers\":[{\"name\":\"ollama\",\"enabled\":true,\"timeout\":1e12}]}", "root", true).status);
 }
 
 

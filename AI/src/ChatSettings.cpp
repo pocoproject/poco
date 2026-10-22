@@ -36,7 +36,14 @@ namespace
 		const Poco::Dynamic::Var value = pObject->get(name);
 		if (value.isEmpty()) return 0;
 		if (!value.isInteger() || value.isBoolean()) throw Poco::DataFormatException("Not an integer", name);
-		return value.convert<int>();
+		try
+		{
+			return value.convert<int>();
+		}
+		catch (const Poco::RangeException&)
+		{
+			throw Poco::DataFormatException("Out of range", name);
+		}
 	}
 
 

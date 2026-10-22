@@ -117,7 +117,8 @@ struct AI_API ChatSettings
 	[[nodiscard]] static ChatSettings fromJSON(const Poco::JSON::Object::Ptr& pObject);
 		/// Reads settings toJSON() wrote. What is missing gets its default.
 		///
-		/// Throws Poco::DataFormatException if a member has the wrong type.
+		/// Throws Poco::DataFormatException if a member has the wrong type,
+		/// or a number is beyond the range of its member.
 };
 
 
