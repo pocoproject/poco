@@ -535,7 +535,7 @@ private:
 		NUMBERING_AT_RISK  // nothing deleted: a table without AUTOINCREMENT would be left
 		                   // with no row above the sealed ranges that stay
 	};
-	Removal removeRanges(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
+	[[nodiscard]] Removal removeRanges(const std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >& ranges,
 		const std::map<std::string, Poco::Int64>& floors, bool keepRows,
 		std::map<std::string, Poco::Int64>& kept);
 		// deletes the rowid ranges (table -> (lo, hi]) from the in-memory tables.
@@ -549,7 +549,7 @@ private:
 		const std::map<std::string, Poco::Int64>& floors, std::map<std::string, Poco::Int64>& kept);
 		// removeRanges() with keepRows, under the connection mutex; false, deleting
 		// nothing, while session() has a transaction open; caller holds _flushMutex
-	bool evictShard(Poco::UInt32 shardId);
+	[[nodiscard]] bool evictShard(Poco::UInt32 shardId);
 		// removes a sealed, written shard's rows from the in-memory tables and marks
 		// it non-resident; false when the shard is not eligible, session() is busy
 		// or the numbering would be at risk (see removeRanges); caller holds _flushMutex

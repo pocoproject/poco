@@ -1475,7 +1475,7 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 		// now, so it is the active shard's; the next flush saves it there.
 		if (!kept.empty())
 		{
-			if (ShardInfo* a = activeShard()) a->dirty = true;
+			if (ShardInfo* a = activeShard(); a != nullptr) a->dirty = true;
 			_dirty = true;
 		}
 		schemaVersion = _schemaVersion;
