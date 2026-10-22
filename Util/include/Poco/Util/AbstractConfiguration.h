@@ -27,16 +27,6 @@
 #include <utility>
 
 
-// Explicitly instantiated in AbstractConfiguration.cpp and exported, so that code built
-// with hidden symbol visibility can use the event type. Declared before its first use
-// below, because the visibility attribute is ignored once the type has been instantiated.
-#if defined(POCO_OS_FAMILY_WINDOWS) && defined(Util_EXPORTS)
-extern template class Poco::BasicEvent<const std::string, Poco::FastMutex>;
-#else
-extern template class Util_API Poco::BasicEvent<const std::string, Poco::FastMutex>;
-#endif
-
-
 namespace Poco::Util {
 
 
@@ -584,6 +574,8 @@ inline Poco::UInt32 AbstractConfiguration::getUInt32(const std::string& key, Poc
 } // namespace Poco::Util
 
 
+// BasicEvent<const std::string> is not declared here and is instantiated where it is used:
+// another header can instantiate it first, and an export attribute declared here is then ignored.
 extern template class Poco::BasicEvent<Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
 extern template class Poco::BasicEvent<const Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
 

@@ -15,7 +15,7 @@ objects = AbstractConfigurationTest ConfigurationTestSuite \
 	SystemConfigurationTest UtilTestSuite XMLConfigurationTest \
 	FilesystemConfigurationTest ValidatorTest \
 	TimerTestSuite TimerTest \
-	JSONConfigurationTest
+	JSONConfigurationTest ConfigurationEventTest
 
 # FastLogger - enabled by default
 # Set POCO_NO_FASTLOGGER=1 to disable

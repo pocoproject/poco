@@ -22,6 +22,7 @@
 #include "FilesystemConfigurationTest.h"
 #include "LoggingConfiguratorTest.h"
 #include "JSONConfigurationTest.h"
+#include "ConfigurationEventTest.h"
 
 
 CppUnit::Test* ConfigurationTestSuite::suite()
@@ -40,6 +41,7 @@ CppUnit::Test* ConfigurationTestSuite::suite()
 	pSuite->addTest(FilesystemConfigurationTest::suite());
 	pSuite->addTest(LoggingConfiguratorTest::suite());
 	pSuite->addTest(JSONConfigurationTest::suite());
+	pSuite->addTest(ConfigurationEventTest::suite());
 
 	return pSuite;
 }
