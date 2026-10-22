@@ -1470,10 +1470,10 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 		for (const auto& s: _shards)
 		{
 			if (!s.sealed || s.id == shardId) continue;
-			for (const auto& r: s.ranges)
+			for (const auto& [table, range]: s.ranges)
 			{
-				Poco::Int64& f = floors[r.first];
-				if (r.second.second > f) f = r.second.second;
+				Poco::Int64& f = floors[table];
+				if (range.second > f) f = range.second;
 			}
 		}
 	}
@@ -1578,30 +1578,29 @@ MemoryDB::Removal MemoryDB::removeRanges(const std::map<std::string, std::pair<P
 	try
 	{
 		std::vector<std::string> tables = userTables(_persist);
-		for (const auto& r: ranges)
+		for (const auto& [t, range]: ranges)
 		{
-			const std::string& t = r.first;
+			const auto& [lo, hi] = range;
 			if (std::find(tables.begin(), tables.end(), t) == tables.end())
 				continue; // dropped since the shard was sealed
-			const std::string inRange = "rowid > " + Poco::NumberFormatter::format(r.second.first) +
-				" AND rowid <= " + Poco::NumberFormatter::format(r.second.second);
+			const std::string inRange = "rowid > " + Poco::NumberFormatter::format(lo) +
+				" AND rowid <= " + Poco::NumberFormatter::format(hi);
 
 			// The numbering of a table without AUTOINCREMENT needs a row above
 			// the sealed ranges that remain (see the class documentation); when
 			// none would stay, the range's newest row does.
 			std::string where = inRange;
-			auto f = floors.find(t);
-			if (f != floors.end() && f->second > 0 && !isAutoincrement(t))
+			if (auto f = floors.find(t); f != floors.end() && f->second > 0 && !isAutoincrement(t))
 			{
 				// The newest row outside the range: two seeks on the rowid, where
 				// a NOT over the range would walk every row of it.
 				Poco::Int64 above = 0;
 				_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
-					" WHERE rowid > " + Poco::NumberFormatter::format(r.second.second)), into(above), now;
+					" WHERE rowid > " + Poco::NumberFormatter::format(hi)), into(above), now;
 				if (above == 0)
 				{
 					_persist << ("SELECT IFNULL(MAX(rowid), 0) FROM " + quoteIdent(t) +
-						" WHERE rowid <= " + Poco::NumberFormatter::format(r.second.first)), into(above), now;
+						" WHERE rowid <= " + Poco::NumberFormatter::format(lo)), into(above), now;
 				}
 				if (above < f->second)
 				{
@@ -1680,10 +1679,10 @@ bool MemoryDB::evictShard(Poco::UInt32 shardId)
 		if (shard == nullptr || !shard->sealed || !shard->resident || shard->dirty || shard->file.empty())
 			return false;
 		ranges = shard->ranges;
-		for (const auto& r: ranges)
+		for (const auto& [table, range]: ranges)
 		{
-			auto lo = _activeLo.find(r.first);
-			floors[r.first] = (lo != _activeLo.end()) ? lo->second : 0;
+			auto lo = _activeLo.find(table);
+			floors[table] = (lo != _activeLo.end()) ? lo->second : 0;
 		}
 	}
 
