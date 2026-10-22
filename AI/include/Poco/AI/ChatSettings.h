@@ -20,6 +20,7 @@
 
 #include "Poco/AI/AI.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/Timespan.h"
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -62,13 +63,13 @@ struct AI_API ProviderSettings
 	int maxTokens = 0;
 		/// The limit of an answer, in tokens; 0 for that of the service.
 
-	int timeout = 0;
-		/// The limit of a call of the API, in seconds; 0 for that of the
-		/// service.
+	Poco::Timespan timeout;
+		/// The limit of a call of the API; zero for that of the service.
+		/// Stored and sent in whole seconds.
 
-	int probeTimeout = 0;
-		/// How long a server has to answer the question for its models, in
-		/// seconds; 0 for that of the service.
+	Poco::Timespan probeTimeout;
+		/// How long a server has to answer the question for its models; zero
+		/// for that of the service. Stored and sent in whole seconds.
 
 	bool tools = true;
 		/// Whether the model is given the tools of the chat; off for a model

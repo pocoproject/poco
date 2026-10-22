@@ -201,7 +201,7 @@ void ChatService::chat(Poco::JSON::Array& conversation, const Poco::AI::MCP::Ide
 		baseUrl = server;
 	}
 
-	const Poco::Timespan timeout = settings->timeout > 0 ? Poco::Timespan(settings->timeout, 0) : _params.timeout;
+	const Poco::Timespan timeout = settings->timeout > Poco::Timespan() ? settings->timeout : _params.timeout;
 	std::shared_ptr<LLMProvider> pProvider;
 	try
 	{
@@ -531,7 +531,7 @@ void ChatService::validate(const ChatSettings& settings, bool needsProvider)
 		{
 			throw Poco::InvalidArgumentException("A provider of a kind without a default base URL needs one", entry.name);
 		}
-		if (entry.maxTokens < 0 || entry.timeout < 0 || entry.probeTimeout < 0)
+		if (entry.maxTokens < 0 || entry.timeout < Poco::Timespan() || entry.probeTimeout < Poco::Timespan())
 		{
 			throw Poco::InvalidArgumentException("A limit cannot be negative", entry.name);
 		}
@@ -814,7 +814,7 @@ void ChatService::connectionFailed(const std::string& name, Poco::UInt64 generat
 
 Poco::Timespan ChatService::probeTimeoutOf(const ProviderSettings& settings) const
 {
-	return settings.probeTimeout > 0 ? Poco::Timespan(settings.probeTimeout, 0) : _params.probeTimeout;
+	return settings.probeTimeout > Poco::Timespan() ? settings.probeTimeout : _params.probeTimeout;
 }
 
 

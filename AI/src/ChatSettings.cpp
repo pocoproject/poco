@@ -152,8 +152,8 @@ Poco::JSON::Object::Ptr ProviderSettings::toJSON() const
 	pEntry->set("servers", toArray(servers));
 	pEntry->set("models", toArray(models));
 	pEntry->set("maxTokens", maxTokens);
-	pEntry->set("timeout", timeout);
-	pEntry->set("probeTimeout", probeTimeout);
+	pEntry->set("timeout", timeout.totalSeconds());
+	pEntry->set("probeTimeout", probeTimeout.totalSeconds());
 	pEntry->set("tools", tools);
 	pEntry->set("apiKey", apiKey);
 	return pEntry;
@@ -171,8 +171,8 @@ ProviderSettings ProviderSettings::fromJSON(const Poco::JSON::Object::Ptr& pEntr
 	entry.servers = stringsMember(pEntry, "servers");
 	entry.models = stringsMember(pEntry, "models");
 	entry.maxTokens = intMember(pEntry, "maxTokens");
-	entry.timeout = intMember(pEntry, "timeout");
-	entry.probeTimeout = intMember(pEntry, "probeTimeout");
+	entry.timeout = Poco::Timespan(intMember(pEntry, "timeout"), 0);
+	entry.probeTimeout = Poco::Timespan(intMember(pEntry, "probeTimeout"), 0);
 	entry.tools = boolMember(pEntry, "tools", entry.tools);
 	entry.apiKey = stringMember(pEntry, "apiKey");
 	return entry;

@@ -894,7 +894,7 @@ void ChatServiceTest::testFailover()
 	Events kept;
 	service.chat(conversation, who("alice"), "c1", kept.sink());
 	assertEqual(std::string("text,done"), kept.types());
-	ollama.probeTimeout = 1;
+	ollama.probeTimeout = Poco::Timespan(1, 0);
 	service.configure({ollama, entry("openai", false)});
 	Events none;
 	service.chat(conversation, who("alice"), "c1", none.sink());
@@ -1052,7 +1052,7 @@ void ChatServiceTest::testConfigure()
 	assertTrue(refused({entry("lab", true)}));
 	assertTrue(refused({entry("ollama", false)}));
 	ProviderSettings negative = entry("ollama", true);
-	negative.timeout = -1;
+	negative.timeout = Poco::Timespan(-1, 0);
 	assertTrue(refused({negative}));
 	assertTrue(stored.empty());
 
@@ -1181,8 +1181,8 @@ void ChatServiceTest::testSettingsJSON()
 	ollama.baseUrl = "http://[server]:11434/v1";
 	ollama.servers = {"a", "b"};
 	ollama.maxTokens = 2048;
-	ollama.timeout = 30;
-	ollama.probeTimeout = 3;
+	ollama.timeout = Poco::Timespan(30, 0);
+	ollama.probeTimeout = Poco::Timespan(3, 0);
 	ollama.tools = false;
 	ollama.apiKey = "secret";
 	settings.providers.push_back(ollama);
@@ -1198,8 +1198,10 @@ void ChatServiceTest::testSettingsJSON()
 	const ProviderSettings& back = read.providers[0];
 	assertTrue(back.enabled && back.servers == ollama.servers && back.models == ollama.models);
 	assertEqual(2048, back.maxTokens);
-	assertEqual(30, back.timeout);
-	assertEqual(3, back.probeTimeout);
+	assertTrue(back.timeout == Poco::Timespan(30, 0));
+	assertTrue(back.probeTimeout == Poco::Timespan(3, 0));
+	// The limits go in whole seconds.
+	assertEqual(30, settings.toJSON()->getArray("providers")->getObject(0)->getValue<int>("timeout"));
 	assertTrue(!back.tools);
 	assertEqual(std::string("secret"), back.apiKey);
 	assertTrue(ChatSettings::fromJSON(parse("{\"providers\":[{\"name\":\"x\"}]}")).providers[0].tools);
@@ -1847,7 +1849,7 @@ void ChatServiceTest::testStaleConnectionFailure()
 	const bool started = pState->started.tryWait(10000);
 	if (started)
 	{
-		ollama.timeout = 7;
+		ollama.timeout = Poco::Timespan(7, 0);
 		service.configure({ollama});
 	}
 	pState->releaseCall.set();
