@@ -30,6 +30,7 @@
 #include <atomic>
 #include <cctype>
 #include <iterator>
+#include <mutex>
 #include <set>
 
 // Table classification is built on PRAGMA table_list (SQLite 3.37),
@@ -2518,15 +2519,11 @@ void MemoryDB::retryDeferredRemovals()
 {
 	// A removal deferred because session() was busy is otherwise retried only
 	// by the next flush, and with nothing written since, there would be none.
-	bool expected = false;
-	if (!_flushing.compare_exchange_strong(expected, true)) return;
-	struct Releaser
-	{
-		std::atomic<bool>& flag;
-		~Releaser() { flag.store(false); }
-	} releaser{_flushing};
-
-	Poco::Mutex::ScopedLock fl(_flushMutex);
+	// The retry leaves _flushing alone: a flush() that comes in meanwhile waits
+	// for _flushMutex and then flushes, instead of returning at once. While a
+	// flush or another removal holds the mutex, the retry is left to them.
+	Poco::Mutex::ScopedLockWithUnlock fl(_flushMutex, std::try_to_lock);
+	if (!fl.ownsLock()) return;
 	_retryPending.store(false, std::memory_order_release);
 	evictSealedShards();
 	enforceRetention(); // an error is logged by onTimer()

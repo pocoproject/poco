@@ -80,6 +80,7 @@ public:
 	void testKeptShardReportedOncePerReason();
 	void testDeferredDropReportedOnce();
 	void testPutOffRewriteIsNoCompletedFlush();
+	void testFlushNotSkippedByRetry();
 	void testDeleteNewestShardKeepsNoRowWhenNotNeeded();
 	void testDeleteActiveShardRefused();
 	void testDeleteNonexistentShardRefused();

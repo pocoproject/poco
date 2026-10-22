@@ -2167,6 +2167,51 @@ namespace
 }
 
 
+void MemoryDBTest::testFlushNotSkippedByRetry()
+{
+	// While session() is busy the timer retries a deferred drop at every tick.
+	// A flush() that comes in during a retry must wait for it and flush, not
+	// return at once as if another flush were saving its writes.
+	MemoryDB::Options o;
+	o.loadArchivedShards = false;
+	o.retentionMaxBytes = 1; // every sealed shard is over budget
+	o.checkIntervalMs = 1;   // the timer retries all the time
+	MemoryDB db(_dir, o);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+	std::string v("x");
+	// more than one row, so that the statement below stops before the end
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	LogCapture capture("Poco.Data.SQLite.MemoryDB");
+
+	int id = 0;
+	Poco::Data::Statement stmt = (db.session() << "SELECT id FROM t", into(id), limit(1));
+	stmt.execute(); // partially stepped: holds a read transaction on main
+	db.sealActive();
+	// The timer may run the seal itself; either way shard 1 gets sealed, and
+	// retention cannot drop it, so the timer goes on retrying.
+	assertTrue (waitUntil([&]()
+	{
+		db.flush();
+		return db.archivedShardIds().size() == 1 && capture.count("retried later") >= 2;
+	}, Poco::Timespan(10, 0)));
+
+	// A retry starts by trying to evict shard 1, which logs that it stays, and
+	// then spends a while on the drop. Once a new such line appears after this
+	// thread's own flush, a retry is under way, and the flush below runs into
+	// it. One that returned without flushing would leave its row unsaved.
+	constexpr int ROUNDS = 3;
+	const std::string stays("stays in memory");
+	for (int i = 0; i < ROUNDS; ++i)
+	{
+		const std::size_t seen = capture.count(stays);
+		assertTrue (waitUntil([&]() { return capture.count(stays) > seen; }, Poco::Timespan(10, 0)));
+		db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.flush();
+		assertTrue (!db.dirty());
+	}
+}
+
+
 void MemoryDBTest::testRetentionByAge()
 {
 	MemoryDB::Options o;
@@ -3399,6 +3444,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testKeptShardReportedOncePerReason);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeferredDropReportedOnce);
 	CppUnit_addTest(pSuite, MemoryDBTest, testPutOffRewriteIsNoCompletedFlush);
+	CppUnit_addTest(pSuite, MemoryDBTest, testFlushNotSkippedByRetry);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteActiveShardRefused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNonexistentShardRefused);
