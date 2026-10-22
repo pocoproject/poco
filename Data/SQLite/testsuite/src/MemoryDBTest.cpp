@@ -1097,8 +1097,8 @@ void MemoryDBTest::testHistoryViewCountsResidentShardOnce()
 	// A shard sealed in this run can still have its rows in main: here the
 	// table has no AUTOINCREMENT and the active shard held no row of it when
 	// the shard was sealed, so its rows carry the numbering until a later flush
-	// finds a newer row. The history view must then take the shard from main
-	// and not from its file as well, or it shows every one of its rows twice.
+	// finds a newer row. The history view must then read the shard from its
+	// file only and leave its rowid range out of main, or it shows every row twice.
 	MemoryDB::Options off;
 	off.loadArchivedShards = false;
 	{
