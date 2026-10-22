@@ -61,8 +61,9 @@ class AIMCPHTTP_API ServerTransport
 	///   - the size of the body: at most maxMessageSize bytes, else 413;
 	///   - the body: JSON, else 400 with PARSE_ERROR; one object, not a batch,
 	///     else 400 with INVALID_REQUEST;
-	///   - the MCP headers: an MCP-Protocol-Version or Mcp-Method header that
-	///     is sent matches the message. A request whose _meta object names
+	///   - the MCP headers: each comes once at most, and an
+	///     MCP-Protocol-Version or Mcp-Method header that is sent matches
+	///     the message. A request whose _meta object names
 	///     this revision carries both, the Mcp-Name header of tools/call,
 	///     prompts/get and resources/read, with the name or the URI, and the
 	///     Mcp-Param headers of the arguments with a value that the input

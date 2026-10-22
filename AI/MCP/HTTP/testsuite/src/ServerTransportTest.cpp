@@ -238,7 +238,7 @@ namespace
 			Poco::Net::HTTPClientSession session("127.0.0.1", _port);
 			session.setTimeout(Poco::Timespan(10, 0));
 			HTTPRequest httpRequest(method, path, Poco::Net::HTTPMessage::HTTP_1_1);
-			for (const auto& header: headers) httpRequest.set(header.first, header.second);
+			for (const auto& header: headers) httpRequest.add(header.first, header.second);
 			if (chunked) httpRequest.setChunkedTransferEncoding(true);
 			else httpRequest.setContentLength(static_cast<std::streamsize>(body.size()));
 			std::ostream& out = session.sendRequest(httpRequest);
@@ -549,6 +549,40 @@ void ServerTransportTest::testStandardHeaders()
 	answer = endpoint.post(request(Id(std::string("abc")), "tools/list"), headersOf("tools/call"));
 	assertEqual(400, answer.status);
 	assertEqual(std::string("abc"), answer.message()->getValue<std::string>("id"));
+}
+
+
+void ServerTransportTest::testRepeatedHeaders()
+{
+	// An MCP header that comes more than once is refused, whatever its
+	// values: an intermediary may take another of the fields than the server.
+	Server server;
+	buildServer(server);
+	Endpoint endpoint(server);
+	const auto refused = [&endpoint](const std::string& body, const NameValueCollection& headers)
+	{
+		const Answer reply = endpoint.post(body, headers);
+		return reply.status == 400 && reply.code() == static_cast<int>(ErrorCode::HEADER_MISMATCH);
+	};
+	const std::string list = request(Id(7), "tools/list");
+	NameValueCollection headers = headersOf("tools/list");
+	headers.add("Mcp-Method", "tools/call");
+	assertTrue(refused(list, headers));
+	headers = headersOf("tools/list");
+	headers.add("Mcp-Method", "tools/list");
+	assertTrue(refused(list, headers));
+	headers = headersOf("tools/list");
+	headers.add("mcp-protocol-version", Poco::AI::MCP::PROTOCOL_VERSION);
+	assertTrue(refused(list, headers));
+	headers = headersOf("tools/list");
+	headers.add("Mcp-Param-Region", "a");
+	headers.add("MCP-PARAM-REGION", "b");
+	assertTrue(refused(list, headers));
+	const std::string call = request(Id(8), "tools/call", "{\"name\":\"echo\",\"arguments\":{\"message\":\"hi\"}}");
+	headers = headersOf("tools/call", "echo");
+	headers.add("Mcp-Name", "other");
+	assertTrue(refused(call, headers));
+	assertEqual(200, endpoint.post(call, headersOf("tools/call", "echo")).status);
 }
 
 
@@ -1049,6 +1083,7 @@ CppUnit::Test* ServerTransportTest::suite()
 	CppUnit_addTest(pSuite, ServerTransportTest, testNotifications);
 	CppUnit_addTest(pSuite, ServerTransportTest, testStandardHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testNameHeader);
+	CppUnit_addTest(pSuite, ServerTransportTest, testRepeatedHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testParamHeaders);
 	CppUnit_addTest(pSuite, ServerTransportTest, testEncodedWords);
 	CppUnit_addTest(pSuite, ServerTransportTest, testDecodedHeadersRefused);

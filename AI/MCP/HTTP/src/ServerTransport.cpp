@@ -25,6 +25,7 @@
 #include "Poco/Logger.h"
 #include "Poco/Exception.h"
 #include <optional>
+#include <set>
 
 
 namespace Poco::AI::MCP::HTTP {
@@ -73,6 +74,22 @@ namespace
 		if (it == request.end()) return false;
 		value = Poco::trim(it->second);
 		return true;
+	}
+
+
+	std::string repeatedHeader(const Poco::Net::HTTPServerRequest& request)
+		/// The name of an MCP header that the request has more than once, or
+		/// an empty string.
+	{
+		std::set<std::string> seen;
+		for (const auto& field: request)
+		{
+			const std::string name = Poco::toLower(field.first);
+			const bool mcp = name == Poco::toLower(PROTOCOL_VERSION_HEADER) || name == Poco::toLower(METHOD_HEADER) || name == Poco::toLower(NAME_HEADER)
+				|| name.compare(0, PARAM_HEADER_PREFIX.size(), Poco::toLower(PARAM_HEADER_PREFIX)) == 0;
+			if (mcp && !seen.insert(name).second) return field.first;
+		}
+		return std::string();
 	}
 
 
@@ -255,6 +272,11 @@ namespace
 		const Poco::JSON::Object::Ptr pParams = pMessage->isObject("params") ? pMessage->getObject("params") : Poco::JSON::Object::Ptr();
 		const Poco::JSON::Object::Ptr pMeta = (!pParams.isNull() && pParams->isObject("_meta")) ? pParams->getObject("_meta") : Poco::JSON::Object::Ptr();
 		const Poco::Dynamic::Var revision = pMeta.isNull() ? Poco::Dynamic::Var() : pMeta->get(META_PROTOCOL_VERSION);
+
+		// One field of each: an intermediary that routes on another of
+		// several, or on all of them joined, would see another request.
+		const std::string repeated = repeatedHeader(request);
+		if (!repeated.empty()) return "the request has more than one " + repeated + " header";
 
 		// A header that is sent matches the message, whatever it is.
 		std::string version;

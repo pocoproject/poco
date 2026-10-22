@@ -32,6 +32,7 @@ public:
 	void testNotifications();
 	void testStandardHeaders();
 	void testNameHeader();
+	void testRepeatedHeaders();
 	void testParamHeaders();
 	void testEncodedWords();
 	void testDecodedHeadersRefused();
