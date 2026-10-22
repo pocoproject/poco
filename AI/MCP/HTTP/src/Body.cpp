@@ -50,13 +50,16 @@ namespace
 			if (n <= 0) break;
 			if (refuseMore && text.size() + static_cast<std::size_t>(n) > maxSize)
 			{
-				throw Poco::DataFormatException("The reply exceeds the size limit");
+				throw Poco::DataFormatException("The body exceeds the size limit");
 			}
 			text.append(buffer, static_cast<std::size_t>(n));
 		}
 		return text;
 	}
 }
+
+
+namespace Impl {
 
 
 std::string readBody(std::istream& stream, std::size_t maxSize, const ReadGuard& guard)
@@ -103,6 +106,9 @@ Poco::JSON::Object::Ptr parseObject(const std::string& text)
 	}
 	return Poco::JSON::Object::Ptr();
 }
+
+
+} // namespace Impl
 
 
 } // namespace Poco::AI::MCP::HTTP

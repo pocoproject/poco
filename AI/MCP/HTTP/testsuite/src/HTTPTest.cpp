@@ -887,22 +887,34 @@ void HTTPTest::testReadAtMostStopsAtTheLimit()
 		throw Poco::TimeoutException("no more input wanted");
 	};
 	std::istringstream exact("0123456789");
-	assertEqual(std::string("0123456789"), Poco::AI::MCP::HTTP::readAtMost(exact, 10, guard));
+	assertEqual(std::string("0123456789"), Poco::AI::MCP::HTTP::Impl::readAtMost(exact, 10, guard));
 	std::istringstream longer("0123456789abcdef");
-	assertEqual(std::string("0123456789"), Poco::AI::MCP::HTTP::readAtMost(longer, 10, guard));
+	assertEqual(std::string("0123456789"), Poco::AI::MCP::HTTP::Impl::readAtMost(longer, 10, guard));
 	assertEqual(0, guardCalls);
 
 	// A body that is not complete yet still asks the guard before it waits.
 	std::istringstream shorter("01234");
 	try
 	{
-		(void) Poco::AI::MCP::HTTP::readAtMost(shorter, 10, guard);
+		(void) Poco::AI::MCP::HTTP::Impl::readAtMost(shorter, 10, guard);
 		fail("a prefix that is not complete must wait for more input");
 	}
 	catch (const Poco::TimeoutException&)
 	{
 	}
 	assertEqual(1, guardCalls);
+
+	// A whole body larger than the limit is refused, whatever message it is.
+	std::istringstream large("0123456789abcdef");
+	try
+	{
+		(void) Poco::AI::MCP::HTTP::Impl::readBody(large, 10);
+		fail("a body larger than the limit must be refused");
+	}
+	catch (const Poco::DataFormatException& exc)
+	{
+		assertMessageEqual("The body exceeds the size limit", exc.message());
+	}
 }
 
 

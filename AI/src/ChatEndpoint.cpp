@@ -636,13 +636,13 @@ Poco::JSON::Object::Ptr ChatEndpoint::readObject(Poco::Net::HTTPServerRequest& r
 	std::string body;
 	try
 	{
-		body = Poco::AI::MCP::HTTP::readBody(request.stream(), maxSize);
+		body = Poco::AI::MCP::HTTP::Impl::readBody(request.stream(), maxSize);
 	}
 	catch (const Poco::DataFormatException&)
 	{
 		throw Refusal{Poco::Net::HTTPResponse::HTTP_REQUEST_ENTITY_TOO_LARGE, "too large", "the body is larger than the limit"};
 	}
-	const Poco::JSON::Object::Ptr pObject = Poco::AI::MCP::HTTP::parseObject(body);
+	const Poco::JSON::Object::Ptr pObject = Poco::AI::MCP::HTTP::Impl::parseObject(body);
 	if (pObject.isNull())
 	{
 		throw Refusal{Poco::Net::HTTPResponse::HTTP_BAD_REQUEST, "bad request", "the body is not a JSON object"};

@@ -44,11 +44,11 @@
 namespace Poco::AI {
 
 
-using Poco::AI::MCP::HTTP::readBody;
-using Poco::AI::MCP::HTTP::readAtMost;
-using Poco::AI::MCP::HTTP::cutAtCharacter;
-using Poco::AI::MCP::HTTP::excerpt;
-using Poco::AI::MCP::HTTP::parseObject;
+using Poco::AI::MCP::HTTP::Impl::readBody;
+using Poco::AI::MCP::HTTP::Impl::readAtMost;
+using Poco::AI::MCP::HTTP::Impl::cutAtCharacter;
+using Poco::AI::MCP::HTTP::Impl::excerpt;
+using Poco::AI::MCP::HTTP::Impl::parseObject;
 
 
 class ProviderCall

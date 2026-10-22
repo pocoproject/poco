@@ -64,7 +64,7 @@ namespace
 			else result += c;
 			if (result.size() > MAX_LOGGED_NAME) break;
 		}
-		return excerpt(result, MAX_LOGGED_NAME);
+		return Impl::excerpt(result, MAX_LOGGED_NAME);
 	}
 
 
@@ -361,7 +361,7 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 			while (reader.next(event))
 			{
 				if (!event.type.empty() && event.type != "message") continue;
-				const Poco::JSON::Object::Ptr pMessage = parseObject(event.data);
+				const Poco::JSON::Object::Ptr pMessage = Impl::parseObject(event.data);
 				if (isReply(pMessage, id))
 				{
 					// The server may keep the stream open: the next request takes a new session.
@@ -376,7 +376,7 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 			throw Poco::IOException("The MCP event stream ended before the reply to " + method);
 		}
 
-		const std::string text = readBody(*pStream, maxSize, bound);
+		const std::string text = Impl::readBody(*pStream, maxSize, bound);
 		// A body that broke off reads as a shorter one: the session or the
 		// length the answer promised tells.
 		if (httpSession.networkException() != nullptr) httpSession.networkException()->rethrow();
@@ -388,12 +388,12 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 		{
 			throw Poco::ProtocolException("The MCP endpoint accepted the request without a reply");
 		}
-		const Poco::JSON::Object::Ptr pMessage = parseObject(text);
+		const Poco::JSON::Object::Ptr pMessage = Impl::parseObject(text);
 		if (success)
 		{
 			if (pMessage.isNull())
 			{
-				throw Poco::ProtocolException("The MCP endpoint did not answer with a JSON object", excerpt(text, 200));
+				throw Poco::ProtocolException("The MCP endpoint did not answer with a JSON object", Impl::excerpt(text, 200));
 			}
 			if (!isReply(pMessage, id))
 			{
@@ -410,7 +410,7 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 			}
 			return pMessage;
 		}
-		throw Poco::Net::HTTPException(Poco::format("The MCP endpoint answered HTTP %d %s", status, response.getReason()), excerpt(text, 200));
+		throw Poco::Net::HTTPException(Poco::format("The MCP endpoint answered HTTP %d %s", status, response.getReason()), Impl::excerpt(text, 200));
 	}
 	catch (...)
 	{

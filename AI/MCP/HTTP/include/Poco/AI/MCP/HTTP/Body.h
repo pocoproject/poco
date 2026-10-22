@@ -5,7 +5,7 @@
 // Package: HTTP
 // Module:  Body
 //
-// Functions that read the body of an HTTP response that carries JSON.
+// Functions that read and check the bodies of HTTP messages that carry JSON.
 //
 // Copyright (c) 2026, Aleph ONE Software Engineering LLC.
 // and Contributors.
@@ -35,6 +35,11 @@ using ReadGuard = std::function<void ()>;
 	/// by setting the receive timeout of the socket to the time that is left.
 
 
+namespace Impl {
+	// Internal to the AI libraries, which share these helpers: they are no
+	// part of the public interface and may change.
+
+
 [[nodiscard]] AIMCPHTTP_API std::string readBody(std::istream& stream, std::size_t maxSize, const ReadGuard& guard = ReadGuard());
 	/// Reads the stream to its end.
 	///
@@ -60,6 +65,9 @@ AIMCPHTTP_API void cutAtCharacter(std::string& text, std::size_t maxSize);
 
 [[nodiscard]] AIMCPHTTP_API Poco::JSON::Object::Ptr parseObject(const std::string& text);
 	/// The JSON object in text, or null when text is not a JSON object.
+
+
+} // namespace Impl
 
 
 } // namespace Poco::AI::MCP::HTTP

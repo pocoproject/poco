@@ -376,7 +376,7 @@ ServerTransport::Reply ServerTransport::answer(Server& server, Poco::Net::HTTPSe
 		std::string body;
 		try
 		{
-			body = readBody(request.stream(), _params.maxMessageSize);
+			body = Impl::readBody(request.stream(), _params.maxMessageSize);
 		}
 		catch (const Poco::DataFormatException&)
 		{
