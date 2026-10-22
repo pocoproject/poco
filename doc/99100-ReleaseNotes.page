@@ -72,6 +72,9 @@ runtime, and a chat service an application serves its users with.
     cancellation, a tool registry of MCP tools, the agent loop, and <*MCPHost*>, which
     mirrors the tools of MCP servers into the registry. Enable with cmake <*ENABLE_AI*> (off
     by default); make component <*AI*>.
+  - GH #5573 <*Foundation*>: the launch option <*PROCESS_CLEAR_ENVIRONMENT*> of
+    <*Poco::Process*> starts a child with only the environment variables given to
+    <*Process::launch()*>, on every platform.
   - GH #5576 <*AI/MCP/HTTP*>: the server side of the Streamable HTTP transport,
     <*ServerTransport*>, which serves a <*Poco::AI::MCP::Server*> at an endpoint of an
     application's <*Poco::Net::HTTPServer*> and checks what the transport asks of a request:

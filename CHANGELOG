@@ -66,6 +66,10 @@ Features:
   active shard). Disabled by default; enable with ENABLE_DATA_SQLITE_VEC (cmake),
   POCO_ENABLE_SQLITE_VEC (gnu make) or ./configure --sqlite-vec. Works with bundled and
   unbundled SQLite (3.37 or newer required); optional AVX2/NEON SIMD kernels.
+- GH #5573 Poco::Process::launch(): the option PROCESS_CLEAR_ENVIRONMENT starts the child with
+  only the environment variables given to launch(), on every platform. Without it the child
+  inherits the environment of the parent with the given variables added, but replaced by them
+  when any are given on Windows, and on QNX when the child is spawned.
 
 New Components:
 
@@ -102,10 +106,6 @@ New Components:
   repeat), and MCPHost, which mirrors the tools of MCP servers into the registry. HTTPS
   through Poco::Net::HTTPSessionFactory, so no NetSSL link. CMake option ENABLE_AI (off by
   default); make component AI.
-- GH #5573 Poco::Process::launch(): the option PROCESS_CLEAR_ENVIRONMENT starts the child with
-  only the environment variables given to launch(), on every platform. Without it the child
-  inherits the environment of the parent: on POSIX platforms with the given variables added, on
-  Windows replaced by them when any are given.
 - GH #5576 AI/MCP/HTTP: the server side of the Streamable HTTP transport. ServerTransport
   serves a Poco::AI::MCP::Server at one endpoint of an application's Poco::Net::HTTPServer,
   statelessly: POST only, the Origin of a browser against the allowed origins, the Content-Type,
