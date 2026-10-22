@@ -33,6 +33,17 @@ public:
 	void testPollSetWakeUp();
 	void testClear();
 	void testCloseOnExec();
+	void testClosedSocketIsRejected();
+	void testClosedSocketIsNotReported();
+	void testReusedDescriptorIsNotReported();
+	void testReusedDescriptorGetsNewMode();
+	void testAddAfterRemove();
+	void testAddAfterClear();
+	void testHas();
+	void testRemoveClosedSocket();
+	void testUpdateWhilePolling();
+	void testUpdateBeforePoll();
+	void testUpdateNotInSet();
 
 	void setUp();
 	void tearDown();

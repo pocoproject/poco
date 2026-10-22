@@ -58,7 +58,7 @@ public:
 		/// Subsequent socket additions to the PollSet are mode-cumulative,
 		/// so the following code:
 		///
-		/// StreamSocket ss;
+		/// StreamSocket ss(SocketAddress::IPv4);
 		/// PollSet ps;
 		/// ps.add(ss, PollSet::POLL_READ);
 		/// ps.add(ss, PollSet::POLL_WRITE);
@@ -67,24 +67,38 @@ public:
 		/// equivalent to this:
 		///
 		/// ps.update(ss, PollSet::POLL_READ | PollSet::POLL_WRITE);
+		///
+		/// Throws an InvalidSocketException if the socket has no
+		/// descriptor, for example because it has been closed.
 
 	void remove(const Poco::Net::Socket& socket);
 		/// Removes the given socket from the set.
+		///
+		/// A socket is to be removed before it is closed. A socket that
+		/// is closed while in the set stays in it until it is removed,
+		/// and poll() does not report it.
+		///
+		/// Note: On platforms where PollSet uses poll(), such as macOS
+		/// and the BSDs, a socket that is added with the descriptor number
+		/// of a closed socket in the set replaces the closed socket.
 
 	void update(const Poco::Net::Socket& socket, int mode);
-		/// Updates the mode of the given socket. If socket does
-		/// not exist in the PollSet, it is silently added. For
-		/// an existing socket, any prior mode is overwritten.
+		/// Updates the mode of the given socket. Any prior mode
+		/// is overwritten.
 		/// Updating socket is non-mode-cumulative.
 		///
 		/// The following code:
 		///
-		/// StreamSocket ss;
+		/// StreamSocket ss(SocketAddress::IPv4);
 		/// PollSet ps;
-		/// ps.update(ss, PollSet::POLL_READ);
+		/// ps.add(ss, PollSet::POLL_READ);
 		/// ps.update(ss, PollSet::POLL_WRITE);
 		///
 		/// shall result in the socket being monitored for write only.
+		///
+		/// Throws an InvalidSocketException if the socket has no
+		/// descriptor, for example because it has been closed, and
+		/// an IOException if the socket is not in the PollSet.
 
 	[[nodiscard]] bool has(const Socket& socket) const;
 		/// Returns true if socket is registered for polling.
