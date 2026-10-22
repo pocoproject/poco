@@ -12,14 +12,18 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Glob.h"
+#include "Poco/Exception.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
+#include <chrono>
+#include <cstddef>
 #include <fstream>
 
 
 using Poco::Glob;
 using Poco::File;
 using Poco::Path;
+using Poco::SyntaxException;
 
 
 GlobTest::GlobTest(const std::string& name): CppUnit::TestCase(name)
@@ -483,6 +487,110 @@ void GlobTest::testMatchEmptyPattern()
 }
 
 
+void GlobTest::testMatchAsteriskBacktracking()
+{
+	Glob g1("*ab*ab");
+	assertTrue (g1.match("abab"));
+	assertTrue (g1.match("aabxabab"));
+	assertTrue (g1.match("ababab"));
+	assertTrue (!g1.match("ababa"));
+	assertTrue (!g1.match("abba"));
+
+	Glob g2("a*?b*c");
+	assertTrue (g2.match("axbyc"));
+	assertTrue (g2.match("abbc"));
+	assertTrue (g2.match("abbcbc"));
+	assertTrue (!g2.match("abc"));
+	assertTrue (!g2.match("abcb"));
+
+	Glob g3("*[!a]*a");
+	assertTrue (g3.match("ba"));
+	assertTrue (g3.match("aaba"));
+	assertTrue (g3.match("abaaa"));
+	assertTrue (!g3.match("aaaa"));
+	assertTrue (!g3.match("aab"));
+
+	Glob g4("**a**b**");
+	assertTrue (g4.match("ab"));
+	assertTrue (g4.match("xaybz"));
+	assertTrue (!g4.match("ba"));
+
+	Glob g5("*a*", Glob::GLOB_DOT_SPECIAL);
+	assertTrue (g5.match("ba"));
+	assertTrue (g5.match("b.a"));
+	assertTrue (!g5.match(".a"));
+
+	Glob g6("*A*b", Glob::GLOB_CASELESS);
+	assertTrue (g6.match("xaYB"));
+	assertTrue (g6.match("AaBb"));
+	assertTrue (!g6.match("xaYBc"));
+
+	Glob g7("*a\\");
+	try
+	{
+		(void) g7.match("bab");
+		fail("must throw");
+	}
+	catch (SyntaxException&)
+	{
+	}
+
+	Glob g8("*[a");
+	assertTrue (!g8.match("xb"));
+	try
+	{
+		(void) g8.match("xa");
+		fail("must throw");
+	}
+	catch (SyntaxException&)
+	{
+	}
+}
+
+
+void GlobTest::testMatchManyAsterisksInBoundedTime()
+{
+	// Going back to every '*' after a mismatch takes time exponential in the number of '*',
+	// far beyond the limit below for these patterns.
+	constexpr int ASTERISKS = 16;
+	constexpr std::size_t SUBJECT_LENGTH = 30;
+	constexpr std::chrono::seconds TIME_LIMIT(1);
+
+	std::string literals;
+	std::string questionMarks;
+	std::string sets;
+	for (int i = 0; i < ASTERISKS; ++i)
+	{
+		literals += "*a";
+		questionMarks += "*?";
+		sets += "*[a]";
+	}
+	const std::string subject(SUBJECT_LENGTH, 'a');
+
+	struct Case
+	{
+		std::string pattern;
+		int options;
+		std::string subject;
+		bool matches;
+	};
+	const Case cases[] =
+	{
+		{literals + "b", Glob::GLOB_DEFAULT, subject, false},
+		{literals + "b", Glob::GLOB_DEFAULT, subject + "b", true},
+		{literals + "B", Glob::GLOB_CASELESS, subject, false},
+		{questionMarks + "b", Glob::GLOB_DEFAULT, subject, false},
+		{sets + "b", Glob::GLOB_DOT_SPECIAL, subject, false}
+	};
+	for (const auto& c: cases)
+	{
+		const auto start = std::chrono::steady_clock::now();
+		assertEqual (c.matches, Glob(c.pattern, c.options).match(c.subject));
+		assertTrue (std::chrono::steady_clock::now() - start < TIME_LIMIT);
+	}
+}
+
+
 void GlobTest::createFile(const std::string& path)
 {
 	Path p(path, Path::PATH_UNIX);
@@ -528,6 +636,8 @@ CppUnit::Test* GlobTest::suite()
 	CppUnit_addTest(pSuite, GlobTest, testCaseless);
 	CppUnit_addTest(pSuite, GlobTest, testGlob);
 	CppUnit_addTest(pSuite, GlobTest, testMatchEmptyPattern);
+	CppUnit_addTest(pSuite, GlobTest, testMatchAsteriskBacktracking);
+	CppUnit_addTest(pSuite, GlobTest, testMatchManyAsterisksInBoundedTime);
 
 	return pSuite;
 }

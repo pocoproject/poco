@@ -16,6 +16,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Types.h"
 #include <string>
 #include <atomic>
 #include <vector>
@@ -281,19 +282,19 @@ void SPSCQueueTest::testHighThroughput()
 	const int COUNT = 1000000;
 	SPSCQueue<int> queue(8192);
 	std::atomic<bool> done{false};
-	std::atomic<int> sum{0};
+	std::atomic<Poco::Int64> sum{0};
 
 	Thread consumer;
 	class Consumer : public Poco::Runnable
 	{
 	public:
-		Consumer(SPSCQueue<int>& q, std::atomic<bool>& d, std::atomic<int>& s)
+		Consumer(SPSCQueue<int>& q, std::atomic<bool>& d, std::atomic<Poco::Int64>& s)
 			: queue(q), done(d), sum(s) {}
 
 		void run() override
 		{
 			int value;
-			int localSum = 0;
+			Poco::Int64 localSum = 0;
 			while (!done.load(std::memory_order_acquire) || !queue.empty())
 			{
 				if (queue.tryPop(value))
@@ -306,7 +307,7 @@ void SPSCQueueTest::testHighThroughput()
 
 		SPSCQueue<int>& queue;
 		std::atomic<bool>& done;
-		std::atomic<int>& sum;
+		std::atomic<Poco::Int64>& sum;
 	} consumerRunnable(queue, done, sum);
 
 	consumer.start(consumerRunnable);
@@ -330,7 +331,7 @@ void SPSCQueueTest::testHighThroughput()
 
 	// Verify sum
 	long long expectedSum = (long long)(COUNT - 1) * COUNT / 2;
-	assertTrue(sum.load() == (int)(expectedSum & 0x7FFFFFFF) || true); // Allow overflow
+	assertTrue(sum.load() == expectedSum);
 
 	// Just for info - throughput
 	double elapsed = sw.elapsed() / 1000000.0;

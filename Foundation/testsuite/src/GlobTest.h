@@ -33,6 +33,8 @@ public:
 	void testGlob();
 	void testCaseless();
 	void testMatchEmptyPattern();
+	void testMatchAsteriskBacktracking();
+	void testMatchManyAsterisksInBoundedTime();
 
 	void setUp();
 	void tearDown();
