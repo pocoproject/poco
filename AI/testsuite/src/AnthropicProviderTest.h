@@ -41,6 +41,7 @@ public:
 	void testRequestMembersAndHeaders();
 	void testCancelDuringUpload();
 	void testCancelDuringConnect();
+	void testCancelDescriptorNotInherited();
 	void testCutToolCall();
 	void testThinkingSignatures();
 	void testBlocksAsTheyCame();
