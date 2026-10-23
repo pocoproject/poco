@@ -355,7 +355,6 @@ Poco::JSON::Object::Ptr ProcessClient::exchange(const Poco::JSON::Object::Ptr& r
 	const Id id = request->get("id");
 	const std::string method = request->getValue<std::string>("method");
 	const Poco::Timespan timeout = getTimeout();
-	const Poco::Timestamp start;
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		if (_closed)
@@ -363,16 +362,20 @@ Poco::JSON::Object::Ptr ProcessClient::exchange(const Poco::JSON::Object::Ptr& r
 			throw Poco::IOException("The MCP server process is closed");
 		}
 	}
+	const std::string line = serialize(request) + '\n';
 	{
 		Poco::Mutex::ScopedLock lock(_pReader->mutex);
 		_pReader->outstanding = id;
 		_pReader->pReply = nullptr;
 		_pReader->tooLarge = false;
 	}
+	// The timeout counts from the moment the request is handed to the
+	// writer, not while it is serialized.
+	const Poco::Timestamp start;
 	bool written = false;
 	try
 	{
-		written = send(serialize(request) + '\n', start, timeout, true);
+		written = send(line, start, timeout, true);
 	}
 	catch (...)
 	{
