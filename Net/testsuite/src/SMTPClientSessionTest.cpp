@@ -34,6 +34,7 @@ using Poco::Net::SocketAddress;
 using Poco::Net::SMTPException;
 using Poco::Stopwatch;
 using Poco::Thread;
+using Poco::InvalidArgumentException;
 
 
 SMTPClientSessionTest::SMTPClientSessionTest(const std::string& name): CppUnit::TestCase(name)
@@ -401,6 +402,45 @@ void SMTPClientSessionTest::testSendInvalidNestedPartHeader()
 }
 
 
+void SMTPClientSessionTest::testSendInvalidRecipient()
+{
+	DialogServer server;
+	server.addResponse("220 localhost SMTP ready");
+	server.addResponse("250 Hello localhost");
+	server.addResponse("250 OK");
+	server.addResponse("250 OK");
+	server.addResponse("250 OK");
+	server.addResponse("354 Send data");
+	server.addResponse("250 OK");
+	server.addResponse("221 Bye");
+	SMTPClientSession session("127.0.0.1", server.port());
+	session.login("localhost");
+
+	MailMessage message;
+	message.setSender("john.doe@no.where");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "jane.doe@no.where", "Jane Doe"));
+	message.setSubject("Test Message");
+	message.setContent("Hello\r\n");
+	SMTPClientSession::Recipients recipients;
+	recipients.push_back("jane.doe@no.where>\r\nRCPT TO: <joe.doe@no.where");
+	server.clearCommands();
+	try
+	{
+		session.sendMessage(message, recipients);
+		fail("line break in recipient - must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	session.close();
+	std::string cmd = server.popCommandWait();
+	assertTrue (cmd == "MAIL FROM: <john.doe@no.where>");
+	cmd = server.popCommandWait();
+	assertTrue (cmd == "QUIT");
+}
+
+
 void SMTPClientSessionTest::setUp()
 {
 }
@@ -424,6 +464,7 @@ CppUnit::Test* SMTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendFailed);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendInvalidHeader);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendInvalidNestedPartHeader);
+	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendInvalidRecipient);
 
 	return pSuite;
 }

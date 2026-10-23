@@ -146,6 +146,9 @@ public:
 		///
 		/// Throws a SMTPException in case of a SMTP-specific error, or a
 		/// NetException in case of a general network communication failure.
+		///
+		/// Throws an InvalidArgumentException, before anything is sent,
+		/// if the command contains a CR or LF character.
 
 	int sendCommand(const std::string& command, const std::string& arg, std::string& response);
 		/// Sends the given command verbatim to the server
@@ -153,6 +156,9 @@ public:
 		///
 		/// Throws a SMTPException in case of a SMTP-specific error, or a
 		/// NetException in case of a general network communication failure.
+		///
+		/// Throws an InvalidArgumentException, before anything is sent,
+		/// if the command or an argument contains a CR or LF character.
 
 	void sendAddresses(const std::string& from, const Recipients& recipients);
 		/// Sends the message preamble by sending a MAIL FROM command,

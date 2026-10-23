@@ -50,6 +50,17 @@ using Poco::Environment;
 namespace Poco::Net {
 
 
+namespace
+{
+	void checkCommand(const std::string& str)
+	{
+		// A CR or LF would end the command line and start another command.
+		if (str.find_first_of("\r\n") != std::string::npos)
+			throw Poco::InvalidArgumentException("Line break in command or argument");
+	}
+}
+
+
 SMTPClientSession::SMTPClientSession(const StreamSocket& socket):
 	_socket(socket),
 	_isOpen(false)
@@ -528,6 +539,7 @@ void SMTPClientSession::transportMessage(const MailMessage& message)
 
 int SMTPClientSession::sendCommand(const std::string& command, std::string& response)
 {
+	checkCommand(command);
 	_socket.sendMessage(command);
 	return _socket.receiveStatusMessage(response);
 }
@@ -535,6 +547,8 @@ int SMTPClientSession::sendCommand(const std::string& command, std::string& resp
 
 int SMTPClientSession::sendCommand(const std::string& command, const std::string& arg, std::string& response)
 {
+	checkCommand(command);
+	checkCommand(arg);
 	_socket.sendMessage(command, arg);
 	return _socket.receiveStatusMessage(response);
 }
