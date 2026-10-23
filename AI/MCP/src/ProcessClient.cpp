@@ -24,6 +24,7 @@
 #include <utility>
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <pthread.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -121,6 +122,12 @@ ProcessClient::~ProcessClient()
 
 void ProcessClient::start(std::size_t maxMessageSize)
 {
+#if defined(F_SETNOSIGPIPE)
+	// Where a write to a closed pipe raises SIGPIPE for the whole process, as
+	// on Apple platforms, no signal mask of one thread keeps it away: the
+	// pipe is set not to raise it.
+	(void) ::fcntl(_inPipe.writeHandle(), F_SETNOSIGPIPE, 1);
+#endif
 	try
 	{
 		_readerThread = std::thread(&ProcessClient::read, _pReader, _outPipe, maxMessageSize);
@@ -190,9 +197,9 @@ void ProcessClient::write(const std::shared_ptr<Writer>& pWriter, Poco::Pipe pip
 {
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	// A write to a server that has ended fails with EPIPE instead of ending
-	// the process with SIGPIPE. The thread takes over the signal mask of the
-	// one that made the client, which need not block it as a Poco::Thread
-	// does.
+	// the process with SIGPIPE, which these systems raise for the thread
+	// that writes. The thread takes over the signal mask of the one that
+	// made the client, which need not block it as a Poco::Thread does.
 	sigset_t pipeSignal;
 	sigemptyset(&pipeSignal);
 	sigaddset(&pipeSignal, SIGPIPE);

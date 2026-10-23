@@ -50,11 +50,13 @@ class AIMCP_API ProcessClient: public Client
 	/// that stops reading its standard input times a request out too, and
 	/// does not hold up close(). After a timeout the client sends
 	/// notifications/cancelled for the request, unless it took the request
-	/// back before any of it was written, and throws Poco::TimeoutException. Only the reply to the request in flight is
-	/// kept; notifications and late replies are passed over. A request to a
-	/// server that has ended fails with a Poco::IOException; on POSIX
-	/// platforms the writer blocks SIGPIPE, whatever the signal mask of the
-	/// thread that makes the client.
+	/// back before any of it was written, and throws Poco::TimeoutException.
+	/// Only the reply to the request in flight is kept; notifications and
+	/// late replies are passed over. A request to a server that has ended
+	/// fails with a Poco::IOException, without SIGPIPE: where a write to a
+	/// closed pipe raises it for the whole process, as on Apple platforms,
+	/// the pipe is set not to raise it; elsewhere the writer thread blocks
+	/// it, whatever the signal mask of the thread that makes the client.
 	///
 	/// close(), which the destructor calls, ends the server as the stdio
 	/// transport describes it: it closes the server's standard input, waits
