@@ -31,7 +31,16 @@ poco_socket_t duplicate(poco_socket_t fd)
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	WSAPROTOCOL_INFOW info;
 	if (::WSADuplicateSocketW(fd, ::GetCurrentProcessId(), &info) != 0) return POCO_INVALID_SOCKET;
-	return ::WSASocketW(FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO, &info, 0, WSA_FLAG_OVERLAPPED | WSA_FLAG_NO_HANDLE_INHERIT);
+	const poco_socket_t copy = ::WSASocketW(FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO, &info, 0, WSA_FLAG_OVERLAPPED | WSA_FLAG_NO_HANDLE_INHERIT);
+	if (copy == POCO_INVALID_SOCKET) return POCO_INVALID_SOCKET;
+	// A socket made from the protocol information of another one may be
+	// inheritable all the same.
+	if (!::SetHandleInformation(reinterpret_cast<HANDLE>(copy), HANDLE_FLAG_INHERIT, 0))
+	{
+		poco_closesocket(copy);
+		return POCO_INVALID_SOCKET;
+	}
+	return copy;
 #elif defined(F_DUPFD_CLOEXEC)
 	const int copy = ::fcntl(fd, F_DUPFD_CLOEXEC, 0);
 	return copy >= 0 ? copy : POCO_INVALID_SOCKET;
