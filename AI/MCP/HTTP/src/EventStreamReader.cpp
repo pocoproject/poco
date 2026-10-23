@@ -16,6 +16,7 @@
 #include "Poco/Exception.h"
 #include <algorithm>
 #include <cstring>
+#include <limits>
 #include <utility>
 
 
@@ -32,6 +33,7 @@ namespace
 EventStreamReader::EventStreamReader(std::istream& in, std::size_t maxEventSize):
 	_in(in),
 	_maxEventSize(maxEventSize),
+	_maxLineSize(maxEventSize > std::numeric_limits<std::size_t>::max() - LINE_OVERHEAD ? std::numeric_limits<std::size_t>::max() : maxEventSize + LINE_OVERHEAD),
 	_skipLF(false),
 	_ended(false),
 	_cut(false),
@@ -56,7 +58,7 @@ void EventStreamReader::beforeRead()
 
 void EventStreamReader::append(std::string& line, const char* pText, std::size_t size) const
 {
-	if (line.size() + size > _maxEventSize + LINE_OVERHEAD)
+	if (size > _maxLineSize - line.size())
 	{
 		throw Poco::DataFormatException("Event stream line exceeds the size limit");
 	}

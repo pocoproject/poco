@@ -35,6 +35,7 @@
 #include "Poco/Message.h"
 #include "Poco/Mutex.h"
 #include "Poco/Timestamp.h"
+#include <limits>
 #include <memory>
 #include <sstream>
 #include <streambuf>
@@ -487,6 +488,40 @@ void HTTPTest::testResponseLimit()
 	// Within the limit all is well.
 	HTTPClient bigClient{Poco::URI(host.url())};
 	assertEqual(1u, static_cast<unsigned>(bigClient.listTools().size()));
+}
+
+
+void HTTPTest::testEventAtResponseLimit()
+{
+	// A reply on one data line of an event stream is read when it is exactly
+	// the limit, with the field name in the line, and refused when it is one
+	// byte more. Each client sends the same request, which gets the same reply.
+	Server server;
+	buildServer(server);
+	TestHTTPHost host(server);
+	host.setFault(TestHTTPHost::FAULT_ONE_LINE);
+	host.start();
+	HTTPClient sizer{Poco::URI(host.url())};
+	(void) sizer.listTools();
+	const std::size_t size = host.replies().back().size();
+
+	HTTPClient exact{Poco::URI(host.url())};
+	exact.setMaxResponseSize(size);
+	assertEqual(1u, static_cast<unsigned>(exact.listTools().size()));
+
+	HTTPClient under{Poco::URI(host.url())};
+	under.setMaxResponseSize(size - 1);
+	try
+	{
+		(void) under.listTools();
+		fail("an event beyond the limit must throw");
+	}
+	catch (const Poco::DataFormatException&)
+	{
+	}
+	const std::vector<std::string> replies = host.replies();
+	assertEqual(3u, static_cast<unsigned>(replies.size()));
+	assertTrue(replies[1] == replies[0] && replies[2] == replies[0]);
 }
 
 
@@ -949,6 +984,15 @@ void HTTPTest::testEventStreamReader()
 	assertEqual(1u, static_cast<unsigned>(result.size()));
 	assertEqual(std::string("|") + std::string(64, 'd'), result[0]);
 
+	// A limit near the largest size leaves lines of any length.
+	{
+		std::istringstream in("data: " + std::string(200, 'x') + "\n\n");
+		EventStreamReader reader(in, std::numeric_limits<std::size_t>::max());
+		EventStreamReader::Event event;
+		assertTrue(reader.next(event));
+		assertEqual(std::string(200, 'x'), event.data);
+	}
+
 	// A line cut off at the end is dropped.
 	result = events("data: full\n\ndata: cut off", cut);
 	assertEqual(1u, static_cast<unsigned>(result.size()));
@@ -1041,6 +1085,7 @@ CppUnit::Test* HTTPTest::suite()
 	CppUnit_addTest(pSuite, HTTPTest, testEventStream);
 	CppUnit_addTest(pSuite, HTTPTest, testCutEventStream);
 	CppUnit_addTest(pSuite, HTTPTest, testResponseLimit);
+	CppUnit_addTest(pSuite, HTTPTest, testEventAtResponseLimit);
 	CppUnit_addTest(pSuite, HTTPTest, testTimeout);
 	CppUnit_addTest(pSuite, HTTPTest, testEventStreamDeadline);
 	CppUnit_addTest(pSuite, HTTPTest, testStaleKeepAlive);

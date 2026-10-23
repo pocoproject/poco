@@ -76,7 +76,8 @@ public:
 		FAULT_TRICKLE_LINE,     /// Sends the event stream one byte every 20 ms
 		FAULT_BOM,              /// Starts the event stream with a byte order mark
 		FAULT_NO_BLANK_LINE,    /// Ends the event stream without the blank line after the reply
-		FAULT_CUT_BODY          /// Sends half of the body, and closes the connection
+		FAULT_CUT_BODY,         /// Sends half of the body, and closes the connection
+		FAULT_ONE_LINE          /// Sends the reply as the one event of a stream, on one data line
 	};
 
 	explicit TestHTTPHost(Poco::AI::MCP::Server& server, ReplyMode replyMode = REPLY_JSON):
@@ -155,6 +156,13 @@ public:
 		return _state.bodies;
 	}
 
+	std::vector<std::string> replies() const
+		/// The serialized replies to requests, in order.
+	{
+		Poco::FastMutex::ScopedLock lock(_state.mutex);
+		return _state.replies;
+	}
+
 	Poco::Net::NameValueCollection lastHeaders() const
 		/// The headers of the last request.
 	{
@@ -180,6 +188,7 @@ private:
 		Poco::Net::NameValueCollection lastHeaders;
 		std::vector<std::string> listedTools;
 		std::vector<std::string> bodies;
+		std::vector<std::string> replies;
 		Poco::Event stopping{Poco::Event::EVENT_MANUALRESET};
 		Poco::Mutex activeMutex;
 		Poco::Condition idle;
@@ -306,6 +315,10 @@ private:
 				break;
 			}
 			const std::string text = Poco::AI::MCP::serialize(reply.message);
+			{
+				Poco::FastMutex::ScopedLock lock(_state.mutex);
+				_state.replies.push_back(text);
+			}
 			switch (_state.fault)
 			{
 			case FAULT_STALL_BODY:
@@ -325,6 +338,9 @@ private:
 				return;
 			case FAULT_NO_BLANK_LINE:
 				sendText(response, Poco::Net::HTTPResponse::HTTP_OK, "text/event-stream", ": a notification first\n\ndata: " + text + "\n");
+				return;
+			case FAULT_ONE_LINE:
+				sendText(response, Poco::Net::HTTPResponse::HTTP_OK, "text/event-stream", "data: " + text + "\n\n");
 				return;
 			default:
 				break;

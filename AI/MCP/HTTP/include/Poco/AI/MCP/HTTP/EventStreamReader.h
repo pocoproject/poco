@@ -105,6 +105,7 @@ private:
 
 	std::istream& _in;
 	std::size_t _maxEventSize;
+	std::size_t _maxLineSize;
 	ReadGuard _guard;
 	bool _skipLF;
 	bool _ended;

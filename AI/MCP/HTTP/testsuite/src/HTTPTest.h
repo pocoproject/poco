@@ -32,6 +32,7 @@ public:
 	void testEventStream();
 	void testCutEventStream();
 	void testResponseLimit();
+	void testEventAtResponseLimit();
 	void testTimeout();
 	void testEventStreamDeadline();
 	void testStaleKeepAlive();
