@@ -77,7 +77,9 @@ public:
 		FAULT_BOM,              /// Starts the event stream with a byte order mark
 		FAULT_NO_BLANK_LINE,    /// Ends the event stream without the blank line after the reply
 		FAULT_CUT_BODY,         /// Sends half of the body, and closes the connection
-		FAULT_ONE_LINE          /// Sends the reply as the one event of a stream, on one data line
+		FAULT_ONE_LINE,         /// Sends the reply as the one event of a stream, on one data line
+		FAULT_TRICKLE_HEAD,     /// Sends the head of an answer one byte every 20 ms
+		FAULT_CONTINUE_FLOOD    /// Sends a 100 Continue every 100 ms, and no answer
 	};
 
 	explicit TestHTTPHost(Poco::AI::MCP::Server& server, ReplyMode replyMode = REPLY_JSON):
@@ -258,6 +260,12 @@ private:
 				break;
 			case FAULT_TRICKLE:
 				trickle(response, _state.stopping);
+				return;
+			case FAULT_TRICKLE_HEAD:
+				trickleHead(request, _state.stopping);
+				return;
+			case FAULT_CONTINUE_FLOOD:
+				floodContinue(request, _state.stopping);
 				return;
 			case FAULT_STALE_KEEP_ALIVE:
 				// The server parameters close every connection after its response.
@@ -451,6 +459,47 @@ private:
 				out.put(c);
 				out.flush();
 				if (!out.good() || stopping.tryWait(20)) break;
+			}
+		}
+
+		static void trickleHead(Poco::Net::HTTPServerRequest& request, Poco::Event& stopping)
+			/// Sends the head of an answer, a status line and 40 header fields,
+			/// one byte every 20 ms, which takes some 20 seconds.
+		{
+			Poco::Net::StreamSocket socket = static_cast<Poco::Net::HTTPServerRequestImpl&>(request).detachSocket();
+			std::string head("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n");
+			for (int i = 0; i < 40; ++i) head += "X-Field-" + std::to_string(i) + ": value\r\n";
+			head += "Content-Length: 2\r\n\r\n{}";
+			for (const char c: head)
+			{
+				if (stopping.tryWait(20)) return;
+				try
+				{
+					if (socket.sendBytes(&c, 1) != 1) return;
+				}
+				catch (const Poco::Exception&)
+				{
+					return;
+				}
+			}
+		}
+
+		static void floodContinue(Poco::Net::HTTPServerRequest& request, Poco::Event& stopping)
+			/// Sends a 100 Continue every 100 ms, for 20 seconds, and no answer.
+		{
+			Poco::Net::StreamSocket socket = static_cast<Poco::Net::HTTPServerRequestImpl&>(request).detachSocket();
+			const std::string interim("HTTP/1.1 100 Continue\r\n\r\n");
+			for (int i = 0; i < 200; ++i)
+			{
+				if (stopping.tryWait(100)) return;
+				try
+				{
+					if (socket.sendBytes(interim.data(), static_cast<int>(interim.size())) != static_cast<int>(interim.size())) return;
+				}
+				catch (const Poco::Exception&)
+				{
+					return;
+				}
 			}
 		}
 

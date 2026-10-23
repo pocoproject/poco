@@ -14,6 +14,7 @@
 
 #include "Poco/AI/MCP/HTTP/HTTPClient.h"
 #include "Poco/AI/MCP/HTTP/Body.h"
+#include "Poco/AI/MCP/HTTP/Connection.h"
 #include "Poco/AI/MCP/HTTP/EventStreamReader.h"
 #include "Headers.h"
 #include "Poco/AI/MCP/Message.h"
@@ -31,10 +32,15 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
+#include <condition_variable>
 #include <istream>
+#include <mutex>
 #include <ostream>
 #include <sstream>
+#include <system_error>
+#include <thread>
 #include <utility>
 
 
@@ -88,6 +94,71 @@ namespace
 		return std::max(remaining, Poco::Timespan(0, 1000));
 	}
 
+
+	class Watchdog
+		/// Shuts a connection down once the deadline passes, until it is
+		/// destroyed. The session bounds each read and write by itself only:
+		/// a server that sends the head of its answer a byte at a time, or one
+		/// 100 Continue after another, would hold a request past its deadline.
+		/// The watchdog works on a descriptor of its own, so that it never
+		/// shuts down another connection.
+	{
+	public:
+		Watchdog(poco_socket_t fd, const Poco::Timestamp& deadline):
+			_fd(Impl::duplicate(fd))
+		{
+			if (_fd == POCO_INVALID_SOCKET) return;
+			const auto until = std::chrono::steady_clock::now() + std::chrono::microseconds(std::max<Poco::Timestamp::TimeDiff>(0, deadline - Poco::Timestamp()));
+			try
+			{
+				_thread = std::thread([this, until]()
+				{
+					std::unique_lock<std::mutex> lock(_mutex);
+					if (!_ready.wait_until(lock, until, [this]() { return _stopped; }))
+					{
+						_fired = true;
+						// 2 shuts both directions down, on every platform.
+						(void) ::shutdown(_fd, 2);
+					}
+				});
+			}
+			catch (const std::system_error& exc)
+			{
+				poco_closesocket(_fd);
+				throw Poco::SystemException("Cannot start the watchdog of a request", exc.what());
+			}
+		}
+
+		~Watchdog()
+		{
+			{
+				std::lock_guard<std::mutex> lock(_mutex);
+				_stopped = true;
+			}
+			_ready.notify_all();
+			if (_thread.joinable()) _thread.join();
+			if (_fd != POCO_INVALID_SOCKET) poco_closesocket(_fd);
+		}
+
+		[[nodiscard]] bool fired() const
+			/// Returns true if the deadline passed, and the connection was shut
+			/// down.
+		{
+			std::lock_guard<std::mutex> lock(_mutex);
+			return _fired;
+		}
+
+	private:
+		Watchdog(const Watchdog&) = delete;
+		Watchdog& operator = (const Watchdog&) = delete;
+
+		poco_socket_t _fd;
+		mutable std::mutex _mutex;
+		std::condition_variable _ready;
+		bool _stopped = false;
+		bool _fired = false;
+		std::thread _thread;
+	};
 }
 
 
@@ -313,9 +384,13 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 	Poco::Net::HTTPResponse response;
 	std::istream* pStream = nullptr;
 	bool sent = false;
+	// From the request head on, the body and the head of the answer as a
+	// whole are bounded by the deadline too.
+	std::unique_ptr<Watchdog> pWatchdog;
 	try
 	{
 		std::ostream& os = httpSession.sendRequest(httpRequest);
+		pWatchdog = std::make_unique<Watchdog>(httpSession.socket().impl()->sockfd(), deadline);
 		os << body;
 		os.flush();
 		if (os.bad())
@@ -326,10 +401,17 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 		sent = true;
 		bound();
 		pStream = &httpSession.receiveResponse(response);
+		pWatchdog.reset();
 	}
 	catch (const Poco::IOException&)
 	{
+		const bool late = pWatchdog != nullptr && pWatchdog->fired();
+		pWatchdog.reset();
 		_pSession.reset();
+		if (late)
+		{
+			throw Poco::TimeoutException("No reply from the MCP endpoint to " + method + " within the timeout");
+		}
 		// Once more, on a new connection: a request that cannot have reached
 		// the server, or one that only reads. A tool call the server may have
 		// run is not repeated.
@@ -342,6 +424,7 @@ Poco::JSON::Object::Ptr HTTPClient::post(const Poco::JSON::Object::Ptr& request,
 	}
 	catch (...)
 	{
+		pWatchdog.reset();
 		_pSession.reset();
 		throw;
 	}

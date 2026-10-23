@@ -749,6 +749,35 @@ void HTTPTest::testReadsBoundedByTheTimeout()
 }
 
 
+void HTTPTest::testHeadBoundedByTheTimeout()
+{
+	// The head of an answer that trickles in, a byte every 20 ms, and one
+	// 100 Continue after another: the session reads the head by itself, and
+	// the request still ends near the timeout.
+	const TestHTTPHost::Fault faults[] = {TestHTTPHost::FAULT_TRICKLE_HEAD, TestHTTPHost::FAULT_CONTINUE_FLOOD};
+	for (const TestHTTPHost::Fault fault: faults)
+	{
+		Server server;
+		buildServer(server);
+		TestHTTPHost host(server);
+		host.setFault(fault);
+		host.start();
+		HTTPClient client{Poco::URI(host.url())};
+		client.setTimeout(Poco::Timespan(0, 600000));
+		const Poco::Timestamp start;
+		try
+		{
+			(void) client.listTools();
+			fail("an answer whose head takes longer than the timeout must throw");
+		}
+		catch (const Poco::TimeoutException&)
+		{
+		}
+		assertTrue(start.elapsed() < 3 * Poco::Timestamp::resolution());
+	}
+}
+
+
 void HTTPTest::testEventStreamFraming()
 {
 	// A byte order mark at the start of the stream is skipped.
@@ -1094,6 +1123,7 @@ CppUnit::Test* HTTPTest::suite()
 	CppUnit_addTest(pSuite, HTTPTest, testBodyBreaksOff);
 	CppUnit_addTest(pSuite, HTTPTest, testHeaderMismatch);
 	CppUnit_addTest(pSuite, HTTPTest, testReadsBoundedByTheTimeout);
+	CppUnit_addTest(pSuite, HTTPTest, testHeadBoundedByTheTimeout);
 	CppUnit_addTest(pSuite, HTTPTest, testEventStreamFraming);
 	CppUnit_addTest(pSuite, HTTPTest, testLogShowsNoSecrets);
 	CppUnit_addTest(pSuite, HTTPTest, testRequestHook);

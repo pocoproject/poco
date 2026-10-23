@@ -13,6 +13,7 @@
 
 
 #include "ProviderCall.h"
+#include "Poco/AI/MCP/HTTP/Connection.h"
 #include "Poco/Net/HTTPMessage.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/JSON/Array.h"
@@ -28,10 +29,6 @@
 #include "Poco/Net/NetException.h"
 #include <algorithm>
 #include <sstream>
-#if !defined(POCO_OS_FAMILY_WINDOWS)
-#include <fcntl.h>
-#include <unistd.h>
-#endif
 
 
 namespace Poco::AI {
@@ -39,32 +36,6 @@ namespace Poco::AI {
 
 namespace
 {
-	poco_socket_t duplicate(poco_socket_t fd)
-		/// Another descriptor of the same connection, which only its owner
-		/// closes; invalid when there is none. Like the sockets of Poco::Net,
-		/// it is not inherited by child processes.
-	{
-		if (fd == POCO_INVALID_SOCKET) return POCO_INVALID_SOCKET;
-#if defined(POCO_OS_FAMILY_WINDOWS)
-		WSAPROTOCOL_INFOW info;
-		if (::WSADuplicateSocketW(fd, ::GetCurrentProcessId(), &info) != 0) return POCO_INVALID_SOCKET;
-		return ::WSASocketW(FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO, &info, 0, WSA_FLAG_OVERLAPPED | WSA_FLAG_NO_HANDLE_INHERIT);
-#elif defined(F_DUPFD_CLOEXEC)
-		const int copy = ::fcntl(fd, F_DUPFD_CLOEXEC, 0);
-		return copy >= 0 ? copy : POCO_INVALID_SOCKET;
-#else
-		const int copy = ::dup(fd);
-		if (copy < 0) return POCO_INVALID_SOCKET;
-		if (::fcntl(copy, F_SETFD, FD_CLOEXEC) == -1)
-		{
-			::close(copy);
-			return POCO_INVALID_SOCKET;
-		}
-		return copy;
-#endif
-	}
-
-
 	Poco::Dynamic::Var copyOf(const Poco::Dynamic::Var& value)
 		/// A copy of a JSON value; objects and arrays recursively.
 	{
@@ -227,7 +198,7 @@ void ProviderCall::abort()
 
 void ProviderCall::keepDescriptor()
 {
-	const poco_socket_t copy = duplicate(_pSession->socket().impl()->sockfd());
+	const poco_socket_t copy = Poco::AI::MCP::HTTP::Impl::duplicate(_pSession->socket().impl()->sockfd());
 	Poco::FastMutex::ScopedLock lock(_abortMutex);
 	_descriptor = copy;
 	if (_aborted && _descriptor != POCO_INVALID_SOCKET)

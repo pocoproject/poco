@@ -54,8 +54,11 @@ class AIMCPHTTP_API HTTPClient: public Poco::AI::MCP::Client
 	/// any other status that is not 200 becomes a Poco::Net::HTTPException
 	/// with the status and the start of the body. Replies are limited in size.
 	/// The whole request, from sending it to the end of its reply, must take
-	/// no longer than the client's timeout: every read that waits is bounded
-	/// by the time that is left, so a reply that trickles in times out too.
+	/// no longer than the client's timeout: every read of the body of the
+	/// reply that waits is bounded by the time that is left, and the body of
+	/// the request and the head of the reply as a whole, so that a reply that
+	/// trickles in times out too. For the latter the client shuts the
+	/// connection down at the deadline, from a thread that waits for it.
 	///
 	/// The Mcp-Param headers of a tool come from its definition, which
 	/// listTools() reads. callTool() answered with HEADER_MISMATCH lists the

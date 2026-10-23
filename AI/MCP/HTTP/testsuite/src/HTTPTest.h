@@ -41,6 +41,7 @@ public:
 	void testBodyBreaksOff();
 	void testHeaderMismatch();
 	void testReadsBoundedByTheTimeout();
+	void testHeadBoundedByTheTimeout();
 	void testEventStreamFraming();
 	void testLogShowsNoSecrets();
 	void testRequestHook();
