@@ -270,6 +270,28 @@ namespace
 			return send(HTTPRequest::HTTP_POST, headers, body);
 		}
 
+		Answer postBytes(const std::string& body, const NameValueCollection& headers) const
+			/// Posts the request as it is written here, without the checks of
+			/// Poco::Net::MessageHeader, e.g. with a character it refuses to write.
+		{
+			std::ostringstream text;
+			text << "POST /mcp HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n";
+			for (const auto& header: headers) text << header.first << ": " << header.second << "\r\n";
+			text << "Content-Length: " << body.size() << "\r\n\r\n" << body;
+			const std::string bytes = text.str();
+			Poco::Net::StreamSocket socket(Poco::Net::SocketAddress("127.0.0.1", _port));
+			socket.setReceiveTimeout(Poco::Timespan(10, 0));
+			socket.sendBytes(bytes.data(), static_cast<int>(bytes.size()));
+			Poco::Net::SocketStream stream(socket);
+			HTTPResponse response;
+			response.read(stream);
+			Answer answer;
+			answer.status = static_cast<int>(response.getStatus());
+			for (const auto& header: response) answer.headers.add(header.first, header.second);
+			Poco::StreamCopier::copyToString(stream, answer.body);
+			return answer;
+		}
+
 	private:
 		void start(Poco::Net::HTTPRequestHandlerFactory::Ptr pFactory, bool autoDecodeHeaders = false, const Poco::Timespan& timeout = Poco::Timespan())
 		{
@@ -801,7 +823,7 @@ void ServerTransportTest::testParamHeaders()
 	headers.set("Mcp-Param-Region", "anything");
 	assertEqual(200, endpoint.post(sparse, headers).status);
 	headers.set("Mcp-Param-Region", "a\x01" "b");
-	answer = endpoint.post(sparse, headers);
+	answer = endpoint.postBytes(sparse, headers);
 	assertEqual(400, answer.status);
 	assertEqual(static_cast<int>(ErrorCode::HEADER_MISMATCH), answer.code());
 
