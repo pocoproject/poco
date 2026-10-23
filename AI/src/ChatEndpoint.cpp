@@ -317,15 +317,18 @@ void ChatEndpoint::handle(const std::string& route, Poco::Net::HTTPServerRequest
 	{
 		sendError(response, Poco::Net::HTTPResponse::HTTP_NOT_FOUND, errorOf(Poco::Net::HTTPResponse::HTTP_NOT_FOUND), exc.message());
 	}
+	// What an unexpected failure says may name addresses, files or, with
+	// ENABLE_TRACE, the stack of the server: the log has it, and of the
+	// callers only one who may manage the chat.
 	catch (const Poco::Exception& exc)
 	{
 		if (logger.error()) logger.error("AI chat request %s failed: %s", route, exc.displayText());
-		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", exc.displayText());
+		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", caller.mayManage ? exc.displayText() : std::string());
 	}
 	catch (const std::exception& exc)
 	{
 		if (logger.error()) logger.error("AI chat request %s failed: %s", route, std::string(exc.what()));
-		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", exc.what());
+		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", caller.mayManage ? std::string(exc.what()) : std::string());
 	}
 }
 

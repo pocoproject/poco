@@ -52,6 +52,7 @@ public:
 	void testTokenLimit();
 	void testEndpointIdentity();
 	void testEndpointErrorClientGone();
+	void testEndpointErrorDetail();
 	void testEndpointClientGone();
 
 	void setUp();

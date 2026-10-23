@@ -82,7 +82,8 @@ class AI_API ChatEndpoint
 	/// they come from its configuration or the environment, and a request that
 	/// sets one, or that gives a provider with a key another base URL or other
 	/// servers, gets 403. Errors come as {"error", "detail"}, with 400, 403,
-	/// 404, 405, 413, 415 or 500.
+	/// 404, 405, 413, 415 or 500. A 500 is an unexpected failure, whose text
+	/// is logged and is the detail for a caller who may manage the chat only.
 	///
 	/// A page of another site cannot have the browser send what the endpoint
 	/// takes without a preflight request, which the endpoint does not answer:

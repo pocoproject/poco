@@ -61,6 +61,7 @@
 #include <algorithm>
 #include <set>
 #include <sstream>
+#include <streambuf>
 #include <string>
 #include <thread>
 #include <vector>
@@ -648,6 +649,86 @@ namespace
 		Poco::Net::SocketAddress _address;
 		Poco::Net::HTTPServerResponse& _response;
 		Poco::Net::HTTPServerParams::Ptr _pParams;
+	};
+
+
+	class RecordingResponse: public Poco::Net::HTTPServerResponse
+		/// A response that keeps the body sent with sendBuffer().
+	{
+	public:
+		void sendContinue() override
+		{
+		}
+
+		std::ostream& send() override
+		{
+			_sent = true;
+			return _out;
+		}
+
+		void sendFile(const std::string&, const std::string&) override
+		{
+			_sent = true;
+		}
+
+		void sendBuffer(const void* pBuffer, std::size_t length) override
+		{
+			_sent = true;
+			body.assign(static_cast<const char*>(pBuffer), length);
+		}
+
+		void redirect(const std::string&, HTTPStatus) override
+		{
+			_sent = true;
+		}
+
+		void requireAuthentication(const std::string&) override
+		{
+			_sent = true;
+		}
+
+		bool sent() const override
+		{
+			return _sent;
+		}
+
+		std::string body;
+
+	private:
+		bool _sent = false;
+		std::ostringstream _out;
+	};
+
+
+	class FailingBuffer: public std::streambuf
+		/// A source that fails at its first read.
+	{
+	protected:
+		int_type underflow() override
+		{
+			throw Poco::IOException("The store at /srv/chat failed");
+		}
+	};
+
+
+	class FailingRequest: public BareRequest
+		/// A request whose body fails to be read.
+	{
+	public:
+		FailingRequest(const std::string& method, Poco::Net::HTTPServerResponse& response):
+			BareRequest(method, "{}", response),
+			_in(&_buffer)
+		{
+		}
+
+		std::istream& stream() override
+		{
+			return _in;
+		}
+
+	private:
+		FailingBuffer _buffer;
+		std::istream _in;
 	};
 
 
@@ -1954,6 +2035,35 @@ void ChatServiceTest::testEndpointErrorClientGone()
 }
 
 
+void ChatServiceTest::testEndpointErrorDetail()
+{
+	// An unexpected failure gets 500 with its text for a caller who may manage
+	// the chat, and without it for any other caller.
+	auto pState = std::make_shared<FakeState>();
+	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({entry("ollama", true, {"m1"})}), fakeParams(pState));
+	ChatEndpoint endpoint(service);
+	ChatEndpoint::Caller user;
+	user.identity.principal = "alice";
+	user.identity.authenticated = true;
+	ChatEndpoint::Caller manager = user;
+	manager.mayManage = true;
+
+	RecordingResponse userResponse;
+	FailingRequest userRequest(Poco::Net::HTTPRequest::HTTP_POST, userResponse);
+	endpoint.handle("chat/stream", userRequest, userResponse, user);
+	assertEqual(500, static_cast<int>(userResponse.getStatus()));
+	const Object::Ptr pUserReply = parse(userResponse.body);
+	assertEqual(std::string("internal error"), pUserReply->getValue<std::string>("error"));
+	assertTrue(!pUserReply->has("detail"));
+
+	RecordingResponse managerResponse;
+	FailingRequest managerRequest(Poco::Net::HTTPRequest::HTTP_POST, managerResponse);
+	endpoint.handle("chat/stream", managerRequest, managerResponse, manager);
+	assertEqual(500, static_cast<int>(managerResponse.getStatus()));
+	assertTrue(parse(managerResponse.body)->getValue<std::string>("detail").find("/srv/chat") != std::string::npos);
+}
+
+
 void ChatServiceTest::testEndpointClientGone()
 {
 	auto pState = std::make_shared<FakeState>();
@@ -2028,6 +2138,7 @@ CppUnit::Test* ChatServiceTest::suite()
 	CppUnit_addTest(pSuite, ChatServiceTest, testTokenLimit);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointIdentity);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointErrorClientGone);
+	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointErrorDetail);
 	CppUnit_addTest(pSuite, ChatServiceTest, testEndpointClientGone);
 
 	return pSuite;
