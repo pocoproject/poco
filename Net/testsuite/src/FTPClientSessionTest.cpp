@@ -602,6 +602,40 @@ void FTPClientSessionTest::testDownloadPASV()
 }
 
 
+void FTPClientSessionTest::testDownloadPASVOtherHost()
+{
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	server.addResponse("331 Password required");
+	server.addResponse("230 Welcome");
+	server.addResponse("200 Type set to I");
+	FTPClientSession session("127.0.0.1", server.port());
+	session.setTimeout(Poco::Timespan(2, 0));
+	session.login("user", "password");
+	server.clearCommands();
+
+	server.addResponse("500 EPSV not understood");
+
+	DialogServer dataServer(false);
+	Poco::UInt16 dataServerPort = dataServer.port();
+	dataServer.addResponse("This is some data");
+	std::ostringstream pasv;
+	pasv << "227 Entering Passive Mode (192,0,2,1," << (dataServerPort/256) << "," << (dataServerPort % 256) << ")";
+	server.addResponse(pasv.str());
+	server.addResponse("150 sending data\r\n226 Transfer complete");
+
+	std::istream& istr = session.beginDownload("test.txt");
+	std::ostringstream dataStr;
+	StreamCopier::copyStream(istr, dataStr);
+	session.endDownload();
+	std::string s(dataStr.str());
+	assertTrue (s == "This is some data\r\n");
+
+	server.addResponse("221 Good Bye");
+	session.close();
+}
+
+
 void FTPClientSessionTest::testDownloadEPSV()
 {
 	DialogServer server;
@@ -732,6 +766,7 @@ CppUnit::Test* FTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadPORT);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadEPRT);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadPASV);
+	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadPASVOtherHost);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadEPSV);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testUpload);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testList);
