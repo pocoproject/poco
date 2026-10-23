@@ -32,6 +32,13 @@
 #include <spawn.h>
 #include <cstring>
 #endif
+#if !defined(POCO_NO_FORK_EXEC)
+#if defined(__APPLE__)
+#include <crt_externs.h>
+#else
+extern char** environ;
+#endif
+#endif
 
 
 namespace Poco {
@@ -248,18 +255,10 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		char** envPtr = 0;
 		std::vector<char> envChars;
 		std::vector<char*> envPtrs;
-		if (!env.empty())
+		if (!env.empty() || (options & PROCESS_CLEAR_ENVIRONMENT))
 		{
 			envChars = getEnvironmentVariablesBuffer(env);
-			envPtrs.reserve(env.size() + 1);
-			char* p = &envChars[0];
-			while (*p)
-			{
-				envPtrs.push_back(p);
-				while (*p) ++p;
-				++p;
-			}
-			envPtrs.push_back(0);
+			envPtrs = getEnvironmentPointers(envChars);
 			envPtr = &envPtrs[0];
 		}
 
@@ -299,6 +298,19 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		// therefore allocate all required buffers first.
 
 		std::vector<char> envChars = getEnvironmentVariablesBuffer(env);
+		// A cleared environment is replaced in the child by an array of the
+		// given variables, which needs no allocation there.
+		const bool clearEnvironment = (options & PROCESS_CLEAR_ENVIRONMENT) != 0;
+		std::vector<char*> envPtrs;
+		if (clearEnvironment)
+		{
+			envPtrs = getEnvironmentPointers(envChars);
+		}
+#if defined(__APPLE__)
+		char*** pEnviron = _NSGetEnviron();
+#else
+		char*** pEnviron = &environ;
+#endif
 		std::vector<char*> argv(args.size() + 2);
 		int i = 0;
 		argv[i++] = const_cast<char*>(command.c_str());
@@ -325,13 +337,21 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 				}
 			}
 
-			// set environment variables
-			char* p = &envChars[0];
-			while (*p)
+			// set environment variables; execvp() looks the command up in
+			// the PATH of the environment set here
+			if (clearEnvironment)
 			{
-				::putenv(p);
-				while (*p) ++p;
-				++p;
+				*pEnviron = &envPtrs[0];
+			}
+			else
+			{
+				char* p = &envChars[0];
+				while (*p)
+				{
+					::putenv(p);
+					while (*p) ++p;
+					++p;
+				}
 			}
 
 			// setup redirection

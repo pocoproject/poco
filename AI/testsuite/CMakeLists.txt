@@ -1,0 +1,36 @@
+# Sources
+file(GLOB SRCS_G "src/*.cpp")
+POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "src/*.h")
+POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
+
+poco_add_executable(AI-testrunner ${TEST_SRCS})
+if(ANDROID)
+	add_test(
+		NAME AI
+		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/AI-testrunner -DTEST_PARAMETER=-all -P ${PROJECT_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
+	)
+else()
+	if(WIN32)
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.win")
+	else()
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.lnx")
+	endif()
+	add_test(
+		NAME AI
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND AI-testrunner -ignore ${CPPIGNORE_FILE} -all
+	)
+endif()
+target_link_libraries(AI-testrunner PUBLIC Poco::AI CppUnit)
+# A cancel test talks https where NetSSL is built.
+if(ENABLE_NETSSL AND EXISTS ${PROJECT_SOURCE_DIR}/NetSSL_OpenSSL)
+	target_link_libraries(AI-testrunner PUBLIC Poco::NetSSL)
+	target_compile_definitions(AI-testrunner PRIVATE POCO_AI_TEST_NETSSL)
+endif()
+# The MCPHost tests serve their MCP servers with the test host of the
+# AI/MCP/HTTP test suite.
+target_include_directories(AI-testrunner PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../MCP/HTTP/testsuite/src)

@@ -178,6 +178,62 @@ void ProcessTest::testLaunchEnv()
 }
 
 
+void ProcessTest::testLaunchClearedEnvironment()
+{
+	std::string name("TestApp");
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+	// A variable of this process, which a child launched with a cleared
+	// environment does not get.
+	Poco::Environment::set("POCO_TEST_INHERITED", "inherited");
+	Process::Env env;
+	// What the child needs to be found and to load the libraries.
+	for (const std::string variable: {"PATH", "LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "SystemRoot"})
+	{
+		if (Poco::Environment::has(variable)) env[variable] = Poco::Environment::get(variable);
+	}
+	env["TESTENV"] = "given";
+
+	const auto childValue = [&name, &env](const std::string& variable, int options)
+		/// The value of variable in the environment of the child, or
+		/// "(none)" when it has none.
+	{
+		Pipe outPipe;
+		ProcessHandle ph = Process::launch(name, {"-getenv", variable}, nullptr, &outPipe, nullptr, env, options);
+		PipeInputStream istr(outPipe);
+		std::string value;
+		int c = istr.get();
+		while (c != -1) { value += static_cast<char>(c); c = istr.get(); }
+		return ph.wait() == 0 ? value : std::string("(none)");
+	};
+
+	assertEqual(std::string("given"), childValue("TESTENV", Poco::PROCESS_CLEAR_ENVIRONMENT));
+	assertEqual(std::string("(none)"), childValue("POCO_TEST_INHERITED", Poco::PROCESS_CLEAR_ENVIRONMENT));
+#if defined(POCO_OS_FAMILY_UNIX)
+	// Without the option, the child inherits the variables of this process.
+	assertEqual(std::string("inherited"), childValue("POCO_TEST_INHERITED", 0));
+#endif
+
+	// Without any variable given, the child has none.
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	ProcessHandle bare = Process::launch(name, {"-getenv", "PATH"}, nullptr, nullptr, nullptr, Process::Env(), Poco::PROCESS_CLEAR_ENVIRONMENT);
+	assertEqual(1, bare.wait());
+#elif defined(POCO_OS_FAMILY_UNIX) && (POCO_OS != POCO_OS_QNX)
+	// env is found through the default search path, and prints what it has.
+	Pipe outPipe;
+	ProcessHandle bare = Process::launch("env", Process::Args(), nullptr, &outPipe, nullptr, Process::Env(), Poco::PROCESS_CLEAR_ENVIRONMENT);
+	PipeInputStream istr(outPipe);
+	std::string output;
+	int c = istr.get();
+	while (c != -1) { output += static_cast<char>(c); c = istr.get(); }
+	assertEqual(0, bare.wait());
+	assertEqual(std::string(), output);
+#endif
+}
+
+
 void ProcessTest::testLaunchArgs()
 {
 #if defined (_WIN32)
@@ -766,6 +822,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectIn);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectOut);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchEnv);
+	CppUnit_addTest(pSuite, ProcessTest, testLaunchClearedEnvironment);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchArgs);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchInvalidCommand);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunning);

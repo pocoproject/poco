@@ -1,0 +1,3 @@
+{"jsonrpc":"2.0","id":1,"result":{"supportedVersions":["2026-07-28"],"capabilities":{"tools":{},"resources":{},"prompts":{}},"ttlMs":0,"cacheScope":"private","resultType":"complete"}}
+{"jsonrpc":"2.0","id":2,"result":{"tools":[{"name":"a","inputSchema":{"type":"object"}}],"nextCursor":"p2","resultType":"complete"}}
+{"jsonrpc":"2.0","id":3,"result":{"tools":[{"name":"b","inputSchema":{"type":"object"}}],"resultType":"complete"}}

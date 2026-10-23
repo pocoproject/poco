@@ -1,0 +1,91 @@
+//
+// Body.h
+//
+// Library: AI/MCP/HTTP
+// Package: HTTP
+// Module:  Body
+//
+// Functions that read and check the bodies of HTTP messages that carry JSON.
+//
+// Copyright (c) 2026, Aleph ONE Software Engineering LLC.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#ifndef AIMCPHTTP_Body_INCLUDED
+#define AIMCPHTTP_Body_INCLUDED
+
+
+#include "Poco/AI/MCP/HTTP/HTTP.h"
+#include "Poco/JSON/Object.h"
+#include "Poco/Net/HTTPMessage.h"
+#include "Poco/Net/HTTPSession.h"
+#include <functional>
+#include <istream>
+#include <string>
+
+
+namespace Poco::AI::MCP::HTTP {
+
+
+using ReadGuard = std::function<void ()>;
+	/// Called before every read of a stream that may block, because nothing
+	/// is buffered. It throws to stop the reading, e.g. Poco::TimeoutException
+	/// once a deadline has passed, and may bound the read that follows, e.g.
+	/// by setting the receive timeout of the socket to the time that is left.
+
+
+namespace Impl {
+	// Internal to the AI libraries, which share these helpers: they are no
+	// part of the public interface and may change.
+
+
+[[nodiscard]] AIMCPHTTP_API std::string readBody(std::istream& stream, std::size_t maxSize, const ReadGuard& guard = ReadGuard());
+	/// Reads the stream to its end.
+	///
+	/// Throws Poco::DataFormatException when it holds more than maxSize
+	/// bytes. What the source of the stream throws, a timeout or a reset
+	/// connection, is passed on. A body that ends early without an error,
+	/// as when the peer closes the connection before the Content-Length is
+	/// reached, comes back shorter: the caller asks brokeOff(). A chunked
+	/// body that ends between two chunks reads as complete; its content has
+	/// to tell.
+
+
+[[nodiscard]] AIMCPHTTP_API std::string readAtMost(std::istream& stream, std::size_t maxSize, const ReadGuard& guard = ReadGuard());
+	/// Reads at most maxSize bytes of the stream, e.g. the start of the body
+	/// of an error. Failures are passed on as by readBody().
+
+
+AIMCPHTTP_API void cutAtCharacter(std::string& text, std::size_t maxSize);
+	/// Cuts text to at most maxSize bytes, at a UTF-8 character boundary.
+
+
+[[nodiscard]] AIMCPHTTP_API std::string excerpt(const std::string& text, std::size_t maxSize = 500);
+	/// The start of text, at most maxSize bytes cut at a character boundary,
+	/// followed by "..." when text is longer: for an error message.
+
+
+[[nodiscard]] AIMCPHTTP_API Poco::JSON::Object::Ptr parseObject(const std::string& text);
+	/// The JSON object in text, or null when text is not a JSON object.
+
+
+[[nodiscard]] AIMCPHTTP_API bool brokeOff(const Poco::Net::HTTPMessage& message, std::size_t received);
+	/// Returns true if the message promised more bytes in its Content-Length
+	/// than the received ones of its body.
+
+
+[[nodiscard]] AIMCPHTTP_API bool brokeOff(const Poco::Net::HTTPSession& session, const Poco::Net::HTTPMessage& message, std::size_t received);
+	/// Returns true if the session met a network error while it read the
+	/// body, or the message promised more bytes than received.
+
+
+} // namespace Impl
+
+
+} // namespace Poco::AI::MCP::HTTP
+
+
+#endif // AIMCPHTTP_Body_INCLUDED

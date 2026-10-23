@@ -1,0 +1,13 @@
+# Dictionary of the event stream fuzzer: server-sent event fields.
+
+"data:"
+"data: "
+"event:"
+"id:"
+"retry:"
+":"
+"\x0d\x0a"
+"\x0a\x0a"
+"\x0d"
+"\xef\xbb\xbf"
+"message"

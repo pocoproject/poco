@@ -78,7 +78,17 @@ private:
 class MyApp
 {
 public:
-	MyApp() {}
+	MyApp()
+	{
+#if defined(POCO_OS_FAMILY_UNIX)
+		// The termination signals are blocked before a PID file tells the parent
+		// that this process runs, so that a request to end that comes at once
+		// waits for waitForTerminationRequest() instead of ending the process.
+		const sigset_t sset = terminationSignals();
+		sigprocmask(SIG_BLOCK, &sset, nullptr);
+#endif
+	}
+
 	~MyApp() {}
 
 	std::unique_ptr<PIDFile> _pPIDFile;
@@ -135,7 +145,7 @@ public:
 	}
 
 #elif defined(POCO_OS_FAMILY_UNIX)
-	void waitForTerminationRequest()
+	static sigset_t terminationSignals()
 	{
 		sigset_t sset;
 		sigemptyset(&sset);
@@ -145,7 +155,12 @@ public:
 		}
 		sigaddset(&sset, SIGQUIT);
 		sigaddset(&sset, SIGTERM);
-		sigprocmask(SIG_BLOCK, &sset, nullptr);
+		return sset;
+	}
+
+	void waitForTerminationRequest()
+	{
+		const sigset_t sset = terminationSignals();
 		int sig;
 		sigwait(&sset, &sig);
 	}
@@ -407,7 +422,17 @@ int main(int argc, char** argv)
 		else if (arg == "-env")
 		{
 			const char* s = std::getenv("TESTENV");
-			if (s)
+			if (s != nullptr)
+			{
+				std::cout << s;
+				return 0;
+			}
+			else return 1;
+		}
+		else if (arg == "-getenv" && argc > 2)
+		{
+			const char* s = std::getenv(argv[2]);
+			if (s != nullptr)
 			{
 				std::cout << s;
 				return 0;

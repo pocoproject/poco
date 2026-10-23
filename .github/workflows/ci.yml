@@ -42,6 +42,7 @@ env:
     -DENABLE_REDIS=ON -DENABLE_MONGODB=ON -DENABLE_SSH=ON
     -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_SQLITE_VEC=ON
     -DENABLE_PROMETHEUS=ON
+    -DENABLE_AI=ON -DENABLE_AI_MCP=ON -DENABLE_AI_MCP_HTTP=ON
     -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON
     -DENABLE_CPPPARSER=ON
     -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
@@ -67,6 +68,7 @@ env:
     -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_SQLITE_VEC=ON -DENABLE_DATA_ODBC=ON
     -DENABLE_ZIP=ON -DENABLE_ENCODINGS=ON -DENABLE_SSH=ON
     -DENABLE_PDF=ON -DENABLE_PROMETHEUS=ON
+    -DENABLE_AI=ON -DENABLE_AI_MCP=ON -DENABLE_AI_MCP_HTTP=ON
     -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON
     -DENABLE_CPPPARSER=ON
     -DENABLE_CODEGENERATION=ON -DENABLE_REMOTINGNG=ON -DENABLE_REMOTINGNG_REMOTEGEN=ON
@@ -113,6 +115,7 @@ jobs:
       data: ${{ steps.filter.outputs.data }}
       sqlparser: ${{ steps.filter.outputs.sqlparser }}
       crypto_netssl: ${{ steps.filter.outputs.crypto_netssl }}
+      ai: ${{ steps.filter.outputs.ai }}
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v4
@@ -636,6 +639,31 @@ jobs:
         run: ./configure --config=Linux-c++20 --everything --no-samples --sqlite-vec
       - name: Build libraries and testsuites
         run: make -s -j$(nproc)
+
+  # The AI libraries are C++17 code, while CMake builds with C++20 where the
+  # compiler has it and the make job above uses Linux-c++20. This job builds
+  # them, with what they need, under the C++17 Linux config and runs their
+  # testsuites.
+  linux-gcc-make-cxx17-ai:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.ai == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - name: Configure (classic make, C++17)
+        run: ./configure --config=Linux --everything --no-samples
+      - name: Build the AI libraries and testsuites
+        run: make -s -j$(nproc) AI/MCP-tests AI/MCP/HTTP-tests AI-tests
+      - name: Run the AI testsuites
+        run: |
+          export POCO_BASE="${GITHUB_WORKSPACE}"
+          export LD_LIBRARY_PATH="${GITHUB_WORKSPACE}/lib/Linux/$(uname -m)"
+          for t in AI/MCP AI/MCP/HTTP AI; do
+            "$t/testsuite/bin/Linux/$(uname -m)/testrunner" -all
+          done
 
   # ------------------------------------------------------------------------
   # Linux cross-compile and other arch build-only probes

@@ -16,3 +16,6 @@ ActiveRecord
 ActiveRecord/Compiler
 Prometheus
 Serial
+AI
+AI/MCP
+AI/MCP/HTTP

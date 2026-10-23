@@ -113,7 +113,9 @@ $(ls -C "$base"/build/config/)
 
 
   --omit=<component>{,<component>}
-    Do not build the specified component(s).
+    Do not build the specified component(s). A component is omitted with
+    the components below it: --omit=Data also omits Data/SQLite and the
+    other connectors, --omit=AI also omits AI/MCP and AI/MCP/HTTP.
     Example: --omit=Data/MySQL,Data/ODBC,Zip
 
   --include-path=<path>
@@ -200,8 +202,8 @@ static=""
 shared=""
 nosqlparser=
 mssqlbigstring=
-omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser PageCompiler Serial"
-omitTypical="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser"
+omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser PageCompiler Serial AI"
+omitTypical="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser AI"
 omit=$omitTypical
 # parse arguments
 while [ $# -ge 1 ]; do

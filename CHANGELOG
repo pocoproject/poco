@@ -66,6 +66,10 @@ Features:
   active shard). Disabled by default; enable with ENABLE_DATA_SQLITE_VEC (cmake),
   POCO_ENABLE_SQLITE_VEC (gnu make) or ./configure --sqlite-vec. Works with bundled and
   unbundled SQLite (3.37 or newer required); optional AVX2/NEON SIMD kernels.
+- GH #5573 Poco::Process::launch(): the option PROCESS_CLEAR_ENVIRONMENT starts the child with
+  only the environment variables given to launch(), on every platform. Without it the child
+  inherits the environment of the parent with the given variables added, but replaced by them
+  when any are given on Windows, and on QNX when the child is spawned.
 
 New Components:
 
@@ -87,6 +91,37 @@ New Components:
   from macchina.io into POCO. CMake option ENABLE_SERIAL (on by default, off with
   POCO_MINIMAL_BUILD); make component Serial. The component is turned off automatically for the
   emscripten target, which it does not support.
+- GH #5532 AI/MCP (Model Context Protocol, revision 2026-07-28, the stateless one: server with
+  message and stream ingress for tools, resources and prompts, server/discover and cache
+  hints; an abstract client with the stream transport and the stdio transport to a server
+  process) and AI/MCP/HTTP (the Streamable HTTP client transport, which takes its sessions
+  from Poco::Net::HTTPSessionFactory and therefore links Net only; HTTPS comes from the
+  instantiator the application registers). CMake options ENABLE_AI_MCP and
+  ENABLE_AI_MCP_HTTP (off by default); make components AI/MCP and AI/MCP/HTTP.
+- GH #5533 AI (experimental: the interface may change within 2.x): a client library for large
+  language model APIs and a minimal agent runtime: providers for the Anthropic Messages API
+  and the OpenAI Chat Completions format (streaming, tool calls, per-call cancellation, model
+  listing, embeddings on the OpenAI-compatible side), a thread-safe registry of MCP tools,
+  the agent loop (call the model, execute the tools it requests, feed the results back,
+  repeat), and MCPHost, which mirrors the tools of MCP servers into the registry. HTTPS
+  through Poco::Net::HTTPSessionFactory, so no NetSSL link. CMake option ENABLE_AI (off by
+  default); make component AI.
+- GH #5576 AI/MCP/HTTP: the server side of the Streamable HTTP transport. ServerTransport
+  serves a Poco::AI::MCP::Server at one endpoint of an application's Poco::Net::HTTPServer,
+  statelessly: POST only, the Origin of a browser against the allowed origins, the Content-Type,
+  the Accept header and a limit of the body checked, the MCP-Protocol-Version, Mcp-Method,
+  Mcp-Name and Mcp-Param headers checked against the message (HEADER_MISMATCH), and each reply
+  with the status the transport gives it; the application passes the identity of the caller in
+  the RequestContext. ServerRequestHandlerFactory is an HTTP server of one endpoint. The sample
+  MCPHTTPServer. AI/MCP: Server::findTool() and parseMessage().
+- GH #5577 AI: ChatService, the chat of an application with a model, for any number of users:
+  a turn runs through the agent loop with the tools of the application and the identity of its
+  user, its events come as JSON objects, and a user cancels a turn of a chat; the providers it
+  may use and the provider and model in use are settings an administrator changes while it runs
+  and the application stores, with model listing and failover among the servers of a provider.
+  ChatEndpoint is its HTTP interface for a chat in a browser: the health, a turn as server-sent
+  events with comments while the model works, cancelling, the choice of provider and model, and
+  the settings, whose keys are set there only where the application lets them be.
 
 Bug Fixes and Improvements:
 

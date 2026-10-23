@@ -39,6 +39,9 @@ Serial
 MongoDB
 Redis
 Prometheus
+AI
+AI/MCP
+AI/MCP/HTTP
 ActiveRecord
 ActiveRecord/Compiler
 DNSSD
