@@ -73,7 +73,11 @@ public:
 	void send(const std::string& body, Cancellation& cancellation);
 		/// Registers the abort with cancellation, and sends the request, with
 		/// body unless it is empty. The abort is registered first, so that a
-		/// cancel ends the connect, the TLS handshake and the upload too.
+		/// cancel ends the connect and the upload too. Over TLS the abort
+		/// reaches the connection only once the handshake has ended, as the
+		/// secure socket has no descriptor before: a cancel during the connect
+		/// or the handshake takes effect when they end, at the latest when the
+		/// timeout ends.
 		///
 		/// Throws Poco::IOException when the call is cancelled before it is
 		/// sent, a Poco::Net::NetException when the request does not go out

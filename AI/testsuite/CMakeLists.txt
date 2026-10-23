@@ -26,6 +26,11 @@ else()
 	)
 endif()
 target_link_libraries(AI-testrunner PUBLIC Poco::AI CppUnit)
+# A cancel test talks https where NetSSL is built.
+if(ENABLE_NETSSL AND EXISTS ${PROJECT_SOURCE_DIR}/NetSSL_OpenSSL)
+	target_link_libraries(AI-testrunner PUBLIC Poco::NetSSL)
+	target_compile_definitions(AI-testrunner PRIVATE POCO_AI_TEST_NETSSL)
+endif()
 # The MCPHost tests serve their MCP servers with the test host of the
 # AI/MCP/HTTP test suite.
 target_include_directories(AI-testrunner PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../MCP/HTTP/testsuite/src)

@@ -19,6 +19,10 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#if defined(POCO_AI_TEST_NETSSL)
+#include "Poco/Net/Context.h"
+#include "Poco/Net/HTTPSClientSession.h"
+#endif
 #include "Poco/JSON/Object.h"
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
@@ -798,10 +802,25 @@ void AnthropicProviderTest::testCancelDuringConnect()
 {
 #if defined(__linux__)
 	// A listener whose queue is full drops further connection requests, so
-	// a connect to it hangs: the cancel ends it, not the timeout.
+	// a connect to it hangs: the cancel ends it, not the timeout. The queue
+	// is filled until a connect to it does hang.
 	Poco::Net::ServerSocket listener(Poco::Net::SocketAddress("127.0.0.1", 0), 0);
-	Poco::Net::StreamSocket queued;
-	queued.connect(listener.address());
+	std::vector<Poco::Net::StreamSocket> queued;
+	bool full = false;
+	for (int i = 0; i < 64 && !full; ++i)
+	{
+		Poco::Net::StreamSocket socket;
+		try
+		{
+			socket.connect(listener.address(), Poco::Timespan(0, 500000));
+			queued.push_back(socket);
+		}
+		catch (const Poco::TimeoutException&)
+		{
+			full = true;
+		}
+	}
+	assertTrue(full);
 	const Poco::UInt16 port = listener.address().port();
 	AnthropicProvider::Params settings = params("http://127.0.0.1:" + std::to_string(port) + "/v1");
 	settings.timeout = Poco::Timespan(20, 0);
@@ -813,12 +832,42 @@ void AnthropicProviderTest::testCancelDuringConnect()
 	{
 		Poco::Thread::sleep(1);
 	}
+	assertTrue(hanging);
 	const Poco::Timestamp cancelled;
 	chat.cancellation.cancel();
 	chat.join();
-	// Where the kernel takes the connection all the same, no connect hangs.
-	if (!hanging) return;
 	assertTrue(cancelled.elapsed() < 5 * Poco::Timestamp::resolution());
+	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
+	assertTrue(chat.error.empty());
+#endif
+}
+
+
+void AnthropicProviderTest::testCancelDuringHandshake()
+{
+	// Over https the connection has no descriptor the cancel can reach before
+	// the TLS handshake has ended: a cancel during a handshake the server
+	// never answers takes effect when the timeout ends it, and the call ends
+	// as cancelled.
+#if defined(POCO_AI_TEST_NETSSL)
+	Poco::Net::ServerSocket listener(Poco::Net::SocketAddress("127.0.0.1", 0));
+	Poco::Net::Context::Ptr pContext = new Poco::Net::Context(Poco::Net::Context::TLS_CLIENT_USE, "", Poco::Net::Context::VERIFY_NONE);
+	AnthropicProvider::Params settings = params("https://127.0.0.1:" + std::to_string(listener.address().port()) + "/v1");
+	settings.timeout = Poco::Timespan(2, 0);
+	AnthropicProvider provider(settings, [pContext](const Poco::URI& uri)
+	{
+		return std::make_unique<Poco::Net::HTTPSClientSession>(uri.getHost(), uri.getPort(), pContext);
+	});
+	ChatThread chat(provider, userRequest("Hi"));
+	// The server takes the connection and the hello of the client, and does
+	// not answer.
+	assertTrue(listener.poll(Poco::Timespan(10, 0), Poco::Net::Socket::SELECT_READ));
+	Poco::Net::StreamSocket peer = listener.acceptConnection();
+	assertTrue(peer.poll(Poco::Timespan(10, 0), Poco::Net::Socket::SELECT_READ));
+	const Poco::Timestamp cancelled;
+	chat.cancellation.cancel();
+	chat.join();
+	assertTrue(cancelled.elapsed() < 10 * Poco::Timestamp::resolution());
 	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
 	assertTrue(chat.error.empty());
 #endif
@@ -1069,6 +1118,7 @@ CppUnit::Test* AnthropicProviderTest::suite()
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testRequestMembersAndHeaders);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringUpload);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringConnect);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringHandshake);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDescriptorNotInherited);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCutToolCall);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testThinkingSignatures);

@@ -203,7 +203,10 @@ public:
 		/// An error the API reports, before or within the response stream,
 		/// arrives as a FAILURE event, and the result has stop reason FAILURE; so
 		/// does a response stream that ends before its end. A cancelled call
-		/// returns quietly with stop reason CANCELLED.
+		/// returns quietly with stop reason CANCELLED. A cancel ends the call
+		/// at once in any phase but one: for an https endpoint a cancel during
+		/// the connect or the TLS handshake takes effect when they end, at the
+		/// latest when the timeout of the call ends.
 		///
 		/// Throws when the call fails before an answer arrives: a
 		/// Poco::Net::NetException when the endpoint cannot be reached or the

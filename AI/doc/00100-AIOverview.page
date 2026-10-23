@@ -29,7 +29,9 @@ tunnel.
 
 <[Cancellation]> is the token of one call or one run, which another thread may cancel. A
 cancel ends a call in any phase, connecting, sending, or reading the stream, by shutting its
-connection down. Calls that share a provider each have their own token.
+connection down. The connect and the TLS handshake of an https endpoint are the exception: a
+cancel during them takes effect when they end, at the latest when the timeout of the call
+ends. Calls that share a provider each have their own token.
 
 <[ToolRegistry]> holds the tools an agent may call, as <[Poco::AI::MCP::Tool]> definitions
 with handlers that return a <[Poco::AI::MCP::ToolResult]>: the same tool model as an MCP
