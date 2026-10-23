@@ -30,7 +30,6 @@
 			${PocoBuild}/doc/*.page,
 			${PocoBuild}/*/doc/*.page
 			${PocoBuild}/*/*/doc/*.page
-			${PocoBuild}/*/*/*/doc/*.page
 		</pages>
 		<resources>
 			${PocoBase}/PocoDoc/resources/css,
