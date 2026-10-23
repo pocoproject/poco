@@ -35,7 +35,11 @@ public:
 	void testInvalid1();
 	void testInvalid2();
 	void testInvalid3();
+	void testInvalidControlCharacter();
 	void testCookies();
+	void testTooManyCookies();
+	void testWriteInvalid();
+	void testWhiteSpaceLimit();
 
 	void setUp();
 	void tearDown();

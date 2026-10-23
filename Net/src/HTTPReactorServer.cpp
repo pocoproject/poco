@@ -2,12 +2,25 @@
 #include "Poco/Net/HTTPReactorServerSession.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Exception.h"
 #include <cstring>
 
 namespace Poco::Net {
 
+namespace {
+
+HTTPServerParams::Ptr checkedParams(const HTTPServerParams::Ptr& pParams)
+{
+	if (pParams == nullptr) throw InvalidArgumentException("HTTPReactorServer requires server parameters");
+	// The request handlers do not expect sendBytes() to send less than it was given.
+	if (pParams->getNonBlocking()) throw InvalidArgumentException("HTTPReactorServer does not support non-blocking connections");
+	return pParams;
+}
+
+} // namespace
+
 HTTPReactorServer::HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory)
-	: _tcpReactorServer(port, pParams)
+	: _tcpReactorServer(port, checkedParams(pParams))
 {
 	_pParams = pParams;
 	_pFactory = pFactory;
@@ -19,7 +32,7 @@ HTTPReactorServer::HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HT
 }
 
 HTTPReactorServer::HTTPReactorServer(const SocketAddress& address, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory)
-	: _tcpReactorServer(address, pParams)
+	: _tcpReactorServer(address, checkedParams(pParams))
 {
 	_pParams = pParams;
 	_pFactory = pFactory;

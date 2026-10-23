@@ -101,9 +101,6 @@ HTTPHeaderStreamBuf* HTTPHeaderIOS::rdbuf()
 //
 
 
-Poco::MemoryPool HTTPHeaderInputStream::_pool(sizeof(HTTPHeaderInputStream));
-
-
 HTTPHeaderInputStream::HTTPHeaderInputStream(HTTPSession& session):
 	HTTPHeaderIOS(session, std::ios::in),
 	std::istream(&_buf)
@@ -116,31 +113,9 @@ HTTPHeaderInputStream::~HTTPHeaderInputStream()
 }
 
 
-void* HTTPHeaderInputStream::operator new(std::size_t size)
-{
-	return _pool.get();
-}
-
-
-void HTTPHeaderInputStream::operator delete(void* ptr)
-{
-	try
-	{
-		_pool.release(ptr);
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
-}
-
-
 //
 // HTTPHeaderOutputStream
 //
-
-
-Poco::MemoryPool HTTPHeaderOutputStream::_pool(sizeof(HTTPHeaderOutputStream));
 
 
 HTTPHeaderOutputStream::HTTPHeaderOutputStream(HTTPSession& session):
@@ -152,25 +127,6 @@ HTTPHeaderOutputStream::HTTPHeaderOutputStream(HTTPSession& session):
 
 HTTPHeaderOutputStream::~HTTPHeaderOutputStream()
 {
-}
-
-
-void* HTTPHeaderOutputStream::operator new(std::size_t size)
-{
-	return _pool.get();
-}
-
-
-void HTTPHeaderOutputStream::operator delete(void* ptr)
-{
-	try
-	{
-		_pool.release(ptr);
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
 }
 
 

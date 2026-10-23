@@ -26,6 +26,8 @@ public:
 
 	void testInsert();
 	void testInsertOrder();
+	void testInsertRepeatedKeys();
+	void testInsertRepeatedKeyComparisons();
 	void testErase();
 	void testIterator();
 	void testConstIterator();

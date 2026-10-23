@@ -53,6 +53,10 @@ public:
 		/// Must be overridden by subclasses.
 		///
 		/// Handles the given request.
+		///
+		/// After the handler returns, the buffered rest of the response
+		/// is sent, then a request body the handler did not read is
+		/// discarded, up to 64 KiB; a larger one closes the connection.
 
 private:
 	HTTPRequestHandler(const HTTPRequestHandler&);

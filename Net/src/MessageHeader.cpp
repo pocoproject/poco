@@ -20,7 +20,9 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/UTF8Encoding.h"
+#include <algorithm>
 #include <sstream>
+#include <string_view>
 
 
 namespace Poco::Net {
@@ -47,7 +49,8 @@ MessageHeader::MessageHeader():
 	_nameLengthLimit(DFL_NAME_LENGTH_LIMIT),
 	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT),
 	_autoDecode(true),
-	_decodedOnRead(false)
+	_decodedOnRead(false),
+	_strictParsing(false)
 {
 }
 
@@ -56,7 +59,10 @@ MessageHeader::MessageHeader(const MessageHeader& messageHeader):
 	NameValueCollection(messageHeader),
 	_fieldLimit(DFL_FIELD_LIMIT),
 	_nameLengthLimit(DFL_NAME_LENGTH_LIMIT),
-	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT)
+	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT),
+	_autoDecode(messageHeader._autoDecode),
+	_decodedOnRead(messageHeader._decodedOnRead),
+	_strictParsing(messageHeader._strictParsing)
 {
 }
 
@@ -69,18 +75,17 @@ MessageHeader::~MessageHeader()
 MessageHeader& MessageHeader::operator = (const MessageHeader& messageHeader)
 {
 	NameValueCollection::operator = (messageHeader);
+	_autoDecode = messageHeader._autoDecode;
+	_decodedOnRead = messageHeader._decodedOnRead;
+	_strictParsing = messageHeader._strictParsing;
 	return *this;
 }
 
 
 void MessageHeader::write(std::ostream& ostr) const
 {
-	NameValueCollection::ConstIterator it = begin();
-	while (it != end())
-	{
-		ostr << it->first << ": " << it->second << "\r\n";
-		++it;
-	}
+	checkFields(*this, true);
+	writeFields(*this, ostr);
 }
 
 
@@ -106,10 +111,25 @@ void MessageHeader::read(std::istream& istr)
 			name += ch;
 			ch = buf.sbumpc();
 		}
-		if (ch == '\n') { ch = buf.sbumpc(); continue; } // ignore invalid header lines
+		if (ch == '\n') { ch = buf.sbumpc(); ++fields; continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
+		// White space or a control character in a name would hide a header
+		// such as "Content-Length : 5" from a lookup by name, while a front
+		// end may still frame the message on it.
+		if (_strictParsing && !isValidFieldName(name))
+			throw MessageException("Invalid character in header field name");
 		ch = buf.sbumpc(); // skip ':'
-		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
+		if (_strictParsing)
+		{
+			int skipped = 0;
+			while (ch == ' ' || ch == '\t')
+			{
+				if (++skipped > _valueLengthLimit) throw MessageException("Field value too long");
+				ch = buf.sbumpc();
+			}
+		}
+		else
+			while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
 		while (ch != eof && ch != '\r' && ch != '\n' && static_cast<int>(value.length()) < _valueLengthLimit)
 		{
 			value += ch;
@@ -135,10 +155,20 @@ void MessageHeader::read(std::istream& istr)
 		}
 
 		// TODO: Add to the if below?
-		Poco::trimRightInPlace(value);
+		if (_strictParsing)
+			value.erase(value.find_last_not_of(" \t") + 1);
+		else
+			Poco::trimRightInPlace(value);
 
 		if (_autoDecode && !isFramingHeader(name))
-			add(name, decodeWord(value));
+		{
+			// A decoded CR or LF would split the field when the value is written again.
+			const std::string decoded = decodeWord(value);
+			if (std::any_of(decoded.begin(), decoded.end(), isInvalidValueChar))
+				add(name, value);
+			else
+				add(name, decoded);
+		}
 		else
 			add(name, value);
 
@@ -160,6 +190,18 @@ void MessageHeader::setAutoDecode(bool decode)
 bool MessageHeader::getAutoDecode() const
 {
 	return _autoDecode;
+}
+
+
+void MessageHeader::setStrictParsing(bool strict)
+{
+	_strictParsing = strict;
+}
+
+
+bool MessageHeader::getStrictParsing() const
+{
+	return _strictParsing;
 }
 
 
@@ -503,6 +545,56 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 	} while (true);
 
 	return outs;
+}
+
+
+bool MessageHeader::isValidFieldName(const std::string& name)
+{
+	static constexpr std::string_view tokenPunct("!#$%&'*+-.^_`|~");
+	return !name.empty() && std::all_of(name.begin(), name.end(),
+		[](char c) { return Poco::Ascii::isAlphaNumeric(c) || tokenPunct.find(c) != std::string_view::npos; });
+}
+
+
+bool MessageHeader::isInvalidValueChar(char c)
+{
+	return c != '\t' && Poco::Ascii::hasProperties(c, Poco::Ascii::ACP_CONTROL);
+}
+
+
+void MessageHeader::checkFields(const NameValueCollection& fields, bool allowFolding)
+{
+	const auto isFieldTextChar = [](char c) { return Poco::Ascii::isPrintable(c) && c != ' ' && c != ':'; };
+	for (const auto& [name, value]: fields)
+	{
+		const bool validName = allowFolding
+			? !name.empty() && std::all_of(name.begin(), name.end(), isFieldTextChar)
+			: isValidFieldName(name);
+		if (!validName)
+			throw MessageException("Invalid header field name");
+		for (std::string::size_type i = 0; i < value.size(); ++i)
+		{
+			if (!isInvalidValueChar(value[i])) continue;
+			// CR LF folds the value, as MailMessage::encodeWord() writes it, only when
+			// white space and then other text follow; any other CR or LF would start
+			// a new field or, as a line of white space only, end the header.
+			const std::string::size_type text = value.find_first_not_of(" \t", i + 2);
+			const bool isFold = allowFolding && value.compare(i, 2, "\r\n") == 0
+				&& text != std::string::npos && text > i + 2
+				&& value[text] != '\r' && value[text] != '\n';
+			if (isFold)
+				++i;
+			else
+				throw MessageException("Invalid character in header field value", name);
+		}
+	}
+}
+
+
+void MessageHeader::writeFields(const NameValueCollection& fields, std::ostream& ostr)
+{
+	for (const auto& [name, value]: fields)
+		ostr << name << ": " << value << "\r\n";
 }
 
 

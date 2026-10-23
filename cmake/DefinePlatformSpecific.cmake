@@ -142,6 +142,21 @@ function(poco_enable_detailed_compiler_warnings)
 	endif()
 endfunction(poco_enable_detailed_compiler_warnings)
 
+#################################################################################
+# Compiler diagnostics that are errors for Poco code only
+#################################################################################
+# An assignment in a condition (if (i = 0)) is a compile error. Always active;
+# called from the root CMakeLists.txt after add_subdirectory(dependencies), like
+# poco_enable_detailed_compiler_warnings(), so bundled code is not affected.
+#
+function(poco_enable_mandatory_compiler_errors)
+	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Werror=parentheses>)
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+		add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/we4706>)
+	endif()
+endfunction(poco_enable_mandatory_compiler_errors)
+
 # Add a d postfix to the debug libraries
 if(BUILD_SHARED_LIBS)
 	set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Set Debug library postfix" FORCE)

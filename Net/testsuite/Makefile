@@ -11,13 +11,13 @@ objects = \
 	DatagramSocketTest HTTPStreamFactoryTest MultipartReaderTest SocketTest \
 	Driver HTTPTestServer MultipartWriterTest SocketsTestSuite \
 	EchoServer HTTPTestSuite NameValueCollectionTest TCPServerTest \
-	HTTPClientSessionTest IPAddressTest NetCoreTestSuite TCPServerTestSuite \
+	HTTPClientSessionTest HTTPClientSessionPoolTest IPAddressTest NetCoreTestSuite TCPServerTestSuite \
 	HTTPRequestTest MessageHeaderTest NetTestSuite UDPEchoServer \
 	HTTPResponseTest MessagesTestSuite NetworkInterfaceTest \
 	HTTPServerTest MulticastEchoServer SocketAddressTest \
 	HTTPReactorServerSessionTest HTTPReactorServerTest HTTPReactorServerTestSuite \
 	TCPReactorServerTest \
-	HTTPCookieTest HTTPCredentialsTest HTMLFormTest HTMLTestSuite \
+	HTTPCookieTest HTTPCredentialsTest HTTPChunkedStreamTest HTMLFormTest HTMLTestSuite \
 	MediaTypeTest QuotedPrintableTest DialogSocketTest \
 	HTTPClientTestSuite FTPClientTestSuite FTPClientSessionTest \
 	FTPStreamFactoryTest DialogServer \

@@ -25,7 +25,6 @@ namespace Poco::Net {
 
 
 HTTPSession::HTTPSession():
-	_pBuffer(nullptr),
 	_pCurrent(nullptr),
 	_pEnd(nullptr),
 	_keepAlive(false),
@@ -39,7 +38,6 @@ HTTPSession::HTTPSession():
 
 HTTPSession::HTTPSession(const StreamSocket& socket):
 	_socket(socket),
-	_pBuffer(nullptr),
 	_pCurrent(nullptr),
 	_pEnd(nullptr),
 	_keepAlive(false),
@@ -53,7 +51,6 @@ HTTPSession::HTTPSession(const StreamSocket& socket):
 
 HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 	_socket(socket),
-	_pBuffer(nullptr),
 	_pCurrent(nullptr),
 	_pEnd(nullptr),
 	_keepAlive(keepAlive),
@@ -67,14 +64,6 @@ HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 
 HTTPSession::~HTTPSession()
 {
-	try
-	{
-		if (_pBuffer) HTTPBufferAllocator::deallocate(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
 	try
 	{
 		close();
@@ -100,9 +89,58 @@ void HTTPSession::setTimeout(const Poco::Timespan& timeout)
 
 void HTTPSession::setTimeout(const Poco::Timespan& connectionTimeout, const Poco::Timespan& sendTimeout, const Poco::Timespan& receiveTimeout)
 {
-	 _connectionTimeout = connectionTimeout;
-	 _sendTimeout = sendTimeout;
-	 _receiveTimeout = receiveTimeout;
+	_connectionTimeout = connectionTimeout;
+	try
+	{
+		setSendTimeout(sendTimeout);
+	}
+	catch (...)
+	{
+		try
+		{
+			setReceiveTimeout(receiveTimeout);
+		}
+		catch (...)
+		{
+			// The exception from the send timeout is the one reported.
+		}
+		throw;
+	}
+	setReceiveTimeout(receiveTimeout);
+}
+
+
+void HTTPSession::setSendTimeout(const Poco::Timespan& timeout)
+{
+	_sendTimeout = timeout;
+	if (connected())
+	{
+		try
+		{
+			_socket.setSendTimeout(timeout);
+		}
+		catch (NetException&)
+		{
+			// A socket that rejects the option has failed; the next send or receive reports it.
+		}
+	}
+}
+
+
+void HTTPSession::setReceiveTimeout(const Poco::Timespan& timeout)
+{
+	_receiveTimeout = timeout;
+	if (connected())
+	{
+		try
+		{
+			_socket.setReceiveTimeout(timeout);
+		}
+		catch (NetException&)
+		{
+			// A socket that rejects the option has failed; the next send or receive reports it.
+		}
+	}
 }
 
 
@@ -112,7 +150,7 @@ int HTTPSession::get()
 		refill();
 
 	if (_pCurrent < _pEnd)
-		return *_pCurrent++;
+		return static_cast<unsigned char>(*_pCurrent++);
 	else
 		return std::char_traits<char>::eof();
 }
@@ -124,7 +162,7 @@ int HTTPSession::peek()
 		refill();
 
 	if (_pCurrent < _pEnd)
-		return *_pCurrent;
+		return static_cast<unsigned char>(*_pCurrent);
 	else
 		return std::char_traits<char>::eof();
 }
@@ -162,6 +200,15 @@ int HTTPSession::receive(char* buffer, int length)
 {
 	try
 	{
+		if (_readDeadline.has_value())
+		{
+			const Poco::Timespan remaining(*_readDeadline - Poco::Clock());
+			// poll() is needed only where the deadline comes before the receive timeout of the socket;
+			// available() counts data that TLS has already decrypted, which poll() does not see.
+			const bool deadlineFirst = _receiveTimeout == 0 || remaining < _receiveTimeout;
+			if (remaining <= 0 || (deadlineFirst && _socket.available() == 0 && !_socket.poll(remaining, Socket::SELECT_READ)))
+				throw TimeoutException("HTTP read deadline expired");
+		}
 		return _socket.receiveBytes(buffer, length);
 	}
 	catch (Poco::Exception& exc)
@@ -172,15 +219,23 @@ int HTTPSession::receive(char* buffer, int length)
 }
 
 
+bool HTTPSession::dataPending() const
+{
+	// Only a TLS socket holds data that poll() does not see: bytes decrypted but not yet read.
+	return buffered() > 0 || (_socket.secure() && _socket.available() > 0) || _socket.poll(Poco::Timespan(), Socket::SELECT_READ);
+}
+
+
 void HTTPSession::refill()
 {
-	if (!_pBuffer)
+	if (_pBuffer == nullptr)
 	{
-		_pBuffer = HTTPBufferAllocator::allocate(HTTPBufferAllocator::BUFFER_SIZE);
+		_pBuffer.reset(new char[HTTPBufferAllocator::BUFFER_SIZE]);
 	}
-	_pCurrent = _pEnd = _pBuffer;
-	int n = receive(_pBuffer, HTTPBufferAllocator::BUFFER_SIZE);
-	_pEnd += n;
+	_pCurrent = _pEnd = _pBuffer.get();
+	int n = receive(_pBuffer.get(), HTTPBufferAllocator::BUFFER_SIZE);
+	// A non-blocking socket returns a negative value when no data is available.
+	if (n > 0) _pEnd += n;
 }
 
 
@@ -201,7 +256,7 @@ void HTTPSession::connect(const SocketAddress& address)
 		_socket.setNoDelay(true);
 	// There may be leftover data from a previous (failed) request in the buffer,
 	// so we clear it.
-	_pCurrent = _pEnd = _pBuffer;
+	_pCurrent = _pEnd = _pBuffer.get();
 }
 
 
@@ -239,6 +294,18 @@ void HTTPSession::clearException()
 }
 
 
+void HTTPSession::setReadDeadline(const Poco::Clock& deadline)
+{
+	_readDeadline = deadline;
+}
+
+
+void HTTPSession::clearReadDeadline()
+{
+	_readDeadline.reset();
+}
+
+
 StreamSocket HTTPSession::detachSocket()
 {
 	StreamSocket oldSocket(_socket);
@@ -251,6 +318,7 @@ StreamSocket HTTPSession::detachSocket()
 void HTTPSession::attachSocket(const StreamSocket& socket)
 {
 	_socket = socket;
+	_pCurrent = _pEnd = _pBuffer.get();
 }
 
 

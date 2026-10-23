@@ -14,6 +14,8 @@
 
 #include "Poco/Net/HTTPFixedLengthStream.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/NetException.h"
+#include "Poco/Buffer.h"
 
 
 using Poco::BufferedStreamBuf;
@@ -41,6 +43,23 @@ HTTPFixedLengthStreamBuf::~HTTPFixedLengthStreamBuf()
 }
 
 
+bool HTTPFixedLengthStreamBuf::isComplete() const noexcept
+{
+	return _count == _length;
+}
+
+
+bool HTTPFixedLengthStreamBuf::skipBuffered()
+{
+	if ((getMode() & std::ios::in) && _count < _length && _length - _count <= _session.buffered())
+	{
+		Poco::Buffer<char> rest(static_cast<std::size_t>(_length - _count));
+		_count += _session.read(rest.begin(), static_cast<std::streamsize>(rest.size()));
+	}
+	return isComplete();
+}
+
+
 std::streamsize HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	std::streamsize n = 0;
@@ -49,7 +68,11 @@ std::streamsize HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::stre
 		if (_count + length > _length)
 			length = static_cast<std::streamsize>(_length - _count);
 		n = _session.read(buffer, length);
+		// A negative result is no data yet on a non-blocking socket, not an end of file.
+		// A cause the session already recorded is kept: HTTPSClientSession::read()
+		// returns 0 for a TLS connection closed without close_notify.
 		if (n > 0) _count += n;
+		else if (n == 0 && _session.networkException() == nullptr) _session.setException(MessageException("Incomplete message body"));
 	}
 	return n;
 }
@@ -57,13 +80,30 @@ std::streamsize HTTPFixedLengthStreamBuf::readFromDevice(char* buffer, std::stre
 
 std::streamsize HTTPFixedLengthStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
+	// The peer may have received part of the failed write; anything sent after it,
+	// including the buffer sent again by a later sync, would be read as body data.
+	if (_writeFailed) return -1;
 	std::streamsize n = 0;
 	if (_count < _length)
 	{
 		if (_count + length > _length)
 			length = static_cast<std::streamsize>(_length - _count);
-		n = _session.write(buffer, length);
+		try
+		{
+			n = _session.write(buffer, length);
+		}
+		catch (...)
+		{
+			_writeFailed = true;
+			throw;
+		}
 		if (n > 0) _count += n;
+		if (n != length)
+		{
+			_writeFailed = true;
+			// Stored as for a thrown error, so that the connection is closed instead of reused.
+			if (_session.networkException() == nullptr) _session.setException(NetException("Incomplete message write"));
+		}
 	}
 	return n;
 }
@@ -104,9 +144,6 @@ HTTPFixedLengthStreamBuf* HTTPFixedLengthIOS::rdbuf()
 //
 
 
-Poco::MemoryPool HTTPFixedLengthInputStream::_pool(sizeof(HTTPFixedLengthInputStream));
-
-
 HTTPFixedLengthInputStream::HTTPFixedLengthInputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length):
 	HTTPFixedLengthIOS(session, length, std::ios::in),
 	std::istream(&_buf)
@@ -119,31 +156,9 @@ HTTPFixedLengthInputStream::~HTTPFixedLengthInputStream()
 }
 
 
-void* HTTPFixedLengthInputStream::operator new(std::size_t size)
-{
-	return _pool.get();
-}
-
-
-void HTTPFixedLengthInputStream::operator delete(void* ptr)
-{
-	try
-	{
-		_pool.release(ptr);
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
-}
-
-
 //
 // HTTPFixedLengthOutputStream
 //
-
-
-Poco::MemoryPool HTTPFixedLengthOutputStream::_pool(sizeof(HTTPFixedLengthOutputStream));
 
 
 HTTPFixedLengthOutputStream::HTTPFixedLengthOutputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length):
@@ -155,25 +170,6 @@ HTTPFixedLengthOutputStream::HTTPFixedLengthOutputStream(HTTPSession& session, H
 
 HTTPFixedLengthOutputStream::~HTTPFixedLengthOutputStream()
 {
-}
-
-
-void* HTTPFixedLengthOutputStream::operator new(std::size_t size)
-{
-	return _pool.get();
-}
-
-
-void HTTPFixedLengthOutputStream::operator delete(void* ptr)
-{
-	try
-	{
-		_pool.release(ptr);
-	}
-	catch (...)
-	{
-		poco_unexpected();
-	}
 }
 
 

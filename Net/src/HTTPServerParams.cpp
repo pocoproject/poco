@@ -23,6 +23,7 @@ HTTPServerParams::HTTPServerParams():
 	_keepAlive(true),
 	_maxKeepAliveRequests(0),
 	_keepAliveTimeout(15000000),
+	_requestHeaderTimeout(30000000),
 	_autoDecodeHeaders(true)
 {
 }
@@ -60,6 +61,12 @@ void HTTPServerParams::setKeepAlive(bool keepAlive)
 void HTTPServerParams::setKeepAliveTimeout(const Poco::Timespan& timeout)
 {
 	_keepAliveTimeout = timeout;
+}
+
+
+void HTTPServerParams::setRequestHeaderTimeout(const Poco::Timespan& timeout)
+{
+	_requestHeaderTimeout = timeout;
 }
 
 

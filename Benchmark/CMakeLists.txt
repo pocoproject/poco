@@ -14,6 +14,7 @@ set(SRCS
 	src/BenchmarkApp.cpp
 	src/PatternFormatterBench.cpp
 	src/LoggerBench.cpp
+	src/NotificationQueueBench.cpp
 )
 
 # Headers

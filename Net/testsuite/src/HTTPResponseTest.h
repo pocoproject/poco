@@ -32,9 +32,13 @@ public:
 	void testInvalid1();
 	void testInvalid2();
 	void testInvalid3();
+	void testNonNumericStatus();
+	void testStatusNotThreeDigits();
+	void testStatusBelow100();
 	void testCookies();
 	void testReplaceCookie();
 	void testRemoveCookie();
+	void testWriteInvalid();
 
 	void setUp();
 	void tearDown();

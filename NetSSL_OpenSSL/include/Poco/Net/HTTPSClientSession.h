@@ -66,7 +66,7 @@ class NetSSL_API HTTPSClientSession: public HTTPClientSession
 	/// If session caching has been enabled for the Context object passed
 	/// to the HTTPSClientSession, the HTTPSClientSession class will
 	/// attempt to reuse a previously obtained Session object in
-	/// case of a reconnect.
+	/// case of a reconnect with the same peer host name.
 {
 public:
 	enum
@@ -89,9 +89,11 @@ public:
 		/// The socket must not be connected. The session
 		/// takes ownership of the socket.
 		///
-		/// The given Session is reused, if possible (client session
-		/// caching is enabled for the given Context, and the server
-		/// agrees to reuse the session).
+		/// The given Session is offered in the handshake with the first
+		/// peer host name if client session caching is enabled for the
+		/// Context of the socket or the connection goes through a proxy
+		/// tunnel, and is dropped when the peer host name changes. It is
+		/// reused if the server agrees.
 
 	HTTPSClientSession(const std::string& host, Poco::UInt16 port = HTTPS_PORT);
 		/// Creates a HTTPSClientSession using the given host and port.
@@ -104,9 +106,10 @@ public:
 		/// Creates an unconnected HTTPSClientSession, using the
 		/// give SSL context.
 		///
-		/// The given Session is reused, if possible (client session
-		/// caching is enabled for the given Context, and the server
-		/// agrees to reuse the session).
+		/// The given Session is offered in the handshake with the first
+		/// peer host name, whether or not client session caching is
+		/// enabled for the Context, and is dropped when the peer host
+		/// name changes. It is reused if the server agrees.
 
 	HTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext);
 		/// Creates a HTTPSClientSession using the given host and port,
@@ -116,9 +119,10 @@ public:
 		/// Creates a HTTPSClientSession using the given host and port,
 		/// using the given SSL context.
 		///
-		/// The given Session is reused, if possible (client session
-		/// caching is enabled for the given Context, and the server
-		/// agrees to reuse the session).
+		/// The given Session is offered in the handshake with the first
+		/// peer host name, whether or not client session caching is
+		/// enabled for the Context, and is dropped when the peer host
+		/// name changes. It is reused if the server agrees.
 
 	~HTTPSClientSession();
 		/// Destroys the HTTPSClientSession and closes
@@ -149,7 +153,17 @@ protected:
 	void connect(const SocketAddress& address);
 	[[nodiscard]] std::string proxyRequestPrefix() const;
 	void proxyAuthenticate(HTTPRequest& request);
+	[[nodiscard]] int get();
 	int read(char* buffer, std::streamsize length);
+		/// Returns 0 when the server closes the TLS connection without
+		/// close_notify, and networkException() holds the
+		/// SSLConnectionUnexpectedlyClosedException. A response body delimited
+		/// by the end of the connection then ends normally; a body with
+		/// Content-Length or chunked transfer encoding ends with eof after the
+		/// bytes received, and networkException() holds the cause
+		/// (see HTTPClientSession::receiveResponse()).
+		/// get() returns eof in that case, and receiveResponse() and
+		/// peekResponse() throw the exception for a response header cut that way.
 
 private:
 	void initProxySessionFactory();
@@ -163,6 +177,11 @@ private:
 
 	Context::Ptr _pContext;
 	Session::Ptr _pSession;
+	std::string _peerHostName;
+		/// The peer host name this session last set on its socket.
+	std::string _sessionHostName;
+		/// The peer host name of the last handshake, which _pSession
+		/// and the session held by the socket belong to.
 };
 
 

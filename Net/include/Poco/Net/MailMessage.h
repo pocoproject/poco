@@ -233,6 +233,13 @@ public:
 	void write(std::ostream& ostr) const;
 		/// Writes the mail message to the given output stream.
 
+	void validateHeaders() const;
+		/// Throws a MessageException if write() would reject a field of the
+		/// message header or of a part header (see MessageHeader::write()).
+		///
+		/// Part content is not read, so the headers of the parts inside
+		/// a MultipartSource are checked only when the message is written.
+
 	[[nodiscard]] static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
 		/// If the given string contains non-ASCII characters,
 		/// encodes the given string using RFC 2047 "Q" word encoding.
@@ -270,6 +277,7 @@ protected:
 	void writeHeader(const MessageHeader& header, std::ostream& ostr) const;
 	void writeMultipart(MessageHeader& header, std::ostream& ostr) const;
 	static void writePart(MultipartWriter& writer, const Part& part);
+	[[nodiscard]] static MessageHeader createPartHeader(const Part& part);
 	static void writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding);
 	void setRecipientHeaders(MessageHeader& headers) const;
 	void readHeader(std::istream& istr);

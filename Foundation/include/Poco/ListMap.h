@@ -151,10 +151,16 @@ public:
 		/// block. Thus, all the equal value entries are located
 		/// sequentially at all times.
 		/// Returns iterator pointing to the newly inserted value
+		///
+		/// The block is searched from the end of the map, so the cost
+		/// is the distance from the end of the map to the block.
 	{
-		Iterator it = find(val.first);
-		while (it != _container.end() && isEqual(it->first, val.first)) ++it;
-		return _container.insert(it, val);
+		for (auto it = _container.rbegin(); it != _container.rend(); ++it)
+		{
+			// it.base() is the position after the last entry of the block.
+			if (isEqual(it->first, val.first)) return _container.insert(it.base(), val);
+		}
+		return _container.insert(_container.end(), val);
 	}
 
 	void erase(Iterator it)

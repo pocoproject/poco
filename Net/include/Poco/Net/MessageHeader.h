@@ -68,6 +68,13 @@ public:
 		/// name and value separated by a colon and lines
 		/// delimited by a carriage return and a linefeed
 		/// character. See RFC 2822 for details.
+		///
+		/// Throws a MessageException, before anything is written,
+		/// if a field name is empty or contains a character that is not
+		/// printable ASCII, a space or a colon (RFC 5322), or a field
+		/// value contains a control character other than a horizontal tab.
+		/// A carriage return and a linefeed followed by spaces or horizontal
+		/// tabs and then other text are allowed and fold the value.
 
 	virtual void read(std::istream& istr);
 		/// Reads the message header from the given input stream.
@@ -81,7 +88,8 @@ public:
 		/// the stream.
 		///
 		/// Some basic sanity checking of the input stream is
-		/// performed.
+		/// performed. Lines without a colon are ignored, but
+		/// count towards the field limit.
 		///
 		/// Throws a MessageException if the input stream is
 		/// malformed.
@@ -89,19 +97,41 @@ public:
 	void setAutoDecode(bool convert);
 		/// Enables or disables automatic conversion of HTTP header values
 		/// when reading HTTP header.
+		///
+		/// A value whose decoded form contains a control character other
+		/// than a horizontal tab is stored undecoded.
 
 	[[nodiscard]] bool getAutoDecode() const;
 		/// Returns true if automatic conversion of HTTP header values
 		/// when reading HTTP header.
 
+	void setStrictParsing(bool strict);
+		/// Enables or disables strict parsing in read().
+		///
+		/// In strict mode, read() throws a MessageException if a field
+		/// name is not a token as defined in RFC 9110, and removes only
+		/// spaces and horizontal tabs before and after a field value.
+		///
+		/// Strict parsing is disabled by default. The HTTP server
+		/// enables it for requests.
+
+	[[nodiscard]] bool getStrictParsing() const;
+		/// Returns true if strict parsing is enabled.
+
 	[[nodiscard]] std::string getDecoded(const std::string& name) const;
 		/// Get decoded header value. It does conversion if it was not
 		/// automatically converted when reading.
+		///
+		/// A value that automatic conversion left undecoded
+		/// (see setAutoDecode()) is returned unchanged.
 
 	[[nodiscard]] std::string getDecoded(const std::string& name, const std::string& defaultValue) const;
 		/// Get decoded header value. It does conversion if it was not
 		/// automatically converted when reading.
 		/// Default value is returned if the name does not exist.
+		///
+		/// A value that automatic conversion left undecoded
+		/// (see setAutoDecode()) is returned unchanged.
 
 	[[nodiscard]] int getFieldLimit() const;
 		/// Returns the maximum number of header fields
@@ -185,6 +215,21 @@ public:
 	[[nodiscard]] static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
 			/// Decode RFC2047 string.
 
+protected:
+	[[nodiscard]] static bool isValidFieldName(const std::string& name);
+		/// Returns true if name is a token as defined in RFC 9110.
+
+	[[nodiscard]] static bool isInvalidValueChar(char c);
+		/// Returns true if c is a control character other than
+		/// a horizontal tab.
+
+	static void checkFields(const NameValueCollection& fields, bool allowFolding);
+		/// Throws a MessageException if a field cannot be written.
+		/// If allowFolding is true, the rules of write() apply; otherwise
+		/// those of HTTPMessage::write().
+
+	static void writeFields(const NameValueCollection& fields, std::ostream& ostr);
+		/// Writes the fields without checking them; see checkFields().
 
 private:
 	enum Limits
@@ -200,6 +245,7 @@ private:
 	int _valueLengthLimit;
 	bool _autoDecode;
 	bool _decodedOnRead;
+	bool _strictParsing;
 
 };
 

@@ -202,6 +202,24 @@ void HTTPRequestTest::testInvalid3()
 }
 
 
+void HTTPRequestTest::testInvalidControlCharacter()
+{
+	for (const char* s: {"GET /a\x01/ HTTP/1.1\r\n\r\n", "GET / HTTP/1.\x01\r\n\r\n"})
+	{
+		std::istringstream istr(s);
+		HTTPRequest request;
+		try
+		{
+			request.read(istr);
+			fail("control character in request line - must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+}
+
+
 void HTTPRequestTest::testCookies()
 {
 	HTTPRequest request1;
@@ -236,6 +254,117 @@ void HTTPRequestTest::testCookies()
 }
 
 
+void HTTPRequestTest::testTooManyCookies()
+{
+	std::string cookie = "c0=v";
+	for (int i = 1; i < 500; ++i)
+	{
+		cookie.append("; c");
+		cookie.append(std::to_string(i));
+		cookie.append("=v");
+	}
+	HTTPRequest request;
+	request.add("Cookie", cookie);
+	request.add("Cookie", cookie);
+	NameValueCollection cookies;
+	request.getCookies(cookies);
+	assertTrue (cookies.size() == 1000);
+
+	request.add("Cookie", "c500=v");
+	try
+	{
+		NameValueCollection tooMany;
+		request.getCookies(tooMany);
+		fail("more than 1000 cookies - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+
+void HTTPRequestTest::testWriteInvalid()
+{
+	HTTPRequest invalidURI(HTTPRequest::HTTP_GET, "/a\r\nX-Injected: 1", HTTPMessage::HTTP_1_1);
+	HTTPRequest spaceInURI(HTTPRequest::HTTP_GET, "/a HTTP/1.1", HTTPMessage::HTTP_1_1);
+	HTTPRequest invalidMethod("GE\x01T", "/", HTTPMessage::HTTP_1_1);
+	HTTPRequest spaceInMethod("GET /admin HTTP/1.1", "/", HTTPMessage::HTTP_1_1);
+	HTTPRequest emptyMethod("", "/", HTTPMessage::HTTP_1_1);
+	HTTPRequest emptyURI(HTTPRequest::HTTP_GET, "", HTTPMessage::HTTP_1_1);
+	HTTPRequest spaceInVersion(HTTPRequest::HTTP_GET, "/", "HTTP/1.1 X");
+	HTTPRequest invalidField(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	invalidField.set("X-Field", "a\r\nX-Injected: 1");
+	HTTPRequest foldedField(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	foldedField.set("X-Field", "a\r\n b");
+	HTTPRequest invalidVersion(HTTPRequest::HTTP_GET, "/", "HTTP/1.1\r\nX-Injected: 1");
+	HTTPRequest invalidName(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	invalidName.set("Na(me)", "value");
+	for (const HTTPRequest* pRequest: {&invalidURI, &spaceInURI, &invalidMethod, &spaceInMethod, &emptyMethod, &emptyURI, &spaceInVersion, &invalidField, &foldedField, &invalidVersion, &invalidName})
+	{
+		std::ostringstream ostr;
+		try
+		{
+			pRequest->write(ostr);
+			fail("invalid request must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+		assertTrue (ostr.str().empty());
+	}
+
+	HTTPRequest customMethod("M-SEARCH", "/caf\xC3\xA9", HTTPMessage::HTTP_1_1);
+	std::ostringstream ostr;
+	customMethod.write(ostr);
+	assertTrue (ostr.str() == "M-SEARCH /caf\xC3\xA9 HTTP/1.1\r\n\r\n");
+}
+
+
+void HTTPRequestTest::testWhiteSpaceLimit()
+{
+	const std::string padding(20000, ' ');
+	const std::string requests[] = {
+		std::string(20000, '\n') + "GET / HTTP/1.1\r\n\r\n",
+		"GET" + padding + "/ HTTP/1.1\r\n\r\n",
+		"GET /" + padding + "HTTP/1.1\r\n\r\n",
+		"GET / HTTP/1.1" + padding + "\r\n\r\n",
+		"GET / HTTP/1.1\r\nHost: test\r\n\r" + padding + "\n"
+	};
+	for (const auto& s: requests)
+	{
+		std::istringstream istr(s);
+		HTTPRequest request;
+		try
+		{
+			request.read(istr);
+			fail("request header of unlimited length - must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+
+	std::istringstream strict("GET / HTTP/1.1\r\nX:" + padding + "a\r\n\r\n");
+	HTTPRequest strictRequest;
+	strictRequest.setStrictParsing(true);
+	try
+	{
+		strictRequest.read(strict);
+		fail("white space of unlimited length after a colon - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+
+	std::istringstream istr("GET" + std::string(1000, ' ') + "/ HTTP/1.1\r\nHost: test\r\n\r\n");
+	HTTPRequest request;
+	request.read(istr);
+	assertTrue (request.getMethod() == HTTPRequest::HTTP_GET);
+	assertTrue (request.getURI() == "/");
+	assertTrue (request.getHost() == "test");
+}
+
+
 void HTTPRequestTest::setUp()
 {
 }
@@ -261,7 +390,11 @@ CppUnit::Test* HTTPRequestTest::suite()
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid1);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid2);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid3);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalidControlCharacter);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testCookies);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testTooManyCookies);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testWriteInvalid);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testWhiteSpaceLimit);
 
 	return pSuite;
 }

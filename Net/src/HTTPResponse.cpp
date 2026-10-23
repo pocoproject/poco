@@ -22,6 +22,7 @@
 #include "Poco/DateTimeParser.h"
 #include "Poco/Ascii.h"
 #include "Poco/String.h"
+#include <algorithm>
 
 
 using Poco::DateTime;
@@ -266,8 +267,13 @@ void HTTPResponse::getCookies(std::vector<HTTPCookie>& cookies) const
 
 void HTTPResponse::write(std::ostream& ostr) const
 {
+	if (std::any_of(getVersion().begin(), getVersion().end(), isSpaceOrControl))
+		throw MessageException("Invalid HTTP version");
+	if (std::any_of(_reason.begin(), _reason.end(), isInvalidValueChar))
+		throw MessageException("Invalid character in HTTP reason phrase");
+	checkFields(*this, false);
 	ostr << getVersion() << " " << static_cast<int>(_status) << " " << _reason << "\r\n";
-	HTTPMessage::write(ostr);
+	writeFields(*this, ostr);
 	ostr << "\r\n";
 }
 
@@ -290,6 +296,8 @@ void HTTPResponse::read(std::istream& istr)
 	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && status.length() < MAX_STATUS_LENGTH) { status += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("Invalid HTTP status code");
+	if (status.size() != 3 || status[0] == '0' || !std::all_of(status.begin(), status.end(), [](char c) { return Poco::Ascii::isDigit(c); }))
+		throw MessageException("Invalid HTTP status code", status);
 	while (Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n' && ch != eof) ch = istr.get();
 	while (ch != '\r' && ch != '\n' && ch != eof && reason.length() < MAX_REASON_LENGTH) { reason += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP reason string too long");

@@ -13,6 +13,11 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/URI.h"
 #include "Poco/Path.h"
+#include "Poco/Exception.h"
+#include <cstring>
+#include <functional>
+#include <new>
+#include <vector>
 
 
 using Poco::URI;
@@ -165,6 +170,22 @@ void URITest::testConstruction()
 	assertTrue (uri11.getPathEtc() == "/index.html?query=test#fragment");
 	assertTrue (uri11.getQuery() == "query=test");
 	assertTrue (uri11.getFragment() == "fragment");
+
+	// The storage is filled with 0xFF, so a port that a constructor leaves unset is not 0.
+	alignas(URI) unsigned char storage[sizeof(URI)];
+	const std::vector<std::function<URI*()>> constructWithEmptyAuthority = {
+		[&storage] { return new (storage) URI("file", "", "/tmp/a"); },
+		[&storage] { return new (storage) URI("file", "", "/tmp/a", "q"); },
+		[&storage] { return new (storage) URI("file", "", "/tmp/a", "q", "f"); }
+	};
+	for (const auto& construct: constructWithEmptyAuthority)
+	{
+		std::memset(storage, 0xFF, sizeof(storage));
+		URI* pURI = construct();
+		const unsigned short port = pURI->getSpecifiedPort();
+		pURI->~URI();
+		assertTrue (port == 0);
+	}
 }
 
 
@@ -914,6 +935,62 @@ void URITest::testQueryParametersPlus()
 }
 
 
+void URITest::testControlCharacters()
+{
+	const std::vector<std::function<void()>> invalid = {
+		[] { URI uri("http://h/p?a\r\nX-Injected: 1"); },
+		[] { URI uri("http://h/p#a\nb"); },
+		[] { URI uri("http://ev\r\nil/"); },
+		[] { URI uri("http://[::1\n]/"); },
+		[] { URI uri("http://us\r\ner:pw@h/"); },
+		[] { URI uri("http://h/p?a\tb"); },
+		[] { URI uri(std::string("http://h/p?a\0b", 14)); },
+		[] { URI uri("http://h/p?a\x7f"); },
+		[] { URI uri("http", "h", "/p", "a\r\nb"); },
+		[] { URI uri("http", "h", "/p", "q", "a\r\nb"); },
+		[] { URI uri("http://h/"); uri.setRawQuery("a\r\nb"); },
+		[] { URI uri("http://h/"); uri.setRawFragment("a\r\nb"); },
+		[] { URI uri("http://h/"); uri.setHost("ev\r\nil"); },
+		[] { URI uri("http://h/"); uri.setUserInfo("us%0D%0Aer"); },
+		[] { URI uri("http://h/"); uri.setAuthority("ev\r\nil"); },
+		[] { URI uri("http://h/"); uri.setPathEtc("/p?a\r\nb"); },
+		[] { URI uri("http://h/"); uri.resolve("http://h2/p?a\r\nX-Injected: 1"); }
+	};
+	for (std::size_t i = 0; i < invalid.size(); ++i)
+	{
+		try
+		{
+			invalid[i]();
+			fail("control character not rejected, case " + std::to_string(i));
+		}
+		catch (Poco::URISyntaxException&)
+		{
+		}
+	}
+
+	URI uri("http://h/p?q=1");
+	try
+	{
+		uri.setRawQuery("a\r\nb");
+		fail("control character not rejected");
+	}
+	catch (Poco::URISyntaxException&)
+	{
+	}
+	assertTrue (uri.getRawQuery() == "q=1");
+
+	uri = "http://h/a\tb";
+	assertTrue (uri.getPathAndQuery() == "/a%09b");
+
+	uri = "http://h/p?a%0D%0Ab#c%0Ad";
+	assertTrue (uri.getRawQuery() == "a%0D%0Ab");
+	assertTrue (uri.getRawFragment() == "c%0Ad");
+
+	uri = "file:///tmp/with space/\xC3\xA4.txt";
+	assertTrue (uri.getPath() == "/tmp/with space/\xC3\xA4.txt");
+}
+
+
 void URITest::setUp()
 {
 }
@@ -940,6 +1017,7 @@ CppUnit::Test* URITest::suite()
 	CppUnit_addTest(pSuite, URITest, testFromPath);
 	CppUnit_addTest(pSuite, URITest, testQueryParameters);
 	CppUnit_addTest(pSuite, URITest, testQueryParametersPlus);
+	CppUnit_addTest(pSuite, URITest, testControlCharacters);
 
 	return pSuite;
 }

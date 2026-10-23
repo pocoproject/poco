@@ -217,7 +217,7 @@ int HTTPReactorServerSession::get()
 {
 	if (_idx < _complete)
 	{
-		return _buf[_idx++];
+		return static_cast<unsigned char>(_buf[_idx++]);
 	} else
 	{
 		return std::char_traits<char>::eof();
@@ -229,7 +229,7 @@ int HTTPReactorServerSession::peek()
 	if (_idx < _complete)
 	{
 
-		return _buf[_idx];
+		return static_cast<unsigned char>(_buf[_idx]);
 	} else
 	{
 

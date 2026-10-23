@@ -98,6 +98,13 @@ public:
 		/// Returns true if the Transfer-Encoding header is set
 		/// and its value is chunked.
 
+	void checkFramingHeaders() const;
+		/// Throws a MessageException if the Content-Length and
+		/// Transfer-Encoding headers do not determine the length
+		/// of the body unambiguously: either header occurs more
+		/// than once, both are present, or the Content-Length value
+		/// is not a decimal number that fits into a 64-bit integer.
+
 	void setContentType(const std::string& mediaType);
 		/// Sets the content type for this message.
 		///
@@ -124,6 +131,16 @@ public:
 		///   * the message has a Connection header field and its value is "Keep-Alive"
 		///   * the message is a HTTP/1.1 message and not Connection header is set
 		/// Returns false otherwise.
+
+	void write(std::ostream& ostr) const override;
+		/// Writes the header fields as MessageHeader::write() does,
+		/// but throws a MessageException if a field name is not a token
+		/// as defined in RFC 9110, or a field value contains a carriage
+		/// return or a linefeed, because HTTP does not allow folded lines
+		/// (RFC 9112, section 5.2).
+
+	static void writeTrailer(const MessageHeader& trailer, std::ostream& ostr);
+		/// Writes the fields of a chunked trailer with the checks of write().
 
 	static const std::string HTTP_1_0;
 	static const std::string HTTP_1_1;
@@ -161,6 +178,10 @@ protected:
 
 	virtual ~HTTPMessage();
 		/// Destroys the HTTPMessage.
+
+	[[nodiscard]] static bool isSpaceOrControl(char c);
+		/// Returns true if c is a space or a control character, which
+		/// a method, a request target and a version must not contain.
 
 private:
 	std::string _version;

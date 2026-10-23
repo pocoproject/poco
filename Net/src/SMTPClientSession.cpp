@@ -487,6 +487,7 @@ void SMTPClientSession::sendData()
 
 void SMTPClientSession::sendMessage(const MailMessage& message)
 {
+	message.validateHeaders();
 	sendCommands(message);
 	transportMessage(message);
 }
@@ -494,6 +495,7 @@ void SMTPClientSession::sendMessage(const MailMessage& message)
 
 void SMTPClientSession::sendMessage(const MailMessage& message, const Recipients& recipients)
 {
+	message.validateHeaders();
 	sendCommands(message, &recipients);
 	transportMessage(message);
 }
@@ -503,9 +505,20 @@ void SMTPClientSession::transportMessage(const MailMessage& message)
 {
 	SocketOutputStream socketStream(_socket);
 	MailOutputStream mailStream(socketStream);
-	message.write(mailStream);
-	mailStream.close();
-	socketStream.flush();
+	try
+	{
+		message.write(mailStream);
+		mailStream.close();
+		socketStream.flush();
+	}
+	catch (...)
+	{
+		// The server still reads message data, so QUIT would become part of the
+		// message; closing the connection makes the server discard the message.
+		_socket.close();
+		_isOpen = false;
+		throw;
+	}
 
 	std::string response;
 	int status = _socket.receiveStatusMessage(response);

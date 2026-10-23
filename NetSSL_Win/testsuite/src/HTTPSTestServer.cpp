@@ -107,9 +107,11 @@ void HTTPSTestServer::run()
 
 bool HTTPSTestServer::requestComplete() const
 {
+	// The Content-Length request bodies of the tests end with "\r\n0\r\n".
+	const std::string bodyEnd(_lastRequest.find("chunked") != std::string::npos ? "\r\n0\r\n\r\n" : "\r\n0\r\n");
 	return ((_lastRequest.substr(0, 3) == "GET" || _lastRequest.substr(0, 4) == "HEAD") &&
 		   (_lastRequest.find("\r\n\r\n") != std::string::npos)) ||
-		   (_lastRequest.find("\r\n0\r\n") != std::string::npos);
+		   (_lastRequest.find(bodyEnd) != std::string::npos);
 }
 
 
@@ -169,38 +171,6 @@ std::string HTTPSTestServer::handleRequest() const
 			response.append("Connection: Close\r\n");
 		response.append("\r\n");
 		response.append(body);
-	}
-	else if (_lastRequest.substr(0, 15) == "HEAD /keepAlive")
-	{
-		std::string body(SMALL_BODY);
-		response.append("HTTP/1.1 200 OK\r\n");
-		response.append("Connection: keep-alive\r\n");
-		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: ");
-		response.append(NumberFormatter::format((int) body.size()));
-		response.append("\r\n\r\n");
-		response.append("HTTP/1.1 200 OK\r\n");
-		response.append("Connection: Keep-Alive\r\n");
-		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: ");
-		response.append(NumberFormatter::format((int) body.size()));
-		response.append("\r\n\r\n");
-		response.append(body);
-		body = LARGE_BODY;
-		response.append("HTTP/1.1 200 OK\r\n");
-		response.append("Connection: keep-alive\r\n");
-		response.append("Content-Type: text/plain\r\n");
-		response.append("Transfer-Encoding: chunked\r\n\r\n");
-		response.append(NumberFormatter::formatHex((unsigned) body.length()));
-		response.append("\r\n");
-		response.append(body);
-		response.append("\r\n0\r\n\r\n");
-		response.append("HTTP/1.1 200 OK\r\n");
-		response.append("Connection: close\r\n");
-		response.append("Content-Type: text/plain\r\n");
-		response.append("Content-Length: ");
-		response.append(NumberFormatter::format((int) body.size()));
-		response.append("\r\n\r\n");
 	}
 	else if (_lastRequest.substr(0, 13) == "GET /redirect")
 	{

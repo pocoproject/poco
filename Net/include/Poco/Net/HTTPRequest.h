@@ -58,13 +58,15 @@ public:
 		/// Assignment operator.
 
 	void setMethod(const std::string& method);
-		/// Sets the method.
+		/// Sets the method. write() rejects an empty method and
+		/// a method with a space or a control character.
 
 	[[nodiscard]] const std::string& getMethod() const;
 		/// Returns the method.
 
 	void setURI(const std::string& uri);
-		/// Sets the request URI.
+		/// Sets the request URI. write() rejects an empty URI and
+		/// a URI with a space or a control character.
 
 	[[nodiscard]] const std::string& getURI() const;
 		/// Returns the request URI.
@@ -92,6 +94,9 @@ public:
 	void getCookies(NameValueCollection& cookies) const;
 		/// Fills cookies with the cookies extracted
 		/// from the Cookie headers in the request.
+		///
+		/// Throws a MessageException if the Cookie headers
+		/// contain more than 1000 ';'-separated entries.
 
 	[[nodiscard]] bool hasCredentials() const;
 		/// Returns true iff the request contains authentication
@@ -137,13 +142,24 @@ public:
 	void removeProxyCredentials();
 		/// Removes any proxy credentials from the request.
 
-	void write(std::ostream& ostr) const;
+	void validate() const;
+		/// Throws a MessageException if the method or the URI is empty,
+		/// the method, the URI or the version contains a space or a control
+		/// character, or a header field is invalid (see HTTPMessage::write()).
+
+	void write(std::ostream& ostr) const override;
 		/// Writes the HTTP request to the given
 		/// output stream.
+		///
+		/// Throws a MessageException, before anything is written,
+		/// if validate() does.
 
-	void read(std::istream& istr);
+	void read(std::istream& istr) override;
 		/// Reads the HTTP request from the
 		/// given input stream.
+		///
+		/// Throws a MessageException if the URI or the version
+		/// contains a control character.
 
 	static const std::string HTTP_GET;
 	static const std::string HTTP_HEAD;
@@ -179,7 +195,8 @@ private:
 	{
 		MAX_METHOD_LENGTH  = 32,
 		MAX_URI_LENGTH     = 16384,
-		MAX_VERSION_LENGTH = 8
+		MAX_VERSION_LENGTH = 8,
+		MAX_COOKIES        = 1000
 	};
 
 	std::string _method;

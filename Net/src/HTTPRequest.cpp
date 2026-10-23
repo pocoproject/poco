@@ -18,6 +18,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Ascii.h"
 #include "Poco/String.h"
+#include <algorithm>
 
 
 using Poco::NumberFormatter;
@@ -166,9 +167,13 @@ void HTTPRequest::setCookies(const NameValueCollection& cookies)
 
 void HTTPRequest::getCookies(NameValueCollection& cookies) const
 {
+	std::size_t count = 0;
 	NameValueCollection::ConstIterator it = find(COOKIE);
 	while (it != end() && Poco::icompare(it->first, COOKIE) == 0)
 	{
+		// The separators bound the number of entries before the value is split.
+		count += static_cast<std::size_t>(std::count(it->second.begin(), it->second.end(), ';')) + 1;
+		if (count > MAX_COOKIES) throw MessageException("Too many cookies");
 		splitParameters(it->second.begin(), it->second.end(), cookies);
 		++it;
 	}
@@ -223,10 +228,21 @@ void HTTPRequest::removeProxyCredentials()
 }
 
 
+void HTTPRequest::validate() const
+{
+	if (_method.empty() || _uri.empty() || std::any_of(_method.begin(), _method.end(), isSpaceOrControl) || std::any_of(_uri.begin(), _uri.end(), isSpaceOrControl))
+		throw MessageException("Invalid HTTP request method or URI");
+	if (std::any_of(getVersion().begin(), getVersion().end(), isSpaceOrControl))
+		throw MessageException("Invalid HTTP version");
+	checkFields(*this, false);
+}
+
+
 void HTTPRequest::write(std::ostream& ostr) const
 {
+	validate();
 	ostr << _method << " " << _uri << " " << getVersion() << "\r\n";
-	HTTPMessage::write(ostr);
+	writeFields(*this, ostr);
 	ostr << "\r\n";
 }
 
@@ -241,23 +257,32 @@ void HTTPRequest::read(std::istream& istr)
 	method.reserve(16);
 	uri.reserve(64);
 	version.reserve(16);
+	// The bytes around the tokens are bounded as well, so that the request header cannot grow without limit.
+	std::size_t skipped = 0;
+	const auto skip = [&istr, &skipped]()
+	{
+		if (++skipped > MAX_URI_LENGTH) throw MessageException("HTTP request header too long");
+		return istr.get();
+	};
 	int ch = istr.get();
 	if (istr.bad()) throw NetException("Error reading HTTP request header");
 	if (ch == eof) throw NoMessageException();
-	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
+	while (Poco::Ascii::isSpace(ch)) ch = skip();
 	if (ch == eof) throw MessageException("No HTTP request header");
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP request method invalid or too long");
-	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
+	while (Poco::Ascii::isSpace(ch)) ch = skip();
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && uri.length() < MAX_URI_LENGTH) { uri += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP request URI invalid or too long");
-	while (Poco::Ascii::isSpace(ch)) ch = istr.get();
+	if (std::any_of(uri.begin(), uri.end(), isSpaceOrControl)) throw MessageException("HTTP request URI contains control characters");
+	while (Poco::Ascii::isSpace(ch)) ch = skip();
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && version.length() < MAX_VERSION_LENGTH) { version += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("Invalid HTTP version string");
-	while (ch != '\n' && ch != eof) { ch = istr.get(); }
+	if (std::any_of(version.begin(), version.end(), isSpaceOrControl)) throw MessageException("HTTP version contains control characters");
+	while (ch != '\n' && ch != eof) { ch = skip(); }
 	HTTPMessage::read(istr);
 	ch = istr.get();
-	while (ch != '\n' && ch != eof) { ch = istr.get(); }
+	while (ch != '\n' && ch != eof) { ch = skip(); }
 	setMethod(method);
 	setURI(uri);
 	setVersion(version);

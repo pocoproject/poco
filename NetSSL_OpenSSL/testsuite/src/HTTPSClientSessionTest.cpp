@@ -12,6 +12,8 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/HTTPSClientSession.h"
+#include "Poco/Net/HTTPClientSessionPool.h"
+#include "Poco/Net/HTTPBufferAllocator.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
@@ -20,6 +22,8 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerParams.h"
+#include "Poco/Net/HTTPSessionFactory.h"
+#include "Poco/Net/HTTPSSessionInstantiator.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/ServerSocket.h"
@@ -42,6 +46,7 @@
 #include "Poco/Event.h"
 #include "Poco/Timespan.h"
 #include "Poco/Timestamp.h"
+#include "Poco/URI.h"
 #include "DialogServer.h"
 #include "HTTPSTestServer.h"
 #include <atomic>
@@ -84,6 +89,50 @@ public:
 	HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
 	{
 		return new TestRequestHandler();
+	}
+};
+
+
+class KeepAliveRequestHandler: public HTTPRequestHandler
+	/// Answers HEAD /keepAlive, GET /small, GET /large and HEAD /large;
+	/// the last one closes the connection.
+{
+public:
+	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override
+	{
+		const bool head = request.getMethod() == HTTPRequest::HTTP_HEAD;
+		if (head && request.getURI() == "/keepAlive")
+		{
+			response.setContentType("text/plain");
+			response.setContentLength(static_cast<std::streamsize>(HTTPSTestServer::SMALL_BODY.size()));
+			response.send();
+		}
+		else if (!head && request.getURI() == "/small")
+		{
+			response.sendBuffer(HTTPSTestServer::SMALL_BODY.data(), HTTPSTestServer::SMALL_BODY.size());
+		}
+		else if (!head && request.getURI() == "/large")
+		{
+			response.setChunkedTransferEncoding(true);
+			response.send() << HTTPSTestServer::LARGE_BODY;
+		}
+		else if (head && request.getURI() == "/large")
+		{
+			response.setContentType("text/plain");
+			response.setContentLength(static_cast<std::streamsize>(HTTPSTestServer::LARGE_BODY.size()));
+			response.setKeepAlive(false);
+			response.send();
+		}
+	}
+};
+
+
+class KeepAliveRequestHandlerFactory: public HTTPRequestHandlerFactory
+{
+public:
+	HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&) override
+	{
+		return new KeepAliveRequestHandler;
 	}
 };
 
@@ -332,6 +381,48 @@ namespace
 		Poco::Event _bodyReleased;
 		Poco::Event _stopped;
 	};
+
+	class LoopbackHTTPSClientSession: public HTTPSClientSession
+		/// Connects to 127.0.0.1 on the port of the given address, so that
+		/// a host name that is not a loopback name reaches a local server.
+	{
+	public:
+		LoopbackHTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext):
+			HTTPSClientSession(host, port, pContext)
+		{
+		}
+
+		LoopbackHTTPSClientSession(const std::string& host, Poco::UInt16 port, Context::Ptr pContext, Session::Ptr pSession):
+			HTTPSClientSession(host, port, pContext, pSession)
+		{
+		}
+
+		LoopbackHTTPSClientSession(const SecureStreamSocket& socket, const std::string& host, Poco::UInt16 port):
+			HTTPSClientSession(socket, host, port)
+		{
+		}
+
+	protected:
+		void connect(const SocketAddress& address) override
+		{
+			HTTPSClientSession::connect(SocketAddress("127.0.0.1", address.port()));
+		}
+	};
+
+	Context::Ptr createSessionCachingServerContext()
+		/// Returns a server context that resumes sessions from its
+		/// session cache only, without session tickets.
+	{
+		Context::Ptr pContext = new Context(
+			Context::SERVER_USE,
+			Application::instance().config().getString("openSSL.server.privateKeyFile"),
+			Application::instance().config().getString("openSSL.server.privateKeyFile"),
+			Application::instance().config().getString("openSSL.server.caConfig"),
+			Context::VERIFY_NONE);
+		pContext->enableSessionCache(true, "TestSuite");
+		pContext->disableStatelessSessionResumption();
+		return pContext;
+	}
 }
 
 
@@ -535,49 +626,61 @@ void HTTPSClientSessionTest::testPostLargeChunkedKeepAlive()
 
 void HTTPSClientSessionTest::testKeepAlive()
 {
-	HTTPSTestServer srv;
-	HTTPSClientSession s("127.0.0.1", srv.port());
-	s.setKeepAlive(true);
-	HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
-	s.sendRequest(request);
-	HTTPResponse response;
-	std::istream& rs1 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assertTrue (response.getContentType() == "text/plain");
-	assertTrue (response.getKeepAlive());
-	std::ostringstream ostr1;
-	assertTrue (StreamCopier::copyStream(rs1, ostr1) == 0);
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	HTTPServer srv(new KeepAliveRequestHandlerFactory, svs, new HTTPServerParams);
+	srv.start();
+	try
+	{
+		HTTPSClientSession s("127.0.0.1", srv.port());
+		s.setKeepAlive(true);
+		HTTPRequest request(HTTPRequest::HTTP_HEAD, "/keepAlive", HTTPMessage::HTTP_1_1);
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs1 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+		assertTrue (response.getContentType() == "text/plain");
+		assertTrue (response.getKeepAlive());
+		std::ostringstream ostr1;
+		assertTrue (StreamCopier::copyStream(rs1, ostr1) == 0);
 
-	request.setMethod(HTTPRequest::HTTP_GET);
-	request.setURI("/small");
-	s.sendRequest(request);
-	std::istream& rs2 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
-	assertTrue (response.getKeepAlive());
-	std::ostringstream ostr2;
-	StreamCopier::copyStream(rs2, ostr2);
-	assertTrue (ostr2.str() == HTTPSTestServer::SMALL_BODY);
+		request.setMethod(HTTPRequest::HTTP_GET);
+		request.setURI("/small");
+		s.sendRequest(request);
+		std::istream& rs2 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+		assertTrue (response.getKeepAlive());
+		std::ostringstream ostr2;
+		StreamCopier::copyStream(rs2, ostr2);
+		assertTrue (ostr2.str() == HTTPSTestServer::SMALL_BODY);
 
-	request.setMethod(HTTPRequest::HTTP_GET);
-	request.setURI("/large");
-	s.sendRequest(request);
-	std::istream& rs3 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assertTrue (response.getChunkedTransferEncoding());
-	assertTrue (response.getKeepAlive());
-	std::ostringstream ostr3;
-	StreamCopier::copyStream(rs3, ostr3);
-	assertTrue (ostr3.str() == HTTPSTestServer::LARGE_BODY);
+		request.setMethod(HTTPRequest::HTTP_GET);
+		request.setURI("/large");
+		s.sendRequest(request);
+		std::istream& rs3 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
+		assertTrue (response.getChunkedTransferEncoding());
+		assertTrue (response.getKeepAlive());
+		std::ostringstream ostr3;
+		StreamCopier::copyStream(rs3, ostr3);
+		assertTrue (ostr3.str() == HTTPSTestServer::LARGE_BODY);
 
-	request.setMethod(HTTPRequest::HTTP_HEAD);
-	request.setURI("/large");
-	s.sendRequest(request);
-	std::istream& rs4 = s.receiveResponse(response);
-	assertTrue (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
-	assertTrue (response.getContentType() == "text/plain");
-	assertTrue (!response.getKeepAlive());
-	std::ostringstream ostr4;
-	assertTrue (StreamCopier::copyStream(rs4, ostr4) == 0);
+		request.setMethod(HTTPRequest::HTTP_HEAD);
+		request.setURI("/large");
+		s.sendRequest(request);
+		std::istream& rs4 = s.receiveResponse(response);
+		assertTrue (response.getContentLength() == HTTPSTestServer::LARGE_BODY.length());
+		assertTrue (response.getContentType() == "text/plain");
+		assertTrue (!response.getKeepAlive());
+		std::ostringstream ostr4;
+		assertTrue (StreamCopier::copyStream(rs4, ostr4) == 0);
+		assertTrue (srv.totalConnections() == 1);
+		srv.stop();
+	}
+	catch (...)
+	{
+		srv.stop();
+		throw;
+	}
 }
 
 
@@ -608,7 +711,7 @@ void HTTPSClientSessionTest::testMultipleSSLInit()
 		initSSL();
 
 		HTTPSClientSession session("secure.appinf.com");
-		HTTPRequest request(HTTPRequest::HTTP_GET, "", HTTPMessage::HTTP_1_1);
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
 		(void)session.sendRequest(request);
 		deinitSSL();
 	}
@@ -768,6 +871,94 @@ void HTTPSClientSessionTest::testServerAbort()
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 	assertTrue (dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
 			 s.networkException()) != nullptr );
+}
+
+
+void HTTPSClientSessionTest::testServerAbortContentLength()
+{
+	HTTPSTestServer srv;
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/shortlength/connection/abort");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getContentLength() > static_cast<std::streamsize>(HTTPSTestServer::SMALL_BODY.size()));
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (rs.eof());
+	assertTrue (!rs.bad());
+	assertTrue (dynamic_cast<const SSLConnectionUnexpectedlyClosedException*>(s.networkException()) != nullptr);
+}
+
+
+void HTTPSClientSessionTest::testServerAbortChunked()
+{
+	HTTPSTestServer srv;
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setTimeout(Poco::Timespan(10, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/shortchunk/connection/abort");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getChunkedTransferEncoding());
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (rs.eof());
+	assertTrue (!rs.bad());
+	assertTrue (dynamic_cast<const SSLConnectionUnexpectedlyClosedException*>(s.networkException()) != nullptr);
+}
+
+
+void HTTPSClientSessionTest::testServerAbortChunkedFraming()
+{
+	for (const char* path: {"/cutchunkline/connection/abort", "/cutlastchunk/connection/abort"})
+	{
+		HTTPSTestServer srv;
+		HTTPSClientSession s("127.0.0.1", srv.port());
+		s.setTimeout(Poco::Timespan(10, 0));
+		HTTPRequest request(HTTPRequest::HTTP_GET, path);
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs = s.receiveResponse(response);
+		assertTrue (response.getChunkedTransferEncoding());
+		std::ostringstream ostr;
+		StreamCopier::copyStream(rs, ostr);
+		assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+		assertTrue (rs.eof());
+		assertTrue (!rs.bad());
+		assertTrue (dynamic_cast<const SSLConnectionUnexpectedlyClosedException*>(s.networkException()) != nullptr);
+	}
+}
+
+
+void HTTPSClientSessionTest::testServerAbortHeader()
+{
+	// The header is read by receiveResponse(), or by peekResponse() for a request that expects 100 Continue.
+	for (bool peek: {false, true})
+	{
+		HTTPSTestServer srv;
+		HTTPSClientSession s("127.0.0.1", srv.port());
+		s.setTimeout(Poco::Timespan(10, 0));
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/cutheader/connection/abort");
+		request.setExpectContinue(peek);
+		s.sendRequest(request);
+		HTTPResponse response;
+		try
+		{
+			if (peek)
+				s.peekResponse(response);
+			else
+				s.receiveResponse(response);
+			fail("a response with a cut header must not be returned");
+		}
+		catch (SSLConnectionUnexpectedlyClosedException&)
+		{
+		}
+		assertTrue (!s.connected());
+	}
 }
 
 
@@ -1055,6 +1246,255 @@ void HTTPSClientSessionTest::testHttpsProxyTunnelCloseEndsHandshake()
 }
 
 
+void HTTPSClientSessionTest::testChunkedTerminatorInPendingTLSDataKeepsConnection()
+{
+	// The chunk data is read from the TLS record with a read of its size, so the
+	// rest of the body stays decrypted in the TLS layer, where poll() does not see it.
+	// The server accepts one connection: a reconnect would time out in the handshake.
+	HeldBackHTTPSServer srv("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\n", "hello\r\n0\r\nTrailer-1: Value 1\r\n\r\n");
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setKeepAlive(true);
+	s.setTimeout(Poco::Timespan(5, 0));
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	s.sendRequest(request);
+	srv.sendHeader();
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	srv.sendBody();
+	char buffer[5];
+	rs.read(buffer, sizeof(buffer));
+	assertTrue (std::string(buffer, static_cast<std::size_t>(rs.gcount())) == "hello");
+
+	s.sendRequest(request);
+	assertTrue (s.responseTrailer().get("Trailer-1", "") == "Value 1");
+}
+
+
+void HTTPSClientSessionTest::testHttpsProxyTunnelReconnectDiscardsBufferedData()
+{
+	// The first target sends a second response in the same TLS record as
+	// the first one, so it is read into the buffer of the session. The
+	// response to the next request comes from the new tunnel, not from
+	// that buffer.
+	HeldBackHTTPSServer srv1("HTTP/1.1 200 OK\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok"
+		"HTTP/1.1 200 OK\r\nContent-Length: 8\r\n\r\nINJECTED", "");
+	HeldBackHTTPSServer srv2("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n", "REAL");
+	TLSConnectProxy proxy1(srv1.port());
+	TLSConnectProxy proxy2(srv2.port());
+	const Poco::Timespan timeout(5, 0);
+
+	HTTPSClientSession s("www.appinf.com", srv1.port());
+	s.setTimeout(timeout);
+	s.setProxy("127.0.0.1", proxy1.port(), "https", true);
+	srv1.sendHeader();
+	HTTPRequest request1(HTTPRequest::HTTP_GET, "/");
+	s.sendRequest(request1);
+	HTTPResponse response1;
+	std::istream& rs1 = s.receiveResponse(response1);
+	std::ostringstream ostr1;
+	StreamCopier::copyStream(rs1, ostr1);
+	assertTrue (ostr1.str() == "ok");
+
+	s.reset();
+	s.setPort(srv2.port());
+	s.setProxy("127.0.0.1", proxy2.port(), "https", true);
+	srv2.sendHeader();
+	srv2.sendBody();
+	HTTPRequest request2(HTTPRequest::HTTP_GET, "/");
+	s.sendRequest(request2);
+	HTTPResponse response2;
+	std::istream& rs2 = s.receiveResponse(response2);
+	std::ostringstream ostr2;
+	StreamCopier::copyStream(rs2, ostr2);
+	assertTrue (ostr2.str() == "REAL");
+}
+
+
+void HTTPSClientSessionTest::testReconnectChecksNewHost()
+{
+	// The certificate is accepted for 127.0.0.1, a loopback name. After the
+	// host is changed, it is checked against the new host name.
+	HTTPSTestServer srv;
+	LoopbackHTTPSClientSession s("127.0.0.1", srv.port(), SSLManager::instance().defaultClientContext());
+	s.setTimeout(Poco::Timespan(5, 0));
+	HTTPRequest request1(HTTPRequest::HTTP_GET, "/small");
+	s.sendRequest(request1);
+	HTTPResponse response1;
+	std::istream& rs1 = s.receiveResponse(response1);
+	std::ostringstream ostr1;
+	StreamCopier::copyStream(rs1, ostr1);
+	assertTrue (ostr1.str() == HTTPSTestServer::SMALL_BODY);
+
+	s.reset();
+	s.setHost("192.0.2.1");
+	HTTPRequest request2(HTTPRequest::HTTP_GET, "/small");
+	try
+	{
+		s.sendRequest(request2);
+		fail("the certificate is not issued for 192.0.2.1");
+	}
+	catch (CertificateValidationException&)
+	{
+	}
+}
+
+
+void HTTPSClientSessionTest::testReconnectKeepsSocketPeerHostName()
+{
+	HTTPSTestServer srv;
+	SecureStreamSocket socket(SSLManager::instance().defaultClientContext());
+	socket.setPeerHostName("www.appinf.com");
+	LoopbackHTTPSClientSession s(socket, "192.0.2.1", srv.port());
+	s.setTimeout(Poco::Timespan(5, 0));
+	for (const char* host: {"192.0.2.1", "192.0.2.2"})
+	{
+		s.reset();
+		s.setHost(host);
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+		s.sendRequest(request);
+		HTTPResponse response;
+		std::istream& rs = s.receiveResponse(response);
+		std::ostringstream ostr;
+		StreamCopier::copyStream(rs, ostr);
+		assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	}
+}
+
+
+void HTTPSClientSessionTest::testReconnectResumesSessionOfSameHost()
+{
+	HTTPSTestServer srv(createSessionCachingServerContext());
+
+	// The certificate of the server is self-signed and trusted as its own CA.
+	Context::Ptr pClientContext = new Context(
+		Context::CLIENT_USE,
+		Application::instance().config().getString("openSSL.server.privateKeyFile"),
+		Context::VERIFY_RELAXED);
+	pClientContext->enableSessionCache(true);
+	// TLS 1.3 delivers the session after the handshake.
+	pClientContext->disableProtocols(Context::PROTO_TLSV1_3);
+
+	LoopbackHTTPSClientSession s("127.0.0.1", srv.port(), pClientContext);
+	s.setTimeout(Poco::Timespan(5, 0));
+	assertFalse (getSmallReusesSession(s, "127.0.0.1"));
+	assertTrue (getSmallReusesSession(s, "127.0.0.1"));
+	assertFalse (getSmallReusesSession(s, "127.0.0.2"));
+}
+
+
+void HTTPSClientSessionTest::testReconnectOffersGivenSessionToSameHostOnly()
+{
+	HTTPSTestServer srv(createSessionCachingServerContext());
+
+	// TLS 1.3 delivers the session after the handshake.
+	Context::Ptr pCachingContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_NONE);
+	pCachingContext->enableSessionCache(true);
+	pCachingContext->disableProtocols(Context::PROTO_TLSV1_3);
+	// The sessions under test use a context without session caching.
+	Context::Ptr pClientContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_NONE);
+	pClientContext->disableProtocols(Context::PROTO_TLSV1_3);
+
+	HTTPSClientSession caching("127.0.0.1", srv.port(), pCachingContext);
+	caching.setTimeout(Poco::Timespan(5, 0));
+	assertFalse (getSmallReusesSession(caching, "127.0.0.1"));
+	Session::Ptr pSession = caching.sslSession();
+	assertTrue (pSession != nullptr);
+
+	LoopbackHTTPSClientSession direct("127.0.0.1", srv.port(), pClientContext, pSession);
+	direct.setTimeout(Poco::Timespan(5, 0));
+	assertTrue (getSmallReusesSession(direct, "127.0.0.1"));
+	assertTrue (getSmallReusesSession(direct, "127.0.0.1"));
+	assertFalse (getSmallReusesSession(direct, "127.0.0.2"));
+
+	// Each proxy serves one connection.
+	TLSConnectProxy proxy1(srv.port());
+	TLSConnectProxy proxy2(srv.port());
+	HTTPSClientSession tunneled("127.0.0.1", srv.port(), pClientContext, pSession);
+	tunneled.setTimeout(Poco::Timespan(5, 0));
+	tunneled.setProxy("127.0.0.1", proxy1.port(), "https", true);
+	assertTrue (getSmallReusesSession(tunneled, "127.0.0.1"));
+	tunneled.reset();
+	tunneled.setProxy("127.0.0.1", proxy2.port(), "https", true);
+	assertFalse (getSmallReusesSession(tunneled, "127.0.0.2"));
+}
+
+
+bool HTTPSClientSessionTest::getSmallReusesSession(HTTPSClientSession& session, const std::string& host)
+{
+	session.reset();
+	session.setHost(host);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+	session.sendRequest(request);
+	const bool reused = SecureStreamSocket(session.socket()).sessionWasReused();
+	HTTPResponse response;
+	std::istream& rs = session.receiveResponse(response);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	return reused;
+}
+
+
+void HTTPSClientSessionTest::testSessionPool()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	HTTPServer srv(new TestRequestHandlerFactory(), svs, new HTTPServerParams());
+	srv.start();
+	try
+	{
+		Context::Ptr pContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_NONE);
+		HTTPSessionFactory factory;
+		factory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+		HTTPClientSessionPool pool(factory);
+		const Poco::URI uri("https://127.0.0.1:" + std::to_string(srv.port()) + "/");
+		for (int i = 0; i < 3; ++i)
+		{
+			HTTPClientSessionPool::Handle handle = pool.acquire(uri);
+			handle->setTimeout(Poco::Timespan(10, 0));
+			HTTPRequest request(HTTPRequest::HTTP_POST, "/", HTTPMessage::HTTP_1_1);
+			request.setContentLength(5);
+			handle->sendRequest(request) << "hello";
+			HTTPResponse response;
+			std::istream& rs = handle->receiveResponse(response);
+			std::ostringstream ostr;
+			StreamCopier::copyStream(rs, ostr);
+			assertTrue (ostr.str() == "hello");
+		}
+		assertTrue (pool.idleSessions() == 1);
+		assertTrue (srv.totalConnections() == 1);
+		srv.stop();
+	}
+	catch (...)
+	{
+		srv.stop();
+		throw;
+	}
+}
+
+
+void HTTPSClientSessionTest::testDecryptedStrayDataPreventsReuse()
+{
+	// The stray bytes follow the response in the same TLS record. The body is
+	// read past the buffer of the session, so they stay in the TLS layer.
+	const std::string body(2*HTTPBufferAllocator::BUFFER_SIZE, 'x');
+	HeldBackHTTPSServer srv("HTTP/1.1 200 OK\r\nContent-Length: " + std::to_string(body.size()) + "\r\n\r\n" + body + "stray", "");
+	Context::Ptr pContext = new Context(Context::CLIENT_USE, "", Context::VERIFY_NONE);
+	HTTPSClientSession s("127.0.0.1", srv.port(), pContext);
+	s.setKeepAlive(true);
+	s.setTimeout(Poco::Timespan(5, 0));
+	srv.sendHeader();
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == body);
+	assertTrue (s.socket().available() > 0);
+	assertTrue (!s.canReuse());
+}
+
+
 void HTTPSClientSessionTest::setUp()
 {
 }
@@ -1086,6 +1526,10 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testUnknownContentLength);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbort);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbortContentLength);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbortChunked);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbortChunkedFraming);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbortHeader);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxyConfig);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxySetters);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testStalledPeerTimeout);
@@ -1096,6 +1540,14 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelCorruptedRecord);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelClosedInBody);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelCloseEndsHandshake);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testChunkedTerminatorInPendingTLSDataKeepsConnection);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHttpsProxyTunnelReconnectDiscardsBufferedData);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectChecksNewHost);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectKeepsSocketPeerHostName);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectResumesSessionOfSameHost);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testReconnectOffersGivenSessionToSameHostOnly);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testSessionPool);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testDecryptedStrayDataPreventsReuse);
 
 	return pSuite;
 }

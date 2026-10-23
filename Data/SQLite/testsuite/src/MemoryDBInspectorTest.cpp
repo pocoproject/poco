@@ -1038,9 +1038,14 @@ void MemoryDBInspectorTest::testConcurrentOwnerWritesWhileInspectorReads()
 		admin.join();
 
 		{
+			// A sealed shard's rows leave main once its file is written
+			// (loadArchivedShards is off), so count main plus every sealed
+			// shard, each once, through the history view.
 			std::lock_guard<std::mutex> g(ownerLock);
+			db.attachAllArchived();
 			int n = 0;
-			db << "SELECT count(*) FROM t", into(n), now;
+			db << ("SELECT count(*) FROM " + db.historyView("t")), into(n), now;
+			db.detachAllArchived();
 			assertTrue (n == writes.load());
 		}
 	}

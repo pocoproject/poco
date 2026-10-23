@@ -20,7 +20,6 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/HTTPBasicStreamBuf.h"
-#include <cstddef>
 #include <istream>
 #include <ostream>
 
@@ -49,6 +48,15 @@ public:
 	HTTPFixedLengthStreamBuf(HTTPSession& session, ContentLength length, openmode mode);
 	~HTTPFixedLengthStreamBuf();
 
+	[[nodiscard]] bool isComplete() const noexcept;
+		/// Returns true if all bytes of the body have been read or written.
+
+	[[nodiscard]] bool skipBuffered();
+		/// Discards the rest of an input body if all of it is in the
+		/// session buffer. Does not read from the socket.
+		///
+		/// Returns isComplete().
+
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length);
 	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
@@ -57,6 +65,7 @@ private:
 	HTTPSession&    _session;
 	ContentLength _length;
 	ContentLength _count;
+	bool _writeFailed = false;
 };
 
 
@@ -79,12 +88,6 @@ class Net_API HTTPFixedLengthInputStream: public HTTPFixedLengthIOS, public std:
 public:
 	HTTPFixedLengthInputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
 	~HTTPFixedLengthInputStream();
-
-	void* operator new(std::size_t size);
-	void operator delete(void* ptr);
-
-private:
-	static Poco::MemoryPool _pool;
 };
 
 
@@ -94,12 +97,6 @@ class Net_API HTTPFixedLengthOutputStream: public HTTPFixedLengthIOS, public std
 public:
 	HTTPFixedLengthOutputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
 	~HTTPFixedLengthOutputStream();
-
-	void* operator new(std::size_t size);
-	void operator delete(void* ptr);
-
-private:
-	static Poco::MemoryPool _pool;
 };
 
 

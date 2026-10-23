@@ -13,6 +13,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
+#include <cstring>
+#include <new>
 #include <sstream>
 
 
@@ -500,6 +502,230 @@ void MessageHeaderTest::testNoDecodeFramingHeaders()
 }
 
 
+void MessageHeaderTest::testStrictFieldName()
+{
+	const std::string invalid[] = {
+		"Content-Length : 5\r\n\r\n",
+		"Transfer-Encoding\t: chunked\r\n\r\n",
+		"Content-Length\r: 5\r\n\r\n",
+		"Na\x01me: value\r\n\r\n",
+		"N\xC3\xA4me: value\r\n\r\n",
+		"X(a): value\r\n\r\n",
+		"X/a: value\r\n\r\n",
+		": value\r\n\r\n"
+	};
+	for (const auto& s: invalid)
+	{
+		std::istringstream istr(s);
+		MessageHeader mh;
+		mh.setStrictParsing(true);
+		try
+		{
+			mh.read(istr);
+			failmsg("invalid field name must throw: " + s);
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+
+	std::istringstream istr("Content-Length: 5\r\nX-Name_1.~!#$%&'*+^`|: value\r\n\r\n");
+	MessageHeader mh;
+	mh.setStrictParsing(true);
+	mh.read(istr);
+	assertTrue (mh.size() == 2);
+	assertTrue (mh.get("Content-Length") == "5");
+	assertTrue (mh.get("X-Name_1.~!#$%&'*+^`|") == "value");
+
+	std::istringstream lenient("Content-Length : 5\r\n\r\n");
+	MessageHeader mhLenient;
+	mhLenient.read(lenient);
+	assertTrue (mhLenient.get("Content-Length ") == "5");
+}
+
+
+void MessageHeaderTest::testStrictValueWhitespace()
+{
+	std::istringstream istr("Transfer-Encoding:\vchunked\r\nContent-Length: \t5\f \r\n\r\n");
+	MessageHeader mh;
+	mh.setStrictParsing(true);
+	mh.read(istr);
+	assertTrue (mh.get("Transfer-Encoding") == "\vchunked");
+	assertTrue (mh.get("Content-Length") == "5\f");
+
+	std::istringstream lenient("Transfer-Encoding:\vchunked\r\nContent-Length: \t5\f \r\n\r\n");
+	MessageHeader mhLenient;
+	mhLenient.read(lenient);
+	assertTrue (mhLenient.get("Transfer-Encoding") == "chunked");
+	assertTrue (mhLenient.get("Content-Length") == "5");
+}
+
+
+void MessageHeaderTest::testFieldLimitLinesWithoutColon()
+{
+	std::string s;
+	for (int i = 0; i < 200; ++i) s += "x\r\n";
+	s += "name: value\r\n\r\n";
+	std::istringstream istr(s);
+	MessageHeader mh;
+	try
+	{
+		mh.read(istr);
+		fail("Field limit exceeded - must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+
+void MessageHeaderTest::testWriteInvalidFieldValue()
+{
+	const std::string invalid[] = {
+		"a\r\nSet-Cookie: b",
+		"a\nb",
+		"a\rb",
+		"a\r\n",
+		"a\r\n ",
+		"a\r\n \r\n b",
+		"a\r\n\t\r\nb",
+		std::string("a\0b", 3),
+		"a\x01" "b",
+		"a\x7F"
+	};
+	for (const auto& value: invalid)
+	{
+		MessageHeader mh;
+		mh.set("Name1", "value1");
+		mh.set("Name2", value);
+		std::ostringstream ostr;
+		try
+		{
+			mh.write(ostr);
+			fail("invalid field value must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+		assertTrue (ostr.str().empty());
+	}
+}
+
+
+void MessageHeaderTest::testWriteInvalidFieldName()
+{
+	const std::string invalid[] = {
+		"",
+		"Na me",
+		"Name:",
+		"Na\tme",
+		"Na\x01me",
+		"N\xC3\xA4me"
+	};
+	for (const auto& name: invalid)
+	{
+		MessageHeader mh;
+		mh.set("Name1", "value1");
+		mh.set(name, "value");
+		std::ostringstream ostr;
+		try
+		{
+			mh.write(ostr);
+			failmsg("invalid field name must throw: " + name);
+		}
+		catch (MessageException&)
+		{
+		}
+		assertTrue (ostr.str().empty());
+	}
+}
+
+
+void MessageHeaderTest::testWriteValidFields()
+{
+	MessageHeader mh;
+	mh.set("X-Name_1.~!#$%&'*+^`|", "a\tb");
+	mh.set("Subject", "=?UTF-8?Q?a?=\r\n =?UTF-8?Q?b?=");
+	mh.set("Text", "N\xC3\xA4me");
+	mh.set("X-A/B(c)", "a\r\n \t b");
+	std::ostringstream ostr;
+	mh.write(ostr);
+	assertTrue (ostr.str() == "X-Name_1.~!#$%&'*+^`|: a\tb\r\nSubject: =?UTF-8?Q?a?=\r\n =?UTF-8?Q?b?=\r\nText: N\xC3\xA4me\r\nX-A/B(c): a\r\n \t b\r\n");
+}
+
+
+void MessageHeaderTest::testReadDecodedControlCharacters()
+{
+	std::istringstream istr(
+		"X-Q: =?UTF-8?Q?a=0D=0AY:_b?=\r\n"
+		"X-B: =?UTF-8?B?YQ0KWTogYg==?=\r\n"
+		"X-Nul: =?UTF-8?Q?a=00b?=\r\n"
+		"X-Tab: =?UTF-8?Q?a=09b?=\r\n"
+		"\r\n");
+	MessageHeader mh;
+	mh.read(istr);
+	assertTrue (mh.get("X-Q") == "=?UTF-8?Q?a=0D=0AY:_b?=");
+	assertTrue (mh.get("X-B") == "=?UTF-8?B?YQ0KWTogYg==?=");
+	assertTrue (mh.get("X-Nul") == "=?UTF-8?Q?a=00b?=");
+	assertTrue (mh.get("X-Tab") == "a\tb");
+
+	std::ostringstream ostr;
+	mh.write(ostr);
+	assertTrue (ostr.str().find("\r\nY:") == std::string::npos);
+}
+
+
+void MessageHeaderTest::testAutoDecodeCopy()
+{
+	const std::string header("X-A: =?UTF-8?B?SGVsbG8=?=\r\n\r\n");
+	// The storage is filled with the opposite of the source's decode flags,
+	// so the copy must take both from the source.
+	alignas(MessageHeader) unsigned char storage[sizeof(MessageHeader)];
+	for (const bool autoDecode: {false, true})
+	{
+		std::istringstream istr(header);
+		MessageHeader src;
+		src.setAutoDecode(autoDecode);
+		src.read(istr);
+
+		std::memset(storage, autoDecode ? 0x00 : 0x01, sizeof(storage));
+		MessageHeader* pCopy = new (storage) MessageHeader(src);
+		const bool copyAutoDecode = pCopy->getAutoDecode();
+		const std::string copyDecoded = pCopy->getDecoded("X-A");
+		pCopy->~MessageHeader();
+		assertTrue (copyAutoDecode == autoDecode);
+		assertTrue (copyDecoded == "Hello");
+
+		// The target holds a decode state that differs from the source.
+		std::istringstream assignedIstr(header);
+		MessageHeader assigned;
+		assigned.setAutoDecode(!autoDecode);
+		assigned.read(assignedIstr);
+		assigned = src;
+		assertTrue (assigned.getAutoDecode() == autoDecode);
+		assertTrue (assigned.getDecoded("X-A") == "Hello");
+	}
+}
+
+
+void MessageHeaderTest::testStrictParsingCopy()
+{
+	for (const bool strict: {false, true})
+	{
+		MessageHeader src;
+		src.setStrictParsing(strict);
+
+		MessageHeader copy(src);
+		assertTrue (copy.getStrictParsing() == strict);
+
+		MessageHeader assigned;
+		assigned.setStrictParsing(!strict);
+		assigned = src;
+		assertTrue (assigned.getStrictParsing() == strict);
+	}
+}
+
+
 CppUnit::Test* MessageHeaderTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MessageHeaderTest");
@@ -526,6 +752,15 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testNoDecodeFramingHeaders);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testAutoDecode);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictFieldName);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictValueWhitespace);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimitLinesWithoutColon);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteInvalidFieldValue);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteInvalidFieldName);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteValidFields);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testReadDecodedControlCharacters);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testAutoDecodeCopy);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictParsingCopy);
 
 	return pSuite;
 }

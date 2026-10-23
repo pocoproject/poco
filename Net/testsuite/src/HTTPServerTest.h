@@ -41,6 +41,24 @@ public:
 	void testFileKeepAlive();
 	void testEmptyFileKeepAlive();
 	void testChunkedTrailer();
+	void testChunkedFramingError();
+	void testUnreadRequestBody();
+	void testUnreadChunkedRequestBody();
+	void testLargeUnreadRequestBody();
+	void testResponseBeforeUnreadRequestBody();
+	void testNonBlockingHandlerClosesConnection();
+	void testHandlerNonBlockingReadThenBlocking();
+	void testIncompleteFixedLengthRequest();
+	void testSocketTimeouts();
+	void testFieldNameWhitespace();
+	void testRedirectLineBreak();
+	void testSendLineBreak();
+	void testEchoDecodedLineBreak();
+	void testSlowRequestHeader();
+	void testSlowUnreadRequestBody();
+	void testInvalidRequestHeaderClearsDeadline();
+	void testFailedResponseWriteNotRepeated();
+	void testParallelKeepAliveSessions();
 
 	void setUp();
 	void tearDown();

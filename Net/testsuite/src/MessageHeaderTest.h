@@ -46,6 +46,15 @@ public:
 	void testDecodeWord();
 	void testNoDecodeFramingHeaders();
 	void testAutoDecode();
+	void testStrictFieldName();
+	void testStrictValueWhitespace();
+	void testFieldLimitLinesWithoutColon();
+	void testWriteInvalidFieldValue();
+	void testWriteInvalidFieldName();
+	void testWriteValidFields();
+	void testReadDecodedControlCharacters();
+	void testAutoDecodeCopy();
+	void testStrictParsingCopy();
 
 	void setUp();
 	void tearDown();

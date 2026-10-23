@@ -31,6 +31,8 @@ public:
 	void testSendMultiRecipient();
 	void testMultiSeparateRecipient();
 	void testSendFailed();
+	void testSendInvalidHeader();
+	void testSendInvalidNestedPartHeader();
 
 	void setUp();
 	void tearDown();

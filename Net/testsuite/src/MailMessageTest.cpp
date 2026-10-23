@@ -37,6 +37,7 @@ using Poco::Net::MailInputStream;
 using Poco::Net::MailOutputStream;
 using Poco::Net::MailRecipient;
 using Poco::Net::MessageHeader;
+using Poco::Net::MessageException;
 using Poco::Net::PartHandler;
 using Poco::Net::MediaType;
 using Poco::Net::StringPartSource;
@@ -993,6 +994,45 @@ void MailMessageTest::testReadMultiPartLargeWithoutContentLength()
 }
 
 
+void MailMessageTest::testWriteFoldedField()
+{
+	MailMessage message;
+	message.set("X-Field", "a\r\n b");
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertTrue (ostr.str().find("\r\nX-Field: a\r\n b\r\n") != std::string::npos);
+}
+
+
+void MailMessageTest::testValidateHeaders()
+{
+	MailMessage valid;
+	valid.setSubject("Test Message");
+	valid.addAttachment("a.txt", new StringPartSource("a", "text/plain", "a.txt"));
+	valid.validateHeaders();
+
+	MailMessage invalidSubject;
+	invalidSubject.setSubject("Test\nBcc: x");
+	MailMessage invalidFilename;
+	invalidFilename.addAttachment("a.txt", new StringPartSource("a", "text/plain", "a\r\nBcc: x"));
+	MailMessage invalidPartField;
+	StringPartSource* pSource = new StringPartSource("a", "text/plain");
+	pSource->headers().set("X-Field", "a\r\nBcc: x");
+	invalidPartField.addContent(pSource);
+	for (const MailMessage* pMessage: {&invalidSubject, &invalidFilename, &invalidPartField})
+	{
+		try
+		{
+			pMessage->validateHeaders();
+			fail("invalid header field must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+}
+
+
 void MailMessageTest::setUp()
 {
 }
@@ -1030,6 +1070,8 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartTooManyParts);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartLargeWithContentLength);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartLargeWithoutContentLength);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteFoldedField);
+	CppUnit_addTest(pSuite, MailMessageTest, testValidateHeaders);
 
 	return pSuite;
 }

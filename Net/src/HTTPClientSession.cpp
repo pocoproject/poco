@@ -26,6 +26,8 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/CountingStream.h"
 #include "Poco/RegularExpression.h"
+#include "Poco/String.h"
+#include <algorithm>
 #include <sstream>
 
 
@@ -35,6 +37,35 @@ using Poco::InvalidArgumentException;
 
 
 namespace Poco::Net {
+
+
+namespace {
+
+
+bool isConnectionBoundCredentials(const std::string& credentials)
+{
+	const std::string::size_type begin = credentials.find_first_not_of(" \t");
+	if (begin == std::string::npos) return false;
+	const std::string::size_type end = credentials.find_first_of(" \t", begin);
+	const std::string::size_type length = (end == std::string::npos ? credentials.size() : end) - begin;
+	return Poco::icompare(credentials, begin, length, "NTLM") == 0 ||
+		Poco::icompare(credentials, begin, length, "Negotiate") == 0 ||
+		Poco::icompare(credentials, begin, length, "Kerberos") == 0;
+}
+
+
+bool sendsConnectionBoundCredentials(const HTTPRequest& request)
+{
+	// A request can carry several credential fields, and any one of them can authenticate the connection.
+	return std::any_of(request.begin(), request.end(), [](const auto& field)
+	{
+		return (Poco::icompare(field.first, HTTPRequest::AUTHORIZATION) == 0 || Poco::icompare(field.first, HTTPRequest::PROXY_AUTHORIZATION) == 0) &&
+			isConnectionBoundCredentials(field.second);
+	});
+}
+
+
+} // namespace
 
 
 ProxyConfig HTTPClientSession::_globalProxyConfig;
@@ -319,10 +350,36 @@ void HTTPClientSession::setKeepAliveTimeout(const Poco::Timespan& timeout)
 
 std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 {
+	request.validate();
+	bool keepAlive = getKeepAlive();
+	// Unread bytes of the last response, or data the server sent after it, would be parsed as the next response.
+	bool responseDataUnread = keepAlive && connected() && networkException() == nullptr && _pResponseStream != nullptr && (!responseStreamComplete() || dataPending());
+	if (responseDataUnread)
+		_mustReconnect = true;
+	if (_pRequestStream != nullptr)
+		_requestBodyComplete = requestStreamComplete();
+	bool requestBodyComplete = _requestBodyComplete;
+	_requestBodyComplete = true;
+	// A failed send or receive or an incomplete request body leaves the connection in an unknown state.
+	// Closed before the request stream is released, which would send its buffer again.
+	if (connected() && (networkException() != nullptr || !requestBodyComplete))
+		close();
 	_pRequestStream = nullptr;
 	_pResponseStream = nullptr;
 
-	bool keepAlive = getKeepAlive();
+	if (_host.empty())
+	{
+		// A session without a host cannot set up a new connection.
+		if (networkException() != nullptr)
+			networkException()->rethrow();
+		if (!requestBodyComplete)
+			throw NetException("Cannot reconnect without a host", "the last request body was not sent to its end");
+		if (responseDataUnread)
+		{
+			close();
+			throw NetException("Cannot reconnect without a host", "the last response body was not read to its end, or the server sent data or closed the connection after it");
+		}
+	}
 	if (((connected() && !keepAlive) || mustReconnect()) && !_host.empty())
 	{
 		close();
@@ -333,6 +390,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		if (!connected())
 		{
 			_ntlmProxyAuthenticated = false;
+			_connectionAuthenticated = false;
 			reconnect();
 		}
 		if (!keepAlive)
@@ -365,15 +423,22 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 
 std::ostream& HTTPClientSession::sendRequestImpl(const HTTPRequest& request)
 {
+	if (sendsConnectionBoundCredentials(request))
+		_connectionAuthenticated = true;
 	_pRequestStream = nullptr;
 	_pResponseStream = nullptr;
 	clearException();
 	_responseReceived = false;
 	_expectResponseBody = request.getMethod() != HTTPRequest::HTTP_HEAD;
+	_connectRequest = request.getMethod() == HTTPRequest::HTTP_CONNECT;
 	if (request.getChunkedTransferEncoding())
 	{
-		HTTPHeaderOutputStream hos(*this);
-		request.write(hos);
+		{
+			// The destructor flushes the header and swallows a write error, which HTTPSession::write() records.
+			HTTPHeaderOutputStream hos(*this);
+			request.write(hos);
+		}
+		if (networkException() != nullptr) networkException()->rethrow();
 		_pRequestStream = new HTTPChunkedOutputStream(*this, &requestTrailer());
 	}
 	else if (request.hasContentLength())
@@ -401,8 +466,12 @@ std::ostream& HTTPClientSession::sendRequestImpl(const HTTPRequest& request)
 
 void HTTPClientSession::flushRequest()
 {
+	if (_pRequestStream != nullptr)
+		_requestBodyComplete = requestStreamComplete();
+	// Closed before the request stream is released, which would send its buffer on the failed connection.
+	if (networkException() != nullptr) close();
 	_pRequestStream = nullptr;
-	if (networkException()) networkException()->rethrow();
+	if (networkException() != nullptr) networkException()->rethrow();
 }
 
 
@@ -419,11 +488,14 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 			try
 			{
 				response.read(his);
+				// The header parser takes the end of the stream for the end of the header,
+				// so a header cut by a failed receive can look complete.
+				if (networkException() != nullptr) networkException()->rethrow();
 			}
 			catch (Exception&)
 			{
 				close();
-				if (networkException())
+				if (networkException() != nullptr)
 					networkException()->rethrow();
 				else
 					throw;
@@ -432,9 +504,25 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 		while (response.getStatus() == HTTPResponse::HTTP_CONTINUE);
 	}
 
-	_mustReconnect = getKeepAlive() && !response.getKeepAlive();
+	// RFC 9112, 6.3: the framing headers of a response without a body, and of a 2xx response to CONNECT, are ignored.
+	const bool tunnelEstablished = _connectRequest && response.getStatus() >= 200 && response.getStatus() < 300;
+	// After a 101 response or an established tunnel, the connection no longer carries HTTP messages of this session.
+	_mustReconnect = (getKeepAlive() && !response.getKeepAlive()) || response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS || tunnelEstablished;
+	const bool hasBody = _expectResponseBody && !tunnelEstablished && response.getStatus() >= 200 && response.getStatus() != HTTPResponse::HTTP_NO_CONTENT && response.getStatus() != HTTPResponse::HTTP_NOT_MODIFIED;
+	if (hasBody)
+	{
+		try
+		{
+			response.checkFramingHeaders();
+		}
+		catch (MessageException&)
+		{
+			close();
+			throw;
+		}
+	}
 
-	if (!_expectResponseBody || response.getStatus() < 200 || response.getStatus() == HTTPResponse::HTTP_NO_CONTENT || response.getStatus() == HTTPResponse::HTTP_NOT_MODIFIED)
+	if (!hasBody)
 		_pResponseStream = new HTTPFixedLengthInputStream(*this, 0);
 	else if (response.getChunkedTransferEncoding())
 		_pResponseStream = new HTTPChunkedInputStream(*this, &responseTrailer());
@@ -451,24 +539,42 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 }
 
 
+bool HTTPClientSession::responseComplete() const
+{
+	if (_pResponseStream == nullptr) return false;
+	const auto* pChunked = dynamic_cast<const HTTPChunkedStreamBuf*>(_pResponseStream->rdbuf());
+	if (pChunked != nullptr) return pChunked->isComplete();
+	const auto* pFixed = dynamic_cast<const HTTPFixedLengthStreamBuf*>(_pResponseStream->rdbuf());
+	if (pFixed != nullptr) return pFixed->isComplete();
+	return false;
+}
+
+
 bool HTTPClientSession::peekResponse(HTTPResponse& response)
 {
 	poco_assert (!_responseReceived);
 
 	_pRequestStream->flush();
 
-	if (networkException()) networkException()->rethrow();
+	if (networkException() != nullptr)
+	{
+		close();
+		networkException()->rethrow();
+	}
 
 	response.clear();
 	HTTPHeaderInputStream his(*this);
 	try
 	{
 		response.read(his);
+		// The header parser takes the end of the stream for the end of the header,
+		// so a header cut by a failed receive can look complete.
+		if (networkException() != nullptr) networkException()->rethrow();
 	}
 	catch (Exception&)
 	{
 		close();
-		if (networkException())
+		if (networkException() != nullptr)
 			networkException()->rethrow();
 		else
 			throw;
@@ -485,6 +591,21 @@ void HTTPClientSession::reset()
 }
 
 
+bool HTTPClientSession::canReuse()
+{
+	// Data without a pending response means the server has closed the connection or sent stray data.
+	return stateAllowsReuse() && !dataPending();
+}
+
+
+bool HTTPClientSession::stateAllowsReuse()
+{
+	if (!getKeepAlive() || !connected() || networkException() != nullptr) return false;
+	if (_pRequestStream != nullptr || !_requestBodyComplete || _pResponseStream == nullptr || mustReconnect()) return false;
+	return responseStreamComplete() && buffered() == 0;
+}
+
+
 bool HTTPClientSession::secure() const
 {
 	return false;
@@ -493,6 +614,8 @@ bool HTTPClientSession::secure() const
 
 int HTTPClientSession::write(const char* buffer, std::streamsize length)
 {
+	// A request stream flushed on a closed connection would replace the recorded cause with the error of this write.
+	if (!connected() && networkException() != nullptr) networkException()->rethrow();
 	try
 	{
 		int rc = HTTPSession::write(buffer, length);
@@ -503,12 +626,22 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 	{
 		if (_reconnect)
 		{
-			close();
-			reconnect();
-			int rc = HTTPSession::write(buffer, length);
-			clearException();
+			// One attempt per request: after a failed reconnect, a later write must not send body data on a new connection.
 			_reconnect = false;
-			return rc;
+			close();
+			try
+			{
+				reconnect();
+				int rc = HTTPSession::write(buffer, length);
+				clearException();
+				return rc;
+			}
+			catch (Exception&)
+			{
+				// A failed connect leaves a new, unconnected socket open; the check at the top needs it closed.
+				close();
+				throw;
+			}
 		}
 		else throw;
 	}
@@ -553,6 +686,37 @@ std::string HTTPClientSession::proxyRequestPrefix() const
 		NumberFormatter::append(result, _port);
 	}
 	return result;
+}
+
+
+bool HTTPClientSession::requestStreamComplete()
+{
+	if (networkException() != nullptr) return false;
+	try
+	{
+		auto* pChunked = dynamic_cast<HTTPChunkedOutputStream*>(_pRequestStream.get());
+		if (pChunked != nullptr)
+		{
+			pChunked->rdbuf()->close();
+			return true;
+		}
+		auto* pFixed = dynamic_cast<HTTPFixedLengthOutputStream*>(_pRequestStream.get());
+		return pFixed != nullptr && pFixed->rdbuf()->pubsync() == 0 && pFixed->rdbuf()->isComplete();
+	}
+	catch (Exception&)
+	{
+		return false;
+	}
+}
+
+
+bool HTTPClientSession::responseStreamComplete()
+{
+	auto* pChunked = dynamic_cast<HTTPChunkedStreamBuf*>(_pResponseStream->rdbuf());
+	if (pChunked != nullptr) return pChunked->consumeTerminator();
+	auto* pFixed = dynamic_cast<HTTPFixedLengthStreamBuf*>(_pResponseStream->rdbuf());
+	if (pFixed != nullptr) return pFixed->skipBuffered();
+	return false;
 }
 
 
@@ -697,6 +861,9 @@ void HTTPClientSession::proxyTunnel()
 {
 	StreamSocket ss = proxyConnect();
 	attachSocket(ss);
+	// A response of the previous connection must not decide whether the tunnel is reused.
+	_pResponseStream = nullptr;
+	_mustReconnect = false;
 }
 
 

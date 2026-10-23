@@ -17,11 +17,17 @@ class Net_API HTTPReactorServer
 public:
 	HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory);
 		/// Listens on the wildcard address on the given port.
+		///
+		/// Throws an InvalidArgumentException if pParams is null or enables
+		/// non-blocking connections (see TCPServerParams::setNonBlocking()).
 
 	HTTPReactorServer(const SocketAddress& address, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory);
 		/// Listens on a specific (host, port) so deployments can bind to a
 		/// single interface (e.g. SocketAddress("127.0.0.1", 9800) for a
 		/// localhost-only service).
+		///
+		/// Throws an InvalidArgumentException if pParams is null or enables
+		/// non-blocking connections (see TCPServerParams::setNonBlocking()).
 
 	~HTTPReactorServer();
 	void start();

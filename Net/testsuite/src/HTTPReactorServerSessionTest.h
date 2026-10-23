@@ -19,6 +19,7 @@ public:
 	void testCheckRequestCompleteChunkedMalformedSize();
 	void testCheckRequestCompleteChunkedSizeExtension();
 	void testCheckRequestCompleteChunkedMissingCRLF();
+	void testChunkExtensionHighByte();
 	void testCheckRequestCompleteContentLength();
 	void testCheckRequestCompleteContentLengthIncomplete();
 	void testCheckRequestCompleteContentLengthWithStickyBody();

@@ -176,3 +176,8 @@ node_modules
 ##############
 *.core
 
+# Local agent settings #
+########################
+CLAUDE.local.md
+ai-agents/local/
+.mcp.json

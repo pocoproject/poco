@@ -21,14 +21,44 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Clock.h"
 #include "Poco/Delegate.h"
+#include <istream>
 #include <memory>
+#include <optional>
 
 
 using namespace std::string_literals;
 
 
 namespace Poco::Net {
+
+
+namespace
+{
+	// A larger unread remainder closes the connection instead of being read.
+	constexpr std::streamsize MAX_DRAIN_SIZE = 65536;
+
+	// Bytes of the request body left unread would be parsed as the next request,
+	// so the connection can only be kept alive once the body is read to its end.
+	bool drainRequestBody(std::istream& body)
+	{
+		try
+		{
+			if (body.bad()) return false;
+			// A handler that read the body on a non-blocking socket and then made it blocking again can leave
+			// eofbit set from a would-block; ignore() would then read nothing and the eof() test would report
+			// the body as complete.
+			body.clear();
+			body.ignore(MAX_DRAIN_SIZE + 1);
+			return body.eof() && !body.bad();
+		}
+		catch (std::exception&)
+		{
+			return false;
+		}
+	}
+}
 
 
 HTTPServerConnection::HTTPServerConnection(const StreamSocket& socket, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
@@ -67,15 +97,15 @@ void HTTPServerConnection::run()
 			Poco::FastMutex::ScopedLock lock(_mutex);
 			if (!_stopped)
 			{
-				HTTPServerResponseImpl response(session);
-				HTTPServerRequestImpl request(response, session, _pParams);
+				std::optional<HTTPServerResponseImpl> response(std::in_place, session);
+				HTTPServerRequestImpl request(*response, session, _pParams);
 
 				Poco::Timestamp now;
-				response.setDate(now);
-				response.setVersion(request.getVersion());
-				response.setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
+				response->setDate(now);
+				response->setVersion(request.getVersion());
+				response->setKeepAlive(_pParams->getKeepAlive() && request.getKeepAlive() && session.canKeepAlive());
 				if (!server.empty())
-					response.set("Server"s, server);
+					response->set("Server"s, server);
 				try
 				{
 					session.requestTrailer().clear();
@@ -83,17 +113,30 @@ void HTTPServerConnection::run()
 					std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
 					if (pHandler.get())
 					{
-						if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
-							response.sendContinue();
+						if (request.getExpectContinue() && response->getStatus() == HTTPResponse::HTTP_OK)
+							response->sendContinue();
 
-						pHandler->handleRequest(request, response);
-						session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive() && session.canKeepAlive());
+						pHandler->handleRequest(request, *response);
+						bool keepAlive = _pParams->getKeepAlive() && response->getKeepAlive() && session.canKeepAlive();
+						// Destroying the response sends its buffered rest before the drain waits for the body.
+						response.reset();
+						if (keepAlive)
+						{
+							const Poco::Timespan drainTimeout = _pParams->getRequestHeaderTimeout();
+							if (drainTimeout > 0)
+								session.setReadDeadline(Poco::Clock() + drainTimeout.totalMicroseconds());
+							// On a socket that the handler made non-blocking, a would-block also ends the body stream,
+							// so the drain cannot tell whether the body was read to its end.
+							keepAlive = session.socket().getBlocking() && drainRequestBody(request.stream());
+							session.clearReadDeadline();
+						}
+						session.setKeepAlive(keepAlive && session.networkException() == nullptr);
 					}
 					else sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
 				}
 				catch (Poco::Exception&)
 				{
-					if (!response.sent())
+					if (response.has_value() && !response->sent())
 					{
 						try
 						{

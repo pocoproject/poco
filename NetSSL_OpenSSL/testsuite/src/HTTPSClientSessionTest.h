@@ -18,6 +18,13 @@
 #include "CppUnit/TestCase.h"
 
 
+namespace Poco::Net {
+
+class HTTPSClientSession;
+
+} // namespace Poco::Net
+
+
 class HTTPSClientSessionTest: public CppUnit::TestCase
 {
 public:
@@ -41,6 +48,10 @@ public:
 	void testCachedSession();
 	void testUnknownContentLength();
 	void testServerAbort();
+	void testServerAbortContentLength();
+	void testServerAbortChunked();
+	void testServerAbortChunkedFraming();
+	void testServerAbortHeader();
 	void testProxyConfig();
 	void testProxySetters();
 	void testStalledPeerTimeout();
@@ -51,6 +62,14 @@ public:
 	void testHttpsProxyTunnelCorruptedRecord();
 	void testHttpsProxyTunnelClosedInBody();
 	void testHttpsProxyTunnelCloseEndsHandshake();
+	void testChunkedTerminatorInPendingTLSDataKeepsConnection();
+	void testHttpsProxyTunnelReconnectDiscardsBufferedData();
+	void testReconnectChecksNewHost();
+	void testReconnectKeepsSocketPeerHostName();
+	void testReconnectResumesSessionOfSameHost();
+	void testReconnectOffersGivenSessionToSameHostOnly();
+	void testSessionPool();
+	void testDecryptedStrayDataPreventsReuse();
 
 	void setUp();
 	void tearDown();
@@ -58,6 +77,9 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	bool getSmallReusesSession(Poco::Net::HTTPSClientSession& session, const std::string& host);
+		/// Resets session, sets host, gets /small, checks the body and
+		/// returns whether the TLS session was resumed.
 };
 
 

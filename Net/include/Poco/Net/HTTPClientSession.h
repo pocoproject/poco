@@ -223,12 +223,18 @@ public:
 	[[nodiscard]] const Poco::Timespan& getKeepAliveTimeout() const;
 		/// Returns the connection timeout for HTTP connections.
 
+	[[nodiscard]] const Poco::Timestamp& getLastRequest() const;
+		/// Returns the time the last request was sent.
+
 	virtual std::ostream& sendRequest(HTTPRequest& request);
 		/// Sends the header for the given HTTP request to
 		/// the server.
 		///
 		/// The HTTPClientSession will set the request's
 		/// Host and Keep-Alive headers accordingly.
+		///
+		/// Throws a MessageException, without connecting or closing
+		/// the connection, if HTTPRequest::validate() does.
 		///
 		/// The returned output stream can be used to write
 		/// the request body. The stream is valid until
@@ -237,11 +243,12 @@ public:
 		///
 		/// In case a network or server failure happens
 		/// while writing the request body to the returned stream,
-		/// the stream state will change to bad or fail. In this
-		/// case, reset() should be called if the session will
-		/// be reused and persistent connections are enabled
-		/// to ensure a new connection will be set up
-		/// for the next request.
+		/// the stream state will change to bad or fail, and the next
+		/// request sets up a new connection, as it does after a request
+		/// body that has not been written to its end. A session without
+		/// a host (created from a socket) cannot set up a new connection:
+		/// its next sendRequest() closes the socket and throws the
+		/// recorded exception or a NetException.
 
 	virtual std::istream& receiveResponse(HTTPResponse& response);
 		/// Receives the header for the response to the previous
@@ -249,23 +256,43 @@ public:
 		///
 		/// The returned input stream can be used to read
 		/// the response body. The stream is valid until
-		/// sendRequest() is called or the session is
-		/// destroyed.
+		/// sendRequest() or proxyTunnel() is called or the
+		/// session is destroyed.
 		///
-		/// It must be ensured that the response stream
-		/// is fully consumed before sending a new request
-		/// and persistent connections are enabled. Otherwise,
-		/// the unread part of the response body may be treated as
-		/// part of the next request's response header, resulting
-		/// in a Poco::Net::MessageException being thrown.
+		/// If persistent connections are enabled and the response
+		/// body has not been fully read from the connection when
+		/// the next request is sent, a new connection is set up
+		/// for the next request. The unread rest of a body with a
+		/// Content-Length is skipped instead if it has already been
+		/// received. A new connection is also set up if the server
+		/// has sent data after the response or closed the connection.
+		/// A session without a host (created from a socket) cannot set
+		/// up a new connection; its next sendRequest() closes the socket
+		/// and throws a NetException.
 		///
 		/// In case a network or server failure happens
 		/// while reading the response body from the returned stream,
-		/// the stream state will change to bad or fail. In this
-		/// case, reset() should be called if the session will
-		/// be reused and persistent connections are enabled
-		/// to ensure a new connection will be set up
-		/// for the next request.
+		/// the stream state will change to bad or fail, and the next
+		/// sendRequest() does not reuse the connection.
+		///
+		/// A body with Content-Length or chunked transfer encoding that the
+		/// server cuts short ends with eof after the bytes received;
+		/// responseComplete() then returns false and networkException()
+		/// holds the cause. Malformed chunked framing throws a
+		/// MessageException in the stream, which sets badbit.
+		/// A body delimited by the end of the connection ends normally.
+		///
+		/// After a 101 Switching Protocols response, or a 2xx response
+		/// to a CONNECT request, the next request sets up a new connection.
+
+	[[nodiscard]] bool responseComplete() const;
+		/// Returns true if the body of the last response has been received
+		/// up to its announced end: all bytes given by the Content-Length
+		/// header, or the last chunk and the trailer of a chunked body.
+		///
+		/// Returns false for a body delimited by the end of the connection,
+		/// and if no response has been received since the last sendRequest().
+		/// Does not read from the connection.
 
 	virtual bool peekResponse(HTTPResponse& response);
 		/// If the request contains a "Expect: 100-continue" header,
@@ -299,11 +326,19 @@ public:
 		/// The next request will initiate a new connection,
 		/// even if persistent connections are enabled.
 		///
-		/// This should be called whenever something went
-		/// wrong when sending a request (e.g., sendRequest()
-		/// or receiveResponse() throws an exception, or
-		/// the request or response stream changes into
-		/// fail or bad state, but not eof state).
+		/// The session closes the connection itself after a network
+		/// error; reset() is needed only to force a new connection.
+
+	[[nodiscard]] bool canReuse();
+		/// Returns true if the connection can carry another request:
+		/// persistent connections are enabled, the body of the last request
+		/// has been sent to its end, the response to the last request
+		/// has been received and its body read from the connection
+		/// to its end, neither the server nor the keep-alive timeout ends
+		/// the connection, and the server has neither closed the connection
+		/// nor sent data that does not belong to a response.
+		///
+		/// Reads the terminator of a chunked body if the server has sent it.
 
 	[[nodiscard]] virtual bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
@@ -363,6 +398,8 @@ protected:
 	void proxyTunnel();
 		/// Calls proxyConnect() and attaches the resulting StreamSocket
 		/// to the HTTPClientSession.
+		///
+		/// Destroys the stream returned by an earlier receiveResponse().
 
 	HTTPSessionFactory _proxySessionFactory;
 		/// Factory to create HTTPClientSession to proxy.
@@ -382,23 +419,45 @@ private:
 	bool                  _reconnect;
 	bool                  _mustReconnect;
 	bool                  _expectResponseBody;
+	bool                  _connectRequest = false;
 	bool                  _responseReceived;
+	bool                  _requestBodyComplete = true;
+		/// False if the last request stream was dropped before its body was sent to its end.
 	OStreamPtr            _pRequestStream;
 	IStreamPtr            _pResponseStream;
 	HTTPBasicCredentials  _proxyBasicCreds;
 	HTTPDigestCredentials _proxyDigestCreds;
 	HTTPNTLMCredentials   _proxyNTLMCreds;
 	bool                  _ntlmProxyAuthenticated = false;
+	bool                  _connectionAuthenticated = false;
+		/// True if a request on the current connection carried NTLM, Negotiate or
+		/// Kerberos credentials, which authenticate the connection, not the request.
 
 	static ProxyConfig _globalProxyConfig;
 
 	void initProxySessionFactory();
 		/// Registers the "http" protocol with _proxySessionFactory.
 
+	bool requestStreamComplete();
+		/// Sends the buffered data of the request stream and, for a chunked
+		/// body, the last chunk. Returns true if the request body has been
+		/// sent to its end. Returns false without sending if networkException()
+		/// is set.
+
+	bool responseStreamComplete();
+		/// Reads the terminator of a chunked body if the server has sent it,
+		/// or skips the rest of a Content-Length body that is in the session
+		/// buffer, then returns responseComplete().
+
+	bool stateAllowsReuse();
+		/// Performs the checks of canReuse() except the check of the socket
+		/// for data or a close by the server.
+
 	HTTPClientSession(const HTTPClientSession&) = delete;
 	HTTPClientSession& operator = (const HTTPClientSession&) = delete;
 
 	friend class WebSocket;
+	friend class HTTPClientSessionPool;
 };
 
 
@@ -468,6 +527,12 @@ inline const ProxyConfig& HTTPClientSession::getGlobalProxyConfig()
 inline const Poco::Timespan& HTTPClientSession::getKeepAliveTimeout() const
 {
 	return _keepAliveTimeout;
+}
+
+
+inline const Poco::Timestamp& HTTPClientSession::getLastRequest() const
+{
+	return _lastRequest;
 }
 
 

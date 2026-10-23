@@ -383,6 +383,18 @@ void MailMessage::write(std::ostream& ostr) const
 }
 
 
+void MailMessage::validateHeaders() const
+{
+	MessageHeader header(*this);
+	setRecipientHeaders(header);
+	checkFields(header, true);
+	for (const auto& part: _parts)
+	{
+		checkFields(createPartHeader(part), true);
+	}
+}
+
+
 void MailMessage::makeMultipart()
 {
 	if (_isMultipart) return;
@@ -423,6 +435,13 @@ void MailMessage::writeMultipart(MessageHeader& header, std::ostream& ostr) cons
 
 void MailMessage::writePart(MultipartWriter& writer, const Part& part)
 {
+	writer.nextPart(createPartHeader(part));
+	writeEncoded(part.pSource->stream(), writer.stream(), part.encoding);
+}
+
+
+MessageHeader MailMessage::createPartHeader(const Part& part)
+{
 	MessageHeader partHeader(part.pSource->headers());
 	MediaType mediaType(part.pSource->mediaType());
 	if (!part.name.empty())
@@ -442,8 +461,7 @@ void MailMessage::writePart(MultipartWriter& writer, const Part& part)
 	}
 	else disposition = "inline";
 	partHeader.set(HEADER_CONTENT_DISPOSITION, disposition);
-	writer.nextPart(partHeader);
-	writeEncoded(part.pSource->stream(), writer.stream(), part.encoding);
+	return partHeader;
 }
 
 
