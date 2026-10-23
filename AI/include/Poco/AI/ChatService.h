@@ -102,7 +102,8 @@ public:
 	using Approver = std::function<bool (const Poco::AI::MCP::Identity& user, const ToolCall& call, const Poco::AI::MCP::Tool& tool)>;
 		/// Decides whether a tool call the model makes in a turn of the user
 		/// runs, as AgentLoop::setApprover() does: a refused call gets an
-		/// error result, which the model reads, and throwing refuses it.
+		/// error result, which the model reads, and throwing refuses it. A
+		/// cancel of the turn does not reach an approver that waits.
 
 	struct Params
 		/// The settings of the service that are not an administrator's.

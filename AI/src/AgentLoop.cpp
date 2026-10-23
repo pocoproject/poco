@@ -342,9 +342,18 @@ void AgentLoop::run(Poco::JSON::Array& conversation, const std::string& systemPr
 								approved = false;
 							}
 						}
-						toolResult = approved
-							? ToolRegistry::execute(*pTool, call.input, context)
-							: Poco::AI::MCP::ToolResult::error("The tool call was refused.");
+						if (!approved)
+						{
+							toolResult = Poco::AI::MCP::ToolResult::error("The tool call was refused.");
+						}
+						else if (cancellation.cancelled())
+						{
+							toolResult = Poco::AI::MCP::ToolResult::error("The tool was not run: the run was cancelled.");
+						}
+						else
+						{
+							toolResult = ToolRegistry::execute(*pTool, call.input, context);
+						}
 					}
 					toolResult = limited(toolResult, _maxToolResultSize, _maxImageSize);
 

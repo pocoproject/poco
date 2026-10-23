@@ -38,6 +38,7 @@ public:
 	void testCutByTokenLimit();
 	void testToolAddedDuringRun();
 	void testApproverThrows();
+	void testCancelWhileApproving();
 	void testToolReplacedDuringRun();
 	void testCallbackThrows();
 	void testCallbackThrowsDuringCall();

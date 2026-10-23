@@ -698,6 +698,37 @@ void AgentLoopTest::testApproverThrows()
 }
 
 
+void AgentLoopTest::testCancelWhileApproving()
+{
+	// The run is cancelled while the approver decides on the first of two
+	// calls, which it then allows: neither call runs, and the run ends.
+	Cancellation cancellation;
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"echo", "echo"}), text("never")});
+	ToolRegistry registry;
+	int runs = 0;
+	registerEcho(registry, "echo", &runs);
+	AgentLoop loop(pProvider, registry);
+	int asked = 0;
+	loop.setApprover([&cancellation, &asked](const ToolCall&, const Poco::AI::MCP::Tool&)
+	{
+		++asked;
+		cancellation.cancel();
+		return true;
+	});
+	Array conversation = userTurn("go");
+	Recorder recorder;
+	loop.run(conversation, "", recorder.callback(), cancellation);
+
+	assertEqual(1, asked);
+	assertEqual(0, runs);
+	assertEqual(1u, static_cast<unsigned>(pProvider->requests.size()));
+	assertEqual(std::string("The tool was not run: the run was cancelled."), textOf(pProvider->results[0], 0));
+	assertEqual(std::string("The tool was not run: the run was cancelled."), textOf(pProvider->results[1], 0));
+	assertEqual(2, recorder.count(AgentEvent::Type::TOOL_RESULT));
+	assertTrue(recorder.events.back().stopReason == StopReason::CANCELLED);
+}
+
+
 void AgentLoopTest::testCallbackThrows()
 {
 	// The callback throws on the first of two results: run() passes the
@@ -991,6 +1022,7 @@ CppUnit::Test* AgentLoopTest::suite()
 	CppUnit_addTest(pSuite, AgentLoopTest, testCutByTokenLimit);
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolAddedDuringRun);
 	CppUnit_addTest(pSuite, AgentLoopTest, testApproverThrows);
+	CppUnit_addTest(pSuite, AgentLoopTest, testCancelWhileApproving);
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolReplacedDuringRun);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrows);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrowsDuringCall);

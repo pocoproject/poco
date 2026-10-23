@@ -81,7 +81,9 @@ using ToolApprover = std::function<bool (const ToolCall& call, const Poco::AI::M
 	/// Decides whether a tool call of the model runs; a refusal becomes an
 	/// error result the model sees. It gets the call with its input and the
 	/// tool with its annotations, which for tools of a remote server are
-	/// untrusted hints.
+	/// untrusted hints. It gets no request context: a cancel of the run does
+	/// not reach an approver that waits, e.g. for a person, and takes effect
+	/// when the approver returns; the call is then not run.
 
 
 class AI_API AgentLoop
