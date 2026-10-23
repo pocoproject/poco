@@ -875,15 +875,15 @@ void AgentLoopTest::testResultLimits()
 	big.handler = [](const Object::Ptr&, const Poco::AI::MCP::RequestContext&)
 	{
 		Poco::AI::MCP::ToolResult result;
-		result.addText(std::string(300, 'x'));
-		result.setStructuredContent(Poco::Dynamic::Var(std::string(300, 'y')));
+		result.addText(std::string(500, 'x'));
+		result.setStructuredContent(Poco::Dynamic::Var(std::string(500, 'y')));
 		return result;
 	};
 	registry.registerTool(big);
 	AgentLoop loop(pProvider, registry);
 	loop.setMaxImageSize(50);
 	assertEqual(std::size_t(50), loop.getMaxImageSize());
-	loop.setMaxToolResultSize(250);
+	loop.setMaxToolResultSize(400);
 	Array conversation = userTurn("go");
 	loop.run(conversation, "", AgentEventCallback());
 
@@ -900,10 +900,79 @@ void AgentLoopTest::testResultLimits()
 
 	// The text is cut to the limit; the structured content no longer fits.
 	const Poco::AI::MCP::ToolResult& second = pProvider->results[1];
-	assertEqual(2u, static_cast<unsigned>(second.content()->size()));
-	assertEqual(std::string(250, 'x'), textOf(second, 0));
+	assertEqual(3u, static_cast<unsigned>(second.content()->size()));
+	assertEqual(std::string(400, 'x'), textOf(second, 0));
 	assertEqual(std::string("...(truncated)"), textOf(second, 1));
+	assertEqual(std::string("[structured content of 502 bytes left out]"), textOf(second, 2));
 	assertTrue(second.structuredContent().isEmpty());
+}
+
+
+void AgentLoopTest::testResultTotals()
+{
+	// The images of one result share the image limit, its resource links
+	// count as text, and structured content that does not fit beside whole
+	// text is named, without a mark of cut text.
+	auto pProvider = std::make_shared<ScriptedProvider>(std::vector<Step>{tools({"images", "links", "structured"}), text("ok")});
+	ToolRegistry registry;
+	Poco::AI::MCP::Tool images;
+	images.name = "images";
+	images.handler = [](const Object::Ptr&, const Poco::AI::MCP::RequestContext&)
+	{
+		Poco::AI::MCP::ToolResult result;
+		result.addImage(std::string(30, 'A'), "image/png")
+			.addImage(std::string(30, 'B'), "image/png")
+			.addImage(std::string(30, 'C'), "image/png")
+			.addImage(std::string(20, 'D'), "image/png");
+		return result;
+	};
+	registry.registerTool(images);
+	Poco::AI::MCP::Tool links;
+	links.name = "links";
+	links.handler = [](const Object::Ptr&, const Poco::AI::MCP::RequestContext&)
+	{
+		Poco::AI::MCP::ToolResult result;
+		result.addResourceLink("file:///a.txt", "a")
+			.addResourceLink("file:///b.txt", std::string(300, 'b'));
+		return result;
+	};
+	registry.registerTool(links);
+	Poco::AI::MCP::Tool structured;
+	structured.name = "structured";
+	structured.handler = [](const Object::Ptr&, const Poco::AI::MCP::RequestContext&)
+	{
+		Poco::AI::MCP::ToolResult result;
+		result.addText("whole");
+		result.setStructuredContent(Poco::Dynamic::Var(std::string(300, 's')));
+		return result;
+	};
+	registry.registerTool(structured);
+	AgentLoop loop(pProvider, registry);
+	loop.setMaxImageSize(50);
+	loop.setMaxToolResultSize(200);
+	Array conversation = userTurn("go");
+	loop.run(conversation, "", AgentEventCallback());
+
+	const Poco::AI::MCP::ToolResult& first = pProvider->results[0];
+	assertEqual(4u, static_cast<unsigned>(first.content()->size()));
+	assertEqual(std::string("image"), typeOf(first, 0));
+	assertEqual(std::string("[image image/png of 30 bytes left out]"), textOf(first, 1));
+	assertEqual(std::string("[image image/png of 30 bytes left out]"), textOf(first, 2));
+	assertEqual(std::string("image"), typeOf(first, 3));
+
+	const Poco::AI::MCP::ToolResult& second = pProvider->results[1];
+	assertEqual(3u, static_cast<unsigned>(second.content()->size()));
+	assertEqual(std::string("resource_link"), typeOf(second, 0));
+	// The second link is cut as text, to what the first left of the limit.
+	const std::string cutLink = textOf(second, 1);
+	assertTrue(!cutLink.empty() && cutLink[0] == '{' && cutLink.size() < 200);
+	assertEqual(std::string("...(truncated)"), textOf(second, 2));
+
+	const Poco::AI::MCP::ToolResult& third = pProvider->results[2];
+	assertEqual(2u, static_cast<unsigned>(third.content()->size()));
+	assertEqual(std::string("whole"), textOf(third, 0));
+	assertEqual(std::string("[structured content of 302 bytes left out]"), textOf(third, 1));
+	assertTrue(third.structuredContent().isEmpty());
 }
 
 
@@ -1028,6 +1097,7 @@ CppUnit::Test* AgentLoopTest::suite()
 	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrowsDuringCall);
 	CppUnit_addTest(pSuite, AgentLoopTest, testCallbackThrowsAtRoundLimit);
 	CppUnit_addTest(pSuite, AgentLoopTest, testResultLimits);
+	CppUnit_addTest(pSuite, AgentLoopTest, testResultTotals);
 	CppUnit_addTest(pSuite, AgentLoopTest, testDoneCarriesTheOutcome);
 	CppUnit_addTest(pSuite, AgentLoopTest, testToolSeesTheCancel);
 

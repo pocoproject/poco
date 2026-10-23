@@ -44,6 +44,7 @@ public:
 	void testCallbackThrowsDuringCall();
 	void testCallbackThrowsAtRoundLimit();
 	void testResultLimits();
+	void testResultTotals();
 	void testDoneCarriesTheOutcome();
 	void testToolSeesTheCancel();
 

@@ -128,7 +128,8 @@ public:
 		/// The default limit, in bytes, of the text of a tool result.
 
 	static constexpr std::size_t DEFAULT_MAX_IMAGE_SIZE = 5*1024*1024;
-		/// The default limit, in bytes of base64, of one image of a tool result.
+		/// The default limit, in bytes of base64, of the images of a tool
+		/// result.
 
 	static constexpr int DEFAULT_MAX_ROUNDS = 10;
 		/// The default number of model calls of a run that may run tools.
@@ -146,17 +147,21 @@ public:
 	void setMaxToolResultSize(std::size_t maxSize);
 		/// Sets the limit, in bytes, of the text of a tool result that is
 		/// reported and passed back to the model: its text blocks, embedded
-		/// text resources and structured content together. Text beyond it is
-		/// cut at a character boundary, and the result says so.
+		/// text resources, resource links and structured content together.
+		/// Text beyond it is cut at a character boundary, and the result says
+		/// so. Structured content that does not fit is passed back as text,
+		/// cut, when the result has no text blocks, and else left out with a
+		/// line that says so.
 
 	[[nodiscard]] std::size_t getMaxToolResultSize() const;
 		/// Returns the limit of the text of a tool result.
 
 	void setMaxImageSize(std::size_t maxSize);
-		/// Sets the limit, in bytes of base64, of one image of a tool result.
-		/// An image of a type the APIs take (PNG, JPEG, GIF, WebP) is passed
-		/// back whole up to it; a larger one, one of another type, audio and
-		/// binary resources are replaced by a line that says what was left out.
+		/// Sets the limit, in bytes of base64, of the images of a tool result
+		/// together. Images of a type the APIs take (PNG, JPEG, GIF, WebP) are
+		/// passed back whole, in their order, while they fit in it; one that
+		/// does not fit, one of another type, audio and binary resources are
+		/// replaced by a line that says what was left out.
 
 	[[nodiscard]] std::size_t getMaxImageSize() const;
 		/// Returns the limit of one image of a tool result.

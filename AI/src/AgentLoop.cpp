@@ -63,16 +63,20 @@ namespace
 
 	Poco::AI::MCP::ToolResult limited(const Poco::AI::MCP::ToolResult& result, std::size_t maxText, std::size_t maxImage)
 		/// The result as the model gets it: its text (text blocks, embedded
-		/// text resources, structured content) cut to maxText bytes in all, at
-		/// a character boundary, and marked as cut; images of the types the
-		/// APIs take kept whole up to maxImage bytes each; other images, audio
-		/// and binary resources replaced by a line that says what was left out.
+		/// text resources, resource links, structured content) cut to maxText
+		/// bytes in all, at a character boundary, and marked as cut, or
+		/// structured content that does not fit left out and named; images of
+		/// the types the APIs take kept whole while they fit in maxImage bytes
+		/// in all; other images, audio and binary resources replaced by a
+		/// line that says what was left out.
 	{
 		Poco::AI::MCP::ToolResult out;
 		out.setError(result.isError());
 		std::size_t left = maxText;
+		std::size_t imageLeft = maxImage;
 		bool cut = false;
 		bool hasText = false;
+		std::size_t structuredLeftOut = 0;
 		const auto addText = [&](std::string text)
 		{
 			if (text.size() > left)
@@ -100,7 +104,11 @@ namespace
 			{
 				const std::string mimeType = stringOf(pBlock, "mimeType");
 				const std::size_t size = stringOf(pBlock, "data").size();
-				if (takenImage(mimeType) && size <= maxImage) out.addContent(pBlock);
+				if (takenImage(mimeType) && size <= imageLeft)
+				{
+					imageLeft -= size;
+					out.addContent(pBlock);
+				}
 				else addText(leftOut("image", mimeType, size));
 			}
 			else if (type == "audio")
@@ -115,7 +123,14 @@ namespace
 			}
 			else if (type == "resource_link")
 			{
-				out.addContent(pBlock);
+				// The model reads a link as text.
+				const std::string text = serializeJSON(pBlock);
+				if (text.size() <= left)
+				{
+					left -= text.size();
+					out.addContent(pBlock);
+				}
+				else addText(text);
 			}
 			else if (!pBlock.isNull())
 			{
@@ -135,9 +150,10 @@ namespace
 				// What the model reads without text blocks, as text.
 				addText(text);
 			}
-			else cut = true;
+			else structuredLeftOut = text.size();
 		}
 		if (cut) out.addText("...(truncated)");
+		if (structuredLeftOut > 0) out.addText(leftOut("structured content", "", structuredLeftOut));
 		return out;
 	}
 }
