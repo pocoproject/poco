@@ -800,6 +800,19 @@ void LoggerTest::testGetDuringDestructionOfDetached()
 }
 
 
+void LoggerTest::testGetDuringDestroy()
+{
+	// While a channel of a logger destroyed via Logger::destroy() is
+	// destroyed, any thread may ask for a logger.
+	auto getOne = [] { Logger::get("TestLogger.AskedFor").information("asked for while a channel is destroyed"); };
+	auto pDestroyBystander = std::make_shared<Bystander>(getOne);
+	Logger& loggerToDestroy = Logger::get("TestLogger.DestructionOnDestroy");
+	loggerToDestroy.setChannel(new LastWordsChannel(pDestroyBystander));
+	Logger::destroy("TestLogger.DestructionOnDestroy");
+	assertTrue (pDestroyBystander->couldLog());
+}
+
+
 void LoggerTest::testConcurrentSetLevel()
 {
 	Logger& logger = Logger::get("TestLogger.ConcurrentLevel");
@@ -1058,6 +1071,7 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testConcurrentShutdown);
 	CppUnit_addTest(pSuite, LoggerTest, testLogDuringDestructionOfReplaced);
 	CppUnit_addTest(pSuite, LoggerTest, testGetDuringDestructionOfDetached);
+	CppUnit_addTest(pSuite, LoggerTest, testGetDuringDestroy);
 	CppUnit_addTest(pSuite, LoggerTest, testConcurrentSetLevel);
 	CppUnit_addTest(pSuite, LoggerTest, testReplacedChannelReleased);
 	CppUnit_addTest(pSuite, LoggerTest, testReplaceChannelWithMessageOnItsWay);

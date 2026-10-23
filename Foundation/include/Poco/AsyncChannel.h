@@ -128,9 +128,9 @@ private:
 	FastMutex _threadMutex;
 	mutable FastMutex _channelMutex;
 	NotificationQueue _queue;
-	std::size_t _queueSize = 0;
-	std::size_t _dropCount = 0;
-	std::atomic<bool> _closed;
+	std::atomic<std::size_t> _queueSize{0};
+	std::atomic<std::size_t> _dropCount{0};
+	std::atomic<bool> _closed{false};
 	bool _enableCpuAffinity = false;
 };
 
