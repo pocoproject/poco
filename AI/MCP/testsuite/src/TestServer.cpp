@@ -16,6 +16,8 @@
 //   spawn   starts this program with --linger, which keeps the standard
 //           output it inherits open, and returns its process id; with the
 //           group argument "own" the process leads a group of its own
+//   regroup moves the process into the process group of its parent, and
+//           returns "moved" (POSIX)
 //
 // With the environment variable MCP_TEST_INPUT_LOG it copies what it reads
 // to the file it names, so that a test can see what reached the server.
@@ -47,6 +49,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <unistd.h>
+#endif
 
 
 using Poco::AI::MCP::Server;
@@ -161,6 +166,16 @@ int main(int argc, char** argv)
 		Poco::ProcessHandle handle = Poco::Process::launch(Poco::Path::self(), arguments, options);
 		ToolResult result;
 		result.addText(Poco::NumberFormatter::format(handle.id()));
+		return result;
+	});
+	server.registerTool("regroup", "Moves the process into the process group of its parent.", nullptr, [](const Object::Ptr&)
+	{
+		ToolResult result;
+#if defined(POCO_OS_FAMILY_UNIX)
+		result.addText(::setpgid(0, ::getpgid(::getppid())) == 0 ? "moved" : "failed");
+#else
+		result.addText("unsupported");
+#endif
 		return result;
 	});
 

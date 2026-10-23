@@ -88,7 +88,8 @@ The transports:
   - <[ProcessClient]> launches a server program and talks to it over its standard input and
     output: the stdio transport. The server gets the environment of the application, or only
     the variables it is given. Closing it ends the server: it closes the server's standard
-    input, asks the server's process group to end, and kills it last.
+    input, asks a server that does not end by itself to end, together with its process group,
+    and kills it last. A server that ends by itself leaves the processes it started running.
   - <[Poco::AI::MCP::HTTP::HTTPClient]> speaks the Streamable HTTP transport over one
     keep-alive connection, with a byte limit on replies and a deadline for every request. A
     request hook adds headers such as <*Authorization*>. It sends the headers the server

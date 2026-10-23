@@ -62,11 +62,15 @@ class AIMCP_API ProcessClient: public Client
 	/// period, and kills it after another. On POSIX platforms the request
 	/// (SIGINT) and the kill (SIGKILL) go to the server's whole process
 	/// group, so that the processes it started (npx, uvx, a shell) end with
-	/// it. On Windows the request is a CTRL_BREAK_EVENT to the group, which
-	/// console programs take as a request to end, and the kill ends the
-	/// server process only. A process that keeps the server's standard
-	/// output open after that (one that left the group) does not hold up
-	/// close(): the reader thread is left to end when that process does.
+	/// it, and to the server itself should it have left the group. On
+	/// Windows the request is a CTRL_BREAK_EVENT to the group, which console
+	/// programs take as a request to end, and the kill ends the server
+	/// process only. The processes the server started are signalled only
+	/// together with the server: a server that exits by itself at the end of
+	/// its input leaves them running. When one of them keeps the server's
+	/// standard output open after the server has ended, close() waits one
+	/// more grace period for the reader thread, then leaves it to end when
+	/// that process does.
 {
 public:
 	enum class Environment

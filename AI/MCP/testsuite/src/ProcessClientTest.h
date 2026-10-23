@@ -27,6 +27,7 @@ public:
 	void testWriteToEndedServer();
 	void testWriteTimeoutCancels();
 	void testReaderOutlivesClient();
+	void testServerLeavesItsGroup();
 	void testNoiseOnStandardOutput();
 	void testCloseEndsServer();
 	void testStubbornServerIsKilled();

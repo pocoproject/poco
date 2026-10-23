@@ -26,6 +26,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <unistd.h>
 #endif
 
 
@@ -421,8 +422,11 @@ void ProcessClient::requestTermination()
 #if defined(POCO_OS_FAMILY_UNIX)
 	// The server leads a process group of its own: the request goes to every
 	// process of it, as Ctrl+C in a terminal does. While the server has not
-	// been waited for, its group exists, and its id names no other.
-	::killpg(static_cast<pid_t>(_pHandle->id()), SIGINT);
+	// been waited for, its group exists, and its id names no other. A server
+	// that moved to another group gets the request by itself.
+	const pid_t pid = static_cast<pid_t>(_pHandle->id());
+	::killpg(pid, SIGINT);
+	if (::getpgid(pid) != pid) ::kill(pid, SIGINT);
 #else
 	try
 	{
@@ -438,7 +442,10 @@ void ProcessClient::requestTermination()
 void ProcessClient::kill()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
-	::killpg(static_cast<pid_t>(_pHandle->id()), SIGKILL);
+	// The server itself as well, should it have moved to another group.
+	const pid_t pid = static_cast<pid_t>(_pHandle->id());
+	::killpg(pid, SIGKILL);
+	::kill(pid, SIGKILL);
 #else
 	try
 	{

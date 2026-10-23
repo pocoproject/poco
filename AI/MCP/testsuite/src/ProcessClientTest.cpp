@@ -117,7 +117,7 @@ void ProcessClientTest::testRoundTrip()
 {
 	ProcessClient client(serverPath(), std::vector<std::string>());
 	assertEqual(std::string("test-server"), client.discover().serverInfo.name);
-	assertEqual(9u, static_cast<unsigned>(client.listTools().size()));
+	assertEqual(10u, static_cast<unsigned>(client.listTools().size()));
 	assertEqual(std::string("over stdio"), text(client.callTool("echo", args("message", "over stdio"))));
 	assertEqual(0, client.close());
 }
@@ -437,6 +437,26 @@ void ProcessClientTest::testReaderOutlivesClient()
 }
 
 
+void ProcessClientTest::testServerLeavesItsGroup()
+{
+	// A server that moved into another process group still gets the
+	// termination request, and the kill.
+#if defined(POCO_OS_FAMILY_UNIX)
+	ProcessClient interruptible(serverPath(), mode("--interruptible"));
+	interruptible.setGracePeriod(Poco::Timespan(0, 300000));
+	assertEqual(std::string("moved"), text(interruptible.callTool("regroup")));
+	assertEqual(42, interruptible.close());
+
+	ProcessClient stubborn(serverPath(), mode("--stubborn"));
+	stubborn.setGracePeriod(Poco::Timespan(0, 200000));
+	assertEqual(std::string("moved"), text(stubborn.callTool("regroup")));
+	const Poco::Process::PID pid = stubborn.id();
+	(void) stubborn.close();
+	assertTrue(!Poco::Process::isRunning(pid));
+#endif
+}
+
+
 void ProcessClientTest::testCommandThatCannotRun()
 {
 	const std::string missing = Poco::Path(serverPath()).setFileName("no-such-mcp-server").toString();
@@ -489,6 +509,7 @@ CppUnit::Test* ProcessClientTest::suite()
 	CppUnit_addTest(pSuite, ProcessClientTest, testWriteToEndedServer);
 	CppUnit_addTest(pSuite, ProcessClientTest, testWriteTimeoutCancels);
 	CppUnit_addTest(pSuite, ProcessClientTest, testReaderOutlivesClient);
+	CppUnit_addTest(pSuite, ProcessClientTest, testServerLeavesItsGroup);
 	CppUnit_addTest(pSuite, ProcessClientTest, testNoiseOnStandardOutput);
 	CppUnit_addTest(pSuite, ProcessClientTest, testCloseEndsServer);
 	CppUnit_addTest(pSuite, ProcessClientTest, testStubbornServerIsKilled);
