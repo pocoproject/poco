@@ -96,7 +96,7 @@ AuthenticateResult SCRAMAuthenticator::authenticate(const Credentials& creds, Po
 				std::string clientAuthMessage;
 				const std::string computedClientProof = computeClientProof(pConv->username, pConv->clientNonce, pConv->salt, pConv->iterations, saltedPassword, pConv->serverNonce, clientAuthMessage);
 
-				if (computedClientProof == receivedClientProof && pConv->serverNonce == receivedServerNonce)
+				if (Poco::DigestEngine::constantTimeEquals(computedClientProof, receivedClientProof) && pConv->serverNonce == receivedServerNonce)
 				{
 					std::string serverSignature = computeServerSignature(saltedPassword, clientAuthMessage);
 
