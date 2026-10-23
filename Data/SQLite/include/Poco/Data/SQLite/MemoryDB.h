@@ -115,8 +115,10 @@ class SQLite_API MemoryDB
 	///     stay in memory above the sealed shards, or the next row would be numbered
 	///     inside one of them. With loadArchivedShards false, the newest sealed shard
 	///     therefore keeps its rows in memory until the active shard holds a row of the
-	///     table, and deleteShard() leaves the newest row of the deleted shard behind in
-	///     the active shard when no other row would stay above the remaining ones.
+	///     table, and deleteShard() leaves the newest row of the deleted shard in memory
+	///     when no other row would stay above the remaining ones. That row is saved with
+	///     the active shard, except at the end of an empty newer range, where it only
+	///     carries the numbering until the next open.
 	///   * Do not run the VACUUM command against the database (see PRAGMA notes in the docs);
 	///     it can renumber rowids and break shard ownership.
 	///   * Total shard count is capped at sqlite3_limit(SQLITE_LIMIT_ATTACHED) on the
@@ -375,8 +377,8 @@ public:
 		/// rows, catalog entry, file and attachment - as it was. The same holds while a
 		/// statement reads the shard through its attachArchived() alias, which has
 		/// to be detached first. One row may outlive the shard: the newest row of a
-		/// table without AUTOINCREMENT can be left behind in the active shard (see the
-		/// numbering of rows in the class documentation). The removal is
+		/// table without AUTOINCREMENT can stay in memory (see the numbering of rows
+		/// in the class documentation). The removal is
 		/// crash-safe: the manifest transaction commits before the file is unlinked,
 		/// so a crash in the window leaves an orphan file that cleanOrphans() removes
 		/// on the next open. Thread-safe (serializes via the internal flush mutex).

@@ -1536,7 +1536,8 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 			_shards.end());
 		rebuildActiveLo();
 		// A row left in memory for the numbering lies above every sealed range
-		// now, so it is the active shard's; the next flush saves it there.
+		// now and is the active shard's, which the next flush saves; one at the
+		// end of an empty newer range lies in no range and is not saved.
 		if (removal == Removal::KEPT_NEWEST)
 		{
 			if (ShardInfo* a = activeShard(); a != nullptr) a->dirty = true;
