@@ -55,7 +55,7 @@ enum ProcessOptions
 		/// On Windows, creates a Job Object with JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE.
 		/// On stop, a graceful termination signal (NamedEvent) is sent to
 		/// the leader process only. Non-Poco children in the tree receive
-		/// no graceful signal — they are terminated when the Job Object
+		/// no graceful signal - they are terminated when the Job Object
 		/// handle is closed after the leader exits or the timeout expires.
 
 	PROCESS_NEW_GROUP = 16,
@@ -81,10 +81,10 @@ enum ProcessOptions
 /// Exit codes used by the child process to signal pre-exec failures
 /// back to the parent. These are chosen to avoid collision with common
 /// application exit codes.
-static constexpr int PROCESS_EXIT_EXEC_FAILED    = 72;
+inline constexpr int PROCESS_EXIT_EXEC_FAILED    = 72;
 	/// execvp() failed (command not found, permission denied, etc.)
 
-static constexpr int PROCESS_EXIT_SETPGID_FAILED = 73;
+inline constexpr int PROCESS_EXIT_SETPGID_FAILED = 73;
 	/// setpgid(0, 0) failed in child (PROCESS_KILL_TREE or PROCESS_NEW_GROUP).
 	/// The specific errno is lost (child address space).
 

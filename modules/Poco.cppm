@@ -16,6 +16,9 @@ export import :Foundation;
 #ifdef ENABLE_ACTIVERECORD
 export import :ActiveRecord;
 #endif
+#ifdef ENABLE_CODEGENERATION
+export import :CodeGeneration;
+#endif
 #ifdef ENABLE_CPPPARSER
 export import :CppParser;
 #endif
@@ -27,6 +30,9 @@ export import :DNSSD;
 #endif
 #ifdef ENABLE_DATA
 export import :Data;
+#endif
+#ifdef ENABLE_GEO
+export import :Geo;
 #endif
 #ifdef ENABLE_JSON
 export import :JSON;
@@ -49,6 +55,15 @@ export import :Prometheus;
 #ifdef ENABLE_REDIS
 export import :Redis;
 #endif
+#ifdef ENABLE_REMOTINGNG
+export import :RemotingNG;
+#endif
+#ifdef ENABLE_SSH
+export import :SSH;
+#endif
+#ifdef ENABLE_SERIAL
+export import :Serial;
+#endif
 #ifdef ENABLE_SEVENZIP
 export import :SevenZip;
 #endif
@@ -57,6 +72,15 @@ export import :Util;
 #endif
 #ifdef ENABLE_XML
 export import :XML;
+#endif
+#ifdef ENABLE_XSD_PARSER
+export import :XSD.Parser;
+#endif
+#ifdef ENABLE_XSD_TYPES
+export import :XSD.Types;
+#endif
+#ifdef ENABLE_XSD_VALIDATOR
+export import :XSD.Validator;
 #endif
 #ifdef ENABLE_ZIP
 export import :Zip;
