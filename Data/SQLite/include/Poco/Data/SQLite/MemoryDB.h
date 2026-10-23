@@ -40,6 +40,7 @@
 #include <string_view>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 
@@ -109,6 +110,15 @@ class SQLite_API MemoryDB
 	///     the active shard at open, so that SQLite numbers the next row above it. A
 	///     table that is emptied and filled again reuses rowids; declare its key
 	///     AUTOINCREMENT if it is to be archived.
+	///   * The numbering of rows: SQLite numbers the next row of a table without
+	///     AUTOINCREMENT after the newest row in memory, so one row of such a table must
+	///     stay in memory above the sealed shards, or the next row would be numbered
+	///     inside one of them. With loadArchivedShards false, the newest sealed shard
+	///     therefore keeps its rows in memory until the active shard holds a row of the
+	///     table, and deleteShard() leaves the newest row of the deleted shard in memory
+	///     when no other row would stay above the remaining ones. That row is saved with
+	///     the active shard, except at the end of an empty newer range, where it only
+	///     carries the numbering until the next open.
 	///   * Do not run the VACUUM command against the database (see PRAGMA notes in the docs);
 	///     it can renumber rowids and break shard ownership.
 	///   * Total shard count is capped at sqlite3_limit(SQLITE_LIMIT_ATTACHED) on the
@@ -143,6 +153,11 @@ public:
 
 		Poco::UInt64   shardMaxBytes    = 256ULL * 1024 * 1024;
 			/// Seal the active shard once its on-disk size reaches this many bytes. Zero disables.
+			///
+			/// With loadArchivedShards false, the rows of a sealed shard leave memory in one
+			/// transaction, and SQLite keeps a copy of their pages until it commits: while
+			/// a shard is evicted, the memory SQLite uses peaks at about one more shard of
+			/// this size, and statements on session() wait until its rows are deleted.
 
 		Poco::Timespan shardMaxAge      = Poco::Timespan(3600, 0);
 			/// Seal the active shard once it is this old. Zero disables.
@@ -151,11 +166,26 @@ public:
 			/// Granularity of the background flush timer, in milliseconds.
 
 		bool           loadArchivedShards = false;
-			/// If false (the default), only the active shard is RAM-resident; sealed shards
-			/// stay on disk and are read on demand (the SQLite page cache handles paging
-			/// transparently when they are attached via attachArchived()/historyView()).
-			/// This keeps memory bounded regardless of how much history accumulates and is
-			/// the right choice for any workload where data grows over time.
+			/// If false (the default), only the active shard is RAM-resident: a sealed
+			/// shard's rows leave memory once its file is written, at the flush that
+			/// seals it or at a later one.
+			///
+			/// They stay in memory while session() has a transaction open, and while a
+			/// table without AUTOINCREMENT has no row in the active shard yet (see the
+			/// numbering of rows in the class documentation). One such table keeps the
+			/// rows of every table of that shard in memory. A shard that stays is logged
+			/// once per reason, at information level.
+			///
+			/// An eviction briefly needs memory for about one more shard (see shardMaxBytes).
+			///
+			/// Sealed rows stay on disk and are read on demand (the SQLite page cache
+			/// handles paging transparently when they are attached via
+			/// attachArchived()/historyView()). Rows that have left memory are read-only,
+			/// as after a reopen: an UPDATE or DELETE on the base table no longer finds
+			/// them, and an INSERT into their rowid range poisons the instance. This keeps
+			/// memory bounded regardless of how much history accumulates and is the right
+			/// choice for any workload where data grows over time.
+			///
 			/// Set to true to merge every sealed shard into memory on open, so plain
 			/// SELECTs see the full dataset without attaching anything. Only safe when the
 			/// total dataset comfortably fits in RAM.
@@ -254,6 +284,10 @@ public:
 		///     while (db.lastFlushTime() < t) { db.flush(); Poco::Thread::sleep(1); }
 		///
 		/// guarantees every write before t has been persisted (or thrown).
+		///
+		/// A flush that puts off the write of a shard, because a statement is
+		/// reading the attached shard (see attachArchived()), does not count as
+		/// completed: lastFlushTime() advances only with the flush that saves it.
 
 	std::size_t shardCount() const;
 		/// Returns the total number of shards (sealed plus the active one).
@@ -334,9 +368,17 @@ public:
 		/// (seal it first if you really want to drop in-flight data). If the shard is
 		/// currently attached read-only via attachArchived(), it is force-detached;
 		/// any concurrent caller relying on its alias will see "no such table" errors
-		/// on subsequent steps. In loadArchivedShards=true mode the shard's rows are
-		/// also in main; they are deleted from the in-memory tables so the drop
-		/// actually removes the data, not just the disk copy. The removal is
+		/// on subsequent steps. If the shard's rows are in memory (always so in
+		/// loadArchivedShards=true mode), they are deleted from the in-memory tables
+		/// first, so the drop actually removes the data, not just the disk copy.
+		/// That cannot happen while session() has a transaction open (a write, or
+		/// a statement still stepping over the in-memory tables): if it stays open
+		/// past a short retry, throws TableLockedException and leaves the shard -
+		/// rows, catalog entry, file and attachment - as it was. The same holds while a
+		/// statement reads the shard through its attachArchived() alias, which has
+		/// to be detached first. One row may outlive the shard: the newest row of a
+		/// table without AUTOINCREMENT can stay in memory (see the numbering of rows
+		/// in the class documentation). The removal is
 		/// crash-safe: the manifest transaction commits before the file is unlinked,
 		/// so a crash in the window leaves an orphan file that cleanOrphans() removes
 		/// on the next open. Thread-safe (serializes via the internal flush mutex).
@@ -345,7 +387,9 @@ public:
 		/// Applies the Options-driven retention policy (retentionMaxAge, retentionMaxBytes)
 		/// plus the always-on SQLITE_LIMIT_ATTACHED backstop on total shard count.
 		/// Called automatically at the end of every successful flush; safe to call
-		/// manually at any time. Returns the number of shards dropped. When the backstop
+		/// manually at any time. Returns the number of shards dropped. A shard that
+		/// deleteShard() has to keep because session() is busy is skipped, logged
+		/// and not counted; a later run drops it. When the backstop
 		/// fires, logs a warning to the "Poco.Data.SQLite.MemoryDB" logger naming the
 		/// cap and the four ways to avoid the auto-drop. Thread-safe (serializes via
 		/// the internal flush mutex; can transiently force-detach attached shards -
@@ -353,11 +397,13 @@ public:
 
 	std::size_t dropOlderThan(const Poco::Timestamp& cutoff);
 		/// Drops every sealed shard whose sealedAt is strictly before cutoff. Returns the
-		/// number of shards dropped. Thread-safe (see enforceRetention).
+		/// number of shards dropped; a shard kept because session() is busy is skipped
+		/// as in enforceRetention(). Thread-safe (see enforceRetention).
 
 	std::size_t dropToFit(Poco::UInt64 maxTotalBytes);
 		/// Drops oldest sealed shards until the sum of all shard files' bytes is at most
-		/// maxTotalBytes, or no more sealed shards remain. Returns the number dropped.
+		/// maxTotalBytes, or no more sealed shards remain. Returns the number dropped; a
+		/// shard kept because session() is busy is skipped as in enforceRetention().
 		/// Thread-safe (see enforceRetention).
 
 	std::string historyView(const std::string& table);
@@ -365,7 +411,11 @@ public:
 		/// and every currently-attached sealed shard's same-named table via UNION ALL.
 		/// Returns the view name ("<table>_history"). The view is read-only by virtue of
 		/// being a SQLite view without INSTEAD OF triggers, so writes to it fail with a
-		/// clear SQLite error. If Options::loadArchivedShards is true, sealed data is
+		/// clear SQLite error. An attached sealed shard is read from its file and its
+		/// rowid range is left out of the base table, so the view shows each row once
+		/// whether the shard's rows are still in memory or not, and stays valid when a
+		/// later flush removes them from memory. Changes to such rows made in memory
+		/// show once a flush has written them. If Options::loadArchivedShards is true, sealed data is
 		/// already merged into main, so the view simply aliases the base table to keep
 		/// the call site uniform across modes. For a virtual table the view always
 		/// aliases only the base table: virtual tables live whole in the active shard,
@@ -403,6 +453,32 @@ public:
 		/// Thread-safe (see attachArchived).
 
 private:
+	static constexpr int BUSY_RETRY_ATTEMPTS = 10; // a busy session() or alias is tried this often, 1 ms apart
+
+	using RowidRanges = std::map<std::string, std::pair<Poco::Int64, Poco::Int64> >; // table -> (lo, hi]
+	using TableRowids = std::map<std::string, Poco::Int64>;                          // table -> rowid
+
+	enum class Removal
+	{
+		DONE,              // the rows are gone from the in-memory tables
+		KEPT_NEWEST,       // as DONE, but the newest row of a range stays for the numbering
+		SESSION_BUSY,      // nothing deleted: session() has a transaction open
+		NUMBERING_AT_RISK  // nothing deleted: a table without AUTOINCREMENT would be left
+		                   // with no row above the sealed ranges that stay
+	};
+
+	enum class OnNumberingRisk
+	{
+		KEEP_NEWEST_ROW, // leave the range's newest row in memory and remove the others
+		KEEP_SHARD       // remove nothing: the shard stays in memory
+	};
+
+	struct RemovalResult
+	{
+		Removal     outcome = Removal::DONE;
+		std::string table;   // NUMBERING_AT_RISK: the table whose numbering keeps the shard
+	};
+
 	struct ShardInfo
 	{
 		Poco::UInt32    id = 0;
@@ -413,8 +489,12 @@ private:
 		int             schemaVersion = 0;
 		Poco::UInt64    bytes = 0;    // size of the file as last written
 		bool            dirty = false;
-		bool            resident = true; // its rows are in the in-memory database
-		std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges; // table -> (lo, hi]
+		bool            resident = true; // its rows are in the in-memory database: the active
+		                                 // shard, every shard with loadArchivedShards, and a
+		                                 // sealed shard until evictSealedShards() removes them
+		Removal         deferral = Removal::DONE; // why its eviction was last put off; logged once per reason
+		bool            dropDeferred = false;     // its drop was put off, and that was logged
+		RowidRanges     ranges;
 	};
 
 	struct MovedRow
@@ -453,7 +533,7 @@ private:
 	void registerHooks();
 	void doFlush(bool allowSeal = true);
 	void writeCatalog(int schemaVersion, const std::vector<std::string>& schemaLog,
-		const std::map<std::string, Poco::Int64>* pSequences = nullptr);
+		const TableRowids* pSequences = nullptr);
 		// pSequences: the AUTOINCREMENT sequences to store; null leaves the stored ones as they are.
 		// A sealed shard a row was moved out of is recorded with the range it had
 		// before, until the shard the row is in now has been written: the catalog
@@ -466,12 +546,12 @@ private:
 	void purgeMovedRows(const std::vector<MovedRow>& rows);
 		// removes rows unsealNewestRows() moved, and a flush has saved, from their
 		// sealed shard files; caller holds _flushMutex
-	[[nodiscard]] bool sampleSequences(std::map<std::string, Poco::Int64>& sequences);
+	[[nodiscard]] bool sampleSequences(TableRowids& sequences);
 		// false when no table is declared AUTOINCREMENT
 	[[nodiscard]] bool isAutoincrement(const std::string& table);
 	std::string buildHistoryView(const std::string& table, const std::vector<Poco::UInt32>& shardIds);
 	void maybeSeal(const std::vector<std::string>& tables,
-		const std::map<std::string, Poco::Int64>& maxRowids); // caller holds _stateMutex
+		const TableRowids& maxRowids); // caller holds _stateMutex
 	void migrateShardFile(ShardInfo& shard, int toVersion, const std::vector<std::string>& schemaLog);
 	[[nodiscard]] std::vector<std::string> userTables(Session& s); // ordinary rowid tables (no virtual, no shadow)
 	[[nodiscard]] std::vector<std::string> virtualTables(Session& s, const std::string& schema = "main");
@@ -487,10 +567,52 @@ private:
 	[[nodiscard]] ColumnCopy columnCopy(Session& s, const std::string& table, bool isVirtual = false); // cached by table name
 	void markTableDirty(const std::string& table);      // caller holds _stateMutex
 	ShardInfo* activeShard();                            // caller holds _stateMutex
+	ShardInfo* findShard(Poco::UInt32 shardId);          // caller holds _stateMutex; null if there is none
 	ShardInfo* owningShard(const std::string& table, Poco::Int64 row); // caller holds _stateMutex
 	void rebuildActiveLo();                              // caller holds _stateMutex
 	bool tryDetach(Poco::UInt32 shardId);                // caller holds _attachMutex
 	void sweepDetached();                                // caller holds _attachMutex
+	enum class Install
+	{
+		DONE,     // the new file is in place, and attached again if it was
+		DETACHED, // the new file is in place, but attaching it again failed
+		BUSY      // nothing moved: a statement is reading the attached shard
+	};
+	[[nodiscard]] Install installShardFile(Poco::UInt32 shardId, bool sealed,
+		const std::string& tmpPath, const std::string& path);
+		// moves a shard file written by doFlush() into place; a sealed shard that
+		// is attached is detached, replaced and attached again under the
+		// connection mutex. caller holds _flushMutex
+	[[nodiscard]] bool attachedShardBusy(Poco::UInt32 shardId);
+		// true while a statement reads the attached sealed shard, so that a new
+		// file for it could not be put in place; caller holds _flushMutex
+	[[nodiscard]] RemovalResult removeRanges(const RowidRanges& ranges, const TableRowids& floors,
+		OnNumberingRisk onRisk);
+		// deletes the rowid ranges from the in-memory tables.
+		// floors: table -> the end of the newest sealed shard that keeps its range.
+		// When no row of a table without AUTOINCREMENT would stay above that end
+		// (see the numbering of rows in the class documentation), onRisk decides:
+		// KEEP_NEWEST_ROW leaves the range's newest row in place (KEPT_NEWEST),
+		// KEEP_SHARD deletes nothing (NUMBERING_AT_RISK, with the table).
+		// caller holds _flushMutex and the connection mutex (DbMutexGuard)
+	[[nodiscard]] Removal removeFromMemory(const RowidRanges& ranges, const TableRowids& floors);
+		// removeRanges() with KEEP_NEWEST_ROW, under the connection mutex: DONE,
+		// KEPT_NEWEST, or SESSION_BUSY, deleting nothing, while session() has a
+		// transaction open; caller holds _flushMutex
+	[[nodiscard]] bool evictShard(Poco::UInt32 shardId);
+		// removes a sealed, written shard's rows from the in-memory tables and marks
+		// it non-resident; false when the shard is not eligible, session() is busy
+		// or the numbering would be at risk (see removeRanges); caller holds _flushMutex
+	void evictSealedShards();
+		// doFlush(), after the files and the catalog are committed: evictShard() on
+		// every sealed resident shard whose file is written, with loadArchivedShards
+		// off; caller holds _flushMutex
+	void retryDeferredRemovals();
+		// onTimer(): evictSealedShards() and enforceRetention() again after
+		// session() was busy, without a flush; skipped while one is running
+	std::size_t deleteShards(const std::vector<Poco::UInt32>& ids);
+		// deleteShard() on each id, skipping the ones it has to keep; returns the
+		// number dropped; caller holds _flushMutex
 	void throwIfRejected() const;
 	std::string shardPath(Poco::UInt32 id, const Poco::Timestamp& createdAt) const;
 	void cleanOrphans();
@@ -581,8 +703,10 @@ private:
 	//      guards _attached's lifetime alongside the SQLite-side attachment
 	//      state. Recursion is load-bearing: attachAllArchived and
 	//      historyView(table,from,to) call attachArchived under their own
-	//      lock. Held for ms-scale ATTACH/DETACH; merging into _flushMutex
-	//      would block history queries behind every flush's IO loop.
+	//      lock. Held for ATTACH/DETACH, for the rename of an attached shard's
+	//      file in doFlush, and in deleteShard while the shard's rows leave
+	//      memory under the connection mutex; merging into _flushMutex would
+	//      block history queries behind every flush's IO loop.
 	//
 	//   _flushing - skip-on-concurrent-flush gate at doFlush entry. NOT a
 	//      try_lock on _flushMutex: deleteShard / enforceRetention also hold
@@ -590,14 +714,20 @@ private:
 	//      is not the contract flush() advertises.
 	//
 	// Lock-acquisition order (outer -> inner):
-	//   _flushMutex -> _attachMutex -> _stateMutex -> sqlite3_db_mutex
-	// The hook path inverts: sqlite3_db_mutex -> _stateMutex, deliberately
-	// kept disjoint from _flushMutex/_attachMutex (doFlush samples _persist
-	// BEFORE taking _stateMutex - see comment at the top of doFlush).
+	//   _flushMutex -> _attachMutex -> sqlite3_db_mutex -> _stateMutex
+	// The hooks, evictShard() and buildHistoryView() take _stateMutex while
+	// sqlite3_db_mutex is held; no code takes sqlite3_db_mutex while it holds
+	// _stateMutex. The hooks never take _flushMutex or _attachMutex (doFlush
+	// samples _persist BEFORE taking _stateMutex - see comment at the top of
+	// doFlush).
 	mutable Poco::FastMutex    _stateMutex;
 	Poco::Mutex                _flushMutex;
 	mutable Poco::Mutex        _attachMutex;
 	std::atomic<bool>          _flushing{false};
+	std::atomic<bool>          _retryPending{false};
+		// a shard's rows could not leave memory, or a shard could not be
+		// dropped, because session() was busy; the timer tries again even
+		// when nothing has been written since
 };
 
 
