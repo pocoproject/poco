@@ -31,6 +31,17 @@ using Poco::StreamCopier;
 namespace Poco::Net {
 
 
+namespace
+{
+	void checkCommand(const std::string& str)
+	{
+		// A CR or LF would end the command line and start another command.
+		if (str.find_first_of("\r\n") != std::string::npos)
+			throw Poco::InvalidArgumentException("Line break in command or argument");
+	}
+}
+
+
 class DialogStreamBuf: public Poco::UnbufferedStreamBuf
 {
 public:
@@ -248,6 +259,7 @@ void POP3ClientSession::deleteMessage(int id)
 
 bool POP3ClientSession::sendCommand(const std::string& command, std::string& response)
 {
+	checkCommand(command);
 	_socket.sendMessage(command);
 	_socket.receiveMessage(response);
 	return isPositive(response);
@@ -256,6 +268,8 @@ bool POP3ClientSession::sendCommand(const std::string& command, std::string& res
 
 bool POP3ClientSession::sendCommand(const std::string& command, const std::string& arg, std::string& response)
 {
+	checkCommand(command);
+	checkCommand(arg);
 	_socket.sendMessage(command, arg);
 	_socket.receiveMessage(response);
 	return isPositive(response);
@@ -264,6 +278,9 @@ bool POP3ClientSession::sendCommand(const std::string& command, const std::strin
 
 bool POP3ClientSession::sendCommand(const std::string& command, const std::string& arg1, const std::string& arg2, std::string& response)
 {
+	checkCommand(command);
+	checkCommand(arg1);
+	checkCommand(arg2);
 	_socket.sendMessage(command, arg1, arg2);
 	_socket.receiveMessage(response);
 	return isPositive(response);

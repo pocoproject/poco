@@ -150,6 +150,9 @@ public:
 		///
 		/// Throws a POP3Exception in case of a POP3-specific error, or a
 		/// NetException in case of a general network communication failure.
+		///
+		/// Throws an InvalidArgumentException, before anything is sent,
+		/// if the command contains a CR or LF character.
 
 	bool sendCommand(const std::string& command, const std::string& arg, std::string& response);
 		/// Sends the given command verbatim to the server
@@ -159,6 +162,9 @@ public:
 		///
 		/// Throws a POP3Exception in case of a POP3-specific error, or a
 		/// NetException in case of a general network communication failure.
+		///
+		/// Throws an InvalidArgumentException, before anything is sent,
+		/// if the command or an argument contains a CR or LF character.
 
 	bool sendCommand(const std::string& command, const std::string& arg1, const std::string& arg2, std::string& response);
 		/// Sends the given command verbatim to the server
@@ -168,6 +174,9 @@ public:
 		///
 		/// Throws a POP3Exception in case of a POP3-specific error, or a
 		/// NetException in case of a general network communication failure.
+		///
+		/// Throws an InvalidArgumentException, before anything is sent,
+		/// if the command or an argument contains a CR or LF character.
 
 protected:
 	static bool isPositive(const std::string& response);

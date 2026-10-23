@@ -27,6 +27,17 @@ using Poco::NumberFormatter;
 namespace Poco::Net {
 
 
+namespace
+{
+	void checkCommand(const std::string& str)
+	{
+		// A CR or LF would end the command line and start another command.
+		if (str.find_first_of("\r\n") != std::string::npos)
+			throw Poco::InvalidArgumentException("Line break in command or argument");
+	}
+}
+
+
 FTPClientSession::FTPClientSession(Poco::UInt16 activeDataPort):
 	_pControlSocket(nullptr),
 	_pDataStream(nullptr),
@@ -425,6 +436,7 @@ int FTPClientSession::sendCommand(const std::string& command, std::string& respo
 	if (!isOpen())
 		throw FTPException("Connection is closed.");
 
+	checkCommand(command);
 	_pControlSocket->sendMessage(command);
 	return _pControlSocket->receiveStatusMessage(response);
 }
@@ -435,6 +447,8 @@ int FTPClientSession::sendCommand(const std::string& command, const std::string&
 	if (!isOpen())
 		throw FTPException("Connection is closed.");
 
+	checkCommand(command);
+	checkCommand(arg);
 	_pControlSocket->sendMessage(command, arg);
 	return _pControlSocket->receiveStatusMessage(response);
 }
