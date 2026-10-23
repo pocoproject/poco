@@ -450,7 +450,7 @@ namespace
 			caller.identity.principal = request.get("X-User", "");
 			caller.identity.scope = request.get("X-Scope", "");
 			caller.identity.authenticated = !caller.identity.principal.empty();
-			caller.mayManage = request.get("X-Manage", "") == "1";
+			caller.canManage = request.get("X-Manage", "") == "1";
 			const std::string path = Poco::URI(request.getURI()).getPath();
 			_endpoint.handle(path.substr(std::string("/api/ai/").size()), request, response, caller);
 		}
@@ -1332,7 +1332,7 @@ void ChatServiceTest::testProviderDetail()
 	assertTrue(texts[0].find("http://a:11434/v1") != std::string::npos);
 	assertTrue(texts[0].find("secret") == std::string::npos);
 
-	// Through the endpoint only a caller who may manage the chat reads the
+	// Through the endpoint only a caller who can manage the chat reads the
 	// detail; others get a fixed reason for a provider that does not answer.
 	Host host(service);
 	Object::Ptr pEntry = host.send("GET", "health").json()->getArray("providerStatus")->getObject(0);
@@ -2003,7 +2003,7 @@ void ChatServiceTest::testEndpointErrorClientGone()
 	ChatEndpoint::Caller manager;
 	manager.identity.principal = "root";
 	manager.identity.authenticated = true;
-	manager.mayManage = true;
+	manager.canManage = true;
 	struct Case
 	{
 		std::string method;
@@ -2037,7 +2037,7 @@ void ChatServiceTest::testEndpointErrorClientGone()
 
 void ChatServiceTest::testEndpointErrorDetail()
 {
-	// An unexpected failure gets 500 with its text for a caller who may manage
+	// An unexpected failure gets 500 with its text for a caller who can manage
 	// the chat, and without it for any other caller.
 	auto pState = std::make_shared<FakeState>();
 	ChatService service(std::make_shared<ToolRegistry>(), settingsOf({entry("ollama", true, {"m1"})}), fakeParams(pState));
@@ -2046,7 +2046,7 @@ void ChatServiceTest::testEndpointErrorDetail()
 	user.identity.principal = "alice";
 	user.identity.authenticated = true;
 	ChatEndpoint::Caller manager = user;
-	manager.mayManage = true;
+	manager.canManage = true;
 
 	RecordingResponse userResponse;
 	FailingRequest userRequest(Poco::Net::HTTPRequest::HTTP_POST, userResponse);

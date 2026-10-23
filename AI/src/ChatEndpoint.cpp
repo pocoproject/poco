@@ -124,7 +124,7 @@ namespace
 
 	void needsManager(const ChatEndpoint::Caller& caller)
 	{
-		if (!caller.mayManage)
+		if (!caller.canManage)
 		{
 			throw Refusal("the caller may not manage the chat", Poco::Net::HTTPResponse::HTTP_FORBIDDEN);
 		}
@@ -163,11 +163,11 @@ namespace
 
 	std::string detailFor(const ProviderStatus& status, const ChatEndpoint::Caller& caller)
 		/// The detail of the status of a provider as the caller gets it: what
-		/// the service knows for one who may manage the chat, which may quote
+		/// the service knows for one who can manage the chat, which may quote
 		/// the answers of the servers of the provider, and a fixed reason for
 		/// others.
 	{
-		if (caller.mayManage) return status.detail;
+		if (caller.canManage) return status.detail;
 		return status.reachable ? std::string() : std::string("the provider does not answer");
 	}
 
@@ -319,16 +319,16 @@ void ChatEndpoint::handle(const std::string& route, Poco::Net::HTTPServerRequest
 	}
 	// What an unexpected failure says may name addresses, files or, with
 	// ENABLE_TRACE, the stack of the server: the log has it, and of the
-	// callers only one who may manage the chat.
+	// callers only one who can manage the chat.
 	catch (const Poco::Exception& exc)
 	{
 		if (logger.error()) logger.error("AI chat request %s failed: %s", route, exc.displayText());
-		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", caller.mayManage ? exc.displayText() : std::string());
+		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", caller.canManage ? exc.displayText() : std::string());
 	}
 	catch (const std::exception& exc)
 	{
 		if (logger.error()) logger.error("AI chat request %s failed: %s", route, std::string(exc.what()));
-		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", caller.mayManage ? std::string(exc.what()) : std::string());
+		sendError(response, Poco::Net::HTTPResponse::HTTP_INTERNAL_SERVER_ERROR, "internal error", caller.canManage ? std::string(exc.what()) : std::string());
 	}
 }
 
@@ -344,7 +344,7 @@ void ChatEndpoint::health(Poco::Net::HTTPServerResponse& response, const Caller&
 	pBody->set("providers", toArray(_service.providers()));
 	pBody->set("providerStatus", providerStatus(caller));
 	Poco::JSON::Object::Ptr pFeatures = new Poco::JSON::Object;
-	pFeatures->set("manage", caller.mayManage);
+	pFeatures->set("manage", caller.canManage);
 	pFeatures->set("keys", _params.keysFromRequests);
 	pBody->set("features", pFeatures);
 	sendJSON(response, Poco::Net::HTTPResponse::HTTP_OK, pBody);

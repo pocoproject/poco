@@ -40,10 +40,10 @@ class AI_API ChatEndpoint
 	///     "providers", "providerStatus": [{"name", "reachable", "detail",
 	///     "modelCount"}], "features": {"manage", "keys"}}, where reachable,
 	///     detail and modelCount are there once the provider was asked for its
-	///     models, manage tells whether the caller may manage the chat, and
+	///     models, manage tells whether the caller can manage the chat, and
 	///     keys whether keys are set here. detail, which may quote the answer
 	///     of a server of the provider, is what the service knows (see
-	///     ProviderStatus) for a caller who may manage the chat; others get
+	///     ProviderStatus) for a caller who can manage the chat; others get
 	///     only "the provider does not answer" for a provider that does not;
 	///   - POST chat/stream with {"messages": [{"role", "content"}], "chat"}:
 	///     the events of the turn (see ChatService) as server-sent events, a
@@ -77,13 +77,13 @@ class AI_API ChatEndpoint
 	///     where keys may be set here, under the name POST config gives it.
 	///
 	/// Putting a provider or model in use, the configuration and the keys need
-	/// a caller who may manage the chat; others get 403. Keys are set here
+	/// a caller who can manage the chat; others get 403. Keys are set here
 	/// only where the host lets them be (Params::keysFromRequests): by default
 	/// they come from its configuration or the environment, and a request that
 	/// sets one, or that gives a provider with a key another base URL or other
 	/// servers, gets 403. Errors come as {"error", "detail"}, with 400, 403,
 	/// 404, 405, 413, 415 or 500. A 500 is an unexpected failure, whose text
-	/// is logged and is the detail for a caller who may manage the chat only.
+	/// is logged and is the detail for a caller who can manage the chat only.
 	///
 	/// A page of another site cannot have the browser send what the endpoint
 	/// takes without a preflight request, which the endpoint does not answer:
@@ -106,8 +106,9 @@ public:
 			/// do in the terms of the host, e.g. the permissions. The tools of
 			/// a turn run with it. An empty principal is a caller who is not
 			/// signed in.
-		bool mayManage = false;
-			/// Whether the caller may change the settings of the chat.
+		bool canManage = false;
+			/// Whether the caller can manage the chat: change its settings,
+			/// and read the detail of a provider status and of a failure.
 	};
 
 	struct Params
@@ -123,7 +124,7 @@ public:
 			/// connection alive. Zero or less sends none; another interval is
 			/// taken between 10 milliseconds and a day.
 		bool keysFromRequests = false;
-			/// Whether a caller who may manage the chat sets the keys of the
+			/// Whether a caller who can manage the chat sets the keys of the
 			/// providers, and the base URL and servers of a provider with a
 			/// key; else they come from the host alone.
 		std::vector<std::string> allowedOrigins;

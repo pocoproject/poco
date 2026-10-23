@@ -62,8 +62,8 @@ http://[server]:11434/v1, is reached at the first of its servers that answers.
 <[ChatEndpoint]> is the HTTP interface of a chat service for a chat in a browser, below a base
 path the application chooses: the health with the providers and models, a turn as server-sent
 events with comments while the model works, cancelling, choosing the provider and model, and
-the settings and keys, which only a caller who may manage the chat changes. The application
-signs the caller in and says who it is and whether they may manage the chat.
+the settings and keys, which only a caller who can manage the chat changes. The application
+signs the caller in and says who it is and whether they can manage the chat.
 
 
 !!!Security
