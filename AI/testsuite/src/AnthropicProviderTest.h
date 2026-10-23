@@ -42,7 +42,6 @@ public:
 	void testCancelDuringUpload();
 	void testCancelDuringConnect();
 	void testCancelDuringHandshake();
-	void testCancelDescriptorNotInherited();
 	void testCutToolCall();
 	void testThinkingSignatures();
 	void testBlocksAsTheyCame();

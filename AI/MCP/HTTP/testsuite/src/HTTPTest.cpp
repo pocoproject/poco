@@ -19,7 +19,10 @@
 #include "Poco/AI/MCP/HTTP/HTTPClient.h"
 #include "Poco/AI/MCP/HTTP/EventStreamReader.h"
 #include "Poco/AI/MCP/HTTP/Body.h"
+#include "Poco/AI/MCP/HTTP/Connection.h"
 #include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/JSON/Object.h"
@@ -41,6 +44,9 @@
 #include <streambuf>
 #include <algorithm>
 #include <typeinfo>
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+#include <fcntl.h>
+#endif
 
 
 using Poco::AI::MCP::Server;
@@ -778,6 +784,29 @@ void HTTPTest::testHeadBoundedByTheTimeout()
 }
 
 
+void HTTPTest::testDuplicateNotInherited()
+{
+	// The descriptor Impl::duplicate() makes of a connection is not inherited
+	// by child processes, as the sockets of Poco::Net are not.
+	Poco::Net::ServerSocket listener(Poco::Net::SocketAddress("127.0.0.1", 0));
+	const poco_socket_t copy = Poco::AI::MCP::HTTP::Impl::duplicate(listener.impl()->sockfd());
+	assertTrue(copy != POCO_INVALID_SOCKET);
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	DWORD flags = 0;
+	const bool known = ::GetHandleInformation(reinterpret_cast<HANDLE>(copy), &flags) != 0;
+	poco_closesocket(copy);
+	assertTrue(known);
+	assertTrue((flags & HANDLE_FLAG_INHERIT) == 0);
+#else
+	const int flags = ::fcntl(copy, F_GETFD);
+	poco_closesocket(copy);
+	assertTrue(flags != -1);
+	assertTrue((flags & FD_CLOEXEC) != 0);
+#endif
+	assertTrue(Poco::AI::MCP::HTTP::Impl::duplicate(POCO_INVALID_SOCKET) == POCO_INVALID_SOCKET);
+}
+
+
 void HTTPTest::testEventStreamFraming()
 {
 	// A byte order mark at the start of the stream is skipped.
@@ -1124,6 +1153,7 @@ CppUnit::Test* HTTPTest::suite()
 	CppUnit_addTest(pSuite, HTTPTest, testHeaderMismatch);
 	CppUnit_addTest(pSuite, HTTPTest, testReadsBoundedByTheTimeout);
 	CppUnit_addTest(pSuite, HTTPTest, testHeadBoundedByTheTimeout);
+	CppUnit_addTest(pSuite, HTTPTest, testDuplicateNotInherited);
 	CppUnit_addTest(pSuite, HTTPTest, testEventStreamFraming);
 	CppUnit_addTest(pSuite, HTTPTest, testLogShowsNoSecrets);
 	CppUnit_addTest(pSuite, HTTPTest, testRequestHook);

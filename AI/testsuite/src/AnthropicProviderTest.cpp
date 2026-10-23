@@ -38,14 +38,9 @@
 #include <atomic>
 #include <fstream>
 #include <memory>
-#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
-#if defined(POCO_OS_FAMILY_UNIX)
-#include <fcntl.h>
-#include <sys/stat.h>
-#endif
 
 
 using namespace Poco::AI;
@@ -111,25 +106,6 @@ namespace
 			if (state == "02" && peer.size() > remote.size() && peer.compare(peer.size() - remote.size(), remote.size(), remote) == 0) return true;
 		}
 		return false;
-	}
-#endif
-
-
-#if defined(POCO_OS_FAMILY_UNIX)
-	std::set<int> inheritableSockets()
-		/// The socket descriptors of the process that a child process would
-		/// inherit. A new descriptor takes the lowest free number, so the
-		/// first 1024 are enough for the test.
-	{
-		std::set<int> result;
-		for (int fd = 0; fd < 1024; ++fd)
-		{
-			struct stat info;
-			if (::fstat(fd, &info) != 0 || !S_ISSOCK(info.st_mode)) continue;
-			const int flags = ::fcntl(fd, F_GETFD);
-			if (flags != -1 && (flags & FD_CLOEXEC) == 0) result.insert(fd);
-		}
-		return result;
 	}
 #endif
 
@@ -874,28 +850,6 @@ void AnthropicProviderTest::testCancelDuringHandshake()
 }
 
 
-void AnthropicProviderTest::testCancelDescriptorNotInherited()
-{
-	// The descriptor a call keeps to cancel it is not inherited by a child
-	// process, as the socket of the session is not.
-#if defined(POCO_OS_FAMILY_UNIX)
-	const std::set<int> before = inheritableSockets();
-	CannedServer::Response response;
-	response.waitBeforeHeaders = true;
-	CannedServer server(response);
-	AnthropicProvider provider(params(server.baseUrl()));
-	ChatThread chat(provider, userRequest("Hi"));
-	// The server has read the body, which is sent after the descriptor is kept.
-	assertTrue(server.waitForRequest(10000));
-	const std::set<int> during = inheritableSockets();
-	chat.cancellation.cancel();
-	chat.join();
-	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
-	assertTrue(during == before);
-#endif
-}
-
-
 void AnthropicProviderTest::testConcurrentCalls()
 {
 	// Two calls share the provider; cancelling one leaves the other running.
@@ -1119,7 +1073,6 @@ CppUnit::Test* AnthropicProviderTest::suite()
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringUpload);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringConnect);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringHandshake);
-	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDescriptorNotInherited);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCutToolCall);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testThinkingSignatures);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testBlocksAsTheyCame);
