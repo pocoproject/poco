@@ -1398,6 +1398,43 @@ void MemoryDBTest::testRewriteWaitsForBusyAttachedShard()
 }
 
 
+void MemoryDBTest::testBusyAttachedShardNotWritten()
+{
+	// While a statement reads an attached shard, a new file for it could not
+	// be put in place, so a flush must not write the shard at all. Otherwise
+	// every timer tick writes a whole shard file and drops it, for as long as
+	// the statement runs.
+	constexpr int FLUSHES = 3;
+	MemoryDB db(_dir, flushedByTest(false));
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now; // keeps shard 1 in memory
+	std::string old("old");
+	for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(old), now;
+	db.sealActive();
+	db.flush();
+
+	std::vector<Poco::UInt32> ids = db.archivedShardIds();
+	assertTrue (ids.size() == 1);
+	const std::string alias = db.attachArchived(ids[0]);
+	db << "UPDATE t SET v = 'new' WHERE id = 1", now; // shard 1 has unsaved changes
+	LogCapture capture("Poco.Data.SQLite.MemoryDB");
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() << ("SELECT id FROM " + alias + ".t"), into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read transaction on the attached shard
+		for (int i = 0; i < FLUSHES; ++i) db.flush();
+		assertTrue (db.dirty()); // the shard is still to be written
+	}
+	assertTrue (capture.count("the new file is dropped") == 0);
+
+	db.flush();
+	assertTrue (!db.dirty());
+	std::string v;
+	db << ("SELECT v FROM " + alias + ".t WHERE id = 1"), into(v), now;
+	assertEqual (std::string("new"), v);
+	db.detachArchived(ids[0]);
+}
+
+
 void MemoryDBTest::testPutOffRewriteIsNoCompletedFlush()
 {
 	// lastFlushTime() promises that every write before it has been saved. A
@@ -3483,6 +3520,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testKeptShardReportedOncePerReason);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeferredDropReportedOnce);
 	CppUnit_addTest(pSuite, MemoryDBTest, testPutOffRewriteIsNoCompletedFlush);
+	CppUnit_addTest(pSuite, MemoryDBTest, testBusyAttachedShardNotWritten);
 	CppUnit_addTest(pSuite, MemoryDBTest, testFlushNotSkippedByRetry);
 	CppUnit_addTest(pSuite, MemoryDBTest, testKeptShardStaysAttached);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteNewestShardKeepsNoRowWhenNotNeeded);

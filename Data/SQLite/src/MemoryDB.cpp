@@ -1253,6 +1253,16 @@ bool MemoryDB::tryDetach(Poco::UInt32 shardId)
 }
 
 
+bool MemoryDB::attachedShardBusy(Poco::UInt32 shardId)
+{
+	Poco::Mutex::ScopedLock al(_attachMutex);
+	if (_attached.find(shardId) == _attached.end()) return false;
+	const std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
+	DbMutexGuard dbm(_memHandle);
+	return sqlite3_txn_state(_memHandle, alias.c_str()) > SQLITE_TXN_NONE;
+}
+
+
 MemoryDB::Install MemoryDB::installShardFile(Poco::UInt32 shardId, bool sealed,
 	const std::string& tmpPath, const std::string& path)
 {
@@ -2803,6 +2813,17 @@ void MemoryDB::doFlush(bool allowSeal)
 
 		try
 		{
+			// A statement reads the attached shard, so a new file could not be put
+			// in place: the shard waits for a later flush without being written.
+			// The check in installShardFile() covers a statement that starts meanwhile.
+			if (sealed && attachedShardBusy(shardId))
+			{
+				Poco::FastMutex::ScopedLock l(_stateMutex);
+				_shards[p.idx].dirty = true;
+				putOff = true;
+				continue;
+			}
+
 			Poco::TemporaryFile tmp(_dir);
 			std::string tmpPath = tmp.path();
 			RowidRanges ranges;
@@ -2854,6 +2875,9 @@ void MemoryDB::doFlush(bool allowSeal)
 			if (installed == Install::BUSY)
 			{
 				// tmp removes the new file; the shard stays dirty, and so in memory
+				Poco::Logger& logger = Poco::Logger::get("Poco.Data.SQLite.MemoryDB");
+				if (logger.debug())
+					logger.debug(Poco::format("shard %u written, but a statement reads it: the new file is dropped", shardId));
 				Poco::FastMutex::ScopedLock l(_stateMutex);
 				_shards[p.idx].dirty = true;
 				putOff = true;

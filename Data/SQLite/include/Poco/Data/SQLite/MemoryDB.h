@@ -581,6 +581,9 @@ private:
 		// moves a shard file written by doFlush() into place; a sealed shard that
 		// is attached is detached, replaced and attached again under the
 		// connection mutex. caller holds _flushMutex
+	[[nodiscard]] bool attachedShardBusy(Poco::UInt32 shardId);
+		// true while a statement reads the attached sealed shard, so that a new
+		// file for it could not be put in place; caller holds _flushMutex
 	[[nodiscard]] RemovalResult removeRanges(const RowidRanges& ranges, const TableRowids& floors,
 		OnNumberingRisk onRisk);
 		// deletes the rowid ranges from the in-memory tables.
