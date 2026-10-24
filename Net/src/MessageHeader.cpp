@@ -40,6 +40,158 @@ namespace
 		return Poco::icompare(name, "Transfer-Encoding") == 0 ||
 			Poco::icompare(name, "Content-Length") == 0;
 	}
+
+
+	bool parseEncodedWord(const std::string& text, std::size_t pos, std::size_t& endPos)
+	{
+		if (pos + 2 >= text.size() || text.compare(pos, 2, "=?") != 0)
+			return false;
+
+		std::size_t pos1 = text.find('?', pos + 2);
+		if (pos1 == std::string::npos)
+			return false;
+
+		std::size_t pos2 = text.find('?', pos1 + 1);
+		if (pos2 == std::string::npos)
+			return false;
+
+		std::size_t pos3 = text.find("?=", pos2 + 1);
+		if (pos3 == std::string::npos)
+			return false;
+
+		std::string wordCharset = text.substr(pos + 2, pos1 - (pos + 2));
+		std::string wordEncoding = text.substr(pos1 + 1, pos2 - (pos1 + 1));
+		std::string wordText = text.substr(pos2 + 1, pos3 - (pos2 + 1));
+
+		if (wordCharset.empty() || wordEncoding.empty() ||
+			wordCharset.find_first_of(" \t\r\n\v") != std::string::npos ||
+			wordEncoding.find_first_of(" \t\r\n\v") != std::string::npos ||
+			wordText.find_first_of(" \t\r\n\v") != std::string::npos ||
+			wordText.find('?') != std::string::npos ||
+			wordCharset.find("=?") != std::string::npos ||
+			wordText.find("=?") != std::string::npos)
+		{
+			return false;
+		}
+
+		if (wordEncoding.size() != 1 ||
+			(wordEncoding[0] != 'B' && wordEncoding[0] != 'b' &&
+			 wordEncoding[0] != 'Q' && wordEncoding[0] != 'q'))
+		{
+			return false;
+		}
+
+		endPos = pos3 + 2;
+		return true;
+	}
+
+
+	bool decodeRFC2047Internal(const std::string& ins, std::string& outs, const std::string& charset_to)
+	{
+		std::string tempout;
+		std::string raw = ins;
+		if (raw.size() >= 4 && raw.compare(0, 2, "=?") == 0 && raw.compare(raw.size() - 2, 2, "?=") == 0)
+		{
+			raw = raw.substr(2, raw.size() - 4);
+		}
+
+		StringTokenizer tokens(raw, "?");
+		if (tokens.count() != 3)
+		{
+			outs = ins;
+			return false;
+		}
+
+		std::string charset = toUpper(tokens[0]);
+		std::string encoding = toUpper(tokens[1]);
+		std::string text = tokens[2];
+
+		if (charset.empty() || encoding.empty())
+		{
+			outs = ins;
+			return false;
+		}
+
+		std::istringstream istr(text);
+
+		try
+		{
+			if (encoding == "B")
+			{
+				// Base64 encoding.
+				Base64Decoder decoder(istr);
+				decoder.exceptions(std::ios::badbit);
+				for (char c; decoder.get(c); tempout += c) {}
+				if (decoder.bad() || (!text.empty() && tempout.empty()))
+				{
+					outs = ins;
+					return false;
+				}
+			}
+			else if (encoding == "Q")
+			{
+				// Quoted encoding.
+				for (char c; istr.get(c);)
+				{
+					if (c == '_')
+					{
+						// RFC 2047 _ is a space.
+						tempout += " ";
+						continue;
+					}
+
+					if (c == '=')
+					{
+						char h1, h2;
+						if (!istr.get(h1) || !istr.get(h2) ||
+							!Poco::Ascii::isHexDigit(h1) || !Poco::Ascii::isHexDigit(h2))
+						{
+							outs = ins;
+							return false;
+						}
+						char hex[3] = {h1, h2, '\0'};
+						tempout += static_cast<char>(::strtol(hex, nullptr, 16));
+						continue;
+					}
+					tempout += c;
+				}
+			}
+			else
+			{
+				// Wrong encoding
+				outs = ins;
+				return false;
+			}
+		}
+		catch (...)
+		{
+			outs = ins;
+			return false;
+		}
+
+		// convert to the right charset.
+		if (charset != charset_to)
+		{
+			try
+			{
+				TextEncoding& enc = TextEncoding::byName(charset);
+				TextEncoding& dec = TextEncoding::byName(charset_to);
+				TextConverter converter(enc, dec);
+				converter.convert(tempout, outs);
+			}
+			catch (...)
+			{
+				// Unsupported or unknown encoding; fall back to raw decoded text
+				outs = tempout;
+			}
+		}
+		else
+		{
+			// No conversion necessary.
+			outs = tempout;
+		}
+		return true;
+	}
 }
 
 
@@ -404,146 +556,71 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 
 void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset_to)
 {
-	std::string tempout;
-	StringTokenizer tokens(ins, "?");
-
-	std::string charset = toUpper(tokens[0]);
-	std::string encoding = toUpper(tokens[1]);
-	std::string text = tokens[2];
-
-	std::istringstream istr(text);
-
-	if (encoding == "B")
-	{
-		// Base64 encoding.
-		Base64Decoder decoder(istr);
-		for (char c; decoder.get(c); tempout += c) {}
-	}
-	else if (encoding == "Q")
-	{
-		// Quoted encoding.
-		for (char c; istr.get(c);)
-		{
-			if (c == '_')
-			{
-				//RFC 2047  _ is a space.
-				tempout += " ";
-				continue;
-			}
-
-			if (c == '=')
-			{
-				// The next two chars are hex representation of the complete byte.
-				std::string hex;
-				for (int i = 0; i < 2; i++)
-				{
-					if (!istr.get(c)) break;
-					hex += c;
-				}
-				if (hex.length() == 2)
-				{
-					hex = toUpper(hex);
-					tempout += (char)(int)::strtol(hex.c_str(), nullptr, 16);
-				}
-				continue;
-			}
-			tempout += c;
-		}
-	}
-	else
-	{
-		// Wrong encoding
-		outs = ins;
-		return;
-	}
-
-	// convert to the right charset.
-	if (charset != charset_to)
-	{
-		try
-		{
-			TextEncoding& enc = TextEncoding::byName(charset);
-			TextEncoding& dec = TextEncoding::byName(charset_to);
-			TextConverter converter(enc, dec);
-			converter.convert(tempout, outs);
-		}
-		catch (...)
-		{
-			// Unsupported or unknown encoding; fall back to raw decoded text
-			outs = tempout;
-		}
-	}
-	else
-	{
-		// Not conversion necesary.
-		outs = tempout;
-	}
+	decodeRFC2047Internal(ins, outs, charset_to);
 }
 
 
 std::string MessageHeader::decodeWord(const std::string& text, const std::string& charset)
 {
-	std::string outs, tmp = text;
-	size_t pos = tmp.find("=?");
-	do {
-		std::string tmp2;
-		// find the begining of the next rfc2047 chunk
-		if (pos == std::string::npos) {
-			// No more found, return
-			outs += tmp;
-			break;
-		}
+	std::string outs;
+	std::size_t cur = 0;
+	bool prevWasEncoded = false;
 
-		// check if there are standar text before the rfc2047 chunk, and if so, copy it.
-		if (pos > 0) {
-			outs += tmp.substr(0, pos);
-		}
-
-		// remove text already copied.
-		tmp = tmp.substr(pos + 2);
-
-		// find the first separator
-		size_t pos1 = tmp.find("?");
-		if (pos1 == std::string::npos) {
-			// not found.
-			outs += tmp;
-			break;
-		}
-
-		// find the second separator
-		size_t pos2 = tmp.find("?", pos1 + 1);
-		if (pos2 == std::string::npos) {
-			// not found
-			outs += tmp;
-			break;
-		}
-
-		// find the end of the actual rfc2047 chunk
-		size_t pos3 = tmp.find("?=", pos2 + 1);
-		if (pos3 == std::string::npos) {
-			// not found.
-			outs += tmp;
-			break;
-		}
-
-		// At this place, there are a valid rfc2047 chunk, so decode and copy the result.
-		decodeRFC2047(tmp.substr(0, pos3), tmp2, charset);
-		outs += tmp2;
-
-		// Jump at the rest of the string and repeat the whole process.
-		tmp = tmp.substr(pos3 + 2);
-		pos = tmp.find("=?");
-		if (pos != std::string::npos)
+	while (cur < text.size())
+	{
+		std::size_t pos = text.find("=?", cur);
+		if (pos == std::string::npos)
 		{
-			std::string betweenChunks = tmp.substr(0, pos);
-			if (betweenChunks.find_first_not_of(" \t\v\n") == std::string::npos)
-			{
-				tmp = tmp.substr(pos);
-				pos = 0;
-			}
+			outs.append(text, cur, std::string::npos);
+			break;
 		}
-	} while (true);
 
+		std::size_t endPos = 0;
+		bool isEncoded = parseEncodedWord(text, pos, endPos);
+
+		std::string_view between;
+		bool onlyLWS = false;
+		if (pos > cur)
+		{
+			between = std::string_view(text.data() + cur, pos - cur);
+			onlyLWS = (between.find_first_not_of(" \t\r\n\v") == std::string_view::npos);
+		}
+
+		if (!isEncoded)
+		{
+			if (!between.empty())
+			{
+				outs.append(between);
+			}
+			outs.append("=?");
+			cur = pos + 2;
+			prevWasEncoded = false;
+			continue;
+		}
+
+		std::string encodedWord = text.substr(pos, endPos - pos);
+		std::string decoded;
+		if (decodeRFC2047Internal(encodedWord, decoded, charset))
+		{
+			if (!between.empty() && !(prevWasEncoded && onlyLWS))
+			{
+				outs.append(between);
+			}
+			outs.append(decoded);
+			prevWasEncoded = true;
+		}
+		else
+		{
+			if (!between.empty())
+			{
+				outs.append(between);
+			}
+			outs.append(encodedWord);
+			prevWasEncoded = false;
+		}
+
+		cur = endPos;
+	}
 	return outs;
 }
 
