@@ -237,6 +237,8 @@ public:
 	static void properties(int ch, CharacterProperties& props);
 		/// Return the Unicode character properties for the
 		/// character with the given Unicode value.
+		/// Values outside 0 to 0x10FFFF, including the -1 that TextEncoding
+		/// returns for an invalid sequence, yield the properties of U+0000.
 
 	[[nodiscard]] static bool isSpace(int ch);
 		/// Returns true iff the given character is a separator.

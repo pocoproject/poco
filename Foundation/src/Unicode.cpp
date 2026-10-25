@@ -27,7 +27,7 @@ namespace Poco {
 
 void Unicode::properties(int ch, CharacterProperties& props)
 {
-	if (ch > UCP_MAX_CODEPOINT) ch = 0;
+	if (ch < 0 || ch > UCP_MAX_CODEPOINT) ch = 0;
 	const ucd_record* ucd = GET_UCD(ch);
 	props.category = static_cast<CharacterCategory>(PRIV(ucp_gentype)[ucd->chartype]);
 	props.type     = static_cast<CharacterType>(ucd->chartype);
