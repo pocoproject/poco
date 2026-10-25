@@ -50,6 +50,9 @@ Breaking Changes:
   BinaryReader::DEFAULT_MAX_CSTR_LENGTH (1024, the same as BinaryWriter::writeCString()); a
   longer string sets failbit and the value holds the first maxLength characters.
   Source-compatible, binary-incompatible: recompile against the new header.
+- GH #5510 The const Poco::Message::operator[] throws Poco::NotFoundException for a missing
+  parameter, as documented, where it used to return an empty string and add the parameter when
+  the message had other parameters.
 
 Bundled Third-Party Library Upgrades:
 

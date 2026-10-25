@@ -126,13 +126,8 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 				text.append(msg.getSource());
 			break;
 		case 'x':
-			try
-			{
-				text.append(msg[pa.property]);
-			}
-			catch (...)
-			{
-			}
+			if (msg.has(pa.property))
+				text.append(msg.get(pa.property));
 			break;
 		case 'L':
 			if (!localTime)
