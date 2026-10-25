@@ -472,6 +472,26 @@ void MessageHeaderTest::testDecodeWord()
 	assertTrue (out == "=?UTF-8?Q?bad=ZZ?=");
 	MessageHeader::decodeRFC2047("=?UTF-8?Q?bad=2?=", out);
 	assertTrue (out == "=?UTF-8?Q?bad=2?=");
+
+	assertTrue (MessageHeader::decodeWord("=?UTF-8?Q?" "?=") == "=?UTF-8?Q?" "?=");
+	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?" "?=") == "=?UTF-8?B?" "?=");
+	assertTrue (MessageHeader::decodeWord("=?bad/charset?Q?abc?=") == "=?bad/charset?Q?abc?=");
+	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=A?=") == "=?UTF-8?B?SGVsbG8=A?=");
+	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=QQ==?=") == "=?UTF-8?B?SGVsbG8=QQ==?=");
+	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8?=") == "=?UTF-8?B?SGVsbG8?=");
+
+	MessageHeader::decodeRFC2047("=?UTF-8?Q?" "?=", out);
+	assertTrue (out == "=?UTF-8?Q?" "?=");
+	MessageHeader::decodeRFC2047("=?UTF-8?B?" "?=", out);
+	assertTrue (out == "=?UTF-8?B?" "?=");
+	MessageHeader::decodeRFC2047("=?bad/charset?Q?abc?=", out);
+	assertTrue (out == "=?bad/charset?Q?abc?=");
+	MessageHeader::decodeRFC2047("=?UTF-8?B?SGVsbG8=A?=", out);
+	assertTrue (out == "=?UTF-8?B?SGVsbG8=A?=");
+	MessageHeader::decodeRFC2047("=?UTF-8?B?SGVsbG8=QQ==?=", out);
+	assertTrue (out == "=?UTF-8?B?SGVsbG8=QQ==?=");
+	MessageHeader::decodeRFC2047("=?UTF-8?B?SGVsbG8?=", out);
+	assertTrue (out == "=?UTF-8?B?SGVsbG8?=");
 }
 
 // Sample HTTP reuest header
