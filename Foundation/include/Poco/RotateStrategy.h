@@ -59,6 +59,9 @@ public:
 template <class DT>
 class RotateAtTimeStrategy: public RotateStrategy
 	/// The file is rotated at specified [day,][hour]:minute
+	///
+	/// The hour must be in the range 0-23 and the minute in the range 0-59,
+	/// otherwise the constructor throws an InvalidArgumentException.
 {
 public:
 	RotateAtTimeStrategy(const std::string& rtime):
@@ -86,10 +89,14 @@ public:
 			[[fallthrough]];
 		case 2: // hh:mm
 			_hour = NumberParser::parse(timestr[index]);
+			if (_hour < 0 || _hour > 23)
+				throw InvalidArgumentException("Invalid rotation hour", timestr[index]);
 			++index;
 			[[fallthrough]];
 		case 1: // mm
 			_minute = NumberParser::parse(timestr[index]);
+			if (_minute < 0 || _minute > 59)
+				throw InvalidArgumentException("Invalid rotation minute", timestr[index]);
 			break;
 		default:
 			throw InvalidArgumentException("Invalid rotation time specified.");
@@ -112,9 +119,15 @@ public:
 private:
 	void getNextRollover()
 	{
+		// A change of the UTC offset, such as the start of daylight saving time, and the millisecond
+		// added per step can each skip one occurrence, so the rotation time is reached within three weeks.
+		constexpr int MAX_STEPS = 3*7*24*60;
 		Timespan tsp(0, 0, 1, 0, 1000); // 0,00:01:00.001
+		int steps = 0;
 		do
 		{
+			if (++steps > MAX_STEPS)
+				poco_bugcheck_msg("Rotation time not reached within three weeks");
 			_threshold += tsp;
 		}
 		while (!(_threshold.minute() == _minute &&

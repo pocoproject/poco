@@ -32,6 +32,8 @@
 #include "Poco/Event.h"
 #include "Poco/FileStream.h"
 #include <atomic>
+#include <chrono>
+#include <future>
 #include <memory>
 #include <thread>
 #include <vector>
@@ -600,6 +602,56 @@ void FileChannelTest::testRotateAtTimeMinLocal()
 		throw;
 	}
 	remove(name);
+}
+
+
+void FileChannelTest::testRotateAtTimeInvalid()
+{
+	// The rotation is set on another thread, so that a rotation time that
+	// is never reached fails the test instead of hanging it.
+	constexpr auto TIMEOUT = std::chrono::seconds(10);
+
+	const auto setRotation = [this, TIMEOUT](const std::string& times, const std::string& rotation)
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(filename());
+		pChannel->setProperty(FileChannel::PROP_TIMES, times);
+		auto pDone = std::make_shared<std::promise<void>>();
+		std::future<void> done = pDone->get_future();
+		std::thread([pChannel, pDone, rotation]() mutable
+		{
+			try
+			{
+				pChannel->setProperty(FileChannel::PROP_ROTATION, rotation);
+				pDone->set_value();
+			}
+			catch (...)
+			{
+				pDone->set_exception(std::current_exception());
+			}
+		}).detach();
+		if (done.wait_for(TIMEOUT) != std::future_status::ready)
+			failmsg("rotation " + rotation + " does not return");
+		done.get();
+	};
+
+	for (const std::string times: {"utc", "local"})
+	{
+		for (const std::string rotation: {"25:00", "24:00", "12:60", ":75", ":-1", "-5:00", "-1:00", "Mon,24:00"})
+		{
+			try
+			{
+				setRotation(times, rotation);
+				failmsg("rotation " + rotation + " must be rejected");
+			}
+			catch (InvalidArgumentException&)
+			{
+			}
+		}
+		for (const std::string rotation: {"00:00", "23:59", ":59", "Sun,0:0"})
+		{
+			setRotation(times, rotation);
+		}
+	}
 }
 
 
@@ -1190,6 +1242,7 @@ CppUnit::Test* FileChannelTest::suite()
 	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeHourLocal);
 	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeMinUTC);
 	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeMinLocal);
+	CppUnit_addTest(pSuite, FileChannelTest, testRotateAtTimeInvalid);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateByStrategy);
 	CppUnit_addTest(pSuite, FileChannelTest, testArchive);
 	CppUnit_addTest(pSuite, FileChannelTest, testArchiveByStrategy);
