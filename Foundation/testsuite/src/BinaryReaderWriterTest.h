@@ -33,6 +33,10 @@ public:
 	void testCopyWithTextEncoding();
 	void testReadRawString();
 	void testReadRawStringWithExceptions();
+	void testReadCString();
+	void testReadCStringWithExceptions();
+	void testReadCStringUnterminated();
+	void testReadCStringDefaultLimit();
 	void write(Poco::BinaryWriter& writer);
 	void read(Poco::BinaryReader& reader);
 

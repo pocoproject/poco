@@ -51,6 +51,10 @@ public:
 		UNSPECIFIED_BYTE_ORDER   = 4   /// unknown, byte-order will be determined by reading the byte-order mark
 	};
 
+	static constexpr std::streamsize	DEFAULT_MAX_CSTR_LENGTH { 1024 };
+		/// The same as BinaryWriter::DEFAULT_MAX_CSTR_LENGTH, so that readCString()
+		/// reads back what writeCString() writes with the default limit.
+
 	BinaryReader(std::istream& istr, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
 		/// Creates the BinaryReader.
 
@@ -121,8 +125,13 @@ public:
 	void readRaw(char* buffer, std::streamsize length);
 		/// Reads length bytes of raw data into buffer.
 
-	void readCString(std::string& value);
+	void readCString(std::string& value, std::streamsize maxLength = DEFAULT_MAX_CSTR_LENGTH);
 		/// Reads zero-terminated C-string into value.
+		///
+		/// If maxLength characters have been read and the next byte is not zero,
+		/// failbit is set on the stream and that byte is consumed. If the stream
+		/// ends before the terminator, the stream state reports it. In both cases
+		/// value holds the characters read.
 
 	void readBOM();
 		/// Reads a byte-order mark from the stream and configures
