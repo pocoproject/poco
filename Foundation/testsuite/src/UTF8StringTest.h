@@ -26,6 +26,7 @@ public:
 
 	void testCompare();
 	void testTransform();
+	void testInvalidSequence();
 
 	void testEscape();
 	void testUnescape();
