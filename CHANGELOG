@@ -53,6 +53,11 @@ Breaking Changes:
 - GH #5510 The const Poco::Message::operator[] throws Poco::NotFoundException for a missing
   parameter, as documented, where it used to return an empty string and add the parameter when
   the message had other parameters.
+- GH #5510 Poco::AsyncChannel passes an exception thrown by the target channel to the
+  ErrorHandler and continues with the next message, where its worker thread used to end;
+  messages that the ErrorHandler logs through the same channel while it handles such an
+  exception are dropped. A new private member changes the class layout: recompile against the
+  new header.
 
 Bundled Third-Party Library Upgrades:
 
