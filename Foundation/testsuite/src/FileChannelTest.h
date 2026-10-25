@@ -44,6 +44,7 @@ public:
 	void testRotateAtTimeHourLocal();
 	void testRotateAtTimeMinUTC();
 	void testRotateAtTimeMinLocal();
+	void testRotateAtTimeInvalid();
 	void testRotateByStrategy();
 	void testArchive();
 	void testArchiveByStrategy();
