@@ -297,7 +297,7 @@ const std::string& Message::get(const std::string& param) const
 			return it->second;
 	}
 
-	throw NotFoundException();
+	throw NotFoundException(param);
 }
 
 
@@ -339,10 +339,7 @@ void Message::set(const std::string& param, const std::string& value)
 
 const std::string& Message::operator [] (const std::string& param) const
 {
-	if (_pMap)
-		return (*_pMap)[param];
-	else
-		throw NotFoundException();
+	return get(param);
 }
 
 

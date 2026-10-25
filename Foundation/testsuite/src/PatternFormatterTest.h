@@ -26,6 +26,7 @@ public:
 
 	void testPatternFormatter();
 	void testExtractBasename();
+	void testMissingParameter();
 
 	void setUp();
 	void tearDown();
