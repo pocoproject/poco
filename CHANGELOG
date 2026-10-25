@@ -46,6 +46,10 @@ Breaking Changes:
 - GH #5510 Poco::Dynamic::Var::parse() throws Poco::DataFormatException for an array or object
   whose elements are not separated by a comma, such as [1 2], which it used to accept, and for
   objects and arrays nested deeper than 128 levels.
+- GH #5510 Poco::BinaryReader::readCString() takes a maximum length, by default
+  BinaryReader::DEFAULT_MAX_CSTR_LENGTH (1024, the same as BinaryWriter::writeCString()); a
+  longer string sets failbit and the value holds the first maxLength characters.
+  Source-compatible, binary-incompatible: recompile against the new header.
 
 Bundled Third-Party Library Upgrades:
 
