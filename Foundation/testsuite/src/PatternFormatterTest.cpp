@@ -17,6 +17,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timezone.h"
+#include "Poco/Exception.h"
 
 
 using Poco::PatternFormatter;
@@ -25,6 +26,7 @@ using Poco::DateTime;
 using Poco::DateTimeFormatter;
 using Poco::Timestamp;
 using Poco::Timezone;
+using Poco::NotFoundException;
 
 
 PatternFormatterTest::PatternFormatterTest(const std::string& name): CppUnit::TestCase(name)
@@ -188,6 +190,30 @@ void PatternFormatterTest::testExtractBasename()
 }
 
 
+void PatternFormatterTest::testMissingParameter()
+{
+	Message msg;
+	msg["a"] = "1";
+	const Message& cmsg = msg;
+	try
+	{
+		failmsg ("const operator [] returned '" + cmsg["b"] + "' for a missing parameter");
+	}
+	catch (NotFoundException& exc)
+	{
+		assertMessageEqual ("b", exc.message());
+	}
+	assertFalse (cmsg.has("b"));
+
+	PatternFormatter fmt("%[b]");
+	std::string result;
+	fmt.format(msg, result);
+	assertTrue (result.empty());
+	assertFalse (msg.has("b"));
+	assertTrue (msg.getAll().size() == 1);
+}
+
+
 void PatternFormatterTest::setUp()
 {
 }
@@ -204,6 +230,7 @@ CppUnit::Test* PatternFormatterTest::suite()
 
 	CppUnit_addTest(pSuite, PatternFormatterTest, testPatternFormatter);
 	CppUnit_addTest(pSuite, PatternFormatterTest, testExtractBasename);
+	CppUnit_addTest(pSuite, PatternFormatterTest, testMissingParameter);
 
 	return pSuite;
 }
