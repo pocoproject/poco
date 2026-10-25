@@ -48,6 +48,7 @@ public:
 	void testForDirectory();
 	void testAddDirectorySeparator();
 	void testExpand();
+	void testHomeWithoutHomeEnv();
 	void testListRoots();
 	void testFind();
 	void testSwap();

@@ -15,11 +15,18 @@
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
 #include "Poco/Environment.h"
+#include <atomic>
 #include <iostream>
+#include <thread>
+#include <vector>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Path_WIN32U.h"
+#elif defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+#include <pwd.h>
+#include <stdlib.h>
+#include <unistd.h>
 #endif
 
 
@@ -1596,6 +1603,65 @@ void PathTest::testExpand()
 }
 
 
+void PathTest::testHomeWithoutHomeEnv()
+{
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	// Without an entry in the user database, as under an arbitrary uid in a
+	// container, Path::home() returns "/".
+	std::string expected("/");
+	const struct passwd* pPwd = getpwuid(getuid());
+	if (pPwd == nullptr || pPwd->pw_dir == nullptr) pPwd = getpwuid(geteuid());
+	if (pPwd != nullptr && pPwd->pw_dir != nullptr)
+	{
+		expected = pPwd->pw_dir;
+		if (!expected.empty() && expected.back() != '/') expected.append("/");
+	}
+
+	const bool hadHome = Environment::has("HOME");
+	const std::string savedHome = Environment::get("HOME", "");
+	unsetenv("HOME");
+
+	const std::string home = Path::home();
+
+	// A getpwuid() call in another thread overwrites the storage that
+	// getpwuid() returns, so Path::home() must not read the result from there.
+	// Only one thread calls getpwuid(): concurrent calls can corrupt the heap
+	// on a C library that does not lock it. The lookup is for root, so for
+	// root the check cannot detect anything.
+	std::atomic<int> mismatches{0};
+	if (getuid() != 0)
+	{
+		constexpr int THREADS = 4;
+		constexpr int ITERATIONS = 2000;
+		std::atomic<bool> done{false};
+		std::thread lookup([&done]()
+		{
+			while (!done) getpwuid(0);
+		});
+		std::vector<std::thread> homes;
+		for (int i = 0; i < THREADS; ++i)
+		{
+			homes.emplace_back([&expected, &mismatches]()
+			{
+				for (int n = 0; n < ITERATIONS; ++n)
+				{
+					if (Path::home() != expected) ++mismatches;
+				}
+			});
+		}
+		for (auto& t: homes) t.join();
+		done = true;
+		lookup.join();
+	}
+
+	if (hadHome) Environment::set("HOME", savedHome);
+
+	assertEqual (expected, home);
+	assertEqual (0, mismatches.load());
+#endif
+}
+
+
 void PathTest::testListRoots()
 {
 	std::vector<std::string> devs;
@@ -1745,6 +1811,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testForDirectory);
 	CppUnit_addTest(pSuite, PathTest, testAddDirectorySeparator);
 	CppUnit_addTest(pSuite, PathTest, testExpand);
+	CppUnit_addTest(pSuite, PathTest, testHomeWithoutHomeEnv);
 	CppUnit_addTest(pSuite, PathTest, testListRoots);
 	CppUnit_addTest(pSuite, PathTest, testFind);
 	CppUnit_addTest(pSuite, PathTest, testSwap);
