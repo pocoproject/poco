@@ -42,6 +42,82 @@ namespace
 	}
 
 
+	bool isValidCharsetToken(const std::string& s)
+	{
+		if (s.empty())
+			return false;
+		for (unsigned char c : s)
+		{
+			if (c <= 0x20 || c >= 0x7F ||
+				std::string_view("()<>@,;:\\\"/[]?.=").find(static_cast<char>(c)) != std::string_view::npos)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+	bool isValidEncodedText(const std::string& s)
+	{
+		if (s.empty())
+			return false;
+		for (unsigned char c : s)
+		{
+			if (c <= 0x20 || c >= 0x7F || c == '?')
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+	bool isValidBase64Encoding(const std::string& s)
+	{
+		if (s.empty() || (s.size() % 4) != 0)
+			return false;
+
+		const auto isB64Char = [](char c)
+		{
+			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+				(c >= '0' && c <= '9') || c == '+' || c == '/';
+		};
+
+		std::size_t n = s.size();
+		if (s[n - 1] == '=')
+		{
+			if (s[n - 2] == '=')
+			{
+				if (n < 4 || s[n - 3] == '=')
+					return false;
+				for (std::size_t i = 0; i < n - 2; ++i)
+				{
+					if (!isB64Char(s[i]))
+						return false;
+				}
+				return true;
+			}
+			else
+			{
+				for (std::size_t i = 0; i < n - 1; ++i)
+				{
+					if (!isB64Char(s[i]))
+						return false;
+				}
+				return true;
+			}
+		}
+
+		for (std::size_t i = 0; i < n; ++i)
+		{
+			if (!isB64Char(s[i]))
+				return false;
+		}
+		return true;
+	}
+
+
 	bool parseEncodedWord(const std::string& text, std::size_t pos, std::size_t& endPos)
 	{
 		if (pos + 2 >= text.size() || text.compare(pos, 2, "=?") != 0)
@@ -63,13 +139,7 @@ namespace
 		std::string wordEncoding = text.substr(pos1 + 1, pos2 - (pos1 + 1));
 		std::string wordText = text.substr(pos2 + 1, pos3 - (pos2 + 1));
 
-		if (wordCharset.empty() || wordEncoding.empty() ||
-			wordCharset.find_first_of(" \t\r\n\v") != std::string::npos ||
-			wordEncoding.find_first_of(" \t\r\n\v") != std::string::npos ||
-			wordText.find_first_of(" \t\r\n\v") != std::string::npos ||
-			wordText.find('?') != std::string::npos ||
-			wordCharset.find("=?") != std::string::npos ||
-			wordText.find("=?") != std::string::npos)
+		if (!isValidCharsetToken(wordCharset) || !isValidEncodedText(wordText))
 		{
 			return false;
 		}
@@ -106,7 +176,8 @@ namespace
 		std::string encoding = toUpper(tokens[1]);
 		std::string text = tokens[2];
 
-		if (charset.empty() || encoding.empty())
+		if (!isValidCharsetToken(charset) || !isValidEncodedText(text) ||
+			encoding.size() != 1 || (encoding[0] != 'B' && encoding[0] != 'Q'))
 		{
 			outs = ins;
 			return false;
@@ -118,11 +189,17 @@ namespace
 		{
 			if (encoding == "B")
 			{
+				if (!isValidBase64Encoding(text))
+				{
+					outs = ins;
+					return false;
+				}
+
 				// Base64 encoding.
 				Base64Decoder decoder(istr);
 				decoder.exceptions(std::ios::badbit);
 				for (char c; decoder.get(c); tempout += c) {}
-				if (decoder.bad() || (!text.empty() && tempout.empty()))
+				if (decoder.bad() || tempout.empty())
 				{
 					outs = ins;
 					return false;
