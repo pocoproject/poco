@@ -40,6 +40,12 @@ class Foundation_API AsyncChannel: public Channel, public Runnable
 	///
 	/// All log messages are put into a queue and this queue is
 	/// then processed by a separate thread.
+	///
+	/// An exception thrown by the target channel is passed to the
+	/// ErrorHandler and the message is dropped; the thread continues
+	/// with the next message. Messages that the ErrorHandler logs
+	/// through this channel while it handles such an exception are
+	/// dropped.
 {
 public:
 	using Ptr = AutoPtr<AsyncChannel>;
@@ -131,6 +137,7 @@ private:
 	std::size_t _queueSize = 0;
 	std::size_t _dropCount = 0;
 	std::atomic<bool> _closed;
+	std::atomic<bool> _inErrorHandler{false};
 	bool _enableCpuAffinity = false;
 };
 
