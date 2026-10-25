@@ -294,7 +294,7 @@ void BinaryReader::readRaw(char* buffer, std::streamsize length)
 }
 
 
-void BinaryReader::readCString(std::string& value)
+void BinaryReader::readCString(std::string& value, std::streamsize maxLength)
 {
 	value.clear();
 	if (!_istr.good())
@@ -312,6 +312,11 @@ void BinaryReader::readCString(std::string& value)
 		}
 		if (c == '\0')
 		{
+			break;
+		}
+		if (static_cast<std::streamsize>(value.size()) >= maxLength)
+		{
+			_istr.setstate(std::ios::failbit);
 			break;
 		}
 		value += c;
