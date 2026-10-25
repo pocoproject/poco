@@ -276,6 +276,11 @@ std::string Logger::format(const std::string& fmt, int argc, std::string argv[])
 		if (*it == '$')
 		{
 			++it;
+			if (it == fmt.end())
+			{
+				result += '$';
+				break;
+			}
 			if (*it == '$')
 			{
 				result += '$';

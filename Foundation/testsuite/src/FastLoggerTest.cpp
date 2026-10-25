@@ -247,6 +247,12 @@ void FastLoggerTest::testFormat()
 	assertTrue (str == "123");
 	str = FastLogger::format("$0$1$2$3", "1", "2", "3", "4");
 	assertTrue (str == "1234");
+	str = FastLogger::format("foo$", "bar");
+	assertTrue (str == "foo$");
+	str = FastLogger::format("$", "bar");
+	assertTrue (str == "$");
+	str = FastLogger::format("$0$", "bar");
+	assertTrue (str == "bar$");
 }
 
 
