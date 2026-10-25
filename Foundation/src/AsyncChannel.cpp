@@ -20,6 +20,7 @@
 #include "Poco/LoggingRegistry.h"
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #if defined(__linux__)
@@ -130,6 +131,9 @@ template <typename M>
 void AsyncChannel::logImpl(M&& msg)
 {
 	if (_closed) return;
+	// A message that the ErrorHandler logs through this channel while the worker reports
+	// a failure of the target would fail again and keep the worker busy for good.
+	if (_inErrorHandler && Thread::current() == &_thread) return;
 	if (_queueSize != 0 && static_cast<std::size_t>(_queue.size()) >= _queueSize)
 	{
 		++_dropCount;
@@ -219,8 +223,29 @@ void AsyncChannel::run()
 		MessageNotification* pNf = dynamic_cast<MessageNotification*>(nf.get());
 		if (pNf)
 		{
-			Channel::Ptr pChannel = getChannel();
-			if (pChannel) pChannel->log(pNf->message());
+			try
+			{
+				Channel::Ptr pChannel = getChannel();
+				if (pChannel != nullptr) pChannel->log(pNf->message());
+			}
+			catch (Exception& exc)
+			{
+				_inErrorHandler = true;
+				ErrorHandler::handle(exc);
+				_inErrorHandler = false;
+			}
+			catch (std::exception& exc)
+			{
+				_inErrorHandler = true;
+				ErrorHandler::handle(exc);
+				_inErrorHandler = false;
+			}
+			catch (...)
+			{
+				_inErrorHandler = true;
+				ErrorHandler::handle();
+				_inErrorHandler = false;
+			}
 		}
 		nf = _queue.waitDequeueNotification();
 	}

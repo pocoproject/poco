@@ -28,6 +28,8 @@ public:
 	void testSplitterAddSameChannelTwice();
 	void testAsync();
 	void testAsyncConcurrentReplacement();
+	void testAsyncTargetThrows();
+	void testAsyncErrorHandlerLogsToChannel();
 	void testFormatting();
 	void testFormattingConcurrentReplacement();
 	void testFormattingMessageKeepsItsPair();
