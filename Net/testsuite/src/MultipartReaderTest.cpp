@@ -276,6 +276,23 @@ void MultipartReaderTest::testBadBoundary()
 }
 
 
+void MultipartReaderTest::testEmptyBoundary()
+{
+	std::string s("--\r\nname1: value1\r\n\r\nthis is part 1\r\n----\r\n");
+	std::istringstream istr(s);
+	MultipartReader r(istr);
+	MessageHeader h;
+	try
+	{
+		r.nextPart(h);
+		fail("empty boundary - must throw");
+	}
+	catch (MultipartException&)
+	{
+	}
+}
+
+
 void MultipartReaderTest::testRobustness()
 {
 	std::string s("--MIME_boundary_01234567\rname1: value1\r\n\nthis is part 1\n--MIME_boundary_01234567--");
@@ -371,6 +388,7 @@ CppUnit::Test* MultipartReaderTest::suite()
 	CppUnit_addTest(pSuite, MultipartReaderTest, testGuessBoundary);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testPreamble);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testBadBoundary);
+	CppUnit_addTest(pSuite, MultipartReaderTest, testEmptyBoundary);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testRobustness);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testUnixLineEnds);
 
