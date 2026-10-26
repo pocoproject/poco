@@ -16,6 +16,8 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
+#include "Poco/Exception.h"
+#include "Poco/Timespan.h"
 #include <chrono>
 #include <cstring>
 #include <future>
@@ -28,6 +30,7 @@ using Poco::Net::DialogSocket;
 using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::StreamSocket;
+using Poco::InvalidArgumentException;
 
 
 DialogSocketTest::DialogSocketTest(const std::string& name): CppUnit::TestCase(name)
@@ -129,6 +132,56 @@ void DialogSocketTest::testReceiveStatusMessageAtEndOfConnection()
 }
 
 
+void DialogSocketTest::testSendMessageRejectsCRLF()
+{
+	EchoServer echoServer;
+	DialogSocket ds;
+	ds.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	ds.setReceiveTimeout(Poco::Timespan(5, 0));
+
+	try
+	{
+		ds.sendMessage("NOOP\r\nQUIT");
+		fail("CR LF in message - must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	try
+	{
+		ds.sendMessage("CMD", "a\r\nB");
+		fail("CR LF in argument - must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	try
+	{
+		ds.sendMessage("PUT", "local.txt", "remote.txt\nB");
+		fail("LF in second argument - must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	try
+	{
+		ds.sendMessage("PUT", "local.txt\r", "remote.txt");
+		fail("CR in first argument - must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	ds.sendMessage("Hello, world!");
+	std::string str;
+	ds.receiveMessage(str);
+	assertTrue (str == "Hello, world!");
+}
+
+
 void DialogSocketTest::setUp()
 {
 }
@@ -145,6 +198,7 @@ CppUnit::Test* DialogSocketTest::suite()
 
 	CppUnit_addTest(pSuite, DialogSocketTest, testDialogSocket);
 	CppUnit_addTest(pSuite, DialogSocketTest, testReceiveStatusMessageAtEndOfConnection);
+	CppUnit_addTest(pSuite, DialogSocketTest, testSendMessageRejectsCRLF);
 
 	return pSuite;
 }

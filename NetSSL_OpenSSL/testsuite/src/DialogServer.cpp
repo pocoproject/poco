@@ -130,7 +130,8 @@ void DialogServer::run()
 				FastMutex::ScopedLock lock(_mutex);
 				if (!_nextResponses.empty())
 				{
-					ds.sendMessage(_nextResponses.front());
+					// A scripted response may hold several lines, which sendMessage() rejects.
+					ds.sendString(_nextResponses.front() + "\r\n");
 					_nextResponses.erase(_nextResponses.begin());
 				}
 			}
@@ -160,7 +161,7 @@ void DialogServer::run()
 							if (!_nextResponses.empty())
 							{
 								if (_log) std::cout << "<< " << _nextResponses.front() << std::endl;
-								ds.sendMessage(_nextResponses.front());
+								ds.sendString(_nextResponses.front() + "\r\n");
 								_nextResponses.erase(_nextResponses.begin());
 							}
 						}

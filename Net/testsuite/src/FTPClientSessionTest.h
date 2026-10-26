@@ -43,6 +43,7 @@ public:
 	void testConstructorFailureClosesSocket1();
 	void testConstructorFailureClosesSocket2();
 	void testCommands();
+	void testCommandWithCRLF();
 	void testDownloadPORT();
 	void testDownloadEPRT();
 	void testDownloadPASV();

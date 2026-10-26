@@ -26,6 +26,7 @@ public:
 
 	void testDialogSocket();
 	void testReceiveStatusMessageAtEndOfConnection();
+	void testSendMessageRejectsCRLF();
 
 	void setUp();
 	void tearDown();
