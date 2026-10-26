@@ -95,6 +95,9 @@ Breaking Changes:
   the subject alternative names, as RFC 9525 requires and OpenSSL 4.1 does by default. The
   host-name check of a TLS connection therefore rejects a peer certificate that names the host only
   in its common name.
+- GH #5510 Poco::FormattingChannel overrides log(Message&&) and formats the message in place
+  instead of copying it; a subclass that overrides log(const Message&) must also override
+  log(Message&&). New: Poco::Message::setText(std::string&&).
 
 Bundled Third-Party Library Upgrades:
 

@@ -17,6 +17,8 @@
 #include "Poco/Message.h"
 #include "Poco/Formatter.h"
 #include "Poco/FormattingChannel.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/Logger.h"
 #include "Poco/ConsoleChannel.h"
 #include "Poco/StreamChannel.h"
 #include "Poco/Event.h"
@@ -40,6 +42,8 @@ using Poco::ConsoleChannel;
 using Poco::StreamChannel;
 using Poco::Channel;
 using Poco::Formatter;
+using Poco::PatternFormatter;
+using Poco::Logger;
 using Poco::Message;
 using Poco::AutoPtr;
 using Poco::Event;
@@ -301,6 +305,61 @@ namespace
 		int _generation;
 		std::atomic<int>& _torn;
 	};
+
+
+	struct MoveTally
+		/// The messages that a MoveCountingChannel has got.
+	{
+		int copied = 0;
+		int moved = 0;
+		bool inPlace = false;
+		Message last;
+	};
+
+
+	class MoveCountingChannel: public Channel
+		/// Counts the messages it gets as rvalues and as const references,
+		/// and keeps a copy of the last one. log(Message&&) also notes
+		/// whether it got the very message that the test logged.
+	{
+	public:
+		explicit MoveCountingChannel(MoveTally& tally, const Message* pOriginal = nullptr);
+		MoveCountingChannel() = delete;
+		MoveCountingChannel(const MoveCountingChannel&) = delete;
+		MoveCountingChannel& operator = (const MoveCountingChannel&) = delete;
+
+		void log(const Message& msg) override;
+		void log(Message&& msg) override;
+
+	protected:
+		~MoveCountingChannel() override = default;
+
+	private:
+		MoveTally& _tally;
+		const Message* _pOriginal;
+	};
+
+
+	MoveCountingChannel::MoveCountingChannel(MoveTally& tally, const Message* pOriginal):
+		_tally(tally),
+		_pOriginal(pOriginal)
+	{
+	}
+
+
+	void MoveCountingChannel::log(const Message& msg)
+	{
+		++_tally.copied;
+		_tally.last = msg;
+	}
+
+
+	void MoveCountingChannel::log(Message&& msg)
+	{
+		++_tally.moved;
+		_tally.inPlace = (&msg == _pOriginal);
+		_tally.last = std::move(msg);
+	}
 }
 
 
@@ -483,7 +542,8 @@ void ChannelTest::testFormattingConcurrentReplacement()
 {
 	// Messages are logged while another thread replaces the formatter and
 	// the destination: each one is formatted by a formatter or by none,
-	// and gets to a destination.
+	// and gets to a destination. Lvalues and rvalues take turns, so that
+	// both overloads of log() meet the replacement.
 	constexpr int THREADS = 4;
 	constexpr int ROUNDS = 1000;
 	constexpr long TIMEOUT = 10000;
@@ -501,11 +561,14 @@ void ChannelTest::testFormattingConcurrentReplacement()
 		threads.emplace_back([&]()
 		{
 			Message msg("Source", "Text", Message::PRIO_INFORMATION);
+			bool asRvalue = false;
 			while (!stop)
 			{
 				try
 				{
-					pFormatterChannel->log(msg);
+					if (asRvalue) pFormatterChannel->log(Message(msg));
+					else pFormatterChannel->log(msg);
+					asRvalue = !asRvalue;
 					++logged;
 				}
 				catch (...)
@@ -570,6 +633,8 @@ void ChannelTest::testFormattingPairNeverTorn()
 	// and then the channel, generation after generation. A message is
 	// formatted by the formatter and sent to the channel of one moment, so
 	// none that an older formatter formatted reaches a newer channel.
+	// Lvalues and rvalues take turns, so that both overloads of log()
+	// meet the replacement.
 	constexpr int THREADS = 4;
 	constexpr int ROUNDS = 1000;
 	constexpr long TIMEOUT = 10000;
@@ -585,9 +650,12 @@ void ChannelTest::testFormattingPairNeverTorn()
 		threads.emplace_back([&]()
 		{
 			Message msg("Source", "Text", Message::PRIO_INFORMATION);
+			bool asRvalue = false;
 			while (!stop)
 			{
-				pFormatterChannel->log(msg);
+				if (asRvalue) pFormatterChannel->log(Message(msg));
+				else pFormatterChannel->log(msg);
+				asRvalue = !asRvalue;
 				loggedOne.set();
 			}
 		});
@@ -608,6 +676,77 @@ void ChannelTest::testFormattingPairNeverTorn()
 
 	assertEqual(ROUNDS, rounds);
 	assertEqual(0, torn.load());
+}
+
+
+void ChannelTest::testFormattingRvalueInPlace()
+{
+	// An rvalue message is formatted in place and passed on as the same
+	// object, with its source, priority and parameters.
+	MoveTally tally;
+	Message msg("Source", "Text", Message::PRIO_INFORMATION);
+	msg.set("k", "v");
+	AutoPtr<MoveCountingChannel> pChannel = new MoveCountingChannel(tally, &msg);
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel(new PatternFormatter("%s: %p: %t [%[k]]"), pChannel);
+	pFormatterChannel->log(std::move(msg));
+
+	assertEqual(1, tally.moved);
+	assertEqual(0, tally.copied);
+	assertTrue(tally.inPlace);
+	assertTrue(tally.last.getText() == "Source: Information: Text [v]");
+	assertTrue(tally.last.getSource() == "Source");
+	assertTrue(tally.last.getPriority() == Message::PRIO_INFORMATION);
+	assertTrue(tally.last.get("k") == "v");
+}
+
+
+void ChannelTest::testFormattingRvalueWithoutFormatter()
+{
+	MoveTally tally;
+	Message msg("Source", "Text", Message::PRIO_INFORMATION);
+	AutoPtr<MoveCountingChannel> pChannel = new MoveCountingChannel(tally, &msg);
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel;
+	pFormatterChannel->setChannel(pChannel);
+	pFormatterChannel->log(std::move(msg));
+
+	assertEqual(1, tally.moved);
+	assertEqual(0, tally.copied);
+	assertTrue(tally.inPlace);
+	assertTrue(tally.last.getText() == "Text");
+}
+
+
+void ChannelTest::testFormattingConstLeavesMessage()
+{
+	MoveTally tally;
+	const Message msg("Source", "Text", Message::PRIO_INFORMATION);
+	AutoPtr<MoveCountingChannel> pChannel = new MoveCountingChannel(tally, &msg);
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel(new SimpleFormatter, pChannel);
+	pFormatterChannel->log(msg);
+
+	assertTrue(msg.getText() == "Text");
+	assertFalse(tally.inPlace);
+	assertTrue(tally.last.getText() == "Source: Text");
+}
+
+
+void ChannelTest::testFormattingRvalueFromLogger()
+{
+	// Without a formatter, only the overload that the FormattingChannel
+	// calls decides whether the message arrives as an rvalue.
+	MoveTally tally;
+	AutoPtr<MoveCountingChannel> pChannel = new MoveCountingChannel(tally);
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel;
+	pFormatterChannel->setChannel(pChannel);
+	Logger& logger = Logger::get("ChannelTest.FormattingRvalue");
+	logger.setLevel(Message::PRIO_INFORMATION);
+	logger.setChannel(pFormatterChannel);
+	logger.information("x");
+	Logger::destroy("ChannelTest.FormattingRvalue");
+
+	assertEqual(1, tally.moved);
+	assertEqual(0, tally.copied);
+	assertTrue(tally.last.getText() == "x");
 }
 
 
@@ -657,6 +796,10 @@ CppUnit::Test* ChannelTest::suite()
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingConcurrentReplacement);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingMessageKeepsItsPair);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingPairNeverTorn);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingRvalueInPlace);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingRvalueWithoutFormatter);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingConstLeavesMessage);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingRvalueFromLogger);
 	CppUnit_addTest(pSuite, ChannelTest, testConsole);
 	CppUnit_addTest(pSuite, ChannelTest, testStream);
 

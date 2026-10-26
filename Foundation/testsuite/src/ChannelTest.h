@@ -34,6 +34,10 @@ public:
 	void testFormattingConcurrentReplacement();
 	void testFormattingMessageKeepsItsPair();
 	void testFormattingPairNeverTorn();
+	void testFormattingRvalueInPlace();
+	void testFormattingRvalueWithoutFormatter();
+	void testFormattingConstLeavesMessage();
+	void testFormattingRvalueFromLogger();
 	void testConsole();
 	void testStream();
 
