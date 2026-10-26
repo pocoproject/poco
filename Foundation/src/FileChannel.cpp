@@ -244,8 +244,9 @@ UInt64 FileChannel::size() const
 }
 
 
-const std::string& FileChannel::path() const
+std::string FileChannel::path() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _path;
 }
 
