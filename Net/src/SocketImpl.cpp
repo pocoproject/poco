@@ -1021,7 +1021,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 		// A negative timeout is passed as -1, which epoll_wait() takes as no timeout.
 		const int milliseconds = (remainingTime < 0) ? -1 : static_cast<int>(std::min<Poco::Int64>(remainingTime.totalMilliseconds(), std::numeric_limits<int>::max()));
 		rc = epoll_wait(epollfd, &evout, 1, milliseconds);
-		if (rc < 0 && lastError() == POCO_EINTR)
+		if (rc < 0 && lastError() == POCO_EINTR && remainingTime > 0)
 		{
 			Poco::Timestamp end;
 			Poco::Timespan waited = end - start;
