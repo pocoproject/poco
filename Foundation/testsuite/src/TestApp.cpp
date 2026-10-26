@@ -21,10 +21,18 @@
 #include <vector>
 #include <signal.h>
 
+#include "Poco/AsyncChannel.h"
+#include "Poco/Channel.h"
+#include "Poco/FileChannel.h"
+#include "Poco/FormattingChannel.h"
 #include "Poco/FileStreamRWLock.h"
 #include "Poco/Event.h"
 #include "Poco/Exception.h"
 #include "Poco/File.h"
+#include "Poco/Logger.h"
+#include "Poco/Message.h"
+#include "Poco/NumberParser.h"
+#include "Poco/PatternFormatter.h"
 #include "Poco/Process.h"
 #include "Poco/ProcessOptions.h"
 #include "Poco/Stopwatch.h"
@@ -403,6 +411,69 @@ int breakOwnChildWithoutStdHandles(const std::string& self, const std::string& r
 }
 
 
+class ReleaseLoggingChannel: public Poco::Channel
+	/// Passes messages on to another channel, slowly, and logs "released"
+	/// to it when it is destroyed.
+{
+public:
+	ReleaseLoggingChannel() = delete;
+
+	explicit ReleaseLoggingChannel(Poco::Channel::Ptr pChannel);
+
+	void log(const Poco::Message& msg) override;
+
+protected:
+	~ReleaseLoggingChannel() override;
+
+private:
+	Poco::Channel::Ptr _pChannel;
+};
+
+
+ReleaseLoggingChannel::ReleaseLoggingChannel(Poco::Channel::Ptr pChannel):
+	_pChannel(pChannel)
+{
+}
+
+
+ReleaseLoggingChannel::~ReleaseLoggingChannel()
+{
+	try
+	{
+		_pChannel->log(Poco::Message("TestApp", "released", Poco::Message::PRIO_INFORMATION));
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
+}
+
+
+void ReleaseLoggingChannel::log(const Poco::Message& msg)
+{
+	// Keeps the AsyncChannel's worker within the FormattingChannel, which
+	// reads its parts with a DeferredRelease reader, when main() returns.
+	Poco::Thread::sleep(1);
+	_pChannel->log(msg);
+}
+
+
+void logAsync(const std::string& path, int count)
+	/// Logs count numbered messages to the file at path through an
+	/// AsyncChannel and a FormattingChannel and returns without
+	/// Logger::shutdown(). The last line, "released", is written only if
+	/// the AsyncChannel is destroyed at exit.
+{
+	Poco::Logger& root = Poco::Logger::root();
+	Poco::Channel::Ptr pFormatting = new Poco::FormattingChannel(new Poco::PatternFormatter("%t"), new ReleaseLoggingChannel(new Poco::FileChannel(path)));
+	root.setChannel(new Poco::AsyncChannel(pFormatting));
+	for (int i = 0; i < count; ++i)
+	{
+		root.information("message %d", i);
+	}
+}
+
+
 int main(int argc, char** argv)
 {
 	if (argc > 1)
@@ -459,6 +530,11 @@ int main(int argc, char** argv)
 		else if (arg == "-signal-invalid-pids")
 		{
 			return signalInvalidPids();
+		}
+		else if (arg == "-log-async" && argc > 3)
+		{
+			logAsync(argv[2], Poco::NumberParser::parse(argv[3]));
+			return 0;
 		}
 		else if (arg == "-echo-args")
 		{

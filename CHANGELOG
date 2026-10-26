@@ -213,6 +213,10 @@ Bug Fixes and Improvements:
 - GH #5526 Poco::RemotingNG::TCP::Listener runs the connections it accepts on the thread pool of
   its ConnectionManager, as it does requests and events, and no longer on the default thread pool
   whichever ConnectionManager it was given.
+- GH #5510 Poco::Logger keeps its logger map and its mutex in storage that is never destroyed,
+  so that Logger::get() works while static objects are constructed and destroyed; at exit the
+  channels are detached and released by the thread that destroys the static objects, and the
+  loggers are not freed.
 
 
 Release 1.15.4 (2026-09-22)

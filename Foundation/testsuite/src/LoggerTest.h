@@ -42,6 +42,7 @@ public:
 	void testReplacedChannelNotKeptByLaterMessage();
 	void testChannelReplacesItself();
 	void testLogWhileThreadEnds();
+	void testChannelsReleasedAtExit();
 
 	void setUp();
 	void tearDown();
