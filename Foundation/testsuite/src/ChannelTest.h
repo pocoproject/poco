@@ -30,6 +30,12 @@ public:
 	void testAsyncConcurrentReplacement();
 	void testAsyncTargetThrows();
 	void testAsyncErrorHandlerLogsToChannel();
+	void testAsyncReopen();
+	void testAsyncCloseDeliversQueued();
+	void testAsyncCloseWhileLogging();
+	void testAsyncCloseWhileTargetLogs();
+	void testAsyncDropCountConcurrent();
+	void testAsyncAppThreadLogsWhileHandling();
 	void testFormatting();
 	void testFormattingConcurrentReplacement();
 	void testFormattingMessageKeepsItsPair();
