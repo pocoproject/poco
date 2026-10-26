@@ -111,6 +111,9 @@ Breaking Changes:
   timeout, and a negative timeout of less than one millisecond also waits without limit, where it
   returned at once before. To end such a wait, use PollSet::wakeUp() where it is available, a
   finite timeout or a socket that becomes ready.
+- GH #5510 Poco::Net socket exceptions name the address of the failed operation for every error
+  code, and a connect with a timeout names the address also when the failure is reported after
+  the wait. The message texts change.
 
 Bundled Third-Party Library Upgrades:
 

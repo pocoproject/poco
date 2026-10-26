@@ -16,6 +16,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/SocketImpl.h"
 #include "Poco/Net/TCPServerConnection.h"
 #include "Poco/Net/TCPServerConnectionFactory.h"
 #include "Poco/Net/TCPServer.h"
@@ -51,6 +52,8 @@ using Poco::Net::StreamSocket;
 using Poco::Net::ServerSocket;
 using Poco::Net::DatagramSocket;
 using Poco::Net::SocketAddress;
+using Poco::Net::SocketImpl;
+using Poco::Net::NetException;
 using Poco::Net::ConnectionRefusedException;
 using Poco::Net::TCPServerConnection;
 using Poco::Net::TCPServerConnectionFactoryImpl;
@@ -224,6 +227,18 @@ namespace
 		return (flags & FD_CLOEXEC) == 0;
 #endif
 	}
+
+	class SocketErrorReporter: public SocketImpl
+		/// Makes the protected static SocketImpl::error() callable from the tests.
+	{
+	public:
+		using SocketImpl::error;
+
+		SocketErrorReporter() = delete;
+
+	protected:
+		~SocketErrorReporter() override = default;
+	};
 }
 
 
@@ -499,6 +514,84 @@ void SocketTest::testConnectRefusedNB()
 	catch (ConnectionRefusedException&)
 	{
 	}
+}
+
+
+void SocketTest::testConnectTimeoutErrorNamesAddress()
+{
+	const Timespan CONNECT_TIMEOUT(2, 0);
+	ServerSocket serv;
+	serv.bind(SocketAddress());
+	serv.listen();
+	const SocketAddress address("127.0.0.1", serv.address().port());
+	serv.close();
+	StreamSocket ss;
+	try
+	{
+		ss.connect(address, CONNECT_TIMEOUT);
+		fail("connection refused - must throw");
+	}
+	catch (ConnectionRefusedException& exc)
+	{
+		assertTrue (exc.displayText().find(address.toString()) != std::string::npos);
+	}
+	catch (TimeoutException& exc)
+	{
+		assertTrue (exc.displayText().find(address.toString()) != std::string::npos);
+	}
+}
+
+
+void SocketTest::testBindErrorNamesAddress()
+{
+	ServerSocket serv(SocketAddress("127.0.0.1", 0));
+	const std::string address = serv.address().toString();
+	ServerSocket other;
+	try
+	{
+		other.bind(serv.address(), false);
+		fail("address in use - must throw");
+	}
+	catch (NetException& exc)
+	{
+		assertTrue (exc.displayText().find(address) != std::string::npos);
+	}
+	try
+	{
+		serv.impl()->bind(serv.address(), false);
+		fail("socket already bound - must throw");
+	}
+	catch (InvalidArgumentException& exc)
+	{
+		assertEqual (POCO_EINVAL, exc.code());
+		assertTrue (exc.displayText().find(address) != std::string::npos);
+		assertTrue (exc.displayText().find("Invalid argument: Invalid argument") == std::string::npos);
+	}
+}
+
+
+void SocketTest::testErrorNamesArgument()
+{
+	const std::string address("192.0.2.1:80");
+	assertSocketError(POCO_EINVAL, address, "Invalid argument", address);
+	assertSocketError(POCO_ENETUNREACH, address, "Net Exception", "Network is unreachable: " + address);
+	assertSocketError(POCO_ECONNRESET, address, "Connection reset by peer", address);
+}
+
+
+void SocketTest::testErrorWithoutArgumentKeepsText()
+{
+	try
+	{
+		SocketErrorReporter::error(POCO_EINVAL);
+		fail("must throw");
+	}
+	catch (InvalidArgumentException& exc)
+	{
+		assertMessageEqual ("", exc.message());
+	}
+	assertSocketError(POCO_EINVAL, "", "Invalid argument", "");
+	assertSocketError(POCO_ENETUNREACH, "", "Net Exception", "Network is unreachable");
 }
 
 
@@ -1820,6 +1913,21 @@ void SocketTest::onWritable(bool& b)
 }
 
 
+void SocketTest::assertSocketError(int code, const std::string& arg, const std::string& name, const std::string& message)
+{
+	try
+	{
+		SocketErrorReporter::error(code, arg);
+		fail("must throw");
+	}
+	catch (const Poco::Exception& exc)
+	{
+		assertEqual (name, std::string(exc.name()));
+		assertMessageEqual (message, exc.message());
+	}
+}
+
+
 void SocketTest::setUp()
 {
 	_readableToNot = 0;
@@ -1849,6 +1957,10 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testConnect);
 	CppUnit_addTest(pSuite, SocketTest, testConnectRefused);
 	CppUnit_addTest(pSuite, SocketTest, testConnectRefusedNB);
+	CppUnit_addTest(pSuite, SocketTest, testConnectTimeoutErrorNamesAddress);
+	CppUnit_addTest(pSuite, SocketTest, testBindErrorNamesAddress);
+	CppUnit_addTest(pSuite, SocketTest, testErrorNamesArgument);
+	CppUnit_addTest(pSuite, SocketTest, testErrorWithoutArgumentKeepsText);
 	CppUnit_addTest(pSuite, SocketTest, testNonBlocking);
 	CppUnit_addTest(pSuite, SocketTest, testAddress);
 	CppUnit_addTest(pSuite, SocketTest, testAssign);
