@@ -279,6 +279,8 @@ Bug Fixes and Improvements:
   timeout is waited, and with poll() (BSD, macOS) the wait ends after INT_MAX milliseconds, as in
   Socket::poll().
 - GH #5510 Poco::Net::HTTPBasicCredentials accepts base64 credentials without padding.
+- GH #5510 Poco::Net::SocketAddress, IPAddress and HostEntry have noexcept move operations, so
+  that containers move them instead of copying.
 
 
 Release 1.15.4 (2026-09-22)

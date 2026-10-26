@@ -19,6 +19,7 @@
 #include <netdb.h>
 #endif
 #include <cerrno>
+#include <type_traits>
 
 
 using Poco::Net::DNS;
@@ -293,6 +294,24 @@ void DNSTest::testAIError()
 }
 
 
+void DNSTest::testHostEntryMoveNoexcept()
+{
+	static_assert(std::is_nothrow_move_constructible_v<HostEntry>);
+	static_assert(std::is_nothrow_move_assignable_v<HostEntry>);
+
+	HostEntry he1 = DNS::hostByName("localhost");
+	const HostEntry::AddressList addresses = he1.addresses();
+	assertTrue (!addresses.empty());
+
+	HostEntry he2(std::move(he1));
+	assertTrue (he2.addresses() == addresses);
+
+	HostEntry he3;
+	he3 = std::move(he2);
+	assertTrue (he3.addresses() == addresses);
+}
+
+
 void DNSTest::setUp()
 {
 }
@@ -315,6 +334,7 @@ CppUnit::Test* DNSTest::suite()
 	CppUnit_addTest(pSuite, DNSTest, testSystemError);
 	CppUnit_addTest(pSuite, DNSTest, testHostByNameEmbeddedNul);
 	CppUnit_addTest(pSuite, DNSTest, testAIError);
+	CppUnit_addTest(pSuite, DNSTest, testHostEntryMoveNoexcept);
 
 	return pSuite;
 }
