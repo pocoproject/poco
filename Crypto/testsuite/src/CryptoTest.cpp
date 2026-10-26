@@ -22,6 +22,7 @@
 #include "Poco/Crypto/CryptoException.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
 #include "Poco/Exception.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/HexBinaryEncoder.h"
@@ -552,6 +553,26 @@ void CryptoTest::testCertificateSaveCannotCreateFile()
 }
 
 
+void CryptoTest::testCertificateLoadNotPEM()
+{
+	ErrorQueueCleaner cleaner;
+
+	Poco::TemporaryFile file;
+	Poco::FileOutputStream ostr(file.path());
+	ostr << "not a certificate";
+	ostr.close();
+	try
+	{
+		X509Certificate cert(file.path());
+		fail("file is not PEM - must throw");
+	}
+	catch (Poco::ReadFileException& exc)
+	{
+		assertMessageEqual ("Failed to load certificate from: " + file.path(), exc.message());
+	}
+}
+
+
 void CryptoTest::testCertificate()
 {
 	std::istringstream certStream(APPINF_PEM);
@@ -740,6 +761,7 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateSubjectAltName);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateDuplicate);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateSaveCannotCreateFile);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateLoadNotPEM);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateUTF8);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateNameEntries);

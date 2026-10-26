@@ -123,6 +123,9 @@ Breaking Changes:
   host name, not only as a number. The message text changes: it has the form
   'EAI <code>: <text>', with the host as the argument. DNSException::code() carries the
   getaddrinfo() error code, where it was 0.
+- GH #5510 Poco::Net::InvalidCertificateException::name() is "Invalid certificate", and the
+  Poco::ReadFileException that Poco::Crypto::X509Certificate throws when it cannot load a
+  certificate from a file reads "Failed to load certificate from" (both were misspelled).
 
 Bundled Third-Party Library Upgrades:
 
