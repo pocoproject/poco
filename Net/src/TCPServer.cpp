@@ -16,6 +16,7 @@
 #include "Poco/Net/TCPServerDispatcher.h"
 #include "Poco/Net/TCPServerConnection.h"
 #include "Poco/Net/TCPServerConnectionFactory.h"
+#include "Poco/Net/SocketDefs.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
@@ -25,6 +26,32 @@ using Poco::ErrorHandler;
 
 
 namespace Poco::Net {
+
+
+namespace {
+
+
+constexpr long RESOURCE_PAUSE_MS = 50;
+
+
+[[nodiscard]] bool isResourceError(int code)
+{
+	switch (code)
+	{
+	case POCO_EMFILE:
+	case POCO_ENOBUFS:
+#if defined(POCO_OS_FAMILY_UNIX)
+	case ENFILE:
+	case ENOMEM:
+#endif
+		return true;
+	default:
+		return false;
+	}
+}
+
+
+} // namespace
 
 
 //
@@ -152,7 +179,12 @@ void TCPServer::run()
 				catch (Poco::Exception& exc)
 				{
 					if (!_stopped)
+					{
 						ErrorHandler::handle(exc);
+						// The pending connection stays in the backlog and poll() reports the socket
+						// readable at once, so the acceptor would spin.
+						if (isResourceError(exc.code())) Poco::Thread::sleep(RESOURCE_PAUSE_MS);
+					}
 				}
 				catch (std::exception& exc)
 				{
@@ -173,7 +205,7 @@ void TCPServer::run()
 				ErrorHandler::handle(exc);
 				// possibly a resource issue since poll() failed;
 				// give some time to recover before trying again
-				Poco::Thread::sleep(50);
+				Poco::Thread::sleep(RESOURCE_PAUSE_MS);
 			}
 		}
 	}
