@@ -209,11 +209,16 @@ public:
 		/// or null pointer if no filter has been set.
 
 protected:
-	void run();
+	void run() override final;
 		/// Runs the server. The server will run until
 		/// the stop() method is called, or the server
 		/// object is destroyed, which implicitly calls
 		/// the stop() method.
+		/// The thread calls this function without a
+		/// virtual call, so that the call does not race
+		/// with the constructor or destructor of a
+		/// subclass; it is final because an override
+		/// would never be called.
 
 	static std::string threadName(const ServerSocket& socket);
 		/// Returns a thread name for the server thread.

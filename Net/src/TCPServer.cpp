@@ -134,7 +134,7 @@ void TCPServer::start()
 	poco_assert (_stopped);
 
 	_stopped = false;
-	_thread.start(*this);
+	_thread.startFunc([this]() { TCPServer::run(); });
 }
 
 

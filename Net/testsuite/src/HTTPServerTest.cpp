@@ -32,6 +32,7 @@
 #include "Poco/FileStream.h"
 #include "Poco/File.h"
 #include "Poco/Stopwatch.h"
+#include <chrono>
 #include <optional>
 #include <sstream>
 #include <thread>
@@ -60,6 +61,7 @@ using Poco::FileOutputStream;
 namespace
 {
 	static constexpr int sendFileSize = 64000;
+	static constexpr std::chrono::seconds ROUND_TRIP_TIMEOUT{10};
 
 	class EchoBodyRequestHandler: public HTTPRequestHandler
 	{
@@ -302,6 +304,17 @@ namespace
 				return nullptr;
 		}
 	};
+
+	class DerivedHTTPServer: public HTTPServer
+		/// Its destructor runs while the server thread is still running.
+	{
+	public:
+		using HTTPServer::HTTPServer;
+		DerivedHTTPServer() = delete;
+		~DerivedHTTPServer() override;
+	};
+
+	DerivedHTTPServer::~DerivedHTTPServer() = default;
 }
 
 
@@ -1338,6 +1351,34 @@ void HTTPServerTest::testParallelKeepAliveSessions()
 }
 
 
+void HTTPServerTest::testDestroyRunningSubclass()
+{
+	// Only ThreadSanitizer shows the defect: a data race on the vptr between the destructor of the
+	// derived class and a virtual call of run() in the server thread. The rest checks that a server
+	// of a derived class still answers a request.
+	{
+		ServerSocket svs(0);
+		DerivedHTTPServer srv(new RequestHandlerFactory, svs, new HTTPServerParams);
+		srv.start();
+	}
+	ServerSocket svs(0);
+	HTTPServerParams::Ptr pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	DerivedHTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
+	cs.setTimeout(Poco::Timespan(ROUND_TRIP_TIMEOUT));
+	const std::string body("hello, world");
+	HTTPRequest request("POST", "/echoBody");
+	request.setContentLength(static_cast<std::streamsize>(body.length()));
+	cs.sendRequest(request) << body;
+	HTTPResponse response;
+	std::string rbody;
+	StreamCopier::copyToString(cs.receiveResponse(response), rbody);
+	assertTrue (rbody == body);
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
@@ -1377,6 +1418,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testInvalidRequestHeaderClearsDeadline);
 	CppUnit_addTest(pSuite, HTTPServerTest, testFailedResponseWriteNotRepeated);
 	CppUnit_addTest(pSuite, HTTPServerTest, testParallelKeepAliveSessions);
+	CppUnit_addTest(pSuite, HTTPServerTest, testDestroyRunningSubclass);
 
 	return pSuite;
 }
