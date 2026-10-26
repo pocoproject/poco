@@ -31,6 +31,7 @@ public:
 	void testGuessBoundary();
 	void testPreamble();
 	void testBadBoundary();
+	void testEmptyBoundary();
 	void testRobustness();
 	void testUnixLineEnds();
 
