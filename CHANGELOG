@@ -63,6 +63,9 @@ Breaking Changes:
   POP3ClientSession and FTPClientSession are sent through it. Code that sends several lines in
   one call, such as a multi-line reply of a server, uses sendString() and adds the line ends
   itself.
+- GH #5510 Poco::Net::IPAddress rejects IPv6 text that is not a valid address, such as 0:0:0 or
+  0:0:0:0:0:0:0:0:0, which it used to accept as the unspecified address ::. The IPv4-embedded
+  spelling ::0.0.0.0, which it used to reject, is accepted as ::.
 
 Bundled Third-Party Library Upgrades:
 
