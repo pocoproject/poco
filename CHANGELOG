@@ -98,6 +98,10 @@ Breaking Changes:
 - GH #5510 Poco::FormattingChannel overrides log(Message&&) and formats the message in place
   instead of copying it; a subclass that overrides log(const Message&) must also override
   log(Message&&). New: Poco::Message::setText(std::string&&).
+- GH #5520 Poco::FileChannel::path(), Poco::SimpleFileChannel::path() and secondaryPath() return
+  the path by value, read under the mutex of the channel. Callers that keep a reference, a
+  string_view or the c_str() of the result must copy it. Poco::SimpleFileChannel::size() and
+  creationDate() read the log file under the mutex as well.
 
 Bundled Third-Party Library Upgrades:
 
