@@ -352,7 +352,7 @@ void SocketImpl::connect(const SocketAddress& address, const Poco::Timespan& tim
 			if (!poll(timeout, SELECT_READ | SELECT_WRITE | SELECT_ERROR))
 				throw Poco::TimeoutException("connect timed out", address.toString());
 			err = socketError();
-			if (err != 0) error(err);
+			if (err != 0) error(err, address.toString());
 		}
 	}
 	catch (Poco::Exception&)
@@ -1668,69 +1668,69 @@ void SocketImpl::error(int code, const std::string& arg)
 	{
 	case POCO_ENOERR: return;
 	case POCO_ESYSNOTREADY:
-		throw NetException("Net subsystem not ready", code);
+		throw NetException("Net subsystem not ready", arg, code);
 	case POCO_ENOTINIT:
-		throw NetException("Net subsystem not initialized", code);
+		throw NetException("Net subsystem not initialized", arg, code);
 	case POCO_EINTR:
-		throw IOException("Interrupted", code);
+		throw IOException("Interrupted", arg, code);
 	case POCO_EACCES:
-		throw IOException("Permission denied", code);
+		throw IOException("Permission denied", arg, code);
 	case POCO_EFAULT:
-		throw IOException("Bad address", code);
+		throw IOException("Bad address", arg, code);
 	case POCO_EINVAL:
-		throw InvalidArgumentException(code);
+		throw InvalidArgumentException(arg, code);
 	case POCO_EMFILE:
-		throw IOException("Too many open files", code);
+		throw IOException("Too many open files", arg, code);
 	case POCO_EWOULDBLOCK:
-		throw IOException("Operation would block", code);
+		throw IOException("Operation would block", arg, code);
 	case POCO_EINPROGRESS:
-		throw IOException("Operation now in progress", code);
+		throw IOException("Operation now in progress", arg, code);
 	case POCO_EALREADY:
-		throw IOException("Operation already in progress", code);
+		throw IOException("Operation already in progress", arg, code);
 	case POCO_ENOTSOCK:
-		throw IOException("Socket operation attempted on non-socket", code);
+		throw IOException("Socket operation attempted on non-socket", arg, code);
 	case POCO_EDESTADDRREQ:
-		throw NetException("Destination address required", code);
+		throw NetException("Destination address required", arg, code);
 	case POCO_EMSGSIZE:
-		throw NetException("Message too long", code);
+		throw NetException("Message too long", arg, code);
 	case POCO_EPROTOTYPE:
-		throw NetException("Wrong protocol type", code);
+		throw NetException("Wrong protocol type", arg, code);
 	case POCO_ENOPROTOOPT:
-		throw NetException("Protocol not available", code);
+		throw NetException("Protocol not available", arg, code);
 	case POCO_EPROTONOSUPPORT:
-		throw NetException("Protocol not supported", code);
+		throw NetException("Protocol not supported", arg, code);
 	case POCO_ESOCKTNOSUPPORT:
-		throw NetException("Socket type not supported", code);
+		throw NetException("Socket type not supported", arg, code);
 	case POCO_ENOTSUP:
-		throw NetException("Operation not supported", code);
+		throw NetException("Operation not supported", arg, code);
 	case POCO_EPFNOSUPPORT:
-		throw NetException("Protocol family not supported", code);
+		throw NetException("Protocol family not supported", arg, code);
 	case POCO_EAFNOSUPPORT:
-		throw NetException("Address family not supported", code);
+		throw NetException("Address family not supported", arg, code);
 	case POCO_EADDRINUSE:
 		throw NetException("Address already in use", arg, code);
 	case POCO_EADDRNOTAVAIL:
 		throw NetException("Cannot assign requested address", arg, code);
 	case POCO_ENETDOWN:
-		throw NetException("Network is down", code);
+		throw NetException("Network is down", arg, code);
 	case POCO_ENETUNREACH:
-		throw NetException("Network is unreachable", code);
+		throw NetException("Network is unreachable", arg, code);
 	case POCO_ENETRESET:
-		throw NetException("Network dropped connection on reset", code);
+		throw NetException("Network dropped connection on reset", arg, code);
 	case POCO_ECONNABORTED:
-		throw ConnectionAbortedException(code);
+		throw ConnectionAbortedException(arg, code);
 	case POCO_ECONNRESET:
-		throw ConnectionResetException(code);
+		throw ConnectionResetException(arg, code);
 	case POCO_ENOBUFS:
-		throw IOException("No buffer space available", code);
+		throw IOException("No buffer space available", arg, code);
 	case POCO_EISCONN:
-		throw NetException("Socket is already connected", code);
+		throw NetException("Socket is already connected", arg, code);
 	case POCO_ENOTCONN:
-		throw NetException("Socket is not connected", code);
+		throw NetException("Socket is not connected", arg, code);
 	case POCO_ESHUTDOWN:
-		throw NetException("Cannot send after socket shutdown", code);
+		throw NetException("Cannot send after socket shutdown", arg, code);
 	case POCO_ETIMEDOUT:
-		throw TimeoutException(code);
+		throw TimeoutException(arg, code);
 	case POCO_ECONNREFUSED:
 		throw ConnectionRefusedException(arg, code);
 	case POCO_EHOSTDOWN:
@@ -1739,9 +1739,9 @@ void SocketImpl::error(int code, const std::string& arg)
 		throw NetException("No route to host", arg, code);
 #if defined(POCO_OS_FAMILY_UNIX)
 	case EPIPE:
-		throw IOException("Broken pipe", code);
+		throw IOException("Broken pipe", arg, code);
 	case EBADF:
-		throw IOException("Bad socket descriptor", code);
+		throw IOException("Bad socket descriptor", arg, code);
 	case ENOENT:
 		throw IOException("Not found", arg, code);
 #endif
