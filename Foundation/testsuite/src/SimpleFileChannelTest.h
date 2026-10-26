@@ -25,6 +25,8 @@ public:
 	~SimpleFileChannelTest();
 
 	void testRotate();
+	void testRotateBySizeUnits();
+	void testRotationOverflow();
 
 	void setUp();
 	void tearDown();

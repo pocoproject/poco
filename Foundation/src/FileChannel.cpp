@@ -24,6 +24,7 @@
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
+#include <limits>
 #include <memory>
 
 
@@ -249,13 +250,27 @@ const std::string& FileChannel::path() const
 }
 
 
+namespace
+{
+	[[nodiscard]] Int64 scaled(Int64 n, Int64 factor, const std::string& rotation)
+	{
+		if (n > std::numeric_limits<Int64>::max()/factor)
+			throw InvalidArgumentException("rotation", rotation);
+		return n*factor;
+	}
+}
+
+
 RotateStrategy* FileChannel::createRotationStrategy(const std::string& rotation, const std::string& times) const
 {
 	std::string::const_iterator it  = rotation.begin();
 	std::string::const_iterator end = rotation.end();
 	Poco::Int64 n = 0;
 	while (it != end && Ascii::isSpace(*it)) ++it;
-	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+	std::string digits;
+	while (it != end && Ascii::isDigit(*it)) digits += *it++;
+	if (!digits.empty() && !NumberParser::tryParse64(digits, n))
+		throw InvalidArgumentException("rotation", rotation);
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
@@ -277,21 +292,23 @@ RotateStrategy* FileChannel::createRotationStrategy(const std::string& rotation,
 	else if (unit == "monthly")
 		pStrategy = new RotateByIntervalStrategy(Timespan(30*Timespan::DAYS));
 	else if (unit == "seconds") // for testing only
-		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::SECONDS));
+		pStrategy = new RotateByIntervalStrategy(Timespan(scaled(n, Timespan::SECONDS, rotation)));
 	else if (unit == "minutes")
-		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::MINUTES));
+		pStrategy = new RotateByIntervalStrategy(Timespan(scaled(n, Timespan::MINUTES, rotation)));
 	else if (unit == "hours")
-		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::HOURS));
+		pStrategy = new RotateByIntervalStrategy(Timespan(scaled(n, Timespan::HOURS, rotation)));
 	else if (unit == "days")
-		pStrategy = new RotateByIntervalStrategy(Timespan(n*Timespan::DAYS));
+		pStrategy = new RotateByIntervalStrategy(Timespan(scaled(n, Timespan::DAYS, rotation)));
 	else if (unit == "weeks")
-		pStrategy = new RotateByIntervalStrategy(Timespan(n*7*Timespan::DAYS));
+		pStrategy = new RotateByIntervalStrategy(Timespan(scaled(n, 7*Timespan::DAYS, rotation)));
 	else if (unit == "months")
-		pStrategy = new RotateByIntervalStrategy(Timespan(n*30*Timespan::DAYS));
+		pStrategy = new RotateByIntervalStrategy(Timespan(scaled(n, 30*Timespan::DAYS, rotation)));
 	else if (unit == "K")
-		pStrategy = new RotateBySizeStrategy(n*1024);
+		pStrategy = new RotateBySizeStrategy(scaled(n, 1024, rotation));
 	else if (unit == "M")
-		pStrategy = new RotateBySizeStrategy(n*1024*1024);
+		pStrategy = new RotateBySizeStrategy(scaled(n, 1024*1024, rotation));
+	else if (unit == "G")
+		pStrategy = new RotateBySizeStrategy(scaled(n, static_cast<Int64>(1024)*1024*1024, rotation));
 	else if (unit.empty())
 		pStrategy = new RotateBySizeStrategy(n);
 	else if (unit == "never")
