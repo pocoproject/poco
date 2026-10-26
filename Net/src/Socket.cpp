@@ -178,17 +178,19 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		}
 	}
 
+	const bool infinite = timeout < 0;
 	Poco::Timespan remainingTime(timeout);
 	int rc;
 	do
 	{
+		const int milliseconds = infinite ? -1 : static_cast<int>(remainingTime.totalMilliseconds());
 		Poco::Timestamp start;
 #ifdef _WIN32
-		rc = WSAPoll(pPollArr, nfd, static_cast<INT>(remainingTime.totalMilliseconds()));
+		rc = WSAPoll(pPollArr, nfd, milliseconds);
 #else
-		rc = ::poll(pPollArr, nfd, remainingTime.totalMilliseconds());
+		rc = ::poll(pPollArr, nfd, milliseconds);
 #endif
-		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !infinite)
 		{
 			Poco::Timestamp end;
 			Poco::Timespan waited = end - start;
@@ -259,6 +261,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		}
 	}
 	if (nfd == 0) return 0;
+	const bool infinite = timeout < 0;
 	Poco::Timespan remainingTime(timeout);
 	int rc;
 	do
@@ -267,8 +270,8 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 		tv.tv_sec  = (long) remainingTime.totalSeconds();
 		tv.tv_usec = (long) remainingTime.useconds();
 		Poco::Timestamp start;
-		rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
-		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+		rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, infinite ? nullptr : &tv);
+		if (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !infinite)
 		{
 			Poco::Timestamp end;
 			Poco::Timespan waited = end - start;

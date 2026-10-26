@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <vector>
 #if defined(POCO_OS_FAMILY_UNIX)
+#include "InterruptingSignal.h"
 #include <csignal>
 #include <pthread.h>
 #include <sys/resource.h>
@@ -68,33 +69,6 @@ using Poco::delegate;
 namespace
 {
 #if defined(POCO_OS_FAMILY_UNIX)
-	extern "C" void ignoreSignal(int)
-	{
-	}
-
-	class InterruptingSignal
-		/// Installs a handler for SIGUSR1 that does not restart an
-		/// interrupted system call, for the lifetime of the object.
-	{
-	public:
-		InterruptingSignal()
-		{
-			struct sigaction action;
-			action.sa_handler = ignoreSignal;
-			sigemptyset(&action.sa_mask);
-			action.sa_flags = 0;
-			sigaction(SIGUSR1, &action, &_previous);
-		}
-
-		~InterruptingSignal()
-		{
-			sigaction(SIGUSR1, &_previous, nullptr);
-		}
-
-	private:
-		struct sigaction _previous;
-	};
-
 	class Interrupter: public Poco::Runnable
 		/// Sends a signal to a thread every 50 milliseconds, to interrupt
 		/// its blocking system calls, until it is stopped or three seconds
@@ -1286,6 +1260,56 @@ void SocketTest::testPollNegativeTimeoutBelowOneMillisecond()
 }
 
 
+void SocketTest::testSelectNegativeTimeoutBelowOneMillisecond()
+{
+	static constexpr long SEND_AFTER_MS = 200;
+	static constexpr long MIN_ELAPSED_MS = 150;
+
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	const Poco::Clock start;
+	Poco::Thread peerThread;
+	peerThread.startFunc([&peer]
+		{
+			Poco::Thread::sleep(SEND_AFTER_MS);
+			try
+			{
+				peer.sendBytes("x", 1);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	Socket::SocketList readList{ss};
+	Socket::SocketList writeList;
+	Socket::SocketList exceptList;
+	int ready = 0;
+	std::string selectError;
+	try
+	{
+		ready = Socket::select(readList, writeList, exceptList, Timespan(-1));
+	}
+	catch (const Poco::Exception& exc)
+	{
+		selectError = exc.displayText();
+	}
+	const Timespan elapsed = start.elapsed();
+	peerThread.join();
+
+	if (!selectError.empty()) failmsg(selectError);
+	// a negative timeout of less than one millisecond also waits without limit
+	assertEqual (1, ready);
+	assertTrue (readList.size() == 1);
+	assertTrue (readList[0] == ss);
+	assertTrue (elapsed.totalMilliseconds() >= MIN_ELAPSED_MS);
+}
+
+
 #if defined(POCO_OS_FAMILY_UNIX)
 void SocketTest::testReceiveInterruptedWithTimeout()
 {
@@ -1552,6 +1576,63 @@ void SocketTest::testPollInterruptedNoTimeout()
 }
 
 
+void SocketTest::testSelectInterruptedNoTimeout()
+{
+	static constexpr long INTERRUPT_AFTER_MS = 100;
+	static constexpr long SEND_AFTER_MS = 300;
+	static constexpr long MIN_ELAPSED_MS = 250;
+
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	InterruptingSignal signal;
+
+	// the peer sends only after the select was interrupted
+	const pthread_t poller = pthread_self();
+	const Poco::Clock start;
+	Poco::Thread peerThread;
+	peerThread.startFunc([&peer, poller]
+		{
+			Poco::Thread::sleep(INTERRUPT_AFTER_MS);
+			pthread_kill(poller, SIGUSR1);
+			Poco::Thread::sleep(SEND_AFTER_MS - INTERRUPT_AFTER_MS);
+			try
+			{
+				peer.sendBytes("x", 1);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	Socket::SocketList readList{ss};
+	Socket::SocketList writeList;
+	Socket::SocketList exceptList;
+	int ready = 0;
+	std::string selectError;
+	try
+	{
+		ready = Socket::select(readList, writeList, exceptList, Timespan(-1, 0));
+	}
+	catch (const Poco::Exception& exc)
+	{
+		selectError = exc.displayText();
+	}
+	const Timespan elapsed = start.elapsed();
+	peerThread.join();
+
+	if (!selectError.empty()) failmsg(selectError);
+	// the signal does not end a select without a timeout
+	assertEqual (1, ready);
+	assertTrue (readList.size() == 1);
+	assertTrue (readList[0] == ss);
+	assertTrue (elapsed.totalMilliseconds() >= MIN_ELAPSED_MS);
+}
+
+
 void SocketTest::testPollClosedDescriptor()
 {
 	ServerSocket server(SocketAddress("127.0.0.1", 0));
@@ -1739,6 +1820,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testCloseOnExec);
 	CppUnit_addTest(pSuite, SocketTest, testReceiveNonBlockingIgnoresTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testPollNegativeTimeoutBelowOneMillisecond);
+	CppUnit_addTest(pSuite, SocketTest, testSelectNegativeTimeoutBelowOneMillisecond);
 #if defined(POCO_OS_FAMILY_UNIX)
 	CppUnit_addTest(pSuite, SocketTest, testReceiveInterruptedWithTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testReceiveWaitAllInterruptedKeepsTimeout);
@@ -1747,6 +1829,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testAcceptInterruptedWithTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testReceiveInterruptedNoTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testPollInterruptedNoTimeout);
+	CppUnit_addTest(pSuite, SocketTest, testSelectInterruptedNoTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testPollClosedDescriptor);
 	CppUnit_addTest(pSuite, SocketTest, testPollAtFdLimit);
 #if defined(MSG_DONTWAIT)

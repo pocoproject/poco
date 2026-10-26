@@ -27,6 +27,11 @@
 #include <optional>
 #include <set>
 #include <utility>
+#if defined(POCO_OS_FAMILY_UNIX)
+#include "InterruptingSignal.h"
+#include <csignal>
+#include <pthread.h>
+#endif
 
 
 using Poco::Net::Socket;
@@ -880,6 +885,111 @@ void PollSetTest::testReplacedSocketGetsNoEventOfPredecessor()
 }
 
 
+void PollSetTest::testPollInterruptedNoTimeout()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	static constexpr long INTERRUPT_AFTER_MS = 100;
+	static constexpr long SEND_AFTER_MS = 300;
+	static constexpr long MIN_ELAPSED_MS = 250;
+
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_READ);
+
+	const InterruptingSignal signal;
+
+	// the peer sends only after the poll was interrupted
+	const pthread_t poller = pthread_self();
+	Stopwatch sw;
+	sw.start();
+	Thread peerThread;
+	peerThread.startFunc([&peer, poller]
+		{
+			Thread::sleep(INTERRUPT_AFTER_MS);
+			pthread_kill(poller, SIGUSR1);
+			Thread::sleep(SEND_AFTER_MS - INTERRUPT_AFTER_MS);
+			try
+			{
+				peer.sendBytes("x", 1);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	PollSet::SocketModeMap sm;
+	std::string pollError;
+	try
+	{
+		sm = ps.poll(Timespan(-1, 0));
+	}
+	catch (const Poco::Exception& exc)
+	{
+		pollError = exc.displayText();
+	}
+	sw.stop();
+	peerThread.join();
+
+	if (!pollError.empty()) failmsg(pollError);
+	// the signal does not end a poll without a timeout
+	assertTrue (sm.find(ss) != sm.end());
+	assertTrue (Timespan(sw.elapsed()).totalMilliseconds() >= MIN_ELAPSED_MS);
+#endif
+}
+
+
+void PollSetTest::testPollNegativeTimeoutBelowOneMillisecond()
+{
+	static constexpr long SEND_AFTER_MS = 200;
+	static constexpr long MIN_ELAPSED_MS = 150;
+
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_READ);
+
+	Stopwatch sw;
+	sw.start();
+	Thread peerThread;
+	peerThread.startFunc([&peer]
+		{
+			Thread::sleep(SEND_AFTER_MS);
+			try
+			{
+				peer.sendBytes("x", 1);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	PollSet::SocketModeMap sm;
+	std::string pollError;
+	try
+	{
+		sm = ps.poll(Timespan(-1));
+	}
+	catch (const Poco::Exception& exc)
+	{
+		pollError = exc.displayText();
+	}
+	sw.stop();
+	peerThread.join();
+
+	if (!pollError.empty()) failmsg(pollError);
+	// a negative timeout of less than one millisecond also waits without limit
+	assertTrue (sm.find(ss) != sm.end());
+	assertTrue (Timespan(sw.elapsed()).totalMilliseconds() >= MIN_ELAPSED_MS);
+}
+
+
 void PollSetTest::setUp()
 {
 }
@@ -915,6 +1025,8 @@ CppUnit::Test* PollSetTest::suite()
 	CppUnit_addTest(pSuite, PollSetTest, testUpdateBeforePoll);
 	CppUnit_addTest(pSuite, PollSetTest, testUpdateNotInSet);
 	CppUnit_addTest(pSuite, PollSetTest, testReplacedSocketGetsNoEventOfPredecessor);
+	CppUnit_addTest(pSuite, PollSetTest, testPollInterruptedNoTimeout);
+	CppUnit_addTest(pSuite, PollSetTest, testPollNegativeTimeoutBelowOneMillisecond);
 
 	return pSuite;
 }
