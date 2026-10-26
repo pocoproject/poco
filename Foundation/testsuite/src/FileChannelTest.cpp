@@ -374,6 +374,39 @@ void FileChannelTest::testConcurrentOpenClose()
 }
 
 
+void FileChannelTest::testPathWhileSetPath()
+{
+	// The path is read while another thread sets it: every path read is
+	// one that was set.
+	// Only ThreadSanitizer shows the unlocked read reliably.
+	constexpr int ROUNDS = 10000;
+	const std::string first = "log_path_first.log";
+	const std::string second = "log_path_second_with_a_longer_name.log";
+
+	AutoPtr<FileChannel> pChannel = new FileChannel(first);
+	std::atomic<bool> stop(false);
+	std::thread setter([&]()
+	{
+		for (int i = 0; i < ROUNDS; ++i)
+		{
+			pChannel->setProperty(FileChannel::PROP_PATH, i % 2 == 0 ? second : first);
+		}
+		stop = true;
+	});
+
+	int unexpected = 0;
+	while (!stop)
+	{
+		const std::string path = pChannel->path();
+		if (path != first && path != second) ++unexpected;
+	}
+	setter.join();
+
+	assertEqual (0, unexpected);
+	assertEqual (first, pChannel->path());
+}
+
+
 void FileChannelTest::testRotateBySize()
 {
 	std::string name = filename();
@@ -1299,6 +1332,7 @@ CppUnit::Test* FileChannelTest::suite()
 	CppUnit_addTest(pSuite, FileChannelTest, testOpenCalledByLog);
 	CppUnit_addTest(pSuite, FileChannelTest, testPurgeStrategyReplacedDuringPurge);
 	CppUnit_addTest(pSuite, FileChannelTest, testConcurrentOpenClose);
+	CppUnit_addTest(pSuite, FileChannelTest, testPathWhileSetPath);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySize);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySizeUnits);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotationOverflow);

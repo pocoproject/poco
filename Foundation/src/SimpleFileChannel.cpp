@@ -129,6 +129,8 @@ void SimpleFileChannel::setProperty(const std::string& name, const std::string& 
 
 std::string SimpleFileChannel::getProperty(const std::string& name) const
 {
+	FastMutex::ScopedLock lock(_mutex);
+
 	if (name == PROP_PATH)
 		return _path;
 	else if (name == PROP_SECONDARYPATH)
@@ -144,7 +146,9 @@ std::string SimpleFileChannel::getProperty(const std::string& name) const
 
 Timestamp SimpleFileChannel::creationDate() const
 {
-	if (_pFile)
+	FastMutex::ScopedLock lock(_mutex);
+
+	if (_pFile != nullptr)
 		return _pFile->creationDate();
 	else
 		return 0;
@@ -153,21 +157,25 @@ Timestamp SimpleFileChannel::creationDate() const
 
 UInt64 SimpleFileChannel::size() const
 {
-	if (_pFile)
+	FastMutex::ScopedLock lock(_mutex);
+
+	if (_pFile != nullptr)
 		return _pFile->size();
 	else
 		return 0;
 }
 
 
-const std::string& SimpleFileChannel::path() const
+std::string SimpleFileChannel::path() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _path;
 }
 
 
-const std::string& SimpleFileChannel::secondaryPath() const
+std::string SimpleFileChannel::secondaryPath() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _secondaryPath;
 }
 
