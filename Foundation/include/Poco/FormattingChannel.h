@@ -79,6 +79,13 @@ public:
 		/// passes the formatted message on to the destination
 		/// Channel.
 
+	void log(Message&& msg) override;
+		/// Formats the given Message in place using the Formatter
+		/// and passes it on to the destination Channel as an rvalue.
+		///
+		/// A subclass that overrides log(const Message&) must also
+		/// override this overload, which does not call it.
+
 	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets or changes a configuration property.
 		///
