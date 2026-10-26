@@ -19,6 +19,8 @@
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
 #include "Poco/String.h"
+#include "Poco/NumberParser.h"
+#include <limits>
 
 
 namespace Poco {
@@ -170,21 +172,37 @@ const std::string& SimpleFileChannel::secondaryPath() const
 }
 
 
+namespace
+{
+	[[nodiscard]] UInt64 scaled(UInt64 n, UInt64 factor, const std::string& rotation)
+	{
+		if (n > std::numeric_limits<UInt64>::max()/factor)
+			throw InvalidArgumentException("rotation", rotation);
+		return n*factor;
+	}
+}
+
+
 void SimpleFileChannel::setRotation(const std::string& rotation)
 {
 	std::string::const_iterator it  = rotation.begin();
 	std::string::const_iterator end = rotation.end();
 	UInt64 n = 0;
 	while (it != end && Ascii::isSpace(*it)) ++it;
-	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+	std::string digits;
+	while (it != end && Ascii::isDigit(*it)) digits += *it++;
+	if (!digits.empty() && !NumberParser::tryParseUnsigned64(digits, n))
+		throw InvalidArgumentException("rotation", rotation);
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
 
 	if (unit == "K")
-		_limit = n*1024;
+		_limit = scaled(n, 1024, rotation);
 	else if (unit == "M")
-		_limit = n*1024*1024;
+		_limit = scaled(n, 1024*1024, rotation);
+	else if (unit == "G")
+		_limit = scaled(n, static_cast<UInt64>(1024)*1024*1024, rotation);
 	else if (unit.empty())
 		_limit = n;
 	else if (unit == "never")

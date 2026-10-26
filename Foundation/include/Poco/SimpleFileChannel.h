@@ -59,6 +59,8 @@ class Foundation_API SimpleFileChannel: public Channel
 	///                    <n> Kilobytes.
 	///   * <n> M:         the file is rotated when its size exceeds
 	///                    <n> Megabytes.
+	///   * <n> G:         the file is rotated when its size exceeds
+	///                    <n> Gigabytes.
 	///
 	/// The path of the (primary) log file can be specified with
 	/// the "path" property. Optionally, the path of the secondary

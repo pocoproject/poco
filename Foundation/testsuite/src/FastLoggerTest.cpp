@@ -20,6 +20,7 @@
 #include "Poco/FastLogger.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/FileChannel.h"
+#include "Poco/Exception.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/Thread.h"
@@ -268,6 +269,40 @@ int countLogFiles(const std::string& basePath)
 	}
 
 	return count;
+}
+
+
+class RotationOverrideChannel: public FileChannel
+	/// Reports a rotation value that FileChannel itself would reject, so that
+	/// FastLogger's own check of the value is reached.
+{
+public:
+	RotationOverrideChannel() = delete;
+
+	RotationOverrideChannel(const std::string& path, const std::string& rotation);
+
+	[[nodiscard]] std::string getProperty(const std::string& name) const override;
+
+protected:
+	~RotationOverrideChannel() override = default;
+
+private:
+	std::string _rotation;
+};
+
+
+RotationOverrideChannel::RotationOverrideChannel(const std::string& path, const std::string& rotation):
+	FileChannel(path),
+	_rotation(rotation)
+{
+}
+
+
+std::string RotationOverrideChannel::getProperty(const std::string& name) const
+{
+	if (name == PROP_ROTATION)
+		return _rotation;
+	return FileChannel::getProperty(name);
 }
 
 } // anonymous namespace
@@ -699,6 +734,92 @@ void FastLoggerTest::testRotateWithPurgeCount()
 }
 
 
+void FastLoggerTest::testRotateBySizeGigabytes()
+{
+	std::string logFile = Path::tempHome() + "fastlogger_gigabyte_rotation_test.log";
+	std::string rotatedFile = Path::tempHome() + "fastlogger_gigabyte_rotation_test.1.log";
+	removeLogFiles(logFile);
+
+	try
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(logFile);
+		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 G");
+
+		FastLogger& logger = FastLogger::create("rotate_gigabyte_test", pChannel, Message::PRIO_INFORMATION);
+
+		// Several kilobytes: enough to rotate at the 512-byte minimum of a misread size,
+		// far below 1 GiB.
+		for (int i = 0; i < 50; ++i)
+		{
+			logger.information("Gigabyte rotation test message " + std::to_string(i) + " - padding to ensure sufficient length");
+		}
+
+		logger.flush();
+		FastLogger::shutdown();
+
+		assertTrue (File(logFile).exists());
+		assertTrue (!File(rotatedFile).exists());
+	}
+	catch (...)
+	{
+		removeLogFiles(logFile);
+		FastLogger::shutdown();
+		throw;
+	}
+	removeLogFiles(logFile);
+}
+
+
+void FastLoggerTest::testRotationOverflow()
+{
+	std::string logFile = Path::tempHome() + "fastlogger_overflow_rotation_test.log";
+	removeLogFiles(logFile);
+
+	try
+	{
+		const auto assertRejected = [&](const AutoPtr<Channel>& pChannel, const std::string& name)
+		{
+			try
+			{
+				[[maybe_unused]] FastLogger& logger = FastLogger::create(name, pChannel, Message::PRIO_INFORMATION);
+				fail("must fail: " + name);
+			}
+			catch (Poco::InvalidArgumentException&)
+			{
+			}
+			assertTrue (FastLogger::has(name) == nullptr);
+			FastLogger::shutdown();
+		};
+
+		AutoPtr<Channel> pChannel = new RotationOverrideChannel(logFile, "99999999999 months");
+		assertRejected(pChannel, "rotate_overflow_test");
+
+		// FileChannel accepts this interval; FastLogger stores it in 32 bits.
+		AutoPtr<FileChannel> pFileChannel = new FileChannel(logFile);
+		pFileChannel->setProperty(FileChannel::PROP_ROTATION, "5000000000 minutes");
+		assertRejected(pFileChannel, "rotate_overflow_minutes_test");
+
+		// These intervals fit in 32 bits, but the next rotation time in signed 64-bit nanoseconds would overflow.
+		pFileChannel->setProperty(FileChannel::PROP_ROTATION, "200000000 minutes");
+		assertRejected(pFileChannel, "rotate_overflow_ns_minutes_test");
+
+		pFileChannel->setProperty(FileChannel::PROP_ROTATION, "3000000 hours");
+		assertRejected(pFileChannel, "rotate_overflow_ns_hours_test");
+
+		pFileChannel->setProperty(FileChannel::PROP_ROTATION, "100000000 minutes");
+		[[maybe_unused]] FastLogger& logger = FastLogger::create("rotate_large_minutes_test", pFileChannel, Message::PRIO_INFORMATION);
+		FastLogger::shutdown();
+	}
+	catch (...)
+	{
+		FastLogger::shutdown();
+		removeLogFiles(logFile);
+		throw;
+	}
+	removeLogFiles(logFile);
+}
+
+
 void FastLoggerTest::setUp()
 {
 	FastLogger::shutdown();
@@ -723,6 +844,8 @@ CppUnit::Test* FastLoggerTest::suite()
 	CppUnit_addTest(pSuite, FastLoggerTest, testRotateDaily);
 	CppUnit_addTest(pSuite, FastLoggerTest, testRotateLargeFile);
 	CppUnit_addTest(pSuite, FastLoggerTest, testRotateWithPurgeCount);
+	CppUnit_addTest(pSuite, FastLoggerTest, testRotateBySizeGigabytes);
+	CppUnit_addTest(pSuite, FastLoggerTest, testRotationOverflow);
 
 	return pSuite;
 }
@@ -795,6 +918,18 @@ void FastLoggerTest::testRotateLargeFile()
 
 
 void FastLoggerTest::testRotateWithPurgeCount()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerTest::testRotateBySizeGigabytes()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerTest::testRotationOverflow()
 {
 	// FastLogger not enabled
 }
