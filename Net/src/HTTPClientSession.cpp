@@ -28,6 +28,7 @@
 #include "Poco/RegularExpression.h"
 #include "Poco/String.h"
 #include <algorithm>
+#include <chrono>
 #include <sstream>
 
 
@@ -40,6 +41,10 @@ namespace Poco::Net {
 
 
 namespace {
+
+
+// A request sent just before the server's timeout ends can cross the server closing the connection.
+constexpr std::chrono::seconds SERVER_KEEP_ALIVE_MARGIN{1};
 
 
 bool isConnectionBoundCredentials(const std::string& credentials)
@@ -508,6 +513,11 @@ std::istream& HTTPClientSession::receiveResponse(HTTPResponse& response)
 	const bool tunnelEstablished = _connectRequest && response.getStatus() >= 200 && response.getStatus() < 300;
 	// After a 101 response or an established tunnel, the connection no longer carries HTTP messages of this session.
 	_mustReconnect = (getKeepAlive() && !response.getKeepAlive()) || response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS || tunnelEstablished;
+	if (response.getKeepAlive())
+		_serverKeepAliveTimeout = response.getKeepAliveTimeout();
+	else
+		_serverKeepAliveTimeout.reset();
+	_lastResponse.update();
 	const bool hasBody = _expectResponseBody && !tunnelEstablished && response.getStatus() >= 200 && response.getStatus() != HTTPResponse::HTTP_NO_CONTENT && response.getStatus() != HTTPResponse::HTTP_NOT_MODIFIED;
 	if (hasBody)
 	{
@@ -650,6 +660,7 @@ int HTTPClientSession::write(const char* buffer, std::streamsize length)
 
 void HTTPClientSession::reconnect()
 {
+	_serverKeepAliveTimeout.reset();
 	SocketAddress addr;
 	if (_proxyConfig.host.empty() || bypassProxy())
 	{
@@ -725,6 +736,12 @@ bool HTTPClientSession::mustReconnect() const
 	if (!_mustReconnect)
 	{
 		Poco::Timestamp now;
+		if (_serverKeepAliveTimeout.has_value())
+		{
+			// Half of a short timeout as the margin keeps a connection with a timeout of one second reusable.
+			const Poco::Timespan margin = std::min(Poco::Timespan(SERVER_KEEP_ALIVE_MARGIN), Poco::Timespan(_serverKeepAliveTimeout->totalMicroseconds() / 2));
+			if (*_serverKeepAliveTimeout - margin <= now - _lastResponse) return true;
+		}
 		return _keepAliveTimeout <= now - _lastRequest;
 	}
 	else return true;
@@ -864,6 +881,7 @@ void HTTPClientSession::proxyTunnel()
 	// A response of the previous connection must not decide whether the tunnel is reused.
 	_pResponseStream = nullptr;
 	_mustReconnect = false;
+	_serverKeepAliveTimeout.reset();
 }
 
 

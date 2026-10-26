@@ -242,6 +242,10 @@ Bug Fixes and Improvements:
   backend (about 290 years).
 - GH #5510 Poco::Net::TCPServerDispatcher counts a connection until its TCPServerConnection object
   has been destroyed.
+- GH #5510 Poco::Net::HTTPClientSession does not reuse a connection longer than the timeout that
+  the server announces in its Keep-Alive header, counted from the receipt of the response header,
+  less one second, or less half of it when it is shorter than two seconds. New:
+  Poco::Net::HTTPMessage::getKeepAliveTimeout(), which returns std::optional<Poco::Timespan>.
 
 
 Release 1.15.4 (2026-09-22)
