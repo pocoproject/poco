@@ -68,6 +68,13 @@ class Foundation_API Logger: public Channel
 	/// Nevertheless, there are methods to simultaneously change the level and channel of
 	/// all loggers in a certain hierarchy.
 	///
+	/// get(), root(), has(), create(), destroy(), names(), setLevel(), setChannel()
+	/// and shutdown() may be called while static objects are constructed and
+	/// destroyed; setProperty() with the channel property may not, because it looks
+	/// up the channel in the LoggingRegistry, which is destroyed at exit.
+	/// Loggers are not freed at exit; their channels are detached and released
+	/// by the thread that destroys the static objects.
+	///
 	/// There are also convenience macros available that wrap the actual
 	/// logging statement into a check whether the Logger's log level
 	/// is sufficient to actually log the message. This allows to increase
@@ -495,8 +502,6 @@ protected:
 	[[nodiscard]] static Ptr find(const std::string& name);
 
 private:
-	using LoggerMapPtr = std::unique_ptr<LoggerMap>;
-
 	Logger();
 	Logger(const Logger&);
 	Logger& operator = (const Logger&);
@@ -519,7 +524,28 @@ private:
 		/// Attaches the given Channel and returns the one that was
 		/// attached. A thread that logs may still use that one: the
 		/// caller lets go of it with DeferredRelease, where it holds
-		/// no mutex.
+		/// no mutex. Only at exit are the channels let go of directly.
+
+	[[nodiscard]] static Mutex& mapMutex();
+		/// Returns the mutex of the logger map, which is built on
+		/// first use and never destroyed.
+
+	[[nodiscard]] static LoggerMap& loggerMap();
+		/// Returns the logger map, which is built on first use and
+		/// never destroyed. The caller holds the mapMutex().
+
+	class ExitGuard
+		/// Releases the channels of all loggers when the static objects
+		/// of the program are destroyed.
+	{
+	public:
+		ExitGuard() = default;
+		ExitGuard(const ExitGuard&) = delete;
+		ExitGuard& operator = (const ExitGuard&) = delete;
+		~ExitGuard();
+	};
+
+	static ExitGuard _exitGuard;
 
 	std::string       _name;
 	Channel::Ptr      _pChannel;
@@ -528,10 +554,6 @@ private:
 		/// without the mutex and without counting a reference.
 	std::atomic<int>  _level;
 	mutable FastMutex _channelMutex;
-
-	// definitions in Foundation.cpp
-	static LoggerMapPtr _pLoggerMap;
-	static Mutex      _mapMtx;
 };
 
 

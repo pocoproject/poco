@@ -228,6 +228,10 @@ Bug Fixes and Improvements:
   character, a '*' or an empty label; before, with OpenSSL a name with a trailing NUL, a wildcard
   host name or a name with a leading '.' could match, and in NetSSL_Win a NUL in the leftmost label
   or a wildcard host name matched a wildcard certificate.
+- GH #5510 Poco::Logger keeps its logger map and its mutex in storage that is never destroyed,
+  so that Logger::get() works while static objects are constructed and destroyed; at exit the
+  channels are detached and released by the thread that destroys the static objects, and the
+  loggers are not freed.
 
 
 Release 1.15.4 (2026-09-22)
