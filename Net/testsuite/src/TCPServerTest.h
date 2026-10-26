@@ -29,6 +29,7 @@ public:
 	void testMultiConnections();
 	void testThreadCapacity();
 	void testFilter();
+	void testAcceptResourceError();
 
 	void setUp();
 	void tearDown();
@@ -36,6 +37,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void checkPauseAfterAcceptError(int errorCode);
 };
 
 
