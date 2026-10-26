@@ -90,6 +90,9 @@ Breaking Changes:
   throws, where it used to return the value and skip the next line, and
   RedisInputStream::getline() throws Poco::Redis::RedisException when the stream ends before the
   end of the line.
+- GH #5510 Poco::FormattingChannel overrides log(Message&&) and formats the message in place
+  instead of copying it; a subclass that overrides log(const Message&) must also override
+  log(Message&&). New: Poco::Message::setText(std::string&&).
 
 Bundled Third-Party Library Upgrades:
 
