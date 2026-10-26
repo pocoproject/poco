@@ -237,6 +237,8 @@ Bug Fixes and Improvements:
   accept the rotation size unit G and throw Poco::InvalidArgumentException for a rotation value
   whose number overflows. FastLogger also rejects a rotation interval beyond the range of its
   backend (about 290 years).
+- GH #5510 Poco::Net::TCPServerDispatcher counts a connection until its TCPServerConnection object
+  has been destroyed.
 
 
 Release 1.15.4 (2026-09-22)

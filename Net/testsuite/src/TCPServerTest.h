@@ -30,6 +30,9 @@ public:
 	void testThreadCapacity();
 	void testFilter();
 	void testAcceptResourceError();
+	void testConnectionCountAfterDestructor();
+	void testFactoryThrows();
+	void testRefusedNotCounted();
 
 	void setUp();
 	void tearDown();
