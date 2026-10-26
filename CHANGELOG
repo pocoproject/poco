@@ -232,6 +232,9 @@ Bug Fixes and Improvements:
   so that Logger::get() works while static objects are constructed and destroyed; at exit the
   channels are detached and released by the thread that destroys the static objects, and the
   loggers are not freed.
+- GH #5520 Poco::Logger::destroy() lets go of the logger after it has released the mutex of the
+  logger map, so that a channel destructor that waits for a thread asking for a logger no longer
+  deadlocks.
 
 
 Release 1.15.4 (2026-09-22)
