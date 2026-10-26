@@ -36,6 +36,10 @@ public:
 	void testConnect();
 	void testConnectRefused();
 	void testConnectRefusedNB();
+	void testConnectTimeoutErrorNamesAddress();
+	void testBindErrorNamesAddress();
+	void testErrorNamesArgument();
+	void testErrorWithoutArgumentKeepsText();
 	void testNonBlocking();
 	void testAddress();
 	void testAssign();
@@ -88,6 +92,9 @@ public:
 private:
 	void onReadable(bool& b);
 	void onWritable(bool& b);
+	void assertSocketError(int code, const std::string& arg, const std::string& name, const std::string& message);
+		/// Checks that SocketImpl::error() throws an exception with the
+		/// given name and message for the code and argument.
 
 	int _readableToNot = 0;
 	int _notToReadable = 0;
