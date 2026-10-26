@@ -92,6 +92,13 @@ public:
 	void testShortRequestWriteClosesConnection();
 	void testFailedChunkedHeaderSendThrows();
 	void testFailedReconnectIsNotRetried();
+	void testServerKeepAliveTimeoutReconnects();
+	void testServerKeepAliveTimeoutKeepsConnection();
+	void testSessionKeepAliveTimeoutShorterThanServerReconnects();
+	void testProxyTunnelIgnoresServerKeepAliveTimeout();
+	void testServerKeepAliveTimeoutCountedFromResponse();
+	void testServerKeepAliveTimeoutCountedFromPeekedResponse();
+	void testServerKeepAliveTimeoutLessOneSecond();
 
 	void setUp();
 	void tearDown();
@@ -102,6 +109,11 @@ private:
 	void assertNewConnectionServes(Poco::Net::HTTPClientSession& session, Poco::Net::ServerSocket& server, Poco::Net::HTTPRequest& request);
 		/// Sends request on session and checks that it arrives on a new
 		/// connection from server and that the response sent there is read.
+
+	[[nodiscard]] Poco::Net::StreamSocket answerWithKeepAlive(Poco::Net::HTTPClientSession& session, Poco::Net::ServerSocket& server, Poco::Net::HTTPRequest& request, const std::string& keepAliveFields);
+		/// Sends request on session, answers it on the connection accepted from server
+		/// with an empty keep-alive response that also carries the given header fields,
+		/// receives the response and returns the connection.
 
 	std::string receiveHeader(Poco::Net::StreamSocket& peer);
 		/// Returns the bytes received from peer up to and including the empty line
