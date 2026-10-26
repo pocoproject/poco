@@ -102,6 +102,12 @@ Breaking Changes:
   the path by value, read under the mutex of the channel. Callers that keep a reference, a
   string_view or the c_str() of the result must copy it. Poco::SimpleFileChannel::size() and
   creationDate() read the log file under the mutex as well.
+- GH #5520 Poco::AsyncChannel: close() delivers the queued messages and stops the worker thread
+  without polling, a message logged while close() runs no longer starts the worker again,
+  open() after close() makes the channel accept messages again, and the queue size limit and
+  the count of dropped messages are synchronized. log() starts the background thread without
+  calling the virtual open(), so an open() that a subclass overrides is no longer called by
+  log().
 
 Bundled Third-Party Library Upgrades:
 

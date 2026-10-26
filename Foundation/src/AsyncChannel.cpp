@@ -64,7 +64,8 @@ private:
 AsyncChannel::AsyncChannel(Channel::Ptr pChannel, Thread::Priority prio):
 	_pChannel(pChannel),
 	_thread("AsyncChannel"),
-	_closed(false)
+	_closed(false),
+	_pStop(new Notification)
 {
 	_thread.setPriority(prio);
 }
@@ -105,24 +106,60 @@ void AsyncChannel::open()
 {
 	FastMutex::ScopedLock lock(_threadMutex);
 
-	if (!_thread.isRunning()) _thread.start(*this);
+	_closed = false;
+	if (!_running) startThread();
 }
 
 
 void AsyncChannel::close()
 {
-	if (!_closed.exchange(true))
+	FastMutex::ScopedLock lock(_threadMutex);
+
+	if (!_closed.exchange(true) && _running)
 	{
+		// A notification at the back of the queue, unlike wakeUpAll(), leaves
+		// no woken state behind that would end a thread started by open().
+		_queue.enqueueNotification(_pStop);
+		_thread.join();
+		_running = false;
+	}
+}
+
+
+void AsyncChannel::startWorker()
+{
+	// The background thread itself logs here when the target channel logs
+	// back into this channel; it never needs to start itself and must not wait for the mutex
+	// that close() holds while it joins the thread. Thread::isRunning() is not
+	// used here: on Windows it reads the thread handle that join() and start()
+	// replace.
+	if (_running || Thread::current() == &_thread) return;
+
+	FastMutex::ScopedLock lock(_threadMutex);
+
+	if (!_closed && !_running) startThread();
+}
+
+
+void AsyncChannel::startThread()
+{
+	// Set before the thread starts, so that startWorker() does not start it twice.
+	_running = true;
+	try
+	{
+		_thread.start(*this);
+	}
+	catch (...)
+	{
+		// Thread::start() sets the priority after the thread runs and throws if that fails;
+		// close() would not stop that thread once _running is false.
 		if (_thread.isRunning())
 		{
-			while (!_queue.empty()) Thread::sleep(100);
-
-			do
-			{
-				_queue.wakeUpAll();
-			}
-			while (!_thread.tryJoin(100));
+			_queue.enqueueNotification(_pStop);
+			_thread.join();
 		}
+		_running = false;
+		throw;
 	}
 }
 
@@ -134,19 +171,22 @@ void AsyncChannel::logImpl(M&& msg)
 	// A message that the ErrorHandler logs through this channel while the worker reports
 	// a failure of the target would fail again and keep the worker busy for good.
 	if (_inErrorHandler && Thread::current() == &_thread) return;
-	if (_queueSize != 0 && static_cast<std::size_t>(_queue.size()) >= _queueSize)
+	const std::size_t queueSize = _queueSize;
+	if (queueSize != 0 && static_cast<std::size_t>(_queue.size()) >= queueSize)
 	{
-		++_dropCount;
+		_dropCount.fetch_add(1);
 		return;
 	}
 
 	if (_dropCount != 0)
 	{
-		_queue.enqueueNotification(new MessageNotification(Message(msg, Poco::format("Dropped %z messages.", _dropCount))));
-		_dropCount = 0;
+		// Another thread can take the count between the check and the exchange.
+		const std::size_t dropped = _dropCount.exchange(0);
+		if (dropped != 0)
+			_queue.enqueueNotification(new MessageNotification(Message(msg, Poco::format("Dropped %z messages.", dropped))));
 	}
 
-	open();
+	startWorker();
 
 	_queue.enqueueNotification(new MessageNotification(std::forward<M>(msg)));
 }
@@ -218,7 +258,7 @@ void AsyncChannel::run()
 	}
 
 	AutoPtr<Notification> nf = _queue.waitDequeueNotification();
-	while (nf)
+	while (nf != nullptr && nf != _pStop)
 	{
 		MessageNotification* pNf = dynamic_cast<MessageNotification*>(nf.get());
 		if (pNf)
