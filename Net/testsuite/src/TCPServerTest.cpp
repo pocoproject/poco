@@ -274,6 +274,17 @@ namespace
 	{
 		return nullptr;
 	}
+
+	class DerivedServer: public TCPServer
+		/// Its destructor runs while the server thread is still running.
+	{
+	public:
+		using TCPServer::TCPServer;
+		DerivedServer() = delete;
+		~DerivedServer() override;
+	};
+
+	DerivedServer::~DerivedServer() = default;
 }
 
 
@@ -592,6 +603,27 @@ void TCPServerTest::testRefusedNotCounted()
 }
 
 
+void TCPServerTest::testDestroyRunningSubclass()
+{
+	// Only ThreadSanitizer shows the defect: a data race on the vptr between the destructor of the
+	// derived class and a virtual call of run() in the server thread. The rest checks that a server
+	// of a derived class still serves a connection.
+	{
+		DerivedServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>());
+		srv.start();
+	}
+	DerivedServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>());
+	srv.start();
+	StreamSocket ss(SocketAddress("127.0.0.1", srv.port()));
+	ss.setReceiveTimeout(Timespan(WAIT_LIMIT));
+	const std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[RECEIVE_BUFFER_SIZE];
+	const int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (std::string(buffer, n) == data);
+}
+
+
 void TCPServerTest::setUp()
 {
 }
@@ -615,6 +647,7 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testConnectionCountAfterDestructor);
 	CppUnit_addTest(pSuite, TCPServerTest, testFactoryThrows);
 	CppUnit_addTest(pSuite, TCPServerTest, testRefusedNotCounted);
+	CppUnit_addTest(pSuite, TCPServerTest, testDestroyRunningSubclass);
 
 	return pSuite;
 }

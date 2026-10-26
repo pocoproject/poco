@@ -33,6 +33,7 @@ public:
 	void testConnectionCountAfterDestructor();
 	void testFactoryThrows();
 	void testRefusedNotCounted();
+	void testDestroyRunningSubclass();
 
 	void setUp();
 	void tearDown();

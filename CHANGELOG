@@ -103,6 +103,9 @@ Breaking Changes:
   the count of dropped messages are synchronized. log() starts the background thread without
   calling the virtual open(), so an open() that a subclass overrides is no longer called by
   log().
+- GH #5510 Poco::Net::TCPServer::run() is final, and the acceptor thread runs it without a
+  virtual call, so that the thread no longer reads the vptr while the constructor or destructor
+  of a subclass writes it; a subclass can no longer override run().
 
 Bundled Third-Party Library Upgrades:
 
