@@ -17,9 +17,17 @@
 #include "Poco/Net/TCPServerParams.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/ServerSocketImpl.h"
+#include "Poco/Net/SocketDefs.h"
 #include "Poco/Thread.h"
 #include "Poco/Mutex.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/Exception.h"
+#include "Poco/Stopwatch.h"
+#include "Poco/Timespan.h"
+#include <atomic>
 #include <iostream>
+#include <string>
 
 
 using Poco::Net::TCPServer;
@@ -73,6 +81,107 @@ namespace
 		bool accept(const StreamSocket&)
 		{
 			return false;
+		}
+	};
+
+	class CountingErrorHandler: public Poco::ErrorHandler
+		/// Counts the exceptions reported to it. It is installed as the
+		/// ErrorHandler for its lifetime.
+	{
+	public:
+		POCO_NODISCARD_CTOR CountingErrorHandler():
+			_pPrevious(Poco::ErrorHandler::set(this))
+		{
+		}
+
+		~CountingErrorHandler() override
+		{
+			Poco::ErrorHandler::set(_pPrevious);
+		}
+
+		CountingErrorHandler(const CountingErrorHandler&) = delete;
+		CountingErrorHandler(CountingErrorHandler&&) = delete;
+		CountingErrorHandler& operator = (const CountingErrorHandler&) = delete;
+		CountingErrorHandler& operator = (CountingErrorHandler&&) = delete;
+
+		void exception(const Poco::Exception&) override
+		{
+			++_reports;
+		}
+
+		void exception(const std::exception&) override
+		{
+			++_reports;
+		}
+
+		void exception() override
+		{
+			++_reports;
+		}
+
+		[[nodiscard]] int reports() const
+		{
+			return _reports;
+		}
+
+	private:
+		Poco::ErrorHandler* _pPrevious;
+		std::atomic<int> _reports{0};
+	};
+
+	class FailingAcceptSocketImpl: public Poco::Net::ServerSocketImpl
+		/// Fails every accept with the given error code, as accept() does
+		/// when the process runs out of descriptors or memory, until
+		/// stopFailing() is called. The pending connection stays queued.
+	{
+	public:
+		explicit FailingAcceptSocketImpl(int errorCode):
+			_errorCode(errorCode)
+		{
+		}
+
+		FailingAcceptSocketImpl() = delete;
+
+		FailingAcceptSocketImpl(const FailingAcceptSocketImpl&) = delete;
+		FailingAcceptSocketImpl(FailingAcceptSocketImpl&&) = delete;
+		FailingAcceptSocketImpl& operator = (const FailingAcceptSocketImpl&) = delete;
+		FailingAcceptSocketImpl& operator = (FailingAcceptSocketImpl&&) = delete;
+
+		[[nodiscard]] Poco::Net::SocketImpl* acceptConnection(Poco::Net::SocketAddress& clientAddr) override
+		{
+			if (_failing) throw Poco::IOException("Resource error", _errorCode);
+			return ServerSocketImpl::acceptConnection(clientAddr);
+		}
+
+		void stopFailing()
+		{
+			_failing = false;
+		}
+
+	protected:
+		~FailingAcceptSocketImpl() override = default;
+
+	private:
+		const int _errorCode;
+		std::atomic<bool> _failing{true};
+	};
+
+	class FailingAcceptSocket: public ServerSocket
+		/// A ServerSocket whose accepts fail until
+		/// failingImpl().stopFailing() is called.
+	{
+	public:
+		explicit FailingAcceptSocket(int errorCode):
+			ServerSocket(new FailingAcceptSocketImpl(errorCode), true)
+		{
+		}
+
+		FailingAcceptSocket() = delete;
+		~FailingAcceptSocket() override = default;
+
+		[[nodiscard]] FailingAcceptSocketImpl& failingImpl() const
+		{
+			return *static_cast<FailingAcceptSocketImpl*>(impl());
 		}
 	};
 }
@@ -282,6 +391,59 @@ void TCPServerTest::testFilter()
 }
 
 
+void TCPServerTest::testAcceptResourceError()
+{
+	checkPauseAfterAcceptError(POCO_EMFILE);
+	checkPauseAfterAcceptError(POCO_ENOBUFS);
+#if defined(POCO_OS_FAMILY_UNIX)
+	checkPauseAfterAcceptError(ENFILE);
+	checkPauseAfterAcceptError(ENOMEM);
+#endif
+}
+
+
+void TCPServerTest::checkPauseAfterAcceptError(int errorCode)
+{
+	constexpr long WINDOW_MS = 500;
+	constexpr int MAX_REPORTS = 100;
+
+	const std::string context = "error code " + std::to_string(errorCode) + ": ";
+	CountingErrorHandler handler;
+	FailingAcceptSocket svs(errorCode);
+	svs.bind(SocketAddress("127.0.0.1", 0));
+	svs.listen();
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	StreamSocket client;
+	client.connect(SocketAddress("127.0.0.1", svs.address().port()));
+	Poco::Stopwatch sw;
+	sw.start();
+	while (handler.reports() == 0 && sw.elapsedSeconds() < 10)
+	{
+		Thread::sleep(10);
+	}
+	if (handler.reports() == 0) failmsg(context + "the failed accept was not reported");
+
+	// A measurement window, not synchronization: about 10 reports with the
+	// pause after a failed accept, thousands without it.
+	const int reportsBefore = handler.reports();
+	Thread::sleep(WINDOW_MS);
+	const int reports = handler.reports() - reportsBefore;
+	if (reports >= MAX_REPORTS)
+		failmsg(context + std::to_string(reports) + " failed accepts in the window, the acceptor does not pause");
+
+	svs.failingImpl().stopFailing();
+	client.setReceiveTimeout(Poco::Timespan(5, 0));
+	const char sent = 'x';
+	client.sendBytes(&sent, 1);
+	char received = 0;
+	if (client.receiveBytes(&received, 1) != 1 || received != sent)
+		failmsg(context + "the connection was not served after the accepts succeeded again");
+	srv.stop();
+}
+
+
 void TCPServerTest::setUp()
 {
 }
@@ -301,6 +463,7 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testMultiConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testThreadCapacity);
 	CppUnit_addTest(pSuite, TCPServerTest, testFilter);
+	CppUnit_addTest(pSuite, TCPServerTest, testAcceptResourceError);
 
 	return pSuite;
 }
