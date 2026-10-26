@@ -122,6 +122,9 @@ public:
 		/// changes accordingly to its mode, or the timeout expires.
 		/// Returns a PollMap containing the sockets that have had
 		/// their state changed.
+		///
+		/// A negative timeout waits without limit, also when a signal
+		/// interrupts the wait.
 
 	void wakeUp();
 		/// Wakes up a waiting PollSet.

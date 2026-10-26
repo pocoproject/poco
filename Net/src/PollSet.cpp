@@ -182,6 +182,7 @@ public:
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
 	{
 		PollSet::SocketModeMap result;
+		const bool infinite = timeout < 0;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
@@ -193,8 +194,9 @@ public:
 
 		while (true)
 		{
+			const int milliseconds = infinite ? -1 : static_cast<int>(remainingTime.totalMilliseconds());
 			Poco::Timestamp start;
-			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
+			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), milliseconds);
 			if (rc == 0)
 			{
 				if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
@@ -213,7 +215,7 @@ public:
 				// if interrupted and there's still time left, keep waiting
 				if (SocketImpl::lastError() == POCO_EINTR)
 				{
-					if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
+					if (!pollLock.isClosed() && (infinite || keepWaiting(start, remainingTime))) continue;
 				}
 				else if (pollLock.isClosed())
 				{
@@ -570,14 +572,16 @@ public:
 
 		if (_polledFds.empty()) return result;
 
+		const bool infinite = timeout < 0;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
 		do
 		{
+			const int milliseconds = infinite ? -1 : static_cast<int>(remainingTime.totalMilliseconds());
 			Poco::Timestamp start;
-			rc = ::poll(_polledFds.data(), _polledFds.size(), remainingTime.totalMilliseconds());
-			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+			rc = ::poll(_polledFds.data(), _polledFds.size(), milliseconds);
+			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !infinite)
 			{
 				Poco::Timestamp end;
 				Poco::Timespan waited = end - start;
@@ -795,6 +799,7 @@ public:
 			_addedSockets.clear();
 		}
 
+		const bool infinite = timeout < 0;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
@@ -804,8 +809,8 @@ public:
 			tv.tv_sec  = (long) remainingTime.totalSeconds();
 			tv.tv_usec = (long) remainingTime.useconds();
 			Poco::Timestamp start;
-			rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
-			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+			rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, infinite ? nullptr : &tv);
+			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !infinite)
 			{
 				Poco::Timestamp end;
 				Poco::Timespan waited = end - start;

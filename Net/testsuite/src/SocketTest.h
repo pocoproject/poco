@@ -61,6 +61,7 @@ public:
 	void testCloseOnExec();
 	void testReceiveNonBlockingIgnoresTimeout();
 	void testPollNegativeTimeoutBelowOneMillisecond();
+	void testSelectNegativeTimeoutBelowOneMillisecond();
 #if defined(POCO_OS_FAMILY_UNIX)
 	void testReceiveInterruptedWithTimeout();
 	void testReceiveWaitAllInterruptedKeepsTimeout();
@@ -69,6 +70,7 @@ public:
 	void testAcceptInterruptedWithTimeout();
 	void testReceiveInterruptedNoTimeout();
 	void testPollInterruptedNoTimeout();
+	void testSelectInterruptedNoTimeout();
 	void testPollClosedDescriptor();
 	void testPollAtFdLimit();
 #if defined(MSG_DONTWAIT)
