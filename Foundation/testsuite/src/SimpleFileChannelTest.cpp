@@ -16,6 +16,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Exception.h"
 #include "SimpleFileChannelTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -29,6 +30,7 @@ using Poco::DirectoryIterator;
 using Poco::Timestamp;
 using Poco::DateTimeFormatter;
 using Poco::AutoPtr;
+using Poco::InvalidArgumentException;
 
 
 SimpleFileChannelTest::SimpleFileChannelTest(const std::string& name): CppUnit::TestCase(name)
@@ -66,6 +68,68 @@ void SimpleFileChannelTest::testRotate()
 		throw;
 	}
 	remove(name);
+}
+
+
+void SimpleFileChannelTest::testRotateBySizeUnits()
+{
+	std::string name = filename();
+	try
+	{
+		AutoPtr<SimpleFileChannel> pChannel = new SimpleFileChannel(name);
+		pChannel->setProperty(SimpleFileChannel::PROP_ROTATION, "1 G");
+		assertTrue (pChannel->getProperty(SimpleFileChannel::PROP_ROTATION) == "1 G");
+		pChannel->setProperty(SimpleFileChannel::PROP_ROTATION, "4 G");
+		assertTrue (pChannel->getProperty(SimpleFileChannel::PROP_ROTATION) == "4 G");
+		try
+		{
+			pChannel->setProperty(SimpleFileChannel::PROP_ROTATION, "1 X");
+			fail("must fail");
+		}
+		catch (InvalidArgumentException&)
+		{
+		}
+		pChannel->open();
+		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
+		for (int i = 0; i < 200; ++i)
+		{
+			pChannel->log(msg);
+		}
+		File f(name);
+		assertTrue (f.exists());
+		f = name + ".0";
+		assertTrue (!f.exists());
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
+void SimpleFileChannelTest::testRotationOverflow()
+{
+	AutoPtr<SimpleFileChannel> pChannel = new SimpleFileChannel(filename());
+	pChannel->setProperty(SimpleFileChannel::PROP_ROTATION, "2 K");
+	const auto assertRejected = [&](const std::string& rotation)
+	{
+		try
+		{
+			pChannel->setProperty(SimpleFileChannel::PROP_ROTATION, rotation);
+			fail("must fail: " + rotation);
+		}
+		catch (InvalidArgumentException& exc)
+		{
+			assertTrue (exc.message().find(rotation) != std::string::npos);
+		}
+		assertTrue (pChannel->getProperty(SimpleFileChannel::PROP_ROTATION) == "2 K");
+	};
+	assertRejected("99999999999999999 K");
+	assertRejected("99999999999999 M");
+	assertRejected("99999999999 G");
+	assertRejected("1234567890123456789012345");
 }
 
 
@@ -120,6 +184,8 @@ CppUnit::Test* SimpleFileChannelTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SimpleFileChannelTest");
 
 	CppUnit_addTest(pSuite, SimpleFileChannelTest, testRotate);
+	CppUnit_addTest(pSuite, SimpleFileChannelTest, testRotateBySizeUnits);
+	CppUnit_addTest(pSuite, SimpleFileChannelTest, testRotationOverflow);
 
 	return pSuite;
 }

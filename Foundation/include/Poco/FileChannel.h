@@ -85,6 +85,8 @@ class Foundation_API FileChannel: public Channel
 	///                    <n> Kilobytes.
 	///   * <n> M:         the file is rotated when its size exceeds
 	///                    <n> Megabytes.
+	///   * <n> G:         the file is rotated when its size exceeds
+	///                    <n> Gigabytes.
 	///
 	/// NOTE: For periodic log file rotation (daily, weekly, monthly, etc.),
 	/// the date and time of log file creation or last rotation is

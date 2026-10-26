@@ -223,6 +223,10 @@ Bug Fixes and Improvements:
 - GH #5520 Poco::Logger::destroy() lets go of the logger after it has released the mutex of the
   logger map, so that a channel destructor that waits for a thread asking for a logger no longer
   deadlocks.
+- GH #5510 Poco::FileChannel, Poco::SimpleFileChannel and the FastLogger channels built from them
+  accept the rotation size unit G and throw Poco::InvalidArgumentException for a rotation value
+  whose number overflows. FastLogger also rejects a rotation interval beyond the range of its
+  backend (about 290 years).
 
 
 Release 1.15.4 (2026-09-22)
