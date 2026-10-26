@@ -32,6 +32,7 @@ public:
 	void testSystemError();
 	void testHostByNameEmbeddedNul();
 	void testAIError();
+	void testHostEntryMoveNoexcept();
 
 	void setUp();
 	void tearDown();

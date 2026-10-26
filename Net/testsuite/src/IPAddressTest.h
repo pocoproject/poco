@@ -42,6 +42,7 @@ public:
 	void testOperators();
 	void testByteOrderMacros();
 	void testScoped();
+	void testMoveNoexcept();
 
 	void setUp();
 	void tearDown();
