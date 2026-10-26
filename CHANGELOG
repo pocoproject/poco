@@ -58,6 +58,11 @@ Breaking Changes:
   messages that the ErrorHandler logs through the same channel while it handles such an
   exception are dropped. A new private member changes the class layout: recompile against the
   new header.
+- GH #5510 Poco::Net::DialogSocket::sendMessage() throws Poco::InvalidArgumentException for a
+  message or an argument that contains CR or LF; the commands of SMTPClientSession,
+  POP3ClientSession and FTPClientSession are sent through it. Code that sends several lines in
+  one call, such as a multi-line reply of a server, uses sendString() and adds the line ends
+  itself.
 
 Bundled Third-Party Library Upgrades:
 

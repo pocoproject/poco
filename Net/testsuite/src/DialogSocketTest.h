@@ -25,6 +25,7 @@ public:
 	~DialogSocketTest();
 
 	void testDialogSocket();
+	void testSendMessageRejectsCRLF();
 
 	void setUp();
 	void tearDown();
