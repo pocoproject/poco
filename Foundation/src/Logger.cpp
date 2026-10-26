@@ -428,12 +428,21 @@ Logger::Ptr Logger::find(const std::string& name)
 
 void Logger::destroy(const std::string& name)
 {
-	Mutex::ScopedLock lock(_mapMtx);
-
-	if (_pLoggerMap)
+	// The logger is released when the mutex is free again: the destructor
+	// of its channel may wait for a thread that asks for a logger.
+	Logger::Ptr pLogger;
 	{
-		LoggerMap::iterator it = _pLoggerMap->find(name);
-		if (it != _pLoggerMap->end()) _pLoggerMap->erase(it);
+		Mutex::ScopedLock lock(_mapMtx);
+
+		if (_pLoggerMap)
+		{
+			LoggerMap::iterator it = _pLoggerMap->find(name);
+			if (it != _pLoggerMap->end())
+			{
+				pLogger = it->second;
+				_pLoggerMap->erase(it);
+			}
+		}
 	}
 }
 

@@ -35,6 +35,7 @@ public:
 	void testConcurrentShutdown();
 	void testLogDuringDestructionOfReplaced();
 	void testGetDuringDestructionOfDetached();
+	void testGetDuringDestroy();
 	void testConcurrentSetLevel();
 	void testReplacedChannelReleased();
 	void testReplaceChannelWithMessageOnItsWay();
