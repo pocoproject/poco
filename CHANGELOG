@@ -263,6 +263,7 @@ Bug Fixes and Improvements:
   which made a wait end early, spin or never end: with epoll (Linux, Windows, Android) the whole
   timeout is waited, and with poll() (BSD, macOS) the wait ends after INT_MAX milliseconds, as in
   Socket::poll().
+- GH #5510 Poco::Net::HTTPBasicCredentials accepts base64 credentials without padding.
 
 
 Release 1.15.4 (2026-09-22)
