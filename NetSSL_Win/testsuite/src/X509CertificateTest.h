@@ -37,6 +37,7 @@ public:
 	void testVerifyExpired();
 	void testVerifyIssuedCertificate();
 	void testVerifyIgnoresOtherCertificateErrors();
+	void testInvalidCertificateExceptionName();
 
 	void setUp();
 	void tearDown();
