@@ -379,6 +379,7 @@ void ThreadTest::testTryJoin()
 	assertTrue (!thread.tryJoin(100));
 	r.notify();
 	assertTrue (thread.tryJoin(500));
+	assertTrue (thread.tryJoin(500));
 	assertTrue (!thread.isRunning());
 }
 
@@ -394,6 +395,7 @@ void ThreadTest::testJoin()
 	assertTrue(!thread.tryJoin(100));
 	r.stop();
 	thread.join();
+	assertTrue(thread.tryJoin(100));
 	assertTrue(!thread.isRunning());
 	assertTrue(!r.running());
 }

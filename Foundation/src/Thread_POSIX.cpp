@@ -328,7 +328,8 @@ void ThreadImpl::joinImpl()
 
 bool ThreadImpl::joinImpl(long milliseconds)
 {
-	if (_pData->started && _pData->done.tryWait(milliseconds) && !_pData->joined)
+	if (_pData->joined) return true;
+	if (_pData->started && _pData->done.tryWait(milliseconds))
 	{
 		int errorCode;
 		if ((errorCode = pthread_join(_pData->thread, nullptr)))
