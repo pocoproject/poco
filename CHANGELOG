@@ -119,6 +119,10 @@ Breaking Changes:
 - GH #5510 Poco::Net socket exceptions name the address of the failed operation for every error
   code, and a connect with a timeout names the address also when the failure is reported after
   the wait. The message texts change.
+- GH #5510 Poco::Net::DNS: an unknown getaddrinfo() error code is reported with its text and the
+  host name, not only as a number. The message text changes: it has the form
+  'EAI <code>: <text>', with the host as the argument. DNSException::code() carries the
+  getaddrinfo() error code, where it was 0.
 
 Bundled Third-Party Library Upgrades:
 

@@ -31,6 +31,7 @@ public:
 	void testDecodeIDN();
 	void testSystemError();
 	void testHostByNameEmbeddedNul();
+	void testAIError();
 
 	void setUp();
 	void tearDown();
