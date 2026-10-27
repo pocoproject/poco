@@ -288,6 +288,8 @@ Bug Fixes and Improvements:
   returned a positive value for a negative zero source, and on Solaris and Windows the negated
   target for a zero source or target. On Solaris copySign(double) no longer truncates the result
   to float.
+- GH #5510 Poco::File::createDirectory() returns false instead of throwing
+  Poco::FileExistsException when another thread or process creates the directory at the same time.
 
 
 Release 1.15.4 (2026-09-22)

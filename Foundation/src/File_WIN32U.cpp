@@ -548,7 +548,14 @@ bool FileImpl::createDirectoryImpl()
 	if (existsImpl() && isDirectoryImpl())
 		return false;
 	if (::CreateDirectoryW(_upath.c_str(), 0) == 0)
-		handleLastErrorImpl(_path);
+	{
+		// Saved before isDirectoryImpl() calls GetFileAttributesW(), which overwrites it.
+		const DWORD err = ::GetLastError();
+		// Another thread or process may have created the directory since the check above.
+		if (err == ERROR_ALREADY_EXISTS && isDirectoryImpl())
+			return false;
+		handleLastErrorImpl(err, _path);
+	}
 	return true;
 }
 
@@ -586,9 +593,8 @@ FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
 }
 
 
-void FileImpl::handleLastErrorImpl(const std::string& path)
+void FileImpl::handleLastErrorImpl(DWORD err, const std::string& path)
 {
-	DWORD err = ::GetLastError();
 	switch (err)
 	{
 	case ERROR_FILE_NOT_FOUND:
@@ -634,6 +640,12 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	default:
 		throw FileException(path, err);
 	}
+}
+
+
+void FileImpl::handleLastErrorImpl(const std::string& path)
+{
+	handleLastErrorImpl(::GetLastError(), path);
 }
 
 
