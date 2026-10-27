@@ -185,6 +185,10 @@ public:
 		/// greater-than signs are escaped, unless a CDATA section
 		/// has been opened by calling startCDATA().
 		///
+		/// Outside a CDATA section, carriage returns are written as the
+		/// character reference &#xD; so that they survive line-end
+		/// normalization when the document is parsed.
+		///
 		/// In a CDATA section, "]]>" in the data is written as "]]]]><![CDATA[>",
 		/// and a control character other than tab, CR and LF throws an XMLException,
 		/// as it does outside a CDATA section.
@@ -196,6 +200,10 @@ public:
 		/// Writes XML character data. Quotes, ampersand's, less-than and
 		/// greater-than signs are escaped, unless a CDATA section
 		/// has been opened by calling startCDATA().
+		///
+		/// Outside a CDATA section, carriage returns are written as the
+		/// character reference &#xD; so that they survive line-end
+		/// normalization when the document is parsed.
 		///
 		/// In a CDATA section, "]]>" in the data is written as "]]]]><![CDATA[>",
 		/// and a control character other than tab, CR and LF throws an XMLException,

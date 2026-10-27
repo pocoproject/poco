@@ -319,6 +319,8 @@ Bug Fixes and Improvements:
 - GH #5510 Poco::Util::ServerApplication::beDaemon() ends the foreground process with _exit()
   after flushing the standard streams, so that atexit handlers and static destructors no longer
   run in both processes.
+- GH #5510 Poco::XML::XMLWriter writes a carriage return in character data outside a CDATA
+  section as &#xD;, so that it survives a parse.
 
 
 Release 1.15.4 (2026-09-22)

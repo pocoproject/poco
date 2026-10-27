@@ -365,10 +365,11 @@ void XMLWriter::characters(const XMLChar ch[], int start, int length)
 			case '&':  writeMarkup(MARKUP_AMPENC); break;
 			case '<':  writeMarkup(MARKUP_LTENC); break;
 			case '>':  writeMarkup(MARKUP_GTENC); break;
+			case '\r': writeMarkup(MARKUP_CRENC); break;
 			default:
 				if (static_cast<unsigned char>(c) < 32)
 				{
-					if (c == '\t' || c == '\r' || c == '\n')
+					if (c == '\t' || c == '\n')
 						writeXML(c);
 					else
 						throw XMLException("Invalid character token.");

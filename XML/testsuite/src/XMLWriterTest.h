@@ -44,6 +44,7 @@ public:
 	void testComment();
 	void testPI();
 	void testCharacters();
+	void testCharactersCR();
 	void testEmptyCharacters();
 	void testCDATA();
 	void testCDATATerminator();
