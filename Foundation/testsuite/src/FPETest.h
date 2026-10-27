@@ -27,6 +27,7 @@ public:
 	void testClassify();
 	void testFlags();
 	void testRound();
+	void testCopySign();
 
 	void setUp();
 	void tearDown();
