@@ -311,6 +311,9 @@ Bug Fixes and Improvements:
   to float.
 - GH #5510 Poco::File::createDirectory() returns false instead of throwing
   Poco::FileExistsException when another thread or process creates the directory at the same time.
+- GH #5510 Poco::Util::ServerApplication::beDaemon() ends the foreground process with _exit()
+  after flushing the standard streams, so that atexit handlers and static destructors no longer
+  run in both processes.
 
 
 Release 1.15.4 (2026-09-22)
