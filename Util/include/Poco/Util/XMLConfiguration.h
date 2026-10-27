@@ -41,7 +41,6 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	/// names is supported to allow full access to the XML document.
 	/// XML namespaces are not supported. The name of the root element
 	/// of the XML document is not significant and ignored.
-	/// Periods in tag names are not supported.
 	///
 	/// Given the following XML document as an example:
 	///
@@ -77,6 +76,13 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	/// passing the desired character to the constructor. This allows
 	/// working with XML documents having element names with periods
 	/// in them.
+	///
+	/// An element name that contains the delimiter character is written
+	/// in a property name with a backslash before each delimiter: with the
+	/// default delimiter, the element <a.b> is addressed as a\.b ("a\\.b"
+	/// in C++ source). keys() returns such element names in this escaped
+	/// form, so every enumerated key can be passed back to getString(),
+	/// hasProperty(), setString() and remove().
 {
 public:
 	XMLConfiguration(char delim = '.');
