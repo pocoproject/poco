@@ -132,6 +132,9 @@ Breaking Changes:
   and Poco::URI::setRawPath(). setPath() decodes into a copy, so an argument that refers to the
   URI's own path, as in uri.setPath(uri.getPath()), no longer empties the path, and a malformed
   path leaves the URI unchanged instead of partly decoded.
+- GH #5510 Poco::NumberParser quotes the rejected string in its SyntaxException messages, so that
+  empty and space-only input is visible, and the octal parsers no longer say "hexadecimal". The
+  message texts change.
 
 Bundled Third-Party Library Upgrades:
 
