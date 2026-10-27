@@ -29,6 +29,7 @@ public:
 	void testParseWriteSimple();
 	void testParseWriteCDATATerminator();
 	void testMaxElementDepth();
+	void testWriteParseTextCR();
 
 	void setUp();
 	void tearDown();
