@@ -185,7 +185,12 @@ public:
 	}
 
 protected:
-	void run();
+	void run() override final;
+		/// Executes the scheduled tasks in the timer thread.
+		/// The thread calls this function without a virtual call, so that the call does not
+		/// race with the constructor or destructor of a subclass; it is final because an
+		/// override would never be called.
+
 	static void validateTask(const TimerTask::Ptr& pTask);
 
 private:
