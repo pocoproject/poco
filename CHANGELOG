@@ -151,6 +151,9 @@ Breaking Changes:
   from several threads is safe; a nested object or array is printed with the options of its
   parent, and its own flags are left unchanged. New: Poco::JSON::Object::stringify() and
   Poco::JSON::Array::stringify() with an options argument.
+- GH #5510 Poco::Util::Timer::run() is final, and the timer thread runs it without a virtual
+  call, so that the thread no longer reads the vptr while the constructor or destructor of a
+  subclass writes it; a subclass can no longer override run().
 
 Bundled Third-Party Library Upgrades:
 
