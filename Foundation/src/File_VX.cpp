@@ -380,7 +380,14 @@ bool FileImpl::createDirectoryImpl()
 	if (existsImpl() && isDirectoryImpl())
 		return false;
 	if (mkdir(_path.c_str()) != 0)
-		handleLastErrorImpl(_path);
+	{
+		// Saved before existsImpl() and isDirectoryImpl() run stat(), which may change errno.
+		const int err = errno;
+		// Another task may have created the directory since the check above.
+		if (err == EEXIST && existsImpl() && isDirectoryImpl())
+			return false;
+		handleLastErrorImpl(err, _path);
+	}
 	return true;
 }
 
@@ -421,9 +428,9 @@ FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
 }
 
 
-void FileImpl::handleLastErrorImpl(const std::string& path)
+void FileImpl::handleLastErrorImpl(int err, const std::string& path)
 {
-	switch (errno)
+	switch (err)
 	{
 	case EIO:
 		throw IOException(path);
@@ -451,8 +458,14 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case EMFILE:
 		throw FileException("too many open files", path);
 	default:
-		throw FileException(std::strerror(errno), path);
+		throw FileException(std::strerror(err), path);
 	}
+}
+
+
+void FileImpl::handleLastErrorImpl(const std::string& path)
+{
+	handleLastErrorImpl(errno, path);
 }
 
 
