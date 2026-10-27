@@ -135,6 +135,9 @@ Breaking Changes:
 - GH #5510 Poco::NumberParser quotes the rejected string in its SyntaxException messages, so that
   empty and space-only input is visible, and the octal parsers no longer say "hexadecimal". The
   message texts change.
+- GH #5510 Poco::ActiveDispatcher::run() and Poco::DirectoryWatcher::run() are final, and their
+  threads run them without a virtual call, so that a thread no longer reads the vptr while the
+  constructor or destructor of a subclass writes it; a subclass can no longer override run().
 
 Bundled Third-Party Library Upgrades:
 

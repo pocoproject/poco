@@ -573,7 +573,7 @@ void DirectoryWatcher::init()
 #else
 	_pStrategy = new PollingDirectoryWatcherStrategy(*this);
 #endif
-	_thread.start(*this);
+	_thread.startFunc([this]() { DirectoryWatcher::run(); });
 }
 
 
