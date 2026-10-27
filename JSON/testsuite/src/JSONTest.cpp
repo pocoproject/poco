@@ -25,6 +25,9 @@
 #include "Poco/DateTimeFormatter.h"
 #include <set>
 #include <iostream>
+#include <exception>
+#include <thread>
+#include <vector>
 
 
 using namespace Poco::JSON;
@@ -2210,6 +2213,83 @@ void JSONTest::testEscapeUnicode()
 }
 
 
+void JSONTest::testStringifyKeepsFlags()
+{
+	Parser parser;
+	Object::Ptr root = parser.parse("{\"a\":{\"s\":\"\\u4e2d\"},\"b\":[\"\\u00fc\"]}").extract<Object::Ptr>();
+	Object::Ptr nested = root->getObject("a");
+	Poco::JSON::Array::Ptr array = root->getArray("b");
+
+	std::ostringstream escaped;
+	Stringifier::stringify(root, escaped, 0, -1, Poco::JSON_ESCAPE_UNICODE | Poco::JSON_LOWERCASE_HEX);
+	assertEqual ("{\"a\":{\"s\":\"\\u4e2d\"},\"b\":[\"\\u00fc\"]}", escaped.str());
+
+	assertFalse (root->getEscapeUnicode());
+	assertFalse (root->getLowercaseHex());
+	assertFalse (nested->getEscapeUnicode());
+	assertFalse (nested->getLowercaseHex());
+	assertFalse (array->getEscapeUnicode());
+	assertFalse (array->getLowercaseHex());
+
+	const std::string RAW("{\"a\":{\"s\":\"\xE4\xB8\xAD\"},\"b\":[\"\xC3\xBC\"]}");
+	std::ostringstream plain;
+	root->stringify(plain);
+	assertEqual (RAW, plain.str());
+	assertEqual (RAW, Var(root).toString());
+
+	nested->setEscapeUnicode(true);
+	std::ostringstream parentOut;
+	root->stringify(parentOut);
+	assertEqual (RAW, parentOut.str());
+	assertTrue (nested->getEscapeUnicode());
+}
+
+
+void JSONTest::testConcurrentStringify()
+{
+	constexpr int THREAD_COUNT = 4;
+	constexpr int ITERATIONS = 1000;
+	constexpr int ESCAPE_OPTIONS = Poco::JSON_ESCAPE_UNICODE | Poco::JSON_LOWERCASE_HEX;
+
+	const std::string ESCAPED("{\"a\":{\"s\":\"\\u4e2d\"},\"b\":[\"\\u4e2d\"]}");
+	const std::string RAW("{\"a\":{\"s\":\"\xE4\xB8\xAD\"},\"b\":[\"\xE4\xB8\xAD\"]}");
+
+	Parser parser;
+	const Object::Ptr root = parser.parse(ESCAPED).extract<Object::Ptr>();
+
+	std::vector<int> mismatches(THREAD_COUNT, 0);
+	std::vector<std::exception_ptr> errors(THREAD_COUNT);
+	std::vector<std::thread> threads;
+	for (int t = 0; t < THREAD_COUNT; ++t)
+	{
+		const bool escape = (t % 2) != 0;
+		threads.emplace_back([&, t, escape]()
+		{
+			try
+			{
+				for (int i = 0; i < ITERATIONS; ++i)
+				{
+					std::ostringstream out;
+					Stringifier::stringify(root, out, 0, -1, escape ? ESCAPE_OPTIONS : 0);
+					if (out.str() != (escape ? ESCAPED : RAW)) ++mismatches[t];
+				}
+			}
+			catch (...)
+			{
+				errors[t] = std::current_exception();
+			}
+		});
+	}
+	for (auto& thread: threads) thread.join();
+
+	for (int t = 0; t < THREAD_COUNT; ++t)
+	{
+		if (errors[t]) std::rethrow_exception(errors[t]);
+		assertEqual (0, mismatches[t]);
+	}
+}
+
+
 std::string JSONTest::getTestFilesPath(const std::string& type)
 {
 	std::ostringstream ostr;
@@ -2690,6 +2770,8 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testEscape0);
 	CppUnit_addTest(pSuite, JSONTest, testNonEscapeUnicode);
 	CppUnit_addTest(pSuite, JSONTest, testEscapeUnicode);
+	CppUnit_addTest(pSuite, JSONTest, testStringifyKeepsFlags);
+	CppUnit_addTest(pSuite, JSONTest, testConcurrentStringify);
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
 	CppUnit_addTest(pSuite, JSONTest, testRemove);

@@ -232,6 +232,13 @@ public:
 		/// When indent is 0, the object will be printed on a single
 		/// line without indentation.
 
+	void stringify(std::ostream& out, unsigned int indent, int step, int options) const;
+		/// Prints the object to out stream, like stringify(out, indent, step),
+		/// but with the given options instead of the stored escape and
+		/// lowercase-hex flags, which are neither read nor changed.
+		/// Only JSON_ESCAPE_UNICODE and JSON_LOWERCASE_HEX are used from options;
+		/// they apply to nested objects and arrays as well.
+
 	void remove(const std::string& key);
 		/// Removes the property with the given key.
 
@@ -269,12 +276,8 @@ private:
 	}
 
 	template <typename C>
-	void doStringify(const C& container, std::ostream& out, unsigned int indent, int step) const
+	void doStringify(const C& container, std::ostream& out, unsigned int indent, int step, int options) const
 	{
-		int options = Poco::JSON_WRAP_STRINGS;
-		options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
-		options |= _lowercaseHex ? Poco::JSON_LOWERCASE_HEX : 0;
-
 		out << '{';
 
 		if (indent > 0) out << std::endl;
@@ -362,9 +365,8 @@ private:
 	KeyList           _keys;
 	bool              _preserveInsOrder;
 	// Note:
-	//  The reason for this flag (rather than as argument to stringify()) is
-	//  because Object can be returned stringified from Dynamic::Var::toString(),
-	//  so it must know whether to escape unicode or not.
+	//  The flags are the defaults for stringify(out, indent, step) and
+	//  Dynamic::Var::toString(), which have no options argument.
 	bool              _escapeUnicode;
 	bool              _lowercaseHex;
 	mutable StructPtr    _pStruct;

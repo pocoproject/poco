@@ -141,6 +141,11 @@ Breaking Changes:
 - GH #5510 Poco::Util::XMLConfiguration returns element names that contain the delimiter with
   the delimiter escaped by a backslash (a.b becomes a\.b) from keys(), and accepts such escaped
   names in keys, so that every enumerated key can be read back.
+- GH #5566 Poco::JSON::Stringifier no longer changes the escape and lowercase-hex flags of the
+  objects and arrays it prints, including nested ones, so that stringifying a shared object
+  from several threads is safe; a nested object or array is printed with the options of its
+  parent, and its own flags are left unchanged. New: Poco::JSON::Object::stringify() and
+  Poco::JSON::Array::stringify() with an options argument.
 
 Bundled Third-Party Library Upgrades:
 
