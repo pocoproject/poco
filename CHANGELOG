@@ -138,6 +138,9 @@ Breaking Changes:
 - GH #5510 Poco::ActiveDispatcher::run() and Poco::DirectoryWatcher::run() are final, and their
   threads run them without a virtual call, so that a thread no longer reads the vptr while the
   constructor or destructor of a subclass writes it; a subclass can no longer override run().
+- GH #5510 Poco::Util::XMLConfiguration returns element names that contain the delimiter with
+  the delimiter escaped by a backslash (a.b becomes a\.b) from keys(), and accepts such escaped
+  names in keys, so that every enumerated key can be read back.
 
 Bundled Third-Party Library Upgrades:
 

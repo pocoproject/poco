@@ -32,6 +32,11 @@ public:
 	void testFromScratch();
 	void testLoadEmpty();
 	void testManyKeys();
+	void testDelimiterInElementName();
+		/// Checks that element names containing the delimiter are enumerated
+		/// with the delimiter escaped and can be read, written and removed
+		/// with such keys, and that a backslash before another character
+		/// is part of the name.
 
 	void setUp();
 	void tearDown();
