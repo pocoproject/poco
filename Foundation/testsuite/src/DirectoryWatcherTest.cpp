@@ -24,6 +24,34 @@
 using Poco::DirectoryWatcher;
 
 
+namespace
+{
+	// Seconds between two scans where the platform has no native notifications.
+	constexpr int SCAN_INTERVAL = 2;
+
+
+	class DerivedDirectoryWatcher: public DirectoryWatcher
+		/// A directory watcher whose constructor sets the vptr after the
+		/// constructor of DirectoryWatcher has started the watcher thread.
+	{
+	public:
+		DerivedDirectoryWatcher() = delete;
+
+		explicit DerivedDirectoryWatcher(const std::string& path);
+			/// Creates the watcher for the directory given in path.
+
+		~DerivedDirectoryWatcher() override = default;
+			/// Destroys the watcher.
+	};
+
+
+	DerivedDirectoryWatcher::DerivedDirectoryWatcher(const std::string& path):
+		DirectoryWatcher(path, DirectoryWatcher::DW_FILTER_ENABLE_ALL, SCAN_INTERVAL)
+	{
+	}
+}
+
+
 DirectoryWatcherTest::DirectoryWatcherTest(const std::string& name):
 	CppUnit::TestCase(name),
 	_error(false)
@@ -334,6 +362,15 @@ void DirectoryWatcherTest::testSuspendMultipleTimes()
 }
 
 
+void DirectoryWatcherTest::testDerivedConstructor()
+{
+	// Only ThreadSanitizer shows the defect: if the watcher thread is started with
+	// a virtual call to run(), it reports a data race on the vptr. The test passes
+	// in a normal build either way.
+	DerivedDirectoryWatcher dw(path().toString());
+}
+
+
 void DirectoryWatcherTest::setUp()
 {
 	_error = false;
@@ -452,6 +489,7 @@ CppUnit::Test* DirectoryWatcherTest::suite()
 	CppUnit_addTest(pSuite, DirectoryWatcherTest, testSuspend);
 	CppUnit_addTest(pSuite, DirectoryWatcherTest, testResume);
 	CppUnit_addTest(pSuite, DirectoryWatcherTest, testSuspendMultipleTimes);
+	CppUnit_addTest(pSuite, DirectoryWatcherTest, testDerivedConstructor);
 
 	return pSuite;
 }

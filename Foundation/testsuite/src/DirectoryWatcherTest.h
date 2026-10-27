@@ -39,6 +39,7 @@ public:
 	void testSuspend();
 	void testResume();
 	void testSuspendMultipleTimes();
+	void testDerivedConstructor();
 
 	void setUp();
 	void tearDown();
