@@ -17,6 +17,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
 #include "Poco/Environment.h"
+#include "Poco/Event.h"
 #include <fstream>
 #include <set>
 #include <atomic>
@@ -601,6 +602,119 @@ void FileTest::testDirectory()
 
 	d.remove(true);
 }
+
+
+void FileTest::testCreateDirectoryExisting()
+{
+	File d("testcreatedir");
+	if (d.exists()) d.remove(true);
+	TemporaryFile::registerForDeletion(d.path());
+
+	assertTrue (d.createDirectory());
+	assertFalse (d.createDirectory());
+
+	File f(Path(Path(d.path()), "file"));
+	assertTrue (f.createFile());
+	try
+	{
+		(void) f.createDirectory();
+		failmsg("a regular file at the path - must throw FileExistsException");
+	}
+	catch (Poco::FileExistsException&)
+	{
+	}
+
+	d.remove(true);
+}
+
+
+void FileTest::testCreateDirectoryConcurrent()
+{
+	// The defect shows only when the threads run in parallel on several CPUs;
+	// on one CPU the test can pass without the fix.
+	constexpr int THREAD_COUNT = 8;
+	constexpr int DIRECTORY_COUNT = 200;
+
+	File root("testcreatedirconcurrent");
+	if (root.exists()) root.remove(true);
+	TemporaryFile::registerForDeletion(root.path());
+	root.createDirectories();
+
+	std::vector<std::string> paths;
+	paths.reserve(DIRECTORY_COUNT);
+	for (int i = 0; i < DIRECTORY_COUNT; ++i)
+	{
+		paths.push_back(Path(Path(root.path()), "dir" + std::to_string(i)).toString());
+	}
+
+	// Every thread creates the same directories in the same order, so that the
+	// threads compete for each one.
+	std::vector<std::atomic<int>> createdCount(DIRECTORY_COUNT);
+	std::vector<std::string> errors(THREAD_COUNT);
+	Poco::Event start(Poco::Event::EVENT_MANUALRESET);
+	std::vector<std::thread> threads;
+	threads.reserve(THREAD_COUNT);
+	for (int t = 0; t < THREAD_COUNT; ++t)
+	{
+		threads.emplace_back([&, t]()
+		{
+			try
+			{
+				start.wait();
+				for (int i = 0; i < DIRECTORY_COUNT; ++i)
+				{
+					if (File(paths[i]).createDirectory())
+						++createdCount[i];
+				}
+			}
+			catch (const Exception& exc)
+			{
+				errors[t] = exc.displayText();
+			}
+		});
+	}
+	start.set();
+	for (auto& thread: threads)
+	{
+		thread.join();
+	}
+
+	for (const auto& error: errors)
+	{
+		if (!error.empty()) failmsg(error);
+	}
+	for (int i = 0; i < DIRECTORY_COUNT; ++i)
+	{
+		assertEqual (1, createdCount[i].load());
+		assertTrue (File(paths[i]).isDirectory());
+	}
+
+	root.remove(true);
+}
+
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+void FileTest::testCreateDirectorySymlinkLoop()
+{
+	// tmpDir removes the links when it goes out of scope, also after a failed assertion.
+	TemporaryFile tmpDir;
+	tmpDir.createDirectories();
+	const std::string a = Path(Path(tmpDir.path()), "a").toString();
+	const std::string b = Path(Path(tmpDir.path()), "b").toString();
+	File(b).linkTo(a);
+	File(a).linkTo(b);
+
+	// stat() fails on the loop, so the EEXIST error of mkdir() is reported.
+	try
+	{
+		(void) File(a).createDirectory();
+		failmsg("a symbolic link loop at the path - must throw FileExistsException");
+	}
+	catch (Poco::FileExistsException&)
+	{
+	}
+}
+#endif
 
 
 void FileTest::testCopy()
@@ -1326,6 +1440,8 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testSwap);
 	CppUnit_addTest(pSuite, FileTest, testSize);
 	CppUnit_addTest(pSuite, FileTest, testDirectory);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoryExisting);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoryConcurrent);
 	CppUnit_addTest(pSuite, FileTest, testCopy);
 	CppUnit_addTest(pSuite, FileTest, testCopyFailIfDestinationFileExists);
 	CppUnit_addTest(pSuite, FileTest, testMove);
@@ -1353,6 +1469,7 @@ CppUnit::Test* FileTest::suite()
 #if defined(POCO_OS_FAMILY_UNIX)
 #if !defined(POCO_VXWORKS)
 	CppUnit_addTest(pSuite, FileTest, testPermissionsMatchAccess);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectorySymlinkLoop);
 #endif
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathThreadSafety);
 #endif
