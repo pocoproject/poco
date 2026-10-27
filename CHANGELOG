@@ -284,6 +284,10 @@ Bug Fixes and Improvements:
 - GH #5510 Poco::Net::HTTPBasicCredentials accepts base64 credentials without padding.
 - GH #5510 Poco::Net::SocketAddress, IPAddress and HostEntry have noexcept move operations, so
   that containers move them instead of copying.
+- GH #5510 Poco::BasicBufferedStreamBuf and BasicBufferedBidirectionalStreamBuf write the rest of
+  the buffer when writeToDevice() writes only part of it, instead of failing the stream; after a
+  failure only the bytes the device did not accept stay buffered, so a retried flush no longer
+  writes the accepted bytes again.
 
 
 Release 1.15.4 (2026-09-22)

@@ -8,7 +8,7 @@ include $(POCO_BASE)/build/rules/global
 
 objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	AutoPtrTest ArrayTest SharedPtrTest AutoReleasePoolTest \
-	Base32Test Base64Test BinaryReaderWriterTest LineEndingConverterTest \
+	Base32Test Base64Test BinaryReaderWriterTest BufferedStreamBufTest LineEndingConverterTest \
 	ByteOrderTest ChannelTest ChecksumTest ClassLoaderTest ClockTest CoreTest CoreTestSuite \
 	CountingStreamTest CryptTestSuite DateTimeFormatterTest \
 	DateTimeParserTest DateTimeTest LocalDateTimeTest DateTimeTestSuite DigestStreamTest \
