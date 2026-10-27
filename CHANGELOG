@@ -168,6 +168,8 @@ Features:
   only the environment variables given to launch(), on every platform. Without it the child
   inherits the environment of the parent with the given variables added, except on QNX when the
   child is spawned without an initial directory and is given variables: it then gets only those.
+- GH #5510 Poco::Util::LayeredConfiguration::replace() replaces a labeled configuration in one
+  step, so that readers never see the configuration without it.
 
 New Components:
 

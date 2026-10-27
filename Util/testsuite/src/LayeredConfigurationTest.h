@@ -30,6 +30,13 @@ public:
 	void testThreeLayers();
 	void testRemove();
 	void testFind();
+	void testReplace();
+		/// Checks that replace() swaps the first configuration with the label,
+		/// applies the given priority and writeable flag, adds a configuration
+		/// whose label is missing, and rejects an empty label and a null configuration.
+	void testReplaceConcurrent();
+		/// Checks that readers never miss a property of the labeled configuration
+		/// while another thread replaces that configuration.
 
 	void setUp();
 	void tearDown();
