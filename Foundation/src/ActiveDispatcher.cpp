@@ -47,14 +47,14 @@ namespace
 
 ActiveDispatcher::ActiveDispatcher()
 {
-	_thread.start(*this);
+	_thread.startFunc([this]() { ActiveDispatcher::run(); });
 }
 
 
 ActiveDispatcher::ActiveDispatcher(Thread::Priority prio)
 {
 	_thread.setPriority(prio);
-	_thread.start(*this);
+	_thread.startFunc([this]() { ActiveDispatcher::run(); });
 }
 
 
