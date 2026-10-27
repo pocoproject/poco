@@ -58,15 +58,15 @@ MD5Engine::~MD5Engine()
 void MD5Engine::updateImpl(const void* input_, std::size_t inputLen)
 {
 	const unsigned char* input = (const unsigned char*) input_;
-	unsigned int i, index, partLen;
+	std::size_t i, index, partLen;
 
 	/* Compute number of bytes mod 64 */
-	index = (unsigned int)((_context.count[0] >> 3) & 0x3F);
+	index = (std::size_t)((_context.count[0] >> 3) & 0x3F);
 
 	/* Update number of bits */
 	if ((_context.count[0] += ((UInt32) inputLen << 3)) < ((UInt32) inputLen << 3))
 		_context.count[1]++;
-	_context.count[1] += ((UInt32) inputLen >> 29);
+	_context.count[1] += (UInt32) (inputLen >> 29);
 
 	partLen = 64 - index;
 

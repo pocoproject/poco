@@ -12,6 +12,9 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/MD5Engine.h"
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <sys/mman.h>
+#endif
 
 
 using Poco::MD5Engine;
@@ -69,6 +72,23 @@ void MD5EngineTest::testConstantTimeEquals()
 }
 
 
+void MD5EngineTest::testLargeInput()
+{
+#if defined(POCO_OS_FAMILY_UNIX) && defined(POCO_PTR_IS_64_BIT)
+	// more than 4 GB of zero bytes in a single update() call;
+	// a read-only anonymous mapping does not consume physical memory
+	const std::size_t size = (std::size_t(1) << 32) + 100;
+	void* p = mmap(nullptr, size, PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	assertTrue (p != MAP_FAILED);
+
+	MD5Engine engine;
+	engine.update(p, size);
+	munmap(p, size);
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "3601846a07f37ff8fbbeed3a1a7999b7");
+#endif
+}
+
+
 void MD5EngineTest::setUp()
 {
 }
@@ -84,6 +104,7 @@ CppUnit::Test* MD5EngineTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MD5EngineTest");
 
 	CppUnit_addTest(pSuite, MD5EngineTest, testMD5);
+	CppUnit_addLongTest(pSuite, MD5EngineTest, testLargeInput);
 	CppUnit_addTest(pSuite, MD5EngineTest, testConstantTimeEquals);
 
 	return pSuite;
