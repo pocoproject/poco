@@ -81,6 +81,8 @@ public:
 	void testEscape0();
 	void testNonEscapeUnicode();
 	void testEscapeUnicode();
+	void testStringifyKeepsFlags();
+	void testConcurrentStringify();
 
 	void testCopy();
 	void testMove();
