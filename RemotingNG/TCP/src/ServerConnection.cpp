@@ -30,6 +30,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Clock.h"
 #include "Poco/URI.h"
+#include "Poco/String.h"
 #include <deque>
 
 
@@ -378,6 +379,9 @@ private:
 		Poco::URI dispatcherURI(item.subscriberURI);
 		dispatcherURI.setAuthority(_pListener->endPoint());
 		dispatcherURI.setFragment("");
+		// Look the object up by the decoded path, whatever percent-encoding the subscriber used.
+		// setPath() decodes its argument, so a '%' of the decoded path is escaped.
+		dispatcherURI.setPath(Poco::replace(dispatcherURI.getPath(), "%", "%25"));
 		Poco::RemotingNG::EventDispatcher::Ptr pEventDispatcher = Poco::RemotingNG::ORB::instance().findEventDispatcher(dispatcherURI.toString(), Transport::PROTOCOL);
 		if (item.type == Item::SUBSCRIBE)
 		{

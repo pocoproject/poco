@@ -31,6 +31,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NullStream.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/String.h"
 #include "Tester.h"
 #include "TesterServerHelper.h"
 #include "TesterClientHelper.h"
@@ -452,6 +453,28 @@ void RemotingTest::testNoPermission()
 }
 
 
+void RemotingTest::testPercentEncodedObjectPath()
+{
+	constexpr int ARGUMENT = 42;
+
+	// "%54" is the percent-encoded 'T' of "TheTester".
+	ITester::Ptr pTester = createProxy(Poco::replace(_objectURI, "TheTester", "%54heTester"));
+	testInt(pTester);
+
+	// "%2554" is the percent-encoded "%54", which is not decoded a second time.
+	pTester = createProxy(Poco::replace(_objectURI, "TheTester", "%2554heTester"));
+	try
+	{
+		pTester->testInt1(ARGUMENT);
+		fail("unknown object - must throw");
+	}
+	catch (Poco::RemotingNG::RemoteException& exc)
+	{
+		assertMessageEqual ("RemotingNG Exception: Unknown service", exc.message());
+	}
+}
+
+
 void RemotingTest::testInt(ITester::Ptr pTester)
 {
 	int i = pTester->testInt1(42);
@@ -799,6 +822,7 @@ CppUnit::Test* RemotingTestHTTP::suite()
 	CppUnit_addTest(pSuite, RemotingTestHTTP, testAuthenticatedNoCredentials);
 	CppUnit_addTest(pSuite, RemotingTestHTTP, testPermission);
 	CppUnit_addTest(pSuite, RemotingTestHTTP, testNoPermission);
+	CppUnit_addTest(pSuite, RemotingTestHTTP, testPercentEncodedObjectPath);
 
 	return pSuite;
 }

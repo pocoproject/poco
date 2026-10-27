@@ -19,6 +19,7 @@
 #include "Poco/RemotingNG/TCP/FrameHandler.h"
 #include "Poco/RemotingNG/TCP/ChannelStream.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/String.h"
 
 
 namespace Poco::RemotingNG::TCP {
@@ -288,6 +289,9 @@ Listener::EventSubscription::EventSubscription(Listener& listener, const std::st
 
 	suri.setFragment(Poco::NumberFormatter::format(id));
 	_suri = suri.toString();
+	// Event messages name the object by its decoded id, whatever percent-encoding the URI used.
+	// setPath() decodes its argument, so a '%' of the decoded path is escaped.
+	suri.setPath(Poco::replace(suri.getPath(), "%", "%25"));
 	_path = suri.getPathEtc().substr(1);
 }
 
