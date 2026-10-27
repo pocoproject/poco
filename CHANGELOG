@@ -126,6 +126,17 @@ Breaking Changes:
 - GH #5510 Poco::Net::InvalidCertificateException::name() is "Invalid certificate", and the
   Poco::ReadFileException that Poco::Crypto::X509Certificate throws when it cannot load a
   certificate from a file reads "Failed to load certificate from" (both were misspelled).
+- GH #3256 Poco::URI: toString(), getPathEtc() and getPathAndQuery() keep percent-encoded
+  characters of the path as written. operator== compares paths in percent-encoded form,
+  normalized as in RFC 3986, section 6.2.2, so a percent-encoded reserved character (such as
+  %2F, %2B, %3A or %40) no longer equals its literal form. Poco::Net::OAuth10Credentials signs
+  the path as written, so the signature base string changes for paths with percent-encoded
+  characters. As these outputs keep the client's encoding, lookups and access checks that must
+  match how a request is dispatched use getPath() (or operator== where the RFC 3986 distinction
+  is wanted), not toString(), getPathEtc() or getPathAndQuery(). New: Poco::URI::getRawPath()
+  and Poco::URI::setRawPath(). setPath() decodes into a copy, so an argument that refers to the
+  URI's own path, as in uri.setPath(uri.getPath()), no longer empties the path, and a malformed
+  path leaves the URI unchanged instead of partly decoded.
 
 Bundled Third-Party Library Upgrades:
 

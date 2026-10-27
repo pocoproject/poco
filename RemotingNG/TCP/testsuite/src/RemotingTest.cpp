@@ -36,6 +36,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NullStream.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/String.h"
 #include "Poco/Delegate.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
@@ -827,25 +828,7 @@ void RemotingTest::testTimeout()
 
 void RemotingTest::testEvent()
 {
-	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
-	TesterServerHelper::enableEvents(_objectURI, "tcp");
-
-	ITester::Ptr pTester = createProxy(_objectURI);
-
-	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
-	pProxy->remoting__enableEvents(pEventListener);
-
-	pTester->testEvent += Poco::delegate(this, &RemotingTest::onEvent);
-	_eventArg.clear();
-	pTester->fireTestEvent("s3cr3t");
-	_eventReceived.wait(2000);
-	assert (_eventArg == "s3cr3t");
-
-	pTester->testEvent -= Poco::delegate(this, &RemotingTest::onEvent);
-	pProxy->remoting__enableEvents(pEventListener, false);
-	pTester = nullptr;
-	pProxy = nullptr;
-	Poco::Thread::sleep(1000); // wait for unsubscribe message
+	checkEvent(_objectURI);
 }
 
 
@@ -894,6 +877,40 @@ void RemotingTest::testVoidEvent()
 	pTester = nullptr;
 	pProxy = nullptr;
 	Poco::Thread::sleep(1000); // wait for unsubscribe message
+}
+
+
+void RemotingTest::testEventPercentEncodedObjectPath()
+{
+	// "%54" is the percent-encoded 'T' of "TheTester".
+	checkEvent(Poco::replace(_objectURI, "TheTester", "%54heTester"));
+}
+
+
+void RemotingTest::checkEvent(const std::string& proxyURI)
+{
+	constexpr long EVENT_TIMEOUT = 2000;
+	constexpr long UNSUBSCRIBE_WAIT = 1000;
+
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	TesterServerHelper::enableEvents(_objectURI, "tcp");
+
+	ITester::Ptr pTester = createProxy(proxyURI);
+
+	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
+	pProxy->remoting__enableEvents(pEventListener);
+
+	pTester->testEvent += Poco::delegate(this, &RemotingTest::onEvent);
+	_eventArg.clear();
+	pTester->fireTestEvent("s3cr3t");
+	_eventReceived.wait(EVENT_TIMEOUT);
+	assert (_eventArg == "s3cr3t");
+
+	pTester->testEvent -= Poco::delegate(this, &RemotingTest::onEvent);
+	pProxy->remoting__enableEvents(pEventListener, false);
+	pTester = nullptr;
+	pProxy = nullptr;
+	Poco::Thread::sleep(UNSUBSCRIBE_WAIT);
 }
 
 
@@ -1409,6 +1426,7 @@ CppUnit::Test* RemotingTest::suite()
 	CppUnit_addTest(pSuite, RemotingTest, testTimeout);
 	CppUnit_addTest(pSuite, RemotingTest, testEvent);
 	CppUnit_addTest(pSuite, RemotingTest, testOneWayEvent);
+	CppUnit_addTest(pSuite, RemotingTest, testEventPercentEncodedObjectPath);
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeBeforeReply);
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeOrder);
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeNoThread);

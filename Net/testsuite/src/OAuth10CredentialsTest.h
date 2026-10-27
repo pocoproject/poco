@@ -30,6 +30,7 @@ public:
 	void testPlaintext();
 	void testVerify();
 	void testVerifyPlaintext();
+	void testPercentEncodedPath();
 
 	void setUp();
 	void tearDown();

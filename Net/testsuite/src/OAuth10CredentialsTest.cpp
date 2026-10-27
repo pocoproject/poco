@@ -239,6 +239,51 @@ void OAuth10CredentialsTest::testVerifyPlaintext()
 }
 
 
+void OAuth10CredentialsTest::testPercentEncodedPath()
+{
+	// The signature base string contains the path as written, so "%2F" is signed
+	// differently from a literal slash: "GET&https%3A%2F%2Fh%2Fa%252Fb&..." and
+	// "GET&https%3A%2F%2Fh%2Fa%2Fb&...".
+	OAuth10Credentials creds(
+		"xvz1evFS4wEEPTGEFPHBog",
+		"kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw",
+		"370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb",
+		"LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE"
+	);
+	creds.nonceAndTimestampForTesting("kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg", "1318622958");
+
+	URI encodedURI("https://h/a%2Fb");
+	HTTPRequest encodedRequest(HTTPRequest::HTTP_GET, encodedURI.getPathEtc());
+	creds.authenticate(encodedRequest, encodedURI);
+
+	URI literalURI("https://h/a/b");
+	HTTPRequest literalRequest(HTTPRequest::HTTP_GET, literalURI.getPathEtc());
+	creds.authenticate(literalRequest, literalURI);
+
+	assertTrue (encodedRequest.get("Authorization") == "OAuth"
+		" oauth_consumer_key=\"xvz1evFS4wEEPTGEFPHBog\","
+		" oauth_nonce=\"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg\","
+		" oauth_signature=\"OcvAMAaYGTcni0mFiFIbRtm%2BA9g%3D\","
+		" oauth_signature_method=\"HMAC-SHA1\","
+		" oauth_timestamp=\"1318622958\","
+		" oauth_token=\"370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb\","
+		" oauth_version=\"1.0\"");
+	assertTrue (literalRequest.get("Authorization") == "OAuth"
+		" oauth_consumer_key=\"xvz1evFS4wEEPTGEFPHBog\","
+		" oauth_nonce=\"kYjzVBB8Y0ZFabxSWbWovY3uYSQ2pTgmZeNu2VS4cg\","
+		" oauth_signature=\"P18xJz1KKJXn16FlPA8KOUvvMLA%3D\","
+		" oauth_signature_method=\"HMAC-SHA1\","
+		" oauth_timestamp=\"1318622958\","
+		" oauth_token=\"370773112-GmHxMAgYyLbNEtIKZeRNFsMKPR9EyMZeS9weJAEb\","
+		" oauth_version=\"1.0\"");
+
+	OAuth10Credentials verifier(encodedRequest);
+	verifier.setConsumerSecret("kAcSOqF21Fu85e7zjz7ZN2U4ZRhfV3WpwPAoE3Z7kBw");
+	verifier.setTokenSecret("LswwdoUaIvS8ltyTt5jkRh4J50vUPVVHtR2YPi5kE");
+	assertTrue (verifier.verify(encodedRequest, encodedURI));
+}
+
+
 void OAuth10CredentialsTest::setUp()
 {
 }
@@ -259,6 +304,7 @@ CppUnit::Test* OAuth10CredentialsTest::suite()
 	CppUnit_addTest(pSuite, OAuth10CredentialsTest, testPlaintext);
 	CppUnit_addTest(pSuite, OAuth10CredentialsTest, testVerify);
 	CppUnit_addTest(pSuite, OAuth10CredentialsTest, testVerifyPlaintext);
+	CppUnit_addTest(pSuite, OAuth10CredentialsTest, testPercentEncodedPath);
 
 	return pSuite;
 }

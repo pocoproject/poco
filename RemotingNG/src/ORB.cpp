@@ -22,6 +22,7 @@
 #include "Poco/Format.h"
 #include "Poco/URI.h"
 #include "Poco/StringTokenizer.h"
+#include "Poco/String.h"
 
 
 using namespace std::string_literals;
@@ -72,6 +73,9 @@ bool ORB::invoke(const Listener& listener, const std::string& uri, ServerTranspo
 
 	Poco::URI theURI(uri);
 	std::string uriPath = theURI.getPath();
+	// Look objects up by the decoded path, whatever percent-encoding the client used.
+	// setPath() decodes its argument, so a '%' of the decoded path is escaped.
+	theURI.setPath(Poco::replace(uriPath, "%", "%25"));
 
 	Skeleton::Ptr pSkeleton;
 	RemoteObject::Ptr pRemoteObject;

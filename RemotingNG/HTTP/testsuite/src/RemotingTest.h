@@ -48,6 +48,7 @@ public:
 	void testAuthenticatedBadCredentials();
 	void testPermission();
 	void testNoPermission();
+	void testPercentEncodedObjectPath();
 
 	void setUp() override;
 	void tearDown() override;
