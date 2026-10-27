@@ -299,6 +299,10 @@ Bug Fixes and Improvements:
   the buffer when writeToDevice() writes only part of it, instead of failing the stream; after a
   failure only the bytes the device did not accept stay buffered, so a retried flush no longer
   writes the accepted bytes again.
+- GH #5510 Poco::FPEnvironment::copySign(long double) copies the sign of a zero or NaN source; it
+  returned a positive value for a negative zero source, and on Solaris and Windows the negated
+  target for a zero source or target. On Solaris copySign(double) no longer truncates the result
+  to float.
 
 
 Release 1.15.4 (2026-09-22)
