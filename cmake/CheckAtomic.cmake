@@ -8,12 +8,17 @@ set(Poco_ATOMIC_LIBRARIES "")
 
 # MSVC and Apple don't ship/need a separate libatomic.
 if(NOT MSVC AND NOT APPLE)
+    # The atomic variables in the test programs are global and modified with
+    # a read-modify-write operation, otherwise the compiler can fold them away
+    # when optimizing and the check passes even though libatomic is needed.
+
     # 1) 32-bit atomics
     check_cxx_source_compiles("
 	#include <atomic>
-	int main() {
-	    std::atomic<int> x(0);
-	    return x.load(std::memory_order_relaxed);
+	std::atomic<int> x(0);
+	int main(int argc, char **) {
+	    x.fetch_add(argc);
+	    return x.load();
 	}
     " POCO_HAVE_CXX_ATOMICS32)
 
@@ -28,9 +33,10 @@ if(NOT MSVC AND NOT APPLE)
     check_cxx_source_compiles("
 	#include <atomic>
 	#include <cstdint>
-	int main() {
-	    std::atomic<uint64_t> x(0);
-	    return (int)x.load(std::memory_order_relaxed);
+	std::atomic<uint64_t> x(0);
+	int main(int argc, char **) {
+	    x.fetch_add(static_cast<uint64_t>(argc));
+	    return static_cast<int>(x.load());
 	}
     " POCO_HAVE_CXX_ATOMICS64)
 
