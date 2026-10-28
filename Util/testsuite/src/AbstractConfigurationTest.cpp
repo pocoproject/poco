@@ -360,6 +360,13 @@ void AbstractConfigurationTest::testChangeEvents()
 	assertTrue (_changingValue == "true");
 	assertTrue (_changedKey == "set.bool1");
 	assertTrue (_changedValue == "true");
+
+	_changingCount = 0;
+	_changedCount = 0;
+	pConf->setUInt64("set.uint64", 42);
+	assertEqual (1, _changingCount);
+	assertEqual (1, _changedCount);
+	assertTrue (_changedValue == "42");
 }
 
 
@@ -522,6 +529,7 @@ void AbstractConfigurationTest::onPropertyChanging(const void*, AbstractConfigur
 {
 	_changingKey   = kv.key();
 	_changingValue = kv.value();
+	++_changingCount;
 }
 
 
@@ -529,6 +537,7 @@ void AbstractConfigurationTest::onPropertyChanged(const void*, const AbstractCon
 {
 	_changedKey   = kv.key();
 	_changedValue = kv.value();
+	++_changedCount;
 }
 
 
