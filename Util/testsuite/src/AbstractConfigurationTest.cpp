@@ -363,7 +363,7 @@ void AbstractConfigurationTest::testChangeEvents()
 
 	_changingCount = 0;
 	_changedCount = 0;
-	pConf->setUInt64("set.uint64", 42);
+	pConf->setUInt("set.uint1", 42);
 	assertEqual (1, _changingCount);
 	assertEqual (1, _changedCount);
 	assertTrue (_changedValue == "42");

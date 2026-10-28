@@ -12,12 +12,17 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Util/JSONConfiguration.h"
+#include "Poco/Util/ConfigurationMapper.h"
+#include "Poco/Util/LayeredConfiguration.h"
 #include "Poco/JSON/JSONException.h"
+#include "Poco/Delegate.h"
 #include <string>
 
 
 using Poco::Util::JSONConfiguration;
 using Poco::Util::AbstractConfiguration;
+using Poco::Util::ConfigurationMapper;
+using Poco::Util::LayeredConfiguration;
 using Poco::AutoPtr;
 using Poco::NotImplementedException;
 using Poco::NotFoundException;
@@ -134,6 +139,46 @@ void JSONConfigurationTest::testConfigurationView()
 }
 
 
+void JSONConfigurationTest::testWrapperEvents()
+{
+	AbstractConfigurationTest* pTest = this;
+	AutoPtr<JSONConfiguration> pJSON = new JSONConfiguration;
+	pJSON->propertyChanging += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanging);
+	pJSON->propertyChanged += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanged);
+
+	AbstractConfiguration::Ptr pView = pJSON->createView("view");
+	pView->propertyChanging += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanging);
+	pView->propertyChanged += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanged);
+	pView->setInt("int", 1);
+	assertEqual (1, _changingCount);
+	assertEqual (1, _changedCount);
+	assertTrue (_changedKey == "int");
+	assertEqual (1, pJSON->getInt("view.int"));
+
+	_changingCount = 0;
+	_changedCount = 0;
+	AutoPtr<ConfigurationMapper> pMapper = new ConfigurationMapper("json", "mapped", pJSON);
+	pMapper->propertyChanging += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanging);
+	pMapper->propertyChanged += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanged);
+	pMapper->setInt("mapped.int", 2);
+	assertEqual (1, _changingCount);
+	assertEqual (1, _changedCount);
+	assertTrue (_changedKey == "mapped.int");
+	assertEqual (2, pJSON->getInt("json.int"));
+
+	_changingCount = 0;
+	_changedCount = 0;
+	AutoPtr<LayeredConfiguration> pLayered = new LayeredConfiguration;
+	pLayered->addWriteable(pJSON, 0);
+	pLayered->propertyChanging += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanging);
+	pLayered->propertyChanged += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanged);
+	pLayered->setInt("layered.int", 3);
+	assertEqual (1, _changingCount);
+	assertEqual (1, _changedCount);
+	assertEqual (3, pJSON->getInt("layered.int"));
+}
+
+
 AbstractConfiguration::Ptr JSONConfigurationTest::allocConfiguration() const
 {
 	return new JSONConfiguration;
@@ -158,6 +203,7 @@ CppUnit::Test* JSONConfigurationTest::suite()
 	CppUnit_addTest(pSuite, JSONConfigurationTest, testLoad);
 	CppUnit_addTest(pSuite, JSONConfigurationTest, testSetArrayElement);
 	CppUnit_addTest(pSuite, JSONConfigurationTest, testConfigurationView);
+	CppUnit_addTest(pSuite, JSONConfigurationTest, testWrapperEvents);
 
 	return pSuite;
 }
