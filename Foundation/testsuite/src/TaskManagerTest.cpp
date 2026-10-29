@@ -349,7 +349,7 @@ void TaskManagerTest::testCancel()
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
-	assertTrue (waitForCondition([&]{ return pTT->progress() == 0.5f; }, 5000));
+	assertTrue (waitForCondition([&]{ return to.progress() > 0; }, 5000));
 	assertTrue (to.progress() == 0.5);
 	assertTrue (to.started());
 	assertTrue (pTT->state() == Task::TASK_RUNNING);
