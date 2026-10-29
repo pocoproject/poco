@@ -19,8 +19,10 @@
 
 
 #include "Poco/Redis/Redis.h"
+#include "Poco/Redis/Exception.h"
 #include "Poco/BufferedStreamBuf.h"
 #include "Poco/Net/StreamSocket.h"
+#include "Poco/NumberFormatter.h"
 #include <istream>
 #include <ostream>
 
@@ -37,9 +39,6 @@ public:
 
 	~RedisStreamBuf();
 		/// Destructor
-
-	[[nodiscard]] std::string readLine();
-		/// Reads a line from Redis (until \r\n is encountered).
 
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length);
@@ -90,8 +89,40 @@ public:
 
 class Redis_API RedisInputStream: public RedisIOS, public std::istream
 	/// An input stream for reading from a Redis server.
+	///
+	/// Replies are checked only where a missing check would cause a memory or
+	/// stack problem or would return wrong data without an error: a bulk string
+	/// is read as its bytes arrive, arrays are nested at most MAX_NESTING_DEPTH
+	/// levels deep, and a reply cut short by the end of the stream or a bulk
+	/// string without its terminator throws a RedisException. Sizes and the
+	/// rest of the protocol structure are not checked.
 {
 public:
+	static constexpr int MAX_NESTING_DEPTH = 128;
+		/// The maximum number of nested arrays in a reply.
+
+	class NestingGuard
+		/// Counts one level of array nesting of the stream for the lifetime
+		/// of the guard.
+	{
+	public:
+		POCO_NODISCARD_CTOR explicit NestingGuard(RedisInputStream& stream);
+			/// Enters one level of nesting. Throws a RedisException when the
+			/// reply is nested deeper than MAX_NESTING_DEPTH.
+
+		~NestingGuard();
+			/// Leaves the level of nesting.
+
+		NestingGuard() = delete;
+		NestingGuard(const NestingGuard&) = delete;
+		NestingGuard(NestingGuard&&) = delete;
+		NestingGuard& operator = (const NestingGuard&) = delete;
+		NestingGuard& operator = (NestingGuard&&) = delete;
+
+	private:
+		RedisInputStream& _stream;
+	};
+
 	RedisInputStream(Net::StreamSocket& redis);
 		/// Creates the RedisInputStream with the given socket.
 
@@ -101,7 +132,36 @@ public:
 	[[nodiscard]] std::string getline();
 		/// Redis uses \r\n as delimiter. This getline version removes
 		/// the \r from the result.
+		///
+		/// Throws a RedisException when the stream ends before the end
+		/// of the line.
+
+private:
+	int _depth = 0;
 };
+
+
+//
+// inlines
+//
+
+
+inline RedisInputStream::NestingGuard::NestingGuard(RedisInputStream& stream):
+	_stream(stream)
+{
+	if (_stream._depth >= MAX_NESTING_DEPTH)
+	{
+		throw RedisException("Reply from Redis server has more than "
+			+ NumberFormatter::format(MAX_NESTING_DEPTH) + " nested arrays");
+	}
+	++_stream._depth;
+}
+
+
+inline RedisInputStream::NestingGuard::~NestingGuard()
+{
+	--_stream._depth;
+}
 
 
 } // namespace Poco::Redis
