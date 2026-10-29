@@ -142,6 +142,8 @@ void JSONConfigurationTest::testConfigurationView()
 void JSONConfigurationTest::testWrapperEvents()
 {
 	AbstractConfigurationTest* pTest = this;
+	_changingCount = 0;
+	_changedCount = 0;
 	AutoPtr<JSONConfiguration> pJSON = new JSONConfiguration;
 	pJSON->propertyChanging += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanging);
 	pJSON->propertyChanged += Poco::delegate(pTest, &AbstractConfigurationTest::onPropertyChanged);
