@@ -332,8 +332,7 @@ CHARACTER{WS}+VARYING        TOKEN(CHARACTER_VARYING)
   errno = 0;
   yylval->ival = strtoll(yytext, nullptr, 0);
   if (errno) {
-    return fprintf(stderr, "[SQL-Lexer-Error] Integer cannot be parsed - is it out of range?");
-    return 0;
+    return SQL_HSQL_UNDEF;
   }
   return SQL_INTVAL;
 }
@@ -381,9 +380,15 @@ CHARACTER{WS}+VARYING        TOKEN(CHARACTER_VARYING)
 <singlequotedstring>\'\'    { get_strbuf() << '\''; }
 <singlequotedstring>[^']*   { get_strbuf() << yytext; }
 <singlequotedstring>\'      { BEGIN 0; yylval->sval = strdup(get_strbuf().str().c_str()); return SQL_STRING; }
-<singlequotedstring><<EOF>> { fprintf(stderr, "[SQL-Lexer-Error] Unterminated string\n"); return 0; }
+  /*
+   * Input the lexer cannot read is the invalid token, which fails the parse.
+   * Returning 0 instead would end the input there and leave the statements read
+   * so far looking complete. An unterminated string returns to INITIAL first,
+   * so the next call reads the end of the input.
+   */
+<singlequotedstring><<EOF>> { BEGIN(INITIAL); return SQL_HSQL_UNDEF; }
 
-. { fprintf(stderr, "[SQL-Lexer-Error] Unknown Character: %c\n", yytext[0]); return 0; }
+. { return SQL_HSQL_UNDEF; }
 
 %%
 /***************************

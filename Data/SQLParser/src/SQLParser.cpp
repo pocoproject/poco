@@ -1,6 +1,8 @@
 
 #include "SQLParser.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <string>
 #include "parser/bison_parser.h"
 #include "parser/flex_lexer.h"
@@ -26,6 +28,24 @@ bool SQLParser::parse(const std::string& sql, SQLParserResult* result) {
   // If parsing fails, the result will contain an error object.
   int ret = hsql_parse(result, scanner);
   bool success = (ret == 0);
+  if (!success) {
+    // A statement list is complete before the token after it is read, so a
+    // failed parse can hold the statements before the error. They are dropped,
+    // so that a part of the input does not pass for the whole; the error
+    // details stay.
+    const char* message = result->errorMsg();
+    const std::string errorMsg = message ? message : "";
+    const bool hasMessage = message != nullptr;
+    const int errorLine = result->errorLine();
+    const int errorColumn = result->errorColumn();
+    result->reset();
+    char* copy = nullptr;
+    if (hasMessage) {
+      copy = static_cast<char*>(malloc(errorMsg.size() + 1));
+      memcpy(copy, errorMsg.c_str(), errorMsg.size() + 1);
+    }
+    result->setErrorDetails(copy, errorLine, errorColumn);
+  }
   result->setIsValid(success);
 
   hsql__delete_buffer(state, scanner);

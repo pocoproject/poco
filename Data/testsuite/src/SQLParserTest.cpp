@@ -853,6 +853,43 @@ void SQLParserTest::testPerThreadStringBuffer()
 }
 
 
+void SQLParserTest::testUnreadableInput()
+{
+	// Input the lexer cannot read fails the parse instead of ending the input,
+	// so the statements before it do not look complete: a byte outside the
+	// characters SQL uses, a backtick, an unterminated string, an integer out of
+	// range.
+	static const char* const invalid[] =
+	{
+		"SELECT 1 \xc3\xa9 DELETE FROM Test;",
+		"SELECT 1 `x`; DROP TABLE Test;",
+		"SELECT 1 ~ 2; DELETE FROM Test;",
+		"SELECT A FROM Test WHERE B = 1 $ OR 1 = 1;",
+		"SELECT 1 'abc",
+		"SELECT 99999999999999999999;"
+	};
+
+	for (const char* query: invalid)
+	{
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue (!result.isValid());
+		assertEqual(0, static_cast<int>(result.size()));
+	}
+
+	// Inside a string or a quoted identifier, any byte belongs to the value.
+	SQLParserResult result;
+	SQLParser::parse("SELECT 'caf\xc3\xa9', \"caf\xc3\xa9\" FROM Test;", &result);
+	assertTrue (result.isValid());
+	assertEqual(1, result.size());
+
+	// Tokenizing goes on past unreadable input and ends with the input.
+	std::vector<int16_t> tokens;
+	assertTrue (SQLParser::tokenize("SELECT 1 \xc3\xa9 'abc", &tokens));
+	assertEqual(5, static_cast<int>(tokens.size()));
+}
+
+
 void SQLParserTest::setUp()
 {
 }
@@ -892,6 +929,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testComments);
 	CppUnit_addTest(pSuite, SQLParserTest, testTokenize);
 	CppUnit_addTest(pSuite, SQLParserTest, testPerThreadStringBuffer);
+	CppUnit_addTest(pSuite, SQLParserTest, testUnreadableInput);
 
 	return pSuite;
 }

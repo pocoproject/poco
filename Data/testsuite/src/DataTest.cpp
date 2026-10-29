@@ -1556,6 +1556,15 @@ void DataTest::testSQLParse()
 	assertTrue (!stmt.isDelete().value());
 	assertTrue (stmt.hasDelete().value());
 
+	// A statement that fails to parse has no statements to classify, also when
+	// its start parses on its own.
+	stmt.reset();
+	stmt = (sess << "SELECT 1 DELETE FROM Test");
+	assertTrue (!stmt.parse().value());
+	assertEqual (0u, stmt.statementsCount().value());
+	assertTrue (!stmt.isSelect().value());
+	assertTrue (!stmt.hasDelete().value());
+
 	sess.setFeature("sqlParse", false);
 	assertTrue (!sess.getFeature("sqlParse"));
 
