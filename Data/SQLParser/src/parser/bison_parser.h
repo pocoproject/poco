@@ -70,12 +70,11 @@ struct HierarchicalClause {
 };
 
 // A query expression body while its set operations are collected: the select
-// that heads the tree, the select whose set operations take the next member,
-// and whether the body is one parenthesized query expression. Trivially
-// copyable, which a %union member has to be.
+// that heads it and holds its set operations, and whether the body is one
+// parenthesized query expression. Trivially copyable, which a %union member has
+// to be.
 struct QueryBody {
   hsql::SelectStatement* head;
-  hsql::SelectStatement* open;
   bool parenthesized;
 };
 
@@ -94,7 +93,7 @@ struct QueryBody {
     }                                         \
   }
 
-#line 98 "bison_parser.h"
+#line 97 "bison_parser.h"
 
 /* Token kinds.  */
 #ifndef HSQL_TOKENTYPE
@@ -309,7 +308,7 @@ struct QueryBody {
 #if ! defined HSQL_STYPE && ! defined HSQL_STYPE_IS_DECLARED
 union HSQL_STYPE
 {
-#line 230 "bison_parser.y"
+#line 229 "bison_parser.y"
 
   // clang-format on
   bool bval;
@@ -386,7 +385,7 @@ union HSQL_STYPE
 
   // clang-format off
 
-#line 390 "bison_parser.h"
+#line 389 "bison_parser.h"
 
 };
 typedef union HSQL_STYPE HSQL_STYPE;

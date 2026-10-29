@@ -1,5 +1,8 @@
 #include <climits>
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "SQLParser.h"
 #include "sql_asserts.h"
@@ -2054,40 +2057,77 @@ TEST(SelectParenthesizedSetOperationMemberTest) {
 }
 
 TEST(SelectSetOperationChainWithParenthesizedMembersTest) {
-  // An unparenthesized chain nests to the right: each member holds the one
-  // after it. A parenthesized member is a query expression of its own and
-  // holds nothing, so the member after it goes beside it.
+  // INTERSECT binds tighter than UNION and EXCEPT, a parenthesized member is
+  // one unit, and the set operations apply from left to right:
+  // (t UNION ((u EXCEPT v) INTERSECT w)) UNION x.
   TEST_PARSE_SINGLE_SQL(
       "SELECT a FROM t UNION (SELECT b FROM u EXCEPT SELECT c FROM v) INTERSECT SELECT d FROM w UNION SELECT e FROM x;",
       kStmtSelect, SelectStatement, result, stmt);
   ASSERT_STREQ(stmt->fromTable->name, "t");
   ASSERT_EQ(stmt->setOperations->size(), 2);
   ASSERT_EQ(stmt->setOperations->at(0)->setType, kSetUnion);
-  const SelectStatement* group = stmt->setOperations->at(0)->nestedSelectStatement;
-  ASSERT_STREQ(group->fromTable->name, "u");
-  ASSERT_EQ(group->setOperations->size(), 1);
-  ASSERT_EQ(group->setOperations->at(0)->setType, kSetExcept);
-  ASSERT_STREQ(group->setOperations->at(0)->nestedSelectStatement->fromTable->name, "v");
-  ASSERT_NULL(group->setOperations->at(0)->nestedSelectStatement->setOperations);
-  ASSERT_EQ(stmt->setOperations->at(1)->setType, kSetIntersect);
-  const SelectStatement* third = stmt->setOperations->at(1)->nestedSelectStatement;
-  ASSERT_STREQ(third->fromTable->name, "w");
-  ASSERT_EQ(third->setOperations->size(), 1);
-  ASSERT_EQ(third->setOperations->at(0)->setType, kSetUnion);
-  ASSERT_STREQ(third->setOperations->at(0)->nestedSelectStatement->fromTable->name, "x");
+  const SelectStatement* term = stmt->setOperations->at(0)->nestedSelectStatement;
+  ASSERT_STREQ(term->fromTable->name, "u");
+  ASSERT_EQ(term->setOperations->size(), 2);
+  ASSERT_EQ(term->setOperations->at(0)->setType, kSetExcept);
+  ASSERT_STREQ(term->setOperations->at(0)->nestedSelectStatement->fromTable->name, "v");
+  ASSERT_NULL(term->setOperations->at(0)->nestedSelectStatement->setOperations);
+  ASSERT_EQ(term->setOperations->at(1)->setType, kSetIntersect);
+  ASSERT_STREQ(term->setOperations->at(1)->nestedSelectStatement->fromTable->name, "w");
+  ASSERT_EQ(stmt->setOperations->at(1)->setType, kSetUnion);
+  ASSERT_STREQ(stmt->setOperations->at(1)->nestedSelectStatement->fromTable->name, "x");
+  ASSERT_NULL(stmt->setOperations->at(1)->nestedSelectStatement->setOperations);
 
-  // A parenthesized group on the left keeps its set operations and takes the
-  // members after it beside them.
+  // A parenthesized group on the left keeps its set operations, and the ones
+  // after it follow them: (t UNION u) EXCEPT (v INTERSECT w).
   TEST_PARSE_SINGLE_SQL("(SELECT a FROM t UNION SELECT b FROM u) EXCEPT (SELECT c FROM v) INTERSECT SELECT d FROM w;",
                         kStmtSelect, SelectStatement, leftResult, left);
-  ASSERT_EQ(left->setOperations->size(), 3);
+  ASSERT_EQ(left->setOperations->size(), 2);
   ASSERT_EQ(left->setOperations->at(0)->setType, kSetUnion);
   ASSERT_STREQ(left->setOperations->at(0)->nestedSelectStatement->fromTable->name, "u");
   ASSERT_NULL(left->setOperations->at(0)->nestedSelectStatement->setOperations);
   ASSERT_EQ(left->setOperations->at(1)->setType, kSetExcept);
-  ASSERT_STREQ(left->setOperations->at(1)->nestedSelectStatement->fromTable->name, "v");
-  ASSERT_EQ(left->setOperations->at(2)->setType, kSetIntersect);
-  ASSERT_STREQ(left->setOperations->at(2)->nestedSelectStatement->fromTable->name, "w");
+  const SelectStatement* intersected = left->setOperations->at(1)->nestedSelectStatement;
+  ASSERT_STREQ(intersected->fromTable->name, "v");
+  ASSERT_EQ(intersected->setOperations->size(), 1);
+  ASSERT_EQ(intersected->setOperations->at(0)->setType, kSetIntersect);
+  ASSERT_STREQ(intersected->setOperations->at(0)->nestedSelectStatement->fromTable->name, "w");
+}
+
+// Renders a set operation tree the way it evaluates: the set operations of a
+// select apply from left to right to the result so far, a nested select first.
+// A member shows the integer its select list starts with.
+static std::string setOperationTree(const SelectStatement* stmt) {
+  std::string tree = std::to_string(stmt->selectList->at(0)->ival);
+  if (stmt->setOperations) {
+    for (const SetOperation* op : *stmt->setOperations) {
+      const char* name = op->setType == kSetUnion ? "UNION" : op->setType == kSetIntersect ? "INTERSECT" : "EXCEPT";
+      tree = "(" + tree + " " + name + " " + setOperationTree(op->nestedSelectStatement) + ")";
+    }
+  }
+  return tree;
+}
+
+TEST(SetOperationPrecedenceTest) {
+  // INTERSECT binds tighter than UNION and EXCEPT, set operations of the same
+  // level apply from left to right, and parentheses around a single SELECT
+  // change nothing.
+  const std::vector<std::pair<std::string, std::string>> cases = {
+      {"SELECT 1 UNION SELECT 2 INTERSECT SELECT 3", "(1 UNION (2 INTERSECT 3))"},
+      {"SELECT 1 UNION (SELECT 2) INTERSECT SELECT 3", "(1 UNION (2 INTERSECT 3))"},
+      {"SELECT 1 INTERSECT SELECT 2 UNION SELECT 3", "((1 INTERSECT 2) UNION 3)"},
+      {"SELECT 1 INTERSECT (SELECT 2) UNION SELECT 3", "((1 INTERSECT 2) UNION 3)"},
+      {"SELECT 1 EXCEPT SELECT 2 EXCEPT SELECT 3", "((1 EXCEPT 2) EXCEPT 3)"},
+      {"SELECT 1 EXCEPT (SELECT 2) EXCEPT SELECT 3", "((1 EXCEPT 2) EXCEPT 3)"},
+      {"SELECT 1 UNION SELECT 2 EXCEPT SELECT 3", "((1 UNION 2) EXCEPT 3)"},
+      {"(SELECT 1 UNION SELECT 2) INTERSECT SELECT 3", "((1 UNION 2) INTERSECT 3)"},
+      {"SELECT 1 UNION (SELECT 2 EXCEPT SELECT 3) INTERSECT SELECT 4", "(1 UNION ((2 EXCEPT 3) INTERSECT 4))"},
+      {"SELECT 1 INTERSECT SELECT 2 INTERSECT SELECT 3 UNION SELECT 4 INTERSECT SELECT 5",
+       "(((1 INTERSECT 2) INTERSECT 3) UNION (4 INTERSECT 5))"}};
+  for (const auto& c : cases) {
+    TEST_PARSE_SINGLE_SQL(c.first, kStmtSelect, SelectStatement, result, stmt);
+    ASSERT_EQ(setOperationTree(stmt), c.second);
+  }
 }
 
 TEST(SelectClausesAfterParenthesizedSetOperationTest) {

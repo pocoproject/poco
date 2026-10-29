@@ -211,7 +211,7 @@ struct SQLParser_API Expr {
   static Expr* makeIntervalLiteral(int64_t duration, DatetimeField unit);
 
   // For a field range such as YEAR TO MONTH, whose value is a formatted string.
-  static Expr* makeIntervalLiteral(char* value, DatetimeField unit);
+  static Expr* makeIntervalRangeLiteral(char* value, DatetimeField range);
 
   static Expr* makeColumnRef(char* name);
 

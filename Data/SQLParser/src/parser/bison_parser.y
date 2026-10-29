@@ -162,12 +162,11 @@ struct HierarchicalClause {
 };
 
 // A query expression body while its set operations are collected: the select
-// that heads the tree, the select whose set operations take the next member,
-// and whether the body is one parenthesized query expression. Trivially
-// copyable, which a %union member has to be.
+// that heads it and holds its set operations, and whether the body is one
+// parenthesized query expression. Trivially copyable, which a %union member has
+// to be.
 struct QueryBody {
   hsql::SelectStatement* head;
-  hsql::SelectStatement* open;
   bool parenthesized;
 };
 
@@ -405,7 +404,7 @@ struct QueryBody {
 %type <transaction_stmt>       transaction_statement
 %type <prep_stmt>              prepare_statement
 %type <select_stmt>            query_expression query_expression_parens query_primary subquery
-%type <query_body_t>           query_expression_body
+%type <query_body_t>           query_expression_body query_term query_member
 %type <import_stmt>            import_statement
 %type <export_stmt>            export_statement
 %type <create_stmt>            create_statement
@@ -452,7 +451,7 @@ struct QueryBody {
 %type <group_t>                opt_group
 %type <alias_t>                opt_table_alias table_alias opt_alias alias
 %type <with_description_t>     with_description
-%type <set_operator_t>         set_operator set_type
+%type <set_operator_t>         union_operator intersect_operator
 %type <column_constraint_t>    column_constraint
 %type <column_constraints_t>   opt_column_constraints column_constraints
 %type <alter_action_t>         alter_action
@@ -1120,45 +1119,48 @@ query_expression : query_expression_body opt_order opt_limit opt_locking_clause 
   }
 };
 
-// Set operations are written left to right while the tree chains them to the
-// right: the set operations of a select hold the member that follows it, the
-// member holding the one after it. The body therefore carries the select that
-// takes the next member. An unparenthesized member takes the members after
-// it; a parenthesized member is a query expression of its own and takes none,
-// so the next member goes beside it and a parenthesized group stays together
-// with its ORDER BY and LIMIT. Only a parenthesized body can carry a WITH
-// clause here, and the tree would hang the members that follow under it,
-// while in SQL it covers the parentheses alone; such a set operation is
-// rejected rather than read with the wider scope.
-query_expression_body : query_primary { $$ = QueryBody{$1, $1, false}; }
+// INTERSECT binds tighter than UNION and EXCEPT, and set operations of the same
+// level apply from left to right, as in the SQL standard. The select that heads
+// a chain holds its set operations in that order, each applying to the result
+// so far. A member that is a chain of its own, a parenthesized query expression
+// or an INTERSECT term after UNION or EXCEPT, is a nested select, and a
+// parenthesized one stays one unit with its ORDER BY and LIMIT. Only a
+// parenthesized member can carry a WITH clause here, and the set operations
+// after it would come under it, while in SQL it covers the parentheses alone;
+// such a set operation is rejected rather than read with the wider scope.
+query_expression_body : query_term
+| query_expression_body union_operator query_term {
+  if ($1.head->withDescriptions) {
+    delete $1.head;
+    delete $2;
+    delete $3.head;
+    yyerror(&yyloc, result, scanner, "A WITH clause in parentheses cannot be followed by a set operation.");
+    YYERROR;
+  }
+  $2->nestedSelectStatement = $3.head;
+  addSetOperation($1.head, $2);
+  $$ = QueryBody{$1.head, false};
+};
+
+query_term : query_member
+| query_term intersect_operator query_member {
+  if ($1.head->withDescriptions) {
+    delete $1.head;
+    delete $2;
+    delete $3.head;
+    yyerror(&yyloc, result, scanner, "A WITH clause in parentheses cannot be followed by a set operation.");
+    YYERROR;
+  }
+  $2->nestedSelectStatement = $3.head;
+  addSetOperation($1.head, $2);
+  $$ = QueryBody{$1.head, false};
+};
+
+query_member : query_primary { $$ = QueryBody{$1, false}; }
 // A parenthesized query expression followed by ')' is also the inner part of
 // a nested parenthesization. Both read the same, so the lower precedence lets
-// the parenthesis be shifted instead of reducing the body here.
-| query_expression_parens %prec SUBQUERY_AS_EXPR { $$ = QueryBody{$1, $1, true}; }
-| query_expression_body set_operator query_primary {
-  if ($1.head->withDescriptions) {
-    delete $1.head;
-    delete $2;
-    delete $3;
-    yyerror(&yyloc, result, scanner, "A WITH clause in parentheses cannot be followed by a set operation.");
-    YYERROR;
-  }
-  $2->nestedSelectStatement = $3;
-  addSetOperation($1.open, $2);
-  $$ = QueryBody{$1.head, $3, false};
-}
-| query_expression_body set_operator query_expression_parens {
-  if ($1.head->withDescriptions) {
-    delete $1.head;
-    delete $2;
-    delete $3;
-    yyerror(&yyloc, result, scanner, "A WITH clause in parentheses cannot be followed by a set operation.");
-    YYERROR;
-  }
-  $2->nestedSelectStatement = $3;
-  addSetOperation($1.open, $2);
-  $$ = QueryBody{$1.head, $1.open, false};
-};
+// the parenthesis be shifted instead of reducing the member here.
+| query_expression_parens %prec SUBQUERY_AS_EXPR { $$ = QueryBody{$1, true}; };
 
 query_expression_parens : '(' query_expression ')' { $$ = $2; }
 | '(' query_expression_parens ')' { $$ = $2; };
@@ -1169,22 +1171,21 @@ query_expression_parens : '(' query_expression ')' { $$ = $2; }
 // expression; both read the same, so the lower precedence lets ')' be shifted.
 subquery : query_expression_parens %prec SUBQUERY_AS_EXPR;
 
-set_operator : set_type opt_all {
-  $$ = $1;
+union_operator : UNION opt_all {
+  $$ = new SetOperation();
+  $$->setType = SetType::kSetUnion;
+  $$->isAll = $2;
+}
+| EXCEPT opt_all {
+  $$ = new SetOperation();
+  $$->setType = SetType::kSetExcept;
   $$->isAll = $2;
 };
 
-set_type : UNION {
-  $$ = new SetOperation();
-  $$->setType = SetType::kSetUnion;
-}
-| INTERSECT {
+intersect_operator : INTERSECT opt_all {
   $$ = new SetOperation();
   $$->setType = SetType::kSetIntersect;
-}
-| EXCEPT {
-  $$ = new SetOperation();
-  $$->setType = SetType::kSetExcept;
+  $$->isAll = $2;
 };
 
 opt_all : ALL { $$ = true; }
@@ -1710,7 +1711,7 @@ interval_literal : INTVAL duration_field { $$ = Expr::makeIntervalLiteral($1, $2
 }
 // A field range such as YEAR TO MONTH takes a formatted value, e.g. '1-2',
 // which is kept as the string it is.
-| INTERVAL STRING interval_range { $$ = Expr::makeIntervalLiteral($2, $3); }
+| INTERVAL STRING interval_range { $$ = Expr::makeIntervalRangeLiteral($2, $3); }
 | INTERVAL STRING {
   int duration{0}, chars_parsed{0};
   // 'seconds' and 'minutes' are the longest accepted interval qualifiers (7 chars) + null byte

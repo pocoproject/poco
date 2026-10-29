@@ -37,6 +37,7 @@ public:
 	void testThreePartColumnName();
 	void testArrayLiteralNotShadowedByBracketIdentifier();
 	void testDialectStatements();
+	void testSetOperationPrecedence();
 	void testIntervalTypes();
 	void testDatetimeLiterals();
 	void testCarriageReturn();

@@ -365,6 +365,36 @@ void SQLParserTest::testDialectStatements()
 }
 
 
+void SQLParserTest::testSetOperationPrecedence()
+{
+	// INTERSECT binds tighter than UNION and EXCEPT, set operations of the same
+	// level apply from left to right, and parentheses around a single SELECT
+	// change nothing. The select that heads a chain holds its operations in
+	// that order.
+	SQLParserResult except;
+	SQLParser::parse("SELECT A FROM T EXCEPT SELECT B FROM U EXCEPT SELECT C FROM V;", &except);
+	assertTrue (except.isValid());
+	const auto* chain = static_cast<const SelectStatement*>(except.getStatement(0));
+	assertTrue (chain->setOperations != nullptr);
+	assertEqual(2, static_cast<int>(chain->setOperations->size()));
+	assertTrue (chain->setOperations->at(0)->setType == kSetExcept);
+	assertTrue (chain->setOperations->at(1)->setType == kSetExcept);
+
+	SQLParserResult mixed;
+	SQLParser::parse("SELECT A FROM T UNION (SELECT B FROM U) INTERSECT SELECT C FROM V;", &mixed);
+	assertTrue (mixed.isValid());
+	const auto* top = static_cast<const SelectStatement*>(mixed.getStatement(0));
+	assertTrue (top->setOperations != nullptr);
+	assertEqual(1, static_cast<int>(top->setOperations->size()));
+	assertTrue (top->setOperations->at(0)->setType == kSetUnion);
+	const SelectStatement* term = top->setOperations->at(0)->nestedSelectStatement;
+	assertTrue (term != nullptr && term->setOperations != nullptr);
+	assertEqual(1, static_cast<int>(term->setOperations->size()));
+	assertTrue (term->setOperations->at(0)->setType == kSetIntersect);
+}
+
+
+
 void SQLParserTest::testIntervalTypes()
 {
 	// INTERVAL as a column type: bare, with a single field and with a field
@@ -784,6 +814,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartColumnName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testDialectStatements);
+	CppUnit_addTest(pSuite, SQLParserTest, testSetOperationPrecedence);
 	CppUnit_addTest(pSuite, SQLParserTest, testIntervalTypes);
 	CppUnit_addTest(pSuite, SQLParserTest, testDatetimeLiterals);
 	CppUnit_addTest(pSuite, SQLParserTest, testCarriageReturn);

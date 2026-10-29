@@ -215,10 +215,10 @@ Expr* Expr::makeIntervalLiteral(int64_t duration, DatetimeField unit) {
   return e;
 }
 
-Expr* Expr::makeIntervalLiteral(char* value, DatetimeField unit) {
+Expr* Expr::makeIntervalRangeLiteral(char* value, DatetimeField range) {
   Expr* e = new Expr(kExprLiteralInterval);
   e->name = value;
-  e->datetimeField = unit;
+  e->datetimeField = range;
   return e;
 }
 

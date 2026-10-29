@@ -4,6 +4,7 @@
 
 #include "thirdparty/microtest/microtest.h"
 
+#include <cstring>
 #include <iostream>
 #include <sstream>
 
@@ -639,13 +640,15 @@ TEST(NestedSetOperationTest) {
   TEST_PARSE_SINGLE_SQL("SELECT * FROM students INTERSECT SELECT grade FROM students_2 UNION SELECT * FROM employees;",
                         kStmtSelect, SelectStatement, result, stmt);
 
-  ASSERT_STREQ(
-      stmt->setOperations->back()->nestedSelectStatement->setOperations->back()->nestedSelectStatement->fromTable->name,
-      "employees");
-  ASSERT_STREQ(stmt->setOperations->back()->nestedSelectStatement->fromTable->name, "students_2");
+  // INTERSECT binds tighter than UNION, and the set operations apply from left
+  // to right: (students INTERSECT students_2) UNION employees.
   ASSERT_STREQ(stmt->fromTable->name, "students");
-  ASSERT_EQ(stmt->setOperations->back()->setType, kSetIntersect);
-  ASSERT_EQ(stmt->setOperations->back()->nestedSelectStatement->setOperations->back()->setType, kSetUnion);
+  ASSERT_EQ(stmt->setOperations->size(), 2);
+  ASSERT_EQ(stmt->setOperations->at(0)->setType, kSetIntersect);
+  ASSERT_STREQ(stmt->setOperations->at(0)->nestedSelectStatement->fromTable->name, "students_2");
+  ASSERT_NULL(stmt->setOperations->at(0)->nestedSelectStatement->setOperations);
+  ASSERT_EQ(stmt->setOperations->at(1)->setType, kSetUnion);
+  ASSERT_STREQ(stmt->setOperations->at(1)->nestedSelectStatement->fromTable->name, "employees");
   ASSERT_FALSE(stmt->setOperations->back()->isAll);
 }
 
@@ -679,16 +682,11 @@ TEST(SetOperationLastSubQueryOrder) {
       "DESC) ORDER BY grade ASC;",
       kStmtSelect, SelectStatement, result, stmt);
 
-  ASSERT_EQ(stmt->setOperations->back()
-                ->nestedSelectStatement->setOperations->back()
-                ->nestedSelectStatement->order->at(0)
-                ->type,
-            kOrderDesc);
-  ASSERT_STREQ(stmt->setOperations->back()
-                   ->nestedSelectStatement->setOperations->back()
-                   ->nestedSelectStatement->order->at(0)
-                   ->expr->name,
-               "name");
+  // (students INTERSECT students_2) UNION (employees ORDER BY name DESC): the
+  // parenthesized member keeps its ORDER BY, the one after it orders the result.
+  ASSERT_EQ(stmt->setOperations->size(), 2);
+  ASSERT_EQ(stmt->setOperations->back()->nestedSelectStatement->order->at(0)->type, kOrderDesc);
+  ASSERT_STREQ(stmt->setOperations->back()->nestedSelectStatement->order->at(0)->expr->name, "name");
 
   ASSERT_EQ(stmt->setOperations->back()->resultOrder->at(0)->type, kOrderAsc);
   ASSERT_STREQ(stmt->setOperations->back()->resultOrder->at(0)->expr->name, "grade");
@@ -1054,6 +1052,23 @@ TEST(QualifiedCurrentDatetimeNameTest) {
   ASSERT_STREQ(stmt->selectList->at(1)->name, "CURRENT_TIME");
   ASSERT_STREQ(stmt->fromTable->schema, "db.CURRENT_TIME");
   ASSERT_STREQ(stmt->fromTable->name, "t");
+}
+
+TEST(IntervalLiteralFactoryTest) {
+  // A duration of 0 is a plain integer: the factory for a field range value has
+  // a name of its own, so the call is not ambiguous.
+  Expr* single = Expr::makeIntervalLiteral(0, kDatetimeSecond);
+  ASSERT_EQ(single->type, kExprLiteralInterval);
+  ASSERT_EQ(single->ival, 0);
+  ASSERT_NULL(single->name);
+  ASSERT_EQ(single->datetimeField, kDatetimeSecond);
+  delete single;
+
+  Expr* range = Expr::makeIntervalRangeLiteral(strdup("1-2"), kIntervalYearToMonth);
+  ASSERT_EQ(range->type, kExprLiteralInterval);
+  ASSERT_STREQ(range->name, "1-2");
+  ASSERT_EQ(range->datetimeField, kIntervalYearToMonth);
+  delete range;
 }
 
 TEST(IntervalYearTest) {
