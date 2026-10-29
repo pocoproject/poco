@@ -301,6 +301,7 @@ void SHA2Engine::updateImpl(const void* buffer_, std::size_t count)
 		pContext->total.total32[0] += (Poco::UInt32)count;
 		pContext->total.total32[0] &= 0xFFFFFFFF;
 		if (pContext->total.total32[0] < (Poco::UInt32)count) pContext->total.total32[1]++;
+		pContext->total.total32[1] += static_cast<Poco::UInt32>(static_cast<Poco::UInt64>(count) >> 32);
 		if (left && count >= fill)
 		{
 			memcpy((void *)(pContext->buffer + left), data, fill);

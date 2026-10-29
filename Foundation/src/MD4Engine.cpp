@@ -58,17 +58,17 @@ MD4Engine::~MD4Engine()
 void MD4Engine::updateImpl(const void* input_, std::size_t inputLen)
 {
 	const unsigned char* input = (const unsigned char*) input_;
-	std::size_t i, index, partLen;
 
 	/* Compute number of bytes mod 64 */
-	index = (std::size_t)((_context.count[0] >> 3) & 0x3F);
+	std::size_t index = (_context.count[0] >> 3) & 0x3F;
 
 	/* Update number of bits */
 	if ((_context.count[0] += ((UInt32) inputLen << 3)) < ((UInt32) inputLen << 3))
 		_context.count[1]++;
-	_context.count[1] += (UInt32) (inputLen >> 29);
+	_context.count[1] += static_cast<UInt32>(inputLen >> 29);
 
-	partLen = 64 - index;
+	const std::size_t partLen = 64 - index;
+	std::size_t i = 0;
 
 	/* Transform as many times as possible. */
 	if (inputLen >= partLen)
@@ -81,7 +81,6 @@ void MD4Engine::updateImpl(const void* input_, std::size_t inputLen)
 
 		index = 0;
 	}
-	else i = 0;
 
 	/* Buffer remaining input */
 	std::memcpy(&_context.buffer[index], &input[i], inputLen-i);

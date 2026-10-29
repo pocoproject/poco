@@ -12,7 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/MD4Engine.h"
-#if defined(POCO_OS_FAMILY_UNIX)
+#if (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && defined(POCO_PTR_IS_64_BIT)
 #include <sys/mman.h>
 #endif
 
@@ -63,9 +63,9 @@ void MD4EngineTest::testMD4()
 
 void MD4EngineTest::testLargeInput()
 {
-#if defined(POCO_OS_FAMILY_UNIX) && defined(POCO_PTR_IS_64_BIT)
-	// more than 4 GB of zero bytes in a single update() call;
-	// a read-only anonymous mapping does not consume physical memory
+#if (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && defined(POCO_PTR_IS_64_BIT)
+	// more than 4 GB of zero bytes in a single update() call; on Linux, reads
+	// of a read-only anonymous mapping go to the shared zero page and use no memory
 	const std::size_t size = (std::size_t(1) << 32) + 100;
 	void* p = mmap(nullptr, size, PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	assertTrue (p != MAP_FAILED);
