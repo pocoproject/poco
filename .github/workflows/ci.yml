@@ -467,6 +467,31 @@ jobs:
             ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^Foundation$"
       - uses: ./.github/actions/upload-test-report
 
+  # Long tests (CppUnit_addLongTest) run only with -long, which ctest does not
+  # pass: the Foundation suites that hold long tests, named one by one.
+  linux-gcc-cmake-long-tests:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja
+          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }}
+      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $(nproc)
+      - name: Run Foundation long tests
+        timeout-minutes: 30
+        run: >-
+          cd cmake-build/bin &&
+          POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
+          ./Foundation-testrunner -ignore "$GITHUB_WORKSPACE/cppignore.lnx" -long
+          RWLockTest PBKDF2EngineTest FileStreamRWLockTest FileChannelTest
+          MD5EngineTest MD4EngineTest
+
   # Clang toolchain exception + C++ modules probe: Foundation + Util smoke.
   linux-clang-21-cmake-modules:
     runs-on: ubuntu-24.04

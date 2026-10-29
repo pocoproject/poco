@@ -7,7 +7,8 @@ POCO tests use the CppUnit framework in `CppUnit/`. Each component has a test ru
 
 - A test class derives from `CppUnit::TestCase` and has a static `suite()` that registers its test methods with
   `CppUnit_addTest(pSuite, Class, method)`. Slow tests use `CppUnit_addLongTest`; they run only with the runner option
-  `-long`.
+  `-long`. CI runs them in the job `linux-gcc-cmake-long-tests`, which names the Foundation suites that hold long tests;
+  a long test in another suite or component is added to that job.
 - The class's suite is added to the component suite in `<Component>/testsuite/src/<Component>TestSuite.cpp`. Foundation
   groups its classes in intermediate suites (`CoreTestSuite`, `ThreadingTestSuite`, ...) that `FoundationTestSuite.cpp`
   collects.
