@@ -17,6 +17,8 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Mutex.h"
 #include "Poco/IOLock.h"
+#include <algorithm>
+#include <limits>
 #include <set>
 
 
@@ -31,7 +33,6 @@
 		#include <sys/eventfd.h>
 	#endif
 #elif defined(POCO_HAVE_FD_POLL)
-	#include <algorithm>
 	#ifndef _WIN32
 		#include <poll.h>
 		#include "Poco/Pipe.h"
@@ -40,6 +41,28 @@
 
 
 namespace Poco::Net {
+
+
+#if defined(POCO_HAVE_FD_EPOLL) || defined(POCO_HAVE_FD_POLL)
+
+
+namespace {
+
+
+int pollMilliseconds(const Poco::Timespan& remainingTime)
+	/// Returns the remaining time in milliseconds for epoll_wait() and poll(),
+	/// limited to INT_MAX; a negative time is returned as -1, which they take
+	/// as no timeout.
+{
+	if (remainingTime < 0) return -1;
+	return static_cast<int>(std::min<Poco::Int64>(remainingTime.totalMilliseconds(), std::numeric_limits<int>::max()));
+}
+
+
+} // namespace
+
+
+#endif
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
@@ -194,9 +217,8 @@ public:
 
 		while (true)
 		{
-			const int milliseconds = infinite ? -1 : static_cast<int>(remainingTime.totalMilliseconds());
 			Poco::Timestamp start;
-			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), milliseconds);
+			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), pollMilliseconds(remainingTime));
 			if (rc == 0)
 			{
 				if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
@@ -578,9 +600,8 @@ public:
 
 		do
 		{
-			const int milliseconds = infinite ? -1 : static_cast<int>(remainingTime.totalMilliseconds());
 			Poco::Timestamp start;
-			rc = ::poll(_polledFds.data(), _polledFds.size(), milliseconds);
+			rc = ::poll(_polledFds.data(), _polledFds.size(), pollMilliseconds(remainingTime));
 			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !infinite)
 			{
 				Poco::Timestamp end;

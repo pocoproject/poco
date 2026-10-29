@@ -18,6 +18,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Error.h"
 #include <algorithm>
+#include <limits>
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
@@ -183,7 +184,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	int rc;
 	do
 	{
-		const int milliseconds = infinite ? -1 : static_cast<int>(remainingTime.totalMilliseconds());
+		const int milliseconds = infinite ? -1 : static_cast<int>(std::min<Poco::Int64>(remainingTime.totalMilliseconds(), std::numeric_limits<int>::max()));
 		Poco::Timestamp start;
 #ifdef _WIN32
 		rc = WSAPoll(pPollArr, nfd, milliseconds);

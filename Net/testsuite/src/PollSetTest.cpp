@@ -990,6 +990,57 @@ void PollSetTest::testPollNegativeTimeoutBelowOneMillisecond()
 }
 
 
+void PollSetTest::testPollTimeoutBeyondIntMilliseconds()
+{
+#if defined(POCO_HAVE_FD_EPOLL) || defined (POCO_HAVE_FD_POLL)
+	// 2^32 milliseconds, which is 0 when it is converted to int without a limit
+	static constexpr Timespan::TimeDiff TIMEOUT = (Timespan::TimeDiff(1) << 32) * Timespan::MILLISECONDS;
+	static constexpr long WAKE_UP_AFTER_MS = 200;
+	static constexpr long MIN_ELAPSED_MS = 150;
+
+	// With epoll (Linux, Windows, Android), the poll loop keeps waiting after a timeout of 0, so the
+	// test passes there either way; it detects the defect where poll() is used (BSD, macOS).
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+	PollSet ps;
+	ps.add(ss, PollSet::POLL_READ);
+
+	Stopwatch sw;
+	sw.start();
+	Thread wakeUpThread;
+	wakeUpThread.startFunc([&ps, &peer]
+		{
+			Thread::sleep(WAKE_UP_AFTER_MS);
+			try
+			{
+				ps.wakeUp();
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	std::string pollError;
+	try
+	{
+		ps.poll(Timespan(TIMEOUT));
+	}
+	catch (const Poco::Exception& exc)
+	{
+		pollError = exc.displayText();
+	}
+	sw.stop();
+	wakeUpThread.join();
+
+	if (!pollError.empty()) failmsg(pollError);
+	assertTrue (Timespan(sw.elapsed()).totalMilliseconds() >= MIN_ELAPSED_MS);
+#endif
+}
+
+
 void PollSetTest::setUp()
 {
 }
@@ -1027,6 +1078,7 @@ CppUnit::Test* PollSetTest::suite()
 	CppUnit_addTest(pSuite, PollSetTest, testReplacedSocketGetsNoEventOfPredecessor);
 	CppUnit_addTest(pSuite, PollSetTest, testPollInterruptedNoTimeout);
 	CppUnit_addTest(pSuite, PollSetTest, testPollNegativeTimeoutBelowOneMillisecond);
+	CppUnit_addTest(pSuite, PollSetTest, testPollTimeoutBeyondIntMilliseconds);
 
 	return pSuite;
 }

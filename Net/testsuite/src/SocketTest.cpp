@@ -1310,6 +1310,60 @@ void SocketTest::testSelectNegativeTimeoutBelowOneMillisecond()
 }
 
 
+void SocketTest::testSelectTimeoutBeyondIntMilliseconds()
+{
+	// 2^32 milliseconds, which is 0 when it is converted to int without a limit
+	static constexpr Timespan::TimeDiff TIMEOUT = (Timespan::TimeDiff(1) << 32) * Timespan::MILLISECONDS;
+	static constexpr long SEND_AFTER_MS = 200;
+	static constexpr long MIN_ELAPSED_MS = 150;
+
+	// With epoll (Linux, Windows, Android), select() runs the poll loop of PollSet, which keeps
+	// waiting after a timeout of 0, so the test passes there either way; it detects the defect where
+	// poll() is used (BSD, macOS).
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	Socket::SocketList readList{ss};
+	Socket::SocketList writeList;
+	Socket::SocketList exceptList;
+	const Poco::Clock start;
+	Poco::Thread peerThread;
+	peerThread.startFunc([&peer]
+		{
+			Poco::Thread::sleep(SEND_AFTER_MS);
+			try
+			{
+				peer.sendBytes("x", 1);
+			}
+			catch (Poco::Exception&)
+			{
+				peer.close();
+			}
+		});
+
+	int ready = 0;
+	std::string selectError;
+	try
+	{
+		ready = Socket::select(readList, writeList, exceptList, Timespan(TIMEOUT));
+	}
+	catch (const Poco::Exception& exc)
+	{
+		selectError = exc.displayText();
+	}
+	const Timespan elapsed = start.elapsed();
+	peerThread.join();
+
+	if (!selectError.empty()) failmsg(selectError);
+	assertEqual (1, ready);
+	assertTrue (readList.size() == 1);
+	assertTrue (readList[0] == ss);
+	assertTrue (elapsed.totalMilliseconds() >= MIN_ELAPSED_MS);
+}
+
+
 #if defined(POCO_OS_FAMILY_UNIX)
 void SocketTest::testReceiveInterruptedWithTimeout()
 {
@@ -1821,6 +1875,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testReceiveNonBlockingIgnoresTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testPollNegativeTimeoutBelowOneMillisecond);
 	CppUnit_addTest(pSuite, SocketTest, testSelectNegativeTimeoutBelowOneMillisecond);
+	CppUnit_addTest(pSuite, SocketTest, testSelectTimeoutBeyondIntMilliseconds);
 #if defined(POCO_OS_FAMILY_UNIX)
 	CppUnit_addTest(pSuite, SocketTest, testReceiveInterruptedWithTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testReceiveWaitAllInterruptedKeepsTimeout);

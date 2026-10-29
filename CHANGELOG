@@ -251,6 +251,11 @@ Bug Fixes and Improvements:
   the server announces in its Keep-Alive header, counted from the receipt of the response header,
   less one second, or less half of it when it is shorter than two seconds. New:
   Poco::Net::HTTPMessage::getKeepAliveTimeout(), which returns std::optional<Poco::Timespan>.
+- GH #5510 Poco::Net::Socket::select() and Poco::Net::PollSet::poll() no longer wrap a timeout of
+  more than INT_MAX milliseconds (about 24.8 days) when they pass it to epoll_wait() or poll(),
+  which made a wait end early, spin or never end: with epoll (Linux, Windows, Android) the whole
+  timeout is waited, and with poll() (BSD, macOS) the wait ends after INT_MAX milliseconds, as in
+  Socket::poll().
 
 
 Release 1.15.4 (2026-09-22)
