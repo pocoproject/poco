@@ -19,6 +19,7 @@
 #include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
 #include <sstream>
+#include <type_traits>
 
 
 using namespace std::string_literals;
@@ -68,6 +69,7 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
 	_elementCount(0),
 	_inFragment(false),
 	_inCDATA(false),
+	_cdataBrackets(0),
 	_inDTD(false),
 	_inInternalDTD(false),
 	_contentWritten(false),
@@ -91,6 +93,7 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 	_elementCount(0),
 	_inFragment(false),
 	_inCDATA(false),
+	_cdataBrackets(0),
 	_inDTD(false),
 	_inInternalDTD(false),
 	_contentWritten(false),
@@ -114,6 +117,7 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 	_elementCount(0),
 	_inFragment(false),
 	_inCDATA(false),
+	_cdataBrackets(0),
 	_inDTD(false),
 	_inInternalDTD(false),
 	_contentWritten(false),
@@ -319,7 +323,25 @@ void XMLWriter::characters(const XMLChar ch[], int start, int length)
 	_contentWritten = _contentWritten || length > 0;
 	if (_inCDATA)
 	{
-		while (length-- > 0) writeXML(ch[start++]);
+		while (length-- > 0)
+		{
+			XMLChar c = ch[start++];
+			if (c == '>' && _cdataBrackets >= 2)
+			{
+				// End the section after the "]]" already written and start a new one,
+				// so that "]]>" in the data becomes "]]]]><![CDATA[>".
+				writeMarkup(MARKUP_END_CDATA);
+				writeMarkup(MARKUP_BEGIN_CDATA);
+			}
+			if (static_cast<std::make_unsigned_t<XMLChar>>(c) < 32 && c != '\t' && c != '\r' && c != '\n')
+				throw XMLException("Invalid character token.");
+			writeXML(c);
+			if (c == ']')
+			{
+				if (_cdataBrackets < 2) ++_cdataBrackets;
+			}
+			else _cdataBrackets = 0;
+		}
 	}
 	else
 	{
@@ -444,6 +466,7 @@ void XMLWriter::startCDATA()
 	if (_inCDATA) throw XMLException("Cannot nest CDATA sections");
 	if (_unclosedStartTag) closeStartTag();
 	_inCDATA = true;
+	_cdataBrackets = 0;
 	writeMarkup(MARKUP_BEGIN_CDATA);
 }
 
