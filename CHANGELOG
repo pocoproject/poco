@@ -73,6 +73,14 @@ Breaking Changes:
   such as std::bad_alloc, to the caller and frees the parser, where it used to unwind through
   Expat and leak the parser. A new private member changes the class layout: recompile against
   the new header.
+- GH #5510 Poco::Redis throws Poco::Redis::RedisException for a truncated reply, where it used
+  to return a bulk string padded with spaces or a partial line, and for arrays nested deeper
+  than 128 levels; a bulk string is read as its bytes arrive instead of being allocated in full
+  first. A bulk string followed by anything other than an empty line after its declared length
+  throws, where it used to return the value and skip the next line, and
+  RedisInputStream::getline() throws Poco::Redis::RedisException when the stream ends before the
+  end of the line. A new private member of RedisInputStream changes the class layout: recompile
+  against the new header.
 
 Bundled Third-Party Library Upgrades:
 
