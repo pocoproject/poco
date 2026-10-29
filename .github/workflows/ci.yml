@@ -104,7 +104,7 @@ env:
   # without an ignore list, so every failure fails the job.
   POCO_LONG_TEST_SUITES: >-
     RWLockTest PBKDF2EngineTest FileStreamRWLockTest FileChannelTest
-    MD5EngineTest MD4EngineTest
+    MD5EngineTest MD4EngineTest SHA1EngineTest SHA2EngineTest
 
 jobs:
   # Change detection. Narrow-scope jobs gate on
