@@ -140,6 +140,8 @@ std::string RedisInputStream::getline()
 {
 	std::string line;
 	std::getline(*this, line);
+	// A line cut short would be returned as a complete value; see the reply checks of the class.
+	if (!good()) throw RedisException("Incomplete reply from Redis server");
 	if (!line.empty() && line.back() == '\r') line.pop_back();
 	return line;
 }

@@ -299,6 +299,8 @@ struct RedisTypeTraits<Array>
 
 	static void read(RedisInputStream& input, Array& value)
 	{
+		// Each nested array recurses; see the reply checks of RedisInputStream.
+		const RedisInputStream::NestingGuard guard(input);
 		value.makeNull();
 
 		const Int64 length = NumberParser::parse64(input.getline());

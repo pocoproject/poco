@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Driver NotificationTest RedisTest RedisTestSuite
+objects = Driver NotificationTest RedisTest RedisTestSuite ReplyTest
 
 target         = testrunner
 target_version = 1
