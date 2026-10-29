@@ -1073,6 +1073,118 @@ jobs:
             ctest ${{ env.POCO_CTEST_COMMON }} --parallel $env:NUMBER_OF_PROCESSORS -R "^(Foundation|Util)$"
       - uses: ./.github/actions/upload-test-report
 
+  # Native ARM64 counterpart of windows-2025-msvc-cmake: same scope and steps,
+  # vcpkg arm64-windows triplet.
+  windows-11-arm-msvc-cmake:
+    runs-on: windows-11-arm
+    steps:
+      - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: arm64
+      - name: Cache vcpkg binary archives and downloads
+        # Same layout as the x64 job. runner.arch leads the key so the x64
+        # restore prefix (vcpkg-Windows-) never matches the arm64 archives.
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~\AppData\Local\vcpkg\archives
+            C:\vcpkg\downloads
+          key: vcpkg-${{ runner.arch }}-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            vcpkg-${{ runner.arch }}-${{ runner.os }}-
+      - name: Uninstall pre-existing OpenSSL / libssh
+        shell: pwsh
+        # Same scrub as the x64 job: only the vcpkg OpenSSL may remain.
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          vcpkg --vcpkg-root="$env:VCPKG_INSTALLATION_ROOT" remove libssh:arm64-windows libxml2:arm64-windows openssl:arm64-windows --recurse 2>&1 | Out-Host
+          $drop = @(
+            'C:\Program Files\OpenSSL\bin',
+            'C:\Program Files\OpenSSL-Win64\bin',
+            'C:\OpenSSL-Win64\bin',
+            'C:\Windows\System32\OpenSSH'
+          )
+          $clean = ($env:PATH -split ';' | Where-Object {
+            $p = $_.TrimEnd('\'); $drop -notcontains $p
+          }) -join ';'
+          "PATH=$clean" | Out-File -FilePath $env:GITHUB_ENV -Append
+          foreach ($d in 'C:\OpenSSL-Win64','C:\Program Files\OpenSSL','C:\Program Files\OpenSSL-Win64') {
+            if (Test-Path $d) { Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $d }
+          }
+      - name: Install OpenSSL + libssh (vcpkg)
+        shell: pwsh
+        # libssh drags in openssl as a transitive dep; the arm64-windows triplet
+        # places runtime DLLs and the OpenSSL provider modules flat under
+        # $root\bin\, as x64-windows does.
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          vcpkg --vcpkg-root="$env:VCPKG_INSTALLATION_ROOT" install libssh:arm64-windows libxml2:arm64-windows
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $root = "$env:VCPKG_INSTALLATION_ROOT\installed\arm64-windows"
+          $providerDir = "$root\bin"
+          $required = @(
+            "$root\bin\libcrypto-3-arm64.dll",
+            "$root\bin\libssl-3-arm64.dll",
+            "$root\bin\ssh.dll",
+            "$root\bin\libxml2.dll",
+            "$root\lib\libcrypto.lib",
+            "$root\lib\libssl.lib",
+            "$root\lib\ssh.lib",
+            "$root\lib\libxml2.lib",
+            "$root\include\openssl\ssl.h",
+            "$root\include\libssh\libssh.h",
+            "$root\include\libxml2\libxml\xmlschemas.h",
+            "$providerDir\legacy.dll"
+          )
+          foreach ($p in $required) {
+            if (-not (Test-Path $p)) { Write-Error "Missing: $p"; exit 1 }
+          }
+          "OPENSSL_ROOT_DIR=$root"          | Out-File -FilePath $env:GITHUB_ENV -Append
+          "LIBSSH_ROOT_DIR=$root"           | Out-File -FilePath $env:GITHUB_ENV -Append
+          "OPENSSL_MODULES=$providerDir"    | Out-File -FilePath $env:GITHUB_ENV -Append
+          Add-Content $env:GITHUB_PATH "$root\bin"
+          Write-Host "OPENSSL_ROOT_DIR=$root"
+          Write-Host "LIBSSH_ROOT_DIR=$root"
+          Write-Host "OPENSSL_MODULES=$providerDir"
+      - name: Verify OpenSSL / libssh DLL resolution
+        shell: pwsh
+        run: |
+          foreach ($dll in 'libcrypto-3-arm64.dll','libssl-3-arm64.dll','ssh.dll','libxml2.dll','legacy.dll') {
+            $cmd = Get-Command $dll -ErrorAction SilentlyContinue
+            if ($null -eq $cmd) { Write-Error "$dll not resolvable on PATH"; exit 1 }
+            $resolved = [System.IO.Path]::GetFullPath($cmd.Source)
+            $expected = [System.IO.Path]::GetFullPath("$env:LIBSSH_ROOT_DIR\bin\$dll")
+            Write-Host "$dll -> $resolved"
+            if ($resolved -ne $expected) {
+              Write-Error "$dll resolves to $resolved, expected $expected"
+              exit 1
+            }
+          }
+      - run: >-
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_WINDOWS_FULL }}
+          -DOPENSSL_ROOT_DIR="${{ env.OPENSSL_ROOT_DIR }}"
+          -DCMAKE_PREFIX_PATH="${{ env.LIBSSH_ROOT_DIR }}"
+      - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
+      - uses: ./.github/actions/retry-action
+        env:
+          CPPUNIT_IGNORE: ${{ env.POCO_WIN_CPPUNIT_IGNORE }}
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build;
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $env:NUMBER_OF_PROCESSORS -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
+      - uses: ./.github/actions/upload-test-report
+      - name: Uninstall OpenSSL / libssh
+        if: always()
+        shell: pwsh
+        run: |
+          vcpkg --vcpkg-root="$env:VCPKG_INSTALLATION_ROOT" remove libssh:arm64-windows libxml2:arm64-windows openssl:arm64-windows --recurse 2>&1 | Out-Host
+
   # Static linkage probes on Windows x64: minimal scope (Foundation + Util).
   windows-2025-msvc-cmake-static:
     runs-on: windows-2025
