@@ -62,6 +62,8 @@ protected:
 	std::string _changingValue;
 	std::string _changedKey;
 	std::string _changedValue;
+	int _changingCount = 0;
+	int _changedCount = 0;
 	std::string _removingKey;
 	std::string _removedKey;
 };
