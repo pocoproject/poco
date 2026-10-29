@@ -62,6 +62,7 @@ public:
 	void testReceiveNonBlockingIgnoresTimeout();
 	void testPollNegativeTimeoutBelowOneMillisecond();
 	void testSelectNegativeTimeoutBelowOneMillisecond();
+	void testSelectTimeoutBeyondIntMilliseconds();
 #if defined(POCO_OS_FAMILY_UNIX)
 	void testReceiveInterruptedWithTimeout();
 	void testReceiveWaitAllInterruptedKeepsTimeout();
