@@ -142,7 +142,7 @@ public:
 
 	bool verify(const Signer& signer, const std::string& header, const std::string& payload, const Poco::DigestEngine::Digest& signature)
 	{
-		return sign(signer, header, payload) == signature;
+		return Poco::DigestEngine::constantTimeEquals(sign(signer, header, payload), signature);
 	}
 };
 

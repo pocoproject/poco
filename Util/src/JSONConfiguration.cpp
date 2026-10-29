@@ -255,6 +255,17 @@ void JSONConfiguration::setValue(const std::string& key, const Dynamic::Var& val
 		propertyChanging(this, kv);
 	}
 
+	storeValue(key, value);
+
+	if (eventsEnabled())
+	{
+		propertyChanged(this, kv);
+	}
+}
+
+
+void JSONConfiguration::storeValue(const std::string& key, const Dynamic::Var& value)
+{
 	std::string lastPart;
 	JSON::Object::Ptr parentObject = findStart(key, lastPart);
 
@@ -296,11 +307,6 @@ void JSONConfiguration::setValue(const std::string& key, const Dynamic::Var& val
 		}
 		arr->set(indexes.back(), value);
 	}
-
-	if (eventsEnabled())
-	{
-		propertyChanged(this, kv);
-	}
 }
 
 
@@ -312,7 +318,7 @@ void JSONConfiguration::setString(const std::string& key, const std::string& val
 
 void JSONConfiguration::setRaw(const std::string& key, const std::string& value)
 {
-	setValue(key, value);
+	storeValue(key, value);
 }
 
 

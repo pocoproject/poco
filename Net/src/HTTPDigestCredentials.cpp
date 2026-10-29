@@ -397,7 +397,7 @@ bool HTTPDigestCredentials::verifyAuthParams(const HTTPRequest& request, const H
 		const std::string ha2 = digest(engine, request.getMethod(), request.getURI());
 		response = digest(engine, ha1, nonce, nc, cnonce, qop, ha2);
 	}
-	return response == params.get(RESPONSE_PARAM);
+	return DigestEngine::constantTimeEquals(response, params.get(RESPONSE_PARAM));
 }
 
 
