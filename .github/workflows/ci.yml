@@ -100,7 +100,8 @@ env:
   # Sanitizer extra: lift the 300KB output cap so long stack traces survive.
   POCO_CTEST_SANITIZER_EXTRA: "--test-output-size-failed 0 --test-output-truncation tail"
   # Foundation suites that hold long tests (CppUnit_addLongTest). Long tests run
-  # only with -long, which ctest does not pass; the *-long-tests jobs run these.
+  # only with -long, which ctest does not pass; the *-long-tests jobs run these
+  # without an ignore list, so every failure fails the job.
   POCO_LONG_TEST_SUITES: >-
     RWLockTest PBKDF2EngineTest FileStreamRWLockTest FileChannelTest
     MD5EngineTest MD4EngineTest
@@ -492,8 +493,7 @@ jobs:
         run: >-
           cd cmake-build/bin &&
           POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
-          ./Foundation-testrunner -ignore "$GITHUB_WORKSPACE/cppignore.lnx" -long
-          ${{ env.POCO_LONG_TEST_SUITES }}
+          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
 
   # Clang toolchain exception + C++ modules probe: Foundation + Util smoke.
   linux-clang-21-cmake-modules:
@@ -836,8 +836,7 @@ jobs:
         run: >-
           cd cmake-build/bin &&
           POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
-          ./Foundation-testrunner -ignore "$GITHUB_WORKSPACE/cppignore.lnx" -long
-          ${{ env.POCO_LONG_TEST_SUITES }}
+          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
 
   # Newer non-Apple compiler probe (brew clang-21). Scope: Foundation + Util
   # + Crypto (exercises the OpenSSL link path implied by the -openssl3 name).
@@ -1178,12 +1177,9 @@ jobs:
       - run: cmake --build cmake-build --target Foundation-testrunner --parallel $env:NUMBER_OF_PROCESSORS
       - name: Run Foundation long tests
         timeout-minutes: 30
-        env:
-          CPPUNIT_IGNORE: ${{ env.POCO_WIN_CPPUNIT_IGNORE }}
         run: >-
           cd cmake-build/bin;
-          ./Foundation-testrunner -ignore "$env:GITHUB_WORKSPACE/cppignore.win" -long
-          ${{ env.POCO_LONG_TEST_SUITES }}
+          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
 
   # Build-only warnings probe: extra compiler warnings enabled.
   windows-msvc-cmake-warnings:

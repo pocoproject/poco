@@ -9,8 +9,8 @@ POCO tests use the CppUnit framework in `CppUnit/`. Each component has a test ru
   `CppUnit_addTest(pSuite, Class, method)`. Slow tests use `CppUnit_addLongTest`; they run only with the runner option
   `-long`. CI runs them in the jobs `linux-gcc-cmake-long-tests`, `macos-clang-cmake-long-tests` and
   `windows-2025-msvc-cmake-long-tests` for the Foundation suites listed in `POCO_LONG_TEST_SUITES` in
-  `.github/workflows/ci.yml`. A suite that gets a long test is added to that list; a long test in another component
-  also needs its test runner in these jobs.
+  `.github/workflows/ci.yml`, without an ignore list. A suite that gets a long test is added to that list; a long test
+  in another component also needs its test runner in these jobs.
 - The class's suite is added to the component suite in `<Component>/testsuite/src/<Component>TestSuite.cpp`. Foundation
   groups its classes in intermediate suites (`CoreTestSuite`, `ThreadingTestSuite`, ...) that `FoundationTestSuite.cpp`
   collects.
