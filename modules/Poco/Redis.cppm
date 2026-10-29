@@ -21,6 +21,7 @@ module;
 #include "Poco/Redis/PoolableConnectionFactory.h"
 #include "Poco/Redis/RedisEventArgs.h"
 #include "Poco/Redis/Redis.h"
+#include "Poco/Redis/RedisNotifications.h"
 #include "Poco/Redis/RedisStream.h"
 #include "Poco/Redis/Type.h"
 #endif
@@ -35,10 +36,14 @@ export namespace Poco::Redis {
 	using Poco::Redis::Command;
 	using Poco::Redis::Error;
 	using Poco::Redis::PooledConnection;
+	using Poco::Redis::RedisConnectNotification;
+	using Poco::Redis::RedisDisconnectNotification;
+	using Poco::Redis::RedisErrorNotification;
 	using Poco::Redis::RedisEventArgs;
 	using Poco::Redis::RedisException;
 	using Poco::Redis::RedisIOS;
 	using Poco::Redis::RedisInputStream;
+	using Poco::Redis::RedisNotification;
 	using Poco::Redis::RedisOutputStream;
 	using Poco::Redis::RedisStreamBuf;
 	using Poco::Redis::RedisType;

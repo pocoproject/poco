@@ -216,6 +216,11 @@ macro(POCO_GENERATE_PACKAGE target_name)
 		VERSION ${PROJECT_VERSION}
 		COMPATIBILITY AnyNewerVersion
 	)
+	# Without CXX_MODULES_DIRECTORY, CMake exports no module information and consumers cannot import the module
+	set(_poco_package_cxx_modules_directory)
+	if("${target_name}" STREQUAL "Modules")
+		set(_poco_package_cxx_modules_directory CXX_MODULES_DIRECTORY cxx-modules)
+	endif()
 	if("${CMAKE_VERSION}" VERSION_LESS "3.0.0")
 		if(NOT EXISTS "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake")
 			export(TARGETS "${target_name}" APPEND
@@ -227,6 +232,7 @@ macro(POCO_GENERATE_PACKAGE target_name)
 		export(EXPORT "${target_name}Targets"
 			FILE "${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Targets.cmake"
 			NAMESPACE "${PROJECT_NAME}::"
+			${_poco_package_cxx_modules_directory}
 		)
 	endif()
 	if("${target_name}" STREQUAL "CppUnit")
@@ -256,7 +262,9 @@ macro(POCO_GENERATE_PACKAGE target_name)
 		NAMESPACE "${PROJECT_NAME}::"
 		DESTINATION "${PocoConfigPackageLocation}"
 		COMPONENT Devel
+		${_poco_package_cxx_modules_directory}
 	)
+	unset(_poco_package_cxx_modules_directory)
 
 	install(
 		FILES

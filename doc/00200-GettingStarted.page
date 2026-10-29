@@ -430,6 +430,52 @@ If you get an error like 'By not providing "FindPoco.cmake"', then you should se
 
     $ cmake -H/path/to/yourProject -B/path/to/yourProject-build -DCMAKE_PREFIX_PATH=/path/to/installationOf/poco
 
+!!!How to use the POCO C++ module:
+
+With ENABLE_MODULES=ON, POCO builds the C++20 module Poco, which provides the public API of all enabled
+libraries through one import. Building it requires a C++20 compiler, CMake 3.28 or later and a generator
+that supports C++ modules, such as Ninja:
+
+    $ cmake -S poco -B poco-build -G Ninja -DENABLE_MODULES=ON
+
+To use the module in a CMake project, link the Modules component and let CMake scan the sources for module
+dependencies:
+
+    find_package(Poco REQUIRED Modules)
+    ....
+    target_link_libraries(yourTargetName ... Poco::Modules)
+    set_target_properties(yourTargetName PROPERTIES CXX_SCAN_FOR_MODULES ON)
+
+Headers come before the import:
+
+    #include <iostream>
+    #include <string>
+    #include "Poco/Bugcheck.h"
+
+    import Poco;
+
+    int main()
+    {
+        Poco::URI uri("https://pocoproject.org/");
+        poco_assert (uri.getHost() == "pocoproject.org");
+        std::cout << uri.toString() << std::endl;
+        return 0;
+    }
+
+The module contains the libraries enabled in the POCO build; its partitions cannot be imported on their own.
+A module does not export macros: a program that uses a macro includes the header that defines it, for example
+Poco/Bugcheck.h for poco_assert, Poco/Logger.h for the logging macros or Poco/ClassLibrary.h for the manifest
+macros. Standard library headers for the types the program uses directly, such as <string> for comparing
+std::string values, are included as well.
+
+Note: the using-directive for std::literals in namespace Poco is not exported; code that imports Poco and
+uses "..."s literals needs its own using-directive.
+
+Note: the module builds with LLVM Clang. On macOS, Apple clang does not provide the dependency scanner
+(clang-scan-deps) that CMake needs for modules; use LLVM Clang, for example from Homebrew. MSVC 19.51 stops with
+an internal compiler error, and GCC 15 and 16 reject the module because of defects in merging declarations that
+several partitions include.
+
 !!!Some other Hints:
 
 For a faster build, use ninja as build system. See https://ninja-build.org/

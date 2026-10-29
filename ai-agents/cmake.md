@@ -52,7 +52,7 @@ cmake --build <build-dir> --parallel --target <Component>-testrunner
 | `POCO_SANITIZEFLAGS` | empty | Sanitizer flags for compile and link (see [analysis.md](analysis.md)) |
 | `POCO_COMPILER` | empty | Compiler by name or path (`gcc-12`, `clang-18`, `clang-cl`) |
 | `POCO_CROSS_COMPILE` | empty | Cross build for `arm-linux`, `android` or `emscripten`; not together with `CMAKE_TOOLCHAIN_FILE` |
-| `ENABLE_MODULES` | OFF | Build the `Poco.*` C++ modules; needs C++20, CMake 3.28+ and a generator that scans modules: Ninja or Ninja Multi-Config with ninja 1.11+, or Visual Studio 17 2022 (cmake-cxxmodules(7)) |
+| `ENABLE_MODULES` | OFF | Build the C++ module `Poco`; needs C++20, CMake 3.28+ and a generator that scans modules: Ninja or Ninja Multi-Config with ninja 1.11+, or Visual Studio 17 2022 (cmake-cxxmodules(7)); builds with LLVM Clang only: Apple clang has no clang-scan-deps, MSVC 19.51 and GCC 15/16 fail with compiler defects |
 | `ENABLE_NETSSL_WIN` | OFF | Windows only: NetSSL on SChannel |
 | `ENABLE_FUZZING` | OFF | OSS-Fuzz targets; needs Clang |
 | `CMAKE_EXPORT_COMPILE_COMMANDS` | OFF | Write `compile_commands.json` for clang-tidy and cppcheck (Makefile and Ninja generators only) |

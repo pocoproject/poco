@@ -113,6 +113,7 @@ jobs:
       data: ${{ steps.filter.outputs.data }}
       sqlparser: ${{ steps.filter.outputs.sqlparser }}
       crypto_netssl: ${{ steps.filter.outputs.crypto_netssl }}
+      modules: ${{ steps.filter.outputs.modules }}
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v4
@@ -467,12 +468,14 @@ jobs:
             ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^Foundation$"
       - uses: ./.github/actions/upload-test-report
 
-  # Clang toolchain exception + C++ modules probe: Foundation + Util smoke.
+  # Clang toolchain exception + C++ modules: every library with a module partition, the module tests,
+  # Foundation + Util smoke.
   linux-clang-21-cmake-modules:
     runs-on: ubuntu-24.04
     needs: changes
     if: |
       needs.changes.outputs.foundation_util == 'true' ||
+      needs.changes.outputs.modules == 'true' ||
       needs.changes.outputs.ci_core == 'true' ||
       github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
@@ -488,12 +491,16 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-21 100
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-21 100
       - name: Install dependencies
-        run: sudo apt -y install cmake ninja-build
+        run: >-
+          sudo apt -y install cmake ninja-build libssl-dev libssh-dev libxml2-dev libavahi-client-dev
+          libpq-dev unixodbc-dev libmysqlclient-dev
       - name: Configure with Clang 21 and modules
         run: |
           export CC=clang-21
           export CXX=clang++-21
-          cmake -S . -B build -G Ninja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DENABLE_MODULES=ON -DENABLE_TESTS=ON
+          cmake -S . -B build -G Ninja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DENABLE_MODULES=ON -DENABLE_TESTS=ON \
+            -DENABLE_PDF=ON -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_DNSSD=ON -DENABLE_DNSSD_AVAHI=ON \
+            -DENABLE_SSH=ON -DENABLE_XSD_VALIDATOR=ON
       - name: Build
         run: cmake --build build --parallel $(nproc)
       - uses: ./.github/actions/retry-action
@@ -503,7 +510,7 @@ jobs:
           retry_on: any
           command: >-
             cd build &&
-            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util)$"
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util|Modules)$"
       - uses: ./.github/actions/upload-test-report
         with:
           build-dir: build

@@ -97,6 +97,7 @@ export namespace Poco::XML {
 	using Poco::XML::AbstractNode;
 	using Poco::XML::Attr;
 	using Poco::XML::AttrMap;
+	using Poco::XML::AutoPtr;
 	using Poco::XML::CDATASection;
 	using Poco::XML::CharacterData;
 	using Poco::XML::ChildNodesList;
@@ -176,6 +177,15 @@ export namespace Poco::XML {
 	using Poco::XML::XMLStreamParser;
 	using Poco::XML::XMLStreamParserException;
 	using Poco::XML::XMLWriter;
+
+	using Poco::XML::XMLByteInputStream;
+	using Poco::XML::XMLByteOutputStream;
+	#if defined(XML_UNICODE_WCHAR_T) || !defined(XML_UNICODE)
+	using Poco::XML::XMLChar;
+	using Poco::XML::XMLCharInputStream;
+	using Poco::XML::XMLCharOutputStream;
+	using Poco::XML::XMLString;
+	#endif
 
 	using Poco::XML::fromXMLString;
 	using Poco::XML::operator!=;

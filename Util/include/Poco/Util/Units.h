@@ -1238,34 +1238,34 @@ namespace Values
 namespace Constants
 {
 	// Physical constants:
-	const Value<double, Compose<Units::J, Power<Units::K, -1> > > k (1.3806504e-23);
-	const Value<double, Units::kg> mu (1.660538782e-27);
-	const Value<double, Power<Units::mol, -1> > NA (6.02214179e23);
-	const Value<double, Units::s> G0 (7.7480917004e-5);
-	const Value<double, Compose<Units::F, Power<Units::m, -1> > > e0 (8.854187817e-12);
-	const Value<double, Units::kg> me (9.10938215e-31);
-	const Value<double, Units::J> eV (1.602176487e-19);
-	const Value<double, Units::C> e (1.602176487e-19);
-	const Value<double, Units::F> F (96485.3399);
-	const Value<double, Units::Unit> alpha (7.2973525376e-3);
-	const Value<double, Units::Unit> inv_alpha (137.035999679);
-	const Value<double, Compose<Units::N, Power<Units::A, -2> > > u0 (12.566370614);
-	const Value<double, Units::Wb> phi0 (2.067833667e-15);	// ??
-	const Value<double, Compose<Units::J, Compose<Power<Units::mol, -1>, Power<Units::kg, -1> > > > R (8.314472);
-	const Value<double, Compose< Power<Units::m, 3>, Compose<Power<Units::kg, -1>, Power<Units::s, -2> > > > G (6.67428e-11);
-	const Value<double, Compose< Units::J, Units::s > > h (6.62606896e-34);
-	const Value<double, Compose< Units::J, Units::s > > h_bar (1.054571628e-34);
-	const Value<double, Units::kg> mp (1.672621637e-27);
-	const Value<double, Unit> mpme (1836.15267247);
-	const Value<double, Power<Units::m, -1> > Rinf (10973731.568527);
-	const Value<double, Compose<Units::m, Power<Units::s, -1> > > c (299792458);
-	const Value<double, Compose<Units::W, Compose< Power<Units::m, -1>, Power<Units::K, -4> > > > rho (5.6704e-8);
+	inline const Value<double, Compose<Units::J, Power<Units::K, -1> > > k (1.3806504e-23);
+	inline const Value<double, Units::kg> mu (1.660538782e-27);
+	inline const Value<double, Power<Units::mol, -1> > NA (6.02214179e23);
+	inline const Value<double, Units::s> G0 (7.7480917004e-5);
+	inline const Value<double, Compose<Units::F, Power<Units::m, -1> > > e0 (8.854187817e-12);
+	inline const Value<double, Units::kg> me (9.10938215e-31);
+	inline const Value<double, Units::J> eV (1.602176487e-19);
+	inline const Value<double, Units::C> e (1.602176487e-19);
+	inline const Value<double, Units::F> F (96485.3399);
+	inline const Value<double, Units::Unit> alpha (7.2973525376e-3);
+	inline const Value<double, Units::Unit> inv_alpha (137.035999679);
+	inline const Value<double, Compose<Units::N, Power<Units::A, -2> > > u0 (12.566370614);
+	inline const Value<double, Units::Wb> phi0 (2.067833667e-15);	// ??
+	inline const Value<double, Compose<Units::J, Compose<Power<Units::mol, -1>, Power<Units::kg, -1> > > > R (8.314472);
+	inline const Value<double, Compose< Power<Units::m, 3>, Compose<Power<Units::kg, -1>, Power<Units::s, -2> > > > G (6.67428e-11);
+	inline const Value<double, Compose< Units::J, Units::s > > h (6.62606896e-34);
+	inline const Value<double, Compose< Units::J, Units::s > > h_bar (1.054571628e-34);
+	inline const Value<double, Units::kg> mp (1.672621637e-27);
+	inline const Value<double, Unit> mpme (1836.15267247);
+	inline const Value<double, Power<Units::m, -1> > Rinf (10973731.568527);
+	inline const Value<double, Compose<Units::m, Power<Units::s, -1> > > c (299792458);
+	inline const Value<double, Compose<Units::W, Compose< Power<Units::m, -1>, Power<Units::K, -4> > > > rho (5.6704e-8);
 
 	// Other constants:
-	const Value<double, Units::rad> pi (3.141592653589793);
-	const Value<double, Units::m> lightyear (9.4605284e15);
-	const Value<double, Units::km> AU(149597871);
-	const Value<double, Compose<Units::m, Power<Units::s, -2> > > g (9.80665);
+	inline const Value<double, Units::rad> pi (3.141592653589793);
+	inline const Value<double, Units::m> lightyear (9.4605284e15);
+	inline const Value<double, Units::km> AU(149597871);
+	inline const Value<double, Compose<Units::m, Power<Units::s, -2> > > g (9.80665);
 }
 
 

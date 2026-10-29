@@ -46,8 +46,12 @@ export namespace Poco::DNSSD {
 	using Poco::DNSSD::Record;
 	using Poco::DNSSD::Service;
 
-	using Poco::DNSSD::BrowserHandle;
+	using Poco::DNSSD::BrowseHandle;
 	using Poco::DNSSD::RecordHandle;
 	using Poco::DNSSD::ServiceHandle;
+
+	using Poco::DNSSD::SD_BROWSE_HANDLE;
+	using Poco::DNSSD::SD_RECORD_HANDLE;
+	using Poco::DNSSD::SD_SERVICE_HANDLE;
 	#endif
 }
