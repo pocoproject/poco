@@ -69,6 +69,10 @@ Breaking Changes:
 - GH #5510 Poco::XML::XMLWriter splits "]]>" in CDATA content into two CDATA sections and
   throws Poco::XML::XMLException for a control character in CDATA content, as it does outside
   CDATA. A new private member changes the class layout: recompile against the new header.
+- GH #5510 Poco::XML::XMLStreamParser passes an exception thrown while an Expat callback runs,
+  such as std::bad_alloc, to the caller and frees the parser, where it used to unwind through
+  Expat and leak the parser. A new private member changes the class layout: recompile against
+  the new header.
 
 Bundled Third-Party Library Upgrades:
 

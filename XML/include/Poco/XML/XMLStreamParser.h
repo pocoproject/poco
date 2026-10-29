@@ -36,6 +36,7 @@
 #include <string>
 #include <iosfwd>
 #include <cstddef>
+#include <exception>
 
 
 struct XML_ParserStruct;
@@ -194,6 +195,9 @@ public:
 
 	EventType next();
 		/// Call the next() function when we are ready to handle the next piece of XML.
+		///
+		/// An exception thrown while an Expat callback runs, such as std::bad_alloc,
+		/// reaches the caller; the parser is then finished and next() returns EV_EOF.
 
 	void nextExpect(EventType);
 		/// Get the next event and make sure that it's what's expected. If it
@@ -278,6 +282,7 @@ private:
 	[[nodiscard]] EventType nextImpl(bool peek);
 	[[nodiscard]] EventType nextBody();
 	[[noreturn]] void handleError();
+	void rethrowHandlerException();
 
 #ifndef POCO_DOC
 	// If _size is 0, then data is std::istream. Otherwise, it is a buffer.
@@ -299,6 +304,7 @@ private:
 	const std::string _inputName;
 	FeatureType _feature;
 	XML_ParserStruct* _parser;
+	std::exception_ptr _handlerException;
 	std::size_t _depth;
 	bool _accumulateContent; // Whether we are accumulating character content.
 	ParserState _parserState;

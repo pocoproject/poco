@@ -22,6 +22,8 @@
 #include <cstring>
 #include <istream>
 #include <ostream>
+#include <utility>
+#include <exception>
 
 
 namespace Poco::XML {
@@ -186,6 +188,30 @@ void XMLStreamParser::handleError()
 	}
 	else
 		throw XMLStreamParserException(_inputName, XML_GetCurrentLineNumber(_parser), XML_GetCurrentColumnNumber(_parser), XML_ErrorString(e));
+}
+
+
+void XMLStreamParser::rethrowHandlerException()
+{
+	// The handlers capture exceptions instead of letting them unwind through
+	// Expat, which cannot free a parser whose handler call depth stays above zero.
+	// Queued events are discarded without allocating, so the next call returns EV_EOF.
+	if (_handlerException != nullptr)
+	{
+		std::exception_ptr ex = std::move(_handlerException);
+		_handlerException = nullptr;
+		_startNamespace.clear();
+		_startNamespaceIndex = 0;
+		_attributes.clear();
+		_currentAttributeIndex = 0;
+		_endNamespace.clear();
+		_endNamespaceIndex = 0;
+		_queue = EV_EOF;
+		_currentEvent = EV_EOF;
+		_qualifiedName = &_qname;
+		_pvalue = &_value;
+		std::rethrow_exception(ex);
+	}
 }
 
 
@@ -592,7 +618,9 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 	}
 	case XML_SUSPENDED:
 	{
-		switch (XML_ResumeParser(_parser))
+		const XML_Status rs = XML_ResumeParser(_parser);
+		rethrowHandlerException();
+		switch (rs)
 		{
 		case XML_STATUS_SUSPENDED:
 		{
@@ -613,6 +641,11 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 		}
 		case XML_STATUS_ERROR:
 			handleError();
+		default:
+		{
+			poco_assert(false);
+			return _currentEvent = EV_EOF;
+		}
 		}
 		break;
 	}
@@ -630,6 +663,7 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 		if (_size != 0)
 		{
 			s = XML_Parse(_parser, static_cast<const char*>(_data.buf), static_cast<int>(_size), true);
+			rethrowHandlerException();
 
 			if (s == XML_STATUS_ERROR)
 				handleError();
@@ -662,6 +696,7 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 			bool eof(is.eof());
 
 			s = XML_ParseBuffer(_parser, static_cast<int>(is.gcount()), eof);
+			rethrowHandlerException();
 
 			if (s == XML_STATUS_ERROR)
 				handleError();
@@ -723,74 +758,82 @@ void XMLStreamParser::handleStartElement(void* v, const XMLChar* name, const XML
 	if (ps.parsing == XML_FINISHED)
 		return;
 
-	// Cannot be a followup event.
-	//
-	poco_assert(ps.parsing == XML_PARSING);
-
-	// When accumulating characters in simple content, we expect to
-	// see more characters or end element. Seeing start element is
-	// possible but means violation of the content model.
-	//
-	if (p._accumulateContent)
+	try
 	{
-		// It would have been easier to throw the exception directly,
-		// however, the Expat code is most likely not exception safe.
+		// Cannot be a followup event.
 		//
+		poco_assert(ps.parsing == XML_PARSING);
+
+		// When accumulating characters in simple content, we expect to
+		// see more characters or end element. Seeing start element is
+		// possible but means violation of the content model.
+		//
+		if (p._accumulateContent)
+		{
+			// It would have been easier to throw the exception directly,
+			// however, the Expat code is most likely not exception safe.
+			//
+			p._line = XML_GetCurrentLineNumber(p._parser);
+			p._column = XML_GetCurrentColumnNumber(p._parser);
+			XML_StopParser(p._parser, false);
+			return;
+		}
+
+		p._currentEvent = EV_START_ELEMENT;
+		splitName(name, p._qname);
+
 		p._line = XML_GetCurrentLineNumber(p._parser);
 		p._column = XML_GetCurrentColumnNumber(p._parser);
-		XML_StopParser(p._parser, false);
-		return;
-	}
 
-	p._currentEvent = EV_START_ELEMENT;
-	splitName(name, p._qname);
-
-	p._line = XML_GetCurrentLineNumber(p._parser);
-	p._column = XML_GetCurrentColumnNumber(p._parser);
-
-	// Handle attributes.
-	//
-	if (*atts != nullptr)
-	{
-		bool am((p._feature & RECEIVE_ATTRIBUTE_MAP) != 0);
-		bool ae((p._feature & RECEIVE_ATTRIBUTES_EVENT) != 0);
-
-		// Provision an entry for this element.
+		// Handle attributes.
 		//
-		ElementEntry* pe(nullptr);
-		if (am)
+		if (*atts != nullptr)
 		{
-			p._elementState.emplace_back(p._depth + 1);
-			pe = &p._elementState.back();
-		}
+			bool am((p._feature & RECEIVE_ATTRIBUTE_MAP) != 0);
+			bool ae((p._feature & RECEIVE_ATTRIBUTES_EVENT) != 0);
 
-		if (am || ae)
-		{
-			for (; *atts != nullptr; atts += 2)
+			// Provision an entry for this element.
+			//
+			ElementEntry* pe(nullptr);
+			if (am)
 			{
-				if (am)
-				{
-					QName qn;
-					splitName(*atts, qn);
-					AttributeMapType::value_type attrEntry(qn, AttributeValueType());
-					attrEntry.second.value = *(atts + 1);
-					attrEntry.second.handled = false;
-					pe->attributeMap.insert(attrEntry);
-				}
-				else
-				{
-					p._attributes.emplace_back();
-					splitName(*atts, p._attributes.back().qname);
-					p._attributes.back().value = *(atts + 1);
-				}
+				p._elementState.emplace_back(p._depth + 1);
+				pe = &p._elementState.back();
 			}
 
-			if (am)
-				pe->attributesUnhandled = pe->attributeMap.size();
-		}
-	}
+			if (am || ae)
+			{
+				for (; *atts != nullptr; atts += 2)
+				{
+					if (am)
+					{
+						QName qn;
+						splitName(*atts, qn);
+						AttributeMapType::value_type attrEntry(qn, AttributeValueType());
+						attrEntry.second.value = *(atts + 1);
+						attrEntry.second.handled = false;
+						pe->attributeMap.insert(attrEntry);
+					}
+					else
+					{
+						p._attributes.emplace_back();
+						splitName(*atts, p._attributes.back().qname);
+						p._attributes.back().value = *(atts + 1);
+					}
+				}
 
-	XML_StopParser(p._parser, true);
+				if (am)
+					pe->attributesUnhandled = pe->attributeMap.size();
+			}
+		}
+
+		XML_StopParser(p._parser, true);
+	}
+	catch (...)
+	{
+		p._handlerException = std::current_exception();
+		XML_StopParser(p._parser, XML_FALSE);
+	}
 }
 
 
@@ -807,28 +850,36 @@ void XMLStreamParser::handleEndElement(void* v, const XMLChar* name)
 	if (ps.parsing == XML_FINISHED)
 		return;
 
-	// This can be a followup event for empty elements (<foo/>). In this
-	// case the element name is already set.
-	//
-	if (ps.parsing != XML_PARSING)
-		p._queue = EV_END_ELEMENT;
-	else
+	try
 	{
-		splitName(name, p._qname);
-
-		// If we are accumulating characters, then queue this event.
+		// This can be a followup event for empty elements (<foo/>). In this
+		// case the element name is already set.
 		//
-		if (p._accumulateContent)
+		if (ps.parsing != XML_PARSING)
 			p._queue = EV_END_ELEMENT;
 		else
 		{
-			p._currentEvent = EV_END_ELEMENT;
+			splitName(name, p._qname);
 
-			p._line = XML_GetCurrentLineNumber(p._parser);
-			p._column = XML_GetCurrentColumnNumber(p._parser);
+			// If we are accumulating characters, then queue this event.
+			//
+			if (p._accumulateContent)
+				p._queue = EV_END_ELEMENT;
+			else
+			{
+				p._currentEvent = EV_END_ELEMENT;
+
+				p._line = XML_GetCurrentLineNumber(p._parser);
+				p._column = XML_GetCurrentColumnNumber(p._parser);
+			}
+
+			XML_StopParser(p._parser, true);
 		}
-
-		XML_StopParser(p._parser, true);
+	}
+	catch (...)
+	{
+		p._handlerException = std::current_exception();
+		XML_StopParser(p._parser, XML_FALSE);
 	}
 }
 
@@ -846,60 +897,68 @@ void XMLStreamParser::handleCharacters(void* v, const XMLChar* s, int n)
 	if (ps.parsing == XML_FINISHED)
 		return;
 
-	Content cont(p.content());
+	try
+	{
+		Content cont(p.content());
 
-	// If this is empty or complex content, see if these are whitespaces.
-	//
-	switch (cont)
-	{
-	case Content::Empty:
-	case Content::Complex:
-	{
-		for (int i(0); i != n; ++i)
+		// If this is empty or complex content, see if these are whitespaces.
+		//
+		switch (cont)
 		{
-			char c(s[i]);
-			if (c == 0x20 || c == 0x0A || c == 0x0D || c == 0x09)
-				continue;
+		case Content::Empty:
+		case Content::Complex:
+		{
+			for (int i(0); i != n; ++i)
+			{
+				char c(s[i]);
+				if (c == 0x20 || c == 0x0A || c == 0x0D || c == 0x09)
+					continue;
 
-			// It would have been easier to throw the exception directly,
-			// however, the Expat code is most likely not exception safe.
-			//
-			p._line = XML_GetCurrentLineNumber(p._parser);
-			p._column = XML_GetCurrentColumnNumber(p._parser);
-			XML_StopParser(p._parser, false);
+				// It would have been easier to throw the exception directly,
+				// however, the Expat code is most likely not exception safe.
+				//
+				p._line = XML_GetCurrentLineNumber(p._parser);
+				p._column = XML_GetCurrentColumnNumber(p._parser);
+				XML_StopParser(p._parser, false);
+				break;
+			}
+			return;
+		}
+		default:
 			break;
 		}
-		return;
-	}
-	default:
-		break;
-	}
 
-	// Append the characters if we are accumulating. This can also be a
-	// followup event for another character event. In this case also
-	// append the data.
-	//
-	if (p._accumulateContent || ps.parsing != XML_PARSING)
-	{
-		poco_assert(p._currentEvent == EV_CHARACTERS);
-		p._value.append(s, n);
-	}
-	else
-	{
-		p._currentEvent = EV_CHARACTERS;
-		p._value.assign(s, n);
-
-		p._line = XML_GetCurrentLineNumber(p._parser);
-		p._column = XML_GetCurrentColumnNumber(p._parser);
-
-		// In simple content we need to accumulate all the characters
-		// into a single event. To do this we will let the XMLStreamParser run
-		// until we reach the end of the element.
+		// Append the characters if we are accumulating. This can also be a
+		// followup event for another character event. In this case also
+		// append the data.
 		//
-		if (cont == Content::Simple)
-			p._accumulateContent = true;
+		if (p._accumulateContent || ps.parsing != XML_PARSING)
+		{
+			poco_assert(p._currentEvent == EV_CHARACTERS);
+			p._value.append(s, n);
+		}
 		else
-			XML_StopParser(p._parser, true);
+		{
+			p._currentEvent = EV_CHARACTERS;
+			p._value.assign(s, n);
+
+			p._line = XML_GetCurrentLineNumber(p._parser);
+			p._column = XML_GetCurrentColumnNumber(p._parser);
+
+			// In simple content we need to accumulate all the characters
+			// into a single event. To do this we will let the XMLStreamParser run
+			// until we reach the end of the element.
+			//
+			if (cont == Content::Simple)
+				p._accumulateContent = true;
+			else
+				XML_StopParser(p._parser, true);
+		}
+	}
+	catch (...)
+	{
+		p._handlerException = std::current_exception();
+		XML_StopParser(p._parser, XML_FALSE);
 	}
 }
 
@@ -917,9 +976,17 @@ void XMLStreamParser::handleStartNamespaceDecl(void* v, const XMLChar* prefix, c
 	if (ps.parsing == XML_FINISHED)
 		return;
 
-	p._startNamespace.emplace_back();
-	p._startNamespace.back().prefix() = (prefix != nullptr ? prefix : "");
-	p._startNamespace.back().namespaceURI() = (ns != nullptr ? ns : "");
+	try
+	{
+		p._startNamespace.emplace_back();
+		p._startNamespace.back().prefix() = (prefix != nullptr ? prefix : "");
+		p._startNamespace.back().namespaceURI() = (ns != nullptr ? ns : "");
+	}
+	catch (...)
+	{
+		p._handlerException = std::current_exception();
+		XML_StopParser(p._parser, XML_FALSE);
+	}
 }
 
 
@@ -936,8 +1003,16 @@ void XMLStreamParser::handleEndNamespaceDecl(void* v, const XMLChar* prefix)
 	if (ps.parsing == XML_FINISHED)
 		return;
 
-	p._endNamespace.emplace_back();
-	p._endNamespace.back().prefix() = (prefix != nullptr ? prefix : "");
+	try
+	{
+		p._endNamespace.emplace_back();
+		p._endNamespace.back().prefix() = (prefix != nullptr ? prefix : "");
+	}
+	catch (...)
+	{
+		p._handlerException = std::current_exception();
+		XML_StopParser(p._parser, XML_FALSE);
+	}
 }
 
 
