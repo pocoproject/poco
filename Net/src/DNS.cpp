@@ -16,6 +16,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Environment.h"
+#include "Poco/Error.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/RWLock.h"
 #include "Poco/TextIterator.h"
@@ -115,6 +116,8 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 #endif
 
 #if defined(POCO_HAVE_ADDRINFO)
+	// Built before the lookup: toString() can change errno, which aierror() reads for EAI_SYSTEM.
+	const std::string addressText = address.toString();
 	SocketAddress sa(address, 0);
 	char fqname[1024];
 	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), nullptr, 0, NI_NAMEREQD);
@@ -133,12 +136,12 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 		}
 		else
 		{
-			aierror(rc, address.toString());
+			aierror(rc, addressText);
 		}
 	}
 	else
 	{
-		aierror(rc, address.toString());
+		aierror(rc, addressText);
 	}
 #elif defined(POCO_VXWORKS)
 	char name[MAXHOSTNAMELEN + 1];
@@ -380,7 +383,10 @@ void DNS::aierror(int code, const std::string& arg)
 		throw HostNotFoundException(arg);
 #if defined(EAI_SYSTEM)
 	case EAI_SYSTEM:
-		error(lastError(), arg);
+		{
+			const int err = Poco::Error::last();
+			throw DNSException("System error: " + Poco::Error::getMessage(err), arg, err);
+		}
 #endif
 #if defined(_WIN32)
 	case WSANO_DATA: // may happen on XP

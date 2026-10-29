@@ -375,6 +375,15 @@ void GlobTest::testCaseless()
 }
 
 
+void GlobTest::testCaselessInvalidSequence()
+{
+	// TextIterator yields -1 for the invalid byte 0xFF.
+	Glob g("*a", Glob::GLOB_CASELESS);
+	assertTrue (g.match("\xFF" "A"));
+	assertTrue (!g.match("A" "\xFF"));
+}
+
+
 void GlobTest::testGlob()
 {
 	createFile("globtest/Makefile");
@@ -526,6 +535,7 @@ CppUnit::Test* GlobTest::suite()
 	CppUnit_addTest(pSuite, GlobTest, testMatchRange);
 	CppUnit_addTest(pSuite, GlobTest, testMisc);
 	CppUnit_addTest(pSuite, GlobTest, testCaseless);
+	CppUnit_addTest(pSuite, GlobTest, testCaselessInvalidSequence);
 	CppUnit_addTest(pSuite, GlobTest, testGlob);
 	CppUnit_addTest(pSuite, GlobTest, testMatchEmptyPattern);
 

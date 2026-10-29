@@ -33,6 +33,7 @@ public:
 	void testSendFailed();
 	void testSendInvalidHeader();
 	void testSendInvalidNestedPartHeader();
+	void testSendRecipientWithCRLF();
 
 	void setUp();
 	void tearDown();

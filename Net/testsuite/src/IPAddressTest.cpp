@@ -175,6 +175,25 @@ void IPAddressTest::testParse()
 	assertFalse (IPAddress::tryParse("::0:0::", ip));
 	assertFalse (IPAddress::tryParse("::0::0::", ip));
 
+	for (const char* addr: {"::", "0::", "::0", "0:0:0:0:0:0:0:0", "0000:0000:0000:0000:0000:0000:0000:0000", "::0.0.0.0"})
+	{
+		assertTrue (IPAddress::tryParse(addr, ip));
+		assertTrue (ip.isWildcard());
+		assertTrue (IPAddress::parse(addr).isWildcard());
+	}
+	for (const char* addr: {"0:0:0", "0:0:0:0", "00000:0:0", "0:0:0:0:0:0:0:0:0", "0::0:0:0:0:0:0:0", "::%nonexistent0"})
+	{
+		assertFalse (IPAddress::tryParse(addr, ip));
+		try
+		{
+			ip = IPAddress::parse(addr);
+			fail(std::string(addr) + ": bad address - must throw");
+		}
+		catch (InvalidAddressException&)
+		{
+		}
+	}
+
 	assertTrue (IPAddress::tryParse("::1", ip));
 	assertTrue (IPAddress::tryParse("1080:0:0:0:8:600:200a:425c", ip));
 	assertTrue (IPAddress::tryParse("1080::8:600:200a:425c", ip));

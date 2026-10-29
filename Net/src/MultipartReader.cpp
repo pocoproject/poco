@@ -595,7 +595,7 @@ void MultipartReader::guessBoundary()
 			_boundary += (char) _istr.get();
 			ch = _istr.peek();
 		}
-		if (ch != '\r' && ch != '\n')
+		if (_boundary.empty() || (ch != '\r' && ch != '\n'))
 			throw MultipartException("Invalid boundary line found");
 		if (ch == '\r' || ch == '\n')
 			_istr.get();

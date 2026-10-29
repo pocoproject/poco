@@ -143,8 +143,8 @@ public:
 		/// NetException in case of a general network communication failure.
 
 	bool sendCommand(const std::string& command, std::string& response);
-		/// Sends the given command verbatim to the server
-		/// and waits for a response.
+		/// Sends the given command to the server and waits for a response.
+		/// Throws an InvalidArgumentException if the command contains CR or LF.
 		///
 		/// Returns true if the response is positive, false otherwise.
 		///
@@ -152,8 +152,8 @@ public:
 		/// NetException in case of a general network communication failure.
 
 	bool sendCommand(const std::string& command, const std::string& arg, std::string& response);
-		/// Sends the given command verbatim to the server
-		/// and waits for a response.
+		/// Sends the given command and argument to the server and waits for a response.
+		/// Throws an InvalidArgumentException if the command or the argument contains CR or LF.
 		///
 		/// Returns true if the response is positive, false otherwise.
 		///
@@ -161,8 +161,8 @@ public:
 		/// NetException in case of a general network communication failure.
 
 	bool sendCommand(const std::string& command, const std::string& arg1, const std::string& arg2, std::string& response);
-		/// Sends the given command verbatim to the server
-		/// and waits for a response.
+		/// Sends the given command and arguments to the server and waits for a response.
+		/// Throws an InvalidArgumentException if the command or an argument contains CR or LF.
 		///
 		/// Returns true if the response is positive, false otherwise.
 		///

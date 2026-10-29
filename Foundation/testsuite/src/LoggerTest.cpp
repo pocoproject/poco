@@ -463,6 +463,12 @@ void LoggerTest::testFormat()
 	assertTrue (str == "123");
 	str = Logger::format("$0$1$2$3", "1", "2", "3", "4");
 	assertTrue (str == "1234");
+	str = Logger::format("foo$", "bar");
+	assertTrue (str == "foo$");
+	str = Logger::format("$", "bar");
+	assertTrue (str == "$");
+	str = Logger::format("$0$", "bar");
+	assertTrue (str == "bar$");
 }
 
 void LoggerTest::testFormatAny()

@@ -331,6 +331,76 @@ void BinaryReaderWriterTest::testReadRawStringWithExceptions()
 }
 
 
+void BinaryReaderWriterTest::testReadCString()
+{
+	std::istringstream istr(std::string("0123456789\0" "0123456789A\0", 23));
+	BinaryReader reader(istr);
+
+	std::string value;
+	reader.readCString(value, 10);
+	assertTrue (value == "0123456789");
+	assertTrue (reader.good());
+
+	reader.readCString(value, 10);
+	assertTrue (value == "0123456789");
+	assertTrue (reader.fail());
+}
+
+
+void BinaryReaderWriterTest::testReadCStringWithExceptions()
+{
+	std::istringstream istr(std::string("0123456789A", 12));
+	BinaryReader reader(istr);
+	reader.setExceptions(std::ios::failbit);
+
+	std::string value;
+	try
+	{
+		reader.readCString(value, 10);
+		fail("readCString of a string longer than maxLength did not throw");
+	}
+	catch (std::ios_base::failure&)
+	{
+	}
+	assertTrue (value == "0123456789");
+}
+
+
+void BinaryReaderWriterTest::testReadCStringUnterminated()
+{
+	std::istringstream istr(std::string("abc"));
+	BinaryReader reader(istr);
+
+	std::string value;
+	reader.readCString(value);
+	assertTrue (value == "abc");
+	assertTrue (reader.eof());
+	assertTrue (!reader.good());
+}
+
+
+void BinaryReaderWriterTest::testReadCStringDefaultLimit()
+{
+	const std::string longest(static_cast<std::string::size_type>(BinaryWriter::DEFAULT_MAX_CSTR_LENGTH), 'a');
+	const std::string tooLong(longest + "b");
+	std::stringstream stream;
+	BinaryWriter writer(stream);
+	writer.writeCString(longest.c_str());
+	writer.writeCString(tooLong.c_str(), BinaryWriter::DEFAULT_MAX_CSTR_LENGTH + 1);
+	writer.flush();
+
+	BinaryReader reader(stream);
+	std::string value;
+	reader.readCString(value);
+	assertTrue (value == longest);
+	assertTrue (reader.good());
+
+	reader.readCString(value);
+	assertTrue (value == longest);
+	assertTrue (reader.fail());
+}
+
+
 void BinaryReaderWriterTest::setUp()
 {
 }
@@ -352,6 +422,10 @@ CppUnit::Test* BinaryReaderWriterTest::suite()
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testCopyWithTextEncoding);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadRawString);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadRawStringWithExceptions);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadCString);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadCStringWithExceptions);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadCStringUnterminated);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadCStringDefaultLimit);
 
 	return pSuite;
 }

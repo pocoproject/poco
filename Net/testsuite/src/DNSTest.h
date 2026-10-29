@@ -29,6 +29,7 @@ public:
 	void testResolve();
 	void testEncodeIDN();
 	void testDecodeIDN();
+	void testSystemError();
 
 	void setUp();
 	void tearDown();

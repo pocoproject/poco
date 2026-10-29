@@ -92,14 +92,20 @@ public:
 	void sendMessage(const std::string& message);
 		/// Appends a CR-LF sequence to the message and sends it
 		/// over the socket connection.
+		///
+		/// Throws an InvalidArgumentException if message contains CR or LF.
 
 	void sendMessage(const std::string& message, const std::string& arg);
 		/// Concatenates message and arg, separated by a space, appends a
 		/// CR-LF sequence, and sends the result over the socket connection.
+		///
+		/// Throws an InvalidArgumentException if message or an argument contains CR or LF.
 
 	void sendMessage(const std::string& message, const std::string& arg1, const std::string& arg2);
 		/// Concatenates message and args, separated by a space, appends a
 		/// CR-LF sequence, and sends the result over the socket connection.
+		///
+		/// Throws an InvalidArgumentException if message or an argument contains CR or LF.
 
 	bool receiveMessage(std::string& message);
 		/// Receives a single-line message, terminated by CR-LF,

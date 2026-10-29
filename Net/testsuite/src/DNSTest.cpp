@@ -14,6 +14,10 @@
 #include "Poco/Net/DNS.h"
 #include "Poco/Net/HostEntry.h"
 #include "Poco/Net/NetException.h"
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <netdb.h>
+#endif
+#include <cerrno>
 
 
 using Poco::Net::DNS;
@@ -23,6 +27,22 @@ using Poco::Net::InvalidAddressException;
 using Poco::Net::HostNotFoundException;
 using Poco::Net::ServiceNotFoundException;
 using Poco::Net::NoAddressFoundException;
+using Poco::Net::DNSException;
+
+
+#if defined(EAI_SYSTEM)
+namespace
+{
+	class DNSErrorProbe: public Poco::Net::DNS
+	{
+	public:
+		DNSErrorProbe() = delete;
+		~DNSErrorProbe() = default;
+
+		using DNS::aierror;
+	};
+}
+#endif
 
 
 DNSTest::DNSTest(const std::string& name): CppUnit::TestCase(name)
@@ -190,6 +210,28 @@ void DNSTest::testDecodeIDN()
 }
 
 
+void DNSTest::testSystemError()
+{
+#if defined(EAI_SYSTEM)
+	h_errno = HOST_NOT_FOUND;
+	errno = EMFILE;
+	try
+	{
+		DNSErrorProbe::aierror(EAI_SYSTEM, "example.com");
+		fail("must throw");
+	}
+	catch (HostNotFoundException&)
+	{
+		failmsg("EAI_SYSTEM error was taken from h_errno instead of errno");
+	}
+	catch (DNSException& exc)
+	{
+		assertEqual (EMFILE, exc.code());
+	}
+#endif
+}
+
+
 void DNSTest::setUp()
 {
 }
@@ -209,6 +251,7 @@ CppUnit::Test* DNSTest::suite()
 	CppUnit_addTest(pSuite, DNSTest, testResolve);
 	CppUnit_addTest(pSuite, DNSTest, testEncodeIDN);
 	CppUnit_addTest(pSuite, DNSTest, testDecodeIDN);
+	CppUnit_addTest(pSuite, DNSTest, testSystemError);
 
 	return pSuite;
 }

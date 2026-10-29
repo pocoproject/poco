@@ -20,8 +20,13 @@
 #include "Poco/ConsoleChannel.h"
 #include "Poco/StreamChannel.h"
 #include "Poco/Event.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/Exception.h"
+#include "Poco/Mutex.h"
 #include "TestChannel.h"
 #include <atomic>
+#include <limits>
+#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -150,6 +155,131 @@ namespace
 	};
 
 
+	class FailingChannel: public Channel
+		/// Throws a WriteFileException for the first messages it gets and
+		/// records the text of the others, and the thread of every call.
+	{
+	public:
+		FailingChannel(int failures, int messages):
+			_failures(failures),
+			_messages(messages)
+		{
+		}
+
+		void log(const Message& msg) override
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			_threads.insert(Thread::currentOsTid());
+			if (++_calls == _messages) _allCalled.set();
+			if (_calls <= _failures) throw Poco::WriteFileException("full.log");
+			_texts.push_back(msg.getText());
+		}
+
+		[[nodiscard]] bool waitAllCalled(long milliseconds)
+		{
+			return _allCalled.tryWait(milliseconds);
+		}
+
+		[[nodiscard]] std::size_t threadCount() const
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _threads.size();
+		}
+
+		[[nodiscard]] std::vector<std::string> texts() const
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _texts;
+		}
+
+	private:
+		mutable Poco::FastMutex _mutex;
+		Event _allCalled;
+		std::set<long> _threads;
+		std::vector<std::string> _texts;
+		int _failures;
+		int _messages;
+		int _calls = 0;
+	};
+
+
+	class CountingErrorHandler: public Poco::ErrorHandler
+	{
+	public:
+		void exception(const Poco::Exception&) override
+		{
+			++_count;
+		}
+
+		void exception(const std::exception&) override
+		{
+			++_count;
+		}
+
+		void exception() override
+		{
+			++_count;
+		}
+
+		[[nodiscard]] int count() const
+		{
+			return _count.load();
+		}
+
+	private:
+		std::atomic<int> _count{0};
+	};
+
+
+	class LoggingErrorHandler: public Poco::ErrorHandler
+		/// Counts its calls and logs a message through the given channel in each.
+	{
+	public:
+		LoggingErrorHandler(Channel& channel, int calls):
+			_channel(channel),
+			_calls(calls)
+		{
+		}
+
+		void exception(const Poco::Exception&) override
+		{
+			report();
+		}
+
+		void exception(const std::exception&) override
+		{
+			report();
+		}
+
+		void exception() override
+		{
+			report();
+		}
+
+		[[nodiscard]] bool waitAllCalled(long milliseconds)
+		{
+			return _allCalled.tryWait(milliseconds);
+		}
+
+		[[nodiscard]] int count() const
+		{
+			return _count.load();
+		}
+
+	private:
+		void report()
+		{
+			_channel.log(Message("Handler", "Target failed", Message::PRIO_ERROR));
+			if (++_count == _calls) _allCalled.set();
+		}
+
+		Channel& _channel;
+		Event _allCalled;
+		std::atomic<int> _count{0};
+		int _calls;
+	};
+
+
 	class GenerationChannel: public Channel
 		/// Counts the messages that a formatter of an older generation
 		/// than its own formatted: pairs of a formatter and a channel
@@ -270,6 +400,70 @@ void ChannelTest::testAsyncConcurrentReplacement()
 	pAsync->close();
 
 	assertEqual(MESSAGES, tally.plain.load());
+}
+
+
+void ChannelTest::testAsyncTargetThrows()
+{
+	constexpr int FAILURES = 3;
+	constexpr int MESSAGES = 10;
+	constexpr long TIMEOUT = 10000;
+
+	CountingErrorHandler handler;
+	Poco::ErrorHandler* pOldHandler = Poco::ErrorHandler::set(&handler);
+	AutoPtr<FailingChannel> pChannel = new FailingChannel(FAILURES, MESSAGES);
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pChannel);
+	for (int i = 0; i < MESSAGES; ++i)
+	{
+		pAsync->log(Message("Source", std::to_string(i), Message::PRIO_ERROR));
+	}
+	const bool allCalled = pChannel->waitAllCalled(TIMEOUT);
+
+	// The closing thread holds a reference, so that a close() that does not
+	// return is left behind instead of hanging the destructor of the channel.
+	Thread closing;
+	closing.startFunc([pAsync]() mutable { pAsync->close(); });
+	const bool closed = closing.tryJoin(TIMEOUT);
+	Poco::ErrorHandler::set(pOldHandler);
+
+	assertTrue(allCalled);
+	assertTrue(closed);
+	assertEqual(FAILURES, handler.count());
+	assertEqual(1, static_cast<int>(pChannel->threadCount()));
+	const std::vector<std::string> texts = pChannel->texts();
+	assertEqual(MESSAGES - FAILURES, static_cast<int>(texts.size()));
+	for (int i = FAILURES; i < MESSAGES; ++i)
+	{
+		assertEqual(std::to_string(i), texts[i - FAILURES]);
+	}
+}
+
+
+void ChannelTest::testAsyncErrorHandlerLogsToChannel()
+{
+	constexpr int MESSAGES = 5;
+	constexpr long TIMEOUT = 10000;
+
+	AutoPtr<FailingChannel> pChannel = new FailingChannel(std::numeric_limits<int>::max(), MESSAGES);
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pChannel);
+	LoggingErrorHandler handler(*pAsync, MESSAGES);
+	Poco::ErrorHandler* pOldHandler = Poco::ErrorHandler::set(&handler);
+	for (int i = 0; i < MESSAGES; ++i)
+	{
+		pAsync->log(Message("Source", std::to_string(i), Message::PRIO_ERROR));
+	}
+	const bool allCalled = handler.waitAllCalled(TIMEOUT);
+
+	// A message that the handler logged and the channel queued would fail
+	// again and call the handler once more before close() returns.
+	Thread closing;
+	closing.startFunc([pAsync]() mutable { pAsync->close(); });
+	const bool closed = closing.tryJoin(TIMEOUT);
+	Poco::ErrorHandler::set(pOldHandler);
+
+	assertTrue(allCalled);
+	assertTrue(closed);
+	assertEqual(MESSAGES, handler.count());
 }
 
 
@@ -457,6 +651,8 @@ CppUnit::Test* ChannelTest::suite()
 	CppUnit_addTest(pSuite, ChannelTest, testSplitterAddSameChannelTwice);
 	CppUnit_addTest(pSuite, ChannelTest, testAsync);
 	CppUnit_addTest(pSuite, ChannelTest, testAsyncConcurrentReplacement);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncTargetThrows);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncErrorHandlerLogsToChannel);
 	CppUnit_addTest(pSuite, ChannelTest, testFormatting);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingConcurrentReplacement);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingMessageKeepsItsPair);

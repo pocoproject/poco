@@ -25,6 +25,9 @@
 #include "Poco/Nullable.h"
 #include "Poco/Redis/Redis.h"
 #include "Poco/Redis/RedisStream.h"
+#include "Poco/Redis/Exception.h"
+#include <algorithm>
+#include <utility>
 
 
 namespace Poco::Redis {
@@ -214,12 +217,30 @@ struct RedisTypeTraits<BulkString>
 
 		if (length >= 0)
 		{
+			// The allocation follows the bytes received, not the declared length;
+			// see the reply checks of RedisInputStream.
+			constexpr Int64 READ_CHUNK_SIZE = 64 * 1024;
 			std::string s;
-			s.resize(static_cast<std::size_t>(length), ' ');
-			input.read(s.data(), static_cast<std::streamsize>(length));
-			value.assign(s);
-
-			(void) input.getline(); // Read and ignore \r\n
+			for (Int64 remaining = length; remaining > 0; )
+			{
+				const auto chunkSize = static_cast<std::streamsize>(std::min(remaining, READ_CHUNK_SIZE));
+				const std::size_t offset = s.size();
+				s.resize(offset + static_cast<std::size_t>(chunkSize));
+				input.read(s.data() + offset, chunkSize);
+				if (input.gcount() != chunkSize)
+				{
+					throw RedisException("Incomplete bulk string reply from Redis server: received "
+						+ NumberFormatter::format(length - remaining + input.gcount())
+						+ " of " + NumberFormatter::format(length) + " bytes");
+				}
+				remaining -= chunkSize;
+			}
+			if (!input.getline().empty())
+			{
+				throw RedisException("Bulk string reply from Redis server does not end after its "
+					+ NumberFormatter::format(length) + " bytes");
+			}
+			value.assign(std::move(s));
 		}
 	}
 };

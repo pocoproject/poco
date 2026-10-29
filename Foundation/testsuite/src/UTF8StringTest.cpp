@@ -12,9 +12,12 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/UTF8String.h"
+#include "Poco/Unicode.h"
+#include <limits>
 
 
 using Poco::UTF8;
+using Poco::Unicode;
 
 
 UTF8StringTest::UTF8StringTest(const std::string& name): CppUnit::TestCase(name)
@@ -80,6 +83,28 @@ void UTF8StringTest::testTransform()
 	// a mix of invalid sequences
 	std::string str = "\xC2\xE5\xF0\xF8\xE8\xED\xFB+-++";
 	assertTrue ("???+-++" == UTF8::toLower(str));
+}
+
+
+void UTF8StringTest::testInvalidSequence()
+{
+	Unicode::CharacterProperties props;
+	Unicode::properties(-1, props);
+	assertTrue (props.category == Unicode::UCP_OTHER);
+	assertTrue (props.type == Unicode::UCP_CONTROL);
+
+	const int minInt = std::numeric_limits<int>::min();
+	Unicode::properties(minInt, props);
+	assertTrue (props.category == Unicode::UCP_OTHER);
+	assertTrue (props.type == Unicode::UCP_CONTROL);
+
+	assertTrue (!Unicode::isUpper(-1));
+	assertTrue (!Unicode::isLower(-1));
+	assertTrue (Unicode::toLower(-1) == -1);
+	assertTrue (Unicode::toUpper(minInt) == minInt);
+
+	// TextIterator yields -1 for the invalid byte 0xFF.
+	assertTrue (UTF8::icompare(std::string("a\xFF"), std::string("A\xFF")) == 0);
 }
 
 
@@ -149,6 +174,7 @@ CppUnit::Test* UTF8StringTest::suite()
 
 	CppUnit_addTest(pSuite, UTF8StringTest, testCompare);
 	CppUnit_addTest(pSuite, UTF8StringTest, testTransform);
+	CppUnit_addTest(pSuite, UTF8StringTest, testInvalidSequence);
 	CppUnit_addTest(pSuite, UTF8StringTest, testEscape);
 	CppUnit_addTest(pSuite, UTF8StringTest, testUnescape);
 	CppUnit_addTest(pSuite, UTF8StringTest, testUnescapeTrailingBackslash);

@@ -11,6 +11,7 @@
 #include "RedisTestSuite.h"
 #include "RedisTest.h"
 #include "NotificationTest.h"
+#include "ReplyTest.h"
 
 
 CppUnit::Test* RedisTestSuite::suite()
@@ -19,6 +20,7 @@ CppUnit::Test* RedisTestSuite::suite()
 
 	pSuite->addTest(RedisTest::suite());
 	pSuite->addTest(NotificationTest::suite());
+	pSuite->addTest(ReplyTest::suite());
 
 	return pSuite;
 }

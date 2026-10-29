@@ -19,6 +19,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Exception.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Thread.h"
 
@@ -32,6 +33,7 @@ using Poco::Net::StringPartSource;
 using Poco::Net::StreamSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::SMTPException;
+using Poco::InvalidArgumentException;
 using Poco::Stopwatch;
 using Poco::Thread;
 
@@ -401,6 +403,51 @@ void SMTPClientSessionTest::testSendInvalidNestedPartHeader()
 }
 
 
+void SMTPClientSessionTest::testSendRecipientWithCRLF()
+{
+	DialogServer server;
+	server.addResponse("220 localhost SMTP ready");
+	server.addResponse("250 Hello localhost");
+	server.addResponse("250 OK");
+	server.addResponse("250 OK");
+	server.addResponse("250 OK");
+	server.addResponse("354 Send data");
+	server.addResponse("250 OK");
+	server.addResponse("221 Bye");
+	SMTPClientSession session("127.0.0.1", server.port());
+	session.login("localhost");
+	session.setTimeout(Poco::Timespan(5, 0));
+
+	MailMessage message;
+	message.setSender("john.doe@no.where");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "jane.doe@no.where", "Jane Doe"));
+	message.setContent("Hello\r\n");
+	SMTPClientSession::Recipients recipients;
+	recipients.push_back("jane.doe@no.where>\r\nRCPT TO:<joe.doe@no.where");
+	server.clearCommands();
+	try
+	{
+		session.sendMessage(message, recipients);
+		fail("CR LF in recipient - must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	session.close();
+	Stopwatch sw;
+	sw.start();
+	std::string command = server.popCommand();
+	while (command != "QUIT")
+	{
+		assertTrue (command.find("RCPT TO:") == std::string::npos);
+		assertTrue (sw.elapsedSeconds() < 5);
+		if (command.empty()) Thread::sleep(10);
+		command = server.popCommand();
+	}
+}
+
+
 void SMTPClientSessionTest::setUp()
 {
 }
@@ -424,6 +471,7 @@ CppUnit::Test* SMTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendFailed);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendInvalidHeader);
 	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendInvalidNestedPartHeader);
+	CppUnit_addTest(pSuite, SMTPClientSessionTest, testSendRecipientWithCRLF);
 
 	return pSuite;
 }

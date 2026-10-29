@@ -185,6 +185,10 @@ public:
 		/// greater-than signs are escaped, unless a CDATA section
 		/// has been opened by calling startCDATA().
 		///
+		/// In a CDATA section, "]]>" in the data is written as "]]]]><![CDATA[>",
+		/// and a control character other than tab, CR and LF throws an XMLException,
+		/// as it does outside a CDATA section.
+		///
 		/// The characters must be encoded in UTF-8 (if XMLChar is char) or
 		/// UTF-16 (if XMLChar is wchar_t).
 
@@ -192,6 +196,10 @@ public:
 		/// Writes XML character data. Quotes, ampersand's, less-than and
 		/// greater-than signs are escaped, unless a CDATA section
 		/// has been opened by calling startCDATA().
+		///
+		/// In a CDATA section, "]]>" in the data is written as "]]]]><![CDATA[>",
+		/// and a control character other than tab, CR and LF throws an XMLException,
+		/// as it does outside a CDATA section.
 		///
 		/// The characters must be encoded in UTF-8 (if XMLChar is char) or
 		/// UTF-16 (if XMLChar is wchar_t).
@@ -231,6 +239,7 @@ public:
 	void startCDATA();
 		/// Writes the <![CDATA[ string that begins a CDATA section.
 		/// Use characters() to write the actual character data.
+		/// characters() ends the section and starts a new one where the data contains "]]>".
 
 	void endCDATA();
 		/// Writes the ]]> string that ends a CDATA section.
@@ -328,6 +337,7 @@ private:
 	int              _elementCount;
 	bool             _inFragment;
 	bool             _inCDATA;
+	int              _cdataBrackets;
 	bool             _inDTD;
 	bool             _inInternalDTD;
 	bool             _contentWritten;

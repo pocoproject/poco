@@ -12,9 +12,11 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/XML/XMLWriter.h"
+#include "Poco/XML/XMLException.h"
 #include "Poco/SAX/AttributesImpl.h"
 #include "Poco/Exception.h"
 #include <sstream>
+#include <vector>
 
 
 using Poco::XML::XMLWriter;
@@ -380,6 +382,71 @@ void XMLWriterTest::testCDATA()
 }
 
 
+void XMLWriterTest::testCDATATerminator()
+{
+	const auto writeCDATA = [](const std::vector<std::string>& chunks)
+	{
+		std::ostringstream str;
+		XMLWriter writer(str, 0);
+		writer.startDocument();
+		writer.startElement("", "", "r");
+		writer.startCDATA();
+		for (const auto& chunk: chunks) writer.characters(chunk);
+		writer.endCDATA();
+		writer.endElement("", "", "r");
+		writer.endDocument();
+		return str.str();
+	};
+
+	assertTrue (writeCDATA({"a]]>b"}) == "<r><![CDATA[a]]]]><![CDATA[>b]]></r>");
+	assertTrue (writeCDATA({"a]", "]", ">b"}) == "<r><![CDATA[a]]]]><![CDATA[>b]]></r>");
+	assertTrue (writeCDATA({"]]]>"}) == "<r><![CDATA[]]]]]><![CDATA[>]]></r>");
+	assertTrue (writeCDATA({"a]>b"}) == "<r><![CDATA[a]>b]]></r>");
+	assertTrue (writeCDATA({"]]x>"}) == "<r><![CDATA[]]x>]]></r>");
+	assertTrue (writeCDATA({"]", "x", "]>"}) == "<r><![CDATA[]x]>]]></r>");
+	assertTrue (writeCDATA({"\xC3\xA9"}) == "<r><![CDATA[\xC3\xA9]]></r>");
+
+	// A new section starts without the brackets that ended the previous one.
+	std::ostringstream str;
+	XMLWriter writer(str, 0);
+	writer.startDocument();
+	writer.startElement("", "", "r");
+	writer.startCDATA();
+	writer.characters("a]]");
+	writer.endCDATA();
+	writer.startCDATA();
+	writer.characters(">b");
+	writer.endCDATA();
+	writer.endElement("", "", "r");
+	writer.endDocument();
+	assertTrue (str.str() == "<r><![CDATA[a]]]]><![CDATA[>b]]></r>");
+}
+
+
+void XMLWriterTest::testCDATAControlCharacter()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, 0);
+	writer.startDocument();
+	writer.startElement("", "", "r");
+	writer.startCDATA();
+	writer.characters("a\tb\rc\nd");
+	try
+	{
+		writer.characters("\x01");
+		fail("control character in CDATA - must throw exception");
+	}
+	catch (const Poco::XML::XMLException&)
+	{
+	}
+	writer.endCDATA();
+	writer.endElement("", "", "r");
+	writer.endDocument();
+	std::string xml = str.str();
+	assertTrue (xml == "<r><![CDATA[a\tb\rc\nd]]></r>");
+}
+
+
 void XMLWriterTest::testRawCharacters()
 {
 	std::ostringstream str;
@@ -682,6 +749,8 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCDATA);
+	CppUnit_addTest(pSuite, XMLWriterTest, testCDATATerminator);
+	CppUnit_addTest(pSuite, XMLWriterTest, testCDATAControlCharacter);
 	CppUnit_addTest(pSuite, XMLWriterTest, testRawCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testAttributeCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testDefaultNamespace);

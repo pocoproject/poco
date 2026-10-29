@@ -299,12 +299,12 @@ public:
 		/// not necessary.
 
 	int sendCommand(const std::string& command, std::string& response);
-		/// Sends the given command verbatim to the server
-		/// and waits for a response.
+		/// Sends the given command to the server and waits for a response.
+		/// Throws an InvalidArgumentException if the command contains CR or LF.
 
 	int sendCommand(const std::string& command, const std::string& arg, std::string& response);
-		/// Sends the given command verbatim to the server
-		/// and waits for a response.
+		/// Sends the given command and argument to the server and waits for a response.
+		/// Throws an InvalidArgumentException if the command or the argument contains CR or LF.
 
 	[[nodiscard]] bool isOpen() const;
 		/// Returns true if the connection with FTP server is opened.

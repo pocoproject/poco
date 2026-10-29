@@ -46,6 +46,8 @@ public:
 	void testCharacters();
 	void testEmptyCharacters();
 	void testCDATA();
+	void testCDATATerminator();
+	void testCDATAControlCharacter();
 	void testRawCharacters();
 	void testAttributeCharacters();
 	void testDefaultNamespace();

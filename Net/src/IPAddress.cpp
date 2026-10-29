@@ -39,6 +39,25 @@ using Poco::Net::Impl::IPv6AddressImpl;
 #endif
 
 
+#if defined(POCO_HAVE_IPv6)
+namespace {
+
+
+[[nodiscard]] bool isUnspecifiedIPv6(const std::string& addr)
+{
+	// IPv6AddressImpl::parse() returns the all-zero address for unparsable text, too.
+	// macOS inet_pton() ignores a scope suffix; scoped text is left to IPv6AddressImpl::parse().
+	struct in6_addr ia{};
+	return addr.find('%') == std::string::npos &&
+		inet_pton(AF_INET6, addr.c_str(), &ia) == 1 &&
+		IPv6AddressImpl(&ia).isWildcard();
+}
+
+
+} // namespace
+#endif
+
+
 namespace Poco::Net {
 
 
@@ -93,15 +112,8 @@ IPAddress::IPAddress(const std::string& addr)
 	}
 
 #if defined(POCO_HAVE_IPv6)
-	IPv6AddressImpl empty6 = IPv6AddressImpl();
-	if (addr.empty() || trimIPv6(addr) == "::")
-	{
-		newIPv6(empty6.addr());
-		return;
-	}
-
 	IPv6AddressImpl addr6(IPv6AddressImpl::parse(addr));
-	if (addr6 != IPv6AddressImpl())
+	if (addr6 != IPv6AddressImpl() || isUnspecifiedIPv6(addr))
 	{
 		newIPv6(addr6.addr(), addr6.scope());
 		return;
@@ -521,48 +533,6 @@ unsigned IPAddress::prefixLength() const
 }
 
 
-std::string& IPAddress::compressV6(std::string& v6addr)
-{
-	// get rid of leading zeros at the beginning
-	while (v6addr.size() && v6addr[0] == '0') v6addr.erase(v6addr.begin());
-
-	// get rid of leading zeros in the middle
-	while (v6addr.find(":0") != std::string::npos)
-		Poco::replaceInPlace(v6addr, ":0", ":");
-
-	// get rid of extraneous colons
-	while (v6addr.find(":::") != std::string::npos)
-		Poco::replaceInPlace(v6addr, ":::", "::");
-
-	return v6addr;
-}
-
-
-std::string IPAddress::trimIPv6(const std::string& v6Addr)
-{
-	std::string v6addr(v6Addr);
-	std::string::size_type len = v6addr.length();
-	int dblColOcc = 0;
-	auto pos = v6addr.find("::");
-	while ((pos <= len-2) && (pos != std::string::npos))
-	{
-		++dblColOcc;
-		pos = v6addr.find("::", pos + 2);
-	}
-
-	if ((dblColOcc > 1) ||
-		(std::count(v6addr.begin(), v6addr.end(), ':') > 8) ||
-		(v6addr.find(":::") != std::string::npos) ||
-		// CodeQL [cpp/constant-comparison]: intentional IPv6 validation — checks for trailing single colon
-		((len >= 2) && ((v6addr[len-1] == ':') && v6addr[len-2] != ':')))
-	{
-		return v6addr;
-	}
-
-	return compressV6(v6addr);
-}
-
-
 IPAddress IPAddress::parse(const std::string& addr)
 {
 	return IPAddress(addr);
@@ -580,7 +550,7 @@ bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 	}
 #if defined(POCO_HAVE_IPv6)
 	IPv6AddressImpl impl6(IPv6AddressImpl::parse(addr));
-	if (impl6 != IPv6AddressImpl() || trimIPv6(addr) == "::")
+	if (impl6 != IPv6AddressImpl() || isUnspecifiedIPv6(addr))
 	{
 		result.newIPv6(impl6.addr(), impl6.scope());
 		return true;

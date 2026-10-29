@@ -19,7 +19,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <algorithm>
+#include <cerrno>
 #include <climits>
+#include <vector>
 
 
 #if !defined(POCO_VXWORKS)
@@ -45,6 +48,37 @@ using namespace std::string_literals;
 
 
 namespace Poco {
+
+
+#if !defined(POCO_VXWORKS)
+namespace
+{
+	[[nodiscard]] bool homeFromPasswd(uid_t uid, std::string& path)
+		/// Stores the home directory of uid from the user database in path
+		/// and returns true, or returns false if there is no entry or the
+		/// lookup fails.
+		/// Uses getpwuid_r() because getpwuid() returns storage that a
+		/// lookup in another thread overwrites.
+	{
+		constexpr std::size_t DEFAULT_BUFFER_SIZE = 16384;
+		constexpr std::size_t MAX_BUFFER_SIZE = std::size_t{1024} * 1024;
+
+		const long sizeHint = sysconf(_SC_GETPW_R_SIZE_MAX);
+		std::vector<char> buffer(sizeHint > 0 ? static_cast<std::size_t>(sizeHint) : DEFAULT_BUFFER_SIZE);
+		struct passwd pwd{};
+		struct passwd* pResult = nullptr;
+		int rc = getpwuid_r(uid, &pwd, buffer.data(), buffer.size(), &pResult);
+		while (rc == ERANGE && buffer.size() < MAX_BUFFER_SIZE)
+		{
+			buffer.resize(std::min(buffer.size() * 2, MAX_BUFFER_SIZE));
+			rc = getpwuid_r(uid, &pwd, buffer.data(), buffer.size(), &pResult);
+		}
+		if (rc != 0 || pResult == nullptr || pResult->pw_dir == nullptr) return false;
+		path = pResult->pw_dir;
+		return true;
+	}
+}
+#endif
 
 
 std::string PathImpl::selfImpl()
@@ -126,21 +160,9 @@ std::string PathImpl::homeImpl()
 	{
 		path = EnvironmentImpl::getImpl("HOME"s);
 	}
-	else
+	else if (!homeFromPasswd(getuid(), path) && !homeFromPasswd(geteuid(), path))
 	{
-		struct passwd* pwd = getpwuid(getuid());
-		if (pwd)
-		{
-			path = pwd->pw_dir;
-		}
-		else
-		{
-			pwd = getpwuid(geteuid());
-			if (pwd)
-				path = pwd->pw_dir;
-			else
-				path = "/";
-		}
+		path = "/";
 	}
 	std::string::size_type n = path.size();
 	if (n > 0 && path[n - 1] != '/') path.append("/");

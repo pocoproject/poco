@@ -32,6 +32,7 @@ public:
 	void testMisc();
 	void testGlob();
 	void testCaseless();
+	void testCaselessInvalidSequence();
 	void testMatchEmptyPattern();
 
 	void setUp();

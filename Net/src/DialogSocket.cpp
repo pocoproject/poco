@@ -21,6 +21,19 @@
 namespace Poco::Net {
 
 
+namespace {
+
+
+void checkLineContent(const std::string& s)
+{
+	if (s.find_first_of("\r\n") != std::string::npos)
+		throw Poco::InvalidArgumentException("CR or LF in protocol command");
+}
+
+
+} // namespace
+
+
 DialogSocket::DialogSocket():
 	_pBuffer(nullptr),
 	_pNext(nullptr),
@@ -104,6 +117,7 @@ void DialogSocket::sendString(const std::string& str)
 
 void DialogSocket::sendMessage(const std::string& message)
 {
+	checkLineContent(message);
 	std::string line;
 	line.reserve(message.length() + 2);
 	line.append(message);
@@ -114,6 +128,8 @@ void DialogSocket::sendMessage(const std::string& message)
 
 void DialogSocket::sendMessage(const std::string& message, const std::string& arg)
 {
+	checkLineContent(message);
+	checkLineContent(arg);
 	std::string line;
 	line.reserve(message.length() + arg.length() + 3);
 	line.append(message);
@@ -129,6 +145,9 @@ void DialogSocket::sendMessage(const std::string& message, const std::string& ar
 
 void DialogSocket::sendMessage(const std::string& message, const std::string& arg1, const std::string& arg2)
 {
+	checkLineContent(message);
+	checkLineContent(arg1);
+	checkLineContent(arg2);
 	std::string line;
 	line.reserve(message.length() + arg1.length() +arg2.length() + 4);
 	line.append(message);

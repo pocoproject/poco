@@ -43,6 +43,44 @@ Breaking Changes:
   rather than an enumerator, so an expression that mixes it with a signed value changes type
   without a diagnostic; and poll(), available(), device(), baudRate(), parameters(), flowControl()
   and getRTS() are [[nodiscard]].
+- GH #5510 Poco::Dynamic::Var::parse() throws Poco::DataFormatException for an array or object
+  whose elements are not separated by a comma, such as [1 2], which it used to accept, and for
+  objects and arrays nested deeper than 128 levels.
+- GH #5510 Poco::BinaryReader::readCString() takes a maximum length, by default
+  BinaryReader::DEFAULT_MAX_CSTR_LENGTH (1024, the same as BinaryWriter::writeCString()); a
+  longer string sets failbit and the value holds the first maxLength characters.
+  Source-compatible, binary-incompatible: recompile against the new header.
+- GH #5510 The const Poco::Message::operator[] throws Poco::NotFoundException for a missing
+  parameter, as documented, where it used to return an empty string and add the parameter when
+  the message had other parameters.
+- GH #5510 Poco::AsyncChannel passes an exception thrown by the target channel to the
+  ErrorHandler and continues with the next message, where its worker thread used to end;
+  messages that the ErrorHandler logs through the same channel while it handles such an
+  exception are dropped. A new private member changes the class layout: recompile against the
+  new header.
+- GH #5510 Poco::Net::DialogSocket::sendMessage() throws Poco::InvalidArgumentException for a
+  message or an argument that contains CR or LF; the commands of SMTPClientSession,
+  POP3ClientSession and FTPClientSession are sent through it. Code that sends several lines in
+  one call, such as a multi-line reply of a server, uses sendString() and adds the line ends
+  itself.
+- GH #5510 Poco::Net::IPAddress rejects IPv6 text that is not a valid address, such as 0:0:0 or
+  0:0:0:0:0:0:0:0:0, which it used to accept as the unspecified address ::. The IPv4-embedded
+  spelling ::0.0.0.0, which it used to reject, is accepted as ::.
+- GH #5510 Poco::XML::XMLWriter splits "]]>" in CDATA content into two CDATA sections and
+  throws Poco::XML::XMLException for a control character in CDATA content, as it does outside
+  CDATA. A new private member changes the class layout: recompile against the new header.
+- GH #5510 Poco::XML::XMLStreamParser passes an exception thrown while an Expat callback runs,
+  such as std::bad_alloc, to the caller and frees the parser, where it used to unwind through
+  Expat and leak the parser. A new private member changes the class layout: recompile against
+  the new header.
+- GH #5510 Poco::Redis throws Poco::Redis::RedisException for a truncated reply, where it used
+  to return a bulk string padded with spaces or a partial line, and for arrays nested deeper
+  than 128 levels; a bulk string is read as its bytes arrive instead of being allocated in full
+  first. A bulk string followed by anything other than an empty line after its declared length
+  throws, where it used to return the value and skip the next line, and
+  RedisInputStream::getline() throws Poco::Redis::RedisException when the stream ends before the
+  end of the line. A new private member of RedisInputStream changes the class layout: recompile
+  against the new header.
 
 Bundled Third-Party Library Upgrades:
 

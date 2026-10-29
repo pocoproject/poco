@@ -15,6 +15,7 @@
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
+#include "Poco/DOM/NodeList.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/XML/XMLWriter.h"
@@ -26,6 +27,7 @@ using Poco::XML::DOMWriter;
 using Poco::XML::XMLReader;
 using Poco::XML::XMLWriter;
 using Poco::XML::Document;
+using Poco::XML::NodeList;
 using Poco::XML::AutoPtr;
 using Poco::XML::InputSource;
 
@@ -104,6 +106,23 @@ void ParserWriterTest::testParseWriteSimple()
 }
 
 
+void ParserWriterTest::testParseWriteCDATATerminator()
+{
+	DOMParser parser;
+	AutoPtr<Document> pDoc = parser.parseString("<r><![CDATA[a]]]]><![CDATA[><x/>]]></r>");
+	assertTrue (pDoc->documentElement()->innerText() == "a]]><x/>");
+
+	std::ostringstream ostr;
+	DOMWriter writer;
+	writer.writeNode(ostr, pDoc);
+
+	AutoPtr<Document> pReparsed = parser.parseString(ostr.str());
+	AutoPtr<NodeList> pElements = pReparsed->getElementsByTagName("x");
+	assertTrue (pElements->length() == 0);
+	assertTrue (pReparsed->documentElement()->innerText() == "a]]><x/>");
+}
+
+
 void ParserWriterTest::testMaxElementDepth()
 {
 	DOMParser parser;
@@ -138,6 +157,7 @@ CppUnit::Test* ParserWriterTest::suite()
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML2);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteSimple);
+	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteCDATATerminator);
 	CppUnit_addTest(pSuite, ParserWriterTest, testMaxElementDepth);
 
 	return pSuite;
