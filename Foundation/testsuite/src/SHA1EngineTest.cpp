@@ -54,13 +54,13 @@ void SHA1EngineTest::testLargeInput()
 #if (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && defined(POCO_PTR_IS_64_BIT)
 	// more than 4 GB of zero bytes in a single update() call; on Linux, reads
 	// of a read-only anonymous mapping go to the shared zero page and use no memory
-	const std::size_t size = (std::size_t(1) << 32) + 100;
-	void* p = mmap(nullptr, size, PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	constexpr std::size_t size = (std::size_t(1) << 32) + 100;
+	void* p = ::mmap(nullptr, size, PROT_READ, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	assertTrue (p != MAP_FAILED);
 
 	SHA1Engine engine;
 	engine.update(p, size);
-	munmap(p, size);
+	::munmap(p, size);
 	assertTrue (DigestEngine::digestToHex(engine.digest()) == "ed4e242fbb152330b464d8812afead7ba2e2a07a");
 #endif
 }
