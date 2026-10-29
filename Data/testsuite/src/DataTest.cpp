@@ -1657,7 +1657,7 @@ void DataTest::testTransactionAutoCommit()
 {
 	// Transaction must work on an auto-commit session: it disables auto-commit for
 	// the duration (so a real SessionImpl::begin() does not throw "Session in auto
-	// commit mode") and restores it on commit(), rollback() AND destruction — the
+	// commit mode") and restores it on commit(), rollback() AND destruction - the
 	// last path being what keeps a pooled session from being handed back in
 	// manual-commit mode. Uses the no-op Test connector, so no server is involved.
 	Session sess(SessionFactory::instance().create("test", "cs"));

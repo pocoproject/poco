@@ -946,13 +946,13 @@ TEST(WithClauseSingle) {
       "SELECT name FROM a;",
       kStmtSelect, SelectStatement, result, stmt);
 
-  // with_description_list – count
+  // with_description_list - count
   ASSERT_EQ(stmt->withDescriptions->size(), 1);
 
-  // with_description – alias
+  // with_description - alias
   ASSERT_STREQ(stmt->withDescriptions->at(0)->alias, "a");
 
-  // with_description – select stmt
+  // with_description - select stmt
   ASSERT_EQ(stmt->withDescriptions->at(0)->select->selectList->size(), 1);
   ASSERT_STREQ(stmt->withDescriptions->at(0)->select->selectList->at(0)->name, std::string("name"));
   ASSERT_STREQ(stmt->withDescriptions->at(0)->select->fromTable->name, std::string("peopleA"));
@@ -971,14 +971,14 @@ TEST(WithClauseDouble) {
       "SELECT nameA FROM a;",
       kStmtSelect, SelectStatement, result, stmt);
 
-  // with_description_list – count
+  // with_description_list - count
   ASSERT_EQ(stmt->withDescriptions->size(), 2);
 
-  // with_description – aliases
+  // with_description - aliases
   ASSERT_STREQ(stmt->withDescriptions->at(0)->alias, "a");
   ASSERT_STREQ(stmt->withDescriptions->at(1)->alias, "b");
 
-  // with_description – select stmts
+  // with_description - select stmts
   ASSERT_EQ(stmt->withDescriptions->at(0)->select->selectList->size(), 1);
   ASSERT_STREQ(stmt->withDescriptions->at(0)->select->fromTable->name, "peopleA");
   ASSERT_EQ(stmt->withDescriptions->at(1)->select->selectList->size(), 2);
