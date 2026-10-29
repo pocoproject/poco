@@ -6,7 +6,9 @@
 namespace hsql {
 
 // Represents "column = value" expressions.
-struct UpdateClause {
+struct SQLParser_API UpdateClause {
+  ~UpdateClause();
+
   char* column;
   Expr* value;
 };

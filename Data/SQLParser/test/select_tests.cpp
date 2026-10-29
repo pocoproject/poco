@@ -1,5 +1,8 @@
 #include <climits>
 #include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "SQLParser.h"
 #include "sql_asserts.h"
@@ -45,6 +48,25 @@ TEST(SelectExprTest) {
   ASSERT_EQ(stmt->selectList->at(2)->exprList->at(1)->exprList->size(), 1);
   ASSERT(stmt->selectList->at(2)->exprList->at(1)->exprList->at(0)->isType(kExprColumnRef));
   ASSERT_STREQ(stmt->selectList->at(2)->exprList->at(1)->exprList->at(0)->getName(), "un");
+}
+
+TEST(SelectThreePartColumnRefTest) {
+  TEST_PARSE_SINGLE_SQL("SELECT catalog.students.grade FROM students;", kStmtSelect, SelectStatement, result, stmt);
+
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT(stmt->selectList->at(0)->isType(kExprColumnRef));
+  ASSERT_STREQ(stmt->selectList->at(0)->schema, "catalog");
+  ASSERT_STREQ(stmt->selectList->at(0)->table, "students");
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "grade");
+}
+
+TEST(SelectThreePartStarTest) {
+  TEST_PARSE_SINGLE_SQL("SELECT catalog.students.* FROM students;", kStmtSelect, SelectStatement, result, stmt);
+
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT(stmt->selectList->at(0)->isType(kExprStar));
+  ASSERT_STREQ(stmt->selectList->at(0)->schema, "catalog");
+  ASSERT_STREQ(stmt->selectList->at(0)->table, "students");
 }
 
 TEST(SelectUnaryMinusTest) {
@@ -744,6 +766,26 @@ TEST(SetLimitOffset) {
 
 // T-SQL dialect support (Poco fork extension).
 
+TEST(SelectTopWithOffsetOrLimitAllTest) {
+  // OFFSET alone and LIMIT ALL give no row count, so TOP keeps its own; a LIMIT
+  // with a row count replaces it.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT TOP 5 a FROM t ORDER BY a OFFSET 10;"
+      "SELECT TOP 5 a FROM t LIMIT ALL;"
+      "SELECT TOP 5 a FROM t LIMIT 3;",
+      result, 3);
+
+  auto stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->limit);
+  ASSERT_EQ(stmt->limit->limit->ival, 5);
+  ASSERT_EQ(stmt->limit->offset->ival, 10);
+  stmt = (SelectStatement*)result.getStatement(1);
+  ASSERT_EQ(stmt->limit->limit->ival, 5);
+  ASSERT_NULL(stmt->limit->offset);
+  stmt = (SelectStatement*)result.getStatement(2);
+  ASSERT_EQ(stmt->limit->limit->ival, 3);
+}
+
 TEST(SelectTopParenthesesTest) {
   SelectStatement* stmt;
 
@@ -907,13 +949,13 @@ TEST(WithClauseSingle) {
       "SELECT name FROM a;",
       kStmtSelect, SelectStatement, result, stmt);
 
-  // with_description_list – count
+  // with_description_list - count
   ASSERT_EQ(stmt->withDescriptions->size(), 1);
 
-  // with_description – alias
+  // with_description - alias
   ASSERT_STREQ(stmt->withDescriptions->at(0)->alias, "a");
 
-  // with_description – select stmt
+  // with_description - select stmt
   ASSERT_EQ(stmt->withDescriptions->at(0)->select->selectList->size(), 1);
   ASSERT_STREQ(stmt->withDescriptions->at(0)->select->selectList->at(0)->name, std::string("name"));
   ASSERT_STREQ(stmt->withDescriptions->at(0)->select->fromTable->name, std::string("peopleA"));
@@ -932,14 +974,14 @@ TEST(WithClauseDouble) {
       "SELECT nameA FROM a;",
       kStmtSelect, SelectStatement, result, stmt);
 
-  // with_description_list – count
+  // with_description_list - count
   ASSERT_EQ(stmt->withDescriptions->size(), 2);
 
-  // with_description – aliases
+  // with_description - aliases
   ASSERT_STREQ(stmt->withDescriptions->at(0)->alias, "a");
   ASSERT_STREQ(stmt->withDescriptions->at(1)->alias, "b");
 
-  // with_description – select stmts
+  // with_description - select stmts
   ASSERT_EQ(stmt->withDescriptions->at(0)->select->selectList->size(), 1);
   ASSERT_STREQ(stmt->withDescriptions->at(0)->select->fromTable->name, "peopleA");
   ASSERT_EQ(stmt->withDescriptions->at(1)->select->selectList->size(), 2);
@@ -966,6 +1008,36 @@ TEST(DateLiteral) {
   stmt = (SelectStatement*)result.getStatement(0);
   ASSERT_EQ(stmt->whereClause->opType, kOpEquals);
   ASSERT_STREQ(stmt->whereClause->expr2->name, "1996-12-31");
+}
+
+TEST(TimeLiteral) {
+  // The string is not validated: fractional seconds and time zones vary.
+  TEST_PARSE_SINGLE_SQL("SELECT * FROM t WHERE a = TIME '12:11:10.5+02:00'", kStmtSelect, SelectStatement, result,
+                        stmt);
+  ASSERT_EQ(stmt->whereClause->opType, kOpEquals);
+  ASSERT_EQ(stmt->whereClause->expr2->type, kExprLiteralTime);
+  ASSERT_STREQ(stmt->whereClause->expr2->name, "12:11:10.5+02:00");
+  ASSERT_FALSE(stmt->whereClause->expr2->isCurrentDatetime);
+  ASSERT_TRUE(stmt->whereClause->expr2->isLiteral());
+}
+
+TEST(TimestampLiteral) {
+  TEST_PARSE_SQL_QUERY(
+      "SELECT * FROM t WHERE a = TIMESTAMP '1996-12-31 12:11:10';"
+      "SELECT timestamp FROM t;",
+      result, 2);
+
+  auto stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->whereClause->opType, kOpEquals);
+  ASSERT_EQ(stmt->whereClause->expr2->type, kExprLiteralTimestamp);
+  ASSERT_STREQ(stmt->whereClause->expr2->name, "1996-12-31 12:11:10");
+  ASSERT_FALSE(stmt->whereClause->expr2->isCurrentDatetime);
+  ASSERT_TRUE(stmt->whereClause->expr2->isLiteral());
+
+  // Only a string after it makes TIMESTAMP a literal; on its own it stays a name.
+  stmt = (SelectStatement*)result.getStatement(1);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "TIMESTAMP");
 }
 
 TEST(IntervalLiteral) {
@@ -1030,6 +1102,97 @@ TEST(IntervalLiteral) {
       ASSERT_EQ(interval_literal->type, kExprLiteralInterval);
     }
   }
+}
+
+TEST(IntervalTypes) {
+  TEST_PARSE_SINGLE_SQL(
+      "select "
+      "cast('12' as interval year), "
+      "cast('12' as interval month), "
+      "cast('12' as interval day), "
+      "cast('12' as interval hour), "
+      "cast('12' as interval minute), "
+      "cast('12' as interval second), "
+      "cast('12' as interval);",
+      kStmtSelect, SelectStatement, result, stmt);
+
+  ASSERT_TRUE(stmt->selectList);
+  ASSERT_EQ(stmt->selectList->size(), 7);
+  const DatetimeField expectedFields[] = {kDatetimeYear,   kDatetimeMonth,  kDatetimeDay, kDatetimeHour,
+                                          kDatetimeMinute, kDatetimeSecond, kDatetimeNone};
+  for (size_t i = 0; i < 7; ++i) {
+    ASSERT_EQ(stmt->selectList->at(i)->type, kExprCast);
+    ASSERT_EQ(stmt->selectList->at(i)->columnType.data_type, DataType::INTERVAL);
+    ASSERT_EQ(stmt->selectList->at(i)->columnType.datetime_field, expectedFields[i]);
+    ASSERT_STREQ(stmt->selectList->at(i)->expr->name, "12");
+  }
+}
+
+TEST(IntervalToIntervalTypes) {
+  TEST_PARSE_SINGLE_SQL(
+      "select "
+      "cast('1-2' as interval year to month), "
+      "cast('2 1' as interval day to hour), "
+      "cast('2 04:30' as interval day to minute), "
+      "cast('2 21:46:20.123' as interval day to second), "
+      "cast('10:30' as interval hour to minute), "
+      "cast('21:46:20' as interval hour to second), "
+      "cast('5:30.123' as interval minute to second);",
+      kStmtSelect, SelectStatement, result, stmt);
+
+  ASSERT_TRUE(stmt->selectList);
+  ASSERT_EQ(stmt->selectList->size(), 7);
+  const DatetimeField expectedFields[] = {kIntervalYearToMonth,   kIntervalDayToHour,    kIntervalDayToMinute,
+                                          kIntervalDayToSecond,   kIntervalHourToMinute, kIntervalHourToSecond,
+                                          kIntervalMinuteToSecond};
+  const char* expectedValues[] = {"1-2", "2 1", "2 04:30", "2 21:46:20.123", "10:30", "21:46:20", "5:30.123"};
+  for (size_t i = 0; i < 7; ++i) {
+    ASSERT_EQ(stmt->selectList->at(i)->type, kExprCast);
+    ASSERT_EQ(stmt->selectList->at(i)->columnType.data_type, DataType::INTERVAL);
+    ASSERT_EQ(stmt->selectList->at(i)->columnType.datetime_field, expectedFields[i]);
+    ASSERT_STREQ(stmt->selectList->at(i)->expr->name, expectedValues[i]);
+  }
+
+  // Only the seven ranges of the standard are accepted, as a type and as the
+  // field of a literal.
+  const char* rejected[] = {"SELECT CAST('1' AS INTERVAL YEAR TO DAY);",
+                            "CREATE TABLE t (i INTERVAL SECOND TO MINUTE);", "SELECT INTERVAL '1' YEAR TO DAY;",
+                            "SELECT INTERVAL '1' DAY TO DAY;"};
+  for (const char* query : rejected) {
+    SQLParserResult rejectedResult;
+    SQLParser::parse(query, &rejectedResult);
+    ASSERT_FALSE(rejectedResult.isValid());
+  }
+}
+
+TEST(IntervalRangeLiteral) {
+  TEST_PARSE_SQL_QUERY(
+      "SELECT INTERVAL '1-2' YEAR TO MONTH, INTERVAL '2 04:30' DAY TO MINUTE FROM t;"
+      "SELECT * FROM t WHERE a = DATE '2000-01-01' - INTERVAL '10:30' HOUR TO MINUTE;",
+      result, 2);
+
+  // A field range keeps the formatted value as the string it is; ival stays 0.
+  auto stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprLiteralInterval);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "1-2");
+  ASSERT_EQ(stmt->selectList->at(0)->ival, 0);
+  ASSERT_EQ(stmt->selectList->at(0)->datetimeField, kIntervalYearToMonth);
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprLiteralInterval);
+  ASSERT_STREQ(stmt->selectList->at(1)->name, "2 04:30");
+  ASSERT_EQ(stmt->selectList->at(1)->datetimeField, kIntervalDayToMinute);
+
+  stmt = (SelectStatement*)result.getStatement(1);
+  Expr* interval_literal = stmt->whereClause->expr2->expr2;
+  ASSERT_EQ(interval_literal->type, kExprLiteralInterval);
+  ASSERT_STREQ(interval_literal->name, "10:30");
+  ASSERT_EQ(interval_literal->datetimeField, kIntervalHourToMinute);
+  ASSERT_TRUE(interval_literal->isLiteral());
+
+  // A single field still takes an integer and nothing else.
+  SQLParserResult rejectedResult;
+  SQLParser::parse("SELECT INTERVAL '1-2' YEAR;", &rejectedResult);
+  ASSERT_FALSE(rejectedResult.isValid());
 }
 
 TEST(LockingClauseWithoutWaitPolicy) {
@@ -1764,16 +1927,19 @@ TEST(SelectRowConstructorInTest) {
 TEST(SelectMultiPartColumnNameTest) {
   SelectStatement* stmt;
 
-  // Three- and four-part column references. The qualifiers are folded into the
-  // single table slot Expr has, mirroring how table_name folds database+schema.
+  // Three- and four-part column references. The part before the table fills
+  // the schema; a four-part name folds database and schema into it, mirroring
+  // table_name.
   TEST_PARSE_SQL_QUERY("SELECT dbo.T.C, mydb.dbo.T.C2 FROM mydb.dbo.T;", result, 1);
   stmt = (SelectStatement*)result.getStatement(0);
   ASSERT_EQ(stmt->selectList->size(), 2);
   ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
-  ASSERT_STREQ(stmt->selectList->at(0)->table, "dbo.T");
+  ASSERT_STREQ(stmt->selectList->at(0)->schema, "dbo");
+  ASSERT_STREQ(stmt->selectList->at(0)->table, "T");
   ASSERT_STREQ(stmt->selectList->at(0)->name, "C");
   ASSERT_EQ(stmt->selectList->at(1)->type, kExprColumnRef);
-  ASSERT_STREQ(stmt->selectList->at(1)->table, "mydb.dbo.T");
+  ASSERT_STREQ(stmt->selectList->at(1)->schema, "mydb.dbo");
+  ASSERT_STREQ(stmt->selectList->at(1)->table, "T");
   ASSERT_STREQ(stmt->selectList->at(1)->name, "C2");
 
   // Star qualified by the same multi-part names.
@@ -1781,9 +1947,24 @@ TEST(SelectMultiPartColumnNameTest) {
   stmt = (SelectStatement*)starResult.getStatement(0);
   ASSERT_EQ(stmt->selectList->size(), 2);
   ASSERT_EQ(stmt->selectList->at(0)->type, kExprStar);
-  ASSERT_STREQ(stmt->selectList->at(0)->table, "dbo.T");
+  ASSERT_STREQ(stmt->selectList->at(0)->schema, "dbo");
+  ASSERT_STREQ(stmt->selectList->at(0)->table, "T");
   ASSERT_EQ(stmt->selectList->at(1)->type, kExprStar);
-  ASSERT_STREQ(stmt->selectList->at(1)->table, "mydb.dbo.T");
+  ASSERT_STREQ(stmt->selectList->at(1)->schema, "mydb.dbo");
+  ASSERT_STREQ(stmt->selectList->at(1)->table, "T");
+
+  // A keyword in the column position splits the same way.
+  TEST_PARSE_SQL_QUERY("SELECT dbo.T.MONTH, mydb.dbo.T.YEAR FROM mydb.dbo.T;", keywordResult, 1);
+  stmt = (SelectStatement*)keywordResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->schema, "dbo");
+  ASSERT_STREQ(stmt->selectList->at(0)->table, "T");
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "MONTH");
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(1)->schema, "mydb.dbo");
+  ASSERT_STREQ(stmt->selectList->at(1)->table, "T");
+  ASSERT_STREQ(stmt->selectList->at(1)->name, "YEAR");
 
   // One- and two-part references and schema-qualified function calls are
   // unchanged - they share the leading IDENTIFIER '.' IDENTIFIER prefix.
@@ -1791,8 +1972,12 @@ TEST(SelectMultiPartColumnNameTest) {
   stmt = (SelectStatement*)keptResult.getStatement(0);
   ASSERT_EQ(stmt->selectList->size(), 4);
   ASSERT_NULL(stmt->selectList->at(0)->table);
+  ASSERT_NULL(stmt->selectList->at(0)->schema);
   ASSERT_STREQ(stmt->selectList->at(1)->table, "a");
+  ASSERT_NULL(stmt->selectList->at(1)->schema);
   ASSERT_EQ(stmt->selectList->at(2)->type, kExprStar);
+  ASSERT_STREQ(stmt->selectList->at(2)->table, "a");
+  ASSERT_NULL(stmt->selectList->at(2)->schema);
   ASSERT_EQ(stmt->selectList->at(3)->type, kExprFunctionRef);
   ASSERT_STREQ(stmt->selectList->at(3)->schema, "sys");
 }
@@ -1847,6 +2032,249 @@ TEST(SelectScientificNotationTest) {
   ASSERT_NOTNULL(stmt->whereClause);
   ASSERT_EQ(stmt->whereClause->expr2->type, kExprLiteralFloat);
   ASSERT_EQ(stmt->whereClause->expr2->fval, 0.005);
+}
+
+TEST(SelectParenthesizedSetOperationMemberTest) {
+  // A parenthesized member at any nesting depth is the member itself; the
+  // parentheses leave no trace in the tree.
+  TEST_PARSE_SQL_QUERY(
+      "((SELECT a FROM t)) UNION (((SELECT b FROM u)));"
+      "(((SELECT a FROM t) UNION (SELECT b FROM u)));"
+      "SELECT a FROM t UNION ((SELECT b FROM u));",
+      result, 3);
+  for (size_t i = 0; i < 3; ++i) {
+    const SelectStatement* stmt = (const SelectStatement*)result.getStatement(i);
+    ASSERT_EQ(stmt->type(), kStmtSelect);
+    ASSERT_STREQ(stmt->fromTable->name, "t");
+    ASSERT_NOTNULL(stmt->setOperations);
+    ASSERT_EQ(stmt->setOperations->size(), 1);
+    ASSERT_EQ(stmt->setOperations->at(0)->setType, kSetUnion);
+    ASSERT_STREQ(stmt->setOperations->at(0)->nestedSelectStatement->fromTable->name, "u");
+    ASSERT_NULL(stmt->setOperations->at(0)->nestedSelectStatement->setOperations);
+    ASSERT_NULL(stmt->setOperations->at(0)->resultOrder);
+    ASSERT_NULL(stmt->setOperations->at(0)->resultLimit);
+  }
+}
+
+TEST(SelectSetOperationChainWithParenthesizedMembersTest) {
+  // INTERSECT binds tighter than UNION and EXCEPT, a parenthesized member is
+  // one unit, and the set operations apply from left to right:
+  // (t UNION ((u EXCEPT v) INTERSECT w)) UNION x.
+  TEST_PARSE_SINGLE_SQL(
+      "SELECT a FROM t UNION (SELECT b FROM u EXCEPT SELECT c FROM v) INTERSECT SELECT d FROM w UNION SELECT e FROM x;",
+      kStmtSelect, SelectStatement, result, stmt);
+  ASSERT_STREQ(stmt->fromTable->name, "t");
+  ASSERT_EQ(stmt->setOperations->size(), 2);
+  ASSERT_EQ(stmt->setOperations->at(0)->setType, kSetUnion);
+  const SelectStatement* term = stmt->setOperations->at(0)->nestedSelectStatement;
+  ASSERT_STREQ(term->fromTable->name, "u");
+  ASSERT_EQ(term->setOperations->size(), 2);
+  ASSERT_EQ(term->setOperations->at(0)->setType, kSetExcept);
+  ASSERT_STREQ(term->setOperations->at(0)->nestedSelectStatement->fromTable->name, "v");
+  ASSERT_NULL(term->setOperations->at(0)->nestedSelectStatement->setOperations);
+  ASSERT_EQ(term->setOperations->at(1)->setType, kSetIntersect);
+  ASSERT_STREQ(term->setOperations->at(1)->nestedSelectStatement->fromTable->name, "w");
+  ASSERT_EQ(stmt->setOperations->at(1)->setType, kSetUnion);
+  ASSERT_STREQ(stmt->setOperations->at(1)->nestedSelectStatement->fromTable->name, "x");
+  ASSERT_NULL(stmt->setOperations->at(1)->nestedSelectStatement->setOperations);
+
+  // A parenthesized group on the left keeps its set operations, and the ones
+  // after it follow them: (t UNION u) EXCEPT (v INTERSECT w).
+  TEST_PARSE_SINGLE_SQL("(SELECT a FROM t UNION SELECT b FROM u) EXCEPT (SELECT c FROM v) INTERSECT SELECT d FROM w;",
+                        kStmtSelect, SelectStatement, leftResult, left);
+  ASSERT_EQ(left->setOperations->size(), 2);
+  ASSERT_EQ(left->setOperations->at(0)->setType, kSetUnion);
+  ASSERT_STREQ(left->setOperations->at(0)->nestedSelectStatement->fromTable->name, "u");
+  ASSERT_NULL(left->setOperations->at(0)->nestedSelectStatement->setOperations);
+  ASSERT_EQ(left->setOperations->at(1)->setType, kSetExcept);
+  const SelectStatement* intersected = left->setOperations->at(1)->nestedSelectStatement;
+  ASSERT_STREQ(intersected->fromTable->name, "v");
+  ASSERT_EQ(intersected->setOperations->size(), 1);
+  ASSERT_EQ(intersected->setOperations->at(0)->setType, kSetIntersect);
+  ASSERT_STREQ(intersected->setOperations->at(0)->nestedSelectStatement->fromTable->name, "w");
+}
+
+// Renders a set operation tree the way it evaluates: the set operations of a
+// select apply from left to right to the result so far, a nested select first.
+// A member shows the integer its select list starts with.
+static std::string setOperationTree(const SelectStatement* stmt) {
+  std::string tree = std::to_string(stmt->selectList->at(0)->ival);
+  if (stmt->setOperations) {
+    for (const SetOperation* op : *stmt->setOperations) {
+      const char* name = op->setType == kSetUnion ? "UNION" : op->setType == kSetIntersect ? "INTERSECT" : "EXCEPT";
+      tree = "(" + tree + " " + name + " " + setOperationTree(op->nestedSelectStatement) + ")";
+    }
+  }
+  return tree;
+}
+
+TEST(SetOperationPrecedenceTest) {
+  // INTERSECT binds tighter than UNION and EXCEPT, set operations of the same
+  // level apply from left to right, and parentheses around a single SELECT
+  // change nothing.
+  const std::vector<std::pair<std::string, std::string>> cases = {
+      {"SELECT 1 UNION SELECT 2 INTERSECT SELECT 3", "(1 UNION (2 INTERSECT 3))"},
+      {"SELECT 1 UNION (SELECT 2) INTERSECT SELECT 3", "(1 UNION (2 INTERSECT 3))"},
+      {"SELECT 1 INTERSECT SELECT 2 UNION SELECT 3", "((1 INTERSECT 2) UNION 3)"},
+      {"SELECT 1 INTERSECT (SELECT 2) UNION SELECT 3", "((1 INTERSECT 2) UNION 3)"},
+      {"SELECT 1 EXCEPT SELECT 2 EXCEPT SELECT 3", "((1 EXCEPT 2) EXCEPT 3)"},
+      {"SELECT 1 EXCEPT (SELECT 2) EXCEPT SELECT 3", "((1 EXCEPT 2) EXCEPT 3)"},
+      {"SELECT 1 UNION SELECT 2 EXCEPT SELECT 3", "((1 UNION 2) EXCEPT 3)"},
+      {"(SELECT 1 UNION SELECT 2) INTERSECT SELECT 3", "((1 UNION 2) INTERSECT 3)"},
+      {"SELECT 1 UNION (SELECT 2 EXCEPT SELECT 3) INTERSECT SELECT 4", "(1 UNION ((2 EXCEPT 3) INTERSECT 4))"},
+      {"SELECT 1 INTERSECT SELECT 2 INTERSECT SELECT 3 UNION SELECT 4 INTERSECT SELECT 5",
+       "(((1 INTERSECT 2) INTERSECT 3) UNION (4 INTERSECT 5))"}};
+  for (const auto& c : cases) {
+    TEST_PARSE_SINGLE_SQL(c.first, kStmtSelect, SelectStatement, result, stmt);
+    ASSERT_EQ(setOperationTree(stmt), c.second);
+  }
+}
+
+TEST(SelectClausesAfterParenthesizedSetOperationTest) {
+  // ORDER BY and LIMIT after a parenthesized set operation describe the
+  // combined result and go to the last set operation; the locking clause goes
+  // to the leading select. The members keep their own ORDER BY and LIMIT.
+  TEST_PARSE_SINGLE_SQL(
+      "((SELECT a FROM t ORDER BY a LIMIT 1) UNION (SELECT b FROM u ORDER BY b LIMIT 2)) ORDER BY 1 DESC LIMIT 3 "
+      "OFFSET 4 FOR UPDATE;",
+      kStmtSelect, SelectStatement, result, stmt);
+  ASSERT_STREQ(stmt->order->at(0)->expr->name, "a");
+  ASSERT_EQ(stmt->limit->limit->ival, 1);
+  ASSERT_EQ(stmt->setOperations->size(), 1);
+  const SelectStatement* member = stmt->setOperations->at(0)->nestedSelectStatement;
+  ASSERT_STREQ(member->order->at(0)->expr->name, "b");
+  ASSERT_EQ(member->limit->limit->ival, 2);
+  ASSERT_NULL(member->lockings);
+  ASSERT_EQ(stmt->setOperations->at(0)->resultOrder->at(0)->type, kOrderDesc);
+  ASSERT_EQ(stmt->setOperations->at(0)->resultOrder->at(0)->expr->ival, 1);
+  ASSERT_EQ(stmt->setOperations->at(0)->resultLimit->limit->ival, 3);
+  ASSERT_EQ(stmt->setOperations->at(0)->resultLimit->offset->ival, 4);
+  ASSERT_EQ(stmt->lockings->size(), 1);
+  ASSERT_EQ(stmt->lockings->at(0)->rowLockMode, RowLockMode::ForUpdate);
+
+  // ORDER BY and LIMIT inside the parentheses stay with the set operation they
+  // close, before the member that follows; the LIMIT of the whole statement
+  // goes to the last set operation.
+  TEST_PARSE_SINGLE_SQL("(SELECT a FROM t UNION SELECT b FROM u ORDER BY a LIMIT 1) UNION SELECT c FROM v LIMIT 5;",
+                        kStmtSelect, SelectStatement, groupResult, group);
+  ASSERT_EQ(group->setOperations->size(), 2);
+  ASSERT_STREQ(group->setOperations->at(0)->resultOrder->at(0)->expr->name, "a");
+  ASSERT_EQ(group->setOperations->at(0)->resultLimit->limit->ival, 1);
+  ASSERT_NULL(group->setOperations->at(1)->resultOrder);
+  ASSERT_EQ(group->setOperations->at(1)->resultLimit->limit->ival, 5);
+  ASSERT_NULL(group->order);
+  ASSERT_NULL(group->limit);
+
+  // A plain parenthesized query takes the clauses after it as its own, but not
+  // a clause it already has.
+  TEST_PARSE_SINGLE_SQL("((SELECT a FROM t)) ORDER BY a LIMIT 2 FOR SHARE;", kStmtSelect, SelectStatement, plainResult,
+                        plain);
+  ASSERT_NULL(plain->setOperations);
+  ASSERT_STREQ(plain->order->at(0)->expr->name, "a");
+  ASSERT_EQ(plain->limit->limit->ival, 2);
+  ASSERT_EQ(plain->lockings->at(0)->rowLockMode, RowLockMode::ForShare);
+  const char* rejected[] = {"(SELECT a FROM t ORDER BY a) ORDER BY a;", "(SELECT a FROM t LIMIT 1) LIMIT 2;",
+                            "(SELECT a FROM t FOR UPDATE) FOR UPDATE;",
+                            "(SELECT a FROM t UNION SELECT b FROM u ORDER BY 1) ORDER BY 2;"};
+  for (const char* query : rejected) {
+    SQLParserResult rejectedResult;
+    SQLParser::parse(query, &rejectedResult);
+    ASSERT_FALSE(rejectedResult.isValid());
+  }
+}
+
+TEST(SelectScalarSubqueryWithSetOperationTest) {
+  // A scalar subquery is a full query expression: set operations with
+  // parenthesized members, ORDER BY and LIMIT.
+  TEST_PARSE_SINGLE_SQL("SELECT ((SELECT a FROM t) UNION (SELECT b FROM u) ORDER BY 1 LIMIT 1) AS v, (((SELECT 2)));",
+                        kStmtSelect, SelectStatement, result, stmt);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  const Expr* scalar = stmt->selectList->at(0);
+  ASSERT_EQ(scalar->type, kExprSelect);
+  ASSERT_STREQ(scalar->alias, "v");
+  ASSERT_STREQ(scalar->select->fromTable->name, "t");
+  ASSERT_EQ(scalar->select->setOperations->size(), 1);
+  ASSERT_STREQ(scalar->select->setOperations->at(0)->nestedSelectStatement->fromTable->name, "u");
+  ASSERT_EQ(scalar->select->setOperations->at(0)->resultOrder->at(0)->expr->ival, 1);
+  ASSERT_EQ(scalar->select->setOperations->at(0)->resultLimit->limit->ival, 1);
+  const Expr* nested = stmt->selectList->at(1);
+  ASSERT_EQ(nested->type, kExprSelect);
+  ASSERT_EQ(nested->select->selectList->at(0)->ival, 2);
+  ASSERT_NULL(nested->select->setOperations);
+}
+
+TEST(SelectInParenthesizedSetOperationTest) {
+  // IN and EXISTS take a full query expression, also a parenthesized one.
+  TEST_PARSE_SINGLE_SQL(
+      "SELECT * FROM t WHERE a IN ((SELECT x FROM u) UNION (SELECT y FROM v)) AND EXISTS ((SELECT 1 FROM w) EXCEPT "
+      "(SELECT 1 FROM z));",
+      kStmtSelect, SelectStatement, result, stmt);
+  ASSERT_EQ(stmt->whereClause->opType, kOpAnd);
+  const Expr* in = stmt->whereClause->expr;
+  ASSERT_EQ(in->opType, kOpIn);
+  ASSERT_STREQ(in->expr->name, "a");
+  ASSERT_NULL(in->exprList);
+  ASSERT_STREQ(in->select->fromTable->name, "u");
+  ASSERT_EQ(in->select->setOperations->at(0)->setType, kSetUnion);
+  ASSERT_STREQ(in->select->setOperations->at(0)->nestedSelectStatement->fromTable->name, "v");
+  const Expr* exists = stmt->whereClause->expr2;
+  ASSERT_EQ(exists->opType, kOpExists);
+  ASSERT_STREQ(exists->select->fromTable->name, "w");
+  ASSERT_EQ(exists->select->setOperations->at(0)->setType, kSetExcept);
+  ASSERT_STREQ(exists->select->setOperations->at(0)->nestedSelectStatement->fromTable->name, "z");
+
+  // A doubly parenthesized query on the right of IN is the subquery itself, as
+  // PostgreSQL reads it, not an IN list holding one scalar subquery.
+  TEST_PARSE_SINGLE_SQL("SELECT * FROM t WHERE a IN ((SELECT x FROM u));", kStmtSelect, SelectStatement, doubledResult,
+                        doubled);
+  ASSERT_EQ(doubled->whereClause->opType, kOpIn);
+  ASSERT_NULL(doubled->whereClause->exprList);
+  ASSERT_STREQ(doubled->whereClause->select->fromTable->name, "u");
+}
+
+TEST(InsertParenthesizedSetOperationTest) {
+  // INSERT takes a query expression, with or without a column list.
+  TEST_PARSE_SQL_QUERY(
+      "INSERT INTO t (SELECT a FROM u) UNION (SELECT b FROM v);"
+      "INSERT INTO t (a, b) (SELECT a, b FROM u) UNION ALL (SELECT a, b FROM v) ORDER BY 1;",
+      result, 2);
+  const InsertStatement* plain = (const InsertStatement*)result.getStatement(0);
+  ASSERT_EQ(plain->type, kInsertSelect);
+  ASSERT_STREQ(plain->tableName, "t");
+  ASSERT_NULL(plain->columns);
+  ASSERT_STREQ(plain->select->fromTable->name, "u");
+  ASSERT_EQ(plain->select->setOperations->at(0)->setType, kSetUnion);
+  ASSERT_STREQ(plain->select->setOperations->at(0)->nestedSelectStatement->fromTable->name, "v");
+  const InsertStatement* listed = (const InsertStatement*)result.getStatement(1);
+  ASSERT_EQ(listed->type, kInsertSelect);
+  ASSERT_EQ(listed->columns->size(), 2);
+  ASSERT_STREQ(listed->columns->at(0), "a");
+  ASSERT_STREQ(listed->columns->at(1), "b");
+  ASSERT_TRUE(listed->select->setOperations->at(0)->isAll);
+  ASSERT_EQ(listed->select->setOperations->at(0)->resultOrder->at(0)->expr->ival, 1);
+}
+
+TEST(NestedWithClauseScopeTest) {
+  // A WITH clause inside a nested query expression stays with it: on a later
+  // set operation member and on the right of IN.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT 1 UNION (WITH c AS (SELECT 2) SELECT * FROM c);"
+      "SELECT * FROM t WHERE a IN (WITH c AS (SELECT 1) SELECT * FROM c);",
+      result, 2);
+
+  auto stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NULL(stmt->withDescriptions);
+  ASSERT_EQ(stmt->setOperations->size(), 1);
+  const SelectStatement* member = stmt->setOperations->at(0)->nestedSelectStatement;
+  ASSERT_NOTNULL(member->withDescriptions);
+  ASSERT_EQ(member->withDescriptions->size(), 1);
+  ASSERT_STREQ(member->withDescriptions->at(0)->alias, "c");
+
+  stmt = (SelectStatement*)result.getStatement(1);
+  ASSERT_NULL(stmt->withDescriptions);
+  ASSERT_EQ(stmt->whereClause->opType, kOpIn);
+  ASSERT_NOTNULL(stmt->whereClause->select->withDescriptions);
+  ASSERT_STREQ(stmt->whereClause->select->withDescriptions->at(0)->alias, "c");
 }
 
 }  // namespace hsql

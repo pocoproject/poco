@@ -53,6 +53,21 @@
 !SELECT * FROM t WHERE a = DATE '2000-01-01' + x DAYS;
 !SELECT * FROM t WHERE a = DATE '2000-01-01' + INTERVAL 'x' DAY;
 !SELECT * FROM t WHERE a = DATE '2000-01-01' + INTERVAL '3.3 DAYS';
+!SELECT * FROM t WHERE a = DATE '2000-01-01' + INTERVAL 1 YEAR;
+!SELECT * FROM t WHERE a = DATE '2000-01-01' + INTERVAL '1' YEAR TO DAY;
+!SELECT CAST('1' AS INTERVAL YEAR TO DAY);
+!CREATE TABLE t (i INTERVAL YEAR TO DAY);
+!SELECT * FROM t WHERE a = TIME 12;
+# CURRENT_DATE, CURRENT_TIME and CURRENT_TIMESTAMP are keywords: names only after a qualifier or in quotes, precision an integer
+!CREATE TABLE t (current_date INT);
+!SELECT a AS current_time FROM t;
+!SELECT CURRENT_TIMESTAMP(a);
+!SELECT CURRENT_DATE(3);
+!SELECT CURRENT_TIMESTAMP(-9223372036854775808);
+# A column reference has at most four parts, the star only at the end, no trailing dot
+!SELECT a.b.c.d.e FROM t;
+!SELECT a.b.*.c FROM t;
+!SELECT a.b.c. FROM t;
 # ON is not supported by postgres. We follow postgres here since the sql-92 standard does not specify index
 # implementation details.
 !DROP INDEX myindex ON mytable;
@@ -60,6 +75,13 @@
 !SELECT * FROM test WHERE val = 2 FOR SHARE test1;
 !SELECT * FROM test WHERE val = 2 FOR NO KEY SHARE;
 !SELECT * FROM test WHERE val = 2 NOWAIT FOR UPDATE;
+# A parse error discards the clauses parsed so far: the SET list of an UPDATE, the locking clauses of a SELECT
+!UPDATE students SET grade = 1.0, name = 'Max' WHERE;
+!UPDATE students SET grade = 1.0, name = CAST('1' AS INTERVAL YEAR TO DAY);
+!SELECT * FROM test FOR UPDATE OF test FOR SHARE OF;
+!(SELECT a FROM test FOR UPDATE OF test) FOR UPDATE OF test;
+# A rule that rejects its input releases the statement it built
+!CREATE TABLE t FROM foo FILE 'students.tbl';
 !CREATE TABLE a_table (a_column INT PRIMARY KEY NULL);
 !CREATE TABLE a_table (a_column INT NULL PRIMARY KEY);
 !CREATE TABLE a_table (a_column INT NOT NULL NULL);
@@ -117,3 +139,27 @@
 !SELECT * FROM LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b);
 # A parenthesized TOP holding a placeholder cannot be combined with LIMIT
 !SELECT TOP (?) * FROM t LIMIT 5;
+!SELECT TOP (?) a FROM t ORDER BY a LIMIT 1 FOR UPDATE;
+!WITH c AS (SELECT 1) SELECT TOP (?) * FROM c ORDER BY 1 LIMIT 5 FOR UPDATE;
+# Set operations and parenthesized query expressions: malformed forms
+!SELECT 1 UNION;
+!(SELECT 1;
+!SELECT 1 ORDER BY 1 UNION SELECT 2;
+!(SELECT 1) (SELECT 2);
+!((SELECT 1) UNION);
+!SELECT * FROM (SELECT 1) UNION;
+!SELECT 1 UNION LIMIT 1;
+!INSERT INTO t (a, b) (SELECT 1, 2) UNION;
+# A parenthesized query expression does not take a clause it already has
+!(SELECT 1 ORDER BY 1) ORDER BY 2;
+!(SELECT 1 LIMIT 1) LIMIT 2;
+!(SELECT 1 FOR UPDATE) FOR UPDATE;
+!(SELECT 1 UNION SELECT 2 ORDER BY 1) ORDER BY 2;
+!(SELECT 1 UNION SELECT 2 LIMIT 1) LIMIT 2;
+!(SELECT TOP (?) * FROM t) LIMIT 5;
+!WITH a AS (SELECT 1) (WITH b AS (SELECT 2) SELECT 3);
+!WITH a AS (SELECT 1) (WITH b AS (SELECT 2) SELECT 3) UNION SELECT 4;
+# A WITH clause in parentheses cannot be followed by a set operation
+!(WITH c AS (SELECT 1) SELECT * FROM c) UNION SELECT 2;
+!((WITH c AS (SELECT 1) SELECT * FROM c)) UNION (SELECT 2);
+!SELECT * FROM t WHERE a IN ((WITH c AS (SELECT 1) SELECT * FROM c) EXCEPT SELECT 2);

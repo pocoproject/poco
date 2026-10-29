@@ -52,7 +52,7 @@ bool SQLParser::tokenize(const std::string& sql, std::vector<int16_t>* tokens) {
   state = hsql__scan_string(sql.c_str(), scanner);
 
   YYSTYPE yylval;
-  YYLTYPE yylloc;
+  YYLTYPE yylloc{};
 
   // Step through the string until EOF is read. Each lex pass that returns
   // an sval-bearing token (SQL_IDENTIFIER, SQL_STRING, SQL_NAMED_PARAM)
