@@ -12,7 +12,6 @@ void printOperatorExpression(Expr* expr, uintmax_t num_indent);
 void printAlias(Alias* alias, uintmax_t num_indent);
 
 std::ostream& operator<<(std::ostream& os, const OperatorType& op);
-std::ostream& operator<<(std::ostream& os, const DatetimeField& datetime);
 std::ostream& operator<<(std::ostream& os, const FrameBound& frame_bound);
 
 std::string indent(uintmax_t num_indent) { return std::string(num_indent, '\t'); }
@@ -97,18 +96,27 @@ void printOperatorExpression(Expr* expr, uintmax_t num_indent) {
   }
 }
 
+void printColumnQualifiers(Expr* expr, uintmax_t num_indent) {
+  if (expr->table) {
+    inprint("Table:", num_indent + 1);
+    inprint(expr->table, num_indent + 2);
+  }
+  if (expr->schema) {
+    inprint("Schema:", num_indent + 1);
+    inprint(expr->schema, num_indent + 2);
+  }
+}
+
 void printExpression(Expr* expr, uintmax_t num_indent) {
   if (!expr) return;
   switch (expr->type) {
     case kExprStar:
       inprint("*", num_indent);
+      printColumnQualifiers(expr, num_indent);
       break;
     case kExprColumnRef:
       inprint(expr->name, num_indent);
-      if (expr->table) {
-        inprint("Table:", num_indent + 1);
-        inprint(expr->table, num_indent + 2);
-      }
+      printColumnQualifiers(expr, num_indent);
       break;
     // case kExprTableColumnRef: inprint(expr->table, expr->name, num_indent); break;
     case kExprLiteralFloat:
@@ -121,14 +129,30 @@ void printExpression(Expr* expr, uintmax_t num_indent) {
       inprint(expr->name, num_indent);
       break;
     case kExprLiteralDate:
-      inprint(expr->name, num_indent);
+      inprint(expr->isCurrentDatetime ? "CURRENT_DATE" : expr->name, num_indent);
+      break;
+    case kExprLiteralTime:
+      inprint(expr->isCurrentDatetime ? "CURRENT_TIME" : expr->name, num_indent);
+      if (expr->isCurrentDatetime && expr->ival >= 0) {
+        inprint(expr->ival, num_indent + 1);
+      }
+      break;
+    case kExprLiteralTimestamp:
+      inprint(expr->isCurrentDatetime ? "CURRENT_TIMESTAMP" : expr->name, num_indent);
+      if (expr->isCurrentDatetime && expr->ival >= 0) {
+        inprint(expr->ival, num_indent + 1);
+      }
       break;
     case kExprLiteralNull:
       inprint("NULL", num_indent);
       break;
     case kExprLiteralInterval:
       inprint("INTERVAL", num_indent);
-      inprint(expr->ival, num_indent + 1);
+      if (expr->name) {
+        inprint(expr->name, num_indent + 1);
+      } else {
+        inprint(expr->ival, num_indent + 1);
+      }
       inprint(expr->datetimeField, num_indent + 1);
       break;
     case kExprFunctionRef:
@@ -492,7 +516,11 @@ std::ostream& operator<<(std::ostream& os, const OperatorType& op) {
 std::ostream& operator<<(std::ostream& os, const DatetimeField& datetime) {
   static const std::map<const DatetimeField, const std::string> operatorToToken = {
       {kDatetimeNone, "None"}, {kDatetimeSecond, "SECOND"}, {kDatetimeMinute, "MINUTE"}, {kDatetimeHour, "HOUR"},
-      {kDatetimeDay, "DAY"},   {kDatetimeMonth, "MONTH"},   {kDatetimeYear, "YEAR"}};
+      {kDatetimeDay, "DAY"},   {kDatetimeMonth, "MONTH"},   {kDatetimeYear, "YEAR"},
+      {kIntervalYearToMonth, "YEAR TO MONTH"},   {kIntervalDayToHour, "DAY TO HOUR"},
+      {kIntervalDayToMinute, "DAY TO MINUTE"},   {kIntervalDayToSecond, "DAY TO SECOND"},
+      {kIntervalHourToMinute, "HOUR TO MINUTE"}, {kIntervalHourToSecond, "HOUR TO SECOND"},
+      {kIntervalMinuteToSecond, "MINUTE TO SECOND"}};
 
   const auto found = operatorToToken.find(datetime);
   if (found == operatorToToken.cend()) {

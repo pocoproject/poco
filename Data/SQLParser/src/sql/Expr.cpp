@@ -57,6 +57,7 @@ Expr::Expr(ExprType type)
       datetimeField(kDatetimeNone),
       columnType(DataType::UNKNOWN, 0),
       isBoolLiteral(false),
+      isCurrentDatetime(false),
       opType(kOpNone),
       distinct(false),
       windowDescription(nullptr),
@@ -186,12 +187,37 @@ Expr* Expr::makeNullLiteral() {
 Expr* Expr::makeDateLiteral(char* string) {
   Expr* e = new Expr(kExprLiteralDate);
   e->name = string;
+  e->isCurrentDatetime = (string == nullptr);
+  if (e->isCurrentDatetime) e->ival = -1;
+  return e;
+}
+
+Expr* Expr::makeTimeLiteral(char* string) {
+  Expr* e = new Expr(kExprLiteralTime);
+  e->name = string;
+  e->isCurrentDatetime = (string == nullptr);
+  if (e->isCurrentDatetime) e->ival = -1;
+  return e;
+}
+
+Expr* Expr::makeTimestampLiteral(char* string) {
+  Expr* e = new Expr(kExprLiteralTimestamp);
+  e->name = string;
+  e->isCurrentDatetime = (string == nullptr);
+  if (e->isCurrentDatetime) e->ival = -1;
   return e;
 }
 
 Expr* Expr::makeIntervalLiteral(int64_t duration, DatetimeField unit) {
   Expr* e = new Expr(kExprLiteralInterval);
   e->ival = duration;
+  e->datetimeField = unit;
+  return e;
+}
+
+Expr* Expr::makeIntervalLiteral(char* value, DatetimeField unit) {
+  Expr* e = new Expr(kExprLiteralInterval);
+  e->name = value;
   e->datetimeField = unit;
   return e;
 }
@@ -206,6 +232,14 @@ Expr* Expr::makeColumnRef(char* table, char* name) {
   Expr* e = new Expr(kExprColumnRef);
   e->name = name;
   e->table = table;
+  return e;
+}
+
+Expr* Expr::makeColumnRef(char* schema, char* table, char* name) {
+  Expr* e = new Expr(kExprColumnRef);
+  e->name = name;
+  e->table = table;
+  e->schema = schema;
   return e;
 }
 
@@ -320,7 +354,8 @@ bool Expr::isType(ExprType exprType) const { return exprType == type; }
 bool Expr::isLiteral() const {
   return isType(kExprLiteralInt) || isType(kExprLiteralFloat) || isType(kExprLiteralString) || isType(kExprParameter) ||
          isType(kExprParameterDollar) || isType(kExprParameterNamed) ||
-         isType(kExprLiteralNull) || isType(kExprLiteralDate) || isType(kExprLiteralInterval);
+         isType(kExprLiteralNull) || isType(kExprLiteralDate) || isType(kExprLiteralTime) ||
+         isType(kExprLiteralTimestamp) || isType(kExprLiteralInterval);
 }
 
 bool Expr::hasAlias() const { return alias != nullptr; }

@@ -7,14 +7,16 @@
 
 namespace hsql {
 
-ColumnType::ColumnType(DataType data_type, int64_t length, int64_t precision, int64_t scale)
-    : data_type(data_type), length(length), precision(precision), scale(scale) {}
+ColumnType::ColumnType(DataType data_type, int64_t length, int64_t precision, int64_t scale,
+                       DatetimeField datetime_field)
+    : data_type(data_type), length(length), precision(precision), scale(scale), datetime_field(datetime_field) {}
 
 bool operator==(const ColumnType& lhs, const ColumnType& rhs) {
   if (lhs.data_type != rhs.data_type) {
     return false;
   }
-  return lhs.length == rhs.length && lhs.precision == rhs.precision && lhs.scale == rhs.scale;
+  return lhs.length == rhs.length && lhs.precision == rhs.precision && lhs.scale == rhs.scale &&
+         lhs.datetime_field == rhs.datetime_field;
 }
 
 bool operator!=(const ColumnType& lhs, const ColumnType& rhs) { return !(lhs == rhs); }
@@ -62,6 +64,12 @@ std::ostream& operator<<(std::ostream& stream, const ColumnType& column_type) {
       break;
     case DataType::TIME:
       stream << "TIME";
+      break;
+    case DataType::INTERVAL:
+      stream << "INTERVAL";
+      if (column_type.datetime_field != kDatetimeNone) {
+        stream << " " << column_type.datetime_field;
+      }
       break;
     case DataType::SMALLINT:
       stream << "SMALLINT";
@@ -286,6 +294,16 @@ WithDescription::~WithDescription() {
   delete select;
 }
 
+// LockingClause
+LockingClause::~LockingClause() {
+  if (tables) {
+    for (char* table : *tables) {
+      free(table);
+    }
+    delete tables;
+  }
+}
+
 // SelectStatement
 SelectStatement::SelectStatement()
     : SQLStatement(kStmtSelect),
@@ -341,16 +359,16 @@ SelectStatement::~SelectStatement() {
 
   if (lockings) {
     for (LockingClause* lockingClause : *lockings) {
-      if (lockingClause->tables) {
-        for (char* dtable : *lockingClause->tables) {
-          free(dtable);
-        }
-        delete lockingClause->tables;
-      }
       delete lockingClause;
     }
     delete lockings;
   }
+}
+
+// UpdateClause
+UpdateClause::~UpdateClause() {
+  free(column);
+  delete value;
 }
 
 // UpdateStatement
@@ -362,8 +380,6 @@ UpdateStatement::~UpdateStatement() {
 
   if (updates) {
     for (UpdateClause* update : *updates) {
-      free(update->column);
-      delete update->value;
       delete update;
     }
     delete updates;

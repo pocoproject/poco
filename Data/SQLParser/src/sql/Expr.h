@@ -20,6 +20,8 @@ enum ExprType {
   kExprLiteralInt,
   kExprLiteralNull,
   kExprLiteralDate,
+  kExprLiteralTime,
+  kExprLiteralTimestamp,
   kExprLiteralInterval,
   kExprStar,
   kExprParameter,
@@ -84,16 +86,6 @@ enum OperatorType {
   kOpPrior
 };
 
-enum DatetimeField {
-  kDatetimeNone,
-  kDatetimeSecond,
-  kDatetimeMinute,
-  kDatetimeHour,
-  kDatetimeDay,
-  kDatetimeMonth,
-  kDatetimeYear,
-};
-
 // Description of the frame clause within a window expression.
 enum FrameBoundType { kFollowing, kPreceding, kCurrentRow };
 struct FrameBound {
@@ -152,6 +144,13 @@ struct SQLParser_API Expr {
   ColumnType columnType;
   bool isBoolLiteral;
 
+  // Set on a date, time or timestamp literal that stands for the current value,
+  // i.e. CURRENT_DATE, CURRENT_TIME or CURRENT_TIMESTAMP. name is nullptr then;
+  // ival holds the fractional seconds precision given in parentheses to
+  // CURRENT_TIME or CURRENT_TIMESTAMP, and -1 when none is given, which is
+  // always the case for CURRENT_DATE.
+  bool isCurrentDatetime;
+
   OperatorType opType;
   bool distinct;
 
@@ -202,13 +201,23 @@ struct SQLParser_API Expr {
 
   static Expr* makeNullLiteral();
 
+  // A null val makes the literal stand for the current date, time or timestamp.
   static Expr* makeDateLiteral(char* val);
 
+  static Expr* makeTimeLiteral(char* val);
+
+  static Expr* makeTimestampLiteral(char* val);
+
   static Expr* makeIntervalLiteral(int64_t duration, DatetimeField unit);
+
+  // For a field range such as YEAR TO MONTH, whose value is a formatted string.
+  static Expr* makeIntervalLiteral(char* value, DatetimeField unit);
 
   static Expr* makeColumnRef(char* name);
 
   static Expr* makeColumnRef(char* table, char* name);
+
+  static Expr* makeColumnRef(char* schema, char* table, char* name);
 
   static Expr* makeStar(void);
 
