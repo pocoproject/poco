@@ -30,6 +30,8 @@ public:
 	void testBufVecAndBufferOverloadsRefused();
 	void testNB();
 	void testHandshakeTimeout();
+	void testServerDropsPlainClient();
+	void testClientLeavesPlainServer();
 	void testLazyHandshake();
 	void testBindClient();
 	void testBindClientIPv6();

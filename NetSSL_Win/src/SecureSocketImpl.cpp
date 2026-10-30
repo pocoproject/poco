@@ -496,8 +496,6 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		int dataSize = dataToSend;
 		if (dataSize > _streamSizes.cbMaximumMessage)
 			dataSize = _streamSizes.cbMaximumMessage;
-		SecBuffer* pDataBuffer  = nullptr;
-		SecBuffer* pExtraBuffer = nullptr;
 
 		if (_sendBuffer.size() < _sendBufferPending + dataSize +  _streamSizes.cbHeader + _streamSizes.cbTrailer)
 		{
@@ -1020,6 +1018,9 @@ void SecureSocketImpl::stateClientHandshakeLoopRecv()
 	if (n > 0) 
 	{
 		_recvBufferOffset += n;
+		// the records of a peer that does not speak TLS would never be complete
+		if (!isRecordStart(*_recvBuffer.begin()))
+			throw SSLException("Handshake failure", "the peer does not send TLS records");
 		// NOTE: InitializeSecurityContext() will fail with SEC_E_INVALID_TOKEN
 		// if provided with a buffer containing incomplete records, rather than returning
 		// SEC_E_INCOMPLETE_MESSAGE. Therefore we have to make sure that we
@@ -1276,6 +1277,11 @@ void SecureSocketImpl::stateServerHandshakeLoopRecv()
 	if (n > 0) 
 	{
 		_recvBufferOffset += n;
+		// Schannel takes any five bytes for a record header and may wait for the rest of the
+		// record, also from a peer that does not speak TLS at all, such as a plain syslog or
+		// HTTP client.
+		if (!isRecordStart(*_recvBuffer.begin()))
+			throw SSLException("Handshake failure", "the peer does not send TLS records");
 		setState(ST_SERVER_HSK_LOOP_PROCESS);
 	}
 }
@@ -1430,6 +1436,17 @@ bool SecureSocketImpl::bufferHasCompleteRecords(const BYTE* pBuffer, int length)
 }
 
 
+bool SecureSocketImpl::isRecordStart(BYTE firstByte)
+{
+	// TLS records have the content types 20 to 24; a first byte with the high
+	// bit set begins an SSL 2.0 header, which is left to Schannel.
+	constexpr BYTE FIRST_CONTENT_TYPE = 20;
+	constexpr BYTE LAST_CONTENT_TYPE = 24;
+	constexpr BYTE SSL2_HEADER_BIT = 0x80;
+	return (firstByte >= FIRST_CONTENT_TYPE && firstByte <= LAST_CONTENT_TYPE) || (firstByte & SSL2_HEADER_BIT) != 0;
+}
+
+
 void SecureSocketImpl::initClientCredentials()
 {
 	_pOwnCertificate = loadCertificate(false);
@@ -1448,7 +1465,9 @@ SECURITY_STATUS SecureSocketImpl::doHandshake()
 {
 	while (_state != ST_DONE && _state != ST_ERROR)
 	{
-		stateMachine();
+		// On a blocking socket a step waits for its I/O or throws: a step that keeps the state
+		// has sent part of a token or received part of a record, and only the state ends the handshake.
+		(void) stateMachine();
 	}
 	return _securityStatus;
 }

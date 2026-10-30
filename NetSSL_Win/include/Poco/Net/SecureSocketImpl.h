@@ -318,6 +318,8 @@ protected:
 	void drainExtraBuffer();
 	[[nodiscard]] static int recordLength(const BYTE* pBuffer, int length);
 	[[nodiscard]] static bool bufferHasCompleteRecords(const BYTE* pBuffer, int length);
+	[[nodiscard]] static bool isRecordStart(BYTE firstByte);
+		/// Returns true if the byte can begin a TLS record or an SSL 2.0 header.
 
 	void initClientCredentials();
 	void initServerCredentials();
