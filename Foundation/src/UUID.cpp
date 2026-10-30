@@ -139,6 +139,8 @@ bool UUID::tryParse(const std::string& uuid)
 		else
 			return false;
 	}
+	else if (uuid.size() != 32)
+		return false;
 
 	UUID newUUID;
 	std::string::const_iterator it = uuid.begin();
