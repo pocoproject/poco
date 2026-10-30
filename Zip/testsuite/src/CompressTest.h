@@ -29,6 +29,7 @@ public:
 	void testManipulator();
 	void testManipulatorDel();
 	void testManipulatorReplace();
+	void testManipulatorZip64DataDescriptor();
 	void testSetZipComment();
 
 	static constexpr Poco::UInt64 KB = 1024;
