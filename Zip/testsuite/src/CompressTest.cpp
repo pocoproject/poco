@@ -19,6 +19,7 @@
 #include "CppUnit/TestSuite.h"
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 
 
 using namespace Poco::Zip;
@@ -121,6 +122,42 @@ void CompressTest::testManipulatorReplace()
 }
 
 
+void CompressTest::testManipulatorZip64DataDescriptor()
+{
+	const std::string zipFile(Poco::Path::temp() + "zip64dd.zip");
+	{
+		// A non-seekable output with forced Zip64 writes a Zip64 data descriptor after each entry.
+		Poco::FileOutputStream out(zipFile, std::ios::trunc);
+		Compress c(out, false, true);
+		c.addFile(ZipTest::getTestFile("data", "test.zip"), "first.zip");
+		c.addFile(ZipTest::getTestFile("data", "data.zip"), "second.zip");
+		ZipArchive a(c.close());
+	}
+	{
+		ZipManipulator zm(zipFile, false);
+		zm.renameFile("first.zip", "renamed.zip");
+		ZipArchive archive = zm.commit();
+	}
+	Poco::FileInputStream in(zipFile);
+	ZipArchive archive(in);
+	int entries = 0;
+	for (ZipArchive::FileInfos::const_iterator it = archive.fileInfoBegin(); it != archive.fileInfoEnd(); ++it)
+	{
+		// The central directory must point at the local header of each entry.
+		char signature[ZipCommon::HEADER_SIZE];
+		in.clear();
+		in.seekg(static_cast<std::streamoff>(it->second.getOffset()));
+		in.read(signature, ZipCommon::HEADER_SIZE);
+		assertTrue (in.gcount() == ZipCommon::HEADER_SIZE);
+		assertTrue (std::memcmp(signature, ZipLocalFileHeader::HEADER, ZipCommon::HEADER_SIZE) == 0);
+		++entries;
+	}
+	assertEqual (2, entries);
+	in.close();
+	Poco::File(zipFile).remove();
+}
+
+
 void CompressTest::testSetZipComment()
 {
 	std::string comment("Testing...123...");
@@ -213,6 +250,7 @@ CppUnit::Test* CompressTest::suite()
 	CppUnit_addTest(pSuite, CompressTest, testManipulator);
 	CppUnit_addTest(pSuite, CompressTest, testManipulatorDel);
 	CppUnit_addTest(pSuite, CompressTest, testManipulatorReplace);
+	CppUnit_addTest(pSuite, CompressTest, testManipulatorZip64DataDescriptor);
 	CppUnit_addTest(pSuite, CompressTest, testSetZipComment);
 	CppUnit_addTest(pSuite, CompressTest, testZip64);
 

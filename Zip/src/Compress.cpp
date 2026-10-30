@@ -165,7 +165,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 		{
 			ZipDataInfo64 info(in, false);
 			_out.write(info.getRawHeader(), static_cast<std::streamsize>(info.getFullHeaderSize()));
-			_offset += ZipDataInfo::getFullHeaderSize();
+			_offset += ZipDataInfo64::getFullHeaderSize();
 		}
 		else
 		{
