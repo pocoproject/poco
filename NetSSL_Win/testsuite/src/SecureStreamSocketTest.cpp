@@ -158,6 +158,95 @@ namespace
 		Poco::FastMutex _mutex;
 		std::string _received;
 	};
+
+	class HandshakeServer: public Poco::Runnable
+		/// Takes one connection and makes the TLS handshake with it.
+	{
+	public:
+		HandshakeServer():
+			_socket(SocketAddress("127.0.0.1", 0))
+		{
+		}
+
+		[[nodiscard]] Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		[[nodiscard]] bool failed() const
+			/// Returns true if the handshake ended with an SSLException.
+			/// Valid after the thread running the server has been joined.
+		{
+			return _failed;
+		}
+
+		void run() override
+		{
+			try
+			{
+				SecureStreamSocket socket(_socket.acceptConnection());
+				socket.completeHandshake();
+			}
+			catch (Poco::Net::SSLException&)
+			{
+				_failed = true;
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+
+	private:
+		SecureServerSocket _socket;
+		bool _failed = false;
+	};
+
+	class PlainServer: public Poco::Runnable
+		/// Takes one connection and answers the first data with a plain
+		/// HTTP response.
+	{
+	public:
+		PlainServer():
+			_socket(SocketAddress("127.0.0.1", 0))
+		{
+		}
+
+		[[nodiscard]] Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		[[nodiscard]] bool clientDone() const
+			/// Returns true if the client closed the connection, or sent
+			/// something, within ten seconds of the response.
+			/// Valid after the thread running the server has been joined.
+		{
+			return _clientDone;
+		}
+
+		void run() override
+		{
+			try
+			{
+				StreamSocket socket = _socket.acceptConnection();
+				socket.setReceiveTimeout(Poco::Timespan(10, 0));
+				char buffer[1024];
+				if (socket.receiveBytes(buffer, sizeof(buffer)) > 0)
+				{
+					const std::string response("HTTP/1.1 400 Bad Request\r\n\r\n");
+					socket.sendBytes(response.data(), static_cast<int>(response.size()));
+					_clientDone = socket.poll(Poco::Timespan(10, 0), Socket::SELECT_READ);
+				}
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+
+	private:
+		Poco::Net::ServerSocket _socket;
+		bool _clientDone = false;
+	};
 }
 
 
@@ -365,6 +454,49 @@ void SecureStreamSocketTest::testHandshakeTimeout()
 	thread.join();
 	assertEqual (std::string("timeout"), outcome);
 	assertTrue (server.received().empty());
+}
+
+
+void SecureStreamSocketTest::testServerDropsPlainClient()
+{
+	HandshakeServer server;
+	Thread thread;
+	thread.start(server);
+
+	// the start of a plain HTTP request reads like the header of a record of 8239 bytes
+	StreamSocket client(SocketAddress("127.0.0.1", server.port()));
+	const std::string request("GET / HTTP/1.1\r\n\r\n");
+	client.sendBytes(request.data(), static_cast<int>(request.size()));
+	// the server closes the connection when its handshake has ended
+	const bool dropped = client.poll(Poco::Timespan(10, 0), Socket::SELECT_READ);
+	client.close();
+	thread.join();
+	assertTrue (dropped);
+	assertTrue (server.failed());
+}
+
+
+void SecureStreamSocketTest::testClientLeavesPlainServer()
+{
+	PlainServer server;
+	Thread thread;
+	thread.start(server);
+
+	// the server keeps the connection open after its response
+	SecureStreamSocket client;
+	bool failed = false;
+	try
+	{
+		client.connect(SocketAddress("127.0.0.1", server.port()));
+	}
+	catch (Poco::Net::SSLException&)
+	{
+		failed = true;
+	}
+	client.close();
+	thread.join();
+	assertTrue (failed);
+	assertTrue (server.clientDone());
 }
 
 
@@ -637,6 +769,8 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testBufVecAndBufferOverloadsRefused);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testServerDropsPlainClient);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testClientLeavesPlainServer);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLazyHandshake);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testBindClient);
 #if defined(POCO_HAVE_IPv6)
