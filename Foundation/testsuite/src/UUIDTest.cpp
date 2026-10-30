@@ -98,6 +98,17 @@ void UUIDTest::testParse()
 	catch (Poco::SyntaxException&)
 	{
 	}
+
+	try
+	{
+		uuid.parse("495cff3aa4b311ee9e549cb6d0f68b51AA");
+		fail("invalid Poco::UUID - must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	assertFalse (uuid.tryParse("495cff3aa4b311ee9e549cb6d0f68b51AAAA"));
 }
 
 
