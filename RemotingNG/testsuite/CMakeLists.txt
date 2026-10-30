@@ -31,3 +31,8 @@ target_link_libraries(RemotingNG-testrunner PUBLIC Poco::RemotingNG CppUnit)
 target_include_directories(RemotingNG-testrunner
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	add_subdirectory(OptionalConsumer)
+	add_dependencies(RemotingNG-testrunner OptionalConsumer)
+endif()

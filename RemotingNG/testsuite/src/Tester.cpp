@@ -184,7 +184,7 @@ Poco::Optional<std::string> Tester::testPocoOptional(const Poco::Optional<std::s
 }
 
 
-#if __cplusplus >= 201703L
+#if POCO_HAVE_CPP17_COMPILER
 std::optional<std::string> Tester::testStdOptional(const std::optional<std::string>& value)
 {
 	return value;

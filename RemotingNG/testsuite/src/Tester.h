@@ -33,7 +33,7 @@
 #include <list>
 #include <set>
 #include <array>
-#if __cplusplus >= 201703L
+#if POCO_HAVE_CPP17_COMPILER
 #include <optional>
 #endif
 #include <memory>
@@ -142,7 +142,7 @@ struct Struct7
 struct Struct8
 {
 	Poco::Optional<std::string> pocoOptional;
-#if __cplusplus >= 201703L
+#if POCO_HAVE_CPP17_COMPILER
 	std::optional<std::string> stdOptional;
 #endif
 };
@@ -287,7 +287,7 @@ public:
 
 	Poco::Optional<std::string> testPocoOptional(const Poco::Optional<std::string>& value);
 
-#if __cplusplus >= 201703L
+#if POCO_HAVE_CPP17_COMPILER
 	std::optional<std::string> testStdOptional(const std::optional<std::string>& value);
 #endif
 

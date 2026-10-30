@@ -185,9 +185,15 @@
 //	#define POCO_HAVE_SENDFILE
 #endif
 
-#define POCO_HAVE_CPP17_COMPILER (__cplusplus >= 201703L)
-#define POCO_HAVE_CPP20_COMPILER (__cplusplus >= 202002L)
-#define POCO_HAVE_CPP23_COMPILER (__cplusplus >= 202302L)
+// MSVC sets __cplusplus to the standard only with /Zc:__cplusplus, _MSVC_LANG always.
+#if defined(_MSVC_LANG)
+	#define POCO_CPLUSPLUS _MSVC_LANG
+#else
+	#define POCO_CPLUSPLUS __cplusplus
+#endif
+#define POCO_HAVE_CPP17_COMPILER (POCO_CPLUSPLUS >= 201703L)
+#define POCO_HAVE_CPP20_COMPILER (POCO_CPLUSPLUS >= 202002L)
+#define POCO_HAVE_CPP23_COMPILER (POCO_CPLUSPLUS >= 202302L)
 
 #if (POCO_HAVE_CPP20_COMPILER)
 #include <version>
