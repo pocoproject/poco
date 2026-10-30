@@ -21,6 +21,7 @@ using Poco::Net::POP3ClientSession;
 using Poco::Net::MessageHeader;
 using Poco::Net::MailMessage;
 using Poco::Net::POP3Exception;
+using Poco::InvalidArgumentException;
 
 
 POP3ClientSessionTest::POP3ClientSessionTest(const std::string& name): CppUnit::TestCase(name)
@@ -269,6 +270,79 @@ void POP3ClientSessionTest::testDeleteMessage()
 }
 
 
+void POP3ClientSessionTest::testSendCommandLineBreak()
+{
+	DialogServer server;
+	server.addResponse("+OK POP3 Ready...");
+	server.addResponse("+OK USER");
+	server.addResponse("+OK PASS");
+	server.addResponse("+OK QUIT");
+	POP3ClientSession session("127.0.0.1", server.port());
+	session.setTimeout(Poco::Timespan(5, 0));
+	session.login("user", "secret");
+	server.clearCommands();
+
+	std::string response;
+	for (const char* bad: {"NO\rOP", "NO\nOP"})
+	{
+		try
+		{
+			session.sendCommand(bad, response);
+			fail("line break in command - must throw");
+		}
+		catch (InvalidArgumentException&)
+		{
+		}
+		try
+		{
+			session.sendCommand(bad, "1", response);
+			fail("line break in command - must throw");
+		}
+		catch (InvalidArgumentException&)
+		{
+		}
+		try
+		{
+			session.sendCommand("LIST", bad, response);
+			fail("line break in argument - must throw");
+		}
+		catch (InvalidArgumentException&)
+		{
+		}
+		try
+		{
+			session.sendCommand(bad, "1", "10", response);
+			fail("line break in command - must throw");
+		}
+		catch (InvalidArgumentException&)
+		{
+		}
+		try
+		{
+			session.sendCommand("TOP", bad, "10", response);
+			fail("line break in first argument - must throw");
+		}
+		catch (InvalidArgumentException&)
+		{
+		}
+		try
+		{
+			session.sendCommand("TOP", "1", bad, response);
+			fail("line break in second argument - must throw");
+		}
+		catch (InvalidArgumentException&)
+		{
+		}
+	}
+
+	// None of the rejected commands reached the server.
+	session.close();
+	std::string cmd = server.popCommandWait();
+	assertTrue (cmd == "QUIT");
+	assertTrue (server.popCommand().empty());
+}
+
+
 void POP3ClientSessionTest::setUp()
 {
 }
@@ -291,6 +365,7 @@ CppUnit::Test* POP3ClientSessionTest::suite()
 	CppUnit_addTest(pSuite, POP3ClientSessionTest, testRetrieveHeader);
 	CppUnit_addTest(pSuite, POP3ClientSessionTest, testRetrieveMessages);
 	CppUnit_addTest(pSuite, POP3ClientSessionTest, testDeleteMessage);
+	CppUnit_addTest(pSuite, POP3ClientSessionTest, testSendCommandLineBreak);
 
 	return pSuite;
 }
