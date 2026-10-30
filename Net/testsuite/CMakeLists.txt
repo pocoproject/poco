@@ -26,3 +26,8 @@ else()
 	)
 endif()
 target_link_libraries(Net-testrunner PUBLIC Poco::Net CppUnit)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	add_subdirectory(UnixLocalConsumer)
+	add_dependencies(Net-testrunner UnixLocalConsumer)
+endif()

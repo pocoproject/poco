@@ -25,9 +25,7 @@ classes and class templates from the STL are supported:
   * <[std::unique_ptr]>
   * <[std::optional]> (C++17)
 
-Note: For `std::optional` support, the compiler must identify itself as C++17 compiler
-by defining the `__cplusplus` built-in macro to a value >= `201703L`. For Visual C++,
-the `/Zc:__cplusplus` option must be passed to the compiler to enable this.
+Note: For `std::optional` support, the code must be compiled as C++17 or later.
 
 The following types from the POCO C++ Libraries are supported as well:
 

@@ -38,7 +38,7 @@
 #include <set>
 #include <unordered_set>
 #include <array>
-#if __cplusplus >= 201703L
+#if POCO_HAVE_CPP17_COMPILER
 #include <optional>
 #endif
 #include <memory>
@@ -273,7 +273,7 @@ public:
 };
 
 
-#if __cplusplus >= 201703L
+#if POCO_HAVE_CPP17_COMPILER
 
 
 template <typename T>
@@ -292,7 +292,7 @@ public:
 };
 
 
-#endif // __cplusplus >= 201703L
+#endif // POCO_HAVE_CPP17_COMPILER
 
 
 template <typename T>
