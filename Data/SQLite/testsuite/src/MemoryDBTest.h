@@ -29,6 +29,8 @@ public:
 	void testPersistAndReload();
 	void testManualFlushAndDirty();
 	void testDestructorFlush();
+	void testSessionClosed();
+	void testSessionClosedShards();
 	void testShardingBySize();
 	void testActiveOnlyRewrite();
 	void testUpdateSealedRow();

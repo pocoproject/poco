@@ -13,6 +13,7 @@
 
 
 #include "Poco/Data/SQLite/SQLiteStatementImpl.h"
+#include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/String.h"
@@ -58,6 +59,12 @@ void SQLiteStatementImpl::compileImpl()
 	{
 		_bindBegin = bindings().begin();
 	}
+
+	// The session may have been closed and opened again since the statement
+	// was created: compile on the connection it has now.
+	auto* pSession = dynamic_cast<SessionImpl*>(&session());
+	if (pSession != nullptr) _pDB = pSession->handle();
+	poco_check_ptr (_pDB);
 
 	std::string statement(toString());
 

@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SQLite/Connector.h"
+#include "Poco/Data/SQLite/Notifier.h"
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/NumberFormatter.h"
@@ -25,6 +26,7 @@
 
 using Poco::Data::Session;
 using Poco::Data::SQLite::Connector;
+using Poco::Data::SQLite::Notifier;
 using namespace Poco::Data::Keywords;
 
 
@@ -130,11 +132,45 @@ void SQLiteThreadSafetyTest::testRaceHasNextVsAttach()
 }
 
 
+void SQLiteThreadSafetyTest::testRaceHookRegistration()
+{
+	constexpr int THREAD_COUNT = 4;
+	constexpr int ROUNDS = 500;
+	std::atomic<int> failures{0};
+	std::vector<std::thread> threads;
+	for (int t = 0; t < THREAD_COUNT; ++t)
+	{
+		threads.emplace_back([&failures](int n)
+		{
+			for (int i = 0; i < n; ++i)
+			{
+				try
+				{
+					Session session(Connector::KEY, ":memory:");
+					Notifier notifier(session);
+					if (!notifier.updateEnabled() || !notifier.commitEnabled() || !notifier.rollbackEnabled())
+						++failures;
+					if (!notifier.disableAll())
+						++failures;
+				}
+				catch (...)
+				{
+					++failures;
+				}
+			}
+		}, ROUNDS);
+	}
+	for (auto& thread: threads) thread.join();
+	assertTrue (failures.load() == 0);
+}
+
+
 CppUnit::Test* SQLiteThreadSafetyTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SQLiteThreadSafetyTest");
 
 	CppUnit_addTest(pSuite, SQLiteThreadSafetyTest, testRaceHasNextVsAttach);
+	CppUnit_addTest(pSuite, SQLiteThreadSafetyTest, testRaceHookRegistration);
 
 	return pSuite;
 }

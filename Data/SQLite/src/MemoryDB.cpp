@@ -559,7 +559,9 @@ MemoryDB::~MemoryDB()
 	try { _timer.stop(); }
 	catch (...) {}
 
-	if (_memHandle)
+	// If session() lost its connection, _memHandle may be freed: leave it alone,
+	// and let the final flush below fail (see session()).
+	if (_memHandle != nullptr && !_memClosed.load(std::memory_order_acquire))
 	{
 		sqlite3_trace_v2(_memHandle, SQLITE_TRACE_STMT, nullptr, nullptr);
 		sqlite3_update_hook(_memHandle, nullptr, nullptr);
@@ -631,7 +633,7 @@ bool MemoryDB::mentionsWithoutRowid(std::string_view sql)
 
 void MemoryDB::registerHooks()
 {
-	sqlite3_trace_v2(_memHandle, SQLITE_TRACE_STMT, &MemoryDB::traceCallback, this);
+	sqlite3_trace_v2(_memHandle, SQLITE_TRACE_STMT | SQLITE_TRACE_CLOSE, &MemoryDB::traceCallback, this);
 	sqlite3_update_hook(_memHandle, &MemoryDB::updateCallback, this);
 }
 
@@ -1056,6 +1058,13 @@ void MemoryDB::throwIfRejected() const
 }
 
 
+void MemoryDB::checkSession() const
+{
+	if (_memClosed.load(std::memory_order_acquire))
+		throw Poco::IllegalStateException("MemoryDB: session() was closed");
+}
+
+
 bool MemoryDB::collidesWithVirtualPrefix(const std::string& name)
 {
 	Poco::FastMutex::ScopedLock l(_stateMutex);
@@ -1379,6 +1388,8 @@ void MemoryDB::sweepDetached()
 
 std::string MemoryDB::attachArchived(Poco::UInt32 shardId)
 {
+	checkSession();
+
 	// Coordination layers (also see the comment block on the mutex declarations
 	// in MemoryDB.h):
 	//   _attachMutex (recursive) serializes our own attach/detach/historyView
@@ -1432,6 +1443,8 @@ std::string MemoryDB::attachArchived(Poco::UInt32 shardId)
 
 void MemoryDB::detachArchived(Poco::UInt32 shardId)
 {
+	checkSession();
+
 	// SQLite refuses DETACH while the attached btree is in any transaction
 	// state, and a busy statement - even one reading only main - holds read
 	// transactions on all attached btrees while it steps, so under load the
@@ -1460,6 +1473,7 @@ void MemoryDB::detachArchived(Poco::UInt32 shardId)
 
 void MemoryDB::deleteShard(Poco::UInt32 shardId)
 {
+	checkSession();
 	Poco::Mutex::ScopedLock fl(_flushMutex);
 
 	std::string file;
@@ -1876,6 +1890,7 @@ void MemoryDB::writeCatalog(int schemaVersion, const std::vector<std::string>& s
 
 std::size_t MemoryDB::enforceRetention()
 {
+	checkSession();
 	Poco::Mutex::ScopedLock fl(_flushMutex);
 
 	std::vector<ShardDescriptor> all = shards();
@@ -1948,6 +1963,7 @@ std::size_t MemoryDB::enforceRetention()
 
 std::size_t MemoryDB::dropOlderThan(const Poco::Timestamp& cutoff)
 {
+	checkSession();
 	Poco::Mutex::ScopedLock fl(_flushMutex);
 	std::vector<Poco::UInt32> drop;
 	for (const auto& d: shards())
@@ -1958,6 +1974,7 @@ std::size_t MemoryDB::dropOlderThan(const Poco::Timestamp& cutoff)
 
 std::size_t MemoryDB::dropToFit(Poco::UInt64 maxTotalBytes)
 {
+	checkSession();
 	Poco::Mutex::ScopedLock fl(_flushMutex);
 	std::vector<ShardDescriptor> all = shards();
 	Poco::UInt64 total = 0;
@@ -1974,6 +1991,7 @@ std::size_t MemoryDB::dropToFit(Poco::UInt64 maxTotalBytes)
 
 void MemoryDB::attachAllArchived()
 {
+	checkSession();
 	Poco::Mutex::ScopedLock al(_attachMutex);
 	std::vector<Poco::UInt32> ids = archivedShardIds();
 	for (auto id: ids) attachArchived(id); // attachArchived is no-op-safe if already attached
@@ -1982,6 +2000,7 @@ void MemoryDB::attachAllArchived()
 
 std::string MemoryDB::historyView(const std::string& table)
 {
+	checkSession();
 	Poco::Mutex::ScopedLock al(_attachMutex);
 	if (_opts.loadArchivedShards)
 	{
@@ -2004,6 +2023,7 @@ std::string MemoryDB::historyView(const std::string& table)
 std::string MemoryDB::historyView(const std::string& table,
 	const Poco::Timestamp& from, const Poco::Timestamp& to)
 {
+	checkSession();
 	Poco::Mutex::ScopedLock al(_attachMutex);
 	if (_opts.loadArchivedShards) return historyView(table);
 
@@ -2142,6 +2162,7 @@ void MemoryDB::detachAllArchived()
 	// count. Caller is responsible for ensuring no other thread still relies
 	// on these aliases (the docstring above says "useful after a burst of
 	// history queries to release the per-shard SQLite page caches").
+	checkSession();
 	Poco::Mutex::ScopedLock al(_attachMutex);
 	std::vector<Poco::UInt32> ids;
 	for (const auto& kv: _attached) ids.push_back(kv.first);
@@ -2173,6 +2194,11 @@ int MemoryDB::traceCallback(unsigned type, void* ctx, void* /*p*/, void* x)
 		const char* sql = static_cast<const char*>(x);
 		try { static_cast<MemoryDB*>(ctx)->onStatement(sql); }
 		catch (...) {}
+	}
+	else if (type == SQLITE_TRACE_CLOSE && ctx != nullptr)
+	{
+		// session() is closing the connection the hooks are on
+		static_cast<MemoryDB*>(ctx)->_memClosed.store(true, std::memory_order_release);
 	}
 	return 0;
 }
@@ -2460,6 +2486,7 @@ void MemoryDB::onRowChange(int op, const char* table, Poco::Int64 row)
 void MemoryDB::onTimer(Poco::Timer&)
 {
 	if (_poisoned.load(std::memory_order_acquire)) return;
+	if (_memClosed.load(std::memory_order_acquire)) return; // nothing can be flushed (see session())
 	bool go = false;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
@@ -2510,6 +2537,7 @@ void MemoryDB::retryDeferredRemovals()
 	// The retry leaves _flushing alone: a flush() that comes in meanwhile waits
 	// for _flushMutex and then flushes, instead of returning at once. While a
 	// flush or another removal holds the mutex, the retry is left to them.
+	checkSession();
 	Poco::Mutex::ScopedLockWithUnlock fl(_flushMutex, std::try_to_lock);
 	if (!fl.ownsLock()) return;
 	_retryPending.store(false, std::memory_order_release);
@@ -2695,6 +2723,8 @@ void MemoryDB::maybeSeal(const std::vector<std::string>& tables,
 
 void MemoryDB::doFlush(bool allowSeal)
 {
+	checkSession();
+
 	// Skip-if-busy gate: if another doFlush is in progress (timer, user, or
 	// destructor), bail immediately rather than queue up on _flushMutex. The
 	// in-progress flush will persist everything written before it started; this

@@ -63,12 +63,18 @@ public:
 		/// In-memory system database can be queried and updated but can not
 		/// be dropped. It may be used for other purposes
 		/// in the future.
+		///
+		/// Throws InvalidAccessException if the session is already connected.
 
 	void close() override;
 		/// Closes the session.
+		/// Disables the callbacks registered with the connection first (see
+		/// Utility::registerUpdateHandler()), so SQLite rolls back a transaction
+		/// in progress without notifying it.
 
 	void reset() override;
-		/// Do nothing
+		/// Disables the callbacks registered with the connection, so that a
+		/// pooled session goes back to its pool without them.
 
 	[[nodiscard]] bool isConnected() const override;
 		/// Returns true if connected, false otherwise.
@@ -76,6 +82,8 @@ public:
 	void setConnectionTimeout(std::size_t timeout) override;
 		/// Sets the session connection timeout value.
 		/// Timeout value is in seconds.
+		/// The connections opened later by open() or reconnect() get it too.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] std::size_t getConnectionTimeout() const override;
 		/// Returns the session connection timeout value.
@@ -95,6 +103,7 @@ public:
 
 	[[nodiscard]] bool isTransaction() const override;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+		/// Returns false once the session is closed.
 
 	void setTransactionIsolation(Poco::UInt32 ti) override;
 		/// Sets the transaction isolation level.
@@ -121,6 +130,8 @@ public:
 
 	[[nodiscard]] bool isAutoCommit(const std::string& name="") const;
 		/// Returns autocommit property value.
+		/// Returns true if the session is not connected: without a connection,
+		/// no transaction can be open.
 
 	void setTransactionType(TransactionType transactionType);
 		/// Sets begin transaction type for the session.
@@ -131,15 +142,28 @@ public:
 	[[nodiscard]] const std::string& connectorName() const override;
 		/// Returns the name of the connector.
 
+	[[nodiscard]] Poco::Any getHandle(const std::string& name = "") const;
+		/// Returns the native handle of the current connection, the "handle"
+		/// property. Reads it under the session mutex, which open() and close()
+		/// hold while they change it.
+
 protected:
 	void setConnectionTimeout(const std::string& prop, const Poco::Any& value);
+		/// Sets the "connectionTimeout" property, the timeout in seconds, given as
+		/// an int, the type getConnectionTimeout(prop) returns, or as a std::size_t.
+
 	[[nodiscard]] Poco::Any getConnectionTimeout(const std::string& prop) const;
+		/// Returns the "connectionTimeout" property, the timeout in seconds, as an int.
 
 	void setTransactionType(const std::string &prop, const Poco::Any& value);
 	[[nodiscard]] Poco::Any getTransactionType(const std::string& prop) const;
 
 private:
 	void setName();
+
+	[[nodiscard]] sqlite3* handle() const;
+		/// Returns the handle of the current connection, or nullptr
+		/// if the session is not connected.
 
 	std::string _connector;
 	sqlite3*    _pDB;
@@ -157,6 +181,8 @@ private:
 	static const std::string SQLITE_READ_UNCOMMITTED;
 	static const std::string SQLITE_READ_COMMITTED;
 	Poco::UInt32 _transactionIsolationLevel;
+
+	friend class SQLiteStatementImpl;
 };
 
 

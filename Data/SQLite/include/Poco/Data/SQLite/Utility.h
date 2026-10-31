@@ -37,6 +37,10 @@ extern "C"
 namespace Poco::Data::SQLite {
 
 
+class SessionImpl;
+class Notifier;
+
+
 class SQLite_API Utility
 	/// Various utility functions for SQLite.
 {
@@ -66,7 +70,10 @@ public:
 	static const int OPERATION_UPDATE;
 
 	[[nodiscard]] static sqlite3* dbHandle(const Session& session);
-		/// Returns native DB handle.
+		/// Returns the native handle of the session's current connection, or nullptr
+		/// if the session is not connected. The handle changes when the session is
+		/// closed, opened or reconnected.
+		/// Throws NullPointerException if the session was moved from.
 
 	static int setAttachedLimit(Session& session, int newVal);
 		/// Sets the per-connection limit on the number of databases that can
@@ -82,6 +89,7 @@ public:
 		/// SQLITE_MAX_ATTACHED (compile-time constant, default 10, SQLite
 		/// hard ceiling 125); requests above the compile-time cap are
 		/// silently clamped to it by SQLite. Returns the previous value.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] static std::string lastError(sqlite3* pDB);
 		/// Retreives the last error code from sqlite and converts it to a string.
@@ -94,30 +102,35 @@ public:
 
 	[[nodiscard]] static MetaColumn::ColumnDataType getColumnType(sqlite3_stmt* pStmt, std::size_t pos);
 		/// Returns column data type.
+		/// Throws NullPointerException if pStmt is null.
 
 	static bool fileToMemory(sqlite3* pInMemory, const std::string& fileName);
 		/// Loads the contents of a database file on disk into an opened
 		/// database in memory.
 		///
 		/// Returns true if succesful.
+		/// Throws NullPointerException if pInMemory is null.
 
 	static bool fileToMemory(const Session& session, const std::string& fileName);
 		/// Loads the contents of a database file on disk into an opened
 		/// database in memory.
 		///
 		/// Returns true if succesful.
+		/// Throws NullPointerException if the session is not connected.
 
 	static bool memoryToFile(const std::string& fileName, sqlite3* pInMemory);
 		/// Saves the contents of an opened database in memory to the
 		/// database on disk.
 		///
 		/// Returns true if succesful.
+		/// Throws NullPointerException if pInMemory is null.
 
 	static bool memoryToFile(const std::string& fileName, const Session& session);
 		/// Saves the contents of an opened database in memory to the
 		/// database on disk.
 		///
 		/// Returns true if succesful.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] static bool isThreadSafe();
 		/// Returns true if SQLite was compiled in multi-thread or serialized mode.
@@ -151,55 +164,29 @@ public:
 	static bool registerUpdateHandler(sqlite3* pDB, CBT callbackFn, T* pParam)
 		/// Registers the callback for (1)(insert, delete, update), (2)(commit) or
 		/// or (3)(rollback) events. Only one function per group can be registered
-		/// at a time. Registration is not thread-safe. Storage pointed to by pParam
-		/// must remain valid as long as registration is active. Registering with
-		/// callbackFn set to zero disables notifications.
+		/// at a time; a registration replaces the one before it. Storage pointed to
+		/// by pParam must remain valid as long as registration is active.
+		/// Registering with callbackFn set to zero disables the notifications of
+		/// the group if they were registered with pParam, and returns false if they
+		/// were not; a registration made with another pParam stays in place.
+		/// Disabling uses the connection only if they were, so pDB may be the handle
+		/// of a connection closed before; the connection must not be closed while
+		/// another thread registers or disables a callback of it.
+		/// Closing the session, or returning it to its pool, disables all
+		/// notifications of its connection.
+		/// Throws NullPointerException if pDB is null and callbackFn is not zero.
 		///
 		/// See http://www.sqlite.org/c3ref/update_hook.html and
 		/// http://www.sqlite.org/c3ref/commit_hook.html for details.
 	{
-		typedef std::pair<CBT, T*> CBPair;
-		typedef std::multimap<sqlite3*, CBPair> CBMap;
-		typedef typename CBMap::iterator CBMapIt;
-		typedef std::pair<CBMapIt, CBMapIt> CBMapItPair;
-
-		static CBMap retMap;
-		T* pRet = reinterpret_cast<T*>(eventHookRegister(pDB, callbackFn, pParam));
-
-		if (pRet == nullptr)
-		{
-			if (retMap.find(pDB) == retMap.end())
-			{
-				retMap.insert(std::make_pair(pDB, CBPair(callbackFn, pParam)));
-				return true;
-			}
-		}
-		else
-		{
-			CBMapItPair retMapRange = retMap.equal_range(pDB);
-			for (CBMapIt it = retMapRange.first; it != retMapRange.second; ++it)
-			{
-				poco_assert (it->second.first != nullptr);
-				if ((callbackFn == nullptr) && (*pRet == *it->second.second))
-				{
-					retMap.erase(it);
-					return true;
-				}
-
-				if ((callbackFn == it->second.first) && (*pRet == *it->second.second))
-				{
-					it->second.second = pParam;
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return eventHookRegister(pDB, callbackFn, pParam);
 	}
 
 	template <typename T, typename CBT>
 	static bool registerUpdateHandler(const Session& session, CBT callbackFn, T* pParam)
 		/// Registers the callback by calling registerUpdateHandler(sqlite3*, CBT, T*).
+		/// Throws NullPointerException if the session was moved from, or if callbackFn
+		/// is not zero and the session is not connected.
 	{
 		return registerUpdateHandler(dbHandle(session), callbackFn, pParam);
 	}
@@ -229,13 +216,28 @@ private:
 	Utility(const Utility&) = delete;
 	Utility& operator = (const Utility&) = delete;
 
-	static void* eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam);
-	static void* eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam);
-	static void* eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, void* pParam);
+	[[nodiscard]] static bool eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam);
+	[[nodiscard]] static bool eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam);
+	[[nodiscard]] static bool eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, void* pParam);
+
+	static void unregisterUpdateHandlers(sqlite3* pDB);
+		/// Disables the update, commit and rollback callbacks of the connection
+		/// and removes their registrations. Called by SessionImpl before it closes
+		/// the connection or the session goes back to its pool. Does not throw.
+
+	[[nodiscard]] static int registeredHooks(sqlite3* pDB, const void* pParam);
+		/// Returns the callbacks of the connection registered with pParam: 1 for
+		/// update, 2 for commit and 4 for rollback callbacks, as Notifier's
+		/// SQLITE_NOTIFY_UPDATE, SQLITE_NOTIFY_COMMIT and SQLITE_NOTIFY_ROLLBACK.
+		/// Returns 0 if pDB is null. Uses pDB only to look the registrations up,
+		/// so it may be the handle of a connection closed before.
 
 	static TypeMap     _types;
 	static Poco::Mutex _mutex;
 	static int         _threadMode;
+
+	friend class Poco::Data::SQLite::SessionImpl;
+	friend class Poco::Data::SQLite::Notifier;
 };
 
 

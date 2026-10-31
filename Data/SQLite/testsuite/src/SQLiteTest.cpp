@@ -16,8 +16,10 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/Data/RowFilter.h"
 #include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SessionFactory.h"
+#include "Poco/Data/SessionPool.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/Notifier.h"
@@ -42,14 +44,18 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Delegate.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/Bugcheck.h"
 #include <iostream>
 
 
 using namespace std::string_literals;
 using namespace Poco::Data::Keywords;
 using Poco::Data::Session;
+using Poco::Data::SessionPool;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
+using Poco::Data::RowFilter;
 using Poco::Data::Column;
 using Poco::Data::Row;
 using Poco::Data::SQLChannel;
@@ -259,6 +265,128 @@ RecordSet getRecordsetCopyRVO(Session& session, const std::string& sql)
 	// return temp copy (RVO)
 	RecordSet recordSet(select);
 	return recordSet;
+}
+
+
+namespace
+{
+	class CountingErrorHandler: public Poco::ErrorHandler
+		/// Counts the exceptions passed to Poco::ErrorHandler while it exists.
+	{
+	public:
+		CountingErrorHandler();
+		~CountingErrorHandler() override;
+		CountingErrorHandler(const CountingErrorHandler&) = delete;
+		CountingErrorHandler& operator = (const CountingErrorHandler&) = delete;
+		CountingErrorHandler(CountingErrorHandler&&) = delete;
+		CountingErrorHandler& operator = (CountingErrorHandler&&) = delete;
+
+		void exception(const Poco::Exception&) override;
+		void exception(const std::exception&) override;
+		void exception() override;
+
+		[[nodiscard]] int count() const;
+			/// Returns the number of exceptions counted so far.
+
+	private:
+		int _count = 0;
+		Poco::ErrorHandler* _pPrevious;
+	};
+
+
+	CountingErrorHandler::CountingErrorHandler():
+		_pPrevious(Poco::ErrorHandler::set(this))
+	{
+	}
+
+
+	CountingErrorHandler::~CountingErrorHandler()
+	{
+		try
+		{
+			Poco::ErrorHandler::set(_pPrevious);
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
+	}
+
+
+	void CountingErrorHandler::exception(const Poco::Exception&)
+	{
+		++_count;
+	}
+
+
+	void CountingErrorHandler::exception(const std::exception&)
+	{
+		++_count;
+	}
+
+
+	void CountingErrorHandler::exception()
+	{
+		++_count;
+	}
+
+
+	int CountingErrorHandler::count() const
+	{
+		return _count;
+	}
+
+
+	[[noreturn]] void throwingHandler(const void*)
+	{
+		throw Poco::RuntimeException("event handler failed");
+	}
+
+
+	class SessionCloser
+		/// An event handler that enables and disables the callbacks of a Notifier
+		/// on another session, and then closes that session.
+	{
+	public:
+		SessionCloser() = delete;
+		explicit SessionCloser(Session& session);
+		~SessionCloser() = default;
+		SessionCloser(const SessionCloser&) = delete;
+		SessionCloser& operator = (const SessionCloser&) = delete;
+		SessionCloser(SessionCloser&&) = delete;
+		SessionCloser& operator = (SessionCloser&&) = delete;
+
+		void onInsert(const void*);
+
+		[[nodiscard]] int calls() const;
+			/// Returns the number of times onInsert() has been called.
+
+	private:
+		Session& _session;
+		int _calls = 0;
+	};
+
+
+	SessionCloser::SessionCloser(Session& session):
+		_session(session)
+	{
+	}
+
+
+	void SessionCloser::onInsert(const void*)
+	{
+		{
+			Notifier notifier(_session);
+		}
+		_session.close();
+		++_calls;
+	}
+
+
+	int SessionCloser::calls() const
+	{
+		return _calls;
+	}
 }
 
 
@@ -3069,6 +3197,338 @@ void SQLiteTest::testReconnect()
 }
 
 
+void SQLiteTest::testClosedSession()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE Person (LastName VARCHAR(30),"
+		"FirstName VARCHAR(30),"
+		"Address VARCHAR(30),"
+		"Age INTEGER)", now;
+
+	int count = -1;
+	Statement stmt = (session << "SELECT COUNT(*) FROM PERSON", into(count));
+	stmt.execute();
+	assertTrue (count == 0);
+
+	// closing the session ends the transaction in progress
+	session.begin();
+	assertTrue (session.isTransaction());
+	session.close();
+	assertTrue (!session.isConnected());
+	assertTrue (!session.isTransaction());
+
+	try
+	{
+		stmt.execute();
+		fail ("must fail");
+	}
+	catch (NotConnectedException&) { }
+
+	try
+	{
+		session.begin();
+		fail ("must fail");
+	}
+	catch (NotConnectedException&) { }
+
+	// without a connection, no transaction can be open
+	assertTrue (session.getFeature("autoCommit"));
+	{
+		Transaction trans(session, false);
+		assertTrue (!trans.isActive());
+	}
+
+	try
+	{
+		Transaction trans(session);
+		fail ("must fail");
+	}
+	catch (NotConnectedException&) { }
+
+	try
+	{
+		session.setConnectionTimeout(5);
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+
+	session.open();
+	assertTrue (session.isConnected());
+	assertTrue (!session.isTransaction());
+	assertTrue (session.getFeature("autoCommit"));
+	session.setConnectionTimeout(5);
+	assertTrue (session.getConnectionTimeout() == 5);
+
+	// the statement compiled before close() runs on the new connection
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	stmt.execute();
+	assertTrue (count == 1);
+
+	Transaction trans(session);
+	assertTrue (trans.isActive());
+	trans.rollback();
+}
+
+
+void SQLiteTest::testSessionHandle()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE Person (LastName VARCHAR(30),"
+		"FirstName VARCHAR(30),"
+		"Address VARCHAR(30),"
+		"Age INTEGER)", now;
+	assertTrue (Utility::dbHandle(session) != nullptr);
+
+	session.close();
+	assertTrue (Utility::dbHandle(session) == nullptr);
+
+	try
+	{
+		Utility::setAttachedLimit(session, 5);
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+
+	try
+	{
+		Utility::fileToMemory(session, "dummy.db");
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+
+	try
+	{
+		Utility::memoryToFile("dsk.db", session);
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+
+	Poco::Int64 val = 2;
+	try
+	{
+		Utility::registerUpdateHandler(session, &sqliteUpdateCallbackFn, &val);
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+
+	// disabling needs no connection: close() has disabled everything
+	assertTrue (!Utility::registerUpdateHandler(session, static_cast<Utility::UpdateCallbackType>(nullptr), &val));
+
+	try
+	{
+		Notifier notifier(session);
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+
+	{
+		// nothing to enable, so nothing needs the connection
+		Notifier notifier(session, static_cast<Notifier::EnabledEventType>(0));
+		assertTrue (!notifier.updateEnabled());
+		assertTrue (notifier.disableAll());
+	}
+
+	// after open(), dbHandle() returns the handle of the new connection
+	session.open();
+	assertTrue (Utility::dbHandle(session) != nullptr);
+	_insertCounter = 0;
+	assertTrue (Utility::registerUpdateHandler(session, &sqliteUpdateCallbackFn, &val));
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	assertTrue (_insertCounter == 1);
+	assertTrue (Utility::registerUpdateHandler(session, static_cast<Utility::UpdateCallbackType>(nullptr), &val));
+
+	Session moved(std::move(session));
+	assertTrue (Utility::dbHandle(moved) != nullptr);
+	try
+	{
+		(void) Utility::dbHandle(session);
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+}
+
+
+void SQLiteTest::testRecordSetCopyFilter()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS Ages", now;
+	session << "CREATE TABLE Ages (Name VARCHAR(30), Age INTEGER)", now;
+	session << "INSERT INTO Ages VALUES ('Lisa', 10), ('Marge', 40)", now;
+
+	Statement stmt = (session << "SELECT Name, Age FROM Ages ORDER BY Age", now);
+	RecordSet rs(stmt);
+	RowFilter::Ptr pYoung = new RowFilter(&rs);
+	pYoung->add("Age", RowFilter::VALUE_LESS_THAN, 30);
+	RecordSet young(rs);
+	assertTrue (1 == young.rowCount());
+
+	// another filter for the original leaves the copy filtered by the first one
+	RowFilter::Ptr pOld = new RowFilter(&rs);
+	pOld->add("Age", RowFilter::VALUE_GREATER_THAN, 30);
+	assertTrue (1 == young.rowCount());
+	assertTrue (young.moveFirst());
+	assertTrue (young["Name"].convert<std::string>() == "Lisa");
+	assertTrue (1 == rs.rowCount());
+	assertTrue (rs.moveFirst());
+	assertTrue (rs["Name"].convert<std::string>() == "Marge");
+}
+
+
+void SQLiteTest::testRecordSetFilterOwnRows()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS Ages", now;
+	session << "CREATE TABLE Ages (Name VARCHAR(30), Age INTEGER)", now;
+	session << "INSERT INTO Ages VALUES ('Lisa', 10), ('Marge', 40)", now;
+
+	Statement stmt = (session << "SELECT Name, Age FROM Ages ORDER BY Age", now);
+	RecordSet rs(stmt);
+	RowFilter::Ptr pYoung = new RowFilter(&rs);
+	pYoung->add("Age", RowFilter::VALUE_LESS_THAN, 30);
+	RecordSet young(rs);
+
+	// the original gets the rows of another query; the copy keeps its rows and
+	// shares the filter, which each recordset applies to its own rows
+	Statement desc = (session << "SELECT Name, Age FROM Ages ORDER BY Age DESC", now);
+	rs.reset(desc);
+	assertTrue (1 == young.rowCount());
+	assertTrue (young.moveFirst());
+	assertTrue (young["Name"].convert<std::string>() == "Lisa");
+	assertTrue (1 == rs.rowCount());
+	assertTrue (rs.moveFirst());
+	assertTrue (rs["Name"].convert<std::string>() == "Lisa");
+}
+
+
+void SQLiteTest::testOpenConnected()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	sqlite3* pDB = Utility::dbHandle(session);
+
+	try
+	{
+		session.open();
+		fail ("must fail");
+	}
+	catch (InvalidAccessException&) { }
+
+	// the session's own connection string does not open a second connection either
+	try
+	{
+		session.open(session.impl()->connectionString());
+		fail ("must fail");
+	}
+	catch (InvalidAccessException&) { }
+
+	assertTrue (session.isConnected());
+	assertTrue (Utility::dbHandle(session) == pDB);
+	int one = 0;
+	session << "SELECT 1", into(one), now;
+	assertTrue (one == 1);
+}
+
+
+void SQLiteTest::testReconnectTimeout()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session.setConnectionTimeout(5);
+
+	session.reconnect();
+	assertTrue (session.getConnectionTimeout() == 5);
+
+	// the new connection waits for a lock as long as the old one did
+	int timeout = 0;
+	session << "PRAGMA busy_timeout", into(timeout), now;
+	assertTrue (timeout == 5000);
+}
+
+
+void SQLiteTest::testStatementAfterReconnect()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE Person (LastName VARCHAR(30),"
+		"FirstName VARCHAR(30),"
+		"Address VARCHAR(30),"
+		"Age INTEGER)", now;
+
+	// not compiled yet: nothing keeps the old connection after reconnect()
+	int count = -1;
+	Statement stmt = (session << "SELECT COUNT(*) FROM PERSON", into(count));
+	session.reconnect();
+	stmt.execute();
+	assertTrue (count == 0);
+
+	// compiled: runs on the connection the session has now
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	session.reconnect();
+	stmt.execute();
+	assertTrue (count == 1);
+}
+
+
+void SQLiteTest::testColumnTypeNullStatement()
+{
+	try
+	{
+		(void) Utility::getColumnType(nullptr, 0);
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+}
+
+
+void SQLiteTest::testFileToMemoryError()
+{
+	{
+		Session file (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+		file << "DROP TABLE IF EXISTS Person", now;
+		file << "CREATE TABLE Person (LastName VARCHAR(30),"
+			"FirstName VARCHAR(30),"
+			"Address VARCHAR(30),"
+			"Age INTEGER)", now;
+	}
+
+	// the backup cannot write into a database that has a transaction open
+	Session mem (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	mem << "CREATE TABLE Strings (str VARCHAR(30))", now;
+	mem.begin();
+	mem << "INSERT INTO Strings VALUES('busy')", now;
+	assertTrue (!Utility::fileToMemory(mem, "dummy.db"));
+	mem.rollback();
+
+	assertTrue (Utility::fileToMemory(mem, "dummy.db"));
+}
+
+
+void SQLiteTest::testPooledConnectionTimeout()
+{
+	SessionPool pool(Poco::Data::SQLite::Connector::KEY, "dummy.db", 1, 1, 60, 3);
+	{
+		// the property reads back as an int, which the pool sets back when the session is returned
+		CountingErrorHandler errorHandler;
+		{
+			Session session(pool.get("connectionTimeout", static_cast<std::size_t>(5)));
+			assertTrue (session.getConnectionTimeout() == 5);
+		}
+		assertTrue (errorHandler.count() == 0);
+	}
+	assertTrue (pool.allocated() == 1);
+	assertTrue (pool.idle() == 1);
+
+	Session session(pool.get());
+	assertTrue (session.getConnectionTimeout() == 3);
+	assertTrue (AnyCast<int>(session.getProperty("connectionTimeout")) == 3);
+	session.setProperty("connectionTimeout", 7);
+	assertTrue (session.getConnectionTimeout() == 7);
+}
+
+
 void SQLiteTest::testThreadModes()
 {
 	using namespace Poco::Data::SQLite;
@@ -3394,6 +3854,311 @@ void SQLiteTest::testNotifier()
 	assertTrue (_rollbackCounter == 1);
 	assertTrue (notifier.getRow() == 0);
 	notifier.rollback -= delegate(this, &SQLiteTest::onRollback);
+}
+
+
+void SQLiteTest::testNotifierClose()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	Notifier notifier(session);
+	notifier.rollback += delegate(this, &SQLiteTest::onRollback);
+	_rollbackCounter = 0;
+	{
+		// a statement keeps the closed connection until it is destroyed
+		int count = -1;
+		Statement stmt = (session << "SELECT COUNT(*) FROM PERSON", into(count));
+		stmt.execute();
+		session.begin();
+		session.close();
+	}
+	// freeing the connection rolled its transaction back: close() had disabled the callbacks
+	assertTrue (_rollbackCounter == 0);
+
+	// enabling registers the callbacks with the new connection
+	session.open();
+	assertTrue (notifier.enableAll());
+	notifier.insert += delegate(this, &SQLiteTest::onInsert);
+	_insertCounter = 0;
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	assertTrue (_insertCounter == 1);
+	session.begin();
+	session.rollback();
+	assertTrue (_rollbackCounter == 1);
+	notifier.insert -= delegate(this, &SQLiteTest::onInsert);
+	notifier.rollback -= delegate(this, &SQLiteTest::onRollback);
+
+	// the destructor of notifier runs after this close()
+	session.close();
+}
+
+
+void SQLiteTest::testNotifierReconnect()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	{
+		Notifier notifier(session);
+		session.reconnect();
+	} // the destructor leaves the new connection alone
+
+	Notifier notifier(session);
+	notifier.insert += delegate(this, &SQLiteTest::onInsert);
+	_insertCounter = 0;
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	assertTrue (_insertCounter == 1);
+	notifier.insert -= delegate(this, &SQLiteTest::onInsert);
+}
+
+
+void SQLiteTest::testNotifierMovedSession()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	Notifier notifier(session);
+	notifier.insert += delegate(this, &SQLiteTest::onInsert);
+	Session moved(std::move(session));
+	_insertCounter = 0;
+	moved << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	assertTrue (_insertCounter == 1);
+
+	// disabling uses the connection the callbacks were registered with, not the moved-from session
+	assertTrue (notifier.disableAll());
+	moved << "INSERT INTO PERSON VALUES('Simpson', 'Lisa', 'Springfield', 10)", now;
+	assertTrue (_insertCounter == 1);
+	notifier.insert -= delegate(this, &SQLiteTest::onInsert);
+}
+
+
+void SQLiteTest::testNotifierRegistry()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	{
+		Notifier first(session, Notifier::SQLITE_NOTIFY_UPDATE);
+		assertTrue (first.updateEnabled());
+		assertTrue (!first.commitEnabled());
+		assertTrue (!first.rollbackEnabled());
+	} // disabling commit and rollback, never enabled, registers nothing
+
+	Notifier notifier(session);
+	assertTrue (notifier.updateEnabled());
+	assertTrue (notifier.commitEnabled());
+	assertTrue (notifier.rollbackEnabled());
+	notifier.insert += delegate(this, &SQLiteTest::onInsert);
+
+	// other replaces the update callback of notifier
+	Notifier other(session, Notifier::SQLITE_NOTIFY_UPDATE);
+	_insertCounter = 0;
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	assertTrue (_insertCounter == 0);
+
+	// notifier takes it back; disabling other then leaves the callback of notifier in place
+	assertTrue (notifier.enableUpdate());
+	assertTrue (other.disableUpdate());
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Lisa', 'Springfield', 10)", now;
+	assertTrue (_insertCounter == 1);
+	notifier.insert -= delegate(this, &SQLiteTest::onInsert);
+}
+
+
+void SQLiteTest::testNotifierPooledSession()
+{
+	SessionPool pool(Poco::Data::SQLite::Connector::KEY, "dummy.db", 1, 1);
+	Session session(pool.get());
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	Notifier notifier(session);
+	notifier.insert += delegate(this, &SQLiteTest::onInsert);
+	notifier.rollback += delegate(this, &SQLiteTest::onRollback);
+	_insertCounter = 0;
+	_rollbackCounter = 0;
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	assertTrue (_insertCounter == 1);
+
+	// closing rolls back the transaction in progress, which is notified,
+	// and the connection goes back to the pool without the callbacks
+	session.begin();
+	session.close();
+	assertTrue (_rollbackCounter == 1);
+	assertTrue (!notifier.updateEnabled());
+	assertTrue (!notifier.rollbackEnabled());
+	Session next(pool.get());
+	next << "INSERT INTO PERSON VALUES('Simpson', 'Lisa', 'Springfield', 10)", now;
+	assertTrue (_insertCounter == 1);
+	next.begin();
+	next.rollback();
+	assertTrue (_rollbackCounter == 1);
+	notifier.insert -= delegate(this, &SQLiteTest::onInsert);
+	notifier.rollback -= delegate(this, &SQLiteTest::onRollback);
+
+	// a transaction begun with SQL is rolled back on closing too, before the callbacks are removed
+	Notifier nextNotifier(next);
+	nextNotifier.rollback += delegate(this, &SQLiteTest::onRollback);
+	next << "BEGIN; INSERT INTO PERSON VALUES('Simpson', 'Maggie', 'Springfield', 1)", now;
+	assertTrue (!next.isTransaction());
+	next.close();
+	assertTrue (_rollbackCounter == 2);
+	nextNotifier.rollback -= delegate(this, &SQLiteTest::onRollback);
+	Session last(pool.get());
+	int count = -1;
+	last << "SELECT COUNT(*) FROM PERSON WHERE FirstName = 'Maggie'", into(count), now;
+	assertTrue (0 == count);
+}
+
+
+void SQLiteTest::testNotifierRegisteredConnection()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	Notifier notifier(session);
+	Notifier other(session, Notifier::SQLITE_NOTIFY_UPDATE);
+	assertTrue (notifier == other);
+
+	{
+		// the statement keeps the first connection, so the next one has another address
+		int one = 0;
+		Statement stmt = (session << "SELECT 1", into(one));
+		stmt.execute();
+		session.close();
+		session.open();
+	}
+	// other registers its callback with the connection the session has now
+	assertTrue (other.enableUpdate());
+	assertTrue (!(notifier == other));
+
+	// the comparison does not use the session, which may have been moved from
+	Session moved(std::move(session));
+	const Notifier& same = other;
+	assertTrue (other == same);
+	assertTrue (!(notifier == other));
+
+	// enabling needs the connection of the session
+	try
+	{
+		Notifier fromMoved(session);
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+
+	moved.close();
+	try
+	{
+		Notifier withValue(moved, Any(42));
+		fail ("must fail");
+	}
+	catch (NullPointerException&) { }
+}
+
+
+void SQLiteTest::testNotifierCallbackException()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	Notifier notifier(session);
+	notifier.insert += Poco::delegate(&throwingHandler);
+	notifier.rollback += Poco::delegate(&throwingHandler);
+	{
+		// the exceptions go to the ErrorHandler, not through SQLite
+		CountingErrorHandler errorHandler;
+		session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+		session.begin();
+		session.rollback();
+		assertTrue (errorHandler.count() == 2);
+	}
+	notifier.insert -= Poco::delegate(&throwingHandler);
+	notifier.rollback -= Poco::delegate(&throwingHandler);
+
+	int count = 0;
+	session << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assertTrue (count == 1);
+}
+
+
+void SQLiteTest::testNotifierEnabledAfterClose()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+
+	Notifier notifier(session);
+	notifier.insert += delegate(this, &SQLiteTest::onInsert);
+	notifier.commit += delegate(this, &SQLiteTest::onCommit);
+	_insertCounter = 0;
+	_commitCounter = 0;
+
+	// reset(), which a pool calls on a session returned to it, removes the
+	// callbacks from the connection and keeps the connection
+	session.impl()->reset();
+	assertTrue (!notifier.updateEnabled());
+	assertTrue (!notifier.commitEnabled());
+	assertTrue (!notifier.rollbackEnabled());
+
+	// enabling one of them again on that connection enables that one only
+	assertTrue (notifier.enableUpdate());
+	assertTrue (notifier.updateEnabled());
+	assertTrue (!notifier.commitEnabled());
+	assertTrue (!notifier.rollbackEnabled());
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	assertTrue (_insertCounter == 1);
+	assertTrue (_commitCounter == 0);
+
+	// closing removes them as well; the new connection may have the address of the old one
+	session.close();
+	assertTrue (!notifier.updateEnabled());
+	assertTrue (!notifier.commitEnabled());
+	assertTrue (!notifier.rollbackEnabled());
+	session.open();
+	assertTrue (notifier.enableCommit());
+	assertTrue (!notifier.updateEnabled());
+	assertTrue (notifier.commitEnabled());
+	assertTrue (!notifier.rollbackEnabled());
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Lisa', 'Springfield', 10)", now;
+	assertTrue (_insertCounter == 1);
+	assertTrue (_commitCounter == 1);
+
+	notifier.insert -= delegate(this, &SQLiteTest::onInsert);
+	notifier.commit -= delegate(this, &SQLiteTest::onCommit);
+}
+
+
+void SQLiteTest::testNotifierFromHandler()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE IF NOT EXISTS Person (LastName VARCHAR(30), FirstName VARCHAR, Address VARCHAR, Age INTEGER(3))", now;
+	Session other (Poco::Data::SQLite::Connector::KEY, ":memory:");
+
+	// SQLite runs the handler with the mutex of the connection held, and the handler
+	// takes the registry mutex; Notifier below takes them in the same order
+	SessionCloser closer(other);
+	Notifier notifier(session);
+	notifier.insert += Poco::delegate(&closer, &SessionCloser::onInsert);
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	notifier.insert -= Poco::delegate(&closer, &SessionCloser::onInsert);
+	assertTrue (closer.calls() == 1);
+	assertTrue (!other.isConnected());
+
+	assertTrue (notifier.updateEnabled());
+	notifier.insert += delegate(this, &SQLiteTest::onInsert);
+	_insertCounter = 0;
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Lisa', 'Springfield', 10)", now;
+	assertTrue (_insertCounter == 1);
+	notifier.insert -= delegate(this, &SQLiteTest::onInsert);
+
+	int count = 0;
+	session << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assertTrue (count == 2);
 }
 
 
@@ -4221,11 +4986,30 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testMultipleResults);
 	CppUnit_addTest(pSuite, SQLiteTest, testPair);
 	CppUnit_addTest(pSuite, SQLiteTest, testReconnect);
+	CppUnit_addTest(pSuite, SQLiteTest, testClosedSession);
+	CppUnit_addTest(pSuite, SQLiteTest, testSessionHandle);
+	CppUnit_addTest(pSuite, SQLiteTest, testRecordSetCopyFilter);
+	CppUnit_addTest(pSuite, SQLiteTest, testRecordSetFilterOwnRows);
+	CppUnit_addTest(pSuite, SQLiteTest, testOpenConnected);
+	CppUnit_addTest(pSuite, SQLiteTest, testReconnectTimeout);
+	CppUnit_addTest(pSuite, SQLiteTest, testStatementAfterReconnect);
+	CppUnit_addTest(pSuite, SQLiteTest, testColumnTypeNullStatement);
+	CppUnit_addTest(pSuite, SQLiteTest, testFileToMemoryError);
+	CppUnit_addTest(pSuite, SQLiteTest, testPooledConnectionTimeout);
 	CppUnit_addTest(pSuite, SQLiteTest, testThreadModes);
 	CppUnit_addTest(pSuite, SQLiteTest, testUpdateCallback);
 	CppUnit_addTest(pSuite, SQLiteTest, testCommitCallback);
 	CppUnit_addTest(pSuite, SQLiteTest, testRollbackCallback);
 	CppUnit_addTest(pSuite, SQLiteTest, testNotifier);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifierClose);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifierReconnect);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifierMovedSession);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifierRegistry);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifierPooledSession);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifierCallbackException);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifierEnabledAfterClose);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifierFromHandler);
+	CppUnit_addTest(pSuite, SQLiteTest, testNotifierRegisteredConnection);
 	CppUnit_addTest(pSuite, SQLiteTest, testSessionTransactionReadCommitted);
 	CppUnit_addTest(pSuite, SQLiteTest, testSessionTransactionReadUncommitted);
 	CppUnit_addTest(pSuite, SQLiteTest, testSessionTransactionSerializable);

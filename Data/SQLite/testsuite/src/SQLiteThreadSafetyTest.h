@@ -59,6 +59,11 @@ public:
 		/// SQLiteStatementImpl.cpp:249 in place, TSan reports nothing;
 		/// without it, TSan reports a race on the Vdbe bytes.
 
+	void testRaceHookRegistration();
+		/// Threads enable and disable Notifier callbacks on connections of their own
+		/// at the same time. The registrations of all connections are kept in one
+		/// table, which the threads change concurrently (TSan: no data race).
+
 	void setUp();
 	void tearDown();
 
