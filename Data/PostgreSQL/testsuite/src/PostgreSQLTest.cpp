@@ -21,10 +21,15 @@
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/PostgreSQL/Connector.h"
 #include "Poco/Data/PostgreSQL/Utility.h"
+#include "Poco/Data/PostgreSQL/SessionHandle.h"
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
 #include "Poco/Nullable.h"
 #include "Poco/Data/DataException.h"
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <sys/resource.h>
+#endif
 #include <iostream>
+#include <memory>
 
 #include "Poco/Data/Transaction.h"
 
@@ -820,6 +825,328 @@ void PostgreSQLTest::testReconnect()
 }
 
 
+void PostgreSQLTest::testClosedSession()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	recreatePersonTable();
+
+	Session session(PostgreSQL::Connector::KEY, _dbConnString);
+	Statement stmt = (session << "DELETE FROM Person");
+
+	// opening a connected session fails and leaves its transaction alone
+	session.begin();
+	try { session.open(_dbConnString); fail ("must fail"); }
+	catch (ConnectionFailedException&) { }
+	assertTrue (session.isTransaction());
+	session.rollback();
+
+	session.setFeature("autoCommit", false);
+	session.close();
+	assertTrue (!session.isConnected());
+
+	try { stmt.execute(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+
+	try { (void) Utility::hostInfo(session); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+
+	// a new connection starts in autocommit mode
+	session.open();
+	assertTrue (session.getFeature("autoCommit"));
+
+	// the asynchronousCommit feature switches synchronous_commit, not autocommit
+	session.setFeature("autoCommit", false);
+	session.setFeature("asynchronousCommit", true);
+	assertTrue (session.getFeature("asynchronousCommit"));
+	assertTrue (!session.getFeature("autoCommit"));
+	std::string synchronousCommit;
+	session << "SELECT current_setting('synchronous_commit')", into(synchronousCommit), now;
+	assertTrue (synchronousCommit == "off");
+}
+
+
+void PostgreSQLTest::testLostConnection()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	Session session(PostgreSQL::Connector::KEY, _dbConnString);
+	int pid = 0;
+	session << "SELECT pg_backend_pid()", into(pid), now;
+	session.begin();
+	assertTrue (session.isTransaction());
+	assertTrue (!session.getFeature("autoCommit"));
+
+	{
+		Session killer(PostgreSQL::Connector::KEY, _dbConnString);
+		bool terminated = false;
+		killer << "SELECT pg_terminate_backend($1)", use(pid), into(terminated), now;
+		assertTrue (terminated);
+	}
+
+	try { session << "SELECT 1", now; fail ("must fail"); }
+	catch (StatementException&) { }
+	assertTrue (!session.isConnected());
+
+	// the server ended the transaction with the connection
+	assertTrue (!session.isTransaction());
+
+	// close() frees the dead connection, and a new connection starts in autocommit mode
+	session.close();
+	PGconn* pConnection = *Utility::handle(session);
+	assertTrue (nullptr == pConnection);
+	session.open();
+	assertTrue (session.isConnected());
+	assertTrue (session.getFeature("autoCommit"));
+	assertTrue (!session.isTransaction());
+
+	// open() without close() drops a dead connection too, and keeps nothing of it
+	session.setFeature("asynchronousCommit", true);
+	session << "SELECT pg_backend_pid()", into(pid), now;
+	{
+		Session killer(PostgreSQL::Connector::KEY, _dbConnString);
+		bool terminated = false;
+		killer << "SELECT pg_terminate_backend($1)", use(pid), into(terminated), now;
+		assertTrue (terminated);
+	}
+
+	try { session << "SELECT 1", now; fail ("must fail"); }
+	catch (StatementException&) { }
+	assertTrue (!session.isConnected());
+
+	session.open();
+	assertTrue (session.isConnected());
+	assertTrue (!session.getFeature("asynchronousCommit"));
+}
+
+
+void PostgreSQLTest::testFailedExecute()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	_pSession->setFeature("autoCommit", true);
+	dropTable("UniqueInts");
+	*_pSession << "CREATE TABLE UniqueInts (i INTEGER PRIMARY KEY)", now;
+
+	// every row is executed on its own; the third one violates the key after the
+	// first two have produced results, and each result must be freed exactly once
+	std::vector<int> ints = {1, 2, 2};
+	{
+		Statement insert(*_pSession);
+		insert << "INSERT INTO UniqueInts VALUES ($1)", use(ints);
+		try { insert.execute(); fail ("must fail"); }
+		catch (StatementException&) { }
+
+		try { insert.execute(); fail ("must fail"); }
+		catch (StatementException&) { }
+	}
+
+	int count = 0;
+	*_pSession << "SELECT COUNT(*) FROM UniqueInts", into(count), now;
+	assertTrue (2 == count);
+	dropTable("UniqueInts");
+}
+
+
+void PostgreSQLTest::testStatementAfterReopen()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	Session session(PostgreSQL::Connector::KEY, _dbConnString);
+	{
+		Statement stmt = (session << "SELECT 1", now);
+		session.close();
+		session.open();
+		session.begin();
+
+		// the server has freed the statement with the connection that prepared it;
+		// executing it fails before it reaches the server, so the transaction goes on
+		try { stmt.execute(); fail ("must fail"); }
+		catch (NotConnectedException&) { }
+		int one = 0;
+		session << "SELECT 1", into(one), now;
+		assertTrue (1 == one);
+	}
+
+	// the transaction ends normally, although a statement of the closed connection was destroyed in it
+	session.commit();
+	assertTrue (session.getFeature("autoCommit"));
+	session.begin();
+	session.rollback();
+}
+
+
+void PostgreSQLTest::testStaleStatementInSQLTransaction()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	Session session(PostgreSQL::Connector::KEY, _dbConnString);
+	{
+		Statement stmt = (session << "SELECT 1", now);
+		session.close();
+		session.open();
+		session << "BEGIN", now;
+	}
+
+	// a DEALLOCATE of the statement of the closed connection would fail on the server
+	// and abort the transaction begun with SQL, which the session does not track
+	int one = 0;
+	session << "SELECT 1", into(one), now;
+	assertTrue (1 == one);
+	session << "ROLLBACK", now;
+}
+
+
+void PostgreSQLTest::testStatementOutlivesSession()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	std::unique_ptr<Statement> pStmt;
+	{
+		Session session(PostgreSQL::Connector::KEY, _dbConnString);
+		pStmt = std::make_unique<Statement>((session << "SELECT 1", now));
+	}
+
+	// destroying the statement does not touch the destroyed session
+	pStmt.reset();
+}
+
+
+namespace
+{
+	void countNotice(void* pCount, const PGresult*)
+	{
+		++*static_cast<int*>(pCount);
+	}
+} // namespace
+
+
+void PostgreSQLTest::testRollbackWithoutTransaction()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	int notices = 0;
+	Session session(PostgreSQL::Connector::KEY, _dbConnString);
+	PGconn* pConnection = *Utility::handle(session);
+	PQsetNoticeReceiver(pConnection, countNotice, &notices);
+
+	// with no transaction block open, nothing is sent to the server,
+	// which would answer a ROLLBACK with a warning
+	session.rollback();
+	assertTrue (0 == notices);
+	assertTrue (!session.isTransaction());
+
+	// a transaction begun with SQL, which the session does not track, is rolled back
+	session << "BEGIN", now;
+	session << "CREATE TEMPORARY TABLE poco_rollback_probe (i INTEGER)", now;
+	session.rollback();
+	assertTrue (0 == notices);
+	int count = -1;
+	session << "SELECT COUNT(*) FROM pg_class WHERE relname = 'poco_rollback_probe'", into(count), now;
+	assertTrue (0 == count);
+}
+
+
+void PostgreSQLTest::testIsolationAfterLostConnection()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	Session session(PostgreSQL::Connector::KEY, _dbConnString);
+	std::string isolation;
+	session << "SELECT current_setting('default_transaction_isolation')", into(isolation), now;
+	assertTrue (isolation == "read committed");
+
+	session.setTransactionIsolation(Session::TRANSACTION_SERIALIZABLE);
+	assertTrue (session.getTransactionIsolation() == Session::TRANSACTION_SERIALIZABLE);
+
+	int pid = 0;
+	session << "SELECT pg_backend_pid()", into(pid), now;
+	{
+		Session killer(PostgreSQL::Connector::KEY, _dbConnString);
+		bool terminated = false;
+		killer << "SELECT pg_terminate_backend($1)", use(pid), into(terminated), now;
+		assertTrue (terminated);
+	}
+
+	try { session << "SELECT 1", now; fail ("must fail"); }
+	catch (StatementException&) { }
+	assertTrue (!session.isConnected());
+
+	// open() without close() drops the dead connection; the new one starts at the default level
+	session.open();
+	assertTrue (session.isConnected());
+	assertTrue (session.getTransactionIsolation() == Session::TRANSACTION_READ_COMMITTED);
+	session << "SELECT current_setting('default_transaction_isolation')", into(isolation), now;
+	assertTrue (isolation == "read committed");
+
+	// so setting the level again reaches the server
+	session.setTransactionIsolation(Session::TRANSACTION_SERIALIZABLE);
+	session << "SELECT current_setting('default_transaction_isolation')", into(isolation), now;
+	assertTrue (isolation == "serializable");
+}
+
+
+void PostgreSQLTest::testCancelFailure()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	Session session(PostgreSQL::Connector::KEY, _dbConnString);
+	PostgreSQL::SessionHandle* pHandle = Utility::handle(session);
+
+	// with no file descriptor to spare, the cancel request cannot open its connection to the server
+	struct rlimit limit{};
+	assertTrue (0 == ::getrlimit(RLIMIT_NOFILE, &limit));
+	struct rlimit noFiles = limit;
+	noFiles.rlim_cur = 0;
+	assertTrue (0 == ::setrlimit(RLIMIT_NOFILE, &noFiles));
+	bool failed = false;
+	try
+	{
+		pHandle->cancel();
+	}
+	catch (StatementException&)
+	{
+		failed = true;
+	}
+	catch (...)
+	{
+		(void) ::setrlimit(RLIMIT_NOFILE, &limit);
+		throw;
+	}
+	assertTrue (0 == ::setrlimit(RLIMIT_NOFILE, &limit));
+	assertTrue (failed);
+
+	// with descriptors available again, the request is sent
+	pHandle->cancel();
+	assertTrue (session.isConnected());
+#endif
+}
+
+
+void PostgreSQLTest::testFailedDeallocate()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	Session session(PostgreSQL::Connector::KEY, _dbConnString);
+	session.begin();
+
+	// destroyed in the transaction, both statements are deallocated when it ends;
+	// by then DEALLOCATE ALL has removed them, which must not make that or a
+	// later commit() or rollback() fail
+	int one = 0;
+	session << "SELECT 1", into(one), now;
+	assertTrue (1 == one);
+	session << "DEALLOCATE ALL", now;
+
+	session.commit();
+	assertTrue (!session.isTransaction());
+	assertTrue (session.getFeature("autoCommit"));
+	session.begin();
+	session.rollback();
+}
+
+
 void PostgreSQLTest::testTransactionWithReconnect()
 {
     if (!_pSession) fail ("Test not available.");
@@ -1422,6 +1749,16 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSessionTransactionNoAutoCommit);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTransaction);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testReconnect);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testClosedSession);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testLostConnection);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testFailedExecute);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testStatementAfterReopen);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testStaleStatementInSQLTransaction);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testStatementOutlivesSession);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testRollbackWithoutTransaction);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testIsolationAfterLostConnection);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testCancelFailure);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testFailedDeallocate);
     CppUnit_addTest(pSuite, PostgreSQLTest, testTransactionWithReconnect);
 
 	return pSuite;

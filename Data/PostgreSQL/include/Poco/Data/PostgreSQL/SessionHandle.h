@@ -18,9 +18,12 @@
 #define SQL_PostgreSQL_SessionHandle_INCLUDED
 
 
+#include "Poco/Data/PostgreSQL/PostgreSQL.h"
 #include "Poco/Mutex.h"
 #include "Poco/Types.h"
+#include <atomic>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <libpq-fe.h>
@@ -72,10 +75,13 @@ private:
 using SessionParametersMap = std::map<std::string, SessionParameters>;
 
 
-class SessionHandle
+class PostgreSQL_API SessionHandle
 	/// PostgreSQL connection(session) handle
 {
 public:
+	using Counter = std::atomic<Poco::UInt32>;
+		/// The type of the counter that generation() returns.
+
 	explicit SessionHandle();
 		/// Creates session handle
 
@@ -106,12 +112,14 @@ public:
 
 	[[nodiscard]] bool isTransaction() const;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+		/// Returns false once the connection is lost, because the server ends the transaction then.
 
 	void commit();
 		/// Commit transaction
 
 	void rollback();
 		/// Rollback trabsaction
+		/// Sends nothing to the server when no transaction block is open there.
 
 	[[nodiscard]] bool isAutoCommit() const;
 		/// is the connection in auto commit mode?
@@ -127,6 +135,7 @@ public:
 
 	void cancel();
 		/// Attempts to cancel in-process statements
+		/// Throws StatementException if the cancel request cannot be sent.
 
 	void setTransactionIsolation(Poco::UInt32 aTI);
 		/// Sets the transaction isolation level.
@@ -140,6 +149,12 @@ public:
 
 	void deallocatePreparedStatement(const std::string& aPreparedStatementToDeAllocate);
 		/// deallocates a previously prepared statement
+
+	[[nodiscard]] std::shared_ptr<const Counter> generation() const;
+		/// Returns the number of times a connection of the handle has been
+		/// closed or reset. The server frees the prepared statements of a
+		/// connection with it, so a statement prepared before the number
+		/// changed must not be executed or deallocated.
 
 	[[nodiscard]] int serverVersion() const;
 		/// remote server version
@@ -194,6 +209,7 @@ private:
 	bool                      _isAsynchronousCommit;
 	Poco::UInt32              _tranactionIsolationLevel;
 	std::vector <std::string> _preparedStatementsToBeDeallocated;
+	std::shared_ptr<Counter>  _pGeneration;
 
 //	static const std::string POSTGRESQL_READ_UNCOMMITTED;  // NOT SUPPORTED
 	static const std::string POSTGRESQL_READ_COMMITTED;
@@ -297,9 +313,17 @@ inline std::string SessionHandle::connectionString() const
 }
 
 
+inline std::shared_ptr<const SessionHandle::Counter> SessionHandle::generation() const
+{
+	return _pGeneration;
+}
+
+
 inline bool SessionHandle::isTransaction() const
 {
-	return _inTransaction;
+	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+
+	return _inTransaction && isConnectedNoLock();
 }
 
 

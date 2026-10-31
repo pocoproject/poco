@@ -72,6 +72,8 @@ namespace Poco::Data::PostgreSQL {
 
 StatementExecutor::StatementExecutor(SessionHandle& sessionHandle, bool binaryExtraction):
 	_sessionHandle(sessionHandle),
+	_pGeneration(sessionHandle.generation()),
+	_generation(*_pGeneration),
 	_binaryExtraction(binaryExtraction),
 	_state(STMT_INITED),
 	_pResultHandle(nullptr),
@@ -84,15 +86,18 @@ StatementExecutor::StatementExecutor(SessionHandle& sessionHandle, bool binaryEx
 
 StatementExecutor::~StatementExecutor()
 {
+	// the result is freed even if removing the prepared statement fails
+	PQResultClear resultClearer(_pResultHandle);
+	_pResultHandle = nullptr;
+
 	try
 	{
-		// remove the prepared statement from the session
-		if(_sessionHandle.isConnected() && _state >= STMT_COMPILED)
+		// remove the prepared statement from the session, unless the server
+		// has freed it with the connection that prepared it
+		if (_state >= STMT_COMPILED && isValid() && _sessionHandle.isConnected())
 		{
 			_sessionHandle.deallocatePreparedStatement(_preparedStatementName);
 		}
-
-		PQResultClear resultClearer(_pResultHandle);
 	}
 	catch (...)
 	{
@@ -132,12 +137,16 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 	const char* pStatementName = statementName.c_str();
 
 	PGresult* ptrPGResult = nullptr;
+	Poco::UInt32 generation = 0;
 
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionHandle.mutex());
 
 		// prepare the statement - temporary PGresult returned
 		ptrPGResult = PQprepare(_sessionHandle, pStatementName, ptrCSQLStatement, (int)countPlaceholdersInSQLStatement, nullptr);
+
+		// the connection the statement is prepared on
+		generation = *_pGeneration;
 	}
 
 	{
@@ -187,6 +196,7 @@ void StatementExecutor::prepare(const std::string& aSQLStatement)
 	_SQLStatement = aSQLStatement;
 	_preparedStatementName = statementName;
 	_countPlaceholdersInSQLStatement = countPlaceholdersInSQLStatement;
+	_generation = generation;
 	_state = STMT_COMPILED;  // must be last
 }
 
@@ -196,6 +206,8 @@ void StatementExecutor::bindParams(const InputParameterVector& anInputParameterV
 	if (!_sessionHandle.isConnected()) throw NotConnectedException();
 
 	if (_state < STMT_COMPILED) throw StatementException("Statement is not compiled yet");
+
+	if (!isValid()) throw NotConnectedException("Statement was prepared on a connection that has been closed");
 
 	if (anInputParameterVector.size() != _countPlaceholdersInSQLStatement)
 	{
@@ -213,6 +225,9 @@ void StatementExecutor::execute()
 	if (!_sessionHandle.isConnected()) throw NotConnectedException();
 
 	if (_state < STMT_COMPILED) throw StatementException("Statement is not compiled yet");
+
+	// refused here, as the server would fail it and abort an open transaction
+	if (!isValid()) throw NotConnectedException("Statement was prepared on a connection that has been closed");
 
 	if (_countPlaceholdersInSQLStatement != 0 &&
 		_inputParameterVector.size() != _countPlaceholdersInSQLStatement)
@@ -413,6 +428,7 @@ void StatementExecutor::clearResults()
 	{
 		PQResultClear resultClearer(_pResultHandle);
 	}
+	_pResultHandle = nullptr;
 
 	_outputParameterVector.clear();
 	_affectedRowCount	= 0;

@@ -55,9 +55,11 @@ public:
 
 	void open(const std::string& aConnectionString = std::string()) override;
 		/// Opens a connection to the database.
+		/// Autocommit is on for the new connection.
 
 	void close() override;
 		/// Closes the connection.
+		/// Also frees a connection that is no longer alive.
 
 	void reset() override;
 		/// Do nothing
@@ -82,6 +84,7 @@ public:
 
 	[[nodiscard]] bool isTransaction() const override;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+		/// Returns false once the connection is lost, because the server ends the transaction then.
 
 	void setTransactionIsolation(Poco::UInt32 aTI) override;
 		/// Sets the transaction isolation level.
@@ -105,6 +108,7 @@ public:
 
 	void setAsynchronousCommit(const std::string&, bool aValue);
 		/// Sets asynchronousCommit property for the session.
+		/// This is what the "asynchronousCommit" feature sets; it does not change autocommit.
 
 	[[nodiscard]] bool isAsynchronousCommit(const std::string& aName = std::string()) const;
 		/// is the connection in Asynchronous commit mode?

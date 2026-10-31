@@ -117,6 +117,16 @@ public:
 	void testSessionTransactionNoAutoCommit();
 	void testTransaction();
 	void testReconnect();
+	void testClosedSession();
+	void testLostConnection();
+	void testFailedExecute();
+	void testStatementAfterReopen();
+	void testStaleStatementInSQLTransaction();
+	void testStatementOutlivesSession();
+	void testRollbackWithoutTransaction();
+	void testIsolationAfterLostConnection();
+	void testCancelFailure();
+	void testFailedDeallocate();
     void testTransactionWithReconnect();
 	void testSqlState();
 
