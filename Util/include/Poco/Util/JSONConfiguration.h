@@ -110,6 +110,10 @@ private:
 	void getIndexes(std::string& name, std::vector<int>& indexes);
 
 	void setValue(const std::string& key, const Poco::Dynamic::Var& value);
+		/// Stores the value and fires propertyChanging and propertyChanged.
+
+	void storeValue(const std::string& key, const Poco::Dynamic::Var& value);
+		/// Stores the value without firing events.
 
 	JSON::Object::Ptr _object;
 };

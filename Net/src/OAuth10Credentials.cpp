@@ -17,6 +17,7 @@
 #include "Poco/Net/HTMLForm.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/HTTPAuthenticationParams.h"
+#include "Poco/DigestEngine.h"
 #include "Poco/SHA1Engine.h"
 #include "Poco/HMACEngine.h"
 #include "Poco/Base64Encoder.h"
@@ -205,7 +206,7 @@ bool OAuth10Credentials::verify(const HTTPRequest& request, const Poco::URI& uri
 			}
 			else throw NotAuthenticatedException("Unsupported OAuth signature method", method);
 
-			return refSignature == signature;
+			return DigestEngine::constantTimeEquals(refSignature, signature);
 		}
 		else throw NotAuthenticatedException("No OAuth credentials found in Authorization header");
 	}

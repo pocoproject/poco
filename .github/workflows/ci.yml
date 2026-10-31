@@ -101,6 +101,12 @@ env:
   POCO_CTEST_COMMON: "--output-on-failure --no-tests=error --output-junit test-report.xml"
   # Sanitizer extra: lift the 300KB output cap so long stack traces survive.
   POCO_CTEST_SANITIZER_EXTRA: "--test-output-size-failed 0 --test-output-truncation tail"
+  # Foundation suites that hold long tests (CppUnit_addLongTest). Long tests run
+  # only with -long, which ctest does not pass; the *-long-tests jobs run these
+  # without an ignore list, so every failure fails the job.
+  POCO_LONG_TEST_SUITES: >-
+    RWLockTest PBKDF2EngineTest FileStreamRWLockTest FileChannelTest
+    MD5EngineTest MD4EngineTest
 
 jobs:
   # Change detection. Narrow-scope jobs gate on
@@ -470,6 +476,28 @@ jobs:
             ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^Foundation$"
       - uses: ./.github/actions/upload-test-report
 
+  # Long tests: the suites of POCO_LONG_TEST_SUITES with -long.
+  linux-gcc-cmake-long-tests:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja
+          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }}
+      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $(nproc)
+      - name: Run Foundation long tests
+        timeout-minutes: 30
+        run: >-
+          cd cmake-build/bin &&
+          POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
+          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
+
   # Clang toolchain exception + C++ modules probe: Foundation + Util smoke.
   linux-clang-21-cmake-modules:
     runs-on: ubuntu-24.04
@@ -817,6 +845,27 @@ jobs:
           ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^Foundation$"
       - uses: ./.github/actions/upload-test-report
 
+  # Long tests on macos-arm64: the suites of POCO_LONG_TEST_SUITES with -long.
+  macos-clang-cmake-long-tests:
+    runs-on: macos-latest
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: >-
+          cmake -S. -Bcmake-build
+          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }}
+      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $(sysctl -n hw.ncpu)
+      - name: Run Foundation long tests
+        timeout-minutes: 30
+        run: >-
+          cd cmake-build/bin &&
+          POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
+          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
+
   # Newer non-Apple compiler probe (brew clang-21). Scope: Foundation + Util
   # + Crypto (exercises the OpenSSL link path implied by the -openssl3 name).
   macos-clang-21-cmake-openssl3:
@@ -1136,6 +1185,29 @@ jobs:
       - uses: ./.github/actions/upload-test-report
         with:
           suffix: ${{ matrix.name }}
+
+  # Long tests on Windows x64: the suites of POCO_LONG_TEST_SUITES with -long.
+  windows-2025-msvc-cmake-long-tests:
+    runs-on: windows-2025
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+      - run: >-
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }}
+      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $env:NUMBER_OF_PROCESSORS
+      - name: Run Foundation long tests
+        timeout-minutes: 30
+        run: >-
+          cd cmake-build/bin;
+          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
 
   # Build-only warnings probe: extra compiler warnings enabled.
   windows-msvc-cmake-warnings:

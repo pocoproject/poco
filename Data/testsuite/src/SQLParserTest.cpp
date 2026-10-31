@@ -21,6 +21,8 @@
 #include "sql/AlterStatement.h"
 #include "sql/DropStatement.h"
 #include "sql/DeleteStatement.h"
+#include "sql/CreateStatement.h"
+#include "sql/InsertStatement.h"
 #include "sql/SelectStatement.h"
 
 
@@ -120,6 +122,20 @@ void SQLParserTest::testTopWithParentheses()
 }
 
 
+void SQLParserTest::testTopWithOffset()
+{
+	// OFFSET alone gives no row count, so TOP keeps its own.
+	SQLParserResult result;
+	SQLParser::parse("SELECT TOP 5 A FROM Test ORDER BY A OFFSET 10;", &result);
+	assertTrue (result.isValid());
+	assertEqual(1, result.size());
+	const auto* select = static_cast<const SelectStatement*>(result.getStatement(0));
+	assertTrue (select->limit != nullptr && select->limit->limit != nullptr && select->limit->offset != nullptr);
+	assertEqual(5, static_cast<int>(select->limit->limit->ival));
+	assertEqual(10, static_cast<int>(select->limit->offset->ival));
+}
+
+
 void SQLParserTest::testOffsetFetchNext()
 {
 	std::string query = "SELECT * FROM Test ORDER BY Id OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;";
@@ -150,6 +166,41 @@ void SQLParserTest::testThreePartTableName()
 	assertTrue(result.isValid());
 	assertEqual(1, result.size());
 	assertTrue(result.getStatement(0)->type() == kStmtSelect);
+}
+
+
+void SQLParserTest::testThreePartColumnName()
+{
+	// A three-part column reference fills schema, table and name; a four-part
+	// one folds database and schema into the schema, as a table name does.
+	std::string query = "SELECT dbo.T.C, mydb.dbo.T.*, T.C2 FROM mydb.dbo.T;";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue (result.isValid());
+	assertEqual(1, result.size());
+	assertTrue (result.getStatement(0)->type() == kStmtSelect);
+	const auto* select = static_cast<const SelectStatement*>(result.getStatement(0));
+	assertTrue (select->selectList != nullptr);
+	assertEqual(3, static_cast<int>(select->selectList->size()));
+
+	const Expr* column = select->selectList->at(0);
+	assertTrue (column->type == kExprColumnRef);
+	assertTrue (column->schema != nullptr && column->table != nullptr && column->name != nullptr);
+	assertEqual(std::string("dbo"), std::string(column->schema));
+	assertEqual(std::string("T"), std::string(column->table));
+	assertEqual(std::string("C"), std::string(column->name));
+
+	const Expr* star = select->selectList->at(1);
+	assertTrue (star->type == kExprStar);
+	assertTrue (star->schema != nullptr && star->table != nullptr);
+	assertEqual(std::string("mydb.dbo"), std::string(star->schema));
+	assertEqual(std::string("T"), std::string(star->table));
+
+	const Expr* twoPart = select->selectList->at(2);
+	assertTrue (twoPart->type == kExprColumnRef);
+	assertTrue (twoPart->schema == nullptr);
+	assertTrue (twoPart->table != nullptr);
+	assertEqual(std::string("T"), std::string(twoPart->table));
 }
 
 
@@ -240,7 +291,13 @@ void SQLParserTest::testDialectStatements()
 		// ODBC outer join escape.
 		"SELECT * FROM {oj Test LEFT OUTER JOIN Other ON Test.Id = Other.Id};",
 		// Scientific notation numeric literals.
-		"SELECT 1.5e3, 1.5E+3, 5e-1, .5e1, 2e10 FROM Test;"
+		"SELECT 1.5e3, 1.5E+3, 5e-1, .5e1, 2e10 FROM Test;",
+		// Parenthesized query expressions in set operations, subqueries and IN.
+		"((SELECT A FROM Test) UNION SELECT B FROM Other);",
+		"(SELECT A FROM Test LIMIT 1) ORDER BY A;",
+		"SELECT A FROM Test UNION (SELECT B FROM Other EXCEPT SELECT C FROM Third) INTERSECT SELECT D FROM Fourth;",
+		"SELECT * FROM Test WHERE A IN ((SELECT X FROM Other) UNION (SELECT Y FROM Other));",
+		"SELECT ((SELECT 1) UNION (SELECT 2) ORDER BY 1 LIMIT 1);"
 	};
 
 	for (const char* query: selects)
@@ -270,14 +327,33 @@ void SQLParserTest::testDialectStatements()
 		assertTrue (result.getStatement(0)->type() == kStmtExecute);
 	}
 
+	// INSERT takes a query expression, also a parenthesized one, with or
+	// without a column list.
+	static const char* const inserts[] =
+	{
+		"INSERT INTO Test (SELECT A FROM Other);",
+		"INSERT INTO Test (A, B) (SELECT A, B FROM Other) UNION ALL (SELECT C, D FROM Third);"
+	};
+
+	for (const char* query: inserts)
+	{
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue (result.isValid());
+		assertEqual(1, result.size());
+		assertTrue (result.getStatement(0)->type() == kStmtInsert);
+	}
+
 	// A window function or an ordered-set aggregate is not a table reference,
 	// and a parenthesized TOP holding a placeholder cannot be combined with
-	// LIMIT: the placeholder is also held by the parameter list.
+	// LIMIT, with or without ORDER BY and a locking clause: the placeholder is
+	// also held by the parameter list.
 	static const char* const invalid[] =
 	{
 		"SELECT * FROM Count(*) OVER (PARTITION BY A);",
 		"SELECT * FROM ListAgg(A, ', ') WITHIN GROUP (ORDER BY B);",
-		"SELECT TOP (?) * FROM Test LIMIT 5;"
+		"SELECT TOP (?) * FROM Test LIMIT 5;",
+		"SELECT TOP (?) A FROM Test ORDER BY A LIMIT 5 FOR UPDATE;"
 	};
 
 	for (const char* query: invalid)
@@ -286,6 +362,168 @@ void SQLParserTest::testDialectStatements()
 		SQLParser::parse(query, &result);
 		assertTrue (!result.isValid());
 	}
+}
+
+
+void SQLParserTest::testSetOperationPrecedence()
+{
+	// INTERSECT binds tighter than UNION and EXCEPT, set operations of the same
+	// level apply from left to right, and parentheses around a single SELECT
+	// change nothing. The select that heads a chain holds its operations in
+	// that order.
+	SQLParserResult except;
+	SQLParser::parse("SELECT A FROM T EXCEPT SELECT B FROM U EXCEPT SELECT C FROM V;", &except);
+	assertTrue (except.isValid());
+	const auto* chain = static_cast<const SelectStatement*>(except.getStatement(0));
+	assertTrue (chain->setOperations != nullptr);
+	assertEqual(2, static_cast<int>(chain->setOperations->size()));
+	assertTrue (chain->setOperations->at(0)->setType == kSetExcept);
+	assertTrue (chain->setOperations->at(1)->setType == kSetExcept);
+
+	SQLParserResult mixed;
+	SQLParser::parse("SELECT A FROM T UNION (SELECT B FROM U) INTERSECT SELECT C FROM V;", &mixed);
+	assertTrue (mixed.isValid());
+	const auto* top = static_cast<const SelectStatement*>(mixed.getStatement(0));
+	assertTrue (top->setOperations != nullptr);
+	assertEqual(1, static_cast<int>(top->setOperations->size()));
+	assertTrue (top->setOperations->at(0)->setType == kSetUnion);
+	const SelectStatement* term = top->setOperations->at(0)->nestedSelectStatement;
+	assertTrue (term != nullptr && term->setOperations != nullptr);
+	assertEqual(1, static_cast<int>(term->setOperations->size()));
+	assertTrue (term->setOperations->at(0)->setType == kSetIntersect);
+}
+
+
+
+void SQLParserTest::testIntervalTypes()
+{
+	// INTERVAL as a column type: bare, with a single field and with a field
+	// range; the same in CAST. A range the standard does not define is rejected.
+	std::string query = "CREATE TABLE T (A INTERVAL, B INTERVAL YEAR, C INTERVAL DAY TO SECOND);"
+		"SELECT CAST('1-2' AS INTERVAL YEAR TO MONTH), CAST(X AS INTERVAL) FROM T;"
+		"SELECT * FROM T WHERE A > INTERVAL '2 04:30' DAY TO MINUTE AND B = INTERVAL '3' YEAR;";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue (result.isValid());
+	assertEqual(3, result.size());
+
+	assertTrue (result.getStatement(0)->type() == kStmtCreate);
+	const auto* create = static_cast<const CreateStatement*>(result.getStatement(0));
+	assertTrue (create->columns != nullptr);
+	assertEqual(3, static_cast<int>(create->columns->size()));
+	assertTrue (create->columns->at(0)->type == ColumnType(DataType::INTERVAL));
+	assertTrue (create->columns->at(1)->type == ColumnType(DataType::INTERVAL, 0, 0, 0, kDatetimeYear));
+	assertTrue (create->columns->at(2)->type == ColumnType(DataType::INTERVAL, 0, 0, 0, kIntervalDayToSecond));
+
+	assertTrue (result.getStatement(1)->type() == kStmtSelect);
+	const auto* select = static_cast<const SelectStatement*>(result.getStatement(1));
+	assertTrue (select->selectList != nullptr);
+	assertTrue (select->selectList->at(0)->type == kExprCast);
+	assertTrue (select->selectList->at(0)->columnType.data_type == DataType::INTERVAL);
+	assertTrue (select->selectList->at(0)->columnType.datetime_field == kIntervalYearToMonth);
+	assertTrue (select->selectList->at(1)->columnType.datetime_field == kDatetimeNone);
+
+	// A range literal keeps its value as the string it is; a single field takes an integer.
+	assertTrue (result.getStatement(2)->type() == kStmtSelect);
+	const Expr* where = static_cast<const SelectStatement*>(result.getStatement(2))->whereClause;
+	assertTrue (where != nullptr && where->expr != nullptr && where->expr2 != nullptr);
+	const Expr* range = where->expr->expr2;
+	assertTrue (range != nullptr);
+	assertTrue (range->type == kExprLiteralInterval);
+	assertTrue (range->name != nullptr);
+	assertEqual(std::string("2 04:30"), std::string(range->name));
+	assertTrue (range->datetimeField == kIntervalDayToMinute);
+	const Expr* single = where->expr2->expr2;
+	assertTrue (single != nullptr);
+	assertTrue (single->type == kExprLiteralInterval);
+	assertEqual(3, static_cast<int>(single->ival));
+	assertTrue (single->datetimeField == kDatetimeYear);
+
+	SQLParserResult rejected;
+	SQLParser::parse("CREATE TABLE T (A INTERVAL YEAR TO DAY);", &rejected);
+	assertTrue (!rejected.isValid());
+}
+
+
+void SQLParserTest::testDatetimeLiterals()
+{
+	// TIME and TIMESTAMP literals, and CURRENT_DATE, CURRENT_TIME and
+	// CURRENT_TIMESTAMP as literals of the same kinds, so they are accepted
+	// wherever only a literal is, such as INSERT ... VALUES; a precision given
+	// in parentheses, also 0, is kept apart from none. After a qualifier, the
+	// three name a column; on their own they are not names.
+	std::string query = "INSERT INTO Log VALUES (1, CURRENT_TIMESTAMP, CURRENT_DATE, CURRENT_TIME(3), "
+		"TIMESTAMP '2026-10-28 12:11:10', TIME '12:11:10', CURRENT_TIMESTAMP(0));"
+		"UPDATE Log SET Stamp = CURRENT_TIMESTAMP() WHERE Id = 1;"
+		"SELECT Id FROM Log WHERE Stamp < CURRENT_TIMESTAMP - INTERVAL '1' DAY;"
+		"SELECT timestamp FROM Log;"
+		"SELECT Log.current_timestamp FROM Log;"
+		"SELECT Log.current_date.A FROM Log.current_date;"
+		"SELECT dbo.current_timestamp() FROM Log;";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue (result.isValid());
+	assertEqual(7, result.size());
+
+	assertTrue (result.getStatement(0)->type() == kStmtInsert);
+	const auto* insert = static_cast<const InsertStatement*>(result.getStatement(0));
+	assertTrue (insert->values != nullptr);
+	assertEqual(7, static_cast<int>(insert->values->size()));
+	const Expr* current = insert->values->at(1);
+	assertTrue (current->type == kExprLiteralTimestamp);
+	assertTrue (current->isCurrentDatetime);
+	assertTrue (current->name == nullptr);
+	assertEqual(-1, static_cast<int>(current->ival));
+	assertTrue (insert->values->at(2)->type == kExprLiteralDate);
+	assertTrue (insert->values->at(2)->isCurrentDatetime);
+	const Expr* precise = insert->values->at(3);
+	assertTrue (precise->type == kExprLiteralTime);
+	assertTrue (precise->isCurrentDatetime);
+	assertEqual(3, static_cast<int>(precise->ival));
+	const Expr* timestamp = insert->values->at(4);
+	assertTrue (timestamp->type == kExprLiteralTimestamp);
+	assertTrue (!timestamp->isCurrentDatetime);
+	assertTrue (timestamp->name != nullptr);
+	assertEqual(std::string("2026-10-28 12:11:10"), std::string(timestamp->name));
+	assertTrue (insert->values->at(5)->type == kExprLiteralTime);
+	assertTrue (insert->values->at(5)->name != nullptr);
+	assertEqual(std::string("12:11:10"), std::string(insert->values->at(5)->name));
+	const Expr* precisionZero = insert->values->at(6);
+	assertTrue (precisionZero->type == kExprLiteralTimestamp);
+	assertTrue (precisionZero->isCurrentDatetime);
+	assertEqual(0, static_cast<int>(precisionZero->ival));
+
+	assertTrue (result.getStatement(1)->type() == kStmtUpdate);
+	assertTrue (result.getStatement(2)->type() == kStmtSelect);
+
+	// On its own, TIMESTAMP stays a name.
+	const auto* select = static_cast<const SelectStatement*>(result.getStatement(3));
+	assertTrue (select->selectList != nullptr);
+	assertTrue (select->selectList->at(0)->type == kExprColumnRef);
+
+	const auto* qualifiedSelect = static_cast<const SelectStatement*>(result.getStatement(4));
+	assertTrue (qualifiedSelect->selectList != nullptr);
+	const Expr* qualified = qualifiedSelect->selectList->at(0);
+	assertTrue (qualified->type == kExprColumnRef);
+	assertTrue (qualified->table != nullptr && qualified->name != nullptr);
+	assertEqual(std::string("Log"), std::string(qualified->table));
+	assertEqual(std::string("CURRENT_TIMESTAMP"), std::string(qualified->name));
+
+	// Also as a table name and as the name of a qualified call.
+	const auto* tableSelect = static_cast<const SelectStatement*>(result.getStatement(5));
+	assertTrue (tableSelect->fromTable != nullptr && tableSelect->fromTable->name != nullptr);
+	assertEqual(std::string("CURRENT_DATE"), std::string(tableSelect->fromTable->name));
+	const auto* callSelect = static_cast<const SelectStatement*>(result.getStatement(6));
+	assertTrue (callSelect->selectList != nullptr);
+	const Expr* call = callSelect->selectList->at(0);
+	assertTrue (call->type == kExprFunctionRef);
+	assertTrue (call->name != nullptr && call->schema != nullptr);
+	assertEqual(std::string("CURRENT_TIMESTAMP"), std::string(call->name));
+	assertEqual(std::string("dbo"), std::string(call->schema));
+
+	SQLParserResult reserved;
+	SQLParser::parse("CREATE TABLE Test (current_date INT);", &reserved);
+	assertTrue (!reserved.isValid());
 }
 
 
@@ -475,6 +713,48 @@ void SQLParserTest::testDeleteShape()
 }
 
 
+void SQLParserTest::testCreateIndexOnQualifiedTable()
+{
+	// The schema of a qualified table name belongs to the statement.
+	SQLParserResult result;
+	SQLParser::parse("CREATE INDEX MyIndex ON MySchema.Test (A);", &result);
+	assertTrue (result.isValid());
+	assertEqual(1, result.size());
+	assertTrue (result.getStatement(0)->type() == kStmtCreate);
+	const auto* create = static_cast<const CreateStatement*>(result.getStatement(0));
+	assertTrue (create->type == kCreateIndex);
+	assertTrue (create->schema != nullptr && create->tableName != nullptr);
+	assertEqual(std::string("MySchema"), std::string(create->schema));
+	assertEqual(std::string("Test"), std::string(create->tableName));
+}
+
+
+
+void SQLParserTest::testParseErrorReleasesClauses()
+{
+	// A statement that fails to parse, by a syntax error or by a rule that
+	// rejects its input, discards the clauses parsed so far: the SET list of an
+	// UPDATE, the locking clauses of a SELECT, the statement a rejecting rule has
+	// built. Under a leak checker (AddressSanitizer, valgrind) this fails if the
+	// names, values and table lists of the discarded parts are not released.
+	static const char* const invalid[] =
+	{
+		"UPDATE Test SET A = 'x', B = 2 WHERE;",
+		"UPDATE Test SET A = 'x', B = CAST('1' AS INTERVAL YEAR TO DAY);",
+		"SELECT * FROM Test FOR UPDATE OF Test FOR SHARE OF;",
+		"(SELECT A FROM Test FOR UPDATE OF Test) FOR UPDATE OF Test;",
+		"CREATE TABLE Test FROM Foo FILE 'test.tbl';"
+	};
+
+	for (const char* query: invalid)
+	{
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue (!result.isValid());
+	}
+}
+
+
 void SQLParserTest::testComments()
 {
 	// hsql lexer supports -- line comments; the C-style /* ... */ form is
@@ -527,11 +807,16 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testSQLParser);
 	CppUnit_addTest(pSuite, SQLParserTest, testInvalidSQL);
 	CppUnit_addTest(pSuite, SQLParserTest, testTopWithParentheses);
+	CppUnit_addTest(pSuite, SQLParserTest, testTopWithOffset);
 	CppUnit_addTest(pSuite, SQLParserTest, testOffsetFetchNext);
 	CppUnit_addTest(pSuite, SQLParserTest, testBracketedIdentifiers);
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
+	CppUnit_addTest(pSuite, SQLParserTest, testThreePartColumnName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testDialectStatements);
+	CppUnit_addTest(pSuite, SQLParserTest, testSetOperationPrecedence);
+	CppUnit_addTest(pSuite, SQLParserTest, testIntervalTypes);
+	CppUnit_addTest(pSuite, SQLParserTest, testDatetimeLiterals);
 	CppUnit_addTest(pSuite, SQLParserTest, testCarriageReturn);
 	CppUnit_addTest(pSuite, SQLParserTest, testODBCCallParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);
@@ -539,6 +824,8 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testAlterDropColumnIfExists);
 	CppUnit_addTest(pSuite, SQLParserTest, testDropDiscrimination);
 	CppUnit_addTest(pSuite, SQLParserTest, testDeleteShape);
+	CppUnit_addTest(pSuite, SQLParserTest, testCreateIndexOnQualifiedTable);
+	CppUnit_addTest(pSuite, SQLParserTest, testParseErrorReleasesClauses);
 	CppUnit_addTest(pSuite, SQLParserTest, testComments);
 	CppUnit_addTest(pSuite, SQLParserTest, testTokenize);
 

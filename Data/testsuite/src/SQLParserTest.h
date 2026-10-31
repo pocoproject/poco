@@ -30,11 +30,16 @@ public:
 	void testSQLParser();
 	void testInvalidSQL();
 	void testTopWithParentheses();
+	void testTopWithOffset();
 	void testOffsetFetchNext();
 	void testBracketedIdentifiers();
 	void testThreePartTableName();
+	void testThreePartColumnName();
 	void testArrayLiteralNotShadowedByBracketIdentifier();
 	void testDialectStatements();
+	void testSetOperationPrecedence();
+	void testIntervalTypes();
+	void testDatetimeLiterals();
 	void testCarriageReturn();
 	void testODBCCallParameters();
 	void testResetClearsParameters();
@@ -42,6 +47,8 @@ public:
 	void testAlterDropColumnIfExists();
 	void testDropDiscrimination();
 	void testDeleteShape();
+	void testCreateIndexOnQualifiedTable();
+	void testParseErrorReleasesClauses();
 	void testComments();
 	void testTokenize();
 

@@ -207,6 +207,7 @@ template <typename I>
 	const char* start = begin;
 	if (*start == '+') ++start;
 	if (start >= end) return false; // reject bare sign without digits
+	if (start != begin && *start == '-') return false; // reject a sign after '+'
 
 	// Try std::from_chars -- handles sign, overflow, and all bases.
 	const auto [ptr, ec] = std::from_chars(start, end, outResult, base);

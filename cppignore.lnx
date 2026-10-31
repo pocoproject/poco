@@ -7,7 +7,6 @@ CppUnit::TestCaller<UniqueExpireCacheTest>.testAccessExpireN
 CppUnit::TestCaller<UniqueExpireCacheTest>.testExpireN
 CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testAccessExpireN
 CppUnit::TestCaller<UniqueExpireLRUCacheTest>.testExpireN
-CppUnit::TestCaller<FileChannelTest>.testPurgeAge
 CppUnit::TestCaller<FileTest>.testFileAttributes2
 CppUnit::TestCaller<PathTest>.testExpand
 CppUnit::TestCaller<PathTest>.testExpandVariableFromPath

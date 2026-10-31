@@ -1,4 +1,4 @@
-# This file contains a list of strings that are NOT valid SQL queries.
+# This file contains a list of strings that are valid SQL queries.
 # Each line contains a single SQL query.
 # SELECT statement
 SELECT * FROM orders;
@@ -18,6 +18,24 @@ SELECT * FROM t WHERE a = ? AND b = ?;
 SELECT City.name, Product.category, SUM(price) FROM fact INNER JOIN City ON fact.city_id = City.id INNER JOIN Product ON fact.product_id = Product.id GROUP BY City.name, Product.category;
 SELECT SUBSTR(a, 3, 5) FROM t;
 SELECT * FROM t WHERE a = DATE '1996-12-31';
+SELECT * FROM t WHERE a = TIMESTAMP '1996-12-31 12:11:10';
+SELECT * FROM t WHERE a = TIME '12:11:10';
+SELECT * FROM t WHERE a = CURRENT_DATE;
+SELECT * FROM t WHERE a = CURRENT_TIMESTAMP;
+SELECT * FROM t WHERE a = CURRENT_TIME;
+SELECT CURRENT_TIMESTAMP();
+SELECT CURRENT_TIMESTAMP(3);
+SELECT CURRENT_TIME(), CURRENT_TIME(6), CURRENT_DATE();
+SELECT timestamp FROM t;
+SELECT * FROM t WHERE a = CURRENT_DATE - INTERVAL '1' DAY;
+SELECT CURRENT_TIMESTAMP(0), CURRENT_TIME(0);
+CREATE TABLE t ("current_date" INT);
+SELECT dbo.current_date.a, dbo.current_date.* FROM dbo.current_date JOIN db.current_time.t ON dbo.current_date.a = t.b;
+SELECT dbo.current_timestamp(), dbo.current_time(1) FROM t;
+INSERT INTO dbo.current_date VALUES (1);
+UPDATE dbo.current_time SET a = 1;
+SELECT NEXT VALUE FOR dbo.current_timestamp;
+SELECT t.current_date, dbo.t.current_time, mydb.dbo.t.current_timestamp FROM t WHERE t.current_date < CURRENT_DATE;
 # JOIN
 SELECT t1.a, t1.b, t2.c FROM "table" AS t1 JOIN (SELECT * FROM foo JOIN bar ON foo.id = bar.id) t2 ON t1.a = t2.b WHERE (t1.b OR NOT t1.a) AND t2.c = 12.5
 SELECT * FROM t1 JOIN t2 ON c1 = c2;
@@ -25,6 +43,7 @@ SELECT a, SUM(b) FROM t2 GROUP BY a HAVING SUM(b) > 100;
 # CREATE statement
 CREATE TABLE "table" FROM TBL FILE 'students.tbl'
 CREATE TABLE IF NOT EXISTS "table" FROM TBL FILE 'students.tbl'
+CREATE INDEX myindex ON myschema.mytable (col1);
 CREATE TABLE students (name TEXT, student_number INTEGER, city TEXT, grade DOUBLE, credits BIGINT)
 CREATE TABLE students (name TEXT, student_number INTEGER NOT NULL, city TEXT, grade DOUBLE PRIMARY KEY UNIQUE)
 CREATE TABLE teachers (name VARCHAR(30), student_number LONG, city CHAR(10), grade FLOAT)
@@ -37,6 +56,9 @@ CREATE TABLE foo (a int, b int REFERENCES bar REFERENCES baz);
 CREATE TABLE foo (a int, b int REFERENCES bar (x) REFERENCES baz (y));
 CREATE TABLE foo (a int, b int, FOREIGN KEY (b) REFERENCES bar, FOREIGN KEY (b) REFERENCES baz);
 CREATE TABLE foo (a int, b int, FOREIGN KEY (b) REFERENCES bar (x), FOREIGN KEY (b) REFERENCES baz (y));
+CREATE TABLE foo (i INTERVAL);
+CREATE TABLE t (ts TIMESTAMP, i INTERVAL HOUR TO MINUTE);
+CREATE TABLE t (a INTERVAL YEAR, b INTERVAL DAY TO SECOND, c INTERVAL MINUTE TO SECOND);
 # Multiple statements
 CREATE TABLE "table" FROM TBL FILE 'students.tbl'; SELECT * FROM "table";
 # INSERT
@@ -44,6 +66,8 @@ INSERT INTO test_table VALUES (1, 2, 'test');
 INSERT INTO test_table (id, value, name) VALUES (1, 2, 'test');
 INSERT INTO test_table SELECT * FROM students;
 INSERT INTO some_schema.test_table SELECT * FROM another_schema.students;
+INSERT INTO logs VALUES (101, CURRENT_TIMESTAMP, CURRENT_DATE, CURRENT_TIME);
+INSERT INTO t VALUES (INTERVAL '1' YEAR, INTERVAL '1-2' YEAR TO MONTH, INTERVAL '2 04:30' DAY TO MINUTE);
 # DELETE
 DELETE FROM students WHERE grade > 3.0
 DELETE FROM students
@@ -53,6 +77,7 @@ UPDATE students SET grade = 1.3 WHERE name = 'Max Mustermann';
 UPDATE students SET grade = 1.3, name='Felix Fürstenberg' WHERE name = 'Max Mustermann';
 UPDATE students SET grade = 1.0;
 UPDATE some_schema.students SET grade = 1.0;
+UPDATE logs SET ts = CURRENT_TIMESTAMP, d = CURRENT_DATE, t = CURRENT_TIME WHERE id = 101;
 # ALTER
 ALTER TABLE mytable DROP COLUMN IF EXISTS mycolumn;
 ALTER TABLE IF EXISTS mytable DROP COLUMN IF EXISTS mycolumn;
@@ -98,6 +123,9 @@ SHOW COLUMNS students;
 DESCRIBE students;
 SELECT * FROM t WHERE a = DATE '2000-01-01' + INTERVAL '30 DAYS';
 SELECT * FROM t WHERE a = DATE '2000-01-01' + INTERVAL '10' DAY;
+SELECT TOP 5 a FROM t ORDER BY a OFFSET 10;
+SELECT * FROM t WHERE a = DATE '2000-01-01' + INTERVAL '1-2' YEAR TO MONTH;
+SELECT CAST('12' AS INTERVAL YEAR), CAST('1-2' AS INTERVAL YEAR TO MONTH), CAST('2 21:46:20.123' AS INTERVAL DAY TO SECOND);
 SELECT * FROM t WHERE a BETWEEN '2000-01-01' AND DATE '2000-01-01' - 1 MONTH;
 SELECT (CAST('2002-5-01' as DATE) + INTERVAL '60 days');
 SELECT CAST(student.student_number as BIGINT) FROM student;
@@ -213,3 +241,75 @@ SELECT RANK() OVER (PARTITION BY a) FROM test;
 SELECT * FROM dbo.fn_split('a', ',') f;
 # ODBC call escape with a return marker
 {? = call some_proc(?, ?)};
+# Parenthesized query expressions in set operations, at any nesting depth
+SELECT 1 UNION SELECT 1;
+(SELECT 1 UNION SELECT 1);
+((SELECT 1 UNION SELECT 1));
+(SELECT 1) UNION SELECT 1;
+((SELECT 1)) UNION SELECT 1;
+((SELECT 1) UNION SELECT 1);
+(((SELECT 1) UNION SELECT 1));
+(((SELECT 1)) UNION SELECT 1);
+((((SELECT 1)) UNION SELECT 1));
+SELECT 1 UNION (SELECT 1);
+(SELECT 1 UNION ((SELECT 1)));
+((SELECT 1 UNION ((SELECT 1))));
+SELECT 1 UNION ((SELECT 1));
+(SELECT 1) UNION (SELECT 1);
+((SELECT 1) UNION (SELECT 1));
+(((SELECT 1) UNION (SELECT 1)));
+((SELECT 1)) UNION (SELECT 1);
+(((SELECT 1)) UNION (SELECT 1));
+((((SELECT 1)) UNION (SELECT 1)));
+(SELECT 1) UNION ((SELECT 1));
+((SELECT 1) UNION ((SELECT 1)));
+(((SELECT 1) UNION ((SELECT 1))));
+((SELECT 1)) UNION ((SELECT 1));
+(((SELECT 1)) UNION ((SELECT 1)));
+((((SELECT 1)) UNION ((SELECT 1))));
+# Set operations inside a scalar subquery
+SELECT (SELECT 1  UNION SELECT 1);
+SELECT ((SELECT 1) UNION SELECT 1);
+SELECT (((SELECT 1)) UNION SELECT 1);
+SELECT (SELECT 1 UNION (SELECT 1));
+SELECT (SELECT 1 UNION ((SELECT 1)));
+SELECT ((SELECT 1 UNION ((SELECT 1))));
+SELECT ((SELECT 1) UNION (SELECT 1));
+SELECT (((SELECT 1) UNION (SELECT 1)));
+SELECT ((((SELECT 1)) UNION ((SELECT 1))));
+# Clauses after a parenthesized query expression, and every place that takes one
+(SELECT 1 UNION SELECT 1) ORDER BY 1;
+(SELECT a FROM t) UNION (SELECT b FROM u) ORDER BY 1 LIMIT 5;
+(SELECT a FROM t ORDER BY a LIMIT 1) UNION (SELECT b FROM u ORDER BY b LIMIT 1);
+SELECT * FROM ((SELECT 1) UNION (SELECT 2)) AS x;
+SELECT * FROM (SELECT 1 UNION SELECT 2) AS x;
+WITH c AS (SELECT 1) (SELECT * FROM c) UNION (SELECT 2);
+WITH c AS (SELECT 1) SELECT * FROM c UNION SELECT 2;
+INSERT INTO t SELECT 1 UNION SELECT 2;
+INSERT INTO t (SELECT 1) UNION (SELECT 2);
+SELECT * FROM t WHERE a IN ((SELECT x FROM u) UNION (SELECT y FROM v));
+SELECT 1 INTERSECT (SELECT 1) EXCEPT (SELECT 2);
+(SELECT 1) FOR UPDATE;
+((SELECT 1 ORDER BY 1 LIMIT 1 FOR UPDATE));
+(SELECT 1) UNION (SELECT 2) FOR UPDATE SKIP LOCKED;
+SELECT * FROM (WITH c AS (SELECT 1) SELECT * FROM c) AS x;
+# Parenthesized members with subqueries, joins, WITH, placeholders and TOP
+(SELECT t.a, u.b FROM t JOIN u ON t.id = u.id WHERE t.c > ? ORDER BY t.a LIMIT 10) UNION ALL (SELECT a, b FROM v WHERE d = $1) ORDER BY 1 DESC LIMIT 5 OFFSET 2;
+(SELECT TOP 5 a FROM t ORDER BY a) UNION (SELECT TOP (:n) b FROM u) EXCEPT (SELECT c FROM w WHERE c IN ((SELECT x FROM x1) INTERSECT (SELECT y FROM y1)));
+WITH recent AS ((SELECT id FROM orders WHERE day > :since) UNION (SELECT id FROM returns)) SELECT * FROM recent WHERE EXISTS ((SELECT 1 FROM items WHERE items.id = recent.id) UNION (SELECT 1 FROM gifts WHERE gifts.id = recent.id));
+SELECT * FROM t WHERE (a, b) IN ((SELECT x, y FROM u) UNION (SELECT x, y FROM v)) AND c NOT IN ((SELECT z FROM w) EXCEPT (SELECT z FROM w2));
+SELECT * FROM (WITH c AS (SELECT 1 AS a) (SELECT a FROM c) UNION (SELECT 2)) AS x JOIN ((SELECT 3 AS b) UNION (SELECT 4)) AS y ON x.a = y.b;
+INSERT INTO t (a, b) (SELECT x, y FROM u WHERE x = $1) UNION (SELECT x, y FROM v WHERE y = $2) ORDER BY 1 LIMIT 100;
+CREATE TABLE t AS (SELECT 1) UNION (SELECT 2);
+CREATE VIEW v AS (SELECT a FROM t) INTERSECT (SELECT a FROM u) ORDER BY 1;
+COPY ((SELECT a FROM t) UNION (SELECT b FROM u)) TO 'file_path' WITH (FORMAT CSV);
+# A WITH clause in a nested query expression, scoped to it
+SELECT * FROM t WHERE a IN (WITH c AS (SELECT 1) SELECT * FROM c);
+SELECT * FROM t WHERE EXISTS (WITH c AS (SELECT 1) SELECT * FROM c);
+SELECT (WITH c AS (SELECT 1) SELECT * FROM c);
+COPY (WITH c AS (SELECT 1) SELECT * FROM c) TO 'file_path';
+INSERT INTO t WITH c AS (SELECT 1) SELECT * FROM c;
+INSERT INTO t (a) (WITH c AS (SELECT 1) SELECT * FROM c);
+SELECT 1 UNION (WITH c AS (SELECT 2) SELECT * FROM c);
+SELECT (SELECT COUNT(*) FROM ((SELECT a FROM t) UNION ALL (SELECT b FROM u)) AS c) AS n FROM d;
+SELECT 1 UNION (SELECT 2 UNION SELECT 3 ORDER BY 1 LIMIT 1) UNION SELECT 4 ORDER BY 1 FOR UPDATE;

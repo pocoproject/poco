@@ -48,6 +48,79 @@
     return dotJoin(name.schema, name.name);
   }
 
+  // Adds a set operation to the select whose result it combines with its
+  // nested select.
+  void addSetOperation(SelectStatement* stmt, SetOperation* op) {
+    if (!stmt->setOperations) stmt->setOperations = new std::vector<SetOperation*>();
+    stmt->setOperations->push_back(op);
+  }
+
+  // Attaches the clauses around a query expression body to its statement. The
+  // WITH clause belongs to the outermost statement. ORDER BY and LIMIT after a
+  // set operation describe the combined result and belong to the last set
+  // operation of the leading select; otherwise they belong to the select
+  // itself. Locking clauses belong to the leading select. A parenthesized
+  // query expression takes a clause it does not have yet as its own, the way
+  // PostgreSQL merges them: (SELECT a FROM t LIMIT 1) ORDER BY a reads as
+  // SELECT a FROM t ORDER BY a LIMIT 1. Returns the message to report when a
+  // clause cannot be attached - the statement then owns none of the clauses -
+  // and nullptr when all of them are in place.
+  const char* attachQueryClauses(const QueryBody& body, std::vector<WithDescription*>* with,
+                                 std::vector<OrderDescription*>* order, LimitDescription* limit,
+                                 std::vector<LockingClause*>* lockings) {
+    SelectStatement* stmt = body.head;
+    if (with && stmt->withDescriptions) return "The query expression already has a WITH clause.";
+    if (lockings && stmt->lockings) return "The query expression already has a locking clause.";
+    if (stmt->setOperations) {
+      SetOperation* last = stmt->setOperations->back();
+      if (order && last->resultOrder) return "The query expression already has an ORDER BY clause.";
+      if (limit && last->resultLimit) return "The query expression already has a LIMIT clause.";
+      if (order) last->resultOrder = order;
+      if (limit) last->resultLimit = limit;
+    } else {
+      if (order && stmt->order) return "The query expression already has an ORDER BY clause.";
+      if (limit && stmt->limit) {
+        // A parenthesized query keeps the limit it has; otherwise the limit
+        // comes from TOP. A parenthesized TOP may hold a placeholder, which is
+        // also referenced from the parameter list the input rule walks;
+        // deleting it here would leave that reference dangling. TOP with a
+        // literal has no such reference, so "top 20 ... limit 10" keeps
+        // working.
+        if (body.parenthesized) return "The query expression already has a LIMIT clause.";
+        if (stmt->limit->limit->type != kExprLiteralInt) return "TOP with an expression cannot be combined with LIMIT.";
+        // OFFSET alone and LIMIT ALL give no row count, so the one of TOP stays.
+        if (!limit->limit) {
+          limit->limit = stmt->limit->limit;
+          stmt->limit->limit = nullptr;
+        }
+        delete stmt->limit;
+      }
+      if (order) stmt->order = order;
+      if (limit) stmt->limit = limit;
+    }
+    if (with) stmt->withDescriptions = with;
+    if (lockings) stmt->lockings = lockings;
+    return nullptr;
+  }
+
+  // Releases the clauses of a query expression its statement did not take.
+  void deleteQueryClauses(std::vector<WithDescription*>* with, std::vector<OrderDescription*>* order,
+                          LimitDescription* limit, std::vector<LockingClause*>* lockings) {
+    if (with) {
+      for (auto ptr : *with) delete ptr;
+      delete with;
+    }
+    if (order) {
+      for (auto ptr : *order) delete ptr;
+      delete order;
+    }
+    delete limit;
+    if (lockings) {
+      for (auto ptr : *lockings) delete ptr;
+      delete lockings;
+    }
+  }
+
   }  // namespace
   // clang-format off
 %}
@@ -86,6 +159,15 @@
 struct HierarchicalClause {
   hsql::Expr* startWith;
   hsql::Expr* connectBy;
+};
+
+// A query expression body while its set operations are collected: the select
+// that heads it and holds its set operations, and whether the body is one
+// parenthesized query expression. Trivially copyable, which a %union member has
+// to be.
+struct QueryBody {
+  hsql::SelectStatement* head;
+  bool parenthesized;
 };
 
 // Auto update column and line number
@@ -182,6 +264,7 @@ struct HierarchicalClause {
   hsql::FrameType frame_type;
   hsql::GroupByDescription* group_t;
   HierarchicalClause hierarchical_t;
+  QueryBody query_body_t;
   hsql::ImportType import_type_t;
   hsql::JoinType join_type;
   hsql::LimitDescription* limit;
@@ -233,6 +316,7 @@ struct HierarchicalClause {
   delete $$.startWith;
   delete $$.connectBy;
 } <hierarchical_t>
+%destructor { delete $$.head; } <query_body_t>
 %destructor {
   if ($$) {
     for (auto ptr : *($$)) {
@@ -249,7 +333,7 @@ struct HierarchicalClause {
     }
   }
   delete ($$);
-} <table_vec> <table_element_vec> <update_vec> <expr_vec> <order_vec> <stmt_vec> <with_description_vec>
+} <table_vec> <table_element_vec> <update_vec> <expr_vec> <order_vec> <stmt_vec> <with_description_vec> <locking_clause_vec>
 %destructor {
   free($$->second);
   delete ($$);
@@ -304,6 +388,7 @@ struct HierarchicalClause {
 %token TRANSACTION BEGIN COMMIT ROLLBACK
 %token NOWAIT SKIP LOCKED SHARE
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
+%token CURRENT_DATE CURRENT_TIME CURRENT_TIMESTAMP
 %token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
 %token OUTERJOIN PRIOR ODBC_OJ NEXT_VALUE_FOR
@@ -318,7 +403,8 @@ struct HierarchicalClause {
 %type <exec_stmt>              execute_statement odbc_call_statement
 %type <transaction_stmt>       transaction_statement
 %type <prep_stmt>              prepare_statement
-%type <select_stmt>            select_statement select_with_paren select_no_paren select_clause select_within_set_operation select_within_set_operation_no_parentheses
+%type <select_stmt>            query_expression query_expression_parens query_primary subquery
+%type <query_body_t>           query_expression_body query_term query_member
 %type <import_stmt>            import_statement
 %type <export_stmt>            export_statement
 %type <create_stmt>            create_statement
@@ -330,7 +416,8 @@ struct HierarchicalClause {
 %type <show_stmt>              show_statement
 %type <table_name>             table_name
 %type <sval>                   opt_index_name
-%type <sval>                   file_path prepare_target_query nonreserved_keyword name_or_keyword
+%type <sval>                   file_path prepare_target_query nonreserved_keyword name_or_keyword name_after_qualifier
+%type <sval>                   qualified_name_or_keyword
 %type <frame_description>      opt_frame_clause
 %type <frame_bound>            frame_bound
 %type <frame_type>             frame_type
@@ -345,6 +432,7 @@ struct HierarchicalClause {
 %type <expr>                   function_expr between_expr expr_alias param_expr next_value_expr opt_odbc_return
 %type <expr>                   table_function_expr
 %type <expr>                   column_name literal int_literal num_literal string_literal bool_literal date_literal interval_literal
+%type <expr>                   time_literal timestamp_literal
 %type <expr>                   comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
 %type <hierarchical_t>         opt_hierarchical_clause
 %type <expr>                   array_expr array_index null_literal extended_literal casted_extended_literal
@@ -352,7 +440,7 @@ struct HierarchicalClause {
 %type <order>                  order_desc
 %type <order_type>             opt_order_type
 %type <null_ordering_t>        opt_null_ordering
-%type <datetime_field>         datetime_field datetime_field_plural duration_field
+%type <datetime_field>         datetime_field datetime_field_plural duration_field interval_range
 %type <column_t>               column_def
 %type <table_element_t>        table_elem
 %type <column_type_t>          column_type
@@ -363,7 +451,7 @@ struct HierarchicalClause {
 %type <group_t>                opt_group
 %type <alias_t>                opt_table_alias table_alias opt_alias alias
 %type <with_description_t>     with_description
-%type <set_operator_t>         set_operator set_type
+%type <set_operator_t>         union_operator intersect_operator
 %type <column_constraint_t>    column_constraint
 %type <column_constraints_t>   opt_column_constraints column_constraints
 %type <alter_action_t>         alter_action
@@ -381,7 +469,7 @@ struct HierarchicalClause {
 %type <expr_vec>               row_expr_list table_value_row_list opt_call_args in_row_list
 %type <table_vec>              table_ref_commalist
 %type <order_vec>              opt_order order_list opt_within_group
-%type <with_description_vec>   opt_with_clause with_clause with_description_list
+%type <with_description_vec>   with_clause with_description_list
 %type <update_vec>             update_clause_commalist
 %type <table_element_vec>      table_elem_commalist
 %type <locking_clause_vec>     opt_locking_clause_list opt_locking_clause
@@ -408,6 +496,7 @@ struct HierarchicalClause {
 %right    UMINUS
 %right    PRIOR
 %left     '[' ']'
+%precedence SUBQUERY_AS_EXPR
 %left     '(' ')'
 %left     '.'
 %left     JOIN
@@ -462,7 +551,7 @@ statement : prepare_statement opt_hints {
 | import_statement { $$ = $1; }
 | export_statement { $$ = $1; };
 
-preparable_statement : select_statement { $$ = $1; }
+preparable_statement : query_expression { $$ = $1; }
 | create_statement { $$ = $1; }
 | insert_statement { $$ = $1; }
 | delete_statement { $$ = $1; }
@@ -696,7 +785,7 @@ export_statement : COPY table_name TO file_path opt_import_export_options {
   }
   delete $5;
 }
-| COPY select_with_paren TO file_path opt_import_export_options {
+| COPY subquery TO file_path opt_import_export_options {
   $$ = new ExportStatement($5->format);
   $$->filePath = $4;
   $$->select = $2;
@@ -740,6 +829,8 @@ create_statement : CREATE TABLE opt_not_exists table_name FROM IDENTIFIER FILE f
   $$->tableName = $4.name;
   if (strcasecmp($6, "tbl") != 0) {
     free($6);
+    free($8);
+    delete $$;
     yyerror(&yyloc, result, scanner, "File type is unknown.");
     YYERROR;
   }
@@ -758,7 +849,7 @@ create_statement : CREATE TABLE opt_not_exists table_name FROM IDENTIFIER FILE f
     YYERROR;
   }
 }
-| CREATE TABLE opt_not_exists table_name AS select_statement {
+| CREATE TABLE opt_not_exists table_name AS query_expression {
   $$ = new CreateStatement(kCreateTable);
   $$->ifNotExists = $3;
   $$->schema = $4.schema;
@@ -769,10 +860,11 @@ create_statement : CREATE TABLE opt_not_exists table_name FROM IDENTIFIER FILE f
   $$ = new CreateStatement(kCreateIndex);
   $$->indexName = $4;
   $$->ifNotExists = $3;
+  $$->schema = $6.schema;
   $$->tableName = $6.name;
   $$->indexColumns = $8;
 }
-| CREATE VIEW opt_not_exists table_name opt_column_list AS select_statement {
+| CREATE VIEW opt_not_exists table_name opt_column_list AS query_expression {
   $$ = new CreateStatement(kCreateView);
   $$->ifNotExists = $3;
   $$->schema = $4.schema;
@@ -808,7 +900,7 @@ column_type : BIGINT { $$ = ColumnType{DataType::BIGINT}; }
 | BOOLEAN { $$ = ColumnType{DataType::BOOLEAN}; }
 | CHAR '(' INTVAL ')' { $$ = ColumnType{DataType::CHAR, $3}; }
 | CHARACTER_VARYING '(' INTVAL ')' { $$ = ColumnType{DataType::VARCHAR, $3}; }
-| DATE { $$ = ColumnType{DataType::DATE}; };
+| DATE { $$ = ColumnType{DataType::DATE}; }
 | DATETIME { $$ = ColumnType{DataType::DATETIME}; }
 | DECIMAL opt_decimal_specification {
   $$ = ColumnType{DataType::DECIMAL, 0, $2->first, $2->second};
@@ -818,6 +910,9 @@ column_type : BIGINT { $$ = ColumnType{DataType::BIGINT}; }
 | FLOAT { $$ = ColumnType{DataType::FLOAT}; }
 | INT { $$ = ColumnType{DataType::INT}; }
 | INTEGER { $$ = ColumnType{DataType::INT}; }
+| INTERVAL { $$ = ColumnType{DataType::INTERVAL}; }
+| INTERVAL datetime_field { $$ = ColumnType{DataType::INTERVAL, 0, 0, 0, $2}; }
+| INTERVAL interval_range { $$ = ColumnType{DataType::INTERVAL, 0, 0, 0, $2}; }
 | LONG { $$ = ColumnType{DataType::LONG}; }
 | REAL { $$ = ColumnType{DataType::REAL}; }
 | SMALLINT { $$ = ColumnType{DataType::SMALLINT}; }
@@ -949,12 +1044,21 @@ insert_statement : INSERT INTO table_name opt_column_list VALUES '(' extended_li
   $$->columns = $4;
   $$->values = $7;
 }
-| INSERT INTO table_name opt_column_list select_no_paren {
+// The column list is written out instead of being optional, because an empty
+// rule in front of the query could not be told from the parenthesis opening a
+// parenthesized query expression.
+| INSERT INTO table_name query_expression {
   $$ = new InsertStatement(kInsertSelect);
   $$->schema = $3.schema;
   $$->tableName = $3.name;
-  $$->columns = $4;
-  $$->select = $5;
+  $$->select = $4;
+}
+| INSERT INTO table_name '(' ident_commalist ')' query_expression {
+  $$ = new InsertStatement(kInsertSelect);
+  $$->schema = $3.schema;
+  $$->tableName = $3.name;
+  $$->columns = $5;
+  $$->select = $7;
 };
 
 opt_column_list : '(' ident_commalist ')' { $$ = $2; }
@@ -991,100 +1095,97 @@ update_clause : name_or_keyword '=' expr {
  * Select Statement
  ******************************/
 
-select_statement : opt_with_clause select_with_paren {
-  $$ = $2;
-  $$->withDescriptions = $1;
-}
-| opt_with_clause select_no_paren {
-  $$ = $2;
-  $$->withDescriptions = $1;
-}
-| opt_with_clause select_with_paren set_operator select_within_set_operation opt_order opt_limit {
-  $$ = $2;
-  if ($$->setOperations == nullptr) {
-    $$->setOperations = new std::vector<SetOperation*>();
-  }
-  $$->setOperations->push_back($3);
-  $$->setOperations->back()->nestedSelectStatement = $4;
-  $$->setOperations->back()->resultOrder = $5;
-  $$->setOperations->back()->resultLimit = $6;
-  $$->withDescriptions = $1;
-};
-
-select_within_set_operation : select_with_paren | select_within_set_operation_no_parentheses;
-
-select_within_set_operation_no_parentheses : select_clause { $$ = $1; }
-| select_clause set_operator select_within_set_operation {
-  $$ = $1;
-  if ($$->setOperations == nullptr) {
-    $$->setOperations = new std::vector<SetOperation*>();
-  }
-  $$->setOperations->push_back($2);
-  $$->setOperations->back()->nestedSelectStatement = $3;
-};
-
-select_with_paren : '(' select_no_paren ')' { $$ = $2; }
-| '(' select_with_paren ')' { $$ = $2; };
-
-select_no_paren : select_clause opt_order opt_limit opt_locking_clause {
-  $$ = $1;
-  $$->order = $2;
-
-  // Limit could have been set by TOP. A parenthesized TOP may hold a
-  // placeholder, which is also referenced from the parameter list the input
-  // rule walks; deleting it here would leave that reference dangling. TOP with
-  // a literal has no such reference, so "top 20 ... limit 10" keeps working.
-  if ($3) {
-    if ($$->limit && $$->limit->limit->type != kExprLiteralInt) {
-      delete $1;
-      if ($2) {
-        for (auto ptr : *$2) delete ptr;
-        delete $2;
-      }
-      delete $3;
-      if ($4) {
-        for (auto ptr : *$4) delete ptr;
-        delete $4;
-      }
-      yyerror(&yyloc, result, scanner, "TOP with an expression cannot be combined with LIMIT.");
-      YYERROR;
-    }
-    delete $$->limit;
-    $$->limit = $3;
-  }
-
-  if ($4) {
-    $$->lockings = $4;
+// A query expression as the SQL standard shapes it: an optional WITH clause,
+// a body of set operations and the clauses that order, limit and lock the
+// result. The WITH clause is written out instead of being optional, because
+// an empty rule in front of the body could not be told from the parenthesis
+// opening an expression.
+query_expression : query_expression_body opt_order opt_limit opt_locking_clause {
+  $$ = $1.head;
+  if (const char* error = attachQueryClauses($1, nullptr, $2, $3, $4)) {
+    delete $$;
+    deleteQueryClauses(nullptr, $2, $3, $4);
+    yyerror(&yyloc, result, scanner, error);
+    YYERROR;
   }
 }
-| select_clause set_operator select_within_set_operation opt_order opt_limit opt_locking_clause {
-  $$ = $1;
-  if ($$->setOperations == nullptr) {
-    $$->setOperations = new std::vector<SetOperation*>();
+| with_clause query_expression_body opt_order opt_limit opt_locking_clause {
+  $$ = $2.head;
+  if (const char* error = attachQueryClauses($2, $1, $3, $4, $5)) {
+    delete $$;
+    deleteQueryClauses($1, $3, $4, $5);
+    yyerror(&yyloc, result, scanner, error);
+    YYERROR;
   }
-  $$->setOperations->push_back($2);
-  $$->setOperations->back()->nestedSelectStatement = $3;
-  $$->setOperations->back()->resultOrder = $4;
-  $$->setOperations->back()->resultLimit = $5;
-  $$->lockings = $6;
 };
 
-set_operator : set_type opt_all {
-  $$ = $1;
+// INTERSECT binds tighter than UNION and EXCEPT, and set operations of the same
+// level apply from left to right, as in the SQL standard. The select that heads
+// a chain holds its set operations in that order, each applying to the result
+// so far. A member that is a chain of its own, a parenthesized query expression
+// or an INTERSECT term after UNION or EXCEPT, is a nested select, and a
+// parenthesized one stays one unit with its ORDER BY and LIMIT. Only a
+// parenthesized member can carry a WITH clause here, and the set operations
+// after it would come under it, while in SQL it covers the parentheses alone;
+// such a set operation is rejected rather than read with the wider scope.
+query_expression_body : query_term
+| query_expression_body union_operator query_term {
+  if ($1.head->withDescriptions) {
+    delete $1.head;
+    delete $2;
+    delete $3.head;
+    yyerror(&yyloc, result, scanner, "A WITH clause in parentheses cannot be followed by a set operation.");
+    YYERROR;
+  }
+  $2->nestedSelectStatement = $3.head;
+  addSetOperation($1.head, $2);
+  $$ = QueryBody{$1.head, false};
+};
+
+query_term : query_member
+| query_term intersect_operator query_member {
+  if ($1.head->withDescriptions) {
+    delete $1.head;
+    delete $2;
+    delete $3.head;
+    yyerror(&yyloc, result, scanner, "A WITH clause in parentheses cannot be followed by a set operation.");
+    YYERROR;
+  }
+  $2->nestedSelectStatement = $3.head;
+  addSetOperation($1.head, $2);
+  $$ = QueryBody{$1.head, false};
+};
+
+query_member : query_primary { $$ = QueryBody{$1, false}; }
+// A parenthesized query expression followed by ')' is also the inner part of
+// a nested parenthesization. Both read the same, so the lower precedence lets
+// the parenthesis be shifted instead of reducing the member here.
+| query_expression_parens %prec SUBQUERY_AS_EXPR { $$ = QueryBody{$1, true}; };
+
+query_expression_parens : '(' query_expression ')' { $$ = $2; }
+| '(' query_expression_parens ')' { $$ = $2; };
+
+// A query expression in parentheses where an expression operand is possible,
+// e.g. a scalar subquery or the right side of IN. The parentheses around a
+// nested one, ((SELECT 1)), are either those of the subquery or those of an
+// expression; both read the same, so the lower precedence lets ')' be shifted.
+subquery : query_expression_parens %prec SUBQUERY_AS_EXPR;
+
+union_operator : UNION opt_all {
+  $$ = new SetOperation();
+  $$->setType = SetType::kSetUnion;
+  $$->isAll = $2;
+}
+| EXCEPT opt_all {
+  $$ = new SetOperation();
+  $$->setType = SetType::kSetExcept;
   $$->isAll = $2;
 };
 
-set_type : UNION {
-  $$ = new SetOperation();
-  $$->setType = SetType::kSetUnion;
-}
-| INTERSECT {
+intersect_operator : INTERSECT opt_all {
   $$ = new SetOperation();
   $$->setType = SetType::kSetIntersect;
-}
-| EXCEPT {
-  $$ = new SetOperation();
-  $$->setType = SetType::kSetExcept;
+  $$->isAll = $2;
 };
 
 opt_all : ALL { $$ = true; }
@@ -1102,7 +1203,7 @@ opt_hierarchical_clause : START_WITH expr connect_by expr { $$ = HierarchicalCla
 // the tree needs, so both spellings reduce to the same clause.
 connect_by : CONNECT_BY | CONNECT_BY_NOCYCLE;
 
-select_clause : SELECT opt_top opt_distinct select_list opt_from_clause opt_where opt_hierarchical_clause opt_group {
+query_primary : SELECT opt_top opt_distinct select_list opt_from_clause opt_where opt_hierarchical_clause opt_group {
   $$ = new SelectStatement();
   $$->limit = $2;
   $$->selectDistinct = $3;
@@ -1228,7 +1329,7 @@ casted_extended_literal : extended_literal | CAST '(' extended_literal AS column
 };
 
 extended_literal : literal { $$ = $1; }
-| '-' num_literal { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); };
+| '-' num_literal { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); }
 | '-' interval_literal { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); };
 
 expr_alias : expr opt_alias {
@@ -1244,8 +1345,8 @@ expr : operand | between_expr | logic_expr | exists_expr | in_expr;
 
 operand : '(' expr ')' { $$ = $2; }
 | array_index | scalar_expr | unary_expr | binary_expr | case_expr | function_expr | extract_expr | cast_expr | next_value_expr |
-    array_expr | '(' select_no_paren ')' {
-  $$ = Expr::makeSelect($2);
+    array_expr | subquery {
+  $$ = Expr::makeSelect($1);
 };
 
 scalar_expr : column_name | literal
@@ -1278,13 +1379,13 @@ logic_expr : expr AND expr { $$ = Expr::makeOpBinary($1, kOpAnd, $3); }
 
 in_expr : operand IN '(' expr_list ')' { $$ = Expr::makeInOperator($1, $4); }
 | operand NOT IN '(' expr_list ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator($1, $5)); }
-| operand IN '(' select_no_paren ')' { $$ = Expr::makeInOperator($1, $4); }
-| operand NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator($1, $5)); }
+| operand IN subquery { $$ = Expr::makeInOperator($1, $3); }
+| operand NOT IN subquery { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator($1, $4)); }
 // Row constructor on the left of IN, e.g. (a, b) IN (SELECT x, y FROM t). The
 // tuple is represented as an array expression - Expr has no dedicated row type
 // and this keeps every element in the tree instead of dropping any.
-| '(' row_expr_list ')' IN '(' select_no_paren ')' { $$ = Expr::makeInOperator(Expr::makeArray($2), $6); }
-| '(' row_expr_list ')' NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator(Expr::makeArray($2), $7)); }
+| '(' row_expr_list ')' IN subquery { $$ = Expr::makeInOperator(Expr::makeArray($2), $5); }
+| '(' row_expr_list ')' NOT IN subquery { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator(Expr::makeArray($2), $6)); }
 // The literal-list counterpart, e.g. (a, b) IN ((1, 2), (3, 4)).
 | '(' row_expr_list ')' IN '(' in_row_list ')' { $$ = Expr::makeInOperator(Expr::makeArray($2), $6); }
 | '(' row_expr_list ')' NOT IN '(' in_row_list ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator(Expr::makeArray($2), $7)); };
@@ -1322,8 +1423,8 @@ case_expr : CASE expr case_list END { $$ = Expr::makeCase($2, $3, nullptr); }
 case_list : WHEN expr THEN expr { $$ = Expr::makeCaseList(Expr::makeCaseListElement($2, $4)); }
 | case_list WHEN expr THEN expr { $$ = Expr::caseListAppend($1, Expr::makeCaseListElement($3, $5)); };
 
-exists_expr : EXISTS '(' select_no_paren ')' { $$ = Expr::makeExists($3); }
-| NOT EXISTS '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeExists($4)); };
+exists_expr : EXISTS subquery { $$ = Expr::makeExists($2); }
+| NOT EXISTS subquery { $$ = Expr::makeOpUnary(kOpNot, Expr::makeExists($3)); };
 
 comp_expr : operand '=' operand { $$ = Expr::makeOpBinary($1, kOpEquals, $3); }
 | operand EQUALS operand { $$ = Expr::makeOpBinary($1, kOpEquals, $3); }
@@ -1341,10 +1442,10 @@ table_function_expr : IDENTIFIER '(' ')' {
 | IDENTIFIER '(' opt_distinct expr_list ')' {
   $$ = Expr::makeFunctionRef($1, $4, $3, nullptr);
 }
-| IDENTIFIER '.' IDENTIFIER '(' ')' {
+| IDENTIFIER '.' name_after_qualifier '(' ')' {
   $$ = Expr::makeFunctionRef($3, $1, new std::vector<Expr*>(), false, nullptr);
 }
-| IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' {
+| IDENTIFIER '.' name_after_qualifier '(' opt_distinct expr_list ')' {
   $$ = Expr::makeFunctionRef($3, $1, $6, $5, nullptr);
 }
 // Dialect functions whose names collide with grammar keywords, e.g.
@@ -1421,6 +1522,33 @@ datetime_field_plural : SECONDS { $$ = kDatetimeSecond; }
 
 duration_field : datetime_field | datetime_field_plural;
 
+// The range qualifier of an interval type or literal, from a leading to a
+// trailing field such as DAY TO SECOND. Only the seven ranges of the SQL
+// standard are accepted. EXTRACT keeps taking datetime_field, where a range has
+// no meaning.
+interval_range : datetime_field TO datetime_field {
+  if ($1 == kDatetimeYear && $3 == kDatetimeMonth) {
+    $$ = kIntervalYearToMonth;
+  } else if ($1 == kDatetimeDay && $3 == kDatetimeHour) {
+    $$ = kIntervalDayToHour;
+  } else if ($1 == kDatetimeDay && $3 == kDatetimeMinute) {
+    $$ = kIntervalDayToMinute;
+  } else if ($1 == kDatetimeDay && $3 == kDatetimeSecond) {
+    $$ = kIntervalDayToSecond;
+  } else if ($1 == kDatetimeHour && $3 == kDatetimeMinute) {
+    $$ = kIntervalHourToMinute;
+  } else if ($1 == kDatetimeHour && $3 == kDatetimeSecond) {
+    $$ = kIntervalHourToSecond;
+  } else if ($1 == kDatetimeMinute && $3 == kDatetimeSecond) {
+    $$ = kIntervalMinuteToSecond;
+  } else {
+    yyerror(&yyloc, result, scanner,
+            "Found incorrect interval field range. Expected one of: YEAR TO MONTH, DAY TO HOUR, DAY TO MINUTE, "
+            "DAY TO SECOND, HOUR TO MINUTE, HOUR TO SECOND, MINUTE TO SECOND");
+    YYERROR;
+  }
+};
+
 array_expr : ARRAY '[' expr_list ']' { $$ = Expr::makeArray($3); };
 
 // makeArrayIndex takes the index by value, so the int_literal Expr is not
@@ -1435,27 +1563,36 @@ array_index : operand '[' int_literal ']' {
 between_expr : operand BETWEEN operand AND operand { $$ = Expr::makeBetween($1, $3, $5); };
 
 column_name : IDENTIFIER { $$ = Expr::makeColumnRef($1); }
-| IDENTIFIER '.' IDENTIFIER { $$ = Expr::makeColumnRef($1, $3); }
+| IDENTIFIER '.' name_after_qualifier { $$ = Expr::makeColumnRef($1, $3); }
 | '*' { $$ = Expr::makeStar(); }
 | IDENTIFIER '.' '*' { $$ = Expr::makeStar($1); }
 | nonreserved_keyword { $$ = Expr::makeColumnRef($1); }
 // Column qualified by a multi-part table name, e.g. dbo.Table.Column or
 // mydb.dbo.Table.Column - the column-side counterpart of the multi-part
-// table_name below. Expr has a single table slot, so the qualifiers are folded
-// into it the same way table_name folds database+schema; callers that only
-// classify the statement do not read the parts back.
-| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER { $$ = Expr::makeColumnRef(dotJoin($1, $3), $5); }
-| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
-  $$ = Expr::makeColumnRef(dotJoin(dotJoin($1, $3), $5), $7);
+// table_name below. The part before the table fills Expr::schema. Expr has no
+// database slot, so a four-part name folds database and schema into it as
+// "database.schema", the same way table_name does. The qualifiers are spelled
+// out part by part: a table_name here would have to be reduced from the first
+// IDENTIFIER before the parser can see whether the dot starts a two-part
+// column, a qualified star or a schema-qualified function call.
+| IDENTIFIER '.' name_after_qualifier '.' name_after_qualifier { $$ = Expr::makeColumnRef($1, $3, $5); }
+| IDENTIFIER '.' name_after_qualifier '.' name_after_qualifier '.' name_after_qualifier {
+  $$ = Expr::makeColumnRef(dotJoin($1, $3), $5, $7);
 }
-| IDENTIFIER '.' IDENTIFIER '.' '*' { $$ = Expr::makeStar(dotJoin($1, $3)); }
-| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' '*' { $$ = Expr::makeStar(dotJoin(dotJoin($1, $3), $5)); }
+| IDENTIFIER '.' name_after_qualifier '.' '*' {
+  $$ = Expr::makeStar($3);
+  $$->schema = $1;
+}
+| IDENTIFIER '.' name_after_qualifier '.' name_after_qualifier '.' '*' {
+  $$ = Expr::makeStar($5);
+  $$->schema = dotJoin($1, $3);
+}
 // Qualified forms of the keywords below, e.g. t.YEAR, dbo.t.MONTH. Without
 // these the keyword only works as an unqualified name.
 | IDENTIFIER '.' nonreserved_keyword { $$ = Expr::makeColumnRef($1, $3); }
-| IDENTIFIER '.' IDENTIFIER '.' nonreserved_keyword { $$ = Expr::makeColumnRef(dotJoin($1, $3), $5); }
-| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' nonreserved_keyword {
-  $$ = Expr::makeColumnRef(dotJoin(dotJoin($1, $3), $5), $7);
+| IDENTIFIER '.' name_after_qualifier '.' nonreserved_keyword { $$ = Expr::makeColumnRef($1, $3, $5); }
+| IDENTIFIER '.' name_after_qualifier '.' name_after_qualifier '.' nonreserved_keyword {
+  $$ = Expr::makeColumnRef(dotJoin($1, $3), $5, $7);
 };
 
 // Keywords the grammar needs as tokens elsewhere, but which dialects also use
@@ -1484,12 +1621,26 @@ nonreserved_keyword : SECOND { $$ = strdup("SECOND"); }
 | TIMESTAMP { $$ = strdup("TIMESTAMP"); }
 | NEXT { $$ = strdup("NEXT"); };
 
+// A name after a qualifier: an identifier, or one of the datetime keywords. On
+// their own CURRENT_DATE, CURRENT_TIME and CURRENT_TIMESTAMP stand for the
+// current date, time or timestamp, so only a qualified one is a name, e.g.
+// t.current_date, dbo.current_date.a or dbo.current_timestamp(). As for
+// nonreserved_keyword, the canonical spelling is the name.
+name_after_qualifier : IDENTIFIER
+| CURRENT_DATE { $$ = strdup("CURRENT_DATE"); }
+| CURRENT_TIME { $$ = strdup("CURRENT_TIME"); }
+| CURRENT_TIMESTAMP { $$ = strdup("CURRENT_TIMESTAMP"); };
+
+// The last part of a qualified name, which may also be a nonreserved_keyword.
+qualified_name_or_keyword : name_after_qualifier | nonreserved_keyword;
+
 // Any position that names a database object. Kept out of column_name, which
 // would have to choose between reducing an IDENTIFIER here and shifting the
 // '(' of a function call.
 name_or_keyword : IDENTIFIER | nonreserved_keyword;
 
-literal : string_literal | bool_literal | num_literal | null_literal | date_literal | interval_literal | param_expr;
+literal : string_literal | bool_literal | num_literal | null_literal | date_literal | time_literal | timestamp_literal
+| interval_literal | param_expr;
 
 string_literal : STRING { $$ = Expr::makeLiteral($1); };
 
@@ -1512,6 +1663,38 @@ date_literal : DATE STRING {
     YYERROR;
   }
   $$ = Expr::makeDateLiteral($2);
+}
+// The current date is the same kind of literal, without a value of its own.
+// The MySQL spelling with parentheses is accepted as well.
+| CURRENT_DATE { $$ = Expr::makeDateLiteral(nullptr); }
+| CURRENT_DATE '(' ')' { $$ = Expr::makeDateLiteral(nullptr); };
+
+// The string of a time or timestamp literal is kept as it is: fractional seconds
+// and time zones vary too much for one format. CURRENT_TIME and CURRENT_TIMESTAMP
+// may carry the fractional seconds precision in parentheses, which goes to ival;
+// MySQL also writes them with empty parentheses.
+time_literal : TIME STRING { $$ = Expr::makeTimeLiteral($2); }
+| CURRENT_TIME { $$ = Expr::makeTimeLiteral(nullptr); }
+| CURRENT_TIME '(' ')' { $$ = Expr::makeTimeLiteral(nullptr); }
+| CURRENT_TIME '(' INTVAL ')' {
+  if ($3 < 0) {
+    yyerror(&yyloc, result, scanner, "The precision of CURRENT_TIME cannot be negative.");
+    YYERROR;
+  }
+  $$ = Expr::makeTimeLiteral(nullptr);
+  $$->ival = $3;
+};
+
+timestamp_literal : TIMESTAMP STRING { $$ = Expr::makeTimestampLiteral($2); }
+| CURRENT_TIMESTAMP { $$ = Expr::makeTimestampLiteral(nullptr); }
+| CURRENT_TIMESTAMP '(' ')' { $$ = Expr::makeTimestampLiteral(nullptr); }
+| CURRENT_TIMESTAMP '(' INTVAL ')' {
+  if ($3 < 0) {
+    yyerror(&yyloc, result, scanner, "The precision of CURRENT_TIMESTAMP cannot be negative.");
+    YYERROR;
+  }
+  $$ = Expr::makeTimestampLiteral(nullptr);
+  $$->ival = $3;
 };
 
 interval_literal : INTVAL duration_field { $$ = Expr::makeIntervalLiteral($1, $2); }
@@ -1526,6 +1709,9 @@ interval_literal : INTVAL duration_field { $$ = Expr::makeIntervalLiteral($1, $2
   free($2);
   $$ = Expr::makeIntervalLiteral(duration, $3);
 }
+// A field range such as YEAR TO MONTH takes a formatted value, e.g. '1-2',
+// which is kept as the string it is.
+| INTERVAL STRING interval_range { $$ = Expr::makeIntervalRangeLiteral($2, $3); }
 | INTERVAL STRING {
   int duration{0}, chars_parsed{0};
   // 'seconds' and 'minutes' are the longest accepted interval qualifiers (7 chars) + null byte
@@ -1533,12 +1719,12 @@ interval_literal : INTVAL duration_field { $$ = Expr::makeIntervalLiteral($1, $2
   // If the whole string is parsed, chars_parsed points to the terminating null byte after the last character
   if (sscanf($2, "%d %7s%n", &duration, unit_string, &chars_parsed) != 2 || $2[chars_parsed] != 0) {
     free($2);
-    yyerror(&yyloc, result, scanner, "Found incorrect interval format. Expected format: INTEGER INTERVAL_QUALIIFIER");
+    yyerror(&yyloc, result, scanner, "Found incorrect interval format. Expected format: INTEGER INTERVAL_QUALIFIER");
     YYERROR;
   }
   free($2);
 
-  DatetimeField unit;
+  DatetimeField unit = kDatetimeNone;
   if (strcasecmp(unit_string, "second") == 0 || strcasecmp(unit_string, "seconds") == 0) {
     unit = kDatetimeSecond;
   } else if (strcasecmp(unit_string, "minute") == 0 || strcasecmp(unit_string, "minutes") == 0) {
@@ -1597,10 +1783,10 @@ table_ref_atomic : nonjoin_table_ref_atomic | join_clause
 // ends up in the tree.
 | ODBC_OJ table_ref_atomic '}' { $$ = $2; };
 
-nonjoin_table_ref_atomic : table_ref_name | '(' select_statement ')' opt_table_alias {
+nonjoin_table_ref_atomic : table_ref_name | subquery opt_table_alias {
   auto tbl = new TableRef(kTableSelect);
-  tbl->select = $2;
-  tbl->alias = $4;
+  tbl->select = $1;
+  tbl->alias = $2;
   $$ = tbl;
 }
 // Table-valued function, e.g. FROM STRING_SPLIT(s, ','). name mirrors the
@@ -1658,24 +1844,25 @@ table_ref_name_no_alias : table_name {
 
 // Only the last part may be a keyword. Allowing one in a leading part would
 // put '.' in its follow set, which collides with the qualified function call
-// in table_function_expr.
+// in table_function_expr. The datetime keywords are names in every part after
+// the first, see name_after_qualifier.
 table_name : name_or_keyword {
   $$.schema = nullptr;
   $$.name = $1;
 }
-| IDENTIFIER '.' name_or_keyword {
+| IDENTIFIER '.' qualified_name_or_keyword {
   $$.schema = $1;
   $$.name = $3;
 }
-| nonreserved_keyword '.' name_or_keyword {
+| nonreserved_keyword '.' qualified_name_or_keyword {
   $$.schema = $1;
   $$.name = $3;
 }
-| nonreserved_keyword '.' name_or_keyword '.' name_or_keyword {
+| nonreserved_keyword '.' qualified_name_or_keyword '.' qualified_name_or_keyword {
   $$.schema = dotJoin($1, $3);
   $$.name = $5;
 }
-| IDENTIFIER '.' IDENTIFIER '.' name_or_keyword {
+| IDENTIFIER '.' name_after_qualifier '.' qualified_name_or_keyword {
   // Three-part (database.schema.table) name. TableName has no separate
   // database slot, so fold database+schema into schema as "database.schema" -
   // callers here only need the statement to parse, not the individual parts.
@@ -1745,8 +1932,6 @@ opt_row_lock_policy : SKIP LOCKED { $$ = RowLockWaitPolicy::SkipLocked; }
  * With Descriptions
  ******************************/
 
-opt_with_clause : with_clause | /* empty */ { $$ = nullptr; };
-
 with_clause : WITH with_description_list { $$ = $2; };
 
 with_description_list : with_description {
@@ -1758,7 +1943,15 @@ with_description_list : with_description {
   $$ = $1;
 };
 
-with_description : name_or_keyword AS select_with_paren {
+with_description : name_or_keyword AS subquery {
+  // The query expression of a WITH description cannot carry a WITH clause of
+  // its own.
+  if ($3->withDescriptions) {
+    free($1);
+    delete $3;
+    yyerror(&yyloc, result, scanner, "Nested CTE is not allowed.");
+    YYERROR;
+  }
   $$ = new WithDescription();
   $$->alias = $1;
   $$->select = $3;

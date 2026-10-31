@@ -74,6 +74,10 @@ public:
 		/// algorithm. This can be used to prevent timing attacks
 		/// (as discussed in <https://codahale.com/a-lesson-in-timing-attacks/>).
 
+	[[nodiscard]] static bool constantTimeEquals(const std::string& s1, const std::string& s2);
+		/// Compares two strings (e.g., encoded digests or signatures)
+		/// using a constant-time comparison algorithm.
+
 protected:
 	virtual void updateImpl(const void* data, std::size_t length) = 0;
 		/// Updates the digest with the given data. Must be implemented

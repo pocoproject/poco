@@ -62,6 +62,8 @@ struct SQLParser_API SetOperation {
 };
 
 struct SQLParser_API LockingClause {
+  ~LockingClause();
+
   RowLockMode rowLockMode;
   RowLockWaitPolicy rowLockWaitPolicy;
   std::vector<char*>* tables;

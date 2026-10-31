@@ -260,6 +260,12 @@ void NumberParserTest::testParseError()
 
 	try
 	{
+		(void) NumberParser::parse("+-123");
+		failmsg("must throw SyntaxException");
+	} catch (SyntaxException&) { }
+
+	try
+	{
 		(void) NumberParser::parseUnsigned("-123");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
