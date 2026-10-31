@@ -18,7 +18,10 @@
 
 #define TOKEN(name) { return SQL_##name; }
 
-static thread_local std::stringstream strbuf;
+std::stringstream& get_strbuf() {
+    static thread_local std::stringstream buf;
+    return buf;
+}
 
 %}
 
@@ -374,10 +377,10 @@ CHARACTER{WS}+VARYING        TOKEN(CHARACTER_VARYING)
   return SQL_IDENTIFIER;
 }
 
-\'                          { BEGIN singlequotedstring; strbuf.clear(); strbuf.str(""); }  // Clear strbuf manually, see #170
-<singlequotedstring>\'\'    { strbuf << '\''; }
-<singlequotedstring>[^']*   { strbuf << yytext; }
-<singlequotedstring>\'      { BEGIN 0; yylval->sval = strdup(strbuf.str().c_str()); return SQL_STRING; }
+\'                          { BEGIN singlequotedstring; get_strbuf().clear(); get_strbuf().str(""); }  // Clear strbuf manually, see #170
+<singlequotedstring>\'\'    { get_strbuf() << '\''; }
+<singlequotedstring>[^']*   { get_strbuf() << yytext; }
+<singlequotedstring>\'      { BEGIN 0; yylval->sval = strdup(get_strbuf().str().c_str()); return SQL_STRING; }
 <singlequotedstring><<EOF>> { fprintf(stderr, "[SQL-Lexer-Error] Unterminated string\n"); return 0; }
 
 . { fprintf(stderr, "[SQL-Lexer-Error] Unknown Character: %c\n", yytext[0]); return 0; }

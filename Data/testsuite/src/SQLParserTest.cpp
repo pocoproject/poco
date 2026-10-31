@@ -16,6 +16,8 @@
 #include "CppUnit/TestSuite.h"
 #include <sstream>
 #include <set>
+#include <string>
+#include <thread>
 #include <cstdint>
 #include "SQLParser.h"
 #include "sql/AlterStatement.h"
@@ -790,6 +792,67 @@ void SQLParserTest::testTokenize()
 }
 
 
+void SQLParserTest::testPerThreadStringBuffer()
+{
+	// Regression test for issue #4761 / PR #5603.
+	// The thread-local string buffer used by the single-quoted-string lexer
+	// rules must be lazily initialised (function-local static thread_local
+	// inside get_strbuf()) rather than eagerly at thread startup
+	// (namespace-scope static thread_local).  The eager form crashed on
+	// Windows when DLP endpoint software intercepted thread creation before
+	// the C++ runtime had finished setting up its own TLS block.
+	//
+	// Lazy property: the buffer is not constructed until get_strbuf() is
+	// called for the first time, so a brand-new thread that has never
+	// entered the lexer must be able to parse a quoted-string literal
+	// without crashing.
+	//
+	// Value correctness: the string extracted from the SQL token must
+	// match the input literal exactly, distinguishing correct lazy
+	// construction from an uninitialised or shared buffer.
+
+	// Calling-thread check: value extracted correctly on first use.
+	{
+		SQLParserResult result;
+		SQLParser::parse("SELECT 'hello' FROM t;", &result);
+		assertTrue (result.isValid());
+		assertEqual(1, result.size());
+		const SelectStatement* sel =
+			static_cast<const SelectStatement*>(result.getStatement(0));
+		assertTrue (sel->selectList != nullptr && !sel->selectList->empty());
+		const Expr* e = sel->selectList->at(0);
+		assertTrue (e->type == kExprLiteralString);
+		assertTrue (std::string("hello") == std::string(e->name));
+	}
+
+	// Background-thread check: the buffer must be lazily constructed on
+	// first use in a thread that has never called the parser before.
+	// With the old eager namespace-scope initialisation this either
+	// crashed or produced the wrong value on Windows.
+	std::string threadError;
+	std::thread worker([&threadError]()
+	{
+		SQLParserResult result;
+		SQLParser::parse("SELECT 'lazy' FROM t;", &result);
+		if (!result.isValid())
+			{ threadError = "parse failed on new thread"; return; }
+		if (result.size() != 1)
+			{ threadError = "expected 1 statement on new thread"; return; }
+		const SelectStatement* sel =
+			static_cast<const SelectStatement*>(result.getStatement(0));
+		if (!sel->selectList || sel->selectList->empty())
+			{ threadError = "empty select list on new thread"; return; }
+		const Expr* e = sel->selectList->at(0);
+		if (e->type != kExprLiteralString)
+			{ threadError = "expected string literal on new thread"; return; }
+		if (std::string("lazy") != std::string(e->name))
+			{ threadError = "string value mismatch on new thread"; return; }
+	});
+	worker.join();
+	assertTrue (threadError.empty());
+}
+
+
 void SQLParserTest::setUp()
 {
 }
@@ -828,6 +891,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testParseErrorReleasesClauses);
 	CppUnit_addTest(pSuite, SQLParserTest, testComments);
 	CppUnit_addTest(pSuite, SQLParserTest, testTokenize);
+	CppUnit_addTest(pSuite, SQLParserTest, testPerThreadStringBuffer);
 
 	return pSuite;
 }

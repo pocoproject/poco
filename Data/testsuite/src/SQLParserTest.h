@@ -51,6 +51,7 @@ public:
 	void testParseErrorReleasesClauses();
 	void testComments();
 	void testTokenize();
+	void testPerThreadStringBuffer();
 
 	void setUp();
 	void tearDown();
