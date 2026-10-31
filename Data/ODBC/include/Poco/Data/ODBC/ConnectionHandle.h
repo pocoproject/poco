@@ -25,6 +25,8 @@
 #include "Poco/UnWindows.h"
 #endif
 #include <sqltypes.h>
+#include <atomic>
+#include <memory>
 
 
 namespace Poco::Data::ODBC {
@@ -35,9 +37,13 @@ class ODBC_API ConnectionHandle
 	/// ODBC connection handle class
 {
 public:
+	using Counter = std::atomic<Poco::UInt32>;
+		/// The type of the counter that generation() returns.
+
 	static const std::string UNSUPPORTED_SQLSTATE;
 	static const std::string GEN_ERR_SQLSTATE;
 	static const std::string CANT_SET_ATTR_SQLSTATE;
+	static const std::string NOT_OPEN_SQLSTATE;
 
 	ConnectionHandle(const std::string& connectString = "", SQLULEN loginTimeout = 0, SQLULEN timeout = 0);
 		/// Creates the ConnectionHandle.
@@ -50,12 +56,21 @@ public:
 
 	bool connect(const std::string& connectString = "", SQLULEN loginTimeout = 0, SQLULEN timeout = 0);
 		/// Connects the handle to the database.
+		/// A previous connection that is no longer alive is disconnected first.
 
 	bool disconnect();
 		/// Disconnects the handle from database.
+		/// Rolls back an open transaction first, and disconnects
+		/// a connection that is no longer alive too.
 
 	[[nodiscard]] bool isConnected() const;
 		/// Returns true if connected.
+
+	[[nodiscard]] std::shared_ptr<const Counter> generation() const;
+		/// Returns the number of connections the handle has closed.
+		/// SQLDisconnect frees the statement and descriptor handles
+		/// allocated on a connection, so such a handle must not be
+		/// used or freed once the number has changed.
 
 	void setTimeout(int timeout);
 		/// Sets the connection timeout in seconds.
@@ -117,12 +132,22 @@ private:
 		/// Returns true if SQLSTATE is "HY011"
 		/// (Can't set attribute)
 
+	[[nodiscard]] bool isNotOpen(const ConnectionError& e) const;
+		/// Returns true if SQLSTATE is "08003"
+		/// (Connection not open)
+
+	[[nodiscard]] SQLRETURN closeConnection();
+		/// Rolls back an open transaction and disconnects,
+		/// but does not free the handle.
+
 	ConnectionHandle(const ConnectionHandle&);
 	const ConnectionHandle& operator=(const ConnectionHandle&);
 
 	const EnvironmentHandle* _pEnvironment = nullptr;
 	SQLHDBC                  _hdbc = POCO_ODBC_NULL_HDBC;
 	std::string              _connectString;
+	bool                     _connected = false;
+	std::shared_ptr<Counter> _pGeneration = std::make_shared<Counter>(0);
 
 	friend class Poco::Data::ODBC::SessionImpl;
 };
@@ -155,6 +180,12 @@ inline const SQLHDBC& ConnectionHandle::handle() const
 inline const SQLHDBC* ConnectionHandle::pHandle() const
 {
 	return &_hdbc;
+}
+
+
+inline std::shared_ptr<const ConnectionHandle::Counter> ConnectionHandle::generation() const
+{
+	return _pGeneration;
 }
 
 

@@ -102,6 +102,23 @@ void ODBCTest::testSessionPool()
 }
 
 
+void ODBCTest::testClosedSession()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	recreatePersonTable();
+	_pExecutor->closedSession(_rConnectString, 5);
+}
+
+
+void ODBCTest::testExceptionCopy()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	_pExecutor->exceptionCopy();
+}
+
+
 void ODBCTest::testZeroRows()
 {
 	if (!_pSession) failmsg ("Test not available.");
@@ -891,6 +908,15 @@ void ODBCTest::testRecordSet()
 		_pExecutor->recordSet();
 		i += 2;
 	}
+}
+
+
+void ODBCTest::testRecordSetBeforeExecute()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	recreatePersonTable();
+	_pExecutor->recordSetBeforeExecute();
 }
 
 

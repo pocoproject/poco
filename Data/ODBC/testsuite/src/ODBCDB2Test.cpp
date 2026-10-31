@@ -677,6 +677,9 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testTransactor);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNullable);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testReconnect);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testClosedSession);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testExceptionCopy);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testRecordSetBeforeExecute);
 
 		return pSuite;
 	}

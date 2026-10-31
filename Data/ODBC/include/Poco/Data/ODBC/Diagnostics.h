@@ -68,10 +68,24 @@ public:
 		(void)diagnostics();
 	}
 
+	Diagnostics(const Diagnostics& other) = default;
+		/// Creates the Diagnostics from another one.
+		/// Copies the diagnostic records without querying the handle again.
+
+	Diagnostics(Diagnostics&& other) noexcept = default;
+		/// Creates the Diagnostics from another one, taking over its diagnostic records.
+
 	~Diagnostics()
 		/// Destroys the Diagnostics.
 	{
 	}
+
+	Diagnostics& operator = (const Diagnostics& other) = default;
+		/// Assigns another Diagnostics to this one.
+		/// Copies the diagnostic records without querying the handle again.
+
+	Diagnostics& operator = (Diagnostics&& other) noexcept = default;
+		/// Assigns another Diagnostics to this one, taking over its diagnostic records.
 
 	[[nodiscard]] std::string sqlState(int index) const
 		/// Returns SQL state.
@@ -234,7 +248,7 @@ private:
 	FieldVec _fields;
 
 	/// Context handle
-	const H& _handle;
+	H _handle;
 
 	friend class Error<H, handleType>;
 };

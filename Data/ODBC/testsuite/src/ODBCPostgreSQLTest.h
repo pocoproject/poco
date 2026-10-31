@@ -47,6 +47,9 @@ public:
 	void testStoredFunctionAny() override;
 	void testStoredFunctionDynamicAny() override;
 
+	void testUncommittedWorkRolledBack();
+	void testLostConnection();
+
 	static CppUnit::Test* suite();
 
 private:

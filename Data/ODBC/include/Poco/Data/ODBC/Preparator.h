@@ -383,6 +383,7 @@ public:
 	[[nodiscard]] std::size_t columns() const;
 		/// Returns the number of columns.
 		/// Resizes the internal storage iff the size is zero.
+		/// Once the connection of the statement has been closed, returns the number known by then.
 
 	[[nodiscard]] Poco::Any& operator [] (std::size_t pos);
 		/// Returns reference to column data.
@@ -564,6 +565,7 @@ private:
 
 	void resize() const;
 		/// Resize the values and lengths vectors.
+		/// Does nothing once the connection of the statement has been closed.
 
 	template <typename T>
 	void prepareFixedSize(std::size_t pos, SQLSMALLINT valueType)

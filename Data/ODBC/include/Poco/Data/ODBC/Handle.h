@@ -38,7 +38,9 @@ class Handle
 public:
 	Handle(const ConnectionHandle& rConnection):
 		_rConnection(rConnection),
-		_handle(nullptr)
+		_handle(nullptr),
+		_pGeneration(rConnection.generation()),
+		_generation(*_pGeneration)
 			/// Creates the Handle.
 	{
 		if (Utility::isError(SQLAllocHandle(handleType,
@@ -51,19 +53,18 @@ public:
 
 	~Handle()
 		/// Destroys the Handle.
+		/// Does not free the native handle if its connection
+		/// has been closed, because SQLDisconnect has freed it.
 	{
-		try
-		{
-#if defined(_DEBUG)
-			SQLRETURN rc =
-#endif
-			SQLFreeHandle(handleType, _handle);
-			poco_assert_dbg (!Utility::isError(rc));
-		}
-		catch (...)
-		{
-			poco_unexpected();
-		}
+		if (isValid()) SQLFreeHandle(handleType, _handle);
+	}
+
+	[[nodiscard]] bool isValid() const
+		/// Returns true if the connection on which the native handle
+		/// was allocated is still open. Once it has been closed, the
+		/// native handle is freed and must not be used.
+	{
+		return *_pGeneration == _generation;
 	}
 
 	[[nodiscard]] operator const H& () const
@@ -102,6 +103,8 @@ private:
 
 	const ConnectionHandle& _rConnection;
 	H _handle;
+	std::shared_ptr<const ConnectionHandle::Counter> _pGeneration;
+	Poco::UInt32 _generation;
 
 	friend class ODBCStatementImpl;
 };

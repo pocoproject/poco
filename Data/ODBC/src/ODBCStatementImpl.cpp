@@ -55,7 +55,7 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 			0);
 		if (Utility::isError(rc))
 		{
-			throw ODBC::ConnectionException(_stmt,
+			throw ODBC::StatementException(_stmt,
 				Poco::format("SQLSetStmtAttr(SQL_ATTR_QUERY_TIMEOUT, %d)", queryTimeout));
 		}
 	}
@@ -77,6 +77,7 @@ ODBCStatementImpl::~ODBCStatementImpl()
 
 void ODBCStatementImpl::compileImpl()
 {
+	checkConnection();
 	if (!_canCompile) return;
 
 	_stepCalled = false;
@@ -270,6 +271,7 @@ void ODBCStatementImpl::printErrors(std::ostream& os) const
 
 void ODBCStatementImpl::bindImpl()
 {
+	checkConnection();
 	doBind();
 
 	SQLRETURN rc = SQLExecute(_stmt);
@@ -283,6 +285,7 @@ void ODBCStatementImpl::bindImpl()
 
 void ODBCStatementImpl::execDirectImpl(const std::string& query)
 {
+	checkConnection();
 	SQLCHAR * statementText = (SQLCHAR*) query.c_str();
 	SQLINTEGER textLength = static_cast<SQLINTEGER>(query.size());
 	SQLRETURN rc = SQLExecDirect(_stmt,statementText,textLength);
@@ -331,6 +334,7 @@ void ODBCStatementImpl::clear()
 
 bool ODBCStatementImpl::hasNext()
 {
+	checkConnection();
 	if (hasData())
 	{
 		if (!extractions().size())
@@ -396,6 +400,7 @@ void ODBCStatementImpl::makeStep()
 
 std::size_t ODBCStatementImpl::next()
 {
+	checkConnection();
 	std::size_t count = 0;
 
 	if (nextRowReady())
@@ -427,6 +432,7 @@ std::size_t ODBCStatementImpl::next()
 
 std::string ODBCStatementImpl::nativeSQL()
 {
+	poco_check_ptr (_rConnection);
 	std::string statement = toString();
 
 	SQLINTEGER length = (SQLINTEGER) statement.size() * 2;
@@ -466,12 +472,28 @@ void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
 	{
 		std::ostringstream os;
 		os << std::endl << "Requested SQL statement: " << toString() << std::endl;
-		os << "Native SQL statement: " << nativeSQL() << std::endl;
+		os << "Native SQL statement: ";
+		try
+		{
+			os << nativeSQL();
+		}
+		catch (Poco::Exception&)
+		{
+			// the statement error is reported, not the failure to describe it
+		}
+		os << std::endl;
 		std::string str(msg); str += os.str();
 
 		throw StatementException(_stmt, str);
 	}
 	else if (SQL_SUCCESS_WITH_INFO == rc) addErrors();
+}
+
+
+void ODBCStatementImpl::checkConnection() const
+{
+	if (!_stmt.isValid())
+		throw NotConnectedException(session().connectorName());
 }
 
 
@@ -514,7 +536,7 @@ const MetaColumn& ODBCStatementImpl::metaColumn(std::size_t pos) const
 
 int ODBCStatementImpl::affectedRowCount() const
 {
-	if (0 == _affectedRowCount)
+	if (0 == _affectedRowCount && _stmt.isValid())
 	{
 		SQLLEN rows = 0;
 		if (!Utility::isError(SQLRowCount(_stmt, &rows)))

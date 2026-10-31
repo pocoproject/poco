@@ -161,6 +161,7 @@ std::string Utility::sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type)
 	const SQLSMALLINT bufSize = 1024;
 	SQLCHAR dbmsName[bufSize] = {0};
 	SQLSMALLINT retSize = 0;
+	poco_check_ptr (db.handle());
 	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), type, dbmsName, bufSize, &retSize);
 	if (!isError(rc))
 	{

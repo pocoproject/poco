@@ -62,6 +62,7 @@ Preparator::~Preparator()
 
 void Preparator::freeMemory() const
 {
+	bool unknownType = false;
 	IndexMap::iterator it = _varLengthArrays.begin();
 	IndexMap::iterator end = _varLengthArrays.end();
 	for (; it != end; ++it)
@@ -113,9 +114,14 @@ void Preparator::freeMemory() const
 			}
 
 			default:
-				throw InvalidArgumentException("Unknown data type.");
+				// free the remaining arrays before reporting it
+				unknownType = true;
+				break;
 		}
 	}
+
+	if (unknownType)
+		throw InvalidArgumentException("Unknown data type.");
 }
 
 
@@ -128,8 +134,9 @@ std::size_t Preparator::columns() const
 
 void Preparator::resize() const
 {
+	// once the connection of the statement is closed, SQLDisconnect has freed the handle
 	SQLSMALLINT nCol = 0;
-	if (!Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 0 != nCol)
+	if (_rStmt.isValid() && !Utility::isError(SQLNumResultCols(_rStmt, &nCol)) && 0 != nCol)
 	{
 		_values.resize(nCol, 0);
 		_lengths.resize(nCol, 0);

@@ -43,8 +43,9 @@ public:
 	{
 	}
 
-	Error(const Error& other) : Error(other.diagnostics().handle())
+	Error(const Error& other) : _pDiag(std::make_unique<Diagnostics<H, handleType>>(other.diagnostics()))
 		/// Creates the Error from another one.
+		/// Copies the diagnostic records; the handle, which may be freed by now, is not queried again.
 	{
 	}
 
@@ -55,8 +56,9 @@ public:
 
 	Error& operator = (const Error& other)
 		/// Assigns another Error to this one.
+		/// Copies the diagnostic records; the handle, which may be freed by now, is not queried again.
 	{
-		_pDiag.reset(new Diagnostics<H, handleType>(other.diagnostics().handle()));
+		_pDiag = std::make_unique<Diagnostics<H, handleType>>(other.diagnostics());
 		return *this;
 	}
 

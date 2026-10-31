@@ -1031,6 +1031,9 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testStdTupleWithOptional);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testReconnect);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testClosedSession);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testExceptionCopy);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testRecordSetBeforeExecute);
 
 		return pSuite;
 	}

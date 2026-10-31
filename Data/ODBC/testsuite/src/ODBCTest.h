@@ -52,6 +52,8 @@ public:
 	virtual void testConnection();
 	virtual void testSession();
 	virtual void testSessionPool();
+	virtual void testClosedSession();
+	virtual void testExceptionCopy();
 
 	virtual void testZeroRows();
 	virtual void testSimpleAccess();
@@ -115,6 +117,7 @@ public:
 	virtual void testBLOBStmt();
 
 	virtual void testRecordSet();
+	virtual void testRecordSetBeforeExecute();
 
 	virtual void testDateTime();
 	virtual void testDate();

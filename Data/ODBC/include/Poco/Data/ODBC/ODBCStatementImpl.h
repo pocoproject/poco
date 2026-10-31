@@ -49,14 +49,17 @@ public:
 
 	[[nodiscard]] std::string nativeSQL();
 		/// Returns the SQL string as modified by the driver.
+		/// Throws NullPointerException if the session is not connected.
 
 protected:
 	[[nodiscard]] std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
+		/// Once the connection of the statement has been closed, returns the number known by then.
 
 	[[nodiscard]] int affectedRowCount() const override;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert or update.
+		/// Once the connection of the statement has been closed, returns the number known by then.
 
 	[[nodiscard]] const MetaColumn& metaColumn(std::size_t pos) const override;
 		/// Returns column meta data.
@@ -143,6 +146,11 @@ private:
 	void fillColumns();
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
+	void checkConnection() const;
+		/// Throws NotConnectedException if the connection on which the
+		/// statement handle was allocated has been closed, even if the
+		/// session has been opened again since.
+
 	struct ERROR_INFO
 	{
 		SQLCHAR state[8];
@@ -171,8 +179,8 @@ private:
 //
 inline AbstractExtraction::ExtractorPtr ODBCStatementImpl::extractor()
 {
-	poco_assert_dbg (currentDataSet() < _extractors.size());
-	poco_assert_dbg (_extractors[currentDataSet()]);
+	poco_assert (currentDataSet() < _extractors.size());
+	poco_check_ptr (_extractors[currentDataSet()]);
 	return _extractors[currentDataSet()];
 }
 
@@ -186,8 +194,7 @@ inline AbstractBinding::BinderPtr ODBCStatementImpl::binder()
 
 inline std::size_t ODBCStatementImpl::columnsReturned() const
 {
-	poco_assert_dbg (currentDataSet() < _preparations.size());
-	poco_assert_dbg (_preparations[currentDataSet()]);
+	if (currentDataSet() >= _preparations.size()) return 0;
 	return static_cast<std::size_t>(_preparations[currentDataSet()]->columns());
 }
 
