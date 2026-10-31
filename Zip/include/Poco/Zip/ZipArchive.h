@@ -58,6 +58,10 @@ public:
 
 	[[nodiscard]] FileInfos::const_iterator fileInfoEnd() const;
 
+	[[nodiscard]] FileInfos::const_iterator findFileInfo(const std::string& fileName) const;
+		/// Returns the central directory entry of the file with the given name,
+		/// or fileInfoEnd() if the archive has no such entry.
+
 	[[nodiscard]] FileHeaders::const_iterator findHeader(const std::string& fileName) const;
 
 	[[nodiscard]] FileHeaders::const_iterator headerBegin() const;
@@ -96,6 +100,12 @@ inline ZipArchive::FileInfos::const_iterator ZipArchive::fileInfoBegin() const
 inline ZipArchive::FileInfos::const_iterator ZipArchive::fileInfoEnd() const
 {
 	return _infos.end();
+}
+
+
+inline ZipArchive::FileInfos::const_iterator ZipArchive::findFileInfo(const std::string& fileName) const
+{
+	return _infos.find(fileName);
 }
 
 

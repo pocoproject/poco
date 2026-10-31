@@ -27,9 +27,16 @@ Keep::Keep(const ZipLocalFileHeader& hdr):
 }
 
 
+Keep::Keep(const ZipLocalFileHeader& hdr, const ZipFileInfo& info):
+	_hdr(hdr),
+	_info(info)
+{
+}
+
+
 void Keep::execute(Compress& c, std::istream& input)
 {
-	c.addFileRaw(input, _hdr, _hdr.getFileName());
+	c.addFileRaw(input, _hdr, _hdr.getFileName(), _info);
 }
 
 

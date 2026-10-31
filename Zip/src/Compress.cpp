@@ -110,7 +110,7 @@ void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, 
 }
 
 
-void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const Poco::Path& fileName)
+void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const Poco::Path& fileName, const std::optional<ZipFileInfo>& info)
 {
 	if (!in.good())
 		throw ZipException("Invalid input stream");
@@ -128,6 +128,8 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 		hdr.setZip64Data();
 	//bypass zipoutputstream
 	//write the header directly
+	// This header is final and the entry data follows it: the CRC and the sizes of the copied entry are known, and an
+	// entry with a data descriptor carries them in the descriptor after its data.
 	std::string header = hdr.createHeader();
 	_out.write(header.c_str(), static_cast<std::streamsize>(header.size()));
 	// now fwd the payload to _out in chunks of size CHUNKSIZE
@@ -150,7 +152,7 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 			{
 				in.read(buffer.begin(), remaining);
 				std::streamsize n = in.gcount();
-				poco_assert_dbg (n == remaining);
+				poco_assert_dbg (n == static_cast<std::streamsize>(remaining));
 				_out.write(buffer.begin(), n);
 				remaining = 0;
 			}
@@ -161,27 +163,26 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	//write optional block afterwards
 	if (hdr.searchCRCAndSizesAfterData())
 	{
+		// The values come from the source descriptor, which was read when the archive was parsed. The format follows
+		// the written header: a header with a ZIP64 extra field needs a ZIP64 descriptor, whatever the source had.
 		if (hdr.needsZip64())
 		{
-			ZipDataInfo64 info(in, false);
-			_out.write(info.getRawHeader(), static_cast<std::streamsize>(info.getFullHeaderSize()));
-			_offset += info.getFullHeaderSize();
+			ZipDataInfo64 dataInfo;
+			dataInfo.setCRC32(hdr.getCRC());
+			dataInfo.setCompressedSize(hdr.getCompressedSize());
+			dataInfo.setUncompressedSize(hdr.getUncompressedSize());
+			_out.write(dataInfo.getRawHeader(), static_cast<std::streamsize>(dataInfo.getFullHeaderSize()));
+			_offset += dataInfo.getFullHeaderSize();
 		}
 		else
 		{
-			ZipDataInfo info(in, false);
-			_out.write(info.getRawHeader(), static_cast<std::streamsize>(info.getFullHeaderSize()));
-			_offset += info.getFullHeaderSize();
+			ZipDataInfo dataInfo;
+			dataInfo.setCRC32(hdr.getCRC());
+			dataInfo.setCompressedSize(static_cast<Poco::UInt32>(hdr.getCompressedSize()));
+			dataInfo.setUncompressedSize(static_cast<Poco::UInt32>(hdr.getUncompressedSize()));
+			_out.write(dataInfo.getRawHeader(), static_cast<std::streamsize>(dataInfo.getFullHeaderSize()));
+			_offset += dataInfo.getFullHeaderSize();
 		}
-	}
-	else
-	{
-		if (hdr.hasExtraField())	 // Update sizes in header extension.
-			hdr.setZip64Data();
-		_out.seekp(hdr.getStartPos(), std::ios_base::beg);
-		std::string headerData = hdr.createHeader();
-		_out.write(headerData.c_str(), static_cast<std::streamsize>(headerData.size()));
-		_out.seekp(0, std::ios_base::end);
 	}
 
 	_files.insert(std::make_pair(fileName.toString(Poco::Path::PATH_UNIX), hdr));
@@ -189,6 +190,8 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 	ZipFileInfo nfo(hdr);
 	nfo.setOffset(localHeaderOffset);
 	nfo.setZip64Data();
+	if (info.has_value())
+		nfo.copyAttributes(*info);
 	_infos.insert(std::make_pair(fileName.toString(Poco::Path::PATH_UNIX), nfo));
 	EDone.notify(this, hdr);
 }
@@ -376,7 +379,7 @@ ZipArchive Compress::close()
 	_out.write(centr.c_str(), static_cast<std::streamsize>(centr.size()));
 	_out.flush();
 	_offset += centr.size();
-	_dirs.insert(std::make_pair(0, central));
+	_dirs.insert(std::make_pair(static_cast<Poco::UInt16>(0), central));
 	return ZipArchive(_files, _infos, _dirs, _dirs64);
 }
 
