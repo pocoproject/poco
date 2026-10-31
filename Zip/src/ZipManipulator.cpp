@@ -64,7 +64,10 @@ void ZipManipulator::renameFile(const std::string& zipPath, const std::string& n
 	const ZipLocalFileHeader& entry = getForChange(zipPath);
 	// checked later in Compress too but the earlier one gets the error the better
 	std::string fn = ZipUtil::validZipEntryFileName(newZipPath);
-	addOperation(zipPath, new Rename(entry, fn));
+	if (const auto itInfo = _in->findFileInfo(zipPath); itInfo != _in->fileInfoEnd())
+		addOperation(zipPath, new Rename(entry, itInfo->second, fn));
+	else
+		addOperation(zipPath, new Rename(entry, fn));
 }
 
 
@@ -147,6 +150,11 @@ ZipArchive ZipManipulator::compress(const std::string& outFile)
 		{
 			itC->second->execute(c, in);
 			_changes.erase(itC);
+		}
+		else if (const auto itInfo = _in->findFileInfo(it->first); itInfo != _in->fileInfoEnd())
+		{
+			Keep k(it->second, itInfo->second);
+			k.execute(c, in);
 		}
 		else
 		{

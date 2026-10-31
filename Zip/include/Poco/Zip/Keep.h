@@ -21,6 +21,8 @@
 #include "Poco/Zip/Zip.h"
 #include "Poco/Zip/ZipOperation.h"
 #include "Poco/Zip/ZipLocalFileHeader.h"
+#include "Poco/Zip/ZipFileInfo.h"
+#include <optional>
 
 
 namespace Poco::Zip {
@@ -34,11 +36,16 @@ public:
 	Keep(const ZipLocalFileHeader& hdr);
 		/// Creates the Keep object.
 
+	Keep(const ZipLocalFileHeader& hdr, const ZipFileInfo& info);
+		/// Creates the Keep object. The copied entry gets the
+		/// attributes of the directory entry info.
+
 	void execute(Compress& c, std::istream& input);
 		///Adds a copy of the compressed input file to the ZipArchive
 
 private:
 	const ZipLocalFileHeader _hdr;
+	const std::optional<ZipFileInfo> _info;
 };
 
 

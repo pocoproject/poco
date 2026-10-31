@@ -165,6 +165,15 @@ std::string ZipFileInfo::createHeader() const
 }
 
 
+void ZipFileInfo::copyAttributes(const ZipFileInfo& info)
+{
+	// setHostSystem() also changes the version needed to extract, which belongs to this entry.
+	std::memcpy(_rawInfo + VERSIONMADEBY_POS, info._rawInfo + VERSIONMADEBY_POS, VERSIONMADEBY_SIZE);
+	std::memcpy(_rawInfo + INTERNALFILE_ATTR_POS, info._rawInfo + INTERNALFILE_ATTR_POS, INTERNALFILE_ATTR_SIZE);
+	setExternalFileAttributes(info.getExternalFileAttributes());
+}
+
+
 void ZipFileInfo::setUnixAttributes()
 {
 	bool isDir = isDirectory();

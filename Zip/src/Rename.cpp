@@ -26,9 +26,17 @@ Rename::Rename(const ZipLocalFileHeader& hdr, const std::string& newZipEntryName
 }
 
 
+Rename::Rename(const ZipLocalFileHeader& hdr, const ZipFileInfo& info, const std::string& newZipEntryName):
+	_hdr(hdr),
+	_info(info),
+	_newZipEntryName(newZipEntryName)
+{
+}
+
+
 void Rename::execute(Compress& c, std::istream& input)
 {
-	c.addFileRaw(input, _hdr, _newZipEntryName);
+	c.addFileRaw(input, _hdr, _newZipEntryName, _info);
 }
 
 

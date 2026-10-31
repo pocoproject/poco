@@ -22,6 +22,7 @@
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/BasicEvent.h"
 #include <istream>
+#include <optional>
 #include <ostream>
 #include <set>
 
@@ -101,8 +102,9 @@ private:
 		/// Either adds a file or a single directory entry (excluding subchildren) to the Zip file. the compression level will be ignored
 		/// for directories.
 
-	void addFileRaw(std::istream& in, const ZipLocalFileHeader& hdr, const Poco::Path& fileName);
-		/// copys an already compressed ZipEntry from in
+	void addFileRaw(std::istream& in, const ZipLocalFileHeader& hdr, const Poco::Path& fileName, const std::optional<ZipFileInfo>& info);
+		/// Copies an already compressed ZipEntry from in. The directory entry of the copy
+		/// gets the attributes of info, or the default attributes if info is empty.
 
 private:
 	std::set<std::string>        _storeExtensions;

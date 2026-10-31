@@ -96,6 +96,10 @@ public:
 
 	void setZip64Data();
 
+	void copyAttributes(const ZipFileInfo& info);
+		/// Copies the version made by, which includes the host system, and the
+		/// internal and external file attributes from the given directory entry.
+
 private:
 
 	void setCRC(Poco::UInt32 val);
