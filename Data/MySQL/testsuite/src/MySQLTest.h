@@ -109,6 +109,9 @@ public:
 	void testTransaction();
 
 	void testReconnect();
+	void testClosedSession();
+	void testOpenConnectedSession();
+	void testLostConnection();
 	void testSessionPoolAndUnicode();
 
 	void setUp();

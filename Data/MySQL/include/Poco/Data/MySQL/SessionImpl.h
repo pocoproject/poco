@@ -75,9 +75,11 @@ public:
 
 	void open(const std::string& connection = "") override;
 		/// Opens a connection to the database.
+		/// Throws InvalidAccessException if the session is already connected.
 
 	void close() override;
 		/// Closes the connection.
+		/// The session is not in a transaction afterwards; the server rolls an open one back.
 
 	void reset() override;
 		/// Reset connection with dababase and clears session state, but without disconnecting
@@ -99,18 +101,23 @@ public:
 
 	void setConnectionTimeout(std::size_t timeout) override;
 		/// Sets the session connection timeout value.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] std::size_t getConnectionTimeout() const override;
 		/// Returns the session connection timeout value.
 
 	void begin() override;
 		/// Starts a transaction
+		/// Throws NullPointerException if the session is not connected.
 
 	void commit() override;
 		/// Commits and ends a transaction
+		/// Throws NullPointerException if the session is not connected.
 
 	void rollback() override;
 		/// Aborts a transaction
+		/// Throws NullPointerException if the session is not connected.
+		/// If the rollback fails because the connection is lost, the transaction counts as ended.
 
 	[[nodiscard]] bool canTransact() const override;
 		/// Returns true if session has transaction capabilities.
@@ -120,9 +127,11 @@ public:
 
 	void setTransactionIsolation(Poco::UInt32 ti) override;
 		/// Sets the transaction isolation level.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] Poco::UInt32 getTransactionIsolation() const override;
 		/// Returns the transaction isolation level.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] bool hasTransactionIsolation(Poco::UInt32 ti) const override;
 		/// Returns true iff the transaction isolation level corresponding
@@ -131,9 +140,11 @@ public:
 	[[nodiscard]] bool isTransactionIsolation(Poco::UInt32 ti) const override;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
+		/// Throws NullPointerException if the session is not connected.
 
 	void autoCommit(const std::string&, bool val);
 		/// Sets autocommit property for the session.
+		/// If the session is not connected, only records the value; open() turns autocommit on.
 
 	[[nodiscard]] bool isAutoCommit(const std::string& name="") const;
 		/// Returns autocommit property value.
@@ -143,6 +154,7 @@ public:
 
 	[[nodiscard]] Poco::Any getInsertId(const std::string&) const;
 		/// Get insert id
+		/// Throws NullPointerException if the session is not connected.
 
 	void setFailIfInnoReadOnly(const std::string&, bool value);
 		/// Sets the "failIfInnoReadOnly" feature. If set, isGood() will

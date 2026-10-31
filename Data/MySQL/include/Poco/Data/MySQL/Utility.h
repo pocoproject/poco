@@ -32,24 +32,31 @@ class MySQL_API Utility
 public:
 	[[nodiscard]] static std::string serverInfo(MYSQL* pHandle);
 		/// Returns server info.
+		/// Throws NullPointerException if pHandle is null or has no server info.
 
 	[[nodiscard]] static std::string serverInfo(Poco::Data::Session& session);
 		/// Returns server info.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] static unsigned long serverVersion(MYSQL* pHandle);
 		/// Returns server version.
+		/// Throws NullPointerException if pHandle is null.
 
 	[[nodiscard]] static unsigned long serverVersion(Poco::Data::Session& session);
 		/// Returns server version.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] static std::string hostInfo(MYSQL* pHandle);
 		/// Returns host info.
+		/// Throws NullPointerException if pHandle is null or has no host info.
 
 	[[nodiscard]] static std::string hostInfo(Poco::Data::Session& session);
 		/// Returns host info.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] static MYSQL* handle(Poco::Data::Session& session);
 		/// Returns native MySQL handle for the session.
+		/// Returns nullptr if the session is not connected; the handle changes when the session is opened again.
 };
 
 

@@ -18,6 +18,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/StatementImpl.h"
+#include "Poco/Data/Transaction.h"
 #include "Poco/Data/MySQL/Connector.h"
 #include "Poco/Data/MySQL/Utility.h"
 #include "Poco/Data/MySQL/MySQLException.h"
@@ -32,6 +33,7 @@ using Poco::Data::MySQL::Utility;
 using Poco::Data::MySQL::StatementException;
 using Poco::format;
 using Poco::NotFoundException;
+using Poco::NullPointerException;
 using Poco::Int32;
 using Poco::Nullable;
 using Poco::Tuple;
@@ -596,6 +598,173 @@ void MySQLTest::testReconnect()
 }
 
 
+void MySQLTest::testClosedSession()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	recreatePersonTable();
+
+	Session session(MySQL::Connector::KEY, _dbConnString);
+	Statement stmt = (session << "DELETE FROM Person");
+	session.setFeature("autoCommit", false);
+	session.close();
+	assertTrue (!session.isConnected());
+	assertTrue (Utility::handle(session) == nullptr);
+
+	try { stmt.execute(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+
+	try { session.begin(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+
+	try { session.commit(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+
+	try { session.rollback(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+
+	try { session.impl()->begin(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { session.impl()->commit(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { session.impl()->rollback(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	// a closed session only records the autocommit mode
+	session.setFeature("autoCommit", true);
+	assertTrue (session.getFeature("autoCommit"));
+
+	try { session.setConnectionTimeout(5); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { session.setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) session.getTransactionIsolation(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) session.getProperty("insertId"); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	MYSQL* pHandle = nullptr;
+	try { (void) Utility::serverInfo(pHandle); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) Utility::serverVersion(pHandle); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) Utility::hostInfo(pHandle); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) Utility::serverInfo(session); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) Utility::serverVersion(session); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) Utility::hostInfo(session); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	std::string noServer = "host=" MYSQL_HOST ";port=1;user=" MYSQL_USER ";password=" MYSQL_PWD ";db=" MYSQL_DB;
+	try { session.open(noServer); fail ("must fail"); }
+	catch (ConnectionFailedException&) { }
+	assertTrue (!session.isConnected());
+	assertTrue (Utility::handle(session) == nullptr);
+
+	// the failed open() has freed its handle again
+	try { (void) session.getTransactionIsolation(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	Session session2(MySQL::Connector::KEY, _dbConnString);
+	int count = 0;
+	Statement select = (session2 << "SELECT COUNT(*) FROM Person", into(count), now);
+	{
+		Transaction trans(session2);
+		session2.close();
+	}
+	assertTrue (!session2.isConnected());
+	assertTrue (!session2.isTransaction());
+
+	session2.open();
+	assertTrue (Utility::handle(session2) != nullptr);
+	assertTrue (!Utility::serverInfo(session2).empty());
+	assertTrue (session2.getFeature("autoCommit"));
+	assertTrue (!session2.isTransaction());
+	session2.begin();
+	session2.rollback();
+
+	// a statement cannot be used once the connection it was created on is closed
+	try { select.execute(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+}
+
+
+void MySQLTest::testOpenConnectedSession()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	Session session(MySQL::Connector::KEY, _dbConnString);
+	MYSQL* pHandle = Utility::handle(session);
+	assertTrue (pHandle != nullptr);
+	Poco::UInt64 id = 0;
+	session << "SELECT CONNECTION_ID()", into(id), now;
+
+	// a connected session refuses open(), also with its own connection string
+	try { session.open(_dbConnString); fail ("must fail"); }
+	catch (Poco::InvalidAccessException&) { }
+
+	try { session.open(); fail ("must fail"); }
+	catch (Poco::InvalidAccessException&) { }
+
+	// and keeps its connection
+	assertTrue (session.isConnected());
+	assertTrue (Utility::handle(session) == pHandle);
+	Poco::UInt64 sameId = 0;
+	session << "SELECT CONNECTION_ID()", into(sameId), now;
+	assertTrue (id == sameId);
+
+	// a failed open() frees the handle it has made, so nothing can be set on the session
+	session.close();
+	std::string noServer = "host=" MYSQL_HOST ";port=1;user=" MYSQL_USER ";password=" MYSQL_PWD ";db=" MYSQL_DB;
+	try { session.open(noServer); fail ("must fail"); }
+	catch (ConnectionFailedException&) { }
+	assertTrue (!session.isConnected());
+
+	try { session.setConnectionTimeout(5); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	// until open() succeeds again
+	session.open(_dbConnString);
+	assertTrue (session.isConnected());
+	session.setConnectionTimeout(5);
+	assertTrue (5 == session.getConnectionTimeout());
+}
+
+
+void MySQLTest::testLostConnection()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	// no auto-reconnect, so that the rollback fails on the lost connection
+	std::string connString = "host=" MYSQL_HOST ";user=" MYSQL_USER ";password=" MYSQL_PWD ";db=" MYSQL_DB;
+	Session session(MySQL::Connector::KEY, connString);
+	Poco::UInt64 id = 0;
+	session << "SELECT CONNECTION_ID()", into(id), now;
+	session.begin();
+	assertTrue (session.isTransaction());
+
+	*_pSession << "KILL " + std::to_string(id), now;
+
+	try { session.rollback(); fail ("must fail"); }
+	catch (MySQL::TransactionException&) { }
+
+	// the server ended the transaction with the connection
+	assertTrue (!session.isTransaction());
+}
+
+
 void MySQLTest::testNullableInt()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1021,6 +1190,9 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testSessionTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testTransaction);
 	CppUnit_addTest(pSuite, MySQLTest, testReconnect);
+	CppUnit_addTest(pSuite, MySQLTest, testClosedSession);
+	CppUnit_addTest(pSuite, MySQLTest, testOpenConnectedSession);
+	CppUnit_addTest(pSuite, MySQLTest, testLostConnection);
 	CppUnit_addTest(pSuite, MySQLTest, testSessionPoolAndUnicode);
 	return pSuite;
 }
