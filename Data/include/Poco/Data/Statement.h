@@ -409,6 +409,8 @@ public:
 		///
 		/// For Poco::Data builds without SQLParser support, the behavior is the same as
 		/// for unsuccesful parsing.
+		///
+		/// Throws NotConnectedException if the session is not connected; no transaction is started then.
 
 	void executeDirect(const std::string& query);
 		/// Executes the query synchronously and directly.
@@ -424,6 +426,11 @@ public:
 		/// When executed on a synchronous statement, this method does not alter the
 		/// statement's synchronous nature.
 		/// For transactional behavior, see execute() documentation.
+		/// The implementation is kept alive while the execution runs, even if the
+		/// Statement is destroyed first; the Result does not hold it.
+		/// The Session and the variables bound with use() or into() are not kept
+		/// alive; they must outlive the execution, which has ended once wait() on
+		/// the Result has returned.
 
 	void setAsync(bool async = true);
 		/// Sets the asynchronous flag. If this flag is true, executeAsync() is called
@@ -590,7 +597,6 @@ private:
 	bool                _async;
 	mutable ResultPtr   _pResult;
 	Mutex               _mutex;
-	AsyncExecMethodPtr  _pAsyncExec;
 	std::vector<Any>    _arguments;
 	RowFormatter::Ptr   _pRowFormatter;
 	mutable std::string _stmtString;

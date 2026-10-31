@@ -74,8 +74,13 @@ RowFilter::~RowFilter()
 
 bool RowFilter::isAllowed(std::size_t row) const
 {
+	return isAllowed(row, recordSet());
+}
+
+
+bool RowFilter::isAllowed(std::size_t row, const RecordSet& rs) const
+{
 	Poco::Dynamic::Var retVal;
-	const RecordSet& rs = recordSet();
 
 	std::size_t columns = rs.columnCount();
 	ComparisonMap::const_iterator it = _comparisonMap.begin();
@@ -125,16 +130,16 @@ bool RowFilter::isAllowed(std::size_t row) const
 		if (OP_OR == fIt->second)
 		{
 			if (retVal.isEmpty())
-				retVal = fIt->first->isAllowed(row);
+				retVal = fIt->first->isAllowed(row, rs);
 			else
-				retVal = retVal || fIt->first->isAllowed(row);
+				retVal = retVal || fIt->first->isAllowed(row, rs);
 		}
 		else if (OP_AND == fIt->second)
 		{
 			if (retVal.isEmpty())
-				retVal = fIt->first->isAllowed(row);
+				retVal = fIt->first->isAllowed(row, rs);
 			else
-				retVal = retVal && fIt->first->isAllowed(row);
+				retVal = retVal && fIt->first->isAllowed(row, rs);
 		}
 		else
 			throw IllegalStateException("Unknown logical operation.");
@@ -147,8 +152,7 @@ bool RowFilter::isAllowed(std::size_t row) const
 
 int RowFilter::remove(const std::string& name)
 {
-	poco_check_ptr (_pRecordSet);
-	_pRecordSet->moveFirst();
+	rewindRecordSet();
 	return static_cast<int>(_comparisonMap.erase(toUpper(name)));
 }
 
@@ -165,21 +169,17 @@ RowFilter::Comparison RowFilter::getComparison(const std::string& comp) const
 
 void RowFilter::addFilter(Ptr pFilter, LogicOperator comparison)
 {
-	poco_check_ptr (_pRecordSet);
-
 	pFilter->_pRecordSet = _pRecordSet;
-	_pRecordSet->moveFirst();
+	rewindRecordSet();
 	_filterMap.insert(FilterMap::value_type(pFilter, comparison));
 }
 
 
 void RowFilter::removeFilter(Ptr pFilter)
 {
-	poco_check_ptr (_pRecordSet);
-
-	_pRecordSet->moveFirst();
+	rewindRecordSet();
 	_filterMap.erase(pFilter);
-	pFilter->_pRecordSet = nullptr;
+	pFilter->setRecordSet(nullptr);
 	pFilter->_pParent = nullptr;
 }
 
@@ -208,7 +208,10 @@ RecordSet& RowFilter::recordSet() const
 	{
 		Ptr pParent = _pParent;
 		while (pParent && !_pRecordSet)
+		{
 			_pRecordSet = pParent->_pRecordSet;
+			pParent = pParent->_pParent;
+		}
 	}
 	poco_check_ptr (_pRecordSet);
 	return *_pRecordSet;
@@ -218,6 +221,17 @@ RecordSet& RowFilter::recordSet() const
 void RowFilter::rewindRecordSet()
 {
 	if (_pRecordSet) _pRecordSet->moveFirst();
+}
+
+
+void RowFilter::setRecordSet(RecordSet* pRecordSet)
+{
+	_pRecordSet = pRecordSet;
+	for (const auto& entry: _filterMap)
+	{
+		Ptr pFilter = entry.first;
+		pFilter->setRecordSet(pRecordSet);
+	}
 }
 
 

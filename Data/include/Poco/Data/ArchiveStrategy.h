@@ -46,6 +46,8 @@ public:
 
 	void open();
 		/// Opens the session.
+		/// Releases the statements of the previous session; a derived strategy creates them
+		/// again when it next archives (see hasStatements()).
 
 	virtual void archive() = 0;
 		/// Archives the rows.
@@ -81,6 +83,11 @@ protected:
 	[[nodiscard]] Statement& getCopyStatement();
 	[[nodiscard]] Statement& getDeleteStatement();
 	[[nodiscard]] Statement& getCountStatement();
+
+	[[nodiscard]] bool hasStatements() const;
+		/// Returns true if the copy, delete and count statements exist;
+		/// open() releases them.
+
 private:
 
 	ArchiveStrategy();
@@ -165,6 +172,12 @@ inline Statement& ArchiveStrategy::getDeleteStatement()
 inline Statement& ArchiveStrategy::getCountStatement()
 {
 	return *_pCountStatement;
+}
+
+
+inline bool ArchiveStrategy::hasStatements() const
+{
+	return _pCountStatement != nullptr && _pCopyStatement != nullptr && _pDeleteStatement != nullptr;
 }
 
 

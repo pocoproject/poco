@@ -53,7 +53,7 @@ StatementImpl::StatementImpl(SessionImpl& rSession):
 	_bulkExtraction(BULK_UNDEFINED)
 {
 	if (!_rSession.isConnected())
-		throw NotConnectedException(_rSession.connectionString());
+		throw NotConnectedException(_rSession.connectorName());
 
 	_extractors.resize(1);
 	_columnsExtracted.resize(1, 0);
@@ -75,7 +75,7 @@ std::size_t StatementImpl::execute(const bool& reset)
 		if (reset) resetExtraction();
 
 		if (!_rSession.isConnected())
-			throw NotConnectedException(_rSession.connectionString());
+			throw NotConnectedException(_rSession.connectorName());
 
 		if (_lowerLimit > _extrLimit.value())
 			throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");
@@ -111,7 +111,7 @@ void StatementImpl::executeDirect(const std::string &query)
 	if (!_rSession.isConnected())
 	{
 		_state = ST_DONE;
-		throw NotConnectedException(_rSession.connectionString());
+		throw NotConnectedException(_rSession.connectorName());
 	}
 	_ostr.str("");
 	_ostr << query;

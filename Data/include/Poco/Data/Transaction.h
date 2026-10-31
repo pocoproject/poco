@@ -61,6 +61,8 @@ public:
 		/// commited automatically. If no error occurs, rollback is disabled and does
 		/// not occur at destruction time. If an error occurs resulting in exception being
 		/// thrown, the transaction is rolled back and exception propagated to calling code.
+		/// The rollback is skipped on a session that is not connected, and an error in it is logged and never replaces the transactor's exception.
+		/// On a connected session, auto-commit is switched back on if it was on, also when the transactor has ended the transaction itself.
 		///
 		/// Example usage:
 		///
@@ -79,7 +81,7 @@ public:
 		catch (...)
 		{
 			if (_pLogger) _pLogger->error("Error executing transaction.");
-			rollback();
+			rollbackIfActive(true);
 			throw;
 		}
 	}
@@ -91,6 +93,7 @@ public:
 		///
 		/// If an exception is thrown during rollback, the exception is logged
 		/// and no further action is taken.
+		/// On a session that is not connected, nothing is rolled back: the transaction ended with the connection.
 
 	void setIsolation(Poco::UInt32 ti);
 		/// Sets the transaction isolation level.
@@ -159,6 +162,11 @@ private:
 		/// Starts a transaction on the session, disabling auto-commit first if it
 		/// was enabled. Throws InvalidAccessException if a transaction is already
 		/// in progress.
+
+	void rollbackIfActive(bool restoreAutoCommit);
+		/// Rolls back the transaction if it is in progress on a connected session,
+		/// and then restores auto-commit if it was on; with restoreAutoCommit, also
+		/// when no transaction is in progress. Logs errors instead of throwing them.
 
 	Session _rSession;
 	Logger* _pLogger = nullptr;

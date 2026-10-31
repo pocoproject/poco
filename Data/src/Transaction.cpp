@@ -39,9 +39,23 @@ Transaction::Transaction(Poco::Data::Session& rSession, bool start):
 
 Transaction::~Transaction()
 {
+	rollbackIfActive(false);
+}
+
+
+void Transaction::rollbackIfActive(bool restoreAutoCommit)
+{
 	try
 	{
-		if (_rSession.isTransaction())
+		bool inTransaction = _rSession.isTransaction();
+		if (!_rSession.isConnected())
+		{
+			// The transaction ended with the connection; there is nothing to roll back.
+			if (inTransaction && _pLogger != nullptr)
+				_pLogger->debug("Not rolling back transaction: session is not connected.");
+			return;
+		}
+		if (inTransaction)
 		{
 			try
 			{
@@ -60,26 +74,26 @@ Transaction::~Transaction()
 				if (_pLogger)
 					_pLogger->error("Error while rolling back database transaction.");
 			}
+		}
 
-			// Restore auto-commit even if rollback() threw (the dtor documents restoring
-			// it on destruction). Separate try/catch so a rollback error cannot skip it;
-			// restore errors are swallowed/logged.
-			if (_autoCommit)
+		// Restore auto-commit even if rollback() threw (the dtor documents restoring
+		// it on destruction). Separate try/catch so a rollback error cannot skip it;
+		// restore errors are swallowed/logged.
+		if (_autoCommit && (inTransaction || restoreAutoCommit))
+		{
+			try
 			{
-				try
-				{
-					_rSession.setFeature("autoCommit", true);
-				}
-				catch (Poco::Exception& exc)
-				{
-					if (_pLogger)
-						_pLogger->error("Error while restoring auto-commit: %s", exc.displayText());
-				}
-				catch (...)
-				{
-					if (_pLogger)
-						_pLogger->error("Error while restoring auto-commit.");
-				}
+				_rSession.setFeature("autoCommit", true);
+			}
+			catch (Poco::Exception& exc)
+			{
+				if (_pLogger != nullptr)
+					_pLogger->error("Error while restoring auto-commit: %s", exc.displayText());
+			}
+			catch (...)
+			{
+				if (_pLogger != nullptr)
+					_pLogger->error("Error while restoring auto-commit.");
 			}
 		}
 	}

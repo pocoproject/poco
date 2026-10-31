@@ -182,12 +182,16 @@ public:
 
 	Session(Session&&) noexcept;
 		/// Creates a session by moving another one.
+		/// The moved-from session has no implementation: impl() returns nullptr,
+		/// and calls that need the implementation throw NullPointerException.
 
 	Session& operator = (const Session&);
 		/// Assignment operator.
 
 	Session& operator = (Session&&) noexcept;
 		/// Move assignment.
+		/// The moved-from session has no implementation (see the move constructor);
+		/// a self-move leaves the session unchanged.
 
 	~Session();
 		/// Destroys the Session.
@@ -220,6 +224,7 @@ public:
 
 	void close();
 		/// Closes the session.
+		/// A transaction still in progress is rolled back, not committed.
 
 	[[nodiscard]] bool isConnected() const;
 		/// Returns true iff session is connected, false otherwise.
@@ -254,16 +259,19 @@ public:
 		/// If `session` is in autocommit mode, it is switched to manual commit mode
 		/// for the duration of the transaction and reverted back to the original mode
 		/// after transaction completes (on rollback or commit() call).
+		/// Throws NotConnectedException if the session is not connected; the autocommit mode is then left unchanged.
 
 	void commit();
 		/// Commits and ends a transaction.
 		/// If `session` was in autocommit mode when the transaction started (begin() call),
 		/// it is switched back to autocommit mode.
+		/// Throws NotConnectedException if the session is not connected; the autocommit mode is then left unchanged.
 
 	void rollback();
 		/// Rolls back and ends a transaction.
 		/// If `session` was in autocommit mode when the transaction started (begin() call),
 		/// it is switched back to autocommit mode.
+		/// Throws NotConnectedException if the session is not connected; the autocommit mode is then left unchanged.
 
 	[[nodiscard]] bool canTransact();
 		/// Returns true if session has transaction capabilities.
@@ -340,6 +348,7 @@ public:
 
 	[[nodiscard]] SessionImpl* impl();
 		/// Returns a pointer to the underlying SessionImpl.
+		/// Returns nullptr for a moved-from session.
 
 private:
 	Session();
@@ -495,7 +504,7 @@ inline void Session::setFeature(const std::string& name, bool state)
 
 inline bool Session::getFeature(const std::string& name) const
 {
-	return const_cast<SessionImpl*>(_pImpl.get())->getFeature(name);
+	return _pImpl->getFeature(name);
 }
 
 
@@ -512,7 +521,7 @@ inline void Session::setProperty(const std::string& name, const Poco::Any& value
 
 inline Poco::Any Session::getProperty(const std::string& name) const
 {
-	return const_cast<SessionImpl*>(_pImpl.get())->getProperty(name);
+	return _pImpl->getProperty(name);
 }
 
 

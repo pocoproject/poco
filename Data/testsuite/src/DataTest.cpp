@@ -10,11 +10,15 @@
 
 #include "DataTest.h"
 #include "Extractor.h"
+#include "TestStatementImpl.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/Transaction.h"
+#include "Poco/Data/RecordSet.h"
+#include "Poco/Data/RowFilter.h"
+#include "Poco/Data/ArchiveStrategy.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/LOBStream.h"
 #include "Poco/Data/MetaColumn.h"
@@ -40,7 +44,14 @@
 #include "Poco/Glob.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
+#include "Poco/StreamCopier.h"
 #include "Poco/Nullable.h"
+#include "Poco/Logger.h"
+#include "Poco/Mutex.h"
+#include "Poco/SharedPtr.h"
+#include "Poco/Thread.h"
 #include <string>
 #include <cstring>
 #include <sstream>
@@ -1751,6 +1762,892 @@ void DataTest::testExecuteDirectNotImplemented()
 }
 
 
+void DataTest::testSessionNotConnected()
+{
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	Statement stmt = (sess << "SELECT * FROM Strings");
+	Statement stmt2(sess);
+	sess.close();
+	assertTrue (!sess.isConnected());
+
+	// begin() fails before it switches auto-commit off
+	assertTrue (sess.getFeature("autoCommit"));
+	try { sess.begin(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+	assertTrue (sess.getFeature("autoCommit"));
+	assertTrue (!sess.isTransaction());
+
+	sess.setFeature("autoCommit", false);
+	try { sess.begin(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+	assertTrue (!sess.isTransaction());
+
+	try { sess.commit(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+
+	try { sess.rollback(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+
+	// in manual-commit mode, execution fails without starting a transaction
+	try { stmt.execute(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+	assertTrue (stmt.done());
+	assertTrue (!sess.isTransaction());
+
+	try { stmt2.executeDirect("SELECT 1"); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+	assertTrue (!sess.isTransaction());
+}
+
+
+void DataTest::testSessionNullImpl()
+{
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	Session sess2(std::move(sess));
+	assertTrue (sess2.getFeature("autoCommit"));
+
+	try { (void) sess.getFeature("autoCommit"); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) sess.getProperty("storage"); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	Session sess3(SessionFactory::instance().create("test", "cs"));
+	sess3 = std::move(sess2);
+	assertTrue (sess3.getFeature("autoCommit"));
+
+	try { (void) sess2.getFeature("autoCommit"); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) sess2.getProperty("storage"); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	assertTrue (sess.impl() == nullptr);
+	assertTrue (sess2.impl() == nullptr);
+
+	// a self-move leaves the session as it was
+	Session& self = sess3;
+	sess3 = std::move(self);
+	assertTrue (sess3.impl() != nullptr);
+	assertTrue (sess3.isConnected());
+	assertTrue (sess3.getFeature("autoCommit"));
+
+	SessionImpl::Ptr pNull;
+	try { Session nullSess(pNull); fail ("must fail"); }
+	catch (NullPointerException&) { }
+}
+
+
+void DataTest::testRecordSetMovedFrom()
+{
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	RecordSet rs(sess, "SELECT * FROM Strings");
+	RecordSet rs2(std::move(rs));
+	assertTrue (rs2.begin() == rs2.end());
+
+	const RecordSet& crs = rs;
+	std::ostringstream os;
+
+	try { (void) crs.begin(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) crs.end(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) rs.begin(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { (void) rs.end(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { rs.formatNames(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { rs.copyNames(os); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { rs.copyValues(os); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { rs.formatValues(0, RowIterator::POSITION_END); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { rs.copy(os); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { os << rs; fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	// moving from a moved-from recordset gives an empty one
+	RecordSet rs3(std::move(rs));
+	assertTrue (rs3.begin() == rs3.end());
+
+	RecordSet rs4(sess, "SELECT * FROM Strings");
+	rs4 = std::move(rs);
+	assertTrue (rs4.begin() == rs4.end());
+
+	// a self-move leaves the recordset as it was
+	RecordSet& self = rs2;
+	rs2 = std::move(self);
+	assertTrue (rs2.begin() == rs2.end());
+
+	// move assignment over a recordset with iterators of its own
+	RecordSet rs5(sess, "SELECT * FROM Strings");
+	rs5 = std::move(rs2);
+	assertTrue (rs5.begin() == rs5.end());
+
+	try { (void) rs2.begin(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	try { rs2.copy(os); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	// reset() with a moved-from statement fails before it changes anything
+	Statement stmt = (sess << "SELECT * FROM Strings", now);
+	Statement stmt2(std::move(stmt));
+	try { rs5.reset(stmt); fail ("must fail"); }
+	catch (NullPointerException&) { }
+	assertTrue (rs5.begin() == rs5.end());
+
+	rs5.reset(stmt2);
+	assertTrue (rs5.begin() == rs5.end());
+}
+
+
+void DataTest::testRecordSetMoveFilter()
+{
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	// the filter, with its child filters, moves with the recordset
+	RecordSet rs(sess, "SELECT * FROM Strings");
+	RowFilter::Ptr pFilter = new RowFilter(&rs);
+	RowFilter::Ptr pChild = new RowFilter(pFilter, RowFilter::OP_AND);
+	RecordSet rs2(std::move(rs));
+	pFilter->add("str0", RowFilter::VALUE_EQUAL, std::string("1"));
+	pChild->add("str1", RowFilter::VALUE_EQUAL, std::string("2"));
+	assertTrue (rs2.isFiltered());
+	assertTrue (!rs.isFiltered());
+
+	// move assignment: the filter of the source replaces the one of the target,
+	// and letting the replaced filter go leaves the target filtered
+	RecordSet rs3(sess, "SELECT * FROM Strings");
+	RowFilter::Ptr pOld = new RowFilter(&rs3);
+	pOld->add("str0", RowFilter::VALUE_EQUAL, std::string("3"));
+	rs3 = std::move(rs2);
+	pFilter->add("str2", RowFilter::VALUE_EQUAL, std::string("4"));
+	assertTrue (rs3.isFiltered());
+	pOld->add("str1", RowFilter::VALUE_EQUAL, std::string("5"));
+	pOld = nullptr;
+	assertTrue (rs3.isFiltered());
+
+	// a parent and its child hold each other; remove the child to free both
+	pFilter->removeFilter(pChild);
+
+	// a recordset lets go of its filters when it is destroyed first
+	RowFilter::Ptr pOrphan;
+	RowFilter::Ptr pOrphanChild;
+	{
+		RecordSet rs4(sess, "SELECT * FROM Strings");
+		pOrphan = new RowFilter(&rs4);
+		pOrphanChild = new RowFilter(pOrphan, RowFilter::OP_OR);
+	}
+	pOrphan->add("str0", RowFilter::VALUE_EQUAL, std::string("6"));
+	try { (void) pOrphan->isAllowed(0); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	// the child looks for a recordset through its parents, and finds none
+	try { (void) pOrphanChild->isAllowed(0); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	// the parent without a recordset still lets its child go, which frees both
+	pOrphan->removeFilter(pOrphanChild);
+	assertTrue (1 == pOrphan->referenceCount());
+	assertTrue (1 == pOrphanChild->referenceCount());
+
+	// a second filter replaces the first one, which then has no recordset;
+	// letting the first one go leaves the recordset filtered by the second
+	RecordSet rs5(sess, "SELECT * FROM Strings");
+	RowFilter::Ptr pFirst = new RowFilter(&rs5);
+	RowFilter::Ptr pSecond = new RowFilter(&rs5);
+	pSecond->add("str0", RowFilter::VALUE_EQUAL, std::string("7"));
+	try { (void) pFirst->isAllowed(0); fail ("must fail"); }
+	catch (NullPointerException&) { }
+	pFirst = nullptr;
+	assertTrue (rs5.isFiltered());
+	assertTrue (pSecond->isAllowed(0));
+
+	// a replaced filter tree can still be changed: comparisons and child filters
+	// can be removed and added, and removing the child frees both
+	RowFilter::Ptr pReplaced = new RowFilter(&rs5);
+	RowFilter::Ptr pReplacedChild = new RowFilter(pReplaced, RowFilter::OP_AND);
+	pReplaced->add("str0", RowFilter::VALUE_EQUAL, std::string("8"));
+	RowFilter::Ptr pThird = new RowFilter(&rs5);
+	assertTrue (1 == pReplaced->remove("str0"));
+	RowFilter::Ptr pAdded = new RowFilter(pReplaced, RowFilter::OP_OR);
+	pReplaced->removeFilter(pAdded);
+	pReplaced->removeFilter(pReplacedChild);
+	assertTrue (1 == pReplaced->referenceCount());
+	assertTrue (1 == pReplacedChild->referenceCount());
+	assertTrue (1 == pAdded->referenceCount());
+
+	// a replaced filter let go after its recordset does not touch that recordset
+	{
+		RecordSet rs6(sess, "SELECT * FROM Strings");
+		pFirst = new RowFilter(&rs6);
+		RowFilter::Ptr pReplacing = new RowFilter(&rs6);
+	}
+	pFirst = nullptr;
+}
+
+
+void DataTest::testNotConnectedMessage()
+{
+	// The message names the connector, never the connection string,
+	// which can hold a password.
+	Session sess(SessionFactory::instance().create("test", "user=scott;password=tiger"));
+	Statement stmt = (sess << "SELECT * FROM Strings");
+	Statement stmt2(sess);
+	sess.close();
+
+	std::vector<std::string> messages;
+
+	try { sess.begin(); fail ("must fail"); }
+	catch (NotConnectedException& exc) { messages.push_back(exc.message()); }
+
+	try { sess.commit(); fail ("must fail"); }
+	catch (NotConnectedException& exc) { messages.push_back(exc.message()); }
+
+	try { sess.rollback(); fail ("must fail"); }
+	catch (NotConnectedException& exc) { messages.push_back(exc.message()); }
+
+	try { Statement stmt3 = (sess << "SELECT 1"); fail ("must fail"); }
+	catch (NotConnectedException& exc) { messages.push_back(exc.message()); }
+
+	try { Statement stmt4(sess); fail ("must fail"); }
+	catch (NotConnectedException& exc) { messages.push_back(exc.message()); }
+
+	try { stmt.execute(); fail ("must fail"); }
+	catch (NotConnectedException& exc) { messages.push_back(exc.message()); }
+
+	try { stmt2.executeDirect("SELECT 1"); fail ("must fail"); }
+	catch (NotConnectedException& exc) { messages.push_back(exc.message()); }
+
+	assertEqual (7, messages.size());
+	for (const auto& message: messages)
+		assertMessageEqual (Poco::Data::Test::Connector::KEY, message);
+}
+
+
+namespace
+{
+	struct ClosingTransactor
+		/// Closes the session, then fails.
+	{
+		[[noreturn]] void operator () (Session& session) const
+		{
+			session.close();
+			throw Poco::IllegalStateException("transactor failed");
+		}
+	};
+
+
+	struct FailingTransactor
+		/// Makes the rollback fail, then fails.
+	{
+		[[noreturn]] void operator () (Session& session) const
+		{
+			session.setFeature("throwOnRollback", true);
+			throw Poco::IllegalStateException("transactor failed");
+		}
+	};
+
+
+	struct CommittingTransactor
+		/// Commits, then fails.
+	{
+		[[noreturn]] void operator () (Session& session) const
+		{
+			session.commit();
+			throw Poco::IllegalStateException("transactor failed");
+		}
+	};
+
+
+	class TestArchiveStrategy: public ArchiveByAgeStrategy
+		/// Gives the test access to the session and the statements of the strategy.
+	{
+	public:
+		TestArchiveStrategy():
+			ArchiveByAgeStrategy("test", "cs", "T_POCO_LOG", "T_POCO_LOG_ARCHIVE", "1 seconds")
+		{
+		}
+
+		[[nodiscard]] Session& strategySession()
+		{
+			return session();
+		}
+
+		[[nodiscard]] bool strategyHasStatements() const
+		{
+			return hasStatements();
+		}
+
+		[[nodiscard]] Statement& countStatement()
+			/// Returns the count statement; throws NullPointerException if there is none.
+		{
+			return getCountStatement();
+		}
+	};
+
+
+	class ExecutionHold
+		/// Holds the next execution of a TestStatementImpl in hasNext()
+		/// until the hold is destroyed, so that a failing test never
+		/// leaves the execution waiting.
+	{
+	public:
+		POCO_NODISCARD_CTOR ExecutionHold()
+		{
+			Poco::Data::Test::TestStatementImpl::holdNextExecution();
+		}
+
+		~ExecutionHold()
+		{
+			try
+			{
+				Poco::Data::Test::TestStatementImpl::releaseExecution();
+			}
+			catch (...)
+			{
+				poco_unexpected();
+			}
+		}
+
+		ExecutionHold(const ExecutionHold&) = delete;
+		ExecutionHold(ExecutionHold&&) = delete;
+		ExecutionHold& operator = (const ExecutionHold&) = delete;
+		ExecutionHold& operator = (ExecutionHold&&) = delete;
+	};
+
+
+	[[nodiscard]] std::string contentOf(const Path& dir)
+		/// Returns the content of all files in the directory.
+	{
+		std::string content;
+		DirectoryIterator it(dir);
+		const DirectoryIterator end;
+		for (; it != end; ++it)
+		{
+			FileInputStream istr(it->path());
+			std::string text;
+			StreamCopier::copyToString(istr, text);
+			content += text;
+		}
+		return content;
+	}
+}
+
+
+void DataTest::testTransactionNotConnected()
+{
+	// The connection is lost while the transaction is open: the destructor
+	// neither rolls back nor switches auto-commit back on.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	assertTrue (sess.getFeature("autoCommit"));
+	{
+		Transaction trans(sess);
+		assertTrue (sess.isTransaction());
+		assertTrue (!sess.getFeature("autoCommit"));
+		sess.setFeature("connected", false);
+	}
+	assertTrue (!sess.getFeature("autoCommit"));
+}
+
+
+void DataTest::testTransactorFailure()
+{
+	// The transactor closes the session and fails: nothing is rolled back,
+	// and the caller gets the exception of the transactor.
+	{
+		Session sess(SessionFactory::instance().create("test", "cs"));
+		ClosingTransactor tr;
+		try { Transaction trans(sess, tr); fail ("must fail"); }
+		catch (IllegalStateException&) { }
+		assertTrue (!sess.isConnected());
+	}
+
+	// The rollback fails: the caller still gets the exception of the transactor,
+	// and auto-commit is switched back on.
+	{
+		Session sess(SessionFactory::instance().create("test", "cs"));
+		FailingTransactor tr;
+		try { Transaction trans(sess, tr); fail ("must fail"); }
+		catch (IllegalStateException&) { }
+		assertTrue (!sess.isTransaction());
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+
+	// The transactor ends the transaction itself, then fails: there is nothing
+	// to roll back, and auto-commit is switched back on.
+	{
+		Session sess(SessionFactory::instance().create("test", "cs"));
+		CommittingTransactor tr;
+		try { Transaction trans(sess, tr); fail ("must fail"); }
+		catch (IllegalStateException&) { }
+		assertTrue (!sess.isTransaction());
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+}
+
+
+void DataTest::testStatementAsyncKeepsImpl()
+{
+	using Poco::Data::Test::TestStatementImpl;
+
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	const int instances = TestStatementImpl::instances();
+
+	// The execution lets go of the implementation before wait() returns:
+	// the Statement destroys it, and the result of the execution does not hold it.
+	{
+		SharedPtr<Statement::Result> pResult;
+		{
+			Statement stmt = (sess << "SELECT * FROM Strings");
+			assertEqual (instances + 1, TestStatementImpl::instances());
+			pResult = new Statement::Result(stmt.executeAsync());
+			pResult->wait();
+			assertEqual (instances + 1, TestStatementImpl::instances());
+		}
+		assertEqual (instances, TestStatementImpl::instances());
+		assertTrue (!pResult->failed());
+		assertEqual (0, pResult->data());
+	}
+
+	// The Statement is destroyed while the execution runs: the execution holds
+	// the implementation until it ends, and lets it go before wait() returns.
+	{
+		SharedPtr<Statement::Result> pResult;
+		int whileRunning = 0;
+		{
+			ExecutionHold hold;
+			{
+				Statement stmt = (sess << "SELECT * FROM Strings");
+				pResult = new Statement::Result(stmt.executeAsync());
+				assertTrue (TestStatementImpl::waitUntilHeld(10000));
+			}
+			whileRunning = TestStatementImpl::instances();
+		}
+		pResult->wait();
+		assertEqual (instances + 1, whileRunning);
+		assertEqual (instances, TestStatementImpl::instances());
+		assertTrue (!pResult->failed());
+		assertEqual (0, pResult->data());
+	}
+}
+
+
+void DataTest::testSQLChannelUnreachable()
+{
+	// The database cannot be reached: the entries stay queued while the channel
+	// tries to reconnect, wait() waits as long as it is told to, and the channel,
+	// when destroyed, writes the entries to local files instead of hanging.
+	Path dir(TemporaryFile::tempName());
+	dir.makeDirectory();
+	{
+		AutoPtr<SQLChannel> pChannel = new SQLChannel("test", Poco::Data::Test::Connector::UNREACHABLE, "TestSQLChannel");
+		pChannel->setProperty("directory", dir.toString());
+		for (int i = 0; i < 3; ++i)
+		{
+			Message msg("DataTest", Poco::format("unreachable entry %d", i), Message::PRIO_INFORMATION);
+			pChannel->log(msg);
+		}
+
+		Stopwatch sw; sw.start();
+		assertTrue (pChannel->wait(300) > 0);
+		assertTrue (sw.elapsed() >= 300 * 1000);
+	}
+
+	const std::string content = contentOf(dir);
+	File(dir).remove(true);
+
+	for (int i = 0; i < 3; ++i)
+		assertTrue (content.find(Poco::format("unreachable entry %d", i)) != std::string::npos);
+}
+
+
+void DataTest::testArchiveStrategyReopen()
+{
+	TestArchiveStrategy strategy;
+	strategy.archive();
+
+	// keep the first session alive, so that its statements stay valid objects
+	Session first = strategy.strategySession();
+	first.close();
+
+	// the strategy opens a new session and runs new statements on it
+	strategy.archive();
+	assertTrue (!first.isConnected());
+	assertTrue (strategy.strategySession().isConnected());
+	strategy.archive();
+
+	// open() releases the statements; archive() creates them again
+	strategy.open();
+	assertTrue (!strategy.strategyHasStatements());
+	strategy.archive();
+	assertTrue (strategy.strategyHasStatements());
+}
+
+
+namespace
+{
+	class MessageCollector: public Poco::Channel
+		/// Keeps the text of every message logged to it.
+	{
+	public:
+		using Ptr = Poco::AutoPtr<MessageCollector>;
+
+		void log(const Message& msg) override
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			_messages.push_back(msg.getText());
+		}
+
+		[[nodiscard]] std::vector<std::string> messages() const
+			/// Returns the texts of the messages logged so far.
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _messages;
+		}
+
+		void clear()
+			/// Forgets the messages logged so far.
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			_messages.clear();
+		}
+
+	private:
+		mutable Poco::FastMutex  _mutex;
+		std::vector<std::string> _messages;
+	};
+
+
+	struct IdleTransactor
+		/// Does nothing.
+	{
+		void operator () (Session&) const
+		{
+		}
+	};
+}
+
+
+void DataTest::testStatementAsyncError()
+{
+	using Poco::Data::Test::TestStatementImpl;
+
+	// An execution that fails reports its error through the Result. It holds the
+	// implementation until it ends, also when the Statement is destroyed first,
+	// and lets it go before wait() returns.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	sess.setFeature("throwOnHasNext", true);
+	const int instances = TestStatementImpl::instances();
+
+	SharedPtr<Statement::Result> pResult;
+	int whileRunning = 0;
+	{
+		ExecutionHold hold;
+		{
+			Statement stmt = (sess << "SELECT * FROM Strings");
+			pResult = new Statement::Result(stmt.executeAsync());
+			assertTrue (TestStatementImpl::waitUntilHeld(10000));
+		}
+		whileRunning = TestStatementImpl::instances();
+	}
+	pResult->wait();
+	assertEqual (instances + 1, whileRunning);
+	assertEqual (instances, TestStatementImpl::instances());
+	assertTrue (pResult->failed());
+	assertNotNullPtr (pResult->exception());
+	try { pResult->exception()->rethrow(); fail ("must fail"); }
+	catch (UnknownDataBaseException&) { }
+}
+
+
+void DataTest::testStatementSetAsyncMovedFrom()
+{
+	// setAsync() only sets the flag: the asynchronous execution is set up when
+	// it starts, so a statement without an implementation can be marked too.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	Statement stmt = (sess << "SELECT * FROM Strings");
+	Statement moved(std::move(stmt));
+	stmt.setAsync(true);
+	assertTrue (stmt.isAsync());
+
+	moved.setAsync(true);
+	assertEqual (0, moved.execute());
+	assertEqual (0, moved.wait());
+}
+
+
+void DataTest::testTransactionNotConnectedLog()
+{
+	// The connection is lost while the transaction is open: the destructor does
+	// not roll back, and logs that it does not.
+	MessageCollector::Ptr pCollector = new MessageCollector;
+	Logger& logger = Logger::get("DataTest.TransactionNotConnected");
+	logger.setChannel(pCollector);
+	logger.setLevel(Message::PRIO_DEBUG);
+
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	{
+		Transaction trans(sess, &logger);
+		assertTrue (sess.isTransaction());
+		sess.setFeature("connected", false);
+	}
+	Logger::destroy("DataTest.TransactionNotConnected");
+
+	// the test session ends its transaction only when it is rolled back
+	assertTrue (sess.isTransaction());
+	assertTrue (!sess.getFeature("autoCommit"));
+	const std::vector<std::string> messages = pCollector->messages();
+	assertEqual (1, messages.size());
+	assertEqual ("Not rolling back transaction: session is not connected."s, messages[0]);
+}
+
+
+void DataTest::testTransactorFailureLog()
+{
+	// What the Transaction logs shows whether it rolls back.
+	MessageCollector::Ptr pCollector = new MessageCollector;
+	Logger& logger = Logger::get("DataTest.TransactorFailure");
+	logger.setChannel(pCollector);
+	logger.setLevel(Message::PRIO_DEBUG);
+
+	// The rollback fails: its error is logged, and the caller gets the exception
+	// of the transactor.
+	{
+		Session sess(SessionFactory::instance().create("test", "cs"));
+		FailingTransactor tr;
+		try { Transaction trans(sess, tr, &logger); fail ("must fail"); }
+		catch (IllegalStateException&) { }
+	}
+	std::vector<std::string> messages = pCollector->messages();
+	assertEqual (3, messages.size());
+	assertEqual ("Error executing transaction."s, messages[0]);
+	assertEqual ("Rolling back transaction."s, messages[1]);
+	assertTrue (messages[2].find("Error while rolling back database transaction: ") == 0);
+
+	// begin() fails: no transaction is open, so nothing is rolled back, and the
+	// caller gets the exception of begin().
+	pCollector->clear();
+	{
+		Session sess(SessionFactory::instance().create("test", "cs"));
+		sess.setFeature("throwOnBegin", true);
+		sess.setFeature("throwOnRollback", true);
+		IdleTransactor tr;
+		try { Transaction trans(sess, tr, &logger); fail ("must fail"); }
+		catch (ConnectionFailedException& exc)
+		{
+			assertMessageEqual ("Test: begin() failed", exc.message());
+		}
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+	messages = pCollector->messages();
+	assertEqual (1, messages.size());
+	assertEqual ("Error executing transaction."s, messages[0]);
+
+	// The transactor closes the session: nothing is rolled back.
+	pCollector->clear();
+	{
+		Session sess(SessionFactory::instance().create("test", "cs"));
+		ClosingTransactor tr;
+		try { Transaction trans(sess, tr, &logger); fail ("must fail"); }
+		catch (IllegalStateException&) { }
+	}
+	messages = pCollector->messages();
+	Logger::destroy("DataTest.TransactorFailure");
+	assertEqual (2, messages.size());
+	assertEqual ("Error executing transaction."s, messages[0]);
+	assertEqual ("Not rolling back transaction: session is not connected."s, messages[1]);
+}
+
+
+void DataTest::testSQLChannelReconnectNotDelayed()
+{
+	// Before each attempt to reconnect, the logging thread closes the session, and
+	// close() waits up to the timeout for the queue to empty. Only the logging thread
+	// empties the queue, so it does not wait for itself: with a timeout of 10 s,
+	// it tries again after the back-off of 200 ms.
+	Path dir(TemporaryFile::tempName());
+	dir.makeDirectory();
+	{
+		AutoPtr<SQLChannel> pChannel = new SQLChannel("test", Poco::Data::Test::Connector::UNREACHABLE, "TestSQLChannel", "T_POCO_LOG", 10000);
+		pChannel->setProperty("directory", dir.toString());
+		Message msg("DataTest", "entry while reconnecting", Message::PRIO_INFORMATION);
+		pChannel->log(msg);
+
+		// every failed attempt queues an entry of its own
+		Stopwatch sw;
+		sw.start();
+		std::size_t queued = pChannel->wait(10);
+		while (queued < 3 && sw.elapsedSeconds() < 5)
+			queued = pChannel->wait(10);
+		assertTrue (queued >= 3);
+	}
+	File(dir).remove(true);
+}
+
+
+void DataTest::testSQLChannelWaitStopped()
+{
+	// Once the logging thread has stopped, nothing takes queued entries any more:
+	// wait() returns their number at once, also when told to wait without limit.
+	Path dir(TemporaryFile::tempName());
+	dir.makeDirectory();
+	{
+		AutoPtr<SQLChannel> pChannel = new SQLChannel;
+		pChannel->setProperty("directory", dir.toString());
+		pChannel->stop();
+		assertTrue (!pChannel->isRunning());
+		Message msg("DataTest", "entry after stop", Message::PRIO_INFORMATION);
+		pChannel->log(msg);
+
+		Stopwatch sw;
+		sw.start();
+		assertEqual (1, pChannel->wait(10000));
+		assertTrue (sw.elapsedSeconds() < 5);
+		assertEqual (1, pChannel->wait(0));
+	}
+	File(dir).remove(true);
+}
+
+
+void DataTest::testSQLChannelBackOff()
+{
+	// While the database cannot be reached, the channel tries to connect again
+	// after 200, 400, 800 ... ms; the entries logged in the meantime, the errors
+	// of the failed attempts among them, do not make it try sooner.
+	Path dir(TemporaryFile::tempName());
+	dir.makeDirectory();
+	{
+		AutoPtr<SQLChannel> pChannel = new SQLChannel("test", Poco::Data::Test::Connector::UNREACHABLE, "TestSQLChannel");
+		pChannel->setProperty("directory", dir.toString());
+		std::size_t entries = 0;
+		std::size_t queued = 0;
+		Stopwatch sw;
+		sw.start();
+		while (sw.elapsedSeconds() < 1)
+		{
+			Message msg("DataTest", "entry while backing off", Message::PRIO_INFORMATION);
+			pChannel->log(msg);
+			++entries;
+			queued = pChannel->wait(20);
+		}
+		// within the second, the attempts at about 0, 200 and 600 ms have failed
+		assertTrue (queued > entries);
+		assertTrue (queued - entries <= 5);
+	}
+	File(dir).remove(true);
+}
+
+
+void DataTest::testSQLChannelArchiveNotConnected()
+{
+	using Poco::Data::Test::TestStatementImpl;
+
+	// The archive strategy works on the database: it runs with each batch while
+	// the channel is connected, and not while the channel writes to local files.
+	Path dir(TemporaryFile::tempName());
+	dir.makeDirectory();
+	{
+		AutoPtr<SQLChannel> pChannel = new SQLChannel("test", "cs", "TestSQLChannel");
+		pChannel->setProperty("directory", dir.toString());
+		pChannel->setProperty("keep", "1 seconds");
+		{
+			// connected: the archive statements run with the batch; the first one is held
+			ExecutionHold hold;
+			Message msg("DataTest", "database entry", Message::PRIO_INFORMATION);
+			pChannel->log(msg);
+			assertTrue (TestStatementImpl::waitUntilHeld(10000));
+			// set while the logging thread is held, so that it reads the new value after the hold
+			pChannel->setProperty("connector", "");
+		}
+		Stopwatch sw;
+		sw.start();
+		while (pChannel->logged() == 0 && sw.elapsedSeconds() < 10)
+			Thread::sleep(10);
+		const std::size_t logged = pChannel->logged();
+		assertTrue (logged > 0);
+
+		// not connected: the batch goes to a local file, without the archive statements
+		ExecutionHold hold;
+		Message msg("DataTest", "file entry", Message::PRIO_INFORMATION);
+		pChannel->log(msg);
+		sw.restart();
+		while (pChannel->logged() == logged && sw.elapsedSeconds() < 10)
+			Thread::sleep(10);
+		assertTrue (pChannel->logged() > logged);
+		assertTrue (!TestStatementImpl::waitUntilHeld(0));
+	}
+	const std::string content = contentOf(dir);
+	File(dir).remove(true);
+	assertTrue (content.find("file entry") != std::string::npos);
+}
+
+
+void DataTest::testSQLChannelDrainFallback()
+{
+	// When the channel stops, it writes what is left to local files if the
+	// database cannot take it, also when the connector itself cannot be found.
+	Path dir(TemporaryFile::tempName());
+	dir.makeDirectory();
+	{
+		AutoPtr<SQLChannel> pChannel = new SQLChannel("no such connector", "cs", "TestSQLChannel");
+		pChannel->setProperty("directory", dir.toString());
+		Message msg("DataTest", "entry without a connector", Message::PRIO_INFORMATION);
+		pChannel->log(msg);
+	}
+	const std::string content = contentOf(dir);
+	File(dir).remove(true);
+	assertTrue (content.find("entry without a connector") != std::string::npos);
+
+	// The directory for local files is gone: the channel gives up on the entries
+	// when it is destroyed. With "throw" set, the errors of the failed writes
+	// reach the logging thread, which logs them as entries of their own.
+	for (const std::string& throwErrors: {"false"s, "true"s})
+	{
+		Path gone(TemporaryFile::tempName());
+		gone.makeDirectory();
+		{
+			AutoPtr<SQLChannel> pChannel = new SQLChannel("test", Poco::Data::Test::Connector::UNREACHABLE, "TestSQLChannel");
+			pChannel->setProperty("directory", gone.toString());
+			pChannel->setProperty("throw", throwErrors);
+			File(gone).remove(true);
+			Message msg("DataTest", "entry with nowhere to go", Message::PRIO_INFORMATION);
+			pChannel->log(msg);
+		}
+		assertTrue (!File(gone).exists());
+	}
+}
+
+
+void DataTest::testArchiveStrategyOpenReleasesStatements()
+{
+	// open() lets the statements of the previous session go: a strategy that
+	// uses them without creating them again gets NullPointerException.
+	TestArchiveStrategy strategy;
+	(void) strategy.countStatement();
+	strategy.open();
+	try { (void) strategy.countStatement(); fail ("must fail"); }
+	catch (NullPointerException&) { }
+
+	// archive() creates them again, on the new session
+	strategy.archive();
+	assertTrue (strategy.countStatement().done());
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1789,6 +2686,26 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testNullableExtract);
 	CppUnit_addTest(pSuite, DataTest, testTransactionAutoCommit);
 	CppUnit_addTest(pSuite, DataTest, testExecuteDirectNotImplemented);
+	CppUnit_addTest(pSuite, DataTest, testSessionNotConnected);
+	CppUnit_addTest(pSuite, DataTest, testSessionNullImpl);
+	CppUnit_addTest(pSuite, DataTest, testRecordSetMovedFrom);
+	CppUnit_addTest(pSuite, DataTest, testRecordSetMoveFilter);
+	CppUnit_addTest(pSuite, DataTest, testNotConnectedMessage);
+	CppUnit_addTest(pSuite, DataTest, testTransactionNotConnected);
+	CppUnit_addTest(pSuite, DataTest, testTransactorFailure);
+	CppUnit_addTest(pSuite, DataTest, testStatementAsyncKeepsImpl);
+	CppUnit_addTest(pSuite, DataTest, testSQLChannelUnreachable);
+	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyReopen);
+	CppUnit_addTest(pSuite, DataTest, testStatementAsyncError);
+	CppUnit_addTest(pSuite, DataTest, testStatementSetAsyncMovedFrom);
+	CppUnit_addTest(pSuite, DataTest, testTransactionNotConnectedLog);
+	CppUnit_addTest(pSuite, DataTest, testTransactorFailureLog);
+	CppUnit_addTest(pSuite, DataTest, testSQLChannelReconnectNotDelayed);
+	CppUnit_addTest(pSuite, DataTest, testSQLChannelWaitStopped);
+	CppUnit_addTest(pSuite, DataTest, testSQLChannelBackOff);
+	CppUnit_addTest(pSuite, DataTest, testSQLChannelArchiveNotConnected);
+	CppUnit_addTest(pSuite, DataTest, testSQLChannelDrainFallback);
+	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyOpenReleasesStatements);
 
 	return pSuite;
 }

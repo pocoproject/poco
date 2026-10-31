@@ -15,6 +15,7 @@
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/ErrorHandler.h"
 #include <algorithm>
 
 
@@ -53,9 +54,12 @@ SessionPool::~SessionPool()
 Session SessionPool::get(const std::string& name, bool value)
 {
 	Session s = get();
-	_addFeatureMap.insert(AddFeatureMap::value_type(s.impl(),
-		std::make_pair(name, s.getFeature(name))));
+	FeaturePair feature(name, s.getFeature(name));
 	s.setFeature(name, value);
+
+	SessionImpl* pImpl = static_cast<PooledSessionImpl*>(s.impl())->impl();
+	Poco::Mutex::ScopedLock lock(_mutex);
+	_addFeatureMap[pImpl] = feature;
 
 	return s;
 }
@@ -63,9 +67,9 @@ Session SessionPool::get(const std::string& name, bool value)
 
 Session SessionPool::get()
 {
+	Poco::Mutex::ScopedLock lock(_mutex);
 	if (_shutdown) throw InvalidAccessException("Session pool has been shut down.");
 
-	Poco::Mutex::ScopedLock lock(_mutex);
 	purgeDeadSessions();
 
 	if (_idleSessions.empty())
@@ -235,53 +239,92 @@ void SessionPool::customizeSession(Session&)
 
 void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 {
-	if (_shutdown) return;
-
-	Poco::Mutex::ScopedLock lock(_mutex);
-	SessionList::iterator it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder);
-	if (it != _activeSessions.end())
+	try
 	{
-		try
+		Poco::Mutex::ScopedLock lock(_mutex);
+		SessionImpl* pImpl = pHolder->session();
+
+		// take out the settings applied at acquisition time, if any
+		bool hasProperty = false;
+		PropertyPair property;
+		if (auto pIt = _addPropertyMap.find(pImpl); pIt != _addPropertyMap.end())
 		{
-			if (pHolder->session()->isGood())
+			hasProperty = true;
+			property = pIt->second;
+			_addPropertyMap.erase(pIt);
+		}
+
+		bool hasFeature = false;
+		FeaturePair feature;
+		if (auto fIt = _addFeatureMap.find(pImpl); fIt != _addFeatureMap.end())
+		{
+			hasFeature = true;
+			feature = fIt->second;
+			_addFeatureMap.erase(fIt);
+		}
+
+		if (auto it = std::find(_activeSessions.begin(), _activeSessions.end(), pHolder); it != _activeSessions.end())
+		{
+			_activeSessions.erase(it);
+			try
 			{
-				pHolder->session()->reset();
+				if (pImpl->isGood())
+				{
+					pImpl->reset();
 
-				// reverse settings applied at acquisition time, if any
-				AddPropertyMap::iterator pIt = _addPropertyMap.find(pHolder->session());
-				if (pIt != _addPropertyMap.end())
-					pHolder->session()->setProperty(pIt->second.first, pIt->second.second);
+					// reverse settings applied at acquisition time, if any
+					if (hasProperty) pImpl->setProperty(property.first, property.second);
+					if (hasFeature) pImpl->setFeature(feature.first, feature.second);
 
-				AddFeatureMap::iterator fIt = _addFeatureMap.find(pHolder->session());
-				if (fIt != _addFeatureMap.end())
-					pHolder->session()->setFeature(fIt->second.first, fIt->second.second);
+					// re-apply the default pool settings
+					applySettings(pImpl);
 
-				// re-apply the default pool settings
-				applySettings(pHolder->session());
+					// restore the auto-commit mode the session was created with
+					if (pImpl->hasFeature("autoCommit") && pImpl->getFeature("autoCommit") != pHolder->autoCommit())
+						pImpl->setFeature("autoCommit", pHolder->autoCommit());
 
-				pHolder->access();
-				_idleSessions.push_back(pHolder);
+					pHolder->access();
+					_idleSessions.push_back(pHolder);
+				}
+				else --_nSessions;
 			}
-			else --_nSessions;
-
-			_activeSessions.erase(it);
+			catch (...)
+			{
+				// the session can not be reused: discard it
+				--_nSessions;
+				try
+				{
+					pImpl->close();
+				}
+				catch (...)
+				{
+				}
+				throw;
+			}
 		}
-		catch (const Poco::Exception& e)
+		else if (pHolder->isOrphaned())
 		{
-			--_nSessions;
-			_activeSessions.erase(it);
-			poco_bugcheck_msg(format("Exception in SessionPool::putBack(): %s", e.displayText()).c_str());
-		}
-		catch (...)
-		{
-			--_nSessions;
-			_activeSessions.erase(it);
-			poco_bugcheck_msg("Unknown exception in SessionPool::putBack()");
+			// the pool was shut down while the session was being returned
+			try
+			{
+				pImpl->close();
+			}
+			catch (...)
+			{
+			}
 		}
 	}
-	else
+	catch (Poco::Exception& exc)
 	{
-		poco_bugcheck_msg("Unknown session passed to SessionPool::putBack()");
+		Poco::ErrorHandler::handle(exc);
+	}
+	catch (std::exception& exc)
+	{
+		Poco::ErrorHandler::handle(exc);
+	}
+	catch (...)
+	{
+		Poco::ErrorHandler::handle();
 	}
 }
 
@@ -319,7 +362,17 @@ void SessionPool::shutdown()
 
 	Poco::Mutex::ScopedLock lock(_mutex);
 	closeAll(_idleSessions);
-	closeAll(_activeSessions);
+
+	// a session still in use is closed by its user, when released
+	for (auto it = _activeSessions.begin(); it != _activeSessions.end();)
+	{
+		(*it)->orphan();
+		it = _activeSessions.erase(it);
+		if (_nSessions > 0) --_nSessions;
+	}
+
+	_addPropertyMap.clear();
+	_addFeatureMap.clear();
 }
 
 

@@ -175,6 +175,7 @@ void SQLChannel::open()
 		catch (const DataException& ex)
 		{
 			logLocal(ex.displayText());
+			_reconnect = true;
 		}
 	}
 	_pSession = nullptr;
@@ -302,10 +303,45 @@ void SQLChannel::run()
 		{
 			break;
 		}
-		_event.tryWait(sleepTime);
+		if (_reconnect)
+		{
+			// Back off: entries logged in the meantime do not cut the wait short, stop() does.
+			Stopwatch backOff;
+			backOff.start();
+			while (!_stop && backOff.elapsed() / 1000 < sleepTime)
+				_event.tryWait(sleepTime - static_cast<long>(backOff.elapsed() / 1000));
+		}
+		else _event.tryWait(sleepTime);
 	}
+	// Drain what is left. Errors met on the way are logged as entries of their own,
+	// so a pass that writes nothing sends the rest to local files instead of the
+	// database, and if even that fails, the drain stops rather than loop forever.
 	while (_logQueue.size() || _source.size())
-		processBatch();
+	{
+		std::size_t loggedBefore = _logged;
+		try
+		{
+			processBatch();
+		}
+		catch (const Poco::Exception& ex)
+		{
+			logLocal(ex.displayText());
+		}
+		catch (const std::exception& ex)
+		{
+			logLocal(ex.what());
+		}
+		catch (...)
+		{
+			logLocal("SQLChannel::run(): unknown exception"s);
+		}
+		if (_logged == loggedBefore)
+		{
+			if (_pSession == nullptr && _reconnect) break;
+			_pSession = nullptr;
+			_reconnect = true;
+		}
+	}
 }
 
 
@@ -315,11 +351,11 @@ void SQLChannel::stop()
 	{
 		_reconnect = false;
 		_stop = true;
+		_event.set();
 		while (_pLogThread->isRunning())
 			Thread::sleep(10);
 		_pLogThread->join();
 		_pLogThread.reset();
-		_event.set();
 	}
 }
 
@@ -533,8 +569,10 @@ size_t SQLChannel::logToDB(bool flush)
 
 size_t SQLChannel::execSQL(bool flush)
 {
-	if (!_connector.empty() && (!_pSession || !_pSession->isConnected())) open();
-	if (_pArchiveStrategy) _pArchiveStrategy->archive();
+	// No connection attempt per batch while a reconnect is pending:
+	// the logging thread reconnects with a back-off.
+	if (!_connector.empty() && !_reconnect && (_pSession == nullptr || !_pSession->isConnected())) open();
+	if (_pSession != nullptr && _pArchiveStrategy != nullptr) _pArchiveStrategy->archive();
 
 	size_t n = _pSession ? logToDB(flush) : logToFile(flush);
 
@@ -544,12 +582,17 @@ size_t SQLChannel::execSQL(bool flush)
 
 std::size_t SQLChannel::wait(int ms)
 {
+	// Only the logging thread empties the queue: it cannot wait for itself,
+	// and nobody empties the queue once it has stopped.
+	if (!isRunning() || Thread::current() == _pLogThread.get())
+		return static_cast<std::size_t>(_logQueue.size());
+
 	Stopwatch sw;
 	sw.start();
 	while (_logQueue.size())
 	{
 		Thread::sleep(10);
-		if (ms && sw.elapsed() * 1000 > ms)
+		if (ms && sw.elapsed() / 1000 > ms)
 			break;
 	}
 	return _logQueue.size();

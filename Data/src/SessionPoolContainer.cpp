@@ -80,6 +80,7 @@ bool SessionPoolContainer::isActive(const std::string& sessionKey,
 	std::string name = connectionString.empty() ?
 		sessionKey : SessionPool::name(sessionKey, connectionString);
 
+	FastMutex::ScopedLock lock(_mutex);
 	SessionPoolMap::const_iterator it = _sessionPools.find(name);
 	if (it != _sessionPools.end() && it->second->isActive())
 	{
@@ -112,6 +113,7 @@ SessionPool& SessionPoolContainer::getPool(const std::string& name)
 
 void SessionPoolContainer::shutdown()
 {
+	FastMutex::ScopedLock lock(_mutex);
 	SessionPoolMap::iterator it = _sessionPools.begin();
 	SessionPoolMap::iterator end = _sessionPools.end();
 	for (; it != end; ++it) it->second->shutdown();

@@ -23,6 +23,7 @@
 #include "Poco/Data/PooledSessionHolder.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco::Data {
@@ -39,6 +40,7 @@ class Data_API PooledSessionImpl: public SessionImpl
 public:
 	PooledSessionImpl(PooledSessionHolder* pHolder);
 		/// Creates the PooledSessionImpl.
+		/// Throws NullPointerException if pHolder is null.
 
 	~PooledSessionImpl();
 		/// Destroys the PooledSessionImpl.
@@ -49,6 +51,7 @@ public:
 	void rollback();
 	void open(const std::string& connect = "");
 	void close();
+		/// Returns the session to its pool, or closes it if the pool has been shut down.
 	void reset();
 	[[nodiscard]] bool isConnected() const;
 	[[nodiscard]] bool isGood() const;
@@ -56,6 +59,7 @@ public:
 	[[nodiscard]] std::size_t getConnectionTimeout() const;
 	[[nodiscard]] bool canTransact() const;
 	[[nodiscard]] bool isTransaction() const;
+		/// Returns false once the session has been returned to its pool.
 	void setTransactionIsolation(Poco::UInt32);
 	[[nodiscard]] Poco::UInt32 getTransactionIsolation() const;
 	[[nodiscard]] bool hasTransactionIsolation(Poco::UInt32) const;
@@ -69,7 +73,7 @@ public:
 	[[nodiscard]] Poco::Any getProperty(const std::string& name) const;
 
 protected:
-	[[nodiscard]] SessionImpl* access() const;
+	[[nodiscard]] SessionImpl::Ptr access() const;
 		/// Updates the last access timestamp,
 		/// verifies validity of the session
 		/// and returns the session if it is valid.
@@ -78,10 +82,18 @@ protected:
 		/// session is no longer valid.
 
 	[[nodiscard]] SessionImpl* impl() const;
-		/// Returns a pointer to the SessionImpl.
+		/// Returns a pointer to the SessionImpl, or nullptr
+		/// if the session has been returned to its pool.
 
 private:
+	[[nodiscard]] Poco::AutoPtr<PooledSessionHolder> holder() const;
+		/// Returns the holder, or a null pointer if the
+		/// session has been returned to its pool.
+
 	mutable Poco::AutoPtr<PooledSessionHolder> _pHolder;
+	mutable Poco::FastMutex _mutex;
+
+	friend class SessionPool;
 };
 
 
@@ -90,7 +102,8 @@ private:
 //
 inline SessionImpl* PooledSessionImpl::impl() const
 {
-	return _pHolder->session();
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	return _pHolder != nullptr ? _pHolder->session() : nullptr;
 }
 
 

@@ -60,7 +60,7 @@ public:
 		/// Creates a Statement.
 	{
 		if (!_ptrImpl->isConnected())
-			throw NotConnectedException(_ptrImpl->connectionString());
+			throw NotConnectedException(_ptrImpl->connectorName());
 
 		Statement stmt(_ptrImpl->createStatementImpl());
 		stmt << t;
