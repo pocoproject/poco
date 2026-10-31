@@ -44,7 +44,14 @@ struct SSH_API SSHServerConfig
 
 	std::string authorizedKeysDir;
 		/// Directory containing per-user authorized_keys files.
-		/// Each file is named by username (e.g., "admin").
+		/// The key file of a user is the entry of this directory whose name
+		/// equals the user name exactly (e.g., "admin"), compared byte for
+		/// byte with the UTF-8 entry names, so names that the file system
+		/// treats as the same file (other case, other Unicode normalisation,
+		/// short names) do not share a key file. Public key authentication
+		/// refuses a user name that is not a single file name: an empty
+		/// name, "." and "..", and a name that contains "/", "\", ":", NUL
+		/// or another ASCII control character.
 		/// Empty string disables public key authentication.
 
 	int maxConnections = 4;
