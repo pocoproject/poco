@@ -29,6 +29,7 @@ public:
 	void testLaunchRedirectIn();
 	void testLaunchRedirectOut();
 	void testLaunchEnv();
+	void testLaunchClearedEnvironment();
 	void testLaunchArgs();
 	void testLaunchInvalidCommand();
 	void testIsRunning();

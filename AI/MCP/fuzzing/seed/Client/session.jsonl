@@ -1,0 +1,5 @@
+{"jsonrpc":"2.0","id":1,"result":{"supportedVersions":["2026-07-28"],"capabilities":{"tools":{},"resources":{},"prompts":{}},"ttlMs":0,"cacheScope":"private","resultType":"complete"}}
+{"jsonrpc":"2.0","id":2,"result":{"tools":[{"name":"echo","description":"Echoes.","inputSchema":{"type":"object","properties":{"message":{"type":"string"}}}}],"resultType":"complete"}}
+{"jsonrpc":"2.0","id":3,"result":{"content":[{"type":"text","text":"hi"},{"type":"image","data":"aW1n","mimeType":"image/png"}],"structuredContent":{"n":1},"isError":false,"resultType":"complete"}}
+{"jsonrpc":"2.0","id":4,"result":{"contents":[{"uri":"fuzz://resource","mimeType":"text/plain","text":"text"},{"uri":"fuzz://blob","blob":"AAAA"}],"resultType":"complete"}}
+{"jsonrpc":"2.0","id":5,"result":{"description":"d","messages":[{"role":"user","content":{"type":"text","text":"x"}}],"resultType":"complete"}}

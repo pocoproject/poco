@@ -23,6 +23,11 @@ Geo (geographic coordinates and angles, great-circle and rhumb-line calculations
 conversions to and from local cartesian coordinates, and geofences), previously part of
 macchina.io, is a POCO component.
 Serial (serial port I/O), previously part of macchina.io, is a POCO component.
+AI/MCP and AI/MCP/HTTP implement the Model Context Protocol, revision 2026-07-28: a server
+any POCO application can expose tools, resources and prompts with, over a stream or at an
+endpoint of its HTTP server, and clients over a stream, a server process and Streamable HTTP.
+AI (experimental) is a client library for large language model APIs with a minimal agent
+runtime, and a chat service an application serves its users with.
 
 !!Features
 
@@ -54,6 +59,32 @@ Serial (serial port I/O), previously part of macchina.io, is a POCO component.
     macchina.io. Enable with cmake <*ENABLE_SERIAL*> (on by default; off with
     <*POCO_MINIMAL_BUILD*>); make component <*Serial*>. The component is turned off
     automatically for the emscripten target, which it does not support.
+  - GH #5532 <*AI/MCP*>, <*AI/MCP/HTTP*>: the Model Context Protocol, revision 2026-07-28,
+    the stateless one: a <*Server*> with message and stream ingress (tools, resources,
+    prompts, <*server/discover*>, cache hints), an abstract <*Client*> with the stream
+    transport <*StreamClient*>, the stdio transport to a server process <*ProcessClient*>
+    and the Streamable HTTP transport <*HTTPClient*>, which takes its sessions from
+    <*Poco::Net::HTTPSessionFactory*> and links Net only. Enable with cmake
+    <*ENABLE_AI_MCP*> and <*ENABLE_AI_MCP_HTTP*> (off by default); make components
+    <*AI/MCP*> and <*AI/MCP/HTTP*>.
+  - GH #5533 <*AI*> (experimental: the interface may change within 2.x): providers for the
+    Anthropic Messages API and the OpenAI Chat Completions format with per-call
+    cancellation, a tool registry of MCP tools, the agent loop, and <*MCPHost*>, which
+    mirrors the tools of MCP servers into the registry. Enable with cmake <*ENABLE_AI*> (off
+    by default); make component <*AI*>.
+  - GH #5573 <*Foundation*>: the launch option <*PROCESS_CLEAR_ENVIRONMENT*> of
+    <*Poco::Process*> starts a child with only the environment variables given to
+    <*Process::launch()*>, on every platform.
+  - GH #5576 <*AI/MCP/HTTP*>: the server side of the Streamable HTTP transport,
+    <*ServerTransport*>, which serves a <*Poco::AI::MCP::Server*> at an endpoint of an
+    application's <*Poco::Net::HTTPServer*> and checks what the transport asks of a request:
+    the method, the origin, the media types, the size of the body and the MCP headers against
+    the message. <*ServerRequestHandlerFactory*> is a server of one endpoint; the sample
+    <*MCPHTTPServer*>.
+  - GH #5577 <*AI*>: <*ChatService*>, the chat of an application with a model for any
+    number of users, with the tools of the application, cancelling, and the settings of its
+    providers, which an administrator changes while it runs; <*ChatEndpoint*>, its HTTP
+    interface for a chat in a browser, with server-sent events.
 
 !!Breaking Changes
 

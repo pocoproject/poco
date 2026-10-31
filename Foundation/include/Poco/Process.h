@@ -197,7 +197,9 @@ public:
 		/// standard input, standard output or standard error stream
 		/// of the launched process is redirected to the Pipe.
 		///
-		/// The launched process is given the specified environment variables.
+		/// The launched process is given the specified environment variables;
+		/// whether it inherits those of this process as well depends on the
+		/// platform and on PROCESS_CLEAR_ENVIRONMENT, see there.
 
 	static ProcessHandle launch(
 		const std::string& command,
@@ -215,7 +217,9 @@ public:
 		/// If inPipe, outPipe or errPipe is non-null, the corresponding
 		/// standard input, standard output or standard error stream
 		/// of the launched process is redirected to the Pipe.
-		/// The launched process is given the specified environment variables.
+		/// The launched process is given the specified environment variables;
+		/// whether it inherits those of this process as well depends on the
+		/// platform and on PROCESS_CLEAR_ENVIRONMENT, see there.
 
 	static int wait(const ProcessHandle& handle);
 		/// Waits for the process specified by handle to terminate

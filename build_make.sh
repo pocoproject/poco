@@ -26,9 +26,13 @@
 #   ./build_make.sh debug asan Util test rebuild
 #
 # Configures the make build for $POCO_CONFIG (default Linux-clang-c++20) on
-# the first run. Sources poco_env.bash for POCO_BASE / OSNAME / OSARCH /
-# LD_LIBRARY_PATH. Pass 'rebuild' to make clean before building (use after
-# switching sanitizers).
+# the first run, without the components in OMIT_DEFAULT: those that need
+# external libraries or servers, and the AI libraries, which are off by
+# default in CMake too. To build one of them, run ./configure with the same
+# --config and an --omit list without it first; asked for an omitted
+# component, the script prints that command. Sources poco_env.bash for
+# POCO_BASE / OSNAME / OSARCH / LD_LIBRARY_PATH. Pass 'rebuild' to make clean
+# before building (use after switching sanitizers).
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # poco_env.bash references LD_LIBRARY_PATH/DYLD_LIBRARY_PATH, which may be unset;
@@ -39,7 +43,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 set -euo pipefail
 
 POCO_CONFIG="${POCO_CONFIG:-Linux-clang-c++20}"
-OMIT_DEFAULT=Data/ODBC,Data/MySQL,Data/PostgreSQL,MongoDB,Redis,PDF,DNSSD,DNSSD/Avahi,DNSSD/Bonjour,CppParser
+OMIT_DEFAULT=Data/ODBC,Data/MySQL,Data/PostgreSQL,MongoDB,Redis,PDF,DNSSD,DNSSD/Avahi,DNSSD/Bonjour,CppParser,AI,AI/MCP,AI/MCP/HTTP
 
 MODE=all
 SANITIZER=
@@ -88,7 +92,12 @@ esac
 
 cd "$POCO_BASE"
 
-if [[ ! -f config.make ]] || ! grep -qE "^POCO_CONFIG[[:space:]]*=[[:space:]]*${POCO_CONFIG}[[:space:]]*$" config.make; then
+# Compared as a string: config names such as Linux-clang-c++20 are no regex.
+configured=
+if [[ -f config.make ]]; then
+	configured=$(awk '/^POCO_CONFIG[[:space:]]*=/ { sub(/^POCO_CONFIG[[:space:]]*=[[:space:]]*/, ""); sub(/[[:space:]]+$/, ""); print; exit }' config.make)
+fi
+if [[ "$configured" != "$POCO_CONFIG" ]]; then
 	echo "==> configure --config=$POCO_CONFIG"
 	./configure --config="$POCO_CONFIG" --omit="$OMIT_DEFAULT"
 fi
@@ -124,8 +133,9 @@ parse_target_libs()
 		| tr '\n' ' '
 }
 
-# 1. Component discovery: find every component Makefile and build the
-# library-name -> directory index, caching target_libs at the same time.
+# 1. Component discovery: find every component Makefile, up to three levels
+# deep (AI/MCP/HTTP), and build the library-name -> directory index, caching
+# target_libs at the same time.
 declare -A LIB_TO_DIR
 declare -A DEPS_OF
 declare -a ALL_DIRS=()
@@ -141,15 +151,46 @@ while IFS= read -r mk; do
 	LIB_TO_DIR[$target]=$dir
 	DEPS_OF[$dir]=$(parse_target_libs "$mk")
 	ALL_DIRS+=("$dir")
-done < <(find "$POCO_BASE" -maxdepth 3 -name Makefile -type f 2>/dev/null)
+done < <(find "$POCO_BASE" -maxdepth 4 -name Makefile -type f 2>/dev/null)
 
-# 2. Honor OMIT from config.make (entries are top-level dirs).
+# 2. Honor OMIT from config.make. An entry omits the components below it as
+# well, as the filter of the Makefile does: AI omits AI/MCP and AI/MCP/HTTP.
 declare -A OMITTED
 if [[ -f config.make ]]; then
 	omit_line=$({ grep -E "^OMIT[[:space:]]*=" config.make 2>/dev/null || true; } \
 		| head -1 | sed 's/^OMIT[[:space:]]*=[[:space:]]*//')
 	for e in $omit_line; do OMITTED[$e]=1; done
 fi
+
+# Prints the OMIT entries that omit the component directory, sorted, one per
+# line; fails when none does.
+omitted_by()
+{
+	local dir=$1 e found=1
+	for e in $(printf '%s\n' "${!OMITTED[@]}" | sort); do
+		if [[ "$dir" == "$e" || "$dir" == "$e"/* ]]; then
+			echo "$e"
+			found=0
+		fi
+	done
+	return $found
+}
+
+# Prints the component directory and those it needs, omitted or not, one per
+# line.
+declare -A NEEDED
+needed_by()
+{
+	local dir=$1 lib depdir
+	[[ -n "${NEEDED[$dir]:-}" ]] && return
+	NEEDED[$dir]=1
+	echo "$dir"
+	for lib in ${DEPS_OF[$dir]:-}; do
+		depdir="${LIB_TO_DIR[$lib]:-}"
+		[[ -n "$depdir" ]] && needed_by "$depdir"
+	done
+	return 0
+}
 
 # 3. Topological walk via DFS.
 declare -A VISITED
@@ -160,7 +201,7 @@ walk()
 {
 	local dir=$1
 	[[ -n "${VISITED[$dir]:-}" ]] && return
-	[[ -n "${OMITTED[$dir]:-}" ]] && return
+	omitted_by "$dir" >/dev/null && return
 	[[ ! -f "$POCO_BASE/$dir/Makefile" ]] && return
 	VISITED[$dir]=1
 
@@ -176,6 +217,23 @@ walk()
 }
 
 if [[ -n "$COMPONENT" ]]; then
+	if omission=$(omitted_by "$COMPONENT"); then
+		# The command keeps the configuration and the omitted entries that
+		# neither the component nor what it needs falls under.
+		needed=$(needed_by "$COMPONENT")
+		keep=()
+		for e in $(printf '%s\n' "${!OMITTED[@]}" | sort); do
+			covers=0
+			while IFS= read -r d; do
+				if [[ "$d" == "$e" || "$d" == "$e"/* ]]; then covers=1; fi
+			done <<< "$needed"
+			(( covers )) || keep+=("$e")
+		done
+		command="./configure --config=$POCO_CONFIG"
+		if (( ${#keep[@]} )); then command+=" --omit=$(IFS=,; echo "${keep[*]}")"; fi
+		echo "error: $COMPONENT is omitted in config.make, by $(echo $omission | sed 's/ /, /g'); run $command first" >&2
+		exit 1
+	fi
 	walk "$COMPONENT"
 else
 	for d in "${ALL_DIRS[@]}"; do walk "$d"; done

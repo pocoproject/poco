@@ -1,0 +1,140 @@
+AI Overview
+AI
+
+!!!Introduction
+
+The <*AI*> library (<*PocoAI*>, namespace <[Poco::AI]>) runs agents on large language
+models: providers for the Anthropic Messages API and for the OpenAI Chat Completions API and
+the servers compatible with it, a registry of tools, an agent loop that calls the model and
+runs the tools it asks for, and a host that gives the model the tools of MCP servers.
+
+The library is experimental: its API may change within POCO 2.x.
+
+Dependencies: Foundation, JSON, Net, AI/MCP and AI/MCP/HTTP; NetSSL for https endpoints.
+
+
+!!!Classes
+
+<[LLMProvider]> is the interface of a model API. <[LLMProvider::chat()]> makes one call: it
+delivers the text as it streams in, as <[ContentEvent]>s, and returns a <[ChatResult]> with
+the stop reason, the usage, the tool calls and the model's turn in the provider's own message
+format, which the caller appends to the conversation unchanged.
+<[LLMProvider::appendToolResult()]> adds a tool result in that format.
+
+<[AnthropicProvider]> and <[OpenAIProvider]> are the two providers. Each takes its settings in
+a <*Params*> structure: the base URI, the API key, the model, the token limit, the timeout,
+members to merge into every request body, and headers to send with every request. Sessions
+come from a session factory, so that an application can use a proxy, its own TLS context or a
+tunnel.
+
+<[Cancellation]> is the token of one call or one run, which another thread may cancel. A
+cancel ends a call in any phase, connecting, sending, or reading the stream, by shutting its
+connection down. The connect and the TLS handshake of an https endpoint are the exception: a
+cancel during them takes effect when they end, at the latest when the timeout of the call
+ends. Calls that share a provider each have their own token.
+
+<[ToolRegistry]> holds the tools an agent may call, as <[Poco::AI::MCP::Tool]> definitions
+with handlers that return a <[Poco::AI::MCP::ToolResult]>: the same tool model as an MCP
+server's.
+
+<[AgentLoop]> runs an agent: it calls the model, runs the tools it calls, passes the results
+back, and repeats until the model answers without tool calls, the run is cancelled, a call
+fails, the token limit cuts an answer, or the round limit is reached. It reports every step as
+an <[AgentEvent]> and ends every run with a DONE event that carries the stop reason of the
+last call and the usage of all. Every tool call in the conversation gets its result, so the
+conversation stays one the model APIs accept. An approver decides which calls run.
+
+<[MCPHost]> connects to MCP servers over any <[Poco::AI::MCP::Client]>, stdio or Streamable
+HTTP, and registers their tools in a <[ToolRegistry]>.
+
+
+!!!Chat
+
+<[ChatService]> is the chat of an application with a model, for any number of users at once.
+A turn runs through the agent loop with the tools of the application, and its events come as
+JSON objects: text, tool calls and results, failures with the name of their kind, and the end
+of the turn. A user stops a turn of a chat from another request. The providers the chat may
+use, kept in <[ChatSettings]>, and the provider and model in use, are changed while it runs;
+the application stores every change. A provider without a list of models offers those it lists
+itself, and one whose base URL has a placeholder for its server, such as
+http://[server]:11434/v1, is reached at the first of its servers that answers.
+
+<[ChatEndpoint]> is the HTTP interface of a chat service for a chat in a browser, below a base
+path the application chooses: the health with the providers and models, a turn as server-sent
+events with comments while the model works, cancelling, choosing the provider and model, and
+the settings and keys, which only a caller who can manage the chat changes. The application
+signs the caller in and says who it is and whether they can manage the chat.
+
+
+!!!Security
+
+Tool results, the descriptions of tools from remote servers and the input a model gives a tool
+are untrusted input. A model may call a tool with arguments it chose after reading text an
+attacker wrote. Let a person or a policy decide, with an approver
+(<[AgentLoop::setApprover()]>), which calls run; the approver of a chat service
+(<[ChatService::Params]>) also gets the user of the turn.
+
+
+!!!Building AI
+
+!!CMake
+
+The CMake option <*ENABLE_AI*> is off by default; it turns on <*ENABLE_AI_MCP*> and
+<*ENABLE_AI_MCP_HTTP*>.
+
+    cmake -B build -DENABLE_AI=ON
+    cmake --build build
+
+!!GNU Make
+
+The component <*AI*> is omitted from the typical configuration, together with <*AI/MCP*> and
+<*AI/MCP/HTTP*>. Configure with <*--everything*>, or with an <*--omit*> list that does not
+name <*AI*>.
+
+
+!!!Example
+
+The following program gives a model served by a local ollama one tool and asks it a question.
+For an https endpoint, such as the Anthropic or the OpenAI API, register
+<[Poco::Net::HTTPSSessionInstantiator]> first, or give the provider a session factory.
+
+    #include "Poco/AI/AgentLoop.h"
+    #include "Poco/AI/OpenAIProvider.h"
+    #include "Poco/AI/ToolRegistry.h"
+    #include "Poco/DateTimeFormat.h"
+    #include "Poco/DateTimeFormatter.h"
+    #include "Poco/Timestamp.h"
+    #include <iostream>
+    #include <memory>
+
+    using namespace Poco::AI;
+
+    int main()
+    {
+        OpenAIProvider::Params params;
+        params.baseURI = Poco::URI("http://localhost:11434/v1");
+        params.model = "qwen3";
+        auto pProvider = std::make_shared<OpenAIProvider>(params);
+
+        ToolRegistry tools;
+        tools.registerTool("time", "Returns the current time, in UTC.", nullptr,
+            [](const Poco::JSON::Object::Ptr&)
+            {
+                return Poco::DateTimeFormatter::format(Poco::Timestamp(), Poco::DateTimeFormat::ISO8601_FORMAT);
+            });
+
+        AgentLoop loop(pProvider, tools);
+        Poco::JSON::Array conversation;
+        Poco::JSON::Object::Ptr pQuestion = new Poco::JSON::Object;
+        pQuestion->set("role", "user");
+        pQuestion->set("content", "What time is it in Tokyo?");
+        conversation.add(pQuestion);
+
+        loop.run(conversation, "Answer briefly.", [](const AgentEvent& event)
+        {
+            if (event.type == AgentEvent::Type::TEXT) std::cout << event.content << std::flush;
+            if (event.type == AgentEvent::Type::FAILURE) std::cerr << event.content << std::endl;
+        });
+        std::cout << std::endl;
+        return 0;
+    }

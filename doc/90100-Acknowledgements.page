@@ -322,3 +322,12 @@ following copyrighted material, the use of which is hereby acknowledged.
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+
+----
+
+
+!!!Model Context Protocol Specification
+
+    The AI/MCP and AI/MCP/HTTP libraries implement the Model Context Protocol
+    specification (https://modelcontextprotocol.io), revision 2026-07-28. They
+    copy no text or schema of the specification.

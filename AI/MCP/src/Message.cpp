@@ -1,0 +1,250 @@
+//
+// Message.cpp
+//
+// Library: AI/MCP
+// Package: Core
+// Module:  Message
+//
+// Copyright (c) 2026, Aleph ONE Software Engineering LLC.
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#include "Poco/AI/MCP/Message.h"
+#include "Poco/AI/MCP/MCPException.h"
+#include "Poco/JSON/Array.h"
+#include "Poco/JSON/Parser.h"
+#include "Poco/JSON/Stringifier.h"
+#include "Poco/Exception.h"
+#include <istream>
+#include <ostream>
+#include <sstream>
+
+
+namespace Poco::AI::MCP {
+
+
+namespace
+{
+	enum class LineResult
+	{
+		LINE,
+		TOO_LONG,
+		END
+	};
+
+
+	LineResult readLine(std::istream& in, std::string& line, std::size_t maxSize)
+		/// Reads one line without its terminator. A line longer than maxSize
+		/// is skipped up to its end and reported as TOO_LONG.
+	{
+		line.clear();
+		std::streambuf* pBuf = in.rdbuf();
+		if (pBuf == nullptr || !in.good())
+		{
+			return LineResult::END;
+		}
+		bool tooLong = false;
+		bool any = false;
+		for (;;)
+		{
+			const int c = pBuf->sbumpc();
+			if (c == std::char_traits<char>::eof())
+			{
+				in.setstate(std::ios::eofbit);
+				if (!any) return LineResult::END;
+				break;
+			}
+			any = true;
+			if (c == '\n') break;
+			if (tooLong) continue;
+			if (line.size() >= maxSize)
+			{
+				tooLong = true;
+				line.clear();
+				continue;
+			}
+			line += static_cast<char>(c);
+		}
+		return tooLong ? LineResult::TOO_LONG : LineResult::LINE;
+	}
+
+
+	bool isScalar(const std::string& text)
+		/// Returns true if text is one JSON value that is neither an object
+		/// nor an array, which the parser does not take on its own.
+	{
+		try
+		{
+			Poco::JSON::Parser parser;
+			const Poco::Dynamic::Var parsed = parser.parse("[" + text + "]");
+			const Poco::JSON::Array::Ptr pArray = parsed.extract<Poco::JSON::Array::Ptr>();
+			return pArray->size() == 1 && !pArray->isObject(0) && !pArray->isArray(0);
+		}
+		catch (const Poco::Exception&)
+		{
+			return false;
+		}
+	}
+}
+
+
+Poco::JSON::Object::Ptr Request::make(const Id& id, const std::string& method, const Poco::JSON::Object::Ptr& params)
+{
+	Poco::JSON::Object::Ptr pRequest = new Poco::JSON::Object;
+	pRequest->set("jsonrpc", JSONRPC_VERSION);
+	pRequest->set("id", id);
+	pRequest->set("method", method);
+	if (params != nullptr)
+	{
+		pRequest->set("params", params);
+	}
+	return pRequest;
+}
+
+
+Poco::JSON::Object::Ptr Request::makeNotification(const std::string& method, const Poco::JSON::Object::Ptr& params)
+{
+	Poco::JSON::Object::Ptr pNotification = new Poco::JSON::Object;
+	pNotification->set("jsonrpc", JSONRPC_VERSION);
+	pNotification->set("method", method);
+	if (params != nullptr)
+	{
+		pNotification->set("params", params);
+	}
+	return pNotification;
+}
+
+
+Poco::JSON::Object::Ptr Response::result(const Id& id, const Poco::Dynamic::Var& result)
+{
+	Poco::JSON::Object::Ptr pResponse = new Poco::JSON::Object;
+	pResponse->set("jsonrpc", JSONRPC_VERSION);
+	pResponse->set("id", id);
+	pResponse->set("result", result);
+	return pResponse;
+}
+
+
+Poco::JSON::Object::Ptr Response::error(const Id& id, ErrorCode code, const std::string& message, const Poco::JSON::Object::Ptr& data)
+{
+	Poco::JSON::Object::Ptr pError = new Poco::JSON::Object;
+	pError->set("code", static_cast<int>(code));
+	pError->set("message", message);
+	if (data != nullptr)
+	{
+		pError->set("data", data);
+	}
+
+	Poco::JSON::Object::Ptr pResponse = new Poco::JSON::Object;
+	pResponse->set("jsonrpc", JSONRPC_VERSION);
+	if (!id.isEmpty())
+	{
+		pResponse->set("id", id);
+	}
+	pResponse->set("error", pError);
+	return pResponse;
+}
+
+
+bool isValidId(const Poco::Dynamic::Var& id)
+{
+	if (id.isEmpty()) return false;
+	if (id.isString()) return true;
+	// A boolean counts as an integer type to Dynamic::Var.
+	return id.isInteger() && !id.isBoolean();
+}
+
+
+bool sameId(const Id& first, const Id& second)
+{
+	if (!isValidId(first) || !isValidId(second)) return false;
+	try
+	{
+		if (second.isString()) return first.isString() && first.extract<std::string>() == second.extract<std::string>();
+		return !first.isString() && first.convert<Poco::Int64>() == second.convert<Poco::Int64>();
+	}
+	catch (const Poco::Exception&)
+	{
+		return false;
+	}
+}
+
+
+bool isResponseTo(const Poco::JSON::Object::Ptr& message, const Id& id)
+{
+	if (message == nullptr || !(message->has("result") || message->has("error"))) return false;
+	return sameId(message->get("id"), id);
+}
+
+
+std::string serialize(const Poco::JSON::Object::Ptr& message)
+{
+	std::ostringstream os;
+	// Default indent 0 produces a single compact line with no embedded newlines.
+	Poco::JSON::Stringifier::stringify(message, os);
+	return os.str();
+}
+
+
+void writeMessage(std::ostream& out, const Poco::JSON::Object::Ptr& message)
+{
+	out << serialize(message) << '\n';
+	out.flush();
+	if (!out.good())
+	{
+		throw Poco::WriteFileException("The MCP message stream is closed");
+	}
+}
+
+
+Poco::JSON::Object::Ptr parseMessage(const std::string& text)
+{
+	Poco::Dynamic::Var parsed;
+	try
+	{
+		Poco::JSON::Parser parser;
+		parsed = parser.parse(text);
+	}
+	catch (const Poco::Exception& exc)
+	{
+		if (isScalar(text))
+		{
+			throw MCPException("Message is not a JSON object", static_cast<int>(ErrorCode::INVALID_REQUEST));
+		}
+		throw MCPException("Parse error", exc.message(), static_cast<int>(ErrorCode::PARSE_ERROR));
+	}
+	if (parsed.type() != typeid(Poco::JSON::Object::Ptr))
+	{
+		throw MCPException("Message is not a JSON object", static_cast<int>(ErrorCode::INVALID_REQUEST));
+	}
+	return parsed.extract<Poco::JSON::Object::Ptr>();
+}
+
+
+Poco::JSON::Object::Ptr readMessage(std::istream& in, std::size_t maxSize)
+{
+	std::string line;
+	for (;;)
+	{
+		const LineResult result = readLine(in, line, maxSize);
+		if (result == LineResult::END)
+		{
+			return Poco::JSON::Object::Ptr();
+		}
+		if (result == LineResult::TOO_LONG)
+		{
+			throw MessageTooLargeException("Message exceeds the size limit", static_cast<int>(ErrorCode::INVALID_REQUEST));
+		}
+		if (line.find_first_not_of(" \t\r") == std::string::npos)
+		{
+			continue;
+		}
+		return parseMessage(line);
+	}
+}
+
+
+} // namespace Poco::AI::MCP
