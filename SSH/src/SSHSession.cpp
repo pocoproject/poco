@@ -26,18 +26,22 @@
 #include "Poco/SSH/SSHServer.h"
 #include "Poco/SSH/SSHException.h"
 #include "SSHDeadline.h"
+#include "Poco/Ascii.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
+#include "Poco/FileStream.h"
 #include "Poco/Format.h"
+#include "Poco/UTF8String.h"
 #include <libssh/libssh.h>
 #include <libssh/server.h>
 #include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
-#include <fstream>
+#include <ios>
 #include <optional>
 #include <sstream>
+#include <vector>
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include <winsock2.h>
@@ -402,42 +406,93 @@ bool SSHSession::checkAuthorizedKey(const std::string& username, ssh_key clientK
 	if (_config.authorizedKeysDir.empty())
 		return false;
 
-	Poco::Path keyFilePath(_config.authorizedKeysDir);
-	keyFilePath.append(username);
-	std::string keyFile = keyFilePath.toString();
-
-	Poco::File f(keyFile);
-	if (!f.exists()) return false;
-
-	std::ifstream ifs(keyFile);
-	std::string line;
-	while (std::getline(ifs, line))
+	// The user name names a file in authorizedKeysDir, so a name with a path or a drive in it could name a key file
+	// elsewhere
+	const bool isFileName = !username.empty() && username != "." && username != ".." &&
+		std::none_of(username.begin(), username.end(), [](char ch)
+		{
+			return ch == '/' || ch == '\\' || ch == ':' || Poco::Ascii::hasProperties(ch, Poco::Ascii::ACP_CONTROL);
+		});
+	if (!isFileName)
 	{
-		if (line.empty() || line[0] == '#') continue;
-
-		std::istringstream iss(line);
-		std::string keytype, b64key;
-		iss >> keytype >> b64key;
-		if (keytype.empty() || b64key.empty()) continue;
-
-		ssh_key candidate = nullptr;
-		int rc = ssh_pki_import_pubkey_base64(
-			b64key.c_str(),
-			ssh_key_type_from_name(keytype.c_str()),
-			&candidate);
-
-		if (rc == SSH_OK && candidate)
-		{
-			bool match = (ssh_key_cmp(clientKey, candidate, SSH_KEY_CMP_PUBLIC) == 0);
-			ssh_key_free(candidate);
-			if (match) return true;
-		}
-		else if (candidate)
-		{
-			ssh_key_free(candidate);
-		}
+		if (_logger.debug())
+			_logger.debug("Public key authentication refused for user name '%s': not a file name",
+				Poco::UTF8::escape(username));
+		return false;
 	}
 
+	// The caller frees the authentication request after this returns, so an error refuses the key instead of
+	// leaving the function with an exception
+	bool listed = false;
+	std::string error;
+	try
+	{
+		// A file system can open the same file for other names (other case, other Unicode normalisation, short
+		// names), so the key file is the directory entry whose name equals the user name byte for byte
+		std::vector<std::string> entries;
+		Poco::File(_config.authorizedKeysDir).list(entries);
+		listed = true;
+		if (std::find(entries.begin(), entries.end(), username) == entries.end())
+		{
+			if (_logger.debug())
+				_logger.debug("Public key authentication refused for user name '%s': no key file of this name",
+					Poco::UTF8::escape(username));
+			return false;
+		}
+
+		// The constructor takes the user name as the file name as it is; parsing it would expand a leading "~"
+		const Poco::Path keyFilePath(_config.authorizedKeysDir, username);
+		// Poco::FileInputStream opens the UTF-8 name as it is on Windows; std::ifstream reads the name as text in the
+		// ANSI code page and opens another file or none
+		Poco::FileInputStream ifs(keyFilePath.toString());
+		// Without it, std::getline() takes a read error, such as reading a directory, for the end of the file
+		ifs.exceptions(std::ios::badbit);
+		std::string line;
+		while (std::getline(ifs, line))
+		{
+			if (line.empty() || line[0] == '#') continue;
+
+			std::istringstream iss(line);
+			std::string keytype, b64key;
+			iss >> keytype >> b64key;
+			if (keytype.empty() || b64key.empty()) continue;
+
+			ssh_key candidate = nullptr;
+			const int rc = ssh_pki_import_pubkey_base64(
+				b64key.c_str(),
+				ssh_key_type_from_name(keytype.c_str()),
+				&candidate);
+
+			if (rc == SSH_OK && candidate != nullptr)
+			{
+				const bool match = (ssh_key_cmp(clientKey, candidate, SSH_KEY_CMP_PUBLIC) == 0);
+				ssh_key_free(candidate);
+				if (match) return true;
+			}
+			else if (candidate != nullptr)
+			{
+				ssh_key_free(candidate);
+			}
+		}
+		return false;
+	}
+	catch (Poco::Exception& exc)
+	{
+		error = exc.displayText();
+	}
+	catch (std::exception& exc)
+	{
+		error = exc.what();
+	}
+
+	if (listed)
+		_logger.warning(
+			"Public key authentication refused for user '%s': cannot read the key file in the authorized keys "
+			"directory %s: %s", Poco::UTF8::escape(username), _config.authorizedKeysDir, error);
+	else
+		_logger.warning(
+			"Public key authentication refused for user '%s': cannot list the authorized keys directory %s: %s",
+			Poco::UTF8::escape(username), _config.authorizedKeysDir, error);
 	return false;
 }
 

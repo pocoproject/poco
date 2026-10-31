@@ -851,6 +851,31 @@ namespace
 		return cfg;
 	}
 
+	void authorizeKey(const std::string& privateKeyFile, const std::string& keyFile)
+		/// Writes the public key of the private key file to an authorized keys file, whose name is UTF-8 also on
+		/// Windows, where libssh opens a file name in the ANSI code page.
+	{
+		// The name of the private key file is ASCII
+		const std::string publicKeyFile = privateKeyFile + ".pub";
+		ssh_key key = nullptr;
+		if (ssh_pki_import_privkey_file(privateKeyFile.c_str(), nullptr, nullptr, nullptr, &key) != SSH_OK)
+			throw Poco::IOException("Cannot read the private key", privateKeyFile);
+		const int rc = ssh_pki_export_pubkey_file(key, publicKeyFile.c_str());
+		ssh_key_free(key);
+		if (rc != SSH_OK)
+			throw Poco::IOException("Cannot write the public key", publicKeyFile);
+		Poco::File(publicKeyFile).copyTo(keyFile);
+	}
+
+	[[nodiscard]] bool loginWithPublicKey(Poco::UInt16 port, const std::string& user, const std::string& privateKeyFile)
+		/// Connects a new client to the server and returns whether it logs in as the user with the key.
+	{
+		SSHClient client;
+		setClassicalKex(client.session());
+		client.connect("127.0.0.1", port);
+		return client.authenticatePublicKey(user, privateKeyFile);
+	}
+
 	/// Sends input to a ReadLineSession, closes the input if closeInput is true,
 	/// and returns whether the session finished reading within 10 seconds.
 	[[nodiscard]] bool readLines(const std::string& keyDir, const std::string& input, bool closeInput,
@@ -1039,6 +1064,207 @@ void SSHTest::testPasswordAuthFail()
 		server.stop();
 		throw;
 	}
+
+	server.stop();
+}
+
+
+void SSHTest::testPublicKeyAuthUserNameMustEqualKeyFileName()
+{
+	const std::string clientKey = Poco::Path(_testDir, "client_key").toString();
+	SSHHostKeyManager::generateKey(clientKey);
+	const std::string authorizedDir = Poco::Path(_testDir, "authorized").toString();
+	const std::string elsewhereDir = Poco::Path(_testDir, "elsewhere").toString();
+	Poco::File(authorizedDir).createDirectories();
+	Poco::File(elsewhereDir).createDirectories();
+	authorizeKey(clientKey, Poco::Path(authorizedDir, "testuser").toString());
+	authorizeKey(clientKey, Poco::Path(elsewhereDir, "uploaded").toString());
+#if !defined(_WIN32)
+	// Windows file names cannot contain ":", other systems allow it
+	authorizeKey(clientKey, Poco::Path(authorizedDir, "a:b").toString());
+#endif
+
+	SSHServerConfig cfg = makeTestConfig(_testDir);
+	cfg.enablePubkeyAuth = true;
+	cfg.authorizedKeysDir = authorizedDir;
+	// One session for each login, so that a session that has not ended yet does not refuse the next login
+	cfg.maxConnections = 8;
+
+	SSHServer server(cfg, [](ssh_session s, const SSHServerConfig& c, SSHServer& srv) -> SSHSession*
+	{
+		return new EchoSession(s, c, srv);
+	});
+	server.start();
+
+	const auto loginWithKey = [&server, &clientKey](const std::string& user)
+	{
+		return loginWithPublicKey(server.port(), user, clientKey);
+	};
+	assertTrue(loginWithKey("testuser"));
+	assertFalse(loginWithKey("../elsewhere/uploaded"));
+	// A backslash separates directories on Windows
+	assertFalse(loginWithKey("..\\elsewhere\\uploaded"));
+	// A colon follows a drive letter or separates a stream name on Windows
+	assertFalse(loginWithKey("C:x"));
+	assertFalse(loginWithKey("a:b"));
+
+	if (Poco::File(Poco::Path(authorizedDir, "TESTUSER")).exists())
+		assertFalse(loginWithKey("TESTUSER"));
+	else
+		warnmsg("The file system distinguishes the case of file names, the login in another case is not tested");
+
+#if defined(_WIN32)
+	// Windows removes a trailing dot from a file name
+	assertFalse(loginWithKey("testuser."));
+#endif
+
+	server.stop();
+}
+
+
+void SSHTest::testPublicKeyAuthKeepsSessionWhenKeyFileCannotBeRead()
+{
+	const std::string clientKey = Poco::Path(_testDir, "client_key").toString();
+	SSHHostKeyManager::generateKey(clientKey);
+	const std::string missingDir = Poco::Path(_testDir, "missing").toString();
+	const std::string authorizedDir = Poco::Path(_testDir, "authorized").toString();
+	// The directory is listed like a key file of the user; Windows does not open it, other systems do not read it
+	Poco::File(Poco::Path(authorizedDir, "testuser")).createDirectories();
+	std::atomic<int> warnings{0};
+	std::atomic<int> expectedWarnings{0};
+	std::atomic<const char*> expectedText{""};
+	const LogCapture capture("Poco.SSH.SSHSession",
+		[&warnings, &expectedWarnings, &expectedText](const Poco::Message& msg)
+		{
+			if (msg.getPriority() != Poco::Message::PRIO_WARNING)
+				return;
+			++warnings;
+			if (msg.getText().find(expectedText.load()) != std::string::npos)
+				++expectedWarnings;
+		});
+
+	const std::vector<std::pair<std::string, const char*>> cases{
+		{missingDir, "cannot list the authorized keys directory"},
+		{authorizedDir, "cannot read the key file"}};
+	for (const auto& [keysDir, text]: cases)
+	{
+		warnings = 0;
+		expectedWarnings = 0;
+		expectedText = text;
+		SSHServerConfig cfg = makeTestConfig(_testDir);
+		cfg.enablePubkeyAuth = true;
+		cfg.authorizedKeysDir = keysDir;
+
+		SSHServer server(cfg, [](ssh_session s, const SSHServerConfig& c, SSHServer& srv) -> SSHSession*
+		{
+			return new EchoSession(s, c, srv);
+		});
+		server.start();
+
+		SSHClient client;
+		setClassicalKex(client.session());
+		// Without a timeout, a login on a connection whose session has ended waits forever
+		constexpr long timeoutSeconds = 10;
+		ssh_options_set(client.session(), SSH_OPTIONS_TIMEOUT, &timeoutSeconds);
+		client.connect("127.0.0.1", server.port());
+		assertFalse(client.authenticatePublicKey("testuser", clientKey));
+		// The refused key leaves the session open for another authentication method
+		assertTrue(client.authenticatePassword("testuser", "testpass"));
+		assertEqual(1, warnings.load());
+		assertEqual(1, expectedWarnings.load());
+		client.disconnect();
+
+		server.stop();
+	}
+}
+
+
+void SSHTest::testPublicKeyAuthTakesTildeAsFileName()
+{
+	const std::string clientKey = Poco::Path(_testDir, "client_key").toString();
+	SSHHostKeyManager::generateKey(clientKey);
+	const std::string authorizedDir = Poco::Path(_testDir, "authorized").toString();
+	Poco::File(authorizedDir).createDirectories();
+	// A path that begins with "~" names the home directory, the file name "~" does not
+	authorizeKey(clientKey, Poco::Path(authorizedDir, "~").toString());
+
+	SSHServerConfig cfg = makeTestConfig(_testDir);
+	cfg.enablePubkeyAuth = true;
+	cfg.authorizedKeysDir = authorizedDir;
+
+	SSHServer server(cfg, [](ssh_session s, const SSHServerConfig& c, SSHServer& srv) -> SSHSession*
+	{
+		return new EchoSession(s, c, srv);
+	});
+	server.start();
+
+	assertTrue(loginWithPublicKey(server.port(), "~", clientKey));
+
+	server.stop();
+}
+
+
+void SSHTest::testPublicKeyAuthNonAsciiUserNameUsesItsOwnKeyFile()
+{
+	const std::string keyA = Poco::Path(_testDir, "key_a").toString();
+	const std::string keyB = Poco::Path(_testDir, "key_b").toString();
+	SSHHostKeyManager::generateKey(keyA);
+	SSHHostKeyManager::generateKey(keyB);
+	const std::string authorizedDir = Poco::Path(_testDir, "authorized").toString();
+	Poco::File(authorizedDir).createDirectories();
+	// A name converted to the ANSI code page on Windows turns U+FF54 into 't' and names the key file of "testuser"
+	const std::string fullwidthUser = "\xEF\xBD\x94" "estuser";
+	authorizeKey(keyA, Poco::Path(authorizedDir, "testuser").toString());
+	authorizeKey(keyB, Poco::Path(authorizedDir, fullwidthUser).toString());
+
+	SSHServerConfig cfg = makeTestConfig(_testDir);
+	cfg.enablePubkeyAuth = true;
+	cfg.authorizedKeysDir = authorizedDir;
+	// One session for each login, so that a session that has not ended yet does not refuse the next login
+	cfg.maxConnections = 8;
+
+	SSHServer server(cfg, [](ssh_session s, const SSHServerConfig& c, SSHServer& srv) -> SSHSession*
+	{
+		return new EchoSession(s, c, srv);
+	});
+	server.start();
+
+	assertTrue(loginWithPublicKey(server.port(), fullwidthUser, keyB));
+	assertFalse(loginWithPublicKey(server.port(), fullwidthUser, keyA));
+	assertTrue(loginWithPublicKey(server.port(), "testuser", keyA));
+
+	server.stop();
+}
+
+
+void SSHTest::testPublicKeyAuthLogsUserNameOnOneLine()
+{
+	const std::string clientKey = Poco::Path(_testDir, "client_key").toString();
+	SSHHostKeyManager::generateKey(clientKey);
+	std::atomic<int> refusals{0};
+	std::atomic<int> linesWithBreak{0};
+	const LogCapture capture("Poco.SSH.SSHSession", [&refusals, &linesWithBreak](const Poco::Message& msg)
+	{
+		if (msg.getText().find("Public key authentication refused") != std::string::npos)
+			++refusals;
+		if (msg.getText().find_first_of("\r\n") != std::string::npos)
+			++linesWithBreak;
+	});
+
+	SSHServerConfig cfg = makeTestConfig(_testDir);
+	cfg.enablePubkeyAuth = true;
+	cfg.authorizedKeysDir = _testDir;
+
+	SSHServer server(cfg, [](ssh_session s, const SSHServerConfig& c, SSHServer& srv) -> SSHSession*
+	{
+		return new EchoSession(s, c, srv);
+	});
+	server.start();
+
+	// The server logs the refusal before it replies to the client
+	assertFalse(loginWithPublicKey(server.port(), "test\r\nuser", clientKey));
+	assertEqual(1, refusals.load());
+	assertEqual(0, linesWithBreak.load());
 
 	server.stop();
 }
@@ -2264,6 +2490,11 @@ CppUnit::Test* SSHTest::suite()
 	CppUnit_addTest(pSuite, SSHTest, testClientConnect);
 	CppUnit_addTest(pSuite, SSHTest, testPasswordAuth);
 	CppUnit_addTest(pSuite, SSHTest, testPasswordAuthFail);
+	CppUnit_addTest(pSuite, SSHTest, testPublicKeyAuthUserNameMustEqualKeyFileName);
+	CppUnit_addTest(pSuite, SSHTest, testPublicKeyAuthKeepsSessionWhenKeyFileCannotBeRead);
+	CppUnit_addTest(pSuite, SSHTest, testPublicKeyAuthTakesTildeAsFileName);
+	CppUnit_addTest(pSuite, SSHTest, testPublicKeyAuthNonAsciiUserNameUsesItsOwnKeyFile);
+	CppUnit_addTest(pSuite, SSHTest, testPublicKeyAuthLogsUserNameOnOneLine);
 	CppUnit_addTest(pSuite, SSHTest, testSessionHandling);
 	CppUnit_addTest(pSuite, SSHTest, testServerShutdownWithActiveSession);
 	CppUnit_addTest(pSuite, SSHTest, testClientDisconnect);

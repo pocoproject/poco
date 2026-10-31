@@ -30,6 +30,11 @@ public:
 	void testClientConnect();
 	void testPasswordAuth();
 	void testPasswordAuthFail();
+	void testPublicKeyAuthUserNameMustEqualKeyFileName();
+	void testPublicKeyAuthKeepsSessionWhenKeyFileCannotBeRead();
+	void testPublicKeyAuthTakesTildeAsFileName();
+	void testPublicKeyAuthNonAsciiUserNameUsesItsOwnKeyFile();
+	void testPublicKeyAuthLogsUserNameOnOneLine();
 	void testSessionHandling();
 	void testServerShutdownWithActiveSession();
 	void testClientDisconnect();
