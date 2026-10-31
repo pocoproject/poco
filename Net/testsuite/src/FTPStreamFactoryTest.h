@@ -29,6 +29,7 @@ public:
 	void testUserInfo();
 	void testPasswordProvider();
 	void testMissingPasswordProvider();
+	void testLineBreakInPath();
 
 	void setUp();
 	void tearDown();

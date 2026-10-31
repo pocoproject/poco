@@ -32,6 +32,7 @@ public:
 	void testRetrieveHeader();
 	void testRetrieveMessages();
 	void testDeleteMessage();
+	void testSendCommandLineBreak();
 
 	void setUp();
 	void tearDown();

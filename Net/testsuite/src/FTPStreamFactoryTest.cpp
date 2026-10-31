@@ -29,6 +29,7 @@ using Poco::Net::SocketAddress;
 using Poco::Net::FTPException;
 using Poco::URI;
 using Poco::StreamCopier;
+using Poco::InvalidArgumentException;
 
 
 namespace
@@ -232,6 +233,44 @@ void FTPStreamFactoryTest::testMissingPasswordProvider()
 }
 
 
+void FTPStreamFactoryTest::testLineBreakInPath()
+{
+	FTPStreamFactory::setPasswordProvider(nullptr);
+
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	server.addResponse("331 Password required");
+	server.addResponse("230 Welcome");
+	server.addResponse("200 Type set to I");
+
+	DialogServer dataServer(false);
+	dataServer.addResponse("line1\r\nline2");
+	std::ostringstream epsv;
+	epsv << "229 Entering Extended Passive Mode (|||" << dataServer.port() << "|)";
+	server.addResponse(epsv.str());
+	server.addResponse("150 sending data\r\n226 Transfer complete");
+	server.addResponse("250 Deleted");
+	server.addResponse("221 Good bye");
+
+	// The URI decodes %0D%0A in the path; the file name must not become a second command.
+	URI uri("ftp://127.0.0.1:" + std::to_string(server.port()) + "/test.txt%0D%0ADELE%20other.txt");
+	try
+	{
+		FTPStreamFactory sf;
+		std::unique_ptr<std::istream> pStr(sf.open(uri));
+		fail("line break in path - must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	for (const auto& command: server.lastCommands())
+	{
+		assertTrue (command != "DELE other.txt");
+	}
+}
+
+
 void FTPStreamFactoryTest::setUp()
 {
 }
@@ -251,6 +290,7 @@ CppUnit::Test* FTPStreamFactoryTest::suite()
 	CppUnit_addTest(pSuite, FTPStreamFactoryTest, testUserInfo);
 	CppUnit_addTest(pSuite, FTPStreamFactoryTest, testPasswordProvider);
 	CppUnit_addTest(pSuite, FTPStreamFactoryTest, testMissingPasswordProvider);
+	CppUnit_addTest(pSuite, FTPStreamFactoryTest, testLineBreakInPath);
 
 	return pSuite;
 }
