@@ -1997,6 +1997,27 @@ void DataTest::testRecordSetMoveFilter()
 		RowFilter::Ptr pReplacing = new RowFilter(&rs6);
 	}
 	pFirst = nullptr;
+
+	// a filter tree attached to a filter of another recordset takes that recordset
+	// into all its filters: none of them uses the recordset the tree came from,
+	// which is destroyed here
+	RecordSet rs7(sess, "SELECT * FROM Strings");
+	RowFilter::Ptr pTarget = new RowFilter(&rs7);
+	RowFilter::Ptr pAttached;
+	RowFilter::Ptr pAttachedChild;
+	{
+		RecordSet rs8(sess, "SELECT * FROM Strings");
+		pAttached = new RowFilter(&rs8);
+		pAttachedChild = new RowFilter(pAttached, RowFilter::OP_AND);
+		pTarget->addFilter(pAttached, RowFilter::OP_OR);
+	}
+	pAttachedChild->add("str0", RowFilter::VALUE_EQUAL, std::string("9"));
+	assertTrue (pAttachedChild->isAllowed(0));
+	assertTrue (1 == pAttachedChild->remove("str0"));
+	pTarget->removeFilter(pAttached);
+	pAttached->removeFilter(pAttachedChild);
+	assertTrue (1 == pAttached->referenceCount());
+	assertTrue (1 == pAttachedChild->referenceCount());
 }
 
 

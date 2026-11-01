@@ -169,7 +169,7 @@ RowFilter::Comparison RowFilter::getComparison(const std::string& comp) const
 
 void RowFilter::addFilter(Ptr pFilter, LogicOperator comparison)
 {
-	pFilter->_pRecordSet = _pRecordSet;
+	pFilter->setRecordSet(_pRecordSet);
 	rewindRecordSet();
 	_filterMap.insert(FilterMap::value_type(pFilter, comparison));
 }
