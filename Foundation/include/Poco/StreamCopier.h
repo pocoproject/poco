@@ -48,6 +48,25 @@ public:
 		/// integer is used to count the number of bytes copied.
 #endif
 
+	static std::streamsize copyStreamN(std::istream& istr, std::ostream& ostr, std::streamsize count, std::size_t bufferSize = 8192);
+		/// Writes up to count bytes readable from the current position in istr to ostr,
+		/// using an internal buffer.
+		///
+		/// Returns the number of bytes copied.
+		/// The count must be non-negative.
+
+#if defined(POCO_HAVE_INT64)
+	static Poco::UInt64 copyStreamN64(std::istream& istr, std::ostream& ostr, std::streamsize count, std::size_t bufferSize = 8192);
+		/// Writes up to count bytes readable from the current position in istr to ostr,
+		/// using an internal buffer.
+		///
+		/// Returns the number of bytes copied as a 64-bit unsigned integer.
+		///
+		/// Note: the only difference to copyStreamN() is that a 64-bit unsigned
+		/// integer is used to count the number of bytes copied.
+		/// The count must be non-negative.
+#endif
+
 	static std::streamsize copyStreamRange(std::istream& istr, std::ostream& ostr, std::streampos rangeStart, std::streamsize rangeLength, std::size_t bufferSize = 8192);
 		/// Writes range of bytes readable from istr to ostr, using an internal buffer.
 		///
@@ -133,28 +152,30 @@ private:
 	}
 
 	template <typename T>
-	static T copyStreamRangeImpl(std::istream& istr, std::ostream& ostr, std::streampos rangeStart, std::streamsize rangeLen, std::size_t bufferSize)
+	static T copyStreamCountedImpl(std::istream& istr, std::ostream& ostr, std::streamsize count, std::size_t bufferSize)
 	{
 		poco_assert (bufferSize > 0);
+		poco_assert (count >= 0);
 
-		const T rangeLength = static_cast<T>(rangeLen);
-		if (bufferSize > static_cast<std::size_t>(rangeLength))
-			bufferSize = static_cast<std::size_t>(rangeLength);
+		if (count == 0) return 0;
+
+		const T copyLength = static_cast<T>(count);
+		if (bufferSize > static_cast<std::size_t>(copyLength))
+			bufferSize = static_cast<std::size_t>(copyLength);
 
 		Buffer<char> buffer(bufferSize);
 		T len = 0;
 		if (istr)
 		{
-			istr.seekg(rangeStart, std::ios_base::beg);
 			istr.read(buffer.begin(), bufferSize);
 			std::streamsize n = istr.gcount();
 			while (n > 0)
 			{
 				len += n;
 				ostr.write(buffer.begin(), n);
-				if ((len < rangeLength) && istr && ostr)
+				if ((len < copyLength) && istr && ostr)
 				{
-					const std::size_t inputLen = static_cast<std::size_t>(rangeLength - len);
+					const std::size_t inputLen = static_cast<std::size_t>(copyLength - len);
 					if (bufferSize > inputLen)
 						bufferSize = inputLen;
 					istr.read(buffer.begin(), bufferSize);
@@ -164,6 +185,13 @@ private:
 			}
 		}
 		return len;
+	}
+
+	template <typename T>
+	static T copyStreamRangeImpl(std::istream& istr, std::ostream& ostr, std::streampos rangeStart, std::streamsize rangeLength, std::size_t bufferSize)
+	{
+		if (istr) istr.seekg(rangeStart, std::ios_base::beg);
+		return copyStreamCountedImpl<T>(istr, ostr, rangeLength, bufferSize);
 	}
 
 	template <typename T>

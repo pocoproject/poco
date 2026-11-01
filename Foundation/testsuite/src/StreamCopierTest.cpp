@@ -11,11 +11,35 @@
 #include "StreamCopierTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Exception.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
 
 
 using Poco::StreamCopier;
+
+
+namespace
+{
+	class NonSeekableStringBuf: public std::stringbuf
+	{
+	public:
+		explicit NonSeekableStringBuf(const std::string& str): std::stringbuf(str)
+		{
+		}
+
+	protected:
+		pos_type seekoff(off_type, std::ios_base::seekdir, std::ios_base::openmode) override
+		{
+			return pos_type(off_type(-1));
+		}
+
+		pos_type seekpos(pos_type, std::ios_base::openmode) override
+		{
+			return pos_type(off_type(-1));
+		}
+	};
+}
 
 
 StreamCopierTest::StreamCopierTest(const std::string& name): CppUnit::TestCase(name)
@@ -65,6 +89,41 @@ void StreamCopierTest::testBufferedCopy()
 		std::streamsize n = StreamCopier::copyStream(istr, ostr, 512);
 		assertTrue (ostr.str() == src);
 		assertTrue (n == src.size());
+	}
+}
+
+
+void StreamCopierTest::testBufferedCopyN()
+{
+	const std::string src("0123456789abcdefghijklmnopqrstuvwxyz");
+	NonSeekableStringBuf streamBuf(src);
+	std::istream istr(&streamBuf);
+	char prefix[10];
+	istr.read(prefix, sizeof(prefix));
+	std::ostringstream ostr;
+	std::streamsize n = StreamCopier::copyStreamN(istr, ostr, 20, 7);
+	assertTrue (ostr.str() == src.substr(10, 20));
+	assertTrue (n == 20);
+
+	std::ostringstream truncated;
+	n = StreamCopier::copyStreamN(istr, truncated, 20, 7);
+	assertTrue (truncated.str() == src.substr(30));
+	assertTrue (n == 6);
+
+	std::istringstream zeroInput(src);
+	std::ostringstream zeroOutput;
+	n = StreamCopier::copyStreamN(zeroInput, zeroOutput, 0);
+	assertTrue (zeroOutput.str().empty());
+	assertTrue (n == 0);
+	assertTrue (zeroInput.peek() == src[0]);
+
+	try
+	{
+		StreamCopier::copyStreamN(zeroInput, zeroOutput, -1);
+		fail("negative count must fail");
+	}
+	catch (const Poco::AssertionViolationException&)
+	{
 	}
 }
 
@@ -203,6 +262,18 @@ void StreamCopierTest::testBufferedCopy64()
 }
 
 
+void StreamCopierTest::testBufferedCopyN64()
+{
+	const std::string src("0123456789abcdefghijklmnopqrstuvwxyz");
+	NonSeekableStringBuf streamBuf(src);
+	std::istream istr(&streamBuf);
+	std::ostringstream ostr;
+	Poco::UInt64 n = StreamCopier::copyStreamN64(istr, ostr, 13, 5);
+	assertTrue (ostr.str() == src.substr(0, 13));
+	assertTrue (n == 13);
+}
+
+
 void StreamCopierTest::testUnbufferedCopy64()
 {
 	std::string src;
@@ -311,6 +382,7 @@ CppUnit::Test* StreamCopierTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("StreamCopierTest");
 
 	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopy);
+	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopyN);
 	CppUnit_addTest(pSuite, StreamCopierTest, testUnbufferedCopy);
 	CppUnit_addTest(pSuite, StreamCopierTest, testCopyToString);
 	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopyRange);
@@ -318,6 +390,7 @@ CppUnit::Test* StreamCopierTest::suite()
 
 #if defined(POCO_HAVE_INT64)
 	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopy64);
+	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopyN64);
 	CppUnit_addTest(pSuite, StreamCopierTest, testUnbufferedCopy64);
 	CppUnit_addTest(pSuite, StreamCopierTest, testCopyToString64);
 	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopyRange64);

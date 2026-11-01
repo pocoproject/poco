@@ -32,6 +32,20 @@ Poco::UInt64 StreamCopier::copyStream64(std::istream& istr, std::ostream& ostr, 
 #endif
 
 
+std::streamsize StreamCopier::copyStreamN(std::istream& istr, std::ostream& ostr, std::streamsize count, std::size_t bufferSize)
+{
+	return copyStreamCountedImpl<std::streamsize>(istr, ostr, count, bufferSize);
+}
+
+
+#if defined(POCO_HAVE_INT64)
+Poco::UInt64 StreamCopier::copyStreamN64(std::istream& istr, std::ostream& ostr, std::streamsize count, std::size_t bufferSize)
+{
+	return copyStreamCountedImpl<Poco::UInt64>(istr, ostr, count, bufferSize);
+}
+#endif
+
+
 std::streamsize StreamCopier::copyStreamRange(std::istream& istr, std::ostream& ostr, std::streampos rangeStart, std::streamsize rangeLength, std::size_t bufferSize)
 {
 	return copyStreamRangeImpl<std::streamsize>(istr, ostr, rangeStart, rangeLength, bufferSize);
