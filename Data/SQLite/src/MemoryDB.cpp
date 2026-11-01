@@ -1204,17 +1204,16 @@ namespace
 	};
 
 
-	// The Poco::Data statement path takes SessionImpl's own mutex and then,
-	// inside sqlite3_get_autocommit() (which locks the connection as of SQLite
-	// 3.53.4), the connection mutex. Running such a statement while the
-	// connection mutex is already held inverts that order and deadlocks against
-	// a concurrent user statement, so every DbMutexGuard region below issues its
-	// SQL on the in-memory connection through these two helpers, which stay on
-	// the C API and never take the session mutex. Poco::Data statements on
-	// _persist inside such a region (removeRanges(), copyVirtualTables()) are
-	// safe: _persist is a connection of its own and is used only while the
-	// database is opened and under _flushMutex, so no other thread holds its
-	// session mutex.
+	// A Poco::Data statement in manual-commit mode begins a transaction, which
+	// takes SessionImpl's own mutex and then the connection mutex. Running such a
+	// statement while the connection mutex is already held inverts that order and
+	// deadlocks against a concurrent user statement, so every DbMutexGuard region
+	// below issues its SQL on the in-memory connection through these two helpers,
+	// which stay on the C API and never take the session mutex. Poco::Data
+	// statements on _persist inside such a region (removeRanges(),
+	// copyVirtualTables()) are safe: _persist is a connection of its own and is
+	// used only while the database is opened and under _flushMutex, so no other
+	// thread holds its session mutex.
 	void execDirect(sqlite3* db, const std::string& sql)
 	{
 		char* pErrMsg = nullptr;

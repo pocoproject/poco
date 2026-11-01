@@ -25,6 +25,7 @@
 #include "Poco/Data/AbstractSessionImpl.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
+#include "Poco/Condition.h"
 
 
 extern "C"
@@ -69,8 +70,20 @@ public:
 	void close() override;
 		/// Closes the session.
 		/// Disables the callbacks registered with the connection first (see
-		/// Utility::registerUpdateHandler()), so SQLite rolls back a transaction
-		/// in progress without notifying it.
+		/// Utility::registerUpdateHandler()), then rolls back a transaction in
+		/// progress without notifying it. The transaction is rolled back before
+		/// close() returns, also while statements compiled on the connection
+		/// still exist.
+		///
+		/// Waits until no isAutoCommit() of another thread uses the connection.
+		///
+		/// A statement paused by a limit is not continued on a connection opened
+		/// later: its next execution throws NotConnectedException, and the one
+		/// after that runs the query again from the start. Until it is executed
+		/// again on an open session, reset or destroyed, such a statement keeps
+		/// the read lock of the closed connection, which can make writes of other
+		/// connections, also of the session opened again, fail with
+		/// DBLockedException.
 
 	void reset() override;
 		/// Disables the callbacks registered with the connection, so that a
@@ -132,6 +145,11 @@ public:
 		/// Returns autocommit property value.
 		/// Returns true if the session is not connected: without a connection,
 		/// no transaction can be open.
+		///
+		/// Does not lock the session mutex, which close(), begin() and the other
+		/// functions that change the connection hold while they wait for SQLite to
+		/// lock it, so a callback that SQLite calls with the connection locked (see
+		/// Utility::registerUpdateHandler()) can call it.
 
 	void setTransactionType(TransactionType transactionType);
 		/// Sets begin transaction type for the session.
@@ -144,8 +162,9 @@ public:
 
 	[[nodiscard]] Poco::Any getHandle(const std::string& name = "") const;
 		/// Returns the native handle of the current connection, the "handle"
-		/// property. Reads it under the session mutex, which open() and close()
-		/// hold while they change it.
+		/// property. Like isAutoCommit(), does not lock the session mutex, so a
+		/// callback that SQLite calls with the connection locked can call it, also
+		/// through Utility::dbHandle().
 
 protected:
 	void setConnectionTimeout(const std::string& prop, const Poco::Any& value);
@@ -173,6 +192,14 @@ private:
 	int         _timeout;
 	mutable
 	Poco::Mutex _mutex;
+	mutable Poco::FastMutex _handleMutex;
+		/// Guards _pDB, the "handle" property and _handleUsers for handle(), getHandle()
+		/// and isAutoCommit(); open() and close() change _pDB and the property under both
+		/// mutexes. No SQLite function is called with it held.
+	mutable int _handleUsers = 0;
+		/// The isAutoCommit() calls that use the connection without a lock; close()
+		/// waits on _handleReleased until there are none before it closes the connection.
+	mutable Poco::Condition _handleReleased;
 	static const std::string DEFERRED_BEGIN_TRANSACTION;
 	static const std::string EXCLUSIVE_BEGIN_TRANSACTION;
 	static const std::string IMMEDIATE_BEGIN_TRANSACTION;

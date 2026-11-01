@@ -3472,6 +3472,112 @@ void SQLiteTest::testStatementAfterReconnect()
 }
 
 
+void SQLiteTest::testPausedStatementAfterReconnect()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+
+	session << "DROP TABLE IF EXISTS Strings", now;
+	session << "CREATE TABLE Strings (str VARCHAR(30))", now;
+	session << "INSERT INTO Strings VALUES ('a'), ('b'), ('c')", now;
+
+	std::string str;
+	Statement stmt = (session << "SELECT str FROM Strings ORDER BY str", into(str), limit(1));
+	stmt.execute();
+	assertTrue (stmt.paused());
+	assertTrue (str == "a");
+
+	// the rest of the result is not read through the connection that reconnect() closed
+	session.reconnect();
+	try
+	{
+		stmt.execute();
+		fail ("must fail");
+	}
+	catch (NotConnectedException&) { }
+	assertTrue (stmt.done());
+
+	// nor does that connection keep its lock on the database:
+	// without a busy timeout, a write would fail at once
+	session.setConnectionTimeout(0);
+	session << "DELETE FROM Strings WHERE str = 'b'", now;
+
+	// executed again, the query starts over on the connection the session has now,
+	// and goes on there after a pause
+	stmt.execute();
+	assertTrue (stmt.paused());
+	assertTrue (str == "a");
+	stmt.execute();
+	assertTrue (stmt.done());
+	assertTrue (str == "c");
+}
+
+
+void SQLiteTest::testCloseRollsBack()
+{
+	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	// a lock still held makes a write fail at once, not after the busy timeout
+	session.setConnectionTimeout(0);
+
+	session << "DROP TABLE IF EXISTS Person", now;
+	session << "CREATE TABLE Person (LastName VARCHAR(30),"
+		"FirstName VARCHAR(30),"
+		"Address VARCHAR(30),"
+		"Age INTEGER)", now;
+
+	Notifier notifier(session, Notifier::SQLITE_NOTIFY_ROLLBACK);
+	notifier.rollback += delegate(this, &SQLiteTest::onRollback);
+	_rollbackCounter = 0;
+
+	// the statement is still compiled on the connection when the session is closed
+	session.begin();
+	Statement insert(session);
+	insert << "INSERT INTO PERSON VALUES('Simpson', 'Bart', 'Springfield', 12)", now;
+	session.close();
+	// close() disables the callbacks before it rolls back
+	assertTrue (_rollbackCounter == 0);
+	notifier.rollback -= delegate(this, &SQLiteTest::onRollback);
+
+	// the transaction has released its lock: another connection can write
+	Session other (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	other.setConnectionTimeout(0);
+	try
+	{
+		other << "INSERT INTO PERSON VALUES('Simpson', 'Lisa', 'Springfield', 8)", now;
+	}
+	catch (Poco::Data::SQLite::DBLockedException&)
+	{
+		fail ("the transaction of the closed session still holds its lock");
+	}
+
+	// and so can the session opened again
+	session.open();
+	session << "INSERT INTO PERSON VALUES('Simpson', 'Maggie', 'Springfield', 1)", now;
+
+	// what the transaction inserted is rolled back
+	int count = -1;
+	other << "SELECT COUNT(*) FROM PERSON WHERE FirstName = 'Bart'", into(count), now;
+	assertTrue (count == 0);
+	other << "SELECT COUNT(*) FROM PERSON", into(count), now;
+	assertTrue (count == 2);
+
+	// a transaction begun with SQL, not with begin(), is rolled back too
+	Statement beginInsert(session);
+	beginInsert << "BEGIN; INSERT INTO PERSON VALUES('Simpson', 'Homer', 'Springfield', 39)", now;
+	assertTrue (!session.isTransaction());
+	session.close();
+	try
+	{
+		other << "INSERT INTO PERSON VALUES('Simpson', 'Marge', 'Springfield', 36)", now;
+	}
+	catch (Poco::Data::SQLite::DBLockedException&)
+	{
+		fail ("the transaction begun with SQL still holds its lock");
+	}
+	other << "SELECT COUNT(*) FROM PERSON WHERE FirstName = 'Homer'", into(count), now;
+	assertTrue (count == 0);
+}
+
+
 void SQLiteTest::testColumnTypeNullStatement()
 {
 	try
@@ -3874,7 +3980,7 @@ void SQLiteTest::testNotifierClose()
 		session.begin();
 		session.close();
 	}
-	// freeing the connection rolled its transaction back: close() had disabled the callbacks
+	// close() rolled the transaction back after it had disabled the callbacks
 	assertTrue (_rollbackCounter == 0);
 
 	// enabling registers the callbacks with the new connection
@@ -4993,6 +5099,8 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testOpenConnected);
 	CppUnit_addTest(pSuite, SQLiteTest, testReconnectTimeout);
 	CppUnit_addTest(pSuite, SQLiteTest, testStatementAfterReconnect);
+	CppUnit_addTest(pSuite, SQLiteTest, testPausedStatementAfterReconnect);
+	CppUnit_addTest(pSuite, SQLiteTest, testCloseRollsBack);
 	CppUnit_addTest(pSuite, SQLiteTest, testColumnTypeNullStatement);
 	CppUnit_addTest(pSuite, SQLiteTest, testFileToMemoryError);
 	CppUnit_addTest(pSuite, SQLiteTest, testPooledConnectionTimeout);

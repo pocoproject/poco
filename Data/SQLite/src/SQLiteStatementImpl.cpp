@@ -228,7 +228,22 @@ void SQLiteStatementImpl::clear()
 bool SQLiteStatementImpl::hasNext()
 {
 	if (_stepCalled)
+	{
+		// A query paused by a limit resumes here, at the row it has looked ahead
+		// at, without compileImpl(): the rest of its result is refused once the
+		// session has closed the connection it was compiled on.
+		if (_pStmt != nullptr && getState() == ST_PAUSED)
+		{
+			auto* pSession = dynamic_cast<SessionImpl*>(&session());
+			if (pSession != nullptr && pSession->handle() != _pDB)
+			{
+				// ends the read transaction the query holds on the closed connection
+				sqlite3_reset(_pStmt);
+				throw NotConnectedException(session().connectorName());
+			}
+		}
 		return (_nextResponse == SQLITE_ROW);
+	}
 
 	// _pStmt is allowed to be null for conditional SQL statements
 	if (_pStmt == nullptr)

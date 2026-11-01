@@ -134,6 +134,8 @@ public:
 	void testOpenConnected();
 	void testReconnectTimeout();
 	void testStatementAfterReconnect();
+	void testPausedStatementAfterReconnect();
+	void testCloseRollsBack();
 	void testColumnTypeNullStatement();
 	void testFileToMemoryError();
 	void testPooledConnectionTimeout();
