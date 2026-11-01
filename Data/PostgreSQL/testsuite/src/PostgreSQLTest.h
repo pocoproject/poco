@@ -121,6 +121,7 @@ public:
 	void testLostConnection();
 	void testFailedExecute();
 	void testStatementAfterReopen();
+	void testPausedStatementAfterReopen();
 	void testStaleStatementInSQLTransaction();
 	void testStatementOutlivesSession();
 	void testRollbackWithoutTransaction();

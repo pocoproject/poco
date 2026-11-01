@@ -976,6 +976,49 @@ void PostgreSQLTest::testStatementAfterReopen()
 }
 
 
+void PostgreSQLTest::testPausedStatementAfterReopen()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	Session session(PostgreSQL::Connector::KEY, _dbConnString);
+	int value = 0;
+	Statement stmt = (session << "SELECT * FROM generate_series(1, 3)", into(value), limit(1));
+	int laterValue = 0;
+	Statement laterStmt = (session << "SELECT * FROM generate_series(1, 3)", into(laterValue), limit(1));
+	assertTrue (1 == stmt.execute());
+	assertTrue (1 == value);
+	assertTrue (stmt.paused());
+
+	session.close();
+	session.open();
+
+	// resuming does not prepare or execute the statement again; it would go on with
+	// the result of the closed connection, whose next row has already been fetched
+	try { stmt.execute(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+	assertTrue (1 == value);
+	assertTrue (stmt.done());
+
+	// a statement created before close() and first executed after open() pauses and resumes
+	assertTrue (1 == laterStmt.execute());
+	assertTrue (1 == laterValue);
+	assertTrue (1 == laterStmt.execute());
+	assertTrue (2 == laterValue);
+	assertTrue (laterStmt.paused());
+
+	// SessionHandle::reset() replaces the connection as close() and open() do
+	int resetValue = 0;
+	Statement resetStmt = (session << "SELECT * FROM generate_series(1, 3)", into(resetValue), limit(1));
+	assertTrue (1 == resetStmt.execute());
+	assertTrue (resetStmt.paused());
+	assertTrue (Utility::handle(session)->reset());
+	try { resetStmt.execute(); fail ("must fail"); }
+	catch (NotConnectedException&) { }
+	assertTrue (1 == resetValue);
+	assertTrue (resetStmt.done());
+}
+
+
 void PostgreSQLTest::testStaleStatementInSQLTransaction()
 {
 	if (_pSession == nullptr) fail ("Test not available.");
@@ -1753,6 +1796,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testLostConnection);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testFailedExecute);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testStatementAfterReopen);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testPausedStatementAfterReopen);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testStaleStatementInSQLTransaction);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testStatementOutlivesSession);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testRollbackWithoutTransaction);

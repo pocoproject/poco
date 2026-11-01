@@ -82,6 +82,11 @@ public:
 	[[nodiscard]] operator PGresult* ();
 		/// Cast operator to native result handle type.
 
+	void checkValid() const;
+		/// Throws NotConnectedException if the connection that prepared the
+		/// statement has been closed or reset, even if the session has been
+		/// opened again since: the server has freed the prepared statement.
+
 private:
 	void clearResults();
 

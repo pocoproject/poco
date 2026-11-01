@@ -207,7 +207,7 @@ void StatementExecutor::bindParams(const InputParameterVector& anInputParameterV
 
 	if (_state < STMT_COMPILED) throw StatementException("Statement is not compiled yet");
 
-	if (!isValid()) throw NotConnectedException("Statement was prepared on a connection that has been closed");
+	checkValid();
 
 	if (anInputParameterVector.size() != _countPlaceholdersInSQLStatement)
 	{
@@ -220,6 +220,13 @@ void StatementExecutor::bindParams(const InputParameterVector& anInputParameterV
 }
 
 
+
+void StatementExecutor::checkValid() const
+{
+	if (!isValid()) throw NotConnectedException("Statement was prepared on a connection that has been closed");
+}
+
+
 void StatementExecutor::execute()
 {
 	if (!_sessionHandle.isConnected()) throw NotConnectedException();
@@ -227,7 +234,7 @@ void StatementExecutor::execute()
 	if (_state < STMT_COMPILED) throw StatementException("Statement is not compiled yet");
 
 	// refused here, as the server would fail it and abort an open transaction
-	if (!isValid()) throw NotConnectedException("Statement was prepared on a connection that has been closed");
+	checkValid();
 
 	if (_countPlaceholdersInSQLStatement != 0 &&
 		_inputParameterVector.size() != _countPlaceholdersInSQLStatement)

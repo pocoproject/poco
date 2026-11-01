@@ -57,6 +57,10 @@ const MetaColumn& PostgreSQLStatementImpl::metaColumn(std::size_t aPosition) con
 
 bool PostgreSQLStatementImpl::hasNext()
 {
+	// a statement paused by a limit resumes here without bindImpl(), and may
+	// already hold the next row of a result of the closed connection
+	_statementExecutor.checkValid();
+
 	if (NEXT_DONTKNOW == _hasNext)
 	{
 		if (columnsReturned() == 0)
