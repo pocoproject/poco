@@ -19,6 +19,7 @@ namespace Poco::Data::Test {
 
 const std::string Connector::KEY("test");
 const std::string Connector::UNREACHABLE("unreachable");
+const std::string Connector::REJECTING("rejecting");
 
 
 Connector::Connector()
@@ -37,7 +38,10 @@ Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::strin
 	if (connectionString == UNREACHABLE)
 		throw Poco::Data::ConnectionFailedException(connectionString);
 
-	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString, timeout));
+	Poco::AutoPtr<Poco::Data::SessionImpl> pImpl(new SessionImpl(connectionString, timeout));
+	if (connectionString == REJECTING)
+		pImpl->setFeature("throwOnHasNext", true);
+	return pImpl;
 }
 
 

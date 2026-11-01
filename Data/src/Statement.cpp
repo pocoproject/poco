@@ -482,7 +482,7 @@ std::size_t Statement::wait(long milliseconds)
 		_pResult->wait();
 
 	if (_pResult->exception())
-		throw *_pResult->exception();
+		_pResult->exception()->rethrow();
 	else if (!success)
 		throw TimeoutException("Statement timed out.");
 

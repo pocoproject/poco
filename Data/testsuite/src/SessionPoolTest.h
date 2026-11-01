@@ -34,6 +34,8 @@ public:
 	void testSessionPoolTransaction();
 	void testSessionPoolManualCommit();
 	void testSessionPoolRollbackUnlocked();
+	void testSessionPoolStatementAfterRelease();
+	void testSessionPoolNotGoodClosed();
 	void testPooledSessionNullHolder();
 	void testSessionPoolContainerWaitsForAdd();
 

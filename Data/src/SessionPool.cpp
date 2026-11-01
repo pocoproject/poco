@@ -105,6 +105,14 @@ void SessionPool::purgeDeadSessions()
 	{
 		if (!(*it)->session()->isGood())
 		{
+			// close it now: a Session that returned it may still refer to it
+			try
+			{
+				(*it)->session()->close();
+			}
+			catch (...)
+			{
+			}
 			it = _idleSessions.erase(it);
 			--_nSessions;
 		}
@@ -286,7 +294,18 @@ void SessionPool::putBack(PooledSessionHolderPtr pHolder)
 					pHolder->access();
 					_idleSessions.push_back(pHolder);
 				}
-				else --_nSessions;
+				else
+				{
+					// close it now: the Session that returned it still refers to it
+					--_nSessions;
+					try
+					{
+						pImpl->close();
+					}
+					catch (...)
+					{
+					}
+				}
 			}
 			catch (...)
 			{

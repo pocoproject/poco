@@ -62,6 +62,7 @@ public:
 	void testSQLChannelUnreachable();
 	void testArchiveStrategyReopen();
 	void testStatementAsyncError();
+	void testStatementWaitErrorType();
 	void testStatementSetAsyncMovedFrom();
 	void testTransactionNotConnectedLog();
 	void testTransactorFailureLog();
@@ -70,6 +71,7 @@ public:
 	void testSQLChannelBackOff();
 	void testSQLChannelArchiveNotConnected();
 	void testSQLChannelDrainFallback();
+	void testSQLChannelDrainRejected();
 	void testArchiveStrategyOpenReleasesStatements();
 
 	void setUp();

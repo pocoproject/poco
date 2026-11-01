@@ -73,6 +73,12 @@ class Data_API SessionPool: public RefCountedObject
 	/// The pool must not be destroyed while another thread still uses
 	/// it, e.g. to get a session or to release one.
 	///
+	/// A statement created through a pooled Session must not be executed
+	/// after the Session has been closed: until the pool closes the
+	/// session, the statement would run on a connection that another user
+	/// may have; once the pool has closed the session, executing the
+	/// statement throws NotConnectedException.
+	///
 	/// Usage example:
 	///
 	///     SessionPool pool("ODBC", "...");

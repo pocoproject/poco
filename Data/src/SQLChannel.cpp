@@ -308,8 +308,12 @@ void SQLChannel::run()
 			// Back off: entries logged in the meantime do not cut the wait short, stop() does.
 			Stopwatch backOff;
 			backOff.start();
-			while (!_stop && backOff.elapsed() / 1000 < sleepTime)
-				_event.tryWait(sleepTime - static_cast<long>(backOff.elapsed() / 1000));
+			while (!_stop)
+			{
+				const long remaining = sleepTime - static_cast<long>(backOff.elapsed() / 1000);
+				if (remaining <= 0) break;
+				_event.tryWait(remaining);
+			}
 		}
 		else _event.tryWait(sleepTime);
 	}
@@ -319,6 +323,9 @@ void SQLChannel::run()
 	while (_logQueue.size() || _source.size())
 	{
 		std::size_t loggedBefore = _logged;
+		// A pass that starts without a session and with a reconnect pending writes to local
+		// files. Read before the pass: a failed write to the database ends in the same state.
+		const bool toFiles = (_pSession == nullptr && _reconnect);
 		try
 		{
 			processBatch();
@@ -337,7 +344,7 @@ void SQLChannel::run()
 		}
 		if (_logged == loggedBefore)
 		{
-			if (_pSession == nullptr && _reconnect) break;
+			if (toFiles) break;
 			_pSession = nullptr;
 			_reconnect = true;
 		}

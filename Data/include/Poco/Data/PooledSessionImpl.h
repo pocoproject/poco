@@ -54,6 +54,10 @@ public:
 		/// Returns the session to its pool, or closes it if the pool has been shut down.
 	void reset();
 	[[nodiscard]] bool isConnected() const;
+		/// Returns false once the session has been returned to its pool.
+		/// The other members, connectorName() among them, then throw
+		/// SessionUnavailableException, so creating a statement through the
+		/// Session, begin(), commit() and rollback() throw it too.
 	[[nodiscard]] bool isGood() const;
 	void setConnectionTimeout(std::size_t timeout);
 	[[nodiscard]] std::size_t getConnectionTimeout() const;
@@ -90,8 +94,15 @@ private:
 		/// Returns the holder, or a null pointer if the
 		/// session has been returned to its pool.
 
+	[[nodiscard]] SessionImpl::Ptr heldSession() const;
+		/// Updates the last access timestamp and returns the session,
+		/// or a null pointer once the session has been returned to its pool.
+
 	mutable Poco::AutoPtr<PooledSessionHolder> _pHolder;
 	mutable Poco::FastMutex _mutex;
+	SessionImpl::Ptr _pSessionImpl;
+		/// The session of the holder, kept after close():
+		/// the statements created through this object refer to it.
 
 	friend class SessionPool;
 };

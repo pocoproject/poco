@@ -445,6 +445,9 @@ public:
 		/// returns immediately for synchronous ones. The return value for
 		/// asynchronous statement is the execution result (i.e. number of
 		/// rows retrieved). For synchronous statements, the return value is zero.
+		///
+		/// If the asynchronous execution failed, rethrows the exception of the
+		/// execution with its type.
 
 	[[nodiscard]] bool initialized();
 		/// Returns true if the statement was initialized (i.e. not executed yet).

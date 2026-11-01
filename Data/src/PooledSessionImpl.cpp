@@ -35,7 +35,8 @@ namespace {
 PooledSessionImpl::PooledSessionImpl(PooledSessionHolder* pHolder):
 	SessionImpl(holderSession(pHolder).connectionString(),
 		holderSession(pHolder).getLoginTimeout()),
-	_pHolder(pHolder, true)
+	_pHolder(pHolder, true),
+	_pSessionImpl(pHolder->session(), true)
 {
 }
 
@@ -73,7 +74,8 @@ void PooledSessionImpl::commit()
 
 bool PooledSessionImpl::isConnected() const
 {
-	return access()->isConnected();
+	const SessionImpl::Ptr pImpl = heldSession();
+	return pImpl != nullptr && pImpl->isConnected();
 }
 
 
@@ -103,11 +105,8 @@ bool PooledSessionImpl::canTransact() const
 
 bool PooledSessionImpl::isTransaction() const
 {
-	Poco::AutoPtr<PooledSessionHolder> pHolder = holder();
-	if (pHolder == nullptr) return false;
-
-	pHolder->access();
-	return pHolder->session()->isTransaction();
+	const SessionImpl::Ptr pImpl = heldSession();
+	return pImpl != nullptr && pImpl->isTransaction();
 }
 
 
@@ -252,13 +251,8 @@ Poco::Any PooledSessionImpl::getProperty(const std::string& name) const
 
 SessionImpl::Ptr PooledSessionImpl::access() const
 {
-	Poco::AutoPtr<PooledSessionHolder> pHolder = holder();
-	if (pHolder != nullptr)
-	{
-		pHolder->access();
-		return SessionImpl::Ptr(pHolder->session(), true);
-	}
-	else throw SessionUnavailableException();
+	if (SessionImpl::Ptr pImpl = heldSession(); pImpl != nullptr) return pImpl;
+	throw SessionUnavailableException();
 }
 
 
@@ -266,6 +260,16 @@ Poco::AutoPtr<PooledSessionHolder> PooledSessionImpl::holder() const
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 	return _pHolder;
+}
+
+
+SessionImpl::Ptr PooledSessionImpl::heldSession() const
+{
+	Poco::AutoPtr<PooledSessionHolder> pHolder = holder();
+	if (pHolder == nullptr) return nullptr;
+
+	pHolder->access();
+	return SessionImpl::Ptr(pHolder->session(), true);
 }
 
 

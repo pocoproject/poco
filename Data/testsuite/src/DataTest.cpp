@@ -2395,6 +2395,22 @@ void DataTest::testStatementAsyncError()
 }
 
 
+void DataTest::testStatementWaitErrorType()
+{
+	// wait() rethrows the error of an asynchronous execution with its type.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	sess.setFeature("throwOnHasNext", true);
+	Statement stmt = (sess << "SELECT * FROM Strings");
+	stmt.executeAsync();
+	try
+	{
+		stmt.wait();
+		fail ("must throw UnknownDataBaseException");
+	}
+	catch (UnknownDataBaseException&) { }
+}
+
+
 void DataTest::testStatementSetAsyncMovedFrom()
 {
 	// setAsync() only sets the flag: the asynchronous execution is set up when
@@ -2653,6 +2669,38 @@ void DataTest::testSQLChannelDrainFallback()
 }
 
 
+void DataTest::testSQLChannelDrainRejected()
+{
+	// The logging thread holds the entries back until a batch of minBatch entries
+	// is full. When the channel stops and the database rejects the entries held
+	// back, the channel writes them to local files.
+	Path dir(TemporaryFile::tempName());
+	dir.makeDirectory();
+	std::size_t queued = 0;
+	std::size_t logged = 0;
+	{
+		AutoPtr<SQLChannel> pChannel = new SQLChannel("test", Poco::Data::Test::Connector::REJECTING, "TestSQLChannel", "T_POCO_LOG", 1000, 10);
+		pChannel->setProperty("directory", dir.toString());
+		pChannel->setProperty("flush", "0");
+		for (int i = 0; i < 3; ++i)
+		{
+			Message msg("DataTest", Poco::format("held back entry %d", i), Message::PRIO_INFORMATION);
+			pChannel->log(msg);
+		}
+		// the logging thread has taken the entries and holds them back
+		queued = pChannel->wait(10000);
+		logged = pChannel->logged();
+	}
+	const std::string content = contentOf(dir);
+	File(dir).remove(true);
+
+	assertEqual (0, queued);
+	assertEqual (0, logged);
+	for (int i = 0; i < 3; ++i)
+		assertTrue (content.find(Poco::format("held back entry %d", i)) != std::string::npos);
+}
+
+
 void DataTest::testArchiveStrategyOpenReleasesStatements()
 {
 	// open() lets the statements of the previous session go: a strategy that
@@ -2718,6 +2766,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testSQLChannelUnreachable);
 	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyReopen);
 	CppUnit_addTest(pSuite, DataTest, testStatementAsyncError);
+	CppUnit_addTest(pSuite, DataTest, testStatementWaitErrorType);
 	CppUnit_addTest(pSuite, DataTest, testStatementSetAsyncMovedFrom);
 	CppUnit_addTest(pSuite, DataTest, testTransactionNotConnectedLog);
 	CppUnit_addTest(pSuite, DataTest, testTransactorFailureLog);
@@ -2726,6 +2775,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testSQLChannelBackOff);
 	CppUnit_addTest(pSuite, DataTest, testSQLChannelArchiveNotConnected);
 	CppUnit_addTest(pSuite, DataTest, testSQLChannelDrainFallback);
+	CppUnit_addTest(pSuite, DataTest, testSQLChannelDrainRejected);
 	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyOpenReleasesStatements);
 
 	return pSuite;
