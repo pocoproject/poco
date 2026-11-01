@@ -7,7 +7,7 @@
 include $(POCO_BASE)/build/rules/global
 
 objects = CppParserTestSuite Driver \
-	CppParserTest \
+	CppParserTest UtilityTest \
 	AttributesTestSuite AttributesParserTest
 
 target         = testrunner

@@ -45,6 +45,24 @@ public:
 	static void parseDir(const std::vector <std::string>& includePattern, const std::vector <std::string>& excludePattern, NameSpace::SymbolTable& st, const std::string& exec, const std::string& options, const std::string& path);
 		/// Preprocesses and parses all files specified by the include pattern (e.g.: p:/poco/Foundation/include/*/*.h) minus the ones defined in the exclude pattern
 
+	static void collectDependencies(const std::vector<std::string>& includePattern,
+		const std::vector<std::string>& excludePattern,
+		std::set<std::string>& files,
+		std::set<std::string>& directories);
+		/// Inserts into files the absolute paths of the files that parseDir() parses for the given patterns,
+		/// and into directories the absolute paths of the directories whose entries decide that list.
+		/// A searched directory is listed where the pattern component has a wildcard, or no entry of that name
+		/// resolves to a directory (for the last component of a pattern that names a file, exists); for a
+		/// symbolic link or junction at a directory component that does not resolve to a directory, the deepest
+		/// existing directory on its target path is listed too, as far as that path can be followed. On Windows,
+		/// where the search ignores the letter case, every searched directory is listed.
+		///
+		/// Note: Where the file system ignores the letter case or the Unicode normalization of names and the
+		/// search does not, as on macOS, a rename that changes only the case or normalization of a name that
+		/// a pattern spells literally can change the file list without changing a listed file or directory.
+		/// So can a new target of a link before a ".." component in the target path of a link that does not
+		/// resolve to a directory.
+
 	static void fixup(NameSpace::SymbolTable& st);
 		/// Fixes all base pointers in the symbol table
 
