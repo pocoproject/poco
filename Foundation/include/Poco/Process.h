@@ -197,9 +197,13 @@ public:
 		/// standard input, standard output or standard error stream
 		/// of the launched process is redirected to the Pipe.
 		///
-		/// The launched process is given the specified environment variables;
-		/// whether it inherits those of this process as well depends on the
-		/// platform and on PROCESS_CLEAR_ENVIRONMENT, see there.
+		/// The launched process is given the environment of the calling
+		/// process, to which the specified environment variables are added.
+		/// A specified variable replaces a variable of the same name.
+		/// On QNX, if env is not empty, the launched process is given only
+		/// the specified environment variables.
+		/// With PROCESS_CLEAR_ENVIRONMENT, it is given only the specified
+		/// environment variables.
 
 	static ProcessHandle launch(
 		const std::string& command,
@@ -217,9 +221,13 @@ public:
 		/// If inPipe, outPipe or errPipe is non-null, the corresponding
 		/// standard input, standard output or standard error stream
 		/// of the launched process is redirected to the Pipe.
-		/// The launched process is given the specified environment variables;
-		/// whether it inherits those of this process as well depends on the
-		/// platform and on PROCESS_CLEAR_ENVIRONMENT, see there.
+		/// The launched process is given the environment of the calling
+		/// process, to which the specified environment variables are added.
+		/// A specified variable replaces a variable of the same name.
+		/// On QNX, if initialDirectory is empty and env is not empty, the
+		/// launched process is given only the specified environment variables.
+		/// With PROCESS_CLEAR_ENVIRONMENT, it is given only the specified
+		/// environment variables.
 
 	static int wait(const ProcessHandle& handle);
 		/// Waits for the process specified by handle to terminate
@@ -243,6 +251,7 @@ public:
 
 	static void kill(ProcessHandle& handle);
 		/// Kills the process specified by handle.
+		/// ProcessHandle::wait() then returns the exit code of the process.
 		///
 		/// This is preferable on Windows where process IDs
 		/// may be reused.

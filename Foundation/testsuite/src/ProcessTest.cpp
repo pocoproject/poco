@@ -18,14 +18,17 @@
 #include "Poco/Format.h"
 #include "Poco/Environment.h"
 #include "Poco/Exception.h"
+#include "Poco/Bugcheck.h"
 #include "Poco/ProcessOptions.h"
 #include "Poco/File.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/StreamCopier.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/Thread.h"
 #include "Poco/Timestamp.h"
 #include <atomic>
 #include <csignal>
+#include <cstdlib>
 #include <iostream>
 
 
@@ -211,8 +214,9 @@ void ProcessTest::testLaunchClearedEnvironment()
 
 	assertEqual(std::string("given"), childValue("TESTENV", Poco::PROCESS_CLEAR_ENVIRONMENT));
 	assertEqual(std::string("(none)"), childValue("POCO_TEST_INHERITED", Poco::PROCESS_CLEAR_ENVIRONMENT));
-#if defined(POCO_OS_FAMILY_UNIX)
-	// Without the option, the child inherits the variables of this process.
+	// Without the option, the child inherits the variables of this process,
+	// except on QNX, where a child spawned with variables gets only those.
+#if POCO_OS != POCO_OS_QNX
 	assertEqual(std::string("inherited"), childValue("POCO_TEST_INHERITED", 0));
 #endif
 
@@ -231,6 +235,106 @@ void ProcessTest::testLaunchClearedEnvironment()
 	assertEqual(0, bare.wait());
 	assertEqual(std::string(), output);
 #endif
+}
+
+
+namespace
+{
+	std::string launchEnvApp(const std::string& command, const Process::Env& env, int& rc)
+		/// Launches TestApp with the given environment variables and returns
+		/// what it writes to standard output: the value of TESTENV.
+	{
+		Pipe outPipe;
+		ProcessHandle ph = Process::launch(command, {"-env"}, nullptr, &outPipe, nullptr, env);
+		PipeInputStream istr(outPipe);
+		std::string s;
+		Poco::StreamCopier::copyToString(istr, s);
+		rc = ph.wait();
+		return s;
+	}
+
+	class ScopedEnvironmentVariable
+		/// Sets an environment variable of the test runner and restores its
+		/// previous state when destroyed, so that later tests do not see it.
+	{
+	public:
+		ScopedEnvironmentVariable() = delete;
+
+		POCO_NODISCARD_CTOR ScopedEnvironmentVariable(const std::string& name, const std::string& value):
+			_name(name),
+			_wasSet(Poco::Environment::has(name)),
+			_previousValue(Poco::Environment::get(name, ""))
+		{
+			Poco::Environment::set(name, value);
+		}
+
+		~ScopedEnvironmentVariable()
+		{
+			try
+			{
+				if (_wasSet)
+				{
+					Poco::Environment::set(_name, _previousValue);
+				}
+				else
+				{
+					// Poco::Environment cannot remove a variable.
+#if defined(POCO_OS_FAMILY_WINDOWS)
+					SetEnvironmentVariableA(_name.c_str(), nullptr);
+#else
+					unsetenv(_name.c_str());
+#endif
+				}
+			}
+			catch (...)
+			{
+				poco_unexpected();
+			}
+		}
+
+		ScopedEnvironmentVariable(const ScopedEnvironmentVariable&) = delete;
+		ScopedEnvironmentVariable(ScopedEnvironmentVariable&&) = delete;
+		ScopedEnvironmentVariable& operator = (const ScopedEnvironmentVariable&) = delete;
+		ScopedEnvironmentVariable& operator = (ScopedEnvironmentVariable&&) = delete;
+
+	private:
+		const std::string _name;
+		const bool _wasSet;
+		const std::string _previousValue;
+	};
+}
+
+
+void ProcessTest::testLaunchEnvKeepsParentEnvironment()
+{
+	// The variables given to launch() are added to the environment of the
+	// calling process, which the child keeps; on QNX, a child spawned with
+	// variables gets only those.
+#if POCO_OS != POCO_OS_QNX
+	const ScopedEnvironmentVariable testEnv("TESTENV", "parent");
+	Process::Env env;
+	env["TESTENV_OTHER"] = "other";
+	int rc = -1;
+	assertEqual ("parent"s, launchEnvApp(getFullName("TestApp"), env, rc));
+	assertEqual (0, rc);
+#endif
+}
+
+
+void ProcessTest::testLaunchEnvReplacesParentVariable()
+{
+	// Windows compares the names of environment variables without regard to case.
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	const std::string name("testenv");
+#else
+	const std::string name("TESTENV");
+#endif
+	const ScopedEnvironmentVariable testEnv("TESTENV", "parent");
+	Process::Env env;
+	env[name] = "child";
+	int rc = -1;
+	assertEqual ("child"s, launchEnvApp(getFullName("TestApp"), env, rc));
+	assertEqual (0, rc);
 }
 
 
@@ -682,6 +786,51 @@ void ProcessTest::testIsRunningAfterWait()
 }
 
 
+void ProcessTest::testWaitAfterKill()
+{
+	// The handle of a killed process can be waited for, as for a process
+	// that ended on its own.
+	Process::Args args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(getFullName("TestApp"), args, &inPipe, nullptr, nullptr);
+	Process::kill(ph);
+	const int rc = ph.wait();
+#if defined(POCO_OS_FAMILY_UNIX)
+	assertEqual (256 + SIGKILL, rc);
+#else
+	// kill() passes the exit code 0 to TerminateProcess().
+	assertEqual (0, rc);
+#endif
+	assertTrue (!Process::isRunning(ph));
+}
+
+
+void ProcessTest::testKillAfterExit()
+{
+	// Killing a process that has ended but has not been waited for does nothing.
+	Process::Args args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(getFullName("TestApp"), args, &inPipe, nullptr, nullptr);
+	Process::kill(ph);
+	// Process::isRunning() with a PID does not reap the process on POSIX.
+	Poco::Timestamp waitStart;
+	while (Process::isRunning(ph.id()))
+	{
+		if (waitStart.isElapsed(30 * Poco::Timestamp::resolution())) fail("Process did not terminate within 30 seconds");
+		Thread::sleep(100);
+	}
+	Process::kill(ph);
+	const int rc = ph.wait();
+#if defined(POCO_OS_FAMILY_UNIX)
+	assertEqual (256 + SIGKILL, rc);
+#else
+	assertEqual (0, rc);
+#endif
+}
+
+
 namespace
 {
 	std::string testApp()
@@ -823,6 +972,8 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchRedirectOut);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchEnv);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchClearedEnvironment);
+	CppUnit_addTest(pSuite, ProcessTest, testLaunchEnvKeepsParentEnvironment);
+	CppUnit_addTest(pSuite, ProcessTest, testLaunchEnvReplacesParentVariable);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchArgs);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchInvalidCommand);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunning);
@@ -835,6 +986,8 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testSignalExitCode);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunningByPidThenWaitOnHandle);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunningAfterWait);
+	CppUnit_addTest(pSuite, ProcessTest, testWaitAfterKill);
+	CppUnit_addTest(pSuite, ProcessTest, testKillAfterExit);
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationOfNewGroup);
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationWithoutConsole);
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationKeepsStandardHandles);
