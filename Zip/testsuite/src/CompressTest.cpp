@@ -15,6 +15,7 @@
 #include "Poco/Zip/ZipManipulator.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
+#include "Poco/TemporaryFile.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include <iostream>
@@ -124,7 +125,8 @@ void CompressTest::testManipulatorReplace()
 
 void CompressTest::testManipulatorZip64DataDescriptor()
 {
-	const std::string zipFile(Poco::Path::temp() + "zip64dd.zip");
+	Poco::TemporaryFile tempFile;
+	const std::string zipFile(tempFile.path());
 	{
 		// A non-seekable output with forced Zip64 writes a Zip64 data descriptor after each entry.
 		Poco::FileOutputStream out(zipFile, std::ios::trunc);
@@ -153,8 +155,6 @@ void CompressTest::testManipulatorZip64DataDescriptor()
 		++entries;
 	}
 	assertEqual (2, entries);
-	in.close();
-	Poco::File(zipFile).remove();
 }
 
 
