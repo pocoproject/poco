@@ -189,14 +189,15 @@ public:
 	{
 	}
 
-	void change(bool subscribe, const std::string& subscriberURI)
+	void change(bool subscribe, const std::string& subscriberURI, const std::string& endpointURI)
 		/// Subscribes or unsubscribes the subscriber, now if nothing
 		/// is pending and its EventDispatcher is free, otherwise after
-		/// what is pending.
+		/// what is pending. Events for the subscriber go to endpointURI.
 	{
 		Item item;
 		item.type = subscribe ? Item::SUBSCRIBE : Item::UNSUBSCRIBE;
 		item.subscriberURI = subscriberURI;
+		item.endpointURI = endpointURI;
 		if (subscribe) item.expireTime += _pListener->getEventSubscriptionTimeout().totalMicroseconds();
 
 		{
@@ -311,6 +312,7 @@ private:
 
 		Type type = SUBSCRIBE;
 		std::string subscriberURI;
+		std::string endpointURI;
 		Poco::Clock expireTime;
 		ServerTransport::Ptr pServerTransport;
 	};
@@ -385,8 +387,8 @@ private:
 		Poco::RemotingNG::EventDispatcher::Ptr pEventDispatcher = Poco::RemotingNG::ORB::instance().findEventDispatcher(dispatcherURI.toString(), Transport::PROTOCOL);
 		if (item.type == Item::SUBSCRIBE)
 		{
-			if (!wait) return pEventDispatcher->trySubscribe(item.subscriberURI, item.subscriberURI, item.expireTime);
-			pEventDispatcher->subscribe(item.subscriberURI, item.subscriberURI, item.expireTime);
+			if (!wait) return pEventDispatcher->trySubscribe(item.subscriberURI, item.endpointURI, item.expireTime);
+			pEventDispatcher->subscribe(item.subscriberURI, item.endpointURI, item.expireTime);
 		}
 		else
 		{
@@ -471,7 +473,7 @@ public:
 		if (pFrame->type() == Frame::FRAME_TYPE_EVSU || pFrame->type() == Frame::FRAME_TYPE_EVUN)
 		{
 			std::string suri(pFrame->payloadBegin(), pFrame->getPayloadSize());
-			_pSubscriptionChanges->change(pFrame->type() == Frame::FRAME_TYPE_EVSU, suri);
+			_pSubscriptionChanges->change(pFrame->type() == Frame::FRAME_TYPE_EVSU, suri, eventEndpoint(pConnection, suri));
 			pConnection->returnFrame(pFrame);
 			return true;
 		}
@@ -479,6 +481,23 @@ public:
 	}
 
 private:
+	[[nodiscard]] static std::string eventEndpoint(Connection::Ptr pConnection, const std::string& subscriberURI)
+		/// Returns the endpoint for the events of a subscriber. The server
+		/// connects to the endpoint if it has no connection to it, and the
+		/// subscriber URI is what the peer sent: a client on TCP gets its
+		/// events over the connection it subscribed on. A UNIX domain socket
+		/// has no address to go back to: such a client, which is on the same
+		/// machine, names the socket file of its event Listener.
+	{
+		const Poco::Net::SocketAddress peerAddress = pConnection->remoteAddress();
+#if defined(POCO_OS_FAMILY_UNIX)
+		if (peerAddress.family() == Poco::Net::AddressFamily::UNIX_LOCAL) return subscriberURI;
+#endif
+		Poco::URI endpointURI(subscriberURI);
+		endpointURI.setAuthority(peerAddress.toString());
+		return endpointURI.toString();
+	}
+
 	SubscriptionChanges::Ptr _pSubscriptionChanges;
 };
 

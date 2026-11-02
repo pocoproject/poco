@@ -64,6 +64,7 @@ public:
 	void testEventUnsubscribeBeforeReply();
 	void testEventUnsubscribeOrder();
 	void testEventUnsubscribeNoThread();
+	void testEventSubscriptionOtherEndpoint();
 
 	void setUp() override;
 	void tearDown() override;
