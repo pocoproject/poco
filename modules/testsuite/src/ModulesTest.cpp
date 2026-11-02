@@ -337,6 +337,25 @@ void ModulesTest::testODBC()
 }
 
 
+void ModulesTest::testMySQL()
+{
+#ifdef ENABLE_DATA_MYSQL
+	assertEqual("mysql", Poco::Data::MySQL::Connector::KEY);
+	static_assert(std::is_base_of_v<Poco::Data::MySQL::MySQLException, Poco::Data::MySQL::ConnectionException>);
+#endif
+}
+
+
+void ModulesTest::testPostgreSQL()
+{
+#ifdef ENABLE_DATA_POSTGRESQL
+	assertEqual("postgresql", Poco::Data::PostgreSQL::Connector::KEY);
+	static_assert(Poco::Data::PostgreSQL::INT4OID == 23);
+	assertTrue(Poco::Data::PostgreSQL::oidToColumnDataType(Poco::Data::PostgreSQL::INT4OID) == Poco::Data::MetaColumn::FDT_INT32);
+#endif
+}
+
+
 void ModulesTest::testMongoDB()
 {
 #ifdef ENABLE_MONGODB
@@ -426,6 +445,12 @@ void ModulesTest::testDNSSD()
 	static_assert(static_cast<int>(Poco::DNSSD::BrowseHandle::TYPE) == Poco::DNSSD::SD_BROWSE_HANDLE);
 	static_assert(static_cast<int>(Poco::DNSSD::ServiceHandle::TYPE) == Poco::DNSSD::SD_SERVICE_HANDLE);
 	static_assert(static_cast<int>(Poco::DNSSD::RecordHandle::TYPE) == Poco::DNSSD::SD_RECORD_HANDLE);
+#endif
+#ifdef ENABLE_DNSSD_AVAHI
+	static_assert(std::is_base_of_v<Poco::DNSSD::DNSSDResponderImplFactory, Poco::DNSSD::Avahi::AvahiResponderImplFactory>);
+#endif
+#ifdef ENABLE_DNSSD_BONJOUR
+	static_assert(std::is_base_of_v<Poco::DNSSD::DNSSDResponderImplFactory, Poco::DNSSD::Bonjour::BonjourResponderImplFactory>);
 #endif
 }
 
@@ -662,6 +687,12 @@ CppUnit::Test* ModulesTest::suite()
 #endif
 #ifdef ENABLE_DATA_ODBC
 	CppUnit_addTest(pSuite, ModulesTest, testODBC);
+#endif
+#ifdef ENABLE_DATA_MYSQL
+	CppUnit_addTest(pSuite, ModulesTest, testMySQL);
+#endif
+#ifdef ENABLE_DATA_POSTGRESQL
+	CppUnit_addTest(pSuite, ModulesTest, testPostgreSQL);
 #endif
 #ifdef ENABLE_MONGODB
 	CppUnit_addTest(pSuite, ModulesTest, testMongoDB);

@@ -35,6 +35,8 @@ public:
 	void testData();
 	void testSQLite();
 	void testODBC();
+	void testMySQL();
+	void testPostgreSQL();
 	void testMongoDB();
 	void testRedis();
 	void testPrometheus();
