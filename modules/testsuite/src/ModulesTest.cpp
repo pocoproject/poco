@@ -650,6 +650,66 @@ void ModulesTest::testSerial()
 }
 
 
+void ModulesTest::testAI()
+{
+#ifdef ENABLE_AI
+	static_assert(std::is_base_of_v<Poco::AI::LLMProvider, Poco::AI::OpenAIProvider>);
+
+	Poco::AI::ToolRegistry registry;
+	registry.registerTool("greet", "Greets.", nullptr, [](const Poco::JSON::Object::Ptr& pInput)
+	{
+		return "Hello, " + pInput->optValue<std::string>("name", "you");
+	});
+	assertTrue(registry.hasTool("greet"));
+	const Poco::AI::MCP::ToolResult result = registry.executeTool("greet", nullptr);
+	assertFalse(result.isError());
+	assertEqual("Hello, you", Poco::AI::toolResultText(result));
+
+	Poco::AI::Cancellation cancellation;
+	cancellation.cancel();
+	int aborts = 0;
+	Poco::AI::Cancellation::Request request(cancellation, [&aborts]() { ++aborts; });
+	assertEqual(1, aborts);
+#endif
+}
+
+
+void ModulesTest::testAIMCP()
+{
+#ifdef ENABLE_AI_MCP
+	Poco::JSON::Object::Ptr pParams = new Poco::JSON::Object;
+	pParams->set("k", "v");
+	const Poco::JSON::Object::Ptr pRequest = Poco::AI::MCP::parseMessage(
+		Poco::AI::MCP::serialize(Poco::AI::MCP::Request::make(Poco::AI::MCP::Id(7), "tools/list", pParams)));
+	assertEqual(Poco::AI::MCP::JSONRPC_VERSION, pRequest->getValue<std::string>("jsonrpc"));
+	assertEqual(7, pRequest->getValue<int>("id"));
+	assertEqual("tools/list", pRequest->getValue<std::string>("method"));
+	assertEqual("v", pRequest->getObject("params")->getValue<std::string>("k"));
+
+	const Poco::JSON::Object::Ptr pResponse = Poco::AI::MCP::Response::error(Poco::AI::MCP::Id(3), Poco::AI::MCP::ErrorCode::METHOD_NOT_FOUND, "nope");
+	assertTrue(Poco::AI::MCP::isResponseTo(pResponse, Poco::AI::MCP::Id(3)));
+	assertEqual(-32601, pResponse->getObject("error")->getValue<int>("code"));
+#endif
+}
+
+
+void ModulesTest::testAIMCPHTTP()
+{
+#ifdef ENABLE_AI_MCP_HTTP
+	static_assert(std::is_base_of_v<Poco::Net::HTTPRequestHandlerFactory, Poco::AI::MCP::HTTP::ServerRequestHandlerFactory>);
+
+	std::istringstream stream("event: x\ndata:  two spaces\n\n");
+	Poco::AI::MCP::HTTP::EventStreamReader reader(stream);
+	Poco::AI::MCP::HTTP::EventStreamReader::Event event;
+	assertTrue(reader.next(event));
+	assertEqual("x", event.type);
+	assertEqual(" two spaces", event.data);
+	assertFalse(reader.next(event));
+	assertFalse(reader.cut());
+#endif
+}
+
+
 CppUnit::Test* ModulesTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ModulesTest");
@@ -738,6 +798,15 @@ CppUnit::Test* ModulesTest::suite()
 #endif
 #ifdef ENABLE_SERIAL
 	CppUnit_addTest(pSuite, ModulesTest, testSerial);
+#endif
+#ifdef ENABLE_AI
+	CppUnit_addTest(pSuite, ModulesTest, testAI);
+#endif
+#ifdef ENABLE_AI_MCP
+	CppUnit_addTest(pSuite, ModulesTest, testAIMCP);
+#endif
+#ifdef ENABLE_AI_MCP_HTTP
+	CppUnit_addTest(pSuite, ModulesTest, testAIMCPHTTP);
 #endif
 
 	return pSuite;

@@ -58,3 +58,4 @@ modules:
   - 'modules/**'
   - '*/include/**'
   - '*/*/include/**'
+  - '*/*/*/include/**'

@@ -19,6 +19,18 @@ if(ENABLE_ENCODINGS)
 	poco_modules_add(ENABLE_ENCODINGS Encodings)
 endif()
 
+if(ENABLE_AI)
+	poco_modules_add(ENABLE_AI AI Poco/AI.cppm)
+endif()
+
+if(ENABLE_AI_MCP)
+	poco_modules_add(ENABLE_AI_MCP AIMCP Poco/AI/MCP.cppm)
+endif()
+
+if(ENABLE_AI_MCP_HTTP)
+	poco_modules_add(ENABLE_AI_MCP_HTTP AIMCPHTTP Poco/AI/MCP/HTTP.cppm)
+endif()
+
 if(ENABLE_ACTIVERECORD)
 	poco_modules_add(ENABLE_ACTIVERECORD ActiveRecord Poco/ActiveRecord.cppm)
 endif()

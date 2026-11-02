@@ -52,6 +52,9 @@ public:
 	void testXSD();
 	void testGeo();
 	void testSerial();
+	void testAI();
+	void testAIMCP();
+	void testAIMCPHTTP();
 
 	static CppUnit::Test* suite();
 };

@@ -531,7 +531,7 @@ jobs:
           export CXX=clang++-21
           cmake -S . -B build -G Ninja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DENABLE_MODULES=ON -DENABLE_TESTS=ON \
             -DENABLE_PDF=ON -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_DNSSD=ON -DENABLE_DNSSD_AVAHI=ON \
-            -DENABLE_SSH=ON -DENABLE_XSD_VALIDATOR=ON
+            -DENABLE_SSH=ON -DENABLE_XSD_VALIDATOR=ON -DENABLE_AI=ON
       - name: Build
         run: cmake --build build --parallel $(nproc)
       - uses: ./.github/actions/retry-action

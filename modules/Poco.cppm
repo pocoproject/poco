@@ -13,6 +13,15 @@ export module Poco;
 
 export import :Foundation;
 
+#ifdef ENABLE_AI
+export import :AI;
+#endif
+#ifdef ENABLE_AI_MCP
+export import :AI.MCP;
+#endif
+#ifdef ENABLE_AI_MCP_HTTP
+export import :AI.MCP.HTTP;
+#endif
 #ifdef ENABLE_ACTIVERECORD
 export import :ActiveRecord;
 #endif
