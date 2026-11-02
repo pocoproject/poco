@@ -24,6 +24,8 @@
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
 #include "Poco/Mutex.h"
+#include <cwchar>
+#include <memory>
 
 
 namespace
@@ -72,34 +74,55 @@ namespace
 		}
 	}
 
-	std::vector<wchar_t> getUnicodeEnvironmentVariablesBuffer(const Poco::Process::Env& env)
+	struct EnvNameLess
+		/// Orders the names of environment variables as Windows compares
+		/// them: by code unit, without regard to case.
 	{
-		std::vector<wchar_t> envbuf;
-		std::size_t pos = 0;
-
-		for (const auto& p: env)
+		[[nodiscard]] bool operator () (const std::wstring& name1, const std::wstring& name2) const
 		{
-			std::size_t envlen = p.first.length() + p.second.length() + 1;
+			return CompareStringOrdinal(name1.c_str(), static_cast<int>(name1.size()), name2.c_str(), static_cast<int>(name2.size()), TRUE) == CSTR_LESS_THAN;
+		}
+	};
 
-			std::wstring uname;
-			Poco::UnicodeConverter::convert(p.first, uname);
-			std::wstring uvalue;
-			Poco::UnicodeConverter::convert(p.second, uvalue);
-
-			envbuf.resize(pos + envlen + 1);
-			std::copy(uname.begin(), uname.end(), &envbuf[pos]);
-			pos += uname.length();
-			envbuf[pos] = L'=';
-			++pos;
-			std::copy(uvalue.begin(), uvalue.end(), &envbuf[pos]);
-			pos += uvalue.length();
-
-			envbuf[pos] = L'\0';
-			++pos;
+	std::vector<wchar_t> getUnicodeEnvironmentVariablesBuffer(const Poco::Process::Env& env, bool clearEnvironment)
+		/// Returns the environment of the calling process, in which the
+		/// variables in env are added or replace those of the same name,
+		/// as an environment block for CreateProcessW(). If clearEnvironment
+		/// is true, the block holds only the variables in env.
+	{
+		std::map<std::wstring, std::wstring, EnvNameLess> vars;
+		if (!clearEnvironment)
+		{
+			const std::unique_ptr<wchar_t, decltype(&FreeEnvironmentStringsW)> parentEnv(GetEnvironmentStringsW(), &FreeEnvironmentStringsW);
+			if (parentEnv == nullptr) throw Poco::SystemException("Cannot get the environment of the process");
+			for (const wchar_t* p = parentEnv.get(); *p; p += std::wcslen(p) + 1)
+			{
+				// The names of the variables that hold the current directory of each drive start with '='.
+				const wchar_t* pSep = std::wcschr(p + 1, L'=');
+				if (pSep != nullptr) vars.emplace(std::wstring(p, pSep), std::wstring(pSep + 1));
+			}
 		}
 
-		envbuf.resize(pos + 1);
-		envbuf[pos] = L'\0';
+		for (const auto& [name, value]: env)
+		{
+			std::wstring uname;
+			Poco::UnicodeConverter::convert(name, uname);
+			std::wstring uvalue;
+			Poco::UnicodeConverter::convert(value, uvalue);
+			// The variable keeps the name as the caller wrote it.
+			vars.erase(uname);
+			vars.emplace(std::move(uname), std::move(uvalue));
+		}
+
+		std::vector<wchar_t> envbuf;
+		for (const auto& [name, value]: vars)
+		{
+			envbuf.insert(envbuf.end(), name.begin(), name.end());
+			envbuf.push_back(L'=');
+			envbuf.insert(envbuf.end(), value.begin(), value.end());
+			envbuf.push_back(L'\0');
+		}
+		envbuf.push_back(L'\0');
 
 		return envbuf;
 	}
@@ -322,6 +345,19 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		}
 	}
 
+	// The environment block is built before the standard handles are
+	// duplicated: building it can throw.
+	const wchar_t* pEnv = nullptr;
+	std::vector<wchar_t> envChars;
+	const bool clearEnvironment = (options & PROCESS_CLEAR_ENVIRONMENT) != 0;
+	if (!env.empty() || clearEnvironment)
+	{
+		envChars = getUnicodeEnvironmentVariablesBuffer(env, clearEnvironment);
+		// An empty block ends in two terminators, as one with variables does.
+		if (env.empty()) envChars.push_back(L'\0');
+		pEnv = envChars.data();
+	}
+
 	STARTUPINFOW startupInfo;
 	GetStartupInfoW(&startupInfo); // take defaults from current process
 	startupInfo.cb = sizeof(STARTUPINFOW);
@@ -411,16 +447,6 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	UnicodeConverter::toUTF16(initialDirectory, uinitialDirectory);
 	const wchar_t* workingDirectory = uinitialDirectory.empty() ? 0 : uinitialDirectory.c_str();
 
-	const wchar_t* pEnv = 0;
-	std::vector<wchar_t> envChars;
-	if (!env.empty() || (options & PROCESS_CLEAR_ENVIRONMENT))
-	{
-		envChars = getUnicodeEnvironmentVariablesBuffer(env);
-		// An empty block ends in two terminators, as one with variables does.
-		if (env.empty()) envChars.push_back(L'\0');
-		pEnv = &envChars[0];
-	}
-
 	PROCESS_INFORMATION processInfo;
 	DWORD creationFlags = GetConsoleWindow() ? 0 : CREATE_NO_WINDOW;
 	if (options & PROCESS_NEW_GROUP)
@@ -459,12 +485,13 @@ void ProcessImpl::killImpl(ProcessHandleImpl& handle)
 {
 	if (handle.process())
 	{
-		if (TerminateProcess(handle.process(), 0) == 0)
+		// TerminateProcess() fails for a process that has ended or is ending,
+		// which, as on POSIX before wait(), is not an error.
+		DWORD exitCode = 0;
+		if (TerminateProcess(handle.process(), 0) == 0 && (GetExitCodeProcess(handle.process(), &exitCode) == 0 || exitCode == STILL_ACTIVE))
 		{
-			handle.closeHandle();
 			throw SystemException("cannot kill process");
 		}
-		handle.closeHandle();
 	}
 }
 

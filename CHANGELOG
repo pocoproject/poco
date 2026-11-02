@@ -43,6 +43,9 @@ Breaking Changes:
   rather than an enumerator, so an expression that mixes it with a signed value changes type
   without a diagnostic; and poll(), available(), device(), baudRate(), parameters(), flowControl()
   and getRTS() are [[nodiscard]].
+- On Windows, the environment variables given to Poco::Process::launch() are added to the
+  environment of the parent instead of replacing it. A caller that wants the child to get only
+  those variables passes PROCESS_CLEAR_ENVIRONMENT.
 
 Bundled Third-Party Library Upgrades:
 
@@ -68,8 +71,8 @@ Features:
   unbundled SQLite (3.37 or newer required); optional AVX2/NEON SIMD kernels.
 - GH #5573 Poco::Process::launch(): the option PROCESS_CLEAR_ENVIRONMENT starts the child with
   only the environment variables given to launch(), on every platform. Without it the child
-  inherits the environment of the parent with the given variables added, but replaced by them
-  when any are given on Windows, and on QNX when the child is spawned.
+  inherits the environment of the parent with the given variables added, except on QNX when the
+  child is spawned without an initial directory and is given variables: it then gets only those.
 
 New Components:
 

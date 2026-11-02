@@ -79,10 +79,10 @@ enum ProcessOptions
 	PROCESS_CLEAR_ENVIRONMENT = 32
 		/// Starts the child process with the environment variables given to
 		/// Process::launch() and no others, on every platform. Without it,
-		/// the child inherits the environment of the parent: on Unix/Linux
-		/// with the given variables added, but replaced by them when any are
-		/// given on Windows, and on QNX when the child is spawned, without an
-		/// initial directory.
+		/// the child inherits the environment of the parent with the given
+		/// variables added, except on QNX when the child is spawned, without
+		/// an initial directory, and is given variables: it then gets only
+		/// those.
 		///
 		/// On Unix/Linux, the child looks the command up in the PATH given,
 		/// or in the default search path of the system when none is given;

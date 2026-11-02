@@ -30,6 +30,8 @@ public:
 	void testLaunchRedirectOut();
 	void testLaunchEnv();
 	void testLaunchClearedEnvironment();
+	void testLaunchEnvKeepsParentEnvironment();
+	void testLaunchEnvReplacesParentVariable();
 	void testLaunchArgs();
 	void testLaunchInvalidCommand();
 	void testIsRunning();
@@ -42,6 +44,8 @@ public:
 	void testSignalExitCode();
 	void testIsRunningByPidThenWaitOnHandle();
 	void testIsRunningAfterWait();
+	void testWaitAfterKill();
+	void testKillAfterExit();
 	void testRequestTerminationOfNewGroup();
 	void testRequestTerminationWithoutConsole();
 	void testRequestTerminationKeepsStandardHandles();

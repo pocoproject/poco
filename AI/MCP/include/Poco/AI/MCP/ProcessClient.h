@@ -97,12 +97,10 @@ public:
 		/// bytes fails the request it arrives during, and is passed over
 		/// otherwise.
 		///
-		/// With Environment::INHERITED, what env does differs, as it does for
-		/// Poco::Process::launch(): on POSIX platforms its variables are added
-		/// to the environment of this process, which the server inherits,
-		/// secrets included; on Windows a non-empty env is the whole
-		/// environment of the server. A server that is not trusted with the
-		/// environment of the application is started with
+		/// With Environment::INHERITED, the variables in env are added to the
+		/// environment of this process, as Poco::Process::launch() does it,
+		/// and the server inherits it, secrets included. A server that is not
+		/// trusted with the environment of the application is started with
 		/// Environment::CLEARED and the variables it needs: PATH among them on
 		/// POSIX platforms, where the command is looked up in it, and
 		/// SystemRoot on Windows.
