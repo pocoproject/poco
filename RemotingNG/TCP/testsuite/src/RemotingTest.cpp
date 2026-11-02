@@ -19,6 +19,10 @@
 #include "Poco/RemotingNG/TCP/Transport.h"
 #include "Poco/RemotingNG/TCP/TransportFactory.h"
 #include "Poco/RemotingNG/TCP/Listener.h"
+#include "Poco/RemotingNG/TCP/ConnectionManager.h"
+#include "Poco/RemotingNG/TCP/Connection.h"
+#include "Poco/RemotingNG/TCP/Frame.h"
+#include "Poco/RemotingNG/TCP/FrameHandler.h"
 #include "Poco/RemotingNG/TCP/PlainClientAuthenticator.h"
 #include "Poco/RemotingNG/TCP/SCRAMClientAuthenticator.h"
 #include "Poco/RemotingNG/TCP/SCRAMAuthenticator.h"
@@ -28,6 +32,8 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/URI.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/SHA1Engine.h"
 #include "Poco/HMACEngine.h"
@@ -102,6 +108,30 @@ namespace
 	// run() when the test that let it go is over.
 	ThreadKeeper threadKeeper;
 }
+
+
+class EventFrameCatcher: public Poco::RemotingNG::TCP::FrameHandler
+	/// Tells when an event arrives on the connection it is pushed on.
+{
+public:
+	using Ptr = Poco::AutoPtr<EventFrameCatcher>;
+
+	bool handleFrame(Poco::RemotingNG::TCP::Connection::Ptr pConnection, Poco::RemotingNG::TCP::Frame::Ptr pFrame) override
+	{
+		if (pFrame->type() != Poco::RemotingNG::TCP::Frame::FRAME_TYPE_EVNT) return false;
+		pConnection->returnFrame(pFrame);
+		_received.set();
+		return true;
+	}
+
+	[[nodiscard]] bool received(long milliseconds)
+	{
+		return _received.tryWait(milliseconds);
+	}
+
+private:
+	Poco::Event _received;
+};
 
 
 class MockAuthenticator: public Poco::RemotingNG::Authenticator
@@ -1060,6 +1090,43 @@ void RemotingTest::testEventUnsubscribeNoThread()
 }
 
 
+void RemotingTest::testEventSubscriptionOtherEndpoint()
+{
+	// The server sends a TCP client its events over the connection it
+	// subscribed on. It connects to no other address, whatever the
+	// subscriber URI names.
+	TesterServerHelper::enableEvents(_objectURI, "tcp");
+	Poco::Net::ServerSocket otherEndpoint(Poco::Net::SocketAddress("127.0.0.1", 0));
+
+	ITester::Ptr pTester = createProxy(_objectURI);
+	Poco::RemotingNG::TCP::Connection::Ptr pConnection = Poco::RemotingNG::TCP::ConnectionManager::defaultManager().getConnection(Poco::URI(_objectURI));
+	EventFrameCatcher::Ptr pCatcher = new EventFrameCatcher;
+	pConnection->pushFrameHandler(pCatcher);
+
+	Poco::URI subscriberURI(_objectURI);
+	subscriberURI.setAuthority(otherEndpoint.address().toString());
+	subscriberURI.setFragment("1");
+	const std::string uri = subscriberURI.toString();
+	Poco::RemotingNG::TCP::Frame::Ptr pFrame = new Poco::RemotingNG::TCP::Frame(Poco::RemotingNG::TCP::Frame::FRAME_TYPE_EVSU, 0, Poco::RemotingNG::TCP::Frame::FRAME_FLAG_EOM,
+		static_cast<Poco::UInt16>(Poco::RemotingNG::TCP::Frame::FRAME_HEADER_SIZE + uri.size()));
+	uri.copy(pFrame->payloadBegin(), uri.size());
+	pFrame->setPayloadSize(static_cast<Poco::UInt16>(uri.size()));
+	pConnection->sendFrame(pFrame);
+
+	// Frames of a connection are taken in order: the subscription is there
+	// when the reply comes.
+	assert (pTester->testInt1(42) == 42);
+	pTester->fireTestOneWayEvent("s3cr3t");
+
+	const bool received = pCatcher->received(5000);
+	const bool connected = otherEndpoint.poll(Poco::Timespan(0), Poco::Net::Socket::SELECT_READ);
+	pConnection->popFrameHandler(pCatcher);
+
+	assert (!connected);
+	assert (received);
+}
+
+
 void RemotingTest::onVoidEvent(const void* /*pSender*/)
 {
 	_eventArg = "FIRED";
@@ -1412,6 +1479,7 @@ CppUnit::Test* RemotingTest::suite()
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeBeforeReply);
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeOrder);
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeNoThread);
+	CppUnit_addTest(pSuite, RemotingTest, testEventSubscriptionOtherEndpoint);
 
 	return pSuite;
 }
