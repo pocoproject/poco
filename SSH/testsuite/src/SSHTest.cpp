@@ -1754,9 +1754,12 @@ void SSHTest::testLoginGraceTimeLimitsAuthentication()
 	// The grace time of the server starts before the key exchange
 	const auto start = std::chrono::steady_clock::now();
 	client.connect("127.0.0.1", server.port());
+	// libssh 0.10 does not end the wait for a reply when the server closes the connection instead of replying,
+	// so each wait of the client is limited
+	constexpr long timeoutSeconds = 2;
+	ssh_options_set(client.session(), SSH_OPTIONS_TIMEOUT, &timeoutSeconds);
 
 	// Each request arrives well within the grace time of the previous one, but the requests together take longer
-	// A request on a closed connection waits without a time limit, so each one is sent only while it is connected.
 	while (ssh_is_connected(client.session()) != 0 &&
 		std::chrono::steady_clock::now() - start < std::chrono::seconds(10))
 	{
