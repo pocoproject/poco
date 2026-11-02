@@ -69,14 +69,15 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	_connected(false),
 	_isTransaction(false),
 	_transactionType(TransactionType::DEFERRED),
+	_timeout(0),
 	_transactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED)
 {
 	open();
 	setConnectionTimeout(loginTimeout);
-	setProperty("handle", _pDB);
 	addFeature("autoCommit",
 		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
+	addProperty("handle", &SessionImpl::setHandle, &SessionImpl::getHandle);
 	addProperty("connectionTimeout", &SessionImpl::setConnectionTimeout, &SessionImpl::getConnectionTimeout);
 	addProperty(Utility::TRANSACTION_TYPE_PROPERTY_KEY, &SessionImpl::setTransactionType, &SessionImpl::getTransactionType);
 }
@@ -207,14 +208,13 @@ bool SessionImpl::isTransactionIsolation(Poco::UInt32 ti) const
 
 void SessionImpl::open(const std::string& connect)
 {
-	if (connect != connectionString())
-	{
-		if (isConnected())
-			throw InvalidAccessException("Session already connected");
+	Poco::Mutex::ScopedLock l(_mutex);
 
-		if (!connect.empty())
-			setConnectionString(connect);
-	}
+	if (isConnected())
+		throw InvalidAccessException("Session already connected");
+
+	if (connect != connectionString() && !connect.empty())
+		setConnectionString(connect);
 
 	poco_assert_dbg (!connectionString().empty());
 
@@ -230,6 +230,9 @@ void SessionImpl::open(const std::string& connect)
 			+ sqlite3_errstr(rcVec));
 #endif
 
+	// isAutoCommit() uses the handle without a lock once it is published, so it is
+	// published only once the connection is open
+	sqlite3* pDB = nullptr;
 	try
 	{
 		int rc = 0;
@@ -237,44 +240,69 @@ void SessionImpl::open(const std::string& connect)
 		Stopwatch sw; sw.start();
 		while (true)
 		{
-			rc = sqlite3_open_v2(connectionString().c_str(), &_pDB,
+			rc = sqlite3_open_v2(connectionString().c_str(), &pDB,
 				SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, nullptr);
 			if (rc == SQLITE_OK) break;
-			if (!_pDB)
+			if (pDB == nullptr)
 				throw ConnectionFailedException(std::string(sqlite3_errstr(rc)));
 			if (static_cast<std::size_t>(sw.elapsedSeconds()) >= tout)
 			{
-				Utility::throwException(_pDB, rc);
+				Utility::throwException(pDB, rc);
 			}
 			Thread::sleep(10);
-			close();
+			sqlite3_close_v2(pDB);
+			pDB = nullptr;
 		}
+		// a connection opened again keeps the busy timeout the session was given
+		rc = sqlite3_busy_timeout(pDB, _timeout);
+		if (rc != 0) Utility::throwException(pDB, rc);
 	}
 	catch (SQLiteException& ex)
 	{
-		close();
+		sqlite3_close_v2(pDB);
 		throw ConnectionFailedException(ex.displayText());
 	}
 
+	Poco::FastMutex::ScopedLock h(_handleMutex);
+	_pDB = pDB;
 	_connected = true;
+	_isTransaction = false;
+	setProperty("handle", _pDB);
 }
 
 
 void SessionImpl::close()
 {
-	if (_pDB)
+	Poco::Mutex::ScopedLock l(_mutex);
+
+	sqlite3* pDB = nullptr;
 	{
-		sqlite3_close_v2(_pDB);
+		Poco::FastMutex::ScopedLock h(_handleMutex);
+		pDB = _pDB;
 		_pDB = nullptr;
+		_connected = false;
+		_isTransaction = false;
+		setProperty("handle", _pDB);
+		while (_handleUsers > 0) _handleReleased.wait(_handleMutex);
 	}
 
-	_connected = false;
+	if (pDB != nullptr)
+	{
+		Utility::unregisterUpdateHandlers(pDB);
+		// sqlite3_close_v2() rolls back only once the last statement compiled on the
+		// connection is finalized, and the transaction keeps its locks until then
+		if (sqlite3_get_autocommit(pDB) == 0)
+			sqlite3_exec(pDB, ABORT_TRANSACTION.c_str(), nullptr, nullptr, nullptr);
+		sqlite3_close_v2(pDB);
+	}
 }
 
 
 void SessionImpl::reset()
 {
+	Poco::Mutex::ScopedLock l(_mutex);
 
+	if (_pDB != nullptr) Utility::unregisterUpdateHandlers(_pDB);
 }
 
 
@@ -286,6 +314,8 @@ bool SessionImpl::isConnected() const
 
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
+	Poco::Mutex::ScopedLock l(_mutex);
+	poco_check_ptr (_pDB);
 	int tout = static_cast<int>(1000 * timeout);
 	int rc = sqlite3_busy_timeout(_pDB, tout);
 	if (rc != 0) Utility::throwException(_pDB, rc);
@@ -295,7 +325,11 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 
 void SessionImpl::setConnectionTimeout(const std::string& prop, const Poco::Any& value)
 {
-	setConnectionTimeout(Poco::RefAnyCast<std::size_t>(value));
+	// an int is what the getter returns, and what a SessionPool sets back
+	if (value.type() == typeid(int))
+		setConnectionTimeout(static_cast<std::size_t>(Poco::AnyCast<int>(value)));
+	else
+		setConnectionTimeout(Poco::RefAnyCast<std::size_t>(value));
 }
 
 
@@ -326,8 +360,33 @@ void SessionImpl::autoCommit(const std::string&, bool)
 
 bool SessionImpl::isAutoCommit(const std::string&) const
 {
-	Poco::Mutex::ScopedLock l(_mutex);
-	return (0 != sqlite3_get_autocommit(_pDB));
+	sqlite3* pDB = nullptr;
+	{
+		Poco::FastMutex::ScopedLock h(_handleMutex);
+		if (_pDB == nullptr) return true;
+		pDB = _pDB;
+		++_handleUsers;
+	}
+	// sqlite3_get_autocommit() locks the connection, which SQLite holds while it runs
+	// a callback that may call this function: no session lock may be held meanwhile
+	const bool autoCommit = (0 != sqlite3_get_autocommit(pDB));
+	Poco::FastMutex::ScopedLock h(_handleMutex);
+	if (--_handleUsers == 0) _handleReleased.broadcast();
+	return autoCommit;
+}
+
+
+Poco::Any SessionImpl::getHandle(const std::string& name) const
+{
+	Poco::FastMutex::ScopedLock h(_handleMutex);
+	return Poco::Data::AbstractSessionImpl<SessionImpl>::getHandle(name);
+}
+
+
+sqlite3* SessionImpl::handle() const
+{
+	Poco::FastMutex::ScopedLock h(_handleMutex);
+	return _pDB;
 }
 
 

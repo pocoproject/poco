@@ -61,6 +61,9 @@ protected:
 
 	[[nodiscard]] bool hasNext() override;
 		/// Returns true if a call to next() will return data.
+		/// Throws NotConnectedException if the statement was paused by a limit
+		/// and the session has closed its connection since, even if the session
+		/// has been opened again.
 
 	[[nodiscard]] std::size_t next() override;
 		/// Retrieves the next row from the resultset and returns 1.

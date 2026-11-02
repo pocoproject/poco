@@ -15,16 +15,51 @@
 namespace Poco::Data::Test {
 
 
+std::atomic<int> TestStatementImpl::_instances(0);
+std::atomic<bool> TestStatementImpl::_holdNext(false);
+Poco::Event TestStatementImpl::_held;
+Poco::Event TestStatementImpl::_released;
+
+
 TestStatementImpl::TestStatementImpl(SessionImpl& rSession, bool throwOnHasNext):
 	Poco::Data::StatementImpl(rSession),
 	_compiled(false),
 	_throwOnHasNext(throwOnHasNext)
 {
+	++_instances;
 }
 
 
 TestStatementImpl::~TestStatementImpl()
 {
+	--_instances;
+}
+
+
+int TestStatementImpl::instances()
+{
+	return _instances;
+}
+
+
+void TestStatementImpl::holdNextExecution()
+{
+	_held.reset();
+	_released.reset();
+	_holdNext = true;
+}
+
+
+bool TestStatementImpl::waitUntilHeld(long milliseconds)
+{
+	return _held.tryWait(milliseconds);
+}
+
+
+void TestStatementImpl::releaseExecution()
+{
+	_holdNext = false;
+	_released.set();
 }
 
 
@@ -78,6 +113,11 @@ const MetaColumn& TestStatementImpl::metaColumn(std::size_t pos) const
 
 bool TestStatementImpl::hasNext()
 {
+	if (_holdNext.exchange(false))
+	{
+		_held.set();
+		_released.wait();
+	}
 	if (_throwOnHasNext)
 		throw Poco::Data::UnknownDataBaseException();
 	return false;

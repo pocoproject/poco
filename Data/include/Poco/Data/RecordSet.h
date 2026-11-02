@@ -107,7 +107,7 @@ public:
 		/// Copy-creates the recordset.
 
 	RecordSet(RecordSet&& other) noexcept;
-		/// Move-creates the recordset.
+		/// Move-creates the recordset. The RowFilter of other, if any, moves with it.
 
 	RecordSet() = delete;
 
@@ -124,7 +124,8 @@ public:
 		/// Assignment operator.
 
 	RecordSet& operator = (RecordSet&& other) noexcept;
-		/// Move assignment.
+		/// Move assignment. The RowFilter of other, if any, replaces the one of
+		/// this recordset; a self-move leaves the recordset unchanged.
 
 	[[nodiscard]] std::size_t rowCount() const;
 		/// Returns the number of rows in the RecordSet.
@@ -258,6 +259,7 @@ public:
 		/// assigned a new SQL statement, and executed.
 		///
 		/// Does not remove the associated RowFilter or RowFormatter.
+		/// Throws NullPointerException if stmt was moved from; the RecordSet is then left unchanged.
 
 	[[nodiscard]] Poco::Dynamic::Var value(const std::string& name);
 		/// Returns the value in the named column of the current row.
@@ -400,6 +402,7 @@ private:
 
 	void filter(const Poco::AutoPtr<RowFilter>& pFilter);
 		/// Sets the filter for the RecordSet.
+		/// The filter it replaces is no longer associated with the RecordSet.
 
 	[[nodiscard]] const Poco::AutoPtr<RowFilter>& getFilter() const;
 		/// Returns the filter associated with the RecordSet.
@@ -548,24 +551,28 @@ inline bool RecordSet::isNull(const std::string& name) const
 
 inline RecordSet::ConstIterator& RecordSet::begin() const
 {
+	poco_check_ptr (_pBegin);
 	return *_pBegin;
 }
 
 
 inline RecordSet::ConstIterator& RecordSet::end() const
 {
+	poco_check_ptr (_pEnd);
 	return *_pEnd;
 }
 
 
 inline RecordSet::Iterator RecordSet::begin()
 {
+	poco_check_ptr (_pBegin);
 	return *_pBegin;
 }
 
 
 inline RecordSet::Iterator RecordSet::end()
 {
+	poco_check_ptr (_pEnd);
 	return *_pEnd;
 }
 
@@ -578,6 +585,7 @@ inline const Poco::AutoPtr<RowFilter>& RecordSet::getFilter() const
 
 inline void RecordSet::formatNames() const
 {
+	poco_check_ptr (_pBegin);
 	(*_pBegin)->formatNames();
 }
 

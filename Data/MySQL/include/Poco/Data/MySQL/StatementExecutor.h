@@ -19,6 +19,7 @@
 
 
 #include "Poco/Data/MySQL/MySQLException.h"
+#include "Poco/Data/MySQL/SessionHandle.h"
 #include <mysql/mysql.h>
 
 
@@ -36,8 +37,9 @@ public:
 		STMT_EXECUTED
 	};
 
-	explicit StatementExecutor(MYSQL* mysql);
-		/// Creates the StatementExecutor.
+	explicit StatementExecutor(SessionHandle& handle);
+		/// Creates the StatementExecutor on the connection of the handle.
+		/// Throws NullPointerException if the handle is closed.
 
 	StatementExecutor(const StatementExecutor&) = delete;
 
@@ -69,21 +71,35 @@ public:
 
 	[[nodiscard]] int getAffectedRowCount() const;
 
+	[[nodiscard]] bool isValid() const;
+		/// Returns true if the connection on which the statement was created
+		/// is still open. Once it has been closed, the statement is detached
+		/// from it and must not be used, even if the session has been opened again.
+
 	[[nodiscard]] operator MYSQL_STMT* ();
 		/// Cast operator to native handle type.
 
 private:
-	MYSQL*      _pSessionHandle;
-	MYSQL_STMT* _pHandle;
-	int         _state;
-	std::size_t _affectedRowCount;
-	std::string _query;
+	using GenerationPtr = std::shared_ptr<const SessionHandle::Counter>;
+
+	GenerationPtr _pGeneration;
+	Poco::UInt32  _generation;
+	MYSQL_STMT*   _pHandle;
+	int           _state;
+	std::size_t   _affectedRowCount;
+	std::string   _query;
 };
 
 
 //
 // inlines
 //
+
+inline bool StatementExecutor::isValid() const
+{
+	return *_pGeneration == _generation;
+}
+
 
 inline StatementExecutor::operator MYSQL_STMT* ()
 {

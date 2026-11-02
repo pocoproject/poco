@@ -85,24 +85,27 @@ private:
 	SessionPoolContainer& operator = (const SessionPoolContainer&);
 
 	SessionPoolMap  _sessionPools;
-	Poco::FastMutex _mutex;
+	mutable Poco::FastMutex _mutex;
 };
 
 
 inline bool SessionPoolContainer::has(const std::string& name) const
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
 	return _sessionPools.find(name) != _sessionPools.end();
 }
 
 
 inline void SessionPoolContainer::remove(const std::string& name)
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
 	_sessionPools.erase(name);
 }
 
 
 inline int SessionPoolContainer::count() const
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
 	return static_cast<int>(_sessionPools.size());
 }
 

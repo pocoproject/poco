@@ -301,6 +301,98 @@ void MemoryDBTest::testDestructorFlush()
 }
 
 
+void MemoryDBTest::testSessionClosed()
+{
+	{
+		MemoryDB db(_dir, flushedByTest(false));
+		db << "CREATE TABLE t(x INTEGER)", now;
+		int x = 7;
+		db << "INSERT INTO t VALUES(:x)", use(x), now;
+		db.flush();
+
+		// the change hooks are on the connection of session(): without it nothing is tracked
+		db.session().close();
+		try
+		{
+			db.flush();
+			fail ("must fail");
+		}
+		catch (Poco::IllegalStateException&) { }
+
+		try
+		{
+			db << "INSERT INTO t VALUES(:x)", use(x), now;
+			fail ("must fail");
+		}
+		catch (Poco::IllegalStateException&) { }
+	} // the destructor leaves the closed connection alone
+
+	{
+		MemoryDB db(_dir, flushedByTest(false));
+		db.session().reconnect();
+		try
+		{
+			(void) db.historyView("t");
+			fail ("must fail");
+		}
+		catch (Poco::IllegalStateException&) { }
+	}
+
+	MemoryDB db(_dir);
+	int cnt = 0;
+	db << "SELECT count(*) FROM t", into(cnt), now;
+	assertTrue (cnt == 1);
+}
+
+
+void MemoryDBTest::testSessionClosedShards()
+{
+	{
+		MemoryDB db(_dir, flushedByTest(false));
+		db << "CREATE TABLE t(x INTEGER)", now;
+		int x = 7;
+		db << "INSERT INTO t VALUES(:x)", use(x), now;
+		db.sealActive();
+		db.flush();
+		std::vector<Poco::UInt32> ids = db.archivedShardIds();
+		assertTrue (ids.size() == 1);
+
+		// the shard functions need the connection of session() as well
+		db.session().close();
+		try { (void) db.attachArchived(ids[0]); fail ("must fail"); }
+		catch (Poco::IllegalStateException&) { }
+
+		try { db.detachArchived(ids[0]); fail ("must fail"); }
+		catch (Poco::IllegalStateException&) { }
+
+		try { db.attachAllArchived(); fail ("must fail"); }
+		catch (Poco::IllegalStateException&) { }
+
+		try { db.detachAllArchived(); fail ("must fail"); }
+		catch (Poco::IllegalStateException&) { }
+
+		try { (void) db.historyView("t", Poco::Timestamp(0), Poco::Timestamp()); fail ("must fail"); }
+		catch (Poco::IllegalStateException&) { }
+
+		try { db.deleteShard(ids[0]); fail ("must fail"); }
+		catch (Poco::IllegalStateException&) { }
+
+		try { (void) db.enforceRetention(); fail ("must fail"); }
+		catch (Poco::IllegalStateException&) { }
+
+		try { (void) db.dropOlderThan(Poco::Timestamp()); fail ("must fail"); }
+		catch (Poco::IllegalStateException&) { }
+
+		try { (void) db.dropToFit(0); fail ("must fail"); }
+		catch (Poco::IllegalStateException&) { }
+	}
+
+	// none of them dropped or deleted the sealed shard
+	MemoryDB db(_dir, flushedByTest(false));
+	assertTrue (db.archivedShardIds().size() == 1);
+}
+
+
 void MemoryDBTest::testShardingBySize()
 {
 	MemoryDB::Options o;
@@ -3469,6 +3561,8 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testPersistAndReload);
 	CppUnit_addTest(pSuite, MemoryDBTest, testManualFlushAndDirty);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDestructorFlush);
+	CppUnit_addTest(pSuite, MemoryDBTest, testSessionClosed);
+	CppUnit_addTest(pSuite, MemoryDBTest, testSessionClosedShards);
 	CppUnit_addTest(pSuite, MemoryDBTest, testShardingBySize);
 	CppUnit_addTest(pSuite, MemoryDBTest, testActiveOnlyRewrite);
 	CppUnit_addTest(pSuite, MemoryDBTest, testUpdateSealedRow);

@@ -149,23 +149,23 @@ void SessionImpl::open(const std::string& aConnectionString)
 		&SessionImpl::isAutoCommit);
 
 	addFeature("asynchronousCommit",
-		&SessionImpl::setAutoCommit,
-		&SessionImpl::isAutoCommit);
+		&SessionImpl::setAsynchronousCommit,
+		&SessionImpl::isAsynchronousCommit);
 
 	addFeature("binaryExtraction",
 		&SessionImpl::setBinaryExtraction,
 		&SessionImpl::isBinaryExtraction);
 
+	// autocommit is initially on when a session is opened
+	AbstractSessionImpl::setAutoCommit("", true);
 	setName();
 }
 
 
 void SessionImpl::close()
 {
-	if (isConnected())
-	{
-		_sessionHandle.disconnect();
-	}
+	// disconnect() also frees a connection that is no longer alive
+	_sessionHandle.disconnect();
 }
 
 

@@ -44,6 +44,20 @@ class SQLite_API Notifier
 	/// callback automatically unregisters the previous one). All callbacks are
 	/// registered and enabled at Notifier contruction time and can be disabled
 	/// at a later point time.
+	///
+	/// The callbacks are registered with the connection the session has when they
+	/// are enabled. Closing a session removes them from its connection before SQLite
+	/// rolls back a transaction still in progress, so that rollback is not notified;
+	/// once the session is open again, enable them again. Closing a pooled session
+	/// first rolls back a transaction still in progress with an explicit ROLLBACK,
+	/// which is notified, and then returns the connection to its pool without the
+	/// callbacks; a closed pooled session cannot be opened again, so enable them with
+	/// a Notifier on a session taken from the pool. Callbacks removed so are no longer
+	/// enabled: updateEnabled(), commitEnabled() and rollbackEnabled() return false.
+	/// Enabling them uses the session, which must still exist then; disabling them,
+	/// also in the destructor, uses the connection they were registered with, never
+	/// the session. The session must not be closed while another thread enables or
+	/// disables them.
 {
 public:
 	typedef unsigned char EnabledEventType;
@@ -68,17 +82,20 @@ public:
 	Notifier(const Session& session,
 		EnabledEventType enabled = SQLITE_NOTIFY_UPDATE | SQLITE_NOTIFY_COMMIT | SQLITE_NOTIFY_ROLLBACK);
 			/// Creates a Notifier and enables all callbacks.
+			/// Throws NullPointerException if a callback is to be enabled and the session is not connected.
 
 	Notifier(const Session& session,
 		const Any& value,
 		EnabledEventType enabled = SQLITE_NOTIFY_UPDATE | SQLITE_NOTIFY_COMMIT | SQLITE_NOTIFY_ROLLBACK);
 			/// Creates a Notifier, assigns the value to the internal storage and and enables all callbacks.
+			/// Throws NullPointerException if a callback is to be enabled and the session is not connected.
 
 	~Notifier();
 		/// Disables all callbacks and destroys the Notifier.
 
 	bool enableUpdate();
 		/// Enables update callbacks.
+		/// Throws NullPointerException if the session is not connected.
 
 	bool disableUpdate();
 		/// Disables update callbacks.
@@ -88,6 +105,7 @@ public:
 
 	bool enableCommit();
 		/// Enables commit callbacks.
+		/// Throws NullPointerException if the session is not connected.
 
 	bool disableCommit();
 		/// Disables commit callbacks.
@@ -97,6 +115,7 @@ public:
 
 	bool enableRollback();
 		/// Enables rollback callbacks.
+		/// Throws NullPointerException if the session is not connected.
 
 	bool disableRollback();
 		/// Disables rollback callbacks.
@@ -106,6 +125,7 @@ public:
 
 	bool enableAll();
 		/// Enables all callbacks.
+		/// Throws NullPointerException if the session is not connected.
 
 	bool disableAll();
 		/// Disables all callbacks.
@@ -113,6 +133,7 @@ public:
 	static void sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, long long row);
 		/// Update callback event dispatcher. Determines the type of the event, updates the row number
 		/// and triggers the event.
+		/// An exception thrown by an event handler is passed to Poco::ErrorHandler; it does not reach SQLite.
 
 	static int sqliteCommitCallbackFn(void* pVal);
 		/// Commit callback event dispatcher. If an exception occurs, it is catched inside this function,
@@ -122,10 +143,11 @@ public:
 
 	static void sqliteRollbackCallbackFn(void* pVal);
 		/// Rollback callback event dispatcher.
+		/// An exception thrown by an event handler is passed to Poco::ErrorHandler; it does not reach SQLite.
 
 	[[nodiscard]] bool operator == (const Notifier& other) const;
-		/// Equality operator. Compares value, row and database handles and
-		/// returns true iff all are equal.
+		/// Equality operator. Compares value, row and the database handles the
+		/// callbacks are registered with, and returns true iff all are equal.
 
 	[[nodiscard]] const std::string& getTable() const;
 		/// Returns the table name.
@@ -154,11 +176,22 @@ private:
 	Notifier(const Notifier&) = delete;
 	Notifier& operator=(const Notifier&) = delete;
 
+	void init(EnabledEventType enabled);
+		/// Enables the given callbacks. If one of them cannot be enabled,
+		/// disables those already enabled and rethrows.
+
+	void bindConnection();
+		/// Makes the session's current connection the one the callbacks are
+		/// registered with, disabling them on the previous one, and forgets the
+		/// callbacks that closing or resetting the session has removed.
+		/// Throws NullPointerException if the session is not connected.
+
 	const Session&     _session;
+	sqlite3*           _pDB = nullptr;
 	std::string        _table;
-	Poco::Int64        _row;
+	Poco::Int64        _row = 0;
 	Poco::Dynamic::Var _value;
-	EnabledEventType   _enabledEvents;
+	EnabledEventType   _enabledEvents = 0;
 	Poco::Mutex        _mutex;
 };
 
@@ -171,7 +204,7 @@ inline bool Notifier::operator == (const Notifier& other) const
 {
 	return _value == other._value &&
 		_row == other._row &&
-		Utility::dbHandle(_session) == Utility::dbHandle(other._session);
+		_pDB == other._pDB;
 }
 
 

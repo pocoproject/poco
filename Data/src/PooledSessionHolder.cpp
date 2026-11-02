@@ -22,6 +22,9 @@ PooledSessionHolder::PooledSessionHolder(SessionPool& owner, SessionImpl* pSessi
 	_owner(owner),
 	_pImpl(pSessionImpl, true)
 {
+	poco_check_ptr (pSessionImpl);
+
+	_autoCommit = pSessionImpl->isAutocommit();
 }
 
 

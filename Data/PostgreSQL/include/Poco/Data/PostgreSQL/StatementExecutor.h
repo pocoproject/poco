@@ -56,9 +56,13 @@ public:
 	void bindParams(const InputParameterVector& anInputParameterVector);
 		/// Binds the params - REQUIRED if the statement has input parameters/placeholders
 		/// Pointer and list elements must stay valid for the lifetime of the StatementExecutor!
+		/// Throws NotConnectedException if the connection that prepared the statement
+		/// has been closed, even if the session has been opened again since.
 
 	void execute();
 		/// Executes the statement.
+		/// Throws NotConnectedException if the connection that prepared the statement
+		/// has been closed, even if the session has been opened again since.
 
 	[[nodiscard]] bool fetch();
 		/// Fetches the data for the current row
@@ -78,16 +82,30 @@ public:
 	[[nodiscard]] operator PGresult* ();
 		/// Cast operator to native result handle type.
 
+	void checkValid() const;
+		/// Throws NotConnectedException if the connection that prepared the
+		/// statement has been closed or reset, even if the session has been
+		/// opened again since: the server has freed the prepared statement.
+
 private:
 	void clearResults();
+
+	[[nodiscard]] bool isValid() const;
+		/// Returns true if the connection that prepared the statement is
+		/// still open. Once it has been closed or reset, the server has
+		/// freed the prepared statement, even if the session has been
+		/// opened again since.
 
 	StatementExecutor(const StatementExecutor&) = delete;
 	StatementExecutor& operator= (const StatementExecutor&) = delete;
 
 private:
 	typedef std::vector<MetaColumn> ColVec;
+	using GenerationPtr = std::shared_ptr<const SessionHandle::Counter>;
 
 	SessionHandle& _sessionHandle;
+	GenerationPtr  _pGeneration;
+	Poco::UInt32   _generation;
 	bool           _binaryExtraction;
 	State          _state;
 	PGresult*      _pResultHandle;
@@ -111,6 +129,12 @@ private:
 inline StatementExecutor::operator PGresult* ()
 {
 	return _pResultHandle;
+}
+
+
+inline bool StatementExecutor::isValid() const
+{
+	return *_pGeneration == _generation;
 }
 
 

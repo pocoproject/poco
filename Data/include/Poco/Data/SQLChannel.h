@@ -63,8 +63,9 @@ class Data_API SQLChannel: public Poco::Channel, Poco::Runnable
 	/// before the next entry insertion with default timeout of 1 second. The default settings can be
 	/// overridden (see async, timeout and throw properties for details).
 	/// If throw property is false, insertion timeouts are ignored, otherwise a TimeoutException is thrown.
-	/// To force insertion of every entry, set timeout to 0. This setting, however, introduces
-	/// a risk of long blocking periods in case of remote server communication delays.
+	/// A timeout of 0 given to the constructor makes close() wait until the logging thread has
+	/// taken every queued entry. This, however, introduces a risk of long blocking periods in
+	/// case of remote server communication delays.
 	///
 	/// A default-constructed SQLChannel operates without an active DB connection, in a store-and-forward
 	/// mode. For this mode of operation, a separate service is required to consume and execute the SQL
@@ -118,9 +119,16 @@ public:
 	void open() override;
 		/// Opens the SQLChannel.
 		/// Returns true if succesful.
+		/// If the connection fails, the logging thread retries it with a back-off.
 
 	void close() override;
 		/// Closes the SQLChannel.
+		/// Waits up to the timeout (see the timeout property) for the logging thread to take
+		/// the queued entries; entries not yet written by then are written later, or when
+		/// the channel is stopped. A timeout of 0 given to the constructor means no limit:
+		/// close() then blocks until the logging thread has taken the queued entries, which
+		/// it does not do while the database cannot be reached. With the timeout property
+		/// set to "0" or "", close() waits at most one polling interval (about 10 ms).
 
 	void run() override;
 		/// Dequeues and sends the logs to the DB.
@@ -161,8 +169,10 @@ public:
 		///                  This property is deprecated and has no effect - all logging
 		///                  is asynchronous since the 1.13.0. release.
 		///
-		///     * timeout:   Timeout (ms) to wait for previous log operation completion.
-		///                  Values "0" and "" mean no timeout.
+		///     * timeout:   Timeout (ms) close() waits for the logging thread to take the
+		///                  queued entries. Values "0" and "" make close() wait only one
+		///                  polling interval (about 10 ms); a timeout of 0 given to the
+		///                  constructor makes close() wait without limit.
 		///
 		///     * throw:     Boolean value indicating whether to throw in case of timeout.
 		///                  Setting this property to false may result in log entries being lost.
@@ -202,10 +212,15 @@ public:
 
 	void stop();
 		/// Stops and joins the logging thread..
+		/// The thread writes the entries left to the database, or to local files if that fails.
 
 	std::size_t wait(int ms = 1000);
-		/// Waits for the completion of the previous operation and returns
-		/// the result. If chanel is in synchronous mode, returns 0 immediately.
+		/// Waits until the logging thread has taken the queued entries, and returns
+		/// the number of entries still queued. Entries taken are not necessarily
+		/// written yet (see the minBatch and flush properties).
+		/// Waits at most ms milliseconds: zero means no limit, and a negative value
+		/// ends the wait after one polling interval (about 10 ms). Returns at once
+		/// when called from the logging thread or when that thread is not running.
 
 	[[nodiscard]] size_t logged() const;
 		/// Returns the number of logged entries.

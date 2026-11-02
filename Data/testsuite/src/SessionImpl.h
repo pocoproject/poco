@@ -17,7 +17,9 @@
 #include "Poco/Data/AbstractSessionImpl.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Event.h"
 #include "Binder.h"
+#include <atomic>
 
 
 namespace Poco::Data::Test {
@@ -105,7 +107,21 @@ public:
 	void setP(const std::string& name, const Poco::Any& value);
 	Poco::Any getP(const std::string& name) const;
 
+	static void holdNextRollback();
+		/// Makes the next rollback() of a SessionImpl wait until releaseRollback() is called.
+
+	[[nodiscard]] static bool waitUntilRollbackHeld(long milliseconds);
+		/// Waits until the rollback held by holdNextRollback() waits.
+		/// Returns false if it does not within the given time.
+
+	static void releaseRollback();
+		/// Lets the held rollback go on, and cancels a hold that no rollback has reached yet.
+
 private:
+	static std::atomic<bool> _holdRollback;
+	static Poco::Event       _rollbackHeld;
+	static Poco::Event       _rollbackReleased;
+
 	bool         _f;
 	bool         _throwOnHasNext = false;
 	bool         _throwOnBegin = false;

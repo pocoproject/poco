@@ -35,7 +35,8 @@ SessionHandle::SessionHandle():
 	_pConnection(nullptr),
 	_inTransaction(false),
 	_isAsynchronousCommit(false),
-	_tranactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED)
+	_tranactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED),
+	_pGeneration(std::make_shared<Counter>(0))
 {
 }
 
@@ -76,19 +77,23 @@ void SessionHandle::connect(const std::string& aConnectionString)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
-	_inTransaction = false;
-	_preparedStatementsToBeDeallocated.clear();
-
 	if (isConnectedNoLock())
 	{
 		throw ConnectionFailedException("Already Connected");
 	}
 	else if (_pConnection)
 	{
-		// free bad connection
+		// free bad connection; its prepared statements are gone with it
+		++*_pGeneration;
 		PQfinish(_pConnection);
 		_pConnection = nullptr;
 	}
+
+	// nothing of a previous connection carries over to the new one
+	_inTransaction = false;
+	_isAsynchronousCommit = false;
+	_tranactionIsolationLevel = Session::TRANSACTION_READ_COMMITTED;
+	_preparedStatementsToBeDeallocated.clear();
 
 	_pConnection = PQconnectdb(aConnectionString.c_str());
 
@@ -151,6 +156,8 @@ void SessionHandle::disconnect()
 
 	if (_pConnection)
 	{
+		// the prepared statements of the connection are gone with it
+		++*_pGeneration;
 		PQfinish(_pConnection);
 
 		_pConnection = nullptr;
@@ -170,6 +177,8 @@ bool SessionHandle::reset()
 
 	if (_pConnection)
 	{
+		// PQreset opens a new connection, without the prepared statements of the old one
+		++*_pGeneration;
 		PQreset(_pConnection);
 	}
 
@@ -264,6 +273,14 @@ void SessionHandle::rollback()
 		throw NotConnectedException();
 	}
 
+	if (PQtransactionStatus(_pConnection) == PQTRANS_IDLE)
+	{
+		// no transaction block is open on the server, which would answer a ROLLBACK with a warning
+		_inTransaction = false;
+		deallocateStoredPreparedStatements();
+		return;
+	}
+
 	PGresult* pPQResult = PQexec(_pConnection, "ROLLBACK");
 
 	PQResultClear resultClearer(pPQResult);
@@ -303,7 +320,7 @@ void SessionHandle::setAsynchronousCommit(bool aShouldAsynchronousCommit)
 		return;
 	}
 
-	PGresult* pPQResult = PQexec(_pConnection, aShouldAsynchronousCommit ? "SET SYNCHRONOUS COMMIT TO OFF" : "SET SYNCHRONOUS COMMIT TO ON");
+	PGresult* pPQResult = PQexec(_pConnection, aShouldAsynchronousCommit ? "SET SYNCHRONOUS_COMMIT TO OFF" : "SET SYNCHRONOUS_COMMIT TO ON");
 
 	PQResultClear resultClearer(pPQResult);
 
@@ -329,7 +346,12 @@ void SessionHandle::cancel()
 
 	PGCancelFree cancelFreer(ptrPGCancel);
 
-	PQcancel(ptrPGCancel, nullptr, 0); // no error buffer
+	constexpr int CANCEL_ERROR_BUFFER_SIZE = 256;
+	char errorBuffer[CANCEL_ERROR_BUFFER_SIZE] = {0};
+	if (!PQcancel(ptrPGCancel, errorBuffer, CANCEL_ERROR_BUFFER_SIZE))
+	{
+		throw StatementException(std::string("PQcancel failed: ") + errorBuffer);
+	}
 }
 
 
@@ -435,9 +457,18 @@ void SessionHandle::deallocateStoredPreparedStatements()
 	// DO NOT ACQUIRE THE MUTEX IN PRIVATE METHODS
 	while (!_preparedStatementsToBeDeallocated.empty())
 	{
-		deallocatePreparedStatementNoLock(_preparedStatementsToBeDeallocated.back());
-
+		std::string preparedStatementName(std::move(_preparedStatementsToBeDeallocated.back()));
 		_preparedStatementsToBeDeallocated.pop_back();
+
+		try
+		{
+			deallocatePreparedStatementNoLock(preparedStatementName);
+		}
+		catch (StatementException&)
+		{
+			// the transaction has ended; as in the destructor of the statement
+			// that queued it, a failed DEALLOCATE is ignored and not retried
+		}
 	}
 }
 
@@ -519,6 +550,8 @@ int SessionHandle::libpqVersion() const
 
 SessionParametersMap SessionHandle::setConnectionInfoParameters(PQconninfoOption* pConnInfOpt)
 {
+	poco_check_ptr (pConnInfOpt);
+
 	SessionParametersMap sessionParametersMap;
 
 	while (pConnInfOpt->keyword)
@@ -561,14 +594,14 @@ SessionParametersMap SessionHandle::connectionDefaultParameters()
 
 SessionParametersMap SessionHandle::connectionParameters() const
 {
-	if (!isConnected())
-	{
-		throw NotConnectedException();
-	}
-
 	PQconninfoOption* ptrConnInfoOptions = nullptr;
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+
+		if (!isConnectedNoLock())
+		{
+			throw NotConnectedException();
+		}
 
 		ptrConnInfoOptions = PQconninfo(_pConnection);
 	}

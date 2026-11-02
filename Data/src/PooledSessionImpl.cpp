@@ -15,15 +15,28 @@
 #include "Poco/Data/PooledSessionImpl.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/SessionPool.h"
+#include "Poco/ErrorHandler.h"
 
 
 namespace Poco::Data {
 
 
+namespace {
+	// Returns the session of the holder; checks the holder first,
+	// as the base class is initialized from it.
+	[[nodiscard]] SessionImpl& holderSession(PooledSessionHolder* pHolder)
+	{
+		poco_check_ptr (pHolder);
+		return *pHolder->session();
+	}
+} // namespace
+
+
 PooledSessionImpl::PooledSessionImpl(PooledSessionHolder* pHolder):
-	SessionImpl(pHolder->session()->connectionString(),
-		pHolder->session()->getLoginTimeout()),
-	_pHolder(pHolder, true)
+	SessionImpl(holderSession(pHolder).connectionString(),
+		holderSession(pHolder).getLoginTimeout()),
+	_pHolder(pHolder, true),
+	_pSessionImpl(pHolder->session(), true)
 {
 }
 
@@ -61,7 +74,8 @@ void PooledSessionImpl::commit()
 
 bool PooledSessionImpl::isConnected() const
 {
-	return access()->isConnected();
+	const SessionImpl::Ptr pImpl = heldSession();
+	return pImpl != nullptr && pImpl->isConnected();
 }
 
 
@@ -91,7 +105,8 @@ bool PooledSessionImpl::canTransact() const
 
 bool PooledSessionImpl::isTransaction() const
 {
-	return access()->isTransaction();
+	const SessionImpl::Ptr pImpl = heldSession();
+	return pImpl != nullptr && pImpl->isTransaction();
 }
 
 
@@ -133,23 +148,56 @@ void PooledSessionImpl::open(const std::string& connect)
 
 void PooledSessionImpl::close()
 {
-	if (_pHolder)
+	Poco::AutoPtr<PooledSessionHolder> pHolder;
 	{
-		if (isTransaction())
-		{
-			try
-			{
-				rollback();
-			}
-			catch (...)
-			{
-				// Something's wrong with the session. Get rid of it.
-				access()->close();
-			}
-		}
-		_pHolder->owner().putBack(_pHolder);
-		_pHolder = nullptr;
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		pHolder.swap(_pHolder);
 	}
+	if (pHolder == nullptr) return;
+
+	SessionImpl* pImpl = pHolder->session();
+	bool discard = false;
+	try
+	{
+		// roll back an open transaction and, in manual-commit mode, work done outside
+		// a transaction begun through the session: the pool switches auto-commit back on,
+		// which would commit it, and the next user of the session must not inherit it
+		if (pImpl->isConnected() && (pImpl->isTransaction() ||
+			(pImpl->hasFeature("autoCommit") && !pImpl->getFeature("autoCommit"))))
+		{
+			pImpl->rollback();
+		}
+	}
+	catch (Poco::Exception& exc)
+	{
+		// something is wrong with the session: get rid of it
+		discard = true;
+		Poco::ErrorHandler::handle(exc);
+	}
+	catch (std::exception& exc)
+	{
+		discard = true;
+		Poco::ErrorHandler::handle(exc);
+	}
+	catch (...)
+	{
+		discard = true;
+		Poco::ErrorHandler::handle();
+	}
+
+	// An orphaned session is not returned: its pool has been shut down and may be gone.
+	bool orphaned = pHolder->isOrphaned();
+	if (discard || orphaned)
+	{
+		try
+		{
+			pImpl->close();
+		}
+		catch (...)
+		{
+		}
+	}
+	if (!orphaned) pHolder->owner().putBack(pHolder);
 }
 
 
@@ -201,14 +249,27 @@ Poco::Any PooledSessionImpl::getProperty(const std::string& name) const
 }
 
 
-SessionImpl* PooledSessionImpl::access() const
+SessionImpl::Ptr PooledSessionImpl::access() const
 {
-	if (_pHolder)
-	{
-		_pHolder->access();
-		return impl();
-	}
-	else throw SessionUnavailableException();
+	if (SessionImpl::Ptr pImpl = heldSession(); pImpl != nullptr) return pImpl;
+	throw SessionUnavailableException();
+}
+
+
+Poco::AutoPtr<PooledSessionHolder> PooledSessionImpl::holder() const
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+	return _pHolder;
+}
+
+
+SessionImpl::Ptr PooledSessionImpl::heldSession() const
+{
+	Poco::AutoPtr<PooledSessionHolder> pHolder = holder();
+	if (pHolder == nullptr) return nullptr;
+
+	pHolder->access();
+	return SessionImpl::Ptr(pHolder->session(), true);
 }
 
 

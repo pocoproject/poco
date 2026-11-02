@@ -51,7 +51,13 @@ void ArchiveStrategy::open()
 	if (_connector.empty() || _connect.empty())
 		throw IllegalStateException("Connector and connect string must be non-empty.");
 
-	_pSession = new Session(_connector, _connect);
+	SessionPtr pSession = new Session(_connector, _connect);
+	// The statements refer to the session they were created on;
+	// release them while that session is still alive.
+	_pCopyStatement = nullptr;
+	_pDeleteStatement = nullptr;
+	_pCountStatement = nullptr;
+	_pSession = pSession;
 }
 
 
@@ -80,6 +86,7 @@ ArchiveByAgeStrategy::~ArchiveByAgeStrategy()
 void ArchiveByAgeStrategy::archive()
 {
 	if (!session().isConnected()) open();
+	if (!hasStatements()) initStatements();
 
 	DateTime now;
 	_archiveDateTime = now - _maxAge;

@@ -141,6 +141,9 @@ class SQLite_API MemoryDB
 	///     external-content FTS5 tables are not supported. A directory that uses a
 	///     module can only be reopened by builds providing it. Requires SQLite >= 3.37
 	///     (PRAGMA table_list, enforced at compile time).
+	///   * session() must stay open: the change hooks are on its connection. Once it is
+	///     closed or reconnected, the functions that need that connection throw
+	///     Poco::IllegalStateException, and the destructor skips the final flush.
 {
 public:
 	struct Options
@@ -218,6 +221,7 @@ public:
 	~MemoryDB();
 		/// Stops the flush timer, performs a final flush if there are unpersisted changes,
 		/// and closes the database.
+		/// Skips the final flush if session() lost its connection (see session()).
 
 	MemoryDB(const MemoryDB&) = delete;
 	MemoryDB& operator = (const MemoryDB&) = delete;
@@ -230,8 +234,10 @@ public:
 		/// collides with a virtual table's shadow-table namespace ("<vtabname>_..."), are
 		/// rejected up front (the in-memory DB is left untouched, so this instance stays
 		/// usable).
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 	{
 		throwIfRejected();
+		checkSession();
 		if constexpr (std::is_convertible_v<const T&, std::string_view>)
 			checkStatementAllowed(std::string_view(t));
 		return _session << t;
@@ -240,6 +246,8 @@ public:
 	Session& session();
 		/// Returns the underlying in-memory Session, for APIs that require a Session&
 		/// (e.g. Poco::Data::Transaction, RecordSet).
+		/// Do not close or reconnect it: the change hooks are on its connection
+		/// (see the Limitations in the class documentation).
 
 	operator Session& ();
 		/// Implicit conversion to the underlying in-memory Session.
@@ -269,6 +277,7 @@ public:
 		///
 		/// The skip-on-busy semantic avoids cascading waits on _flushMutex when many
 		/// threads attempt to flush in parallel.
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	void sealActive();
 		/// Forces the active shard to be sealed at the next flush, starting a new active shard.
@@ -344,6 +353,7 @@ public:
 		/// reference count and detaches the shard. Subsequent "SELECT FROM arc_N.t"
 		/// from this thread will fail with "no such table" / "no such database". Be
 		/// prepared to catch and retry, or hold deleteShard back yourself.
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	void detachArchived(Poco::UInt32 shardId);
 		/// Detaches a previously attached sealed shard. Thread-safe (see attachArchived).
@@ -354,11 +364,13 @@ public:
 		/// physical DETACH is deferred: the call returns normally and a later
 		/// attach/detach, deleteShard(), detachAllArchived(), or destruction
 		/// completes it.
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	void attachAllArchived();
 		/// Attaches every sealed shard read-only that is not already attached. Convenient
 		/// when history queries become needed in a session; sealed shards remain on disk
 		/// and are demand-paged by SQLite. Thread-safe (see attachArchived).
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	void deleteShard(Poco::UInt32 shardId);
 		/// Permanently removes the given sealed shard from the catalog and deletes its
@@ -382,6 +394,7 @@ public:
 		/// crash-safe: the manifest transaction commits before the file is unlinked,
 		/// so a crash in the window leaves an orphan file that cleanOrphans() removes
 		/// on the next open. Thread-safe (serializes via the internal flush mutex).
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	std::size_t enforceRetention();
 		/// Applies the Options-driven retention policy (retentionMaxAge, retentionMaxBytes)
@@ -394,17 +407,20 @@ public:
 		/// cap and the four ways to avoid the auto-drop. Thread-safe (serializes via
 		/// the internal flush mutex; can transiently force-detach attached shards -
 		/// see attachArchived's force-detach hazard).
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	std::size_t dropOlderThan(const Poco::Timestamp& cutoff);
 		/// Drops every sealed shard whose sealedAt is strictly before cutoff. Returns the
 		/// number of shards dropped; a shard kept because session() is busy is skipped
 		/// as in enforceRetention(). Thread-safe (see enforceRetention).
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	std::size_t dropToFit(Poco::UInt64 maxTotalBytes);
 		/// Drops oldest sealed shards until the sum of all shard files' bytes is at most
 		/// maxTotalBytes, or no more sealed shards remain. Returns the number dropped; a
 		/// shard kept because session() is busy is skipped as in enforceRetention().
 		/// Thread-safe (see enforceRetention).
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	std::string historyView(const std::string& table);
 		/// Creates (or refreshes) a read-only TEMP VIEW spanning the in-memory base table
@@ -420,6 +436,7 @@ public:
 		/// the call site uniform across modes. For a virtual table the view always
 		/// aliases only the base table: virtual tables live whole in the active shard,
 		/// so copies in archived shard files are stale. Thread-safe (see attachArchived).
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	std::string historyView(const std::string& table,
 		const Poco::Timestamp& from, const Poco::Timestamp& to);
@@ -446,11 +463,14 @@ public:
 		/// connection serialize behind it for the duration. For wide ranges, prefer
 		/// fewer history-view rebuilds (cache the view name and re-query it) over
 		/// frequent calls with overlapping ranges.
+		///
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 	void detachAllArchived();
 		/// Detaches every sealed shard currently attached read-only. Useful after a
 		/// burst of history queries to release the per-shard SQLite page caches.
 		/// Thread-safe (see attachArchived).
+		/// Throws Poco::IllegalStateException if session() lost its connection (see session()).
 
 private:
 	static constexpr int BUSY_RETRY_ATTEMPTS = 10; // a busy session() or alias is tried this often, 1 ms apart
@@ -614,6 +634,9 @@ private:
 		// deleteShard() on each id, skipping the ones it has to keep; returns the
 		// number dropped; caller holds _flushMutex
 	void throwIfRejected() const;
+	void checkSession() const;
+		// throws Poco::IllegalStateException once the connection the hooks are on is
+		// closed (session() closed or reconnected): _memHandle may be freed then
 	std::string shardPath(Poco::UInt32 id, const Poco::Timestamp& createdAt) const;
 	void cleanOrphans();
 
@@ -640,6 +663,8 @@ private:
 	// Session would build that Session against an unregistered connector and, on
 	// teardown, release the registration while a Session still lives.
 	ConnectorRegistration      _connectorReg;
+	std::atomic<bool>          _memClosed{false}; // set by traceCallback when _memHandle closes;
+	                                              // declared before _session, whose close sets it
 	Session                    _session;      // user-facing in-memory connection
 	Session                    _persist;      // second connection to the same in-memory db (flush/IO)
 	Session                    _catalog;      // on-disk manifest.db

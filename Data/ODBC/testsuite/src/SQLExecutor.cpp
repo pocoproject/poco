@@ -46,6 +46,7 @@
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
+#include "Poco/Data/ODBC/SessionImpl.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/UTFString.h"
 #include <sqltypes.h>
@@ -1040,6 +1041,219 @@ void SQLExecutor::session(const std::string& connectString, int timeout)
 	assertTrue (s.isConnected());
 	s.reconnect();
 	assertTrue (s.isConnected());
+}
+
+
+void SQLExecutor::closedSession(const std::string& connectString, int timeout)
+{
+	Poco::Data::Session s(Poco::Data::ODBC::Connector::KEY, connectString, timeout);
+	assertTrue (s.isConnected());
+
+	auto* pImpl = dynamic_cast<Poco::Data::ODBC::SessionImpl*>(s.impl());
+	assertNotNullPtr (pImpl);
+	assertTrue (!Utility::driverName(pImpl->dbc()).empty());
+
+	int count = -1;
+	if (s.canTransact())
+	{
+		// close() rolls an open transaction back, it does not commit it
+		s.begin();
+		s << "INSERT INTO Person VALUES ('LN', 'FN', 'ADDR', 1)", now;
+		assertTrue (s.isTransaction());
+		s.close();
+		assertTrue (!s.isTransaction());
+		session() << "SELECT COUNT(*) FROM Person", into(count), now;
+		assertTrue (0 == count);
+		s.open();
+		assertTrue (!s.isTransaction());
+	}
+
+	// statements that have run before the connection is closed
+	Statement insert = (s << "INSERT INTO Person VALUES ('LN', 'FN', 'ADDR', 1)", now);
+	Statement select = (s << "SELECT * FROM Person", now);
+
+	// a statement cannot be used once the connection it was created on is closed;
+	// SQLDisconnect frees its handle, so destroying it must not free the handle again
+	Statement stmt = (s << "SELECT COUNT(*) FROM Person", into(count));
+	s.close();
+	assertTrue (!s.isConnected());
+
+	try
+	{
+		stmt.execute();
+		fail ("must fail");
+	}
+	catch (NotConnectedException&) { }
+
+	// once the connection is closed, a statement reports the columns known by then,
+	// without asking the freed handle; a statement without columns has none
+	try
+	{
+		static_cast<void>(RecordSet(insert).columnType("LastName"));
+		fail ("must fail");
+	}
+	catch (NotFoundException&) { }
+
+	RecordSet rs(select);
+	assertTrue (rs.columnType("LastName") == rs.columnType(0));
+	assertTrue (rs.value("LastName", 0) == "LN");
+
+	Poco::Any handle = s.getProperty("handle");
+	assertTrue (typeid(SQLHDBC) == handle.type());
+	assertTrue (POCO_ODBC_NULL_HDBC == Poco::AnyCast<SQLHDBC>(handle));
+
+	try
+	{
+		s.setTransactionIsolation(Session::TRANSACTION_READ_COMMITTED);
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	try
+	{
+		static_cast<void>(s.getTransactionIsolation());
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	try
+	{
+		static_cast<void>(s.hasTransactionIsolation(Session::TRANSACTION_READ_COMMITTED));
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	try
+	{
+		static_cast<void>(s.isTransactionIsolation(Session::TRANSACTION_READ_COMMITTED));
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	// autoCommit reads false on a closed session, so setting it to false does nothing
+	s.setFeature("autoCommit", false);
+	try
+	{
+		s.setFeature("autoCommit", true);
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+#ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+	try
+	{
+		s.setFeature("multiActiveResultset", true);
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	try
+	{
+		static_cast<void>(s.getFeature("multiActiveResultset"));
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+#endif
+
+	try
+	{
+		pImpl->begin();
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+	assertTrue (!s.isTransaction());
+
+	try
+	{
+		pImpl->commit();
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	try
+	{
+		pImpl->rollback();
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	try
+	{
+		static_cast<void>(pImpl->maxStatementLength());
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	try
+	{
+		static_cast<void>(Utility::dbmsName(pImpl->dbc()));
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	try
+	{
+		pImpl->setCursorUse("", Poco::Data::ODBC::SessionImpl::ODBC_CURSOR_USE_IF_NEEDED);
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	try
+	{
+		static_cast<void>(pImpl->getCursorUse(""));
+		fail ("must fail");
+	}
+	catch (Poco::NullPointerException&) { }
+
+	s.open();
+	assertTrue (s.isConnected());
+	try
+	{
+		stmt.execute();
+		fail ("must fail");
+	}
+	catch (NotConnectedException&) { }
+}
+
+
+void SQLExecutor::exceptionCopy()
+{
+	try
+	{
+		session() << "SELECT * FROM NoSuchTable", now;
+		fail ("must fail");
+	}
+	catch (StatementException& ex)
+	{
+		// the statement and its handle are gone by now; a copy must keep
+		// the diagnostic records instead of querying the handle again
+		int count = ex.diagnostics().count();
+		assertTrue (count > 0);
+
+		StatementException copy(ex);
+		assertTrue (copy.diagnostics().count() == count);
+		assertTrue (copy.diagnostics().sqlState(0) == ex.diagnostics().sqlState(0));
+		assertTrue (copy.diagnostics().message(0) == ex.diagnostics().message(0));
+
+		copy = ex;
+		assertTrue (copy.diagnostics().count() == count);
+	}
+}
+
+
+void SQLExecutor::recordSetBeforeExecute()
+{
+	Statement stmt = (session() << "SELECT * FROM Person");
+	RecordSet rs(stmt);
+	try
+	{
+		static_cast<void>(rs.columnType("LastName"));
+		fail ("must fail");
+	}
+	catch (NotFoundException&) { }
+
+	stmt.execute();
+	assertTrue (rs.columnType("LastName") == rs.columnType(0));
 }
 
 

@@ -20,6 +20,7 @@
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTime.h"
 #include "Poco/UTFString.h"
+#include <memory>
 
 
 using namespace Poco::Data::Keywords;
@@ -70,7 +71,7 @@ RecordSet::RecordSet(const RecordSet& other):
 RecordSet::RecordSet(RecordSet&& other) noexcept:
 	Statement(std::move(other)),
 	_currentRow(other._currentRow),
-	_pBegin(new RowIterator(this, 0 == rowsExtracted())),
+	_pBegin(new RowIterator(this, impl() == nullptr || 0 == rowsExtracted())),
 	_pEnd(new RowIterator(this, true)),
 	_rowMap(std::move(other._rowMap)),
 	_pFilter(other._pFilter),
@@ -84,6 +85,7 @@ RecordSet::RecordSet(RecordSet&& other) noexcept:
 	other._rowMap.clear();
 	other._pFilter.reset();
 	other._totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
+	if (_pFilter != nullptr && _pFilter->_pRecordSet == &other) _pFilter->setRecordSet(this);
 }
 
 
@@ -91,6 +93,7 @@ RecordSet::~RecordSet()
 {
 	try
 	{
+		if (_pFilter != nullptr && _pFilter->_pRecordSet == this) _pFilter->setRecordSet(nullptr);
 		delete _pBegin;
 		delete _pEnd;
 	}
@@ -103,19 +106,25 @@ RecordSet::~RecordSet()
 
 RecordSet& RecordSet::operator = (RecordSet&& other) noexcept
 {
+	if (this == &other) return *this;
+
 	Statement::operator = (std::move(other));
 	_currentRow = std::move(other._currentRow);
 	other._currentRow = 0;
-	_pBegin = new RowIterator(this, 0 == rowsExtracted());
+	delete _pBegin;
+	_pBegin = new RowIterator(this, impl() == nullptr || 0 == rowsExtracted());
 	delete other._pBegin;
 	other._pBegin = nullptr;
+	delete _pEnd;
 	_pEnd = new RowIterator(this, true);
 	delete other._pEnd;
 	other._pEnd = nullptr;
 	_rowMap = std::move(other._rowMap);
 	other._rowMap.clear();
+	if (_pFilter != nullptr && _pFilter != other._pFilter && _pFilter->_pRecordSet == this) _pFilter->setRecordSet(nullptr);
 	_pFilter = std::move(other._pFilter);
 	other._pFilter.reset();
+	if (_pFilter != nullptr && _pFilter->_pRecordSet == &other) _pFilter->setRecordSet(this);
 	_totalRowCount = std::move(other._totalRowCount);
 	other._totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
 
@@ -125,19 +134,19 @@ RecordSet& RecordSet::operator = (RecordSet&& other) noexcept
 
 void RecordSet::reset(const Statement& stmt)
 {
+	bool empty = (0 == stmt.rowsExtracted());
+	auto pBegin = std::make_unique<RowIterator>(this, empty);
+	auto pEnd = std::make_unique<RowIterator>(this, true);
+	Statement::operator = (stmt);
+
 	delete _pBegin;
-	_pBegin = nullptr;
+	_pBegin = pBegin.release();
 	delete _pEnd;
-	_pEnd = nullptr;
+	_pEnd = pEnd.release();
 	_currentRow = 0;
 	_totalRowCount = UNKNOWN_TOTAL_ROW_COUNT;
 
 	_rowMap.clear();
-
-	Statement::operator = (stmt);
-
-	_pBegin = new RowIterator(this, 0 == rowsExtracted());
-	_pEnd = new RowIterator(this, true);
 }
 
 
@@ -529,7 +538,7 @@ std::size_t RecordSet::affectedRowCount() const
 bool RecordSet::isAllowed(std::size_t row) const
 {
 	if (!isFiltered()) return true;
-	return _pFilter->isAllowed(row);
+	return _pFilter->isAllowed(row, *this);
 }
 
 
@@ -621,6 +630,7 @@ void RecordSet::setRowFormatter(RowFormatter::Ptr pRowFormatter)
 
 std::ostream& RecordSet::copyNames(std::ostream& os) const
 {
+	poco_check_ptr (_pBegin);
 	std::string names = (*_pBegin)->namesToString();
 	if (!names.empty()) os << names;
 	return os;
@@ -629,6 +639,8 @@ std::ostream& RecordSet::copyNames(std::ostream& os) const
 
 std::ostream& RecordSet::copyValues(std::ostream& os, std::size_t offset, std::size_t length) const
 {
+	poco_check_ptr (_pBegin);
+	poco_check_ptr (_pEnd);
 	RowIterator it = *_pBegin + offset;
 	RowIterator end = (RowIterator::POSITION_END != length) ? it + length : *_pEnd;
 	std::copy(it, end, std::ostream_iterator<Row>(os));
@@ -638,6 +650,8 @@ std::ostream& RecordSet::copyValues(std::ostream& os, std::size_t offset, std::s
 
 void RecordSet::formatValues(std::size_t offset, std::size_t length) const
 {
+	poco_check_ptr (_pBegin);
+	poco_check_ptr (_pEnd);
 	RowIterator it = *_pBegin + offset;
 	RowIterator end = (RowIterator::POSITION_END != length) ? it + length : *_pEnd;
 	std::string val;
@@ -647,6 +661,7 @@ void RecordSet::formatValues(std::size_t offset, std::size_t length) const
 
 std::ostream& RecordSet::copy(std::ostream& os, std::size_t offset, std::size_t length) const
 {
+	poco_check_ptr (_pBegin);
 	RowFormatter& rf = const_cast<RowFormatter&>((*_pBegin)->getFormatter());
 	rf.setTotalRowCount(static_cast<int>(getTotalRowCount()));
 	if (RowFormatter::FORMAT_PROGRESSIVE == rf.getMode())
@@ -669,6 +684,8 @@ std::ostream& RecordSet::copy(std::ostream& os, std::size_t offset, std::size_t 
 
 void RecordSet::filter(const Poco::AutoPtr<RowFilter>& pFilter)
 {
+	if (_pFilter != nullptr && _pFilter != pFilter && _pFilter->_pRecordSet == this)
+		_pFilter->setRecordSet(nullptr);
 	_pFilter = pFilter;
 }
 

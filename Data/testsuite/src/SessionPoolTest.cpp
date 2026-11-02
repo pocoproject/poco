@@ -13,23 +13,267 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/SessionPool.h"
 #include "Poco/Data/SessionPoolContainer.h"
+#include "Poco/Data/Transaction.h"
 #include "Poco/Thread.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/Event.h"
 #include "Connector.h"
+#include "SessionImpl.h"
+#include <array>
+#include <atomic>
+#include <chrono>
+#include <functional>
+#include <memory>
+#include <vector>
 
 
 using namespace Poco::Data::Keywords;
 using Poco::Thread;
 using Poco::AutoPtr;
+using Poco::ErrorHandler;
 using Poco::NotFoundException;
 using Poco::InvalidAccessException;
+using Poco::InvalidArgumentException;
+using Poco::NullPointerException;
+using Poco::Data::NotConnectedException;
+using Poco::Data::PooledSessionImpl;
 using Poco::Data::Session;
+using Poco::Data::SessionImpl;
 using Poco::Data::SessionPool;
 using Poco::Data::SessionPoolContainer;
 using Poco::Data::SessionPoolExhaustedException;
 using Poco::Data::SessionPoolExistsException;
 using Poco::Data::SessionUnavailableException;
+using Poco::Data::Statement;
+using Poco::Data::Transaction;
+
+
+namespace
+{
+	class MovingSessionPool: public SessionPool
+		/// A SessionPool whose customizeSession() moves from the
+		/// session it is given, leaving it without an implementation.
+	{
+	public:
+		MovingSessionPool(const std::string& connector, const std::string& connectionString):
+			SessionPool(connector, connectionString)
+		{
+		}
+
+	protected:
+		void customizeSession(Session& session) override
+		{
+			Session moved(std::move(session));
+		}
+	};
+
+
+	class BlockingSessionPool: public SessionPool
+		/// A SessionPool whose customizeSession() waits until unblock() is called,
+		/// so that a test can keep a call of get() in progress.
+	{
+	public:
+		BlockingSessionPool(const std::string& connector, const std::string& connectionString):
+			SessionPool(connector, connectionString)
+		{
+		}
+
+		[[nodiscard]] bool waitUntilBlocked(long milliseconds)
+			/// Waits until a call of get() waits in customizeSession().
+			/// Returns false if none does within the given time.
+		{
+			return _blocked.tryWait(milliseconds);
+		}
+
+		void unblock()
+			/// Lets the waiting call of get() go on; later calls do not wait.
+		{
+			_released.set();
+		}
+
+	protected:
+		void customizeSession(Session&) override
+		{
+			_blocked.set();
+			_released.wait();
+		}
+
+	private:
+		Poco::Event _blocked;
+		Poco::Event _released{Poco::Event::EVENT_MANUALRESET};
+	};
+
+
+	class RecordingSessionPool: public SessionPool
+		/// A SessionPool that keeps a reference to each session it creates,
+		/// so that a test can look at a session the pool has let go of.
+	{
+	public:
+		RecordingSessionPool(const std::string& connector, const std::string& connectionString):
+			SessionPool(connector, connectionString)
+		{
+		}
+
+		[[nodiscard]] AutoPtr<SessionImpl> created(std::size_t index) const
+			/// Returns the session created as the index-th one.
+		{
+			return _created.at(index);
+		}
+
+	protected:
+		void customizeSession(Session& session) override
+		{
+			_created.push_back(AutoPtr<SessionImpl>(session.impl(), true));
+		}
+
+	private:
+		std::vector<AutoPtr<SessionImpl>> _created;
+	};
+
+
+	class StaleSessionImpl: public Poco::Data::Test::SessionImpl
+		/// A test session that can be made stale: not good,
+		/// while it stays connected.
+	{
+	public:
+		StaleSessionImpl() = delete;
+
+		explicit StaleSessionImpl(const std::string& connectionString);
+			/// Creates the StaleSessionImpl, connected and good.
+
+		~StaleSessionImpl() override = default;
+			/// Destroys the StaleSessionImpl.
+
+		StaleSessionImpl(const StaleSessionImpl&) = delete;
+		StaleSessionImpl(StaleSessionImpl&&) = delete;
+		StaleSessionImpl& operator = (const StaleSessionImpl&) = delete;
+		StaleSessionImpl& operator = (StaleSessionImpl&&) = delete;
+
+		[[nodiscard]] bool isGood() const override;
+			/// Returns false once makeStale() has been called.
+
+		void makeStale();
+			/// Makes the session not good; it stays connected.
+
+	private:
+		std::atomic<bool> _stale{false};
+	};
+
+
+	StaleSessionImpl::StaleSessionImpl(const std::string& connectionString):
+		Poco::Data::Test::SessionImpl(connectionString)
+	{
+	}
+
+
+	bool StaleSessionImpl::isGood() const
+	{
+		return !_stale && Poco::Data::Test::SessionImpl::isGood();
+	}
+
+
+	void StaleSessionImpl::makeStale()
+	{
+		_stale = true;
+	}
+
+
+	class StaleSessionPool: public RecordingSessionPool
+		/// A RecordingSessionPool whose sessions can be made stale.
+	{
+	public:
+		StaleSessionPool(const std::string& connector, const std::string& connectionString);
+			/// Creates the StaleSessionPool.
+
+		[[nodiscard]] AutoPtr<StaleSessionImpl> created(std::size_t index) const;
+			/// Returns the session created as the index-th one.
+
+	protected:
+		void customizeSession(Session& session) override;
+			/// Replaces the session the connector created with a StaleSessionImpl.
+	};
+
+
+	StaleSessionPool::StaleSessionPool(const std::string& connector, const std::string& connectionString):
+		RecordingSessionPool(connector, connectionString)
+	{
+	}
+
+
+	AutoPtr<StaleSessionImpl> StaleSessionPool::created(std::size_t index) const
+	{
+		return RecordingSessionPool::created(index).cast<StaleSessionImpl>();
+	}
+
+
+	void StaleSessionPool::customizeSession(Session& session)
+	{
+		session = Session(AutoPtr<SessionImpl>(new StaleSessionImpl(session.impl()->connectionString())));
+		RecordingSessionPool::customizeSession(session);
+	}
+
+
+	class CountingErrorHandler: public ErrorHandler
+		/// Counts the exceptions reported to it.
+	{
+	public:
+		void exception(const Poco::Exception&) override
+		{
+			++_reports;
+		}
+
+		void exception(const std::exception&) override
+		{
+			++_reports;
+		}
+
+		void exception() override
+		{
+			++_reports;
+		}
+
+		[[nodiscard]] int reports() const
+		{
+			return _reports;
+		}
+
+	private:
+		std::atomic<int> _reports{0};
+	};
+
+
+	class ErrorHandlerGuard
+		/// Installs an ErrorHandler for the time of a test.
+	{
+	public:
+		POCO_NODISCARD_CTOR explicit ErrorHandlerGuard(ErrorHandler& handler):
+			_pPrevious(ErrorHandler::set(&handler))
+		{
+		}
+
+		~ErrorHandlerGuard()
+		{
+			try
+			{
+				ErrorHandler::set(_pPrevious);
+			}
+			catch (...)
+			{
+				poco_unexpected();
+			}
+		}
+
+		ErrorHandlerGuard(const ErrorHandlerGuard&) = delete;
+		ErrorHandlerGuard(ErrorHandlerGuard&&) = delete;
+		ErrorHandlerGuard& operator = (const ErrorHandlerGuard&) = delete;
+		ErrorHandlerGuard& operator = (ErrorHandlerGuard&&) = delete;
+
+	private:
+		ErrorHandler* _pPrevious;
+	};
+}
 
 
 SessionPoolTest::SessionPoolTest(const std::string& name): CppUnit::TestCase(name)
@@ -263,6 +507,424 @@ void SessionPoolTest::testSessionPoolContainer()
 }
 
 
+void SessionPoolTest::testSessionPoolMovedFromSession()
+{
+	MovingSessionPool pool("test", "cs");
+
+	try
+	{
+		Session s(pool.get());
+		fail("customized session has no implementation - must throw");
+	}
+	catch (NullPointerException&) { }
+
+	assertTrue (pool.allocated() == 0);
+	assertTrue (pool.idle() == 0);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.available() == pool.capacity());
+}
+
+
+void SessionPoolTest::testSessionPoolShutdown()
+{
+	RecordingSessionPool pool("test", "cs");
+	Session s1(pool.get());
+	Session s2(pool.get());
+	AutoPtr<SessionImpl> pInUse = pool.created(0);
+	AutoPtr<SessionImpl> pIdle = pool.created(1);
+	s2.close();
+	assertTrue (pool.used() == 1);
+	assertTrue (pool.idle() == 1);
+
+	pool.shutdown();
+	assertTrue (pool.allocated() == 0);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.idle() == 0);
+	assertTrue (!pIdle->isConnected());
+
+	// a session still in use stays usable until it is released
+	assertTrue (pInUse->isConnected());
+	assertTrue (s1.isConnected());
+	s1 << "DROP TABLE IF EXISTS Test", now;
+
+	// once released, it is closed instead of being returned to the pool
+	s1.close();
+	assertTrue (!pInUse->isConnected());
+	assertTrue (pool.allocated() == 0);
+	assertTrue (pool.idle() == 0);
+}
+
+
+void SessionPoolTest::testSessionPoolDestroyed()
+{
+	AutoPtr<RecordingSessionPool> pPool = new RecordingSessionPool("test", "cs");
+	Session s(pPool->get());
+	AutoPtr<SessionImpl> pImpl = pPool->created(0);
+
+	// the pool goes away while the session is still in use
+	pPool.reset();
+	assertTrue (pImpl->isConnected());
+	assertTrue (s.isConnected());
+
+	// releasing the session must not touch the destroyed pool
+	s.close();
+	assertTrue (!pImpl->isConnected());
+	assertTrue (!s.isTransaction());
+}
+
+
+void SessionPoolTest::testSessionPoolPutBackFailure()
+{
+	RecordingSessionPool pool("test", "cs");
+	pool.setFeature("emptyStringIsNull", true);
+	Session s(pool.get());
+	AutoPtr<SessionImpl> pImpl = pool.created(0);
+
+	// with forceEmptyString on, the pool can not re-apply emptyStringIsNull
+	s.setFeature("emptyStringIsNull", false);
+	s.setFeature("forceEmptyString", true);
+
+	CountingErrorHandler errorHandler;
+	{
+		ErrorHandlerGuard guard(errorHandler);
+		s.close();
+	}
+
+	// the session is discarded and the error reported, not thrown
+	assertTrue (errorHandler.reports() == 1);
+	assertTrue (!pImpl->isConnected());
+	assertTrue (pool.allocated() == 0);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.idle() == 0);
+}
+
+
+void SessionPoolTest::testSessionPoolSettingsRestored()
+{
+	SessionPool pool("test", "cs", 1, 1);
+	{
+		Session s(pool.get("f1", true));
+		assertTrue (s.getFeature("f1"));
+	}
+	{
+		Session s(pool.get("p3", 2));
+		assertTrue (2 == Poco::AnyCast<int>(s.getProperty("p3")));
+	}
+	{
+		Session s(pool.get());
+		assertTrue (s.getFeature("autoCommit"));
+		s.setFeature("autoCommit", false);
+	}
+
+	// the session comes back from the pool as the pool created it
+	Session s(pool.get());
+	assertTrue (!s.getFeature("f1"));
+	assertTrue (s.getProperty("p3").empty());
+	assertTrue (s.getFeature("autoCommit"));
+}
+
+
+void SessionPoolTest::testSessionPoolTransaction()
+{
+	SessionPool pool("test", "cs", 1, 1);
+	{
+		Session s(pool.get());
+		Transaction trans(s);
+		assertTrue (s.isTransaction());
+		assertTrue (!s.getFeature("autoCommit"));
+
+		// returning the session to the pool rolls the transaction back,
+		// and the Transaction finds the session not connected
+		s.close();
+		assertTrue (!s.isConnected());
+		assertTrue (!s.isTransaction());
+		assertTrue (!trans.isActive());
+
+		// using the returned session throws
+		try { s.begin(); fail ("must fail"); }
+		catch (SessionUnavailableException&) { }
+		try { Poco::Data::Statement stmt = (s << "SELECT 1"); fail ("must fail"); }
+		catch (SessionUnavailableException&) { }
+	}
+
+	// a transactor that returns the session and fails: its exception reaches the caller
+	{
+		Session s(pool.get());
+		auto transactor = [](Session& session)
+		{
+			session.close();
+			throw InvalidArgumentException("transactor failed");
+		};
+		try
+		{
+			Transaction trans(s, transactor);
+			fail("transactor failed - must throw");
+		}
+		catch (InvalidArgumentException&) { }
+		assertTrue (!s.isConnected());
+	}
+
+	// the next user gets the session in auto-commit mode
+	Session s(pool.get());
+	assertTrue (!s.isTransaction());
+	assertTrue (s.getFeature("autoCommit"));
+}
+
+
+void SessionPoolTest::testSessionPoolManualCommit()
+{
+	RecordingSessionPool pool("test", "cs");
+	CountingErrorHandler errorHandler;
+
+	// a session left in manual-commit mode, with no transaction begun
+	// through it, is rolled back and kept by the pool
+	Session s1(pool.get());
+	s1.setFeature("autoCommit", false);
+	assertTrue (!s1.isTransaction());
+	{
+		ErrorHandlerGuard guard(errorHandler);
+		s1.close();
+	}
+	assertTrue (errorHandler.reports() == 0);
+	assertTrue (pool.idle() == 1);
+
+	// the rollback comes before the pool switches auto-commit back on,
+	// here by reverting get(name, value): a failing rollback shows it,
+	// as the session is then discarded and the error reported
+	Session s2(pool.get("autoCommit", false));
+	assertTrue (!s2.isTransaction());
+	s2.setFeature("throwOnRollback", true);
+	{
+		ErrorHandlerGuard guard(errorHandler);
+		s2.close();
+	}
+	assertTrue (errorHandler.reports() == 1);
+	assertTrue (!pool.created(0)->isConnected());
+	assertTrue (pool.allocated() == 0);
+
+	// and here by restoring the auto-commit mode the session was created with
+	Session s3(pool.get());
+	s3.setFeature("autoCommit", false);
+	s3.setFeature("throwOnRollback", true);
+	{
+		ErrorHandlerGuard guard(errorHandler);
+		s3.close();
+	}
+	assertTrue (errorHandler.reports() == 2);
+	assertTrue (!pool.created(1)->isConnected());
+	assertTrue (pool.allocated() == 0);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.idle() == 0);
+}
+
+
+void SessionPoolTest::testSessionPoolRollbackUnlocked()
+{
+	using TestSessionImpl = Poco::Data::Test::SessionImpl;
+
+	SessionPool pool("test", "cs", 1, 2);
+	Session s(pool.get("autoCommit", false));
+
+	// returning a session in manual-commit mode rolls it back; the pool stays
+	// usable meanwhile, so a second session can be taken
+	TestSessionImpl::holdNextRollback();
+	Thread closer;
+	closer.startFunc([&s]() { s.close(); });
+	const bool held = TestSessionImpl::waitUntilRollbackHeld(10000);
+
+	std::atomic<bool> got(false);
+	Thread getter;
+	getter.startFunc([&pool, &got]()
+	{
+		Session s2(pool.get());
+		got = true;
+	});
+	const bool gotWhileHeld = held && getter.tryJoin(10000) && got;
+
+	TestSessionImpl::releaseRollback();
+	closer.join();
+	getter.join();
+
+	assertTrue (held);
+	assertTrue (gotWhileHeld);
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.idle() == 2);
+}
+
+
+void SessionPoolTest::testSessionPoolStatementAfterRelease()
+{
+	// the ways a pool lets go of a session: closed when it is released after
+	// the pool was shut down, closed and discarded when its rollback fails,
+	// and closed by the pool after it was returned
+	const std::array<std::function<void(SessionPool&, Session&)>, 3> releases =
+	{
+		[](SessionPool& pool, Session& s) { pool.shutdown(); s.close(); },
+		[](SessionPool&, Session& s)
+		{
+			s.setFeature("autoCommit", false);
+			s.setFeature("throwOnRollback", true);
+			s.close();
+		},
+		[](SessionPool& pool, Session& s) { s.close(); pool.shutdown(); }
+	};
+
+	CountingErrorHandler errorHandler;
+	ErrorHandlerGuard guard(errorHandler);
+	for (const auto& release: releases)
+	{
+		SessionPool pool("test", "cs");
+		std::weak_ptr<int> pSessionValue;
+		{
+			Session s(pool.get());
+			Statement stmt(s);
+			stmt << "DROP TABLE IF EXISTS Test";
+
+			// a value stored in the session the pool created
+			// shows whether that session still exists
+			auto pValue = std::make_shared<int>(0);
+			pSessionValue = pValue;
+			s.setProperty("p3", pValue);
+			pValue.reset();
+
+			// the statement refers to that session: it stays alive
+			// with the Session, and the statement finds it closed
+			release(pool, s);
+			assertEqual (0, pool.allocated());
+			assertTrue (!pSessionValue.expired());
+			try
+			{
+				stmt.execute();
+				fail("session closed - must throw");
+			}
+			catch (NotConnectedException&) { }
+		}
+
+		// and it is freed with the Session
+		assertTrue (pSessionValue.expired());
+	}
+	assertEqual (1, errorHandler.reports());
+}
+
+
+void SessionPoolTest::testSessionPoolNotGoodClosed()
+{
+	StaleSessionPool pool("test", "cs");
+
+	// a session that is not good when it is returned is closed as the pool
+	// drops it, although the Session that returned it still refers to it
+	Session s1(pool.get());
+	pool.created(0)->makeStale();
+	s1.close();
+	assertEqual (0, pool.allocated());
+	assertTrue (!pool.created(0)->isConnected());
+
+	// and so is an idle session found not good when a session is taken
+	Session s2(pool.get());
+	s2.close();
+	assertEqual (1, pool.idle());
+	pool.created(1)->makeStale();
+	Session s3(pool.get());
+	assertEqual (1, pool.allocated());
+	assertTrue (!pool.created(1)->isConnected());
+	assertTrue (s3.isConnected());
+}
+
+
+void SessionPoolTest::testSessionPoolContainerWaitsForAdd()
+{
+	SessionPoolContainer spc;
+	AutoPtr<BlockingSessionPool> pPool = new BlockingSessionPool("test", "cs");
+	spc.add(pPool);
+
+	// add() gets the session from the pool with the container locked;
+	// the pool keeps it there until it is released
+	Thread adder;
+	adder.startFunc([&spc]()
+	{
+		Session s(spc.add("test", "cs"));
+	});
+	const bool blocked = pPool->waitUntilBlocked(10000);
+
+	// meanwhile, each of these calls waits for the container; remove() is given
+	// a name the container does not hold, so that shutdown() still finds the pool
+	const std::array<std::function<void()>, 5> calls =
+	{
+		[&spc]() { (void) spc.has("test:///cs"); },
+		[&spc]() { (void) spc.count(); },
+		[&spc]() { (void) spc.isActive("test", "cs"); },
+		[&spc]() { spc.remove("test:///none"); },
+		[&spc]() { spc.shutdown(); }
+	};
+	std::array<Thread, 5> callers;
+	std::atomic<bool> released(false);
+	std::atomic<int> started(0);
+	std::atomic<int> returned(0);
+	std::atomic<int> returnedLocked(0);
+	Poco::Event progress;
+	bool activeLocked = false;
+	if (blocked)
+	{
+		for (std::size_t i = 0; i < calls.size(); ++i)
+		{
+			const std::function<void()>& call = calls[i];
+			callers[i].startFunc([&call, &released, &started, &returned, &returnedLocked, &progress]()
+			{
+				++started;
+				progress.set();
+				call();
+				if (!released) ++returnedLocked;
+				++returned;
+				progress.set();
+			});
+		}
+
+		// once all have started, give them the time to return,
+		// which they must not do while the container is locked
+		const int callCount = static_cast<int>(calls.size());
+		auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+		while (started < callCount)
+		{
+			const auto remaining = std::chrono::ceil<std::chrono::milliseconds>(deadline - std::chrono::steady_clock::now());
+			if (remaining.count() <= 0) break;
+			progress.tryWait(static_cast<long>(remaining.count()));
+		}
+		deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(200);
+		while (returned < callCount)
+		{
+			const auto remaining = std::chrono::ceil<std::chrono::milliseconds>(deadline - std::chrono::steady_clock::now());
+			if (remaining.count() <= 0) break;
+			progress.tryWait(static_cast<long>(remaining.count()));
+		}
+
+		// nor has shutdown() reached the pool
+		activeLocked = pPool->isActive();
+	}
+
+	released = true;
+	pPool->unblock();
+	adder.join();
+	for (Thread& caller: callers) caller.join();
+
+	assertTrue (blocked);
+	assertEqual (0, returnedLocked.load());
+	assertTrue (activeLocked);
+	assertEqual (static_cast<int>(calls.size()), returned.load());
+	assertTrue (!pPool->isActive());
+}
+
+
+void SessionPoolTest::testPooledSessionNullHolder()
+{
+	try
+	{
+		AutoPtr<PooledSessionImpl> pImpl(new PooledSessionImpl(nullptr));
+		fail("no holder - must throw");
+	}
+	catch (NullPointerException&) { }
+}
+
+
 void SessionPoolTest::setUp()
 {
 }
@@ -279,6 +941,18 @@ CppUnit::Test* SessionPoolTest::suite()
 
 	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPool);
 	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolContainer);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolMovedFromSession);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolShutdown);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolDestroyed);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolPutBackFailure);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolSettingsRestored);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolTransaction);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolManualCommit);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolRollbackUnlocked);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolStatementAfterRelease);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolNotGoodClosed);
+	CppUnit_addTest(pSuite, SessionPoolTest, testPooledSessionNullHolder);
+	CppUnit_addTest(pSuite, SessionPoolTest, testSessionPoolContainerWaitsForAdd);
 
 	return pSuite;
 }

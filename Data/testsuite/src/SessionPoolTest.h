@@ -26,6 +26,18 @@ public:
 
 	void testSessionPool();
 	void testSessionPoolContainer();
+	void testSessionPoolMovedFromSession();
+	void testSessionPoolShutdown();
+	void testSessionPoolDestroyed();
+	void testSessionPoolPutBackFailure();
+	void testSessionPoolSettingsRestored();
+	void testSessionPoolTransaction();
+	void testSessionPoolManualCommit();
+	void testSessionPoolRollbackUnlocked();
+	void testSessionPoolStatementAfterRelease();
+	void testSessionPoolNotGoodClosed();
+	void testPooledSessionNullHolder();
+	void testSessionPoolContainerWaitsForAdd();
 
 	void setUp();
 	void tearDown();

@@ -59,6 +59,25 @@ public:
 		/// SQLiteStatementImpl.cpp:249 in place, TSan reports nothing;
 		/// without it, TSan reports a race on the Vdbe bytes.
 
+	void testRaceHookRegistration();
+		/// Threads enable and disable Notifier callbacks on connections of their own
+		/// at the same time. The registrations of all connections are kept in one
+		/// table, which the threads change concurrently (TSan: no data race).
+
+	void testCloseWhileCallbackReadsSession();
+		/// One thread closes the session while SQLite runs an insert handler on
+		/// another thread with the connection mutex held, and a third thread reads
+		/// the handle of the session meanwhile. close() waits for that mutex, and
+		/// the handle and the "autoCommit" feature can still be read, also by the
+		/// handler: reading them does not wait for close().
+
+	void testRaceReadSessionVsReopen();
+		/// Threads read the "autoCommit" feature and the handle of a session while
+		/// another thread closes and opens it again and again. Reading the feature
+		/// uses the connection without a session lock, and close() waits for such
+		/// reads before it closes the connection (ASan: no use after free; TSan:
+		/// no data race).
+
 	void setUp();
 	void tearDown();
 

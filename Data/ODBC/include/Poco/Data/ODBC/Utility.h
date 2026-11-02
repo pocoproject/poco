@@ -167,21 +167,28 @@ public:
 	[[nodiscard]] static std::string sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type);
 		/// Returns the requested info about the DBMS or ODBC driver.
 		/// On error, returns "unknown".
+		/// Throws NullPointerException if db has no connection handle,
+		/// e.g. after disconnect().
 
 	[[nodiscard]] static std::string dbmsName(const ConnectionHandle& db);
 		/// Returns the back end DBMS name.
+		/// Throws NullPointerException if db has no connection handle.
 
-	[[nodiscard]] std::string dbmsVersion(const ConnectionHandle& db);
+	[[nodiscard]] static std::string dbmsVersion(const ConnectionHandle& db);
 		/// Returns the back end DBMS version.
+		/// Throws NullPointerException if db has no connection handle.
 
-	[[nodiscard]] std::string driverName(const ConnectionHandle& db);
+	[[nodiscard]] static std::string driverName(const ConnectionHandle& db);
 		/// Returns the driver name.
+		/// Throws NullPointerException if db has no connection handle.
 
-	[[nodiscard]] std::string driverVersion(const ConnectionHandle& db);
+	[[nodiscard]] static std::string driverVersion(const ConnectionHandle& db);
 		/// Returns the driver version.
+		/// Throws NullPointerException if db has no connection handle.
 
-	[[nodiscard]] std::string driverODBCVersion(const ConnectionHandle& db);
+	[[nodiscard]] static std::string driverODBCVersion(const ConnectionHandle& db);
 		/// Returns the driver ODBC standard version.
+		/// Throws NullPointerException if db has no connection handle.
 
 	template <typename T>
 	[[nodiscard]] static constexpr SQLINTEGER sizeOf()

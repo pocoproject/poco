@@ -53,6 +53,7 @@ const MetaColumn& MySQLStatementImpl::metaColumn(std::size_t pos) const
 
 bool MySQLStatementImpl::hasNext()
 {
+	checkConnection();
 	if (_hasNext == NEXT_DONTKNOW)
 	{
 		if (_metadata.columnsReturned() == 0)
@@ -115,6 +116,7 @@ bool MySQLStatementImpl::canCompile() const
 
 void MySQLStatementImpl::compileImpl()
 {
+	checkConnection();
 	try
 	{
 		_metadata.reset();
@@ -135,6 +137,7 @@ void MySQLStatementImpl::compileImpl()
 
 void MySQLStatementImpl::bindImpl()
 {
+	checkConnection();
     std::size_t pos = 0;
     for (auto& b: bindings())
     {
@@ -161,6 +164,13 @@ void MySQLStatementImpl::bindImpl()
 Poco::Data::AbstractExtractor::Ptr MySQLStatementImpl::extractor()
 {
 	return _pExtractor;
+}
+
+
+void MySQLStatementImpl::checkConnection() const
+{
+	if (!_stmt.isValid())
+		throw NotConnectedException(session().connectorName());
 }
 
 

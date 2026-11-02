@@ -14,6 +14,7 @@
 
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionFactory.h"
+#include "Poco/Data/DataException.h"
 #include "Poco/String.h"
 #include "Poco/URI.h"
 #include <algorithm>
@@ -27,6 +28,7 @@ Session::Session(Poco::AutoPtr<SessionImpl> pImpl):
 	_statementCreator(pImpl),
 	_wasAutoCommit(false)
 {
+	poco_check_ptr (_pImpl);
 }
 
 
@@ -79,9 +81,13 @@ Session& Session::operator = (const Session& other)
 
 Session& Session::operator = (Session&& other) noexcept
 {
-	_pImpl = std::move(other._pImpl);
-	_statementCreator = std::move(other._statementCreator);
-	_wasAutoCommit = other._wasAutoCommit;
+	if (this != &other)
+	{
+		_pImpl = std::move(other._pImpl);
+		_statementCreator = std::move(other._statementCreator);
+		_wasAutoCommit = other._wasAutoCommit;
+		other._wasAutoCommit = false;
+	}
 	return *this;
 }
 
@@ -97,6 +103,9 @@ void Session::swap(Session& other)
 
 void Session::begin()
 {
+	if (!isConnected())
+		throw NotConnectedException(_pImpl->connectorName());
+
 	if (isAutocommit())
 	{
 		setFeature("autoCommit", false);
@@ -108,6 +117,9 @@ void Session::begin()
 
 void Session::commit()
 {
+	if (!isConnected())
+		throw NotConnectedException(_pImpl->connectorName());
+
 	_pImpl->commit();
 	if (_wasAutoCommit)
 	{
@@ -119,6 +131,9 @@ void Session::commit()
 
 void Session::rollback()
 {
+	if (!isConnected())
+		throw NotConnectedException(_pImpl->connectorName());
+
 	_pImpl->rollback();
 	if (_wasAutoCommit)
 	{

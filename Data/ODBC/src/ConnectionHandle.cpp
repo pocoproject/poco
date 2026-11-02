@@ -23,6 +23,7 @@ namespace Poco::Data::ODBC {
 const std::string ConnectionHandle::UNSUPPORTED_SQLSTATE = "HYC00";
 const std::string ConnectionHandle::GEN_ERR_SQLSTATE = "HY000";
 const std::string ConnectionHandle::CANT_SET_ATTR_SQLSTATE = "HY011";
+const std::string ConnectionHandle::NOT_OPEN_SQLSTATE = "08003";
 
 
 ConnectionHandle::ConnectionHandle(const std::string& connectString, SQLULEN loginTimeout, SQLULEN timeout):
@@ -113,6 +114,7 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 	SQLSMALLINT result;
 
 	if (!_pEnvironment) alloc();
+	else if (_connected) static_cast<void>(closeConnection()); // the connection died, or SQLDisconnect was called on the handle
 
 	setTimeouts(loginTimeout, timeout);
 
@@ -129,6 +131,7 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 		disconnect();
 		throw ConnectionFailedException(err.toString());
 	}
+	_connected = (_hdbc != POCO_ODBC_NULL_HDBC);
 
 	try
 	{
@@ -152,12 +155,29 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 
 bool ConnectionHandle::disconnect()
 {
-	SQLRETURN rc = 0;
-	if (isConnected())
-		rc = SQLDisconnect(_hdbc);
+	bool disconnected = true;
+	if (_connected)
+	{
+		// a dead connection must be disconnected too, or neither handle can be freed
+		SQLRETURN rc = closeConnection();
+		disconnected = !Utility::isError(rc) || isNotOpen(ConnectionError(_hdbc));
+	}
 
 	free();
-	return !Utility::isError(rc);
+	return disconnected;
+}
+
+
+SQLRETURN ConnectionHandle::closeConnection()
+{
+	// SQLDisconnect frees the statement and descriptor handles of the connection
+	++*_pGeneration;
+	_connected = false;
+
+	// SQLDisconnect fails while a transaction is open; the result of the
+	// rollback does not matter, SQLDisconnect reports whether the connection is closed
+	SQLEndTran(SQL_HANDLE_DBC, _hdbc, SQL_ROLLBACK);
+	return SQLDisconnect(_hdbc);
 }
 
 
@@ -247,6 +267,21 @@ bool ConnectionHandle::cantSetAttr(const ConnectionError& e) const
 	for (int i = 0; i < diagRecs; ++i)
 	{
 		if (cd.sqlState(i) == CANT_SET_ATTR_SQLSTATE)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+bool ConnectionHandle::isNotOpen(const ConnectionError& e) const
+{
+	const ConnectionDiagnostics& cd = e.diagnostics();
+	int diagRecs = cd.count();
+	for (int i = 0; i < diagRecs; ++i)
+	{
+		if (cd.sqlState(i) == NOT_OPEN_SQLSTATE)
 		{
 			return true;
 		}

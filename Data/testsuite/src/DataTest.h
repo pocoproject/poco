@@ -51,6 +51,28 @@ public:
 	void testNullableExtract();
 	void testTransactionAutoCommit();
 	void testExecuteDirectNotImplemented();
+	void testSessionNotConnected();
+	void testSessionNullImpl();
+	void testRecordSetMovedFrom();
+	void testRecordSetMoveFilter();
+	void testNotConnectedMessage();
+	void testTransactionNotConnected();
+	void testTransactorFailure();
+	void testStatementAsyncKeepsImpl();
+	void testSQLChannelUnreachable();
+	void testArchiveStrategyReopen();
+	void testStatementAsyncError();
+	void testStatementWaitErrorType();
+	void testStatementSetAsyncMovedFrom();
+	void testTransactionNotConnectedLog();
+	void testTransactorFailureLog();
+	void testSQLChannelReconnectNotDelayed();
+	void testSQLChannelWaitStopped();
+	void testSQLChannelBackOff();
+	void testSQLChannelArchiveNotConnected();
+	void testSQLChannelDrainFallback();
+	void testSQLChannelDrainRejected();
+	void testArchiveStrategyOpenReleasesStatements();
 
 	void setUp();
 	void tearDown();

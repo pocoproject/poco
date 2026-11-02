@@ -51,10 +51,10 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 	_connected(false),
 	_inTransaction(false),
 	_failIfInnoReadOnly(false),
+	_timeout(CONNECTION_TIMEOUT_DEFAULT),
 	_lastError(0)
 {
 	addProperty("insertId", &SessionImpl::setInsertId, &SessionImpl::getInsertId);
-	setProperty("handle", static_cast<MYSQL*>(_handle));
 	addFeature("failIfInnoReadOnly", &SessionImpl::setFailIfInnoReadOnly, &SessionImpl::getFailIfInnoReadOnly);
 	open();
 }
@@ -68,14 +68,12 @@ void SessionImpl::setName()
 
 void SessionImpl::open(const std::string& connect)
 {
-	if (connect != connectionString())
-	{
-		if (isConnected())
-			throw InvalidAccessException("Session already connected");
+	// connect() closes the handle when it fails, which must never hit a live connection
+	if (isConnected())
+		throw InvalidAccessException("Session already connected");
 
-		if (!connect.empty())
-			setConnectionString(connect);
-	}
+	if (!connect.empty())
+		setConnectionString(connect);
 
 	poco_assert_dbg (!connectionString().empty());
 
@@ -172,6 +170,7 @@ void SessionImpl::open(const std::string& connect)
 			options["password"].c_str(),
 			db,
 			port);
+	setProperty("handle", static_cast<MYSQL*>(_handle));
 
 	addFeature("autoCommit",
 		&SessionImpl::autoCommit,
@@ -180,13 +179,21 @@ void SessionImpl::open(const std::string& connect)
 	// autocommit is initially on when a session is opened
 	AbstractSessionImpl::setAutoCommit("", true);
 	setName();
+	_inTransaction = false;
 	_connected = true;
 }
 
 
 SessionImpl::~SessionImpl()
 {
-	close();
+	try
+	{
+		close();
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -217,7 +224,24 @@ void SessionImpl::commit()
 
 void SessionImpl::rollback()
 {
-	_handle.rollback();
+	try
+	{
+		_handle.rollback();
+	}
+	catch (TransactionException&)
+	{
+		// with the connection lost, or closed by the server for being idle too long, the
+		// server has rolled the transaction back; any other failure leaves it open, and a
+		// BEGIN would then commit it implicitly. 4031 is a literal: MariaDB has no such
+		// symbol and uses the number for an error that ROLLBACK never returns.
+		constexpr int SERVER_GONE_ERROR = 2006;          // CR_SERVER_GONE_ERROR
+		constexpr int SERVER_LOST = 2013;                // CR_SERVER_LOST
+		constexpr int CLIENT_INTERACTION_TIMEOUT = 4031; // ER_CLIENT_INTERACTION_TIMEOUT, MySQL 8.0.24+
+		int err = static_cast<int>(mysql_errno(_handle));
+		if (err == SERVER_GONE_ERROR || err == SERVER_LOST || err == CLIENT_INTERACTION_TIMEOUT)
+			_inTransaction = false;
+		throw;
+	}
 	_inTransaction = false;
 }
 
@@ -225,7 +249,7 @@ void SessionImpl::rollback()
 void SessionImpl::autoCommit(const std::string& s, bool val)
 {
 	if (val != getAutoCommit(s)) {
-		_handle.autoCommit(val);
+		if (_connected) _handle.autoCommit(val);
 		AbstractSessionImpl::setAutoCommit(s, val);
 	}
 }
@@ -364,11 +388,11 @@ bool SessionImpl::isGood() const
 
 void SessionImpl::close()
 {
-	if (_connected)
-	{
-		_handle.close();
-		_connected = false;
-	}
+	// also frees a handle that a failed open() has left unconnected
+	_handle.close();
+	_connected = false;
+	_inTransaction = false;
+	setProperty("handle", static_cast<MYSQL*>(nullptr));
 }
 
 

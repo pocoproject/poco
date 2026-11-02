@@ -65,7 +65,7 @@ private:
 #endif
 
 
-SessionHandle::SessionHandle(MYSQL* mysql): _pHandle(nullptr)
+SessionHandle::SessionHandle(MYSQL* mysql): _pHandle(nullptr), _pGeneration(std::make_shared<Counter>(0))
 {
 	init(mysql);
 #ifdef POCO_OS_FAMILY_UNIX
@@ -93,6 +93,7 @@ SessionHandle::~SessionHandle()
 
 void SessionHandle::options(mysql_option opt)
 {
+	poco_check_ptr (_pHandle);
 	if (mysql_options(_pHandle, opt, nullptr) != 0)
 		throw ConnectionException("mysql_options error", _pHandle);
 }
@@ -100,6 +101,7 @@ void SessionHandle::options(mysql_option opt)
 
 void SessionHandle::options(mysql_option opt, bool b)
 {
+	poco_check_ptr (_pHandle);
 	my_bool tmp = b;
 	if (mysql_options(_pHandle, opt, &tmp) != 0)
 		throw ConnectionException("mysql_options error", _pHandle);
@@ -108,6 +110,7 @@ void SessionHandle::options(mysql_option opt, bool b)
 
 void SessionHandle::options(mysql_option opt, const char* c)
 {
+	poco_check_ptr (_pHandle);
 	if (mysql_options(_pHandle, opt, c) != 0)
 		throw ConnectionException("mysql_options error", _pHandle);
 }
@@ -115,6 +118,7 @@ void SessionHandle::options(mysql_option opt, const char* c)
 
 void SessionHandle::options(mysql_option opt, unsigned int i)
 {
+	poco_check_ptr (_pHandle);
 #if (POCO_MYSQL_VERSION_NUMBER < 0x050108)
 	const char* tmp = (const char *)&i;
 #else
@@ -127,13 +131,14 @@ void SessionHandle::options(mysql_option opt, unsigned int i)
 
 void SessionHandle::connect(const char* host, const char* user, const char* password, const char* db, unsigned int port)
 {
-#ifdef HAVE_MYSQL_REAL_CONNECT
+	poco_check_ptr (_pHandle);
 	if (!mysql_real_connect(_pHandle, host, user, password, db, port, nullptr, 0))
-		throw ConnectionFailedException(mysql_error(_pHandle));
-#else
-	if (!mysql_connect(_pHandle, host, user, password))
-		throw ConnectionFailedException(mysql_error(_pHandle))
-#endif
+	{
+		// free the handle, so that nothing reads the state a failed connect leaves in it
+		ConnectionFailedException exc(mysql_error(_pHandle));
+		close();
+		throw exc;
+	}
 }
 
 
@@ -141,6 +146,8 @@ void SessionHandle::close()
 {
 	if (_pHandle)
 	{
+		// mysql_close() detaches the statements of the connection
+		++*_pGeneration;
 		mysql_close(_pHandle);
 		_pHandle = nullptr;
 	}
@@ -149,6 +156,7 @@ void SessionHandle::close()
 
 void SessionHandle::startTransaction()
 {
+	poco_check_ptr (_pHandle);
 	int rc = mysql_query(_pHandle, "BEGIN");
 	if (rc != 0)
 	{
@@ -165,6 +173,7 @@ void SessionHandle::startTransaction()
 
 void SessionHandle::commit()
 {
+	poco_check_ptr (_pHandle);
 	if (mysql_commit(_pHandle) != 0)
 		throw TransactionException("Commit failed.", _pHandle);
 }
@@ -172,6 +181,7 @@ void SessionHandle::commit()
 
 void SessionHandle::rollback()
 {
+	poco_check_ptr (_pHandle);
 	if (mysql_rollback(_pHandle) != 0)
 		throw TransactionException("Rollback failed.", _pHandle);
 }
@@ -179,6 +189,7 @@ void SessionHandle::rollback()
 
 void SessionHandle::autoCommit(bool val)
 {
+	poco_check_ptr (_pHandle);
 	if (mysql_autocommit(_pHandle, val) != 0)
 		throw TransactionException("Setting autocommit mode failed.", _pHandle);
 }
@@ -186,6 +197,7 @@ void SessionHandle::autoCommit(bool val)
 
 void SessionHandle::reset()
 {
+	poco_check_ptr (_pHandle);
 #if ((defined (MYSQL_VERSION_ID)) && (MYSQL_VERSION_ID >= 50700)) || ((defined (MARIADB_PACKAGE_VERSION_ID)) && (MARIADB_PACKAGE_VERSION_ID >= 30000))
 	if (mysql_reset_connection(_pHandle) != 0)
 #else
@@ -197,6 +209,7 @@ void SessionHandle::reset()
 
 bool SessionHandle::ping()
 {
+	poco_check_ptr (_pHandle);
 	int rc = mysql_ping(_pHandle);
 	return rc == 0;
 }

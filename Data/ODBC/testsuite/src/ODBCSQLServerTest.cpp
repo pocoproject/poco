@@ -1217,6 +1217,9 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEncoding);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testReconnect);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testClosedSession);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testExceptionCopy);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSetBeforeExecute);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLServerTime);
 
 		return pSuite;

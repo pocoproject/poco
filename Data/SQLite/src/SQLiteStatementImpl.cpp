@@ -13,6 +13,7 @@
 
 
 #include "Poco/Data/SQLite/SQLiteStatementImpl.h"
+#include "Poco/Data/SQLite/SessionImpl.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/String.h"
@@ -58,6 +59,12 @@ void SQLiteStatementImpl::compileImpl()
 	{
 		_bindBegin = bindings().begin();
 	}
+
+	// The session may have been closed and opened again since the statement
+	// was created: compile on the connection it has now.
+	auto* pSession = dynamic_cast<SessionImpl*>(&session());
+	if (pSession != nullptr) _pDB = pSession->handle();
+	poco_check_ptr (_pDB);
 
 	std::string statement(toString());
 
@@ -221,7 +228,22 @@ void SQLiteStatementImpl::clear()
 bool SQLiteStatementImpl::hasNext()
 {
 	if (_stepCalled)
+	{
+		// A query paused by a limit resumes here, at the row it has looked ahead
+		// at, without compileImpl(): the rest of its result is refused once the
+		// session has closed the connection it was compiled on.
+		if (_pStmt != nullptr && getState() == ST_PAUSED)
+		{
+			auto* pSession = dynamic_cast<SessionImpl*>(&session());
+			if (pSession != nullptr && pSession->handle() != _pDB)
+			{
+				// ends the read transaction the query holds on the closed connection
+				sqlite3_reset(_pStmt);
+				throw NotConnectedException(session().connectorName());
+			}
+		}
 		return (_nextResponse == SQLITE_ROW);
+	}
 
 	// _pStmt is allowed to be null for conditional SQL statements
 	if (_pStmt == nullptr)

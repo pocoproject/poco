@@ -58,6 +58,27 @@ class Data_API SessionPool: public RefCountedObject
 	///
 	/// Not connected idle sessions can not exist.
 	///
+	/// When a session is returned to the pool, an open transaction is
+	/// rolled back, and so is any uncommitted work of a session in
+	/// manual-commit mode; settings changed with get(name, value) are
+	/// reverted, the pool settings are re-applied and the auto-commit
+	/// mode the session was created with is restored. The rollback runs
+	/// before the session is handed back, without locking the pool; a
+	/// session whose rollback fails is closed instead, and the error goes
+	/// to Poco::ErrorHandler.
+	///
+	/// A session may be released after its pool has been shut down or
+	/// destroyed: shutdown() and the destructor close the idle sessions
+	/// only, and a session still in use is closed when it is released.
+	/// The pool must not be destroyed while another thread still uses
+	/// it, e.g. to get a session or to release one.
+	///
+	/// A statement created through a pooled Session must not be executed
+	/// after the Session has been closed: until the pool closes the
+	/// session, the statement would run on a connection that another user
+	/// may have; once the pool has closed the session, executing the
+	/// statement throws NotConnectedException.
+	///
 	/// Usage example:
 	///
 	///     SessionPool pool("ODBC", "...");
@@ -81,6 +102,7 @@ public:
 
 	~SessionPool();
 		/// Destroys the SessionPool.
+		/// Closes the idle sessions; a session still in use is closed when it is released.
 
 	[[nodiscard]] Session get();
 		/// Returns a Session.
@@ -101,9 +123,12 @@ public:
 		/// value when the session is reclaimed by the pool.
 	{
 		Session s = get();
-		_addPropertyMap.insert(AddPropertyMap::value_type(s.impl(),
-			std::make_pair(name, s.getProperty(name))));
+		PropertyPair property(name, s.getProperty(name));
 		s.setProperty(name, value);
+
+		SessionImpl* pImpl = static_cast<PooledSessionImpl*>(s.impl())->impl();
+		Poco::Mutex::ScopedLock lock(_mutex);
+		_addPropertyMap[pImpl] = property;
 
 		return s;
 	}
@@ -127,7 +152,7 @@ public:
 		/// Returns the connection timeout.
 
 	[[nodiscard]] int dead();
-		/// Returns the number of not connected active sessions.
+		/// Returns the number of not connected idle sessions.
 
 	[[nodiscard]] int allocated() const;
 		/// Returns the number of allocated sessions.
@@ -156,6 +181,7 @@ public:
 
 	void shutdown();
 		/// Shuts down the session pool.
+		/// Closes the idle sessions; a session still in use is closed when it is released.
 
 	[[nodiscard]] bool isActive() const;
 		/// Returns true if session pool is active (not shut down).
@@ -174,9 +200,11 @@ protected:
 	typedef Poco::HashMap<std::string, Poco::Any> PropertyMap;
 
 	void purgeDeadSessions();
-	int deadImpl(SessionList& rSessions);
 	void applySettings(SessionImpl* pImpl);
 	void putBack(PooledSessionHolderPtr pHolder);
+		/// Returns the session to the pool. Does not throw: a session that
+		/// can not be reset is closed and discarded, and the error is
+		/// reported through Poco::ErrorHandler.
 	void onJanitorTimer(Poco::Timer&);
 
 private:

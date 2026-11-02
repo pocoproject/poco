@@ -17,9 +17,11 @@
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Event.h"
 #include "Binder.h"
 #include "Extractor.h"
 #include "Preparator.h"
+#include <atomic>
 
 
 namespace Poco::Data::Test {
@@ -37,6 +39,20 @@ public:
 
 	~TestStatementImpl();
 		/// Destroys the TestStatementImpl.
+
+	[[nodiscard]] static int instances();
+		/// Returns the number of TestStatementImpl objects alive.
+
+	static void holdNextExecution();
+		/// Makes the next execution of a TestStatementImpl wait in hasNext()
+		/// until releaseExecution() is called.
+
+	[[nodiscard]] static bool waitUntilHeld(long milliseconds);
+		/// Waits until the execution held by holdNextExecution() waits in hasNext().
+		/// Returns false if it does not within the given time.
+
+	static void releaseExecution();
+		/// Lets the held execution go on, and cancels a hold that no execution has reached yet.
 
 protected:
 	std::size_t columnsReturned() const;
@@ -80,6 +96,11 @@ private:
 	Poco::SharedPtr<Preparator> _ptrPreparation;
 	bool                        _compiled;
 	bool                        _throwOnHasNext = false;
+
+	static std::atomic<int>     _instances;
+	static std::atomic<bool>    _holdNext;
+	static Poco::Event          _held;
+	static Poco::Event          _released;
 };
 
 

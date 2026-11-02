@@ -83,12 +83,6 @@ SessionImpl::~SessionImpl()
 {
 	try
 	{
-		if (isTransaction() && !getFeature("autoCommit"))
-		{
-			try { rollback(); }
-			catch (...) { }
-		}
-
 		close();
 	}
 	catch (...)
@@ -160,6 +154,7 @@ void SessionImpl::open(const std::string& connect)
 
 	if (_db.connect(connectionString(), static_cast<SQLULEN>(getLoginTimeout())))
 	{
+		_inTransaction = false;
 		setProperty("handle", _db.handle());
 
 		_dataTypes.fillTypeInfo(_db.pHandle());
@@ -193,8 +188,9 @@ bool SessionImpl::isConnected() const
 }
 
 
-inline void SessionImpl::setCursorUse(const std::string&, const Poco::Any& value)
+void SessionImpl::setCursorUse(const std::string&, const Poco::Any& value)
 {
+	poco_check_ptr (_db.handle());
 	int cursorUse = static_cast<int>(Poco::AnyCast<CursorUse>(value));
 	int rc = 0;
 	switch (cursorUse)
@@ -218,12 +214,13 @@ inline void SessionImpl::setCursorUse(const std::string&, const Poco::Any& value
 }
 
 
-inline Poco::Any SessionImpl::getCursorUse(const std::string&) const
+Poco::Any SessionImpl::getCursorUse(const std::string&) const
 {
 #if POCO_OS == POCO_OS_WINDOWS_NT
 #pragma warning (disable : 4995) // ignore marked as deprecated
 #endif
 	SQLUINTEGER curUse = 0;
+	poco_check_ptr (_db.handle());
 	(void)Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_ATTR_ODBC_CURSORS, &curUse, SQL_IS_UINTEGER, nullptr);
 	switch (curUse)
 	{
@@ -298,6 +295,7 @@ void SessionImpl::setTransactionIsolationImpl(Poco::UInt32 ti) const
 	if (ti & Session::TRANSACTION_SERIALIZABLE)
 		isolation |= SQL_TXN_SERIALIZABLE;
 
+	poco_check_ptr (_db.handle());
 	checkError(SQLSetConnectAttr(_db, SQL_ATTR_TXN_ISOLATION, (SQLPOINTER) isolation, 0));
 }
 
@@ -306,6 +304,7 @@ void SessionImpl::setMultiActiveResultset(const std::string&, bool val)
 {
 #ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
 	int enabled = val ? SQL_MARS_ENABLED_YES : SQL_MARS_ENABLED_NO;
+	poco_check_ptr (_db.handle());
 	checkError(Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_COPT_SS_MARS_ENABLED, &enabled, SQL_IS_INTEGER));
 #endif
 }
@@ -314,7 +313,8 @@ void SessionImpl::setMultiActiveResultset(const std::string&, bool val)
 bool SessionImpl::getMultiActiveResultset(const std::string&) const
 {
 #ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
-	SQLINTEGER mars;
+	SQLINTEGER mars = SQL_MARS_ENABLED_NO;
+	poco_check_ptr (_db.handle());
 	(void)Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_COPT_SS_MARS_ENABLED, &mars, SQL_IS_INTEGER, nullptr);
 	return mars == SQL_MARS_ENABLED_YES;
 #else
@@ -326,6 +326,7 @@ bool SessionImpl::getMultiActiveResultset(const std::string&) const
 Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
 	SQLULEN isolation = 0;
+	poco_check_ptr (_db.handle());
 	checkError(SQLGetConnectAttr(_db, SQL_ATTR_TXN_ISOLATION,
 		&isolation,
 		0,
@@ -398,6 +399,7 @@ void SessionImpl::autoCommit(const std::string&, bool val)
 			"allowed for session in transaction");
 	}
 
+	poco_check_ptr (_db.handle());
 	checkError(Poco::Data::ODBC::SQLSetConnectAttr(_db,
 		SQL_ATTR_AUTOCOMMIT,
 		val ? (SQLPOINTER) SQL_AUTOCOMMIT_ON :
@@ -440,6 +442,7 @@ bool SessionImpl::isTransaction() const
 
 void SessionImpl::begin()
 {
+	poco_check_ptr (_db.handle());
 	if (isAutoCommit())
 		throw InvalidAccessException("Session in auto commit mode.");
 
@@ -456,6 +459,7 @@ void SessionImpl::begin()
 
 void SessionImpl::commit()
 {
+	poco_check_ptr (_db.handle());
 	if (!isAutoCommit())
 		checkError(SQLEndTran(SQL_HANDLE_DBC, _db, SQL_COMMIT));
 
@@ -465,6 +469,7 @@ void SessionImpl::commit()
 
 void SessionImpl::rollback()
 {
+	poco_check_ptr (_db.handle());
 	if (!isAutoCommit())
 		checkError(SQLEndTran(SQL_HANDLE_DBC, _db, SQL_ROLLBACK));
 
@@ -480,19 +485,15 @@ void SessionImpl::reset()
 
 void SessionImpl::close()
 {
-	if (!isConnected()) return;
+	Poco::FastMutex::ScopedLock l(_mutex);
 
-	try
-	{
-		commit();
-	}
-	catch (ConnectionException&)
-	{
-	}
+	_inTransaction = false;
+	if (!_db) return;
 
+	// disconnect() rolls back an open transaction, and closes a dead connection too
 	_db.disconnect();
 	_dataTypes.reset();
-	setProperty("handle", SQL_NULL_HDBC);
+	setProperty("handle", static_cast<SQLHDBC>(POCO_ODBC_NULL_HDBC));
 }
 
 
@@ -500,6 +501,7 @@ int SessionImpl::maxStatementLength() const
 {
 	SQLUINTEGER info;
 	SQLRETURN rc = 0;
+	poco_check_ptr (_db.handle());
 	if (Utility::isError(rc = Poco::Data::ODBC::SQLGetInfo(_db,
 		SQL_MAXIMUM_STATEMENT_LENGTH,
 		(SQLPOINTER) &info,

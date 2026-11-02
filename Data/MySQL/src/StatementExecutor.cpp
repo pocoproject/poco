@@ -20,11 +20,12 @@
 namespace Poco::Data::MySQL {
 
 
-StatementExecutor::StatementExecutor(MYSQL* mysql)
-	: _pSessionHandle(mysql)
+StatementExecutor::StatementExecutor(SessionHandle& handle)
+	: _pGeneration(handle.generation())
+	, _generation(*_pGeneration)
 	, _affectedRowCount(0)
 {
-	if (!(_pHandle = mysql_stmt_init(mysql)))
+	if ((_pHandle = mysql_stmt_init(handle)) == nullptr)
 		throw StatementException("mysql_stmt_init error");
 
 	_state = STMT_INITED;
@@ -55,7 +56,7 @@ void StatementExecutor::prepare(const std::string& query)
 	if (rc != 0)
 	{
 		// retry if connection lost
-		int err = mysql_errno(_pSessionHandle);
+		int err = static_cast<int>(mysql_stmt_errno(_pHandle));
 		if (err == 2006 /* CR_SERVER_GONE_ERROR */ || err == 2013 /* CR_SERVER_LOST */)
 		{
 			rc = mysql_stmt_prepare(_pHandle, query.c_str(), static_cast<unsigned int>(query.length()));
@@ -108,7 +109,7 @@ void StatementExecutor::execute()
 
 	_state = STMT_EXECUTED;
 
-	my_ulonglong affectedRows = mysql_affected_rows(_pSessionHandle);
+	my_ulonglong affectedRows = mysql_stmt_affected_rows(_pHandle);
 	if (affectedRows != ((my_ulonglong) - 1))
 		_affectedRowCount = static_cast<std::size_t>(affectedRows); //Was really a DELETE, UPDATE or INSERT statement
 }

@@ -127,6 +127,18 @@ public:
 	void testMultipleResults();
 
 	void testReconnect();
+	void testClosedSession();
+	void testSessionHandle();
+	void testRecordSetCopyFilter();
+	void testRecordSetFilterOwnRows();
+	void testOpenConnected();
+	void testReconnectTimeout();
+	void testStatementAfterReconnect();
+	void testPausedStatementAfterReconnect();
+	void testCloseRollsBack();
+	void testColumnTypeNullStatement();
+	void testFileToMemoryError();
+	void testPooledConnectionTimeout();
 
 	void testThreadModes();
 
@@ -134,6 +146,15 @@ public:
 	void testCommitCallback();
 	void testRollbackCallback();
 	void testNotifier();
+	void testNotifierClose();
+	void testNotifierReconnect();
+	void testNotifierMovedSession();
+	void testNotifierRegistry();
+	void testNotifierPooledSession();
+	void testNotifierCallbackException();
+	void testNotifierEnabledAfterClose();
+	void testNotifierFromHandler();
+	void testNotifierRegisteredConnection();
 
 	void testSessionTransactionReadCommitted();
 	void testSessionTransactionReadUncommitted();

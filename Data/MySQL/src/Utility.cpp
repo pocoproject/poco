@@ -23,41 +23,46 @@ namespace Poco::Data::MySQL {
 
 std::string Utility::serverInfo(MYSQL* pHandle)
 {
-	std::string info(mysql_get_server_info(pHandle));
+	poco_check_ptr (pHandle);
+	const char* pInfo = mysql_get_server_info(pHandle);
+	poco_check_ptr (pInfo);
+	std::string info(pInfo);
 	return info;
 }
 
 
 std::string Utility::serverInfo(Session& session)
 {
-	std::string info(mysql_get_server_info(handle(session)));
-	return info;
+	return serverInfo(handle(session));
 }
 
 
 unsigned long Utility::serverVersion(MYSQL* pHandle)
 {
+	poco_check_ptr (pHandle);
 	return mysql_get_server_version(pHandle);
 }
 
 
 unsigned long Utility::serverVersion(Session& session)
 {
-	return mysql_get_server_version(handle(session));
+	return serverVersion(handle(session));
 }
 
 
 std::string Utility::hostInfo(MYSQL* pHandle)
 {
-	std::string info(mysql_get_host_info(pHandle));
+	poco_check_ptr (pHandle);
+	const char* pInfo = mysql_get_host_info(pHandle);
+	poco_check_ptr (pInfo);
+	std::string info(pInfo);
 	return info;
 }
 
 
 std::string Utility::hostInfo(Session& session)
 {
-	std::string info(mysql_get_host_info(handle(session)));
-	return info;
+	return hostInfo(handle(session));
 }
 
 

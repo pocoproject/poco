@@ -21,6 +21,7 @@
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
 #include <sqlite3.h>
+#include <new>
 
 
 #ifndef SQLITE_OPEN_URI
@@ -161,13 +162,15 @@ int Utility::setAttachedLimit(Session& session, int newVal)
 	// <sqlite3.h> into their TU, and we want the symbol exported through
 	// PocoDataSQLite's normal SQLite_API surface so static-lib link works
 	// on Windows.
-	return sqlite3_limit(dbHandle(session), SQLITE_LIMIT_ATTACHED, newVal);
+	sqlite3* pDB = dbHandle(session);
+	poco_check_ptr (pDB);
+	return sqlite3_limit(pDB, SQLITE_LIMIT_ATTACHED, newVal);
 }
 
 
 MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size_t pos)
 {
-	poco_assert_dbg (pStmt);
+	poco_check_ptr (pStmt);
 
 	// Ensure statics are initialized
 	{
@@ -262,6 +265,8 @@ void Utility::throwException(sqlite3* pDB, int rc, const std::string& addErrMsg)
 
 bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
 {
+	poco_check_ptr (pInMemory);
+
 	int rc;
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
@@ -277,7 +282,8 @@ bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
 			sqlite3_backup_step(pBackup, -1);
 			sqlite3_backup_finish(pBackup);
 		}
-		rc = sqlite3_errcode(pFile);
+		// the backup reports its outcome on the destination connection
+		rc = sqlite3_errcode(pInMemory);
 	}
 
 	sqlite3_close(pFile);
@@ -287,6 +293,8 @@ bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
 
 bool Utility::memoryToFile(const std::string& fileName, sqlite3* pInMemory)
 {
+	poco_check_ptr (pInMemory);
+
 	int rc;
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
@@ -338,21 +346,128 @@ bool Utility::setThreadMode(int mode)
 }
 
 
-void* Utility::eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam)
+namespace
 {
-	return sqlite3_update_hook(pDB, callbackFn, pParam);
+	constexpr int HOOK_UPDATE = 0;
+	constexpr int HOOK_COMMIT = 1;
+	constexpr int HOOK_ROLLBACK = 2;
+	constexpr int HOOK_KIND_COUNT = 3;
+
+
+	struct HookRegistry
+		/// The registrations made through Utility::registerUpdateHandler(): the
+		/// parameter each callback was registered with, by connection and hook
+		/// kind. The mutex is held across a lookup and the sqlite3_*_hook() call
+		/// that goes with it. It is taken after the mutex of the connection, never
+		/// before: SQLite runs a callback with the connection mutex held, and the
+		/// callback may register or remove callbacks, or close a session.
+	{
+		Poco::FastMutex mutex;
+		std::map<std::pair<sqlite3*, int>, void*> params;
+	};
+
+
+	HookRegistry& hookRegistry()
+	{
+		// Never destroyed: a session closed during static destruction still uses it.
+		alignas(HookRegistry) static unsigned char storage[sizeof(HookRegistry)];
+		static HookRegistry* const pRegistry = ::new (static_cast<void*>(storage)) HookRegistry;
+		return *pRegistry;
+	}
+
+
+	template <typename CBT, typename HookFn>
+	[[nodiscard]] bool registerHook(sqlite3* pDB, int kind, CBT callbackFn, void* pParam, HookFn hookFn)
+		/// Registers callbackFn with pParam or, if callbackFn is null, removes the
+		/// registration made with pParam. Returns false if there is none to remove.
+	{
+		// nothing is registered with a null handle, so there is nothing to remove
+		if (pDB == nullptr && callbackFn == nullptr) return false;
+		poco_check_ptr (pDB);
+
+		HookRegistry& registry = hookRegistry();
+		const std::pair<sqlite3*, int> key(pDB, kind);
+		if (callbackFn == nullptr)
+		{
+			// pDB may be the handle of a connection closed since: use it only if
+			// the registration exists, as closing removes it first
+			Poco::FastMutex::ScopedLock lock(registry.mutex);
+			auto it = registry.params.find(key);
+			if (it == registry.params.end() || it->second != pParam) return false;
+		}
+
+		// the connection mutex before the registry mutex (see HookRegistry)
+		Utility::SQLiteMutex dbLock(pDB);
+		Poco::FastMutex::ScopedLock lock(registry.mutex);
+		if (callbackFn != nullptr)
+		{
+			registry.params[key] = pParam;
+		}
+		else
+		{
+			// it may have been replaced or removed before the connection mutex was taken
+			auto it = registry.params.find(key);
+			if (it == registry.params.end() || it->second != pParam) return false;
+			registry.params.erase(it);
+		}
+		hookFn(pDB, callbackFn, callbackFn != nullptr ? pParam : nullptr);
+		return true;
+	}
+} // namespace
+
+
+bool Utility::eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam)
+{
+	return registerHook(pDB, HOOK_UPDATE, callbackFn, pParam, &sqlite3_update_hook);
 }
 
 
-void* Utility::eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam)
+bool Utility::eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam)
 {
-	return sqlite3_commit_hook(pDB, callbackFn, pParam);
+	return registerHook(pDB, HOOK_COMMIT, callbackFn, pParam, &sqlite3_commit_hook);
 }
 
 
-void* Utility::eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, void* pParam)
+bool Utility::eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, void* pParam)
 {
-	return sqlite3_rollback_hook(pDB, callbackFn, pParam);
+	return registerHook(pDB, HOOK_ROLLBACK, callbackFn, pParam, &sqlite3_rollback_hook);
+}
+
+
+void Utility::unregisterUpdateHandlers(sqlite3* pDB)
+{
+	try
+	{
+		// the connection mutex before the registry mutex (see HookRegistry)
+		SQLiteMutex dbLock(pDB);
+		HookRegistry& registry = hookRegistry();
+		Poco::FastMutex::ScopedLock lock(registry.mutex);
+		sqlite3_update_hook(pDB, nullptr, nullptr);
+		sqlite3_commit_hook(pDB, nullptr, nullptr);
+		sqlite3_rollback_hook(pDB, nullptr, nullptr);
+		for (int kind = HOOK_UPDATE; kind < HOOK_KIND_COUNT; ++kind)
+			registry.params.erase(std::pair<sqlite3*, int>(pDB, kind));
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
+}
+
+
+int Utility::registeredHooks(sqlite3* pDB, const void* pParam)
+{
+	if (pDB == nullptr) return 0;
+
+	HookRegistry& registry = hookRegistry();
+	Poco::FastMutex::ScopedLock lock(registry.mutex);
+	int hooks = 0;
+	for (int kind = HOOK_UPDATE; kind < HOOK_KIND_COUNT; ++kind)
+	{
+		auto it = registry.params.find(std::pair<sqlite3*, int>(pDB, kind));
+		if (it != registry.params.end() && it->second == pParam) hooks |= 1 << kind;
+	}
+	return hooks;
 }
 
 

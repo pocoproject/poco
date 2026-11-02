@@ -27,6 +27,14 @@ public:
 	static const std::string KEY;
 		/// Keyword for creating test sessions.
 
+	static const std::string UNREACHABLE;
+		/// Connection string for which createSession() fails,
+		/// as if the database could not be reached.
+
+	static const std::string REJECTING;
+		/// Connection string for which createSession() returns a session
+		/// whose statements fail when executed, as if the database rejected them.
+
 	Connector();
 		/// Creates the Connector.
 
@@ -37,8 +45,11 @@ public:
 		/// Returns the name associated with this connector.
 
 	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
-		std::size_t timeout = SessionImpl::LOGIN_TIMEOUT_DEFAULT);
+		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT);
 		/// Creates a test SessionImpl object and initializes it with the given connectionString.
+		/// Throws ConnectionFailedException for the UNREACHABLE connection string.
+		/// The statements of a session for the REJECTING connection string throw
+		/// UnknownDataBaseException when executed.
 
 	static void addToFactory();
 		/// Registers the Connector under the Keyword Connector::KEY at the Poco::Data::SessionFactory.

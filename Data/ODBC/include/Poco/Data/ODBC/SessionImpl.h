@@ -83,6 +83,7 @@ public:
 
 	void close() override;
 		/// Closes the connection
+		/// An open transaction is rolled back, not committed.
 
 	[[nodiscard]] bool isConnected() const override;
 		/// Returns true if session is connected
@@ -95,12 +96,15 @@ public:
 
 	void begin() override;
 		/// Starts a transaction
+		/// Throws NullPointerException if the session is not connected.
 
 	void commit() override;
 		/// Commits and ends a transaction
+		/// Throws NullPointerException if the session is not connected.
 
 	void rollback() override;
 		/// Aborts a transaction
+		/// Throws NullPointerException if the session is not connected.
 
 	void reset() override;
 		/// Do nothing
@@ -116,20 +120,25 @@ public:
 
 	void setTransactionIsolation(Poco::UInt32 ti) override;
 		/// Sets the transaction isolation level.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] Poco::UInt32 getTransactionIsolation() const override;
 		/// Returns the transaction isolation level.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] bool hasTransactionIsolation(Poco::UInt32) const override;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
+		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] bool isTransactionIsolation(Poco::UInt32) const override;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
+		/// Throws NullPointerException if the session is not connected.
 
 	void autoCommit(const std::string&, bool val);
 		/// Sets autocommit property for the session.
+		/// Throws NullPointerException if the session is not connected and val is true.
 
 	[[nodiscard]] bool isAutoCommit(const std::string& name="") const;
 		/// Returns autocommit property value.
@@ -154,6 +163,7 @@ public:
 
 	[[nodiscard]] int maxStatementLength() const;
 		/// Returns maximum length of SQL statement allowed by driver.
+		/// Throws NullPointerException if the session is not connected.
 
 	void setQueryTimeout(const std::string&, const Poco::Any& value);
 		/// Sets the timeout (in seconds) for queries.
@@ -168,9 +178,11 @@ public:
 		///   - SQL_CUR_USE_ODBC - always
 		///   - SQL_CUR_USE_IF_NEEDED - if needed
 		///   - SQL_CUR_USE_DRIVER - never
+		/// Throws NullPointerException if the session has no connection handle, e.g. after close().
 
 	[[nodiscard]] Poco::Any getCursorUse(const std::string&) const;
 		/// Returns the use of cursors.
+		/// Throws NullPointerException if the session has no connection handle, e.g. after close().
 
 	int queryTimeout() const;
 		/// Returns the timeout (in seconds) for queries,
@@ -189,10 +201,12 @@ public:
 	void setMultiActiveResultset(const std::string&, bool value);
 		/// Sets the multiple active resultset capability, if available.
 		/// Does nothing, if feature is not available.
+		/// Throws NullPointerException if the feature is available and the session is not connected.
 
 	[[nodiscard]] bool getMultiActiveResultset(const std::string&) const;
 		/// Returns the multiple active resultset capability, if available.
 		/// Returns false, if feature is not available.
+		/// Throws NullPointerException if the feature is available and the session is not connected.
 
 	[[nodiscard]] const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.

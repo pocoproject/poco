@@ -75,6 +75,8 @@ public:
 
 	RowFilter(RecordSet* pRecordSet);
 		/// Creates the top-level RowFilter and associates it with the recordset.
+		/// It replaces the filter the recordset had, which is then no longer
+		/// associated with the recordset.
 
 	RowFilter(Ptr pParent, LogicOperator op = OP_OR);
 		/// Creates child RowFilter and associates it with the parent filter.
@@ -165,9 +167,17 @@ private:
 
 	RecordSet& recordSet() const;
 
+	[[nodiscard]] bool isAllowed(std::size_t row, const RecordSet& rs) const;
+		/// Returns true if the given row of rs passes this filter and its child filters.
+
 	[[nodiscard]] Comparison getComparison(const std::string& comp) const;
 
 	void rewindRecordSet();
+
+	void setRecordSet(RecordSet* pRecordSet);
+		/// Associates this filter and its child filters with the given
+		/// recordset (or with none); used when a RecordSet is moved or destroyed,
+		/// or when its filter is replaced.
 
 	Comparisons        _comparisons;
 	ComparisonMap      _comparisonMap;

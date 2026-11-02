@@ -86,6 +86,11 @@ private:
 		NEXT_FALSE
 	};
 
+	void checkConnection() const;
+		/// Throws NotConnectedException if the connection on which the
+		/// statement was created has been closed, even if the session
+		/// has been opened again since.
+
 	StatementExecutor _stmt;
 	ResultMetadata    _metadata;
 	Binder::Ptr       _pBinder;

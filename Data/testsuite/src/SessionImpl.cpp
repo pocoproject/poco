@@ -17,6 +17,32 @@
 namespace Poco::Data::Test {
 
 
+std::atomic<bool> SessionImpl::_holdRollback(false);
+Poco::Event SessionImpl::_rollbackHeld;
+Poco::Event SessionImpl::_rollbackReleased;
+
+
+void SessionImpl::holdNextRollback()
+{
+	_rollbackHeld.reset();
+	_rollbackReleased.reset();
+	_holdRollback = true;
+}
+
+
+bool SessionImpl::waitUntilRollbackHeld(long milliseconds)
+{
+	return _rollbackHeld.tryWait(milliseconds);
+}
+
+
+void SessionImpl::releaseRollback()
+{
+	_holdRollback = false;
+	_rollbackReleased.set();
+}
+
+
 SessionImpl::SessionImpl(const std::string& init, std::size_t timeout):
 	Poco::Data::AbstractSessionImpl<SessionImpl>(init, timeout),
 	_f(false),
@@ -96,6 +122,11 @@ void SessionImpl::commit()
 
 void SessionImpl::rollback()
 {
+	if (_holdRollback.exchange(false))
+	{
+		_rollbackHeld.set();
+		_rollbackReleased.wait();
+	}
 	_inTransaction = false;
 	if (_throwOnRollback)
 		throw Poco::Data::ConnectionFailedException("Test: rollback() failed");

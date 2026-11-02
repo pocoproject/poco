@@ -18,6 +18,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
+#include "Poco/Data/ODBC/Connector.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -186,6 +187,90 @@ void ODBCPostgreSQLTest::testBLOB()
 		executor().blob(1000000);
 		i += 2;
 	}
+}
+
+
+void ODBCPostgreSQLTest::testUncommittedWorkRolledBack()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	recreatePersonTable();
+	int count = -1;
+
+	// the destructor rolls back the work of a manual-commit session that never called begin(),
+	// even work done on its connection without the session knowing
+	{
+		Poco::Data::Session s(Poco::Data::ODBC::Connector::KEY, _connectString);
+		s.setFeature("autoCommit", false);
+		auto hdbc = AnyCast<SQLHDBC>(s.getProperty("handle"));
+		SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
+		assertTrue (SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt)));
+		std::string sql = "INSERT INTO Person VALUES ('LN', 'FN', 'ADDR', 1)";
+		assertTrue (SQL_SUCCEEDED(SQLExecDirect(hstmt, reinterpret_cast<SQLCHAR*>(sql.data()), static_cast<SQLINTEGER>(sql.length()))));
+		assertTrue (SQL_SUCCEEDED(SQLFreeHandle(SQL_HANDLE_STMT, hstmt)));
+		assertTrue (!s.isTransaction());
+	}
+	session() << "SELECT COUNT(*) FROM Person", into(count), now;
+	assertTrue (0 == count);
+
+	// close() rolls back the work of a manual-commit session that never called begin()
+	Poco::Data::Session s(Poco::Data::ODBC::Connector::KEY, _connectString);
+	s.setFeature("autoCommit", false);
+	s << "INSERT INTO Person VALUES ('LN', 'FN', 'ADDR', 1)", now;
+	s.close();
+	session() << "SELECT COUNT(*) FROM Person", into(count), now;
+	assertTrue (0 == count);
+}
+
+
+void ODBCPostgreSQLTest::testLostConnection()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	Poco::Data::Session s(Poco::Data::ODBC::Connector::KEY, _connectString);
+	int pid = 0;
+	s << "SELECT pg_backend_pid()", into(pid), now;
+	s.begin();
+	assertTrue (s.isTransaction());
+
+	// with a timeout, pg_terminate_backend() returns once the backend has exited
+	constexpr int TERMINATE_TIMEOUT_MS = 10000;
+	int terminated = 0;
+	*_pSession << Poco::format("SELECT CAST(pg_terminate_backend(%d, %d) AS INTEGER)", pid, TERMINATE_TIMEOUT_MS), into(terminated), now;
+	assertTrue (1 == terminated);
+
+	try { s << "SELECT 1", now; fail ("must fail"); }
+	catch (DataException&) { }
+	assertTrue (!s.isConnected());
+
+	// close() disconnects the dead connection and ends its transaction, so the session can be opened again
+	s.close();
+	assertTrue (!s.isTransaction());
+	s.open();
+	assertTrue (s.isConnected());
+	int one = 0;
+	s << "SELECT 1", into(one), now;
+	assertTrue (1 == one);
+
+	// open() without close() disconnects the dead connection first,
+	// and the new connection is not in the transaction of the dead one
+	s << "SELECT pg_backend_pid()", into(pid), now;
+	s.begin();
+	terminated = 0;
+	*_pSession << Poco::format("SELECT CAST(pg_terminate_backend(%d, %d) AS INTEGER)", pid, TERMINATE_TIMEOUT_MS), into(terminated), now;
+	assertTrue (1 == terminated);
+
+	try { s << "SELECT 1", now; fail ("must fail"); }
+	catch (DataException&) { }
+	assertTrue (!s.isConnected());
+
+	s.open();
+	assertTrue (s.isConnected());
+	s.setFeature("autoCommit", false);
+	assertTrue (!s.isTransaction());
+	one = 0;
+	s << "SELECT 1", into(one), now;
+	assertTrue (1 == one);
 }
 
 
@@ -703,6 +788,11 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStdTupleWithOptional);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testUnicode);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testReconnect);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testClosedSession);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExceptionCopy);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRecordSetBeforeExecute);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testUncommittedWorkRolledBack);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLostConnection);
 
 	return pSuite;
 }

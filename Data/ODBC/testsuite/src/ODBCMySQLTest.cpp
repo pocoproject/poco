@@ -539,6 +539,9 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testStdOptional);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testStdTupleWithOptional);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testReconnect);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testClosedSession);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testExceptionCopy);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testRecordSetBeforeExecute);
 
 	return pSuite;
 }

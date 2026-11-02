@@ -124,6 +124,8 @@ public:
 	void session(const std::string& connectString, int timeout);
 	void sessionPool(const std::string& connectString,
 		int minSessions, int maxSessions, int idleTime, int timeout);
+	void closedSession(const std::string& connectString, int timeout);
+	void exceptionCopy();
 
 	void zeroRows();
 	void simpleAccess();
@@ -478,6 +480,7 @@ public:
 
 	void blobStmt();
 	void recordSet();
+	void recordSetBeforeExecute();
 
 	void dateTime();
 	void date();

@@ -29,6 +29,65 @@
 namespace Poco::Data {
 
 
+namespace {
+	class AsyncExecRunnable: public Poco::ActiveRunnableBase
+		/// Runs an asynchronous execution of a StatementImpl. It holds the
+		/// StatementImpl while the execution runs, so that a Statement destroyed
+		/// in the meantime does not destroy it, and lets it go before it reports
+		/// the result, so that the result never holds it.
+	{
+	public:
+		AsyncExecRunnable() = delete;
+		AsyncExecRunnable(StatementImpl::Ptr pImpl, bool reset, const Statement::Result& result);
+		~AsyncExecRunnable() override = default;
+		AsyncExecRunnable(const AsyncExecRunnable&) = delete;
+		AsyncExecRunnable& operator = (const AsyncExecRunnable&) = delete;
+		AsyncExecRunnable(AsyncExecRunnable&&) = delete;
+		AsyncExecRunnable& operator = (AsyncExecRunnable&&) = delete;
+
+		void run() override;
+
+	private:
+		StatementImpl::Ptr _pImpl;
+		bool               _reset;
+		Statement::Result  _result;
+	};
+
+
+	AsyncExecRunnable::AsyncExecRunnable(StatementImpl::Ptr pImpl, bool reset, const Statement::Result& result):
+		_pImpl(std::move(pImpl)),
+		_reset(reset),
+		_result(result)
+	{
+	}
+
+
+	void AsyncExecRunnable::run()
+	{
+		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
+		try
+		{
+			_result.data(new std::size_t(_pImpl->execute(_reset)));
+		}
+		catch (Exception& e)
+		{
+			_result.error(e);
+		}
+		catch (std::exception& e)
+		{
+			_result.error(e.what());
+		}
+		catch (...)
+		{
+			_result.error("unknown exception");
+		}
+		// once wait() returns, only Statements hold the implementation
+		_pImpl.reset();
+		_result.notify();
+	}
+} // namespace
+
+
 Statement::Statement(StatementImpl::Ptr pImpl):
 #ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult(new Parser::SQLParserResult()),
@@ -53,7 +112,6 @@ Statement::Statement(const Statement& stmt):
 	_pImpl(stmt._pImpl),
 	_async(stmt._async),
 	_pResult(stmt._pResult),
-	_pAsyncExec(stmt._pAsyncExec),
 	_arguments(stmt._arguments),
 	_pRowFormatter(stmt._pRowFormatter),
 	_stmtString(stmt._stmtString)
@@ -67,7 +125,6 @@ Statement::Statement(Statement&& stmt) noexcept:
 	_pImpl(std::move(stmt._pImpl)),
 	_async(stmt._async),
 	_pResult(std::move(stmt._pResult)),
-	_pAsyncExec(std::move(stmt._pAsyncExec)),
 	_arguments(std::move(stmt._arguments)),
 	_pRowFormatter(std::move(stmt._pRowFormatter)),
 	_stmtString(std::move(stmt._stmtString))
@@ -86,7 +143,6 @@ void Statement::clear() noexcept
 	_pImpl.reset();
 	_async = false;
 	_pResult = nullptr;
-	_pAsyncExec = nullptr;
 	_arguments.clear();
 	_pRowFormatter = nullptr;
 	_stmtString.clear();
@@ -110,7 +166,6 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 	_pImpl = std::move(stmt._pImpl);
 	_async = stmt._async;
 	_pResult = std::move(stmt._pResult);
-	_pAsyncExec = std::move(stmt._pAsyncExec);
 	_arguments = std::move(stmt._arguments);
 	_pRowFormatter = std::move(stmt._pRowFormatter);
 	_stmtString = std::move(stmt._stmtString);
@@ -127,7 +182,6 @@ void Statement::swap(Statement& other) noexcept
 	swap(_pImpl, other._pImpl);
 	swap(_async, other._async);
 	swap(_pResult, other._pResult);
-	swap(_pAsyncExec, other._pAsyncExec);
 	_arguments.swap(other._arguments);
 	swap(_pRowFormatter, other._pRowFormatter);
 	swap(_stmtString, other._stmtString);
@@ -333,6 +387,7 @@ void Statement::checkBeginTransaction()
 {
 	SessionImpl& session = _pImpl->session();
 	if (!session.isTransaction() && !session.isAutocommit()) {
+		if (!session.isConnected()) return;
 		if (session.shouldParse())
 		{
 			auto result = parse();
@@ -403,9 +458,10 @@ const Statement::Result& Statement::executeAsync(bool reset)
 const Statement::Result& Statement::doAsyncExec(bool reset)
 {
 	if (done()) _pImpl->reset();
-	if (!_pAsyncExec)
-		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
-	_pResult = new Result((*_pAsyncExec)(reset));
+	Result result(new ActiveResultHolder<std::size_t>());
+	ActiveRunnableBase::Ptr pRunnable(new AsyncExecRunnable(_pImpl, reset, result));
+	ActiveStarter<StatementImpl>::start(_pImpl.get(), pRunnable);
+	_pResult = new Result(result);
 	return *_pResult;
 }
 
@@ -413,8 +469,6 @@ const Statement::Result& Statement::doAsyncExec(bool reset)
 void Statement::setAsync(bool async)
 {
 	_async = async;
-	if (_async && !_pAsyncExec)
-		_pAsyncExec = new AsyncExecMethod(_pImpl, &StatementImpl::execute);
 }
 
 
@@ -428,7 +482,7 @@ std::size_t Statement::wait(long milliseconds)
 		_pResult->wait();
 
 	if (_pResult->exception())
-		throw *_pResult->exception();
+		_pResult->exception()->rethrow();
 	else if (!success)
 		throw TimeoutException("Statement timed out.");
 
