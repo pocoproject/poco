@@ -383,9 +383,21 @@ void SecureSyslogTest::testPlainClient()
 {
 	TLSListener listener;
 	// A client that does not speak TLS is dropped ...
+	// Some Schannel versions read the first bytes of a syslog message
+	// ("<34") as an SSL 2.0 record header that announces 15411 bytes,
+	// and wait for them; the message is therefore made longer than any
+	// record such a header can announce.
 	StreamSocket plain(listener.address());
-	send(plain, line("in the clear"));
-	bool dropped = closedByPeer(plain);
+	bool dropped = false;
+	try
+	{
+		send(plain, line("in the clear " + std::string(20*1024, 'x')));
+		dropped = closedByPeer(plain);
+	}
+	catch (const Poco::IOException&)
+	{
+		dropped = true;
+	}
 
 	// ... and the listener goes on serving.
 	SecureStreamSocket client = connectTLS(listener.address());
