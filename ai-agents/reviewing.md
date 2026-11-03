@@ -54,7 +54,9 @@ gh pr diff <N> -R pocoproject/poco
 9. **Style:** conformance to [CODING_STYLE.md](../CODING_STYLE.md). Its rules are must-fix in new and changed code, also
    where existing code on `main` does not follow them.
 10. **API and ABI:** changes to public headers are deliberate and documented; removed API is deprecated first
-    (`POCO_DEPRECATED`); a breaking change is labelled `breaking` and listed under "Breaking Changes" in `CHANGELOG`.
+    (`POCO_DEPRECATED`); a change that breaks source compatibility is labelled `breaking` and listed under "Breaking
+    Changes" in `CHANGELOG`. A change that breaks only binary compatibility is neither labelled nor listed, since
+    every release has its own SOVERSION.
 11. **Text:** ASCII only; documentation and `CHANGELOG` entries match the code.
 
 ## Findings
