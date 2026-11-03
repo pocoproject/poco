@@ -96,28 +96,32 @@ private:
 
 
 inline IntCounter::IntCounter(const std::string& name):
-	Metric(Metric::Type::COUNTER, name)
+	Metric(Metric::Type::COUNTER, name, nullptr)
 {
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 inline IntCounter::IntCounter(const std::string& name, const Params& params):
-	Metric(Metric::Type::COUNTER, name)
+	Metric(Metric::Type::COUNTER, name, nullptr)
 {
 	setHelp(params.help);
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 inline IntCounter::IntCounter(const std::string& name, Registry* pRegistry):
-	Metric(Metric::Type::COUNTER, name, pRegistry)
+	Metric(Metric::Type::COUNTER, name, nullptr)
 {
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 
 inline IntCounter::IntCounter(const std::string& name, const Params& params, Registry* pRegistry):
-	Metric(Metric::Type::COUNTER, name, pRegistry)
+	Metric(Metric::Type::COUNTER, name, nullptr)
 {
 	setHelp(params.help);
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 

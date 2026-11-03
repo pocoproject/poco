@@ -37,16 +37,18 @@ Poco::Timestamp ProcessCollector::_startTime;
 
 
 ProcessCollector::ProcessCollector():
-	Collector("process"s)
+	Collector("process"s, nullptr)
 {
 	buildMetrics();
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 ProcessCollector::ProcessCollector(const std::string& name, Registry* pRegistry):
-	Collector(name, pRegistry)
+	Collector(name, nullptr)
 {
 	buildMetrics();
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 

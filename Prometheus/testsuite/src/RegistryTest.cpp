@@ -11,16 +11,25 @@
 #include "RegistryTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Prometheus/CallbackMetric.h"
 #include "Poco/Prometheus/Collector.h"
 #include "Poco/Prometheus/Counter.h"
+#include "Poco/Prometheus/Gauge.h"
 #include "Poco/Prometheus/Histogram.h"
+#include "Poco/Prometheus/IntCounter.h"
+#include "Poco/Prometheus/IntGauge.h"
+#include "Poco/Prometheus/Metric.h"
+#include "Poco/Prometheus/ProcessCollector.h"
 #include "Poco/Prometheus/Registry.h"
 #include "Poco/Prometheus/TextExporter.h"
+#include "Poco/Prometheus/ThreadPoolCollector.h"
 #include "Poco/Event.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
+#include "Poco/ThreadPool.h"
 #include <atomic>
 #include <memory>
+#include <ostream>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -29,6 +38,87 @@
 
 using namespace Poco::Prometheus;
 using namespace std::string_literals;
+
+
+namespace
+{
+	class HoldingExporter: public TextExporter
+		/// Yields in every header while Registry::exportTo() holds the
+		/// registry mutex, so that a thread that constructs or destroys
+		/// a collector at the same time has to wait for the export.
+	{
+	public:
+		HoldingExporter() = delete;
+
+		explicit HoldingExporter(std::ostream& stream):
+			TextExporter(stream)
+		{
+		}
+
+		~HoldingExporter() override = default;
+
+		HoldingExporter(const HoldingExporter&) = delete;
+		HoldingExporter(HoldingExporter&&) = delete;
+		HoldingExporter& operator = (const HoldingExporter&) = delete;
+		HoldingExporter& operator = (HoldingExporter&&) = delete;
+
+		void writeHeader(const Metric& metric) override
+		{
+			Poco::Thread::yield();
+			TextExporter::writeHeader(metric);
+		}
+	};
+
+
+	class ExportThread
+		/// Exports a Registry through a HoldingExporter in a loop,
+		/// from the first export pass until it is destroyed.
+	{
+	public:
+		ExportThread() = delete;
+
+		POCO_NODISCARD_CTOR explicit ExportThread(const Registry& registry):
+			_registry(registry)
+		{
+			_thread.startFunc([this]()
+			{
+				run();
+			});
+			_exporting.wait();
+		}
+
+		~ExportThread()
+		{
+			_stop = true;
+			_thread.join();
+		}
+
+		ExportThread(const ExportThread&) = delete;
+		ExportThread(ExportThread&&) = delete;
+		ExportThread& operator = (const ExportThread&) = delete;
+		ExportThread& operator = (ExportThread&&) = delete;
+
+	private:
+		void run()
+		{
+			while (!_stop)
+			{
+				std::ostringstream stream;
+				HoldingExporter exporter(stream);
+				_registry.exportTo(exporter);
+				_exporting.set();
+				// The mutex is not fair on every platform; without a yield,
+				// the thread under test can wait through many export passes.
+				Poco::Thread::yield();
+			}
+		}
+
+		const Registry& _registry;
+		std::atomic<bool> _stop{false};
+		Poco::Event _exporting;
+		Poco::Thread _thread;
+	};
+}
 
 
 RegistryTest::RegistryTest(const std::string& name):
@@ -184,6 +274,46 @@ void RegistryTest::testConcurrentExportAndDestruction()
 }
 
 
+void RegistryTest::testConcurrentExportAndConstruction()
+{
+	constexpr int ROUNDS = 10;
+
+	Registry registry;
+	std::vector<std::unique_ptr<Collector>> collectors;
+	{
+		ExportThread exportThread(registry);
+		for (int i = 0; i < ROUNDS; ++i)
+		{
+			const std::string suffix = "_"s + std::to_string(i);
+			collectors.push_back(std::make_unique<Counter>(
+				"counter"s + suffix, Counter::Params{"A test counter"s, {"label"s}}, &registry));
+			collectors.push_back(std::make_unique<Gauge>(
+				"gauge"s + suffix, Gauge::Params{"A test gauge"s, {"label"s}}, &registry));
+			collectors.push_back(std::make_unique<Histogram>(
+				"histogram"s + suffix, Histogram::Params{"A test histogram"s, {"label"s}, {1.0, 2.0}}, &registry));
+			collectors.push_back(std::make_unique<IntCounter>(
+				"int_counter"s + suffix, IntCounter::Params{"A test counter"s}, &registry));
+			collectors.push_back(std::make_unique<IntGauge>(
+				"int_gauge"s + suffix, IntGauge::Params{"A test gauge"s}, &registry));
+			collectors.push_back(std::make_unique<CallbackGauge>(
+				"callback_gauge"s + suffix, "A test gauge"s, &registry, []()
+				{
+					return 1.0;
+				}));
+			collectors.push_back(std::make_unique<ProcessCollector>(
+				"process"s + suffix, &registry));
+			collectors.push_back(std::make_unique<ThreadPoolCollector>(
+				"pool"s + suffix, Poco::ThreadPool::defaultPool(), &registry));
+		}
+	}
+
+	for (const auto& pCollector: collectors)
+	{
+		assertTrue (registry.findCollector(pCollector->name()) == pCollector.get());
+	}
+}
+
+
 void RegistryTest::setUp()
 {
 }
@@ -205,6 +335,7 @@ CppUnit::Test* RegistryTest::suite()
 	CppUnit_addTest(pSuite, RegistryTest, testUnregisteredCollectorCanRegisterElsewhere);
 	CppUnit_addTest(pSuite, RegistryTest, testRegisterWithSecondRegistryFails);
 	CppUnit_addTest(pSuite, RegistryTest, testConcurrentExportAndDestruction);
+	CppUnit_addTest(pSuite, RegistryTest, testConcurrentExportAndConstruction);
 
 	return pSuite;
 }

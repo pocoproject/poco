@@ -25,30 +25,34 @@ GaugeSample::~GaugeSample() = default;
 
 
 Gauge::Gauge(const std::string& name):
-	LabeledMetricImpl<GaugeSample>(Metric::Type::GAUGE, name)
+	LabeledMetricImpl<GaugeSample>(Metric::Type::GAUGE, name, nullptr)
 {
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 Gauge::Gauge(const std::string& name, const Params& params):
-	LabeledMetricImpl<GaugeSample>(Metric::Type::GAUGE, name)
+	LabeledMetricImpl<GaugeSample>(Metric::Type::GAUGE, name, nullptr)
 {
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 Gauge::Gauge(const std::string& name, Registry* pRegistry):
-	LabeledMetricImpl<GaugeSample>(Metric::Type::GAUGE, name, pRegistry)
+	LabeledMetricImpl<GaugeSample>(Metric::Type::GAUGE, name, nullptr)
 {
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 
 Gauge::Gauge(const std::string& name, const Params& params, Registry* pRegistry):
-	LabeledMetricImpl<GaugeSample>(Metric::Type::GAUGE, name, pRegistry)
+	LabeledMetricImpl<GaugeSample>(Metric::Type::GAUGE, name, nullptr)
 {
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 
