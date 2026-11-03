@@ -37,6 +37,7 @@
 #include "ObjectPoolTest.h"
 #include "ListMapTest.h"
 #include "OrderedContainersTest.h"
+#include "ChecksumTest.h"
 
 
 CppUnit::Test* CoreTestSuite::suite()
@@ -71,6 +72,7 @@ CppUnit::Test* CoreTestSuite::suite()
 	pSuite->addTest(ObjectPoolTest::suite());
 	pSuite->addTest(ListMapTest::suite());
 	pSuite->addTest(OrderedContainersTest::suite());
+	pSuite->addTest(ChecksumTest::suite());
 
 	return pSuite;
 }
