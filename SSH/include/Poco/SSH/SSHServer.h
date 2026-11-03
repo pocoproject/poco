@@ -88,6 +88,12 @@ public:
 		/// authenticator of the configuration waits for something other
 		/// than the client.
 		///
+		/// The timeout covers each session until it has removed itself from
+		/// the server, after its handler has returned. stop() then waits
+		/// without a time limit for the session to close its connection and
+		/// to delete itself, so a destructor of a derived session that waits
+		/// extends stop() beyond the timeout.
+		///
 		/// Throws a Poco::TimeoutException if sessions are still running
 		/// after the timeout. Such sessions still use this object; calling
 		/// stop() again waits for them again.
