@@ -61,7 +61,8 @@ public:
 		/// search does not, as on macOS, a rename that changes only the case or normalization of a name that
 		/// a pattern spells literally can change the file list without changing a listed file or directory.
 		/// So can a new target of a link before a ".." component in the target path of a link that does not
-		/// resolve to a directory.
+		/// resolve to a directory. So can replacing a directory that a pattern or a link target names, by a
+		/// rename or a new link target, with one whose timestamp is older.
 
 	static void fixup(NameSpace::SymbolTable& st);
 		/// Fixes all base pointers in the symbol table
