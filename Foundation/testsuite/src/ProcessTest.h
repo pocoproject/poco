@@ -46,6 +46,7 @@ public:
 	void testIsRunningAfterWait();
 	void testWaitAfterKill();
 	void testKillAfterExit();
+	void testKillAfterExitWithCodeStillActive();
 	void testRequestTerminationOfNewGroup();
 	void testRequestTerminationWithoutConsole();
 	void testRequestTerminationKeepsStandardHandles();
