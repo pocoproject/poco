@@ -841,6 +841,77 @@ void WebSocketTest::testNonBlockingThenBlockingReceiveCutShort()
 }
 
 
+void WebSocketTest::testBlockingReceiveBufferedShortFrames()
+{
+	UpgradeState::Ptr pState = new UpgradeState;
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new UpgradeRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	Poco::Net::StreamSocket sock = connectWebSocket(ss.address());
+	assertTrue (pState->upgraded.tryWait(10000));
+	WebSocket& ws = *pState->pWebSocket;
+	// A receive that waits for data which never comes fails with a timeout.
+	ws.setReceiveTimeout(Poco::Timespan(2, 0));
+
+	// A text frame and a close frame without payload, together no longer than
+	// the longest header, sent in one piece: the first receive takes both into
+	// the buffer, and the peer sends nothing more.
+	const std::string frames = maskedTextFrame("ab") + std::string("\x88\x80\x01\x02\x03\x04", 6);
+	sock.sendBytes(frames.data(), static_cast<int>(frames.size()));
+
+	char buffer[256] = {};
+	int flags = 0;
+	int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+	assertEqual (2, n);
+	assertEqual (std::string("ab"), std::string(buffer, n));
+	assertTrue (flags == WebSocket::FRAME_TEXT);
+	n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+	assertEqual (0, n);
+	assertTrue ((flags & WebSocket::FRAME_OP_BITMASK) == WebSocket::FRAME_OP_CLOSE);
+
+	sock.close();
+	ws.close();
+	server.stop();
+}
+
+
+void WebSocketTest::testPayloadTooBigRejectedBeforeMask()
+{
+	UpgradeState::Ptr pState = new UpgradeState;
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new UpgradeRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	Poco::Net::StreamSocket sock = connectWebSocket(ss.address());
+	assertTrue (pState->upgraded.tryWait(10000));
+	WebSocket& ws = *pState->pWebSocket;
+	// A receive that waits for the mask bytes fails with a timeout.
+	ws.setReceiveTimeout(Poco::Timespan(2, 0));
+
+	// The header of a masked frame with a 64-bit length over the limit, without
+	// its mask bytes; the peer sends nothing more.
+	const std::string header("\x82\xFF\x00\x00\x00\x01\x00\x00\x00\x00", 10);
+	sock.sendBytes(header.data(), static_cast<int>(header.size()));
+
+	char buffer[256] = {};
+	int flags = 0;
+	try
+	{
+		int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+		failmsg("must throw WebSocketException, but received " + std::to_string(n));
+	}
+	catch (WebSocketException& exc)
+	{
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_PAYLOAD_TOO_BIG), exc.code());
+	}
+
+	sock.close();
+	ws.close();
+	server.stop();
+}
+
+
 int WebSocketTest::sendServerFrame(const std::string& frameBytes, int allowedRSV, int bufferSize, int* pFlags, int* pReceived)
 {
 	SingleFrameState::Ptr pState = new SingleFrameState;
@@ -1103,6 +1174,8 @@ CppUnit::Test* WebSocketTest::suite()
 	CppUnit_addTest(pSuite, WebSocketTest, testNonBlockingReceiveRetryWithLargerBuffer);
 	CppUnit_addTest(pSuite, WebSocketTest, testNonBlockingThenBlockingReceive);
 	CppUnit_addTest(pSuite, WebSocketTest, testNonBlockingThenBlockingReceiveCutShort);
+	CppUnit_addTest(pSuite, WebSocketTest, testBlockingReceiveBufferedShortFrames);
+	CppUnit_addTest(pSuite, WebSocketTest, testPayloadTooBigRejectedBeforeMask);
 	CppUnit_addTest(pSuite, WebSocketTest, testPeerCloseAfterPartialHeader);
 	CppUnit_addTest(pSuite, WebSocketTest, testPeerCloseAfterPartialHeaderNB);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameUnmaskedClient);

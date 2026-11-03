@@ -35,6 +35,8 @@ public:
 	void testNonBlockingReceiveRetryWithLargerBuffer();
 	void testNonBlockingThenBlockingReceive();
 	void testNonBlockingThenBlockingReceiveCutShort();
+	void testBlockingReceiveBufferedShortFrames();
+	void testPayloadTooBigRejectedBeforeMask();
 	void testPeerCloseAfterPartialHeader();
 	void testPeerCloseAfterPartialHeaderNB();
 	void testMalformedFrameUnmaskedClient();
