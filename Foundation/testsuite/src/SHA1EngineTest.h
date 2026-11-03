@@ -24,6 +24,7 @@ public:
 	SHA1EngineTest(const std::string& name);
 	~SHA1EngineTest();
 
+	void testChunkedUpdate();
 	void testSHA1();
 	void testLargeInput();
 

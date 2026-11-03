@@ -67,9 +67,22 @@ void SHA1Engine::updateImpl(const void* buffer_, std::size_t count)
 	_context.countHi += static_cast<UInt32>(count >> 29);
 
 	/* Process data in BLOCK_SIZE chunks */
-	while (count-- > 0)
+	while (count > 0)
 	{
-		db[_context.slop++] = *(buffer++);
+		if (_context.slop == 0 && count >= BLOCK_SIZE)
+		{
+			/* whole blocks with one fixed-size memcpy; partial blocks stay byte by byte,
+			   since a memcpy of variable size per call slows down short updates */
+			std::memcpy(db, buffer, BLOCK_SIZE);
+			buffer += BLOCK_SIZE;
+			count -= BLOCK_SIZE;
+			_context.slop = BLOCK_SIZE;
+		}
+		else
+		{
+			db[_context.slop++] = *(buffer++);
+			--count;
+		}
 		if (_context.slop == BLOCK_SIZE)
 		{
 			/* transform this one block */
