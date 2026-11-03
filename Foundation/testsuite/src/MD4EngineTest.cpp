@@ -31,6 +31,14 @@ MD4EngineTest::~MD4EngineTest()
 }
 
 
+void MD4EngineTest::testEmptyUpdate()
+{
+	MD4Engine engine;
+	engine.update(nullptr, 0);
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "31d6cfe0d16ae931b73c59d7e0c089c0");
+}
+
+
 void MD4EngineTest::testMD4()
 {
 	MD4Engine engine;
@@ -92,6 +100,7 @@ CppUnit::Test* MD4EngineTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MD4EngineTest");
 
+	CppUnit_addTest(pSuite, MD4EngineTest, testEmptyUpdate);
 	CppUnit_addTest(pSuite, MD4EngineTest, testMD4);
 	CppUnit_addLongTest(pSuite, MD4EngineTest, testLargeInput);
 

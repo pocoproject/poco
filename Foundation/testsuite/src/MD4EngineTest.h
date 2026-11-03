@@ -24,6 +24,7 @@ public:
 	MD4EngineTest(const std::string& name);
 	~MD4EngineTest();
 
+	void testEmptyUpdate();
 	void testMD4();
 	void testLargeInput();
 

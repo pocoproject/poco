@@ -31,6 +31,14 @@ MD5EngineTest::~MD5EngineTest()
 }
 
 
+void MD5EngineTest::testEmptyUpdate()
+{
+	MD5Engine engine;
+	engine.update(nullptr, 0);
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "d41d8cd98f00b204e9800998ecf8427e");
+}
+
+
 void MD5EngineTest::testMD5()
 {
 	MD5Engine engine;
@@ -108,6 +116,7 @@ CppUnit::Test* MD5EngineTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MD5EngineTest");
 
+	CppUnit_addTest(pSuite, MD5EngineTest, testEmptyUpdate);
 	CppUnit_addTest(pSuite, MD5EngineTest, testMD5);
 	CppUnit_addLongTest(pSuite, MD5EngineTest, testLargeInput);
 	CppUnit_addTest(pSuite, MD5EngineTest, testConstantTimeEquals);
