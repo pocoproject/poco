@@ -23,6 +23,7 @@
 #include <chrono>
 #include <cstdint>
 #include <functional>
+#include <optional>
 #include <utility>
 
 
@@ -43,28 +44,39 @@ void limitWaitsAfterStop(ssh_session session)
 
 
 [[nodiscard]] int writeChannel(ssh_channel channel, const char* data, uint32_t length,
-	const std::function<bool()>& stopRequested)
-	/// Writes with ssh_channel_write(). With a stop check, the write takes steps of at most
-	/// SSHSession::STOP_CHECK_INTERVAL until libssh has passed all bytes to the socket, and calls the stop check
-	/// before each step.
-	/// Returns length when libssh has passed all bytes to the socket. If the stop check returns true first,
-	/// returns the number of bytes written before it, or SSH_ERROR when all were written but libssh may still
-	/// hold some. Returns SSH_ERROR on an error.
+	const std::function<bool()>& stopRequested,
+	const std::optional<std::chrono::steady_clock::time_point>& deadline = std::nullopt)
+	/// Writes with ssh_channel_write(). With a stop check or a deadline, the write takes steps of at most
+	/// SSHSession::STOP_CHECK_INTERVAL until libssh has passed all bytes to the socket, calls the stop check
+	/// before each step and ends at the deadline; each wait of a step is limited to the time left until then.
+	/// Returns length when libssh has passed all bytes to the socket. If the stop check returns true or the
+	/// deadline passes first, returns the number of bytes written before it, or SSH_ERROR when all were written
+	/// but libssh may still hold some. Returns SSH_ERROR on an error.
 {
-	if (stopRequested == nullptr)
+	if (stopRequested == nullptr && !deadline.has_value())
 		return ssh_channel_write(channel, data, length);
 
 	// One ssh_channel_write() waits with the session timeout for a key re-exchange to end, for the window and
 	// for the socket, so that each wait may take a third of the interval
 	constexpr auto WRITE_WAIT = SSHSession::STOP_CHECK_INTERVAL / 3;
+	// Returns the given wait, shortened to the time left until the deadline, or zero when the write must end
+	const auto nextWait = [&stopRequested, &deadline](std::chrono::milliseconds wait)
+	{
+		if (stopRequested != nullptr && stopRequested())
+			return std::chrono::milliseconds::zero();
+		return deadline.has_value() ? std::min(wait, remainingWait(*deadline)) : wait;
+	};
 	ssh_session session = ssh_channel_get_session(channel);
 	uint32_t written = 0;
-	while (written < length && !stopRequested())
+	while (written < length)
 	{
+		const auto wait = nextWait(WRITE_WAIT);
+		if (wait == std::chrono::milliseconds::zero())
+			break;
 		// While the window takes the step, libssh does not wait for the window; with a larger step, it waits
 		// again each time the client grows the window
 		const uint32_t step = std::min(length - written, std::max(ssh_channel_window_size(channel), uint32_t{1}));
-		if (!setSessionTimeout(session, WRITE_WAIT))
+		if (!setSessionTimeout(session, wait))
 			return SSH_ERROR;
 		// A wait for the window that times out returns the bytes written before it
 		const int count = ssh_channel_write(channel, data + written, step);
@@ -74,13 +86,19 @@ void limitWaitsAfterStop(ssh_session session)
 	}
 	// ssh_channel_write() also counts the bytes that libssh still holds when its wait for the socket times out
 	int flushed = SSH_AGAIN;
-	while (written == length && flushed == SSH_AGAIN && !stopRequested())
-		flushed = ssh_blocking_flush(session, static_cast<int>(SSHSession::STOP_CHECK_INTERVAL.count()));
+	while (written == length && flushed == SSH_AGAIN)
+	{
+		const auto wait = nextWait(SSHSession::STOP_CHECK_INTERVAL);
+		if (wait == std::chrono::milliseconds::zero())
+			break;
+		flushed = ssh_blocking_flush(session, static_cast<int>(wait.count()));
+	}
 	if (flushed == SSH_AGAIN)
 	{
-		// The stop check returned true. A stop during the flush fails the write, so that the caller does not take
-		// bytes that libssh holds for sent.
-		limitWaitsAfterStop(session);
+		// The stop check returned true or the deadline passed. A stop or the deadline during the flush fails the
+		// write, so that the caller does not take bytes that libssh holds for sent.
+		if (stopRequested != nullptr && stopRequested())
+			limitWaitsAfterStop(session);
 		return written < length ? static_cast<int>(written) : SSH_ERROR;
 	}
 	return flushed == SSH_OK ? static_cast<int>(written) : SSH_ERROR;
@@ -88,11 +106,12 @@ void limitWaitsAfterStop(ssh_session session)
 
 
 [[nodiscard]] bool echo(ssh_channel channel, const char* data, uint32_t length,
-	const std::function<bool()>& stopRequested)
-	/// Echoes input to the client. Returns false if a stop ended the write. A failed echo is otherwise ignored:
-	/// the next read of sshReadLine() reports a channel that has failed.
+	const std::function<bool()>& stopRequested, std::chrono::steady_clock::time_point deadline)
+	/// Echoes input to the client until the deadline. Returns false if a stop ended the write. A failed echo is
+	/// otherwise ignored: a following read reports a channel that has failed, and the loop of sshReadLine()
+	/// throws its timeout unless the echo ended the line.
 {
-	return writeChannel(channel, data, length, stopRequested) == static_cast<int>(length) ||
+	return writeChannel(channel, data, length, stopRequested, deadline) == static_cast<int>(length) ||
 		stopRequested == nullptr || !stopRequested();
 }
 
@@ -187,7 +206,7 @@ bool sshReadLine(ssh_channel channel, std::string& line, std::size_t maxLength, 
 		if (ch == '\r' || ch == '\n')
 		{
 			// Echo newline back to client
-			if (!echo(channel, "\r\n", 2, stopRequested))
+			if (!echo(channel, "\r\n", 2, stopRequested, deadline))
 				return false;
 			// Strip trailing CR if present
 			if (!line.empty() && line.back() == '\r')
@@ -203,14 +222,14 @@ bool sshReadLine(ssh_channel channel, std::string& line, std::size_t maxLength, 
 				while (line.size() > 1 && (static_cast<unsigned char>(line.back()) & 0xC0) == 0x80)
 					line.pop_back();
 				line.pop_back();
-				if (!echo(channel, "\b \b", 3, stopRequested))
+				if (!echo(channel, "\b \b", 3, stopRequested, deadline))
 					return false;
 			}
 		}
 		else if (ch == '\x03')
 		{
 			// Ctrl+C: discard line
-			if (!echo(channel, "^C\r\n", 4, stopRequested))
+			if (!echo(channel, "^C\r\n", 4, stopRequested, deadline))
 				return false;
 			line.clear();
 			return true;
@@ -221,7 +240,7 @@ bool sshReadLine(ssh_channel channel, std::string& line, std::size_t maxLength, 
 				throw SSHChannelException(Poco::format("SSH input line longer than %z bytes", maxLength));
 			// Echo printable character back
 			line += ch;
-			if (!echo(channel, &ch, 1, stopRequested))
+			if (!echo(channel, &ch, 1, stopRequested, deadline))
 				return false;
 		}
 	}

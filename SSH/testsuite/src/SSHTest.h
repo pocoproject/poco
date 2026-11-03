@@ -64,6 +64,7 @@ public:
 	void testHandlerReadAfterStreamWriteWaitsWithoutTimeLimit();
 	void testServerStopDuringReadLineBeforeRawRead();
 	void testReadLineEchoWaitsForWindow();
+	void testReadLineTimeoutEndsEchoWaitingForWindow();
 	void testStreamWriteSendsAllDataBeforeSessionEnds();
 	void testServerStopDuringStreamWriteToReadingClient();
 	void testWriteFailsWhenStopCheckReturnsTrue();
