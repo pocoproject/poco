@@ -82,6 +82,15 @@ public:
 
 	void exportTo(Exporter& exporter) const;
 		/// Exports all registered collector's metrics through the given Exporter.
+		///
+		/// The Registry's mutex is held during the export. A callback that
+		/// runs during the export, such as the callback of a CallbackMetric
+		/// or a function of the Exporter, must not create, destroy, register
+		/// or unregister a Collector of this Registry, nor call
+		/// registerCollector(), unregisterCollector(), findCollector(),
+		/// clear() or exportTo() of this Registry. The mutex is not recursive
+		/// on every platform, so such a call can deadlock or change the
+		/// Registry while it is exported.
 
 	[[nodiscard]] static Registry& defaultRegistry();
 		/// Returns the default Registry.
