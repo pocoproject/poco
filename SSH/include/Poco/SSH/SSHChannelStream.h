@@ -110,11 +110,14 @@ inline constexpr std::chrono::milliseconds DEFAULT_READ_LINE_TIMEOUT = std::chro
 	/// A timeout that is too long for std::chrono::steady_clock,
 	/// such as std::chrono::milliseconds::max(), sets no time limit.
 	/// A zero or negative timeout times out at once.
+	/// The timeout also limits the echo, with or without a stop check:
+	/// each step of the echo sets the timeout of the session and then
+	/// sets it back to zero.
 	///
 	/// With a stop check, such as SSHSession::stopRequested(), the
 	/// function waits for input in steps of at most
 	/// SSHSession::STOP_CHECK_INTERVAL and calls the stop check after
-	/// each step. It writes the echo as SSHChannelStreamBuf describes.
+	/// each step.
 	/// When the stop check returns true, it sets the timeout of the
 	/// session to SSHSession::STOP_CHECK_INTERVAL, as SSHChannelStreamBuf
 	/// describes.

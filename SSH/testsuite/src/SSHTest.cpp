@@ -259,15 +259,18 @@ namespace
 		WriteState& _state;
 	};
 
-	/// Results of a FullWindowSession.
+	/// Timeout and stop check for the sshReadLine() calls of a FullWindowSession, and its results.
 	struct FullWindowState
 	{
+		std::chrono::milliseconds timeout = DEFAULT_READ_LINE_TIMEOUT;
+		bool readStopCheck = true;
 		std::atomic<std::size_t> fillSize{0};
 		Poco::Event lineRead;
+		std::atomic<bool> timedOut{false};
 	};
 
-	/// Uses up the window of the client to its last byte, then reads lines with a stop check until the client
-	/// ends its input, so that the echo of the first line end waits for the client to grow the window.
+	/// Uses up the window of the client to its last byte, then reads lines until the client ends its input or
+	/// the timeout passes, so that the next echo waits for the client to grow the window.
 	class FullWindowSession: public SSHSession
 	{
 	public:
@@ -297,9 +300,19 @@ namespace
 				return;
 			_state.fillSize = fillSize;
 
+			std::function<bool()> readStopCheck;
+			if (_state.readStopCheck)
+				readStopCheck = stopCheck;
 			std::string line;
-			while (sshReadLine(channel, line, DEFAULT_READ_LINE_MAX_LENGTH, DEFAULT_READ_LINE_TIMEOUT, stopCheck))
-				_state.lineRead.set();
+			try
+			{
+				while (sshReadLine(channel, line, DEFAULT_READ_LINE_MAX_LENGTH, _state.timeout, readStopCheck))
+					_state.lineRead.set();
+			}
+			catch (Poco::TimeoutException&)
+			{
+				_state.timedOut = true;
+			}
 		}
 
 	private:
@@ -2339,6 +2352,43 @@ void SSHTest::testReadLineEchoWaitsForWindow()
 }
 
 
+void SSHTest::testReadLineTimeoutEndsEchoWaitingForWindow()
+{
+	for (const bool readStopCheck: {false, true})
+	{
+		FullWindowState state;
+		state.timeout = std::chrono::seconds(1);
+		state.readStopCheck = readStopCheck;
+		SSHServerConfig cfg = makeTestConfig(_testDir);
+
+		SSHServer server(cfg, [&state](ssh_session s, const SSHServerConfig& c, SSHServer& srv) -> SSHSession*
+		{
+			return new FullWindowSession(s, c, srv, state);
+		});
+		server.start();
+
+		SSHClient client;
+		setClassicalKex(client.session());
+		client.connect("127.0.0.1", server.port());
+		assertTrue(client.authenticatePassword("testuser", "testpass"));
+		ssh_channel channel = client.openShellChannel();
+		assertTrue(channel != nullptr);
+		char first = 0;
+		assertEqual(1, ssh_channel_read_timeout(channel, &first, 1, 0, 10000));
+		// The echo of the first character takes the last byte of the window, the echo of the second one waits
+		ssh_channel_write(channel, "ab", 2);
+
+		// The client does not read the channel, so the window stays used up, and the echo must end at the timeout
+		assertTrue(processUntil(client.session(), [&state]() { return state.fillSize > 0; }, std::chrono::seconds(10)));
+		assertTrue(processUntil(client.session(), [&state]() { return state.timedOut.load(); },
+			state.timeout + std::chrono::seconds(2)));
+		assertFalse(state.lineRead.tryWait(0));
+
+		ssh_channel_free(channel);
+	}
+}
+
+
 void SSHTest::testStreamWriteSendsAllDataBeforeSessionEnds()
 {
 	WriteState state;
@@ -2525,6 +2575,7 @@ CppUnit::Test* SSHTest::suite()
 	CppUnit_addTest(pSuite, SSHTest, testHandlerReadAfterStreamWriteWaitsWithoutTimeLimit);
 	CppUnit_addTest(pSuite, SSHTest, testServerStopDuringReadLineBeforeRawRead);
 	CppUnit_addTest(pSuite, SSHTest, testReadLineEchoWaitsForWindow);
+	CppUnit_addTest(pSuite, SSHTest, testReadLineTimeoutEndsEchoWaitingForWindow);
 	CppUnit_addTest(pSuite, SSHTest, testStreamWriteSendsAllDataBeforeSessionEnds);
 	CppUnit_addTest(pSuite, SSHTest, testServerStopDuringStreamWriteToReadingClient);
 	CppUnit_addTest(pSuite, SSHTest, testWriteFailsWhenStopCheckReturnsTrue);
