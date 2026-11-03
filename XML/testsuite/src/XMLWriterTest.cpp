@@ -423,6 +423,29 @@ void XMLWriterTest::testCDATATerminator()
 }
 
 
+void XMLWriterTest::testCDATATerminatorAfterRawCharacters()
+{
+	const auto writeCDATA = [](const std::string& raw, const std::string& text)
+	{
+		std::ostringstream str;
+		XMLWriter writer(str, 0);
+		writer.startDocument();
+		writer.startElement("", "", "r");
+		writer.startCDATA();
+		writer.rawCharacters(raw);
+		writer.characters(text);
+		writer.endCDATA();
+		writer.endElement("", "", "r");
+		writer.endDocument();
+		return str.str();
+	};
+
+	assertTrue (writeCDATA("a]]", "><x/>") == "<r><![CDATA[a]]]]><![CDATA[><x/>]]></r>");
+	assertTrue (writeCDATA("]", "]>") == "<r><![CDATA[]]]]><![CDATA[>]]></r>");
+	assertTrue (writeCDATA("]]x", ">") == "<r><![CDATA[]]x>]]></r>");
+}
+
+
 void XMLWriterTest::testCDATAControlCharacter()
 {
 	std::ostringstream str;
@@ -750,6 +773,7 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCDATA);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCDATATerminator);
+	CppUnit_addTest(pSuite, XMLWriterTest, testCDATATerminatorAfterRawCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCDATAControlCharacter);
 	CppUnit_addTest(pSuite, XMLWriterTest, testRawCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testAttributeCharacters);
