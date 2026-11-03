@@ -21,8 +21,10 @@ Rules for changing library code. The style itself (layout, naming, formatting, c
   API of the component (names, parameter order, error reporting).
 - Visibility or ownership is never widened only to make something compile: do not make a private member public, add a
   `friend`, or turn a reference into an owning pointer to work around a design problem.
-- A change that breaks source or binary compatibility is labelled `breaking` and listed under "Breaking Changes" in
-  `CHANGELOG`; see also the deprecation rules below.
+- A change that breaks source compatibility is labelled `breaking` and listed under "Breaking Changes" in `CHANGELOG`;
+  see also the deprecation rules below. A change that breaks only binary compatibility is neither labelled nor listed:
+  every release has its own SOVERSION (`libversion`), so an upgrade does not break installed software, and using the
+  new release needs a recompile.
 
 ## New files
 
