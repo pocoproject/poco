@@ -28,6 +28,9 @@ namespace Poco::Prometheus {
 class Prometheus_API Metric: public Collector
 	/// This is the base class for all metrics, such as
 	/// Counter, Gauge and Histogram.
+	///
+	/// A class derived from Metric follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	enum class Type

@@ -75,6 +75,9 @@ class Prometheus_API Counter: public LabeledMetricImpl<CounterSample>
 	///
 	/// To increment the value of a Counter (without labels):
 	///     simpleCounter.inc(42);
+	///
+	/// A class derived from Counter follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	struct Params

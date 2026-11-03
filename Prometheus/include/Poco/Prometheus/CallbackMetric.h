@@ -64,6 +64,9 @@ class CallbackMetric: public Metric
 	///    - Poco::Int64
 	///    - Poco::UInt64
 	///    - double
+	///
+	/// A class derived from CallbackMetric follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	using Sample = T;

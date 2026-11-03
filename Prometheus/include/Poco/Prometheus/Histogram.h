@@ -104,6 +104,9 @@ class Prometheus_API Histogram: public LabeledMetricImpl<HistogramSample>
 	///
 	/// To observe a value with a Histogram (without labels):
 	///     simpleHistogram.observe(1.5);
+	///
+	/// A class derived from Histogram follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	struct Params
