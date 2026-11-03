@@ -13,6 +13,7 @@
 #include "CppUnit/TestCase.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/CppParser/Utility.h"
+#include "Poco/Config.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/String.h"
@@ -60,6 +61,17 @@ namespace {
 	{
 		if constexpr (CASELESS_SEARCH) listed.insert(passedByName.begin(), passedByName.end());
 		return lines(listed);
+	}
+
+
+	// Poco paths are UTF-8, which std::filesystem::path takes as char8_t since C++20.
+	[[nodiscard]] std::filesystem::path toFilesystemPath(const std::string& path)
+	{
+#if (POCO_HAVE_CPP20_COMPILER)
+		return {std::u8string(path.begin(), path.end())};
+#else
+		return std::filesystem::u8path(path);
+#endif
 	}
 }
 
@@ -126,7 +138,7 @@ void UtilityTest::testCollectDependenciesExcludePattern()
 
 void UtilityTest::testCollectDependenciesParentDirectory()
 {
-	std::filesystem::current_path(inRoot("work/"));
+	std::filesystem::current_path(toFilesystemPath(inRoot("work/")));
 
 	std::set<std::string> files;
 	std::set<std::string> directories;
@@ -310,14 +322,14 @@ void UtilityTest::setUp()
 		File(path.parent()).createDirectories();
 		assertTrue (File(path).createFile());
 	}
-	std::filesystem::current_path(_tempDir);
+	std::filesystem::current_path(toFilesystemPath(_tempDir));
 	_root = Path::current();
 }
 
 
 void UtilityTest::tearDown()
 {
-	std::filesystem::current_path(_savedCwd);
+	std::filesystem::current_path(toFilesystemPath(_savedCwd));
 	File tempDir(_tempDir);
 	if (tempDir.exists()) tempDir.remove(true);
 }
