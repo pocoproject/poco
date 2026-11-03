@@ -184,7 +184,9 @@ public:
 
 	void log(const Message& msg) override;
 		/// Logs the given message to the file. A channel that is
-		/// not open is opened first, by a call to open().
+		/// not open is opened first, by a call to open(). If another
+		/// thread closes the channel after that call, log() opens
+		/// the file again without calling open().
 
 	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given name.
@@ -235,7 +237,7 @@ public:
 	[[nodiscard]] UInt64 size() const;
 		/// Returns the log file's current size in bytes.
 
-	[[nodiscard]] const std::string& path() const;
+	[[nodiscard]] std::string path() const;
 		/// Returns the log file's path.
 
 	static const std::string PROP_PATH;

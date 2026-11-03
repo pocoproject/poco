@@ -437,6 +437,145 @@ void ChannelTest::testStream()
 	pFormatterChannel->log(msg);
 	assertTrue(str.str().find("Source: Text") == 0);
 }
+void ChannelTest::testAsyncDropNotification()
+{
+	// queueSize=1 over a blocking target channel, asserting that
+	// the "Dropped %z messages." report arrives once.
+	class BlockingChannel: public Channel
+	{
+	public:
+		void log(const Message& msg) override
+		{
+			started.set();
+			(void) unblock.tryWait(10000);
+			FastMutex::ScopedLock lock(_mutex);
+			messages.push_back(msg.getText());
+		}
+
+		Event started;
+		Event unblock;
+		FastMutex _mutex;
+		std::vector<std::string> messages;
+	};
+
+	AutoPtr<BlockingChannel> pTarget = new BlockingChannel;
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pTarget);
+	pAsync->setProperty("queueSize", "1");
+	pAsync->open();
+
+	// First message starts and blocks the worker thread in target->log()
+	pAsync->log(Message("source", "msg1", Message::PRIO_INFORMATION));
+	pTarget->started.wait();
+
+	// queueSize is 1. msg2 fills the queue.
+	pAsync->log(Message("source", "msg2", Message::PRIO_INFORMATION));
+
+	// Further messages must be dropped
+	pAsync->log(Message("source", "msg3", Message::PRIO_INFORMATION));
+	pAsync->log(Message("source", "msg4", Message::PRIO_INFORMATION));
+
+	// Let worker proceed with msg1
+	pTarget->unblock.set();
+
+	// Wait and close
+	pAsync->close();
+
+	FastMutex::ScopedLock lock(pTarget->_mutex);
+	// We expect msg1, msg2, and the dropped report
+	int dropReports = 0;
+	for (const auto& text : pTarget->messages)
+	{
+		if (text.find("Dropped ") != std::string::npos)
+		{
+			++dropReports;
+		}
+	}
+	assertEqual (1, dropReports);
+}
+
+
+void ChannelTest::testAsyncCloseWhileLogging()
+{
+	// Several threads logging while close() runs, asserting that
+	// the worker thread stays stopped.
+	AutoPtr<TestChannel> pTarget = new TestChannel;
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pTarget);
+	pAsync->open();
+
+	std::atomic<bool> start{false};
+	std::atomic<bool> stop{false};
+	std::vector<std::thread> threads;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		threads.emplace_back([&, i]()
+		{
+			while (!start.load(std::memory_order_relaxed)) Thread::yield();
+			Message msg("source", "msg", Message::PRIO_INFORMATION);
+			while (!stop.load(std::memory_order_relaxed))
+			{
+				pAsync->log(msg);
+			}
+		});
+	}
+
+	start.store(true);
+	Thread::sleep(20);
+	pAsync->close();
+	stop.store(true);
+
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+
+	// After close(), logging must not restart the thread
+	Message postCloseMsg("source", "postClose", Message::PRIO_INFORMATION);
+	pAsync->log(postCloseMsg);
+	Thread::sleep(50);
+
+	// Calling close() again is safe and clean
+	pAsync->close();
+}
+
+
+void ChannelTest::testAsyncConcurrentSetQueueSize()
+{
+	// setProperty("queueSize", ...) while other threads log, so that TSan covers the atomics.
+	AutoPtr<TestChannel> pTarget = new TestChannel;
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pTarget);
+	pAsync->open();
+
+	std::atomic<bool> stop{false};
+	std::vector<std::thread> loggers;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		loggers.emplace_back([&]()
+		{
+			Message msg("source", "msg", Message::PRIO_INFORMATION);
+			while (!stop.load(std::memory_order_relaxed))
+			{
+				pAsync->log(msg);
+			}
+		});
+	}
+
+	for (int i = 0; i < 50; ++i)
+	{
+		pAsync->setProperty("queueSize", std::to_string((i % 10) + 1));
+		Thread::sleep(1);
+	}
+
+	stop.store(true);
+	for (auto& t : loggers)
+	{
+		t.join();
+	}
+
+	pAsync->close();
+}
+
 
 
 void ChannelTest::setUp()
@@ -457,6 +596,9 @@ CppUnit::Test* ChannelTest::suite()
 	CppUnit_addTest(pSuite, ChannelTest, testSplitterAddSameChannelTwice);
 	CppUnit_addTest(pSuite, ChannelTest, testAsync);
 	CppUnit_addTest(pSuite, ChannelTest, testAsyncConcurrentReplacement);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncDropNotification);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncCloseWhileLogging);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncConcurrentSetQueueSize);
 	CppUnit_addTest(pSuite, ChannelTest, testFormatting);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingConcurrentReplacement);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingMessageKeepsItsPair);

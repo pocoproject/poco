@@ -36,6 +36,7 @@ public:
 	void testOpenCalledByLog();
 	void testPurgeStrategyReplacedDuringPurge();
 	void testConcurrentOpenClose();
+	void testConcurrentPath();
 	void testRotateBySize();
 	void testRotateByAge();
 	void testRotateAtTimeDayUTC();
