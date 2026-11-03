@@ -12,6 +12,7 @@
 #include "Poco/Path.h"
 #include "Poco/String.h"
 #include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
 #include "Poco/Process.h"
 #include "Poco/Environment.h"
 #include "Poco/NumberFormatter.h"
@@ -351,7 +352,9 @@ protected:
 		}
 
 		// Renamed into place, so that an interrupted run leaves no partial list.
-		const std::string tmpPath = _dependencyListPath + ".tmp";
+		// A unique name in the same directory keeps concurrent runs that write the same list apart.
+		const std::string tmpPath =
+			Poco::TemporaryFile::tempName(Path(_dependencyListPath).absolute().parent().toString());
 		Poco::FileOutputStream ostr(tmpPath);
 		ostr << list;
 		ostr.close();
@@ -360,7 +363,15 @@ protected:
 			Poco::CppParser::Utility::removeFile(tmpPath);
 			throw Poco::WriteFileException(tmpPath);
 		}
-		File(tmpPath).renameTo(_dependencyListPath);
+		try
+		{
+			File(tmpPath).renameTo(_dependencyListPath);
+		}
+		catch (...)
+		{
+			Poco::CppParser::Utility::removeFile(tmpPath);
+			throw;
+		}
 	}
 
 	void generateAll()
