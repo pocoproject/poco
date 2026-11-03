@@ -23,8 +23,15 @@
 #include "Poco/Environment.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
+#include "Poco/Config.h"
 #include <fstream>
 #include <cstddef>
+#include <filesystem>
+#include <set>
+#include <string>
+#include <system_error>
+#include <utility>
+#include <vector>
 
 
 using Poco::StringTokenizer;
@@ -39,6 +46,142 @@ using Poco::Exception;
 
 
 namespace Poco::CppParser {
+
+
+namespace {
+#if defined(_WIN32)
+	constexpr bool CASELESS_SEARCH = true;
+#else
+	constexpr bool CASELESS_SEARCH = false;
+#endif
+	constexpr int GLOB_OPTIONS = CASELESS_SEARCH ? Glob::GLOB_CASELESS : Glob::GLOB_DEFAULT;
+
+	// Longer than any chain of links that a supported system resolves; also ends a loop of links.
+	constexpr int MAX_LINK_CHAIN = 64;
+
+
+	// Poco paths are UTF-8, which std::filesystem::path takes as char8_t since C++20.
+	[[nodiscard]] std::filesystem::path toFilesystemPath(const std::string& path)
+	{
+#if (POCO_HAVE_CPP20_COMPILER)
+		return {std::u8string(path.begin(), path.end())};
+#else
+		return std::filesystem::u8path(path);
+#endif
+	}
+
+
+	[[nodiscard]] bool isLink(const std::filesystem::path& path)
+	{
+		const auto type = std::filesystem::symlink_status(path).type();
+#if defined(_MSVC_STL_VERSION)
+		// The MSVC standard library gives a junction a file type of its own.
+		if (type == std::filesystem::file_type::junction) return true;
+#endif
+		return type == std::filesystem::file_type::symlink;
+	}
+
+
+	// A change of the entries of the deepest existing directory on the target path can make the link resolve.
+	// The components before a ".." are resolved, as the system resolves them.
+	void collectLinkTarget(const std::filesystem::path& link, int chainLength, std::set<std::string>& directories)
+	{
+		if (chainLength > MAX_LINK_CHAIN) return;
+		std::filesystem::path next = link.parent_path() / std::filesystem::read_symlink(link);
+		std::filesystem::path dir = next.parent_path();
+		std::error_code error;
+		while (dir.has_relative_path() && !std::filesystem::is_directory(dir, error))
+		{
+			next = dir;
+			dir = dir.parent_path();
+		}
+		std::filesystem::path deepest;
+		for (const auto& component: dir)
+		{
+			deepest /= component;
+			if (component == "..") deepest = std::filesystem::canonical(deepest);
+		}
+		const auto deepestName = deepest.u8string();
+		Path deepestPath(std::string(deepestName.begin(), deepestName.end()));
+		deepestPath.makeDirectory();
+		directories.insert(deepestPath.toString());
+		if (isLink(next))
+		{
+			collectLinkTarget(next, chainLength + 1, directories);
+		}
+	}
+
+
+	void searchDirectory(const Path& dir, const std::string& component, bool isFileName,
+		std::vector<Path>& found, std::set<std::string>& directories)
+	{
+		// Entries of every kind match, so that links that do not resolve to a directory are seen.
+		Path entryPattern(dir);
+		entryPattern.setFileName(component);
+		std::set<std::string> matches;
+		Glob::glob(entryPattern, dir, matches, GLOB_OPTIONS);
+		bool matched = false;
+		std::error_code error;
+		for (const auto& match: matches)
+		{
+			Path entry(match);
+			entry.makeFile();
+			const std::filesystem::path entryPath = toFilesystemPath(entry.toString());
+			// On Windows, Glob takes a directory link for a directory even where it does not resolve to one.
+			try
+			{
+				if (isFileName)
+				{
+					matched = true;
+				}
+				else if (std::filesystem::is_directory(entryPath, error))
+				{
+					found.push_back(entry.makeDirectory());
+					matched = true;
+				}
+				else if (isLink(entryPath))
+				{
+					collectLinkTarget(entryPath, 1, directories);
+				}
+			}
+			catch (const std::filesystem::filesystem_error&)
+			{
+				// An entry that cannot be followed does not match, so its directory is listed below.
+			}
+		}
+		// A caseless search also finds an entry added or renamed in another letter case.
+		const bool hasWildcard = component.find_first_of("*?[") != std::string::npos;
+		if (hasWildcard || !matched || CASELESS_SEARCH)
+			directories.insert(dir.toString());
+	}
+
+
+	void collectSearchedDirectories(const std::string& includePattern, std::set<std::string>& directories)
+	{
+		const Path pattern(Path::expand(includePattern), Path::PATH_GUESS);
+		Path dirPattern(pattern);
+		dirPattern.makeDirectory();
+		// Glob::glob() opens the leading ".." components (or the share of a UNC path) without searching them.
+		Path base(dirPattern);
+		const int minDepth = base.getNode().empty() ? 0 : 1;
+		while (base.depth() > minDepth && base[base.depth() - 1] != "..")
+		{
+			base.popDirectory();
+		}
+		// An absolute start gives absolute Glob results, which Path does not read as the home directory.
+		std::vector<Path> searched{base.absolute()};
+		for (int depth = base.depth(); depth < dirPattern.depth() && !searched.empty(); ++depth)
+		{
+			const bool isFileName = depth + 1 == dirPattern.depth() && pattern.isFile();
+			std::vector<Path> found;
+			for (const auto& dir: searched)
+			{
+				searchDirectory(dir, dirPattern.directory(depth), isFileName, found, directories);
+			}
+			searched = std::move(found);
+		}
+	}
+}
 
 
 void Utility::parseDir(const std::vector<std::string>& includePattern, const std::vector<std::string>& excludePattern, NameSpace::SymbolTable& st, const std::string& exec, const std::string& options, const std::string& path)
@@ -57,6 +200,27 @@ void Utility::parse(const std::string& file, NameSpace::SymbolTable& st, const s
 {
 	std::string prepFile = Utility::preprocessFile(file, exec, options, path);
 	Utility::parseOnly(file, st, prepFile, true);
+}
+
+
+void Utility::collectDependencies(const std::vector<std::string>& includePattern,
+	const std::vector<std::string>& excludePattern,
+	std::set<std::string>& files,
+	std::set<std::string>& directories)
+{
+	std::set<std::string> found;
+	buildFileList(found, includePattern, excludePattern);
+	const std::string current = Path::current();
+	for (const auto& file: found)
+	{
+		// On POSIX, Path reads a relative path whose first directory is "~" or ends with ":" as the home directory
+		// or a device.
+		files.insert(Path(toFilesystemPath(file).has_root_path() ? file : current + file).toString());
+	}
+	for (const auto& pattern: includePattern)
+	{
+		collectSearchedDirectories(pattern, directories);
+	}
 }
 
 
@@ -247,14 +411,9 @@ void Utility::buildFileList(std::set<std::string>& files, const std::vector<std:
 {
 	std::set<std::string> temp;
 
-	int options = 0;
-#if defined(_WIN32)
-	options |= Glob::GLOB_CASELESS;
-#endif
-
 	for (const auto& pattern : includePattern)
 	{
-		Glob::glob(pattern, temp, options);
+		Glob::glob(pattern, temp, GLOB_OPTIONS);
 	}
 
 	for (const auto& file : temp)
@@ -263,7 +422,7 @@ void Utility::buildFileList(std::set<std::string>& files, const std::vector<std:
 		bool include = true;
 		for (const auto& excPattern : excludePattern)
 		{
-			Glob glob(excPattern, options);
+			Glob glob(excPattern, GLOB_OPTIONS);
 			if (glob.match(p.toString()))
 				include = false;
 		}

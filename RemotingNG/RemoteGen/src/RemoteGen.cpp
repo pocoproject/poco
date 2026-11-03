@@ -12,6 +12,7 @@
 #include "Poco/Path.h"
 #include "Poco/String.h"
 #include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
 #include "Poco/Process.h"
 #include "Poco/Environment.h"
 #include "Poco/NumberFormatter.h"
@@ -56,6 +57,7 @@
 #include <set>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 
 using Poco::StringTokenizer;
@@ -190,6 +192,15 @@ protected:
 				.required(false)
 				.repeatable(false)
 				.callback(OptionCallback<RemoteGenApp>(this, &RemoteGenApp::handleNoGlobal)));
+
+		options.addOption(
+			Option("list-dependencies"s, ""s,
+				"Write the header files that would be parsed and the directories whose entries decide them to <file>, "
+				"then exit without generating code."s)
+				.required(false)
+				.repeatable(false)
+				.argument("<file>"s)
+				.callback(OptionCallback<RemoteGenApp>(this, &RemoteGenApp::handleListDependencies)));
 	}
 
 	void handleConfig(const std::string& /*name*/, const std::string& value)
@@ -205,6 +216,13 @@ protected:
 	void handleNoGlobal(const std::string& /*name*/, const std::string& /*value*/)
 	{
 		_noGlobalConfig = true;
+	}
+
+	void handleListDependencies(const std::string& /*name*/, const std::string& value)
+	{
+		// main() takes an empty path for a missing option and would generate code.
+		if (value.empty()) throw Poco::Util::MissingArgumentException("list-dependencies requires <file>"s);
+		_dependencyListPath = value;
 	}
 
 	void handleDefine(const std::string& /*name*/, const std::string& value)
@@ -276,6 +294,86 @@ protected:
 		_enableBridge = true;
 	}
 
+	void collectFilePatterns(std::vector<std::string>& inc, std::vector<std::string>& exc) const
+	{
+		std::string sysIncludes = config().getString("RemoteGen.system.include"s, ""s);
+		std::string includes = config().getString("RemoteGen.files.include"s);
+		std::string excludes = config().getString("RemoteGen.files.exclude"s, ""s);
+		StringTokenizer sysIncludesTokenizer(sysIncludes, ",;\n"s,
+			StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+		for (const auto& p: sysIncludesTokenizer)
+		{
+			inc.push_back(Poco::Path::expand(p));
+		}
+		StringTokenizer includesTokenizer(includes, ",;\n"s,
+			StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+		for (const auto& p: includesTokenizer)
+		{
+			inc.push_back(Poco::Path::expand(p));
+		}
+		StringTokenizer excludesTokenizer(excludes, ",;\n"s,
+			StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+		for (const auto& p: excludesTokenizer)
+		{
+			exc.push_back(Poco::Path::expand(p));
+		}
+	}
+
+	static void appendDependency(std::string& list, const std::string& kind, const std::string& path)
+	{
+		if (path.find_first_of("\n\r"s) != std::string::npos)
+		{
+			throw Poco::DataFormatException(
+				"A path with a line feed or carriage return cannot be listed, no list was written"s, path);
+		}
+		list += kind;
+		list += ' ';
+		list += path;
+		list += '\n';
+	}
+
+	void writeDependencyList() const
+	{
+		std::vector<std::string> inc;
+		std::vector<std::string> exc;
+		collectFilePatterns(inc, exc);
+		std::set<std::string> files;
+		std::set<std::string> directories;
+		Poco::CppParser::Utility::collectDependencies(inc, exc, files, directories);
+
+		std::string list;
+		for (const auto& file: files)
+		{
+			appendDependency(list, "file"s, file);
+		}
+		for (const auto& directory: directories)
+		{
+			appendDependency(list, "directory"s, directory);
+		}
+
+		// Renamed into place, so that an interrupted run leaves no partial list.
+		// A unique name in the same directory keeps concurrent runs that write the same list apart.
+		const std::string tmpPath =
+			Poco::TemporaryFile::tempName(Path(_dependencyListPath).absolute().parent().toString());
+		Poco::FileOutputStream ostr(tmpPath);
+		ostr << list;
+		ostr.close();
+		if (!ostr.good())
+		{
+			Poco::CppParser::Utility::removeFile(tmpPath);
+			throw Poco::WriteFileException(tmpPath);
+		}
+		try
+		{
+			File(tmpPath).renameTo(_dependencyListPath);
+		}
+		catch (...)
+		{
+			Poco::CppParser::Utility::removeFile(tmpPath);
+			throw;
+		}
+	}
+
 	void generateAll()
 	{
 		std::string compilerKey = "RemoteGen.compiler[";
@@ -291,9 +389,6 @@ protected:
 		compilerKey += "]";
 		std::string compiler = config().getString(compilerKey + ".exec", ""s);
 		std::string path = config().getString(compilerKey + ".path", ""s);
-		std::string sysIncludes = config().getString("RemoteGen.system.include"s, ""s);
-		std::string includes = config().getString("RemoteGen.files.include"s);
-		std::string excludes = config().getString("RemoteGen.files.exclude"s, ""s);
 		std::string includePaths = config().getString("RemoteGen.files.include-paths"s, ""s);
 		_enableOSP = _enableOSP || config().getBool("RemoteGen.output.osp.enable"s, false);
 		_enableBridge = _enableBridge || config().getBool("RemoteGen.output.bridge.enable"s, false);
@@ -316,22 +411,8 @@ protected:
 			throw Poco::InvalidArgumentException("options.memberSerializationOrder must be \"lexical\" or \"as-declared\"");
 
 		std::vector<std::string> inc;
-		StringTokenizer sysIncludesTokenizer(sysIncludes, ",;\n"s, StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-		for (const auto& p: sysIncludesTokenizer)
-		{
-			inc.push_back(Poco::Path::expand(p));
-		}
-		StringTokenizer includesTokenizer(includes, ",;\n"s, StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-		for (const auto& p: includesTokenizer)
-		{
-			inc.push_back(Poco::Path::expand(p));
-		}
 		std::vector<std::string> exc;
-		StringTokenizer excludesTokenizer(excludes, ",;\n"s, StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-		for (const auto& p: excludesTokenizer)
-		{
-			exc.push_back(Poco::Path::expand(p));
-		}
+		collectFilePatterns(inc, exc);
 
 		std::string gccIncludes;
 		std::string msvcIncludes;
@@ -1059,12 +1140,17 @@ protected:
 
 				if (config().hasProperty("RemoteGen.files.include"s))
 				{
-					generateAll();
+					if (_dependencyListPath.empty())
+						generateAll();
+					else
+						writeDependencyList();
 				}
 				else
 				{
 					std::cerr << "Error: no configuration found.\n" << std::endl;
 					displayHelp();
+					// A build that asks for the dependency list must not take a missing configuration for no headers.
+					if (!_dependencyListPath.empty()) return Application::EXIT_CONFIG;
 				}
 			}
 			catch (Exception& exc)
@@ -1090,6 +1176,7 @@ private:
 	std::string _compiler;
 	std::string _bundleActivator;
 	std::string _bundlePath;
+	std::string _dependencyListPath;
 	Poco::CppParser::NameSpace::SymbolTable _gst;
 	std::vector<std::string> _errMsgs;
 	std::vector<const Poco::CppParser::Struct*> _schemaGen;

@@ -11,6 +11,7 @@
 #include "CppParserTestSuite.h"
 #include "AttributesTestSuite.h"
 #include "CppParserTest.h"
+#include "UtilityTest.h"
 
 
 CppUnit::Test* CppParserTestSuite::suite()
@@ -19,6 +20,7 @@ CppUnit::Test* CppParserTestSuite::suite()
 
 	pSuite->addTest(AttributesTestSuite::suite());
 	pSuite->addTest(CppParserTest::suite());
+	pSuite->addTest(UtilityTest::suite());
 
 	return pSuite;
 }

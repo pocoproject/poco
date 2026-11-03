@@ -1124,6 +1124,11 @@ line options:
   * <[/osp]>, <[--osp]>, <[-o]>: Create services and bundle activator for Open
     Service Platform.
   * <[/bridge]}, <[--bridge]>, <[-b]>: Generate remote bridge objects for services.
+  * <[/list-dependencies:<file>]>, <[--list-dependencies=<file>]>: Write the header files that would be parsed
+    and the directories whose entries decide them to <file>, then exit without generating code.
+    The file has one line per entry, each ending with a line feed: <[file <path>]> for each header file,
+    then <[directory <path>]> for each directory, each group sorted, all paths absolute.
+    Poco::CppParser::Utility::collectDependencies() describes which directories are listed.
 
 Command line arguments must be specified using the correct option syntax for the
 respective platform.
