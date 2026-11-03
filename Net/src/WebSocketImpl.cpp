@@ -188,7 +188,7 @@ int WebSocketImpl::incompleteHeader(ReceiveState& receiveState)
 	// would otherwise do forever.
 	//
 	// Clearing the flags is not redundant with the reset at the top of
-	// peekHeader(): three of the four places that come here run after the
+	// peekHeader(): two of the three places that come here run after the
 	// flags have been taken from the header, and a return of 0 with flags
 	// left set tells the caller it received an empty frame rather than a
 	// closed connection.
@@ -207,7 +207,13 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 	receiveState.payloadLength = 0;
 	receiveState.remainingPayloadLength = 0;
 
-	int n = peekSomeBytes(header, MAX_HEADER_LENGTH);
+	// While bytes are buffered, the socket is asked for no more bytes than the
+	// header needs: a blocking receive would wait for them, although a short
+	// frame may be complete in the buffer. So the two bytes that give the length
+	// of the header come first. An empty buffer is filled by one receive, which
+	// returns the bytes that have arrived.
+	const bool buffered = _bufferOffset < static_cast<int>(_buffer.size());
+	int n = peekSomeBytes(header, buffered ? 2 : MAX_HEADER_LENGTH);
 	if (n == 0)
 		return 0;
 	else if (n < 2)
@@ -245,60 +251,57 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 		throw WebSocketException("Server received unmasked frame from client", WebSocket::WS_ERR_CORRUPT_FRAME);
 	}
 
-	int maskOffset = 0;
 	lengthByte &= 0x7f;
 	if (isControl && lengthByte > 125)
 	{
 		throw WebSocketException("Control frame payload must not exceed 125 bytes", WebSocket::WS_ERR_CORRUPT_FRAME);
 	}
+	auto peekAtLeast = [&](int length)
+	{
+		if (n < length) n = peekSomeBytes(header, length);
+		return n >= length;
+	};
+	// The length is checked before the mask bytes are required, so that a frame
+	// that is too big is rejected without waiting for them.
+	const int maskOffset = (lengthByte == 127) ? 10 : (lengthByte == 126) ? 4 : 2;
+	if (!peekAtLeast(maskOffset))
+	{
+		return incompleteHeader(receiveState);
+	}
 	if (lengthByte == 127)
 	{
-		if (n < 10)
-		{
-			return incompleteHeader(receiveState);
-		}
 		Poco::MemoryInputStream istr(header + 2, 8);
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt64 l;
 		reader >> l;
 		if (l > static_cast<Poco::UInt64>(_maxPayloadSize)) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		receiveState.payloadLength = static_cast<int>(l);
-		maskOffset = 10;
 	}
 	else if (lengthByte == 126)
 	{
-		if (n < 4)
-		{
-			return incompleteHeader(receiveState);
-		}
 		Poco::MemoryInputStream istr(header + 2, 2);
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt16 l;
 		reader >> l;
 		if (l > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		receiveState.payloadLength = static_cast<int>(l);
-		maskOffset = 4;
 	}
 	else
 	{
 		if (lengthByte > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		receiveState.payloadLength = lengthByte;
-		maskOffset = 2;
 	}
 
+	const int headerLength = receiveState.useMask ? maskOffset + MASK_LENGTH : maskOffset;
+	if (!peekAtLeast(headerLength))
+	{
+		return incompleteHeader(receiveState);
+	}
 	if (receiveState.useMask)
 	{
-		if (n < maskOffset + MASK_LENGTH)
-		{
-			return incompleteHeader(receiveState);
-		}
 		std::memcpy(receiveState.mask, header + maskOffset, MASK_LENGTH);
-		receiveState.headerLength = maskOffset + MASK_LENGTH;
 	}
-	else
-	{
-		receiveState.headerLength = maskOffset;
-	}
+	receiveState.headerLength = headerLength;
 
 	receiveState.remainingPayloadLength = receiveState.payloadLength;
 
