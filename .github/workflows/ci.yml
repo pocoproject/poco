@@ -547,7 +547,7 @@ jobs:
           build-dir: build
 
   # C++ modules on macOS: the Bonjour partition and the Apple platform guards. Homebrew LLVM,
-  # because Apple clang has no clang-scan-deps.
+  # because Apple clang has no clang-scan-deps; the explicit SDK path reaches clang-scan-deps.
   macos-clang-21-cmake-modules:
     runs-on: macos-latest
     needs: changes
@@ -564,6 +564,7 @@ jobs:
           -DENABLE_PDF=ON -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_DNSSD=ON -DENABLE_DNSSD_BONJOUR=ON
           -DENABLE_SSH=ON -DENABLE_XSD_VALIDATOR=ON -DENABLE_AI=ON
           -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+          -DCMAKE_OSX_SYSROOT=$(xcrun --show-sdk-path)
       - run: cmake --build cmake-build --target Modules-testrunner --parallel $(sysctl -n hw.ncpu)
       - uses: ./.github/actions/retry-action
         with:
