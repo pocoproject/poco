@@ -831,6 +831,25 @@ void ProcessTest::testKillAfterExit()
 }
 
 
+void ProcessTest::testKillAfterExitWithCodeStillActive()
+{
+	// On Windows, a process that has ended with the exit code 259 has the
+	// exit code that GetExitCodeProcess() gives for a running process
+	// (STILL_ACTIVE); killing it does nothing, as for any ended process.
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	Process::Args args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(getFullName("TestApp"), args, &inPipe, nullptr, nullptr);
+	PipeOutputStream ostr(inPipe);
+	ostr << std::string(259, 'x');
+	ostr.close();
+	assertEqual (259, ph.wait());
+	Process::kill(ph);
+#endif
+}
+
+
 namespace
 {
 	std::string testApp()
@@ -988,6 +1007,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunningAfterWait);
 	CppUnit_addTest(pSuite, ProcessTest, testWaitAfterKill);
 	CppUnit_addTest(pSuite, ProcessTest, testKillAfterExit);
+	CppUnit_addTest(pSuite, ProcessTest, testKillAfterExitWithCodeStillActive);
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationOfNewGroup);
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationWithoutConsole);
 	CppUnit_addTest(pSuite, ProcessTest, testRequestTerminationKeepsStandardHandles);

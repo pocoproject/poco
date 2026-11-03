@@ -487,8 +487,12 @@ void ProcessImpl::killImpl(ProcessHandleImpl& handle)
 	{
 		// TerminateProcess() fails for a process that has ended or is ending,
 		// which, as on POSIX before wait(), is not an error.
+		// The handle of an ended process is signalled, while its exit code
+		// can be STILL_ACTIVE (259); the exit code tells one that is ending.
 		DWORD exitCode = 0;
-		if (TerminateProcess(handle.process(), 0) == 0 && (GetExitCodeProcess(handle.process(), &exitCode) == 0 || exitCode == STILL_ACTIVE))
+		if (TerminateProcess(handle.process(), 0) == 0
+			&& WaitForSingleObject(handle.process(), 0) != WAIT_OBJECT_0
+			&& (GetExitCodeProcess(handle.process(), &exitCode) == 0 || exitCode == STILL_ACTIVE))
 		{
 			throw SystemException("cannot kill process");
 		}
