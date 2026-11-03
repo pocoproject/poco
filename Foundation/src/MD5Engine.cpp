@@ -57,6 +57,8 @@ MD5Engine::~MD5Engine()
 
 void MD5Engine::updateImpl(const void* input_, std::size_t inputLen)
 {
+	if (inputLen == 0) return;
+
 	const unsigned char* input = (const unsigned char*) input_;
 
 	/* Compute number of bytes mod 64 */

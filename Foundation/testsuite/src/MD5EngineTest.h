@@ -24,6 +24,7 @@ public:
 	MD5EngineTest(const std::string& name);
 	~MD5EngineTest();
 
+	void testEmptyUpdate();
 	void testMD5();
 	void testLargeInput();
 	void testConstantTimeEquals();
