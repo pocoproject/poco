@@ -232,6 +232,22 @@ void DNSTest::testSystemError()
 }
 
 
+void DNSTest::testHostByNameEmbeddedNul()
+{
+	for (const std::string& name: {std::string("localhost\0junk", 14), std::string("127.0.0.1\0junk", 14)})
+	{
+		try
+		{
+			HostEntry he = DNS::hostByName(name);
+			fail("host name with embedded NUL - must throw");
+		}
+		catch (HostNotFoundException&)
+		{
+		}
+	}
+}
+
+
 void DNSTest::setUp()
 {
 }
@@ -252,6 +268,7 @@ CppUnit::Test* DNSTest::suite()
 	CppUnit_addTest(pSuite, DNSTest, testEncodeIDN);
 	CppUnit_addTest(pSuite, DNSTest, testDecodeIDN);
 	CppUnit_addTest(pSuite, DNSTest, testSystemError);
+	CppUnit_addTest(pSuite, DNSTest, testHostByNameEmbeddedNul);
 
 	return pSuite;
 }

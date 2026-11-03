@@ -259,7 +259,8 @@ bool IPv4AddressImpl::isGlobalMC() const
 
 IPv4AddressImpl IPv4AddressImpl::parse(const std::string& addr)
 {
-	if (addr.empty()) return IPv4AddressImpl();
+	// The C functions below stop at an embedded NUL.
+	if (addr.empty() || addr.find('\0') != std::string::npos) return IPv4AddressImpl();
 #if defined(_WIN32)
 	struct in_addr ia;
 	ia.s_addr = inet_addr(addr.c_str());
@@ -663,7 +664,8 @@ bool IPv6AddressImpl::isGlobalMC() const
 
 IPv6AddressImpl IPv6AddressImpl::parse(const std::string& addr)
 {
-	if (addr.empty()) return IPv6AddressImpl();
+	// The C functions below stop at an embedded NUL.
+	if (addr.empty() || addr.find('\0') != std::string::npos) return IPv6AddressImpl();
 #if defined(_WIN32)
 	struct addrinfo* pAI;
 	struct addrinfo hints;

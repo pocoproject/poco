@@ -30,6 +30,7 @@ public:
 	void testEncodeIDN();
 	void testDecodeIDN();
 	void testSystemError();
+	void testHostByNameEmbeddedNul();
 
 	void setUp();
 	void tearDown();

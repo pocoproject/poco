@@ -67,6 +67,9 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 #endif
 						 )
 {
+	// The resolver functions below stop at an embedded NUL.
+	if (hostname.find('\0') != std::string::npos) throw HostNotFoundException(hostname);
+
 #if defined(POCO_HAVE_LIBRESOLV)
 	Poco::ScopedReadRWLock readLock(resolverLock);
 #endif

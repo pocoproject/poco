@@ -71,6 +71,15 @@ void SocketAddressTest::testSocketAddress()
 	{
 	}
 
+	try
+	{
+		SocketAddress sa5(std::string("127.0.0.1\0junk", 14), 80);
+		fail("host with embedded NUL - must throw");
+	}
+	catch (HostNotFoundException&)
+	{
+	}
+
 	SocketAddress sa04 = SocketAddress("pocoproject.org", 80);
 	SocketAddress sa4(std::move(sa04));
 	assertTrue (sa4.host().toString() == "157.90.17.168");
