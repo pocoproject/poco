@@ -54,7 +54,7 @@ public:
 	~Checksum();
 		/// Destroys the Checksum.
 
-	void update(const char* data, unsigned length);
+	void update(const char* data, std::size_t length);
 		/// Updates the checksum with the given data.
 
 	void update(const std::string& data);
@@ -80,7 +80,7 @@ private:
 //
 inline void Checksum::update(const std::string& data)
 {
-	update(data.c_str(), static_cast<unsigned int>(data.size()));
+	update(data.data(), data.size());
 }
 
 
