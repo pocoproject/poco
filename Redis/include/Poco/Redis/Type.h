@@ -27,6 +27,8 @@
 #include "Poco/Redis/RedisStream.h"
 #include "Poco/Redis/Exception.h"
 #include <algorithm>
+#include <array>
+#include <string_view>
 #include <utility>
 
 
@@ -235,7 +237,10 @@ struct RedisTypeTraits<BulkString>
 				}
 				remaining -= chunkSize;
 			}
-			if (!input.getline().empty())
+			// Exactly CRLF: with a length one byte too long, getline() would accept the LF that remains.
+			std::array<char, 2> terminator{};
+			input.read(terminator.data(), static_cast<std::streamsize>(terminator.size()));
+			if (std::string_view(terminator.data(), static_cast<std::size_t>(input.gcount())) != LineEnding::NEWLINE_CRLF)
 			{
 				throw RedisException("Bulk string reply from Redis server does not end after its "
 					+ NumberFormatter::format(length) + " bytes");
