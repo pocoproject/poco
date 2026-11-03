@@ -133,7 +133,7 @@ public:
 		if (fd != POCO_INVALID_SOCKET && epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &ev) != 0)
 			SocketImpl::error();
 		ScopedLock lock(_mutex);
-		_socketMap.erase(socket.impl());
+		if (_socketMap.erase(socket.impl()) != 0 && _waiting) _removedSockets.insert(socket.impl());
 	}
 
 	bool has(const Socket& socket) const
@@ -156,6 +156,13 @@ public:
 			ScopedLock lock(_mutex);
 
 			close(_epollfd);
+			if (_waiting)
+			{
+				for (const auto& entry: _socketMap)
+				{
+					_removedSockets.insert(entry.first);
+				}
+			}
 			_socketMap.clear();
 #ifdef WEPOLL_H_
 			_epollfd = epoll_create(1);
@@ -181,6 +188,8 @@ public:
 		ScopedIOLock pollLock(_pollLock);
 		if (!pollLock)
 			return result;
+
+		WaitingScope waitingScope(*this);
 
 		while (true)
 		{
@@ -221,8 +230,10 @@ public:
 		{
 			if (_events[i].data.ptr) // skip eventfd
 			{
+				// A socket removed while epoll_wait() ran may have been destroyed and its
+				// address given to a socket added since, which the event is not for.
 				SocketMap::iterator it = _socketMap.find(_events[i].data.ptr);
-				if (it != _socketMap.end())
+				if (it != _socketMap.end() && _removedSockets.find(it->first) == _removedSockets.end())
 				{
 					if (_events[i].events & (EPOLLIN | EPOLLRDNORM | EPOLLHUP))
 						result[it->second.first] |= PollSet::POLL_READ;
@@ -335,6 +346,42 @@ private:
 		return false;
 	}
 
+	class WaitingScope
+		/// Sets _waiting for the time poll() waits and the events are taken,
+		/// and resets it on every exit, also when epoll_wait() fails and
+		/// poll() throws.
+	{
+	public:
+		POCO_NODISCARD_CTOR explicit WaitingScope(PollSetImpl& pollSet): _pollSet(pollSet)
+		{
+			ScopedLock lock(_pollSet._mutex);
+			_pollSet._removedSockets.clear();
+			_pollSet._waiting = true;
+		}
+
+		~WaitingScope()
+		{
+			try
+			{
+				ScopedLock lock(_pollSet._mutex);
+				_pollSet._waiting = false;
+			}
+			catch (...)
+			{
+				poco_unexpected();
+			}
+		}
+
+		WaitingScope() = delete;
+		WaitingScope(const WaitingScope&) = delete;
+		WaitingScope(WaitingScope&&) = delete;
+		WaitingScope& operator = (const WaitingScope&) = delete;
+		WaitingScope& operator = (WaitingScope&&) = delete;
+
+	private:
+		PollSetImpl& _pollSet;
+	};
+
 #ifndef WEPOLL_H_
 	using EPollHandle = std::atomic<int>;
 #else // WEPOLL_H_
@@ -356,6 +403,10 @@ private:
 
 	mutable Mutex _mutex;
 	SocketMap     _socketMap;
+	// The sockets removed since poll() started epoll_wait(), recorded only
+	// while _waiting is set, so that the set does not grow between polls
+	std::set<void*> _removedSockets;
+	bool            _waiting = false;
 	std::vector<struct epoll_event> _events;
 	std::atomic<int> _eventfd;
 	EPollHandle      _epollfd;
@@ -404,7 +455,10 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		poco_socket_t fd = socket.impl()->sockfd();
-		if (auto it = _socketMap.find(fd); it != _socketMap.end() && it->second.impl() != socket.impl())
+		auto it = _socketMap.find(fd);
+		const bool inSet = it != _socketMap.end() && it->second.impl() == socket.impl();
+		if (!inSet) _addedSockets.insert(socket.impl());
+		if (it != _socketMap.end() && !inSet)
 		{
 			// The number belonged to a socket closed while in the set. Its pollfd
 			// is dropped, so that its mode is not polled for this socket.
@@ -420,6 +474,7 @@ public:
 	void remove(const Socket& socket)
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
+		_addedSockets.erase(socket.impl());
 		poco_socket_t fd = descriptorInSet(socket);
 		if (fd == POCO_INVALID_SOCKET) return;
 		_removeSet.insert(fd);
@@ -465,6 +520,7 @@ public:
 		_socketMap.clear();
 		_addMap.clear();
 		_removeSet.clear();
+		_addedSockets.clear();
 		_pollfds.resize(1);
 	}
 
@@ -509,6 +565,7 @@ public:
 			_pollfds.erase(std::remove_if(_pollfds.begin() + 1, _pollfds.end(),
 				[this](const pollfd& pfd) { return polledSocket(pfd.fd) == nullptr; }), _pollfds.end());
 			_polledFds = _pollfds;
+			_addedSockets.clear();
 		}
 
 		if (_polledFds.empty()) return result;
@@ -549,7 +606,10 @@ public:
 		{
 			for (auto it = _polledFds.begin() + 1; it != _polledFds.end(); ++it)
 			{
-				if (const Socket* pSocket = polledSocket(it->fd); pSocket != nullptr)
+				// A socket added since the copy may have the number of a polled socket
+				// that was removed or closed: the events are not its own.
+				if (const Socket* pSocket = polledSocket(it->fd);
+					pSocket != nullptr && _addedSockets.find(pSocket->impl()) == _addedSockets.end())
 				{
 					if (it->revents & POLLIN)
 						result[*pSocket] |= PollSet::POLL_READ;
@@ -624,6 +684,8 @@ private:
 	// update() can change _pollfds in the meantime. Only poll() uses it; as
 	// with _pollLock, one thread at a time may be in poll().
 	std::vector<pollfd>             _polledFds;
+	// The sockets added since poll() took the copy, so not polled by it
+	std::set<const SocketImpl*>     _addedSockets;
 	Poco::Pipe                      _pipe;
 	IOLock                         _pollLock;
 };
@@ -648,13 +710,14 @@ public:
 	void add(const Socket& socket, int mode)
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
-		_map[socket] = mode;
+		if (_map.insert_or_assign(socket, mode).second) _addedSockets.insert(socket.impl());
 	}
 
 	void remove(const Socket& socket)
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		_map.erase(socket);
+		_addedSockets.erase(socket.impl());
 	}
 
 	bool has(const Socket& socket) const
@@ -682,6 +745,7 @@ public:
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 		_map.clear();
+		_addedSockets.clear();
 	}
 
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
@@ -728,6 +792,7 @@ public:
 					}
 				}
 			}
+			_addedSockets.clear();
 		}
 
 		Poco::Timespan remainingTime(timeout);
@@ -762,7 +827,9 @@ public:
 		for (auto it = _map.begin(); it != _map.end(); ++it)
 		{
 			poco_socket_t fd = it->first.impl()->sockfd();
-			if (fd != POCO_INVALID_SOCKET)
+			// A socket added since the sets were filled may have the number of a
+			// polled socket that was removed or closed: the events are not its own.
+			if (fd != POCO_INVALID_SOCKET && _addedSockets.find(it->first.impl()) == _addedSockets.end())
 			{
 				if (FD_ISSET(fd, &fdRead))
 				{
@@ -796,6 +863,8 @@ public:
 private:
 	mutable Poco::FastMutex _mutex;
 	PollSet::SocketModeMap  _map;
+	// The sockets added since poll() filled the descriptor sets
+	std::set<const SocketImpl*> _addedSockets;
 	IOLock                  _pollLock;
 };
 

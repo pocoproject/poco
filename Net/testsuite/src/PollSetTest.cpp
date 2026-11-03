@@ -13,18 +13,26 @@
 #include "CppUnit/TestSuite.h"
 #include "EchoServer.h"
 #include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/DatagramSocket.h"
+#include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/PollSet.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Event.h"
 #include <algorithm>
+#include <atomic>
 #include <iostream>
+#include <optional>
 #include <set>
+#include <utility>
 
 
 using Poco::Net::Socket;
 using Poco::Net::StreamSocket;
+using Poco::Net::DatagramSocket;
+using Poco::Net::StreamSocketImpl;
 using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::ConnectionRefusedException;
@@ -804,6 +812,74 @@ void PollSetTest::testUpdateNotInSet()
 }
 
 
+void PollSetTest::testReplacedSocketGetsNoEventOfPredecessor()
+{
+	// While one thread polls, this one replaces a socket polled for writing by
+	// one polled for reading only, which usually gets the descriptor and the
+	// address of the one it replaces. A datagram socket is always writable and
+	// the stream socket is never connected, so a POLL_WRITE for a stream socket
+	// is an event of the socket it replaced.
+	static constexpr int ITERATIONS = 5000;
+
+	PollSet ps;
+	std::atomic<bool> stop(false);
+	std::atomic<int> foreignEvents(0);
+	Poco::Event polled;
+	Thread poller;
+	poller.startFunc([&ps, &stop, &foreignEvents, &polled]
+	{
+		while (!stop)
+		{
+			for (const auto& [socket, mode]: ps.poll(0))
+			{
+				// A socket in the result may be closed already, so its type is not queried.
+				if (dynamic_cast<StreamSocketImpl*>(socket.impl()) != nullptr && (mode & PollSet::POLL_WRITE) != 0)
+					++foreignEvents;
+			}
+			polled.set();
+		}
+	});
+
+	// Calls from a third thread make the poller wait for the lock after the
+	// system call has returned, which widens the window for a replacement.
+	Thread contender;
+	contender.startFunc([&ps, &stop]
+	{
+		while (!stop)
+		{
+			(void) ps.size();
+		}
+	});
+
+	std::optional<StreamSocket> reader;
+	bool polling = true;
+	for (int i = 0; i < ITERATIONS && polling; ++i)
+	{
+		if (reader)
+		{
+			ps.remove(*reader);
+			reader->close();
+			reader.reset();
+		}
+		std::optional<DatagramSocket> writer(std::in_place, SocketAddress("127.0.0.1", 0), false);
+		ps.add(*writer, PollSet::POLL_WRITE);
+		// After one more poll(), the writer is in the descriptors polled next.
+		polled.reset();
+		polling = polled.tryWait(10000);
+		ps.remove(*writer);
+		writer->close();
+		writer.reset();
+		reader.emplace(SocketAddress::IPv4);
+		ps.add(*reader, PollSet::POLL_READ);
+	}
+	stop = true;
+	poller.join();
+	contender.join();
+	assertTrue (polling);
+	assertEqual (0, foreignEvents.load());
+}
+
+
 void PollSetTest::setUp()
 {
 }
@@ -838,6 +914,7 @@ CppUnit::Test* PollSetTest::suite()
 	CppUnit_addTest(pSuite, PollSetTest, testUpdateWhilePolling);
 	CppUnit_addTest(pSuite, PollSetTest, testUpdateBeforePoll);
 	CppUnit_addTest(pSuite, PollSetTest, testUpdateNotInSet);
+	CppUnit_addTest(pSuite, PollSetTest, testReplacedSocketGetsNoEventOfPredecessor);
 
 	return pSuite;
 }
