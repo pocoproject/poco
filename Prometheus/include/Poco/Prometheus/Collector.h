@@ -46,6 +46,9 @@ class Prometheus_API Collector
 	/// in another thread can use a partially destroyed object.
 	/// The Collector destructor calls it as well, but too late for
 	/// this.
+	///
+	/// A Registry must not be destroyed while a Collector registered
+	/// with it is destroyed or used in another thread.
 {
 public:
 	[[nodiscard]] const std::string& name() const;
