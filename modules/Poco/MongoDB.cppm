@@ -18,11 +18,14 @@ module;
 #include "Poco/MongoDB/BSONWriter.h"
 #include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/Database.h"
+#include "Poco/MongoDB/Decimal128.h"
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Element.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
+#include "Poco/MongoDB/MaxKey.h"
 #include "Poco/MongoDB/Message.h"
 #include "Poco/MongoDB/MessageHeader.h"
+#include "Poco/MongoDB/MinKey.h"
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/OpMsgCursor.h"
@@ -50,8 +53,12 @@ export namespace Poco::MongoDB {
 	using Poco::MongoDB::Binary;
 	using Poco::MongoDB::Connection;
 	using Poco::MongoDB::Database;
+	using Poco::MongoDB::Decimal128;
 	using Poco::MongoDB::Document;
+	using Poco::MongoDB::Element;
 	using Poco::MongoDB::JavaScriptCode;
+	using Poco::MongoDB::Message;
+	using Poco::MongoDB::MessageHeader;
 	using Poco::MongoDB::ObjectId;
 	using Poco::MongoDB::OpMsgCursor;
 	using Poco::MongoDB::OpMsgMessage;
@@ -66,11 +73,24 @@ export namespace Poco::MongoDB {
 
 	// Helper classes and structs
 	using Poco::MongoDB::BSONTimestamp;
+	using Poco::MongoDB::ConcreteElement;
+	using Poco::MongoDB::ElementFindByName;
+	using Poco::MongoDB::ElementPtrCompare;
+	using Poco::MongoDB::ElementTraits;
+	using Poco::MongoDB::MaxKey;
+	using Poco::MongoDB::MinKey;
 	using Poco::MongoDB::PooledConnection;
 	using Poco::MongoDB::PooledReplicaSetConnection;
 
 	// Type aliases
 	using Poco::MongoDB::NullValue;
+
+	// Constants
+	using Poco::MongoDB::BSON_MAX_DOCUMENT_SIZE;
+	using Poco::MongoDB::BSON_MIN_DOCUMENT_SIZE;
+	using Poco::MongoDB::BSON_MIN_STRING_SIZE;
+	using Poco::MongoDB::DEFAULT_LOCAL_THRESHOLD_US;
+	using Poco::MongoDB::MAX_MESSAGE_SIZE_BYTES;
 
 	#endif
 }

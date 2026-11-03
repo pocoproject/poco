@@ -58,7 +58,7 @@ class ClientHelper
 } } // namespace Poco::RemotingNG
 
 
-#define REMOTING_SPECIALIZE_SERVER_HELPER(namespc, clazz) \
+#define REMOTING_SPECIALIZE_CLIENT_HELPER(namespc, clazz) \
 	namespace Poco { \
 	namespace RemotingNG { \
 	template <> \

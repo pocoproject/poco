@@ -122,6 +122,7 @@ jobs:
       sqlparser: ${{ steps.filter.outputs.sqlparser }}
       crypto_netssl: ${{ steps.filter.outputs.crypto_netssl }}
       ai: ${{ steps.filter.outputs.ai }}
+      modules: ${{ steps.filter.outputs.modules }}
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v4
@@ -498,12 +499,14 @@ jobs:
           POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
           ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
 
-  # Clang toolchain exception + C++ modules probe: Foundation + Util smoke.
+  # Clang toolchain exception + C++ modules: every library with a module partition, the module tests,
+  # Foundation + Util smoke.
   linux-clang-21-cmake-modules:
     runs-on: ubuntu-24.04
     needs: changes
     if: |
       needs.changes.outputs.foundation_util == 'true' ||
+      needs.changes.outputs.modules == 'true' ||
       needs.changes.outputs.ci_core == 'true' ||
       github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
@@ -519,12 +522,16 @@ jobs:
           sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-21 100
           sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-21 100
       - name: Install dependencies
-        run: sudo apt -y install cmake ninja-build
+        run: >-
+          sudo apt -y install cmake ninja-build libssl-dev libssh-dev libxml2-dev libavahi-client-dev
+          libpq-dev unixodbc-dev libmysqlclient-dev
       - name: Configure with Clang 21 and modules
         run: |
           export CC=clang-21
           export CXX=clang++-21
-          cmake -S . -B build -G Ninja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DENABLE_MODULES=ON -DENABLE_TESTS=ON
+          cmake -S . -B build -G Ninja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DENABLE_MODULES=ON -DENABLE_TESTS=ON \
+            -DENABLE_PDF=ON -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_DNSSD=ON -DENABLE_DNSSD_AVAHI=ON \
+            -DENABLE_SSH=ON -DENABLE_XSD_VALIDATOR=ON -DENABLE_AI=ON
       - name: Build
         run: cmake --build build --parallel $(nproc)
       - uses: ./.github/actions/retry-action
@@ -534,10 +541,40 @@ jobs:
           retry_on: any
           command: >-
             cd build &&
-            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util)$"
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util|Modules)$"
       - uses: ./.github/actions/upload-test-report
         with:
           build-dir: build
+
+  # C++ modules on macOS: the Bonjour partition and the Apple platform guards. Homebrew LLVM,
+  # because Apple clang has no clang-scan-deps; the explicit SDK path reaches clang-scan-deps.
+  macos-clang-21-cmake-modules:
+    runs-on: macos-latest
+    needs: changes
+    if: |
+      needs.changes.outputs.modules == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: brew install llvm@21 ninja openssl@3 libssh
+      - run: >-
+          CXX=$(brew --prefix llvm@21)/bin/clang++ CC=$(brew --prefix llvm@21)/bin/clang
+          cmake -S. -Bcmake-build -G Ninja -DENABLE_MODULES=ON -DENABLE_TESTS=ON
+          -DENABLE_PDF=ON -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON -DENABLE_DNSSD=ON -DENABLE_DNSSD_BONJOUR=ON
+          -DENABLE_SSH=ON -DENABLE_XSD_VALIDATOR=ON -DENABLE_AI=ON
+          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+          -DCMAKE_OSX_SYSROOT=$(xcrun --show-sdk-path)
+      - run: cmake --build cmake-build --target Modules-testrunner --parallel $(sysctl -n hw.ncpu)
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            ctest ${{ env.POCO_CTEST_COMMON }} -R "^Modules$"
+      - uses: ./.github/actions/upload-test-report
 
   # OpenSSL 4.0, built from source and cached (ubuntu-24.04 ships OpenSSL 3).
   # OpenSSL 4.0 no longer frees its global data at exit, so the job runs with

@@ -53,3 +53,9 @@ ai:
   - 'configure'
   - 'components'
   - 'Makefile'
+
+modules:
+  - 'modules/**'
+  - '*/include/**'
+  - '*/*/include/**'
+  - '*/*/*/include/**'

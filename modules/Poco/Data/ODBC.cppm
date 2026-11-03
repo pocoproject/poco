@@ -29,8 +29,6 @@ module;
 #include "Poco/Data/ODBC/SessionImpl.h"
 #include "Poco/Data/ODBC/TypeInfo.h"
 #include "Poco/Data/ODBC/Unicode.h"
-#include "Poco/Data/ODBC/Unicode_UNIXODBC.h"
-#include "Poco/Data/ODBC/Unicode_WIN32.h"
 #include "Poco/Data/ODBC/Utility.h"
 #endif
 
@@ -66,12 +64,15 @@ export namespace Poco::Data::ODBC {
 	using Poco::Data::ODBC::DescriptorDiagnostics;
 	using Poco::Data::ODBC::DescriptorError;
 	using Poco::Data::ODBC::DescriptorException;
+	using Poco::Data::ODBC::DescriptorHandle;
 	using Poco::Data::ODBC::EnvironmentDiagnostics;
 	using Poco::Data::ODBC::EnvironmentError;
 	using Poco::Data::ODBC::EnvironmentException;
+	using Poco::Data::ODBC::NumAttrPtrType;
 	using Poco::Data::ODBC::StatementDiagnostics;
 	using Poco::Data::ODBC::StatementError;
 	using Poco::Data::ODBC::StatementException;
+	using Poco::Data::ODBC::StatementHandle;
 
 	using Poco::Data::ODBC::SQLBrowseConnect;
 	using Poco::Data::ODBC::SQLColAttribute;
@@ -114,3 +115,11 @@ export namespace Poco::Data::ODBC {
 	using Poco::Data::ODBC::stringLength;
 	#endif
 }
+
+#ifdef ENABLE_DATA_ODBC
+export using ::POCO_ODBC_NULL_HANDLE;
+export using ::POCO_ODBC_NULL_HDBC;
+export using ::POCO_ODBC_NULL_HDESC;
+export using ::POCO_ODBC_NULL_HENV;
+export using ::POCO_ODBC_NULL_HSTMT;
+#endif
