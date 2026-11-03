@@ -40,6 +40,14 @@ class Prometheus_API Collector
 	/// when they are destroyed. A Collector is registered with
 	/// at most one Registry at a time.
 	///
+	/// A Registry::exportTo() running in another thread can use a
+	/// Collector as soon as it is registered. A class derived from
+	/// Collector therefore passes nullptr as the Registry to the
+	/// constructor of its base class and registers itself with
+	/// Registry::registerCollector() in the last statement of its
+	/// own constructor, as Counter, Gauge and the other concrete
+	/// collector classes of this library do.
+	///
 	/// A class derived from Collector must call unregister() at the
 	/// start of its destructor, before any member that exportTo()
 	/// uses is destroyed; otherwise a Registry::exportTo() running

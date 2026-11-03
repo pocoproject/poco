@@ -57,32 +57,36 @@ void HistogramSample::observe(Poco::Clock::ClockVal v)
 
 
 Histogram::Histogram(const std::string& name):
-	LabeledMetricImpl(Metric::Type::HISTOGRAM, name)
+	LabeledMetricImpl(Metric::Type::HISTOGRAM, name, nullptr)
 {
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 Histogram::Histogram(const std::string& name, const Params& params):
-	LabeledMetricImpl(Metric::Type::HISTOGRAM, name),
+	LabeledMetricImpl(Metric::Type::HISTOGRAM, name, nullptr),
 	_bucketBounds(params.buckets)
 {
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 Histogram::Histogram(const std::string& name, Registry* pRegistry):
-	LabeledMetricImpl(Metric::Type::HISTOGRAM, name, pRegistry)
+	LabeledMetricImpl(Metric::Type::HISTOGRAM, name, nullptr)
 {
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 
 Histogram::Histogram(const std::string& name, const Params& params, Registry* pRegistry):
-	LabeledMetricImpl(Metric::Type::HISTOGRAM, name, pRegistry),
+	LabeledMetricImpl(Metric::Type::HISTOGRAM, name, nullptr),
 	_bucketBounds(params.buckets)
 {
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 

@@ -70,37 +70,41 @@ public:
 	using Callback = std::function<Sample()>;
 
 	CallbackMetric(const std::string& name, Callback callback):
-		Metric(metricType, name),
+		Metric(metricType, name, nullptr),
 		_callback(callback)
 		/// Creates a CallbackMetric with the given type and name and
 		/// registers it with the default registry.
 	{
+		Registry::defaultRegistry().registerCollector(this);
 	}
 
 	CallbackMetric(const std::string& name, const std::string& help, Callback callback):
-		Metric(metricType, name),
+		Metric(metricType, name, nullptr),
 		_callback(callback)
 		/// Creates a CallbackMetric with the given type, name and help text, and
 		/// registers it with the default registry.
 	{
 		setHelp(help);
+		Registry::defaultRegistry().registerCollector(this);
 	}
 
 	CallbackMetric(const std::string& name, Registry* pRegistry, Callback callback):
-		Metric(metricType, name, pRegistry),
+		Metric(metricType, name, nullptr),
 		_callback(callback)
 		/// Creates a CallbackMetric with the given type and name and
 		/// registers it with the given registry (if not nullptr).
 	{
+		if (pRegistry != nullptr) pRegistry->registerCollector(this);
 	}
 
 	CallbackMetric(const std::string& name, const std::string& help, Registry* pRegistry, Callback callback):
-		Metric(metricType, name, pRegistry),
+		Metric(metricType, name, nullptr),
 		_callback(callback)
 		/// Creates a CallbackMetric with the given type, name and help text, and
 		/// registers it with the given registry (if not nullptr).
 	{
 		setHelp(help);
+		if (pRegistry != nullptr) pRegistry->registerCollector(this);
 	}
 
 	~CallbackMetric() override

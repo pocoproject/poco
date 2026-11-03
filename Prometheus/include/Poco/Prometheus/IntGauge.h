@@ -105,28 +105,32 @@ private:
 
 
 inline IntGauge::IntGauge(const std::string& name):
-	Metric(Metric::Type::GAUGE, name)
+	Metric(Metric::Type::GAUGE, name, nullptr)
 {
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 inline IntGauge::IntGauge(const std::string& name, const Params& params):
-	Metric(Metric::Type::GAUGE, name)
+	Metric(Metric::Type::GAUGE, name, nullptr)
 {
 	setHelp(params.help);
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 inline IntGauge::IntGauge(const std::string& name, Registry* pRegistry):
-	Metric(Metric::Type::GAUGE, name, pRegistry)
+	Metric(Metric::Type::GAUGE, name, nullptr)
 {
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 
 inline IntGauge::IntGauge(const std::string& name, const Params& params, Registry* pRegistry):
-	Metric(Metric::Type::GAUGE, name, pRegistry)
+	Metric(Metric::Type::GAUGE, name, nullptr)
 {
 	setHelp(params.help);
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 

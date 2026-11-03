@@ -25,30 +25,34 @@ CounterSample::~CounterSample() = default;
 
 
 Counter::Counter(const std::string& name):
-	LabeledMetricImpl<CounterSample>(Metric::Type::COUNTER, name)
+	LabeledMetricImpl<CounterSample>(Metric::Type::COUNTER, name, nullptr)
 {
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 Counter::Counter(const std::string& name, const Params& params):
-	LabeledMetricImpl<CounterSample>(Metric::Type::COUNTER, name)
+	LabeledMetricImpl<CounterSample>(Metric::Type::COUNTER, name, nullptr)
 {
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 Counter::Counter(const std::string& name, Registry* pRegistry):
-	LabeledMetricImpl<CounterSample>(Metric::Type::COUNTER, name, pRegistry)
+	LabeledMetricImpl<CounterSample>(Metric::Type::COUNTER, name, nullptr)
 {
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 
 Counter::Counter(const std::string& name, const Params& params, Registry* pRegistry):
-	LabeledMetricImpl<CounterSample>(Metric::Type::COUNTER, name, pRegistry)
+	LabeledMetricImpl<CounterSample>(Metric::Type::COUNTER, name, nullptr)
 {
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 

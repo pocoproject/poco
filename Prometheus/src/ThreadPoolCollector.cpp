@@ -26,29 +26,32 @@ const std::string ThreadPoolCollector::NAME_PREFIX{"poco_threadpool"s};
 
 
 ThreadPoolCollector::ThreadPoolCollector():
-	Collector(NAME_PREFIX),
+	Collector(NAME_PREFIX, nullptr),
 	_threadPoolName("default"s),
 	_threadPool(Poco::ThreadPool::defaultPool())
 {
 	buildMetrics();
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 ThreadPoolCollector::ThreadPoolCollector(const Poco::ThreadPool& threadPool):
-	Collector(collectorName(threadPool.name())),
+	Collector(collectorName(threadPool.name()), nullptr),
 	_threadPoolName(threadPool.name()),
 	_threadPool(threadPool)
 {
 	buildMetrics();
+	Registry::defaultRegistry().registerCollector(this);
 }
 
 
 ThreadPoolCollector::ThreadPoolCollector(const std::string& name, const Poco::ThreadPool& threadPool, Registry* pRegistry):
-	Collector(collectorName(name), pRegistry),
+	Collector(collectorName(name), nullptr),
 	_threadPoolName(name),
 	_threadPool(threadPool)
 {
 	buildMetrics();
+	if (pRegistry != nullptr) pRegistry->registerCollector(this);
 }
 
 
