@@ -48,6 +48,9 @@ public:
 
 	~Registry();
 		/// Removes all Collector instances and destroys the Registry.
+		///
+		/// The Registry must not be destroyed while a Collector
+		/// registered with it is destroyed or used in another thread.
 
 	void registerCollector(Collector* pCollector);
 		/// Registers a Collector with the Registry.
