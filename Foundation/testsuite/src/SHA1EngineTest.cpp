@@ -15,6 +15,8 @@
 #if (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && defined(POCO_PTR_IS_64_BIT)
 #include <sys/mman.h>
 #endif
+#include <algorithm>
+#include <string>
 
 
 using Poco::SHA1Engine;
@@ -28,6 +30,29 @@ SHA1EngineTest::SHA1EngineTest(const std::string& name): CppUnit::TestCase(name)
 
 SHA1EngineTest::~SHA1EngineTest()
 {
+}
+
+
+void SHA1EngineTest::testChunkedUpdate()
+{
+	// the same 1000 bytes in parts that end before, at and after 64-byte block boundaries
+	std::string data;
+	for (int i = 0; i < 1000; ++i)
+		data += static_cast<char>(i % 251);
+	constexpr std::size_t partSizes[] = {1, 3, 63, 64, 65, 127, 128, 1000};
+	for (const std::size_t partSize: partSizes)
+	{
+		SHA1Engine engine;
+		for (std::size_t pos = 0; pos < data.size(); pos += partSize)
+			engine.update(data.data() + pos, std::min(partSize, data.size() - pos));
+		assertTrue (DigestEngine::digestToHex(engine.digest()) == "c9c960a0b925474fab83942cc27d504fc24ac37b");
+	}
+
+	// a partial block followed by several blocks in one call
+	SHA1Engine engine;
+	engine.update(data.data(), 5);
+	engine.update(data.data() + 5, data.size() - 5);
+	assertTrue (DigestEngine::digestToHex(engine.digest()) == "c9c960a0b925474fab83942cc27d504fc24ac37b");
 }
 
 
@@ -80,6 +105,7 @@ CppUnit::Test* SHA1EngineTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SHA1EngineTest");
 
+	CppUnit_addTest(pSuite, SHA1EngineTest, testChunkedUpdate);
 	CppUnit_addTest(pSuite, SHA1EngineTest, testSHA1);
 	CppUnit_addLongTest(pSuite, SHA1EngineTest, testLargeInput);
 
