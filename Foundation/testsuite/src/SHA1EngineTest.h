@@ -25,6 +25,7 @@ public:
 	~SHA1EngineTest();
 
 	void testSHA1();
+	void testLargeInput();
 
 	void setUp();
 	void tearDown();

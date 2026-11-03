@@ -26,6 +26,7 @@ public:
 
 	void testSHA224();
 	void testSHA256();
+	void testLargeInput();
 	void testSHA384();
 	void testSHA512();
 	void testSHA512_224();

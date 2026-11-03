@@ -25,6 +25,7 @@ public:
 	~MD4EngineTest();
 
 	void testMD4();
+	void testLargeInput();
 
 	void setUp();
 	void tearDown();

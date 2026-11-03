@@ -64,7 +64,7 @@ void SHA1Engine::updateImpl(const void* buffer_, std::size_t count)
 	if ((_context.countLo + ((UInt32) count << 3)) < _context.countLo)
 		_context.countHi++; /* Carry from low to high bitCount */
 	_context.countLo += ((UInt32) count << 3);
-	_context.countHi += ((UInt32 ) count >> 29);
+	_context.countHi += static_cast<UInt32>(count >> 29);
 
 	/* Process data in BLOCK_SIZE chunks */
 	while (count-- > 0)
