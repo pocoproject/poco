@@ -37,6 +37,7 @@ public:
 	void testTruncatedBulkString();
 	void testTruncatedLargeBulkString();
 	void testBulkStringWithoutTerminator();
+	void testBulkStringLengthTooLong();
 	void testTruncatedLine();
 	void testNestingAtLimit();
 	void testNestingTooDeep();

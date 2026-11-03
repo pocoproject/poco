@@ -197,6 +197,31 @@ void ReplyTest::testBulkStringWithoutTerminator()
 	{
 		assertTrue (Poco::startsWith(exc.message(), std::string("Bulk string reply from Redis server does not end")));
 	}
+
+	try
+	{
+		const BulkString value = readReply<BulkString>("$3\r\nabc\n");
+		fail("a bulk string ending with LF alone must throw, got \"" + value.value() + "\"");
+	}
+	catch (RedisException& exc)
+	{
+		assertTrue (Poco::startsWith(exc.message(), std::string("Bulk string reply from Redis server does not end")));
+	}
+}
+
+
+void ReplyTest::testBulkStringLengthTooLong()
+{
+	try
+	{
+		// The declared length takes the CR of the terminator into the value.
+		const BulkString value = readReply<BulkString>("$4\r\nabc\r\n");
+		fail("a bulk string longer than its data must throw, got \"" + value.value() + "\"");
+	}
+	catch (RedisException& exc)
+	{
+		assertTrue (Poco::startsWith(exc.message(), std::string("Bulk string reply from Redis server does not end")));
+	}
 }
 
 
@@ -294,6 +319,7 @@ CppUnit::Test* ReplyTest::suite()
 	CppUnit_addTest(pSuite, ReplyTest, testTruncatedBulkString);
 	CppUnit_addTest(pSuite, ReplyTest, testTruncatedLargeBulkString);
 	CppUnit_addTest(pSuite, ReplyTest, testBulkStringWithoutTerminator);
+	CppUnit_addTest(pSuite, ReplyTest, testBulkStringLengthTooLong);
 	CppUnit_addTest(pSuite, ReplyTest, testTruncatedLine);
 	CppUnit_addTest(pSuite, ReplyTest, testNestingAtLimit);
 	CppUnit_addTest(pSuite, ReplyTest, testNestingTooDeep);
