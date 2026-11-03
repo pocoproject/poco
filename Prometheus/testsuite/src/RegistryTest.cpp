@@ -118,6 +118,43 @@ namespace
 		Poco::Event _exporting;
 		Poco::Thread _thread;
 	};
+
+
+	class InstanceCounter: public Counter
+		/// A Counter that exports its value with an "instance" label,
+		/// following the rules of Collector for derived classes.
+	{
+	public:
+		InstanceCounter() = delete;
+
+		InstanceCounter(const std::string& name, const std::string& instance, Registry* pRegistry):
+			Counter(name, nullptr),
+			_labelNames{"instance"s},
+			_labelValues{instance}
+		{
+			if (pRegistry != nullptr) pRegistry->registerCollector(this);
+		}
+
+		~InstanceCounter() override
+		{
+			unregister();
+		}
+
+		InstanceCounter(const InstanceCounter&) = delete;
+		InstanceCounter(InstanceCounter&&) = delete;
+		InstanceCounter& operator = (const InstanceCounter&) = delete;
+		InstanceCounter& operator = (InstanceCounter&&) = delete;
+
+		void exportTo(Exporter& exporter) const override
+		{
+			exporter.writeHeader(*this);
+			exporter.writeSample(*this, _labelNames, _labelValues, value());
+		}
+
+	private:
+		const std::vector<std::string> _labelNames;
+		const std::vector<std::string> _labelValues;
+	};
 }
 
 
@@ -242,30 +279,39 @@ void RegistryTest::testConcurrentExportAndDestruction()
 		collectors.push_back(std::move(pHistogram));
 	}
 
-	std::atomic<bool> stop{false};
-	Poco::Event exporting;
-	Poco::Thread exportThread;
-	exportThread.startFunc([&registry, &stop, &exporting]()
 	{
-		while (!stop)
-		{
-			std::ostringstream stream;
-			TextExporter exporter(stream);
-			registry.exportTo(exporter);
-			exporting.set();
-			// The mutex is not fair on every platform; without a yield,
-			// destroying collectors can wait through many export passes.
-			Poco::Thread::yield();
-		}
-	});
-	exporting.wait();
-
-	collectors.clear();
-	stop = true;
-	exportThread.join();
+		ExportThread exportThread(registry);
+		collectors.clear();
+	}
 
 	assertNullPtr(registry.findCollector("counter_0"s));
 	assertNullPtr(registry.findCollector("histogram_0"s));
+
+	std::ostringstream stream;
+	TextExporter exporter(stream);
+	registry.exportTo(exporter);
+	assertEqual(""s, stream.str());
+}
+
+
+void RegistryTest::testConcurrentExportAndDerivedClassDestruction()
+{
+	constexpr int COLLECTOR_COUNT = 100;
+
+	Registry registry;
+	std::vector<std::unique_ptr<InstanceCounter>> counters;
+	for (int i = 0; i < COLLECTOR_COUNT; ++i)
+	{
+		counters.push_back(std::make_unique<InstanceCounter>("counter_"s + std::to_string(i), "instance"s, &registry));
+		counters.back()->inc();
+	}
+
+	{
+		ExportThread exportThread(registry);
+		counters.clear();
+	}
+
+	assertNullPtr(registry.findCollector("counter_0"s));
 
 	std::ostringstream stream;
 	TextExporter exporter(stream);
@@ -335,6 +381,7 @@ CppUnit::Test* RegistryTest::suite()
 	CppUnit_addTest(pSuite, RegistryTest, testUnregisteredCollectorCanRegisterElsewhere);
 	CppUnit_addTest(pSuite, RegistryTest, testRegisterWithSecondRegistryFails);
 	CppUnit_addTest(pSuite, RegistryTest, testConcurrentExportAndDestruction);
+	CppUnit_addTest(pSuite, RegistryTest, testConcurrentExportAndDerivedClassDestruction);
 	CppUnit_addTest(pSuite, RegistryTest, testConcurrentExportAndConstruction);
 
 	return pSuite;

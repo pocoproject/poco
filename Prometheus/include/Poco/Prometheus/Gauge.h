@@ -91,6 +91,9 @@ class Prometheus_API Gauge: public LabeledMetricImpl<GaugeSample>
 	///
 	/// To set the value of a Gauge (without labels):
 	///     simpleGauge.set(42);
+	///
+	/// A class derived from Gauge follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	struct Params

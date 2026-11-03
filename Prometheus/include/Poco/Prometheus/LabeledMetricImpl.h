@@ -40,6 +40,9 @@ class LabeledMetricImpl: public LabeledMetric
 	/// A helper class for implementing LabeledMetric classes such as Counter, Gauge and Histogram.
 	///
 	/// This class takes care of managing label values and samples.
+	///
+	/// A class derived from LabeledMetricImpl follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	using Sample = S;

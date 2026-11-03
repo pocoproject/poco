@@ -31,6 +31,7 @@ public:
 	void testUnregisteredCollectorCanRegisterElsewhere();
 	void testRegisterWithSecondRegistryFails();
 	void testConcurrentExportAndDestruction();
+	void testConcurrentExportAndDerivedClassDestruction();
 	void testConcurrentExportAndConstruction();
 
 	void setUp() override;

@@ -42,6 +42,9 @@ class Prometheus_API ProcessCollector: public Collector
 	///   - process_resident_memory_bytes: Resident memory size in bytes (Linux only).
 	///   - process_virtual_memory_bytes: Virtual memory size in bytes (Linux only).
 	///   - process_thread_cpu_seconds: Per-thread CPU time (Linux only).
+	///
+	/// A class derived from ProcessCollector follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	ProcessCollector();

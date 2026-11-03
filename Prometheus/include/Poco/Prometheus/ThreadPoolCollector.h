@@ -36,6 +36,9 @@ class Prometheus_API ThreadPoolCollector: public Collector
 	///
 	/// Metrics have a single label "name" identifying the thread pool.
 	/// The name of the default thread pool is "default".
+	///
+	/// A class derived from ThreadPoolCollector follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	ThreadPoolCollector();

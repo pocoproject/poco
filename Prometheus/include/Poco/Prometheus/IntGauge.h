@@ -34,6 +34,9 @@ class Prometheus_API IntGauge: public Metric
 	/// using std::atomic.
 	///
 	/// Labels are not supported.
+	///
+	/// A class derived from IntGauge follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	using Sample = Poco::Int64;

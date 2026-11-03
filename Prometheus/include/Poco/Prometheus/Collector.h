@@ -55,6 +55,10 @@ class Prometheus_API Collector
 	/// The Collector destructor calls it as well, but too late for
 	/// this.
 	///
+	/// Both rules apply to every class in the hierarchy, also to a
+	/// class derived from Counter, Gauge or another collector class
+	/// of this library, whether or not it adds members.
+	///
 	/// A Registry must not be destroyed while a Collector registered
 	/// with it is destroyed or used in another thread.
 {

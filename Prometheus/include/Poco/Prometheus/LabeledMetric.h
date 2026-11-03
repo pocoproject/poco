@@ -28,6 +28,9 @@ namespace Poco::Prometheus {
 class Prometheus_API LabeledMetric: public Metric
 	/// This class adds support for labels to the
 	/// basic Metric class.
+	///
+	/// A class derived from LabeledMetric follows the rules for derived
+	/// classes in the Collector documentation.
 {
 public:
 	const std::vector<std::string>& labelNames() const;
