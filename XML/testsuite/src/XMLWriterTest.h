@@ -47,6 +47,7 @@ public:
 	void testEmptyCharacters();
 	void testCDATA();
 	void testCDATATerminator();
+	void testCDATATerminatorAfterRawCharacters();
 	void testCDATAControlCharacter();
 	void testRawCharacters();
 	void testAttributeCharacters();

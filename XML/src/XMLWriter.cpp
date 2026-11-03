@@ -18,11 +18,26 @@
 #include "Poco/SAX/AttributesImpl.h"
 #include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
+#include <algorithm>
 #include <sstream>
 #include <type_traits>
 
 
 using namespace std::string_literals;
+
+
+namespace {
+
+
+[[nodiscard]] int trailingCDATABrackets(int brackets, Poco::XML::XMLChar c)
+	/// Returns the number of "]" that end the CDATA text after c,
+	/// up to the two that "]]>" needs.
+{
+	return c == ']' ? std::min(brackets + 1, 2) : 0;
+}
+
+
+} // namespace
 
 
 namespace Poco::XML {
@@ -336,11 +351,7 @@ void XMLWriter::characters(const XMLChar ch[], int start, int length)
 			if (static_cast<std::make_unsigned_t<XMLChar>>(c) < 32 && c != '\t' && c != '\r' && c != '\n')
 				throw XMLException("Invalid character token.");
 			writeXML(c);
-			if (c == ']')
-			{
-				if (_cdataBrackets < 2) ++_cdataBrackets;
-			}
-			else _cdataBrackets = 0;
+			_cdataBrackets = trailingCDATABrackets(_cdataBrackets, c);
 		}
 	}
 	else
@@ -380,6 +391,11 @@ void XMLWriter::rawCharacters(const XMLString& str)
 	if (_unclosedStartTag) closeStartTag();
 	_contentWritten = _contentWritten || !str.empty();
 	writeXML(str);
+	if (_inCDATA)
+	{
+		// characters() must not complete a terminator that starts in the raw text.
+		for (const XMLChar c: str) _cdataBrackets = trailingCDATABrackets(_cdataBrackets, c);
+	}
 }
 
 
