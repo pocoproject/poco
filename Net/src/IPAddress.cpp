@@ -47,8 +47,10 @@ namespace {
 {
 	// IPv6AddressImpl::parse() returns the all-zero address for unparsable text, too.
 	// macOS inet_pton() ignores a scope suffix; scoped text is left to IPv6AddressImpl::parse().
+	// inet_pton() stops at an embedded NUL.
 	struct in6_addr ia{};
 	return addr.find('%') == std::string::npos &&
+		addr.find('\0') == std::string::npos &&
 		inet_pton(AF_INET6, addr.c_str(), &ia) == 1 &&
 		IPv6AddressImpl(&ia).isWildcard();
 }

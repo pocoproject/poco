@@ -17,6 +17,7 @@
 #include "Poco/Format.h"
 #include <iostream>
 #include <string>
+#include <vector>
 
 
 using Poco::Net::IPAddress;
@@ -193,6 +194,16 @@ void IPAddressTest::testParse()
 		{
 		}
 	}
+	const std::string wildcardWithNul("::\0junk", 7);
+	assertFalse (IPAddress::tryParse(wildcardWithNul, ip));
+	try
+	{
+		ip = IPAddress::parse(wildcardWithNul);
+		fail("wildcard with embedded NUL - must throw");
+	}
+	catch (InvalidAddressException&)
+	{
+	}
 
 	assertTrue (IPAddress::tryParse("::1", ip));
 	assertTrue (IPAddress::tryParse("1080:0:0:0:8:600:200a:425c", ip));
@@ -205,6 +216,28 @@ void IPAddressTest::testParse()
 	assertTrue (IPAddress::tryParse("ffff:ffff:ffff:ffff::", ip));
 	assertTrue (IPAddress::tryParse("ffff:ffff::", ip));
 #endif
+}
+
+
+void IPAddressTest::testParseEmbeddedNul()
+{
+	IPAddress ip;
+	std::vector<std::string> addrs{std::string("1.2.3.4\0junk", 12)};
+#ifdef POCO_HAVE_IPv6
+	addrs.emplace_back("::1\0junk", 8);
+#endif
+	for (const auto& addr: addrs)
+	{
+		assertFalse (IPAddress::tryParse(addr, ip));
+		try
+		{
+			ip = IPAddress::parse(addr);
+			fail("address with embedded NUL - must throw");
+		}
+		catch (InvalidAddressException&)
+		{
+		}
+	}
 }
 
 
@@ -862,6 +895,7 @@ CppUnit::Test* IPAddressTest::suite()
 	CppUnit_addTest(pSuite, IPAddressTest, testStringConv6);
 	CppUnit_addTest(pSuite, IPAddressTest, testStringConv6IPv4);
 	CppUnit_addTest(pSuite, IPAddressTest, testParse);
+	CppUnit_addTest(pSuite, IPAddressTest, testParseEmbeddedNul);
 	CppUnit_addTest(pSuite, IPAddressTest, testClassification);
 	CppUnit_addTest(pSuite, IPAddressTest, testMCClassification);
 	CppUnit_addTest(pSuite, IPAddressTest, testClassification6);
