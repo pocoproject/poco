@@ -1183,22 +1183,9 @@ BENCHMARK(Logger_AsyncChannel_ToFile);
 // the time waiting for the backend to process the message.
 //
 
-// Configure FastLogger backend options before any FastLogger is created.
-// This must happen before FastLogger::get() is called for the first time.
-struct FastLoggerBackendInitializer
-{
-	FastLoggerBackendInitializer()
-	{
-		// The benchmark runs the backend thread spinning on purpose, without
-		// sleeping or yielding while idle. By default the idle backend sleeps
-		// for 100 microseconds before it polls again, which would add that
-		// wake-up latency to the measured times. A spinning backend keeps a
-		// CPU core busy, which is acceptable for a benchmark only.
-		Poco::FastLogger::setBackendOption("sleepDuration", "0");
-		Poco::FastLogger::setBackendOption("enableYieldWhenIdle", "false");
-	}
-};
-static FastLoggerBackendInitializer fastLoggerBackendInitializer;
+// The backend runs with its default options, as applications use it: once
+// all queues are drained, it sleeps for 100 microseconds before it polls
+// again, so wall times that wait for the backend include that wake-up latency.
 
 
 // Measures the cost of checking if a log level is enabled (returns true)
