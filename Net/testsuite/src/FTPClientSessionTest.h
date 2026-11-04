@@ -47,6 +47,7 @@ public:
 	void testDownloadPORT();
 	void testDownloadEPRT();
 	void testDownloadPASV();
+	void testDownloadPASVOtherHost();
 	void testDownloadEPSV();
 	void testUpload();
 	void testList();
