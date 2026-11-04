@@ -28,6 +28,7 @@ public:
 	void testFormat();
 	void testFormatAny();
 	void testDump();
+	void testIdleBackendCPUUsage();
 	void testRotateBySize();
 	void testRotateDaily();
 	void testRotateLargeFile();
