@@ -33,6 +33,9 @@
 #include <unistd.h>
 #elif defined(__APPLE__)
 #include <mach/mach.h>
+#elif defined(_WIN32) && !defined(__MINGW32__)
+#include "Poco/UnWindows.h"
+#include <tlhelp32.h>
 #endif
 
 
@@ -144,6 +147,55 @@ Poco::Int64 threadCPUTime(const std::string& threadName)
 		mach_port_deallocate(mach_task_self(), threads[i]);
 	}
 	vm_deallocate(mach_task_self(), reinterpret_cast<vm_address_t>(threads), threadCount*sizeof(thread_act_t));
+	return result;
+#elif defined(_WIN32) && !defined(__MINGW32__)
+	// Quill names its backend thread with SetThreadDescription(), so the
+	// thread is found by its description. GetThreadDescription() exists from
+	// Windows 10 1607 on and is looked up at runtime, as Quill does.
+	typedef HRESULT (WINAPI *GetThreadDescriptionFunc)(HANDLE, PWSTR*);
+	const HMODULE kernelBase = GetModuleHandleW(L"KernelBase.dll");
+	const auto getThreadDescription = kernelBase ?
+		reinterpret_cast<GetThreadDescriptionFunc>(GetProcAddress(kernelBase, "GetThreadDescription")) : nullptr;
+	if (!getThreadDescription)
+		return -2;
+
+	const HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+	if (snapshot == INVALID_HANDLE_VALUE)
+		return -2;
+
+	// The thread names of the test are ASCII.
+	const std::wstring wideName(threadName.begin(), threadName.end());
+	const DWORD processId = GetCurrentProcessId();
+	auto toMicroseconds = [](const FILETIME& ft)
+	{
+		// FILETIME counts 100-nanosecond intervals.
+		return ((static_cast<Poco::UInt64>(ft.dwHighDateTime) << 32) | ft.dwLowDateTime)/10;
+	};
+
+	Poco::Int64 result = -1;
+	THREADENTRY32 entry;
+	entry.dwSize = sizeof(entry);
+	for (BOOL more = Thread32First(snapshot, &entry); more && result == -1; more = Thread32Next(snapshot, &entry))
+	{
+		if (entry.th32OwnerProcessID != processId) continue;
+		const HANDLE thread = OpenThread(THREAD_QUERY_LIMITED_INFORMATION, FALSE, entry.th32ThreadID);
+		if (!thread) continue;
+		PWSTR description = nullptr;
+		if (SUCCEEDED(getThreadDescription(thread, &description)) && description)
+		{
+			if (wideName == description)
+			{
+				FILETIME creationTime, exitTime, kernelTime, userTime;
+				if (GetThreadTimes(thread, &creationTime, &exitTime, &kernelTime, &userTime))
+					result = static_cast<Poco::Int64>(toMicroseconds(kernelTime) + toMicroseconds(userTime));
+				else
+					result = -2;
+			}
+			LocalFree(description);
+		}
+		CloseHandle(thread);
+	}
+	CloseHandle(snapshot);
 	return result;
 #else
 	(void) threadName;
