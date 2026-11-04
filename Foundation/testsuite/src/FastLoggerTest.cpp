@@ -24,6 +24,16 @@
 #include "Poco/Path.h"
 #include "Poco/Thread.h"
 #include "Poco/DirectoryIterator.h"
+#include "Poco/Clock.h"
+#include "Poco/FileStream.h"
+#include "Poco/NumberParser.h"
+#include "Poco/StringTokenizer.h"
+#include <cstring>
+#if defined(__linux__)
+#include <unistd.h>
+#elif defined(__APPLE__)
+#include <mach/mach.h>
+#endif
 
 
 using Poco::FastLogger;
@@ -35,9 +45,112 @@ using Poco::File;
 using Poco::Path;
 using Poco::Thread;
 using Poco::DirectoryIterator;
+using Poco::Clock;
 
 
 namespace {
+
+
+const std::string IDLE_BACKEND_THREAD_NAME("FLIdleBackend");
+
+
+Poco::Int64 threadCPUTime(const std::string& threadName)
+	/// Returns the CPU time, in microseconds, used so far by the thread of
+	/// this process with the given name, -1 if there is no such thread,
+	/// or -2 if the platform's per-thread CPU time cannot be read.
+{
+#if defined(__linux__)
+	auto readLine = [](const std::string& path)
+	{
+		std::string line;
+		try
+		{
+			Poco::FileInputStream istr(path);
+			std::getline(istr, line);
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		return line;
+	};
+
+	DirectoryIterator it;
+	try
+	{
+		it = DirectoryIterator(std::string("/proc/self/task"));
+	}
+	catch (Poco::Exception&)
+	{
+		return -2;
+	}
+	for (; it != DirectoryIterator(); ++it)
+	{
+		const std::string taskDir = "/proc/self/task/" + it.name() + "/";
+		if (readLine(taskDir + "comm") != threadName) continue;
+
+		// schedstat holds the time spent on the CPU in nanoseconds. Kernels
+		// that do not keep scheduler statistics report 0 there, so a zero is
+		// not taken: a running thread always has used some CPU time.
+		Poco::StringTokenizer fields(readLine(taskDir + "schedstat"), " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+		Poco::UInt64 runNs = 0;
+		if (fields.count() > 0 && Poco::NumberParser::tryParseUnsigned64(fields[0], runNs) && runNs > 0)
+			return static_cast<Poco::Int64>(runNs/1000);
+
+		// Without schedstat, fall back to utime and stime (fields 14 and 15
+		// of stat, in clock ticks). The thread name in field 2 may contain
+		// spaces, so the fields are counted from its closing parenthesis.
+		const std::string stat = readLine(taskDir + "stat");
+		const std::string::size_type pos = stat.rfind(')');
+		if (pos == std::string::npos) return -2;
+		Poco::StringTokenizer statFields(stat.substr(pos + 1), " ", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+		Poco::UInt64 utime = 0;
+		Poco::UInt64 stime = 0;
+		const long ticksPerSecond = sysconf(_SC_CLK_TCK);
+		if (statFields.count() > 12 && ticksPerSecond > 0 &&
+			Poco::NumberParser::tryParseUnsigned64(statFields[11], utime) &&
+			Poco::NumberParser::tryParseUnsigned64(statFields[12], stime))
+		{
+			return static_cast<Poco::Int64>((utime + stime)*1000000/ticksPerSecond);
+		}
+		return -2;
+	}
+	return -1;
+#elif defined(__APPLE__)
+	thread_act_array_t threads = nullptr;
+	mach_msg_type_number_t threadCount = 0;
+	if (task_threads(mach_task_self(), &threads, &threadCount) != KERN_SUCCESS)
+		return -2;
+
+	Poco::Int64 result = -1;
+	for (mach_msg_type_number_t i = 0; i < threadCount; ++i)
+	{
+		if (result == -1)
+		{
+			thread_extended_info_data_t extInfo;
+			mach_msg_type_number_t extCount = THREAD_EXTENDED_INFO_COUNT;
+			if (thread_info(threads[i], THREAD_EXTENDED_INFO, reinterpret_cast<thread_info_t>(&extInfo), &extCount) == KERN_SUCCESS &&
+				std::strncmp(extInfo.pth_name, threadName.c_str(), sizeof(extInfo.pth_name)) == 0)
+			{
+				thread_basic_info_data_t basicInfo;
+				mach_msg_type_number_t basicCount = THREAD_BASIC_INFO_COUNT;
+				if (thread_info(threads[i], THREAD_BASIC_INFO, reinterpret_cast<thread_info_t>(&basicInfo), &basicCount) == KERN_SUCCESS)
+				{
+					result = static_cast<Poco::Int64>(basicInfo.user_time.seconds + basicInfo.system_time.seconds)*1000000
+						+ basicInfo.user_time.microseconds + basicInfo.system_time.microseconds;
+				}
+				else result = -2;
+			}
+		}
+		mach_port_deallocate(mach_task_self(), threads[i]);
+	}
+	vm_deallocate(mach_task_self(), reinterpret_cast<vm_address_t>(threads), threadCount*sizeof(thread_act_t));
+	return result;
+#else
+	(void) threadName;
+	return -2;
+#endif
+}
+
 
 std::string getTempFilename()
 {
@@ -310,6 +423,54 @@ void FastLoggerTest::testDump()
 }
 
 
+void FastLoggerTest::testIdleBackendCPUUsage()
+{
+	// With nothing to log, the backend thread must wait between polls
+	// instead of spinning. Only the thread name is set here, so that the
+	// backend thread can be found; all other backend options keep their
+	// defaults.
+	FastLogger::setBackendOption("threadName", IDLE_BACKEND_THREAD_NAME);
+	FastLogger::startBackend();
+
+	Poco::Int64 cpuStart = -1;
+	Clock deadline;
+	deadline += 10*Clock::resolution();
+	while (cpuStart == -1 && !deadline.isElapsed(0))
+	{
+		cpuStart = threadCPUTime(IDLE_BACKEND_THREAD_NAME);
+		if (cpuStart == -1) Thread::sleep(10);
+	}
+	if (cpuStart == -2)
+	{
+		FastLogger::shutdown();
+		warnmsg("per-thread CPU time is not available on this platform, skipping test");
+		return;
+	}
+	if (cpuStart == -1)
+	{
+		FastLogger::shutdown();
+		failmsg("backend thread " + IDLE_BACKEND_THREAD_NAME + " not found");
+	}
+
+	// Measure the CPU time the idle backend uses over a fixed period.
+	// A spinning backend uses about as much CPU time as the period lasts;
+	// a waiting one uses a small fraction of it.
+	Clock start;
+	Thread::sleep(1000);
+	const Poco::Int64 cpuEnd = threadCPUTime(IDLE_BACKEND_THREAD_NAME);
+	const Poco::Int64 elapsed = start.elapsed();
+	FastLogger::shutdown();
+
+	assertTrue (cpuEnd >= cpuStart);
+	const Poco::Int64 cpuUsed = cpuEnd - cpuStart;
+	if (cpuUsed*4 >= elapsed)
+	{
+		failmsg("idle backend thread used " + std::to_string(cpuUsed) +
+			" us of CPU time in " + std::to_string(elapsed) + " us");
+	}
+}
+
+
 void FastLoggerTest::testRotateBySize()
 {
 	std::string logFile = getTempFilename();
@@ -503,6 +664,7 @@ CppUnit::Test* FastLoggerTest::suite()
 	CppUnit_addTest(pSuite, FastLoggerTest, testFormat);
 	CppUnit_addTest(pSuite, FastLoggerTest, testFormatAny);
 	CppUnit_addTest(pSuite, FastLoggerTest, testDump);
+	CppUnit_addTest(pSuite, FastLoggerTest, testIdleBackendCPUUsage);
 	CppUnit_addTest(pSuite, FastLoggerTest, testRotateBySize);
 	CppUnit_addTest(pSuite, FastLoggerTest, testRotateDaily);
 	CppUnit_addTest(pSuite, FastLoggerTest, testRotateLargeFile);
@@ -549,6 +711,12 @@ void FastLoggerTest::testFormatAny()
 
 
 void FastLoggerTest::testDump()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerTest::testIdleBackendCPUUsage()
 {
 	// FastLogger not enabled
 }

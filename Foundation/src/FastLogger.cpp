@@ -1917,13 +1917,11 @@ void FastLogger::ensureBackendStarted()
 	Mutex::ScopedLock lock(_backendMtx);
 	if (!_backendStarted)
 	{
+		// sleep_duration and enable_yield_when_idle keep Quill's defaults: once
+		// all queues are drained, the backend sleeps for 100 microseconds before
+		// it polls again, so the first message after a quiet period may wait up
+		// to that long.
 		quill::BackendOptions options;
-
-		// No sleep - backend should spin when there's work to do
-		options.sleep_duration = std::chrono::nanoseconds{0};
-
-		// Enable yielding when idle for better CPU sharing
-		options.enable_yield_when_idle = true;
 
 		// Disable timestamp ordering grace period for minimum latency
 		options.log_timestamp_ordering_grace_period = std::chrono::microseconds{0};

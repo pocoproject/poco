@@ -1189,9 +1189,12 @@ struct FastLoggerBackendInitializer
 {
 	FastLoggerBackendInitializer()
 	{
-		// Disable yielding when idle for more consistent benchmark timing.
-		// When enabled, the backend thread yields when no messages are pending,
-		// which can add scheduling latency in benchmarks.
+		// The benchmark runs the backend thread spinning on purpose, without
+		// sleeping or yielding while idle. By default the idle backend sleeps
+		// for 100 microseconds before it polls again, which would add that
+		// wake-up latency to the measured times. A spinning backend keeps a
+		// CPU core busy, which is acceptable for a benchmark only.
+		Poco::FastLogger::setBackendOption("sleepDuration", "0");
 		Poco::FastLogger::setBackendOption("enableYieldWhenIdle", "false");
 	}
 };
