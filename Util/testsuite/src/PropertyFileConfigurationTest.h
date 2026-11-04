@@ -35,6 +35,7 @@ public:
 	void testSaveRemovesRootKey();
 	void testSaveRemovedFilesRetryAfterFailure();
 	void testSavePreservingMultiLine();
+	void testSavePreservingEscapedBackslash();
 	void testClearResetsProvenance();
 	void testGetSourceFilesCoversAllKeys();
 	void testIncludeManagement();
