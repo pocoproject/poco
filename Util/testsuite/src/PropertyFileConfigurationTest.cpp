@@ -18,6 +18,7 @@
 #include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
 #include <sstream>
+#include <vector>
 #include <algorithm>
 #include "Poco/File.h"
 #include "Poco/Path.h"
@@ -830,6 +831,75 @@ void PropertyFileConfigurationTest::testSavePreservingMultiLine()
 }
 
 
+void PropertyFileConfigurationTest::testSavePreservingEscapedBackslash()
+{
+	// A value ending in an escaped backslash (\\) is not continued, so
+	// the lines after it are kept; a value ending in an escaped backslash
+	// followed by a continuation backslash (\\\) is continued. The same
+	// holds for a continuation line: one ending in an escaped backslash
+	// ends the value, and the line after it is kept.
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "path.key = C:\\\\temp\\\\\n";
+		ostr << "# comment after an escaped backslash\n";
+		ostr << "dir.key = x\\\\\n";
+		ostr << "next.key = nextValue\n";
+		ostr << "multi.key = part1 \\\\\\\n";
+		ostr << "part2\n";
+		ostr << "cont.key = a \\\n";
+		ostr << "b\\\\\n";
+		ostr << "# comment after a continuation ending in an escaped backslash\n";
+		ostr << "last.key = lastValue\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+	assertEqual ("C:\\temp\\", pConf->getString("path.key"));
+	assertEqual ("x\\", pConf->getString("dir.key"));
+	assertEqual ("nextValue", pConf->getString("next.key"));
+	assertEqual ("part1 \\part2", pConf->getString("multi.key"));
+	assertEqual ("a b\\", pConf->getString("cont.key"));
+	assertEqual ("lastValue", pConf->getString("last.key"));
+
+	pConf->setString("new.key", "newValue");
+	pConf->save(rootFile.path());
+
+	std::vector<std::string> lines;
+	{
+		Poco::FileInputStream istr(rootFile.path());
+		std::string line;
+		while (std::getline(istr, line))
+		{
+			if (!line.empty() && line.back() == '\r') line.pop_back();
+			lines.push_back(line);
+		}
+	}
+	const std::vector<std::string> expected = {
+		"path.key = C:\\\\temp\\\\",
+		"# comment after an escaped backslash",
+		"dir.key = x\\\\",
+		"next.key = nextValue",
+		"multi.key = part1 \\\\part2",
+		"cont.key = a b\\\\",
+		"# comment after a continuation ending in an escaped backslash",
+		"last.key = lastValue",
+		"new.key = newValue"
+	};
+	assertEqual (expected.size(), lines.size());
+	for (std::size_t i = 0; i < expected.size(); ++i)
+		assertEqual (expected[i], lines[i]);
+
+	AutoPtr<PropertyFileConfiguration> pConf2 = new PropertyFileConfiguration(rootFile.path());
+	assertEqual ("C:\\temp\\", pConf2->getString("path.key"));
+	assertEqual ("x\\", pConf2->getString("dir.key"));
+	assertEqual ("nextValue", pConf2->getString("next.key"));
+	assertEqual ("part1 \\part2", pConf2->getString("multi.key"));
+	assertEqual ("a b\\", pConf2->getString("cont.key"));
+	assertEqual ("lastValue", pConf2->getString("last.key"));
+	assertEqual ("newValue", pConf2->getString("new.key"));
+}
+
+
 void PropertyFileConfigurationTest::testClearResetsProvenance()
 {
 	// Load from file to establish provenance
@@ -1144,6 +1214,7 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovesRootKey);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovedFilesRetryAfterFailure);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreservingMultiLine);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreservingEscapedBackslash);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testClearResetsProvenance);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testGetSourceFilesCoversAllKeys);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testIncludeManagement);
