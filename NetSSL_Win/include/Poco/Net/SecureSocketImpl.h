@@ -318,9 +318,12 @@ protected:
 	void drainExtraBuffer();
 	[[nodiscard]] bool processPostHandshakeRecord();
 		/// Hands the post-handshake record at the start of _recvBuffer to the handshake
-		/// state machine. The records after it are read again before anything from the socket.
+		/// state machine of the socket's mode. The records after it are read again before
+		/// anything from the socket.
 		/// Returns true when the state machine has reached ST_DONE, false when a non-blocking
 		/// socket has to wait for the peer.
+		/// A server ends the connection with an SSLException when the record starts a
+		/// renegotiation (any post-handshake message before TLS 1.3).
 	[[nodiscard]] static int recordLength(const BYTE* pBuffer, int length);
 	[[nodiscard]] static bool bufferHasCompleteRecords(const BYTE* pBuffer, int length);
 	[[nodiscard]] static bool isRecordStart(BYTE firstByte);

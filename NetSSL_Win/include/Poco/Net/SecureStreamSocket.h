@@ -48,6 +48,9 @@ class NetSSL_Win_API SecureStreamSocket: public StreamSocket
 	/// Before waiting for the socket to become readable, call available()
 	/// and read while it returns a positive value.
 	///
+	/// A server refuses a renegotiation that the client starts (TLS 1.2 and
+	/// earlier): receiveBytes() ends the connection with an SSLException.
+	///
 	/// The SSL handshake is delayed until the first sendBytes() or
 	/// receiveBytes() operation is performed on the socket. No automatic
 	/// post connection check (checking the peer certificate for a valid
