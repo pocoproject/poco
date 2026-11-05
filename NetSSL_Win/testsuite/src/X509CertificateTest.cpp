@@ -131,7 +131,7 @@ void X509CertificateTest::testVerifyWildcard()
 	assertTrue (verify(WILDCARD_CERT, "FOO.Example.COM"));
 	assertFalse (verify(WILDCARD_CERT, "example.com"));
 	assertFalse (verify(WILDCARD_CERT, "foo.bar.example.com"));
-	// the common name (test) is not considered when the certificate has a DNS name
+	// the common name (test) is not considered
 	assertFalse (verify(WILDCARD_CERT, "test"));
 }
 
@@ -162,9 +162,9 @@ void X509CertificateTest::testVerifyIPAddressAgainstCommonName()
 }
 
 
-void X509CertificateTest::testVerifyCommonName()
+void X509CertificateTest::testVerifyIgnoresCommonName()
 {
-	assertTrue (verify(COMMON_NAME_CERT, "www.example.com"));
+	assertFalse (verify(COMMON_NAME_CERT, "www.example.com"));
 	assertFalse (verify(COMMON_NAME_CERT, "example.com"));
 }
 
@@ -188,7 +188,7 @@ CppUnit::Test* X509CertificateTest::suite()
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIPAddress);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIPAddressAgainstDNSName);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIPAddressAgainstCommonName);
-	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyCommonName);
+	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIgnoresCommonName);
 
 	return pSuite;
 }

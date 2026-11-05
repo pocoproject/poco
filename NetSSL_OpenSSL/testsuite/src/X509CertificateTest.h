@@ -29,7 +29,7 @@ public:
 	void testVerifyIPAddress();
 	void testVerifyIPAddressAgainstDNSName();
 	void testVerifyIPAddressAgainstCommonName();
-	void testVerifyCommonName();
+	void testVerifyIgnoresCommonName();
 
 	void setUp();
 	void tearDown();
