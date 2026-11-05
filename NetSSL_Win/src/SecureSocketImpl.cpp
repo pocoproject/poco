@@ -172,6 +172,12 @@ void SecureSocketImpl::cleanup()
 	_inSecBuffer.release();
 
 	_overflowBuffer.resize(0);
+	_recvBufferOffset = 0;
+	_extraBufferOffset = 0;
+	_extraSecBuffer.pvBuffer = nullptr;
+	_extraSecBuffer.cbBuffer = 0;
+	_sendBufferPending = 0;
+	_sendBufferOffset = 0;
 	_shutdownFlags = 0;
 }
 
@@ -330,6 +336,8 @@ void SecureSocketImpl::abort()
 
 int SecureSocketImpl::available() const
 {
+	if (_state == ST_ERROR) return 0;
+
 	// What a read gets without the network: the data that is decrypted
 	// already, and the records that have arrived in full, which can be
 	// decrypted. A part of a record counts for nothing: the rest of it has
@@ -600,9 +608,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 				if (freeSpace == 0)
 				{
 					// the kept bytes are the start of a record that does not fit
-					cleanup();
-					setState(ST_ERROR);
-					throw SSLException("The peer sent a TLS record larger than the receive buffer");
+					failConnection("The peer sent a TLS record larger than the receive buffer");
 				}
 				int numBytes = receiveRawBytes(_recvBuffer.begin() + _recvBufferOffset, static_cast<int>(freeSpace));
 
@@ -669,7 +675,8 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 			}
 			else if (securityStatus != SEC_E_INCOMPLETE_MESSAGE)
 			{
-				cont = false;
+				_securityStatus = securityStatus;
+				failConnection("Failed to decrypt message", Utility::formatError(securityStatus));
 			}
 
 			if (bytesDecoded > 0)
@@ -708,22 +715,14 @@ bool SecureSocketImpl::processPostHandshakeRecord()
 		SecPkgContext_ConnectionInfo info;
 		const SECURITY_STATUS status = _securityFunctions.QueryContextAttributesW(&_hContext, SECPKG_ATTR_CONNECTION_INFO, &info);
 		if (status != SEC_E_OK)
-		{
-			cleanup();
-			setState(ST_ERROR);
-			throw SSLException("Failed to query connection info", Utility::formatError(status));
-		}
+			failConnection("Failed to query connection info", Utility::formatError(status));
 #if defined(SP_PROT_TLS1_3_SERVER)
 		const bool tls13 = (info.dwProtocol & SP_PROT_TLS1_3_SERVER) != 0;
 #else
 		const bool tls13 = false;
 #endif
 		if (!tls13)
-		{
-			cleanup();
-			setState(ST_ERROR);
-			throw SSLException("The client requested a renegotiation, which a server does not accept");
-		}
+			failConnection("The client requested a renegotiation, which a server does not accept");
 	}
 
 	// We need to pass data to InitializeSecurityContext() record by record, due to an apparent
@@ -744,7 +743,7 @@ bool SecureSocketImpl::processPostHandshakeRecord()
 
 	const int recLength = recordLength(_recvBuffer.begin(), _recvBufferOffset);
 	if (recLength <= 0 || static_cast<DWORD>(recLength) > _recvBufferOffset)
-		throw SSLException("Renegotiation with incomplete record");
+		failConnection("Renegotiation with incomplete record");
 	if (static_cast<DWORD>(recLength) < _recvBufferOffset)
 	{
 		// the rest was read before what _extraBuffer still holds: it is prepended
@@ -777,6 +776,14 @@ bool SecureSocketImpl::processPostHandshakeRecord()
 }
 
 
+void SecureSocketImpl::failConnection(const std::string& message, const std::string& detail)
+{
+	cleanup();
+	setState(ST_ERROR);
+	throw SSLException(message, detail);
+}
+
+
 SECURITY_STATUS SecureSocketImpl::decodeMessage(BYTE* pBuffer, DWORD bufSize, AutoSecBufferDesc<4>& msg, SecBuffer*& pDataBuffer, SecBuffer*& pExtraBuffer)
 {
 	msg.setSecBufferData(0, pBuffer, bufSize);
@@ -787,8 +794,6 @@ SECURITY_STATUS SecureSocketImpl::decodeMessage(BYTE* pBuffer, DWORD bufSize, Au
 	pExtraBuffer = nullptr;
 
 	SECURITY_STATUS securityStatus = _securityFunctions.DecryptMessage(&_hContext, &msg, 0, nullptr);
-	// TODO: when decrypting the close_notify alert, returns SEC_E_DECRYPT_FAILURE
-	// instead of SEC_I_CONTEXT_EXPIRED
 
 	if (securityStatus == SEC_E_OK || securityStatus == SEC_I_RENEGOTIATE)
 	{
