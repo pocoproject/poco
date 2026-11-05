@@ -35,6 +35,8 @@
 #include "Poco/Mutex.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
+#include "SchannelPeer.h"
+#include <functional>
 #include <iostream>
 
 
@@ -44,6 +46,7 @@ using Poco::Net::TCPServerConnectionFactory;
 using Poco::Net::TCPServerConnectionFactoryImpl;
 using Poco::Net::TCPServerParams;
 using Poco::Net::Socket;
+using Poco::Net::ServerSocket;
 using Poco::Net::StreamSocket;
 using Poco::Net::SecureStreamSocket;
 using Poco::Net::SecureServerSocket;
@@ -247,6 +250,106 @@ namespace
 		Poco::Net::ServerSocket _socket;
 		bool _clientDone = false;
 	};
+
+	class SchannelServer: public Poco::Runnable
+		/// Accepts one connection on a plain socket and runs a scenario on it with a
+		/// SchannelPeer in the server role, in a thread of its own. The destructor
+		/// waits for the thread, so that a test that ends early does not leave the
+		/// scenario running on a destroyed object.
+	{
+	public:
+		using Scenario = std::function<void(SchannelPeer&, StreamSocket&)>;
+
+		explicit SchannelServer(const Scenario& scenario):
+			_socket(SocketAddress("127.0.0.1", 0)),
+			_scenario(scenario)
+		{
+			_thread.start(*this);
+		}
+
+		~SchannelServer() override
+		{
+			try
+			{
+				join();
+			}
+			catch (...)
+			{
+			}
+		}
+
+		Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		void join()
+			/// Waits for the scenario to end.
+		{
+			if (!_joined)
+			{
+				_thread.join();
+				_joined = true;
+			}
+		}
+
+		const std::string& failure() const
+			/// Returns the text of the exception that ended the scenario,
+			/// or an empty string. Valid after join().
+		{
+			return _failure;
+		}
+
+		void run() override
+		{
+			try
+			{
+				if (!_socket.poll(Poco::Timespan(10, 0), Socket::SELECT_READ))
+				{
+					_failure = "no connection within 10 s";
+					return;
+				}
+				StreamSocket socket = _socket.acceptConnection();
+				socket.setReceiveTimeout(Poco::Timespan(10, 0));
+				SchannelPeer peer(SchannelPeer::SERVER, socket, SSLManager::instance().defaultServerContext());
+				_scenario(peer, socket);
+			}
+			catch (Poco::Exception& exc)
+			{
+				_failure = exc.displayText();
+			}
+			catch (std::exception& exc)
+			{
+				_failure = exc.what();
+			}
+		}
+
+	private:
+		ServerSocket _socket;
+		Scenario _scenario;
+		Thread _thread;
+		bool _joined = false;
+		std::string _failure;
+	};
+
+	void expectReceived(SchannelPeer& peer, const std::string& expected)
+		/// Receives the next application data from the peer's partner and throws
+		/// if it is not the expected text. An empty text expects the end of the stream.
+	{
+		const std::string received = peer.receive();
+		if (received != expected)
+			throw Poco::DataException("received '" + received + "' instead of '" + expected + "'");
+	}
+
+	std::string sessionTicket(SchannelPeer& peer)
+		/// Runs the handshake and returns the session ticket that a TLS 1.3 server
+		/// sends at its end, without sending it.
+	{
+		const std::string ticket = peer.handshake(false);
+		if (ticket.empty())
+			throw Poco::IllegalStateException("the handshake produced no session ticket");
+		return ticket;
+	}
 }
 
 
