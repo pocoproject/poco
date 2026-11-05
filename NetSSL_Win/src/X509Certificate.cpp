@@ -103,6 +103,26 @@ namespace
 		});
 		return found;
 	}
+
+
+	std::set<std::string> subjectAltNameDNSNames(PCCERT_CONTEXT pCert)
+		/// Returns the DNS names of the subject alternative names
+		/// of the certificate, in UTF-8.
+	{
+		std::set<std::string> domainNames;
+		forEachSubjectAltName(pCert, [&domainNames](const CERT_ALT_NAME_ENTRY& entry)
+		{
+			// Some certificates have Subject Alternative Name entries that are not DNS Name. Skip them.
+			if (entry.dwAltNameChoice == CERT_ALT_NAME_DNS_NAME)
+			{
+				std::wstring waltName(entry.pwszDNSName);
+				std::string altName;
+				Poco::UnicodeConverter::toUTF8(waltName, altName);
+				domainNames.insert(altName);
+			}
+		});
+		return domainNames;
+	}
 }
 
 
@@ -311,19 +331,8 @@ std::string X509Certificate::subjectName(NID nid) const
 
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
-	domainNames.clear();
 	cmnName = commonName();
-	forEachSubjectAltName(_pCert, [&domainNames](const CERT_ALT_NAME_ENTRY& entry)
-	{
-		// Some certificates have Subject Alternative Name entries that are not DNS Name. Skip them.
-		if (entry.dwAltNameChoice == CERT_ALT_NAME_DNS_NAME)
-		{
-			std::wstring waltName(entry.pwszDNSName);
-			std::string altName;
-			Poco::UnicodeConverter::toUTF8(waltName, altName);
-			domainNames.insert(altName);
-		}
-	});
+	domainNames = subjectAltNameDNSNames(_pCert);
 	if (!cmnName.empty() && domainNames.empty())
 	{
 		domainNames.insert(cmnName);
@@ -536,10 +545,7 @@ bool X509Certificate::verify(const Poco::Net::X509Certificate& certificate, cons
 		return subjectAltNameHasAddress(certificate.system(), ip);
 	}
 
-	// extractNames() adds the common name only if there is no DNS name.
-	std::string commonName;
-	std::set<std::string> domainNames;
-	certificate.extractNames(commonName, domainNames);
+	const std::set<std::string> domainNames = subjectAltNameDNSNames(certificate.system());
 	return std::any_of(domainNames.begin(), domainNames.end(), [&hostName](const std::string& name)
 	{
 		if (containsWildcards(name))
