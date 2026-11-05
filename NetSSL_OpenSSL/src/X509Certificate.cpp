@@ -110,7 +110,10 @@ bool X509Certificate::verify(const std::string& hostName) const
 
 bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, const std::string& hostName)
 {
-	if (hostName.empty()) return false;
+	// OpenSSL ignores a trailing NUL and reads a leading '.' as any subdomain; a host to connect to is never a wildcard.
+	if (hostName.empty() || hostName.front() == '.' || hostName.find("..") != std::string::npos ||
+		hostName.find('\0') != std::string::npos || hostName.find('*') != std::string::npos)
+		return false;
 
 	X509* pCert = const_cast<X509*>(certificate.certificate());
 	std::unique_ptr<X509_STORE, decltype(&X509_STORE_free)> pStore(X509_STORE_new(), &X509_STORE_free);

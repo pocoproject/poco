@@ -539,6 +539,11 @@ bool X509Certificate::verify(const std::string& hostName) const
 
 bool X509Certificate::verify(const Poco::Net::X509Certificate& certificate, const std::string& hostName)
 {
+	// matchWildcard() does not look at the leftmost label, so a NUL there would pass; a host to connect to is never a wildcard or a pattern.
+	if (hostName.empty() || hostName.front() == '.' || hostName.find("..") != std::string::npos ||
+		hostName.find('\0') != std::string::npos || hostName.find('*') != std::string::npos)
+		return false;
+
 	IPAddress ip;
 	if (IPAddress::tryParse(hostName, ip))
 	{
