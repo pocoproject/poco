@@ -30,6 +30,11 @@ public:
 	void testVerifyIPAddressAgainstDNSName();
 	void testVerifyIPAddressAgainstCommonName();
 	void testVerifyIgnoresCommonName();
+	void testVerifyEmptyHostName();
+	void testVerifyEmbeddedNul();
+	void testVerifyExpired();
+	void testVerifyIssuedCertificate();
+	void testVerifyIgnoresOtherCertificateErrors();
 
 	void setUp();
 	void tearDown();
