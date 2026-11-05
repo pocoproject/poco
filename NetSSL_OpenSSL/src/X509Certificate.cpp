@@ -113,10 +113,10 @@ bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, c
 	if (IPAddress::tryParse(hostName, ip))
 	{
 		// X509_check_host() would match the address as text against
-		// the DNS names and the common name of the certificate.
+		// the DNS names of the certificate.
 		return X509_check_ip_asc(pCert, hostName.c_str(), 0) == 1;
 	}
-	return X509_check_host(pCert, hostName.c_str(), hostName.length(), X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS, nullptr) == 1;
+	return X509_check_host(pCert, hostName.c_str(), hostName.length(), X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS | X509_CHECK_FLAG_NEVER_CHECK_SUBJECT, nullptr) == 1;
 }
 
 

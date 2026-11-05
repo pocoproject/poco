@@ -140,8 +140,7 @@ public:
 		///
 		/// A wildcard must be the complete leftmost label ("*.example.com");
 		/// a partial wildcard ("f*.example.com") matches no host name.
-		/// The common name of the subject is considered only if the
-		/// subject alternative names contain no domain name.
+		/// The common name of the subject is not considered.
 		///
 		/// If hostName is an IP address, it matches only an IP address
 		/// in the subject alternative names.
@@ -157,8 +156,7 @@ public:
 		///
 		/// A wildcard must be the complete leftmost label ("*.example.com");
 		/// a partial wildcard ("f*.example.com") matches no host name.
-		/// The common name of the subject is considered only if the
-		/// subject alternative names contain no domain name.
+		/// The common name of the subject is not considered.
 		///
 		/// If hostName is an IP address, it matches only an IP address
 		/// in the subject alternative names.
