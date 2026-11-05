@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/SecureServerSocket.h"
+#include "Poco/Net/SSLException.h"
 #include "Poco/Buffer.h"
 #include "Poco/Environment.h"
 #include "Poco/Thread.h"
@@ -112,6 +113,52 @@ void OpenSSLPeerTest::tearDown()
 }
 
 
+void OpenSSLPeerTest::testPostHandshakeRecordAfterData()
+{
+	const auto address = peerAddress(SERVER_KEY_UPDATE);
+	if (!address.has_value())
+		return;
+
+	// the peer sends [one][KeyUpdate][two] in one write
+	SecureStreamSocket ss(*address);
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	assertEqual ("onetwo", receiveText(ss, 6));
+	ss.sendBytes("three", 5);
+	assertEqual ("three", receiveText(ss, 5));
+}
+
+
+void OpenSSLPeerTest::testPostHandshakeRecordAfterDataInSmallReads()
+{
+	const auto address = peerAddress(SERVER_KEY_UPDATE);
+	if (!address.has_value())
+		return;
+
+	// the peer sends [one][KeyUpdate][two] in one write; "one" does not fit into one read
+	SecureStreamSocket ss(*address);
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	assertEqual ("onetwo", receiveText(ss, 6, 2));
+}
+
+
+void OpenSSLPeerTest::testDataAfterRenegotiation()
+{
+	const auto address = peerAddress(SERVER_RENEGOTIATION);
+	if (!address.has_value())
+		return;
+
+	// the peer sends a HelloRequest, and its final flight of the renegotiation together with [two]
+	SecureStreamSocket ss(*address);
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	char buffer[256];
+	const int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertEqual (3, n);
+	assertEqual ("two", std::string(buffer, n));
+	ss.sendBytes("three", 5);
+	assertEqual ("three", receiveText(ss, 5));
+}
+
+
 std::optional<SocketAddress> OpenSSLPeerTest::peerAddress(Poco::UInt16 scenario)
 {
 	const std::string peer = Poco::Environment::get("POCO_TLS_PEER", "");
@@ -125,16 +172,16 @@ std::optional<SocketAddress> OpenSSLPeerTest::peerAddress(Poco::UInt16 scenario)
 }
 
 
-std::string OpenSSLPeerTest::receiveText(StreamSocket& socket, std::size_t length)
+std::string OpenSSLPeerTest::receiveText(StreamSocket& socket, std::size_t length, std::size_t readSize)
 {
 	std::string text;
+	Poco::Buffer<char> buffer(readSize);
 	while (text.size() < length)
 	{
-		char buffer[256];
-		const int n = socket.receiveBytes(buffer, sizeof(buffer));
+		const int n = socket.receiveBytes(buffer.begin(), static_cast<int>(buffer.size()));
 		if (n <= 0)
 			fail("receiveBytes() returned " + std::to_string(n) + " after '" + text + "'");
-		text.append(buffer, n);
+		text.append(buffer.begin(), n);
 	}
 	return text;
 }
@@ -143,6 +190,10 @@ std::string OpenSSLPeerTest::receiveText(StreamSocket& socket, std::size_t lengt
 CppUnit::Test* OpenSSLPeerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("OpenSSLPeerTest");
+
+	CppUnit_addTest(pSuite, OpenSSLPeerTest, testPostHandshakeRecordAfterData);
+	CppUnit_addTest(pSuite, OpenSSLPeerTest, testPostHandshakeRecordAfterDataInSmallReads);
+	CppUnit_addTest(pSuite, OpenSSLPeerTest, testDataAfterRenegotiation);
 
 	return pSuite;
 }
