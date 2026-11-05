@@ -700,6 +700,32 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 
 bool SecureSocketImpl::processPostHandshakeRecord()
 {
+	if (_mode == MODE_SERVER)
+	{
+		// A renegotiation that the client starts makes the server repeat the full handshake as
+		// often as the client wants, and could change the client's identity after its certificate
+		// was verified. The post-handshake messages of a TLS 1.3 client do neither.
+		SecPkgContext_ConnectionInfo info;
+		const SECURITY_STATUS status = _securityFunctions.QueryContextAttributesW(&_hContext, SECPKG_ATTR_CONNECTION_INFO, &info);
+		if (status != SEC_E_OK)
+		{
+			cleanup();
+			setState(ST_ERROR);
+			throw SSLException("Failed to query connection info", Utility::formatError(status));
+		}
+#if defined(SP_PROT_TLS1_3_SERVER)
+		const bool tls13 = (info.dwProtocol & SP_PROT_TLS1_3_SERVER) != 0;
+#else
+		const bool tls13 = false;
+#endif
+		if (!tls13)
+		{
+			cleanup();
+			setState(ST_ERROR);
+			throw SSLException("The client requested a renegotiation, which a server does not accept");
+		}
+	}
+
 	// We need to pass data to InitializeSecurityContext() record by record, due to an apparent
 	// bug in SChannel TLS 1.3 handling. After a successful handshake, the server
 	// will send additional post-handshake messages (e.g., NewSessionTicket),
@@ -732,7 +758,10 @@ bool SecureSocketImpl::processPostHandshakeRecord()
 	// a handshake flight may be larger than one record
 	if (_recvBuffer.size() < IO_BUFFER_SIZE) _recvBuffer.resize(IO_BUFFER_SIZE, true);
 
-	setState(ST_CLIENT_HSK_LOOP_INIT);
+	// the record is the complete input of a continued handshake
+	_securityStatus = SEC_I_CONTINUE_NEEDED;
+	_inputConsumed = true;
+	setState(_mode == MODE_SERVER ? ST_SERVER_HSK_LOOP_INIT : ST_CLIENT_HSK_LOOP_INIT);
 	if (_pSocket->getBlocking())
 	{
 		if (doHandshake() != SEC_E_OK) throw SSLException("Handshake failure");
@@ -1413,9 +1442,9 @@ void SecureSocketImpl::stateServerHandshakeEnd()
 void SecureSocketImpl::stateServerVerify()
 {
 	SECURITY_STATUS securityStatus;
-	if (_clientAuthRequired)
+	// the state is entered again after a post-handshake message: the certificate is verified once
+	if (_clientAuthRequired && _pPeerCertificate == nullptr)
 	{
-		poco_assert_dbg (!_pPeerCertificate);
 		securityStatus = _securityFunctions.QueryContextAttributesW(&_hContext, SECPKG_ATTR_REMOTE_CERT_CONTEXT, &_pPeerCertificate);
 
 		if (securityStatus != SEC_E_OK)

@@ -39,6 +39,8 @@ public:
 	void testPostHandshakeRecordAfterData();
 	void testPostHandshakeRecordAfterDataInSmallReads();
 	void testDataAfterRenegotiation();
+	void testServerPostHandshakeRecord();
+	void testServerRefusesRenegotiation();
 
 	static CppUnit::Test* suite();
 

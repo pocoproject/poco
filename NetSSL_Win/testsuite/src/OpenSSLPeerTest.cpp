@@ -159,6 +159,58 @@ void OpenSSLPeerTest::testDataAfterRenegotiation()
 }
 
 
+void OpenSSLPeerTest::testServerPostHandshakeRecord()
+{
+	const auto address = peerAddress(CLIENT_KEY_UPDATE);
+	if (!address.has_value())
+		return;
+
+	// the peer sends [one][KeyUpdate][two] in one write
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	Relay relay(*address, svs.address());
+	StreamSocket s = svs.acceptConnection();
+	s.setReceiveTimeout(Poco::Timespan(10, 0));
+	assertEqual ("onetwo", receiveText(s, 6));
+	s.sendBytes("three", 5);
+	assertEqual ("three", receiveText(s, 5));
+}
+
+
+void OpenSSLPeerTest::testServerRefusesRenegotiation()
+{
+	const auto address = peerAddress(CLIENT_RENEGOTIATION);
+	if (!address.has_value())
+		return;
+
+	// the peer sends [one][ClientHello] in one write
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	Relay relay(*address, svs.address());
+	StreamSocket s = svs.acceptConnection();
+	s.setReceiveTimeout(Poco::Timespan(10, 0));
+	std::string outcome;
+	try
+	{
+		int n = 0;
+		do
+		{
+			char buffer[256];
+			n = s.receiveBytes(buffer, sizeof(buffer));
+		}
+		while (n > 0);
+		outcome = "receiveBytes() returned " + std::to_string(n);
+	}
+	catch (Poco::Net::SSLException&)
+	{
+		outcome = "SSLException";
+	}
+	catch (Poco::TimeoutException&)
+	{
+		outcome = "timeout";
+	}
+	assertEqual ("SSLException", outcome);
+}
+
+
 std::optional<SocketAddress> OpenSSLPeerTest::peerAddress(Poco::UInt16 scenario)
 {
 	const std::string peer = Poco::Environment::get("POCO_TLS_PEER", "");
@@ -194,6 +246,8 @@ CppUnit::Test* OpenSSLPeerTest::suite()
 	CppUnit_addTest(pSuite, OpenSSLPeerTest, testPostHandshakeRecordAfterData);
 	CppUnit_addTest(pSuite, OpenSSLPeerTest, testPostHandshakeRecordAfterDataInSmallReads);
 	CppUnit_addTest(pSuite, OpenSSLPeerTest, testDataAfterRenegotiation);
+	CppUnit_addTest(pSuite, OpenSSLPeerTest, testServerPostHandshakeRecord);
+	CppUnit_addTest(pSuite, OpenSSLPeerTest, testServerRefusesRenegotiation);
 
 	return pSuite;
 }
