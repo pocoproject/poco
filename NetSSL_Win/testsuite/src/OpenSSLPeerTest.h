@@ -36,6 +36,10 @@ public:
 	void setUp() override;
 	void tearDown() override;
 
+	void testPostHandshakeRecordAfterData();
+	void testPostHandshakeRecordAfterDataInSmallReads();
+	void testDataAfterRenegotiation();
+
 	static CppUnit::Test* suite();
 
 private:
@@ -44,8 +48,9 @@ private:
 		/// the base port. Returns no address, and prints that the test is skipped,
 		/// when POCO_TLS_PEER is not set.
 
-	std::string receiveText(Poco::Net::StreamSocket& socket, std::size_t length);
-		/// Receives length bytes. Fails the test when a call returns no data.
+	std::string receiveText(Poco::Net::StreamSocket& socket, std::size_t length, std::size_t readSize = 256);
+		/// Receives length bytes with calls that read at most readSize bytes each.
+		/// Fails the test when a call returns no data.
 };
 
 

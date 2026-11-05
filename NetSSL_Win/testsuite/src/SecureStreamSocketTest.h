@@ -40,6 +40,14 @@ public:
 	void testTunneledLoopbackPeerIsVerified();
 	void testResolvedLoopbackNameIsVerified();
 	void testLocalhostNameOnOtherAddressIsVerified();
+	void testDataWithCloseNotify();
+	void testCloseNotifyAlone();
+	void testReceiveAfterShutdown();
+	void testNonBlockingReceiveOfTicketWithData();
+	void testEmptyRecordIsNotEndOfStream();
+	void testOversizedRecordThrows();
+	void testCoalescedTicketAndData();
+	void testReconnectAfterCloseNotify();
 
 	void setUp();
 	void tearDown();
