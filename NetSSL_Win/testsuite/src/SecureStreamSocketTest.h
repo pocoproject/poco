@@ -45,7 +45,9 @@ public:
 	void testReceiveAfterShutdown();
 	void testNonBlockingReceiveOfTicketWithData();
 	void testEmptyRecordIsNotEndOfStream();
+	void testCorruptedRecordThrows();
 	void testOversizedRecordThrows();
+	void testAvailableAfterFailedHandshake();
 	void testCoalescedTicketAndData();
 	void testReconnectAfterCloseNotify();
 

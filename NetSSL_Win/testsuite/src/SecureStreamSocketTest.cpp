@@ -1016,6 +1016,35 @@ void SecureStreamSocketTest::testEmptyRecordIsNotEndOfStream()
 }
 
 
+void SecureStreamSocketTest::testCorruptedRecordThrows()
+{
+	SchannelServer server([](SchannelPeer& peer, StreamSocket&)
+	{
+		peer.handshake();
+		std::string record = peer.encrypt("one");
+		record.back() = static_cast<char>(record.back() ^ 0xFF);
+		peer.send(record);
+	});
+	SecureStreamSocket ss(SocketAddress("127.0.0.1", server.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	std::string outcome;
+	try
+	{
+		char buffer[256];
+		outcome = "receiveBytes() returned " + std::to_string(ss.receiveBytes(buffer, sizeof(buffer)));
+	}
+	catch (Poco::Net::SSLException&)
+	{
+		outcome = "SSLException";
+	}
+	const int available = ss.available();
+	server.join();
+	assertEqual (std::string(), server.failure());
+	assertEqual ("SSLException", outcome);
+	assertEqual (0, available);
+}
+
+
 void SecureStreamSocketTest::testOversizedRecordThrows()
 {
 	SchannelServer server([](SchannelPeer& peer, StreamSocket&)
@@ -1050,6 +1079,28 @@ void SecureStreamSocketTest::testOversizedRecordThrows()
 	server.join();
 	assertEqual (std::string(), server.failure());
 	assertEqual ("SSLException", outcome);
+}
+
+
+void SecureStreamSocketTest::testAvailableAfterFailedHandshake()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	// a record header with a payload that is no handshake message
+	StreamSocket plain(svs.address());
+	const char bytes[] = {0x16, 0x03, 0x01, 0x00, 0x02, static_cast<char>(0xAA), static_cast<char>(0xBB)};
+	plain.sendBytes(bytes, sizeof(bytes));
+	StreamSocket s = svs.acceptConnection();
+	s.setReceiveTimeout(Poco::Timespan(10, 0));
+	try
+	{
+		char buffer[256];
+		s.receiveBytes(buffer, sizeof(buffer));
+		fail("not a TLS handshake - must throw");
+	}
+	catch (Poco::Net::SSLException&)
+	{
+	}
+	assertEqual (0, s.available());
 }
 
 
@@ -1155,7 +1206,9 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testReceiveAfterShutdown);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNonBlockingReceiveOfTicketWithData);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testEmptyRecordIsNotEndOfStream);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCorruptedRecordThrows);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testOversizedRecordThrows);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testAvailableAfterFailedHandshake);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCoalescedTicketAndData);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testReconnectAfterCloseNotify);
 
