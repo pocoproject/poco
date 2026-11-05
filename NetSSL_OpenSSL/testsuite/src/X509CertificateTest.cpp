@@ -106,6 +106,52 @@ namespace
 		"-----END CERTIFICATE-----\n");
 
 
+	// subject CN=test, subjectAltName DNS:www.example.com, valid from 2020-01-01 to 2021-01-01
+	const std::string EXPIRED_CERT(
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIIBbzCCARSgAwIBAgIUNcoB3VeYDfYXg02ziFO70RZ65SgwCgYIKoZIzj0EAwIw\n"
+		"DzENMAsGA1UEAwwEdGVzdDAeFw0yMDAxMDEwMDAwMDBaFw0yMTAxMDEwMDAwMDBa\n"
+		"MA8xDTALBgNVBAMMBHRlc3QwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAScyZar\n"
+		"Pb5PWodTyAyL9mq+TQNb/y0RBHMAJwJ3KQdUlKGRbb0FcNEDeNDFOxxY3EP9h8MP\n"
+		"bhM7KIJupyOpnE7Fo04wTDAdBgNVHQ4EFgQUA2o9knmX/3hHPd60VxOPIAKJj8Ew\n"
+		"DwYDVR0TAQH/BAUwAwEB/zAaBgNVHREEEzARgg93d3cuZXhhbXBsZS5jb20wCgYI\n"
+		"KoZIzj0EAwIDSQAwRgIhAPx/dAH6rRfy/f7ztUNP6Vcfkzaa9QpPahVTaTCgs5W1\n"
+		"AiEAg6V6/NNofblh16352BHwRoTKW4aVHOW7VkEkQzSXNAc=\n"
+		"-----END CERTIFICATE-----\n");
+
+
+	// subject CN=server.example.com, issued by CN=Test CA (not included),
+	// subjectAltName DNS:www.example.com, IP:10.0.0.1, IP:::1
+	const std::string ISSUED_CERT(
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIIBlTCCATygAwIBAgIUeoMt1lXfBFJ539SQ4tUHSyWGCmowCgYIKoZIzj0EAwIw\n"
+		"EjEQMA4GA1UEAwwHVGVzdCBDQTAgFw0yNjExMDUxMDQ3MTZaGA8yMTI2MTAxMjEw\n"
+		"NDcxNlowHTEbMBkGA1UEAwwSc2VydmVyLmV4YW1wbGUuY29tMFkwEwYHKoZIzj0C\n"
+		"AQYIKoZIzj0DAQcDQgAElVnGZy5kbbXhCJRbKJF9EG5W9BqSbataauznHjWaZzWv\n"
+		"9Qj0ifoATsmzKJKrL5BuY2DwW5/1zxibKcxwLJJyj6NjMGEwCQYDVR0TBAIwADAL\n"
+		"BgNVHQ8EBAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwEwMgYDVR0RBCswKYIPd3d3\n"
+		"LmV4YW1wbGUuY29thwQKAAABhxAAAAAAAAAAAAAAAAAAAAABMAoGCCqGSM49BAMC\n"
+		"A0cAMEQCIH0c+J8rZP3mdhE0UkWe+i++4MM/nQaXkZ8zOJo0J62HAiBWOHEhrBkE\n"
+		"UwlBs6LTRptrPzY7X/pwAxzlqMCMgJ+DOQ==\n"
+		"-----END CERTIFICATE-----\n");
+
+
+	// subject CN=test, subjectAltName DNS:www.example.com,
+	// critical private extension 1.3.6.1.4.1.55555.1
+	const std::string CRITICAL_EXTENSION_CERT(
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIIBgzCCASqgAwIBAgIUZsSRsmuqW9eUJ4IZCuCCY9HSAq4wCgYIKoZIzj0EAwIw\n"
+		"DzENMAsGA1UEAwwEdGVzdDAgFw0yNjExMDUxMTIzNTFaGA8yMTI2MTAxMjExMjM1\n"
+		"MVowDzENMAsGA1UEAwwEdGVzdDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABArA\n"
+		"mGwjM1wBou91yZG57DT6abMIoc/Uqc+84HiS0CdaizSf5pWDSEJCvboP4MZeqlkl\n"
+		"oB2gykhaZ0SyUFJ7jmijYjBgMB0GA1UdDgQWBBRiLuVO4zRcafS+jbtJFrfpcWNN\n"
+		"djAPBgNVHRMBAf8EBTADAQH/MBoGA1UdEQQTMBGCD3d3dy5leGFtcGxlLmNvbTAS\n"
+		"BgkrBgEEAYOyAwEBAf8EAgUAMAoGCCqGSM49BAMCA0cAMEQCIF7a1bcXisbzwCPJ\n"
+		"NIKagjd078BL+Wq7PKToKKSm4umHAiA/MXyGMZZxbNkmXECpPRfjk7zkSSitwVh4\n"
+		"GGXd4zLOXg==\n"
+		"-----END CERTIFICATE-----\n");
+
+
 	bool verify(const std::string& pem, const std::string& hostName)
 	{
 		std::istringstream istr(pem);
@@ -147,6 +193,9 @@ void X509CertificateTest::testVerifyIPAddress()
 {
 	assertTrue (verify(IP_ADDRESS_CERT, "10.0.0.1"));
 	assertFalse (verify(IP_ADDRESS_CERT, "10.0.0.2"));
+	// the address is compared as POCO parses it, with a leading 0 for octal
+	assertFalse (verify(IP_ADDRESS_CERT, "010.0.0.1"));
+	assertTrue (verify(IP_ADDRESS_CERT, "012.0.0.1"));
 }
 
 
@@ -166,6 +215,46 @@ void X509CertificateTest::testVerifyIgnoresCommonName()
 {
 	assertFalse (verify(COMMON_NAME_CERT, "www.example.com"));
 	assertFalse (verify(COMMON_NAME_CERT, "example.com"));
+}
+
+
+void X509CertificateTest::testVerifyEmptyHostName()
+{
+	assertFalse (verify(WILDCARD_CERT, ""));
+}
+
+
+void X509CertificateTest::testVerifyEmbeddedNul()
+{
+	assertFalse (verify(WILDCARD_CERT, std::string("www.example.com\0.org", 20)));
+	assertFalse (verify(IP_ADDRESS_CERT, std::string("10.0.0.1\0.example.com", 21)));
+}
+
+
+void X509CertificateTest::testVerifyExpired()
+{
+	assertTrue (verify(EXPIRED_CERT, "www.example.com"));
+}
+
+
+void X509CertificateTest::testVerifyIssuedCertificate()
+{
+	assertTrue (verify(ISSUED_CERT, "www.example.com"));
+	assertTrue (verify(ISSUED_CERT, "10.0.0.1"));
+	assertFalse (verify(ISSUED_CERT, "other.example.com"));
+	assertFalse (verify(ISSUED_CERT, "10.0.0.2"));
+	assertFalse (verify(ISSUED_CERT, "server.example.com"));
+#if defined(POCO_HAVE_IPv6)
+	assertTrue (verify(ISSUED_CERT, "::1"));
+	assertFalse (verify(ISSUED_CERT, "::2"));
+#endif
+}
+
+
+void X509CertificateTest::testVerifyIgnoresOtherCertificateErrors()
+{
+	assertTrue (verify(CRITICAL_EXTENSION_CERT, "www.example.com"));
+	assertFalse (verify(CRITICAL_EXTENSION_CERT, "other.example.com"));
 }
 
 
@@ -189,6 +278,11 @@ CppUnit::Test* X509CertificateTest::suite()
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIPAddressAgainstDNSName);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIPAddressAgainstCommonName);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIgnoresCommonName);
+	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyEmptyHostName);
+	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyEmbeddedNul);
+	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyExpired);
+	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIssuedCertificate);
+	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIgnoresOtherCertificateErrors);
 
 	return pSuite;
 }

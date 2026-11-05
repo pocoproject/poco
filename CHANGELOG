@@ -218,6 +218,12 @@ Bug Fixes and Improvements:
 - GH #5526 Poco::RemotingNG::TCP::Listener runs the connections it accepts on the thread pool of
   its ConnectionManager, as it does requests and events, and no longer on the default thread pool
   whichever ConnectionManager it was given.
+- GH #5646 Poco::Net::X509Certificate::verify() checks the host name with X509_VERIFY_PARAM and
+  X509_verify_cert(), so NetSSL_OpenSSL no longer calls X509_check_host() and X509_check_ip_asc(),
+  which OpenSSL 4.1 deprecates. With OpenSSL 4.0 and later, verify() returns false for a host name
+  that OpenSSL does not accept as a DNS name. An IP address is compared as POCO parses it, which is
+  the address a socket connects to, so that "012.0.0.1", which OpenSSL does not accept as an
+  address, matches a certificate for 10.0.0.1.
 
 
 Release 1.15.4 (2026-09-22)
