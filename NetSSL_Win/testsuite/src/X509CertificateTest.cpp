@@ -226,8 +226,31 @@ void X509CertificateTest::testVerifyEmptyHostName()
 
 void X509CertificateTest::testVerifyEmbeddedNul()
 {
+	// these two would match if read up to the NUL
 	assertFalse (verify(WILDCARD_CERT, std::string("www.example.com\0.org", 20)));
 	assertFalse (verify(IP_ADDRESS_CERT, std::string("10.0.0.1\0.example.com", 21)));
+	// matched with OpenSSL, which ignores a trailing NUL
+	assertFalse (verify(WILDCARD_CERT, std::string("foo.example.com\0", 16)));
+	// matched in NetSSL_Win, whose wildcard match ignores the leftmost label
+	assertFalse (verify(WILDCARD_CERT, std::string("a\0b.example.com", 15)));
+}
+
+
+void X509CertificateTest::testVerifyWildcardHostName()
+{
+	// matched with OpenSSL and in NetSSL_Win
+	assertFalse (verify(WILDCARD_CERT, "*.example.com"));
+	// matched with OpenSSL, which compares it literally with the partial wildcard
+	assertFalse (verify(PARTIAL_WILDCARD_CERT, "f*.example.com"));
+}
+
+
+void X509CertificateTest::testVerifyEmptyLabel()
+{
+	// matched with OpenSSL, which reads a leading '.' as any subdomain
+	assertFalse (verify(ISSUED_CERT, ".example.com"));
+	// matched by neither backend; rejected like any empty label
+	assertFalse (verify(WILDCARD_CERT, "www..example.com"));
 }
 
 
@@ -280,6 +303,8 @@ CppUnit::Test* X509CertificateTest::suite()
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIgnoresCommonName);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyEmptyHostName);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyEmbeddedNul);
+	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyWildcardHostName);
+	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyEmptyLabel);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyExpired);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIssuedCertificate);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIgnoresOtherCertificateErrors);

@@ -32,6 +32,8 @@ public:
 	void testVerifyIgnoresCommonName();
 	void testVerifyEmptyHostName();
 	void testVerifyEmbeddedNul();
+	void testVerifyWildcardHostName();
+	void testVerifyEmptyLabel();
 	void testVerifyExpired();
 	void testVerifyIssuedCertificate();
 	void testVerifyIgnoresOtherCertificateErrors();
