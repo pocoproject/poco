@@ -28,3 +28,6 @@ endif()
 
 target_link_libraries(DataODBC-testrunner PUBLIC Poco::DataTest Poco::DataODBC Poco::Data CppUnit)
 target_include_directories(DataODBC-testrunner PUBLIC ${PROJECT_SOURCE_DIR}/Data/DataTest/include/)
+if(MSODBC_DIR)
+	target_include_directories(DataODBC-testrunner SYSTEM PRIVATE "${MSODBC_DIR}")
+endif()
