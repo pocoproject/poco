@@ -35,6 +35,8 @@
 #include "Poco/Mutex.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
+#include "SchannelPeer.h"
+#include <functional>
 #include <iostream>
 
 
@@ -44,6 +46,7 @@ using Poco::Net::TCPServerConnectionFactory;
 using Poco::Net::TCPServerConnectionFactoryImpl;
 using Poco::Net::TCPServerParams;
 using Poco::Net::Socket;
+using Poco::Net::ServerSocket;
 using Poco::Net::StreamSocket;
 using Poco::Net::SecureStreamSocket;
 using Poco::Net::SecureServerSocket;
@@ -247,6 +250,106 @@ namespace
 		Poco::Net::ServerSocket _socket;
 		bool _clientDone = false;
 	};
+
+	class SchannelServer: public Poco::Runnable
+		/// Accepts one connection on a plain socket and runs a scenario on it with a
+		/// SchannelPeer in the server role, in a thread of its own. The destructor
+		/// waits for the thread, so that a test that ends early does not leave the
+		/// scenario running on a destroyed object.
+	{
+	public:
+		using Scenario = std::function<void(SchannelPeer&, StreamSocket&)>;
+
+		explicit SchannelServer(const Scenario& scenario):
+			_socket(SocketAddress("127.0.0.1", 0)),
+			_scenario(scenario)
+		{
+			_thread.start(*this);
+		}
+
+		~SchannelServer() override
+		{
+			try
+			{
+				join();
+			}
+			catch (...)
+			{
+			}
+		}
+
+		Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		void join()
+			/// Waits for the scenario to end.
+		{
+			if (!_joined)
+			{
+				_thread.join();
+				_joined = true;
+			}
+		}
+
+		const std::string& failure() const
+			/// Returns the text of the exception that ended the scenario,
+			/// or an empty string. Valid after join().
+		{
+			return _failure;
+		}
+
+		void run() override
+		{
+			try
+			{
+				if (!_socket.poll(Poco::Timespan(10, 0), Socket::SELECT_READ))
+				{
+					_failure = "no connection within 10 s";
+					return;
+				}
+				StreamSocket socket = _socket.acceptConnection();
+				socket.setReceiveTimeout(Poco::Timespan(10, 0));
+				SchannelPeer peer(SchannelPeer::SERVER, socket, SSLManager::instance().defaultServerContext());
+				_scenario(peer, socket);
+			}
+			catch (Poco::Exception& exc)
+			{
+				_failure = exc.displayText();
+			}
+			catch (std::exception& exc)
+			{
+				_failure = exc.what();
+			}
+		}
+
+	private:
+		ServerSocket _socket;
+		Scenario _scenario;
+		Thread _thread;
+		bool _joined = false;
+		std::string _failure;
+	};
+
+	void expectReceived(SchannelPeer& peer, const std::string& expected)
+		/// Receives the next application data from the peer's partner and throws
+		/// if it is not the expected text. An empty text expects the end of the stream.
+	{
+		const std::string received = peer.receive();
+		if (received != expected)
+			throw Poco::DataException("received '" + received + "' instead of '" + expected + "'");
+	}
+
+	std::string sessionTicket(SchannelPeer& peer)
+		/// Runs the handshake and returns the session ticket that a TLS 1.3 server
+		/// sends at its end, without sending it.
+	{
+		const std::string ticket = peer.handshake(false);
+		if (ticket.empty())
+			throw Poco::IllegalStateException("the handshake produced no session ticket");
+		return ticket;
+	}
 }
 
 
@@ -750,6 +853,323 @@ void SecureStreamSocketTest::testLocalhostNameOnOtherAddressIsVerified()
 }
 
 
+void SecureStreamSocketTest::testDataWithCloseNotify()
+{
+	SchannelServer server([](SchannelPeer& peer, StreamSocket& socket)
+	{
+		peer.handshake();
+		// the operands of + are evaluated in no defined order, the records must be made in this one
+		const std::string data = peer.encrypt("one");
+		peer.send(data + peer.closeNotify());
+		socket.shutdownSend();
+		// the connection stays open until the client's close_notify
+		expectReceived(peer, "");
+	});
+	SecureStreamSocket ss(SocketAddress("127.0.0.1", server.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	char buffer[256];
+	const int n = ss.receiveBytes(buffer, sizeof(buffer));
+	const std::string data(buffer, n > 0 ? n : 0);
+	const int end = ss.receiveBytes(buffer, sizeof(buffer));
+	const int closeNotifyReceived = ss.shutdown();
+	server.join();
+	assertEqual (std::string(), server.failure());
+	assertEqual (3, n);
+	assertEqual ("one", data);
+	assertEqual (0, end);
+	assertEqual (1, closeNotifyReceived);
+}
+
+
+void SecureStreamSocketTest::testCloseNotifyAlone()
+{
+	SchannelServer server([](SchannelPeer& peer, StreamSocket& socket)
+	{
+		peer.handshake();
+		peer.send(peer.closeNotify());
+		socket.shutdownSend();
+		expectReceived(peer, "");
+	});
+	SecureStreamSocket ss(SocketAddress("127.0.0.1", server.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	char buffer[256];
+	const int end = ss.receiveBytes(buffer, sizeof(buffer));
+	const int closeNotifyReceived = ss.shutdown();
+	server.join();
+	assertEqual (std::string(), server.failure());
+	assertEqual (0, end);
+	assertEqual (1, closeNotifyReceived);
+}
+
+
+void SecureStreamSocketTest::testReceiveAfterShutdown()
+{
+	SchannelServer server([](SchannelPeer& peer, StreamSocket&)
+	{
+		peer.handshake();
+		expectReceived(peer, "data");
+		// the operands of + are evaluated in no defined order, the records must be made in this one
+		const std::string reply = peer.encrypt("reply");
+		peer.send(reply + peer.closeNotify());
+		expectReceived(peer, "");
+	});
+	SecureStreamSocket ss(SocketAddress("127.0.0.1", server.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	const int sent = ss.sendBytes("data", 4);
+	// the client's close_notify goes out before the reply is read
+	ss.shutdown();
+	std::string received;
+	std::string failure;
+	int n = 0;
+	try
+	{
+		do
+		{
+			char buffer[256];
+			n = ss.receiveBytes(buffer, sizeof(buffer));
+			if (n > 0)
+				received.append(buffer, n);
+		}
+		while (n > 0);
+	}
+	catch (Poco::Exception& exc)
+	{
+		failure = exc.displayText();
+	}
+	const int closeNotifyReceived = ss.shutdown();
+	server.join();
+	assertEqual (std::string(), server.failure());
+	assertEqual (4, sent);
+	assertEqual (std::string(), failure);
+	assertEqual ("reply", received);
+	assertEqual (0, n);
+	assertEqual (1, closeNotifyReceived);
+}
+
+
+void SecureStreamSocketTest::testNonBlockingReceiveOfTicketWithData()
+{
+	SchannelServer server([](SchannelPeer& peer, StreamSocket&)
+	{
+		const std::string ticket = sessionTicket(peer);
+		peer.send(ticket + peer.encrypt("one"));
+		expectReceived(peer, "done");
+	});
+	SecureStreamSocket ss(SocketAddress("127.0.0.1", server.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	ss.setBlocking(false);
+	const bool readable = ss.poll(Poco::Timespan(10, 0), Socket::SELECT_READ);
+	// the ticket is processed without waiting for the socket again
+	char buffer[256];
+	const int n = ss.receiveBytes(buffer, sizeof(buffer));
+	const std::string data(buffer, n > 0 ? n : 0);
+	ss.setBlocking(true);
+	const int sent = ss.sendBytes("done", 4);
+	server.join();
+	assertEqual (std::string(), server.failure());
+	assertTrue (readable);
+	assertEqual (3, n);
+	assertEqual ("one", data);
+	assertEqual (4, sent);
+}
+
+
+void SecureStreamSocketTest::testEmptyRecordIsNotEndOfStream()
+{
+	SchannelServer server([](SchannelPeer& peer, StreamSocket&)
+	{
+		peer.send(sessionTicket(peer));
+		expectReceived(peer, "go");
+		peer.send(peer.encrypt(""));
+		expectReceived(peer, "go");
+		peer.send(peer.encrypt("two"));
+		expectReceived(peer, "done");
+	});
+	SecureStreamSocket ss(SocketAddress("127.0.0.1", server.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	ss.setBlocking(false);
+	char buffer[256];
+	const bool ticketReadable = ss.poll(Poco::Timespan(10, 0), Socket::SELECT_READ);
+	const int ticketResult = ss.receiveBytes(buffer, sizeof(buffer));
+	const int sentAfterTicket = ss.sendBytes("go", 2);
+	const bool emptyRecordReadable = ss.poll(Poco::Timespan(10, 0), Socket::SELECT_READ);
+	const int emptyRecordResult = ss.receiveBytes(buffer, sizeof(buffer));
+	const int sentAfterEmptyRecord = ss.sendBytes("go", 2);
+	int n = SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
+	while (n < 0 && ss.poll(Poco::Timespan(10, 0), Socket::SELECT_READ))
+	{
+		n = ss.receiveBytes(buffer, sizeof(buffer));
+	}
+	const std::string data(buffer, n > 0 ? n : 0);
+	const int sentDone = ss.sendBytes("done", 4);
+	server.join();
+	assertEqual (std::string(), server.failure());
+	assertTrue (ticketReadable);
+	assertTrue (ticketResult < 0);
+	assertEqual (2, sentAfterTicket);
+	assertTrue (emptyRecordReadable);
+	// an empty record is no end of the stream
+	assertTrue (emptyRecordResult != 0);
+	assertEqual (2, sentAfterEmptyRecord);
+	assertEqual ("two", data);
+	assertEqual (4, sentDone);
+}
+
+
+void SecureStreamSocketTest::testCorruptedRecordThrows()
+{
+	SchannelServer server([](SchannelPeer& peer, StreamSocket&)
+	{
+		peer.handshake();
+		std::string record = peer.encrypt("one");
+		record.back() = static_cast<char>(record.back() ^ 0xFF);
+		peer.send(record);
+	});
+	SecureStreamSocket ss(SocketAddress("127.0.0.1", server.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	std::string outcome;
+	try
+	{
+		char buffer[256];
+		outcome = "receiveBytes() returned " + std::to_string(ss.receiveBytes(buffer, sizeof(buffer)));
+	}
+	catch (Poco::Net::SSLException&)
+	{
+		outcome = "SSLException";
+	}
+	const int available = ss.available();
+	server.join();
+	assertEqual (std::string(), server.failure());
+	assertEqual ("SSLException", outcome);
+	assertEqual (0, available);
+}
+
+
+void SecureStreamSocketTest::testOversizedRecordThrows()
+{
+	SchannelServer server([](SchannelPeer& peer, StreamSocket&)
+	{
+		peer.handshake();
+		// a record header that announces more than the client's receive buffer holds, and the bytes to fill it
+		const int length = 18000;
+		std::string record("\x17\x03\x03", 3);
+		record += static_cast<char>(length >> 8);
+		record += static_cast<char>(length & 0xFF);
+		record.append(17000, 'x');
+		peer.send(record);
+		expectReceived(peer, "");
+	});
+	SecureStreamSocket ss(SocketAddress("127.0.0.1", server.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	std::string outcome;
+	try
+	{
+		char buffer[256];
+		outcome = "receiveBytes() returned " + std::to_string(ss.receiveBytes(buffer, sizeof(buffer)));
+	}
+	catch (Poco::Net::SSLException&)
+	{
+		outcome = "SSLException";
+	}
+	catch (Poco::TimeoutException&)
+	{
+		outcome = "timeout";
+	}
+	ss.close();
+	server.join();
+	assertEqual (std::string(), server.failure());
+	assertEqual ("SSLException", outcome);
+}
+
+
+void SecureStreamSocketTest::testAvailableAfterFailedHandshake()
+{
+	SecureServerSocket svs(SocketAddress("127.0.0.1", 0));
+	// a record header with a payload that is no handshake message
+	StreamSocket plain(svs.address());
+	const char bytes[] = {0x16, 0x03, 0x01, 0x00, 0x02, static_cast<char>(0xAA), static_cast<char>(0xBB)};
+	plain.sendBytes(bytes, sizeof(bytes));
+	StreamSocket s = svs.acceptConnection();
+	s.setReceiveTimeout(Poco::Timespan(10, 0));
+	try
+	{
+		char buffer[256];
+		s.receiveBytes(buffer, sizeof(buffer));
+		fail("not a TLS handshake - must throw");
+	}
+	catch (Poco::Net::SSLException&)
+	{
+	}
+	assertEqual (0, s.available());
+}
+
+
+void SecureStreamSocketTest::testCoalescedTicketAndData()
+{
+	SchannelServer server([](SchannelPeer& peer, StreamSocket&)
+	{
+		const std::string ticket = sessionTicket(peer);
+		const std::string one = peer.encrypt("one");
+		peer.send(ticket + one + peer.encrypt("two"));
+		expectReceived(peer, "done");
+	});
+	SecureStreamSocket ss(SocketAddress("127.0.0.1", server.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	std::string received;
+	int n = 0;
+	do
+	{
+		char buffer[256];
+		n = ss.receiveBytes(buffer, sizeof(buffer));
+		if (n > 0)
+			received.append(buffer, n);
+	}
+	while (n > 0 && received.size() < 6);
+	const int sent = ss.sendBytes("done", 4);
+	server.join();
+	assertEqual (std::string(), server.failure());
+	assertTrue (n > 0);
+	assertEqual ("onetwo", received);
+	assertEqual (4, sent);
+}
+
+
+void SecureStreamSocketTest::testReconnectAfterCloseNotify()
+{
+	SchannelServer first([](SchannelPeer& peer, StreamSocket&)
+	{
+		peer.handshake();
+		peer.send(peer.closeNotify());
+		expectReceived(peer, "");
+	});
+	SchannelServer second([](SchannelPeer& peer, StreamSocket&)
+	{
+		peer.handshake();
+		peer.send(peer.encrypt("two"));
+		expectReceived(peer, "");
+	});
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", first.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	char buffer[256];
+	const int end = ss.receiveBytes(buffer, sizeof(buffer));
+	ss.close();
+	// the second connection is made by the same socket implementation, as HTTPSClientSession does
+	ss.connect(SocketAddress("127.0.0.1", second.port()));
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	const int n = ss.receiveBytes(buffer, sizeof(buffer));
+	const std::string data(buffer, n > 0 ? n : 0);
+	ss.close();
+	first.join();
+	second.join();
+	assertEqual (std::string(), first.failure());
+	assertEqual (std::string(), second.failure());
+	assertEqual (0, end);
+	assertEqual (3, n);
+	assertEqual ("two", data);
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -781,6 +1201,16 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testTunneledLoopbackPeerIsVerified);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testResolvedLoopbackNameIsVerified);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLocalhostNameOnOtherAddressIsVerified);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testDataWithCloseNotify);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCloseNotifyAlone);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testReceiveAfterShutdown);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNonBlockingReceiveOfTicketWithData);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testEmptyRecordIsNotEndOfStream);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCorruptedRecordThrows);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testOversizedRecordThrows);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testAvailableAfterFailedHandshake);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testCoalescedTicketAndData);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testReconnectAfterCloseNotify);
 
 	return pSuite;
 }

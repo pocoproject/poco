@@ -42,6 +42,15 @@ class NetSSL_Win_API SecureStreamSocket: public StreamSocket
 	/// ERR_SSL_WANT_READ is returned, receiveBytes() must be called
 	/// as soon as data is available for reading (indicated by select()).
 	///
+	/// Data that the TLS layer has already read from the socket (decrypted
+	/// bytes, and records that arrived together with the handshake or with
+	/// earlier data) is not seen by poll(), select() or a SocketReactor.
+	/// Before waiting for the socket to become readable, call available()
+	/// and read while it returns a positive value.
+	///
+	/// A server refuses a renegotiation that the client starts (TLS 1.2 and
+	/// earlier): receiveBytes() ends the connection with an SSLException.
+	///
 	/// The SSL handshake is delayed until the first sendBytes() or
 	/// receiveBytes() operation is performed on the socket. No automatic
 	/// post connection check (checking the peer certificate for a valid
@@ -244,6 +253,9 @@ public:
 		/// ERR_SSL_WANT_WRITE if more data is required to complete the
 		/// handshake. In this case, completeHandshake() should be called
 		/// again, after the necessary condition has been met.
+		///
+		/// Records that arrived together with the handshake are not seen by
+		/// poll(); call available() before waiting for the socket.
 
 	[[nodiscard]] Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,
