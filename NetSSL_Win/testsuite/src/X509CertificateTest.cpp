@@ -11,6 +11,7 @@
 #include "X509CertificateTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Net/SSLException.h"
 #include "Poco/Net/X509Certificate.h"
 #include <sstream>
 #include <string>
@@ -169,6 +170,12 @@ void X509CertificateTest::testVerifyCommonName()
 }
 
 
+void X509CertificateTest::testInvalidCertificateExceptionName()
+{
+	assertEqual (std::string("Invalid certificate"), std::string(Poco::Net::InvalidCertificateException().name()));
+}
+
+
 void X509CertificateTest::setUp()
 {
 }
@@ -189,6 +196,7 @@ CppUnit::Test* X509CertificateTest::suite()
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIPAddressAgainstDNSName);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyIPAddressAgainstCommonName);
 	CppUnit_addTest(pSuite, X509CertificateTest, testVerifyCommonName);
+	CppUnit_addTest(pSuite, X509CertificateTest, testInvalidCertificateExceptionName);
 
 	return pSuite;
 }

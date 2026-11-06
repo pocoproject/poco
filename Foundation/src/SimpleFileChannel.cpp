@@ -19,6 +19,8 @@
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
 #include "Poco/String.h"
+#include "Poco/NumberParser.h"
+#include <limits>
 
 
 namespace Poco {
@@ -127,6 +129,8 @@ void SimpleFileChannel::setProperty(const std::string& name, const std::string& 
 
 std::string SimpleFileChannel::getProperty(const std::string& name) const
 {
+	FastMutex::ScopedLock lock(_mutex);
+
 	if (name == PROP_PATH)
 		return _path;
 	else if (name == PROP_SECONDARYPATH)
@@ -142,7 +146,9 @@ std::string SimpleFileChannel::getProperty(const std::string& name) const
 
 Timestamp SimpleFileChannel::creationDate() const
 {
-	if (_pFile)
+	FastMutex::ScopedLock lock(_mutex);
+
+	if (_pFile != nullptr)
 		return _pFile->creationDate();
 	else
 		return 0;
@@ -151,22 +157,37 @@ Timestamp SimpleFileChannel::creationDate() const
 
 UInt64 SimpleFileChannel::size() const
 {
-	if (_pFile)
+	FastMutex::ScopedLock lock(_mutex);
+
+	if (_pFile != nullptr)
 		return _pFile->size();
 	else
 		return 0;
 }
 
 
-const std::string& SimpleFileChannel::path() const
+std::string SimpleFileChannel::path() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _path;
 }
 
 
-const std::string& SimpleFileChannel::secondaryPath() const
+std::string SimpleFileChannel::secondaryPath() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _secondaryPath;
+}
+
+
+namespace
+{
+	[[nodiscard]] UInt64 scaled(UInt64 n, UInt64 factor, const std::string& rotation)
+	{
+		if (n > std::numeric_limits<UInt64>::max()/factor)
+			throw InvalidArgumentException("rotation", rotation);
+		return n*factor;
+	}
 }
 
 
@@ -176,15 +197,20 @@ void SimpleFileChannel::setRotation(const std::string& rotation)
 	std::string::const_iterator end = rotation.end();
 	UInt64 n = 0;
 	while (it != end && Ascii::isSpace(*it)) ++it;
-	while (it != end && Ascii::isDigit(*it)) { n *= 10; n += *it++ - '0'; }
+	std::string digits;
+	while (it != end && Ascii::isDigit(*it)) digits += *it++;
+	if (!digits.empty() && !NumberParser::tryParseUnsigned64(digits, n))
+		throw InvalidArgumentException("rotation", rotation);
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
 
 	if (unit == "K")
-		_limit = n*1024;
+		_limit = scaled(n, 1024, rotation);
 	else if (unit == "M")
-		_limit = n*1024*1024;
+		_limit = scaled(n, 1024*1024, rotation);
+	else if (unit == "G")
+		_limit = scaled(n, static_cast<UInt64>(1024)*1024*1024, rotation);
 	else if (unit.empty())
 		_limit = n;
 	else if (unit == "never")

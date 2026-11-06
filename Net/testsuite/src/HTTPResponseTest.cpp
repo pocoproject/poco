@@ -14,7 +14,11 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPCookie.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Timespan.h"
+#include <optional>
 #include <sstream>
+#include <utility>
+#include <vector>
 
 
 using Poco::Net::HTTPResponse;
@@ -325,6 +329,31 @@ void HTTPResponseTest::testWriteInvalid()
 }
 
 
+void HTTPResponseTest::testKeepAliveTimeout()
+{
+	const Poco::Timespan TIMEOUT(5, 0);
+	HTTPResponse response;
+	assertTrue (!response.getKeepAliveTimeout().has_value());
+
+	const std::vector<std::pair<std::string, std::optional<Poco::Timespan>>> cases = {
+		{"timeout=5, max=100", TIMEOUT},
+		{"max=100,timeout=5", TIMEOUT},
+		{" timeout = 5 ", TIMEOUT},
+		{"TIMEOUT=5", TIMEOUT},
+		{"timeout=abc", std::nullopt},
+		{"xtimeout=5", std::nullopt},
+		{"", std::nullopt},
+		{"timeout=-1", std::nullopt}
+	};
+	for (const auto& [value, timeout]: cases)
+	{
+		response.set("Keep-Alive", value);
+		const std::optional<Poco::Timespan> actual = response.getKeepAliveTimeout();
+		assertTrue (actual == timeout);
+	}
+}
+
+
 void HTTPResponseTest::setUp()
 {
 }
@@ -354,6 +383,7 @@ CppUnit::Test* HTTPResponseTest::suite()
 	CppUnit_addTest(pSuite, HTTPResponseTest, testReplaceCookie);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testRemoveCookie);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testWriteInvalid);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testKeepAliveTimeout);
 
 	return pSuite;
 }

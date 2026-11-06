@@ -45,6 +45,9 @@ public:
 	void testUpdateBeforePoll();
 	void testUpdateNotInSet();
 	void testReplacedSocketGetsNoEventOfPredecessor();
+	void testPollInterruptedNoTimeout();
+	void testPollNegativeTimeoutBelowOneMillisecond();
+	void testPollTimeoutBeyondIntMilliseconds();
 
 	void setUp();
 	void tearDown();

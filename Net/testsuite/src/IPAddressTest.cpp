@@ -17,12 +17,14 @@
 #include "Poco/Format.h"
 #include <iostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 
 using Poco::Net::IPAddress;
 using Poco::Net::NetworkInterface;
 using Poco::Net::InvalidAddressException;
+using Poco::NullPointerException;
 
 
 IPAddressTest::IPAddressTest(const std::string& name): CppUnit::TestCase(name)
@@ -877,6 +879,37 @@ void IPAddressTest::testScoped()
 }
 
 
+void IPAddressTest::testMoveNoexcept()
+{
+	static_assert(std::is_nothrow_move_constructible_v<IPAddress>);
+	static_assert(std::is_nothrow_move_assignable_v<IPAddress>);
+
+	IPAddress ia1("192.168.1.120");
+	IPAddress ia2(std::move(ia1));
+	assertTrue (ia2.toString() == "192.168.1.120");
+	try
+	{
+		[[maybe_unused]] IPAddress::Family family = ia1.family(); // NOLINT(bugprone-use-after-move)
+		fail("moved-from IPAddress - must throw");
+	}
+	catch (NullPointerException&)
+	{
+	}
+
+	IPAddress ia3;
+	ia3 = std::move(ia2);
+	assertTrue (ia3.toString() == "192.168.1.120");
+	try
+	{
+		[[maybe_unused]] IPAddress::Family family = ia2.family(); // NOLINT(bugprone-use-after-move)
+		fail("moved-from IPAddress - must throw");
+	}
+	catch (NullPointerException&)
+	{
+	}
+}
+
+
 void IPAddressTest::setUp()
 {
 }
@@ -909,6 +942,7 @@ CppUnit::Test* IPAddressTest::suite()
 	CppUnit_addTest(pSuite, IPAddressTest, testOperators);
 	CppUnit_addTest(pSuite, IPAddressTest, testByteOrderMacros);
 	CppUnit_addTest(pSuite, IPAddressTest, testScoped);
+	CppUnit_addTest(pSuite, IPAddressTest, testMoveNoexcept);
 
 	return pSuite;
 }

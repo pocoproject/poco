@@ -73,6 +73,8 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <atomic>
+#include <limits>
+#include <chrono>
 
 #ifdef __linux__
 #include <unistd.h>  // for sysconf
@@ -473,12 +475,34 @@ struct RotationConfig
 };
 
 
+// Quill stores the rotation interval in 32 bits and adds it to the next rotation time as signed
+// 64-bit nanoseconds, so a longer interval would overflow there.
+constexpr uint64_t MAX_ROTATION_MINUTES = std::min<uint64_t>(
+	static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::minutes>(std::chrono::nanoseconds::max()).count()),
+	std::numeric_limits<uint32_t>::max());
+constexpr uint64_t MAX_ROTATION_HOURS = std::min<uint64_t>(
+	static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::hours>(std::chrono::nanoseconds::max()).count()),
+	std::numeric_limits<uint32_t>::max());
+
+
+// Returns value*factor, or throws when the product exceeds limit, the largest accepted value.
+// value is the positive number parsed from rotation.
+[[nodiscard]] uint64_t scaled(int64_t value, uint64_t factor, uint64_t limit, const std::string& rotation)
+{
+	const auto n = static_cast<uint64_t>(value);
+	if (n > limit / factor)
+		throw InvalidArgumentException("rotation", rotation);
+	return n * factor;
+}
+
+
 // Parse Poco rotation string and populate RotationConfig
 // Poco rotation formats:
 //   - "never" or empty: no rotation
 //   - "<n>": size in bytes
 //   - "<n> K": size in kilobytes
 //   - "<n> M": size in megabytes
+//   - "<n> G": size in gigabytes
 //   - "<n> minutes": rotate every n minutes
 //   - "<n> hours": rotate every n hours
 //   - "<n> days": rotate every n days
@@ -607,45 +631,50 @@ RotationConfig parsePocoRotation(const std::string& rotation, const std::string&
 	if (unit.empty())
 	{
 		// Pure number = size in bytes
-		config.maxFileSize = static_cast<size_t>(value);
+		config.maxFileSize = static_cast<size_t>(scaled(value, 1, std::numeric_limits<size_t>::max(), rotation));
 	}
 	else if (unit == "k")
 	{
 		// Kilobytes
-		config.maxFileSize = static_cast<size_t>(value) * 1024;
+		config.maxFileSize = static_cast<size_t>(scaled(value, 1024, std::numeric_limits<size_t>::max(), rotation));
 	}
 	else if (unit == "m")
 	{
 		// Megabytes
-		config.maxFileSize = static_cast<size_t>(value) * 1024 * 1024;
+		config.maxFileSize = static_cast<size_t>(scaled(value, 1024 * 1024, std::numeric_limits<size_t>::max(), rotation));
+	}
+	else if (unit == "g")
+	{
+		// Gigabytes
+		config.maxFileSize = static_cast<size_t>(scaled(value, static_cast<uint64_t>(1024) * 1024 * 1024, std::numeric_limits<size_t>::max(), rotation));
 	}
 	else if (unit == "minutes" || unit == "minute")
 	{
 		config.frequencyType = 'M';
-		config.frequencyInterval = static_cast<uint32_t>(value);
+		config.frequencyInterval = static_cast<uint32_t>(scaled(value, 1, MAX_ROTATION_MINUTES, rotation));
 	}
 	else if (unit == "hours" || unit == "hour")
 	{
 		config.frequencyType = 'H';
-		config.frequencyInterval = static_cast<uint32_t>(value);
+		config.frequencyInterval = static_cast<uint32_t>(scaled(value, 1, MAX_ROTATION_HOURS, rotation));
 	}
 	else if (unit == "days" || unit == "day")
 	{
 		// Convert days to hours
 		config.frequencyType = 'H';
-		config.frequencyInterval = static_cast<uint32_t>(value * 24);
+		config.frequencyInterval = static_cast<uint32_t>(scaled(value, 24, MAX_ROTATION_HOURS, rotation));
 	}
 	else if (unit == "weeks" || unit == "week")
 	{
 		// Convert weeks to hours
 		config.frequencyType = 'H';
-		config.frequencyInterval = static_cast<uint32_t>(value * 24 * 7);
+		config.frequencyInterval = static_cast<uint32_t>(scaled(value, 24 * 7, MAX_ROTATION_HOURS, rotation));
 	}
 	else if (unit == "months" || unit == "month")
 	{
 		// Convert months (30 days) to hours
 		config.frequencyType = 'H';
-		config.frequencyInterval = static_cast<uint32_t>(value * 24 * 30);
+		config.frequencyInterval = static_cast<uint32_t>(scaled(value, 24 * 30, MAX_ROTATION_HOURS, rotation));
 	}
 	else
 	{
@@ -1522,13 +1551,14 @@ FastLogger& FastLogger::create(const std::string& name, Channel::Ptr pChannel, i
 		throw ExistsException("FastLogger already exists");
 
 	Ptr pLogger = new FastLogger(name, level);
-	add(pLogger);
 
-	// Apply the channel if provided
+	// Configure before registering: setChannel() throws on an invalid channel
+	// configuration, which must not leave a registered logger with the default sink.
 	if (pChannel)
 	{
 		pLogger->setChannel(pChannel);
 	}
+	add(pLogger);
 
 	return *pLogger;
 }

@@ -374,6 +374,39 @@ void FileChannelTest::testConcurrentOpenClose()
 }
 
 
+void FileChannelTest::testPathWhileSetPath()
+{
+	// The path is read while another thread sets it: every path read is
+	// one that was set.
+	// Only ThreadSanitizer shows the unlocked read reliably.
+	constexpr int ROUNDS = 10000;
+	const std::string first = "log_path_first.log";
+	const std::string second = "log_path_second_with_a_longer_name.log";
+
+	AutoPtr<FileChannel> pChannel = new FileChannel(first);
+	std::atomic<bool> stop(false);
+	std::thread setter([&]()
+	{
+		for (int i = 0; i < ROUNDS; ++i)
+		{
+			pChannel->setProperty(FileChannel::PROP_PATH, i % 2 == 0 ? second : first);
+		}
+		stop = true;
+	});
+
+	int unexpected = 0;
+	while (!stop)
+	{
+		const std::string path = pChannel->path();
+		if (path != first && path != second) ++unexpected;
+	}
+	setter.join();
+
+	assertEqual (0, unexpected);
+	assertEqual (first, pChannel->path());
+}
+
+
 void FileChannelTest::testRotateBySize()
 {
 	std::string name = filename();
@@ -400,6 +433,71 @@ void FileChannelTest::testRotateBySize()
 		throw;
 	}
 	remove(name);
+}
+
+
+void FileChannelTest::testRotateBySizeUnits()
+{
+	std::string name = filename();
+	try
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
+		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 G");
+		assertTrue (pChannel->getProperty(FileChannel::PROP_ROTATION) == "1 G");
+		pChannel->setProperty(FileChannel::PROP_ROTATION, "4 G");
+		assertTrue (pChannel->getProperty(FileChannel::PROP_ROTATION) == "4 G");
+		try
+		{
+			pChannel->setProperty(FileChannel::PROP_ROTATION, "1 X");
+			fail("must fail");
+		}
+		catch (InvalidArgumentException&)
+		{
+		}
+		pChannel->open();
+		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
+		for (int i = 0; i < 200; ++i)
+		{
+			pChannel->log(msg);
+		}
+		File f(name);
+		assertTrue (f.exists());
+		f = name + ".0";
+		assertTrue (!f.exists());
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
+void FileChannelTest::testRotationOverflow()
+{
+	AutoPtr<FileChannel> pChannel = new FileChannel(filename());
+	pChannel->setProperty(FileChannel::PROP_ROTATION, "2 K");
+	const auto assertRejected = [&](const std::string& rotation)
+	{
+		try
+		{
+			pChannel->setProperty(FileChannel::PROP_ROTATION, rotation);
+			fail("must fail: " + rotation);
+		}
+		catch (InvalidArgumentException& exc)
+		{
+			// Rejected as a rotation value, not by a strategy that got a wrapped number.
+			assertTrue (exc.message().find(rotation) != std::string::npos);
+		}
+		assertTrue (pChannel->getProperty(FileChannel::PROP_ROTATION) == "2 K");
+	};
+	assertRejected("99999999999999999 K");
+	assertRejected("99999999999999 M");
+	assertRejected("99999999999 G");
+	assertRejected("1234567890123456789012345");
+	assertRejected("99999999999 months");
+	assertRejected("999999999999 minutes");
 }
 
 
@@ -1234,7 +1332,10 @@ CppUnit::Test* FileChannelTest::suite()
 	CppUnit_addTest(pSuite, FileChannelTest, testOpenCalledByLog);
 	CppUnit_addTest(pSuite, FileChannelTest, testPurgeStrategyReplacedDuringPurge);
 	CppUnit_addTest(pSuite, FileChannelTest, testConcurrentOpenClose);
+	CppUnit_addTest(pSuite, FileChannelTest, testPathWhileSetPath);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySize);
+	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySizeUnits);
+	CppUnit_addTest(pSuite, FileChannelTest, testRotationOverflow);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateByAge);
 	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayUTC);
 	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayLocal);

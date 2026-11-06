@@ -79,8 +79,9 @@ public:
 	IPAddress(const IPAddress& addr);
 		/// Creates an IPAddress by copying another one.
 
-	IPAddress(IPAddress&& addr);
+	IPAddress(IPAddress&& addr) noexcept;
 		/// Creates an IPAddress by moving another one.
+		/// Afterwards addr holds no address and its accessors throw Poco::NullPointerException.
 
 	explicit IPAddress(Family family);
 		/// Creates a wildcard (zero) IPAddress for the
@@ -133,8 +134,9 @@ public:
 	IPAddress& operator = (const IPAddress& addr);
 		/// Assigns an IPAddress.
 
-	IPAddress& operator = (IPAddress&& addr);
+	IPAddress& operator = (IPAddress&& addr) noexcept;
 		/// Move-assigns an IPAddress.
+		/// Afterwards addr holds no address and its accessors throw Poco::NullPointerException.
 
 	[[nodiscard]] bool isV4() const;
 	[[nodiscard]] bool isV6() const;

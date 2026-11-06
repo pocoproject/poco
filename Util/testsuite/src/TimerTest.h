@@ -38,6 +38,7 @@ public:
 	void testMultiCancelAllWaitStop();
 	void testFunc();
 	void testIdle();
+	void testDerivedConstructor();
 
 	void setUp();
 	void tearDown();

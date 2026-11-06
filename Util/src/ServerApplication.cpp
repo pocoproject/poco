@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <cstdio>
+#include <iostream>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Format.h"
 #include "Poco/NamedEvent.h"
@@ -523,11 +525,17 @@ int ServerApplication::run(const ArgVec& args)
 void ServerApplication::beDaemon()
 {
 #if !defined(POCO_NO_FORK_EXEC)
+	// Flush before fork() so that buffered output is written once, by this process,
+	// and not dropped by _exit() or written again by the child.
+	std::fflush(nullptr);
+	std::cout.flush();
+	std::cerr.flush();
+	std::clog.flush();
 	pid_t pid;
 	if ((pid = fork()) < 0)
 		throw SystemException("cannot fork daemon process");
 	else if (pid != 0)
-		exit(0);
+		_exit(0);
 
 	setsid();
 	umask(027);

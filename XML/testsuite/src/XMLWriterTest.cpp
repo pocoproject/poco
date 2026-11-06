@@ -16,6 +16,7 @@
 #include "Poco/SAX/AttributesImpl.h"
 #include "Poco/Exception.h"
 #include <sstream>
+#include <utility>
 #include <vector>
 
 
@@ -349,6 +350,30 @@ void XMLWriterTest::testCharacters()
 	writer.endDocument();
 	std::string xml = str.str();
 	assertTrue (xml == "<r>some &quot;chars&quot; that &lt;must&gt; be &amp; escaped</r>");
+}
+
+
+void XMLWriterTest::testCharactersCR()
+{
+	const std::string CR_TEXT("a\r\nb\rc");
+	const std::pair<int, std::string> EXPECTED_BY_OPTIONS[] = {
+		{0, "<r>a&#xD;\nb&#xD;c</r>"},
+		{XMLWriter::CANONICAL_XML, "<r>a&#xD;\nb&#xD;c</r>"},
+		{XMLWriter::PRETTY_PRINT, "<r>a&#xD;\nb&#xD;c</r>\n"}
+	};
+
+	for (const auto& [options, expected]: EXPECTED_BY_OPTIONS)
+	{
+		std::ostringstream str;
+		XMLWriter writer(str, options);
+		writer.setNewLine(XMLWriter::NEWLINE_LF);
+		writer.startDocument();
+		writer.startElement("", "", "r");
+		writer.characters(CR_TEXT);
+		writer.endElement("", "", "r");
+		writer.endDocument();
+		assertEqual (expected, str.str());
+	}
 }
 
 
@@ -770,6 +795,7 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testComment);
 	CppUnit_addTest(pSuite, XMLWriterTest, testPI);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCharacters);
+	CppUnit_addTest(pSuite, XMLWriterTest, testCharactersCR);
 	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCDATA);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCDATATerminator);

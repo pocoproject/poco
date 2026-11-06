@@ -92,6 +92,21 @@ public:
 		/// Does nothing if the given configuration is not part of the
 		/// LayeredConfiguration.
 
+	void replace(AbstractConfiguration::Ptr pConfig, const std::string& label, int priority, bool writeable = false);
+		/// Replaces the first configuration with the given label by the given configuration,
+		/// which is inserted at the position for the given priority, as add() does,
+		/// and is writeable if writeable is true. Other configurations with the
+		/// same label are kept. If no configuration has the label, the given
+		/// configuration is added.
+		///
+		/// The replacement is atomic for readers: a property read through this
+		/// LayeredConfiguration sees either the old or the new configuration, never
+		/// the LayeredConfiguration without a configuration with the label.
+		/// No property events are fired.
+		///
+		/// Throws an InvalidArgumentException if the label is empty, and a
+		/// NullPointerException if pConfig is null.
+
 protected:
 	struct ConfigItem
 	{
@@ -110,6 +125,8 @@ protected:
 	[[nodiscard]] int lowest() const;
 	[[nodiscard]] int highest() const;
 	void insert(const ConfigItem& item);
+		/// Inserts item at the position for its priority.
+		/// The caller holds the lock.
 
 	~LayeredConfiguration();
 

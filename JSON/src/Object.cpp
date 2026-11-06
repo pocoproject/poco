@@ -184,12 +184,24 @@ Object::NameList Object::getNames() const
 
 void Object::stringify(std::ostream& out, unsigned int indent, int step) const
 {
+	int options = 0;
+	options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
+	options |= _lowercaseHex ? Poco::JSON_LOWERCASE_HEX : 0;
+
+	stringify(out, indent, step, options);
+}
+
+
+void Object::stringify(std::ostream& out, unsigned int indent, int step, int options) const
+{
+	const int stringOptions = Poco::JSON_WRAP_STRINGS | (options & (Poco::JSON_ESCAPE_UNICODE | Poco::JSON_LOWERCASE_HEX));
+
 	if (step < 0) step = static_cast<int>(indent);
 
 	if (!_preserveInsOrder)
-		doStringify(_values, out, indent, step);
+		doStringify(_values, out, indent, step, stringOptions);
 	else
-		doStringify(_keys, out, indent, step);
+		doStringify(_keys, out, indent, step, stringOptions);
 }
 
 

@@ -60,6 +60,7 @@ public:
 	void testEvent();
 	void testOneWayEvent();
 	void testVoidEvent();
+	void testEventPercentEncodedObjectPath();
 	void testEventUnsubscribeBeforeReply();
 	void testEventUnsubscribeOrder();
 	void testEventUnsubscribeNoThread();
@@ -99,6 +100,11 @@ protected:
 	std::string _eventArg;
 	Poco::Event _eventReceived;
 	Poco::Event _proceed;
+
+private:
+	void checkEvent(const std::string& proxyURI);
+		/// Subscribes to testEvent through a proxy for proxyURI, fires the
+		/// event, checks that it arrives and unsubscribes.
 };
 
 

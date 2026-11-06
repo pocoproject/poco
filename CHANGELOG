@@ -90,6 +90,65 @@ Breaking Changes:
   throws, where it used to return the value and skip the next line, and
   RedisInputStream::getline() throws Poco::Redis::RedisException when the stream ends before the
   end of the line.
+- GH #5510 Poco::FormattingChannel overrides log(Message&&) and formats the message in place
+  instead of copying it; a subclass that overrides log(const Message&) must also override
+  log(Message&&). New: Poco::Message::setText(std::string&&).
+- GH #5520 Poco::FileChannel::path(), Poco::SimpleFileChannel::path() and secondaryPath() return
+  the path by value, read under the mutex of the channel. Callers that keep a reference, a
+  string_view or the c_str() of the result must copy it. Poco::SimpleFileChannel::size() and
+  creationDate() read the log file under the mutex as well.
+- GH #5520 Poco::AsyncChannel: close() delivers the queued messages and stops the worker thread
+  without polling, a message logged while close() runs no longer starts the worker again,
+  open() after close() makes the channel accept messages again, and the queue size limit and
+  the count of dropped messages are synchronized. log() starts the background thread without
+  calling the virtual open(), so an open() that a subclass overrides is no longer called by
+  log().
+- GH #5510 Poco::Net::TCPServer::run() is final, and the acceptor thread runs it without a
+  virtual call, so that the thread no longer reads the vptr while the constructor or destructor
+  of a subclass writes it; a subclass can no longer override run().
+- GH #5510 Poco::Net::Socket::select() and Poco::Net::PollSet::poll() wait without limit for any
+  negative timeout, as Socket::poll() does: a signal no longer ends a wait with a negative
+  timeout, and a negative timeout of less than one millisecond also waits without limit, where it
+  returned at once before. To end such a wait, use PollSet::wakeUp() where it is available, a
+  finite timeout or a socket that becomes ready.
+- GH #5510 Poco::Net socket exceptions name the address of the failed operation for every error
+  code, and a connect with a timeout names the address also when the failure is reported after
+  the wait. The message texts change.
+- GH #5510 Poco::Net::DNS: an unknown getaddrinfo() error code is reported with its text and the
+  host name, not only as a number. The message text changes: it has the form
+  'EAI <code>: <text>', with the host as the argument. DNSException::code() carries the
+  getaddrinfo() error code, where it was 0.
+- GH #5510 Poco::Net::InvalidCertificateException::name() is "Invalid certificate", and the
+  Poco::ReadFileException that Poco::Crypto::X509Certificate throws when it cannot load a
+  certificate from a file reads "Failed to load certificate from" (both were misspelled).
+- GH #3256 Poco::URI: toString(), getPathEtc() and getPathAndQuery() keep percent-encoded
+  characters of the path as written. operator== compares paths in percent-encoded form,
+  normalized as in RFC 3986, section 6.2.2, so a percent-encoded reserved character (such as
+  %2F, %2B, %3A or %40) no longer equals its literal form. Poco::Net::OAuth10Credentials signs
+  the path as written, so the signature base string changes for paths with percent-encoded
+  characters. As these outputs keep the client's encoding, lookups and access checks that must
+  match how a request is dispatched use getPath() (or operator== where the RFC 3986 distinction
+  is wanted), not toString(), getPathEtc() or getPathAndQuery(). New: Poco::URI::getRawPath()
+  and Poco::URI::setRawPath(). setPath() decodes into a copy, so an argument that refers to the
+  URI's own path, as in uri.setPath(uri.getPath()), no longer empties the path, and a malformed
+  path leaves the URI unchanged instead of partly decoded.
+- GH #5510 Poco::NumberParser quotes the rejected string in its SyntaxException messages, so that
+  empty and space-only input is visible, and the octal parsers no longer say "hexadecimal". The
+  message texts change.
+- GH #5510 Poco::ActiveDispatcher::run() and Poco::DirectoryWatcher::run() are final, and their
+  threads run them without a virtual call, so that a thread no longer reads the vptr while the
+  constructor or destructor of a subclass writes it; a subclass can no longer override run().
+- GH #5510 Poco::Util::XMLConfiguration returns element names that contain the delimiter with
+  the delimiter escaped by a backslash (a.b becomes a\.b) from keys(), and accepts such escaped
+  names in keys, so that every enumerated key can be read back.
+- GH #5566 Poco::JSON::Stringifier no longer changes the escape and lowercase-hex flags of the
+  objects and arrays it prints, including nested ones, so that stringifying a shared object
+  from several threads is safe; a nested object or array is printed with the options of its
+  parent, and its own flags are left unchanged. New: Poco::JSON::Object::stringify() and
+  Poco::JSON::Array::stringify() with an options argument.
+- GH #5510 Poco::Util::Timer::run() is final, and the timer thread runs it without a virtual
+  call, so that the thread no longer reads the vptr while the constructor or destructor of a
+  subclass writes it; a subclass can no longer override run().
 
 Bundled Third-Party Library Upgrades:
 
@@ -117,6 +176,8 @@ Features:
   only the environment variables given to launch(), on every platform. Without it the child
   inherits the environment of the parent with the given variables added, except on QNX when the
   child is spawned without an initial directory and is given variables: it then gets only those.
+- GH #5510 Poco::Util::LayeredConfiguration::replace() replaces a labeled configuration in one
+  step, so that readers never see the configuration without it.
 
 New Components:
 
@@ -213,6 +274,46 @@ Bug Fixes and Improvements:
 - GH #5526 Poco::RemotingNG::TCP::Listener runs the connections it accepts on the thread pool of
   its ConnectionManager, as it does requests and events, and no longer on the default thread pool
   whichever ConnectionManager it was given.
+- GH #5510 Poco::Logger keeps its logger map and its mutex in storage that is never destroyed,
+  so that Logger::get() works while static objects are constructed and destroyed; at exit the
+  channels are detached and released by the thread that destroys the static objects, and the
+  loggers are not freed.
+- GH #5520 Poco::Logger::destroy() lets go of the logger after it has released the mutex of the
+  logger map, so that a channel destructor that waits for a thread asking for a logger no longer
+  deadlocks.
+- GH #5510 Poco::FileChannel, Poco::SimpleFileChannel and the FastLogger channels built from them
+  accept the rotation size unit G and throw Poco::InvalidArgumentException for a rotation value
+  whose number overflows. FastLogger also rejects a rotation interval beyond the range of its
+  backend (about 290 years).
+- GH #5510 Poco::Net::TCPServerDispatcher counts a connection until its TCPServerConnection object
+  has been destroyed.
+- GH #5510 Poco::Net::HTTPClientSession does not reuse a connection longer than the timeout that
+  the server announces in its Keep-Alive header, counted from the receipt of the response header,
+  less one second, or less half of it when it is shorter than two seconds. New:
+  Poco::Net::HTTPMessage::getKeepAliveTimeout(), which returns std::optional<Poco::Timespan>.
+- GH #5510 Poco::Net::Socket::select() and Poco::Net::PollSet::poll() no longer wrap a timeout of
+  more than INT_MAX milliseconds (about 24.8 days) when they pass it to epoll_wait() or poll(),
+  which made a wait end early, spin or never end: with epoll (Linux, Windows, Android) the whole
+  timeout is waited, and with poll() (BSD, macOS) the wait ends after INT_MAX milliseconds, as in
+  Socket::poll().
+- GH #5510 Poco::Net::HTTPBasicCredentials accepts base64 credentials without padding.
+- GH #5510 Poco::Net::SocketAddress, IPAddress and HostEntry have noexcept move operations, so
+  that containers move them instead of copying.
+- GH #5510 Poco::BasicBufferedStreamBuf and BasicBufferedBidirectionalStreamBuf write the rest of
+  the buffer when writeToDevice() writes only part of it, instead of failing the stream; after a
+  failure only the bytes the device did not accept stay buffered, so a retried flush no longer
+  writes the accepted bytes again.
+- GH #5510 Poco::FPEnvironment::copySign(long double) copies the sign of a zero or NaN source; it
+  returned a positive value for a negative zero source, and on Solaris and Windows the negated
+  target for a zero source or target. On Solaris copySign(double) no longer truncates the result
+  to float.
+- GH #5510 Poco::File::createDirectory() returns false instead of throwing
+  Poco::FileExistsException when another thread or process creates the directory at the same time.
+- GH #5510 Poco::Util::ServerApplication::beDaemon() ends the foreground process with _exit()
+  after flushing the standard streams, so that atexit handlers and static destructors no longer
+  run in both processes.
+- GH #5510 Poco::XML::XMLWriter writes a carriage return in character data outside a CDATA
+  section as &#xD;, so that it survives a parse.
 
 
 Release 1.15.4 (2026-09-22)

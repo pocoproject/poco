@@ -27,6 +27,7 @@ public:
 	void testBasicCredentials();
 	void testProxyBasicCredentials();
 	void testBadCredentials();
+	void testBasicCredentialsNoPadding();
 	void testAuthenticationParams();
 	void testAuthenticationParamsMultipleHeaders();
 	void testDigestCredentials();

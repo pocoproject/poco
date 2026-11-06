@@ -66,6 +66,8 @@ protected:
 	[[nodiscard]] FileSizeImpl totalSpaceImpl() const;
 	[[nodiscard]] FileSizeImpl usableSpaceImpl() const;
 	[[nodiscard]] FileSizeImpl freeSpaceImpl() const;
+	[[noreturn]] static void handleLastErrorImpl(int err, const std::string& path);
+		/// Throws the exception that corresponds to the error code err, with path as its argument.
 	[[noreturn]] static void handleLastErrorImpl(const std::string& path);
 
 private:

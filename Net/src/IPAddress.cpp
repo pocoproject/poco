@@ -80,7 +80,7 @@ IPAddress::IPAddress(const IPAddress& addr)
 }
 
 
-IPAddress::IPAddress(IPAddress&& addr): _pImpl(std::move(addr._pImpl))
+IPAddress::IPAddress(IPAddress&& addr) noexcept: _pImpl(std::move(addr._pImpl))
 {
 }
 
@@ -246,7 +246,7 @@ IPAddress& IPAddress::operator = (const IPAddress& addr)
 }
 
 
-IPAddress& IPAddress::operator = (IPAddress&& addr)
+IPAddress& IPAddress::operator = (IPAddress&& addr) noexcept
 {
 	_pImpl = std::move(addr._pImpl);
 	return *this;

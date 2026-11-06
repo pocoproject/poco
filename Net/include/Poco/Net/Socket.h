@@ -169,6 +169,9 @@ public:
 		/// exceptList is zero, select() will return immediately and the
 		/// return value will be 0.
 		///
+		/// A negative timeout waits without limit, also when a signal
+		/// interrupts the wait.
+		///
 		/// If one of the sockets passed to select() is closed while
 		/// select() runs, select will return immediately. However,
 		/// the closed socket will not be included in any list.

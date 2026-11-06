@@ -17,6 +17,8 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Mutex.h"
 #include "Poco/IOLock.h"
+#include <algorithm>
+#include <limits>
 #include <set>
 
 
@@ -31,7 +33,6 @@
 		#include <sys/eventfd.h>
 	#endif
 #elif defined(POCO_HAVE_FD_POLL)
-	#include <algorithm>
 	#ifndef _WIN32
 		#include <poll.h>
 		#include "Poco/Pipe.h"
@@ -40,6 +41,28 @@
 
 
 namespace Poco::Net {
+
+
+#if defined(POCO_HAVE_FD_EPOLL) || defined(POCO_HAVE_FD_POLL)
+
+
+namespace {
+
+
+int pollMilliseconds(const Poco::Timespan& remainingTime)
+	/// Returns the remaining time in milliseconds for epoll_wait() and poll(),
+	/// limited to INT_MAX; a negative time is returned as -1, which they take
+	/// as no timeout.
+{
+	if (remainingTime < 0) return -1;
+	return static_cast<int>(std::min<Poco::Int64>(remainingTime.totalMilliseconds(), std::numeric_limits<int>::max()));
+}
+
+
+} // namespace
+
+
+#endif
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
@@ -182,6 +205,7 @@ public:
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
 	{
 		PollSet::SocketModeMap result;
+		const bool infinite = timeout < 0;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
@@ -194,7 +218,7 @@ public:
 		while (true)
 		{
 			Poco::Timestamp start;
-			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
+			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), pollMilliseconds(remainingTime));
 			if (rc == 0)
 			{
 				if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
@@ -213,7 +237,7 @@ public:
 				// if interrupted and there's still time left, keep waiting
 				if (SocketImpl::lastError() == POCO_EINTR)
 				{
-					if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
+					if (!pollLock.isClosed() && (infinite || keepWaiting(start, remainingTime))) continue;
 				}
 				else if (pollLock.isClosed())
 				{
@@ -570,14 +594,15 @@ public:
 
 		if (_polledFds.empty()) return result;
 
+		const bool infinite = timeout < 0;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
 		do
 		{
 			Poco::Timestamp start;
-			rc = ::poll(_polledFds.data(), _polledFds.size(), remainingTime.totalMilliseconds());
-			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+			rc = ::poll(_polledFds.data(), _polledFds.size(), pollMilliseconds(remainingTime));
+			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !infinite)
 			{
 				Poco::Timestamp end;
 				Poco::Timespan waited = end - start;
@@ -795,6 +820,7 @@ public:
 			_addedSockets.clear();
 		}
 
+		const bool infinite = timeout < 0;
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
@@ -804,8 +830,8 @@ public:
 			tv.tv_sec  = (long) remainingTime.totalSeconds();
 			tv.tv_usec = (long) remainingTime.useconds();
 			Poco::Timestamp start;
-			rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
-			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+			rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, infinite ? nullptr : &tv);
+			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !infinite)
 			{
 				Poco::Timestamp end;
 				Poco::Timespan waited = end - start;

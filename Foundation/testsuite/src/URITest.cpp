@@ -17,6 +17,7 @@
 #include <cstring>
 #include <functional>
 #include <new>
+#include <utility>
 #include <vector>
 
 
@@ -991,6 +992,296 @@ void URITest::testControlCharacters()
 }
 
 
+void URITest::testRawPath()
+{
+	URI uri("http://h/files/public%2Fdeploy.html?ref=master");
+	assertTrue (uri.getPath() == "/files/public/deploy.html");
+	assertTrue (uri.getRawPath() == "/files/public%2Fdeploy.html");
+	assertTrue (uri.getPathAndQuery() == "/files/public%2Fdeploy.html?ref=master");
+	assertTrue (uri.getPathEtc() == "/files/public%2Fdeploy.html?ref=master");
+	assertTrue (uri.toString() == "http://h/files/public%2Fdeploy.html?ref=master");
+
+	uri = "http://bucket.s3/key%2Bplus+sp";
+	assertTrue (uri.getPath() == "/key+plus+sp");
+	assertTrue (uri.getRawPath() == "/key%2Bplus+sp");
+	assertTrue (uri.getPathAndQuery() == "/key%2Bplus+sp");
+	assertTrue (uri.toString() == "http://bucket.s3/key%2Bplus+sp");
+
+	uri = "http://h/a%20b#f";
+	assertTrue (uri.getPath() == "/a b");
+	assertTrue (uri.getRawPath() == "/a%20b");
+	assertTrue (uri.toString() == "http://h/a%20b#f");
+
+	uri = "http://h/a%2fb";
+	assertTrue (uri.getRawPath() == "/a%2fb");
+	assertTrue (uri.toString() == "http://h/a%2fb");
+
+	uri = "http://h/a\tb%2Fc";
+	assertTrue (uri.getPath() == "/a\tb/c");
+	assertTrue (uri.getRawPath() == "/a%09b%2Fc");
+	assertTrue (uri.getPathAndQuery() == "/a%09b%2Fc");
+
+	uri = "a%2Fb?q";
+	assertTrue (uri.getPath() == "a/b");
+	assertTrue (uri.toString() == "a%2Fb?q");
+
+	uri = "file:%2Fx";
+	assertTrue (uri.getPath() == "/x");
+	assertTrue (uri.toString() == "file:///x");
+	assertTrue (URI(uri.toString()).getPath() == uri.getPath());
+
+	uri = "%2Fx";
+	assertTrue (uri.getPath() == "/x");
+	assertTrue (uri.getRawPath() == "%2Fx");
+
+	uri = "http://h/a%2Fb";
+	uri.setQuery("q=1");
+	uri.setFragment("f");
+	assertTrue (uri.toString() == "http://h/a%2Fb?q=1#f");
+	uri.setQuery("");
+	uri.setFragment("");
+	assertTrue (uri.toString() == "http://h/a%2Fb");
+	assertTrue (uri.getRawPath() == "/a%2Fb");
+}
+
+
+void URITest::testSetRawPath()
+{
+	URI uri("http://h/x%2Fy");
+	uri.setPath("/a b");
+	assertTrue (uri.getRawPath() == "/a%20b");
+	assertTrue (uri.toString() == "http://h/a%20b");
+
+	uri.setPath("/x%2Fy");
+	assertTrue (uri.getPath() == "/x/y");
+	assertTrue (uri.getRawPath() == "/x/y");
+
+	URI samePath("http://h/a%2Fb");
+	samePath.setPath(samePath.getPath());
+	assertTrue (samePath.getPath() == "/a/b");
+	assertTrue (samePath.toString() == "http://h/a/b");
+
+	URI malformed("http://h/a%2Fb");
+	try
+	{
+		malformed.setPath("/a%zz");
+		fail("malformed percent-encoded character accepted");
+	}
+	catch (Poco::URISyntaxException&)
+	{
+	}
+	assertTrue (malformed.getPath() == "/a/b");
+	assertTrue (malformed.getRawPath() == "/a%2Fb");
+	assertTrue (malformed.toString() == "http://h/a%2Fb");
+
+	uri.setRawPath("/x%2Fy");
+	assertTrue (uri.getPath() == "/x/y");
+	assertTrue (uri.getRawPath() == "/x%2Fy");
+	assertTrue (uri.toString() == "http://h/x%2Fy");
+
+	uri.setRawPath("%2Fx");
+	assertTrue (uri.getPath() == "/x");
+	assertTrue (uri.getRawPath() == "/x");
+	assertTrue (uri.getPathAndQuery() == "/x");
+	assertTrue (uri.toString() == "http://h/x");
+	assertTrue (URI(uri.toString()).getPath() == uri.getPath());
+
+	uri.setRawPath("/a\xC3\xA4");
+	assertTrue (uri.getPath() == "/a\xC3\xA4");
+	assertTrue (uri.getRawPath() == "/a%C3%A4");
+
+	uri.setRawPath("/x%2Fy");
+	const std::vector<std::string> invalid = {"/a?b", "/a#b", "/a b", "/a\tb", "/a\x7f", "/a%zz", "/a%2"};
+	for (const auto& path: invalid)
+	{
+		try
+		{
+			uri.setRawPath(path);
+			fail("invalid raw path accepted: " + path);
+		}
+		catch (Poco::URISyntaxException&)
+		{
+		}
+		assertTrue (uri.getRawPath() == "/x%2Fy");
+		assertTrue (uri.getPath() == "/x/y");
+	}
+
+	uri.setPathEtc("/p%2Fq?x");
+	assertTrue (uri.getRawPath() == "/p%2Fq");
+	uri.setPathEtc("?y");
+	assertTrue (uri.getRawPath().empty());
+	assertTrue (uri.toString() == "http://h/?y");
+
+	URI withoutHost;
+	withoutHost.setScheme("http");
+	withoutHost.setRawPath("%2Fx");
+	assertTrue (withoutHost.toString() == "http:%2Fx");
+	withoutHost.setHost("h");
+	assertTrue (withoutHost.getPathAndQuery() == "/x");
+	assertTrue (withoutHost.toString() == "http://h/x");
+	assertTrue (URI(withoutHost.toString()).getPath() == withoutHost.getPath());
+
+	URI replaced("http://h");
+	replaced.setRawPath("/x%2Fy");
+	replaced.setRawPath("/plain");
+	assertTrue (replaced.getPath() == "/plain");
+	assertTrue (replaced.getRawPath() == "/plain");
+	assertTrue (replaced.toString() == "http://h/plain");
+}
+
+
+void URITest::testRawPathCopyMoveSwap()
+{
+	const URI original("http://h/a%2Fb");
+
+	URI copy(original);
+	assertTrue (copy.getRawPath() == "/a%2Fb");
+
+	URI assigned;
+	assigned = original;
+	assertTrue (assigned.getRawPath() == "/a%2Fb");
+
+	URI moved(std::move(copy));
+	assertTrue (moved.getRawPath() == "/a%2Fb");
+
+	URI moveAssigned;
+	moveAssigned = std::move(assigned);
+	assertTrue (moveAssigned.getRawPath() == "/a%2Fb");
+
+	URI other("http://h/c");
+	other.swap(moved);
+	assertTrue (other.getRawPath() == "/a%2Fb");
+	assertTrue (moved.getRawPath() == "/c");
+
+	URI withFragment(original, "#f");
+	assertTrue (withFragment.toString() == "http://h/a%2Fb#f");
+
+	moveAssigned.clear();
+	assertTrue (moveAssigned.getRawPath().empty());
+	assertTrue (moveAssigned.toString().empty());
+}
+
+
+void URITest::testResolveRawPath()
+{
+	URI uri("http://h:5000/");
+	uri.resolve("http://h:5001/a%2Fb/c/");
+	assertTrue (uri.getPathAndQuery() == "/a%2Fb/c/");
+
+	uri = "http://h/dir/x";
+	uri.resolve("y%2Fz");
+	assertTrue (uri.getPath() == "/dir/y/z");
+	assertTrue (uri.getPathAndQuery() == "/dir/y%2Fz");
+
+	uri = "http://h/a%2Fb/x";
+	uri.resolve("y");
+	assertTrue (uri.getPathAndQuery() == "/a%2Fb/y");
+
+	uri = "http://h/a/b/c";
+	uri.resolve("%2E%2E/d%2Fe");
+	assertTrue (uri.getPath() == "/a/d/e");
+	assertTrue (uri.getPathAndQuery() == "/a/d%2Fe");
+
+	uri = "http://h/dir/x";
+	uri.resolve("/p%2Fq");
+	assertTrue (uri.getPathAndQuery() == "/p%2Fq");
+
+	URI networkPathReference;
+	networkPathReference.setHost("other");
+	networkPathReference.setRawPath("/p%2Fq");
+	uri = "http://h/dir/x";
+	uri.resolve(networkPathReference);
+	assertTrue (uri.toString() == "http://other/p%2Fq");
+
+	// "%2F" separates segments in the decoded path only, so the two forms
+	// disagree after ".." is removed; the decoded path decides.
+	uri = "http://h/dir/x";
+	uri.resolve("/p%2Fq/../r");
+	assertTrue (uri.getPath() == "/p/r");
+	assertTrue (uri.getPathAndQuery() == "/p/r");
+
+	// The decoded path decides whether a reference is an absolute path;
+	// the raw form "%2Fx" cannot be written after an authority.
+	uri = "http://h/dir/x";
+	uri.resolve("%2Fx");
+	assertTrue (uri.getPathAndQuery() == "/x");
+	assertTrue (uri.toString() == "http://h/x");
+
+	uri = "http://h";
+	uri.resolve("%2Fx");
+	assertTrue (uri.getPathAndQuery() == "/x");
+	assertTrue (uri.toString() == "http://h/x");
+
+	const URI base("http://h/dir/");
+	const URI resolved(base, "a%2Fb");
+	assertTrue (resolved.toString() == "http://h/dir/a%2Fb");
+
+	uri.clear();
+	uri.setScheme("http");
+	uri.setHost("h");
+	uri.setPath("/d i r/x");
+	uri.resolve("y%2Fz");
+	assertTrue (uri.getPathAndQuery() == "/d%20i%20r/y%2Fz");
+
+	// A URI resolved against itself keeps its raw path in each branch of
+	// resolve() that copies the path.
+	URI self("http://h/a%2Fb");
+	self.resolve(self);
+	assertTrue (self.toString() == "http://h/a%2Fb");
+
+	URI selfNetworkPath;
+	selfNetworkPath.setHost("h");
+	selfNetworkPath.setRawPath("/a%2Fb");
+	selfNetworkPath.resolve(selfNetworkPath);
+	assertTrue (selfNetworkPath.getRawPath() == "/a%2Fb");
+
+	URI selfAbsolutePath("/a%2Fb");
+	selfAbsolutePath.resolve(selfAbsolutePath);
+	assertTrue (selfAbsolutePath.getRawPath() == "/a%2Fb");
+}
+
+
+void URITest::testNormalizeRawPath()
+{
+	URI uri("http://h/a/./b/../c%2Fd");
+	uri.normalize();
+	assertTrue (uri.getPath() == "/a/c/d");
+	assertTrue (uri.getRawPath() == "/a/c%2Fd");
+	assertTrue (uri.toString() == "http://h/a/c%2Fd");
+
+	uri = "http://h/a/%2E/b/%2e%2E/c";
+	uri.normalize();
+	assertTrue (uri.getRawPath() == "/a/c");
+
+	uri = "http://h/a/b%2F..%2Fc";
+	uri.normalize();
+	assertTrue (uri.getPath() == "/a/c");
+	assertTrue (uri.getRawPath() == "/a/c");
+
+	uri = "http:%2Fx";
+	uri.normalize();
+	assertTrue (uri.toString() == "http:%2Fx");
+	assertTrue (URI(uri.toString()).getPath() == uri.getPath());
+}
+
+
+void URITest::testCompareRawPath()
+{
+	assertTrue (URI("http://h/a%2Fb") != URI("http://h/a/b"));
+	assertTrue (URI("http://h/a%2Fb") != "http://h/a/b");
+	assertTrue (URI("http://h/a%2Fb") == "http://h/a%2Fb");
+	assertTrue (URI("http://h/a%2f") == URI("http://h/a%2F"));
+	assertTrue (URI("http://h/a%41") == URI("http://h/aA"));
+	assertTrue (URI("http://h/a%7Eb") == URI("http://h/a~b"));
+	assertTrue (URI("http://h/a%2Bb") != URI("http://h/a+b"));
+	assertTrue (URI("http://h/a%40b") != URI("http://h/a@b"));
+
+	URI uri("http://h");
+	uri.setPath("/a b");
+	assertTrue (uri == "http://h/a%20b");
+}
+
+
 void URITest::setUp()
 {
 }
@@ -1018,6 +1309,12 @@ CppUnit::Test* URITest::suite()
 	CppUnit_addTest(pSuite, URITest, testQueryParameters);
 	CppUnit_addTest(pSuite, URITest, testQueryParametersPlus);
 	CppUnit_addTest(pSuite, URITest, testControlCharacters);
+	CppUnit_addTest(pSuite, URITest, testRawPath);
+	CppUnit_addTest(pSuite, URITest, testSetRawPath);
+	CppUnit_addTest(pSuite, URITest, testRawPathCopyMoveSwap);
+	CppUnit_addTest(pSuite, URITest, testResolveRawPath);
+	CppUnit_addTest(pSuite, URITest, testNormalizeRawPath);
+	CppUnit_addTest(pSuite, URITest, testCompareRawPath);
 
 	return pSuite;
 }

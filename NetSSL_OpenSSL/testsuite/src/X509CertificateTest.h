@@ -30,6 +30,7 @@ public:
 	void testVerifyIPAddressAgainstDNSName();
 	void testVerifyIPAddressAgainstCommonName();
 	void testVerifyCommonName();
+	void testInvalidCertificateExceptionName();
 
 	void setUp();
 	void tearDown();

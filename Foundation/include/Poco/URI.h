@@ -53,9 +53,18 @@ class Foundation_API URI
 	/// getRawQuery(), setFragment(), setRawFragment(), getFragment() and getRawFragment()
 	/// for more information.
 	///
+	/// A path that is parsed or set with setRawPath() is also kept in the percent-encoded
+	/// form it was given in. toString(), getPathEtc() and getPathAndQuery() write that form,
+	/// so that percent-encoded characters such as "%2F" are kept, except where getRawPath()
+	/// describes otherwise. See getPath(), getRawPath() and setRawPath().
+	/// As these outputs keep the client's encoding, lookups and access checks that must
+	/// match how a request is dispatched use getPath() (or operator== where the RFC 3986
+	/// distinction is wanted), not toString(), getPathEtc() or getPathAndQuery().
+	///
 	/// A host, user-info, query or fragment part that contains a control character
 	/// (0x00 to 0x1F or 0x7F) is rejected with a URISyntaxException. Such characters
-	/// in the path are accepted, as the path is percent-encoded on output.
+	/// in the path are accepted by the parser and by setPath(), as the path is
+	/// percent-encoded on output; setRawPath() rejects them.
 {
 public:
 	using QueryParameters = std::vector<std::pair<std::string, std::string>>;
@@ -181,9 +190,34 @@ public:
 
 	[[nodiscard]] const std::string& getPath() const;
 		/// Returns the decoded path part of the URI.
+		///
+		/// Decoding loses the difference between '/' and "%2F";
+		/// use getRawPath() where it matters.
 
 	void setPath(const std::string& path);
 		/// Sets the path part of the URI.
+		///
+		/// Percent-encoded characters in the given path are decoded,
+		/// and the path is percent-encoded again on output.
+
+	[[nodiscard]] std::string getRawPath() const;
+		/// Returns the path part of the URI in percent-encoded form.
+		///
+		/// This is the path as it was parsed or given to setRawPath(),
+		/// with characters that must not appear literally in a path
+		/// percent-encoded. A path set with setPath() is returned
+		/// percent-encoded.
+		///
+		/// If the URI has an authority or is a file URI, a stored raw path
+		/// is returned only if it starts with '/' exactly when getPath()
+		/// does; otherwise the percent-encoded getPath() is returned.
+
+	void setRawPath(const std::string& path);
+		/// Sets the path part of the URI from its percent-encoded form.
+		///
+		/// Throws a URISyntaxException if the path contains '?', '#',
+		/// a space, a control character or a malformed percent-encoded
+		/// character.
 
 	[[nodiscard]] std::string getQuery() const;
 		/// Returns the decoded query part of the URI.
@@ -283,6 +317,11 @@ public:
 		///
 		/// Two URIs are identical if their scheme, authority,
 		/// path, query and fragment part are identical.
+		///
+		/// Paths are compared in percent-encoded form, normalized as in
+		/// section 6.2.2 of RFC 3986: percent-encoded unreserved characters
+		/// are decoded and the hex digits of the other ones are upper-cased.
+		/// So "/a%41" equals "/aA", while "/a%2Fb" does not equal "/a/b".
 
 	[[nodiscard]] bool operator == (const std::string& uri) const;
 		/// Parses the given URI and returns true if both URIs are identical,
@@ -305,6 +344,9 @@ public:
 	void getPathSegments(std::vector<std::string>& segments) const;
 		/// Places the single path segments (delimited by slashes) into the
 		/// given vector.
+		///
+		/// The segments are taken from the decoded path, where "%2F" is a
+		/// slash. Split getRawPath() where the difference matters.
 
 	static void encode(const std::string& str, const std::string& reserved, std::string& encodedStr);
 		/// URI-encodes the given string by escaping reserved and non-ASCII
@@ -375,11 +417,46 @@ private:
 	static void checkControlChars(const std::string& str);
 		/// Throws a URISyntaxException if str contains a control character.
 
+	static void encodeChar(char c, const std::string& reserved, std::string& encodedStr);
+		/// Appends c to encodedStr. A control character, a space, a non-ASCII
+		/// character and a character in ILLEGAL or reserved are percent-encoded.
+
+	[[nodiscard]] static std::string encodeKeepingEscapes(const std::string& str, const std::string& reserved);
+		/// Percent-encodes the characters of str that encode() encodes,
+		/// except for the percent-encoded characters already in it, which
+		/// are kept as written. Every '%' in str must start a well-formed
+		/// percent-encoded character, as decode() checks.
+
+	[[nodiscard]] URI rawPathURI() const;
+		/// Returns a URI with the scheme of this URI whose path is the raw
+		/// path of this URI, with segments that decode to "." or ".." in
+		/// literal form, so that the path algorithms can run on the raw path.
+		/// The scheme is kept so that buildPath() treats the raw path and the
+		/// decoded path alike.
+
+	[[nodiscard]] bool isRawPathUsable(const std::string& rawPath) const;
+		/// Returns true if rawPath may be written as the path of this URI.
+		/// After the "//" that toString() writes for a URI with an authority
+		/// or a file URI, rawPath must start with '/' exactly when the decoded
+		/// path does, or the output parses back to a different path. Any other
+		/// URI keeps a raw path such as "%2Fx", which parses back to the same path.
+
+	void setRawPathIfEquivalent(const std::string& rawPath);
+		/// Keeps rawPath as the raw path if it contains a percent-encoded character,
+		/// decodes to the decoded path and isRawPathUsable() allows it, otherwise
+		/// drops the raw path.
+
+	void copyPath(const URI& uri);
+		/// Copies the decoded and the raw path of uri, with the strong
+		/// exception guarantee: an exception leaves both paths of this URI
+		/// unchanged.
+
 	std::string    _scheme;
 	std::string    _userInfo;
 	std::string    _host;
 	unsigned short _port;
 	std::string    _path;
+	std::string    _rawPath;
 	std::string    _query;
 	std::string    _fragment;
 };

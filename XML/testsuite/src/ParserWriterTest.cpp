@@ -16,6 +16,7 @@
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/DOM/NodeList.h"
+#include "Poco/DOM/Text.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/XML/XMLWriter.h"
@@ -28,6 +29,8 @@ using Poco::XML::XMLReader;
 using Poco::XML::XMLWriter;
 using Poco::XML::Document;
 using Poco::XML::NodeList;
+using Poco::XML::Element;
+using Poco::XML::Text;
 using Poco::XML::AutoPtr;
 using Poco::XML::InputSource;
 
@@ -140,6 +143,27 @@ void ParserWriterTest::testMaxElementDepth()
 }
 
 
+void ParserWriterTest::testWriteParseTextCR()
+{
+	const std::string CR_TEXT("a\r\nb\rc");
+
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElement("v");
+	AutoPtr<Text> pText = pDoc->createTextNode(CR_TEXT);
+	pRoot->appendChild(pText);
+	pDoc->appendChild(pRoot);
+
+	std::ostringstream ostr;
+	DOMWriter writer;
+	writer.writeNode(ostr, pDoc);
+	assertEqual ("<v>a&#xD;\nb&#xD;c</v>", ostr.str());
+
+	DOMParser parser;
+	AutoPtr<Document> pParsedDoc = parser.parseString(ostr.str());
+	assertEqual (CR_TEXT, pParsedDoc->documentElement()->innerText());
+}
+
+
 void ParserWriterTest::setUp()
 {
 }
@@ -159,6 +183,7 @@ CppUnit::Test* ParserWriterTest::suite()
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteSimple);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteCDATATerminator);
 	CppUnit_addTest(pSuite, ParserWriterTest, testMaxElementDepth);
+	CppUnit_addTest(pSuite, ParserWriterTest, testWriteParseTextCR);
 
 	return pSuite;
 }
