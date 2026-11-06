@@ -124,6 +124,15 @@ bool HTTPReactorServerSession::parseHeaders(
 	contentLength = 0;
 	isChunked = false;
 
+	// HTTPRequest::read() and MessageHeader::read() end a line at a bare LF,
+	// while the boundaries here are found at CR LF. A bare LF would make the two
+	// disagree on the fields and on where the header ends, so it is rejected.
+	for (std::size_t lf = _buf.find('\n', pos); lf < headerEnd; lf = _buf.find('\n', lf + 1))
+	{
+		if (lf == pos || _buf[lf - 1] != '\r')
+			throw MessageException("Bare LF in HTTP request header");
+	}
+
 	// The byte boundary computed here has to agree with the message the request
 	// handler is given, so the same parser decides both. A substring search over
 	// the raw buffer does not agree: a spelling such as "TRANSFER-ENCODING"
