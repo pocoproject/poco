@@ -15,6 +15,9 @@ concurrency:
 jobs:
   build:
     if: github.repository == 'pocoproject/poco'
+    env:
+      NIGHTLY_INTERNAL_HOSTNAME: ${{ secrets.NIGHTLY_INTERNAL_HOSTNAME }}
+      NIGHTLY_INTERNAL_HOME: ${{ secrets.NIGHTLY_INTERNAL_HOME }}
     runs-on: [poco-nightly]
     timeout-minutes: 960
     steps:

@@ -25,7 +25,8 @@ the unprivileged runner account. Fixed passwords are test-fixture values.
 
 ## Provisioning
 
-Run `bash ci/nightly/provision.sh` on a dedicated Debian 13 x86_64 runner. It installs
+Run `bash ci/nightly/provision.sh` on a dedicated Debian 13 x86_64 runner with
+trixie-backports enabled. It installs
 build dependencies, Microsoft and Oracle ODBC drivers, database images, the
 local proxy configuration, and the host-lock hook. The runner account requires
 passwordless sudo for Docker, the proxy service, and setcap. Provisioning
@@ -39,6 +40,11 @@ application directories. All registrations must use the same OS service account
 so they share the same host lock. Restart those runner services after configuration.
 Use KillMode=control-group for systemd services so stopping a service also
 stops its listener and workers.
+
+Set the repository secrets NIGHTLY_INTERNAL_HOSTNAME and NIGHTLY_INTERNAL_HOME
+to the runner's machine name and service-account home directory. GitHub masks
+these values in its setup metadata, before workflow commands can filter output.
+Build output and uploaded artifacts also redact machine details.
 
 Every job-start hook acquires the same host lock before workflow steps run.
 The lock remains owned until that job's Runner.Worker exits, including cleanup.
