@@ -15,8 +15,8 @@ fi
 bash "$0" stop
 sudo -n systemctl start squid
 sudo -n docker run -d --name poco-nightly-mysql --memory=1g -p 127.0.0.1:3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_USER=pocotest -e MYSQL_PASSWORD=pocotest -e MYSQL_DATABASE=pocotest mysql:8.1.0
-sudo -n docker run -d --name poco-nightly-postgres --memory=512m -p 127.0.0.1:5432:5432 -e POSTGRES_PASSWORD=postgres postgres:16.0
-sudo -n docker run -d --name poco-nightly-redis --memory=256m -p 127.0.0.1:6379:6379 redis:7
+sudo -n docker run -d --name poco-nightly-postgres --memory=512m -p 127.0.0.1:5432:5432 -p '[::1]:5432:5432' -e POSTGRES_PASSWORD=postgres postgres:16.0
+sudo -n docker run -d --name poco-nightly-redis --memory=256m -p 127.0.0.1:6379:6379 -p '[::1]:6379:6379' redis:7
 sudo -n docker run -d --name poco-nightly-mongo --memory=1g -p 127.0.0.1:27017:27017 mongo:7 --wiredTigerCacheSizeGB 0.25
 sudo -n docker run -d --name poco-nightly-sqlserver --memory=3g -p 127.0.0.1:1433:1433 -e ACCEPT_EULA=Y -e MSSQL_PID=Express -e MSSQL_SA_PASSWORD=Pocopoco1 -e MSSQL_MEMORY_LIMIT_MB=2048 mcr.microsoft.com/mssql/server:2022-latest
 sudo -n docker run -d --name poco-nightly-oracle --memory=3g -p 127.0.0.1:1521:1521 -e ORACLE_PWD=poco container-registry.oracle.com/database/free:23.5.0.0-lite

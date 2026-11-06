@@ -24,7 +24,7 @@ tree.write(config)
 environment = os.environ.copy()
 environment.pop("CPPUNIT_IGNORE", None)
 environment["POCO_BASE"] = str(root / "source")
-environment["PATH"] = str(build / "bin") + ":" + environment["PATH"]
+environment["PATH"] = environment["PATH"] + ":" + str(build / "bin")
 environment["LD_LIBRARY_PATH"] = str(build / "lib") + ":" + str(build / "bin") + ":/opt/oracle/instantclient_23_26"
 log_path = root / "logs" / "tests.log"
 with log_path.open("w") as log:
