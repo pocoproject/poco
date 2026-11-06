@@ -42,6 +42,8 @@ for feature in SSH XSD_VALIDATOR MODULES BENCHMARK DATA_SQLITE_FTS5 DATA_SQL_SER
     fi
 done
 cmake --build build --parallel 4 2>&1 | tee logs/build.log
+test -x build/bin/Benchmark
+test -x build/bin/sample-json-benchmark
 sudo -n setcap cap_net_raw+ep build/bin/Net-testrunner
 bash "$script_dir/poco-test-services.sh" start 2>&1 | tee logs/services.log
 python3 "$script_dir/poco-strict-tests.py"

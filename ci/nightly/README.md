@@ -35,7 +35,8 @@ requirements.
 Register a separate repository-scoped runner with only the `poco-nightly`
 label. Configure ACTIONS_RUNNER_HOOK_JOB_STARTED in every runner registration
 on the machine to point to the installed job-lock.sh, outside all runner
-application directories. Restart those runner services after configuration.
+application directories. All registrations must use the same OS service account
+so they share the same host lock. Restart those runner services after configuration.
 Use KillMode=control-group for systemd services so stopping a service also
 stops its listener and workers.
 
