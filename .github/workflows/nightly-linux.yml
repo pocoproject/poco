@@ -1,0 +1,50 @@
+name: Nightly Linux
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-linux
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'pocoproject/poco'
+    env:
+      NIGHTLY_INTERNAL_HOSTNAME: ${{ secrets.NIGHTLY_INTERNAL_HOSTNAME }}
+      NIGHTLY_INTERNAL_HOME: ${{ secrets.NIGHTLY_INTERNAL_HOME }}
+    runs-on: [poco-nightly]
+    timeout-minutes: 960
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          sparse-checkout: ci/nightly
+      - name: Verify host serialization
+        run: python3 ci/nightly/job-lock.py verify
+      - name: Test nightly controls
+        run: python3 -m unittest discover -s ci/nightly -p 'test_*.py' -v
+      - name: Build main and run all tests including long tests
+        run: |
+          set -o pipefail
+          bash ci/nightly/poco-nightly.sh 2>&1 | python3 ci/nightly/redact_logs.py
+      - name: Collect logs
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/poco-nightly-logs"
+          if [ -d "$HOME/poco-nightly/logs" ]; then
+            python3 ci/nightly/redact_logs.py "$HOME/poco-nightly/logs" "$RUNNER_TEMP/poco-nightly-logs"
+          fi
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: nightly-linux-logs
+          path: ${{ runner.temp }}/poco-nightly-logs
+          retention-days: 14
+          if-no-files-found: error
