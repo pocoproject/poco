@@ -1,4 +1,6 @@
 import importlib.util
+import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -73,6 +75,30 @@ class JobLockTest(unittest.TestCase):
         worker = self.worker()
         with self.assertRaises(RuntimeError):
             job_lock.acquire_lock(worker.pid, self.lock_path)
+
+    def fake_runner(self, use_hook):
+        code = "import subprocess,sys; "
+        if use_hook:
+            code += "subprocess.run(['bash',sys.argv[1]],check=True); "
+        code += "subprocess.run(['python3',sys.argv[2],'verify'],check=True)"
+        environment = dict(os.environ, HOME=self.directory.name)
+        return subprocess.run(
+            ["Runner.Worker", "-c", code, str(module_path.with_suffix(".sh")), str(module_path)],
+            executable=sys.executable, env=environment,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5,
+        ).returncode
+
+    def test_shell_hook_discovers_worker_and_verifies_ownership(self):
+        self.assertEqual(self.fake_runner(True), 0)
+
+    def test_verification_rejects_missing_hook(self):
+        self.assertNotEqual(self.fake_runner(False), 0)
+
+    def test_verification_rejects_wrong_owner(self):
+        cache = Path(self.directory.name) / ".cache"
+        cache.mkdir()
+        (cache / "nightly-jobs.lock").write_text(json.dumps({"pid": 1, "start": "0"}))
+        self.assertNotEqual(self.fake_runner(False), 0)
 
 
 if __name__ == "__main__":

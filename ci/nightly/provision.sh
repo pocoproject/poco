@@ -8,6 +8,7 @@ sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recom
     libavahi-client-dev libsqlite3-dev libxml2-dev unixodbc-dev \
     libmariadb-dev-compat libpq-dev libbenchmark-dev docker.io docker-cli \
     odbc-postgresql odbc-mariadb libsqliteodbc odbcinst libcap2-bin libaio1t64 unzip squid
+sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y -t trixie-backports --no-install-recommends clang-21 clang-tools-21
 sudo -n systemctl stop squid
 sudo -n install -m 644 "$script_dir/poco-squid.conf" /etc/squid/squid.conf
 sudo -n systemctl disable squid

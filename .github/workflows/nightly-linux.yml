@@ -24,6 +24,8 @@ jobs:
           sparse-checkout: ci/nightly
       - name: Verify host serialization
         run: python3 ci/nightly/job-lock.py verify
+      - name: Test nightly controls
+        run: python3 -m unittest discover -s ci/nightly -p 'test_*.py' -v
       - name: Build main and run all tests including long tests
         run: bash ci/nightly/poco-nightly.sh
       - name: Collect logs

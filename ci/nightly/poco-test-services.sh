@@ -3,8 +3,9 @@ set -euo pipefail
 action="${1:-start}"
 names=(mysql postgres redis mongo sqlserver oracle)
 if [[ "$action" == stop ]]; then
+    containers="$(sudo -n docker container ls --all --format '{{.Names}}')"
     for name in "${names[@]}"; do
-        if sudo -n docker container inspect "poco-nightly-$name" >/dev/null 2>&1; then
+        if grep -Fxq "poco-nightly-$name" <<< "$containers"; then
             sudo -n docker rm -fv "poco-nightly-$name"
         fi
     done

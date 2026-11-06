@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from nightly_coverage import find_coverage_gaps
 
 root = Path.home() / "poco-nightly"
 build = root / "build"
@@ -29,8 +30,7 @@ log_path = root / "logs" / "tests.log"
 with log_path.open("w") as log:
     result = subprocess.run(["ctest", "--test-dir", str(build), "--verbose", "--no-tests=error", "--timeout", "7200", "--parallel", "1", "--output-junit", str(root / "logs" / "tests.xml")], env=environment, stdout=log, stderr=subprocess.STDOUT)
 contents = log_path.read_text(errors="replace")
-missing = re.findall(r"^.*(?:FAILURE \(ignored\)|ERROR \(ignored\)|tests not available|tests skipped|no pseudo terminal available).*$", contents, re.MULTILINE)
-missing = [line for line in missing if "DB2" not in line and "Informix" not in line]
+missing = find_coverage_gaps(contents)
 report = root / "logs" / "tests.xml"
 if not report.exists():
     missing.append("CTest did not produce its JUnit report")

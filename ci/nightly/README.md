@@ -3,9 +3,13 @@
 The nightly builds main at 06:17 UTC on the dedicated `poco-nightly` runner.
 It has no pull-request trigger. The runner label is reserved for this workflow.
 
-The Release build enables Linux components, tools, samples, benchmarks, C++
+The Clang 21 Release build enables Linux components, tools, samples, benchmarks, C++
 modules, tests, and deprecated-API tests. Four compiler jobs limit memory use.
 Each run starts with a clean build tree.
+
+For pre-merge validation, POCO_REF can select a topic branch. Scheduled runs
+leave it unset and build main. Clang 21 matches the module CI toolchain; GCC 14
+can crash internally when compiling the Data module.
 
 Generated CTest commands gain `-long` and lose ignore-file arguments.
 CPPUNIT_IGNORE is removed from the environment. Tests run serially without
