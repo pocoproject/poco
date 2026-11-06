@@ -1,4 +1,5 @@
 import os
+import json
 from pathlib import Path
 import re
 import subprocess
@@ -25,7 +26,7 @@ for test_file in build.rglob("CTestTestfile.cmake"):
     if test_file.parent == build / "Data" / "ODBC" / "testsuite":
         contents = contents.replace('"-all" "-long"', '"-long" "ODBCOracleTest" "ODBCSQLServerTest" "ODBCMySQLTest" "ODBCPostgreSQLTest" "ODBCSQLiteTest"')
     if test_file.parent == build / "Crypto" / "testsuite":
-        contents += f'\nset_property(TEST Crypto APPEND PROPERTY ENVIRONMENT "OPENSSL_CONF={openssl_config}")\n'
+        contents += f'\nset_tests_properties(Crypto PROPERTIES ENVIRONMENT "OPENSSL_CONF={openssl_config}")\n'
     test_file.write_text(contents)
 
 config = build / "bin" / "NetSSL-testrunner.xml"
@@ -38,6 +39,10 @@ environment.pop("CPPUNIT_IGNORE", None)
 environment["POCO_BASE"] = str(root / "source")
 environment["PATH"] = environment["PATH"] + ":" + str(build / "bin")
 environment["LD_LIBRARY_PATH"] = str(build / "lib") + ":" + str(build / "bin") + ":/opt/oracle/instantclient_23_26"
+discovery = subprocess.run(["ctest", "--test-dir", str(build), "--show-only=json-v1"], env=environment, capture_output=True, text=True, check=True)
+absent = missing_suites(test["name"] for test in json.loads(discovery.stdout)["tests"])
+if absent:
+    raise RuntimeError("Missing required CTest suites: " + ", ".join(absent))
 log_path = root / "logs" / "tests.log"
 with log_path.open("w") as log:
     result = subprocess.run(["ctest", "--test-dir", str(build), "--verbose", "--no-tests=error", "--timeout", "7200", "--parallel", "1", "--output-junit", str(root / "logs" / "tests.xml")], env=environment, stdout=log, stderr=subprocess.STDOUT)

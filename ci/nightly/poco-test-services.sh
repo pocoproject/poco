@@ -32,7 +32,7 @@ wait_service() {
     sudo -n docker logs "poco-nightly-$service"
     return 1
 }
-wait_service mysql sudo -n docker exec poco-nightly-mysql mysqladmin ping
+wait_service mysql sudo -n docker exec poco-nightly-mysql mysql --protocol=TCP -h127.0.0.1 -upocotest -ppocotest pocotest -e 'SELECT 1'
 sudo -n docker exec poco-nightly-mysql mysql -uroot -e "GRANT SYSTEM_VARIABLES_ADMIN ON *.* TO 'pocotest'@'%';"
 wait_service postgres sudo -n docker exec poco-nightly-postgres pg_isready
 wait_service redis sudo -n docker exec poco-nightly-redis redis-cli ping

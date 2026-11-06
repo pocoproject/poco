@@ -27,13 +27,15 @@ jobs:
       - name: Test nightly controls
         run: python3 -m unittest discover -s ci/nightly -p 'test_*.py' -v
       - name: Build main and run all tests including long tests
-        run: bash ci/nightly/poco-nightly.sh
+        run: |
+          set -o pipefail
+          bash ci/nightly/poco-nightly.sh 2>&1 | python3 ci/nightly/redact_logs.py
       - name: Collect logs
         if: always()
         run: |
           mkdir -p "$RUNNER_TEMP/poco-nightly-logs"
           if [ -d "$HOME/poco-nightly/logs" ]; then
-            cp -a "$HOME/poco-nightly/logs/." "$RUNNER_TEMP/poco-nightly-logs/"
+            python3 ci/nightly/redact_logs.py "$HOME/poco-nightly/logs" "$RUNNER_TEMP/poco-nightly-logs"
           fi
       - name: Upload logs
         if: always()
