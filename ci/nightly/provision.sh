@@ -3,7 +3,7 @@ set -euo pipefail
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 sudo -n apt-get update
 sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    build-essential cmake ninja-build pkg-config python3 git curl ca-certificates \
+    build-essential cmake ninja-build pkg-config python3 git curl ca-certificates bison flex valgrind \
     libssl-dev libssh-dev libltdl-dev apache2-dev libapr1-dev libaprutil1-dev \
     libavahi-client-dev libsqlite3-dev libxml2-dev unixodbc-dev \
     libmariadb-dev-compat libpq-dev libbenchmark-dev docker.io docker-cli \

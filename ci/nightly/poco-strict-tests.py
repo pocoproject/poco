@@ -4,7 +4,7 @@ import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
-from nightly_coverage import find_coverage_gaps
+from nightly_coverage import find_coverage_gaps, missing_suites
 
 root = Path.home() / "poco-nightly"
 build = root / "build"
@@ -35,11 +35,15 @@ report = root / "logs" / "tests.xml"
 if not report.exists():
     missing.append("CTest did not produce its JUnit report")
 else:
-    for testcase in ET.parse(report).iter("testcase"):
+    testcases = list(ET.parse(report).iter("testcase"))
+    missing.extend("Missing CTest suite: " + name for name in missing_suites(case.get("name") for case in testcases))
+    for testcase in testcases:
         if testcase.find("skipped") is not None:
             missing.append("Skipped CTest test: " + testcase.get("name", "unknown"))
 if missing:
     print("Missing coverage or ignored failures:")
     print("\n".join(missing))
 print(contents[-12000:])
-sys.exit(1 if result.returncode or missing else 0)
+with (root / "logs" / "sqlparser.log").open("w") as log:
+    parser = subprocess.run(["make", "-C", str(root / "source" / "Data" / "SQLParser"), "-j4", "test"], env=environment, stdout=log, stderr=subprocess.STDOUT)
+sys.exit(1 if result.returncode or missing or parser.returncode else 0)

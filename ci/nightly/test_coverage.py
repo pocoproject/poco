@@ -1,8 +1,12 @@
 import unittest
-from nightly_coverage import find_coverage_gaps
+from nightly_coverage import EXPECTED_TESTS, find_coverage_gaps, missing_suites
 
 
 class CoverageTest(unittest.TestCase):
+    def test_missing_suite_fails(self):
+        self.assertEqual(missing_suites(EXPECTED_TESTS - {"Modules"}), ["Modules"])
+        self.assertEqual(missing_suites(EXPECTED_TESTS), [])
+
     def test_missing_coverage_fails(self):
         messages = [
             "Not connected, test skipped.",

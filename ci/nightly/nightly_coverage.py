@@ -1,5 +1,11 @@
 import re
 
+EXPECTED_TESTS = set("Foundation Encodings XML JSON Util Net MongoDB Redis SSH Prometheus AIMCPHTTP AIMCP AI PDF JWT NetSSL Crypto Crypto-legacy-provider-unavailable Data DataSQLite DataMySQL DataPostgreSQL DataODBC ActiveRecord Zip CppParser CodeGeneration RemotingNGTCP RemotingNGHTTP RemotingNGJSONRPC RemotingNGREST RemotingNGSOAP RemotingNG XSDTypes XSDParser XSDGen-ElementNameInjection XSDGen-SoapActionInjection XSDValidator Geo Serial PageCompiler Modules".split())
+
+
+def missing_suites(names):
+    return sorted(EXPECTED_TESTS - set(names))
+
 
 def find_coverage_gaps(contents):
     pattern = re.compile(
