@@ -25,7 +25,7 @@ the unprivileged runner account. Fixed passwords are test-fixture values.
 
 ## Provisioning
 
-Run `bash ci/nightly/provision.sh` on a dedicated Debian 13 runner. It installs
+Run `bash ci/nightly/provision.sh` on a dedicated Debian 13 x86_64 runner. It installs
 build dependencies, Microsoft and Oracle ODBC drivers, database images, the
 local proxy configuration, and the host-lock hook. The runner account requires
 passwordless sudo for Docker, the proxy service, and setcap. Provisioning
