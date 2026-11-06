@@ -29,7 +29,14 @@ public:
 	void testVerifyIPAddress();
 	void testVerifyIPAddressAgainstDNSName();
 	void testVerifyIPAddressAgainstCommonName();
-	void testVerifyCommonName();
+	void testVerifyIgnoresCommonName();
+	void testVerifyEmptyHostName();
+	void testVerifyEmbeddedNul();
+	void testVerifyWildcardHostName();
+	void testVerifyEmptyLabel();
+	void testVerifyExpired();
+	void testVerifyIssuedCertificate();
+	void testVerifyIgnoresOtherCertificateErrors();
 
 	void setUp();
 	void tearDown();

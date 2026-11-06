@@ -24,7 +24,9 @@
 #include "Poco/DateTimeParser.h"
 #include <openssl/pem.h>
 #include <openssl/x509v3.h>
+#include <openssl/x509_vfy.h>
 #include <openssl/err.h>
+#include <memory>
 
 
 namespace Poco::Net {
@@ -108,15 +110,40 @@ bool X509Certificate::verify(const std::string& hostName) const
 
 bool X509Certificate::verify(const Poco::Crypto::X509Certificate& certificate, const std::string& hostName)
 {
+	// OpenSSL ignores a trailing NUL and reads a leading '.' as any subdomain; a host to connect to is never a wildcard.
+	if (hostName.empty() || hostName.front() == '.' || hostName.find("..") != std::string::npos ||
+		hostName.find('\0') != std::string::npos || hostName.find('*') != std::string::npos)
+		return false;
+
 	X509* pCert = const_cast<X509*>(certificate.certificate());
+	std::unique_ptr<X509_STORE, decltype(&X509_STORE_free)> pStore(X509_STORE_new(), &X509_STORE_free);
+	std::unique_ptr<X509_STORE_CTX, decltype(&X509_STORE_CTX_free)> pStoreContext(X509_STORE_CTX_new(), &X509_STORE_CTX_free);
+	if (pStore == nullptr || pStoreContext == nullptr) return false;
+
+	// The certificate trusts itself and its validity period is ignored, so that neither its issuer nor the time affects the result.
+	if (X509_STORE_add_cert(pStore.get(), pCert) != 1) return false;
+	X509_VERIFY_PARAM* pParam = X509_STORE_get0_param(pStore.get());
+	X509_VERIFY_PARAM_set_flags(pParam, X509_V_FLAG_PARTIAL_CHAIN | X509_V_FLAG_NO_CHECK_TIME);
+	X509_VERIFY_PARAM_set_hostflags(pParam, X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS | X509_CHECK_FLAG_NEVER_CHECK_SUBJECT);
 	IPAddress ip;
-	if (IPAddress::tryParse(hostName, ip))
+	// X509_VERIFY_PARAM_set1_host() would match an address as text against the DNS names of the certificate.
+	// The address is passed as POCO parsed it, because the text parser of OpenSSL may read the text differently.
+	const int nameSet = IPAddress::tryParse(hostName, ip)
+		? X509_VERIFY_PARAM_set1_ip(pParam, static_cast<const unsigned char*>(ip.addr()), ip.length())
+		: X509_VERIFY_PARAM_set1_host(pParam, hostName.data(), hostName.length());
+	if (nameSet != 1) return false;
+
+	if (X509_STORE_CTX_init(pStoreContext.get(), pStore.get(), pCert, nullptr) != 1) return false;
+	X509_STORE_CTX_set_verify_cb(pStoreContext.get(), [](int ok, X509_STORE_CTX* pContext)
 	{
-		// X509_check_host() would match the address as text against
-		// the DNS names and the common name of the certificate.
-		return X509_check_ip_asc(pCert, hostName.c_str(), 0) == 1;
-	}
-	return X509_check_host(pCert, hostName.c_str(), hostName.length(), X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS, nullptr) == 1;
+		const int error = X509_STORE_CTX_get_error(pContext);
+		return (error == X509_V_ERR_HOSTNAME_MISMATCH || error == X509_V_ERR_IP_ADDRESS_MISMATCH) ? ok : 1;
+	});
+	// A failed verification is reported through the result, the errors it queued are not needed.
+	ERR_set_mark();
+	const int rc = X509_verify_cert(pStoreContext.get());
+	ERR_pop_to_mark();
+	return rc == 1;
 }
 
 
