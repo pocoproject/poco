@@ -57,7 +57,7 @@ namespace {
 const std::string IDLE_BACKEND_THREAD_NAME("FLIdleBackend");
 
 
-Poco::Int64 threadCPUTime(const std::string& threadName)
+Poco::Int64 threadCPUTime([[maybe_unused]] const std::string& threadName)
 	/// Returns the CPU time, in microseconds, used so far by the thread of
 	/// this process with the given name, -1 if there is no such thread,
 	/// or -2 if the platform's per-thread CPU time cannot be read.
@@ -152,7 +152,7 @@ Poco::Int64 threadCPUTime(const std::string& threadName)
 	// Quill names its backend thread with SetThreadDescription(), so the
 	// thread is found by its description. GetThreadDescription() exists from
 	// Windows 10 1607 on and is looked up at runtime, as Quill does.
-	typedef HRESULT (WINAPI *GetThreadDescriptionFunc)(HANDLE, PWSTR*);
+	using GetThreadDescriptionFunc = HRESULT (WINAPI *)(HANDLE, PWSTR*);
 	const HMODULE kernelBase = GetModuleHandleW(L"KernelBase.dll");
 	const auto getThreadDescription = kernelBase ?
 		reinterpret_cast<GetThreadDescriptionFunc>(GetProcAddress(kernelBase, "GetThreadDescription")) : nullptr;
@@ -198,7 +198,6 @@ Poco::Int64 threadCPUTime(const std::string& threadName)
 	CloseHandle(snapshot);
 	return result;
 #else
-	(void) threadName;
 	return -2;
 #endif
 }
@@ -507,6 +506,9 @@ void FastLoggerTest::testIdleBackendCPUUsage()
 	const Poco::Int64 elapsed = start.elapsed();
 	FastLogger::shutdown();
 
+	if (cpuEnd < 0)
+		failmsg("backend thread " + IDLE_BACKEND_THREAD_NAME + " CPU time not available after the measurement (" +
+			std::to_string(cpuEnd) + ")");
 	assertTrue (cpuEnd >= cpuStart);
 	const Poco::Int64 cpuUsed = cpuEnd - cpuStart;
 	if (cpuUsed*4 >= elapsed)
