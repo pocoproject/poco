@@ -141,6 +141,7 @@ void Preparator::resize() const
 		_values.resize(nCol, 0);
 		_lengths.resize(nCol, 0);
 		_lenLengths.resize(nCol);
+		_bufferSizes.resize(nCol, 0);
 		if(_varLengthArrays.size())
 		{
 			freeMemory();
@@ -162,9 +163,9 @@ std::size_t Preparator::maxDataSize(std::size_t pos) const
 		ODBCMetaColumn mc(_rStmt, pos);
 		sz = mc.length();
 
-		// accomodate for terminating zero (non-bulk only!)
+		// accommodate for terminating zero, also in bulk rows
 		MetaColumn::ColumnDataType type = mc.type();
-		if (sz && !isBulk() && ((ODBCMetaColumn::FDT_WSTRING == type) || (ODBCMetaColumn::FDT_STRING == type)))
+		if (sz && ((ODBCMetaColumn::FDT_WSTRING == type) || (ODBCMetaColumn::FDT_STRING == type)))
 			++sz;
 	}
 	catch (StatementException&) { }
@@ -191,8 +192,9 @@ std::size_t Preparator::actualDataSize(std::size_t col, std::size_t row) const
 	SQLLEN size = (POCO_DATA_INVALID_ROW == row) ? _lengths.at(col) :
 		_lenLengths.at(col).at(row);
 
-	// workaround for drivers returning negative length
-	if (size < 0 && SQL_NULL_DATA != size) size *= -1;
+	// workaround for drivers returning negative length;
+	// SQL_NULL_DATA and SQL_NO_TOTAL are not lengths and are returned unchanged
+	if (size < 0 && SQL_NULL_DATA != size && SQL_NO_TOTAL != size) size *= -1;
 
 	return size;
 }
@@ -201,11 +203,14 @@ std::size_t Preparator::actualDataSize(std::size_t col, std::size_t row) const
 void Preparator::prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::size_t length)
 {
 	poco_assert_dbg (DE_BOUND == _dataExtraction);
-	poco_assert_dbg (pos < _values.size());
-	poco_assert_dbg (pos < _lengths.size());
-	poco_assert_dbg (pos < _lenLengths.size());
+	// release checks: a bulk bool extraction past the result set columns
+	poco_assert (pos < _values.size());
+	poco_assert (pos < _lengths.size());
+	poco_assert (pos < _lenLengths.size());
 
 	bool* pArray = (bool*) std::calloc(length, sizeof(bool));
+	if (!pArray && length != 0)
+		throw OutOfMemoryException("ODBC::Preparator::prepareBoolArray()");
 
 	_values[pos] = Any(pArray);
 	_lengths[pos] = 0;

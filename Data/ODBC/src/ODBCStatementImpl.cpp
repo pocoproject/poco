@@ -184,12 +184,34 @@ void ODBCStatementImpl::doPrepare()
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
 
-		if (it != itEnd && (*it)->isBulk())
+		// SQLFetch() writes SQL_ATTR_ROW_ARRAY_SIZE rows into every bound column:
+		// a non-bulk extraction is bound to one row, a bulk extraction to
+		// getLimit() rows. The rowset size is set here, so every extraction of
+		// the data set is checked here, whatever order Statement accepted them in.
+		const bool bulk = (it != itEnd) && (*it)->isBulk();
+		std::size_t rowsetSize = 1;
+		if (bulk)
 		{
-			std::size_t limit = getExtractionLimit();
-			if (limit == Limit::LIMIT_UNLIMITED)
+			rowsetSize = getExtractionLimit();
+			if (rowsetSize == Limit::LIMIT_UNLIMITED)
 				throw InvalidArgumentException("Bulk operation not allowed without limit.");
-			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) limit, 0),
+		}
+		for (Extractions::iterator itExt = it; itExt != itEnd; ++itExt)
+		{
+			if ((*itExt)->isBulk() != bulk)
+				throw InvalidAccessException("Bulk and non-bulk extraction modes can not be mixed.");
+			if (bulk && (*itExt)->getLimit() != rowsetSize)
+				throw InvalidArgumentException("Bulk extraction size differs from the statement limit.");
+		}
+		// A later data set must inherit neither the rowset size nor the column
+		// bindings of an earlier one: SQLMoreResults() keeps the bindings, so a
+		// column this data set does not bind again would receive rowsetSize rows
+		// into an earlier data set's buffers.
+		if (curDataSet > 0)
+			checkError(SQLFreeStmt(_stmt, SQL_UNBIND), "SQLFreeStmt(SQL_UNBIND)");
+		if (bulk || curDataSet > 0)
+		{
+			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) rowsetSize, 0),
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
 		}
 
@@ -222,6 +244,37 @@ void ODBCStatementImpl::doBind()
 	Bindings& binds = bindings();
 	if (!binds.empty())
 	{
+		// The first bulk binding sets SQL_ATTR_PARAMSET_SIZE, and the driver then
+		// reads (and for output parameters writes) that many values for every
+		// parameter: scalar and bulk bindings, or bulk bindings of different
+		// sizes, must not be mixed. The Binder binds every container at its
+		// current size, not at bulkSize(), its size when use() ran.
+		const bool bulk = binds.front()->isBulk();
+		const std::size_t rows = binds.front()->numOfRowsHandled();
+		if (bulk && 0 == rows)
+			throw InvalidArgumentException("Zero size containers not allowed.");
+		for (const auto& pBinding: binds)
+		{
+			if (pBinding->isBulk() != bulk)
+				throw InvalidAccessException("Bulk and non-bulk binding modes can not be mixed.");
+			if (bulk && pBinding->numOfRowsHandled() != rows)
+				throw InvalidArgumentException("Bulk bindings of different sizes can not be mixed.");
+		}
+		if (!bulk)
+		{
+			// Binder::reset() restores SQL_ATTR_PARAMSET_SIZE only when a binding that
+			// already holds the binder is reset. Bindings added after removeBind() or
+			// pushed through bindings() get the binder in compile(), after the reset:
+			// scalars must not be bound as arrays of an earlier size.
+			SQLULEN paramSetSize = 1;
+			if (!Utility::isError(Poco::Data::ODBC::SQLGetStmtAttr(_stmt, SQL_ATTR_PARAMSET_SIZE, &paramSetSize, SQL_IS_UINTEGER, nullptr)) &&
+				paramSetSize > 1)
+			{
+				checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_PARAMSET_SIZE, reinterpret_cast<SQLPOINTER>(static_cast<SQLULEN>(1)), SQL_IS_UINTEGER),
+					"SQLSetStmtAttr(SQL_ATTR_PARAMSET_SIZE)");
+			}
+		}
+
 		Bindings::iterator it    = binds.begin();
 		Bindings::iterator itEnd = binds.end();
 

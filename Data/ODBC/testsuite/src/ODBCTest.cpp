@@ -881,6 +881,112 @@ void ODBCTest::testBLOBContainer()
 }
 
 
+void ODBCTest::testBulkRowsetBackstop()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Statement rejects mixing bulk and non-bulk extractions. This adds the
+	// non-bulk extraction directly to the implementation, to check the backstop
+	// in ODBCStatementImpl::doPrepare(), where the rowset size is set. The table
+	// has a single row, so even without the backstop nothing is written past
+	// the one-row buffer.
+	class MixedStatement: public Poco::Data::Statement
+	{
+	public:
+		explicit MixedStatement(Poco::Data::Session& session): Poco::Data::Statement(session)
+		{
+		}
+
+		void addUnchecked(Poco::Data::AbstractExtraction::Ptr pExtraction)
+		{
+			impl()->addExtract(pExtraction);
+		}
+	};
+
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	dropObject("TABLE", "BulkRowsetBackstop");
+	session() << "CREATE TABLE BulkRowsetBackstop (Id INTEGER, Payload VARCHAR(30))", now;
+	session() << "INSERT INTO BulkRowsetBackstop VALUES (1, 'a')", now;
+
+	std::vector<int> ids;
+	std::string payload;
+	MixedStatement stmt(session());
+	stmt << "SELECT Id, Payload FROM BulkRowsetBackstop", into(ids, bulk(4));
+	stmt.addUnchecked(into(payload));
+	try
+	{
+		stmt.execute();
+		fail ("bulk and non-bulk extractions executed together");
+	}
+	catch (Poco::InvalidAccessException&)
+	{
+	}
+	dropObject("TABLE", "BulkRowsetBackstop");
+}
+
+
+void ODBCTest::testBulkBindingBackstops()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// The row count shows how many parameter sets the driver processed: it
+	// reads SQL_ATTR_PARAMSET_SIZE values from every bound parameter buffer.
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	dropObject("TABLE", "BulkBindingBackstops");
+	session() << "CREATE TABLE BulkBindingBackstops (A INTEGER, B INTEGER)", now;
+	int count = 0;
+
+	// re-executed with grown containers: Binder::reset() runs once per bulk
+	// binding, and the arrays are bound again at their new size
+	std::vector<int> a(2, 1);
+	std::vector<int> b(2, 1);
+	{
+		Poco::Data::Statement insert = (session() << "INSERT INTO BulkBindingBackstops VALUES (?, ?)", use(a, bulk), use(b, bulk));
+		insert.execute();
+		a.assign(4, 2);
+		b.assign(4, 2);
+		insert.execute();
+	}
+	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
+	assertEqual (6, count);
+
+	// shrunk after the statement was built: the sizes are compared when the
+	// containers are bound, not when use() ran
+	{
+		Poco::Data::Statement insert = (session() << "INSERT INTO BulkBindingBackstops VALUES (?, ?)", use(a, bulk), use(b, bulk));
+		b.resize(2);
+		try
+		{
+			insert.execute();
+			fail ("bulk bindings of different sizes executed together");
+		}
+		catch (Poco::InvalidArgumentException&)
+		{
+		}
+	}
+	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
+	assertEqual (6, count);
+
+	// scalars bound after the bulk bindings were removed are one parameter
+	// set, whatever the earlier array size
+	b.assign(4, 3);
+	{
+		Poco::Data::Statement insert = (session() << "INSERT INTO BulkBindingBackstops VALUES (?, ?)", use(a, bulk), use(b, bulk));
+		insert.execute();
+		insert.removeBind("");
+		int x = 4;
+		insert.addBind(use(x));
+		insert.addBind(use(x));
+		insert.execute();
+	}
+	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
+	assertEqual (11, count);
+	dropObject("TABLE", "BulkBindingBackstops");
+}
+
+
 void ODBCTest::testBLOBStmt()
 {
 	if (!_pSession) failmsg ("Test not available.");

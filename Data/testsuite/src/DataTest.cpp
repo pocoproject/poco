@@ -14,6 +14,8 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
+#include "Poco/Data/BulkBinding.h"
+#include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/RecordSet.h"
@@ -2717,6 +2719,56 @@ void DataTest::testArchiveStrategyOpenReleasesStatements()
 }
 
 
+void DataTest::testBulkModeMixing()
+{
+	// Statements are built, never executed. ODBC sets the rowset (parameter set)
+	// size from the bulk extractions (bindings) and binds one row for a non-bulk
+	// one, so the modes must not be mixed. A non-bulk binding resets the bulk
+	// mode flags, so the checks must not depend on the flags alone.
+	Session sess(Poco::Data::Test::Connector::KEY, "dummy.db");
+	sess.setFeature("bulk", true);
+	std::vector<int> ids;
+	std::vector<int> other;
+	int minId = 0;
+	std::string payload;
+
+	{
+		Statement stmt(sess);
+		stmt << "SELECT Id, Payload FROM T WHERE Id >= ?", into(ids, bulk(4)), use(minId);
+		try { stmt, into(payload); fail ("non-bulk extraction accepted after bulk extraction"); }
+		catch (InvalidAccessException&) { }
+	}
+	{
+		Statement stmt(sess);
+		stmt << "SELECT Id FROM T WHERE Id >= ?", into(ids, bulk(4)), use(minId), limit(4);
+		try { stmt, limit(100); fail ("limit that differs from the bulk size accepted"); }
+		catch (InvalidArgumentException&) { }
+		try { stmt, range(0, 100); fail ("range accepted for bulk extraction"); }
+		catch (InvalidAccessException&) { }
+	}
+	{
+		// as documented, the bulk keyword must come before extractions and bindings
+		Statement stmt(sess);
+		int id = 0;
+		stmt << "SELECT Id FROM T", into(id), limit(4);
+		try { stmt, bulk; fail ("bulk keyword accepted after an extraction"); }
+		catch (InvalidAccessException&) { }
+	}
+	{
+		Statement stmt(sess);
+		std::vector<int> values(4);
+		stmt << "INSERT INTO T VALUES (?, ?)", use(values, bulk);
+		try { stmt, use(minId); fail ("non-bulk binding accepted after bulk binding"); }
+		catch (InvalidAccessException&) { }
+	}
+	{
+		// still accepted: bulk extractions, a scalar parameter and the same limit
+		Statement stmt(sess);
+		stmt << "SELECT Id, Other FROM T WHERE Id >= ?", into(ids, bulk(4)), into(other, bulk(4)), use(minId), limit(4);
+	}
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -2777,6 +2829,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testSQLChannelDrainFallback);
 	CppUnit_addTest(pSuite, DataTest, testSQLChannelDrainRejected);
 	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyOpenReleasesStatements);
+	CppUnit_addTest(pSuite, DataTest, testBulkModeMixing);
 
 	return pSuite;
 }

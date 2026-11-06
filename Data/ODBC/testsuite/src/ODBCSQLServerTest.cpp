@@ -18,10 +18,14 @@
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/UTFString.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
 #include <iostream>
+#include <string>
+#include <vector>
 
 
 using namespace std::string_literals;
@@ -1107,6 +1111,47 @@ void ODBCSQLServerTest::recreateEncodingTables()
 }
 
 
+void ODBCSQLServerTest::testBoundUTF16StringBulk()
+{
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	dropObject("TABLE", "BoundUTF16StringBulk");
+	session() << "CREATE TABLE BoundUTF16StringBulk (Id INTEGER, Text NVARCHAR(10))", now;
+	// a short value, NULL, and a value as long as the column
+	const std::vector<std::string> texts = {"abcdef", "", "ghijklmnop"};
+	for (std::size_t i = 0; i < texts.size(); ++i)
+	{
+		int id = static_cast<int>(i);
+		if (texts[i].empty())
+		{
+			session() << "INSERT INTO BoundUTF16StringBulk VALUES (?, NULL)", use(id), now;
+			continue;
+		}
+		Poco::UTF16String text;
+		Poco::UnicodeConverter::convert(texts[i], text);
+		session() << "INSERT INTO BoundUTF16StringBulk VALUES (?, ?)", use(id), use(text), now;
+	}
+
+	// The length indicator counts bytes, and a bulk row holds the whole column
+	// plus the terminator: every value comes back unchanged and in its own row,
+	// NULL as an empty string, both in a one-row and in a three-row batch.
+	Poco::UTF16String stale;
+	Poco::UnicodeConverter::convert(std::string("stale"), stale);
+	for (Poco::UInt32 rows: {Poco::UInt32(1), Poco::UInt32(3)})
+	{
+		std::vector<Poco::UTF16String> output(rows, stale);
+		session() << Poco::format("SELECT TOP %u Text FROM BoundUTF16StringBulk ORDER BY Id", rows), into(output, bulk(rows)), now;
+		for (Poco::UInt32 row = 0; row < rows; ++row)
+		{
+			std::string text;
+			Poco::UnicodeConverter::convert(output[row], text);
+			assertTrue(text == texts[row]);
+		}
+	}
+	dropObject("TABLE", "BoundUTF16StringBulk");
+}
+
+
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
 	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db)))
@@ -1179,6 +1224,9 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigBatch);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBoundUTF16StringBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkBindingBackstops);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSet);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);

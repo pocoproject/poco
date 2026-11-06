@@ -73,6 +73,7 @@ public:
 	void testSQLChannelDrainFallback();
 	void testSQLChannelDrainRejected();
 	void testArchiveStrategyOpenReleasesStatements();
+	void testBulkModeMixing();
 
 	void setUp();
 	void tearDown();

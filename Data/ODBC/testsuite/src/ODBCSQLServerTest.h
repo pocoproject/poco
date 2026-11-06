@@ -64,6 +64,7 @@ public:
 	void testStoredFunction() override;
 
 	void testSQLServerTime();
+	void testBoundUTF16StringBulk();
 
 	static CppUnit::Test* suite();
 

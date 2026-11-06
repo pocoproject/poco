@@ -20,6 +20,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <typeinfo>
 
 
@@ -30,6 +31,12 @@ const std::string Extractor::FLD_SIZE_EXCEEDED_FMT = "Specified data size (%z by
 	"exceeds maximum value (%z).\n"
 	"Use Session.setProperty(\"maxFieldSize\", value) "
 	"to increase the maximum allowed data size\n";
+
+
+const std::string Extractor::BOUND_SIZE_EXCEEDED_FMT = "Column %z: the value (%z bytes) "
+	"does not fit into the bound buffer (%z bytes).\n"
+	"The buffer is sized from the column size reported by the driver, "
+	"limited by the session property \"maxFieldSize\".\n";
 
 
 Extractor::Extractor(const StatementHandle& rStmt,
@@ -55,7 +62,8 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
 	char* sp = AnyCast<char*>(_pPreparator->at(pos));
-	std::size_t len = std::strlen(sp);
+	// look for the terminator only inside the bound buffer
+	std::size_t len = std::find(sp, sp + _pPreparator->boundBufferSize(pos), '\0') - sp;
 	if (len < dataSize) dataSize = len;
 	checkDataSize(dataSize);
 	val.assign(sp, dataSize);
@@ -70,24 +78,31 @@ bool Extractor::extractBoundImpl<UTF16String>(std::size_t pos, UTF16String& val)
 	typedef UTF16String::value_type CharT;
 	if (isNull(pos)) return false;
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
-	CharT* sp = nullptr;
+	// look for the terminator only inside the bound buffer
+	const std::size_t bufferSize = _pPreparator->boundBufferSize(pos);
+	const CharT* sp = nullptr;
+	std::size_t len = 0;
 	UTF16String us;
 	const std::type_info& ti = _pPreparator->at(pos).type();
 	if (ti == typeid(CharT*))
 	{
 		sp = AnyCast<CharT*>(_pPreparator->at(pos));
+		len = std::find(sp, sp + bufferSize / sizeof(CharT), CharT(0)) - sp;
+		// the length indicator counts bytes
+		if (dataSize != static_cast<std::size_t>(SQL_NO_TOTAL)) dataSize /= sizeof(CharT);
 	}
 	else if (ti == typeid(char*))
 	{
-		std::string s(AnyCast<char*>(_pPreparator->at(pos)));
+		const char* cp = AnyCast<char*>(_pPreparator->at(pos));
+		std::string s(cp, std::find(cp, cp + bufferSize, '\0'));
 		Poco::UnicodeConverter::convert(s, us);
-		sp = const_cast<CharT*>(us.c_str());
+		sp = us.c_str();
+		len = us.size();
 	}
 	else
 	{
 		throw Poco::Data::ExtractException("Unsupported string type: " + std::string(ti.name()));
 	}
-	std::size_t len = Poco::UnicodeConverter::UTFStrlen(sp);
 	if (len < dataSize) dataSize = len;
 	checkDataSize(dataSize);
 	val.assign(sp, dataSize);
@@ -1570,6 +1585,21 @@ void Extractor::checkDataSize(std::size_t size)
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	if (size > maxSize)
 		throw DataException(format(FLD_SIZE_EXCEEDED_FMT, size, maxSize));
+}
+
+
+std::size_t Extractor::boundDataSize(std::size_t pos, std::size_t row, std::size_t terminator)
+{
+	std::size_t dataSize = _pPreparator->actualDataSize(pos, row);
+	if (static_cast<std::size_t>(SQL_NO_TOTAL) == dataSize)
+	{
+		throw UnknownDataLengthException(format("ODBC::Extractor::boundDataSize(): column %z: "
+			"the driver truncated the value and could not determine its length.", pos));
+	}
+	std::size_t capacity = _pPreparator->boundBufferSize(pos);
+	if (dataSize > capacity || capacity - dataSize < terminator)
+		throw DataException(format(BOUND_SIZE_EXCEEDED_FMT, pos, dataSize, capacity));
+	return dataSize;
 }
 
 

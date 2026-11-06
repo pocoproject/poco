@@ -32,6 +32,7 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/UTFString.h"
 #include <vector>
+#include <limits>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include "Poco/UnWindows.h"
 #endif
@@ -406,7 +407,17 @@ public:
 		/// Returns the returned length for the column and row specified.
 		/// This is usually equal to the column size, except for
 		/// variable length fields (BLOB and variable length strings).
-		/// For null values, the return value is -1 (SQL_NO_DATA)
+		/// For null values, the return value is (std::size_t) SQL_NULL_DATA;
+		/// if the driver could not determine the length of a truncated
+		/// value, it is (std::size_t) SQL_NO_TOTAL.
+
+	[[nodiscard]] std::size_t boundBufferSize(std::size_t pos) const;
+		/// Returns the length in bytes of the buffer bound with SQLBindCol()
+		/// to the variable length column at position pos (for bulk columns,
+		/// the length of one row), or 0 if no variable length buffer is bound
+		/// to the column. No value fetched into the buffer can be longer.
+		/// Unlike maxDataSize(), the length is recorded when the buffer is
+		/// bound and does not depend on the current column metadata.
 
 	[[nodiscard]] std::size_t bulkSize(std::size_t col = 0) const;
 		/// Returns bulk size. Column argument is optional
@@ -626,17 +637,18 @@ private:
 		poco_assert (pos < _values.size());
 
 		T* pCache = new T[size];
-		std::memset(pCache, 0, size);
+		std::memset(pCache, 0, size * sizeof(T));
 
 		_values[pos] = Any(pCache);
 		_lengths[pos] = (SQLLEN) size;
+		_bufferSizes[pos] = size * sizeof(T);
 		_varLengthArrays.insert(IndexMap::value_type(pos, dt));
 
 		if (Utility::isError(SQLBindCol(_rStmt,
 			(SQLUSMALLINT) pos + 1,
 			valueType,
 			(SQLPOINTER) pCache,
-			(SQLINTEGER) size*sizeof(T),
+			(SQLLEN) _bufferSizes[pos],
 			&_lengths[pos])))
 		{
 			throw StatementException(_rStmt, "ODBC::Preparator::prepareVariableLen():SQLBindCol()");
@@ -646,24 +658,34 @@ private:
 	template <typename T, DataType DT>
 	void prepareCharArray(std::size_t pos, SQLSMALLINT valueType, std::size_t size, std::size_t length)
 		/// Utility function for preparation of bulk variable length character and LOB columns.
+		/// Binds length rows of size elements of type T; the BufferLength passed to
+		/// SQLBindCol(), and with it the row stride, is size * sizeof(T) bytes.
 	{
 		poco_assert_dbg (DE_BOUND == _dataExtraction);
-		poco_assert_dbg (pos < _values.size());
-		poco_assert_dbg (pos < _lengths.size());
-		poco_assert_dbg (pos < _lenLengths.size());
+		// release checks, as in prepareVariableLen(): for a column past the result
+		// set the writes below would go past the per-column vectors
+		poco_assert (pos < _values.size());
+		poco_assert (pos < _lengths.size());
+		poco_assert (pos < _lenLengths.size());
+		poco_assert (pos < _bufferSizes.size());
+		if (size != 0 && length > std::numeric_limits<std::size_t>::max() / size / sizeof(T))
+			throw InvalidArgumentException("ODBC::Preparator::prepareCharArray(): bulk buffer too large");
 
 		T* pArray = (T*) std::calloc(length * size, sizeof(T));
+		if (!pArray && length * size != 0)
+			throw OutOfMemoryException("ODBC::Preparator::prepareCharArray()");
 
 		_values[pos] = Any(pArray);
 		_lengths[pos] = 0;
 		_lenLengths[pos].resize(length);
+		_bufferSizes[pos] = size * sizeof(T);
 		_varLengthArrays.insert(IndexMap::value_type(pos, DT));
 
 		if (Utility::isError(SQLBindCol(_rStmt,
 			(SQLUSMALLINT) pos + 1,
 			valueType,
 			(SQLPOINTER) pArray,
-			(SQLINTEGER) size,
+			(SQLLEN) _bufferSizes[pos],
 			&_lenLengths[pos][0])))
 		{
 			throw StatementException(_rStmt, "ODBC::Preparator::prepareCharArray():SQLBindCol()");
@@ -687,6 +709,7 @@ private:
 	mutable ValueVec        _values;
 	mutable LengthVec       _lengths;
 	mutable LengthLengthVec _lenLengths;
+	mutable std::vector<std::size_t> _bufferSizes;
 	mutable IndexMap        _varLengthArrays;
 	std::size_t             _maxFieldSize;
 	DataExtraction          _dataExtraction;
@@ -1072,19 +1095,19 @@ inline void Preparator::prepare(std::size_t pos, const Poco::Data::BLOB&)
 
 inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::Data::BLOB>& val)
 {
-	prepareCharArray<char, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
+	prepareCharArray<Poco::Data::BLOB::ValueType, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
 }
 
 
 inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::Data::BLOB>& val)
 {
-	prepareCharArray<char, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
+	prepareCharArray<Poco::Data::BLOB::ValueType, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
 }
 
 
 inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Data::BLOB>& val)
 {
-	prepareCharArray<char, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
+	prepareCharArray<Poco::Data::BLOB::ValueType, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
 }
 
 
@@ -1243,6 +1266,12 @@ inline std::size_t Preparator::bulkSize(std::size_t col) const
 	poco_assert (col < _lenLengths.size());
 
 	return _lenLengths[col].size();
+}
+
+
+inline std::size_t Preparator::boundBufferSize(std::size_t pos) const
+{
+	return _bufferSizes.at(pos);
 }
 
 

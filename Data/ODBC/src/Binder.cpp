@@ -488,6 +488,8 @@ void Binder::reset()
 {
 	freeMemory();
 	LengthPtrVec().swap(_lengthIndicator);
+	// freeMemory() deleted these: the next bind must allocate them again
+	LengthVecVec().swap(_vecLengthIndicator);
 	_inParams.clear();
 	_outParams.clear();
 	_dates.clear();
@@ -499,8 +501,14 @@ void Binder::reset()
 	_timeVecVec.clear();
 	_dateTimeVecVec.clear();
 	_charPtrs.clear();
+	_utf16CharPtrs.clear();
 	_boolPtrs.clear();
 	_containers.clear();
+	if (_paramSetSize > 1 && _rStmt.isValid())
+	{
+		// the next execution may bind scalars only; nothing to do if this fails
+		static_cast<void>(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, reinterpret_cast<SQLPOINTER>(static_cast<SQLULEN>(1)), SQL_IS_UINTEGER));
+	}
 	_paramSetSize = 0;
 }
 

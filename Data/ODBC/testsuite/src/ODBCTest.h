@@ -115,6 +115,8 @@ public:
 	virtual void testBLOB();
 	virtual void testBLOBContainer();
 	virtual void testBLOBStmt();
+	virtual void testBulkRowsetBackstop();
+	virtual void testBulkBindingBackstops();
 
 	virtual void testRecordSet();
 	virtual void testRecordSetBeforeExecute();

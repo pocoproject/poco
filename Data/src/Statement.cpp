@@ -85,6 +85,44 @@ namespace {
 		_pImpl.reset();
 		_result.notify();
 	}
+
+
+	bool hasExtractions(const AbstractExtractionVecVec& extractors)
+		/// Returns true if an extraction is registered for any data set.
+	{
+		for (const auto& extractions: extractors)
+		{
+			if (!extractions.empty()) return true;
+		}
+		return false;
+	}
+
+
+	bool hasExtraction(const AbstractExtractionVecVec& extractors, bool bulk)
+		/// Returns true if an extraction with isBulk() == bulk is registered for
+		/// any data set. The bulk mode flags alone do not tell: a non-bulk binding
+		/// resets them (StatementImpl::forbidBulk()).
+	{
+		for (const auto& extractions: extractors)
+		{
+			for (const auto& pExtraction: extractions)
+			{
+				if (pExtraction->isBulk() == bulk) return true;
+			}
+		}
+		return false;
+	}
+
+
+	bool hasBinding(const AbstractBindingVec& bindings, bool bulk)
+		/// Returns true if a binding with isBulk() == bulk is registered.
+	{
+		for (const auto& pBinding: bindings)
+		{
+			if (pBinding->isBulk() == bulk) return true;
+		}
+		return false;
+	}
 } // namespace
 
 
@@ -522,11 +560,13 @@ Statement& Statement::addBind(AbstractBinding::Ptr pBind)
 		if (!_pImpl->isBulkSupported())
 			throw InvalidAccessException("Bulk not supported by this session.");
 
-		if(_pImpl->bulkBindingAllowed())
+		if(_pImpl->bulkBindingAllowed() && !hasBinding(_pImpl->_bindings, false))
 			_pImpl->setBulkBinding();
 		else
 			throw InvalidAccessException("Bulk and non-bulk binding modes can not be mixed.");
 	}
+	else if (hasBinding(_pImpl->_bindings, true))
+		throw InvalidAccessException("Bulk and non-bulk binding modes can not be mixed.");
 	else _pImpl->forbidBulk();
 
 	_pImpl->addBind(pBind);
@@ -541,7 +581,7 @@ Statement& Statement::addExtract(AbstractExtraction::Ptr pExtract)
 		if (!_pImpl->isBulkSupported())
 			throw InvalidAccessException("Bulk not supported by this session.");
 
-		if(_pImpl->bulkExtractionAllowed())
+		if(_pImpl->bulkExtractionAllowed() && !hasExtraction(_pImpl->_extractors, false))
 		{
 			Bulk b(pExtract->getLimit());
 			_pImpl->setBulkExtraction(b);
@@ -549,6 +589,8 @@ Statement& Statement::addExtract(AbstractExtraction::Ptr pExtract)
 		else
 			throw InvalidAccessException("Bulk and non-bulk extraction modes can not be mixed.");
 	}
+	else if (hasExtraction(_pImpl->_extractors, true))
+		throw InvalidAccessException("Bulk and non-bulk extraction modes can not be mixed.");
 	else _pImpl->forbidBulk();
 
 	_pImpl->addExtract(pExtract);
@@ -558,7 +600,8 @@ Statement& Statement::addExtract(AbstractExtraction::Ptr pExtract)
 
 Statement& Statement::operator , (const Limit& extrLimit)
 {
-	if (_pImpl->isBulkExtraction() && _pImpl->extractionLimit() != extrLimit)
+	if ((_pImpl->isBulkExtraction() || hasExtraction(_pImpl->_extractors, true)) &&
+		_pImpl->extractionLimit() != extrLimit)
 		throw InvalidArgumentException("Limit for bulk extraction already set.");
 
 	_pImpl->setExtractionLimit(extrLimit);
@@ -568,7 +611,7 @@ Statement& Statement::operator , (const Limit& extrLimit)
 
 Statement& Statement::operator , (const Range& extrRange)
 {
-	if (_pImpl->isBulkExtraction())
+	if (_pImpl->isBulkExtraction() || hasExtraction(_pImpl->_extractors, true))
 		throw InvalidAccessException("Can not set range for bulk extraction.");
 
 	_pImpl->setExtractionLimit(extrRange.lower());
@@ -599,6 +642,9 @@ Statement& Statement::operator , (const Bulk& bulk)
 
 Statement& Statement::operator , (BulkFnType)
 {
+	if (hasExtractions(_pImpl->_extractors) || !_pImpl->_bindings.empty())
+		throw InvalidAccessException("Can not set bulk operations.");
+
 	const Limit& limit(_pImpl->extractionLimit());
 	if (limit.isHardLimit() ||
 		limit.isLowerLimit() ||

@@ -434,6 +434,10 @@ private:
 	static const std::string FLD_SIZE_EXCEEDED_FMT;
 		/// String format for the exception message when the field size is exceeded.
 
+	static const std::string BOUND_SIZE_EXCEEDED_FMT;
+		/// String format for the exception message when a value
+		/// does not fit into the buffer bound to its column.
+
 	void checkDataSize(std::size_t size);
 		/// This check is only performed for bound data
 		/// retrieval from variable length columns.
@@ -441,6 +445,17 @@ private:
 		/// accept the value ODBC driver is supplying
 		/// (i.e. the bound buffer is large enough to receive
 		/// the returned value)
+
+	std::size_t boundDataSize(std::size_t pos, std::size_t row = POCO_DATA_INVALID_ROW, std::size_t terminator = 0);
+		/// Returns the length in bytes reported by the driver for the non-null
+		/// value fetched into the variable length buffer bound to column pos
+		/// (row is POCO_DATA_INVALID_ROW for non-bulk columns). terminator is the
+		/// size of the terminating character the driver appends to character data,
+		/// 0 for binary data.
+		/// Throws DataException if the value and its terminator do not fit into
+		/// Preparator::boundBufferSize(pos), i.e. the driver truncated the value,
+		/// and UnknownDataLengthException if the driver reported SQL_NO_TOTAL.
+		/// Callers must not read more than the returned number of bytes.
 
 	void resizeLengths(std::size_t pos);
 		/// Resizes the vector holding extracted data lengths to the
@@ -488,16 +503,24 @@ private:
 		typedef typename C::iterator ItType;
 		typedef typename StringType::value_type CharType;
 
-		CharType** pc = AnyCast<CharType*>(&(_pPreparator->at(pos)));
-		poco_assert_dbg (pc);
-		poco_assert_dbg(*pc);
-		poco_assert_dbg (_pPreparator->bulkSize() == values.size());
-		std::size_t colWidth = columnSize(pos);
+		// throws BadCastException if the column is bound to another type
+		CharType* pBuffer = AnyCast<CharType*>(_pPreparator->at(pos));
+		poco_check_ptr (pBuffer);
+		poco_assert_dbg (_pPreparator->bulkSize(pos) == values.size());
+		// row stride and capacity are the BufferLength passed to SQLBindCol(),
+		// not the current column metadata
+		const std::size_t rowLength = _pPreparator->boundBufferSize(pos) / sizeof(CharType);
 		ItType it = values.begin();
 		ItType end = values.end();
-		for (int row = 0; it != end; ++it, ++row)
+		for (std::size_t row = 0; it != end; ++it, ++row)
 		{
-			it->assign(*pc + row * colWidth / sizeof(CharType), _pPreparator->actualDataSize(pos, row));
+			if (isNull(pos, row))
+			{
+				it->clear();
+				continue;
+			}
+			// the length indicator counts bytes, also for UTF-16
+			it->assign(pBuffer + row * rowLength, boundDataSize(pos, row, sizeof(CharType)) / sizeof(CharType));
 			// clean up superfluous null chars returned by some drivers
 			typename StringType::size_type trimLen = 0;
 			typename StringType::reverse_iterator sIt = it->rbegin();
@@ -519,16 +542,27 @@ private:
 		typedef typename C::value_type LOBType;
 		typedef typename LOBType::ValueType CharType;
 		typedef typename C::iterator ItType;
+		static_assert(sizeof(CharType) == 1, "bound LOB lengths and strides are byte counts");
 
-		CharType** pc = AnyCast<CharType*>(&(_pPreparator->at(pos)));
-		poco_assert_dbg (pc);
-		poco_assert_dbg(*pc);
-		poco_assert_dbg (_pPreparator->bulkSize() == values.size());
-		std::size_t colWidth = _pPreparator->maxDataSize(pos);
+		// throws BadCastException if the column is bound to another type
+		CharType* pBuffer = AnyCast<CharType*>(_pPreparator->at(pos));
+		poco_check_ptr (pBuffer);
+		poco_assert_dbg (_pPreparator->bulkSize(pos) == values.size());
+		// row stride and capacity are the BufferLength passed to SQLBindCol(),
+		// not the current column metadata
+		const std::size_t rowSize = _pPreparator->boundBufferSize(pos);
 		ItType it = values.begin();
 		ItType end = values.end();
-		for (int row = 0; it != end; ++it, ++row)
-			it->assignRaw(*pc + row * colWidth, _pPreparator->actualDataSize(pos, row));
+		for (std::size_t row = 0; it != end; ++it, ++row)
+		{
+			if (isNull(pos, row))
+			{
+				// a new empty LOB; clear() would also empty the LOBs sharing the content
+				*it = LOBType();
+				continue;
+			}
+			it->assignRaw(pBuffer + row * rowSize, boundDataSize(pos, row));
+		}
 
 		return true;
 	}
@@ -536,11 +570,12 @@ private:
 	template<typename T>
 	bool extractBoundImplLOB(std::size_t pos, Poco::Data::LOB<T>& val)
 	{
+		static_assert(sizeof(T) == 1, "bound LOB lengths are byte counts");
 		if (isNull(pos)) return false;
 
-		std::size_t dataSize = _pPreparator->actualDataSize(pos);
-		checkDataSize(dataSize);
+		// throws BadCastException if the column is bound to another type
 		T* sp = AnyCast<T*>(_pPreparator->at(pos));
+		std::size_t dataSize = boundDataSize(pos);
 		val.assignRaw(sp, dataSize);
 
 		return true;
@@ -712,8 +747,6 @@ private:
 		/// SQLLEN macro (a.k.a. SQLINTEGER) yields 64-bit value,
 		/// while SQL_NULL_DATA (#define'd as -1 literal) remains 32-bit.
 
-	[[nodiscard]] SQLINTEGER columnSize(std::size_t pos) const;
-
 	const StatementHandle&     _rStmt;
 	PreparatorPtr              _pPreparator;
 	Preparator::DataExtraction _dataExtraction;
@@ -843,15 +876,6 @@ inline void Extractor::resizeLengths(std::size_t pos)
 inline bool Extractor::isNullLengthIndicator(SQLLEN val) const
 {
 	return SQL_NULL_DATA == (int) val;
-}
-
-
-inline SQLINTEGER Extractor::columnSize(std::size_t pos) const
-{
-	std::size_t size = ODBCMetaColumn(_rStmt, pos).length();
-	std::size_t maxSize = _pPreparator->maxDataSize(pos);
-	if (size > maxSize) size = maxSize;
-	return (SQLINTEGER) size;
 }
 
 

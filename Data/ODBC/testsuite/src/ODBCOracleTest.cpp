@@ -1001,6 +1001,8 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkBindingBackstops);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDate);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testFloat);
