@@ -64,6 +64,11 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 
 ODBCStatementImpl::~ODBCStatementImpl()
 {
+	// Bindings can outlive this statement and share ownership of the Binder,
+	// which holds a reference to _stmt. Detach it while the handle is still
+	// valid, so a later reset through a surviving binding never touches it.
+	if (!_pBinder.isNull()) _pBinder->detach();
+
 	ColumnPtrVecVec::iterator it = _columnPtrs.begin();
 	ColumnPtrVecVec::iterator end = _columnPtrs.end();
 	for (; it != end; ++it)
@@ -242,6 +247,13 @@ void ODBCStatementImpl::doBind()
 {
 	this->clear();
 	Bindings& binds = bindings();
+
+	// This is the first bind of an execution (as opposed to a later row of a
+	// container binding): bind() sets ST_BOUND only after this returns.
+	const bool first = (ST_COMPILED == getState());
+
+	bool unbound = true;
+	bool bulk = false;
 	if (!binds.empty())
 	{
 		// The first bulk binding sets SQL_ATTR_PARAMSET_SIZE, and the driver then
@@ -249,7 +261,7 @@ void ODBCStatementImpl::doBind()
 		// parameter: scalar and bulk bindings, or bulk bindings of different
 		// sizes, must not be mixed. The Binder binds every container at its
 		// current size, not at bulkSize(), its size when use() ran.
-		const bool bulk = binds.front()->isBulk();
+		bulk = binds.front()->isBulk();
 		const std::size_t rows = binds.front()->numOfRowsHandled();
 		if (bulk && 0 == rows)
 			throw InvalidArgumentException("Zero size containers not allowed.");
@@ -259,24 +271,32 @@ void ODBCStatementImpl::doBind()
 				throw InvalidAccessException("Bulk and non-bulk binding modes can not be mixed.");
 			if (bulk && pBinding->numOfRowsHandled() != rows)
 				throw InvalidArgumentException("Bulk bindings of different sizes can not be mixed.");
+			unbound = unbound && pBinding->canBind();
 		}
-		if (!bulk)
-		{
-			// Binder::reset() restores SQL_ATTR_PARAMSET_SIZE only when a binding that
-			// already holds the binder is reset. Bindings added after removeBind() or
-			// pushed through bindings() get the binder in compile(), after the reset:
-			// scalars must not be bound as arrays of an earlier size.
-			SQLULEN paramSetSize = 1;
-			if (!Utility::isError(Poco::Data::ODBC::SQLGetStmtAttr(_stmt, SQL_ATTR_PARAMSET_SIZE, &paramSetSize, SQL_IS_UINTEGER, nullptr)) &&
-				paramSetSize > 1)
-			{
-				checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_PARAMSET_SIZE, reinterpret_cast<SQLPOINTER>(static_cast<SQLULEN>(1)), SQL_IS_UINTEGER),
-					"SQLSetStmtAttr(SQL_ATTR_PARAMSET_SIZE)");
-			}
-		}
+	}
 
+	// Reset the Binder at the first bind of an execution, and whenever every
+	// parameter rebinds (a later row of container bindings, or bindings that
+	// replaced the earlier ones). Otherwise a binding that does not hold the
+	// Binder, or that another statement reset last, would leave it with the
+	// parameter-set size, length arrays and parameter bindings of an earlier
+	// execution: the driver would read that many values from the new buffers,
+	// and a marker that is not bound again would keep its old, freed ones. The
+	// reset also runs when there are no bindings left, so a removed parameter
+	// does not keep its binding. A later row that does not rebind every
+	// parameter (a scalar reused across the rows of a container) keeps them.
+	if (!_pBinder.isNull() && (first || unbound))
+		_pBinder->reset();
+
+	if (!binds.empty())
+	{
 		Bindings::iterator it    = binds.begin();
 		Bindings::iterator itEnd = binds.end();
+
+		// An empty non-bulk container at the start of an execution binds no
+		// parameter, which would leave its marker reading the reset buffers.
+		if (first && !bulk && !(*it)->canBind())
+			throw InvalidArgumentException("Empty container not allowed.");
 
 		if (it != itEnd && 0 == _affectedRowCount)
 			_affectedRowCount = static_cast<std::size_t>((*it)->numOfRowsHandled());
@@ -339,6 +359,8 @@ void ODBCStatementImpl::bindImpl()
 void ODBCStatementImpl::execDirectImpl(const std::string& query)
 {
 	checkConnection();
+	// drop any parameter bindings a previous execution left in the driver
+	if (!_pBinder.isNull()) _pBinder->reset();
 	SQLCHAR * statementText = (SQLCHAR*) query.c_str();
 	SQLINTEGER textLength = static_cast<SQLINTEGER>(query.size());
 	SQLRETURN rc = SQLExecDirect(_stmt,statementText,textLength);

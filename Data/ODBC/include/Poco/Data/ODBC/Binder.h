@@ -29,6 +29,7 @@
 #include <deque>
 #include <list>
 #include <map>
+#include <memory>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include "Poco/UnWindows.h"
 #endif
@@ -385,7 +386,22 @@ public:
 	void reset() override;
 		/// Clears the cached storage.
 
+	void detach();
+		/// Resets the binder and detaches it from the statement handle. Called by
+		/// the owning statement before the handle is destroyed. After this, the
+		/// binder only frees memory and never touches the handle, so a binding
+		/// that outlives its statement can still be reset or reused safely.
+
 private:
+	void rejectScalarWithParamArray() const
+		/// Throws if a scalar parameter is bound while a parameter array of more
+		/// than one row is already set: the driver would read (or write) that
+		/// many values through the single scalar buffer.
+	{
+		if (_paramSetSize > 1)
+			throw InvalidArgumentException("ODBC::Binder: a single value and a parameter array can not be bound together.");
+	}
+
 	typedef std::vector<SQLLEN*>                             LengthPtrVec;
 	typedef std::vector<SQLLEN>                              LengthVec;
 	typedef std::vector<LengthVec*>                          LengthVecVec;
@@ -422,6 +438,7 @@ private:
 	template <typename T>
 	void bindImpl(std::size_t pos, T& val, SQLSMALLINT cDataType, Direction dir)
 	{
+		rejectScalarWithParamArray();
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
 
@@ -445,6 +462,7 @@ private:
 	template <typename L>
 	void bindImplLOB(std::size_t pos, const L& val, Direction dir)
 	{
+		rejectScalarWithParamArray();
 		if (isOutBound(dir) || !isInBound(dir))
 			throw NotImplementedException("LOB parameter type can only be inbound.");
 
@@ -582,16 +600,18 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		const C* pVal = nullptr;
-		if (!transcodeRequired()) pVal = &valC;
-		else
+		// the transcoded copy is freed on every path, also when binding throws
+		std::unique_ptr<C> pTranscoded;
+		const C* pVal = &valC;
+		if (transcodeRequired())
 		{
-			pVal = new C(valC.size());
+			pTranscoded.reset(new C(valC.size()));
 			typename C::const_iterator valIt = valC.begin();
 			typename C::const_iterator valEnd = valC.end();
-			typename C::iterator tcIt = const_cast<C*>(pVal)->begin();
+			typename C::iterator tcIt = pTranscoded->begin();
 			for (; valIt != valEnd; ++valIt, ++tcIt)
 				transcode(*valIt, *tcIt);
+			pVal = pTranscoded.get();
 		}
 
 		std::size_t length = pVal->size();
@@ -632,14 +652,10 @@ private:
 		{
 			strSize = it->size();
 			if (strSize > static_cast<std::size_t>(size))
-			{
-				if (transcodeRequired()) delete pVal;
 				throw LengthExceededException(Poco::format("SQLBindParameter(%s)", typeID));
-			}
 			std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
 			offset += size;
 		}
-		if (transcodeRequired()) delete pVal;
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT) pos + 1,
@@ -1182,6 +1198,8 @@ private:
 	SQLINTEGER       _paramSetSize;
 	std::size_t      _maxFieldSize;
 	AnyVecVec        _containers;
+	CharPtrVec       _transcodedStrings;
+	bool             _detached = false;
 };
 
 

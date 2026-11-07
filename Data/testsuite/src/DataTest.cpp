@@ -2769,6 +2769,17 @@ void DataTest::testBulkModeMixing()
 }
 
 
+void DataTest::testBulkBindingReset()
+{
+	// Re-executing a statement resets its bindings, also those added since
+	// the last execution, which do not hold a binder yet.
+	std::vector<int> values(4, 1);
+	BulkBinding<std::vector<int>> binding(values, 4);
+	binding.reset();
+	assertTrue (binding.canBind());
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -2830,6 +2841,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testSQLChannelDrainRejected);
 	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyOpenReleasesStatements);
 	CppUnit_addTest(pSuite, DataTest, testBulkModeMixing);
+	CppUnit_addTest(pSuite, DataTest, testBulkBindingReset);
 
 	return pSuite;
 }

@@ -102,17 +102,18 @@ void Binder::freeMemory()
 	DateTimeVecVec::iterator itDateTimeVecEnd = _dateTimeVecVec.end();
 	for (; itDateTimeVec != itDateTimeVecEnd; ++itDateTimeVec) delete *itDateTimeVec;
 
-	if (transcodeRequired() && _inParams.size())
-	{
-		ParamMap::iterator itInParams = _inParams.begin();
-		ParamMap::iterator itInParamsEnd = _inParams.end();
-		for (; itInParams != itInParamsEnd; ++itInParams) free(itInParams->first);
-	}
+	// Free only the transcoded copies the binder allocated. The _inParams keys
+	// can be memory the caller owns (a LOB's content, a UTF16String's buffer),
+	// so they must not be freed here.
+	CharPtrVec::iterator itTC = _transcodedStrings.begin();
+	CharPtrVec::iterator endTC = _transcodedStrings.end();
+	for (; itTC != endTC; ++itTC) std::free(*itTC);
 }
 
 
 void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	char* pTCVal = nullptr;
 	SQLINTEGER size = 0;
 	if (transcodeRequired())
@@ -122,6 +123,10 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		size = static_cast<SQLINTEGER>(tcVal.size());
 		pTCVal = reinterpret_cast<char*>(std::calloc((size_t)size+1, 1));
 		std::memcpy(pTCVal, tcVal.data(), size);
+		// the binder owns this copy and frees it in freeMemory(), on every exit
+		// path (also when a later step throws, and for outbound parameters where
+		// it is otherwise unused)
+		_transcodedStrings.push_back(pTCVal);
 	}
 	else size = static_cast<SQLINTEGER>(val.size());
 	SQLPOINTER pVal = nullptr;
@@ -180,6 +185,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	typedef UTF16String::value_type CharT;
 
 	SQLPOINTER pVal = nullptr;
@@ -231,6 +237,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
@@ -264,6 +271,7 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
@@ -297,6 +305,7 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
@@ -330,6 +339,7 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn = size;
@@ -362,6 +372,7 @@ void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	if (isOutBound(dir) || !isInBound(dir))
 		throw NotImplementedException("NULL parameter type can only be inbound.");
 
@@ -486,6 +497,14 @@ void Binder::synchronize()
 
 void Binder::reset()
 {
+	if (!_detached && _rStmt.isValid())
+	{
+		// The driver must not keep the addresses of the buffers freed below: a
+		// parameter that is not bound again would be read from (or, for an
+		// output parameter, written to) freed memory. Unbound markers make the
+		// next execution fail instead. Nothing to do if this fails.
+		static_cast<void>(SQLFreeStmt(_rStmt, SQL_RESET_PARAMS));
+	}
 	freeMemory();
 	LengthPtrVec().swap(_lengthIndicator);
 	// freeMemory() deleted these: the next bind must allocate them again
@@ -504,12 +523,21 @@ void Binder::reset()
 	_utf16CharPtrs.clear();
 	_boolPtrs.clear();
 	_containers.clear();
-	if (_paramSetSize > 1 && _rStmt.isValid())
+	_transcodedStrings.clear();
+	if (!_detached && _paramSetSize > 1 && _rStmt.isValid())
 	{
 		// the next execution may bind scalars only; nothing to do if this fails
 		static_cast<void>(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, reinterpret_cast<SQLPOINTER>(static_cast<SQLULEN>(1)), SQL_IS_UINTEGER));
 	}
 	_paramSetSize = 0;
+}
+
+
+void Binder::detach()
+{
+	// run while the handle is still valid, then stop touching it
+	reset();
+	_detached = true;
 }
 
 
@@ -668,6 +696,10 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 
 void Binder::setParamSetSize(std::size_t length)
 {
+	if (0 == length)
+		throw InvalidArgumentException("ODBC::Binder::setParamSetSize(): empty container not allowed.");
+	if (length > 1 && !_lengthIndicator.empty())
+		throw InvalidArgumentException("ODBC::Binder: a single value and a parameter array can not be bound together.");
 	if (0 == _paramSetSize)
 	{
 		if (Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAM_BIND_TYPE, reinterpret_cast<SQLPOINTER>(SQL_PARAM_BIND_BY_COLUMN), SQL_IS_UINTEGER)) ||
@@ -675,6 +707,11 @@ void Binder::setParamSetSize(std::size_t length)
 				throw StatementException(_rStmt, "ODBC::Binder::setParamSetSize():SQLSetStmtAttr()");
 
 		_paramSetSize = static_cast<SQLINTEGER>(length);
+	}
+	else if (static_cast<std::size_t>(_paramSetSize) != length)
+	{
+		// the driver reads _paramSetSize values from every parameter array
+		throw InvalidArgumentException("ODBC::Binder::setParamSetSize(): parameter arrays of different sizes can not be bound together.");
 	}
 }
 

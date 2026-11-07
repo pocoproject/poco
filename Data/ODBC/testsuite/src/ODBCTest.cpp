@@ -26,6 +26,7 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/Utility.h"
 #include <sqltypes.h>
 #include <iostream>
 
@@ -983,6 +984,107 @@ void ODBCTest::testBulkBindingBackstops()
 	}
 	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
 	assertEqual (11, count);
+
+	// bulk bindings replaced after an execution: no binding that is left holds
+	// the Binder, so it must not keep the earlier parameter-set size for the
+	// smaller containers. boundSQL() leaves the new bindings with its own
+	// binder until the statement is compiled again.
+	a.assign(16, 4);
+	b.assign(16, 4);
+	{
+		std::vector<int> c(2, 5);
+		std::vector<int> d(2, 5);
+		Poco::Data::Statement insert = (session() << "INSERT INTO BulkBindingBackstops VALUES (?, ?)", use(a, bulk), use(b, bulk));
+		insert.execute();
+		insert.removeBind("");
+		insert.addBind(use(c, bulk));
+		insert.addBind(use(d, bulk));
+		static_cast<void>(Poco::Data::Utility::boundSQL(insert));
+		insert.execute();
+	}
+	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
+	assertEqual (29, count);
+
+	// the same without boundSQL()
+	{
+		std::vector<int> c(2, 6);
+		std::vector<int> d(2, 6);
+		Poco::Data::Statement insert = (session() << "INSERT INTO BulkBindingBackstops VALUES (?, ?)", use(a, bulk), use(b, bulk));
+		insert.execute();
+		insert.removeBind("");
+		insert.addBind(use(c, bulk));
+		insert.addBind(use(d, bulk));
+		insert.execute();
+	}
+	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
+	assertEqual (47, count);
+
+	// fewer parameters bound again than the statement has markers: the driver
+	// must not keep the earlier parameter buffers, so the execution fails
+	{
+		std::vector<int> c(2, 7);
+		Poco::Data::Statement insert = (session() << "INSERT INTO BulkBindingBackstops VALUES (?, ?)", use(a, bulk), use(b, bulk));
+		insert.execute();
+		insert.removeBind("");
+		insert.addBind(use(c, bulk));
+		try
+		{
+			insert.execute();
+			fail ("executed with a parameter marker that was not bound again");
+		}
+		catch (Poco::Data::DataException&)
+		{
+		}
+	}
+	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
+	assertEqual (63, count);
+
+	// the same for scalars, after removing one named binding
+	{
+		int x = 8;
+		int y = 8;
+		Poco::Data::Statement insert = (session() << "INSERT INTO BulkBindingBackstops VALUES (?, ?)", use(x, "x"), use(y, "y"));
+		insert.execute();
+		insert.removeBind("y");
+		try
+		{
+			insert.execute();
+			fail ("executed with a parameter marker that was not bound again");
+		}
+		catch (Poco::Data::DataException&)
+		{
+		}
+	}
+	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
+	assertEqual (64, count);
+
+	// bindings that are not bulk bindings bind one parameter array per row for
+	// a vector of vectors: the arrays of a row must have the same size
+	{
+		std::vector<std::vector<int>> x(1, std::vector<int>(4, 9));
+		std::vector<std::vector<int>> y(1, std::vector<int>(2, 9));
+		Poco::Data::Statement insert = (session() << "INSERT INTO BulkBindingBackstops VALUES (?, ?)", use(x), use(y));
+		try
+		{
+			insert.execute();
+			fail ("parameter arrays of different sizes executed together");
+		}
+		catch (Poco::InvalidArgumentException&)
+		{
+		}
+	}
+	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
+	assertEqual (64, count);
+
+	// and every row is executed with the size of its own arrays
+	{
+		std::vector<std::vector<int>> x(2, std::vector<int>(3, 10));
+		std::vector<std::vector<int>> y(2, std::vector<int>(3, 10));
+		Poco::Data::Statement insert = (session() << "INSERT INTO BulkBindingBackstops VALUES (?, ?)", use(x), use(y));
+		insert.execute();
+	}
+	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
+	assertEqual (70, count);
 	dropObject("TABLE", "BulkBindingBackstops");
 }
 

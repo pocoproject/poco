@@ -74,6 +74,7 @@ public:
 	void testSQLChannelDrainRejected();
 	void testArchiveStrategyOpenReleasesStatements();
 	void testBulkModeMixing();
+	void testBulkBindingReset();
 
 	void setUp();
 	void tearDown();

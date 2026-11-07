@@ -78,7 +78,9 @@ public:
 	void reset() override
 	{
 		_bound = false;
-		getBinder()->reset();
+		// a binding added after the statement was compiled has no binder yet
+		AbstractBinder::Ptr pBinder = getBinder();
+		if (pBinder) pBinder->reset();
 	}
 
 private:
