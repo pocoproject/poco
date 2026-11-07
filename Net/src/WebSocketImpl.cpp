@@ -357,10 +357,15 @@ int WebSocketImpl::receiveBytes(void* buffer, int length, int)
 	// the payload received so far.
 	if (getBlocking() && _receiveState.remainingPayloadLength == 0)
 	{
+		Poco::Timespan recvTimeout = getReceiveTimeout();
+		if (recvTimeout.totalMicroseconds() <= 0) recvTimeout = Poco::Timespan(5, 0);
+		Poco::Timestamp tsStart;
 		int payloadLength = -1;
 		while (payloadLength < 0)
 		{
 			payloadLength = peekHeader(_receiveState);
+			if ((payloadLength < 0) && tsStart.isElapsed(recvTimeout.totalMicroseconds()))
+				throw Poco::TimeoutException("WebSocket: no complete frame header");
 		}
 		// The blocking path never leaves a partly received frame, so a
 		// non-blocking receive that follows starts with a frame header.
@@ -448,10 +453,15 @@ int WebSocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int, const Poco::Tim
 	// the payload received so far.
 	if (getBlocking() && _receiveState.remainingPayloadLength == 0)
 	{
+		Poco::Timespan recvTimeout = getReceiveTimeout();
+		if (recvTimeout.totalMicroseconds() <= 0) recvTimeout = Poco::Timespan(5, 0);
+		Poco::Timestamp tsStart;
 		int payloadLength = -1;
 		while (payloadLength < 0)
 		{
 			payloadLength = peekHeader(_receiveState);
+			if ((payloadLength < 0) && tsStart.isElapsed(recvTimeout.totalMicroseconds()))
+				throw Poco::TimeoutException("WebSocket: no complete frame header");
 		}
 		// The blocking path never leaves a partly received frame, so a
 		// non-blocking receive that follows starts with a frame header.
