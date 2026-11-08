@@ -228,6 +228,19 @@ public:
 		return sizeOf<std::remove_const_t<std::remove_reference_t<T>>>();
 	}
 
+	[[nodiscard]] static std::size_t arraySize(std::size_t rows, std::size_t rowLength, std::size_t elementSize);
+		/// Returns the size in bytes of an array of rows rows, each of rowLength
+		/// elements of elementSize bytes, such as a bulk parameter buffer.
+		/// Throws LengthExceededException if the size does not fit into std::size_t.
+
+	[[nodiscard]] static void* allocArray(std::size_t rows, std::size_t rowLength, std::size_t elementSize);
+		/// Allocates a zero-filled array of rows rows, each of rowLength elements
+		/// of elementSize bytes, with std::calloc(); the caller frees it with std::free().
+		/// At least one element is allocated, also for an empty array.
+		/// Throws LengthExceededException if the size of the array does not fit
+		/// into std::size_t (see arraySize()), or OutOfMemoryException if the
+		/// array can not be allocated.
+
 private:
 	static const TypeInfo _dataTypes;
 		/// C <==> SQL data type mapping

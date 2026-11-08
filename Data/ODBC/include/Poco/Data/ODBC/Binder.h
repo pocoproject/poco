@@ -30,6 +30,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <limits>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include "Poco/UnWindows.h"
 #endif
@@ -641,7 +642,7 @@ private:
 		if (_charPtrs.size() <= pos)
 			_charPtrs.resize(pos + 1, nullptr);
 
-		_charPtrs[pos] = (char*) std::calloc(pVal->size() * size, sizeof(char));
+		_charPtrs[pos] = static_cast<char*>(Utility::allocArray(pVal->size(), static_cast<std::size_t>(size), sizeof(char)));
 
 		std::string typeID = typeid(*pVal).name();
 		std::size_t strSize;
@@ -708,7 +709,7 @@ private:
 		if (_utf16CharPtrs.size() <= pos)
 			_utf16CharPtrs.resize(pos + 1, nullptr);
 
-		_utf16CharPtrs[pos] = (UTF16Char*)std::calloc(val.size() * size, sizeof(UTF16Char));
+		_utf16CharPtrs[pos] = static_cast<UTF16Char*>(Utility::allocArray(val.size(), static_cast<std::size_t>(size), sizeof(UTF16Char)));
 
 		std::size_t strSize;
 		std::size_t offset = 0;
@@ -757,7 +758,7 @@ private:
 
 		setParamSetSize(length);
 
-		SQLINTEGER size = 0;
+		std::size_t size = 0;
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
@@ -770,16 +771,19 @@ private:
 		typename C::const_iterator cIt = val.begin();
 		for (; lIt != lEnd; ++lIt, ++cIt)
 		{
-			SQLLEN sz = static_cast<SQLLEN>(cIt->size());
-			if (sz > size) size = static_cast<SQLINTEGER>(sz);
-			*lIt = sz;
+			std::size_t sz = cIt->size();
+			if (sz > size) size = sz;
+			*lIt = static_cast<SQLLEN>(sz);
 		}
+
+		// the row length is passed to SQLBindParameter() as ColumnSize and BufferLength
+		if (size > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()))
+			throw LengthExceededException("ODBC::Binder::bindImplContainerLOB():SQLBindParameter(std::vector<BLOB>)");
 
 		if (_charPtrs.size() <= pos)
 			_charPtrs.resize(pos + 1, nullptr);
 
-		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(CharType));
-		poco_check_ptr (_charPtrs[pos]);
+		_charPtrs[pos] = static_cast<char*>(Utility::allocArray(val.size(), size, sizeof(CharType)));
 
 		std::size_t blobSize;
 		std::size_t offset = 0;
@@ -788,7 +792,7 @@ private:
 		for (; cIt != cEnd; ++cIt)
 		{
 			blobSize = cIt->size();
-			if (blobSize > static_cast<std::size_t>(size))
+			if (blobSize > size)
 				throw LengthExceededException("ODBC::Binder::bindImplContainerLOB():SQLBindParameter(std::vector<BLOB>)");
 			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize * sizeof(CharType));
 			offset += size;
@@ -981,7 +985,7 @@ private:
 		if (_charPtrs.size() <= pos)
 			_charPtrs.resize(pos + 1, nullptr);
 
-		_charPtrs[pos] = (char*)std::calloc(val.size() * size, sizeof(char));
+		_charPtrs[pos] = static_cast<char*>(Utility::allocArray(val.size(), static_cast<std::size_t>(size), sizeof(char)));
 		std::size_t offset = 0;
 		for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
 		{

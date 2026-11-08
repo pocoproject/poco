@@ -807,6 +807,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundStringBulkOverflow);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkThenScalarLOB);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testParameterArraySize);
 
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBareboneODBC);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testConnection);

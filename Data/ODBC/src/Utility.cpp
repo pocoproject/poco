@@ -18,8 +18,12 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTime.h"
+#include "Poco/Exception.h"
+#include "Poco/Format.h"
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
+#include <limits>
 #include <vector>
 
 
@@ -217,6 +221,31 @@ std::string Utility::driverVersion(const ConnectionHandle& db)
 std::string Utility::driverODBCVersion(const ConnectionHandle& db)
 {
 	return sqlGetInfo(db, SQL_DRIVER_ODBC_VER);
+}
+
+
+std::size_t Utility::arraySize(std::size_t rows, std::size_t rowLength, std::size_t elementSize)
+{
+	// checked before multiplying, so the product can not wrap around
+	if (rowLength != 0 && elementSize != 0 &&
+		rows > std::numeric_limits<std::size_t>::max() / rowLength / elementSize)
+	{
+		throw LengthExceededException(Poco::format("ODBC::Utility::arraySize(): "
+			"%z rows of %z elements of %z bytes exceed the maximum array size", rows, rowLength, elementSize));
+	}
+	return rows * rowLength * elementSize;
+}
+
+
+void* Utility::allocArray(std::size_t rows, std::size_t rowLength, std::size_t elementSize)
+{
+	std::size_t size = arraySize(rows, rowLength, elementSize);
+	// at least one element, so the result does not depend on how calloc() treats a zero size
+	if (0 == size) size = (0 == elementSize) ? 1 : elementSize;
+	void* pArray = std::calloc(size, 1);
+	if (!pArray)
+		throw OutOfMemoryException(Poco::format("ODBC::Utility::allocArray(): %z bytes", size));
+	return pArray;
 }
 
 

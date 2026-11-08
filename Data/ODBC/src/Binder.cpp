@@ -20,6 +20,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <limits>
 #include <sql.h>
 
 
@@ -120,9 +121,12 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	{
 		std::string tcVal;
 		transcode(val, tcVal);
+		// the length is passed to the driver as an SQLINTEGER
+		if (tcVal.size() > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()))
+			throw LengthExceededException("ODBC::Binder::bind(string): the transcoded value is too long.");
 		size = static_cast<SQLINTEGER>(tcVal.size());
-		pTCVal = reinterpret_cast<char*>(std::calloc((size_t)size+1, 1));
-		std::memcpy(pTCVal, tcVal.data(), size);
+		pTCVal = static_cast<char*>(Utility::allocArray(1, tcVal.size() + 1, sizeof(char)));
+		std::memcpy(pTCVal, tcVal.data(), tcVal.size());
 		// the binder owns this copy and frees it in freeMemory(), on every exit
 		// path (also when a later step throws, and for outbound parameters where
 		// it is otherwise unused)
@@ -137,7 +141,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	if (isOutBound(dir))
 	{
 		getColumnOrParameterSize(pos, size);
-		char* pChar = (char*) std::calloc(size, sizeof(char));
+		char* pChar = static_cast<char*>(Utility::allocArray(1, static_cast<std::size_t>(size), sizeof(char)));
 		pVal = static_cast<SQLPOINTER>(pChar);
 		_outParams.insert(ParamMap::value_type(pVal, size));
 		_strings.insert(StringMap::value_type(pChar, const_cast<std::string*>(&val)));
@@ -197,7 +201,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 	if (isOutBound(dir))
 	{
 		getColumnOrParameterSize(pos, size);
-		CharT* pChar = (CharT*)std::calloc(size, 1);
+		CharT* pChar = static_cast<CharT*>(Utility::allocArray(1, static_cast<std::size_t>(size), 1));
 		pVal = (SQLPOINTER)pChar;
 		_outParams.insert(ParamMap::value_type(pVal, size));
 		_utf16Strings.insert(UTF16StringMap::value_type(pChar, const_cast<UTF16String*>(&val)));

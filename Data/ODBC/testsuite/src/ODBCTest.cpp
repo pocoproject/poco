@@ -30,7 +30,9 @@
 #include "Poco/Data/Utility.h"
 #include <sqltypes.h>
 #include <algorithm>
+#include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <vector>
 
 
@@ -1158,6 +1160,90 @@ void ODBCTest::testBulkBindingBackstops()
 	session() << "SELECT COUNT(*) FROM BulkBindingBackstops", into(count), now;
 	assertEqual (70, count);
 	dropObject("TABLE", "BulkBindingBackstops");
+}
+
+
+void ODBCTest::testParameterArraySize()
+{
+	// The Binder allocates bulk parameter buffers with Utility::allocArray():
+	// rows times row length is checked before it is computed, so it can not wrap
+	// around, and a failed allocation throws instead of leaving a null buffer
+	// for the rows to be copied to.
+	const std::size_t maxSize = std::numeric_limits<std::size_t>::max();
+
+	assertEqual (std::size_t(24), Utility::arraySize(3, 4, 2));
+	assertEqual (std::size_t(0), Utility::arraySize(0, 4, 2));
+	assertEqual (std::size_t(0), Utility::arraySize(3, 0, 2));
+	assertEqual (std::size_t(0), Utility::arraySize(3, 4, 0));
+	assertEqual (maxSize, Utility::arraySize(maxSize, 1, 1));
+	assertEqual (maxSize - 1, Utility::arraySize(maxSize / 2, 2, 1));
+	assertEqual (maxSize - 1, Utility::arraySize(1, maxSize / 2, 2));
+
+	try
+	{
+		static_cast<void>(Utility::arraySize(maxSize / 2 + 1, 2, 1));
+		fail ("array size wrapped around");
+	}
+	catch (Poco::Data::LengthExceededException&)
+	{
+	}
+
+	try
+	{
+		static_cast<void>(Utility::arraySize(2, maxSize / 2 + 1, 1));
+		fail ("array size wrapped around");
+	}
+	catch (Poco::Data::LengthExceededException&)
+	{
+	}
+
+	// rows times row length fits, the size in bytes does not
+	try
+	{
+		static_cast<void>(Utility::arraySize(maxSize / 4 + 1, 2, 2));
+		fail ("array size wrapped around");
+	}
+	catch (Poco::Data::LengthExceededException&)
+	{
+	}
+
+	// a size that needs more than 32 bits
+	if constexpr (sizeof(std::size_t) > 4)
+	{
+		assertEqual (std::size_t(65536) * 65537, Utility::arraySize(65536, 65537, 1));
+	}
+	else
+	{
+		try
+		{
+			static_cast<void>(Utility::arraySize(65536, 65537, 1));
+			fail ("array size wrapped around");
+		}
+		catch (Poco::Data::LengthExceededException&)
+		{
+		}
+	}
+
+	// rejected before anything is allocated
+	try
+	{
+		std::free(Utility::allocArray(maxSize / 2 + 1, 2, 1));
+		fail ("array size wrapped around");
+	}
+	catch (Poco::Data::LengthExceededException&)
+	{
+	}
+
+	// an empty array gets one element, whatever calloc() returns for a zero size
+	void* pEmpty = Utility::allocArray(0, 0, 2);
+	assertTrue (nullptr != pEmpty);
+	std::free(pEmpty);
+
+	unsigned char* pArray = static_cast<unsigned char*>(Utility::allocArray(3, 4, 2));
+	assertTrue (nullptr != pArray);
+	for (std::size_t i = 0; i < 24; ++i)
+		assertTrue (0 == pArray[i]);
+	std::free(pArray);
 }
 
 
