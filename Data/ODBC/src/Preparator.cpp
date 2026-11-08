@@ -142,6 +142,7 @@ void Preparator::resize() const
 		_lengths.resize(nCol, 0);
 		_lenLengths.resize(nCol);
 		_bufferSizes.resize(nCol, 0);
+		_boundTypes.resize(nCol, MetaColumn::FDT_UNKNOWN);
 		if(_varLengthArrays.size())
 		{
 			freeMemory();

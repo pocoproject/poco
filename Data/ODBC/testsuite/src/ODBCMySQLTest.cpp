@@ -529,6 +529,10 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testAsync);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testAny);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testDynamicAny);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testAnyDateTime);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testAnyTime);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testAnyBulk);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testAnyBoundType);
 	//CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLChannel);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLLogger);

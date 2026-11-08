@@ -115,7 +115,8 @@ template<>
 bool Extractor::extractBoundImpl<Poco::Data::Date>(std::size_t pos, Poco::Data::Date& val)
 {
 	if (isNull(pos)) return false;
-	SQL_DATE_STRUCT& ds = *AnyCast<SQL_DATE_STRUCT>(&(_pPreparator->at(pos)));
+	// throws BadCastException if the column is bound to another type
+	SQL_DATE_STRUCT& ds = RefAnyCast<SQL_DATE_STRUCT>(_pPreparator->at(pos));
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -159,7 +160,8 @@ bool Extractor::extractBoundImpl<Poco::Data::Time>(std::size_t pos, Poco::Data::
 
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
 	checkDataSize(dataSize);
-	SQL_TIME_STRUCT& ts = *AnyCast<SQL_TIME_STRUCT>(&_pPreparator->at(pos));
+	// throws BadCastException if the column is bound to another type
+	SQL_TIME_STRUCT& ts = RefAnyCast<SQL_TIME_STRUCT>(_pPreparator->at(pos));
 	Utility::timeSync(val, ts);
 
 	return true;
@@ -203,7 +205,8 @@ bool Extractor::extractBoundImpl<Poco::DateTime>(std::size_t pos, Poco::DateTime
 
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
 	checkDataSize(dataSize);
-	SQL_TIMESTAMP_STRUCT& tss = *AnyCast<SQL_TIMESTAMP_STRUCT>(&_pPreparator->at(pos));
+	// throws BadCastException if the column is bound to another type
+	SQL_TIMESTAMP_STRUCT& tss = RefAnyCast<SQL_TIMESTAMP_STRUCT>(_pPreparator->at(pos));
 	Utility::dateTimeSync(val, tss);
 
 	return true;
@@ -247,7 +250,8 @@ bool Extractor::extractBoundImpl<Poco::UUID>(std::size_t pos, Poco::UUID& val)
 
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
 	checkDataSize(dataSize);
-	char* pBuffer = *AnyCast<char*>(&_pPreparator->at(pos));
+	// throws BadCastException if the column is bound to another type
+	char* pBuffer = AnyCast<char*>(_pPreparator->at(pos));
 	val.copyFrom(pBuffer);
 
 	return true;

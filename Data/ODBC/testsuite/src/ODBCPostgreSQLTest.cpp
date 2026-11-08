@@ -775,6 +775,10 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAsync);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAny);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDynamicAny);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAnyDateTime);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAnyTime);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAnyBulk);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAnyBoundType);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultipleResults);
 	//CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLChannel);
 	//CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLLogger);

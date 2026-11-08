@@ -1007,6 +1007,9 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkFullWidthStrings);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDate);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDateTime);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAnyDateTime);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAnyBulk);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAnyBoundType);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDouble);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);

@@ -25,14 +25,25 @@
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
+#include "Poco/Data/ODBC/Preparator.h"
+#include "Poco/Data/ODBC/Extractor.h"
 #include "Poco/Data/ODBC/SessionImpl.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/Date.h"
+#include "Poco/Data/Time.h"
 #include "Poco/Data/Utility.h"
+#include "Poco/Nullable.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/UTFString.h"
 #include <sqltypes.h>
 #include <algorithm>
 #include <cstdlib>
+#include <deque>
 #include <iostream>
 #include <limits>
+#include <list>
+#include <string>
+#include <typeinfo>
 #include <vector>
 
 
@@ -1607,6 +1618,254 @@ void ODBCTest::testDynamicAny()
 		_pExecutor->dynamicAny();
 
 		i += 2;
+	}
+}
+
+
+namespace
+{
+	DateTime toDateTime(const Any& any)
+		// Returns the value of a DATE or TIMESTAMP column extracted into any.
+		// Drivers can describe DATE columns as timestamps.
+	{
+		if (any.type() == typeid(Poco::Data::Date))
+		{
+			const Poco::Data::Date& date = Poco::RefAnyCast<Poco::Data::Date>(any);
+			return DateTime(date.year(), date.month(), date.day());
+		}
+		return AnyCast<DateTime>(any);
+	}
+}
+
+
+void ODBCTest::testAnyDateTime()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Bound extraction into Poco::Any and Poco::Dynamic::Var binds DATE and
+	// TIMESTAMP columns as the ODBC structures the extraction of
+	// Poco::Data::Date and Poco::DateTime reads. Containers that are not
+	// bulk-extracted are extracted row by row in the same way.
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	recreateNullableTable();
+	DateTime dateTime(2001, 2, 3, 4, 5, 6);
+	Poco::Data::Date date(2001, 2, 3);
+	session() << "INSERT INTO NullableTest (EmptyInteger, EmptyDateTime, EmptyDate) VALUES (1, ?, ?)",
+		use(dateTime), use(date), now;
+	session() << "INSERT INTO NullableTest (EmptyInteger) VALUES (2)", now;
+
+	Any anyDateTime;
+	Any anyDate;
+	session() << "SELECT EmptyDateTime, EmptyDate FROM NullableTest WHERE EmptyInteger = 1",
+		into(anyDateTime), into(anyDate), now;
+	assertTrue (toDateTime(anyDateTime) == dateTime);
+	assertTrue (Poco::Data::Date(toDateTime(anyDate)) == date);
+
+	Var varDateTime;
+	Var varDate;
+	session() << "SELECT EmptyDateTime, EmptyDate FROM NullableTest WHERE EmptyInteger = 1",
+		into(varDateTime), into(varDate), now;
+	assertTrue (varDateTime.convert<DateTime>() == dateTime);
+	assertTrue (Poco::Data::Date(varDate.convert<DateTime>()) == date);
+
+	Poco::Nullable<Any> nullableAny;
+	Poco::Nullable<Var> nullableVar;
+	session() << "SELECT EmptyDateTime, EmptyDate FROM NullableTest WHERE EmptyInteger = 1",
+		into(nullableAny), into(nullableVar), now;
+	assertFalse (nullableAny.isNull());
+	assertTrue (toDateTime(nullableAny.value()) == dateTime);
+	assertFalse (nullableVar.isNull());
+	assertTrue (Poco::Data::Date(nullableVar.value().convert<DateTime>()) == date);
+	session() << "SELECT EmptyDateTime, EmptyDate FROM NullableTest WHERE EmptyInteger = 2",
+		into(nullableAny), into(nullableVar), now;
+	assertTrue (nullableAny.isNull());
+	assertTrue (nullableVar.isNull());
+
+	std::vector<Any> anyDateTimes;
+	std::vector<Var> varDates;
+	session() << "SELECT EmptyDateTime, EmptyDate FROM NullableTest ORDER BY EmptyInteger",
+		into(anyDateTimes), into(varDates), now;
+	assertTrue (2 == anyDateTimes.size());
+	assertTrue (toDateTime(anyDateTimes[0]) == dateTime);
+	assertTrue (anyDateTimes[1].empty());
+	assertTrue (2 == varDates.size());
+	assertTrue (Poco::Data::Date(varDates[0].convert<DateTime>()) == date);
+	assertTrue (varDates[1].isEmpty());
+}
+
+
+void ODBCTest::testAnyTime()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// TIME columns are bound as the ODBC structure the extraction of
+	// Poco::Data::Time reads.
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	recreatePersonTimeTable();
+	Poco::Data::Time timeOfDay(4, 5, 6);
+	session() << "INSERT INTO Person VALUES ('a', 'b', 'c', ?)", use(timeOfDay), now;
+	session() << "INSERT INTO Person (LastName) VALUES ('n')", now;
+
+	Any any;
+	Var var;
+	session() << "SELECT BornTime, BornTime FROM Person WHERE LastName = 'a'", into(any), into(var), now;
+	assertTrue (AnyCast<Poco::Data::Time>(any) == timeOfDay);
+	assertTrue (var.extract<Poco::Data::Time>() == timeOfDay);
+
+	Poco::Nullable<Any> nullableAny;
+	Poco::Nullable<Var> nullableVar;
+	session() << "SELECT BornTime, BornTime FROM Person WHERE LastName = 'n'", into(nullableAny), into(nullableVar), now;
+	assertTrue (nullableAny.isNull());
+	assertTrue (nullableVar.isNull());
+}
+
+
+void ODBCTest::testAnyUUID()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// GUID columns are bound as the 16-byte buffer the extraction of
+	// Poco::UUID reads.
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	recreateUUIDsTable();
+	Poco::UUID uuid("49cf6461-9b62-4163-9659-5472ef73153d");
+	session() << "INSERT INTO Strings VALUES (?)", use(uuid), now;
+	session() << "INSERT INTO Strings VALUES (NULL)", now;
+
+	Any any;
+	Var var;
+	session() << "SELECT str, str FROM Strings WHERE str IS NOT NULL", into(any), into(var), now;
+	assertTrue (AnyCast<Poco::UUID>(any) == uuid);
+	assertTrue (var.extract<Poco::UUID>() == uuid);
+
+	Poco::Nullable<Any> nullableAny;
+	Poco::Nullable<Var> nullableVar;
+	session() << "SELECT str, str FROM Strings WHERE str IS NULL", into(nullableAny), into(nullableVar), now;
+	assertTrue (nullableAny.isNull());
+	assertTrue (nullableVar.isNull());
+}
+
+
+template <typename C>
+void ODBCTest::checkBulkAnyRejected(const std::string& query)
+{
+	C values;
+	try
+	{
+		session() << query, into(values, bulk(2)), now;
+		fail ("bulk extraction into a container of Poco::Any or Poco::Dynamic::Var executed");
+	}
+	catch (Poco::NotImplementedException&)
+	{
+	}
+}
+
+
+void ODBCTest::testAnyBulk()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Bulk extraction into containers of Poco::Any and Poco::Dynamic::Var is
+	// not supported. The statement is rejected before any column is bound.
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	recreateNullableTable();
+	session() << "INSERT INTO NullableTest (EmptyInteger) VALUES (1)", now;
+	session() << "INSERT INTO NullableTest (EmptyInteger) VALUES (2)", now;
+	const std::string query("SELECT EmptyInteger FROM NullableTest");
+	checkBulkAnyRejected<std::vector<Any>>(query);
+	checkBulkAnyRejected<std::deque<Any>>(query);
+	checkBulkAnyRejected<std::list<Any>>(query);
+	checkBulkAnyRejected<std::vector<Var>>(query);
+	checkBulkAnyRejected<std::deque<Var>>(query);
+	checkBulkAnyRejected<std::list<Var>>(query);
+}
+
+
+void ODBCTest::testAnyBoundType()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Bound extraction into Poco::Any and Poco::Dynamic::Var reads the buffer as
+	// the type the Preparator bound it for, which the driver described before
+	// the execution. A driver can describe a column differently after the
+	// fetch; the SQLite driver does so for COUNT(*). Here the Extractor
+	// describes the column of a second statement, an integer, while the buffer
+	// was bound for the character column of the first one.
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	recreateNullableTable();
+	session() << "INSERT INTO NullableTest (EmptyString, EmptyInteger) VALUES ('abc', 7)", now;
+
+	auto* pImpl = dynamic_cast<Poco::Data::ODBC::SessionImpl*>(session().impl());
+	assertNotNullPtr (pImpl);
+	const Poco::Data::ODBC::StatementHandle stringStmt(pImpl->dbc());
+	const Poco::Data::ODBC::StatementHandle integerStmt(pImpl->dbc());
+
+	Poco::Data::ODBC::Preparator::Ptr pPreparator =
+		new Poco::Data::ODBC::Preparator(stringStmt, "SELECT EmptyString FROM NullableTest", 1024);
+	assertTrue (1 == pPreparator->columns());
+	pPreparator->prepare(0, Var());
+	assertFalse (Utility::isError(SQLExecute(stringStmt)));
+	assertFalse (Utility::isError(SQLFetch(stringStmt)));
+	// closes the cursor; the fetched value stays in the bound buffer
+	assertFalse (Utility::isError(SQLFreeStmt(stringStmt, SQL_CLOSE)));
+
+	Poco::Data::ODBC::Preparator integerPreparator(integerStmt, "SELECT EmptyInteger FROM NullableTest", 1024);
+	Poco::Data::ODBC::Extractor extractor(integerStmt, pPreparator);
+
+	Var var;
+	assertTrue (extractor.extract(0, var));
+	assertTrue (var.convert<std::string>() == "abc");
+	Any any;
+	assertTrue (extractor.extract(0, any));
+	// drivers can describe character columns as wide character columns
+	std::string str;
+	if (any.type() == typeid(Poco::UTF16String))
+		Poco::UnicodeConverter::convert(AnyCast<Poco::UTF16String>(any), str);
+	else
+		str = AnyCast<std::string>(any);
+	assertTrue (str == "abc");
+
+	// typed extraction checks the type of the bound buffer
+	Poco::Int32 integer = 0;
+	try
+	{
+		extractor.extract(0, integer);
+		fail ("Int32 extracted from a character buffer");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+	Poco::Data::Date date;
+	try
+	{
+		extractor.extract(0, date);
+		fail ("Date extracted from a character buffer");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+	Poco::Data::Time timeOfDay;
+	try
+	{
+		extractor.extract(0, timeOfDay);
+		fail ("Time extracted from a character buffer");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+	DateTime dateTime;
+	try
+	{
+		extractor.extract(0, dateTime);
+		fail ("DateTime extracted from a character buffer");
+	}
+	catch (Poco::BadCastException&)
+	{
 	}
 }
 

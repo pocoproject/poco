@@ -157,6 +157,11 @@ public:
 
 	virtual void testAny();
 	virtual void testDynamicAny();
+	virtual void testAnyDateTime();
+	virtual void testAnyTime();
+	virtual void testAnyUUID();
+	virtual void testAnyBulk();
+	virtual void testAnyBoundType();
 
 	virtual void testMultipleResults();
 
@@ -234,6 +239,11 @@ protected:
 	const std::string& dbConnString();
 
 private:
+	template <typename C>
+	void checkBulkAnyRejected(const std::string& query);
+		/// Executes query with a bulk extraction into a container C of
+		/// Poco::Any or Poco::Dynamic::Var; expects NotImplementedException.
+
 	static Drivers    _drivers;
 	static constexpr bool _bindValues[8] = {true, true, true, false, false, true, false, false};
 	SessionPtr        _pSession;

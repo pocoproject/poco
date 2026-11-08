@@ -44,6 +44,7 @@ public:
 	void testBoundStringBulk();
 	void testBoundStringBulkOverflow();
 	void testBulkThenScalarLOB();
+	void testAnyUntypedColumn();
 
 	static CppUnit::Test* suite();
 

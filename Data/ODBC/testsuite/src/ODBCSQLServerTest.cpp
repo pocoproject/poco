@@ -1419,6 +1419,10 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAny);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDynamicAny);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAnyDateTime);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAnyUUID);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAnyBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAnyBoundType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLLogger);

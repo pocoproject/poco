@@ -465,8 +465,8 @@ private:
 	bool extractBoundImpl(std::size_t pos, T& val)
 	{
 		if (isNull(pos)) return false;
-		poco_assert_dbg (typeid(T) == _pPreparator->at(pos).type());
-		val = *AnyCast<T>(&_pPreparator->at(pos));
+		// throws BadCastException if the column is bound to another type
+		val = RefAnyCast<T>(_pPreparator->at(pos));
 		return true;
 	}
 
@@ -631,10 +631,18 @@ private:
 	template <typename T>
 	bool extractImpl(std::size_t pos, T& val)
 		/// Utility function for extraction of Any and Dynamic::Var.
+		/// A bound value is extracted as the type its buffer was bound for.
 	{
-		ODBCMetaColumn column(_rStmt, pos);
+		// The driver can describe the column differently after the fetch than
+		// when the buffer was bound. Columns that were not prepared for Any
+		// or Dynamic::Var, and manual extraction, use the current description.
+		MetaColumn::ColumnDataType type = MetaColumn::FDT_UNKNOWN;
+		if (Preparator::DE_BOUND == _dataExtraction)
+			type = _pPreparator->boundType(pos);
+		if (MetaColumn::FDT_UNKNOWN == type)
+			type = ODBCMetaColumn(_rStmt, pos).type();
 
-		switch (column.type())
+		switch (type)
 		{
 			case MetaColumn::FDT_INT8:
 			{ return extAny<T, Poco::Int8>(pos, val); }

@@ -14,6 +14,8 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+#include "Poco/Any.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/MetaColumn.h"
@@ -789,6 +791,39 @@ void ODBCSQLiteTest::testBulkThenScalarLOB()
 }
 
 
+void ODBCSQLiteTest::testAnyUntypedColumn()
+{
+	// The driver can describe a result column without a declared type, such as
+	// COUNT(*) or an expression, differently after the fetch than before the
+	// execution. Bound extraction into Poco::Any and Poco::Dynamic::Var reads
+	// the value as the type its buffer was bound for. SQLChannel extracts its
+	// archive row count this way.
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	session() << "DROP TABLE IF EXISTS AnyUntypedColumn", now;
+	session() << "CREATE TABLE AnyUntypedColumn (Id INTEGER)", now;
+	session() << "INSERT INTO AnyUntypedColumn VALUES (1)", now;
+	session() << "INSERT INTO AnyUntypedColumn VALUES (2)", now;
+
+	Poco::Dynamic::Var count;
+	session() << "SELECT COUNT(*) FROM AnyUntypedColumn", into(count), now;
+	assertTrue (count == 2);
+	Poco::Any anyCount;
+	session() << "SELECT COUNT(*) FROM AnyUntypedColumn", into(anyCount), now;
+	assertFalse (anyCount.empty());
+	assertTrue (anyCount.type() == count.type());
+
+	Poco::Dynamic::Var sum;
+	session() << "SELECT Id + 40 FROM AnyUntypedColumn WHERE Id = 2", into(sum), now;
+	assertTrue (sum == 42);
+	Poco::Any anySum;
+	session() << "SELECT Id + 40 FROM AnyUntypedColumn WHERE Id = 2", into(anySum), now;
+	assertFalse (anySum.empty());
+	assertTrue (anySum.type() == sum.type());
+	session() << "DROP TABLE AnyUntypedColumn", now;
+}
+
+
 CppUnit::Test* ODBCSQLiteTest::suite()
 {
 	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString)))
@@ -874,6 +909,10 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAny);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testDynamicAny);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAnyDateTime);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAnyBulk);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAnyBoundType);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAnyUntypedColumn);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLLogger);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAutoCommit);
