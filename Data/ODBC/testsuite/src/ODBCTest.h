@@ -119,6 +119,7 @@ public:
 	virtual void testBulkRowsetBackstop();
 	virtual void testBulkBindingBackstops();
 	virtual void testParameterArraySize();
+	virtual void testBulkFullWidthStrings();
 
 	virtual void testRecordSet();
 	virtual void testRecordSetBeforeExecute();

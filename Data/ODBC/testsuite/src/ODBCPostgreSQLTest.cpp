@@ -745,6 +745,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkRowsetBackstop);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkBindingBackstops);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testParameterArraySize);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkFullWidthStrings);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDate);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTime);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDateTime);

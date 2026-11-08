@@ -383,6 +383,9 @@ public:
 	void synchronize();
 		/// Transfers the results of non-POD outbound parameters from internal
 		/// holders back into the externally supplied buffers.
+		/// Throws LengthExceededException once all are transferred if the value
+		/// of a string output parameter did not fit into its buffer; the string
+		/// then holds the part that did.
 
 	void reset() override;
 		/// Clears the cached storage.
@@ -403,6 +406,15 @@ private:
 			throw InvalidArgumentException("ODBC::Binder: a single value and a parameter array can not be bound together.");
 	}
 
+	template <typename S>
+	struct OutString
+		/// The buffer bound to a string output parameter.
+	{
+		S*      pValue;       /// receives the value
+		SQLLEN  bufferLength; /// in bytes, including the terminator
+		SQLLEN* pLength;      /// the length or indicator the driver returns
+	};
+
 	typedef std::vector<SQLLEN*>                             LengthPtrVec;
 	typedef std::vector<SQLLEN>                              LengthVec;
 	typedef std::vector<LengthVec*>                          LengthVecVec;
@@ -417,8 +429,8 @@ private:
 	typedef std::vector<DateTimeVec*>                        DateTimeVecVec;
 	typedef std::vector<Poco::Any>                           AnyVec;
 	typedef std::vector<AnyVec>                              AnyVecVec;
-	typedef std::map<char*, std::string*>                    StringMap;
-	typedef std::map<UTF16String::value_type*, UTF16String*> UTF16StringMap;
+	typedef std::map<char*, OutString<std::string>>          StringMap;
+	typedef std::map<UTF16Char*, OutString<UTF16String>>     UTF16StringMap;
 	typedef std::map<char*, UUID*>                           UUIDMap;
 	typedef std::map<SQL_DATE_STRUCT*, Date*>                DateMap;
 	typedef std::map<SQL_TIME_STRUCT*, Time*>                TimeMap;
@@ -636,7 +648,7 @@ private:
 		if (_vecLengthIndicator.size() <= pos)
 		{
 			_vecLengthIndicator.resize(pos + 1, nullptr);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_charPtrs.size() <= pos)
@@ -647,14 +659,18 @@ private:
 		std::string typeID = typeid(*pVal).name();
 		std::size_t strSize;
 		std::size_t offset = 0;
+		// Every row is passed with its length: a value as long as its row has no
+		// terminator, so the driver must not look for one.
+		LengthVec::iterator lIt = _vecLengthIndicator[pos]->begin();
 		typename C::const_iterator it = pVal->begin();
 		typename C::const_iterator end = pVal->end();
-		for (; it != end; ++it)
+		for (; it != end; ++it, ++lIt)
 		{
 			strSize = it->size();
 			if (strSize > static_cast<std::size_t>(size))
 				throw LengthExceededException(Poco::format("SQLBindParameter(%s)", typeID));
 			std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
+			*lIt = static_cast<SQLLEN>(strSize);
 			offset += size;
 		}
 
@@ -689,6 +705,7 @@ private:
 
 		setParamSetSize(val.size());
 
+		// the column size, the row length and the maximum field size count characters
 		SQLINTEGER size = 0;
 		getColumnOrParameterSize(pos, size);
 		poco_assert(size > 0);
@@ -696,14 +713,19 @@ private:
 		if (static_cast<std::size_t>(size) == _maxFieldSize)
 		{
 			getMinValueSize(val, size);
-			// accomodate for terminating zero
-			if (static_cast<std::size_t>(size) != _maxFieldSize) size += sizeof(UTF16Char);
+			// accommodate for terminating zero
+			if (static_cast<std::size_t>(size) != _maxFieldSize) ++size;
 		}
+
+		// BufferLength, the distance between the rows, counts bytes
+		if (static_cast<std::size_t>(size) > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()) / sizeof(UTF16Char))
+			throw LengthExceededException("ODBC::Binder::bindImplContainerUTF16String:SQLBindParameter(std::vector<UTF16String>)");
+		const SQLINTEGER rowLength = static_cast<SQLINTEGER>(static_cast<std::size_t>(size) * sizeof(UTF16Char));
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
 			_vecLengthIndicator.resize(pos + 1, nullptr);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_utf16CharPtrs.size() <= pos)
@@ -713,15 +735,17 @@ private:
 
 		std::size_t strSize;
 		std::size_t offset = 0;
-		char* pBuf = (char*)_utf16CharPtrs[pos];
+		// every row is passed with its length in bytes, as in bindImplContainerString()
+		LengthVec::iterator lIt = _vecLengthIndicator[pos]->begin();
 		typename C::const_iterator it = val.begin();
 		typename C::const_iterator end = val.end();
-		for (; it != end; ++it)
+		for (; it != end; ++it, ++lIt)
 		{
-			strSize = it->size() * sizeof(UTF16Char);
+			strSize = it->size();
 			if (strSize > static_cast<std::size_t>(size))
 				throw LengthExceededException("ODBC::Binder::bindImplContainerUTF16String:SQLBindParameter(std::vector<UTF16String>)");
-			std::memcpy(pBuf + offset, it->data(), strSize);
+			std::memcpy(_utf16CharPtrs[pos] + offset, it->data(), strSize * sizeof(UTF16Char));
+			*lIt = static_cast<SQLLEN>(strSize * sizeof(UTF16Char));
 			offset += size;
 		}
 
@@ -733,7 +757,7 @@ private:
 			getStringColSize(size),
 			0,
 			_utf16CharPtrs[pos],
-			(SQLINTEGER)size,
+			rowLength,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
 			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerUTF16String:SQLBindParameter(std::vector<UTF16String>)");
@@ -1132,13 +1156,15 @@ private:
 		/// Sets the parameter set size. Used for column-wise binding.
 
 	void getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size);
-		/// Fills the column or parameter size into the 'size' argument.
-		/// Does nothing if neither can be obtained from the driver, so
-		/// size should be set to some default value prior to calling this
-		/// function in order to avoid undefined size value.
+		/// Fills the size the driver describes for the parameter into the 'size'
+		/// argument, or, if it describes none, the size of the result column at
+		/// the same position, or DEFAULT_PARAM_SIZE if neither can be obtained
+		/// from the driver (see getParamSizeDirect()), limited to the maximum
+		/// field size and to the largest SQLINTEGER.
 
-	[[nodiscard]] std::size_t getParamSizeDirect(std::size_t pos, SQLINTEGER& size);
+	[[nodiscard]] std::size_t getParamSizeDirect(std::size_t pos);
 		/// A "last ditch" attempt" to obtain parameter size directly from the driver.
+		/// Returns DEFAULT_PARAM_SIZE if it can not be obtained.
 
 	void freeMemory();
 		/// Frees all dynamically allocated memory resources.
@@ -1151,16 +1177,14 @@ private:
 		/// This function, in order to prevent unnecessary memory allocation, does further
 		/// optimization, looking for the maximum length within supplied data container and
 		/// uses the smaller of maximum found and maximum predefined data length.
+		/// Lengths count characters, as column sizes do.
 	{
-		typedef typename T::value_type ContainedValType;
-		typedef typename ContainedValType::value_type BaseValType;
-		std::size_t typeSize = sizeof(BaseValType);
 		std::size_t maxSize = 0;
 		typename T::const_iterator it = val.begin();
 		typename T::const_iterator end = val.end();
 		for (; it != end; ++it)
 		{
-			std::size_t sz = it->size() * typeSize;
+			std::size_t sz = it->size();
 			if (sz > _maxFieldSize)
 				throw LengthExceededException("ODBC::Binder::getMinValueSize(%s, %d)", std::string(typeid(T).name()), static_cast<int>(size));
 

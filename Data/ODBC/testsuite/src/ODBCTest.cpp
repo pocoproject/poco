@@ -1247,6 +1247,48 @@ void ODBCTest::testParameterArraySize()
 }
 
 
+void ODBCTest::testBulkFullWidthStrings()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Bulk bound strings that fill their element of the parameter array, in the
+	// first and in the last row: no terminator follows them. Every row is passed
+	// with its length, so no value runs on into the next row or past the end of
+	// the array.
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+	dropObject("TABLE", "BulkFullWidthStrings");
+	session() << "CREATE TABLE BulkFullWidthStrings (Id INTEGER, Code CHAR(3), Txt VARCHAR(20))", now;
+
+	std::vector<int> ids = {0, 1, 2};
+	// as long as the column: the element length, if the driver reports the column size
+	std::vector<std::string> codes = {"USD", "EUR", "JPY"};
+	// as long as maxFieldSize: the element length, if the driver reports a larger size
+	std::vector<std::string> texts = {"12345678", "abc", "ABCDEFGH"};
+	const Poco::Any maxFieldSize = session().getProperty("maxFieldSize");
+	session().setProperty("maxFieldSize", Poco::Any(std::size_t(8)));
+	try
+	{
+		session() << "INSERT INTO BulkFullWidthStrings VALUES (?, ?, ?)",
+			use(ids, bulk), use(codes, bulk), use(texts, bulk), now;
+	}
+	catch (...)
+	{
+		session().setProperty("maxFieldSize", maxFieldSize);
+		throw;
+	}
+	// the columns of the query are bound with room for the terminator
+	session().setProperty("maxFieldSize", maxFieldSize);
+
+	std::vector<std::string> codesOut;
+	std::vector<std::string> textsOut;
+	session() << "SELECT Code, Txt FROM BulkFullWidthStrings ORDER BY Id", into(codesOut), into(textsOut), now;
+	assertTrue (codesOut == codes);
+	assertTrue (textsOut == texts);
+	dropObject("TABLE", "BulkFullWidthStrings");
+}
+
+
 void ODBCTest::testBLOBStmt()
 {
 	if (!_pSession) failmsg ("Test not available.");
