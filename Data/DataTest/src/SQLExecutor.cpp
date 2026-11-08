@@ -2456,7 +2456,7 @@ void SQLExecutor::blob(int bigSize, const std::string& blobPlaceholder)
 	std::vector<char> v(bigSize, 'x');
 	big.assignRaw(&v[0], v.size());
 
-	assertTrue (big.size() == bigSize);
+	assertTrue (big.size() == static_cast<std::size_t>(bigSize));
 
 	try { session() << "DELETE FROM Person", now; }
 	catch(DataException& ce)
@@ -2791,7 +2791,7 @@ void SQLExecutor::tupleVector()
 		failmsg (__func__);
 	}
 
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int,int> > ret;
 	try { session() << "SELECT * FROM Tuples", into(ret), now; }
@@ -3264,7 +3264,7 @@ void SQLExecutor::internalBulkExtraction()
 	{
 		Statement stmt = (session() << "SELECT * FROM Person", bulk(size), now);
 		RecordSet rset(stmt);
-		assertTrue (size == rset.rowCount());
+		assertTrue (static_cast<std::size_t>(size) == rset.rowCount());
 		assertTrue ("LN0" == rset["LastName"]);
 		assertTrue (0 == rset["Age"]);
 		rset.moveNext();
@@ -3284,7 +3284,7 @@ void SQLExecutor::internalBulkExtraction()
 	{
 		Statement stmt = (session() << "SELECT * FROM Person", limit(size), bulk, now);
 		RecordSet rset(stmt);
-		assertTrue (size == rset.rowCount());
+		assertTrue (static_cast<std::size_t>(size) == rset.rowCount());
 		assertTrue ("LN0" == rset["LastName"]);
 		assertTrue (0 == rset["Age"]);
 		rset.moveLast();
@@ -3329,7 +3329,7 @@ void SQLExecutor::internalBulkExtractionUTF16()
 	{
 		Statement stmt = (session() << "SELECT * FROM Person", bulk(size), now);
 		RecordSet rset(stmt);
-		assertTrue (size == rset.rowCount());
+		assertTrue (static_cast<std::size_t>(size) == rset.rowCount());
 		assertTrue (Poco::UnicodeConverter::to<UTF16String>("LN0") == rset["LastName"]);
 		assertTrue (0 == rset["Age"]);
 		rset.moveNext();
@@ -3344,7 +3344,7 @@ void SQLExecutor::internalBulkExtractionUTF16()
 	{
 		Statement stmt = (session() << "SELECT * FROM Person", limit(size), bulk, now);
 		RecordSet rset(stmt);
-		assertTrue (size == rset.rowCount());
+		assertTrue (static_cast<std::size_t>(size) == rset.rowCount());
 		assertTrue ("LN0" == rset["LastName"]);
 		assertTrue (0 == rset["Age"]);
 		rset.moveLast();
@@ -3689,17 +3689,51 @@ void SQLExecutor::stdVectorBool()
 }
 
 
+namespace
+{
+	class AsyncWait
+		/// Waits for the asynchronous execution of a statement when it goes out
+		/// of scope, so that a failed check does not return while an execution
+		/// still uses the session and the variables of the test.
+	{
+	public:
+		explicit AsyncWait(Statement& stmt): _stmt(stmt)
+		{
+		}
+
+		~AsyncWait()
+		{
+			try
+			{
+				_stmt.wait();
+			}
+			catch (...)
+			{
+			}
+		}
+
+		AsyncWait(const AsyncWait&) = delete;
+		AsyncWait& operator = (const AsyncWait&) = delete;
+
+	private:
+		Statement& _stmt;
+	};
+}
+
+
 void SQLExecutor::asynchronous(std::size_t rowCount)
 {
 	Session tmp = session();
 
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << formatSQL("INSERT INTO Strings VALUES(?)"), use(data));
+	AsyncWait waitStmt(stmt);
 	Statement::Result result = stmt.executeAsync();
 	assertTrue (!stmt.isAsync());
 	result.wait();
 
 	Statement stmt1 = (tmp << "SELECT * FROM Strings", into(data), async, now);
+	AsyncWait waitStmt1(stmt1);
 	assertTrue (stmt1.isAsync());
 	assertTrue (stmt1.wait() == rowCount);
 
@@ -3735,9 +3769,10 @@ void SQLExecutor::asynchronous(std::size_t rowCount)
 	assertTrue (result.data() == rowCount);
 
 	assertTrue (0 == rowCount % 10);
-	std::size_t step = rowCount/10;
+	const std::size_t step = rowCount/10;
 	data.clear();
 	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
+	AsyncWait waitStmt2(stmt2);
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;

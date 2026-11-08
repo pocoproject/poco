@@ -1760,7 +1760,7 @@ void SQLiteTest::testTupleVector10()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1808,7 +1808,7 @@ void SQLiteTest::testTupleVector9()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1856,7 +1856,7 @@ void SQLiteTest::testTupleVector8()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1902,7 +1902,7 @@ void SQLiteTest::testTupleVector7()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1948,7 +1948,7 @@ void SQLiteTest::testTupleVector6()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1994,7 +1994,7 @@ void SQLiteTest::testTupleVector5()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -2040,7 +2040,7 @@ void SQLiteTest::testTupleVector4()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -2086,7 +2086,7 @@ void SQLiteTest::testTupleVector3()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int> > ret;
 	assertTrue (ret != v);
@@ -2130,7 +2130,7 @@ void SQLiteTest::testTupleVector2()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int> > ret;
 	assertTrue (ret != v);
@@ -2174,7 +2174,7 @@ void SQLiteTest::testTupleVector1()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int> > ret;
 	assertTrue (ret != v);
@@ -2762,21 +2762,55 @@ void SQLiteTest::testRowIteratorSwap()
 }
 
 
+namespace
+{
+	class AsyncWait
+		/// Waits for the asynchronous execution of a statement when it goes out
+		/// of scope, so that a failed check does not return while an execution
+		/// still uses the session and the variables of the test.
+	{
+	public:
+		explicit AsyncWait(Statement& stmt): _stmt(stmt)
+		{
+		}
+
+		~AsyncWait()
+		{
+			try
+			{
+				_stmt.wait();
+			}
+			catch (...)
+			{
+			}
+		}
+
+		AsyncWait(const AsyncWait&) = delete;
+		AsyncWait& operator = (const AsyncWait&) = delete;
+
+	private:
+		Statement& _stmt;
+	};
+}
+
+
 void SQLiteTest::testAsync()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 
-	std::size_t rowCount = 500;
+	const std::size_t rowCount = 500;
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(:str)", use(data));
+	AsyncWait waitStmt(stmt);
 	Statement::Result result = stmt.executeAsync();
 	assertTrue (!stmt.isAsync());
 	result.wait();
 	assertTrue (500 == result.data());
 
 	Statement stmt1 = (tmp << "SELECT * FROM Strings", into(data), async, now);
+	AsyncWait waitStmt1(stmt1);
 	assertTrue (stmt1.isAsync());
 	assertTrue (stmt1.wait() == rowCount);
 
@@ -2813,9 +2847,10 @@ void SQLiteTest::testAsync()
 	assertTrue (result.data() == rowCount);
 
 	assertTrue (0 == rowCount % 10);
-	std::size_t step = rowCount/10;
+	const std::size_t step = rowCount/10;
 	data.clear();
 	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
+	AsyncWait waitStmt2(stmt2);
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;
