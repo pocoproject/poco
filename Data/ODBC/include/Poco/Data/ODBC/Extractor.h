@@ -38,6 +38,7 @@
 #endif
 
 #include <sqltypes.h>
+#include <type_traits>
 
 
 namespace Poco::Data::ODBC {
@@ -584,6 +585,9 @@ private:
 	template<typename T>
 	bool extractManualImpl(std::size_t pos, T& val, SQLSMALLINT cType)
 	{
+		// fixed-size values only, for which SQLGetData() ignores the buffer
+		// length; strings, LOBs, dates and UUIDs have their own implementations
+		static_assert(std::is_arithmetic_v<T>, "extractManualImpl() reads arithmetic types only");
 		SQLRETURN rc = 0;
 		T value{};
 
@@ -611,6 +615,10 @@ private:
 
 		return true;
 	}
+
+	template <typename T>
+	bool extractManualImplLOB(std::size_t pos, Poco::Data::LOB<T>& val, SQLSMALLINT cType);
+		/// Reads the value of column pos into val in chunks with SQLGetData().
 
 	template <typename T, typename NT>
 	bool extAny(std::size_t pos, T& val)

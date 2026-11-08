@@ -1395,6 +1395,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testParameterArraySize);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkFullWidthStrings);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkStringLengths);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testManualBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testManualStringChunks);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSet);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);

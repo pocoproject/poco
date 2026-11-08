@@ -120,6 +120,8 @@ public:
 	virtual void testBulkBindingBackstops();
 	virtual void testParameterArraySize();
 	virtual void testBulkFullWidthStrings();
+	virtual void testManualBLOB();
+	virtual void testManualStringChunks();
 
 	virtual void testRecordSet();
 	virtual void testRecordSetBeforeExecute();
@@ -243,6 +245,13 @@ private:
 	void checkBulkAnyRejected(const std::string& query);
 		/// Executes query with a bulk extraction into a container C of
 		/// Poco::Any or Poco::Dynamic::Var; expects NotImplementedException.
+
+	template <typename S>
+	void checkManualString(const std::string& query, std::size_t length, std::size_t maxFieldSize);
+		/// Extracts the single value of query, a string of length 'x'
+		/// characters, into a string S. Expects the value if its size in
+		/// bytes fits into maxFieldSize, the DataException for exceeding
+		/// maxFieldSize otherwise.
 
 	static Drivers    _drivers;
 	static constexpr bool _bindValues[8] = {true, true, true, false, false, true, false, false};

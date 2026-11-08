@@ -31,6 +31,7 @@
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
+#include "Poco/Data/RecordSet.h"
 #include "Poco/Data/Utility.h"
 #include "Poco/Nullable.h"
 #include "Poco/UnicodeConverter.h"
@@ -1312,6 +1313,143 @@ void ODBCTest::testBLOBStmt()
 		_pExecutor->blobStmt();
 		i += 2;
 	}
+}
+
+
+void ODBCTest::testManualBLOB()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Manual extraction reads BLOB values in chunks with SQLGetData(), as CLOB
+	// values. The values are longer than the BLOB object (19 bytes) and than
+	// a chunk of 1024 bytes (2000 bytes); the first checks use the default
+	// maxFieldSize of 1024 bytes.
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", false);
+	recreatePersonBLOBTable();
+	std::vector<unsigned char> bytes(2000);
+	for (std::size_t i = 0; i < bytes.size(); ++i)
+		bytes[i] = static_cast<unsigned char>(i % 251);
+	Poco::Data::BLOB small(&bytes[0], 19);
+	Poco::Data::BLOB large(bytes);
+	session() << "INSERT INTO Person VALUES ('a', 'small', 'x', ?)", use(small), now;
+	session() << "INSERT INTO Person VALUES ('b', 'large', 'x', ?)", use(large), now;
+	session() << "INSERT INTO Person (LastName, FirstName, Address) VALUES ('c', 'null', 'x')", now;
+
+	const Poco::Any maxFieldSize = session().getProperty("maxFieldSize");
+	try
+	{
+		session().setProperty("maxFieldSize", Poco::Any(std::size_t(1024)));
+		Poco::Data::BLOB blob;
+		session() << "SELECT Image FROM Person WHERE LastName = 'a'", into(blob), now;
+		assertTrue (blob == small);
+
+		Poco::Nullable<Poco::Data::BLOB> nullable;
+		session() << "SELECT Image FROM Person WHERE LastName = 'a'", into(nullable), now;
+		assertFalse (nullable.isNull());
+		assertTrue (nullable.value() == small);
+		session() << "SELECT Image FROM Person WHERE LastName = 'c'", into(nullable), now;
+		assertTrue (nullable.isNull());
+
+		Any any;
+		session() << "SELECT Image FROM Person WHERE LastName = 'a'", into(any), now;
+		assertTrue (AnyCast<Poco::Data::BLOB>(any) == small);
+		Var var;
+		session() << "SELECT Image FROM Person WHERE LastName = 'a'", into(var), now;
+		assertTrue (var.extract<Poco::Data::BLOB>() == small);
+
+		try
+		{
+			session() << "SELECT Image FROM Person WHERE LastName = 'b'", into(blob), now;
+			fail ("BLOB longer than maxFieldSize extracted");
+		}
+		catch (Poco::Data::DataException& ex)
+		{
+			assertTrue (ex.message().find("exceeds maximum value") != std::string::npos);
+		}
+
+		session().setProperty("maxFieldSize", Poco::Any(std::size_t(4096)));
+		session() << "SELECT Image FROM Person WHERE LastName = 'b'", into(blob), now;
+		assertTrue (blob == large);
+
+		Poco::Data::RecordSet rs(session(), "SELECT LastName, Image FROM Person ORDER BY LastName");
+		assertTrue (3 == rs.rowCount());
+		assertTrue (rs.value<Poco::Data::BLOB>(1, 0) == small);
+		assertTrue (rs.value<Poco::Data::BLOB>(1, 1) == large);
+		assertTrue (rs.isNull(1, 2));
+	}
+	catch (...)
+	{
+		session().setProperty("maxFieldSize", maxFieldSize);
+		throw;
+	}
+	session().setProperty("maxFieldSize", maxFieldSize);
+}
+
+
+template <typename S>
+void ODBCTest::checkManualString(const std::string& query, std::size_t length, std::size_t maxFieldSize)
+{
+	S str;
+	if (length * sizeof(typename S::value_type) <= maxFieldSize)
+	{
+		session() << query, into(str), now;
+		assertTrue (str == S(length, 'x'));
+	}
+	else
+	{
+		try
+		{
+			session() << query, into(str), now;
+			fail ("string longer than maxFieldSize extracted");
+		}
+		catch (Poco::Data::DataException& ex)
+		{
+			assertTrue (ex.message().find("exceeds maximum value") != std::string::npos);
+		}
+	}
+}
+
+
+void ODBCTest::testManualStringChunks()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Manual extraction reads strings in chunks with SQLGetData() into a
+	// buffer of 1024 bytes, which holds 1023 characters or 511 UTF-16 code
+	// units and the terminator. The lengths are around one and two chunks;
+	// a value of 1024 bytes fits into the default maxFieldSize of 1024 bytes.
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", false);
+	dropObject("TABLE", "ManualStringChunks");
+	session() << "CREATE TABLE ManualStringChunks (Id INTEGER, Str VARCHAR(4000))", now;
+	const std::size_t lengths[] = {511, 512, 513, 1023, 1024, 1025, 2047};
+	for (std::size_t length: lengths)
+	{
+		session() << format("INSERT INTO ManualStringChunks VALUES (%z, '%s')", length, std::string(length, 'x')), now;
+	}
+
+	const Poco::Any maxFieldSize = session().getProperty("maxFieldSize");
+	try
+	{
+		for (std::size_t fieldSize: {std::size_t(1024), std::size_t(4096)})
+		{
+			session().setProperty("maxFieldSize", Poco::Any(fieldSize));
+			for (std::size_t length: lengths)
+			{
+				const std::string query = format("SELECT Str FROM ManualStringChunks WHERE Id = %z", length);
+				checkManualString<std::string>(query, length, fieldSize);
+				checkManualString<Poco::UTF16String>(query, length, fieldSize);
+			}
+		}
+	}
+	catch (...)
+	{
+		session().setProperty("maxFieldSize", maxFieldSize);
+		throw;
+	}
+	session().setProperty("maxFieldSize", maxFieldSize);
+	dropObject("TABLE", "ManualStringChunks");
 }
 
 

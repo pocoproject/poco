@@ -511,6 +511,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkRowsetBackstop);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testParameterArraySize);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkFullWidthStrings);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testManualBLOB);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testDate);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testTime);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testDateTime);
