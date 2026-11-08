@@ -149,6 +149,7 @@ public:
 		///   * microsecond is from 0 to 999.
 		///
 		/// Throws an InvalidArgumentException if an argument date is out of range.
+		/// The DateTime is not modified in that case.
 
 	void swap(DateTime& dateTime) noexcept;
 		/// Swaps the DateTime with another one.
@@ -258,6 +259,11 @@ protected:
 	void checkValid();
 		/// Checks if the given date and time is valid (all arguments are within a proper range).
 		/// Expects all members to be set.
+		///
+		/// Throws Poco::InvalidArgumentException if any of the arguments is not valid.
+
+	static void checkValid(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond);
+		/// Checks if the given date and time is valid (all arguments are within a proper range).
 		///
 		/// Throws Poco::InvalidArgumentException if any of the arguments is not valid.
 

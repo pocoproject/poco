@@ -43,6 +43,7 @@ public:
 	void testLeapSeconds();
 	void testTM();
 	void testInvalid();
+	void testInvalidAssign();
 
 	void setUp();
 	void tearDown();

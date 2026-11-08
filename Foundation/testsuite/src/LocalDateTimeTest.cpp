@@ -23,6 +23,8 @@
 #include "Poco/Timezone.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
+#include "Poco/Exception.h"
+#include <climits>
 #include <ctime>
 #include <iostream>
 
@@ -482,6 +484,82 @@ void LocalDateTimeTest::testTimezone2()
 }
 
 
+void LocalDateTimeTest::testInvalidAssign()
+{
+	static constexpr struct
+	{
+		int d_lineNum;  // source line number
+		int d_year;     // year under test
+		int d_month;    // month under test
+		int d_day;      // day under test
+		int d_hour;     // hour under test
+	} data[] =
+	{
+		//line no.   year      month    day   hour
+		//-------   -----  ---------  -----  -----
+		{ __LINE__, 10000,         1,     1,     0 },
+		{ __LINE__,  2024,         0,     1,     0 },
+		{ __LINE__,  2024,        13,     1,     0 },
+		{ __LINE__,  2024,        20,     1,     0 },
+		{ __LINE__,  2024,       -13,     1,     0 },
+		{ __LINE__,  2024,     65535,     1,     0 },
+		{ __LINE__,  2024, 1 + 65536,     1,     0 },
+		{ __LINE__,  2024,   INT_MAX,     1,     0 },
+		{ __LINE__,  2024,   INT_MIN,     1,     0 },
+		{ __LINE__,  2024,         2,    30,     0 },
+		{ __LINE__,  2024,         1,     1,    24 },
+	};
+
+	const LocalDateTime orig(3600, 2024, 5, 17, 10, 20, 30, 400, 500);
+
+	const int num_data = sizeof data / sizeof *data;
+	for (int di = 0; di < num_data; ++di)
+	{
+		const int line = data[di].d_lineNum;
+
+		LocalDateTime ldt1(orig);
+		try
+		{
+			ldt1.assign(data[di].d_year, data[di].d_month, data[di].d_day, data[di].d_hour, 0, 0, 0, 0);
+			fail("Invalid date time, must throw", line, __FILE__);
+		}
+		catch(const Poco::InvalidArgumentException&) { }
+
+		// The object keeps its previous value.
+		loop_1_assert (line, ldt1.tzd() == orig.tzd());
+		loop_1_assert (line, ldt1.utcTime() == orig.utcTime());
+		loop_1_assert (line, ldt1.year() == orig.year());
+		loop_1_assert (line, ldt1.month() == orig.month());
+		loop_1_assert (line, ldt1.day() == orig.day());
+		loop_1_assert (line, ldt1.hour() == orig.hour());
+		loop_1_assert (line, ldt1.minute() == orig.minute());
+		loop_1_assert (line, ldt1.second() == orig.second());
+		loop_1_assert (line, ldt1.millisecond() == orig.millisecond());
+		loop_1_assert (line, ldt1.microsecond() == orig.microsecond());
+
+		LocalDateTime ldt2(orig);
+		try
+		{
+			ldt2.assign(7200, data[di].d_year, data[di].d_month, data[di].d_day, data[di].d_hour, 0, 0, 0, 0);
+			fail("Invalid date time, must throw", line, __FILE__);
+		}
+		catch(const Poco::InvalidArgumentException&) { }
+
+		// The object keeps its previous value, including the time zone differential.
+		loop_1_assert (line, ldt2.tzd() == orig.tzd());
+		loop_1_assert (line, ldt2.utcTime() == orig.utcTime());
+		loop_1_assert (line, ldt2.year() == orig.year());
+		loop_1_assert (line, ldt2.month() == orig.month());
+		loop_1_assert (line, ldt2.day() == orig.day());
+		loop_1_assert (line, ldt2.hour() == orig.hour());
+		loop_1_assert (line, ldt2.minute() == orig.minute());
+		loop_1_assert (line, ldt2.second() == orig.second());
+		loop_1_assert (line, ldt2.millisecond() == orig.millisecond());
+		loop_1_assert (line, ldt2.microsecond() == orig.microsecond());
+	}
+}
+
+
 void LocalDateTimeTest::setUp()
 {
 }
@@ -508,6 +586,7 @@ CppUnit::Test* LocalDateTimeTest::suite()
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testSwap);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testTimezone);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testTimezone2);
+	CppUnit_addTest(pSuite, LocalDateTimeTest, testInvalidAssign);
 
 	return pSuite;
 }

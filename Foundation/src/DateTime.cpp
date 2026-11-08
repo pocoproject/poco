@@ -71,7 +71,7 @@ DateTime::DateTime(int year, int month, int day, int hour, int minute, int secon
 	_millisecond(static_cast<short>(millisecond)),
 	_microsecond(static_cast<short>(microsecond))
 {
-	checkValid();
+	checkValid(year, month, day, hour, minute, second, millisecond, microsecond);
 	_utcTime = toUtcTime(toJulianDay(year, month, day)) +
 			10 * (hour*Timespan::HOURS + minute*Timespan::MINUTES + second*Timespan::SECONDS +
 				  millisecond*Timespan::MILLISECONDS + microsecond);
@@ -153,6 +153,8 @@ DateTime& DateTime::operator = (double julianDay)
 
 DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond)
 {
+	checkValid(year, month, day, hour, minute, second, millisecond, microsecond);
+
 	_utcTime     = toUtcTime(toJulianDay(year, month, day)) + 10*(hour*Timespan::HOURS + minute*Timespan::MINUTES + second*Timespan::SECONDS + millisecond*Timespan::MILLISECONDS + microsecond);
 	_year        = static_cast<short>(year);
 	_month       = static_cast<short>(month);
@@ -162,7 +164,6 @@ DateTime& DateTime::assign(int year, int month, int day, int hour, int minute, i
 	_second      = static_cast<short>(second);
 	_millisecond = static_cast<short>(millisecond);
 	_microsecond = static_cast<short>(microsecond);
-	checkValid();
 
 	return *this;
 }
@@ -212,8 +213,14 @@ int DateTime::daysOfMonth(int year, int month)
 
 void DateTime::checkValid()
 {
-	if (!isValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond))
-		throw Poco::InvalidArgumentException(Poco::format("Date time is %hd-%hd-%hdT%hd:%hd:%hd.%hd.%hd\n"
+	checkValid(_year, _month, _day, _hour, _minute, _second, _millisecond, _microsecond);
+}
+
+
+void DateTime::checkValid(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond)
+{
+	if (!isValid(year, month, day, hour, minute, second, millisecond, microsecond))
+		throw Poco::InvalidArgumentException(Poco::format("Date time is %d-%d-%dT%d:%d:%d.%d.%d\n"
 				"Valid values:\n"
 				"-4713 <= year <= 9999\n"
 				"1 <= month <= 12\n"
@@ -223,9 +230,9 @@ void DateTime::checkValid()
 				"0 <= second <= 60\n"
 				"0 <= millisecond <= 999\n"
 				"0 <= microsecond <= 999",
-				_year, _month, _day, _hour, _minute,
-				_second, _millisecond, _microsecond,
-				daysOfMonth(_year, _month)));
+				year, month, day, hour, minute,
+				second, millisecond, microsecond,
+				daysOfMonth(year, month)));
 }
 
 

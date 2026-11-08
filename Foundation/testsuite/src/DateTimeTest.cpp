@@ -20,6 +20,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
+#include <climits>
 
 
 using Poco::Timestamp;
@@ -979,6 +980,113 @@ void DateTimeTest::testInvalid()
 	}
 	catch(const Poco::InvalidArgumentException&) { }
 
+	// Arguments outside the range of short are rejected, even if they
+	// would be in range after conversion to short.
+	static constexpr struct
+	{
+		int d_lineNum;      // source line number
+		int d_year;         // year under test
+		int d_month;        // month under test
+		int d_day;          // day under test
+		int d_hour;         // hour under test
+		int d_minute;       // minute under test
+		int d_second;       // second under test
+		int d_millisecond;  // millisecond under test
+		int d_microsecond;  // microsecond under test
+	} data[] =
+	{
+		//line no.          year       month         day   hour  minute  second     ms     us
+		//-------   ------------   ---------   ---------  -----   -----   -----  -----  -----
+		{ __LINE__, 2024 + 65536,          1,          1,     0,      0,      0,     0,     0 },
+		{ __LINE__,         2024,  1 + 65536,          1,     0,      0,      0,     0,     0 },
+		{ __LINE__,         2024,          1,  1 + 65536,     0,      0,      0,     0,     0 },
+		{ __LINE__,         2024,          1,          1, 65536,      0,      0,     0,     0 },
+		{ __LINE__,         2024,          1,          1,     0,  65536,      0,     0,     0 },
+		{ __LINE__,         2024,          1,          1,     0,      0,  65536,     0,     0 },
+		{ __LINE__,         2024,          1,          1,     0,      0,      0, 65536,     0 },
+		{ __LINE__,         2024,          1,          1,     0,      0,      0,     0, 65536 },
+	};
+
+	const int num_data = sizeof data / sizeof *data;
+	for (int di = 0; di < num_data; ++di)
+	{
+		const int line = data[di].d_lineNum;
+		try
+		{
+			DateTime dt(data[di].d_year, data[di].d_month, data[di].d_day, data[di].d_hour,
+				data[di].d_minute, data[di].d_second, data[di].d_millisecond, data[di].d_microsecond);
+			fail("Invalid date time, must throw", line, __FILE__);
+		}
+		catch(const Poco::InvalidArgumentException&) { }
+	}
+}
+
+
+void DateTimeTest::testInvalidAssign()
+{
+	static constexpr struct
+	{
+		int d_lineNum;      // source line number
+		int d_year;         // year under test
+		int d_month;        // month under test
+		int d_day;          // day under test
+		int d_hour;         // hour under test
+		int d_minute;       // minute under test
+		int d_second;       // second under test
+		int d_millisecond;  // millisecond under test
+		int d_microsecond;  // microsecond under test
+	} data[] =
+	{
+		//line no.          year       month         day     hour  minute  second    ms    us
+		//-------   ------------   ---------   ---------  -------   -----   -----  ----  ----
+		{ __LINE__,        10000,          1,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__, 2024 + 65536,          1,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,      INT_MIN,          1,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,          0,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,         13,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,         15,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,         20,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,        -13,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,      65535,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,  1 + 65536,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,    INT_MAX,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,    INT_MIN,          1,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,          2,         30,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,          1,  1 + 65536,       0,      0,      0,    0,    0 },
+		{ __LINE__,         2024,          1,          1,      24,      0,      0,    0,    0 },
+		{ __LINE__,         2024,          1,          1, INT_MAX,      0,      0,    0,    0 },
+		{ __LINE__,         2024,          1,          1,       0,     60,      0,    0,    0 },
+		{ __LINE__,         2024,          1,          1,       0,      0,     61,    0,    0 },
+		{ __LINE__,         2024,          1,          1,       0,      0,      0, 1000,    0 },
+		{ __LINE__,         2024,          1,          1,       0,      0,      0,    0, 1000 },
+	};
+
+	const DateTime orig(2024, 5, 17, 10, 20, 30, 400, 500);
+
+	const int num_data = sizeof data / sizeof *data;
+	for (int di = 0; di < num_data; ++di)
+	{
+		const int line = data[di].d_lineNum;
+		DateTime dt(orig);
+		try
+		{
+			dt.assign(data[di].d_year, data[di].d_month, data[di].d_day, data[di].d_hour,
+				data[di].d_minute, data[di].d_second, data[di].d_millisecond, data[di].d_microsecond);
+			fail("Invalid date time, must throw", line, __FILE__);
+		}
+		catch(const Poco::InvalidArgumentException&) { }
+
+		// The object keeps its previous value.
+		loop_1_assert (line, dt.utcTime() == orig.utcTime());
+		loop_1_assert (line, dt.year() == orig.year());
+		loop_1_assert (line, dt.month() == orig.month());
+		loop_1_assert (line, dt.day() == orig.day());
+		loop_1_assert (line, dt.hour() == orig.hour());
+		loop_1_assert (line, dt.minute() == orig.minute());
+		loop_1_assert (line, dt.second() == orig.second());
+		loop_1_assert (line, dt.millisecond() == orig.millisecond());
+		loop_1_assert (line, dt.microsecond() == orig.microsecond());
+	}
 }
 
 
@@ -1016,6 +1124,7 @@ CppUnit::Test* DateTimeTest::suite()
 	CppUnit_addTest(pSuite, DateTimeTest, testLeapSeconds);
 	CppUnit_addTest(pSuite, DateTimeTest, testTM);
 	CppUnit_addTest(pSuite, DateTimeTest, testInvalid);
+	CppUnit_addTest(pSuite, DateTimeTest, testInvalidAssign);
 
 	return pSuite;
 }
