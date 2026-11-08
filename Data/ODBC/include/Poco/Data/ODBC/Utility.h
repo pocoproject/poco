@@ -166,7 +166,20 @@ public:
 
 	[[nodiscard]] static std::string sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type);
 		/// Returns the requested info about the DBMS or ODBC driver.
+		/// A value that does not fit into a buffer of 1024 bytes is
+		/// truncated to the part that does, which can end inside a
+		/// multi-byte character.
 		/// On error, returns "unknown".
+		/// Throws NullPointerException if db has no connection handle,
+		/// e.g. after disconnect().
+
+	[[nodiscard]] static std::string sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type, SQLSMALLINT bufferSize);
+		/// Returns the requested info about the DBMS or ODBC driver.
+		/// A value that does not fit into a buffer of bufferSize bytes
+		/// is truncated to the part that does, which can end inside a
+		/// multi-byte character.
+		/// On error, returns "unknown".
+		/// Throws InvalidArgumentException if bufferSize is not positive.
 		/// Throws NullPointerException if db has no connection handle,
 		/// e.g. after disconnect().
 

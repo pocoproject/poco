@@ -25,10 +25,13 @@
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
+#include "Poco/Data/ODBC/SessionImpl.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/Utility.h"
 #include <sqltypes.h>
+#include <algorithm>
 #include <iostream>
+#include <vector>
 
 
 using namespace Poco::Data::Keywords;
@@ -117,6 +120,75 @@ void ODBCTest::testExceptionCopy()
 	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	_pExecutor->exceptionCopy();
+}
+
+
+void ODBCTest::testSQLGetInfo()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Utility::sqlGetInfo() reads the value into a buffer of 1024 bytes, or
+	// of the given size. Its results are compared with the values read
+	// through a buffer large enough for them. The length reported for a value
+	// that does not fit into the buffer, and in Unicode builds for a value of
+	// more characters than half the buffer size, exceeds the buffer; such a
+	// value must be returned as far as it is in the buffer. A DBMS name of
+	// more than 3 bytes read into 4 bytes is such a value with every driver,
+	// and so is the SQL_KEYWORDS list of some drivers read into 1024 bytes.
+	auto* pImpl = dynamic_cast<Poco::Data::ODBC::SessionImpl*>(session().impl());
+	assertNotNullPtr (pImpl);
+	const Poco::Data::ODBC::ConnectionHandle& dbc = pImpl->dbc();
+
+	const auto info = [&dbc](SQLUSMALLINT type)
+	{
+		std::vector<SQLCHAR> buffer(8192, 0);
+		SQLSMALLINT length = 0;
+		if (Utility::isError(Poco::Data::ODBC::SQLGetInfo(dbc.handle(), type,
+			buffer.data(), static_cast<SQLSMALLINT>(buffer.size()), &length)))
+		{
+			return std::string("unknown");
+		}
+		const char* pValue = reinterpret_cast<const char*>(buffer.data());
+		return std::string(pValue, std::find(pValue, pValue + buffer.size(), '\0'));
+	};
+
+	assertEqual (info(SQL_DBMS_NAME), Utility::dbmsName(dbc));
+	assertEqual (info(SQL_DBMS_VER), Utility::dbmsVersion(dbc));
+	assertEqual (info(SQL_DRIVER_NAME), Utility::driverName(dbc));
+	assertEqual (info(SQL_DRIVER_VER), Utility::driverVersion(dbc));
+	assertEqual (info(SQL_DRIVER_ODBC_VER), Utility::driverODBCVersion(dbc));
+	assertEqual (Utility::dbmsName(dbc), session().dbmsName());
+
+	const std::string dbms = info(SQL_DBMS_NAME);
+	const std::string prefix = Utility::sqlGetInfo(dbc, SQL_DBMS_NAME, 4);
+	if (dbms.size() < 4)
+		assertEqual (dbms, prefix);
+	else
+	{
+		// the 3 bytes before the terminator, or a full buffer
+		assertTrue (prefix.size() >= 3 && prefix.size() <= 4);
+		assertTrue (0 == dbms.compare(0, prefix.size(), prefix));
+	}
+
+	const std::string keywords = info(SQL_KEYWORDS);
+	const std::string value = Utility::sqlGetInfo(dbc, SQL_KEYWORDS);
+	if (keywords.size() < 1024)
+		assertEqual (keywords, value);
+	else
+	{
+		// the 1023 bytes before the terminator, or a full buffer
+		assertTrue (value.size() >= 1023 && value.size() <= 1024);
+		assertTrue (0 == keywords.compare(0, value.size(), value));
+	}
+
+	try
+	{
+		static_cast<void>(Utility::sqlGetInfo(dbc, SQL_DBMS_NAME, 0));
+		fail ("sqlGetInfo() accepted a buffer size of 0");
+	}
+	catch (Poco::InvalidArgumentException&)
+	{
+	}
 }
 
 

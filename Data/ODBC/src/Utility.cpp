@@ -18,7 +18,9 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTime.h"
+#include <algorithm>
 #include <cmath>
+#include <vector>
 
 
 namespace Poco::Data::ODBC {
@@ -157,17 +159,32 @@ void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 
 std::string Utility::sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type)
 {
+	return sqlGetInfo(db, type, 1024);
+}
+
+
+std::string Utility::sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type, SQLSMALLINT bufferSize)
+{
+	if (bufferSize <= 0)
+		throw InvalidArgumentException("ODBC::Utility::sqlGetInfo(): buffer size must be positive.");
+
 	std::string ret = "unknown"s;
-	const SQLSMALLINT bufSize = 1024;
-	SQLCHAR dbmsName[bufSize] = {0};
+	// One zero byte more than the driver is told about: the driver manager can
+	// fill the buffer without a terminator when it truncates a converted value
+	// and then look for the terminator itself, which must stay in the buffer.
+	std::vector<SQLCHAR> info(static_cast<std::size_t>(bufferSize) + 1, 0);
 	SQLSMALLINT retSize = 0;
 	poco_check_ptr (db.handle());
-	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), type, dbmsName, bufSize, &retSize);
+	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), type, info.data(), bufferSize, &retSize);
 	if (!isError(rc))
 	{
-		ret.assign(reinterpret_cast<char*>(dbmsName), retSize);
-		// API may return string longer than effective length
-		ret.erase(ret.find_last_not_of('\0') + 1, std::string::npos);
+		// The reported length can differ from the length of the value in the
+		// buffer: for a truncated value it is the length of the whole value,
+		// and in Unicode builds it is the length in bytes of the UTF-16 value
+		// that was converted to UTF-8 into the buffer. The value ends at its
+		// terminator, or at the end of the buffer if it fills the buffer.
+		const char* pInfo = reinterpret_cast<const char*>(info.data());
+		ret.assign(pInfo, std::find(pInfo, pInfo + bufferSize, '\0'));
 	}
 	return ret;
 }

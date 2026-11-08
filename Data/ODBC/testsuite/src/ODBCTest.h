@@ -54,6 +54,7 @@ public:
 	virtual void testSessionPool();
 	virtual void testClosedSession();
 	virtual void testExceptionCopy();
+	virtual void testSQLGetInfo();
 
 	virtual void testZeroRows();
 	virtual void testSimpleAccess();
