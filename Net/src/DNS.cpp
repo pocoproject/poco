@@ -26,7 +26,6 @@
 #include "Poco/Unicode.h"
 #include <cstring>
 
-
 #if defined(POCO_HAVE_LIBRESOLV)
 #include <resolv.h>
 #endif
@@ -86,6 +85,12 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 		freeaddrinfo(pAI);
 		return result;
 	}
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	else if(rc == WSANO_DATA && hostname == "localhost") // no data record found and is local host 
+	{
+		return HostEntry("localhost",Poco::Net::IPAddress("127.0.0.1"));
+	}
+#endif // _WIN32
 	else
 	{
 		aierror(rc, hostname);
@@ -137,6 +142,13 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 			freeaddrinfo(pAI);
 			return result;
 		}
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		else if(rc == WSANO_DATA && address.isLoopback()) // no data record found and is local host 
+		{
+			return HostEntry("localhost", address);
+		}
+#endif // _WIN32
+
 		else
 		{
 			aierror(rc, addressText);
