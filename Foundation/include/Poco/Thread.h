@@ -154,12 +154,19 @@ public:
 		/// Note that the given Runnable object must remain
 		/// valid during the entire lifetime of the thread, as
 		/// only a reference to it is stored internally.
+		///
+		/// Throws a SystemException if the thread cannot be started,
+		/// for example because its priority cannot be applied. The
+		/// target is not run in that case. This also applies to the
+		/// other start() variants and to startFunc().
 
 	void start(Poco::SharedPtr<Runnable> pTarget);
 		/// Starts the thread with the given target.
 		///
 		/// The Thread ensures that the given target stays
 		/// alive while the thread is running.
+		///
+		/// Throws a NullPointerException if pTarget is null.
 
 	void start(Callable target, void* pData = nullptr);
 		/// Starts the thread with the given target and parameter.

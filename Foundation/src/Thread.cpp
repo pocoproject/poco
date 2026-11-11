@@ -14,6 +14,7 @@
 
 #include "Poco/Thread.h"
 #include "Poco/Mutex.h"
+#include "Poco/Bugcheck.h"
 #include "Poco/Exception.h"
 #include "Poco/ThreadLocal.h"
 #include <sstream>
@@ -131,6 +132,7 @@ void Thread::start(Runnable& target)
 
 void Thread::start(Poco::SharedPtr<Runnable> pTarget)
 {
+	poco_check_ptr(pTarget);
 	startImpl(pTarget);
 }
 
