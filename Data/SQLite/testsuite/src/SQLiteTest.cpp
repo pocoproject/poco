@@ -3213,6 +3213,18 @@ void SQLiteTest::testMultipleResults()
 	assertTrue (2 == people2.size());
 	assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people2[0]);
 	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
+
+	tmp << "DELETE FROM Person", now;
+	pHomer = Person();
+	aBart = 0;
+	people2.clear();
+
+	assertTrue (7 == stmt.execute());
+	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
+	assertTrue (12 == aBart);
+	assertTrue (2 == people2.size());
+	assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people2[0]);
+	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
 }
 
 
