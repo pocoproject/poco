@@ -24,6 +24,8 @@ cp bin/Net-http-parser-fuzzer $OUT/http_message_fuzzer
 cp bin/AIMCP-server-fuzzer $OUT/mcp_server_fuzzer
 cp bin/AIMCP-client-fuzzer $OUT/mcp_client_fuzzer
 cp bin/AIMCPHTTP-eventstream-fuzzer $OUT/mcp_event_stream_fuzzer
+cp bin/Net-address-fuzzer $OUT/net_address_fuzzer
+cp bin/Net-cookie-fuzzer $OUT/net_cookie_fuzzer
 
 # Seed corpus
 zip -q -r -j $OUT/mail_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Mail
@@ -34,6 +36,8 @@ zip -q -r -j $OUT/mcp_event_stream_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/HTTP/
 zip -q -r -j $OUT/date_time_fuzzer_seed_corpus.zip $SRC/poco/Foundation/fuzzing/seed/DateTime
 zip -q -r -j $OUT/jwt_decode_fuzzer_seed_corpus.zip $SRC/poco/JWT/fuzzing/seed/Token
 zip -q -r -j $OUT/json_parser_fuzzer_seed_corpus.zip $SRC/poco/JSON/fuzzing/seed/JSON
+zip -q -r -j $OUT/net_address_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Address
+zip -q -r -j $OUT/net_cookie_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Cookie
 
 # Dictionaries
 cp $SRC/poco/XML/fuzzing/xml.dict $OUT/xml_parser_fuzzer.dict
@@ -44,3 +48,5 @@ cp $SRC/poco/JWT/fuzzing/jwt.dict $OUT/jwt_decode_fuzzer.dict
 cp $SRC/poco/JSON/fuzzing/json.dict $OUT/json_parser_fuzzer.dict
 cp $SRC/poco/Net/fuzzing/http.dict $OUT/http_message_fuzzer.dict
 cp $SRC/poco/Net/fuzzing/mail.dict $OUT/mail_message_fuzzer.dict
+cp $SRC/poco/Net/fuzzing/address.dict $OUT/net_address_fuzzer.dict
+cp $SRC/poco/Net/fuzzing/cookie.dict $OUT/net_cookie_fuzzer.dict
