@@ -201,6 +201,11 @@ protected:
 	virtual void bindImpl() = 0;
 		/// Binds parameters.
 
+	virtual void resetImpl();
+		/// Resets connector-specific per-data-set state when a finished
+		/// statement is reset for another execution.
+		/// The default implementation does nothing.
+
 	virtual void execDirectImpl(const std::string& query);
 		/// Execute query directly.
 		///
