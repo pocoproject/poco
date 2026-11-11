@@ -67,6 +67,9 @@ void URITest::testConstruction()
 	uri.setPath("/index.html");
 	assertTrue (uri.getPath() == "/index.html");
 
+	uri.setPath(uri.getPath());
+	assertTrue (uri.getPath() == "/index.html");
+
 	uri.setPath("/file%20with%20spaces.html");
 	assertTrue (uri.getPath() == "/file with spaces.html");
 

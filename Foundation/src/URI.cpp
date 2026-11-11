@@ -345,8 +345,9 @@ void URI::setAuthority(const std::string& authority)
 
 void URI::setPath(const std::string& path)
 {
-	_path.clear();
-	decode(path, _path);
+	std::string decodedPath;
+	decode(path, decodedPath);
+	_path = std::move(decodedPath);
 }
 
 
