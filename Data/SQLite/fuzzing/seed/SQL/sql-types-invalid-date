@@ -1,0 +1,7 @@
+CREATE TABLE types (
+	d DATE
+);
+INSERT INTO types VALUES (
+	'not-a-date'
+);
+SELECT * FROM types;
