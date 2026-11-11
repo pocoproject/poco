@@ -1,0 +1,29 @@
+# local file header / central directory / EOCD magics
+"PK\x03\x04"
+"PK\x01\x02"
+"PK\x05\x06"
+"PK\x06\x06"
+"PK\x06\x07"
+"PK\x07\x08"
+# compression methods
+cm: 0
+cm: 8
+cm: 12
+cm: 99
+# versions
+\x14\x00
+\x2d\x00
+\x33\x00
+# flags
+\x00\x00
+\x08\x00
+\x09\x00
+# entry names
+"a.txt"
+"dir/"
+"dir/sub/f.txt"
+"../outside.txt"
+"/abs/path.txt"
+"C:\\evil.txt"
+# zip64 extra field id
+\x01\x00
