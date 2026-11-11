@@ -254,6 +254,13 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 			throw SystemException("thread already running");
 	}
 
+	// Before the thread is created: mapPrio() throws for a value that is not a priority.
+	const int policy = _pData->policy;
+	const bool applyPriority = (policy != SCHED_OTHER) || (_pData->prio != PRIO_NORMAL_IMPL);
+	struct sched_param par{};
+	par.sched_priority = _pData->osPrio;
+	if (applyPriority && policy == SCHED_OTHER) par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
+
 	pthread_attr_t attributes;
 	pthread_attr_init(&attributes);
 
@@ -268,43 +275,41 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		}
 	}
 
+	int priorityError = 0;
 	{
 		FastMutex::ScopedLock l(_pData->mutex);
 		_pData->pRunnableTarget = pTarget;
 		_pData->done.reset();
 		int errorCode;
-		if ((errorCode = pthread_create(&_pData->thread, &attributes, runnableEntry, this)))
+		// A failed pthread_create() may write to its first argument, which still
+		// identifies an earlier thread that join() has to reap.
+		pthread_t thread{};
+		if ((errorCode = pthread_create(&thread, &attributes, runnableEntry, this)))
 		{
 			_pData->pRunnableTarget = nullptr;
+			// join() must not wait for a thread that was not created.
+			_pData->done.set();
 			pthread_attr_destroy(&attributes);
 			throw SystemException(Poco::format("cannot start thread (%s)",
 				Error::getMessage(errorCode)));
+		}
+		_pData->thread = thread;
+		if (applyPriority)
+		{
+			// The new thread waits for this mutex and returns at once if it finds no target.
+			priorityError = pthread_setschedparam(_pData->thread, policy, &par);
+			if (priorityError != 0) _pData->pRunnableTarget = nullptr;
 		}
 	}
 	_pData->started = true;
 	_pData->joined = false;
 	pthread_attr_destroy(&attributes);
 
-	if (_pData->policy == SCHED_OTHER)
+	if (priorityError != 0)
 	{
-		if (_pData->prio != PRIO_NORMAL_IMPL)
-		{
-			struct sched_param par;
-			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
-			int errorCode;
-			if ((errorCode = pthread_setschedparam(_pData->thread, SCHED_OTHER, &par)))
-				throw SystemException(Poco::format("cannot set thread priority (%s)",
-					Error::getMessage(errorCode)));
-		}
-	}
-	else
-	{
-		struct sched_param par;
-		par.sched_priority = _pData->osPrio;
-		int errorCode;
-		if ((errorCode = pthread_setschedparam(_pData->thread, _pData->policy, &par)))
-			throw SystemException(Poco::format("cannot set thread priority (%s)",
-				Error::getMessage(errorCode)));
+		joinImpl();
+		throw SystemException(Poco::format("cannot set thread priority (%s)",
+			Error::getMessage(priorityError)));
 	}
 }
 
@@ -453,12 +458,19 @@ void* ThreadImpl::runnableEntry(void* pThread)
 #endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 
-#ifndef POCO_NO_THREADNAME
 	{
+		// startImpl() holds the mutex until it has applied the priority,
+		// and removes the target if that failed.
 		FastMutex::ScopedLock lock(pData->mutex);
+		if (pData->pRunnableTarget.isNull())
+		{
+			pData->done.set();
+			return nullptr;
+		}
+#ifndef POCO_NO_THREADNAME
 		setCurrentNameImpl(pData->name);
-	}
 #endif
+	}
 
 	try
 	{

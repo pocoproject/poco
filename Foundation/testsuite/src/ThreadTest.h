@@ -41,6 +41,9 @@ public:
 	void testSleep();
 	void testAffinity();
 	void testInterrupt();
+	void testStartFailureLeavesNoThread();
+	void testStartWithPriority();
+	void testStartNullTarget();
 
 	void setUp();
 	void tearDown();

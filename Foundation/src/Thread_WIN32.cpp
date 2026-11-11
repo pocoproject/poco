@@ -142,17 +142,34 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 
 void ThreadImpl::createImpl(Entry ent, void* pData)
 {
+	const bool applyPriority = _prio != PRIO_NORMAL_IMPL;
 #if defined(_DLL)
-	_thread = CreateThread(nullptr, _stackSize, ent, pData, 0, &_threadId);
+	_thread = CreateThread(nullptr, _stackSize, ent, pData, applyPriority ? CREATE_SUSPENDED : 0, &_threadId);
 #else
 	unsigned threadId;
-	_thread = (HANDLE) _beginthreadex(nullptr, _stackSize, ent, this, 0, &threadId);
+	_thread = (HANDLE) _beginthreadex(nullptr, _stackSize, ent, this, applyPriority ? CREATE_SUSPENDED : 0, &threadId);
 	_threadId = static_cast<DWORD>(threadId);
 #endif
 	if (!_thread)
 		throw SystemException("cannot create thread");
-	if (_prio != PRIO_NORMAL_IMPL && !SetThreadPriority(_thread, _prio))
-		throw SystemException("cannot set thread priority");
+	if (applyPriority)
+	{
+		const bool prioritySet = SetThreadPriority(_thread, _prio) != 0;
+		// Without a target the thread returns at once.
+		if (!prioritySet) _pRunnableTarget = nullptr;
+		if (ResumeThread(_thread) == static_cast<DWORD>(-1))
+		{
+			// The thread stays suspended and never runs.
+			_pRunnableTarget = nullptr;
+			threadCleanup();
+			throw SystemException("cannot resume thread");
+		}
+		if (!prioritySet)
+		{
+			joinImpl();
+			throw SystemException("cannot set thread priority");
+		}
+	}
 }
 
 
@@ -351,6 +368,7 @@ unsigned __stdcall ThreadImpl::runnableEntry(void* pThread)
 	auto * pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
 	_currentThreadHolder.set(pThreadImpl);
 	setThreadName(-1, pThreadImpl->_name);
+	if (pThreadImpl->_pRunnableTarget.isNull()) return 0;
 	try
 	{
 		reinterpret_cast<ThreadImpl*>(pThread)->_pRunnableTarget->run();
