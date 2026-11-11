@@ -31,6 +31,7 @@ public:
 	void testWaitDequeue();
 	void testThreads();
 	void testDefaultQueue();
+	void testWakeUpAllBeforeWait();
 
 	void setUp();
 	void tearDown();

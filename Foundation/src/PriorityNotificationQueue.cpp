@@ -40,6 +40,7 @@ void PriorityNotificationQueue::enqueueNotification(Notification::Ptr pNotificat
 {
 	poco_check_ptr (pNotification);
 	FastMutex::ScopedLock lock(_mutex);
+	_wokeUp = false;
 	if (_waitQueue.empty())
 	{
 		_nfQueue.insert(NfQueue::value_type(priority, pNotification));
@@ -70,6 +71,7 @@ Notification* PriorityNotificationQueue::waitDequeueNotification()
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
 		if (pNf) return pNf.duplicate();
+		if (_wokeUp) return nullptr;
 		pWI = new WaitInfo;
 		_waitQueue.push_back(pWI);
 	}
@@ -88,6 +90,7 @@ Notification* PriorityNotificationQueue::waitDequeueNotification(long millisecon
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
 		if (pNf) return pNf.duplicate();
+		if (_wokeUp) return nullptr;
 		pWI = new WaitInfo;
 		_waitQueue.push_back(pWI);
 	}
@@ -128,6 +131,7 @@ void PriorityNotificationQueue::dispatch(NotificationCenter& notificationCenter)
 void PriorityNotificationQueue::wakeUpAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
+	_wokeUp = true;
 	for (auto p: _waitQueue)
 	{
 		p->nfAvailable.set();
