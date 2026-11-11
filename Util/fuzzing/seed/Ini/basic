@@ -1,0 +1,5 @@
+[section]
+key=value
+other=123
+; comment
+empty=
