@@ -454,7 +454,7 @@ void SQLiteTest::testAddBindingReuse()
 	stmt.execute();
 	assertTrue (name == "Alice");
 
-	// second execute with new binding — this is the bug scenario from #5220
+	// second execute with new binding - this is the bug scenario from #5220
 	id = 2;
 	Poco::Data::AbstractBindingVec bindings2;
 	bindings2.push_back(Poco::Data::Keywords::bind(id, "id"));
@@ -3145,6 +3145,18 @@ void SQLiteTest::testMultipleResults()
 		, into(pHomer, from(0)), use(aHomer)
 		, into(aBart, pos1)
 		, into(people2, from(pos2)), use(aLisa), use(aHomer);
+
+	assertTrue (7 == stmt.execute());
+	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
+	assertTrue (12 == aBart);
+	assertTrue (2 == people2.size());
+	assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people2[0]);
+	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
+
+	tmp << "DELETE FROM Person", now;
+	pHomer = Person();
+	aBart = 0;
+	people2.clear();
 
 	assertTrue (7 == stmt.execute());
 	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == pHomer);

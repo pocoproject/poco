@@ -58,6 +58,7 @@ void SQLiteStatementImpl::compileImpl()
 	if (!_pLeftover)
 	{
 		_bindBegin = bindings().begin();
+		_isExtracted = false;
 	}
 
 	// The session may have been closed and opened again since the statement
@@ -144,6 +145,17 @@ void SQLiteStatementImpl::compileImpl()
 				_columns[curDataSet].push_back(mc);
 		}
 	}
+}
+
+
+void SQLiteStatementImpl::resetImpl()
+{
+	_isExtracted = false;
+	_nextResponse = 0;
+	_stepCalled = false;
+	_canCompile = true;
+	_columns.clear();
+	_columns.resize(1);
 }
 
 

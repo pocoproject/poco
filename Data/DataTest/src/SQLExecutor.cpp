@@ -3852,6 +3852,17 @@ void SQLExecutor::multipleResults(const std::string& sql)
 	assertTrue (2 == people2.size());
 	assertTrue (Person("Simpson", "Lisa", "Springfield", 8) == people2[0]);
 	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
+
+	pHomer = Person();
+	aBart = 0;
+	people2.clear();
+
+	assertTrue (4 == stmt.execute());
+	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
+	assertTrue (10 == aBart);
+	assertTrue (2 == people2.size());
+	assertTrue (Person("Simpson", "Lisa", "Springfield", 8) == people2[0]);
+	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
 }
 
 
