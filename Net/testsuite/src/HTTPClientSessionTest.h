@@ -16,6 +16,7 @@
 
 #include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
+#include <ios>
 
 
 namespace Poco::Net {
