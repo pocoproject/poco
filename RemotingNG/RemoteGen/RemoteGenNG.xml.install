@@ -16,6 +16,7 @@
 				-I
 				${POCO_BASE}/include
 				${RemoteGen.internal.gcc.includes}
+				-std=c++20
 				-E
 				-C
 				-DPOCO_NO_GCC_API_ATTRIBUTE
@@ -29,6 +30,7 @@
 				-I
 				${POCO_BASE}/include
 				${RemoteGen.internal.gcc.includes}
+				-std=c++20
 				-E
 				-C
 				-DPOCO_NO_GCC_API_ATTRIBUTE
@@ -44,6 +46,7 @@
 				${POCO_BASE}\include
 				${RemoteGen.internal.msvc.includes}
 				-DPOCO_REMOTEGEN
+				/std:c++20
 				/nologo
 				/C
 				/P

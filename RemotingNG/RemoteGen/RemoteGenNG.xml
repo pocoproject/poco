@@ -26,6 +26,7 @@
 			<options>
 				${RemoteGen.internal.commonIncludes}
 				${RemoteGen.internal.gcc.includes}
+				-std=c++20
 				-E
 				-C
 				-DPOCO_NO_GCC_API_ATTRIBUTE
@@ -38,6 +39,7 @@
 			<options>
 				${RemoteGen.internal.commonIncludes}
 				${RemoteGen.internal.gcc.includes}
+				-std=c++20
 				-E
 				-C
 				-DPOCO_NO_GCC_API_ATTRIBUTE
@@ -52,6 +54,7 @@
 				${RemoteGen.internal.commonIncludes}
 				${RemoteGen.internal.msvc.includes}
 				-DPOCO_REMOTEGEN
+				/std:c++20
 				/nologo
 				/C
 				/P

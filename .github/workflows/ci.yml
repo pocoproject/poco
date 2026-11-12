@@ -121,7 +121,6 @@ jobs:
       data: ${{ steps.filter.outputs.data }}
       sqlparser: ${{ steps.filter.outputs.sqlparser }}
       crypto_netssl: ${{ steps.filter.outputs.crypto_netssl }}
-      ai: ${{ steps.filter.outputs.ai }}
       modules: ${{ steps.filter.outputs.modules }}
     steps:
       - uses: actions/checkout@v5
@@ -717,8 +716,7 @@ jobs:
   # sanity check so the legacy ./configure + make path keeps compiling. All
   # standard components are built (--everything); tests are compiled but not
   # run (cmake jobs above already cover the test signal). Samples are skipped.
-  # Uses the Linux-c++20 config to match the cmake default (C++20 since 1.15.0);
-  # the codebase has moved past C++17 in places (e.g. std::ranges).
+  # Uses the Linux-c++20 config, because POCO requires C++20.
   # Always run: the ci_core path filter does not cover the make build system
   # (build/**, configure, component Makefiles), so gating on it would skip this
   # sanity check on the very PRs that change the legacy make path.
@@ -733,31 +731,6 @@ jobs:
         run: ./configure --config=Linux-c++20 --everything --no-samples --sqlite-vec
       - name: Build libraries and testsuites
         run: make -s -j$(nproc)
-
-  # The AI libraries are C++17 code, while CMake builds with C++20 where the
-  # compiler has it and the make job above uses Linux-c++20. This job builds
-  # them, with what they need, under the C++17 Linux config and runs their
-  # testsuites.
-  linux-gcc-make-cxx17-ai:
-    runs-on: ubuntu-24.04
-    needs: changes
-    if: |
-      needs.changes.outputs.ai == 'true' ||
-      needs.changes.outputs.ci_core == 'true' ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v5
-      - name: Configure (classic make, C++17)
-        run: ./configure --config=Linux --everything --no-samples
-      - name: Build the AI libraries and testsuites
-        run: make -s -j$(nproc) AI/MCP-tests AI/MCP/HTTP-tests AI-tests
-      - name: Run the AI testsuites
-        run: |
-          export POCO_BASE="${GITHUB_WORKSPACE}"
-          export LD_LIBRARY_PATH="${GITHUB_WORKSPACE}/lib/Linux/$(uname -m)"
-          for t in AI/MCP AI/MCP/HTTP AI; do
-            "$t/testsuite/bin/Linux/$(uname -m)/testrunner" -all
-          done
 
   # ------------------------------------------------------------------------
   # Linux cross-compile and other arch build-only probes
