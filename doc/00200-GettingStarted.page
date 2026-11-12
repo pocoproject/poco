@@ -508,7 +508,7 @@ http://cgold.readthedocs.io/en/latest/index.html
 
 !!Building On Windows
 
-Microsoft Visual Studio 2019 or newer is required to build the
+Microsoft Visual Studio 2022 or newer is required to build the
 POCO C++ Libraries on Windows platforms.
 Use CMake to generate Visual Studio solutions and build.
 64-bit (x64) builds are supported as well.
