@@ -512,6 +512,67 @@ void ZipTest::testMalformedZip64()
 }
 
 
+void ZipTest::testUnknownMethodAndHostSystem()
+{
+	// A compression method or host system beyond the enumerators of ZipCommon is
+	// read as it is, and the entry is rejected as unsupported.
+	std::string data;
+	data.append("PK\x03\x04", 4);                          // local file header
+	data.append("\x14\x00", 2);                            // version needed 2.0, host FAT
+	data.append(2, '\0');                                  // general purpose flags
+	data.append("\x6f\x6d", 2);                            // compression method 0x6d6f
+	data.append(4, '\0');                                  // time and date
+	data.append(4, '\0');                                  // crc32
+	data.append(4, '\0');                                  // compressed size
+	data.append(4, '\0');                                  // uncompressed size
+	data.append("\x01\x00", 2);                            // file name length
+	data.append(2, '\0');                                  // extra field length
+	data.append("a", 1);                                   // file name
+	data.append("PK\x01\x02", 4);                          // central directory header
+	data.append("\x14\x00", 2);                            // version made by
+	data.append("\x14\x7f", 2);                            // version needed 2.0, host system 0x7f
+	data.append(2, '\0');                                  // general purpose flags
+	data.append("\x6f\x6d", 2);                            // compression method 0x6d6f
+	data.append(4, '\0');                                  // time and date
+	data.append(4, '\0');                                  // crc32
+	data.append(4, '\0');                                  // compressed size
+	data.append(4, '\0');                                  // uncompressed size
+	data.append("\x01\x00", 2);                            // file name length
+	data.append(2, '\0');                                  // extra field length
+	data.append(2, '\0');                                  // file comment length
+	data.append(2, '\0');                                  // disk number start
+	data.append(2, '\0');                                  // internal attributes
+	data.append(4, '\0');                                  // external attributes
+	data.append(4, '\0');                                  // local header offset
+	data.append("a", 1);                                   // file name
+	std::istringstream istr(data);
+	ZipArchive arch(istr);
+
+	ZipArchive::FileHeaders::const_iterator it = arch.findHeader("a");
+	assertTrue (it != arch.headerEnd());
+	const ZipCommon::CompressionMethod method = it->second.getCompressionMethod();
+	assertEqual (0x6d6f, static_cast<int>(method));
+	assertTrue (!it->second.hasSupportedCompressionMethod());
+
+	ZipArchive::FileInfos::const_iterator info = arch.findFileInfo("a");
+	assertTrue (info != arch.fileInfoEnd());
+	const ZipCommon::CompressionMethod infoMethod = info->second.getCompressionMethod();
+	const ZipCommon::HostSystem hostSystem = info->second.getHostSystem();
+	assertEqual (0x6d6f, static_cast<int>(infoMethod));
+	assertEqual (0x7f, static_cast<int>(hostSystem));
+
+	istr.clear();
+	try
+	{
+		ZipInputStream zipin(istr, it->second);
+		fail("an unsupported compression method must be rejected");
+	}
+	catch (ZipException&)
+	{
+	}
+}
+
+
 CppUnit::Test* ZipTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ZipTest");
@@ -529,6 +590,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testDecompressZip64);
 	CppUnit_addTest(pSuite, ZipTest, testValidPath);
 	CppUnit_addTest(pSuite, ZipTest, testMalformedZip64);
+	CppUnit_addTest(pSuite, ZipTest, testUnknownMethodAndHostSystem);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressConsistency);
 
 	return pSuite;
