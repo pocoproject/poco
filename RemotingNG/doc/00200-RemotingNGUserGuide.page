@@ -23,9 +23,7 @@ classes and class templates from the STL are supported:
   * <[std::array]>
   * <[std::shared_ptr]>
   * <[std::unique_ptr]>
-  * <[std::optional]> (C++17)
-
-Note: For `std::optional` support, the code must be compiled as C++17 or later.
+  * <[std::optional]>
 
 The following types from the POCO C++ Libraries are supported as well:
 
@@ -1047,6 +1045,9 @@ file named <*header.i*> in the current directory. This
 file is then parsed by the code generator.
 Options must be separated with either a newline, a comma
 or a semicolon.
+Unless the options select a language standard, RemoteGenNG adds
+<[/std:c++20]> (if the compiler is <*cl*> or <*clang-cl*>) or
+<[-std=c++20]>, because the POCO headers require C++20.
 
 In the above example, the command line options have the following
 meaning:
