@@ -66,6 +66,8 @@ public:
 	void testStatementAsyncError();
 	void testStatementWaitErrorType();
 	void testStatementExecuteWhileExecuting();
+	void testStatementExecuteWhileExecutingSync();
+	void testStatementExecuteWhileExecutingAsyncStatement();
 	void testStatementSetAsyncMovedFrom();
 	void testTransactionNotConnectedLog();
 	void testTransactorFailureLog();

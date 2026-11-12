@@ -25,12 +25,62 @@
 #include "Poco/ActiveMethod.h"
 #include <algorithm>
 #include <atomic>
+#include <utility>
 
 
 namespace Poco::Data {
 
 
 namespace {
+	class ExecutionClaim
+		/// Claims the execution of a StatementImpl for its lifetime, so that only one execution
+		/// of the implementation runs at a time, also through copies of a Statement used in other
+		/// threads. The state of the implementation cannot tell: an execution that the thread
+		/// pool has not started yet leaves it unchanged, and a running execution sets it to done
+		/// or paused before it ends.
+	{
+	public:
+		ExecutionClaim() = delete;
+		POCO_NODISCARD_CTOR explicit ExecutionClaim(std::atomic<bool>& executing);
+			/// Claims the execution.
+			/// Throws InvalidAccessException if another execution of the implementation runs.
+
+		~ExecutionClaim();
+			/// Ends the claim, unless release() has handed it over.
+
+		ExecutionClaim(const ExecutionClaim&) = delete;
+		ExecutionClaim& operator = (const ExecutionClaim&) = delete;
+		ExecutionClaim(ExecutionClaim&&) = delete;
+		ExecutionClaim& operator = (ExecutionClaim&&) = delete;
+
+		void release() noexcept;
+			/// Hands the claim over to an asynchronous execution, which ends it when it ends.
+
+	private:
+		std::atomic<bool>& _executing;
+		bool               _claimed = true;
+	};
+
+
+	ExecutionClaim::ExecutionClaim(std::atomic<bool>& executing):
+		_executing(executing)
+	{
+		if (_executing.exchange(true)) throw InvalidAccessException("Statement still executing.");
+	}
+
+
+	ExecutionClaim::~ExecutionClaim()
+	{
+		if (_claimed) _executing = false;
+	}
+
+
+	void ExecutionClaim::release() noexcept
+	{
+		_claimed = false;
+	}
+
+
 	class AsyncExecRunnable: public Poco::ActiveRunnableBase
 		/// Runs an asynchronous execution of a StatementImpl. It holds the
 		/// StatementImpl while the execution runs, so that a Statement destroyed
@@ -39,7 +89,7 @@ namespace {
 	{
 	public:
 		AsyncExecRunnable() = delete;
-		AsyncExecRunnable(StatementImpl::Ptr pImpl, std::atomic<bool>& executingAsync, bool reset,
+		AsyncExecRunnable(StatementImpl::Ptr pImpl, std::atomic<bool>& executing, bool reset,
 			const Statement::Result& result);
 		~AsyncExecRunnable() override = default;
 		AsyncExecRunnable(const AsyncExecRunnable&) = delete;
@@ -51,21 +101,21 @@ namespace {
 
 	private:
 		std::size_t execute();
-			/// Executes the StatementImpl and clears the flag that marks the execution
-			/// as running, whether the execution returns or throws. The flag is cleared
-			/// here because reporting the result in run() can throw as well.
+			/// Executes the StatementImpl and ends the claim on its execution that the Statement
+			/// has handed over (see ExecutionClaim), whether the execution returns or throws.
+			/// The claim ends here because reporting the result in run() can throw as well.
 
 		StatementImpl::Ptr _pImpl;
-		std::atomic<bool>& _executingAsync;
+		std::atomic<bool>& _executing;
 		bool               _reset;
 		Statement::Result  _result;
 	};
 
 
-	AsyncExecRunnable::AsyncExecRunnable(StatementImpl::Ptr pImpl, std::atomic<bool>& executingAsync, bool reset,
+	AsyncExecRunnable::AsyncExecRunnable(StatementImpl::Ptr pImpl, std::atomic<bool>& executing, bool reset,
 			const Statement::Result& result):
 		_pImpl(std::move(pImpl)),
-		_executingAsync(executingAsync),
+		_executing(executing),
 		_reset(reset),
 		_result(result)
 	{
@@ -78,7 +128,7 @@ namespace {
 		try
 		{
 			// execute() comes first: new allocates before it evaluates its initializer,
-			// so an allocation failure would skip execute() and leave the flag set
+			// so an allocation failure would skip execute() and never end the claim
 			const std::size_t rows = execute();
 			_result.data(new std::size_t(rows));
 		}
@@ -105,12 +155,12 @@ namespace {
 		try
 		{
 			const std::size_t rows = _pImpl->execute(_reset);
-			_executingAsync = false;
+			_executing = false;
 			return rows;
 		}
 		catch (...)
 		{
-			_executingAsync = false;
+			_executing = false;
 			throw;
 		}
 	}
@@ -433,8 +483,9 @@ void Statement::checkBeginTransaction()
 std::size_t Statement::execute(bool reset)
 {
 	Mutex::ScopedLock lock(_mutex);
+	ExecutionClaim claim(_pImpl->_executing);
 	bool isDone = done();
-	if (!isExecutingAsync() && (initialized() || paused() || isDone))
+	if (initialized() || paused() || isDone)
 	{
 		formatQuery();
 		checkBeginTransaction();
@@ -447,6 +498,7 @@ std::size_t Statement::execute(bool reset)
 		else
 		{
 			doAsyncExec();
+			claim.release();
 			return 0;
 		}
 	}
@@ -457,8 +509,9 @@ std::size_t Statement::execute(bool reset)
 void Statement::executeDirect(const std::string& query)
 {
 	Mutex::ScopedLock lock(_mutex);
+	ExecutionClaim claim(_pImpl->_executing);
 	bool isDone = done();
-	if (!isExecutingAsync() && (initialized() || paused() || isDone))
+	if (initialized() || paused() || isDone)
 	{
 		formatQuery();
 		checkBeginTransaction();
@@ -477,8 +530,13 @@ void Statement::executeDirect(const std::string& query)
 const Statement::Result& Statement::executeAsync(bool reset)
 {
 	Mutex::ScopedLock lock(_mutex);
-	if (!isExecutingAsync() && (initialized() || paused() || done()))
-		return doAsyncExec(reset);
+	ExecutionClaim claim(_pImpl->_executing);
+	if (initialized() || paused() || done())
+	{
+		const Result& result = doAsyncExec(reset);
+		claim.release();
+		return result;
+	}
 	else
 		throw InvalidAccessException("Statement still executing.");
 }
@@ -488,18 +546,11 @@ const Statement::Result& Statement::doAsyncExec(bool reset)
 {
 	if (done()) _pImpl->reset();
 	Result result(new ActiveResultHolder<std::size_t>());
-	ActiveRunnableBase::Ptr pRunnable(new AsyncExecRunnable(_pImpl, _pImpl->_executingAsync, reset, result));
-	_pImpl->_executingAsync = true;
-	try
-	{
-		ActiveStarter<StatementImpl>::start(_pImpl.get(), pRunnable);
-	}
-	catch (...)
-	{
-		_pImpl->_executingAsync = false;
-		throw;
-	}
-	_pResult = new Result(result);
+	ResultPtr pResult(new Result(result));
+	ActiveRunnableBase::Ptr pRunnable(new AsyncExecRunnable(_pImpl, _pImpl->_executing, reset, result));
+	ActiveStarter<StatementImpl>::start(_pImpl.get(), pRunnable);
+	// nothing below may throw: the started execution owns the claim
+	_pResult = std::move(pResult);
 	return *_pResult;
 }
 
@@ -507,15 +558,6 @@ const Statement::Result& Statement::doAsyncExec(bool reset)
 void Statement::setAsync(bool async)
 {
 	_async = async;
-}
-
-
-bool Statement::isExecutingAsync() const
-{
-	// The state of the implementation does not tell: an execution that the
-	// thread pool has not started yet leaves it unchanged, and a running
-	// execution sets it to done or paused before it ends.
-	return _pImpl->_executingAsync;
 }
 
 

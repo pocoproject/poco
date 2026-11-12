@@ -59,6 +59,8 @@
 #include <set>
 #include <type_traits>
 #include <utility>
+#include <array>
+#include <exception>
 
 
 using namespace Poco;
@@ -2228,6 +2230,50 @@ namespace
 	};
 
 
+	template <typename Call>
+	[[nodiscard]] bool refused(Call call)
+		/// Returns true if call() throws InvalidAccessException.
+	{
+		try
+		{
+			call();
+		}
+		catch (InvalidAccessException&)
+		{
+			return true;
+		}
+		return false;
+	}
+
+
+	template <typename Checks>
+	[[nodiscard]] bool checkWhileHeld(std::exception_ptr& pError, Checks checks)
+		/// Runs checks() once the execution held by an ExecutionHold waits. Returns false if it
+		/// does not wait within ten seconds. An exception from checks() is stored in pError, so
+		/// that the test lets the executions end before it rethrows it: they use its locals.
+	{
+		if (!Poco::Data::Test::TestStatementImpl::waitUntilHeld(10000)) return false;
+		try
+		{
+			checks();
+		}
+		catch (...)
+		{
+			pError = std::current_exception();
+		}
+		return true;
+	}
+
+
+	constexpr std::array HOLD_POINTS{
+		Poco::Data::Test::TestStatementImpl::HoldPoint::COMPILE,
+		Poco::Data::Test::TestStatementImpl::HoldPoint::HAS_NEXT,
+		Poco::Data::Test::TestStatementImpl::HoldPoint::AFFECTED_ROW_COUNT
+	};
+		/// The points at which the tests hold an execution: before it has changed the state,
+		/// while it runs, and after it has set the state to done.
+
+
 	[[nodiscard]] std::string contentOf(const Path& dir)
 		/// Returns the content of all files in the directory.
 	{
@@ -2494,35 +2540,17 @@ void DataTest::testStatementWaitErrorType()
 
 void DataTest::testStatementExecuteWhileExecuting()
 {
-	using Poco::Data::Test::TestStatementImpl;
-
 	// A statement and its copies refuse to execute while an asynchronous execution
 	// runs: before it has changed the state, while it runs, and after it has set the
 	// state to done, which an execution with a limit does before it ends.
-	const auto refused = [](auto call)
-	{
-		try
-		{
-			call();
-		}
-		catch (InvalidAccessException&)
-		{
-			return true;
-		}
-		return false;
-	};
-
 	Session sess(SessionFactory::instance().create("test", "cs"));
-	const auto points = {
-		TestStatementImpl::HoldPoint::COMPILE,
-		TestStatementImpl::HoldPoint::HAS_NEXT,
-		TestStatementImpl::HoldPoint::AFFECTED_ROW_COUNT
-	};
-	for (const auto point: points)
+	for (const auto point: HOLD_POINTS)
 	{
 		Statement stmt = (sess << "SELECT * FROM Strings", limit(1));
 		Statement copy(stmt);
 		SharedPtr<Statement::Result> pResult;
+		std::exception_ptr pCheckError;
+		bool held = false;
 		bool executeRefused = false;
 		bool executeAsyncRefused = false;
 		bool executeDirectRefused = false;
@@ -2530,15 +2558,19 @@ void DataTest::testStatementExecuteWhileExecuting()
 		{
 			ExecutionHold hold(point);
 			pResult = new Statement::Result(stmt.executeAsync());
-			assertTrue (TestStatementImpl::waitUntilHeld(10000));
-			executeRefused = refused([&stmt] { stmt.execute(); });
-			executeAsyncRefused = refused([&stmt] { stmt.executeAsync(); });
-			executeDirectRefused = refused([&stmt] { stmt.executeDirect("SELECT * FROM Strings"); });
-			copyExecuteRefused = refused([&copy] { copy.execute(); });
+			held = checkWhileHeld(pCheckError, [&]
+			{
+				executeRefused = refused([&stmt] { stmt.execute(); });
+				executeAsyncRefused = refused([&stmt] { stmt.executeAsync(); });
+				executeDirectRefused = refused([&stmt] { stmt.executeDirect("SELECT * FROM Strings"); });
+				copyExecuteRefused = refused([&copy] { copy.execute(); });
+			});
 		}
 		pResult->wait();
 		// if executeAsync() was not refused, its execution has to end before the next round
 		stmt.wait();
+		if (pCheckError != nullptr) std::rethrow_exception(pCheckError);
+		assertTrue (held);
 		assertTrue (executeRefused);
 		assertTrue (executeAsyncRefused);
 		assertTrue (executeDirectRefused);
@@ -2546,6 +2578,92 @@ void DataTest::testStatementExecuteWhileExecuting()
 		assertTrue (!pResult->failed());
 		// once the execution has ended, the next one is accepted, also through the copy
 		copy.execute();
+	}
+}
+
+
+void DataTest::testStatementExecuteWhileExecutingSync()
+{
+	// A synchronous execution through a copy in another thread makes the statement refuse to
+	// execute as well: before the execution has changed the state, while it runs, and after it
+	// has set the state to done, which an execution with a limit does before it ends.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	for (const auto point: HOLD_POINTS)
+	{
+		Statement stmt = (sess << "SELECT * FROM Strings", limit(1));
+		Statement copy(stmt);
+		std::exception_ptr pCopyError;
+		std::exception_ptr pCheckError;
+		Thread thread;
+		bool held = false;
+		bool executeRefused = false;
+		bool executeAsyncRefused = false;
+		bool executeDirectRefused = false;
+		{
+			ExecutionHold hold(point);
+			thread.startFunc([&copy, &pCopyError]
+			{
+				try
+				{
+					copy.execute();
+				}
+				catch (...)
+				{
+					pCopyError = std::current_exception();
+				}
+			});
+			held = checkWhileHeld(pCheckError, [&]
+			{
+				executeRefused = refused([&stmt] { stmt.execute(); });
+				executeAsyncRefused = refused([&stmt] { stmt.executeAsync(); });
+				executeDirectRefused = refused([&stmt] { stmt.executeDirect("SELECT * FROM Strings"); });
+			});
+		}
+		thread.join();
+		// if executeAsync() was not refused, its execution has to end before the next round
+		stmt.wait();
+		if (pCheckError != nullptr) std::rethrow_exception(pCheckError);
+		if (pCopyError != nullptr) std::rethrow_exception(pCopyError);
+		assertTrue (held);
+		assertTrue (executeRefused);
+		assertTrue (executeAsyncRefused);
+		assertTrue (executeDirectRefused);
+		// once the execution has ended, the next one is accepted
+		stmt.execute();
+	}
+}
+
+
+void DataTest::testStatementExecuteWhileExecutingAsyncStatement()
+{
+	// execute() on an asynchronous statement hands its claim over to the execution as well,
+	// so a copy refuses to execute until that execution has ended.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	for (const auto point: HOLD_POINTS)
+	{
+		Statement stmt = (sess << "SELECT * FROM Strings", limit(1));
+		stmt.setAsync(true);
+		Statement copy(stmt);
+		std::exception_ptr pCheckError;
+		bool held = false;
+		bool copyExecuteRefused = false;
+		{
+			ExecutionHold hold(point);
+			stmt.execute();
+			held = checkWhileHeld(pCheckError, [&]
+			{
+				copyExecuteRefused = refused([&copy] { copy.execute(); });
+			});
+		}
+		stmt.wait();
+		// if copy.execute() was not refused, its execution has to end before the next round
+		copy.wait();
+		if (pCheckError != nullptr) std::rethrow_exception(pCheckError);
+		assertTrue (held);
+		assertTrue (copyExecuteRefused);
+		// once the execution has ended, the next one is accepted
+		copy.execute();
+		copy.wait();
 	}
 }
 
@@ -2909,6 +3027,8 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testStatementAsyncError);
 	CppUnit_addTest(pSuite, DataTest, testStatementWaitErrorType);
 	CppUnit_addTest(pSuite, DataTest, testStatementExecuteWhileExecuting);
+	CppUnit_addTest(pSuite, DataTest, testStatementExecuteWhileExecutingSync);
+	CppUnit_addTest(pSuite, DataTest, testStatementExecuteWhileExecutingAsyncStatement);
 	CppUnit_addTest(pSuite, DataTest, testStatementSetAsyncMovedFrom);
 	CppUnit_addTest(pSuite, DataTest, testTransactionNotConnectedLog);
 	CppUnit_addTest(pSuite, DataTest, testTransactorFailureLog);
