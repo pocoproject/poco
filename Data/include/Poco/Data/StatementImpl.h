@@ -445,7 +445,7 @@ private:
 	using CountVec = std::vector<std::size_t>;
 
 	std::atomic<State>       _state;
-	std::atomic<bool>        _executingAsync = false;
+	std::atomic<bool>        _executing = false;
 	Limit                    _extrLimit;
 	std::size_t              _lowerLimit;
 	std::vector<int>         _columnsExtracted;
