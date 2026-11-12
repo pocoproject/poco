@@ -17,6 +17,8 @@
 #include "Poco/Timespan.h"
 #include <optional>
 #include <sstream>
+#include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -210,6 +212,38 @@ void HTTPResponseTest::testStatusBelow100()
 }
 
 
+void HTTPResponseTest::testStatusWithoutEnumerator()
+{
+	// A status code that HTTPStatus has no enumerator for, such as 520 or 999,
+	// is read, stored, copied and written as it is.
+	const std::pair<std::string, int> statuses[] = {{"512", 512}, {"520", 520}, {"599", 599}, {"999", 999}};
+	for (const auto& [text, code]: statuses)
+	{
+		const std::string message = "HTTP/1.1 " + text + " Unknown\r\n\r\n";
+		std::istringstream istr(message);
+		HTTPResponse response;
+		response.read(istr);
+		assertEqual (code, static_cast<int>(response.getStatus()));
+		assertTrue (response.getReason() == "Unknown");
+		assertTrue (HTTPResponse::getReasonForStatus(response.getStatus()) == HTTPResponse::HTTP_REASON_UNKNOWN);
+
+		HTTPResponse copy(response);
+		assertEqual (code, static_cast<int>(copy.getStatus()));
+
+		std::ostringstream ostr;
+		copy.write(ostr);
+		assertTrue (ostr.str() == message);
+	}
+
+	HTTPResponse response;
+	response.setStatus("599");
+	assertEqual (599, static_cast<int>(response.getStatus()));
+
+	// Without a fixed underlying type, a code above 511 is not a valid value of HTTPStatus.
+	assertTrue ((std::is_same_v<std::underlying_type_t<HTTPResponse::HTTPStatus>, int>));
+}
+
+
 void HTTPResponseTest::testCookies()
 {
 	HTTPResponse response;
@@ -379,6 +413,7 @@ CppUnit::Test* HTTPResponseTest::suite()
 	CppUnit_addTest(pSuite, HTTPResponseTest, testNonNumericStatus);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testStatusNotThreeDigits);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testStatusBelow100);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testStatusWithoutEnumerator);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testCookies);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testReplaceCookie);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testRemoveCookie);

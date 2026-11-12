@@ -40,7 +40,12 @@ class Net_API HTTPResponse: public HTTPMessage
 	/// status code and a reason phrase.
 {
 public:
-	enum HTTPStatus
+	enum HTTPStatus: int
+		/// HTTP status codes with a known reason phrase.
+		///
+		/// A response can carry any three-digit status code. The
+		/// underlying type is fixed, so that a status code without
+		/// an enumerator is a valid value of HTTPStatus.
 	{
 		HTTP_CONTINUE                        = 100,
 		HTTP_SWITCHING_PROTOCOLS             = 101,
