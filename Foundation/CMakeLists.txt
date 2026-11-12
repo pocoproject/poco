@@ -130,20 +130,11 @@ target_compile_definitions(Foundation
 	PUBLIC
 		$<$<CONFIG:Debug>:_DEBUG>
 )
-target_compile_features(Foundation
-	PUBLIC
-		$<$<NOT:$<BOOL:${DISABLE_CPP11}>>:cxx_defaulted_move_initializers>
-)
 
 #
-# Set target C++ standard compile features for exported target.
+# Code that uses Poco is compiled as C++20 or later.
 #
-target_compile_features(Foundation PUBLIC cxx_std_17)
-# Code that uses Poco is compiled with the standard Poco was built with: some
-# class layouts depend on the C++ standard (feature macros in Poco/Config.h).
-if (CMAKE_CXX_STANDARD GREATER_EQUAL 20)
-	target_compile_features(Foundation PUBLIC cxx_std_20)
-endif()
+target_compile_features(Foundation PUBLIC cxx_std_20)
 
 if(NOT BUILD_SHARED_LIBS)
 	# The define must be set here to be included in the generated CMake files

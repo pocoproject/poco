@@ -18,25 +18,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# Determines whether the compiler supports C++20
+# Determines whether the compiler supports the C++20 features that POCO uses
 function(check_for_cxx20_compiler _VAR)
     message(STATUS "Checking for C++20 compiler")
 
     set(_test_source ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/test_compiler_cxx20.cpp)
 
     set(${_VAR} PARENT_SCOPE)
-    try_compile(_COMPILER_TEST_RESULT ${PROJECT_BINARY_DIR} ${_test_source} CMAKE_FLAGS -DCMAKE_CXX_STANDARD=20 -DCMAKE_CXX_STANDARD_REQUIRED=ON)
-    if(NOT _COMPILER_TEST_RESULT AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        message(STATUS "C++20 with the default standard library failed; to use libc++, configure with -DCMAKE_CXX_FLAGS=-stdlib=libc++")
+    try_compile(POCO_CXX20_COMPILER_CHECK ${PROJECT_BINARY_DIR} ${_test_source}
+        CMAKE_FLAGS -DCMAKE_CXX_STANDARD=${CMAKE_CXX_STANDARD} -DCMAKE_CXX_STANDARD_REQUIRED=ON
+        OUTPUT_VARIABLE _test_output)
+    if(NOT POCO_CXX20_COMPILER_CHECK)
+        message(STATUS "Checking for C++20 compiler - unavailable")
+        message(STATUS "${_test_output}")
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+            message(STATUS "C++20 with the default standard library failed; to use libc++, configure with -DCMAKE_CXX_FLAGS=-stdlib=libc++")
+        endif()
+        return()
     endif()
 
-    if(_COMPILER_TEST_RESULT AND ((MSVC AND (MSVC14)) OR
-    (CMAKE_COMPILER_IS_GNUCXX AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 10.0) OR
-    (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 10.0) OR
-    (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 13.0)))
-        set(${_VAR} 1 PARENT_SCOPE)
-        message(STATUS "Checking for C++20 compiler - available")
-    else()
-        message(STATUS "Checking for C++20 compiler - unavailable")
+    set(${_VAR} 1 PARENT_SCOPE)
+    message(STATUS "Checking for C++20 compiler - available")
+
+    # Oldest compilers that POCO is tested with. Emscripten is versioned by its SDK, not by its Clang.
+    set(_min_GNU 12)
+    set(_min_Clang 16)
+    set(_min_AppleClang 16)
+    set(_min_MSVC 19.30)
+    if(NOT EMSCRIPTEN AND DEFINED _min_${CMAKE_CXX_COMPILER_ID} AND
+        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "${_min_${CMAKE_CXX_COMPILER_ID}}")
+        message(WARNING "POCO is tested with GCC 12, Clang 16, Apple Clang 16 and Visual C++ 2022 or newer; "
+            "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} is older and not tested.")
     endif()
 endfunction()

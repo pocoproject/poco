@@ -191,11 +191,15 @@
 #else
 	#define POCO_CPLUSPLUS __cplusplus
 #endif
-#define POCO_HAVE_CPP17_COMPILER (POCO_CPLUSPLUS >= 201703L)
-#define POCO_HAVE_CPP20_COMPILER (POCO_CPLUSPLUS >= 202002L)
+#if POCO_CPLUSPLUS < 202002L
+	#error "POCO requires C++20 or later. Compile with -std=c++20 (GCC, Clang) or /std:c++20 (Visual C++)."
+#endif
+
+// C++20 is the minimum, so the first two are always 1; kept for code that also builds with POCO 1.x.
+#define POCO_HAVE_CPP17_COMPILER 1
+#define POCO_HAVE_CPP20_COMPILER 1
 #define POCO_HAVE_CPP23_COMPILER (POCO_CPLUSPLUS >= 202302L)
 
-#if (POCO_HAVE_CPP20_COMPILER)
 #include <version>
 #if defined(__cpp_lib_jthread)
 	#define POCO_HAVE_JTHREAD true
@@ -204,9 +208,6 @@
 #endif
 #if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
 	#define POCO_HAVE_ATOMIC_SHARED_PTR true
-#else
-	#define POCO_HAVE_ATOMIC_SHARED_PTR false
-#endif
 #else
 	#define POCO_HAVE_ATOMIC_SHARED_PTR false
 #endif
@@ -247,14 +248,7 @@
 // class also carries an export/visibility attribute (eg. Foundation_API),
 // because GCC does not allow standard and GNU attributes to be mixed in a
 // class head; annotate the constructors with POCO_NODISCARD_CTOR instead.
-#if defined(__has_cpp_attribute)
-	#if __has_cpp_attribute(nodiscard) >= 201907L
-		#define POCO_NODISCARD_CTOR [[nodiscard]]
-	#endif
-#endif
-#ifndef POCO_NODISCARD_CTOR
-	#define POCO_NODISCARD_CTOR
-#endif
+#define POCO_NODISCARD_CTOR [[nodiscard]]
 
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER
