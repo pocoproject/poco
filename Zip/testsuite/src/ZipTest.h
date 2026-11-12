@@ -43,6 +43,7 @@ public:
 	void testDecompressZip64();
 	void testValidPath();
 	void testMalformedZip64();
+	void testUnknownMethodAndHostSystem();
 
 	void setUp();
 	void tearDown();

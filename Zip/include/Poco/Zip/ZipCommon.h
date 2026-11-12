@@ -39,7 +39,7 @@ public:
 	static constexpr Poco::UInt16 ZIP64_MAGIC_SHORT = 0xFFFF;
 	static constexpr Poco::UInt32 ZIP64_MAGIC		= 0xFFFFFFFF;
 
-	enum CompressionMethod
+	enum CompressionMethod: int
 	{
 		CM_STORE   = 0,
 		CM_SHRUNK  = 1,
@@ -80,7 +80,7 @@ public:
 		CL_SUPERFAST = 3
 	};
 
-	enum HostSystem
+	enum HostSystem: int
 	{
 		HS_FAT = 0,  // + PKZIPW 2.50 VFAT, NTFS
 		HS_AMIGA = 1,
