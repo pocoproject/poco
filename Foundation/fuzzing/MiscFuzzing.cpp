@@ -3,8 +3,15 @@
 #include "Poco/UUID.h"
 #include "Poco/UTF8String.h"
 #include <fuzzer/FuzzedDataProvider.h>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <exception>
+#include <iostream>
+
 
 using namespace Poco;
+
 
 static void fuzzURI(FuzzedDataProvider& dataProvider)
 {
@@ -23,15 +30,17 @@ static void fuzzURI(FuzzedDataProvider& dataProvider)
 	}
 }
 
+
 static void fuzzPath(FuzzedDataProvider& dataProvider)
 {
 	try
 	{
 		Path path1;
-		path1.tryParse(dataProvider.ConsumeRandomLengthString());
+		(void) path1.tryParse(dataProvider.ConsumeRandomLengthString());
 
 		Path path2(path1, Path(dataProvider.ConsumeRandomLengthString()));
-		Path path3 = path1.absolute();
+		// The result must not depend on the working directory of the process.
+		Path path3 = path1.absolute(Path("/fuzz/base/dir/"));
 		Path path4 = Path::expand(dataProvider.ConsumeRandomLengthString());
 
 		const auto style1 = dataProvider.ConsumeIntegralInRange<char>(Path::PATH_UNIX, Path::PATH_GUESS);
@@ -43,18 +52,26 @@ static void fuzzPath(FuzzedDataProvider& dataProvider)
 	}
 }
 
+
 static void fuzzUUID(FuzzedDataProvider& dataProvider)
 {
 	try
 	{
 		UUID uuid1(dataProvider.ConsumeRandomLengthString());
 		UUID uuid2(uuid1.toString());
-		uuid2.tryParse(dataProvider.ConsumeRandomLengthString());
+		// The text form of an accepted UUID parses back to the same UUID.
+		if (uuid2 != uuid1)
+		{
+			std::cerr << "The text form of a UUID does not parse back to the same UUID\n";
+			std::abort();
+		}
+		(void) uuid2.tryParse(dataProvider.ConsumeRandomLengthString());
 	}
 	catch (const std::exception&)
 	{
 	}
 }
+
 
 static void fuzzUTF8String(FuzzedDataProvider& dataProvider)
 {
@@ -71,11 +88,13 @@ static void fuzzUTF8String(FuzzedDataProvider& dataProvider)
 	}
 }
 
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
 	FuzzedDataProvider dataProvider(data, size);
 
-	switch (dataProvider.ConsumeIntegral<char>())
+	// Every value of the selector runs one of the four functions.
+	switch (dataProvider.ConsumeIntegralInRange<int>(0, 3))
 	{
 	case 0:
 		fuzzURI(dataProvider);
@@ -88,6 +107,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 		break;
 	case 3:
 		fuzzUTF8String(dataProvider);
+		break;
+	default:
 		break;
 	}
 
