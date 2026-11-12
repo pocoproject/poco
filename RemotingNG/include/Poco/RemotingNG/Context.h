@@ -133,7 +133,7 @@ class RemotingNG_API ScopedContext
 	/// Helper class using RAII for Context setup and teardown.
 {
 public:
-	// [[nodiscard]] is on the constructor because GCC < 12 rejects it before RemotingNG_API in the class head.
+	// [[nodiscard]] is on the constructor because GCC < 13 rejects it before RemotingNG_API in the class head.
 	[[nodiscard]] ScopedContext();
 		/// Creates a Context object and registers it as
 		/// the current thread's Context.

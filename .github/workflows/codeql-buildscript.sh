@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
 sudo apt-get -y update && sudo apt-get -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server libxml2-dev
-cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_DNSSD=OFF -DENABLE_TESTS=ON -DENABLE_XSD_VALIDATOR=ON -DENABLE_AI=ON && cmake --build cmake-build --target all --parallel 4
+# GCC 12 is the oldest GCC built in CI; the runner's default is GCC 13.
+CC=gcc-12 CXX=g++-12 cmake -H. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_DNSSD=OFF -DENABLE_TESTS=ON -DENABLE_XSD_VALIDATOR=ON -DENABLE_AI=ON && cmake --build cmake-build --target all --parallel 4

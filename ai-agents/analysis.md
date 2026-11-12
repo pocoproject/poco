@@ -139,13 +139,14 @@ performance was checked.
 ## CodeQL
 
 - `.github/workflows/codeql.yml` analyses `cpp` with the `security-and-quality` queries on pushes to `main`, on pull
-  requests and once a day. The build is `.github/workflows/codeql-buildscript.sh` on Ubuntu 22.04 (GCC 11).
+  requests and once a day. The build is `.github/workflows/codeql-buildscript.sh` on Ubuntu 24.04 with GCC 12
+  (`g++-12`), the oldest GCC built in CI.
 - The SARIF filter in the workflow drops results in `dependencies/` and the rules `cpp/path-injection`,
   `cpp/world-writable-file-creation`, `cpp/poorly-documented-function`, `cpp/potentially-dangerous-function`,
   `cpp/use-of-goto`, `cpp/integer-multiplication-cast-to-long`, `cpp/comparison-with-wider-type`, `cpp/leap-year/*`,
   `cpp/ambiguously-signed-bit-field`, `cpp/suspicious-pointer-scaling`, `cpp/suspicious-pointer-scaling-void`,
   `cpp/unsigned-comparison-zero`.
-- A class that compiles elsewhere fails in the CodeQL build because GCC 11 rejects a standard attribute next to the
+- A class that compiles elsewhere fails in the CodeQL build because GCC 12 rejects a standard attribute next to the
   export macro in a class head; see [Rule 94 of CODING_STYLE.md](../CODING_STYLE.md#rule-94).
 
 List open alerts:
