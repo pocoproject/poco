@@ -411,11 +411,14 @@ public:
 		/// for unsuccesful parsing.
 		///
 		/// Throws NotConnectedException if the session is not connected; no transaction is started then.
+		/// Throws InvalidAccessException if an asynchronous execution of the statement
+		/// or of one of its copies has not ended yet.
 
 	void executeDirect(const std::string& query);
 		/// Executes the query synchronously and directly.
-		/// Even when isAsync() returns true, the statement is still executed synchronously.
 		/// For transactional behavior, see execute() documentation.
+		/// Throws InvalidAccessException if isAsync() returns true or if an asynchronous
+		/// execution of the statement or of one of its copies has not ended yet.
 
 	const Result& executeAsync(bool reset = true);
 		/// Executes the statement asynchronously.
@@ -426,6 +429,8 @@ public:
 		/// When executed on a synchronous statement, this method does not alter the
 		/// statement's synchronous nature.
 		/// For transactional behavior, see execute() documentation.
+		/// Throws InvalidAccessException if an asynchronous execution of the statement
+		/// or of one of its copies has not ended yet.
 		/// The implementation is kept alive while the execution runs, even if the
 		/// Statement is destroyed first; the Result does not hold it.
 		/// The Session and the variables bound with use() or into() are not kept
@@ -551,6 +556,10 @@ protected:
 private:
 	const Result& doAsyncExec(bool reset = true);
 		/// Asynchronously executes the statement.
+
+	[[nodiscard]] bool isExecutingAsync() const;
+		/// Returns true while an asynchronous execution of the implementation runs,
+		/// also one started through a copy of this Statement.
 
 	template <typename T>
 	Statement& commaPODImpl(const T& val)
