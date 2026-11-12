@@ -332,6 +332,8 @@ Bug Fixes and Improvements:
 - PR #5680 The supported C++20 compilers are GCC 12, Clang 16, Apple Clang 16 (Xcode 16.0) and
   Visual C++ 2022 or newer. GCC 10 and 11, Clang 10 to 15 and Apple Clang 13 to 15 are no
   longer supported.
+- PR #5680 Linux CI jobs install only the apt packages that the runner image lacks, which saves
+  about 3.5 minutes of runner time per CI run.
 
 
 Release 1.15.4 (2026-09-22)
