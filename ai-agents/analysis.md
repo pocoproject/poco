@@ -139,7 +139,8 @@ performance was checked.
 ## CodeQL
 
 - `.github/workflows/codeql.yml` analyses `cpp` with the `security-and-quality` queries on pushes to `main`, on pull
-  requests and once a day. The build is `.github/workflows/codeql-buildscript.sh` on Ubuntu 22.04 (GCC 11).
+  requests and once a day. The build is `.github/workflows/codeql-buildscript.sh` on Ubuntu 24.04 with GCC 11
+  (`g++-11`), the oldest GCC built in CI.
 - The SARIF filter in the workflow drops results in `dependencies/` and the rules `cpp/path-injection`,
   `cpp/world-writable-file-creation`, `cpp/poorly-documented-function`, `cpp/potentially-dangerous-function`,
   `cpp/use-of-goto`, `cpp/integer-multiplication-cast-to-long`, `cpp/comparison-with-wider-type`, `cpp/leap-year/*`,
