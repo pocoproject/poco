@@ -46,9 +46,9 @@ The exact location depends on the generator and configuration used.
 
 !!!C++ standard version
 
-MSVC does not correctly report the C++ standard version via the `__cplusplus` macro by default.
-The `/Zc:__cplusplus` compiler flag is required to fix this. CMake sets this flag automatically
-when building the POCO C++ Libraries.
+MSVC sets the `__cplusplus` macro to the C++ standard version only with the `/Zc:__cplusplus` compiler flag.
+The POCO headers read `_MSVC_LANG` instead, so code that uses POCO does not need the flag. CMake sets the
+flag when building the POCO C++ Libraries, because bundled third-party sources test `__cplusplus`.
 
 See the following issues for details and explanations:
 

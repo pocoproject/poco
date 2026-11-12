@@ -23,9 +23,7 @@ classes and class templates from the STL are supported:
   * <[std::array]>
   * <[std::shared_ptr]>
   * <[std::unique_ptr]>
-  * <[std::optional]> (C++17)
-
-Note: For `std::optional` support, the code must be compiled as C++17 or later.
+  * <[std::optional]>
 
 The following types from the POCO C++ Libraries are supported as well:
 
@@ -1054,6 +1052,7 @@ meaning:
   * /I: specify search path for include files. Note that the actual
     path is passed as separate argument and thus placed on the
     next line.
+  * /std:c++20: preprocess as C++20, which the POCO headers require.
   * /nologo: do not display the startup banner.
   * /C: preserve comments during preprocessing (important, otherwise
     the code generator would not see the attributes).
@@ -1068,6 +1067,7 @@ as follows:
         -I${POCO_BASE}/Foundation/include
         -I${POCO_BASE}/RemotingNG/include
         -I./include
+        -std=c++20
         -E
         -C
         -o%.i
@@ -1077,6 +1077,7 @@ as follows:
 These options have the following meaning:
 
   * `-I`: specify search path for include files.
+  * `-std=c++20`: preprocess as C++20, which the POCO headers require.
   * `-E`: run the preprocessor only.
   * `-C`: preserve comments during preprocessing (important, otherwise
     the code generator would not see the attributes).
@@ -1162,6 +1163,7 @@ RemotingNG. To do this, define a macro when invoking the preprocessor:
         -I${POCO_BASE}/Foundation/include
         -I${POCO_BASE}/RemotingNG/include
         -I./include
+        -std=c++20
         -E
         -C
         -DPOCO_REMOTEGEN
