@@ -35,6 +35,7 @@ public:
 	void testNonNumericStatus();
 	void testStatusNotThreeDigits();
 	void testStatusBelow100();
+	void testStatusWithoutEnumerator();
 	void testCookies();
 	void testReplaceCookie();
 	void testRemoveCookie();
