@@ -125,7 +125,7 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 			_ptrOHelper = new PartialOutputStream(*_pOstr, 0, 0, false);
 			_ptrOBuf = new PartialOutputStream(*_ptrOHelper, 0, 0, false);
 		}
-		else throw Poco::NotImplementedException("Unsupported compression method");
+		else throw ZipException(Poco::format("Unsupported compression method (%d)", static_cast<int>(fileEntry.getCompressionMethod())), fileEntry.getFileName());
 
 		// now write the header to the ostr!
         if (fileEntry.needsZip64())

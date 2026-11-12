@@ -15,9 +15,11 @@
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Zip/ZipDataInfo.h"
 #include "Poco/Zip/ParseCallback.h"
+#include "Poco/Zip/ZipException.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include "Poco/File.h"
+#include "Poco/Format.h"
 #include <cstring>
 
 
@@ -95,7 +97,7 @@ ZipLocalFileHeader::ZipLocalFileHeader(std::istream& inp, bool assumeHeaderRead,
     }
     else
     {
-        poco_assert_dbg(!searchCRCAndSizesAfterData());
+        // A declined entry may have a data descriptor after its data, so the next record is searched for.
         ZipUtil::sync(inp);
     }
     _endPos = _startPos + getHeaderSize() + _compressedSize; // exclude the data block!
@@ -124,8 +126,12 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 
     // read the rest of the header
     inp.read(_rawHeader + ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
-    poco_assert (_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED);
-    poco_assert (getMajorVersionNumber() <= 4); // Allow for Zip64 version 4.5
+    const int hostSystem = static_cast<unsigned char>(_rawHeader[VERSION_POS + 1]);
+    if (hostSystem >= ZipCommon::HS_UNUSED)
+        throw ZipException(Poco::format("Unsupported host system (%d)", hostSystem));
+    const int version = static_cast<unsigned char>(_rawHeader[VERSION_POS]);
+    if (version / 10 > 4) // ZIP64 needs version 4.5
+        throw ZipException(Poco::format("Unsupported version needed to extract (%d.%d)", version / 10, version % 10));
     // Note: compression method is not validated here to allow parsing archives with
     // unsupported methods (BZIP2, LZMA, etc.). Validation happens at decompression time.
     parseDateTime();

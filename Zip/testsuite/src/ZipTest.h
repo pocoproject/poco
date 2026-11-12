@@ -44,6 +44,11 @@ public:
 	void testValidPath();
 	void testMalformedZip64();
 	void testUnknownMethodAndHostSystem();
+	void testUnsupportedVersionNeeded();
+	void testDuplicateEndOfCentralDirectory();
+	void testIllegalHeader();
+	void testReplaceUnsupportedMethod();
+	void testDecompressFailedEntryWithDataDescriptor();
 
 	void setUp();
 	void tearDown();

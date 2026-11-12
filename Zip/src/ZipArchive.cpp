@@ -15,7 +15,6 @@
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/Zip/SkipCallback.h"
 #include "Poco/Zip/ZipException.h"
-#include "Poco/Exception.h"
 #include <cstring>
 
 
@@ -130,13 +129,15 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 		else if (std::memcmp(header, ZipArchiveInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipArchiveInfo nfo(in, true);
-			poco_assert (_disks.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			if (!_disks.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second)
+				throw ZipException("Duplicate end of central directory record");
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipArchiveInfo64::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipArchiveInfo64 nfo(in, true);
-			poco_assert (_disks64.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			if (!_disks64.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second)
+				throw ZipException("Duplicate ZIP64 end of central directory record");
 			haveSynced = false;
 		}
 		else
@@ -151,9 +152,9 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 			else
 			{
 				if (_disks.empty() && _disks64.empty())
-					throw Poco::IllegalStateException("Illegal header in zip file");
+					throw ZipException("Illegal header in zip file");
 				else
-					throw Poco::IllegalStateException("Garbage after directory header");
+					throw ZipException("Garbage after directory header");
 			}
 		}
 	}
