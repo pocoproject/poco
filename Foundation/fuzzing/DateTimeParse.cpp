@@ -1,8 +1,16 @@
 #include "Poco/DateTimeParser.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
+#include "Poco/DateTime.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Exception.h"
+#include <cstddef>
+#include <cstdint>
+#include <string>
+
 
 using namespace Poco;
+
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -23,22 +31,30 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 	};
 
 	int tzd = 0;
-	DateTime dt;
+	// A fixed start value, so that a run does not depend on the clock.
+	DateTime dt(Timestamp(0));
 
 	for (const auto& format : formats)
 	{
-		DateTimeParser::tryParse(format, input, dt, tzd);
-		DateTimeFormatter::format(dt.timestamp(), format, tzd);
+		(void) DateTimeParser::tryParse(format, input, dt, tzd);
+		try
+		{
+			(void) DateTimeFormatter::format(dt.timestamp(), format, tzd);
+		}
+		catch (const InvalidArgumentException&)
+		{
+			// A parsed value whose UTC time is outside the range of DateTime.
+		}
 	}
 
-	try { dt.makeLocal(tzd); } catch (const std::exception&) {}
-	try { dt.makeUTC(tzd); } catch (const std::exception&) {}
+	try { dt.makeLocal(tzd); } catch (const InvalidArgumentException&) {}
+	try { dt.makeUTC(tzd); } catch (const InvalidArgumentException&) {}
 
 	try
 	{
 		dt = DateTimeParser::parse(input, tzd);
 	}
-	catch (const std::exception&)
+	catch (const SyntaxException&)
 	{
 	}
 
