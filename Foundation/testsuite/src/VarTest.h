@@ -18,6 +18,7 @@
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Exception.h"
 #include "CppUnit/TestCase.h"
+#include <cmath>
 #include <limits>
 
 
@@ -139,6 +140,28 @@ private:
 
 		TL iMax = static_cast<TL>(std::numeric_limits<TS>::max());
 		da = iMax * 10;
+		try { (void) da.convert<TS>(); fail("must fail"); }
+		catch (Poco::RangeException&) {}
+
+		// max() + 1 = 2^digits; float and double round max() of the wider types up to it.
+		const TL maxPlusOne = std::ldexp(TL{1}, std::numeric_limits<TS>::digits);
+		da = maxPlusOne;
+		try { (void) da.convert<TS>(); fail("must fail"); }
+		catch (Poco::RangeException&) {}
+
+		const TL largest = std::nextafter(maxPlusOne, TL{0});
+		da = largest;
+		assertEqual (static_cast<TS>(largest), da.convert<TS>());
+
+		const TL lowest = static_cast<TL>(std::numeric_limits<TS>::lowest());
+		da = lowest;
+		assertEqual (std::numeric_limits<TS>::lowest(), da.convert<TS>());
+
+		da = std::nextafter(lowest, -std::numeric_limits<TL>::infinity());
+		try { (void) da.convert<TS>(); fail("must fail"); }
+		catch (Poco::RangeException&) {}
+
+		da = std::numeric_limits<TL>::quiet_NaN();
 		try { (void) da.convert<TS>(); fail("must fail"); }
 		catch (Poco::RangeException&) {}
 	}

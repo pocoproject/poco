@@ -43,6 +43,8 @@
 #include <type_traits>
 #include <string_view>
 #include <limits>
+#include <cstdint>
+#include <utility>
 
 
 POCO_CHECK_MINMAX_MACROS
@@ -343,8 +345,7 @@ protected:
 		else
 		{
 			// Signed integral/floating-point to smaller type: check bounds
-			checkUpperLimit<F, T>(from);
-			checkLowerLimit<F, T>(from);
+			checkLimits<F, T>(from);
 			to = static_cast<T>(from);
 		}
 	}
@@ -352,9 +353,8 @@ protected:
 	template <typename F, typename T>
 	static void convertToSmallerUnsigned(const F& from, T& to)
 		/// Converts unsigned integral data types from larger to smaller, as well as to floating-point, types.
-		/// Since lower limit is always 0 for unsigned types, only the upper limit is checked.
 	{
-		checkUpperLimit<F, T>(from);
+		checkLimits<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -363,9 +363,7 @@ protected:
 		/// Converts signed integral data types to unsigned data types.
 		/// Negative values can not be converted and if one is encountered, RangeException is thrown.
 	{
-		if (from < 0)
-			POCO_VAR_RANGE_EXCEPTION("Value too small", from);
-		checkUpperLimit<std::make_unsigned_t<F>, T>(from);
+		checkLimits<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -374,9 +372,7 @@ protected:
 		/// Converts floating point data types to unsigned integral data types.
 		/// Negative values can not be converted and if one is encountered, RangeException is thrown.
 	{
-		if (from < 0)
-			POCO_VAR_RANGE_EXCEPTION("Value too small", from);
-		checkUpperLimit<F, T>(from);
+		checkLimits<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -385,7 +381,7 @@ protected:
 		/// Converts unsigned integral data types to signed integral data types.
 		/// If upper limit is within the target data type limits, the conversion is performed.
 	{
-		checkUpperLimit<F, T>(from);
+		checkLimits<F, T>(from);
 		to = static_cast<T>(from);
 	}
 
@@ -518,28 +514,36 @@ private:
 	}
 
 	template <typename F, typename T>
-	static void checkUpperLimit(const F& from)
-		/// Checks if 'from' exceeds the maximum value representable by type T.
+	static void checkLimits(const F& from)
+		/// Throws RangeException if 'from' is outside the range of type T.
+		/// A floating-point 'from' is in the range of an integral T
+		/// if lowest() <= from < max() + 1; NaN is not.
 	{
-		if (from > static_cast<F>(std::numeric_limits<T>::max()))
-			POCO_VAR_RANGE_EXCEPTION("Value too big", from);
-	}
-
-	template <typename F, typename T>
-	static void checkLowerLimit(const F& from)
-		/// Checks if 'from' is below the minimum value representable by type T.
-		/// For floating-point target types, uses -max() since min() returns
-		/// the smallest positive normalized value, not the most negative.
-	{
-		if constexpr (std::is_floating_point_v<F> && std::is_floating_point_v<T>)
+		if constexpr (std::is_integral_v<F> && std::is_integral_v<T>)
 		{
-			if (from < static_cast<F>(-std::numeric_limits<T>::max()))
+			// Unary plus promotes bool and character types, which std::cmp_less() does not accept.
+			if (std::cmp_less(+from, std::numeric_limits<T>::lowest()))
 				POCO_VAR_RANGE_EXCEPTION("Value too small", from);
+			if (std::cmp_greater(+from, std::numeric_limits<T>::max()))
+				POCO_VAR_RANGE_EXCEPTION("Value too big", from);
+		}
+		else if constexpr (std::is_integral_v<T>)
+		{
+			// lowest() and max() + 1 = 2^digits are exact in F, while max() may round up to 2^digits.
+			// The negated comparisons reject NaN.
+			constexpr F lower = static_cast<F>(std::numeric_limits<T>::lowest());
+			constexpr F upper = static_cast<F>(std::uintmax_t{1} << (std::numeric_limits<T>::digits - 1)) * 2;
+			if (!(from >= lower))
+				POCO_VAR_RANGE_EXCEPTION("Value too small", from);
+			if (!(from < upper))
+				POCO_VAR_RANGE_EXCEPTION("Value too big", from);
 		}
 		else
 		{
-			if (from < static_cast<F>(std::numeric_limits<T>::min()))
+			if (from < std::numeric_limits<T>::lowest())
 				POCO_VAR_RANGE_EXCEPTION("Value too small", from);
+			if (from > std::numeric_limits<T>::max())
+				POCO_VAR_RANGE_EXCEPTION("Value too big", from);
 		}
 	}
 };
@@ -2744,13 +2748,7 @@ public:
 
 	void convert(float& val) const override
 	{
-		const double fMin = -1 * std::numeric_limits<float>::max();
-		const double fMax = std::numeric_limits<float>::max();
-
-		if (_val < fMin) throw RangeException("Value too small.");
-		if (_val > fMax) throw RangeException("Value too large.");
-
-		val = static_cast<float>(_val);
+		convertToSmaller(_val, val);
 	}
 
 	void convert(double& val) const override
