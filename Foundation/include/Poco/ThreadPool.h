@@ -112,12 +112,18 @@ public:
 		/// Obtains a thread, adjusts the thread's priority, and starts the target.
 		/// Throws a NoThreadAvailableException if no more
 		/// threads are available.
+		///
+		/// If the priority cannot be set, the exception is passed on,
+		/// the target is not started and the thread stays available.
 
 	void startWithPriority(Thread::Priority priority, Runnable& target, const std::string& name);
 		/// Obtains a thread, adjusts the thread's priority, and starts the target.
 		/// Assigns the given name to the thread.
 		/// Throws a NoThreadAvailableException if no more
 		/// threads are available.
+		///
+		/// If the priority cannot be set, the exception is passed on,
+		/// the target is not started and the thread stays available.
 
 	void stopAll();
 		/// Stops all running threads and waits for their completion.

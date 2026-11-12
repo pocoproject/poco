@@ -44,6 +44,7 @@ public:
 	void testStartFailureLeavesNoThread();
 	void testStartWithPriority();
 	void testStartNullTarget();
+	void testSetPriorityFailureKeepsPriority();
 
 	void setUp();
 	void tearDown();

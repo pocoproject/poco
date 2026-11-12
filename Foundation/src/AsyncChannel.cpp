@@ -151,13 +151,6 @@ void AsyncChannel::startThread()
 	}
 	catch (...)
 	{
-		// Thread::start() sets the priority after the thread runs and throws if that fails;
-		// close() would not stop that thread once _running is false.
-		if (_thread.isRunning())
-		{
-			_queue.enqueueNotification(_pStop);
-			_thread.join();
-		}
 		_running = false;
 		throw;
 	}

@@ -172,6 +172,62 @@ void ThreadPoolTest::testThreadPoolImmediateShutdown()
 
 }
 
+
+namespace
+{
+	class NameRecorder: public Poco::Runnable
+	{
+	public:
+		void run() override
+		{
+			name = Thread::current()->getName();
+		}
+
+		std::string name;
+	};
+}
+
+
+void ThreadPoolTest::testStartWithPriorityFailure()
+{
+	// Not a Thread::Priority value, but within the range of the enumeration: setting it
+	// on a pooled thread fails (POSIX: mapPrio() rejects it; Windows: SetThreadPriority() fails).
+	constexpr auto NO_SUCH_PRIORITY = static_cast<Thread::Priority>(Thread::PRIO_HIGHEST + 1);
+
+	_event.set(); // a target that starts although it must not does not block
+	ThreadPool pool(1, 1);
+	RunnableAdapter<ThreadPoolTest> ra(*this, &ThreadPoolTest::count);
+	try
+	{
+		pool.startWithPriority(NO_SUCH_PRIORITY, ra);
+		fail("start must fail");
+	}
+	catch (const Poco::Exception&)
+	{
+	}
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.available() == 1);
+
+	try
+	{
+		pool.startWithPriority(NO_SUCH_PRIORITY, ra, "named");
+		fail("start must fail");
+	}
+	catch (const Poco::Exception&)
+	{
+	}
+	assertTrue (pool.used() == 0);
+	assertTrue (pool.available() == 1);
+
+	NameRecorder recorder;
+	pool.startWithPriority(Thread::PRIO_LOW, recorder);
+	pool.joinAll();
+	assertTrue (_count == 0);
+	assertTrue (recorder.name.find("named") == std::string::npos);
+	assertTrue (pool.used() == 0);
+}
+
+
 void ThreadPoolTest::setUp()
 {
 	_event.reset();
@@ -202,6 +258,7 @@ CppUnit::Test* ThreadPoolTest::suite()
 
 	CppUnit_addTest(pSuite, ThreadPoolTest, testThreadPool);
 	CppUnit_addTest(pSuite, ThreadPoolTest, testThreadPoolImmediateShutdown);
+	CppUnit_addTest(pSuite, ThreadPoolTest, testStartWithPriorityFailure);
 
 	return pSuite;
 }

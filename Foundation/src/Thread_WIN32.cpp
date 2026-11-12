@@ -114,12 +114,12 @@ void ThreadImpl::setPriorityImpl(int prio)
 {
 	if (prio != _prio)
 	{
-		_prio = prio;
 		if (_thread)
 		{
-			if (SetThreadPriority(_thread, _prio) == 0)
+			if (SetThreadPriority(_thread, prio) == 0)
 				throw SystemException("cannot set thread priority");
 		}
+		_prio = prio;
 	}
 }
 

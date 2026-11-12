@@ -112,6 +112,9 @@ public:
 		///
 		/// Some platform only allow changing a thread's priority
 		/// if the process has certain privileges.
+		///
+		/// If the priority cannot be set, an exception is thrown
+		/// and the priority of the thread does not change.
 
 	[[nodiscard]] Priority getPriority() const;
 		/// Returns the thread's priority.
@@ -123,6 +126,9 @@ public:
 		/// a scheduling policy can be specified. The policy is currently
 		/// only used on POSIX platforms where the values SCHED_OTHER (default),
 		/// SCHED_FIFO and SCHED_RR are supported.
+		///
+		/// If the priority cannot be set, an exception is thrown
+		/// and the priority of the thread does not change.
 
 	[[nodiscard]] int getOSPriority() const;
 		/// Returns the thread's priority, expressed as an operating system
