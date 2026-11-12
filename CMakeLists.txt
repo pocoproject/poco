@@ -81,7 +81,12 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+if(EMSCRIPTEN)
+	# Static by default: programs do not link against wasm shared libraries.
+	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
 
 option(POCO_MINIMAL_BUILD "Build only bare minimum Poco libraries identifoed with ENABLE options." OFF)
 

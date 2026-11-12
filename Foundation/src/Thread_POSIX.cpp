@@ -59,6 +59,16 @@
 
 
 //
+// Emscripten provides the scheduling functions only to a program built
+// with -pthread. A program built without it cannot start a thread.
+//
+#if defined(POCO_EMSCRIPTEN) && !defined(__EMSCRIPTEN_PTHREADS__)
+	#define POCO_NO_THREAD_SCHEDULING 1
+	#include <errno.h>
+#endif
+
+
+//
 // Block SIGPIPE in main thread.
 //
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
@@ -84,6 +94,20 @@ namespace
 #endif
 
 
+namespace
+{
+#if defined(POCO_NO_THREAD_SCHEDULING)
+	[[nodiscard]] int setSchedulingParameters(pthread_t, int, const sched_param&)
+	{
+		return ENOTSUP;
+	}
+#else
+	[[nodiscard]] int setSchedulingParameters(pthread_t thread, int policy, const sched_param& par)
+	{
+		return ::pthread_setschedparam(thread, policy, &par);
+	}
+#endif
+}
 
 
 namespace Poco {
@@ -157,7 +181,7 @@ void ThreadImpl::setPriorityImpl(int prio)
 			struct sched_param par{};
 			par.sched_priority = mapPrio(prio, SCHED_OTHER);
 			int errorCode;
-			if ((errorCode = pthread_setschedparam(_pData->thread, SCHED_OTHER, &par)))
+			if ((errorCode = setSchedulingParameters(_pData->thread, SCHED_OTHER, par)))
 				throw SystemException(Poco::format("cannot set thread priority (%s)",
 					Error::getMessage(errorCode)));
 		}
@@ -176,7 +200,7 @@ void ThreadImpl::setOSPriorityImpl(int prio, int policy)
 			struct sched_param par;
 			par.sched_priority = prio;
 			int errorCode;
-			if ((errorCode = pthread_setschedparam(_pData->thread, policy, &par)))
+			if ((errorCode = setSchedulingParameters(_pData->thread, policy, par)))
 				throw SystemException(Poco::format("cannot set thread priority (%s)",
 					Error::getMessage(errorCode)));
 		}
@@ -193,6 +217,8 @@ int ThreadImpl::getMinOSPriorityImpl(int policy)
 	return POCO_THREAD_PRIORITY_MIN;
 #elif defined(__digital__)
 	return PRI_OTHER_MIN;
+#elif defined(POCO_NO_THREAD_SCHEDULING)
+	return 0;
 #else
 	return sched_get_priority_min(policy);
 #endif
@@ -205,6 +231,8 @@ int ThreadImpl::getMaxOSPriorityImpl(int policy)
 	return POCO_THREAD_PRIORITY_MAX;
 #elif defined(__digital__)
 	return PRI_OTHER_MAX;
+#elif defined(POCO_NO_THREAD_SCHEDULING)
+	return 0;
 #else
 	return sched_get_priority_max(policy);
 #endif
@@ -297,7 +325,7 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		if (applyPriority)
 		{
 			// The new thread waits for this mutex and returns at once if it finds no target.
-			priorityError = pthread_setschedparam(_pData->thread, policy, &par);
+			priorityError = setSchedulingParameters(_pData->thread, policy, par);
 			if (priorityError != 0) _pData->pRunnableTarget = nullptr;
 		}
 	}

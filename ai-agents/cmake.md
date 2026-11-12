@@ -41,7 +41,7 @@ cmake --build <build-dir> --parallel --target <Component>-testrunner
 | `ENABLE_TEST_DEPRECATED` | OFF | Also build tests of deprecated API (defines `POCO_TEST_DEPRECATED`) |
 | `ENABLE_COMPILER_WARNINGS` | OFF | Maintainer warnings for POCO code only: `-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wzero-as-null-pointer-constant` (GCC, Clang), `/W4` (MSVC) |
 | `ENABLE_TRACE` | OFF | Stack traces in exceptions (defines `POCO_ENABLE_TRACE`) |
-| `BUILD_SHARED_LIBS` | ON | Shared or static libraries |
+| `BUILD_SHARED_LIBS` | ON (OFF for Emscripten) | Shared or static libraries |
 | `POCO_MT` | OFF | MSVC only: static runtime (`/MT`); needs `BUILD_SHARED_LIBS=OFF` |
 | `POCO_SOO` | ON | Small object optimization in Foundation |
 | `POCO_ENABLE_STD_MUTEX` | OFF | `Poco::Mutex` and `Poco::FastMutex` on `std::recursive_mutex` and `std::mutex` |
@@ -97,7 +97,7 @@ job `linux-gcc-make-build` does not compile it.
    properties on the real target. `DNSSD/` deviates from rules 2 and 3 (alias `PocoDNSSD`, links without a scope
    keyword); do not copy it.
 4. **No library type.** Call `add_library(<Component> ${SRCS})` without `STATIC` or `SHARED`; `BUILD_SHARED_LIBS` (an
-   option in the root `CMakeLists.txt`, default ON) decides. The Apache module `mod_poco` is `SHARED` because Apache can
+   option in the root `CMakeLists.txt`) decides. The Apache module `mod_poco` is `SHARED` because Apache can
    only load a shared object.
 5. **Project-wide options in two places only.** Directory-scope compile and link options that apply to every target
    (sanitizer flags, release stripping, `POCO_DLL`/`POCO_STATIC`) are set in `cmake/DefinePlatformSpecific.cmake`, which

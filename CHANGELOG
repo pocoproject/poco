@@ -334,6 +334,10 @@ Bug Fixes and Improvements:
   longer supported.
 - PR #5680 Linux CI jobs install only the apt packages that the runner image lacks, which saves
   about 3.5 minutes of runner time per CI run.
+- GH #5696 POCO builds with the current Emscripten SDK (7.0.0). For Emscripten, Poco::Net::PollSet
+  and Poco::Net::Socket::select() use poll() instead of epoll, Poco::DirectoryWatcher scans the
+  directory periodically instead of using inotify, BUILD_SHARED_LIBS defaults to OFF, and
+  Poco::Thread does not reference the scheduling functions in a program built without -pthread.
 
 
 Release 1.15.4 (2026-09-22)

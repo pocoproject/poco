@@ -146,7 +146,7 @@ public:
 	static int select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout);
 		/// Determines the status of one or more sockets.
 		///
-		/// Uses epoll (Linux, Windows, Android), poll (BSD), or
+		/// Uses epoll (Linux, Windows, Android), poll (BSD, Emscripten), or
 		/// select() as fallback on platforms where neither is available.
 		///
 		/// ReadList contains the list of sockets which should be

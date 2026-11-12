@@ -104,7 +104,7 @@ example `Timestamp`, `Clock`, `LocalDateTime`, `Debugger` and `DirectoryWatcher`
 - `SocketImpl`, `NetworkInterface`, `SocketAddress`, `HostEntry`, `DNS` and `IPAddressImpl` contain platform branches.
   `NetworkInterface` is compiled only where `Net/include/Poco/Net/Net.h` defines `POCO_NET_HAS_INTERFACE`.
 - `PollSet` uses epoll (`POCO_HAVE_FD_EPOLL`: Linux, Android, and Windows through the bundled `wepoll`) or `poll()`
-  (`POCO_HAVE_FD_POLL`: the BSD family in `Net.h`, other systems in `Foundation/CMakeLists.txt`).
+  (`POCO_HAVE_FD_POLL`: the BSD family and Emscripten in `Net.h`, other systems in `Foundation/CMakeLists.txt`).
 
 ## Util
 
