@@ -39,10 +39,10 @@ SHAREDLIBLINKEXT = .so
 CFLAGS          = -mt
 CFLAGS32        =
 CFLAGS64        =
-CXXFLAGS        = -mt -std=c++17 -erroff=hidevf
+CXXFLAGS        = -mt -std=c++20 -erroff=hidevf
 CXXFLAGS32      =
 CXXFLAGS64      =
-LINKFLAGS       = -mt -std=c++17
+LINKFLAGS       = -mt -std=c++20
 LINKFLAGS32     =
 LINKFLAGS64     =
 STATICOPT_CC    =
