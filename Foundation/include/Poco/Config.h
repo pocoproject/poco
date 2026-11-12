@@ -213,8 +213,8 @@
 #endif
 
 // Float std::to_chars/from_chars support detection.
-// - GCC 11+ (libstdc++): full support since GCC 11
-// - MSVC 19.24+: full support since VS 2019 16.4
+// - GCC (libstdc++): full support
+// - MSVC: full support
 // - Apple Clang: requires macOS 26.0+ deployment target (availability annotations)
 // - Non-Apple libc++ (Android NDK, FreeBSD, Emscripten): requires libc++ 20+
 //   (LLVM 20); libc++ 17-19 have float from_chars overloads explicitly deleted.
@@ -225,9 +225,9 @@
 #endif
 #if defined(__cpp_lib_to_chars) && __cpp_lib_to_chars >= 202306L
 	#define POCO_HAS_FLOAT_CHARCONV 1
-#elif defined(_MSC_VER) && _MSC_VER >= 1924
+#elif defined(_MSC_VER)
 	#define POCO_HAS_FLOAT_CHARCONV 1
-#elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 11
+#elif defined(__GNUC__) && !defined(__clang__)
 	#define POCO_HAS_FLOAT_CHARCONV 1
 #elif defined(__APPLE__) && defined(MAC_OS_X_VERSION_MIN_REQUIRED) && MAC_OS_X_VERSION_MIN_REQUIRED >= 260000
 	#define POCO_HAS_FLOAT_CHARCONV 1

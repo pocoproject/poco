@@ -28,7 +28,7 @@
 
 
 // ignore loop unrolling warnings in this file
-#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#if defined(__clang__)
 #	pragma clang diagnostic push
 #	pragma clang diagnostic ignored "-Wpass-failed"
 #endif
@@ -165,9 +165,9 @@ template <class S>
 	typename S::iterator it  = result.begin();
 	typename S::iterator end = result.end();
 
-#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#if defined(__clang__)
 #	pragma clang loop unroll(enable)
-#elif defined(POCO_MSVS_VERSION) && (POCO_MSVS_VERSION >= 2017)
+#elif defined(_MSC_VER)
 #	pragma loop(hint_parallel(0))
 #endif
 	while (it != end)
@@ -187,9 +187,9 @@ S& toUpperInPlace(S& str)
 	typename S::iterator it  = str.begin();
 	typename S::iterator end = str.end();
 
-#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#if defined(__clang__)
 #	pragma clang loop unroll(enable)
-#elif defined(POCO_MSVS_VERSION) && (POCO_MSVS_VERSION >= 2017)
+#elif defined(_MSC_VER)
 #	pragma loop(hint_parallel(0))
 #endif
 	while (it != end)
@@ -211,9 +211,9 @@ template <class S>
 	typename S::iterator it  = result.begin();
 	typename S::iterator end = result.end();
 
-#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#if defined(__clang__)
 #	pragma clang loop unroll(enable)
-#elif defined(POCO_MSVS_VERSION) && (POCO_MSVS_VERSION >= 2017)
+#elif defined(_MSC_VER)
 #	pragma loop(hint_parallel(0))
 #endif
 	while (it != end)
@@ -233,9 +233,9 @@ S& toLowerInPlace(S& str)
 	typename S::iterator it  = str.begin();
 	typename S::iterator end = str.end();
 
-#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#if defined(__clang__)
 #	pragma clang loop unroll(enable)
-#elif defined(POCO_MSVS_VERSION) && (POCO_MSVS_VERSION >= 2017)
+#elif defined(_MSC_VER)
 #	pragma loop(hint_parallel(0))
 #endif
 	while (it != end)
@@ -818,7 +818,7 @@ void secureClear(T& str)
 } // namespace Poco
 
 
-#if defined(__clang__) && ((__clang_major__ > 3) || (__clang_major__ == 3 && __clang_minor__ >= 6))
+#if defined(__clang__)
 #	pragma clang diagnostic pop
 #endif
 

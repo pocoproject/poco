@@ -130,14 +130,12 @@ private:
 
 #if !defined(POCO_NO_BYTESWAP_BUILTINS)
 	#if defined(_MSC_VER)
-		#if (POCO_MSVC_VERSION > 71)
-			#define POCO_HAVE_MSC_BYTESWAP 1
-		#endif
+		#define POCO_HAVE_MSC_BYTESWAP 1
 	#elif defined(__clang__)
 		#if __has_builtin(__builtin_bswap32)
 			#define POCO_HAVE_GCC_BYTESWAP 1
 		#endif
-	#elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
+	#elif defined(__GNUC__)
 		#define POCO_HAVE_GCC_BYTESWAP 1
 	#endif
 #endif
