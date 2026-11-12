@@ -1,0 +1,29 @@
+name: Ensure apt packages
+description: >-
+  Makes sure that the apt packages and commands a job needs are present and
+  installs only the missing ones with apt-get. A job whose requirements the
+  runner image already provides does not contact the package mirrors, so it
+  does not fail when they are unreachable.
+inputs:
+  packages:
+    description: >-
+      Space-separated apt package names, for libraries and headers. A package
+      is present when dpkg reports it as installed.
+    required: false
+    default: ''
+  commands:
+    description: >-
+      Space-separated command:package pairs, for tools, for example
+      ninja:ninja-build. A command is present when it is found in PATH;
+      otherwise its package is installed. The runner image installs some
+      tools outside apt, for example cmake and ninja in /usr/local/bin.
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        ENSURE_APT_PACKAGES: ${{ inputs.packages }}
+        ENSURE_APT_COMMANDS: ${{ inputs.commands }}
+      run: bash "$GITHUB_ACTION_PATH/ensure-apt-packages.sh"
