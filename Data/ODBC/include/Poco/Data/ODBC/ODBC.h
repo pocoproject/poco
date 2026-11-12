@@ -45,7 +45,7 @@
 
 
 #if !defined(ODBC_API)
-	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__)
 		#define ODBC_API __attribute__ ((visibility ("default")))
 	#else
 		#define ODBC_API
@@ -55,26 +55,24 @@
 
 #include "Poco/Data/ODBC/Unicode.h"
 
-#if POCO_HAVE_CPP17_COMPILER
-	#if __has_include(<msodbcsql.h>)
-		#include <msodbcsql.h>
-		#define POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+#if __has_include(<msodbcsql.h>)
+	#include <msodbcsql.h>
+	#define POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
 
-		// To enable varchar(max) > 8000 bytes, set to 1.
-		//
-		// Notes:
-		//
-		// - this setting works in conjunction with
-		//   the session "maxFieldSize" property, which
-		//   ultimately determines the max string length.
-		//
-		// - increasing the "maxFieldSize" property may
-		//   affect performance (more memory preallocated
-		//   for prepared statements in order to safely
-		//   accommodate data returned at execution)
-		#if !defined(POCO_DATA_SQL_SERVER_BIG_STRINGS)
-			#define POCO_DATA_SQL_SERVER_BIG_STRINGS 1
-		#endif
+	// To enable varchar(max) > 8000 bytes, set to 1.
+	//
+	// Notes:
+	//
+	// - this setting works in conjunction with
+	//   the session "maxFieldSize" property, which
+	//   ultimately determines the max string length.
+	//
+	// - increasing the "maxFieldSize" property may
+	//   affect performance (more memory preallocated
+	//   for prepared statements in order to safely
+	//   accommodate data returned at execution)
+	#if !defined(POCO_DATA_SQL_SERVER_BIG_STRINGS)
+		#define POCO_DATA_SQL_SERVER_BIG_STRINGS 1
 	#endif
 #endif
 

@@ -2,10 +2,8 @@
 #define SQLPARSER_SQLPARSER_WIN_H
 
 
-#if (__cplusplus >= 201703L)
-	#if __has_include("Poco/Data/Data.h")
-		#include "Poco/Data/Data.h"
-	#endif
+#if __has_include("Poco/Data/Data.h")
+	#include "Poco/Data/Data.h"
 #endif
 
 

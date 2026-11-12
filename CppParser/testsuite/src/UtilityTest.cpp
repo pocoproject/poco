@@ -13,7 +13,6 @@
 #include "CppUnit/TestCase.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/CppParser/Utility.h"
-#include "Poco/Config.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/String.h"
@@ -67,11 +66,7 @@ namespace {
 	// Poco paths are UTF-8, which std::filesystem::path takes as char8_t since C++20.
 	[[nodiscard]] std::filesystem::path toFilesystemPath(const std::string& path)
 	{
-#if (POCO_HAVE_CPP20_COMPILER)
 		return {std::u8string(path.begin(), path.end())};
-#else
-		return std::filesystem::u8path(path);
-#endif
 	}
 }
 

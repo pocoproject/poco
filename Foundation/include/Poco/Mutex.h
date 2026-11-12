@@ -160,7 +160,7 @@ class Foundation_API SpinlockMutex
 	///
 	/// Spins adaptively: spin briefly, then yield, then sleep.
 	/// This avoids burning CPU while still being fast for uncontended locks.
-	/// On C++20, uses test() with relaxed ordering for efficient polling
+	/// Uses test() with relaxed ordering for efficient polling
 	/// (avoids cache line bouncing), then test_and_set() with acquire
 	/// only when the lock appears free.
 	///

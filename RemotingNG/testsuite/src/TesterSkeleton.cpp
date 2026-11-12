@@ -1560,6 +1560,68 @@ public:
 };
 
 
+class TesterTestStdOptionalMethodHandler: public Poco::RemotingNG::MethodHandler
+{
+public:
+	void invoke(Poco::RemotingNG::ServerTransport& remoting__trans, Poco::RemotingNG::Deserializer& remoting__deser, Poco::RemotingNG::RemoteObject::Ptr remoting__pRemoteObject)
+	{
+		using namespace std::string_literals;
+		
+		static const std::string REMOTING__NAMES[] = {"testStdOptional"s,"value"s};
+		bool remoting__requestSucceeded = false;
+		try
+		{
+			std::optional<std::string> value;
+			remoting__deser.pushProperty(Poco::RemotingNG::SerializerBase::PROP_NAMESPACE, TesterSkeleton::DEFAULT_NS);
+			remoting__deser.deserializeMessageBegin(REMOTING__NAMES[0], Poco::RemotingNG::SerializerBase::MESSAGE_REQUEST);
+			Poco::RemotingNG::TypeDeserializer<std::optional<std::string>>::deserialize(REMOTING__NAMES[1], true, remoting__deser, value);
+			remoting__deser.deserializeMessageEnd(REMOTING__NAMES[0], Poco::RemotingNG::SerializerBase::MESSAGE_REQUEST);
+			remoting__deser.popProperty(Poco::RemotingNG::SerializerBase::PROP_NAMESPACE);
+			TesterRemoteObject* remoting__pCastedRO = static_cast<TesterRemoteObject*>(remoting__pRemoteObject.get());
+			std::optional<std::string> remoting__return = remoting__pCastedRO->testStdOptional(value);
+			remoting__requestSucceeded = true;
+			Poco::RemotingNG::Serializer& remoting__ser = remoting__trans.sendReply(Poco::RemotingNG::SerializerBase::MESSAGE_REPLY);
+			remoting__ser.pushProperty(Poco::RemotingNG::SerializerBase::PROP_NAMESPACE, TesterSkeleton::DEFAULT_NS);
+			static const std::string REMOTING__REPLY_NAME("testStdOptionalReply");
+			remoting__ser.serializeMessageBegin(REMOTING__REPLY_NAME, Poco::RemotingNG::SerializerBase::MESSAGE_REPLY);
+			Poco::RemotingNG::TypeSerializer<std::optional<std::string>>::serialize(Poco::RemotingNG::SerializerBase::RETURN_PARAM, remoting__return, remoting__ser);
+			remoting__ser.serializeMessageEnd(REMOTING__REPLY_NAME, Poco::RemotingNG::SerializerBase::MESSAGE_REPLY);
+			remoting__ser.popProperty(Poco::RemotingNG::SerializerBase::PROP_NAMESPACE);
+		}
+		catch (const Poco::Exception& e)
+		{
+			if (!remoting__requestSucceeded)
+			{
+				remoting__trans.reportException("Tester::testStdOptional"s, e);
+				Poco::RemotingNG::Serializer& remoting__ser = remoting__trans.sendReply(Poco::RemotingNG::SerializerBase::MESSAGE_FAULT);
+				remoting__ser.serializeFaultMessage(REMOTING__NAMES[0], e);
+			}
+		}
+		catch (const std::exception& e)
+		{
+			if (!remoting__requestSucceeded)
+			{
+				const Poco::Exception exc(e.what());
+				remoting__trans.reportException("Tester::testStdOptional"s, exc);
+				Poco::RemotingNG::Serializer& remoting__ser = remoting__trans.sendReply(Poco::RemotingNG::SerializerBase::MESSAGE_FAULT);
+				remoting__ser.serializeFaultMessage(REMOTING__NAMES[0], exc);
+			}
+		}
+		catch (...)
+		{
+			if (!remoting__requestSucceeded)
+			{
+				const Poco::Exception exc("Unknown Exception"s);
+				remoting__trans.reportException("Tester::testStdOptional"s, exc);
+				Poco::RemotingNG::Serializer& remoting__ser = remoting__trans.sendReply(Poco::RemotingNG::SerializerBase::MESSAGE_FAULT);
+				remoting__ser.serializeFaultMessage(REMOTING__NAMES[0], exc);
+			}
+		}
+	}
+
+};
+
+
 class TesterTestStdSharedPtrMethodHandler: public Poco::RemotingNG::MethodHandler
 {
 public:
@@ -3139,6 +3201,7 @@ TesterSkeleton::TesterSkeleton():
 	addMethodHandler("testPocoOptional"s, new TesterTestPocoOptionalMethodHandler);
 	addMethodHandler("testPtr"s, new TesterTestPtrMethodHandler);
 	addMethodHandler("testStdArray"s, new TesterTestStdArrayMethodHandler);
+	addMethodHandler("testStdOptional"s, new TesterTestStdOptionalMethodHandler);
 	addMethodHandler("testStdSharedPtr"s, new TesterTestStdSharedPtrMethodHandler);
 	addMethodHandler("testStruct11"s, new TesterTestStruct11MethodHandler);
 	addMethodHandler("testStruct12"s, new TesterTestStruct12MethodHandler);
