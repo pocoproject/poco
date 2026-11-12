@@ -4620,6 +4620,12 @@ void SQLExecutor::encoding(const std::string& dbConnString)
 		assertTrue(textOutDeque.size() == 2);
 		assertTrue(textOutDeque[0] == utf8TextIn);
 		assertTrue(textOutDeque[1] == utf8TextIn2);
+
+		std::list<std::string> textOutList;
+		session(true) << "SELECT str FROM Latin1Table", into(textOutList, bulk(2)), now;
+		assertTrue(textOutList.size() == 2);
+		assertTrue(*textOutList.begin() == utf8TextIn);
+		assertTrue(*std::next(textOutList.begin()) == utf8TextIn2);
 	}
 	catch (Poco::Exception& ex)
 	{

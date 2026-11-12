@@ -671,12 +671,16 @@ private:
 		bool ret = extractBoundImplContainer(pos, val);
 		if (ret)
 		{
+			std::string converted;
 			for (auto& s: val)
 			{
-				std::string converted;
 				transcode(s, converted);
 				s = std::move(converted);
 			}
+		}
+		else
+		{
+			val.clear();
 		}
 		return ret;
 	}
