@@ -18,6 +18,20 @@ on:
     - cron: '0 0 * * *'
   pull_request:
     branches: '*'
+    # Only pull requests skip documentation-only changes: every commit on main keeps an
+    # analysis, because pull request alerts are compared with the analysis of the base branch.
+    paths-ignore:
+      - '**/*.md'
+      - '**/doc/**'
+      - 'CHANGELOG'
+      - 'CONTRIBUTORS'
+      - 'LICENSE'
+
+# A newer push to a pull request cancels the running analysis of that pull request.
+# Pushes to main and scheduled runs get a group of their own and are never cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   analyze:
