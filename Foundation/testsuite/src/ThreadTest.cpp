@@ -736,6 +736,36 @@ void ThreadTest::testStartNullTarget()
 }
 
 
+void ThreadTest::testSetPriorityFailureKeepsPriority()
+{
+	// Not a Thread::Priority value, but within the range of the enumeration: on a running thread,
+	// mapPrio() rejects it (POSIX) and SetThreadPriority() fails (Windows).
+	constexpr auto NO_SUCH_PRIORITY = static_cast<Thread::Priority>(Thread::PRIO_HIGHEST + 1);
+
+	Thread thread;
+	Event go;
+	thread.startFunc([&go]() { go.wait(); });
+	bool failed = false;
+	try
+	{
+		thread.setPriority(NO_SUCH_PRIORITY);
+	}
+	catch (const Poco::Exception&)
+	{
+		failed = true;
+	}
+	const Thread::Priority prioAfterFailure = thread.getPriority();
+	thread.setPriority(Thread::PRIO_LOW);
+	const Thread::Priority prioAfterSuccess = thread.getPriority();
+	go.set();
+	thread.join();
+
+	assertTrue (failed);
+	assertTrue (prioAfterFailure == Thread::PRIO_NORMAL);
+	assertTrue (prioAfterSuccess == Thread::PRIO_LOW);
+}
+
+
 void ThreadTest::setUp()
 {
 }
@@ -770,6 +800,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testStartFailureLeavesNoThread);
 	CppUnit_addTest(pSuite, ThreadTest, testStartWithPriority);
 	CppUnit_addTest(pSuite, ThreadTest, testStartNullTarget);
+	CppUnit_addTest(pSuite, ThreadTest, testSetPriorityFailureKeepsPriority);
 
 	return pSuite;
 }

@@ -28,6 +28,7 @@ public:
 
 	void testThreadPool();
 	void testThreadPoolImmediateShutdown();
+	void testStartWithPriorityFailure();
 
 	void setUp();
 	void tearDown();

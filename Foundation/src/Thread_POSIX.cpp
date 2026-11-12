@@ -152,17 +152,17 @@ void ThreadImpl::setPriorityImpl(int prio)
 {
 	if (prio != _pData->prio)
 	{
-		_pData->prio = prio;
-		_pData->policy = SCHED_OTHER;
 		if (isRunningImpl())
 		{
-			struct sched_param par;
-			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
+			struct sched_param par{};
+			par.sched_priority = mapPrio(prio, SCHED_OTHER);
 			int errorCode;
 			if ((errorCode = pthread_setschedparam(_pData->thread, SCHED_OTHER, &par)))
 				throw SystemException(Poco::format("cannot set thread priority (%s)",
 					Error::getMessage(errorCode)));
 		}
+		_pData->prio = prio;
+		_pData->policy = SCHED_OTHER;
 	}
 }
 

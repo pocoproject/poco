@@ -42,6 +42,11 @@ public:
 	void run() override;
 
 private:
+	void applyPriority(Thread::Priority priority);
+		/// Sets the priority of the thread. If that fails, returns
+		/// the thread to the idle state and rethrows the exception.
+		/// Must be called with _mutex locked.
+
 	volatile bool        _idle;
 	volatile std::time_t _idleTime;
 	Runnable*            _pTarget;
@@ -86,8 +91,8 @@ void PooledThread::start(Thread::Priority priority, Runnable& target)
 
 	poco_assert (_pTarget == nullptr);
 
+	applyPriority(priority);
 	_pTarget = &target;
-	_thread.setPriority(priority);
 	_targetReady.set();
 }
 
@@ -95,6 +100,8 @@ void PooledThread::start(Thread::Priority priority, Runnable& target)
 void PooledThread::start(Thread::Priority priority, Runnable& target, const std::string& name)
 {
 	FastMutex::ScopedLock lock(_mutex);
+
+	applyPriority(priority);
 
 	std::string fullName(name);
 	if (name.empty())
@@ -108,12 +115,26 @@ void PooledThread::start(Thread::Priority priority, Runnable& target, const std:
 		fullName.append(")");
 	}
 	_thread.setName(fullName);
-	_thread.setPriority(priority);
 
 	poco_assert (_pTarget == nullptr);
 
 	_pTarget = &target;
 	_targetReady.set();
+}
+
+
+void PooledThread::applyPriority(Thread::Priority priority)
+{
+	try
+	{
+		_thread.setPriority(priority);
+	}
+	catch (...)
+	{
+		// ThreadPool::getThread() has activated the thread for a target that is not started.
+		_idle = true;
+		throw;
+	}
 }
 
 
