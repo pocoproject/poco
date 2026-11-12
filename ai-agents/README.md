@@ -10,6 +10,7 @@ entry point is [AGENTS.md](../AGENTS.md); the code style is in [CODING_STYLE.md]
 | [writing-code.md](writing-code.md) | change or add library code: reuse, new files, platform code, deprecation, OpenSSL, protocol checks, documentation |
 | [testing.md](testing.md) | write or run CppUnit tests, run database suites, judge a flaky test |
 | [analysis.md](analysis.md) | run sanitizers, warnings builds, clang-tidy, cppcheck, fuzzing, or triage CodeQL and CodeRabbit findings |
+| [fuzzing.md](fuzzing.md) | write, change or review a fuzz target, its seeds, its dictionary or its lines in the OSS-Fuzz build script |
 | [git-and-pull-requests.md](git-and-pull-requests.md) | name a branch, write a commit, open or merge a pull request, port a fix between branches, or write anything to GitHub |
 | [reviewing.md](reviewing.md) | review a pull request or your own change |
 | [porting.md](porting.md) | port POCO to a new operating system, compiler or C library |
