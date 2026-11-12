@@ -1,0 +1,1 @@
+{"content":[{"type":"text","text":"hello"},{"type":"image","data":"iVBORw0KGgo=","mimeType":"image/png"},{"type":"resource","resource":{"uri":"fuzz://resource","mimeType":"text/plain","text":"text"}}],"structuredContent":{"echo":"hello","count":1},"isError":false}

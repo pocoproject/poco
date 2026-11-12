@@ -1,0 +1,1 @@
+{"name":"echo","title":"Echo","description":"Echoes its message.","inputSchema":{"type":"object","properties":{"message":{"type":"string","description":"The text to echo."}},"required":["message"]},"outputSchema":{"type":"object","properties":{"echo":{"type":"string"}}},"annotations":{"readOnlyHint":true,"idempotentHint":true}}
