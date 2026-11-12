@@ -1,0 +1,14 @@
+# Dictionary of the JWT fuzzer: compact serialization separators and base64url JOSE headers.
+
+"."
+"eyJ"
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+"eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9"
+"eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9"
+"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9"
+"eyJhbGciOiJSUzM4NCIsInR5cCI6IkpXVCJ9"
+"eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9"
+"eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9"
+"eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9"
+"eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9"
+"eyJhbGciOiJub25lIn0"
