@@ -1,0 +1,6 @@
+PUT /notes/today.txt HTTP/1.1
+Host: files.example.com
+Content-Type: text/plain
+Content-Length: 18
+
+buy milk and bread

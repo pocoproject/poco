@@ -8,9 +8,15 @@
 #include "Poco/Net/OAuth20Credentials.h"
 #include "Poco/Net/DNS.h"
 #include "Poco/NullStream.h"
+#include "Poco/URI.h"
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+
 
 using namespace Poco;
 using namespace Poco::Net;
+
 
 template <class F>
 void catchExceptions(const F& func)
@@ -23,6 +29,7 @@ void catchExceptions(const F& func)
 	{
 	}
 }
+
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -39,7 +46,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 
 			HTTPCredentials creds;
 			creds.fromURI(URI(request.getURI()));
-			creds.updateAuthInfo(request);
+			catchExceptions([&] { creds.updateAuthInfo(request); });
 			creds.updateProxyAuthInfo(request);
 		});
 
@@ -53,7 +60,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 			catchExceptions([&] { response.write(null); });
 
 			HTTPRequest request(HTTPRequest::HTTP_GET, "/");
-			request.setHost(DNS::encodeIDN(DNS::decodeIDN(response.get(HTTPRequest::HOST))));
+			request.setHost(DNS::encodeIDN(DNS::decodeIDN(response.get(HTTPRequest::HOST, ""))));
 
 			HTTPCredentials creds;
 			creds.authenticate(request, response);
@@ -74,7 +81,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 			form.write(htmlStream);
 
 			OAuth10Credentials oauth10(request);
-			oauth10.verify(request, URI(request.getURI()), form);
+			(void) oauth10.verify(request, URI(request.getURI()), form);
+			// Fixed nonce and timestamp, so that the signature does not depend on random values or the clock.
+			oauth10.nonceAndTimestampForTesting("fuzz", "0");
 			oauth10.authenticate(request, URI(request.getURI()), form,
 								 request.hasToken("X-Method", "Plain") ? OAuth10Credentials::SIGN_PLAINTEXT
 																	   : OAuth10Credentials::SIGN_HMAC_SHA1);

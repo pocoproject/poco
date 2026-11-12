@@ -1,0 +1,6 @@
+POST /login HTTP/1.1
+Host: www.example.com
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 29
+
+user=alice&pass=s3cret&keep=1
