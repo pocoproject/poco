@@ -24,6 +24,7 @@
 #include "Poco/Tuple.h"
 #include "Poco/ActiveMethod.h"
 #include <algorithm>
+#include <atomic>
 
 
 namespace Poco::Data {
@@ -38,7 +39,8 @@ namespace {
 	{
 	public:
 		AsyncExecRunnable() = delete;
-		AsyncExecRunnable(StatementImpl::Ptr pImpl, bool reset, const Statement::Result& result);
+		AsyncExecRunnable(StatementImpl::Ptr pImpl, std::atomic<bool>& executingAsync, bool reset,
+			const Statement::Result& result);
 		~AsyncExecRunnable() override = default;
 		AsyncExecRunnable(const AsyncExecRunnable&) = delete;
 		AsyncExecRunnable& operator = (const AsyncExecRunnable&) = delete;
@@ -48,14 +50,22 @@ namespace {
 		void run() override;
 
 	private:
+		std::size_t execute();
+			/// Executes the StatementImpl and clears the flag that marks the execution
+			/// as running, whether the execution returns or throws. The flag is cleared
+			/// here because reporting the result in run() can throw as well.
+
 		StatementImpl::Ptr _pImpl;
+		std::atomic<bool>& _executingAsync;
 		bool               _reset;
 		Statement::Result  _result;
 	};
 
 
-	AsyncExecRunnable::AsyncExecRunnable(StatementImpl::Ptr pImpl, bool reset, const Statement::Result& result):
+	AsyncExecRunnable::AsyncExecRunnable(StatementImpl::Ptr pImpl, std::atomic<bool>& executingAsync, bool reset,
+			const Statement::Result& result):
 		_pImpl(std::move(pImpl)),
+		_executingAsync(executingAsync),
 		_reset(reset),
 		_result(result)
 	{
@@ -67,7 +77,10 @@ namespace {
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try
 		{
-			_result.data(new std::size_t(_pImpl->execute(_reset)));
+			// execute() comes first: new allocates before it evaluates its initializer,
+			// so an allocation failure would skip execute() and leave the flag set
+			const std::size_t rows = execute();
+			_result.data(new std::size_t(rows));
 		}
 		catch (Exception& e)
 		{
@@ -84,6 +97,22 @@ namespace {
 		// once wait() returns, only Statements hold the implementation
 		_pImpl.reset();
 		_result.notify();
+	}
+
+
+	std::size_t AsyncExecRunnable::execute()
+	{
+		try
+		{
+			const std::size_t rows = _pImpl->execute(_reset);
+			_executingAsync = false;
+			return rows;
+		}
+		catch (...)
+		{
+			_executingAsync = false;
+			throw;
+		}
 	}
 } // namespace
 
@@ -405,7 +434,7 @@ std::size_t Statement::execute(bool reset)
 {
 	Mutex::ScopedLock lock(_mutex);
 	bool isDone = done();
-	if (initialized() || paused() || isDone)
+	if (!isExecutingAsync() && (initialized() || paused() || isDone))
 	{
 		formatQuery();
 		checkBeginTransaction();
@@ -429,7 +458,7 @@ void Statement::executeDirect(const std::string& query)
 {
 	Mutex::ScopedLock lock(_mutex);
 	bool isDone = done();
-	if (initialized() || paused() || isDone)
+	if (!isExecutingAsync() && (initialized() || paused() || isDone))
 	{
 		formatQuery();
 		checkBeginTransaction();
@@ -448,7 +477,7 @@ void Statement::executeDirect(const std::string& query)
 const Statement::Result& Statement::executeAsync(bool reset)
 {
 	Mutex::ScopedLock lock(_mutex);
-	if (initialized() || paused() || done())
+	if (!isExecutingAsync() && (initialized() || paused() || done()))
 		return doAsyncExec(reset);
 	else
 		throw InvalidAccessException("Statement still executing.");
@@ -459,8 +488,17 @@ const Statement::Result& Statement::doAsyncExec(bool reset)
 {
 	if (done()) _pImpl->reset();
 	Result result(new ActiveResultHolder<std::size_t>());
-	ActiveRunnableBase::Ptr pRunnable(new AsyncExecRunnable(_pImpl, reset, result));
-	ActiveStarter<StatementImpl>::start(_pImpl.get(), pRunnable);
+	ActiveRunnableBase::Ptr pRunnable(new AsyncExecRunnable(_pImpl, _pImpl->_executingAsync, reset, result));
+	_pImpl->_executingAsync = true;
+	try
+	{
+		ActiveStarter<StatementImpl>::start(_pImpl.get(), pRunnable);
+	}
+	catch (...)
+	{
+		_pImpl->_executingAsync = false;
+		throw;
+	}
 	_pResult = new Result(result);
 	return *_pResult;
 }
@@ -469,6 +507,15 @@ const Statement::Result& Statement::doAsyncExec(bool reset)
 void Statement::setAsync(bool async)
 {
 	_async = async;
+}
+
+
+bool Statement::isExecutingAsync() const
+{
+	// The state of the implementation does not tell: an execution that the
+	// thread pool has not started yet leaves it unchanged, and a running
+	// execution sets it to done or paused before it ends.
+	return _pImpl->_executingAsync;
 }
 
 

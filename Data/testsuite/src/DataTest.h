@@ -65,6 +65,7 @@ public:
 	void testArchiveStrategyReopen();
 	void testStatementAsyncError();
 	void testStatementWaitErrorType();
+	void testStatementExecuteWhileExecuting();
 	void testStatementSetAsyncMovedFrom();
 	void testTransactionNotConnectedLog();
 	void testTransactorFailureLog();

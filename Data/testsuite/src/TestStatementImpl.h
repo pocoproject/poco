@@ -34,6 +34,19 @@ class TestStatementImpl: public Poco::Data::StatementImpl
 	/// A no-op implementation of TestStatementImpl for testing.
 {
 public:
+	enum class HoldPoint
+		/// Where holdNextExecution() makes the next execution wait. The first call
+		/// at that point, on any thread, takes the hold.
+	{
+		COMPILE,
+			/// In compileImpl(), before the execution has changed the state.
+		HAS_NEXT,
+			/// In hasNext(), while the state is bound.
+		AFFECTED_ROW_COUNT
+			/// In affectedRowCount(), which an execution with a limit calls
+			/// after it has set the state to done or paused.
+	};
+
 	TestStatementImpl(SessionImpl& rSession, bool throwOnHasNext = false);
 		/// Creates the TestStatementImpl.
 
@@ -43,12 +56,12 @@ public:
 	[[nodiscard]] static int instances();
 		/// Returns the number of TestStatementImpl objects alive.
 
-	static void holdNextExecution();
-		/// Makes the next execution of a TestStatementImpl wait in hasNext()
+	static void holdNextExecution(HoldPoint point = HoldPoint::HAS_NEXT);
+		/// Makes the next execution of a TestStatementImpl wait at the given point
 		/// until releaseExecution() is called.
 
 	[[nodiscard]] static bool waitUntilHeld(long milliseconds);
-		/// Waits until the execution held by holdNextExecution() waits in hasNext().
+		/// Waits until the execution held by holdNextExecution() waits.
 		/// Returns false if it does not within the given time.
 
 	static void releaseExecution();
@@ -91,6 +104,10 @@ protected:
 		/// Returns the concrete binder used by the statement.
 
 private:
+	static void waitIfHeld(HoldPoint point);
+		/// Waits until releaseExecution() is called if the next execution
+		/// is to be held at the given point.
+
 	Poco::SharedPtr<Binder>     _ptrBinder;
 	Poco::SharedPtr<Extractor>  _ptrExtractor;
 	Poco::SharedPtr<Preparator> _ptrPreparation;
@@ -99,6 +116,7 @@ private:
 
 	static std::atomic<int>     _instances;
 	static std::atomic<bool>    _holdNext;
+	static std::atomic<HoldPoint> _holdPoint;
 	static Poco::Event          _held;
 	static Poco::Event          _released;
 };
@@ -116,12 +134,6 @@ inline AbstractExtraction::ExtractorPtr TestStatementImpl::extractor()
 inline AbstractBinding::BinderPtr TestStatementImpl::binder()
 {
 	return _ptrBinder;
-}
-
-
-inline int TestStatementImpl::affectedRowCount() const
-{
-	return 0;
 }
 
 

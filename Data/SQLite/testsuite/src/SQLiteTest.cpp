@@ -2768,7 +2768,7 @@ void SQLiteTest::testAsync()
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 
-	int rowCount = 500;
+	std::size_t rowCount = 500;
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(:str)", use(data));
 	Statement::Result result = stmt.executeAsync();
@@ -2780,18 +2780,13 @@ void SQLiteTest::testAsync()
 	assertTrue (stmt1.isAsync());
 	assertTrue (stmt1.wait() == rowCount);
 
+	// whether a second execution is refused depends on whether the first one
+	// has ended; DataTest::testStatementExecuteWhileExecuting() holds the
+	// execution to test the refusal
 	stmt1.execute();
-	try
-	{
-		stmt1.execute();
-		fail ("must fail");
-	}
-	catch (InvalidAccessException&)
-	{
-		stmt1.wait();
-		stmt1.execute();
-		stmt1.wait();
-	}
+	stmt1.wait();
+	stmt1.execute();
+	stmt1.wait();
 
 	stmt = tmp << "SELECT * FROM Strings", into(data), async, now;
 	assertTrue (stmt.isAsync());
@@ -2799,16 +2794,8 @@ void SQLiteTest::testAsync()
 
 	assertTrue (stmt.execute() == 0);
 	assertTrue (stmt.isAsync());
-	try
-	{
-		result = stmt.executeAsync();
-		fail ("must fail");
-	}
-	catch (InvalidAccessException&)
-	{
-		stmt.wait();
-		result = stmt.executeAsync();
-	}
+	stmt.wait();
+	result = stmt.executeAsync();
 
 	assertTrue (stmt.wait() == rowCount);
 	assertTrue (result.data() == rowCount);
@@ -2826,14 +2813,14 @@ void SQLiteTest::testAsync()
 	assertTrue (result.data() == rowCount);
 
 	assertTrue (0 == rowCount % 10);
-	int step = (int) (rowCount/10);
+	std::size_t step = rowCount/10;
 	data.clear();
 	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;
 
-	for (int i = 0; !stmt2.done(); i += step)
+	for (std::size_t i = 0; !stmt2.done(); i += step)
 	{
 		stmt2.execute();
 		rows = stmt2.wait();

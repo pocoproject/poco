@@ -2197,14 +2197,16 @@ namespace
 
 
 	class ExecutionHold
-		/// Holds the next execution of a TestStatementImpl in hasNext()
+		/// Holds the next execution of a TestStatementImpl at the given point
 		/// until the hold is destroyed, so that a failing test never
 		/// leaves the execution waiting.
 	{
 	public:
-		POCO_NODISCARD_CTOR ExecutionHold()
+		using HoldPoint = Poco::Data::Test::TestStatementImpl::HoldPoint;
+
+		POCO_NODISCARD_CTOR explicit ExecutionHold(HoldPoint point = HoldPoint::HAS_NEXT)
 		{
-			Poco::Data::Test::TestStatementImpl::holdNextExecution();
+			Poco::Data::Test::TestStatementImpl::holdNextExecution(point);
 		}
 
 		~ExecutionHold()
@@ -2472,17 +2474,79 @@ void DataTest::testStatementAsyncError()
 
 void DataTest::testStatementWaitErrorType()
 {
-	// wait() rethrows the error of an asynchronous execution with its type.
+	// wait() rethrows the error of an asynchronous execution with its type. The failed
+	// execution has ended, so the statement accepts the next one, which fails the same way.
 	Session sess(SessionFactory::instance().create("test", "cs"));
 	sess.setFeature("throwOnHasNext", true);
 	Statement stmt = (sess << "SELECT * FROM Strings");
-	stmt.executeAsync();
-	try
+	for (int i = 0; i < 2; ++i)
 	{
-		stmt.wait();
-		fail ("must throw UnknownDataBaseException");
+		stmt.executeAsync();
+		try
+		{
+			stmt.wait();
+			fail ("must throw UnknownDataBaseException");
+		}
+		catch (UnknownDataBaseException&) { }
 	}
-	catch (UnknownDataBaseException&) { }
+}
+
+
+void DataTest::testStatementExecuteWhileExecuting()
+{
+	using Poco::Data::Test::TestStatementImpl;
+
+	// A statement and its copies refuse to execute while an asynchronous execution
+	// runs: before it has changed the state, while it runs, and after it has set the
+	// state to done, which an execution with a limit does before it ends.
+	const auto refused = [](auto call)
+	{
+		try
+		{
+			call();
+		}
+		catch (InvalidAccessException&)
+		{
+			return true;
+		}
+		return false;
+	};
+
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	const auto points = {
+		TestStatementImpl::HoldPoint::COMPILE,
+		TestStatementImpl::HoldPoint::HAS_NEXT,
+		TestStatementImpl::HoldPoint::AFFECTED_ROW_COUNT
+	};
+	for (const auto point: points)
+	{
+		Statement stmt = (sess << "SELECT * FROM Strings", limit(1));
+		Statement copy(stmt);
+		SharedPtr<Statement::Result> pResult;
+		bool executeRefused = false;
+		bool executeAsyncRefused = false;
+		bool executeDirectRefused = false;
+		bool copyExecuteRefused = false;
+		{
+			ExecutionHold hold(point);
+			pResult = new Statement::Result(stmt.executeAsync());
+			assertTrue (TestStatementImpl::waitUntilHeld(10000));
+			executeRefused = refused([&stmt] { stmt.execute(); });
+			executeAsyncRefused = refused([&stmt] { stmt.executeAsync(); });
+			executeDirectRefused = refused([&stmt] { stmt.executeDirect("SELECT * FROM Strings"); });
+			copyExecuteRefused = refused([&copy] { copy.execute(); });
+		}
+		pResult->wait();
+		// if executeAsync() was not refused, its execution has to end before the next round
+		stmt.wait();
+		assertTrue (executeRefused);
+		assertTrue (executeAsyncRefused);
+		assertTrue (executeDirectRefused);
+		assertTrue (copyExecuteRefused);
+		assertTrue (!pResult->failed());
+		// once the execution has ended, the next one is accepted, also through the copy
+		copy.execute();
+	}
 }
 
 
@@ -2844,6 +2908,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyReopen);
 	CppUnit_addTest(pSuite, DataTest, testStatementAsyncError);
 	CppUnit_addTest(pSuite, DataTest, testStatementWaitErrorType);
+	CppUnit_addTest(pSuite, DataTest, testStatementExecuteWhileExecuting);
 	CppUnit_addTest(pSuite, DataTest, testStatementSetAsyncMovedFrom);
 	CppUnit_addTest(pSuite, DataTest, testTransactionNotConnectedLog);
 	CppUnit_addTest(pSuite, DataTest, testTransactorFailureLog);
