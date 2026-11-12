@@ -8,6 +8,8 @@
 //
 
 
+// This file is compiled without /Zc:__cplusplus, so __cplusplus is 199711L. It compiles
+// only if Poco/Config.h reads the standard from _MSVC_LANG.
 #include "Poco/RemotingNG/Serializer.h"
 #include "Poco/RemotingNG/Deserializer.h"
 #include "Poco/RemotingNG/TypeSerializer.h"
@@ -16,8 +18,7 @@
 #include <string>
 
 
-// Compiles only if this file sees the std::optional specializations of
-// TypeSerializer and TypeDeserializer, which need C++17.
+// Instantiates the std::optional specializations of TypeSerializer and TypeDeserializer.
 void serializeOptional(const std::optional<std::string>& value, Poco::RemotingNG::Serializer& ser)
 {
 	Poco::RemotingNG::TypeSerializer<std::optional<std::string>>::serialize("value", value, ser);

@@ -62,18 +62,14 @@ FastMutex::~FastMutex()
 
 namespace {
 
-// Try to acquire the lock. On C++20, first polls with relaxed read
+// Try to acquire the lock. First polls with relaxed read
 // to avoid cache line bouncing, then attempts acquire if lock appears free.
 inline bool tryAcquire(std::atomic_flag& flag)
 {
-#if defined(__cpp_lib_atomic_flag_test)
 	if (!flag.test(std::memory_order_relaxed))
 		if (!flag.test_and_set(std::memory_order_acquire))
 			return true;
 	return false;
-#else
-	return !flag.test_and_set(std::memory_order_acquire);
-#endif
 }
 
 constexpr int SPIN_COUNT = 32;
