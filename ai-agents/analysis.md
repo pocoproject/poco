@@ -86,8 +86,8 @@ cppcheck --project=<build-dir>/compile_commands.json --enable=warning,performanc
 ## Fuzzing
 
 - `.github/workflows/cifuzz.yml` builds and runs the OSS-Fuzz targets of the `poco` project on every pull request.
-- Fuzz targets live in `<Component>/fuzzing/` (Foundation, JSON, JWT, Net, XML) and are built with `-DENABLE_FUZZING=ON`
-  and Clang.
+- Fuzz targets live in `<Component>/fuzzing/` and are built with `-DENABLE_FUZZING=ON` and Clang;
+  `build/script/oss-fuzz-build.sh` lists all of them. Their conventions are in [fuzzing.md](fuzzing.md).
 - Parsers of untrusted input (protocols, file formats) get a fuzz target or at least tests with truncated and malformed
   input (see "Extra quality gates").
 
