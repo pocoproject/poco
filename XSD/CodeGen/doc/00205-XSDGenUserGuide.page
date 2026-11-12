@@ -207,19 +207,14 @@ defined somewhere.
 The definition for this macro typically looks like
 this:
 
-    #if defined(_WIN32) && defined(POCO_DLL)
-        #if defined(Library_EXPORTS)
-            #define Library_API __declspec(dllexport)
-        #else
-            #define Library_API __declspec(dllimport)    
-        #endif
-    #endif
-    
-    
-    #if !defined(Library_API)
-        #define Library_API
-    #endif
+    #include "Poco/Foundation.h"
+
+
+    #define Library_API POCO_API(Library_EXPORTS)
 ----
+
+`Library_EXPORTS` is a macro that is defined only while
+the library itself is compiled.
 
 !alwaysInclude
 

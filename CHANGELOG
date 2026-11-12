@@ -192,6 +192,12 @@ Features:
   child is spawned without an initial directory and is given variables: it then gets only those.
 - GH #5510 Poco::Util::LayeredConfiguration::replace() replaces a labeled configuration in one
   step, so that readers never see the configuration without it.
+- GH #5691 Poco/Foundation.h defines POCO_API(exports), the attribute that exports the symbols
+  of a shared library or imports them. The export macros of the POCO libraries (Foundation_API,
+  Net_API and the others; not CppUnit_API) are defined with it, and a library that is built on
+  POCO can define its own in one line: #define MyLib_API POCO_API(MyLib_EXPORTS). The headers
+  define these macros also when the including code has defined them before. On Cygwin, CppParser
+  and NetSSL use the GCC visibility attribute, as the other libraries do.
 
 New Components:
 

@@ -25,29 +25,9 @@
 
 
 //
-// The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the NetSSL_EXPORTS
-// symbol defined on the command line. This symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file sees
-// NetSSL_API functions as being imported from a DLL, whereas this DLL sees symbols
-// defined with this macro as being exported.
+// NetSSL_EXPORTS is defined only while this library is compiled (see POCO_API in Poco/Foundation.h).
 //
-#if (defined(_WIN32) || defined(__CYGWIN__)) && defined(POCO_DLL)
-	#if defined(NetSSL_EXPORTS)
-		#define NetSSL_API __declspec(dllexport)
-	#else
-		#define NetSSL_API __declspec(dllimport)
-	#endif
-#endif
-
-
-#if !defined(NetSSL_API)
-	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
-		#define NetSSL_API __attribute__ ((visibility ("default")))
-	#else
-		#define NetSSL_API
-	#endif
-#endif
+#define NetSSL_API POCO_API(NetSSL_EXPORTS)
 
 
 //

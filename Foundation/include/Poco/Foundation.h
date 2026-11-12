@@ -37,29 +37,51 @@
 
 
 //
-// The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the Foundation_EXPORTS
-// symbol defined on the command line. This symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file sees
-// Foundation_API functions as being imported from a DLL, whereas this DLL sees symbols
-// defined with this macro as being exported.
+// POCO_API(exports) is the attribute of the classes and functions that a shared
+// library exports. Its argument is a symbol that is defined (empty or as 1) on the
+// command line only while the library itself is compiled, and in no project that
+// uses the library: the library then exports the symbols, and all other code
+// imports them. Every library defines its own macro with it:
+//
+//     #define Net_API POCO_API(Net_EXPORTS)
 //
 #if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(Foundation_EXPORTS)
-		#define Foundation_API __declspec(dllexport)
-	#else
-		#define Foundation_API __declspec(dllimport)
-	#endif
+	// A macro definition cannot contain #if, so POCO_API decides by token pasting.
+	// POCO_API_EXPORTING_ is pasted with the expanded symbol and put in front of the list
+	// "__declspec(dllexport), __declspec(dllimport)"; POCO_API_SECOND returns the
+	// second element:
+	//
+	//   symbol defined as 1:  POCO_API_EXPORTING_1 expands to "~," (~ is a placeholder),
+	//                         so __declspec(dllexport) is second
+	//   symbol defined empty: the same with POCO_API_EXPORTING_
+	//   symbol not defined:   POCO_API_EXPORTING_<symbol> is not a macro and stays in the
+	//                         first element, so __declspec(dllimport) is second
+	#define POCO_API(exports) POCO_API_PASTE(POCO_API_EXPORTING, exports)
+
+	// ## does not expand its operands, so POCO_API expands the symbol and this macro
+	// pastes it. The prefix is a parameter of its own, so that an empty symbol does not
+	// result in a call with one empty argument (warning C4003 of Visual C++).
+	#define POCO_API_PASTE(prefix, value) \
+		POCO_API_EXPAND(POCO_API_SECOND, (prefix##_##value __declspec(dllexport), __declspec(dllimport)))
+
+	// Arguments are separated before they are expanded, so the comma from
+	// POCO_API_EXPORTING_1 counts only if the list is expanded before the call:
+	// POCO_API_EXPAND expands it as its own argument and then forms the call. Passing
+	// the list through one more macro parameter would expand it too, but the
+	// traditional preprocessor of Visual C++ then keeps it as one argument.
+	#define POCO_API_EXPAND(macro, args) macro args
+
+	#define POCO_API_EXPORTING_ ~,
+	#define POCO_API_EXPORTING_1 ~,
+	#define POCO_API_SECOND(first, second, ...) second
+#elif !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__)
+	#define POCO_API(exports) __attribute__ ((visibility ("default")))
+#else
+	#define POCO_API(exports)
 #endif
 
 
-#if !defined(Foundation_API)
-	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
-		#define Foundation_API __attribute__ ((visibility ("default")))
-	#else
-		#define Foundation_API
-	#endif
-#endif
+#define Foundation_API POCO_API(Foundation_EXPORTS)
 
 
 //
