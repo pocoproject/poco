@@ -120,6 +120,10 @@ public:
 
 	[[nodiscard]] bool needsZip64() const;
 
+	[[nodiscard]] bool hasZip64DataDescriptor() const;
+		/// Returns true if the sizes in the data descriptor of the entry are 8 bytes long, which is the
+		/// case if the local file header has a ZIP64 extra field.
+
 	void setZip64Data();
 
 	[[nodiscard]] std::string createHeader() const;
@@ -255,6 +259,12 @@ inline void ZipLocalFileHeader::getRequiredVersion(int& major, int& minor) const
 inline bool ZipLocalFileHeader::needsZip64() const
 {
 	return _forceZip64 || _startPos >= ZipCommon::ZIP64_MAGIC || _compressedSize >= ZipCommon::ZIP64_MAGIC || _uncompressedSize >= ZipCommon::ZIP64_MAGIC;
+}
+
+
+inline bool ZipLocalFileHeader::hasZip64DataDescriptor() const
+{
+	return _forceZip64;
 }
 
 

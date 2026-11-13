@@ -42,6 +42,7 @@
 #include <limits>
 #include <set>
 #include <sstream>
+#include <streambuf>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -192,6 +193,42 @@ namespace
 			zipStream.seekg(ENTRY_SIZE, std::ios_base::cur);
 			return true;
 		}
+	};
+
+
+	class OffsetStreamBuf: public std::streambuf
+		/// Serves the data as if it started at the given offset of the stream.
+	{
+	public:
+		OffsetStreamBuf(std::string data, std::streamoff offset):
+			_data(std::move(data)),
+			_offset(offset)
+		{
+			setg(_data.data(), _data.data(), _data.data() + _data.size());
+		}
+
+	protected:
+		pos_type seekoff(off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which) override
+		{
+			if (dir == std::ios_base::cur)
+				off += _offset + (gptr() - eback());
+			else if (dir == std::ios_base::end)
+				off += _offset + static_cast<off_type>(_data.size());
+			return seekpos(pos_type(off), which);
+		}
+
+		pos_type seekpos(pos_type pos, std::ios_base::openmode which) override
+		{
+			const off_type index = static_cast<off_type>(pos) - _offset;
+			if ((which & std::ios_base::in) == 0 || index < 0 || index > static_cast<off_type>(_data.size()))
+				return pos_type(static_cast<off_type>(-1));
+			setg(eback(), eback() + index, egptr());
+			return pos;
+		}
+
+	private:
+		std::string _data;
+		std::streamoff _offset;
 	};
 }
 
@@ -986,7 +1023,9 @@ void ZipTest::testKeepEntryBeyondEndOfArchive()
 
 void ZipTest::testDataDescriptorEntryAbove4GiB()
 {
-	constexpr Poco::UInt64 OFFSET_ABOVE_4GIB = static_cast<Poco::UInt64>(1) << 32; // the local file header is at 0
+	// The archive starts at 4 GiB: the entry needs ZIP64 for its offset, but its local file header has
+	// no ZIP64 extra field, so its data descriptor has 4-byte sizes.
+	constexpr Poco::UInt64 OFFSET_ABOVE_4GIB = static_cast<Poco::UInt64>(1) << 32;
 	constexpr std::string_view DEFLATED_DATA("\xcb\x48\xcd\xc9\xc9\x07\x00", 7); // raw deflate stream of ENTRY_DATA
 	const Entry entries[] =
 	{
@@ -998,16 +1037,16 @@ void ZipTest::testDataDescriptorEntryAbove4GiB()
 		std::ostringstream ostr;
 		Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 		writer.writeRaw(localFile(entry));
-		// The entry needs ZIP64 at its offset, so ZipInputStream expects a ZIP64 data descriptor.
 		writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
-		writer << ENTRY_CRC << static_cast<Poco::UInt64>(entry.compressedSize) << static_cast<Poco::UInt64>(entry.uncompressedSize);
+		writer << ENTRY_CRC << entry.compressedSize << entry.uncompressedSize;
 		const auto directoryOffset = static_cast<Poco::UInt32>(ostr.str().size());
 		Entry directoryEntry = entry;
 		directoryEntry.localHeaderOffset = ZipCommon::ZIP64_MAGIC;
 		directoryEntry.extraField = zip64ExtraField({OFFSET_ABOVE_4GIB});
 		writer.writeRaw(centralDirectoryEntry(directoryEntry));
 		writer.writeRaw(endOfCentralDirectory(directoryOffset));
-		std::istringstream istr(ostr.str());
+		OffsetStreamBuf buf(ostr.str(), static_cast<std::streamoff>(OFFSET_ABOVE_4GIB));
+		std::istream istr(&buf);
 
 		ZipArchive arch(istr);
 		const auto it = arch.findHeader(std::string(ENTRY_NAME));
@@ -1016,9 +1055,8 @@ void ZipTest::testDataDescriptorEntryAbove4GiB()
 		ZipInputStream zipin(istr, it->second, true);
 		std::string data;
 		Poco::StreamCopier::copyToString(zipin, data);
-		// From the start position cut to 32 bits, the stream would return the data of the entry at offset 0;
-		// the entry itself is at 2^32, past the end of the stream.
-		assertTrue (data != ENTRY_DATA);
+		assertEqual (std::string(ENTRY_DATA), data);
+		assertTrue (zipin.crcValid());
 	}
 }
 
