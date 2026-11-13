@@ -45,6 +45,7 @@ public:
 	void testDecompressZip64();
 	void testValidPath();
 	void testMalformedZip64();
+	void testZip64ExtensibleData();
 	void testUnknownMethodAndHostSystem();
 	void testUnsupportedVersionNeeded();
 	void testDuplicateEndOfCentralDirectory();
