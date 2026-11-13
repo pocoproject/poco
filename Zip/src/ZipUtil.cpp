@@ -108,6 +108,8 @@ void ZipUtil::sync(std::istream& in)
 			// we have a possible header!
 			// read the next 2 bytes
 			in.read(temp+tempPos, PREFIX);
+			if (in.gcount() != PREFIX)
+				return;
 			tempPos += PREFIX;
 			if (std::memcmp(ZipLocalFileHeader::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
 				std::memcmp(ZipArchiveInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||

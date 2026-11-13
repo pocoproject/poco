@@ -54,6 +54,9 @@ public:
 	void testDataDescriptorEntryAbove4GiB();
 	void testEmptyFileName();
 	void testDuplicateFileNames();
+	void testTruncatedArchive();
+	void testTruncatedDataDescriptor();
+	void testSyncAtEndOfArchive();
 
 	void setUp();
 	void tearDown();
