@@ -119,7 +119,7 @@ void StreamCopierTest::testBufferedCopyN()
 
 	try
 	{
-		StreamCopier::copyStreamN(zeroInput, zeroOutput, -1);
+		n = StreamCopier::copyStreamN(zeroInput, zeroOutput, -1);
 		fail("negative count must fail");
 	}
 	catch (const Poco::AssertionViolationException&)

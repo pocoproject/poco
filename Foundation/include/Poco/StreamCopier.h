@@ -48,19 +48,21 @@ public:
 		/// integer is used to count the number of bytes copied.
 #endif
 
-	static std::streamsize copyStreamN(std::istream& istr, std::ostream& ostr, std::streamsize count, std::size_t bufferSize = 8192);
+	[[nodiscard]] static std::streamsize copyStreamN(std::istream& istr, std::ostream& ostr, std::streamsize count, std::size_t bufferSize = 8192);
 		/// Writes up to count bytes readable from the current position in istr to ostr,
 		/// using an internal buffer.
 		///
-		/// Returns the number of bytes copied.
+		/// Returns the number of bytes copied, which is less than count
+		/// if istr ends first.
 		/// The count must be non-negative.
 
 #if defined(POCO_HAVE_INT64)
-	static Poco::UInt64 copyStreamN64(std::istream& istr, std::ostream& ostr, std::streamsize count, std::size_t bufferSize = 8192);
+	[[nodiscard]] static Poco::UInt64 copyStreamN64(std::istream& istr, std::ostream& ostr, std::streamsize count, std::size_t bufferSize = 8192);
 		/// Writes up to count bytes readable from the current position in istr to ostr,
 		/// using an internal buffer.
 		///
-		/// Returns the number of bytes copied as a 64-bit unsigned integer.
+		/// Returns the number of bytes copied as a 64-bit unsigned integer,
+		/// which is less than count if istr ends first.
 		///
 		/// Note: the only difference to copyStreamN() is that a 64-bit unsigned
 		/// integer is used to count the number of bytes copied.
@@ -71,6 +73,7 @@ public:
 		/// Writes range of bytes readable from istr to ostr, using an internal buffer.
 		///
 		/// Returns the number of bytes copied.
+		/// The rangeLength must be non-negative.
 
 #if defined(POCO_HAVE_INT64)
 	static Poco::UInt64 copyStreamRange64(std::istream& istr, std::ostream& ostr, std::streampos rangeStart, std::streamsize rangeLength, std::size_t bufferSize = 8192);
@@ -80,6 +83,7 @@ public:
 		///
 		/// Note: the only difference to copyStreamRange() is that a 64-bit unsigned
 		/// integer is used to count the number of bytes copied.
+		/// The rangeLength must be non-negative.
 #endif
 
 	static std::streamsize copyStreamUnbuffered(std::istream& istr, std::ostream& ostr);
