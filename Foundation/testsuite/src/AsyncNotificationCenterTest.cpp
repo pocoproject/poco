@@ -348,11 +348,8 @@ void AsyncNotificationCenterTest::testErrorHandling()
 	// Post notification - exception should be caught by ErrorHandler
 	nc.postNotification(new Notification);
 
-	// Give time for async processing
-	Poco::Thread::sleep(200);
-
 	// The throwing observer should have been called
-	assertTrue(_exceptionCount > 0);
+	assertTrue(waitForCondition([&]{ return _exceptionCount > 0; }, 5000));
 
 	// The normal observer should also have been called (error handling shouldn't stop dispatch)
 	// Note: This depends on ErrorHandler implementation - it may or may not continue
@@ -457,7 +454,8 @@ void AsyncNotificationCenterTest::testCleanupDestruction()
 	}
 	int notifyProcessed = _notificationCount.load();
 
-	// Test 2: ENQUEUE mode - must process all queued notifications before destructor completes
+	// Test 2: ENQUEUE mode - stop() discards the notifications that are still queued,
+	// so all of them must be delivered before the destructor runs
 	int startCount = _notificationCount.load();
 	{
 		AsyncNotificationCenter nc(AsyncMode::ENQUEUE);
@@ -468,15 +466,26 @@ void AsyncNotificationCenterTest::testCleanupDestruction()
 			nc.postNotification(new Notification);
 		}
 
-		// Give a moment for enqueue thread to start processing
-		Poco::Thread::sleep(10);
-
-		// Destructor MUST process all remaining notifications in ENQUEUE mode
+		assertTrue(waitForCondition([&]{ return _notificationCount - startCount >= testCount; }, 5000));
 	}
 
-	// Verify ENQUEUE processed all notifications
+	// Verify ENQUEUE delivered each notification once
 	int enqueueProcessed = _notificationCount.load() - startCount;
 	assertEqual(testCount, enqueueProcessed);
+
+	// Test 3: ENQUEUE mode - destroyed while notifications are queued, stop() discards them
+	startCount = _notificationCount.load();
+	{
+		AsyncNotificationCenter nc(AsyncMode::ENQUEUE);
+		nc.addNObserver(*this, &AsyncNotificationCenterTest::handleCount);
+
+		for (int i = 0; i < testCount; ++i)
+		{
+			nc.postNotification(new Notification);
+		}
+	}
+	int queuedProcessed = _notificationCount.load() - startCount;
+	assertTrue(queuedProcessed <= testCount);
 
 	// NOTIFY may have processed fewer (workers stop immediately when destructor runs)
 	assertTrue(notifyProcessed >= 0 && notifyProcessed <= testCount);
@@ -733,8 +742,6 @@ void AsyncNotificationCenterTest::handleThrow(const AutoPtr<Notification>& pNf)
 void AsyncNotificationCenterTest::handleThreadSafe(const AutoPtr<Notification>& pNf)
 {
 	++_threadSafeCount;
-	// Simulate some processing time
-	Poco::Thread::sleep(1);
 }
 
 
