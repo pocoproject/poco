@@ -29,6 +29,7 @@ public:
 
 	void testPing();
 	void testBigPing();
+	void testPacketTime();
 
 	void setUp();
 	void tearDown();
