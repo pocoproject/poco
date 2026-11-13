@@ -429,69 +429,119 @@ void MessageHeaderTest::testDecodeWord()
 	coded = "application/pdf; name=\"=?utf-8?Q?RUG_Regler-_und_Ger=C3=A4tebau_Gm?= =?utf-8?Q?bH_Angebot_Erneuerung_=C3=9CE.pdf?=\"";
 	decoded = MessageHeader::decodeWord(coded, "UTF-8");
 	assertTrue (decoded == "application/pdf; name=\"RUG Regler- und Gerätebau GmbH Angebot Erneuerung ÜE.pdf\"");
+}
 
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?=") == "Hello");
-	assertTrue (MessageHeader::decodeWord("=?base64?SGVsbG8=?=") == "=?base64?SGVsbG8=?=");
-	assertTrue (MessageHeader::decodeWord("https://example.com/?a=?b") == "https://example.com/?a=?b");
-	assertTrue (MessageHeader::decodeWord("=?x?y?z?=") == "=?x?y?z?=");
-	assertTrue (MessageHeader::decodeWord("https://example.com/?a=?b&c=?d") == "https://example.com/?a=?b&c=?d");
-	assertTrue (MessageHeader::decodeWord("prefix =?invalid and =?UTF-8?B?SGVsbG8=?= suffix") == "prefix =?invalid and Hello suffix");
-	assertTrue (MessageHeader::decodeWord("=?=") == "=?=");
-	assertTrue (MessageHeader::decodeWord("=?a?=") == "=?a?=");
-	assertTrue (MessageHeader::decodeWord("=?a?b?=") == "=?a?b?=");
-	assertTrue (MessageHeader::decodeWord("=?x?y?z?= =?UTF-8?B?SGVsbG8=?=") == "=?x?y?z?= Hello");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?= =?x?y?z?=") == "Hello =?x?y?z?=");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?X?SGVsbG8=?= =?UTF-8?B?SGVsbG8=?=") == "=?UTF-8?X?SGVsbG8=?= Hello");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?= =?UTF-8?B?V29ybGQ=?=") == "HelloWorld");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?=   =?UTF-8?B?V29ybGQ=?=") == "HelloWorld");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?=\r\n =?UTF-8?B?V29ybGQ=?=") == "HelloWorld");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?= middle =?UTF-8?B?V29ybGQ=?=") == "Hello middle World");
-	assertTrue (MessageHeader::decodeWord("prefix =?UTF-8?B?not!valid!?= suffix") == "prefix =?UTF-8?B?not!valid!?= suffix");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?not!valid!?= =?UTF-8?B?SGVsbG8=?=") == "=?UTF-8?B?not!valid!?= Hello");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?= =?UTF-8?B?not!valid!?=") == "Hello =?UTF-8?B?not!valid!?=");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?Q?bad=ZZ?= =?UTF-8?B?SGVsbG8=?=") == "=?UTF-8?Q?bad=ZZ?= Hello");
+
+void MessageHeaderTest::testDecodeWordNotEncoded()
+{
+	assertEqual ("=?base64?SGVsbG8=?=", MessageHeader::decodeWord("=?base64?SGVsbG8=?="));
+	assertEqual ("https://example.com/?a=?b", MessageHeader::decodeWord("https://example.com/?a=?b"));
+	assertEqual ("=?x?y?z?=", MessageHeader::decodeWord("=?x?y?z?="));
+	assertEqual ("https://example.com/?a=?b&c=?d", MessageHeader::decodeWord("https://example.com/?a=?b&c=?d"));
+	assertEqual ("prefix =?invalid and Hello suffix", MessageHeader::decodeWord("prefix =?invalid and =?UTF-8?B?SGVsbG8=?= suffix"));
+	assertEqual ("=?=", MessageHeader::decodeWord("=?="));
+	assertEqual ("=?a?=", MessageHeader::decodeWord("=?a?="));
+	assertEqual ("=?a?b?=", MessageHeader::decodeWord("=?a?b?="));
 
 	std::istringstream in("X-Value: =?base64?SGVsbG8=?=\r\nX-Link: <https://example.com/?a=?b>\r\n\r\n");
 	MessageHeader header;
 	header.read(in);
-	assertTrue (header.get("X-Value") == "=?base64?SGVsbG8=?=");
-	assertTrue (header.get("X-Link") == "<https://example.com/?a=?b>");
+	assertEqual ("=?base64?SGVsbG8=?=", header.get("X-Value"));
+	assertEqual ("<https://example.com/?a=?b>", header.get("X-Link"));
+}
 
+
+void MessageHeaderTest::testDecodeWordMalformed()
+{
+	assertEqual ("=?UTF-8?B?not!valid!?=", MessageHeader::decodeWord("=?UTF-8?B?not!valid!?="));
+	assertEqual ("prefix =?UTF-8?B?not!valid!?= suffix", MessageHeader::decodeWord("prefix =?UTF-8?B?not!valid!?= suffix"));
+	assertEqual ("=?UTF-8?B?SGVsbG8=A?=", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=A?="));
+	assertEqual ("=?UTF-8?B?SGVsbG8=QQ==?=", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=QQ==?="));
+	assertEqual ("=?UTF-8?B?SGVsbG8?=", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8?="));
+	assertEqual ("=?UTF-8?Q?bad=ZZ?=", MessageHeader::decodeWord("=?UTF-8?Q?bad=ZZ?="));
+	assertEqual ("=?UTF-8?Q?bad=2?=", MessageHeader::decodeWord("=?UTF-8?Q?bad=2?="));
+	assertEqual ("=?UTF-8?Q?" "?=", MessageHeader::decodeWord("=?UTF-8?Q?" "?="));
+	assertEqual ("=?UTF-8?B?" "?=", MessageHeader::decodeWord("=?UTF-8?B?" "?="));
+	assertEqual ("=?bad/charset?Q?abc?=", MessageHeader::decodeWord("=?bad/charset?Q?abc?="));
+}
+
+
+void MessageHeaderTest::testDecodeWordAdjacent()
+{
+	assertEqual ("Hello", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?="));
+	assertEqual ("HelloWorld", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?= =?UTF-8?B?V29ybGQ=?="));
+	assertEqual ("HelloWorld", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?=   =?UTF-8?B?V29ybGQ=?="));
+	assertEqual ("HelloWorld", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?=\r\n =?UTF-8?B?V29ybGQ=?="));
+	assertEqual ("Hello middle World", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?= middle =?UTF-8?B?V29ybGQ=?="));
+	assertEqual ("=?x?y?z?= Hello", MessageHeader::decodeWord("=?x?y?z?= =?UTF-8?B?SGVsbG8=?="));
+	assertEqual ("Hello =?x?y?z?=", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?= =?x?y?z?="));
+	assertEqual ("=?UTF-8?X?SGVsbG8=?= Hello", MessageHeader::decodeWord("=?UTF-8?X?SGVsbG8=?= =?UTF-8?B?SGVsbG8=?="));
+	assertEqual ("=?UTF-8?B?not!valid!?= Hello", MessageHeader::decodeWord("=?UTF-8?B?not!valid!?= =?UTF-8?B?SGVsbG8=?="));
+	assertEqual ("Hello =?UTF-8?B?not!valid!?=", MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=?= =?UTF-8?B?not!valid!?="));
+	assertEqual ("=?UTF-8?Q?bad=ZZ?= Hello", MessageHeader::decodeWord("=?UTF-8?Q?bad=ZZ?= =?UTF-8?B?SGVsbG8=?="));
+
+	std::istringstream in("X-Subject: =?UTF-8?B?SGVsbG8=?=\r\n =?UTF-8?B?V29ybGQ=?=\r\n\r\n");
+	MessageHeader header;
+	header.read(in);
+	assertEqual ("HelloWorld", header.get("X-Subject"));
+}
+
+
+void MessageHeaderTest::testDecodeRFC2047()
+{
 	std::string out;
-	MessageHeader::decodeRFC2047("=?x?y?z?=", out);
-	assertTrue (out == "=?x?y?z?=");
-	MessageHeader::decodeRFC2047("x?y?z", out);
-	assertTrue (out == "x?y?z");
 	MessageHeader::decodeRFC2047("=?UTF-8?B?SGVsbG8=?=", out);
-	assertTrue (out == "Hello");
+	assertEqual ("Hello", out);
 	MessageHeader::decodeRFC2047("UTF-8?B?SGVsbG8=", out);
-	assertTrue (out == "Hello");
+	assertEqual ("Hello", out);
+	MessageHeader::decodeRFC2047("=?ISO-8859-1?Q?=E4?=", out, "UTF-8");
+	assertEqual ("\xC3\xA4", out);
+	MessageHeader::decodeRFC2047("=?x?y?z?=", out);
+	assertEqual ("=?x?y?z?=", out);
+	MessageHeader::decodeRFC2047("x?y?z", out);
+	assertEqual ("x?y?z", out);
 	MessageHeader::decodeRFC2047("=?UTF-8?B?not!valid!?=", out);
-	assertTrue (out == "=?UTF-8?B?not!valid!?=");
-	MessageHeader::decodeRFC2047("=?UTF-8?Q?bad=ZZ?=", out);
-	assertTrue (out == "=?UTF-8?Q?bad=ZZ?=");
-	MessageHeader::decodeRFC2047("=?UTF-8?Q?bad=2?=", out);
-	assertTrue (out == "=?UTF-8?Q?bad=2?=");
-
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?Q?" "?=") == "=?UTF-8?Q?" "?=");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?" "?=") == "=?UTF-8?B?" "?=");
-	assertTrue (MessageHeader::decodeWord("=?bad/charset?Q?abc?=") == "=?bad/charset?Q?abc?=");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=A?=") == "=?UTF-8?B?SGVsbG8=A?=");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8=QQ==?=") == "=?UTF-8?B?SGVsbG8=QQ==?=");
-	assertTrue (MessageHeader::decodeWord("=?UTF-8?B?SGVsbG8?=") == "=?UTF-8?B?SGVsbG8?=");
-
-	MessageHeader::decodeRFC2047("=?UTF-8?Q?" "?=", out);
-	assertTrue (out == "=?UTF-8?Q?" "?=");
-	MessageHeader::decodeRFC2047("=?UTF-8?B?" "?=", out);
-	assertTrue (out == "=?UTF-8?B?" "?=");
-	MessageHeader::decodeRFC2047("=?bad/charset?Q?abc?=", out);
-	assertTrue (out == "=?bad/charset?Q?abc?=");
+	assertEqual ("=?UTF-8?B?not!valid!?=", out);
 	MessageHeader::decodeRFC2047("=?UTF-8?B?SGVsbG8=A?=", out);
-	assertTrue (out == "=?UTF-8?B?SGVsbG8=A?=");
+	assertEqual ("=?UTF-8?B?SGVsbG8=A?=", out);
 	MessageHeader::decodeRFC2047("=?UTF-8?B?SGVsbG8=QQ==?=", out);
-	assertTrue (out == "=?UTF-8?B?SGVsbG8=QQ==?=");
+	assertEqual ("=?UTF-8?B?SGVsbG8=QQ==?=", out);
 	MessageHeader::decodeRFC2047("=?UTF-8?B?SGVsbG8?=", out);
-	assertTrue (out == "=?UTF-8?B?SGVsbG8?=");
+	assertEqual ("=?UTF-8?B?SGVsbG8?=", out);
+	MessageHeader::decodeRFC2047("=?UTF-8?Q?bad=ZZ?=", out);
+	assertEqual ("=?UTF-8?Q?bad=ZZ?=", out);
+	MessageHeader::decodeRFC2047("=?UTF-8?Q?bad=2?=", out);
+	assertEqual ("=?UTF-8?Q?bad=2?=", out);
+	MessageHeader::decodeRFC2047("=?UTF-8?Q?" "?=", out);
+	assertEqual ("=?UTF-8?Q?" "?=", out);
+	MessageHeader::decodeRFC2047("=?UTF-8?B?" "?=", out);
+	assertEqual ("=?UTF-8?B?" "?=", out);
+	MessageHeader::decodeRFC2047("=?bad/charset?Q?abc?=", out);
+	assertEqual ("=?bad/charset?Q?abc?=", out);
+
+	std::string inOut("=?UTF-8?B?SGVsbG8=?=");
+	MessageHeader::decodeRFC2047(inOut, inOut);
+	assertEqual ("Hello", inOut);
+}
+
+
+void MessageHeaderTest::testDecodeWordLongValue()
+{
+	std::string value;
+	for (int i = 0; i < 2730; ++i)
+		value += "=?a";
+	assertEqual (8190, value.size());
+	assertEqual (value, MessageHeader::decodeWord(value));
+
+	std::string fields;
+	for (int i = 0; i < 99; ++i)
+		fields += "X-Field" + std::to_string(i) + ": " + value + "\r\n";
+	fields += "\r\n";
+	std::istringstream in(fields);
+	MessageHeader header;
+	header.read(in);
+	for (int i = 0; i < 99; ++i)
+		assertEqual (value, header.get("X-Field" + std::to_string(i)));
 }
 
 // Sample HTTP reuest header
@@ -813,6 +863,11 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testValueLengthLimit);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testLongValue);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWordNotEncoded);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWordMalformed);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWordAdjacent);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeRFC2047);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWordLongValue);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testNoDecodeFramingHeaders);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testAutoDecode);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testStrictFieldName);
