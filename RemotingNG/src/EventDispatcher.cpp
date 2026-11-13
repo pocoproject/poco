@@ -108,6 +108,18 @@ void EventDispatcher::addSubscriber(const std::string& subscriberURI, const std:
 	}
 	else 
 	{
+		if (it->second->endpoint != endpointURI)
+		{
+			// The subscriber renews its subscription from another endpoint,
+			// for example over a new connection. The Transport keeps the
+			// attributes of the subscriber.
+			it->second->endpoint = endpointURI;
+			if (it->second->pTransport)
+			{
+				it->second->pTransport->disconnect();
+				it->second->pTransport->connect(endpointURI);
+			}
+		}
 		it->second->expireTime = expireTime;
 	}
 }

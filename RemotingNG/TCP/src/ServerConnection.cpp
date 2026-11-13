@@ -473,7 +473,8 @@ public:
 		if (pFrame->type() == Frame::FRAME_TYPE_EVSU || pFrame->type() == Frame::FRAME_TYPE_EVUN)
 		{
 			std::string suri(pFrame->payloadBegin(), pFrame->getPayloadSize());
-			_pSubscriptionChanges->change(pFrame->type() == Frame::FRAME_TYPE_EVSU, suri, eventEndpoint(pConnection, suri));
+			const bool subscribe = pFrame->type() == Frame::FRAME_TYPE_EVSU;
+			_pSubscriptionChanges->change(subscribe, suri, subscribe ? eventEndpoint(pConnection, suri) : std::string());
 			pConnection->returnFrame(pFrame);
 			return true;
 		}
@@ -494,7 +495,9 @@ private:
 		if (peerAddress.family() == Poco::Net::AddressFamily::UNIX_LOCAL) return subscriberURI;
 #endif
 		Poco::URI endpointURI(subscriberURI);
-		endpointURI.setAuthority(peerAddress.toString());
+		// ConnectionManager decodes the authority: the scope of an IPv6
+		// address is percent-encoded, like the path of a socket file.
+		endpointURI.setAuthority(Poco::replace(peerAddress.toString(), "%", "%25"));
 		return endpointURI.toString();
 	}
 

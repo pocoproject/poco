@@ -16,6 +16,7 @@
 #include "Poco/RemotingNG/TransportFactoryManager.h"
 #include "Poco/RemotingNG/Skeleton.h"
 #include "Poco/RemotingNG/ORB.h"
+#include "Poco/RemotingNG/EventDispatcher.h"
 #include "Poco/RemotingNG/TCP/Transport.h"
 #include "Poco/RemotingNG/TCP/TransportFactory.h"
 #include "Poco/RemotingNG/TCP/Listener.h"
@@ -34,6 +35,7 @@
 #include "Poco/Net/HTTPBasicCredentials.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/URI.h"
+#include "Poco/AtomicCounter.h"
 #include "Poco/MD5Engine.h"
 #include "Poco/SHA1Engine.h"
 #include "Poco/HMACEngine.h"
@@ -133,6 +135,46 @@ public:
 private:
 	Poco::Event _received;
 };
+
+
+class EventCounter
+	/// Tells when and how often an event arrives at its subscriber.
+{
+public:
+	void onEvent(const void* /*pSender*/, std::string& /*arg*/)
+	{
+		++_count;
+		_received.set();
+	}
+
+	[[nodiscard]] bool received(long milliseconds)
+	{
+		return _received.tryWait(milliseconds);
+	}
+
+	[[nodiscard]] int count() const
+	{
+		return _count;
+	}
+
+private:
+	Poco::Event _received;
+	Poco::AtomicCounter _count;
+};
+
+
+namespace
+{
+	void sendEventFrame(Poco::RemotingNG::TCP::Connection::Ptr pConnection, Poco::UInt32 type, const std::string& subscriberURI)
+		/// Subscribes or unsubscribes the subscriber, as a Listener does.
+	{
+		Poco::RemotingNG::TCP::Frame::Ptr pFrame = new Poco::RemotingNG::TCP::Frame(type, 0, Poco::RemotingNG::TCP::Frame::FRAME_FLAG_EOM,
+			static_cast<Poco::UInt16>(Poco::RemotingNG::TCP::Frame::FRAME_HEADER_SIZE + subscriberURI.size()));
+		subscriberURI.copy(pFrame->payloadBegin(), subscriberURI.size());
+		pFrame->setPayloadSize(static_cast<Poco::UInt16>(subscriberURI.size()));
+		pConnection->sendFrame(pFrame);
+	}
+}
 
 
 class MockAuthenticator: public Poco::RemotingNG::Authenticator
@@ -1124,11 +1166,7 @@ void RemotingTest::testEventSubscriptionOtherEndpoint()
 	subscriberURI.setAuthority(otherEndpoint.address().toString());
 	subscriberURI.setFragment("1");
 	const std::string uri = subscriberURI.toString();
-	Poco::RemotingNG::TCP::Frame::Ptr pFrame = new Poco::RemotingNG::TCP::Frame(Poco::RemotingNG::TCP::Frame::FRAME_TYPE_EVSU, 0, Poco::RemotingNG::TCP::Frame::FRAME_FLAG_EOM,
-		static_cast<Poco::UInt16>(Poco::RemotingNG::TCP::Frame::FRAME_HEADER_SIZE + uri.size()));
-	uri.copy(pFrame->payloadBegin(), uri.size());
-	pFrame->setPayloadSize(static_cast<Poco::UInt16>(uri.size()));
-	pConnection->sendFrame(pFrame);
+	sendEventFrame(pConnection, Poco::RemotingNG::TCP::Frame::FRAME_TYPE_EVSU, uri);
 
 	// Frames of a connection are taken in order: the subscription is there
 	// when the reply comes.
@@ -1141,6 +1179,112 @@ void RemotingTest::testEventSubscriptionOtherEndpoint()
 
 	assert (!connected);
 	assert (received);
+}
+
+
+void RemotingTest::testEventSubscriptionRenewedOnNewConnection()
+{
+	// A client that renews its subscription after a reconnect gets
+	// its events over the new connection.
+	TesterServerHelper::enableEvents(_objectURI, "tcp");
+	Poco::Net::ServerSocket otherEndpoint(Poco::Net::SocketAddress("127.0.0.1", 0));
+
+	ITester::Ptr pTester = createProxy(_objectURI);
+	Poco::URI subscriberURI(_objectURI);
+	subscriberURI.setAuthority(otherEndpoint.address().toString());
+	subscriberURI.setFragment("1");
+	const std::string uri = subscriberURI.toString();
+
+	Poco::RemotingNG::TCP::Connection::Ptr pConnection = Poco::RemotingNG::TCP::ConnectionManager::defaultManager().getConnection(Poco::URI(_objectURI));
+	sendEventFrame(pConnection, Poco::RemotingNG::TCP::Frame::FRAME_TYPE_EVSU, uri);
+	assert (pTester->testInt1(42) == 42);
+	pConnection->close();
+
+	Poco::RemotingNG::TCP::Connection::Ptr pNewConnection = Poco::RemotingNG::TCP::ConnectionManager::defaultManager().getConnection(Poco::URI(_objectURI));
+	assert (pNewConnection != pConnection);
+	EventFrameCatcher::Ptr pCatcher = new EventFrameCatcher;
+	pNewConnection->pushFrameHandler(pCatcher);
+	sendEventFrame(pNewConnection, Poco::RemotingNG::TCP::Frame::FRAME_TYPE_EVSU, uri);
+	assert (pTester->testInt1(42) == 42);
+	pTester->fireTestOneWayEvent("s3cr3t");
+
+	const bool received = pCatcher->received(5000);
+	pNewConnection->popFrameHandler(pCatcher);
+	sendEventFrame(pNewConnection, Poco::RemotingNG::TCP::Frame::FRAME_TYPE_EVUN, uri);
+	assert (pTester->testInt1(42) == 42);
+
+	assert (received);
+}
+
+
+void RemotingTest::testEventListenersSharingConnection()
+{
+	// Two Listeners with the same ConnectionManager subscribe over the
+	// same connection, and each gets the events of its subscriber.
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener1 = new Poco::RemotingNG::TCP::Listener;
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener2 = new Poco::RemotingNG::TCP::Listener;
+	TesterServerHelper::enableEvents(_objectURI, "tcp");
+
+	ITester::Ptr pTester1 = createProxy(_objectURI);
+	ITester::Ptr pTester2 = createProxy(_objectURI);
+	Poco::AutoPtr<TesterProxy> pProxy1 = pTester1.cast<TesterProxy>();
+	Poco::AutoPtr<TesterProxy> pProxy2 = pTester2.cast<TesterProxy>();
+	pProxy1->remoting__enableEvents(pEventListener1);
+	pProxy2->remoting__enableEvents(pEventListener2);
+
+	EventCounter counter1;
+	EventCounter counter2;
+	pTester1->testOneWayEvent += Poco::delegate(&counter1, &EventCounter::onEvent);
+	pTester2->testOneWayEvent += Poco::delegate(&counter2, &EventCounter::onEvent);
+	pTester1->fireTestOneWayEvent("s3cr3t");
+
+	const bool received1 = counter1.received(5000);
+	const bool received2 = counter2.received(5000);
+
+	pTester1->testOneWayEvent -= Poco::delegate(&counter1, &EventCounter::onEvent);
+	pTester2->testOneWayEvent -= Poco::delegate(&counter2, &EventCounter::onEvent);
+	pProxy1->remoting__enableEvents(pEventListener1, false);
+	pProxy2->remoting__enableEvents(pEventListener2, false);
+	assert (pTester1->testInt1(42) == 42);
+
+	assert (received1);
+	assert (received2);
+}
+
+
+void RemotingTest::testEventToServerListener()
+{
+	// An event that comes in over a connection the server Listener
+	// accepted does not reach the subscribers of the client's Listener,
+	// although both Listeners have the same ConnectionManager.
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	TesterServerHelper::enableEvents(_objectURI, "tcp");
+
+	ITester::Ptr pTester = createProxy(_objectURI);
+	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
+	const std::string subscriberURI = pProxy->remoting__enableEvents(pEventListener);
+	EventCounter counter;
+	pTester->testEvent += Poco::delegate(&counter, &EventCounter::onEvent);
+
+	// A second subscription sends the event for the client's subscriber
+	// to the server Listener. It sorts after the first one, so the event
+	// is delivered to the client's subscriber first.
+	Poco::URI probeEndpoint(subscriberURI);
+	probeEndpoint.setAuthority(_pListener->endPoint());
+	Poco::RemotingNG::EventDispatcher::Ptr pEventDispatcher = Poco::RemotingNG::ORB::instance().findEventDispatcher(_objectURI, "tcp");
+	pEventDispatcher->subscribe("~probe", probeEndpoint.toString());
+	pTester->fireTestEvent("s3cr3t");
+	const bool received = counter.received(5000);
+	// The EventDispatcher is busy until the event has been delivered
+	// to both subscriptions.
+	pEventDispatcher->unsubscribe("~probe");
+
+	pTester->testEvent -= Poco::delegate(&counter, &EventCounter::onEvent);
+	pProxy->remoting__enableEvents(pEventListener, false);
+	assert (pTester->testInt1(42) == 42);
+
+	assert (received);
+	assertEqual (1, counter.count());
 }
 
 
@@ -1498,6 +1642,9 @@ CppUnit::Test* RemotingTest::suite()
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeOrder);
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeNoThread);
 	CppUnit_addTest(pSuite, RemotingTest, testEventSubscriptionOtherEndpoint);
+	CppUnit_addTest(pSuite, RemotingTest, testEventSubscriptionRenewedOnNewConnection);
+	CppUnit_addTest(pSuite, RemotingTest, testEventListenersSharingConnection);
+	CppUnit_addTest(pSuite, RemotingTest, testEventToServerListener);
 
 	return pSuite;
 }

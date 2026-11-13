@@ -41,6 +41,11 @@ class RemotingNGTCP_API Listener: public Poco::RemotingNG::EventListener
 	/// The threads of a Listener are all obtained from the thread pool
 	/// of its ConnectionManager: those driving the connections it accepts,
 	/// as well as those serving requests and delivering events.
+	///
+	/// A server sends a client on TCP the events of its subscriptions
+	/// over the connection the client subscribed on, also if the
+	/// client's Listener has an endpoint of its own. A client on a UNIX
+	/// domain socket gets them at the endpoint of its Listener.
 {
 public:
 	using Ptr = Poco::AutoPtr<Listener>;
@@ -54,13 +59,11 @@ public:
 		/// This method is used to set up a passive Event Listener
 		/// on the client. No TCPServer will be created.
 		///
-		/// There must not be more than one passive Event Listener
-		/// per Connection. A single instance can be used for all
-		/// connections an application uses. The defaultListener()
-		/// method can be used to obtain such a shared Event
-		/// Listener object. Creating the Event Listener explicitly
-		/// is not recommended, unless a non-default ConnectionManager
-		/// has to be used.
+		/// A single instance can be used for all connections an
+		/// application uses. The defaultListener() method can be
+		/// used to obtain such a shared Event Listener object.
+		/// Creating the Event Listener explicitly is not recommended,
+		/// unless a non-default ConnectionManager has to be used.
 
 	Listener(const std::string& endPoint, ConnectionManager& connectionManager = ConnectionManager::defaultManager());
 		/// Creates a Listener for the given endpoint,
@@ -156,7 +159,17 @@ public:
 	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject) override;
 
 	// internal
-	[[nodiscard]] Poco::RemotingNG::EventSubscriber::Ptr findEventSubscriber(const std::string& path) const;
+	[[nodiscard]] Poco::RemotingNG::EventSubscriber::Ptr findEventSubscriber(const std::string& path, Connection::Ptr pConnection) const;
+		/// Returns the subscriber with the given path for an event that
+		/// came in over the given connection, or a null pointer if there
+		/// is none.
+		///
+		/// Over a connection that this process opened, the subscribers of
+		/// all Listeners with the same ConnectionManager are found: such
+		/// Listeners share their connections, and the events of all their
+		/// subscribers on a connection are received by one of them. Over
+		/// a connection that the Listener accepted, only its own
+		/// subscribers are found.
 
 protected:
 	void registerEventFrameHandler(Connection::Ptr pConnection);
