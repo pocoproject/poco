@@ -14,6 +14,7 @@
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Zip/ZipException.h"
 #include "Poco/Zip/ZipArchive.h"
+#include "Poco/Zip/ZipArchiveInfo.h"
 #include "Poco/Zip/ZipStream.h"
 #include "Poco/Zip/Decompress.h"
 #include "Poco/Zip/ZipCommon.h"
@@ -639,6 +640,24 @@ void ZipTest::testMalformedZip64()
 		}
 	}
 
+	// A declared record size above the largest std::streamsize is rejected as
+	// truncated before it is converted to a stream count.
+	{
+		std::string data;
+		data.append("PK\x06\x06", 4);                        // ZIP64 end of central directory
+		data.append(8, '\xff');                              // record size: 2^64 - 1
+		data.append(44, '\0');                               // fixed fields, then EOF
+		std::istringstream istr(data);
+		try
+		{
+			ZipArchiveInfo64 info(istr, false);
+			fail("ZIP64 record size above the stream limit must be rejected");
+		}
+		catch (Poco::DataFormatException&)
+		{
+		}
+	}
+
 	// A central directory header whose ZIP64 extra field declares more bytes
 	// than the field actually holds must not be read past that field.
 	{
@@ -711,6 +730,39 @@ void ZipTest::testMalformedZip64()
 		}
 	}
 
+}
+
+
+void ZipTest::testZip64ExtensibleData()
+{
+	// The extensible data sector of a ZIP64 end of central directory record,
+	// larger than one copy buffer here, is read in full and written back unchanged.
+	std::string sector(10000, '\0');
+	for (std::size_t i = 0; i < sector.size(); ++i)
+		sector[i] = static_cast<char>('a' + i % 26);
+
+	std::string data;
+	data.append("PK\x06\x06", 4);                            // ZIP64 end of central directory
+	const char recordSize[8] = { '\x3c', '\x27', 0, 0, 0, 0, 0, 0 };
+	data.append(recordSize, 8);                              // record size: 44 + 10000
+	data.append(44, '\0');                                   // fixed fields
+	data.append(sector);                                     // extensible data sector
+	data.append("PK\x06\x07", 4);                            // ZIP64 end of central directory locator
+	data.append(16, '\0');
+	std::istringstream istr(data);
+	ZipArchiveInfo64 info(istr, false);
+	assertEqual (data, info.createHeader());
+
+	// The same record without its last sector byte is truncated.
+	std::istringstream truncated(data.substr(0, 4 + 8 + 44 + sector.size() - 1));
+	try
+	{
+		ZipArchiveInfo64 truncatedInfo(truncated, false);
+		fail("truncated ZIP64 extensible data must be rejected");
+	}
+	catch (Poco::DataFormatException&)
+	{
+	}
 }
 
 
@@ -1482,6 +1534,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testDecompressZip64);
 	CppUnit_addTest(pSuite, ZipTest, testValidPath);
 	CppUnit_addTest(pSuite, ZipTest, testMalformedZip64);
+	CppUnit_addTest(pSuite, ZipTest, testZip64ExtensibleData);
 	CppUnit_addTest(pSuite, ZipTest, testUnknownMethodAndHostSystem);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressConsistency);
 	CppUnit_addTest(pSuite, ZipTest, testUnsupportedVersionNeeded);
