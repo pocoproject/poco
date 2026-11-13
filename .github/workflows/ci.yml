@@ -180,6 +180,7 @@ jobs:
   # ------------------------------------------------------------------------
 
   # Primary Linux signal: 3 non-hidden sanitizers + 1 hidden+asan. TRACE on.
+  # The asan entry also runs the deprecated-API tests (ENABLE_TEST_DEPRECATED).
   linux-gcc-cmake-sanitizers:
     runs-on: ubuntu-24.04
     strategy:
@@ -189,6 +190,7 @@ jobs:
           - name: asan
             visibility: default
             sanitize_flags: "-fsanitize=address"
+            extra_cmake: -DENABLE_TEST_DEPRECATED=ON
           - name: ubsan
             visibility: default
             sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
@@ -230,6 +232,7 @@ jobs:
           -DENABLE_TRACE=ON
           ${{ env.POCO_CMAKE_FULL_COMMON }}
           ${{ env.POCO_CMAKE_FULL_LINUX_EXTRA }}
+          ${{ matrix.extra_cmake }}
       - run: cmake --build cmake-build --target all --parallel $(nproc)
       - uses: ./.github/actions/retry-action
         with:
@@ -243,35 +246,6 @@ jobs:
       - uses: ./.github/actions/upload-test-report
         with:
           suffix: ${{ matrix.name }}
-
-  # Linux deprecated-API probe: runs only the deprecated-API test suites.
-  linux-gcc-cmake-deprecated-tests:
-    runs-on: ubuntu-24.04
-    needs: changes
-    if: |
-      needs.changes.outputs.foundation_util == 'true' ||
-      needs.changes.outputs.ci_core == 'true' ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v5
-      - uses: ./.github/actions/ensure-apt-packages
-        with:
-          commands: cmake:cmake ninja:ninja-build
-          packages: libssl-dev
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
-          -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_TEST_DEPRECATED=ON
-      - run: cmake --build cmake-build --target all --parallel $(nproc)
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Net|Crypto|Util|XML|JSON|Data|DataSQLite)$"
-      - uses: ./.github/actions/upload-test-report
 
   # OpenSSL no-deprecated probe: build and test Crypto/NetSSL/JWT with
   # deprecated OpenSSL declarations hidden. Debug + -D_DEBUG so that
@@ -1079,10 +1053,15 @@ jobs:
               exit 1
             }
           }
+      # Also the warnings signal: compiler warnings on, and the components that
+      # POCO_CMAKE_WINDOWS_FULL leaves out (Redis and MongoDB tests need a server).
       - run: >-
           cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
           ${{ env.POCO_CMAKE_WINDOWS_FULL }}
+          ${{ env.POCO_CMAKE_WARNINGS_EXTRA }}
+          -DENABLE_SEVENZIP=ON -DENABLE_REDIS=ON -DENABLE_MONGODB=ON
+          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
           -DOPENSSL_ROOT_DIR="${{ env.OPENSSL_ROOT_DIR }}"
           -DCMAKE_PREFIX_PATH="${{ env.LIBSSH_ROOT_DIR }}"
       - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
@@ -1327,29 +1306,17 @@ jobs:
           cd cmake-build/bin;
           ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
 
-  # Build-only warnings probe: extra compiler warnings enabled.
-  windows-msvc-cmake-warnings:
-    runs-on: windows-2025
-    steps:
-      - uses: actions/checkout@v5
-      - uses: TheMrMilchmann/setup-msvc-dev@v4
-        with:
-          arch: x64
-      - run: >-
-          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          ${{ env.POCO_CMAKE_FULL_COMMON }}
-          ${{ env.POCO_CMAKE_WARNINGS_EXTRA }}
-          -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_XSD_VALIDATOR=OFF
-          -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF
-      - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
-
   # ------------------------------------------------------------------------
   # Data-env: build-once / test-many. `data-build` compiles every Data/Redis/
   # MongoDB testrunner once and uploads the binaries; each data-test-* job
-  # downloads them and runs only its own driver against a real backend.
+  # downloads them and runs its drivers against real backends.
   # ------------------------------------------------------------------------
 
-  data-test-mysql:
+  # MySQL, PostgreSQL, Redis, MongoDB and ODBC with the PostgreSQL driver, against
+  # one set of service containers. Each driver has its own step, and every step
+  # runs when an earlier one failed, so one job reports each driver separately.
+  # TODO DataPostgreSQL sometimes fails on testTransaction and testReconnect
+  data-test-servers:
     runs-on: ubuntu-24.04
     needs: data-build
     if: needs.data-build.outputs.run == 'true'
@@ -1366,90 +1333,12 @@ jobs:
           MYSQL_DATABASE: pocotest
         ports:
           - 3306:3306
-    steps:
-      - uses: actions/checkout@v5
-      - uses: ./.github/actions/ensure-apt-packages
-        with:
-          packages: libmysqlclient21 mysql-client
-      - uses: actions/download-artifact@v8
-        with:
-          name: data-build-artifacts
-          path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: cd cmake-build/bin && ./DataMySQL-testrunner -all
-
-  # TODO tests sometimes failing on testTransaction and testReconnect
-  data-test-postgres:
-    runs-on: ubuntu-24.04
-    needs: data-build
-    if: needs.data-build.outputs.run == 'true'
-    env:
-      POCO_BASE: ${{ github.workspace }}
-      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
-    services:
       postgres:
         image: postgres:16.0
         env:
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
-    steps:
-      - uses: actions/checkout@v5
-      - uses: ./.github/actions/ensure-apt-packages
-        with:
-          packages: libpq5
-      - uses: actions/download-artifact@v8
-        with:
-          name: data-build-artifacts
-          path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: cd cmake-build/bin && ./DataPostgreSQL-testrunner -all
-
-  data-test-redis:
-    runs-on: ubuntu-24.04
-    needs: data-build
-    if: needs.data-build.outputs.run == 'true'
-    env:
-      POCO_BASE: ${{ github.workspace }}
-      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Redis server
-        run: |
-          curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-          echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-          sudo apt-get -y update
-          sudo apt-get -y install redis
-      - uses: actions/download-artifact@v8
-        with:
-          name: data-build-artifacts
-          path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: cd cmake-build/bin && ./Redis-testrunner -all
-
-  data-test-mongodb:
-    runs-on: ubuntu-24.04
-    needs: data-build
-    if: needs.data-build.outputs.run == 'true'
-    env:
-      POCO_BASE: ${{ github.workspace }}
-      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
-    services:
       mongodb:
         # mongo:8 refuses to start on the runner kernels 6.19 to 7.0.13 (SERVER-121912, #5575)
         image: mongo:7
@@ -1460,17 +1349,69 @@ jobs:
           --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v5
+      - uses: ./.github/actions/ensure-apt-packages
+        with:
+          packages: libmysqlclient21 mysql-client libpq5
+      - name: Install Redis server
+        run: |
+          curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+          sudo apt-get -y update
+          sudo apt-get -y install redis
+      - name: Install ODBC runtime dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends \
+            libodbcinst2 libodbc2 odbcinst odbc-postgresql
       - uses: actions/download-artifact@v8
         with:
           name: data-build-artifacts
           path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
+      - id: artifacts
+        run: chmod +x cmake-build/bin/*-testrunner
+      - name: MySQL
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: cd cmake-build/bin && ./DataMySQL-testrunner -all
+      - name: PostgreSQL
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: cd cmake-build/bin && ./DataPostgreSQL-testrunner -all
+      - name: Redis
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: cd cmake-build/bin && ./Redis-testrunner -all
+      - name: MongoDB
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: cd cmake-build/bin && ./MongoDB-testrunner -all
+      - name: ODBC with PostgreSQL
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: cd cmake-build/bin && ./DataODBC-testrunner -all
 
   data-test-odbc-oracle:
     runs-on: ubuntu-24.04
@@ -1629,44 +1570,6 @@ jobs:
           rm packages-microsoft-prod.deb
           sudo apt-get update -o Acquire::Retries=3
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
-
-      - uses: actions/download-artifact@v8
-        with:
-          name: data-build-artifacts
-          path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: cd cmake-build/bin && ./DataODBC-testrunner -all
-
-  data-test-odbc-postgres:
-    runs-on: ubuntu-24.04
-    needs: data-build
-    if: needs.data-build.outputs.run == 'true'
-    env:
-      POCO_BASE: ${{ github.workspace }}
-      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
-    services:
-      postgres:
-        image: postgres:16.0
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Install ODBC runtime dependencies
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          set -euxo pipefail
-          sudo apt-get update -o Acquire::Retries=3
-          sudo apt-get install -y --no-install-recommends \
-            libodbcinst2 libodbc2 odbcinst odbc-postgresql
 
       - uses: actions/download-artifact@v8
         with:

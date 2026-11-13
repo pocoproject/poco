@@ -43,7 +43,7 @@ TSAN_OPTIONS="suppressions=<repo-root>/tsan.suppress,second_deadlock_stack=1" PO
 ## Compiler warnings
 
 Build with `-DENABLE_COMPILER_WARNINGS=ON` (see [cmake.md](cmake.md#options)) and fix every new warning in changed code.
-CI jobs: `macos-clang-cmake-sanitizers` (matrix entry `tsan`), `windows-msvc-cmake-warnings`.
+CI jobs: `macos-clang-cmake-sanitizers` (matrix entry `tsan`), `windows-2025-msvc-cmake`.
 
 Functions that always throw and should be `[[noreturn]]` are found with Clang's `-Wmissing-noreturn`; GCC does not
 report the same cases:

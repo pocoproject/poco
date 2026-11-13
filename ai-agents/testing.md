@@ -152,7 +152,7 @@ images (for example `mysql:8.1.0`, `postgres:16.0`, `mongo:8`), ports and creden
   ([analysis.md](analysis.md)).
 - Tests of deprecated API ([Rule 102 of CODING_STYLE.md](../CODING_STYLE.md#rule-102)) are guarded with
   `#ifdef POCO_TEST_DEPRECATED` and run in a build with `-DENABLE_TEST_DEPRECATED=ON` (CI job
-  `linux-gcc-cmake-deprecated-tests`).
+  `linux-gcc-cmake-sanitizers`, matrix entry `asan`).
 
 ## Known pitfalls
 
