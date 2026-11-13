@@ -38,12 +38,20 @@ public:
 	static constexpr Transform NO_TRANSFORM = nullptr;
 		/// No transform is applied to the characters.
 
-	TextConverter(const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
-		/// Creates the TextConverter. The encoding objects must not be deleted while the
-		/// TextConverter is in use.
+	TextConverter() = delete;
 
-	~TextConverter();
+	TextConverter(const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
+		/// Creates the TextConverter. The encoding objects must outlive
+		/// the TextConverter.
+
+	~TextConverter() = default;
 		/// Destroys the TextConverter.
+
+	TextConverter(const TextEncoding&&, const TextEncoding&&, int = '?') = delete;
+	TextConverter(const TextEncoding&&, const TextEncoding&, int = '?') = delete;
+	TextConverter(const TextEncoding&, const TextEncoding&&, int = '?') = delete;
+	TextConverter& operator = (const TextConverter&) = delete;
+	TextConverter(const TextConverter&) = delete;
 
 	int convert(const std::string& source, std::string& destination, Transform trans = NO_TRANSFORM) const;
 		/// Converts the source string from inEncoding to outEncoding
@@ -68,10 +76,6 @@ public:
 		/// Throws a NullPointerException if source is nullptr when length != 0.
 
 private:
-	TextConverter();
-	TextConverter(const TextConverter&);
-	TextConverter& operator = (const TextConverter&);
-
 	const TextEncoding& _inEncoding;
 	const TextEncoding& _outEncoding;
 	int                 _defaultChar;

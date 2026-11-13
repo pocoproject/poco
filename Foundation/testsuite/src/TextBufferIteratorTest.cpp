@@ -15,12 +15,24 @@
 #include "Poco/Latin1Encoding.h"
 #include "Poco/UTF8Encoding.h"
 #include "Poco/UTF16Encoding.h"
+#include <type_traits>
 
 
 using Poco::TextBufferIterator;
 using Poco::Latin1Encoding;
 using Poco::UTF8Encoding;
 using Poco::UTF16Encoding;
+
+
+static_assert(std::is_constructible_v<TextBufferIterator, const char*, const UTF8Encoding&>);
+static_assert(!std::is_constructible_v<TextBufferIterator, const char*, UTF8Encoding>);
+
+static_assert(std::is_constructible_v<TextBufferIterator, const char*, std::size_t, const UTF8Encoding&>);
+static_assert(!std::is_constructible_v<TextBufferIterator, const char*, std::size_t, UTF8Encoding>);
+
+static_assert(std::is_constructible_v<TextBufferIterator, const char*, const char*, const UTF8Encoding&>);
+static_assert(!std::is_constructible_v<TextBufferIterator, const char*, const char*, UTF8Encoding>,
+	"TextBufferIterator must not accept temporary encodings, as they would dangle");
 
 
 TextBufferIteratorTest::TextBufferIteratorTest(const std::string& name): CppUnit::TestCase(name)

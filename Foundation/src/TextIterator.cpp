@@ -58,11 +58,6 @@ TextIterator::TextIterator(const std::string::const_iterator& end):
 }
 
 
-TextIterator::~TextIterator()
-{
-}
-
-
 TextIterator::TextIterator(const TextIterator& it):
 	_pEncoding(it._pEncoding),
 	_it(it._it),

@@ -21,9 +21,17 @@
 #include "Poco/Windows1251Encoding.h"
 #include "Poco/Windows1252Encoding.h"
 #include "Poco/UTF8Encoding.h"
+#include <type_traits>
 
 
 using namespace Poco;
+
+
+static_assert(std::is_constructible_v<TextConverter, const UTF8Encoding&, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<TextConverter, UTF8Encoding, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<TextConverter, const UTF8Encoding&, ASCIIEncoding>);
+static_assert(!std::is_constructible_v<TextConverter, UTF8Encoding, ASCIIEncoding>,
+	"TextConverter must not accept temporary encodings, as they would dangle");
 
 
 TextConverterTest::TextConverterTest(const std::string& name): CppUnit::TestCase(name)

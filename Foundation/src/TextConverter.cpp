@@ -28,11 +28,6 @@ TextConverter::TextConverter(const TextEncoding& inEncoding, const TextEncoding&
 }
 
 
-TextConverter::~TextConverter()
-{
-}
-
-
 int TextConverter::convert(const std::string& source, std::string& destination, Transform trans) const
 {
 	int errors = 0;
