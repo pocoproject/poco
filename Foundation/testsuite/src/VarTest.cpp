@@ -1751,6 +1751,16 @@ void VarTest::testEnumType()
 	assertTrue (a3 == 32);
 	a3 *= 2;
 	assertTrue (a3 == 64);
+
+	enum class charSrc: char {
+		value = 'A'
+	};
+
+	Var c1 = charSrc::value;
+	assertTrue (c1.convert<Int8>() == 65);
+	assertTrue (c1.convert<UInt8>() == 65);
+	assertTrue (c1.convert<Int64>() == 65);
+	assertTrue (c1.convert<UInt64>() == 65);
 }
 
 
@@ -2063,6 +2073,9 @@ void VarTest::testLimitsInt()
 	testLimitsSigned<Int64, Int32>();
 	testLimitsFloatToInt<float, Int32>();
 	testLimitsFloatToInt<double, Int32>();
+
+	testLimitsFloatToInt<float, Int64>();
+	testLimitsFloatToInt<double, Int64>();
 
 	testLimitsSignedUnsigned<Int8, UInt8>();
 	testLimitsSignedUnsigned<Int16, UInt8>();
