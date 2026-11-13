@@ -237,6 +237,15 @@ void ZipUtil::verifyZipEntryFileName(const std::string& fn)
 }
 
 
+void ZipUtil::verifySizeOrOffset(Poco::UInt64 value, std::string_view message, const std::string& fileName)
+{
+	constexpr Poco::UInt64 MAX_SIZE_OR_OFFSET = static_cast<Poco::UInt64>(1) << 61;
+
+	if (value > MAX_SIZE_OR_OFFSET)
+		throw ZipException(std::string(message), fileName);
+}
+
+
 std::string ZipUtil::validZipEntryFileName(const Poco::Path& entry)
 {
 	std::string fn = entry.toString(Poco::Path::PATH_UNIX);

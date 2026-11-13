@@ -85,6 +85,8 @@ ZipLocalFileHeader::ZipLocalFileHeader(std::istream& inp, bool assumeHeaderRead,
                 setCRC(nfo.getCRC32());
                 setCompressedSize(nfo.getCompressedSize());
                 setUncompressedSize(nfo.getUncompressedSize());
+                ZipUtil::verifySizeOrOffset(_compressedSize, "Compressed size out of range", _fileName);
+                ZipUtil::verifySizeOrOffset(_uncompressedSize, "Uncompressed size out of range", _fileName);
             }
             else
             {
@@ -188,6 +190,8 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 			}
         }
     }
+    ZipUtil::verifySizeOrOffset(_compressedSize, "Compressed size out of range", _fileName);
+    ZipUtil::verifySizeOrOffset(_uncompressedSize, "Uncompressed size out of range", _fileName);
 }
 
 

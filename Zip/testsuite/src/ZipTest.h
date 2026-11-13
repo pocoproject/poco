@@ -49,6 +49,11 @@ public:
 	void testIllegalHeader();
 	void testReplaceUnsupportedMethod();
 	void testDecompressFailedEntryWithDataDescriptor();
+	void testSizeOrOffsetOutOfRange();
+	void testKeepEntryBeyondEndOfArchive();
+	void testDataDescriptorEntryAbove4GiB();
+	void testEmptyFileName();
+	void testDuplicateFileNames();
 
 	void setUp();
 	void tearDown();

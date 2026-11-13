@@ -16,9 +16,36 @@
 #include "Poco/Zip/SkipCallback.h"
 #include "Poco/Zip/ZipException.h"
 #include <cstring>
+#include <map>
+#include <string>
 
 
 namespace Poco::Zip {
+
+
+namespace {
+
+
+template <typename T>
+std::string uniqueName(const std::map<std::string, T>& entries, std::map<std::string, int>& suffixes, const std::string& name)
+	/// Returns name, or name with the first unused ".duplicate-N" suffix if entries has it.
+{
+	if (entries.find(name) == entries.end())
+		return name;
+
+	// Names are never removed, so every suffix below the one remembered is still in use.
+	int& suffix = suffixes.try_emplace(name, 1).first->second;
+	std::string candidate;
+	do
+	{
+		candidate = name + ".duplicate-" + std::to_string(suffix++);
+	}
+	while (entries.find(candidate) != entries.end());
+	return candidate;
+}
+
+
+} // namespace
 
 
 const std::string ZipArchive::EMPTY_COMMENT;
@@ -91,6 +118,8 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 {
 	// read 4 bytes
 	bool haveSynced = false;
+	std::map<std::string, int> entrySuffixes;
+	std::map<std::string, int> infoSuffixes;
 	while (in.good() && !in.eof())
 	{
 		char header[ZipCommon::HEADER_SIZE]={'\x00', '\x00', '\x00', '\x00'};
@@ -100,30 +129,18 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 		if (std::memcmp(header, ZipLocalFileHeader::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipLocalFileHeader entry(in, true, pc);
-			std::string uniqueName = entry.getFileName();
-			int suffix = 1;
-			while (_entries.find(uniqueName) != _entries.end())
-			{
-				uniqueName = entry.getFileName() + ".duplicate-" + std::to_string(suffix++);
-			}
-			_entries.insert(std::make_pair(uniqueName, entry));
+			_entries.insert(std::make_pair(uniqueName(_entries, entrySuffixes, entry.getFileName()), entry));
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipFileInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipFileInfo info(in, true);
-			std::string uniqueName = info.getFileName();
-			int suffix = 1;
-			while (_infos.find(uniqueName) != _infos.end())
-			{
-				uniqueName = info.getFileName() + ".duplicate-" + std::to_string(suffix++);
-			}
 			FileHeaders::iterator it = _entries.find(info.getFileName());
 			if (it != _entries.end())
 			{
 				it->second.setStartPos(info.getOffset());
 			}
-			_infos.insert(std::make_pair(uniqueName, info));
+			_infos.insert(std::make_pair(uniqueName(_infos, infoSuffixes, info.getFileName()), info));
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipArchiveInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)

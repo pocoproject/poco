@@ -145,6 +145,9 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 			}
 		}
 	}
+	ZipUtil::verifySizeOrOffset(_compressedSize, "Compressed size out of range", _fileName);
+	ZipUtil::verifySizeOrOffset(_uncompressedSize, "Uncompressed size out of range", _fileName);
+	ZipUtil::verifySizeOrOffset(_localHeaderOffset, "Local header offset out of range", _fileName);
 	len = getFileCommentLength();
 	if (len > 0)
 	{

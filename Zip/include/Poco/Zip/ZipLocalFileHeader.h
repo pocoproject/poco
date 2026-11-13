@@ -471,8 +471,8 @@ inline bool ZipLocalFileHeader::isFile() const
 
 inline bool ZipLocalFileHeader::isDirectory() const
 {
-	poco_assert_dbg(!_fileName.empty());
-	return getUncompressedSize() == 0 && _fileName[_fileName.length()-1] == '/';
+	// The file name comes from the archive and can be empty.
+	return getUncompressedSize() == 0 && !_fileName.empty() && _fileName.back() == '/';
 }
 
 
