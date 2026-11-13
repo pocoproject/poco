@@ -48,6 +48,7 @@ public:
 		/// passed to the transform function.
 		/// If a character cannot be represented in outEncoding, defaultChar
 		/// is used instead.
+		///
 		/// Returns the number of encoding errors (invalid byte sequences
 		/// in source).
 
@@ -57,14 +58,18 @@ public:
 		/// passed to the transform function.
 		/// If a character cannot be represented in outEncoding, defaultChar
 		/// is used instead.
+		///
 		/// Returns the number of encoding errors (invalid byte sequences
 		/// in source).
+		///
+		/// Throws a NullPointerException if source is nullptr when length != 0.
 
 	int convert(const std::string& source, std::string& destination);
 		/// Converts the source string from inEncoding to outEncoding
 		/// and appends the result to destination.
 		/// If a character cannot be represented in outEncoding, defaultChar
 		/// is used instead.
+		///
 		/// Returns the number of encoding errors (invalid byte sequences
 		/// in source).
 
@@ -73,8 +78,11 @@ public:
 		/// and appends the result to destination.
 		/// If a character cannot be represented in outEncoding, defaultChar
 		/// is used instead.
+		///
 		/// Returns the number of encoding errors (invalid byte sequences
 		/// in source).
+		///
+		/// Throws a NullPointerException if source is nullptr when length != 0.
 
 private:
 	TextConverter();

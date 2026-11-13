@@ -65,6 +65,7 @@ int TextConverter::convert(const std::string& source, std::string& destination, 
 
 int TextConverter::convert(const void* source, int length, std::string& destination, Transform trans)
 {
+	if (length == 0) return 0;
 	poco_check_ptr (source);
 
 	int errors = 0;
