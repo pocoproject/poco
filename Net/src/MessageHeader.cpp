@@ -17,8 +17,8 @@
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
 #include "Poco/TextConverter.h"
+#include "Poco/TextEncoding.h"
 #include "Poco/Base64Decoder.h"
-#include "Poco/UTF8Encoding.h"
 #include <algorithm>
 #include <charconv>
 #include <sstream>
