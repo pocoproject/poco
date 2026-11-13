@@ -15,6 +15,7 @@ make -j$(nproc)
 
 # Copy binaries with preserving historical names
 cp bin/JSON-parse-fuzzer $OUT/json_parser_fuzzer
+cp bin/Crypto-key-fuzzer $OUT/crypto_key_fuzzer
 cp bin/XML-parse-fuzzer $OUT/xml_parser_fuzzer
 cp bin/Foundation-datetime-fuzzer $OUT/date_time_fuzzer
 cp bin/Foundation-misc-fuzzer $OUT/foundation_misc_fuzzer
@@ -27,6 +28,7 @@ cp bin/AIMCPHTTP-eventstream-fuzzer $OUT/mcp_event_stream_fuzzer
 
 # Seed corpus
 zip -q -r -j $OUT/mail_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Mail
+zip -q -r -j $OUT/crypto_key_fuzzer_seed_corpus.zip $SRC/poco/Crypto/fuzzing/seed/KeyCert
 zip -q -r -j $OUT/http_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/HTTP
 zip -q -r -j $OUT/mcp_server_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Server
 zip -q -r -j $OUT/mcp_client_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Client
