@@ -50,6 +50,7 @@ cmake --build <build-dir> --parallel --target <Component>-testrunner
 | `POCO_UNBUNDLED` | OFF | Use system libraries instead of the bundled ones (see [dependencies.md](dependencies.md)) |
 | `POCO_SQLITE_UNBUNDLED` | OFF | Use the system SQLite only |
 | `POCO_SANITIZEFLAGS` | empty | Sanitizer flags for compile and link (see [analysis.md](analysis.md)) |
+| `POCO_EMSCRIPTEN_FLAGS` | `-pthread -fexceptions` | Emscripten only: compile and link flags for threads and C++ exceptions; empty for a build without them |
 | `POCO_COMPILER` | empty | Compiler by name or path (`gcc-12`, `clang-18`, `clang-cl`) |
 | `POCO_CROSS_COMPILE` | empty | Cross build for `arm-linux`, `android` or `emscripten`; not together with `CMAKE_TOOLCHAIN_FILE` |
 | `ENABLE_MODULES` | OFF | Build the C++ module `Poco`; needs C++20, CMake 3.28+ and a generator that scans modules: Ninja or Ninja Multi-Config with ninja 1.11+, or Visual Studio 17 2022 (cmake-cxxmodules(7)); builds with LLVM Clang only: Apple clang has no clang-scan-deps, MSVC 19.51 and GCC 15/16 fail with compiler defects |

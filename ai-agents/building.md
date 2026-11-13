@@ -79,6 +79,12 @@ components that need target libraries, pass a toolchain file with `-DCMAKE_TOOLC
 `CMAKE_SYSTEM_NAME`, the compilers, `CMAKE_SYSROOT` and `CMAKE_FIND_ROOT_PATH_MODE_LIBRARY`, `_INCLUDE` and `_PACKAGE`
 to `ONLY` (cmake-toolchains(7)). Porting to a new platform is described in [porting.md](porting.md).
 
+By default, an Emscripten build produces static libraries and is compiled and linked with `-pthread -fexceptions`
+(`POCO_EMSCRIPTEN_FLAGS`, see [cmake.md](cmake.md#options)). Programs that link the POCO CMake targets get these flags
+too. A program built with `-pthread` needs `SharedArrayBuffer` at run time, which a browser provides only to a
+cross-origin isolated page; `-DPOCO_EMSCRIPTEN_FLAGS=-fexceptions` builds without threads, and `Thread::start()` then
+throws a `SystemException`.
+
 ## Next steps
 
 - Configure, build and CMake options: [cmake.md](cmake.md)

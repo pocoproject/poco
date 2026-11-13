@@ -238,6 +238,14 @@ if(EMSCRIPTEN)
 	target_compile_definitions(Foundation PUBLIC POCO_NO_THREADNAME)
 endif()
 
+# A program that uses POCO needs the thread and exception flags of the libraries
+if(EMSCRIPTEN AND NOT "${POCO_EMSCRIPTEN_FLAGS}" STREQUAL "")
+	separate_arguments(_poco_em_flags UNIX_COMMAND "${POCO_EMSCRIPTEN_FLAGS}")
+	target_compile_options(Foundation PUBLIC ${_poco_em_flags})
+	target_link_options(Foundation PUBLIC ${_poco_em_flags})
+	unset(_poco_em_flags)
+endif()
+
 # iOS
 if(IOS)
 	target_compile_definitions(Foundation
