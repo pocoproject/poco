@@ -21,6 +21,7 @@
 #include "Poco/File.h"
 #include "Poco/Format.h"
 #include <cstring>
+#include <ios>
 
 
 namespace Poco::Zip {
@@ -73,9 +74,22 @@ ZipLocalFileHeader::ZipLocalFileHeader(std::istream& inp, bool assumeHeaderRead,
 
     bool ok = callback.handleZipEntry(inp, *this);
 
-    if (ok)
+    // The stream is repositioned only if it can report its position (_startPos is not negative) and the
+    // callback has not read past its end, which it does if the entry data is truncated.
+    const bool reposition = _startPos >= 0 && inp.good();
+    if (searchCRCAndSizesAfterData())
     {
-        if (searchCRCAndSizesAfterData())
+        bool atDataDescriptor = ok;
+        if (!ok && reposition)
+        {
+            // A declined entry may have left the stream anywhere in its data: search its data descriptor from the start.
+            // If there is none before the end of the stream, the parse ends there.
+            inp.seekg(getDataStartPos(), std::ios::beg);
+            if (!inp.good()) throw Poco::IOException("Failed to seek on input stream");
+            ZipUtil::syncDataDescriptor(inp, _forceZip64);
+            atDataDescriptor = inp.good();
+        }
+        if (atDataDescriptor)
         {
             char header[ZipCommon::HEADER_SIZE]={'\x00', '\x00', '\x00', '\x00'};
             inp.read(header, ZipCommon::HEADER_SIZE);
@@ -102,10 +116,22 @@ ZipLocalFileHeader::ZipLocalFileHeader(std::istream& inp, bool assumeHeaderRead,
                 setUncompressedSize(nfo.getUncompressedSize());
             }
         }
+        else if (!reposition)
+        {
+            // A declined entry may have a data descriptor after its data, so the next record is searched for.
+            ZipUtil::sync(inp);
+        }
     }
-    else
+    else if (reposition)
     {
-        // A declined entry may have a data descriptor after its data, so the next record is searched for.
+        // The callback may have read less than the data of the entry, or nothing. If the data runs past the
+        // end of the stream, the seek fails or the next read finds the end, and the parse ends there.
+        const std::streamoff dataEnd = getDataEndPos();
+        if (inp.tellg() != dataEnd)
+            inp.seekg(dataEnd, std::ios::beg);
+    }
+    else if (!ok)
+    {
         ZipUtil::sync(inp);
     }
     _endPos = _startPos + getHeaderSize() + _compressedSize; // exclude the data block!

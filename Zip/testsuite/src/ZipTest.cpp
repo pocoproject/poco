@@ -57,6 +57,7 @@ namespace
 	// The archives built below hold one entry, a.txt, stored with the content "hello".
 	constexpr std::string_view ENTRY_NAME = "a.txt";
 	constexpr std::string_view ENTRY_DATA = "hello";
+	constexpr std::string_view DEFLATED_DATA("\xcb\x48\xcd\xc9\xc9\x07\x00", 7); // raw deflate stream of ENTRY_DATA
 	constexpr Poco::UInt32 ENTRY_CRC = 0x3610A686;
 	constexpr Poco::UInt32 ENTRY_SIZE = static_cast<Poco::UInt32>(ENTRY_DATA.size());
 	constexpr Poco::UInt16 ENTRY_NAME_LENGTH = static_cast<Poco::UInt16>(ENTRY_NAME.size());
@@ -921,12 +922,13 @@ void ZipTest::testDecompressFailedEntryWithDataDescriptor()
 	Poco::TemporaryFile outputDir;
 	Decompress dec(istr, outputDir.path());
 	dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>>(this, &ZipTest::onDecompressError);
-	// The CRC-32 of a declined entry with a data descriptor is not read, so the
-	// consistency check with the central directory would fail.
-	const ZipArchive arch = dec.decompressAllFiles(false);
+	const ZipArchive arch = dec.decompressAllFiles();
 	dec.EError -= Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>>(this, &ZipTest::onDecompressError);
 	assertEqual (1, _errCnt);
 	assertTrue (arch.findFileInfo(std::string(ENTRY_NAME)) != arch.fileInfoEnd());
+	const auto itHeader = arch.findHeader(std::string(ENTRY_NAME));
+	assertTrue (itHeader != arch.headerEnd());
+	assertEqual (ENTRY_CRC, itHeader->second.getCRC());
 	assertTrue (dec.mapping().empty());
 	std::vector<std::string> files;
 	outputDir.list(files);
@@ -1026,7 +1028,6 @@ void ZipTest::testDataDescriptorEntryAbove4GiB()
 	// The archive starts at 4 GiB: the entry needs ZIP64 for its offset, but its local file header has
 	// no ZIP64 extra field, so its data descriptor has 4-byte sizes.
 	constexpr Poco::UInt64 OFFSET_ABOVE_4GIB = static_cast<Poco::UInt64>(1) << 32;
-	constexpr std::string_view DEFLATED_DATA("\xcb\x48\xcd\xc9\xc9\x07\x00", 7); // raw deflate stream of ENTRY_DATA
 	const Entry entries[] =
 	{
 		{.flags = DATA_DESCRIPTOR_FLAG},
@@ -1359,6 +1360,111 @@ void ZipTest::testDuplicateNamesDataOffsets()
 }
 
 
+void ZipTest::testParseContinuesAtEndOfEntryData()
+{
+	// The data of each outer entry holds a complete local entry that the central directory does not list.
+	const std::string inner = localFile({.name = "inner.txt"});
+	const auto innerSize = static_cast<Poco::UInt32>(inner.size());
+	// The inflater takes the four bytes after the deflate stream as its Adler-32 checksum, and the filler
+	// is larger than the buffers of the inflater, so that the extraction leaves the stream within the data.
+	constexpr std::string_view ENTRY_DATA_ADLER32("\x06\x2c\x02\x15", 4);
+	const std::string deflatedData = std::string(DEFLATED_DATA) + std::string(ENTRY_DATA_ADLER32) + std::string(64 * KB, '\0') + inner;
+	const Entry outerEntries[] =
+	{
+		{.method = ZipCommon::CM_BZIP2, .name = "a.bin", .data = inner, .compressedSize = innerSize, .uncompressedSize = innerSize},
+		{.name = "d/", .data = inner, .compressedSize = innerSize, .uncompressedSize = 0},
+		{.method = ZipCommon::CM_DEFLATE, .data = deflatedData, .compressedSize = static_cast<Poco::UInt32>(deflatedData.size())},
+		{.flags = DATA_DESCRIPTOR_FLAG, .method = ZipCommon::CM_BZIP2, .name = "a.bin", .data = inner, .compressedSize = innerSize, .uncompressedSize = innerSize}
+	};
+	for (const Entry& outer: outerEntries)
+	{
+		std::ostringstream ostr;
+		Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+		writer.writeRaw(localFile(outer));
+		if ((outer.flags & DATA_DESCRIPTOR_FLAG) != 0)
+		{
+			writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
+			writer << outer.crc << outer.compressedSize << outer.uncompressedSize;
+		}
+		const auto directoryOffset = static_cast<Poco::UInt32>(ostr.str().size());
+		writer.writeRaw(centralDirectoryEntry(outer));
+		writer.writeRaw(endOfCentralDirectory(directoryOffset));
+		const std::string data = ostr.str();
+
+		{
+			std::istringstream istr(data);
+			Poco::TemporaryFile outputDir;
+			Decompress dec(istr, outputDir.path());
+			dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>>(this, &ZipTest::onDecompressError);
+			dec.decompressAllFiles(false);
+			dec.EError -= Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>>(this, &ZipTest::onDecompressError);
+			const Poco::Path outputPath = Poco::Path::forDirectory(outputDir.path());
+			assertTrue (!dec.mapping().contains("inner.txt"));
+			assertTrue (!Poco::File(Poco::Path(outputPath, "inner.txt")).exists());
+			if (outer.method == ZipCommon::CM_DEFLATE)
+			{
+				assertTrue (dec.mapping().contains(std::string(ENTRY_NAME)));
+				Poco::FileInputStream in(Poco::Path(outputPath, std::string(ENTRY_NAME)).toString());
+				std::string content;
+				Poco::StreamCopier::copyToString(in, content);
+				assertEqual (std::string(ENTRY_DATA), content);
+			}
+		}
+
+		{
+			std::istringstream istr(data);
+			ZipArchive arch(istr);
+			std::vector<std::string> names;
+			for (auto it = arch.headerBegin(); it != arch.headerEnd(); ++it)
+			{
+				names.push_back(it->first);
+			}
+			assertTrue (names == std::vector<std::string>{std::string(outer.name)});
+		}
+	}
+}
+
+
+void ZipTest::testDecompressTruncatedEntryData()
+{
+	// The archives end within the data of their second entry and have no central directory. Decompress reads
+	// the data of b.txt up to the end of the archive and declines b.bin without reading its data, each with
+	// and without a data descriptor.
+	const std::string archives[] =
+	{
+		localFile({}) + localFile({.name = "b.txt", .compressedSize = 2 * ENTRY_SIZE, .uncompressedSize = 2 * ENTRY_SIZE}),
+		localFile({}) + localFile({.flags = DATA_DESCRIPTOR_FLAG, .name = "b.txt", .compressedSize = 2 * ENTRY_SIZE, .uncompressedSize = 2 * ENTRY_SIZE}),
+		localFile({}) + localFile({.method = ZipCommon::CM_BZIP2, .name = "b.bin", .compressedSize = 2 * ENTRY_SIZE, .uncompressedSize = 2 * ENTRY_SIZE}),
+		localFile({}) + localFile({.flags = DATA_DESCRIPTOR_FLAG, .method = ZipCommon::CM_BZIP2, .name = "b.bin", .compressedSize = 2 * ENTRY_SIZE, .uncompressedSize = 2 * ENTRY_SIZE})
+	};
+	const auto decompress = [this](std::istream& istr)
+	{
+		_errCnt = 0;
+		Poco::TemporaryFile outputDir;
+		Decompress dec(istr, outputDir.path());
+		dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>>(this, &ZipTest::onDecompressError);
+		dec.decompressAllFiles(false);
+		dec.EError -= Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>>(this, &ZipTest::onDecompressError);
+		assertEqual (1, _errCnt);
+		assertEqual (std::size_t{1}, dec.mapping().size());
+		assertTrue (dec.mapping().contains(std::string(ENTRY_NAME)));
+	};
+	for (const std::string& data: archives)
+	{
+		// The result does not depend on the type of the stream.
+		std::istringstream istr(data);
+		decompress(istr);
+		Poco::TemporaryFile zipFile;
+		{
+			Poco::FileOutputStream out(zipFile.path());
+			out << data;
+		}
+		Poco::FileInputStream fileStream(zipFile.path());
+		decompress(fileStream);
+	}
+}
+
+
 CppUnit::Test* ZipTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ZipTest");
@@ -1394,6 +1500,8 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testSyncAtEndOfArchive);
 	CppUnit_addTest(pSuite, ZipTest, testNulCharacterInName);
 	CppUnit_addTest(pSuite, ZipTest, testDuplicateNamesDataOffsets);
+	CppUnit_addTest(pSuite, ZipTest, testParseContinuesAtEndOfEntryData);
+	CppUnit_addTest(pSuite, ZipTest, testDecompressTruncatedEntryData);
 
 	return pSuite;
 }

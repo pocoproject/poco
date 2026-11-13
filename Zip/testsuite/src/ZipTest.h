@@ -62,6 +62,8 @@ public:
 	void testSyncAtEndOfArchive();
 	void testNulCharacterInName();
 	void testDuplicateNamesDataOffsets();
+	void testParseContinuesAtEndOfEntryData();
+	void testDecompressTruncatedEntryData();
 
 	void setUp();
 	void tearDown();
