@@ -102,8 +102,9 @@ env:
   # Sanitizer extra: lift the 300KB output cap so long stack traces survive.
   POCO_CTEST_SANITIZER_EXTRA: "--test-output-size-failed 0 --test-output-truncation tail"
   # Foundation suites that hold long tests (CppUnit_addLongTest). Long tests run
-  # only with -long, which ctest does not pass; the *-long-tests jobs run these
-  # without an ignore list, so every failure fails the job.
+  # only with -long, which ctest does not pass; the *-long-tests jobs and
+  # macos-clang-21-cmake-modules run these without an ignore list, so every
+  # failure fails the job.
   POCO_LONG_TEST_SUITES: >-
     RWLockTest PBKDF2EngineTest FileStreamRWLockTest FileChannelTest
     MD5EngineTest MD4EngineTest SHA1EngineTest SHA2EngineTest ChecksumTest
@@ -191,6 +192,9 @@ jobs:
           - name: ubsan
             visibility: default
             sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+            # UBSan reports and continues by default, and ctest shows the output of
+            # failing tests only: halt on the first report, so that it fails the test.
+            ubsan_options: halt_on_error=1:print_stacktrace=1
           - name: tsan
             visibility: default
             sanitize_flags: "-fsanitize=thread"
@@ -200,6 +204,7 @@ jobs:
     env:
       TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
       ASAN_OPTIONS: ${{ matrix.name == 'hidden-asan' && 'detect_odr_violation=2' || '' }}
+      UBSAN_OPTIONS: ${{ matrix.ubsan_options }}
     services:
       mongodb:
         # mongo:8 refuses to start on the runner kernels 6.19 to 7.0.13 (SERVER-121912, #5575)
@@ -568,12 +573,16 @@ jobs:
         with:
           build-dir: build
 
-  # C++ modules on macOS: the Bonjour partition and the Apple platform guards. Homebrew LLVM,
+  # Non-Apple compiler on macOS (Homebrew clang 21): C++ modules (the Bonjour partition and the
+  # Apple platform guards), Foundation + Util + Crypto against Homebrew OpenSSL 3, and the
+  # Foundation long tests (the suites of POCO_LONG_TEST_SUITES with -long). Homebrew LLVM,
   # because Apple clang has no clang-scan-deps; the explicit SDK path reaches clang-scan-deps.
   macos-clang-21-cmake-modules:
     runs-on: macos-latest
     needs: changes
     if: |
+      needs.changes.outputs.foundation_util == 'true' ||
+      needs.changes.outputs.crypto_netssl == 'true' ||
       needs.changes.outputs.modules == 'true' ||
       needs.changes.outputs.ci_core == 'true' ||
       github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -587,16 +596,28 @@ jobs:
           -DENABLE_SSH=ON -DENABLE_XSD_VALIDATOR=ON -DENABLE_AI=ON
           -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
           -DCMAKE_OSX_SYSROOT=$(xcrun --show-sdk-path)
-      - run: cmake --build cmake-build --target Modules-testrunner --parallel $(sysctl -n hw.ncpu)
+      - id: build
+        run: >-
+          cmake --build cmake-build --parallel $(sysctl -n hw.ncpu) --target
+          Modules-testrunner Foundation-testrunner Util-testrunner Crypto-testrunner
       - uses: ./.github/actions/retry-action
         with:
-          timeout_minutes: 30
+          timeout_minutes: 60
           max_attempts: 3
           retry_on: any
           command: >-
             cd cmake-build &&
-            ctest ${{ env.POCO_CTEST_COMMON }} -R "^Modules$"
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^(Foundation|Util|Crypto|Modules)$"
       - uses: ./.github/actions/upload-test-report
+      # Runs also when the unit tests failed, as a separate signal.
+      - name: Run Foundation long tests
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        timeout-minutes: 30
+        run: >-
+          cd cmake-build/bin &&
+          POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
+          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
 
   # OpenSSL 4.0, built from source and cached (ubuntu-24.04 ships OpenSSL 3).
   # OpenSSL 4.0 no longer frees its global data at exit, so the job runs with
@@ -830,32 +851,33 @@ jobs:
   # macOS arm64 (macos-latest)
   # ------------------------------------------------------------------------
 
-  # Primary macos-arm64 signal: 3 non-hidden sanitizers + 1 hidden+asan. TRACE on.
+  # Primary macos-arm64 signal: ASan + UBSan with hidden visibility, and TSan. TRACE on.
+  # ASan with default visibility runs on Linux. The tsan entry also builds the Data
+  # backends that need a server, with compiler warnings on; their tests do not run here.
   macos-clang-cmake-sanitizers:
     runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: asan
-            visibility: default
-            sanitize_flags: "-fsanitize=address"
+          - name: asan-ubsan-hidden
+            visibility: hidden
+            sanitize_flags: "-fsanitize=address,undefined;-fno-sanitize=vptr"
             # dyld4 registers ASan globals twice for dlopen'd libs -> spurious
             # ODR violation on TestPlugin vtable. Suppress.
             asan_options: detect_odr_violation=0
-          - name: ubsan
-            visibility: default
-            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+            # UBSan reports and continues by default, and ctest shows the output of
+            # failing tests only: halt on the first report, so that it fails the test.
+            ubsan_options: halt_on_error=1:print_stacktrace=1
           - name: tsan
             visibility: default
             sanitize_flags: "-fsanitize=thread"
-          - name: hidden-asan
-            visibility: hidden
-            sanitize_flags: "-fsanitize=address"
-            asan_options: detect_odr_violation=0
+            warnings: true
+            ctest_exclude: "^Data(MySQL|PostgreSQL|ODBC)$"
     env:
       TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
       ASAN_OPTIONS: ${{ matrix.asan_options }}
+      UBSAN_OPTIONS: ${{ matrix.ubsan_options }}
     steps:
       - uses: actions/checkout@v5
       - name: Install OpenSSL, libssh, Redis, MongoDB
@@ -864,6 +886,9 @@ jobs:
           brew tap mongodb/brew
           brew trust mongodb/brew
           brew install mongodb-community
+      - name: Install MySQL, PostgreSQL and ODBC client libraries
+        if: matrix.warnings
+        run: brew install mysql-client unixodbc libpq
       - name: Start Redis and MongoDB
         run: |
           brew services start redis
@@ -875,6 +900,8 @@ jobs:
           -DENABLE_TRACE=ON
           ${{ env.POCO_CMAKE_FULL_COMMON }}
           -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+          ${{ matrix.warnings && env.POCO_CMAKE_WARNINGS_EXTRA || '' }}
+          ${{ matrix.warnings && '-DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON -DMYSQL_ROOT_DIR=$(brew --prefix mysql-client) -DPostgreSQL_ROOT=$(brew --prefix libpq)' || '' }}
       - run: cmake --build cmake-build --target all --parallel $(sysctl -n hw.ncpu)
       - uses: ./.github/actions/retry-action
         with:
@@ -886,115 +913,26 @@ jobs:
             sudo -s
             ASAN_OPTIONS=${ASAN_OPTIONS}
             TSAN_OPTIONS=${TSAN_OPTIONS}
+            UBSAN_OPTIONS=${UBSAN_OPTIONS}
             PWD=`pwd`
             ctest ${{ env.POCO_CTEST_COMMON }} ${{ env.POCO_CTEST_SANITIZER_EXTRA }} --parallel $(sysctl -n hw.ncpu) ${{ matrix.ctest_exclude && format('-E "{0}"', matrix.ctest_exclude) || '' }}
       - uses: ./.github/actions/upload-test-report
         with:
           suffix: ${{ matrix.name }}
 
-  # POCO_SOO=OFF probe on macos-arm64: Foundation only.
-  macos-clang-cmake-poco-soo-off:
-    runs-on: macos-latest
-    needs: changes
-    if: |
-      needs.changes.outputs.foundation == 'true' ||
-      needs.changes.outputs.ci_core == 'true' ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v5
-      - run: >-
-          cmake -S. -Bcmake-build -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
-          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }} -DPOCO_SOO=OFF
-      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $(sysctl -n hw.ncpu)
-      - name: Run Foundation tests
-        run: >-
-          cd cmake-build &&
-          PWD=`pwd`
-          ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^Foundation$"
-      - uses: ./.github/actions/upload-test-report
-
-  # Long tests on macos-arm64: the suites of POCO_LONG_TEST_SUITES with -long.
-  macos-clang-cmake-long-tests:
-    runs-on: macos-latest
-    needs: changes
-    if: |
-      needs.changes.outputs.foundation == 'true' ||
-      needs.changes.outputs.ci_core == 'true' ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v5
-      - run: >-
-          cmake -S. -Bcmake-build
-          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }}
-      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $(sysctl -n hw.ncpu)
-      - name: Run Foundation long tests
-        timeout-minutes: 30
-        run: >-
-          cd cmake-build/bin &&
-          POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
-          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
-
-  # Newer non-Apple compiler probe (brew clang-21). Scope: Foundation + Util
-  # + Crypto (exercises the OpenSSL link path implied by the -openssl3 name).
-  macos-clang-21-cmake-openssl3:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install llvm@21 openssl@3
-      - run: >-
-          CXX=$(brew --prefix llvm@21)/bin/clang++ CC=$(brew --prefix llvm@21)/bin/clang
-          cmake -S. -Bcmake-build -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
-          ${{ env.POCO_CMAKE_FOUNDATION_UTIL }}
-          -DENABLE_CRYPTO=ON
-          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
-      - run: >-
-          cmake --build cmake-build --parallel $(sysctl -n hw.ncpu) --target
-          Foundation Util Crypto Foundation-testrunner Util-testrunner Crypto-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^(Foundation|Util|Crypto)$"
-      - uses: ./.github/actions/upload-test-report
-
-  # Build-only: compile-warnings-as-signal across as many modules as possible.
-  macos-clang-cmake-warnings:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: >-
-          cmake -S. -Bcmake-build
-          ${{ env.POCO_CMAKE_FULL_COMMON }}
-          ${{ env.POCO_CMAKE_WARNINGS_EXTRA }}
-          -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
-          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
-          -DMYSQL_ROOT_DIR=$(brew --prefix mysql-client)
-          -DPostgreSQL_ROOT=$(brew --prefix libpq)
-      - run: cmake --build cmake-build --target all --parallel $(sysctl -n hw.ncpu)
-
   # ------------------------------------------------------------------------
-  # macOS x64 (macos-15-intel) -- de-prioritized, sanitizer-only
+  # macOS x64 (macos-15-intel) -- push and manual runs only
   # ------------------------------------------------------------------------
 
+  # ASan + UBSan on Intel macOS. x86_64 is tested by the Linux and Windows jobs,
+  # macOS by the arm64 jobs; this job covers the combination after the merge.
   macos-x64-clang-cmake-sanitizers:
     runs-on: macos-15-intel
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: asan
-            sanitize_flags: "-fsanitize=address"
-          - name: ubsan
-            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
-          - name: tsan
-            sanitize_flags: "-fsanitize=thread"
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     env:
-      TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
+      # UBSan reports and continues by default, and ctest shows the output of
+      # failing tests only: halt on the first report, so that it fails the test.
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
     steps:
       - uses: actions/checkout@v5
       - name: Install OpenSSL, libssh, Redis, MongoDB
@@ -1009,7 +947,7 @@ jobs:
           brew services start mongodb-community
       - run: >-
           cmake -S. -Bcmake-build
-          -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}"
+          -DPOCO_SANITIZEFLAGS="-fsanitize=address,undefined;-fno-sanitize=vptr"
           -DENABLE_TRACE=ON
           ${{ env.POCO_CMAKE_FULL_COMMON }}
           -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
@@ -1022,12 +960,12 @@ jobs:
           command: >-
             cd cmake-build &&
             sudo -s
-            TSAN_OPTIONS=${TSAN_OPTIONS}
+            UBSAN_OPTIONS=${UBSAN_OPTIONS}
             PWD=`pwd`
             ctest ${{ env.POCO_CTEST_COMMON }} ${{ env.POCO_CTEST_SANITIZER_EXTRA }} --parallel $(sysctl -n hw.ncpu)
       - uses: ./.github/actions/upload-test-report
         with:
-          suffix: ${{ matrix.name }}
+          suffix: asan-ubsan
 
   # ------------------------------------------------------------------------
   # Windows

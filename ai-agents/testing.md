@@ -7,7 +7,7 @@ POCO tests use the CppUnit framework in `CppUnit/`. Each component has a test ru
 
 - A test class derives from `CppUnit::TestCase` and has a static `suite()` that registers its test methods with
   `CppUnit_addTest(pSuite, Class, method)`. Slow tests use `CppUnit_addLongTest`; they run only with the runner option
-  `-long`. CI runs them in the jobs `linux-gcc-cmake-long-tests`, `macos-clang-cmake-long-tests` and
+  `-long`. CI runs them in the jobs `linux-gcc-cmake-long-tests`, `macos-clang-21-cmake-modules` and
   `windows-2025-msvc-cmake-long-tests` for the Foundation suites listed in `POCO_LONG_TEST_SUITES` in
   `.github/workflows/ci.yml`, without an ignore list. A suite that gets a long test is added to that list; a long test
   in another component also needs its test runner in these jobs.
