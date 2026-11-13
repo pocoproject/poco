@@ -1,0 +1,1 @@
+int f(); void g(const std::string& s) noexcept; template<typename T> T h(T t);
