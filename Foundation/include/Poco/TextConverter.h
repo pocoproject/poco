@@ -39,8 +39,8 @@ public:
 		/// No transform is applied to the characters.
 
 	TextConverter(const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
-		/// Creates the TextConverter. The encoding objects must not be deleted while the
-		/// TextConverter is in use.
+		/// Creates the TextConverter. The encoding objects must outlive
+		/// the TextConverter. Temporary encoding objects are not accepted.
 
 	~TextConverter();
 		/// Destroys the TextConverter.
@@ -70,7 +70,11 @@ public:
 private:
 	TextConverter();
 	TextConverter(const TextConverter&);
+	TextConverter(const TextEncoding&&, const TextEncoding&, int = '?') = delete;
+	TextConverter(const TextEncoding&, const TextEncoding&&, int = '?') = delete;
+	TextConverter(const TextEncoding&&, const TextEncoding&&, int = '?') = delete;
 	TextConverter& operator = (const TextConverter&);
+
 
 	const TextEncoding& _inEncoding;
 	const TextEncoding& _outEncoding;
