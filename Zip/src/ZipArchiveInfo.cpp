@@ -73,9 +73,8 @@ void ZipArchiveInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	{
 		Poco::Buffer<char> buf(len);
 		inp.read(buf.begin(), len);
-		if (inp.gcount() != len)
-			throw Poco::IOException("Failed to read archive comment");
-		_comment = std::string(buf.begin(), len);
+		// A comment that runs past the end of the archive is cut, as other readers do.
+		_comment = std::string(buf.begin(), static_cast<std::size_t>(inp.gcount()));
 	}
 }
 

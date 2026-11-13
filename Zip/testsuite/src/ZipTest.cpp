@@ -1074,7 +1074,12 @@ void ZipTest::verifyTruncatedArchive(const std::vector<std::string>& records, st
 		}
 		data += record;
 	}
-	acceptedLengths.insert(data.size());
+	// An archive comment that runs past the end of the data is cut.
+	const std::size_t commentStart = data.size() - archiveComment.size();
+	for (std::size_t length = commentStart; length <= data.size(); ++length)
+	{
+		acceptedLengths.insert(length);
+	}
 
 	for (std::size_t length = 0; length <= data.size(); ++length)
 	{
@@ -1092,8 +1097,7 @@ void ZipTest::verifyTruncatedArchive(const std::vector<std::string>& records, st
 				assertTrue (it->second.getFileName() == ENTRY_NAME);
 				assertTrue (it->second.getFileComment() == fileComment);
 			}
-			// The end of central directory record is the last record of each archive.
-			assertTrue (arch.getZipComment() == (length == data.size() ? archiveComment : std::string_view()));
+			assertTrue (arch.getZipComment() == (length >= commentStart ? archiveComment.substr(0, length - commentStart) : std::string_view()));
 		}
 		catch (const Poco::IOException&)
 		{
