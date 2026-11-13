@@ -12,6 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/TextConverter.h"
+#include "Poco/Exception.h"
 #include "Poco/ASCIIEncoding.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/Latin2Encoding.h"
@@ -311,6 +312,39 @@ void TextConverterTest::testCP1252toUTF8()
 }
 
 
+void TextConverterTest::testEmptyBuffer()
+{
+	ASCIIEncoding encoding;
+	TextConverter converter(encoding, encoding);
+	const std::string unchanged = "unchanged";
+	std::string result = unchanged;
+
+	int errors = converter.convert(nullptr, 0, result);
+	assertEqual (result, unchanged);
+	assertEqual (errors, 0);
+
+	errors = converter.convert("x", 0, result);
+	assertEqual (result, unchanged);
+	assertEqual (errors, 0);
+}
+
+
+void TextConverterTest::testInvalidBuffer()
+{
+	ASCIIEncoding encoding;
+	TextConverter converter(encoding, encoding);
+	const std::string unchanged = "unchanged";
+	std::string result = unchanged;
+
+	try
+	{
+		converter.convert(nullptr, 1, result);
+		fail ("must fail");
+	} catch (NullPointerException&)	{ }
+	assertEqual (result, unchanged);
+}
+
+
 void TextConverterTest::testErrors()
 {
 	UTF8Encoding utf8Encoding;
@@ -349,6 +383,8 @@ CppUnit::Test* TextConverterTest::suite()
 	CppUnit_addTest(pSuite, TextConverterTest, testCP1250toUTF8);
 	CppUnit_addTest(pSuite, TextConverterTest, testCP1251toUTF8);
 	CppUnit_addTest(pSuite, TextConverterTest, testCP1252toUTF8);
+	CppUnit_addTest(pSuite, TextConverterTest, testInvalidBuffer);
+	CppUnit_addTest(pSuite, TextConverterTest, testEmptyBuffer);
 	CppUnit_addTest(pSuite, TextConverterTest, testErrors);
 
 	return pSuite;

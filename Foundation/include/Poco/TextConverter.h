@@ -33,53 +33,48 @@ class Foundation_API TextConverter
 {
 public:
 	using Transform = int (*)(int);
-	/// Transform function for convert.
+		/// Transform function for convert characters.
+
+	static constexpr Transform NO_TRANSFORM = nullptr;
+		/// No transform is applied to the characters.
 
 	TextConverter(const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
-		/// Creates the TextConverter. The encoding objects must not be deleted while the
-		/// TextConverter is in use.
+		/// Creates the TextConverter. The encoding objects must outlive
+		/// the TextConverter. Temporary encoding objects are not accepted.
 
 	~TextConverter();
 		/// Destroys the TextConverter.
 
-	int convert(const std::string& source, std::string& destination, Transform trans);
+	int convert(const std::string& source, std::string& destination, Transform trans = NO_TRANSFORM) const;
 		/// Converts the source string from inEncoding to outEncoding
 		/// and appends the result to destination. Every character is
-		/// passed to the transform function.
+		/// passed to the transform function if trans is not NO_TRANSFORM.
 		/// If a character cannot be represented in outEncoding, defaultChar
 		/// is used instead.
+		///
 		/// Returns the number of encoding errors (invalid byte sequences
 		/// in source).
 
-	int convert(const void* source, int length, std::string& destination, Transform trans);
+	int convert(const void* source, int length, std::string& destination, Transform trans = NO_TRANSFORM) const;
 		/// Converts the source buffer from inEncoding to outEncoding
 		/// and appends the result to destination. Every character is
-		/// passed to the transform function.
+		/// passed to the transform function if trans is not NO_TRANSFORM.
 		/// If a character cannot be represented in outEncoding, defaultChar
 		/// is used instead.
+		///
 		/// Returns the number of encoding errors (invalid byte sequences
 		/// in source).
-
-	int convert(const std::string& source, std::string& destination);
-		/// Converts the source string from inEncoding to outEncoding
-		/// and appends the result to destination.
-		/// If a character cannot be represented in outEncoding, defaultChar
-		/// is used instead.
-		/// Returns the number of encoding errors (invalid byte sequences
-		/// in source).
-
-	int convert(const void* source, int length, std::string& destination);
-		/// Converts the source buffer from inEncoding to outEncoding
-		/// and appends the result to destination.
-		/// If a character cannot be represented in outEncoding, defaultChar
-		/// is used instead.
-		/// Returns the number of encoding errors (invalid byte sequences
-		/// in source).
+		///
+		/// Throws a NullPointerException if source is nullptr when length != 0.
 
 private:
 	TextConverter();
 	TextConverter(const TextConverter&);
+	TextConverter(const TextEncoding&&, const TextEncoding&, int = '?') = delete;
+	TextConverter(const TextEncoding&, const TextEncoding&&, int = '?') = delete;
+	TextConverter(const TextEncoding&&, const TextEncoding&&, int = '?') = delete;
 	TextConverter& operator = (const TextConverter&);
+
 
 	const TextEncoding& _inEncoding;
 	const TextEncoding& _outEncoding;
