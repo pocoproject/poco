@@ -95,7 +95,8 @@ interface. Read `Thread_POSIX.h` for the full set of `ThreadImpl` functions (`st
 
 `_WIN32U` files use the wide-character Windows API through `Poco::UnicodeConverter`; `_DUMMY` files are empty
 implementations for platforms without the facility. Classes with short platform code keep it inline under `#if`, for
-example `Timestamp`, `Clock`, `LocalDateTime`, `Debugger` and `DirectoryWatcher`.
+example `Timestamp`, `Clock`, `LocalDateTime`, `Debugger` and `DirectoryWatcher`. The `_Android` files of
+`NamedEvent` and `NamedMutex` throw `NotImplementedException` and are also used for Emscripten.
 
 ## Net
 
@@ -104,7 +105,7 @@ example `Timestamp`, `Clock`, `LocalDateTime`, `Debugger` and `DirectoryWatcher`
 - `SocketImpl`, `NetworkInterface`, `SocketAddress`, `HostEntry`, `DNS` and `IPAddressImpl` contain platform branches.
   `NetworkInterface` is compiled only where `Net/include/Poco/Net/Net.h` defines `POCO_NET_HAS_INTERFACE`.
 - `PollSet` uses epoll (`POCO_HAVE_FD_EPOLL`: Linux, Android, and Windows through the bundled `wepoll`) or `poll()`
-  (`POCO_HAVE_FD_POLL`: the BSD family in `Net.h`, other systems in `Foundation/CMakeLists.txt`).
+  (`POCO_HAVE_FD_POLL`: the BSD family and Emscripten in `Net.h`, other systems in `Foundation/CMakeLists.txt`).
 
 ## Util
 

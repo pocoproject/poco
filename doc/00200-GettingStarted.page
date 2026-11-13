@@ -229,7 +229,7 @@ For more information see https://cmake.org/cmake/help/latest/variable/CMAKE_BUIL
 
 !!Static vs Dynamic Libraries
 
-By default, POCO builds dynamic (shared) libraries. To build static libraries, set <*BUILD_SHARED_LIBS=OFF*>:
+By default, POCO builds dynamic (shared) libraries; for Emscripten it builds static libraries. To build static libraries, set <*BUILD_SHARED_LIBS=OFF*>:
 
     $ cmake -H/path/to/poco -B/path/to/poco-build -DBUILD_SHARED_LIBS=OFF
     $ cmake --build /path/to/poco-build

@@ -818,11 +818,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install cmake ninja-build emscripten
-      # CMAKE_POLICY_VERSION_MINIMUM=3.5: emscripten's CheckTypeSize.cmake
-      # needs a pre-3.5 policy that CMake 4 removed.
+      - uses: emscripten-core/setup-emsdk@v16
+        with:
+          version: 7.0.0
+      - uses: ./.github/actions/ensure-apt-packages
+        with:
+          commands: cmake:cmake make:make
       - run: >-
-          emcmake cmake -H. -B cmake-build -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_ACTIVERECORD_COMPILER=OFF
+          emcmake cmake -S. -Bcmake-build -DENABLE_ACTIVERECORD_COMPILER=OFF
           -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=off
       - run: emmake cmake --build cmake-build --target all --parallel $(nproc)
 

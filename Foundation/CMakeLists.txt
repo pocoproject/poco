@@ -180,6 +180,10 @@ else()
 				find_package(Threads REQUIRED)
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_POLL)
 				target_link_libraries(Foundation PUBLIC ${CMAKE_DL_LIBS} rt Threads::Threads)
+			elseif(EMSCRIPTEN)
+				# No eventfd(), which PollSet needs with epoll
+				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_POLL)
+				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt ${Poco_ATOMIC_LIBRARIES})
 			else()
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_EPOLL)
 				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt ${Poco_ATOMIC_LIBRARIES})
@@ -232,6 +236,14 @@ endif()
 # Emscripten currently doesn't support thread names
 if(EMSCRIPTEN)
 	target_compile_definitions(Foundation PUBLIC POCO_NO_THREADNAME)
+endif()
+
+# A program that uses POCO needs the thread and exception flags of the libraries
+if(EMSCRIPTEN AND NOT "${POCO_EMSCRIPTEN_FLAGS}" STREQUAL "")
+	separate_arguments(_poco_em_flags UNIX_COMMAND "${POCO_EMSCRIPTEN_FLAGS}")
+	target_compile_options(Foundation PUBLIC ${_poco_em_flags})
+	target_link_options(Foundation PUBLIC ${_poco_em_flags})
+	unset(_poco_em_flags)
 endif()
 
 # iOS

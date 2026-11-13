@@ -41,7 +41,7 @@ cmake --build <build-dir> --parallel --target <Component>-testrunner
 | `ENABLE_TEST_DEPRECATED` | OFF | Also build tests of deprecated API (defines `POCO_TEST_DEPRECATED`) |
 | `ENABLE_COMPILER_WARNINGS` | OFF | Maintainer warnings for POCO code only: `-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wzero-as-null-pointer-constant` (GCC, Clang), `/W4` (MSVC) |
 | `ENABLE_TRACE` | OFF | Stack traces in exceptions (defines `POCO_ENABLE_TRACE`) |
-| `BUILD_SHARED_LIBS` | ON | Shared or static libraries |
+| `BUILD_SHARED_LIBS` | ON (OFF for Emscripten) | Shared or static libraries |
 | `POCO_MT` | OFF | MSVC only: static runtime (`/MT`); needs `BUILD_SHARED_LIBS=OFF` |
 | `POCO_SOO` | ON | Small object optimization in Foundation |
 | `POCO_ENABLE_STD_MUTEX` | OFF | `Poco::Mutex` and `Poco::FastMutex` on `std::recursive_mutex` and `std::mutex` |
@@ -50,6 +50,7 @@ cmake --build <build-dir> --parallel --target <Component>-testrunner
 | `POCO_UNBUNDLED` | OFF | Use system libraries instead of the bundled ones (see [dependencies.md](dependencies.md)) |
 | `POCO_SQLITE_UNBUNDLED` | OFF | Use the system SQLite only |
 | `POCO_SANITIZEFLAGS` | empty | Sanitizer flags for compile and link (see [analysis.md](analysis.md)) |
+| `POCO_EMSCRIPTEN_FLAGS` | `-pthread -fexceptions` | Emscripten only: compile and link flags for threads and C++ exceptions; empty for a build without them |
 | `POCO_COMPILER` | empty | Compiler by name or path (`gcc-12`, `clang-18`, `clang-cl`) |
 | `POCO_CROSS_COMPILE` | empty | Cross build for `arm-linux`, `android` or `emscripten`; not together with `CMAKE_TOOLCHAIN_FILE` |
 | `ENABLE_MODULES` | OFF | Build the C++ module `Poco`; needs C++20, CMake 3.28+ and a generator that scans modules: Ninja or Ninja Multi-Config with ninja 1.11+, or Visual Studio 17 2022 (cmake-cxxmodules(7)); builds with LLVM Clang only: Apple clang has no clang-scan-deps, MSVC 19.51 and GCC 15/16 fail with compiler defects |
@@ -97,7 +98,7 @@ job `linux-gcc-make-build` does not compile it.
    properties on the real target. `DNSSD/` deviates from rules 2 and 3 (alias `PocoDNSSD`, links without a scope
    keyword); do not copy it.
 4. **No library type.** Call `add_library(<Component> ${SRCS})` without `STATIC` or `SHARED`; `BUILD_SHARED_LIBS` (an
-   option in the root `CMakeLists.txt`, default ON) decides. The Apache module `mod_poco` is `SHARED` because Apache can
+   option in the root `CMakeLists.txt`) decides. The Apache module `mod_poco` is `SHARED` because Apache can
    only load a shared object.
 5. **Project-wide options in two places only.** Directory-scope compile and link options that apply to every target
    (sanitizer flags, release stripping, `POCO_DLL`/`POCO_STATIC`) are set in `cmake/DefinePlatformSpecific.cmake`, which

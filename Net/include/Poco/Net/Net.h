@@ -160,12 +160,15 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 #endif
 
 
-#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_WINDOWS_NT) || (POCO_OS == POCO_OS_ANDROID)
+//
+// Emscripten uses poll(): it has no eventfd(), which PollSet needs with epoll.
+//
+#if ((POCO_OS == POCO_OS_LINUX) && !defined(POCO_EMSCRIPTEN)) || (POCO_OS == POCO_OS_WINDOWS_NT) || (POCO_OS == POCO_OS_ANDROID)
 	#define POCO_HAVE_FD_EPOLL 1
 #endif
 
 
-#if defined(POCO_OS_FAMILY_BSD)
+#if defined(POCO_OS_FAMILY_BSD) || defined(POCO_EMSCRIPTEN)
 	#ifndef POCO_HAVE_FD_POLL
 		#define POCO_HAVE_FD_POLL 1
 	#endif

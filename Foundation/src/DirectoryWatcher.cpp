@@ -24,7 +24,11 @@
 #include "Poco/Event.h"
 #include "Poco/Exception.h"
 #include "Poco/Buffer.h"
-#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+// Emscripten has no inotify.
+#if defined(POCO_EMSCRIPTEN) && !defined(POCO_DW_FORCE_POLLING)
+	#define POCO_DW_FORCE_POLLING
+#endif
+#if (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && !defined(POCO_DW_FORCE_POLLING)
 	#include <sys/inotify.h>
 	#include <sys/select.h>
 	#include <unistd.h>

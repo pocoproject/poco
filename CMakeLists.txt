@@ -81,11 +81,20 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+if(EMSCRIPTEN)
+	# Static by default: programs do not link against wasm shared libraries.
+	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
 
 option(POCO_MINIMAL_BUILD "Build only bare minimum Poco libraries identifoed with ENABLE options." OFF)
 
 set(POCO_SANITIZEFLAGS CACHE STRING "Compiler-dependent sanitizer flags (like -fsanitize=address or /fsanitize=address")
+
+if(EMSCRIPTEN)
+	set(POCO_EMSCRIPTEN_FLAGS "-pthread -fexceptions" CACHE STRING "Compile and link flags for Emscripten: threads and C++ exceptions, which Emscripten leaves off by default")
+endif()
 
 if(MSVC)
 	option(POCO_MT "Set to OFF|ON (default is OFF) to control static build of POCO as /MT instead of /MD" OFF)
