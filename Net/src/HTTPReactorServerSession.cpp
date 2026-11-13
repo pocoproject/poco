@@ -115,6 +115,18 @@ bool HTTPReactorServerSession::parseHeaders(
 	std::size_t pos, std::size_t& bodyStart, std::size_t& contentLength, bool& isChunked)
 {
 	const std::size_t headerEnd = _buf.find("\r\n\r\n", pos);
+
+	// HTTPRequest::read() and MessageHeader::read() end a line at a bare LF,
+	// while the boundaries here are found at CR LF. A bare LF would make the two
+	// disagree on the fields and on where the header ends, so it is rejected,
+	// also before the end of the header has been received.
+	const std::size_t scanEnd = (headerEnd == std::string::npos) ? _buf.size() : headerEnd;
+	for (std::size_t lf = _buf.find('\n', pos); lf < scanEnd; lf = _buf.find('\n', lf + 1))
+	{
+		if (lf == pos || _buf[lf - 1] != '\r')
+			throw MessageException("Bare LF in HTTP request header");
+	}
+
 	if (headerEnd == std::string::npos)
 	{
 		return false; // Incomplete headers
@@ -123,15 +135,6 @@ bool HTTPReactorServerSession::parseHeaders(
 	bodyStart = headerEnd + 4; // "\r\n\r\n" is 4 characters
 	contentLength = 0;
 	isChunked = false;
-
-	// HTTPRequest::read() and MessageHeader::read() end a line at a bare LF,
-	// while the boundaries here are found at CR LF. A bare LF would make the two
-	// disagree on the fields and on where the header ends, so it is rejected.
-	for (std::size_t lf = _buf.find('\n', pos); lf < headerEnd; lf = _buf.find('\n', lf + 1))
-	{
-		if (lf == pos || _buf[lf - 1] != '\r')
-			throw MessageException("Bare LF in HTTP request header");
-	}
 
 	// The byte boundary computed here has to agree with the message the request
 	// handler is given, so the same parser decides both. A substring search over

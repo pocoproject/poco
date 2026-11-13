@@ -276,6 +276,7 @@ void HTTPReactorServerSessionTest::testChunkExtensionHighByte()
 	assertTrue(body == "hello");
 }
 
+
 void HTTPReactorServerSessionTest::testCheckRequestCompleteBareLF()
 {
 	// HTTPRequest::read() ends a line at a bare LF. Framing that ends it only at
@@ -284,7 +285,8 @@ void HTTPReactorServerSessionTest::testCheckRequestCompleteBareLF()
 	const std::string requests[] = {
 		"POST / HTTP/1.1\nContent-Length: 32\r\nHost: localhost\r\n\r\nGET /admin HTTP/1.1\r\nHost: x\r\n\r\n",
 		"GET / HTTP/1.1\r\nHost: localhost\n\nGET /admin HTTP/1.1\r\nHost: x\r\n\r\n",
-		"GET / HTTP/1.1\r\nHost: localhost\nContent-Length: 0\r\n\r\n"};
+		"GET / HTTP/1.1\r\nHost: localhost\nContent-Length: 0\r\n\r\n",
+		"GET / HTTP/1.1\nHost: localhost\n\n"};
 	for (const std::string& request: requests)
 	{
 		assertTrue(checkComplete(request).outcome == ParseOutcome::MALFORMED);
@@ -294,6 +296,7 @@ void HTTPReactorServerSessionTest::testCheckRequestCompleteBareLF()
 	assertTrue(result.outcome == ParseOutcome::COMPLETE);
 	assertTrue(result.remaining == 0);
 }
+
 
 CppUnit::Test* HTTPReactorServerSessionTest::suite()
 {
