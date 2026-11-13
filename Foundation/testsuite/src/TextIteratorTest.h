@@ -35,6 +35,7 @@ public:
 	void testSwap();
 	void testUTF32Invalid1();
 	void testUTF32Invalid2();
+	void testUTF16Invalid();
 
 	void setUp();
 	void tearDown();
