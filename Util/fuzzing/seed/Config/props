@@ -1,0 +1,5 @@
+app.keyapp.key=value
+app.other=42
+app.flag=true
+[section]
+section.sub=x
