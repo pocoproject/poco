@@ -45,7 +45,7 @@ public:
 	~TextConverter();
 		/// Destroys the TextConverter.
 
-	int convert(const std::string& source, std::string& destination, Transform trans = NO_TRANSFORM);
+	int convert(const std::string& source, std::string& destination, Transform trans = NO_TRANSFORM) const;
 		/// Converts the source string from inEncoding to outEncoding
 		/// and appends the result to destination. Every character is
 		/// passed to the transform function if trans is not NO_TRANSFORM.
@@ -55,7 +55,7 @@ public:
 		/// Returns the number of encoding errors (invalid byte sequences
 		/// in source).
 
-	int convert(const void* source, int length, std::string& destination, Transform trans = NO_TRANSFORM);
+	int convert(const void* source, int length, std::string& destination, Transform trans = NO_TRANSFORM) const;
 		/// Converts the source buffer from inEncoding to outEncoding
 		/// and appends the result to destination. Every character is
 		/// passed to the transform function if trans is not NO_TRANSFORM.

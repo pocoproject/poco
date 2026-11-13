@@ -33,7 +33,7 @@ TextConverter::~TextConverter()
 }
 
 
-int TextConverter::convert(const std::string& source, std::string& destination, Transform trans)
+int TextConverter::convert(const std::string& source, std::string& destination, Transform trans) const
 {
 	int errors = 0;
 	TextIterator it(source, _inEncoding);
@@ -55,7 +55,7 @@ int TextConverter::convert(const std::string& source, std::string& destination, 
 }
 
 
-int TextConverter::convert(const void* source, int length, std::string& destination, Transform trans)
+int TextConverter::convert(const void* source, int length, std::string& destination, Transform trans) const
 {
 	if (length == 0) return 0;
 	poco_check_ptr (source);
