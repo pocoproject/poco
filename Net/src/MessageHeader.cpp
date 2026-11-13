@@ -106,17 +106,18 @@ namespace
 		}
 		else
 		{
-			for (std::size_t i = 0; i < word.text.size(); ++i)
+			std::size_t i = 0;
+			while (i < word.text.size())
 			{
-				const char c = word.text[i];
+				const char c = word.text[i++];
 				if (c == '_')
 				{
 					bytes += ' ';
 				}
 				else if (c == '=')
 				{
-					if (i + 2 >= word.text.size()) return false;
-					const char* first = word.text.data() + i + 1;
+					if (word.text.size() - i < 2) return false;
+					const char* first = word.text.data() + i;
 					unsigned int value = 0;
 					if (std::from_chars(first, first + 2, value, 16).ptr != first + 2) return false;
 					bytes += static_cast<char>(value);
