@@ -274,6 +274,21 @@ void TextIteratorTest::testUTF32Invalid2()
 }
 
 
+void TextIteratorTest::testUTF16Invalid()
+{
+	UTF16Encoding encoding;
+	const Poco::UInt16 data[] = {0x0041, 0xD800, 0xE000, 0x0041, 0x00};
+	std::string text((const char*) data, 8);
+	TextIterator it(text, encoding);
+	TextIterator end(text);
+
+	assertTrue (it != end);
+	assertTrue (*it++ == 0x41);
+	assertTrue (it != end);
+	assertTrue (*it++ == -1);
+}
+
+
 void TextIteratorTest::setUp()
 {
 }
@@ -299,6 +314,7 @@ CppUnit::Test* TextIteratorTest::suite()
 	CppUnit_addTest(pSuite, TextIteratorTest, testSwap);
 	CppUnit_addTest(pSuite, TextIteratorTest, testUTF32Invalid1);
 	CppUnit_addTest(pSuite, TextIteratorTest, testUTF32Invalid2);
+	CppUnit_addTest(pSuite, TextIteratorTest, testUTF16Invalid);
 
 	return pSuite;
 }
