@@ -1,0 +1,4 @@
+HTTP/1.1 407 Proxy Authentication Required
+Content-Length: 0
+Proxy-Authenticate: Digest realm="proxy@example.net", qop="auth", algorithm=MD5-sess, nonce="9d8c7b6a5f4e3d2c1b0a", opaque="a0b1c2d3"
+

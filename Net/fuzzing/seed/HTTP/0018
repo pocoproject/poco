@@ -1,0 +1,5 @@
+GET /photos?size=large HTTP/1.1
+Host: photos.example.net
+X-Method: Plain
+Authorization: OAuth realm="Photos", oauth_consumer_key="fuzz-consumer", oauth_token="fuzz-token", oauth_signature_method="PLAINTEXT", oauth_nonce="a1b2c3d4", oauth_timestamp="1700000000", oauth_signature="consumer-secret%26token-secret", oauth_version="1.0"
+
