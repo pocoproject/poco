@@ -30,6 +30,7 @@ template <typename T>
 std::string uniqueName(const std::map<std::string, T>& entries, std::map<std::string, int>& suffixes, const std::string& name)
 	/// Returns name, or name with the first unused ".duplicate-N" suffix if entries has it.
 {
+	// find(): std::map::contains() needs C++20, and the library is still built as C++17 for Emscripten.
 	if (entries.find(name) == entries.end())
 		return name;
 

@@ -69,6 +69,8 @@ namespace
 
 	constexpr Poco::UInt16 DATA_DESCRIPTOR_FLAG = 0x0008; // CRC-32 and sizes follow the data
 
+	constexpr Poco::UInt64 OUT_OF_RANGE = static_cast<Poco::UInt64>(1) << 62; // above the limit for sizes and offsets
+
 
 	std::string zip64ExtraField(std::initializer_list<Poco::UInt64> values)
 		/// Returns a ZIP64 extra field that holds the given values.
@@ -84,55 +86,53 @@ namespace
 	}
 
 
-	std::string localFile(
-		Poco::UInt16 versionNeeded,
-		Poco::UInt16 flags,
-		ZipCommon::CompressionMethod method,
-		std::string_view name = ENTRY_NAME,
-		Poco::UInt32 compressedSize = ENTRY_SIZE,
-		Poco::UInt32 uncompressedSize = ENTRY_SIZE,
-		std::string_view extraField = {})
-		/// Returns the local file header of the entry, followed by its data. The name, the
-		/// size fields and the extra field of the header can be given.
+	struct Entry
+		/// The fields of a local file header and a central directory entry that the tests change.
+	{
+		Poco::UInt16 versionNeeded = VERSION_20;
+		Poco::UInt16 flags = 0;
+		ZipCommon::CompressionMethod method = ZipCommon::CM_STORE;
+		std::string_view name = ENTRY_NAME;
+		std::string_view data = ENTRY_DATA;          // written after the local file header
+		Poco::UInt32 compressedSize = ENTRY_SIZE;
+		Poco::UInt32 uncompressedSize = ENTRY_SIZE;
+		Poco::UInt32 localHeaderOffset = 0;          // central directory entry only
+		std::string extraField{};
+		std::string_view comment{};                  // central directory entry only
+	};
+
+
+	std::string localFile(const Entry& entry)
+		/// Returns the local file header of the entry, followed by its data.
 	{
 		std::ostringstream ostr;
 		Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 		writer.writeRaw(ZipLocalFileHeader::HEADER, ZipCommon::HEADER_SIZE);
-		writer << versionNeeded << flags << static_cast<Poco::UInt16>(method);
-		writer << ENTRY_TIME << ENTRY_DATE << ENTRY_CRC << compressedSize << uncompressedSize;
-		writer << static_cast<Poco::UInt16>(name.size()) << static_cast<Poco::UInt16>(extraField.size());
-		writer.writeRaw(name.data(), name.size());
-		writer.writeRaw(extraField.data(), extraField.size());
-		writer.writeRaw(ENTRY_DATA.data(), ENTRY_DATA.size());
+		writer << entry.versionNeeded << entry.flags << static_cast<Poco::UInt16>(entry.method);
+		writer << ENTRY_TIME << ENTRY_DATE << ENTRY_CRC << entry.compressedSize << entry.uncompressedSize;
+		writer << static_cast<Poco::UInt16>(entry.name.size()) << static_cast<Poco::UInt16>(entry.extraField.size());
+		writer.writeRaw(entry.name.data(), entry.name.size());
+		writer.writeRaw(entry.extraField.data(), entry.extraField.size());
+		writer.writeRaw(entry.data.data(), entry.data.size());
 		return ostr.str();
 	}
 
 
-	std::string centralDirectoryEntry(
-		Poco::UInt16 flags,
-		ZipCommon::CompressionMethod method,
-		std::string_view name = ENTRY_NAME,
-		Poco::UInt32 compressedSize = ENTRY_SIZE,
-		Poco::UInt32 uncompressedSize = ENTRY_SIZE,
-		Poco::UInt32 localHeaderOffset = 0,
-		std::string_view extraField = {},
-		std::string_view comment = {})
-		/// Returns the central directory header of the entry, whose local file header is at offset 0
-		/// by default. The name, the size and offset fields, the extra field and the comment of the
-		/// header can be given.
+	std::string centralDirectoryEntry(const Entry& entry)
+		/// Returns the central directory header of the entry.
 	{
 		std::ostringstream ostr;
 		Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 		writer.writeRaw(ZipFileInfo::HEADER, ZipCommon::HEADER_SIZE);
-		writer << VERSION_20 << VERSION_20 << flags << static_cast<Poco::UInt16>(method);
-		writer << ENTRY_TIME << ENTRY_DATE << ENTRY_CRC << compressedSize << uncompressedSize;
-		writer << static_cast<Poco::UInt16>(name.size()) << static_cast<Poco::UInt16>(extraField.size());
-		writer << static_cast<Poco::UInt16>(comment.size());
+		writer << entry.versionNeeded << entry.versionNeeded << entry.flags << static_cast<Poco::UInt16>(entry.method);
+		writer << ENTRY_TIME << ENTRY_DATE << ENTRY_CRC << entry.compressedSize << entry.uncompressedSize;
+		writer << static_cast<Poco::UInt16>(entry.name.size()) << static_cast<Poco::UInt16>(entry.extraField.size());
+		writer << static_cast<Poco::UInt16>(entry.comment.size());
 		writer.writeRaw(std::string(8, '\0'));                 // disk, attributes
-		writer << localHeaderOffset;
-		writer.writeRaw(name.data(), name.size());
-		writer.writeRaw(extraField.data(), extraField.size());
-		writer.writeRaw(comment.data(), comment.size());
+		writer << entry.localHeaderOffset;
+		writer.writeRaw(entry.name.data(), entry.name.size());
+		writer.writeRaw(entry.extraField.data(), entry.extraField.size());
+		writer.writeRaw(entry.comment.data(), entry.comment.size());
 		return ostr.str();
 	}
 
@@ -173,9 +173,9 @@ namespace
 	std::string singleEntryArchive(ZipCommon::CompressionMethod method)
 		/// Returns a complete archive that holds the entry.
 	{
-		std::string data = localFile(VERSION_20, 0, method);
+		std::string data = localFile({.method = method});
 		const auto directoryOffset = static_cast<Poco::UInt32>(data.size());
-		data += centralDirectoryEntry(0, method);
+		data += centralDirectoryEntry({.method = method});
 		data += endOfCentralDirectory(directoryOffset);
 		return data;
 	}
@@ -743,7 +743,7 @@ void ZipTest::testUnsupportedVersionNeeded()
 	};
 	for (const Poco::UInt16 versionNeeded: unsupportedVersions)
 	{
-		std::istringstream istr(localFile(versionNeeded, 0, ZipCommon::CM_STORE));
+		std::istringstream istr(localFile({.versionNeeded = versionNeeded}));
 		try
 		{
 			ZipArchive arch(istr);
@@ -754,7 +754,7 @@ void ZipTest::testUnsupportedVersionNeeded()
 		}
 	}
 
-	std::istringstream istr(localFile(VERSION_45, 0, ZipCommon::CM_STORE));
+	std::istringstream istr(localFile({.versionNeeded = VERSION_45}));
 	ZipArchive arch(istr);
 	assertEqual (1, std::distance(arch.headerBegin(), arch.headerEnd()));
 }
@@ -763,9 +763,9 @@ void ZipTest::testUnsupportedVersionNeeded()
 void ZipTest::testDuplicateEndOfCentralDirectory()
 {
 	{
-		std::string data = localFile(VERSION_20, 0, ZipCommon::CM_STORE);
+		std::string data = localFile({});
 		const auto directoryOffset = static_cast<Poco::UInt32>(data.size());
-		data += centralDirectoryEntry(0, ZipCommon::CM_STORE);
+		data += centralDirectoryEntry({});
 		data += endOfCentralDirectory(directoryOffset);
 		data += endOfCentralDirectory(directoryOffset);
 		std::istringstream istr(data);
@@ -780,9 +780,9 @@ void ZipTest::testDuplicateEndOfCentralDirectory()
 	}
 
 	{
-		std::string data = localFile(VERSION_20, 0, ZipCommon::CM_STORE);
+		std::string data = localFile({});
 		const auto directoryOffset = static_cast<Poco::UInt32>(data.size());
-		data += centralDirectoryEntry(0, ZipCommon::CM_STORE);
+		data += centralDirectoryEntry({});
 		const Poco::UInt64 firstRecordOffset = data.size();
 		data += zip64EndOfCentralDirectory(firstRecordOffset, directoryOffset);
 		const Poco::UInt64 secondRecordOffset = data.size();
@@ -869,11 +869,11 @@ void ZipTest::testDecompressFailedEntryWithDataDescriptor()
 	// the entry data and its data descriptor must still be found.
 	std::ostringstream ostr;
 	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-	writer.writeRaw(localFile(VERSION_20, DATA_DESCRIPTOR_FLAG, ZipCommon::CM_BZIP2));
+	writer.writeRaw(localFile({.flags = DATA_DESCRIPTOR_FLAG, .method = ZipCommon::CM_BZIP2}));
 	writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
 	writer << ENTRY_CRC << ENTRY_SIZE << ENTRY_SIZE;
 	const auto directoryOffset = static_cast<Poco::UInt32>(ostr.str().size());
-	writer.writeRaw(centralDirectoryEntry(DATA_DESCRIPTOR_FLAG, ZipCommon::CM_BZIP2));
+	writer.writeRaw(centralDirectoryEntry({.flags = DATA_DESCRIPTOR_FLAG, .method = ZipCommon::CM_BZIP2}));
 	writer.writeRaw(endOfCentralDirectory(directoryOffset));
 	std::istringstream istr(ostr.str());
 
@@ -895,31 +895,36 @@ void ZipTest::testDecompressFailedEntryWithDataDescriptor()
 
 void ZipTest::testSizeOrOffsetOutOfRange()
 {
-	constexpr Poco::UInt64 OUT_OF_RANGE = static_cast<Poco::UInt64>(1) << 62;
 	const std::string outOfRangeField = zip64ExtraField({OUT_OF_RANGE});
-	const std::string compressedSizeArchive = localFile(VERSION_45, 0, ZipCommon::CM_STORE, ENTRY_NAME, ZipCommon::ZIP64_MAGIC, ENTRY_SIZE, outOfRangeField);
+	const std::string compressedSizeArchive = localFile({.versionNeeded = VERSION_45, .compressedSize = ZipCommon::ZIP64_MAGIC, .extraField = outOfRangeField});
 
 	// A compressed size that moves the position after the entry back to the start of its local file header.
 	const std::size_t headerSize = compressedSizeArchive.size() - ENTRY_DATA.size();
 	const Poco::UInt64 wrappingSize = std::numeric_limits<Poco::UInt64>::max() - headerSize + 1;
 
-	std::string offsetArchive = localFile(VERSION_20, 0, ZipCommon::CM_STORE);
-	const auto directoryOffset = static_cast<Poco::UInt32>(offsetArchive.size());
-	offsetArchive += centralDirectoryEntry(0, ZipCommon::CM_STORE, ENTRY_NAME, ENTRY_SIZE, ENTRY_SIZE, ZipCommon::ZIP64_MAGIC, outOfRangeField);
-	offsetArchive += endOfCentralDirectory(directoryOffset);
+	const auto directoryEntryArchive = [](const Entry& directoryEntry)
+	{
+		std::string data = localFile({});
+		const auto directoryOffset = static_cast<Poco::UInt32>(data.size());
+		data += centralDirectoryEntry(directoryEntry);
+		data += endOfCentralDirectory(directoryOffset);
+		return data;
+	};
 
 	std::ostringstream descriptorArchive;
 	Poco::BinaryWriter writer(descriptorArchive, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-	writer.writeRaw(localFile(VERSION_45, DATA_DESCRIPTOR_FLAG, ZipCommon::CM_STORE, ENTRY_NAME, 0, 0, zip64ExtraField({0, 0})));
+	writer.writeRaw(localFile({.versionNeeded = VERSION_45, .flags = DATA_DESCRIPTOR_FLAG, .compressedSize = 0, .uncompressedSize = 0, .extraField = zip64ExtraField({0, 0})}));
 	writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
 	writer << ENTRY_CRC << static_cast<Poco::UInt64>(ENTRY_SIZE) << OUT_OF_RANGE;
 
 	const std::string archives[] =
 	{
 		compressedSizeArchive,
-		localFile(VERSION_45, 0, ZipCommon::CM_STORE, ENTRY_NAME, ZipCommon::ZIP64_MAGIC, ENTRY_SIZE, zip64ExtraField({wrappingSize})),
-		localFile(VERSION_45, 0, ZipCommon::CM_STORE, ENTRY_NAME, ENTRY_SIZE, ZipCommon::ZIP64_MAGIC, outOfRangeField),
-		offsetArchive,
+		localFile({.versionNeeded = VERSION_45, .compressedSize = ZipCommon::ZIP64_MAGIC, .extraField = zip64ExtraField({wrappingSize})}),
+		localFile({.versionNeeded = VERSION_45, .uncompressedSize = ZipCommon::ZIP64_MAGIC, .extraField = outOfRangeField}),
+		directoryEntryArchive({.compressedSize = ZipCommon::ZIP64_MAGIC, .extraField = outOfRangeField}),
+		directoryEntryArchive({.uncompressedSize = ZipCommon::ZIP64_MAGIC, .extraField = outOfRangeField}),
+		directoryEntryArchive({.localHeaderOffset = ZipCommon::ZIP64_MAGIC, .extraField = outOfRangeField}),
 		descriptorArchive.str()
 	};
 	for (const std::string& archive: archives)
@@ -935,9 +940,9 @@ void ZipTest::testSizeOrOffsetOutOfRange()
 		}
 	}
 
-	std::string data = localFile(VERSION_45, 0, ZipCommon::CM_STORE, ENTRY_NAME, ZipCommon::ZIP64_MAGIC, ZipCommon::ZIP64_MAGIC, zip64ExtraField({ENTRY_SIZE, ENTRY_SIZE}));
+	std::string data = localFile({.versionNeeded = VERSION_45, .compressedSize = ZipCommon::ZIP64_MAGIC, .uncompressedSize = ZipCommon::ZIP64_MAGIC, .extraField = zip64ExtraField({ENTRY_SIZE, ENTRY_SIZE})});
 	const auto zip64DirectoryOffset = static_cast<Poco::UInt32>(data.size());
-	data += centralDirectoryEntry(0, ZipCommon::CM_STORE, ENTRY_NAME, ZipCommon::ZIP64_MAGIC, ZipCommon::ZIP64_MAGIC, ZipCommon::ZIP64_MAGIC, zip64ExtraField({ENTRY_SIZE, ENTRY_SIZE, 0}));
+	data += centralDirectoryEntry({.compressedSize = ZipCommon::ZIP64_MAGIC, .uncompressedSize = ZipCommon::ZIP64_MAGIC, .localHeaderOffset = ZipCommon::ZIP64_MAGIC, .extraField = zip64ExtraField({ENTRY_SIZE, ENTRY_SIZE, 0})});
 	data += endOfCentralDirectory(zip64DirectoryOffset);
 	std::istringstream istr(data);
 	ZipArchive arch(istr);
@@ -958,7 +963,7 @@ void ZipTest::testKeepEntryBeyondEndOfArchive()
 	Poco::TemporaryFile zipFile;
 	{
 		Poco::FileOutputStream out(zipFile.path());
-		out << localFile(VERSION_20, 0, ZipCommon::CM_STORE, ENTRY_NAME, ENTRY_SIZE + 1, ENTRY_SIZE);
+		out << localFile({.compressedSize = ENTRY_SIZE + 1});
 	}
 	// commit() writes the new archive to this file and leaves it behind when it fails.
 	Poco::TemporaryFile::registerForDeletion(zipFile.path() + ".tmp");
@@ -978,33 +983,48 @@ void ZipTest::testKeepEntryBeyondEndOfArchive()
 void ZipTest::testDataDescriptorEntryAbove4GiB()
 {
 	constexpr Poco::UInt64 OFFSET_ABOVE_4GIB = static_cast<Poco::UInt64>(1) << 32; // the local file header is at 0
-	std::ostringstream ostr;
-	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-	writer.writeRaw(localFile(VERSION_20, DATA_DESCRIPTOR_FLAG, ZipCommon::CM_STORE));
-	// The entry needs ZIP64 at its offset, so ZipInputStream expects a ZIP64 data descriptor.
-	writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
-	writer << ENTRY_CRC << static_cast<Poco::UInt64>(ENTRY_SIZE) << static_cast<Poco::UInt64>(ENTRY_SIZE);
-	const auto directoryOffset = static_cast<Poco::UInt32>(ostr.str().size());
-	writer.writeRaw(centralDirectoryEntry(DATA_DESCRIPTOR_FLAG, ZipCommon::CM_STORE, ENTRY_NAME, ENTRY_SIZE, ENTRY_SIZE, ZipCommon::ZIP64_MAGIC, zip64ExtraField({OFFSET_ABOVE_4GIB})));
-	writer.writeRaw(endOfCentralDirectory(directoryOffset));
-	std::istringstream istr(ostr.str());
+	constexpr std::string_view DEFLATED_DATA("\xcb\x48\xcd\xc9\xc9\x07\x00", 7); // raw deflate stream of ENTRY_DATA
+	const Entry entries[] =
+	{
+		{.flags = DATA_DESCRIPTOR_FLAG},
+		{.flags = DATA_DESCRIPTOR_FLAG, .method = ZipCommon::CM_DEFLATE, .data = DEFLATED_DATA, .compressedSize = static_cast<Poco::UInt32>(DEFLATED_DATA.size())}
+	};
+	for (const Entry& entry: entries)
+	{
+		std::ostringstream ostr;
+		Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+		writer.writeRaw(localFile(entry));
+		// The entry needs ZIP64 at its offset, so ZipInputStream expects a ZIP64 data descriptor.
+		writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
+		writer << ENTRY_CRC << static_cast<Poco::UInt64>(entry.compressedSize) << static_cast<Poco::UInt64>(entry.uncompressedSize);
+		const auto directoryOffset = static_cast<Poco::UInt32>(ostr.str().size());
+		Entry directoryEntry = entry;
+		directoryEntry.localHeaderOffset = ZipCommon::ZIP64_MAGIC;
+		directoryEntry.extraField = zip64ExtraField({OFFSET_ABOVE_4GIB});
+		writer.writeRaw(centralDirectoryEntry(directoryEntry));
+		writer.writeRaw(endOfCentralDirectory(directoryOffset));
+		std::istringstream istr(ostr.str());
 
-	ZipArchive arch(istr);
-	const auto it = arch.findHeader(std::string(ENTRY_NAME));
-	assertTrue (it != arch.headerEnd());
-	istr.clear();
-	ZipInputStream zipin(istr, it->second, true);
-	std::string data;
-	Poco::StreamCopier::copyToString(zipin, data);
-	assertTrue (data.empty());
+		ZipArchive arch(istr);
+		const auto it = arch.findHeader(std::string(ENTRY_NAME));
+		assertTrue (it != arch.headerEnd());
+		istr.clear();
+		ZipInputStream zipin(istr, it->second, true);
+		std::string data;
+		Poco::StreamCopier::copyToString(zipin, data);
+		// From the start position cut to 32 bits, the stream would return the data of the entry at offset 0;
+		// the entry itself is at 2^32, past the end of the stream.
+		assertTrue (data != ENTRY_DATA);
+	}
 }
 
 
 void ZipTest::testEmptyFileName()
 {
-	std::string data = localFile(VERSION_20, 0, ZipCommon::CM_STORE, "", ENTRY_SIZE, 0);
+	const Entry entry{.name = "", .uncompressedSize = 0};
+	std::string data = localFile(entry);
 	const auto directoryOffset = static_cast<Poco::UInt32>(data.size());
-	data += centralDirectoryEntry(0, ZipCommon::CM_STORE, "", ENTRY_SIZE, 0);
+	data += centralDirectoryEntry(entry);
 	data += endOfCentralDirectory(directoryOffset);
 	std::istringstream istr(data);
 
@@ -1026,7 +1046,7 @@ void ZipTest::testDuplicateFileNames()
 	std::string data;
 	for (const std::string& name: names)
 	{
-		data += localFile(VERSION_20, 0, ZipCommon::CM_STORE, name);
+		data += localFile({.name = name});
 	}
 	std::istringstream istr(data);
 
@@ -1041,106 +1061,90 @@ void ZipTest::testDuplicateFileNames()
 }
 
 
+void ZipTest::verifyTruncatedArchive(const std::vector<std::string>& records, std::string_view fileComment, std::string_view archiveComment)
+{
+	std::string data;
+	std::set<std::size_t> acceptedLengths;
+	for (const std::string& record: records)
+	{
+		// The parser takes a record signature that ends early for the end of the archive.
+		for (std::size_t i = 0; i < ZipCommon::HEADER_SIZE; ++i)
+		{
+			acceptedLengths.insert(data.size() + i);
+		}
+		data += record;
+	}
+	acceptedLengths.insert(data.size());
+
+	for (std::size_t length = 0; length <= data.size(); ++length)
+	{
+		std::istringstream istr(data.substr(0, length));
+		bool accepted = true;
+		try
+		{
+			ZipArchive arch(istr);
+			for (auto it = arch.headerBegin(); it != arch.headerEnd(); ++it)
+			{
+				assertTrue (it->second.getFileName() == ENTRY_NAME);
+			}
+			for (auto it = arch.fileInfoBegin(); it != arch.fileInfoEnd(); ++it)
+			{
+				assertTrue (it->second.getFileName() == ENTRY_NAME);
+				assertTrue (it->second.getFileComment() == fileComment);
+			}
+			// The end of central directory record is the last record of each archive.
+			assertTrue (arch.getZipComment() == (length == data.size() ? archiveComment : std::string_view()));
+		}
+		catch (const Poco::IOException&)
+		{
+			accepted = false;
+		}
+		if (accepted != acceptedLengths.contains(length))
+		{
+			fail("archive of " + std::to_string(data.size()) + " bytes cut after " + std::to_string(length) + " bytes: " + (accepted ? "accepted" : "rejected"));
+		}
+	}
+}
+
+
 void ZipTest::testTruncatedArchive()
 {
-	struct Archive
-	{
-		std::vector<std::string> records;
-		std::string_view fileComment;
-		std::string_view archiveComment;
-	};
-
 	constexpr std::string_view FILE_COMMENT = "file comment";
 	constexpr std::string_view ARCHIVE_COMMENT = "archive comment";
 	const std::string extraField("UT\0\0", 4); // an extended timestamp field without data
-	const std::string entry = localFile(VERSION_20, 0, ZipCommon::CM_STORE, ENTRY_NAME, ENTRY_SIZE, ENTRY_SIZE, extraField);
+	const std::string entry = localFile({.extraField = extraField});
+	verifyTruncatedArchive(
+		{
+			entry,
+			centralDirectoryEntry({.extraField = extraField, .comment = FILE_COMMENT}),
+			endOfCentralDirectory(static_cast<Poco::UInt32>(entry.size()), ARCHIVE_COMMENT)
+		},
+		FILE_COMMENT,
+		ARCHIVE_COMMENT);
 
-	const std::string plainEntry = localFile(VERSION_20, 0, ZipCommon::CM_STORE);
-	const std::string plainDirectory = centralDirectoryEntry(0, ZipCommon::CM_STORE);
+	const std::string plainEntry = localFile({});
+	const std::string plainDirectory = centralDirectoryEntry({});
 	const auto plainDirectoryOffset = static_cast<Poco::UInt32>(plainEntry.size());
+	verifyTruncatedArchive(
+		{
+			plainEntry,
+			plainDirectory,
+			// The parser reads a ZIP64 end of central directory record together with its locator.
+			zip64EndOfCentralDirectory(plainEntry.size() + plainDirectory.size(), plainDirectoryOffset),
+			endOfCentralDirectory(plainDirectoryOffset)
+		});
 
 	std::ostringstream descriptorEntry;
 	Poco::BinaryWriter writer(descriptorEntry, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-	writer.writeRaw(localFile(VERSION_20, DATA_DESCRIPTOR_FLAG, ZipCommon::CM_STORE));
+	writer.writeRaw(localFile({.flags = DATA_DESCRIPTOR_FLAG}));
 	writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
 	writer << ENTRY_CRC << ENTRY_SIZE << ENTRY_SIZE;
-
-	const Archive archives[] =
-	{
+	verifyTruncatedArchive(
 		{
-			{
-				entry,
-				centralDirectoryEntry(0, ZipCommon::CM_STORE, ENTRY_NAME, ENTRY_SIZE, ENTRY_SIZE, 0, extraField, FILE_COMMENT),
-				endOfCentralDirectory(static_cast<Poco::UInt32>(entry.size()), ARCHIVE_COMMENT)
-			},
-			FILE_COMMENT,
-			ARCHIVE_COMMENT
-		},
-		{
-			{
-				plainEntry,
-				plainDirectory,
-				// The parser reads a ZIP64 end of central directory record together with its locator.
-				zip64EndOfCentralDirectory(plainEntry.size() + plainDirectory.size(), plainDirectoryOffset),
-				endOfCentralDirectory(plainDirectoryOffset)
-			},
-			{},
-			{}
-		},
-		{
-			{
-				descriptorEntry.str(),
-				centralDirectoryEntry(DATA_DESCRIPTOR_FLAG, ZipCommon::CM_STORE),
-				endOfCentralDirectory(static_cast<Poco::UInt32>(descriptorEntry.str().size()))
-			},
-			{},
-			{}
-		}
-	};
-	for (const Archive& archive: archives)
-	{
-		std::string data;
-		std::set<std::size_t> acceptedLengths;
-		for (const std::string& record: archive.records)
-		{
-			// The parser takes a record signature that ends early for the end of the archive.
-			for (std::size_t i = 0; i < ZipCommon::HEADER_SIZE; ++i)
-			{
-				acceptedLengths.insert(data.size() + i);
-			}
-			data += record;
-		}
-		acceptedLengths.insert(data.size());
-
-		for (std::size_t length = 0; length <= data.size(); ++length)
-		{
-			std::istringstream istr(data.substr(0, length));
-			bool accepted = true;
-			try
-			{
-				ZipArchive arch(istr);
-				for (auto it = arch.headerBegin(); it != arch.headerEnd(); ++it)
-				{
-					assertTrue (it->second.getFileName() == ENTRY_NAME);
-				}
-				for (auto it = arch.fileInfoBegin(); it != arch.fileInfoEnd(); ++it)
-				{
-					assertTrue (it->second.getFileName() == ENTRY_NAME);
-					assertTrue (it->second.getFileComment() == archive.fileComment);
-				}
-				// The end of central directory record is the last record of each archive.
-				assertTrue (arch.getZipComment() == (length == data.size() ? archive.archiveComment : std::string_view()));
-			}
-			catch (const Poco::IOException&)
-			{
-				accepted = false;
-			}
-			if (accepted != acceptedLengths.contains(length))
-			{
-				fail("archive of " + std::to_string(data.size()) + " bytes cut after " + std::to_string(length) + " bytes: " + (accepted ? "accepted" : "rejected"));
-			}
-		}
-	}
+			descriptorEntry.str(),
+			centralDirectoryEntry({.flags = DATA_DESCRIPTOR_FLAG}),
+			endOfCentralDirectory(static_cast<Poco::UInt32>(descriptorEntry.str().size()))
+		});
 }
 
 
@@ -1151,14 +1155,14 @@ void ZipTest::testTruncatedDataDescriptor()
 
 	std::ostringstream entry;
 	Poco::BinaryWriter writer(entry, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-	writer.writeRaw(localFile(VERSION_20, DATA_DESCRIPTOR_FLAG, ZipCommon::CM_STORE));
+	writer.writeRaw(localFile({.flags = DATA_DESCRIPTOR_FLAG}));
 	const std::size_t descriptorOffset = entry.str().size();
 	writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
 	writer << ENTRY_CRC << ENTRY_SIZE << ENTRY_SIZE;
 
 	std::ostringstream zip64Entry;
 	Poco::BinaryWriter zip64Writer(zip64Entry, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-	zip64Writer.writeRaw(localFile(VERSION_45, DATA_DESCRIPTOR_FLAG, ZipCommon::CM_STORE, ENTRY_NAME, 0, 0, zip64ExtraField({0, 0})));
+	zip64Writer.writeRaw(localFile({.versionNeeded = VERSION_45, .flags = DATA_DESCRIPTOR_FLAG, .compressedSize = 0, .uncompressedSize = 0, .extraField = zip64ExtraField({0, 0})}));
 	const std::size_t zip64DescriptorOffset = zip64Entry.str().size();
 	zip64Writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
 	zip64Writer << ENTRY_CRC << static_cast<Poco::UInt64>(ENTRY_SIZE) << static_cast<Poco::UInt64>(ENTRY_SIZE);
@@ -1188,6 +1192,28 @@ void ZipTest::testTruncatedDataDescriptor()
 		assertEqual (ENTRY_CRC, header.getCRC());
 		assertEqual (ENTRY_SIZE, header.getCompressedSize());
 		assertEqual (ENTRY_SIZE, header.getUncompressedSize());
+	}
+}
+
+
+void ZipTest::testDataDescriptorCompressedSizeOutOfRange()
+{
+	SkipDataCallback callback;
+
+	std::ostringstream ostr;
+	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+	writer.writeRaw(localFile({.versionNeeded = VERSION_45, .flags = DATA_DESCRIPTOR_FLAG, .compressedSize = 0, .uncompressedSize = 0, .extraField = zip64ExtraField({0, 0})}));
+	writer.writeRaw(ZipDataInfo::HEADER, ZipCommon::HEADER_SIZE);
+	writer << ENTRY_CRC << OUT_OF_RANGE << static_cast<Poco::UInt64>(ENTRY_SIZE);
+	std::istringstream istr(ostr.str());
+	try
+	{
+		// Read through ZipArchive, the entry is rejected earlier, when SkipCallback fails to seek past its data.
+		ZipLocalFileHeader header(istr, false, callback);
+		fail("a compressed size out of range in a data descriptor must be rejected");
+	}
+	catch (const ZipException&)
+	{
 	}
 }
 
@@ -1232,6 +1258,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testDuplicateFileNames);
 	CppUnit_addTest(pSuite, ZipTest, testTruncatedArchive);
 	CppUnit_addTest(pSuite, ZipTest, testTruncatedDataDescriptor);
+	CppUnit_addTest(pSuite, ZipTest, testDataDescriptorCompressedSizeOutOfRange);
 	CppUnit_addTest(pSuite, ZipTest, testSyncAtEndOfArchive);
 
 	return pSuite;

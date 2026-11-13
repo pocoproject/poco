@@ -17,6 +17,8 @@
 #include "Poco/Zip/Zip.h"
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "CppUnit/TestCase.h"
+#include <string_view>
+#include <vector>
 
 
 class ZipTest: public CppUnit::TestCase
@@ -56,6 +58,7 @@ public:
 	void testDuplicateFileNames();
 	void testTruncatedArchive();
 	void testTruncatedDataDescriptor();
+	void testDataDescriptorCompressedSizeOutOfRange();
 	void testSyncAtEndOfArchive();
 
 	void setUp();
@@ -66,6 +69,11 @@ public:
 	static std::string getTestFile(const std::string& directory, const std::string& type);
 
 private:
+	void verifyTruncatedArchive(const std::vector<std::string>& records, std::string_view fileComment = {}, std::string_view archiveComment = {});
+		/// Checks that a prefix of the archive made of the records is read, with the entry and, when it is
+		/// complete, the given comments, exactly when it ends at a record boundary or within a record
+		/// signature, and that every other prefix is rejected with an IOException.
+
 	void onDecompressError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info);
 
 	int _errCnt;
