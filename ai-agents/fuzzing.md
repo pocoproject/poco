@@ -39,7 +39,8 @@ file.
   later run reads ([good-fuzz-target.md][global-state]). One-time initialization is a function-local static object
   ([good-fuzz-target.md][one-time-init]).
 - **No file system access and no output.** A target uses in-memory APIs and writes nothing to `stdout` or `stderr`
-  ([good-fuzz-target.md][io]). Only where the API under test needs a path, the target uses one private directory below
+  ([good-fuzz-target.md][io]); a check that ends the run writes one line to `stderr` that says what failed, directly
+  before `std::abort()`. Only where the API under test needs a path, the target uses one private directory below
   `/tmp`, created once per process and emptied after every run; on OSS-Fuzz nothing else is writable
   ([fuzzer environment][file-system]). The input must not be able to name a file that the library opens (include
   directives, external entities).
@@ -55,10 +56,10 @@ file.
   exception types with which that API answers malformed input (for example `Poco::SyntaxException`,
   `Poco::DataFormatException`, `Poco::JSON::JSONException`). Any other exception ends the run and is a finding.
   `catch (const std::exception&)` and `catch (const Poco::Exception&)` also hide `Poco::AssertionViolationException`,
-  `Poco::NullPointerException` and `Poco::BugcheckException`, which report a defect in the library. The helper
-  `attempt` in `AI/MCP/fuzzing/ClientFuzz.cpp` shows the form of the catch: named types with empty handlers and nothing
-  broader. It has one list of types for all its calls; a target whose calls differ in what they throw has one list per
-  call. The fuzzer documentation has no rule on exceptions; this one is a decision of the project.
+  `Poco::NullPointerException` and `Poco::BugcheckException`, which report a defect in the library. The helpers
+  `attempt` and `attemptParsing` in `AI/MCP/fuzzing/ClientFuzz.cpp` show the form of the catch: named types with empty
+  handlers and nothing broader, and one list of types for each group of calls that answer malformed input with the same
+  types. The fuzzer documentation has no rule on exceptions; this one is a decision of the project.
 - **A round trip is a check.** A target that writes what it parsed and parses the result again calls `std::abort()` when
   the second parse fails or the two results differ. `assert()` and `poco_assert_dbg()` are compiled out in the build of
   `build/script/oss-fuzz-build.sh` and check nothing there.
