@@ -572,7 +572,7 @@ int ThreadImpl::reverseMapPrio(int prio, int policy)
 
 bool ThreadImpl::setAffinityImpl(int coreID)
 {
-#if POCO_OS == POCO_OS_LINUX
+#if (POCO_OS == POCO_OS_LINUX) && !defined(POCO_EMSCRIPTEN)
 	int numCores = sysconf(_SC_NPROCESSORS_ONLN);
 	if (coreID < 0 || coreID >= numCores)
 		return false;
@@ -590,7 +590,7 @@ bool ThreadImpl::setAffinityImpl(int coreID)
 
 int ThreadImpl::getAffinityImpl() const
 {
-#if POCO_OS == POCO_OS_LINUX
+#if (POCO_OS == POCO_OS_LINUX) && !defined(POCO_EMSCRIPTEN)
 	cpu_set_t cpuset;
 	CPU_ZERO(&cpuset);
 	if (0 == pthread_getaffinity_np(_pData->thread, sizeof(cpu_set_t), &cpuset))

@@ -31,13 +31,13 @@ NamedEventImpl::~NamedEventImpl()
 
 void NamedEventImpl::setImpl()
 {
-	throw NotImplementedException("NamedEvent::set() not available on Android");
+	throw NotImplementedException("NamedEvent::set() not available on this platform");
 }
 
 
 void NamedEventImpl::waitImpl()
 {
-	throw NotImplementedException("NamedEvent::wait() not available on Android");
+	throw NotImplementedException("NamedEvent::wait() not available on this platform");
 }
 
 

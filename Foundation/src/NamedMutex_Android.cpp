@@ -31,19 +31,19 @@ NamedMutexImpl::~NamedMutexImpl()
 
 void NamedMutexImpl::lockImpl()
 {
-	throw NotImplementedException("NamedMutex::lock() is not supported on Android");
+	throw NotImplementedException("NamedMutex::lock() is not supported on this platform");
 }
 
 
 bool NamedMutexImpl::tryLockImpl()
 {
-	throw NotImplementedException("NamedMutex::tryLock() is not supported on Android");
+	throw NotImplementedException("NamedMutex::tryLock() is not supported on this platform");
 }
 
 
 void NamedMutexImpl::unlockImpl()
 {
-	throw NotImplementedException("NamedMutex::unlock() is not supported on Android");
+	throw NotImplementedException("NamedMutex::unlock() is not supported on this platform");
 }
 
 

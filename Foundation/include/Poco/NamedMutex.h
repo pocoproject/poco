@@ -24,7 +24,7 @@
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/NamedMutex_WIN32U.h"
-#elif POCO_OS == POCO_OS_ANDROID
+#elif (POCO_OS == POCO_OS_ANDROID) || defined(POCO_EMSCRIPTEN)
 #include "Poco/NamedMutex_Android.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/NamedMutex_UNIX.h"
@@ -51,6 +51,9 @@ class Foundation_API NamedMutex: private NamedMutexImpl
 	/// There should not be more than one instance of NamedMutex for
 	/// a given name in a process. Otherwise, the instances may
 	/// interfere with each other.
+	///
+	/// On Android and Emscripten, lock(), tryLock() and unlock() throw a
+	/// NotImplementedException.
 {
 public:
 	using ScopedLock = Poco::ScopedLock<NamedMutex>;

@@ -95,7 +95,8 @@ interface. Read `Thread_POSIX.h` for the full set of `ThreadImpl` functions (`st
 
 `_WIN32U` files use the wide-character Windows API through `Poco::UnicodeConverter`; `_DUMMY` files are empty
 implementations for platforms without the facility. Classes with short platform code keep it inline under `#if`, for
-example `Timestamp`, `Clock`, `LocalDateTime`, `Debugger` and `DirectoryWatcher`.
+example `Timestamp`, `Clock`, `LocalDateTime`, `Debugger` and `DirectoryWatcher`. The `_Android` files of
+`NamedEvent` and `NamedMutex` throw `NotImplementedException` and are also used for Emscripten.
 
 ## Net
 

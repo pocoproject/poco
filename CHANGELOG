@@ -338,6 +338,10 @@ Bug Fixes and Improvements:
   and Poco::Net::Socket::select() use poll() instead of epoll, Poco::DirectoryWatcher scans the
   directory periodically instead of using inotify, BUILD_SHARED_LIBS defaults to OFF, and
   Poco::Thread does not reference the scheduling functions in a program built without -pthread.
+  Emscripten builds are compiled and linked with -pthread and -fexceptions by default
+  (POCO_EMSCRIPTEN_FLAGS), and programs that link the POCO CMake targets get these flags too.
+  For Emscripten, Poco::Thread::setAffinity() returns false, and the methods of
+  Poco::NamedEvent and Poco::NamedMutex throw Poco::NotImplementedException, as on Android.
 
 
 Release 1.15.4 (2026-09-22)
