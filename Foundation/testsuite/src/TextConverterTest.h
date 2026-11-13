@@ -33,6 +33,8 @@ public:
 	void testCP1250toUTF8();
 	void testCP1251toUTF8();
 	void testCP1252toUTF8();
+	void testInvalidBuffer();
+	void testEmptyBuffer();
 	void testErrors();
 
 	void setUp();
