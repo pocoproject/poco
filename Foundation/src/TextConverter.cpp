@@ -106,16 +106,4 @@ int TextConverter::convert(const void* source, int length, std::string& destinat
 }
 
 
-int TextConverter::convert(const std::string& source, std::string& destination)
-{
-	return convert(source, destination, nullptr);
-}
-
-
-int TextConverter::convert(const void* source, int length, std::string& destination)
-{
-	return convert(source, length, destination, nullptr);
-}
-
-
 } // namespace Poco
