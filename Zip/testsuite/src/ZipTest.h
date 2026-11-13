@@ -60,6 +60,7 @@ public:
 	void testTruncatedDataDescriptor();
 	void testDataDescriptorCompressedSizeOutOfRange();
 	void testSyncAtEndOfArchive();
+	void testNulCharacterInName();
 
 	void setUp();
 	void tearDown();

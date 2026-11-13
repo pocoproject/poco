@@ -228,6 +228,8 @@ void ZipUtil::syncDataDescriptor(std::istream & in, bool force64)
 
 void ZipUtil::verifyZipEntryFileName(const std::string& fn)
 {
+	if (fn.find('\0') != std::string::npos)
+		throw ZipException("Illegal entry name containing a NUL character");
 	if (fn.find("\\") != std::string::npos)
 		throw ZipException("Illegal entry name " + fn + " containing \\");
 	if (fn == "/")

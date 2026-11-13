@@ -555,6 +555,8 @@ void ZipTest::testValidPath()
 	assertTrue (!ZipCommon::isValidPath("~/file.txt"));
 	assertTrue (!ZipCommon::isValidPath("some/dir/or/../another/file.txt"));
 	assertTrue (!ZipCommon::isValidPath("C:\\Windows\\system32"));
+	assertTrue (!ZipCommon::isValidPath(std::string("a\0b", 3)));
+	assertTrue (!ZipCommon::isValidPath(std::string("..\0/x", 5)));
 }
 
 
@@ -1231,6 +1233,55 @@ void ZipTest::testSyncAtEndOfArchive()
 }
 
 
+void ZipTest::testNulCharacterInName()
+{
+	// File system calls end a name at a NUL character.
+	constexpr std::string_view FILE_NAME("a\0b.txt", 7);
+	constexpr std::string_view PATH_NAME("d\0/b.txt", 8);
+	std::string data = localFile({.name = FILE_NAME});
+	const auto secondOffset = static_cast<Poco::UInt32>(data.size());
+	data += localFile({.name = PATH_NAME});
+	const auto directoryOffset = static_cast<Poco::UInt32>(data.size());
+	data += centralDirectoryEntry({.name = FILE_NAME});
+	data += centralDirectoryEntry({.name = PATH_NAME, .localHeaderOffset = secondOffset});
+	data += endOfCentralDirectory(directoryOffset);
+
+	{
+		std::istringstream istr(data);
+		Poco::TemporaryFile outputDir;
+		Decompress dec(istr, outputDir.path());
+		dec.EError += Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>>(this, &ZipTest::onDecompressError);
+		dec.decompressAllFiles(false);
+		dec.EError -= Poco::Delegate<ZipTest, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>>(this, &ZipTest::onDecompressError);
+		assertEqual (2, _errCnt);
+		assertTrue (dec.mapping().empty());
+		std::vector<std::string> files;
+		outputDir.list(files);
+		assertTrue (files.empty());
+	}
+
+	{
+		Poco::TemporaryFile zipFile;
+		{
+			Poco::FileOutputStream out(zipFile.path());
+			out << data;
+		}
+		// commit() writes the new archive to this file and leaves it behind when it fails.
+		Poco::TemporaryFile::registerForDeletion(zipFile.path() + ".tmp");
+
+		ZipManipulator zm(zipFile.path(), false);
+		try
+		{
+			zm.commit();
+			fail("an entry name with a NUL character must not be copied");
+		}
+		catch (const ZipException&)
+		{
+		}
+	}
+}
+
+
 CppUnit::Test* ZipTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ZipTest");
@@ -1264,6 +1315,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testTruncatedDataDescriptor);
 	CppUnit_addTest(pSuite, ZipTest, testDataDescriptorCompressedSizeOutOfRange);
 	CppUnit_addTest(pSuite, ZipTest, testSyncAtEndOfArchive);
+	CppUnit_addTest(pSuite, ZipTest, testNulCharacterInName);
 
 	return pSuite;
 }
