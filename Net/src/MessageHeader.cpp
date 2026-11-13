@@ -17,10 +17,10 @@
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
 #include "Poco/TextConverter.h"
-#include "Poco/StringTokenizer.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/UTF8Encoding.h"
 #include <algorithm>
+#include <charconv>
 #include <sstream>
 #include <string_view>
 
@@ -42,231 +42,115 @@ namespace
 	}
 
 
-	bool isValidCharsetToken(const std::string& s)
+	struct EncodedWord
 	{
-		if (s.empty())
-			return false;
-		for (unsigned char c : s)
-		{
-			if (c <= 0x20 || c >= 0x7F ||
-				std::string_view("()<>@,;:\\\"/[]?.=").find(static_cast<char>(c)) != std::string_view::npos)
-			{
-				return false;
-			}
-		}
-		return true;
+		std::string_view charset;
+		char encoding = 0; // 'B' or 'Q'
+		std::string_view text;
+	};
+
+
+	constexpr std::string_view ESPECIALS("()<>@,;:\"/[]?.="); // RFC 2047, section 2
+
+
+	bool isValidCharset(std::string_view s)
+	{
+		return !s.empty() && std::all_of(s.begin(), s.end(),
+			[](char c) { return Poco::Ascii::hasProperties(c, Poco::Ascii::ACP_GRAPH) && ESPECIALS.find(c) == std::string_view::npos; });
 	}
 
 
-	bool isValidEncodedText(const std::string& s)
+	bool isValidEncodedText(std::string_view s)
 	{
-		if (s.empty())
-			return false;
-		for (unsigned char c : s)
-		{
-			if (c <= 0x20 || c >= 0x7F || c == '?')
-			{
-				return false;
-			}
-		}
-		return true;
+		return !s.empty() && std::all_of(s.begin(), s.end(),
+			[](char c) { return Poco::Ascii::hasProperties(c, Poco::Ascii::ACP_GRAPH) && c != '?'; });
 	}
 
 
-	bool isValidBase64Encoding(const std::string& s)
+	bool isValidBase64(std::string_view s)
 	{
-		if (s.empty() || (s.size() % 4) != 0)
-			return false;
-
-		const auto isB64Char = [](char c)
-		{
-			return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-				(c >= '0' && c <= '9') || c == '+' || c == '/';
-		};
-
-		std::size_t n = s.size();
-		if (s[n - 1] == '=')
-		{
-			if (s[n - 2] == '=')
-			{
-				if (n < 4 || s[n - 3] == '=')
-					return false;
-				for (std::size_t i = 0; i < n - 2; ++i)
-				{
-					if (!isB64Char(s[i]))
-						return false;
-				}
-				return true;
-			}
-			else
-			{
-				for (std::size_t i = 0; i < n - 1; ++i)
-				{
-					if (!isB64Char(s[i]))
-						return false;
-				}
-				return true;
-			}
-		}
-
-		for (std::size_t i = 0; i < n; ++i)
-		{
-			if (!isB64Char(s[i]))
-				return false;
-		}
-		return true;
+		if (s.empty() || s.size() % 4 != 0) return false;
+		const std::size_t dataLength = s.find_last_not_of('=') + 1;
+		if (s.size() - dataLength > 2) return false;
+		return std::all_of(s.begin(), s.begin() + dataLength,
+			[](char c) { return Poco::Ascii::isAlphaNumeric(c) || c == '+' || c == '/'; });
 	}
 
 
-	bool parseEncodedWord(const std::string& text, std::size_t pos, std::size_t& endPos)
+	// word is "charset?encoding?encoded-text", without the enclosing "=?" and "?=".
+	bool parseEncodedWord(std::string_view word, EncodedWord& parts)
 	{
-		if (pos + 2 >= text.size() || text.compare(pos, 2, "=?") != 0)
-			return false;
-
-		std::size_t pos1 = text.find('?', pos + 2);
-		if (pos1 == std::string::npos)
-			return false;
-
-		std::size_t pos2 = text.find('?', pos1 + 1);
-		if (pos2 == std::string::npos)
-			return false;
-
-		std::size_t pos3 = text.find("?=", pos2 + 1);
-		if (pos3 == std::string::npos)
-			return false;
-
-		std::string wordCharset = text.substr(pos + 2, pos1 - (pos + 2));
-		std::string wordEncoding = text.substr(pos1 + 1, pos2 - (pos1 + 1));
-		std::string wordText = text.substr(pos2 + 1, pos3 - (pos2 + 1));
-
-		if (!isValidCharsetToken(wordCharset) || !isValidEncodedText(wordText))
-		{
-			return false;
-		}
-
-		if (wordEncoding.size() != 1 ||
-			(wordEncoding[0] != 'B' && wordEncoding[0] != 'b' &&
-			 wordEncoding[0] != 'Q' && wordEncoding[0] != 'q'))
-		{
-			return false;
-		}
-
-		endPos = pos3 + 2;
-		return true;
+		const std::size_t pos1 = word.find('?');
+		if (pos1 == std::string_view::npos) return false;
+		const std::size_t pos2 = word.find('?', pos1 + 1);
+		if (pos2 == std::string_view::npos) return false;
+		const std::string_view encoding = word.substr(pos1 + 1, pos2 - pos1 - 1);
+		if (encoding.size() != 1) return false;
+		parts.charset = word.substr(0, pos1);
+		parts.encoding = static_cast<char>(Poco::Ascii::toUpper(encoding[0]));
+		parts.text = word.substr(pos2 + 1);
+		if (parts.encoding != 'B' && parts.encoding != 'Q') return false;
+		return isValidCharset(parts.charset) && isValidEncodedText(parts.text);
 	}
 
 
-	bool decodeRFC2047Internal(const std::string& ins, std::string& outs, const std::string& charset_to)
+	bool decodeEncodedWord(const EncodedWord& word, const std::string& toCharset, std::string& decoded)
 	{
-		std::string tempout;
-		std::string raw = ins;
-		if (raw.size() >= 4 && raw.compare(0, 2, "=?") == 0 && raw.compare(raw.size() - 2, 2, "?=") == 0)
+		std::string bytes;
+		if (word.encoding == 'B')
 		{
-			raw = raw.substr(2, raw.size() - 4);
+			if (!isValidBase64(word.text)) return false;
+			std::istringstream istr{std::string(word.text)};
+			Base64Decoder decoder(istr);
+			for (char c; decoder.get(c);) bytes += c;
 		}
-
-		StringTokenizer tokens(raw, "?");
-		if (tokens.count() != 3)
+		else
 		{
-			outs = ins;
-			return false;
-		}
-
-		std::string charset = toUpper(tokens[0]);
-		std::string encoding = toUpper(tokens[1]);
-		std::string text = tokens[2];
-
-		if (!isValidCharsetToken(charset) || !isValidEncodedText(text) ||
-			encoding.size() != 1 || (encoding[0] != 'B' && encoding[0] != 'Q'))
-		{
-			outs = ins;
-			return false;
-		}
-
-		std::istringstream istr(text);
-
-		try
-		{
-			if (encoding == "B")
+			for (std::size_t i = 0; i < word.text.size(); ++i)
 			{
-				if (!isValidBase64Encoding(text))
+				const char c = word.text[i];
+				if (c == '_')
 				{
-					outs = ins;
-					return false;
+					bytes += ' ';
 				}
-
-				// Base64 encoding.
-				Base64Decoder decoder(istr);
-				decoder.exceptions(std::ios::badbit);
-				for (char c; decoder.get(c); tempout += c) {}
-				if (decoder.bad() || tempout.empty())
+				else if (c == '=')
 				{
-					outs = ins;
-					return false;
+					if (i + 2 >= word.text.size()) return false;
+					const char* first = word.text.data() + i + 1;
+					unsigned int value = 0;
+					if (std::from_chars(first, first + 2, value, 16).ptr != first + 2) return false;
+					bytes += static_cast<char>(value);
+					i += 2;
+				}
+				else
+				{
+					bytes += c;
 				}
 			}
-			else if (encoding == "Q")
-			{
-				// Quoted encoding.
-				for (char c; istr.get(c);)
-				{
-					if (c == '_')
-					{
-						// RFC 2047 _ is a space.
-						tempout += " ";
-						continue;
-					}
-
-					if (c == '=')
-					{
-						char h1, h2;
-						if (!istr.get(h1) || !istr.get(h2) ||
-							!Poco::Ascii::isHexDigit(h1) || !Poco::Ascii::isHexDigit(h2))
-						{
-							outs = ins;
-							return false;
-						}
-						char hex[3] = {h1, h2, '\0'};
-						tempout += static_cast<char>(::strtol(hex, nullptr, 16));
-						continue;
-					}
-					tempout += c;
-				}
-			}
-			else
-			{
-				// Wrong encoding
-				outs = ins;
-				return false;
-			}
-		}
-		catch (...)
-		{
-			outs = ins;
-			return false;
 		}
 
-		// convert to the right charset.
-		if (charset != charset_to)
+		std::string result;
+		const std::string charset(word.charset);
+		if (Poco::icompare(charset, toCharset) != 0)
 		{
 			try
 			{
 				TextEncoding& enc = TextEncoding::byName(charset);
-				TextEncoding& dec = TextEncoding::byName(charset_to);
+				TextEncoding& dec = TextEncoding::byName(toCharset);
 				TextConverter converter(enc, dec);
-				converter.convert(tempout, outs);
+				converter.convert(bytes, result);
 			}
 			catch (...)
 			{
 				// Unsupported or unknown encoding; fall back to raw decoded text
-				outs = tempout;
+				result = bytes;
 			}
 		}
 		else
 		{
-			// No conversion necessary.
-			outs = tempout;
+			result = std::move(bytes);
 		}
+		decoded = std::move(result);
 		return true;
 	}
 }
@@ -631,9 +515,17 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 }
 
 
-void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset_to)
+void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, const std::string& toCharset)
 {
-	decodeRFC2047Internal(ins, outs, charset_to);
+	std::string_view word(ins);
+	if (word.size() >= 4 && word.starts_with("=?") && word.ends_with("?="))
+		word = word.substr(2, word.size() - 4);
+	EncodedWord parts;
+	std::string decoded;
+	if (parseEncodedWord(word, parts) && decodeEncodedWord(parts, toCharset, decoded))
+		outs = std::move(decoded);
+	else
+		outs = ins;
 }
 
 
@@ -641,63 +533,36 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 {
 	std::string outs;
 	std::size_t cur = 0;
-	bool prevWasEncoded = false;
-
-	while (cur < text.size())
+	bool prevDecoded = false;
+	std::size_t pos = 0;
+	while ((pos = text.find("=?", cur)) != std::string::npos)
 	{
-		std::size_t pos = text.find("=?", cur);
-		if (pos == std::string::npos)
+		// The encoded text cannot contain '?', so the word ends at the third '?'
+		// after "=?". This keeps the scan linear for values with many "=?" and no "?=".
+		std::size_t end = pos + 1;
+		for (int i = 0; i < 3 && end != std::string::npos; ++i)
+			end = text.find('?', end + 1);
+		EncodedWord parts;
+		std::string decoded;
+		const bool isDecoded = end != std::string::npos && end + 1 < text.size() && text[end + 1] == '='
+			&& parseEncodedWord(std::string_view(text).substr(pos + 2, end - pos - 2), parts)
+			&& decodeEncodedWord(parts, charset, decoded);
+		if (!isDecoded)
 		{
-			outs.append(text, cur, std::string::npos);
-			break;
-		}
-
-		std::size_t endPos = 0;
-		bool isEncoded = parseEncodedWord(text, pos, endPos);
-
-		std::string_view between;
-		bool onlyLWS = false;
-		if (pos > cur)
-		{
-			between = std::string_view(text.data() + cur, pos - cur);
-			onlyLWS = (between.find_first_not_of(" \t\r\n\v") == std::string_view::npos);
-		}
-
-		if (!isEncoded)
-		{
-			if (!between.empty())
-			{
-				outs.append(between);
-			}
-			outs.append("=?");
+			outs.append(text, cur, pos + 2 - cur);
 			cur = pos + 2;
-			prevWasEncoded = false;
+			prevDecoded = false;
 			continue;
 		}
-
-		std::string encodedWord = text.substr(pos, endPos - pos);
-		std::string decoded;
-		if (decodeRFC2047Internal(encodedWord, decoded, charset))
-		{
-			if (!between.empty() && !(prevWasEncoded && onlyLWS))
-			{
-				outs.append(between);
-			}
-			outs.append(decoded);
-			prevWasEncoded = true;
-		}
-		else
-		{
-			if (!between.empty())
-			{
-				outs.append(between);
-			}
-			outs.append(encodedWord);
-			prevWasEncoded = false;
-		}
-
-		cur = endPos;
+		const std::string_view between(text.data() + cur, pos - cur);
+		// RFC 2047, section 6.2: white space between two decoded words is removed.
+		if (!prevDecoded || between.find_first_not_of(" \t\r\n") != std::string_view::npos)
+			outs.append(between);
+		outs.append(decoded);
+		prevDecoded = true;
+		cur = end + 2;
 	}
+	outs.append(text, cur);
 	return outs;
 }
 
