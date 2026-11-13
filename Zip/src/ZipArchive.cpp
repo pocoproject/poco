@@ -18,6 +18,7 @@
 #include <cstring>
 #include <map>
 #include <string>
+#include <vector>
 
 
 namespace Poco::Zip {
@@ -121,6 +122,10 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 	bool haveSynced = false;
 	std::map<std::string, int> entrySuffixes;
 	std::map<std::string, int> infoSuffixes;
+	// Local entries and central directory records of one name are paired in their order,
+	// because the keys of duplicate entries in _entries are generated names.
+	std::map<std::string, std::vector<FileHeaders::iterator>> entriesByName;
+	std::map<std::string, std::size_t> infosByName;
 	while (in.good() && !in.eof())
 	{
 		char header[ZipCommon::HEADER_SIZE]={'\x00', '\x00', '\x00', '\x00'};
@@ -130,16 +135,18 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 		if (std::memcmp(header, ZipLocalFileHeader::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipLocalFileHeader entry(in, true, pc);
-			_entries.insert(std::make_pair(uniqueName(_entries, entrySuffixes, entry.getFileName()), entry));
+			const auto it = _entries.insert(std::make_pair(uniqueName(_entries, entrySuffixes, entry.getFileName()), entry)).first;
+			entriesByName[entry.getFileName()].push_back(it);
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipFileInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipFileInfo info(in, true);
-			FileHeaders::iterator it = _entries.find(info.getFileName());
-			if (it != _entries.end())
+			const std::size_t rank = infosByName[info.getFileName()]++;
+			const auto itEntries = entriesByName.find(info.getFileName());
+			if (itEntries != entriesByName.end() && itEntries->second.size() > rank)
 			{
-				it->second.setStartPos(info.getOffset());
+				itEntries->second[rank]->second.setStartPos(info.getOffset());
 			}
 			_infos.insert(std::make_pair(uniqueName(_infos, infoSuffixes, info.getFileName()), info));
 			haveSynced = false;

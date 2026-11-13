@@ -32,6 +32,7 @@
 #include "Poco/BinaryWriter.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/Exception.h"
+#include "Poco/Checksum.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include <algorithm>
@@ -94,6 +95,7 @@ namespace
 		ZipCommon::CompressionMethod method = ZipCommon::CM_STORE;
 		std::string_view name = ENTRY_NAME;
 		std::string_view data = ENTRY_DATA;          // written after the local file header
+		Poco::UInt32 crc = ENTRY_CRC;
 		Poco::UInt32 compressedSize = ENTRY_SIZE;
 		Poco::UInt32 uncompressedSize = ENTRY_SIZE;
 		Poco::UInt32 localHeaderOffset = 0;          // central directory entry only
@@ -109,7 +111,7 @@ namespace
 		Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 		writer.writeRaw(ZipLocalFileHeader::HEADER, ZipCommon::HEADER_SIZE);
 		writer << entry.versionNeeded << entry.flags << static_cast<Poco::UInt16>(entry.method);
-		writer << ENTRY_TIME << ENTRY_DATE << ENTRY_CRC << entry.compressedSize << entry.uncompressedSize;
+		writer << ENTRY_TIME << ENTRY_DATE << entry.crc << entry.compressedSize << entry.uncompressedSize;
 		writer << static_cast<Poco::UInt16>(entry.name.size()) << static_cast<Poco::UInt16>(entry.extraField.size());
 		writer.writeRaw(entry.name.data(), entry.name.size());
 		writer.writeRaw(entry.extraField.data(), entry.extraField.size());
@@ -125,7 +127,7 @@ namespace
 		Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 		writer.writeRaw(ZipFileInfo::HEADER, ZipCommon::HEADER_SIZE);
 		writer << entry.versionNeeded << entry.versionNeeded << entry.flags << static_cast<Poco::UInt16>(entry.method);
-		writer << ENTRY_TIME << ENTRY_DATE << ENTRY_CRC << entry.compressedSize << entry.uncompressedSize;
+		writer << ENTRY_TIME << ENTRY_DATE << entry.crc << entry.compressedSize << entry.uncompressedSize;
 		writer << static_cast<Poco::UInt16>(entry.name.size()) << static_cast<Poco::UInt16>(entry.extraField.size());
 		writer << static_cast<Poco::UInt16>(entry.comment.size());
 		writer.writeRaw(std::string(8, '\0'));                 // disk, attributes
@@ -1282,6 +1284,43 @@ void ZipTest::testNulCharacterInName()
 }
 
 
+void ZipTest::testDuplicateNamesDataOffsets()
+{
+	const std::string_view contents[] = { "first", "second", "third" };
+	std::vector<Entry> entries;
+	std::string data;
+	for (const std::string_view content: contents)
+	{
+		Poco::Checksum crc(Poco::Checksum::TYPE_CRC32);
+		crc.update(content.data(), content.size());
+		const auto size = static_cast<Poco::UInt32>(content.size());
+		entries.push_back({.data = content, .crc = crc.checksum(), .compressedSize = size, .uncompressedSize = size, .localHeaderOffset = static_cast<Poco::UInt32>(data.size())});
+		data += localFile(entries.back());
+	}
+	const auto directoryOffset = static_cast<Poco::UInt32>(data.size());
+	for (const Entry& entry: entries)
+	{
+		data += centralDirectoryEntry(entry);
+	}
+	data += endOfCentralDirectory(directoryOffset);
+	std::istringstream istr(data);
+
+	ZipArchive arch(istr);
+	const std::string names[] = { "a.txt", "a.txt.duplicate-1", "a.txt.duplicate-2" };
+	for (std::size_t i = 0; i < std::size(names); ++i)
+	{
+		const auto it = arch.findHeader(names[i]);
+		assertTrue (it != arch.headerEnd());
+		istr.clear();
+		ZipInputStream zipin(istr, it->second, true);
+		std::string content;
+		Poco::StreamCopier::copyToString(zipin, content);
+		assertEqual (std::string(contents[i]), content);
+		assertTrue (zipin.crcValid());
+	}
+}
+
+
 CppUnit::Test* ZipTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ZipTest");
@@ -1316,6 +1355,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testDataDescriptorCompressedSizeOutOfRange);
 	CppUnit_addTest(pSuite, ZipTest, testSyncAtEndOfArchive);
 	CppUnit_addTest(pSuite, ZipTest, testNulCharacterInName);
+	CppUnit_addTest(pSuite, ZipTest, testDuplicateNamesDataOffsets);
 
 	return pSuite;
 }

@@ -61,6 +61,7 @@ public:
 	void testDataDescriptorCompressedSizeOutOfRange();
 	void testSyncAtEndOfArchive();
 	void testNulCharacterInName();
+	void testDuplicateNamesDataOffsets();
 
 	void setUp();
 	void tearDown();
