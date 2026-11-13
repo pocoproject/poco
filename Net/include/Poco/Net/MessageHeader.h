@@ -211,9 +211,9 @@ public:
 		/// appended to result, enclosed in double-quotes.
 		/// Otherwise, the value is appended to result as-is.
 
-	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset = "UTF-8");
+	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& toCharset = "UTF-8");
 		/// Decodes a single RFC 2047 encoded word, with or without the enclosing
-		/// "=?" and "?=", and converts it to the given charset. If ins is not a
+		/// "=?" and "?=", and converts it to toCharset. If ins is not a
 		/// well-formed encoded word with the encoding B or Q, or does not decode,
 		/// outs receives ins unchanged.
 
