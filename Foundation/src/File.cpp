@@ -433,11 +433,28 @@ void File::createDirectories()
 	{
 		Path p(getPathImpl());
 		p.makeDirectory();
-		if (p.depth() > 1)
+		const int depth = p.depth();
+		// Loops instead of a recursion, so that the stack use does not grow with the depth of the path.
+		// The deepest existing level is searched for from the bottom up and only the levels below it are
+		// created, so that the levels above it, which may not be accessible, are not touched.
+		Path dir(p);
+		int existing = depth;
+		while (existing > 0)
 		{
-			p.makeParent();
-			File f(p);
-			f.createDirectories();
+			dir.popDirectory();
+			--existing;
+			if (existing > 0 && File(dir).exists()) break;
+		}
+		for (int i = existing; i < depth - 1; ++i)
+		{
+			dir.pushDirectory(p.directory(i));
+			try
+			{
+				(void) File(dir).createDirectory();
+			}
+			catch (FileExistsException&)
+			{
+			}
 		}
 		try
 		{
