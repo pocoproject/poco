@@ -34,6 +34,15 @@ namespace Poco::Crypto {
 
 
 namespace {
+/// Helper to call ASN1_STRING_get_length() on OpenSSL 4.1+ and ASN1_STRING_length() otherwise.
+inline std::size_t asn1StringLength(const ASN1_STRING* pString)
+{
+#if POCO_OPENSSL_VERSION_PREREQ(4, 1, 0)
+	return ASN1_STRING_get_length(pString);
+#else
+	return ASN1_STRING_length(pString);
+#endif
+}
 
 // ASN1 UTCTime format: YYMMDDHHMMSSZ (RFC 5280 Section 4.1.2.5.1)
 const std::string ASN1_UTCTIME_FORMAT("%y%m%d%H%M%S%Z");
@@ -71,14 +80,17 @@ std::string nameEntryText(const X509_NAME* pName, int nid)
 	const ASN1_STRING* pData = X509_NAME_ENTRY_get_data(pEntry);
 	if (pData == nullptr) return std::string();
 
-	// Up to OpenSSL 3.x a queued error makes SSL_get_error() report the
-	// next TLS operation of this thread as failed.
+// Up to OpenSSL 3.x a queued error makes SSL_get_error() report the
+// next TLS operation of this thread as failed.
 	ERR_set_mark();
 	unsigned char* pConverted = nullptr;
 	const int length = ASN1_STRING_to_UTF8(&pConverted, pData);
 	ERR_pop_to_mark();
-	const std::unique_ptr<unsigned char, OpenSSLFree> pUTF8(pConverted);
-	if (length < 0) return toString(ASN1_STRING_get0_data(pData), ASN1_STRING_length(pData));
+	const std::size_t len = OpenSSL::asn1StringLength(pData);
+	const std::string result = toString(pUTF8.get(), length);
+	if (length < 0) return toString(ASN1_STRING_get0_data(pData), len);
+
+	return result;
 
 	return toString(pUTF8.get(), length);
 }
@@ -329,8 +341,8 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			const GENERAL_NAME* name = sk_GENERAL_NAME_value(names, i);
 			if (name->type == GEN_DNS)
 			{
-				const char* data = reinterpret_cast<const char*>(ASN1_STRING_get0_data(name->d.ia5));
-				std::size_t len = ASN1_STRING_length(name->d.ia5);
+const char* data = reinterpret_cast<const char*>(ASN1_STRING_get0_data(name->d.ia5));
+			std::size_t len = OpenSSL::asn1StringLength(name->d.ia5);
 				domainNames.insert(std::string(data, len));
 			}
 		}
@@ -354,7 +366,7 @@ Poco::DateTime X509Certificate::validFrom() const
 {
 	const ASN1_TIME* certTime = X509_get0_notBefore(_pCert);
 	auto certTimeType = ASN1_STRING_type(certTime);
-	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)), ASN1_STRING_length(certTime));
+	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)), OpenSSL::asn1StringLength(certTime));
 	int tzd;
 	if (certTimeType == V_ASN1_UTCTIME)
 	{
@@ -375,7 +387,7 @@ Poco::DateTime X509Certificate::expiresOn() const
 {
 	const ASN1_TIME* certTime = X509_get0_notAfter(_pCert);
 	auto certTimeType = ASN1_STRING_type(certTime);
-	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)), ASN1_STRING_length(certTime));
+	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)), OpenSSL::asn1StringLength(certTime));
 	int tzd;
 	if (certTimeType == V_ASN1_UTCTIME)
 	{
