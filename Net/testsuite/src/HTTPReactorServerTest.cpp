@@ -9,6 +9,7 @@
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketReactor.h"
@@ -94,8 +95,13 @@ namespace
 	class BigBodyRequestHandler: public HTTPRequestHandler
 	{
 	public:
-		void handleRequest(HTTPServerRequest&, HTTPServerResponse& response)
+		BigBodyRequestHandler(bool& failed, Poco::Event& stopped): _failed(failed), _stopped(stopped)
 		{
+		}
+
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			static_cast<Poco::Net::HTTPServerRequestImpl&>(request).socket().setSendBufferSize(8192);
 			const std::size_t chunk = 64 * 1024;
 			const int chunks = 512;                 // 32 MiB total
 			response.setContentLength(static_cast<Poco::Int64>(chunk) * chunks);
@@ -103,7 +109,13 @@ namespace
 			std::ostream& ostr = response.send();
 			for (int i = 0; i < chunks; ++i) ostr.write(data.data(), data.size());
 			ostr.flush();
+			_failed = ostr.bad();
+			_stopped.set();
 		}
+
+	private:
+		bool& _failed;
+		Poco::Event& _stopped;
 	};
 
 	// Writes a chunked body until a write fails, then waits until the client has
@@ -160,9 +172,12 @@ namespace
 			}
 			if (request.getURI() == "/throw-poco") return new ThrowPocoRequestHandler;
 			if (request.getURI() == "/throw-std")  return new ThrowStdRequestHandler;
-			if (request.getURI() == "/big")        return new BigBodyRequestHandler;
+			if (request.getURI() == "/big")        return new BigBodyRequestHandler(failed, stopped);
 			return new EchoBodyRequestHandler;
 		}
+
+		bool failed = false;
+		Poco::Event stopped;
 	};
 
 	// Opens a raw keep-alive connection and completes the given number of
@@ -819,7 +834,8 @@ void HTTPReactorServerTest::testSendTimeoutClosesStalledClient()
 	pParams->setReactorMode(true);
 	pParams->setSendTimeout(Poco::Timespan(1, 0));   // 1 s
 
-	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+	RequestHandlerFactory* factory = new RequestHandlerFactory;
+	Poco::Net::HTTPReactorServer srv(0, pParams, factory);
 	srv.start();
 	int port = srv.port();
 
@@ -829,38 +845,53 @@ void HTTPReactorServerTest::testSendTimeoutClosesStalledClient()
 	// fires the response is abandoned, so when we finally drain we hit EOF
 	// quickly having received far less than the full body. Without the timeout
 	// (or without a client that eventually reads) the send would block forever.
-	Poco::Net::StreamSocket s;
-	s.connect(Poco::Net::SocketAddress("127.0.0.1", port));
-	std::string req("GET /big HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n");
-	s.sendBytes(req.data(), static_cast<int>(req.size()));
-
-	// Give the server's send time to stall and time out (timeout is 1 s).
-	Poco::Thread::sleep(3000);
-
-	s.setReceiveTimeout(Poco::Timespan(5, 0));
-	std::size_t total = 0;
-	bool closed = false;
-	char buf[16 * 1024];
+	Poco::Net::StreamSocket s(Poco::Net::IPAddress::IPv4);
 	try
 	{
-		while (true)
-		{
-			int n = s.receiveBytes(buf, sizeof(buf));
-			if (n <= 0) { closed = true; break; }
-			total += static_cast<std::size_t>(n);
-			if (total > 48u * 1024 * 1024) break;    // safety bound
-		}
-	}
-	catch (const Poco::Exception&)
-	{
-		closed = true;                               // reset also means closed
-	}
-	s.close();
+		s.setReceiveBufferSize(8192);
+		s.connect(Poco::Net::SocketAddress("127.0.0.1", port));
+		std::string req("GET /big HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n");
+		s.sendBytes(req.data(), static_cast<int>(req.size()));
 
-	assertTrue(closed);
-	// Truncated well below the 32 MiB body: the stalled send was aborted rather
-	// than run to completion once we started reading.
-	assertTrue(total < 16u * 1024 * 1024);
+		// Give the server's send time to stall and time out (timeout is 1 s).
+		assertTrue(factory->stopped.tryWait(15000));
+		assertTrue(factory->failed);
+
+		s.setReceiveTimeout(Poco::Timespan(5, 0));
+		std::size_t total = 0;
+		bool closed = false;
+		char buf[16 * 1024];
+		try
+		{
+			while (true)
+			{
+				int n = s.receiveBytes(buf, sizeof(buf));
+				if (n <= 0) { closed = true; break; }
+				total += static_cast<std::size_t>(n);
+				if (total > 48u * 1024 * 1024) break;    // safety bound
+			}
+		}
+		catch (const Poco::TimeoutException&)
+		{
+			fail("Connection remained open after the send timeout");
+		}
+		catch (const Poco::Net::NetException&)
+		{
+			closed = true;                               // reset also means closed
+		}
+		s.close();
+
+		assertTrue(closed);
+		// Truncated well below the 32 MiB body: the stalled send was aborted rather
+		// than run to completion once we started reading.
+		assertTrue(total < 16u * 1024 * 1024);
+	}
+	catch (...)
+	{
+		s.close();
+		srv.stop();
+		throw;
+	}
 	srv.stop();
 }
 
