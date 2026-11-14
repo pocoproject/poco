@@ -4602,6 +4602,30 @@ void SQLExecutor::encoding(const std::string& dbConnString)
 		assertTrue(textOutVec.size() == 2);
 		assertTrue(textOutVec[0] == utf8TextIn);
 		assertTrue(textOutVec[1] == utf8TextIn2);
+
+		textOutVec.clear();
+		session() << "SELECT str FROM Latin1Table", into(textOutVec, bulk(2)), now;
+		assertTrue(textOutVec.size() == 2);
+		assertTrue(textOutVec[0] == latinText);
+		assertTrue(textOutVec[1] == latinText2);
+
+		textOutVec.clear();
+		session(true) << "SELECT str FROM Latin1Table", into(textOutVec, bulk(2)), now;
+		assertTrue(textOutVec.size() == 2);
+		assertTrue(textOutVec[0] == utf8TextIn);
+		assertTrue(textOutVec[1] == utf8TextIn2);
+
+		std::deque<std::string> textOutDeque;
+		session(true) << "SELECT str FROM Latin1Table", into(textOutDeque, bulk(2)), now;
+		assertTrue(textOutDeque.size() == 2);
+		assertTrue(textOutDeque[0] == utf8TextIn);
+		assertTrue(textOutDeque[1] == utf8TextIn2);
+
+		std::list<std::string> textOutList;
+		session(true) << "SELECT str FROM Latin1Table", into(textOutList, bulk(2)), now;
+		assertTrue(textOutList.size() == 2);
+		assertTrue(*textOutList.begin() == utf8TextIn);
+		assertTrue(*std::next(textOutList.begin()) == utf8TextIn2);
 	}
 	catch (Poco::Exception& ex)
 	{

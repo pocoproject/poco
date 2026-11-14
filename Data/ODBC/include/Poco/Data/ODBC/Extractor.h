@@ -668,16 +668,19 @@ private:
 	template <typename C>
 	bool stringContainerExtractConvert(std::size_t pos, C& val)
 	{
-		bool ret = false;
-		C res;
-		ret = extractBoundImplContainer(pos, res);
-		val.clear();
+		bool ret = extractBoundImplContainer(pos, val);
 		if (ret)
 		{
-			val.resize(res.size());
-			typename C::iterator vIt = val.begin();
-			typename C::iterator it = res.begin();
-			for (; it != res.end(); ++it, ++vIt) transcode(*it, *vIt);
+			std::string converted;
+			for (auto& s: val)
+			{
+				transcode(s, converted);
+				s = std::move(converted);
+			}
+		}
+		else
+		{
+			val.clear();
 		}
 		return ret;
 	}
