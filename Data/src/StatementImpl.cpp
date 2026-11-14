@@ -234,7 +234,10 @@ void StatementImpl::bind()
 void StatementImpl::reset()
 {
 	resetBinding();
+	_curDataSet = 0;
 	resetExtraction();
+	for (auto& count: _subTotalRowCount) count = 0;
+	resetImpl();
 	_state = ST_RESET;
 }
 
@@ -301,12 +304,11 @@ void StatementImpl::resetBinding()
 
 void StatementImpl::resetExtraction()
 {
-	Poco::Data::AbstractExtractionVec::iterator it = extractions().begin();
-	Poco::Data::AbstractExtractionVec::iterator itEnd = extractions().end();
-	for (; it != itEnd; ++it) (*it)->reset();
-
-	poco_assert (_curDataSet < _columnsExtracted.size());
-	_columnsExtracted[_curDataSet] = 0;
+	for (auto& extVec: _extractors)
+	{
+		for (auto& pExt: extVec) pExt->reset();
+	}
+	for (auto& count: _columnsExtracted) count = 0;
 }
 
 
@@ -394,6 +396,11 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 void StatementImpl::execDirectImpl(const std::string& /*query*/)
 {
 	throw NotImplementedException("executeDirect() is not supported by the connector", _rSession.connectorName());
+}
+
+
+void StatementImpl::resetImpl()
+{
 }
 
 

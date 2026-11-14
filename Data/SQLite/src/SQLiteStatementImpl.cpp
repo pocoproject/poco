@@ -147,6 +147,18 @@ void SQLiteStatementImpl::compileImpl()
 }
 
 
+void SQLiteStatementImpl::resetImpl()
+{
+	_isExtracted = false;
+	_nextResponse = 0;
+	_stepCalled = false;
+	_canCompile = true;
+	_columns.clear();
+	_columns.resize(1);
+	_pLeftover = nullptr;
+}
+
+
 void SQLiteStatementImpl::bindImpl()
 {
 	_stepCalled = false;

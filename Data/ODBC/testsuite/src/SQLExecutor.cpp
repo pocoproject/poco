@@ -1254,6 +1254,11 @@ void SQLExecutor::recordSetBeforeExecute()
 
 	stmt.execute();
 	assertTrue (rs.columnType("LastName") == rs.columnType(0));
+
+	stmt.execute();
+	RecordSet rs2(stmt);
+	assertTrue (rs2.columnType("LastName") == rs2.columnType(0));
+	assertTrue (0 == Poco::icompare(rs2.columnName(0), "LastName"));
 }
 
 
