@@ -66,12 +66,15 @@ void ZipArchiveInfo::parse(std::istream& inp, bool assumeHeaderRead)
 
 	// read the rest of the header
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
+	if (inp.gcount() != static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE)
+		throw Poco::IOException("Failed to read archive info header");
 	Poco::UInt16 len = getZipCommentSize();
 	if (len > 0)
 	{
 		Poco::Buffer<char> buf(len);
 		inp.read(buf.begin(), len);
-		_comment = std::string(buf.begin(), len);
+		// A comment that runs past the end of the archive is cut, as other readers do.
+		_comment = std::string(buf.begin(), static_cast<std::size_t>(inp.gcount()));
 	}
 }
 
@@ -146,16 +149,22 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 	// read the rest of the header
 	Poco::UInt64 offset = RECORDSIZE_POS;
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, RECORDSIZE_SIZE);
+	if (inp.gcount() != RECORDSIZE_SIZE)
+		throw Poco::IOException("Failed to read archive info header");
 	offset += RECORDSIZE_SIZE;
 	Poco::UInt64 len = ZipUtil::get64BitValue(_rawInfo, RECORDSIZE_POS);
 	if (len <= FULL_HEADER_SIZE - offset)
 	{
 		inp.read(_rawInfo + offset, len);
+		if (inp.gcount() != static_cast<std::streamsize>(len))
+			throw Poco::IOException("Failed to read archive info header");
 		ZipUtil::set64BitValue(FULL_HEADER_SIZE - offset, _rawInfo, RECORDSIZE_POS);
 	}
 	else
 	{
 		inp.read(_rawInfo + offset, FULL_HEADER_SIZE - offset);
+		if (inp.gcount() != static_cast<std::streamsize>(FULL_HEADER_SIZE - offset))
+			throw Poco::IOException("Failed to read archive info header");
 		len -= (FULL_HEADER_SIZE - offset);
 		// The record size is read from the archive, so the buffer grows as the
 		// data actually arrives rather than being allocated from the declared

@@ -15,6 +15,7 @@
 #include "Poco/Zip/ZipFileInfo.h"
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include <istream>
 #include <cstring>
 
@@ -93,6 +94,8 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 
 	// read the rest of the header
 	inp.read(_rawInfo + ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
+	if (inp.gcount() != static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE)
+		throw Poco::IOException("Failed to read file info header");
 	_crc32 = getCRCFromHeader();
 	_compressedSize = getCompressedSizeFromHeader();
 	_uncompressedSize = getUncompressedSizeFromHeader();
@@ -103,6 +106,8 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 	{
 		Poco::Buffer<char> buf(len);
 		inp.read(buf.begin(), len);
+		if (inp.gcount() != len)
+			throw Poco::IOException("Failed to read file name");
 		_fileName = std::string(buf.begin(), len);
 	}
 	if (hasExtraField())
@@ -112,6 +117,8 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 		{
 			Poco::Buffer<char> xtra(len);
 			inp.read(xtra.begin(), len);
+			if (inp.gcount() != len)
+				throw Poco::IOException("Failed to read extra field");
 			_extraField = std::string(xtra.begin(), len);
 			// The field sizes come from the archive, so every read is bounded by
 			// the buffer that was actually read rather than by the declared size.
@@ -145,11 +152,16 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 			}
 		}
 	}
+	ZipUtil::verifySizeOrOffset(_compressedSize, "Compressed size out of range", _fileName);
+	ZipUtil::verifySizeOrOffset(_uncompressedSize, "Uncompressed size out of range", _fileName);
+	ZipUtil::verifySizeOrOffset(_localHeaderOffset, "Local header offset out of range", _fileName);
 	len = getFileCommentLength();
 	if (len > 0)
 	{
 		Poco::Buffer<char> buf2(len);
 		inp.read(buf2.begin(), len);
+		if (inp.gcount() != len)
+			throw Poco::IOException("Failed to read file comment");
 		_fileComment = std::string(buf2.begin(), len);
 	}
 }

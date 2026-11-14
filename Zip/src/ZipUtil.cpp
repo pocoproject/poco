@@ -108,6 +108,8 @@ void ZipUtil::sync(std::istream& in)
 			// we have a possible header!
 			// read the next 2 bytes
 			in.read(temp+tempPos, PREFIX);
+			if (in.gcount() != PREFIX)
+				return;
 			tempPos += PREFIX;
 			if (std::memcmp(ZipLocalFileHeader::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
 				std::memcmp(ZipArchiveInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
@@ -226,6 +228,8 @@ void ZipUtil::syncDataDescriptor(std::istream & in, bool force64)
 
 void ZipUtil::verifyZipEntryFileName(const std::string& fn)
 {
+	if (fn.find('\0') != std::string::npos)
+		throw ZipException("Illegal entry name containing a NUL character");
 	if (fn.find("\\") != std::string::npos)
 		throw ZipException("Illegal entry name " + fn + " containing \\");
 	if (fn == "/")
@@ -234,6 +238,15 @@ void ZipUtil::verifyZipEntryFileName(const std::string& fn)
 		throw ZipException("Illegal empty entry name");
 	if (!ZipCommon::isValidPath(fn))
 		throw ZipException("Illegal entry name " + fn + " containing parent directory reference");
+}
+
+
+void ZipUtil::verifySizeOrOffset(Poco::UInt64 value, std::string_view message, const std::string& fileName)
+{
+	constexpr Poco::UInt64 MAX_SIZE_OR_OFFSET = static_cast<Poco::UInt64>(1) << 61;
+
+	if (value > MAX_SIZE_OR_OFFSET)
+		throw ZipException(std::string(message), fileName);
 }
 
 

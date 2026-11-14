@@ -15,11 +15,39 @@
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/Zip/SkipCallback.h"
 #include "Poco/Zip/ZipException.h"
-#include "Poco/Exception.h"
 #include <cstring>
+#include <map>
+#include <string>
+#include <vector>
 
 
 namespace Poco::Zip {
+
+
+namespace {
+
+
+template <typename T>
+std::string uniqueName(const std::map<std::string, T>& entries, std::map<std::string, int>& suffixes, const std::string& name)
+	/// Returns name, or name with the first unused ".duplicate-N" suffix if entries has it.
+{
+	// find(): std::map::contains() needs C++20, and the library is still built as C++17 for Emscripten.
+	if (entries.find(name) == entries.end())
+		return name;
+
+	// Names are never removed, so every suffix below the one remembered is still in use.
+	int& suffix = suffixes.try_emplace(name, 1).first->second;
+	std::string candidate;
+	do
+	{
+		candidate = name + ".duplicate-" + std::to_string(suffix++);
+	}
+	while (entries.find(candidate) != entries.end());
+	return candidate;
+}
+
+
+} // namespace
 
 
 const std::string ZipArchive::EMPTY_COMMENT;
@@ -92,6 +120,12 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 {
 	// read 4 bytes
 	bool haveSynced = false;
+	std::map<std::string, int> entrySuffixes;
+	std::map<std::string, int> infoSuffixes;
+	// Local entries and central directory records of one name are paired in their order,
+	// because the keys of duplicate entries in _entries are generated names.
+	std::map<std::string, std::vector<FileHeaders::iterator>> entriesByName;
+	std::map<std::string, std::size_t> infosByName;
 	while (in.good() && !in.eof())
 	{
 		char header[ZipCommon::HEADER_SIZE]={'\x00', '\x00', '\x00', '\x00'};
@@ -101,42 +135,34 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 		if (std::memcmp(header, ZipLocalFileHeader::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipLocalFileHeader entry(in, true, pc);
-			std::string uniqueName = entry.getFileName();
-			int suffix = 1;
-			while (_entries.find(uniqueName) != _entries.end())
-			{
-				uniqueName = entry.getFileName() + ".duplicate-" + std::to_string(suffix++);
-			}
-			_entries.insert(std::make_pair(uniqueName, entry));
+			const auto it = _entries.insert(std::make_pair(uniqueName(_entries, entrySuffixes, entry.getFileName()), entry)).first;
+			entriesByName[entry.getFileName()].push_back(it);
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipFileInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipFileInfo info(in, true);
-			std::string uniqueName = info.getFileName();
-			int suffix = 1;
-			while (_infos.find(uniqueName) != _infos.end())
+			const std::size_t rank = infosByName[info.getFileName()]++;
+			const auto itEntries = entriesByName.find(info.getFileName());
+			if (itEntries != entriesByName.end() && itEntries->second.size() > rank)
 			{
-				uniqueName = info.getFileName() + ".duplicate-" + std::to_string(suffix++);
+				itEntries->second[rank]->second.setStartPos(info.getOffset());
 			}
-			FileHeaders::iterator it = _entries.find(info.getFileName());
-			if (it != _entries.end())
-			{
-				it->second.setStartPos(info.getOffset());
-			}
-			_infos.insert(std::make_pair(uniqueName, info));
+			_infos.insert(std::make_pair(uniqueName(_infos, infoSuffixes, info.getFileName()), info));
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipArchiveInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipArchiveInfo nfo(in, true);
-			poco_assert (_disks.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			if (!_disks.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second)
+				throw ZipException("Duplicate end of central directory record");
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipArchiveInfo64::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipArchiveInfo64 nfo(in, true);
-			poco_assert (_disks64.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second);
+			if (!_disks64.insert(std::make_pair(nfo.getDiskNumber(), nfo)).second)
+				throw ZipException("Duplicate ZIP64 end of central directory record");
 			haveSynced = false;
 		}
 		else
@@ -151,9 +177,9 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 			else
 			{
 				if (_disks.empty() && _disks64.empty())
-					throw Poco::IllegalStateException("Illegal header in zip file");
+					throw ZipException("Illegal header in zip file");
 				else
-					throw Poco::IllegalStateException("Garbage after directory header");
+					throw ZipException("Garbage after directory header");
 			}
 		}
 	}

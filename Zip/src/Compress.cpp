@@ -144,7 +144,8 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 			{
 				in.read(buffer.begin(), COMPRESS_CHUNK_SIZE);
 				std::streamsize n = in.gcount();
-				poco_assert_dbg (n == COMPRESS_CHUNK_SIZE);
+				if (n != COMPRESS_CHUNK_SIZE)
+					throw Poco::IOException("Failed to read entry data");
 				_out.write(buffer.begin(), n);
 				remaining -= COMPRESS_CHUNK_SIZE;
 			}
@@ -152,7 +153,8 @@ void Compress::addFileRaw(std::istream& in, const ZipLocalFileHeader& h, const P
 			{
 				in.read(buffer.begin(), remaining);
 				std::streamsize n = in.gcount();
-				poco_assert_dbg (n == static_cast<std::streamsize>(remaining));
+				if (n != static_cast<std::streamsize>(remaining))
+					throw Poco::IOException("Failed to read entry data");
 				_out.write(buffer.begin(), n);
 				remaining = 0;
 			}

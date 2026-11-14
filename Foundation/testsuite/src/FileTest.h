@@ -35,6 +35,8 @@ public:
 	void testDirectory();
 	void testCreateDirectoryExisting();
 	void testCreateDirectoryConcurrent();
+	void testCreateDirectoriesDeep();
+	void testCreateDirectoriesExtendedPath();
 	void testCopy();
 	void testCopyFailIfDestinationFileExists();
 	void testMove();

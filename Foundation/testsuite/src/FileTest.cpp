@@ -693,6 +693,70 @@ void FileTest::testCreateDirectoryConcurrent()
 }
 
 
+void FileTest::testCreateDirectoriesDeep()
+{
+	constexpr int DEPTH = 3000;
+
+	// The first level below a regular file cannot be created.
+	TemporaryFile file;
+	assertTrue (file.createFile());
+	Path p(file.path());
+	p.makeDirectory();
+	for (int i = 0; i < DEPTH; ++i)
+	{
+		p.pushDirectory("d");
+	}
+
+	// A recursion per level would exceed this stack.
+	bool thrown = false;
+	Thread thread;
+	thread.setStackSize(128 * 1024);
+	thread.startFunc([&p, &thrown]()
+	{
+		try
+		{
+			File(p).createDirectories();
+		}
+		catch (const Poco::FileException&)
+		{
+			thrown = true;
+		}
+	});
+	thread.join();
+	assertTrue (thrown);
+}
+
+
+void FileTest::testCreateDirectoriesExtendedPath()
+{
+#if defined(_WIN32)
+	// Only the levels below the deepest existing one are accessed: the first levels of an extended-length
+	// UNC path ("\\?\UNC", "\\?\UNC\localhost") cannot be checked as directories.
+	TemporaryFile root;
+	root.createDirectories();
+	Path p(root.path());
+	p.makeAbsolute();
+	const std::string local = p.toString();
+	const std::string share = "\\\\localhost\\" + local.substr(0, 1) + "$";
+	bool shareAvailable = false;
+	try
+	{
+		shareAvailable = File(share).exists();
+	}
+	catch (const Exception&)
+	{
+	}
+	// The test needs the administrative share of the drive.
+	if (shareAvailable)
+	{
+		const std::string path = "\\\\?\\UNC\\localhost\\" + local.substr(0, 1) + "$" + local.substr(2) + "\\a\\b";
+		File(path).createDirectories();
+		assertTrue (File(path).isDirectory());
+	}
+#endif
+}
+
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 void FileTest::testCreateDirectorySymlinkLoop()
 {
@@ -1442,6 +1506,8 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testDirectory);
 	CppUnit_addTest(pSuite, FileTest, testCreateDirectoryExisting);
 	CppUnit_addTest(pSuite, FileTest, testCreateDirectoryConcurrent);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoriesDeep);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoriesExtendedPath);
 	CppUnit_addTest(pSuite, FileTest, testCopy);
 	CppUnit_addTest(pSuite, FileTest, testCopyFailIfDestinationFileExists);
 	CppUnit_addTest(pSuite, FileTest, testMove);
