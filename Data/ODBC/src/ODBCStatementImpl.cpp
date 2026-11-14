@@ -128,21 +128,20 @@ void ODBCStatementImpl::resetImpl()
 	_prepared = false;
 	_stepCalled = false;
 	_nextResponse = 0;
-	_canCompile = true;
 	_affectedRowCount = 0;
 	_errorInfo.clear();
 
 	SQLRETURN rc = SQLFreeStmt(_stmt, SQL_CLOSE);
 	checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_CLOSE)");
 
-	for (auto& row: _columnPtrs)
-	{
-		for (auto* pCol: row) delete pCol;
-	}
-	_columnPtrs.clear();
+	rc = SQLFreeStmt(_stmt, SQL_UNBIND);
+	checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_UNBIND)");
 
-	PreparatorVec().swap(_preparations);
-	ExtractorVec().swap(_extractors);
+	if (_preparations.size() > 1)
+		_preparations.resize(1);
+
+	if (_extractors.size() > 1)
+		_extractors.resize(1);
 }
 
 

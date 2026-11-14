@@ -58,7 +58,6 @@ void SQLiteStatementImpl::compileImpl()
 	if (!_pLeftover)
 	{
 		_bindBegin = bindings().begin();
-		_isExtracted = false;
 	}
 
 	// The session may have been closed and opened again since the statement
@@ -156,6 +155,7 @@ void SQLiteStatementImpl::resetImpl()
 	_canCompile = true;
 	_columns.clear();
 	_columns.resize(1);
+	_pLeftover = nullptr;
 }
 
 

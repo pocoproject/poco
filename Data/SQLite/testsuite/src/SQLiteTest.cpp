@@ -3164,6 +3164,46 @@ void SQLiteTest::testMultipleResults()
 	assertTrue (2 == people2.size());
 	assertTrue (Person("Simpson", "Lisa", "Springfield", 10) == people2[0]);
 	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
+
+	// re-execution after a failed batch
+	tmp << "DROP TABLE IF EXISTS TabA", now;
+	tmp << "DROP TABLE IF EXISTS TabB", now;
+	tmp << "CREATE TABLE TabA (x INTEGER)", now;
+	tmp << "CREATE TABLE TabB (z INTEGER)", now;
+	tmp << "INSERT INTO TabA VALUES (1)", now;
+	tmp << "INSERT INTO TabB VALUES (7)", now;
+
+	std::vector<int> resA, resB;
+	Statement batchStmt(tmp);
+	batchStmt << "SELECT x FROM TabA; SELECT z FROM TabB", into(resA), into(resB, from(1));
+
+	assertTrue (2 == batchStmt.execute());
+	assertTrue (1 == resA.size() && 1 == resA[0]);
+	assertTrue (1 == resB.size() && 7 == resB[0]);
+
+	tmp << "DROP TABLE TabB", now;
+	resA.clear();
+	resB.clear();
+	try
+	{
+		batchStmt.execute();
+		fail("must fail because TabB was dropped");
+	}
+	catch (Poco::Exception&)
+	{
+	}
+
+	tmp << "CREATE TABLE TabB (z INTEGER)", now;
+	tmp << "INSERT INTO TabB VALUES (7)", now;
+	resA.clear();
+	resB.clear();
+
+	assertTrue (2 == batchStmt.execute());
+	assertTrue (1 == resA.size() && 1 == resA[0]);
+	assertTrue (1 == resB.size() && 7 == resB[0]);
+
+	tmp << "DROP TABLE IF EXISTS TabA", now;
+	tmp << "DROP TABLE IF EXISTS TabB", now;
 }
 
 
