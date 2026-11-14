@@ -21,6 +21,7 @@
 #include "Poco/Process.h"
 #endif
 #include <sstream>
+#include <cstring>
 
 
 using Poco::InvalidArgumentException;
@@ -129,8 +130,8 @@ void ICMPv4PacketImpl::initPacket()
 	icp->id       = static_cast<UInt16>(Poco::Process::id());
 #endif
 
-	struct timeval* ptp = (struct timeval *) (icp + 1);
-	*ptp = time();
+	const struct timeval now = time();
+	std::memcpy(icp + 1, &now, sizeof(now));
 
 	icp->checksum = checksum((UInt16*) icp, getDataSize() + sizeof(Header));
 }
@@ -148,9 +149,12 @@ struct timeval ICMPv4PacketImpl::time(Poco::UInt8* buffer, int length) const
 	}
 	else
 	{
-		struct timeval* ptv = reinterpret_cast<struct timeval*>(data(buffer, length));
-		if (ptv) std::memcpy(&tv, ptv, sizeof(tv));
-		else throw InvalidArgumentException("Invalid packet.");
+		// The time value follows the IP header, which leaves it without the
+		// alignment of struct timeval: copy it from the bytes.
+		const Poco::UInt8* pData = data(buffer, length);
+		if (pData == nullptr || static_cast<std::size_t>(pData - buffer) + sizeof(tv) > static_cast<std::size_t>(length))
+			throw InvalidArgumentException("Invalid packet.");
+		std::memcpy(&tv, pData, sizeof(tv));
 	}
 	return tv;
 }
@@ -170,7 +174,8 @@ ICMPv4PacketImpl::Header* ICMPv4PacketImpl::header(Poco::UInt8* buffer, int leng
 
 Poco::UInt8* ICMPv4PacketImpl::data(Poco::UInt8* buffer, int length) const
 {
-	return (reinterpret_cast<Poco::UInt8*>(header(buffer, length))) + sizeof(Header);
+	Header* icp = header(buffer, length);
+	return (icp != nullptr) ? reinterpret_cast<Poco::UInt8*>(icp + 1) : nullptr;
 }
 
 
