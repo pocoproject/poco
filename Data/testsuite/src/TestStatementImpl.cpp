@@ -17,6 +17,7 @@ namespace Poco::Data::Test {
 
 std::atomic<int> TestStatementImpl::_instances(0);
 std::atomic<bool> TestStatementImpl::_holdNext(false);
+std::atomic<TestStatementImpl::HoldPoint> TestStatementImpl::_holdPoint(TestStatementImpl::HoldPoint::HAS_NEXT);
 Poco::Event TestStatementImpl::_held;
 Poco::Event TestStatementImpl::_released;
 
@@ -42,10 +43,11 @@ int TestStatementImpl::instances()
 }
 
 
-void TestStatementImpl::holdNextExecution()
+void TestStatementImpl::holdNextExecution(HoldPoint point)
 {
 	_held.reset();
 	_released.reset();
+	_holdPoint = point;
 	_holdNext = true;
 }
 
@@ -63,8 +65,19 @@ void TestStatementImpl::releaseExecution()
 }
 
 
+void TestStatementImpl::waitIfHeld(HoldPoint point)
+{
+	if (_holdPoint == point && _holdNext.exchange(false))
+	{
+		_held.set();
+		_released.wait();
+	}
+}
+
+
 void TestStatementImpl::compileImpl()
 {
+	waitIfHeld(HoldPoint::COMPILE);
 	// prepare binding
 	_ptrBinder    = new Binder;
 	_ptrExtractor = new Extractor;
@@ -111,13 +124,16 @@ const MetaColumn& TestStatementImpl::metaColumn(std::size_t pos) const
 }
 
 
+int TestStatementImpl::affectedRowCount() const
+{
+	waitIfHeld(HoldPoint::AFFECTED_ROW_COUNT);
+	return 0;
+}
+
+
 bool TestStatementImpl::hasNext()
 {
-	if (_holdNext.exchange(false))
-	{
-		_held.set();
-		_released.wait();
-	}
+	waitIfHeld(HoldPoint::HAS_NEXT);
 	if (_throwOnHasNext)
 		throw Poco::Data::UnknownDataBaseException();
 	return false;
