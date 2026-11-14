@@ -64,6 +64,10 @@ public:
 	void testEventUnsubscribeBeforeReply();
 	void testEventUnsubscribeOrder();
 	void testEventUnsubscribeNoThread();
+	void testEventSubscriptionOtherEndpoint();
+	void testEventSubscriptionRenewedOnNewConnection();
+	void testEventListenersSharingConnection();
+	void testEventToServerListener();
 
 	void setUp() override;
 	void tearDown() override;

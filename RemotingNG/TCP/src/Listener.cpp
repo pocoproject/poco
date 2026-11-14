@@ -25,6 +25,45 @@
 namespace Poco::RemotingNG::TCP {
 
 
+namespace
+{
+	struct SubscriberRegistry
+		/// The event subscribers of all Listeners, by the ConnectionManager
+		/// of their Listener and their path.
+	{
+		using Key = std::pair<const ConnectionManager*, std::string>;
+
+		Poco::FastMutex mutex;
+		std::map<Key, Poco::RemotingNG::EventSubscriber::Ptr> subscribers;
+	};
+
+	SubscriberRegistry& subscriberRegistry()
+		/// The registry is never destroyed: the last reference to a Listener
+		/// can go with a static object, such as the default ConnectionManager,
+		/// after the static objects of this file are gone.
+	{
+		static SubscriberRegistry* pRegistry = new SubscriberRegistry;
+		return *pRegistry;
+	}
+
+	void addSubscriber(const ConnectionManager& connectionManager, const std::string& path, Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber)
+	{
+		SubscriberRegistry& registry = subscriberRegistry();
+		Poco::FastMutex::ScopedLock lock(registry.mutex);
+
+		registry.subscribers[SubscriberRegistry::Key(&connectionManager, path)] = pEventSubscriber;
+	}
+
+	void removeSubscriber(const ConnectionManager& connectionManager, const std::string& path)
+	{
+		SubscriberRegistry& registry = subscriberRegistry();
+		Poco::FastMutex::ScopedLock lock(registry.mutex);
+
+		registry.subscribers.erase(SubscriberRegistry::Key(&connectionManager, path));
+	}
+}
+
+
 class EventFrameHandler: public FrameHandler
 {
 public:
@@ -123,7 +162,20 @@ Listener::Listener(const std::string& endPoint, const Poco::Net::ServerSocket& s
 }
 
 
-Listener::~Listener() = default;
+Listener::~Listener()
+{
+	try
+	{
+		for (const auto& subscription: _eventSubscriptions)
+		{
+			removeSubscriber(_connectionManager, subscription.second->path());
+		}
+	}
+	catch (...)
+	{
+		poco_unexpected();
+	}
+}
 
 
 void Listener::setTimeout(Poco::Timespan timeout)
@@ -181,8 +233,10 @@ std::string Listener::subscribeToEvents(Poco::RemotingNG::EventSubscriber::Ptr p
 	else
 	{
 		it->second->cancel();
+		removeSubscriber(_connectionManager, it->second->path());
 		it->second = pEventSubscription;
 	}
+	addSubscriber(_connectionManager, pEventSubscription->path(), pEventSubscriber);
 	long interval = static_cast<long>(_eventSubscriptionTimeout.totalMilliseconds()/2);
 	_timer.scheduleAtFixedRate(pEventSubscription, interval, interval);
 	pEventSubscription->run();
@@ -199,13 +253,27 @@ void Listener::unsubscribeFromEvents(Poco::RemotingNG::EventSubscriber::Ptr pEve
 	{
 		it->second->cancel();
 		it->second->run(); // sends unsubscribe message
+		removeSubscriber(_connectionManager, it->second->path());
 		_eventSubscriptions.erase(it);
 	}
 }
 
 
-Poco::RemotingNG::EventSubscriber::Ptr Listener::findEventSubscriber(const std::string& path) const
+Poco::RemotingNG::EventSubscriber::Ptr Listener::findEventSubscriber(const std::string& path, Connection::Ptr pConnection) const
 {
+	if (pConnection->mode() == Connection::MODE_CLIENT)
+	{
+		SubscriberRegistry& registry = subscriberRegistry();
+		Poco::FastMutex::ScopedLock lock(registry.mutex);
+
+		const auto it = registry.subscribers.find(SubscriberRegistry::Key(&_connectionManager, path));
+		if (it != registry.subscribers.end())
+		{
+			return it->second;
+		}
+		return Poco::RemotingNG::EventSubscriber::Ptr();
+	}
+
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
 	for (EventSubscriptionsMap::const_iterator it = _eventSubscriptions.begin(); it != _eventSubscriptions.end(); ++it)
