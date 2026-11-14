@@ -12,7 +12,7 @@ sanitizer and add `-DENABLE_TRACE=ON` for stack traces in exceptions.
 |---|---|---|
 | AddressSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=address"` | |
 | ASan, hidden visibility | the above plus `-DCMAKE_CXX_VISIBILITY_PRESET=hidden` | `ASAN_OPTIONS=detect_odr_violation=2` |
-| UndefinedBehaviorSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr"` | |
+| UndefinedBehaviorSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr"` | `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1` |
 | ThreadSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=thread"` | `TSAN_OPTIONS="suppressions=<repo-root>/tsan.suppress,second_deadlock_stack=1"` |
 
 ```bash
@@ -24,12 +24,15 @@ TSAN_OPTIONS="suppressions=<repo-root>/tsan.suppress,second_deadlock_stack=1" PO
 ```
 
 - The vptr check of UBSan is disabled because the Foundation tests do not link with it.
+- Without `halt_on_error=1`, UBSan prints a report and the test continues and passes; `ctest --output-on-failure`
+  then does not show the report.
 - On macOS, ASan reports a spurious ODR violation for the test plugin loaded with `dlopen`; the CI job
   `macos-clang-cmake-sanitizers` runs ASan with `ASAN_OPTIONS=detect_odr_violation=0`.
 - Fix a race instead of adding a suppression. A new entry in `tsan.suppress` gets a comment that explains why the
   reported race is harmless.
-- CI jobs: `linux-gcc-cmake-sanitizers`, `macos-clang-cmake-sanitizers`, `macos-x64-clang-cmake-sanitizers` (matrix
-  entries `asan`, `ubsan`, `tsan`, and `hidden-asan` on arm64 and Linux).
+- CI jobs: `linux-gcc-cmake-sanitizers` (matrix entries `asan`, `ubsan`, `tsan`, `hidden-asan`),
+  `macos-clang-cmake-sanitizers` (arm64, matrix entries `asan-ubsan-hidden`, `tsan`) and
+  `macos-x64-clang-cmake-sanitizers` (Intel, ASan and UBSan, push and manual runs only).
 - Where sanitizers are not available on Linux, run the affected test class under valgrind memcheck (the
   `linux-sqlparser-upstream-tests` job uses valgrind):
 
@@ -40,7 +43,7 @@ TSAN_OPTIONS="suppressions=<repo-root>/tsan.suppress,second_deadlock_stack=1" PO
 ## Compiler warnings
 
 Build with `-DENABLE_COMPILER_WARNINGS=ON` (see [cmake.md](cmake.md#options)) and fix every new warning in changed code.
-CI jobs: `macos-clang-cmake-warnings`, `windows-msvc-cmake-warnings`.
+CI jobs: `macos-clang-cmake-sanitizers` (matrix entry `tsan`), `windows-2025-msvc-cmake`.
 
 Functions that always throw and should be `[[noreturn]]` are found with Clang's `-Wmissing-noreturn`; GCC does not
 report the same cases:

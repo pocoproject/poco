@@ -102,8 +102,9 @@ env:
   # Sanitizer extra: lift the 300KB output cap so long stack traces survive.
   POCO_CTEST_SANITIZER_EXTRA: "--test-output-size-failed 0 --test-output-truncation tail"
   # Foundation suites that hold long tests (CppUnit_addLongTest). Long tests run
-  # only with -long, which ctest does not pass; the *-long-tests jobs run these
-  # without an ignore list, so every failure fails the job.
+  # only with -long, which ctest does not pass; the *-long-tests jobs and
+  # macos-clang-21-cmake-modules run these without an ignore list, so every
+  # failure fails the job.
   POCO_LONG_TEST_SUITES: >-
     RWLockTest PBKDF2EngineTest FileStreamRWLockTest FileChannelTest
     MD5EngineTest MD4EngineTest SHA1EngineTest SHA2EngineTest ChecksumTest
@@ -179,6 +180,7 @@ jobs:
   # ------------------------------------------------------------------------
 
   # Primary Linux signal: 3 non-hidden sanitizers + 1 hidden+asan. TRACE on.
+  # The asan entry also runs the deprecated-API tests (ENABLE_TEST_DEPRECATED).
   linux-gcc-cmake-sanitizers:
     runs-on: ubuntu-24.04
     strategy:
@@ -188,9 +190,13 @@ jobs:
           - name: asan
             visibility: default
             sanitize_flags: "-fsanitize=address"
+            extra_cmake: -DENABLE_TEST_DEPRECATED=ON
           - name: ubsan
             visibility: default
             sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+            # UBSan reports and continues by default, and ctest shows the output of
+            # failing tests only: halt on the first report, so that it fails the test.
+            ubsan_options: halt_on_error=1:print_stacktrace=1
           - name: tsan
             visibility: default
             sanitize_flags: "-fsanitize=thread"
@@ -200,6 +206,7 @@ jobs:
     env:
       TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
       ASAN_OPTIONS: ${{ matrix.name == 'hidden-asan' && 'detect_odr_violation=2' || '' }}
+      UBSAN_OPTIONS: ${{ matrix.ubsan_options }}
     services:
       mongodb:
         # mongo:8 refuses to start on the runner kernels 6.19 to 7.0.13 (SERVER-121912, #5575)
@@ -225,6 +232,7 @@ jobs:
           -DENABLE_TRACE=ON
           ${{ env.POCO_CMAKE_FULL_COMMON }}
           ${{ env.POCO_CMAKE_FULL_LINUX_EXTRA }}
+          ${{ matrix.extra_cmake }}
       - run: cmake --build cmake-build --target all --parallel $(nproc)
       - uses: ./.github/actions/retry-action
         with:
@@ -238,35 +246,6 @@ jobs:
       - uses: ./.github/actions/upload-test-report
         with:
           suffix: ${{ matrix.name }}
-
-  # Linux deprecated-API probe: runs only the deprecated-API test suites.
-  linux-gcc-cmake-deprecated-tests:
-    runs-on: ubuntu-24.04
-    needs: changes
-    if: |
-      needs.changes.outputs.foundation_util == 'true' ||
-      needs.changes.outputs.ci_core == 'true' ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v5
-      - uses: ./.github/actions/ensure-apt-packages
-        with:
-          commands: cmake:cmake ninja:ninja-build
-          packages: libssl-dev
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
-          -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_TEST_DEPRECATED=ON
-      - run: cmake --build cmake-build --target all --parallel $(nproc)
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Net|Crypto|Util|XML|JSON|Data|DataSQLite)$"
-      - uses: ./.github/actions/upload-test-report
 
   # OpenSSL no-deprecated probe: build and test Crypto/NetSSL/JWT with
   # deprecated OpenSSL declarations hidden. Debug + -D_DEBUG so that
@@ -568,12 +547,16 @@ jobs:
         with:
           build-dir: build
 
-  # C++ modules on macOS: the Bonjour partition and the Apple platform guards. Homebrew LLVM,
+  # Non-Apple compiler on macOS (Homebrew clang 21): C++ modules (the Bonjour partition and the
+  # Apple platform guards), Foundation + Util + Crypto against Homebrew OpenSSL 3, and the
+  # Foundation long tests (the suites of POCO_LONG_TEST_SUITES with -long). Homebrew LLVM,
   # because Apple clang has no clang-scan-deps; the explicit SDK path reaches clang-scan-deps.
   macos-clang-21-cmake-modules:
     runs-on: macos-latest
     needs: changes
     if: |
+      needs.changes.outputs.foundation_util == 'true' ||
+      needs.changes.outputs.crypto_netssl == 'true' ||
       needs.changes.outputs.modules == 'true' ||
       needs.changes.outputs.ci_core == 'true' ||
       github.event_name == 'push' || github.event_name == 'workflow_dispatch'
@@ -587,16 +570,28 @@ jobs:
           -DENABLE_SSH=ON -DENABLE_XSD_VALIDATOR=ON -DENABLE_AI=ON
           -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
           -DCMAKE_OSX_SYSROOT=$(xcrun --show-sdk-path)
-      - run: cmake --build cmake-build --target Modules-testrunner --parallel $(sysctl -n hw.ncpu)
+      - id: build
+        run: >-
+          cmake --build cmake-build --parallel $(sysctl -n hw.ncpu) --target
+          Modules-testrunner Foundation-testrunner Util-testrunner Crypto-testrunner
       - uses: ./.github/actions/retry-action
         with:
-          timeout_minutes: 30
+          timeout_minutes: 60
           max_attempts: 3
           retry_on: any
           command: >-
             cd cmake-build &&
-            ctest ${{ env.POCO_CTEST_COMMON }} -R "^Modules$"
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^(Foundation|Util|Crypto|Modules)$"
       - uses: ./.github/actions/upload-test-report
+      # Runs also when the unit tests failed, as a separate signal.
+      - name: Run Foundation long tests
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        timeout-minutes: 30
+        run: >-
+          cd cmake-build/bin &&
+          POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
+          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
 
   # OpenSSL 4.0, built from source and cached (ubuntu-24.04 ships OpenSSL 3).
   # OpenSSL 4.0 no longer frees its global data at exit, so the job runs with
@@ -833,32 +828,33 @@ jobs:
   # macOS arm64 (macos-latest)
   # ------------------------------------------------------------------------
 
-  # Primary macos-arm64 signal: 3 non-hidden sanitizers + 1 hidden+asan. TRACE on.
+  # Primary macos-arm64 signal: ASan + UBSan with hidden visibility, and TSan. TRACE on.
+  # ASan with default visibility runs on Linux. The tsan entry also builds the Data
+  # backends that need a server, with compiler warnings on; their tests do not run here.
   macos-clang-cmake-sanitizers:
     runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: asan
-            visibility: default
-            sanitize_flags: "-fsanitize=address"
+          - name: asan-ubsan-hidden
+            visibility: hidden
+            sanitize_flags: "-fsanitize=address,undefined;-fno-sanitize=vptr"
             # dyld4 registers ASan globals twice for dlopen'd libs -> spurious
             # ODR violation on TestPlugin vtable. Suppress.
             asan_options: detect_odr_violation=0
-          - name: ubsan
-            visibility: default
-            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+            # UBSan reports and continues by default, and ctest shows the output of
+            # failing tests only: halt on the first report, so that it fails the test.
+            ubsan_options: halt_on_error=1:print_stacktrace=1
           - name: tsan
             visibility: default
             sanitize_flags: "-fsanitize=thread"
-          - name: hidden-asan
-            visibility: hidden
-            sanitize_flags: "-fsanitize=address"
-            asan_options: detect_odr_violation=0
+            warnings: true
+            ctest_exclude: "^Data(MySQL|PostgreSQL|ODBC)$"
     env:
       TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
       ASAN_OPTIONS: ${{ matrix.asan_options }}
+      UBSAN_OPTIONS: ${{ matrix.ubsan_options }}
     steps:
       - uses: actions/checkout@v5
       - name: Install OpenSSL, libssh, Redis, MongoDB
@@ -867,6 +863,9 @@ jobs:
           brew tap mongodb/brew
           brew trust mongodb/brew
           brew install mongodb-community
+      - name: Install MySQL, PostgreSQL and ODBC client libraries
+        if: matrix.warnings
+        run: brew install mysql-client unixodbc libpq
       - name: Start Redis and MongoDB
         run: |
           brew services start redis
@@ -878,6 +877,8 @@ jobs:
           -DENABLE_TRACE=ON
           ${{ env.POCO_CMAKE_FULL_COMMON }}
           -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+          ${{ matrix.warnings && env.POCO_CMAKE_WARNINGS_EXTRA || '' }}
+          ${{ matrix.warnings && '-DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON -DMYSQL_ROOT_DIR=$(brew --prefix mysql-client) -DPostgreSQL_ROOT=$(brew --prefix libpq)' || '' }}
       - run: cmake --build cmake-build --target all --parallel $(sysctl -n hw.ncpu)
       - uses: ./.github/actions/retry-action
         with:
@@ -889,115 +890,26 @@ jobs:
             sudo -s
             ASAN_OPTIONS=${ASAN_OPTIONS}
             TSAN_OPTIONS=${TSAN_OPTIONS}
+            UBSAN_OPTIONS=${UBSAN_OPTIONS}
             PWD=`pwd`
             ctest ${{ env.POCO_CTEST_COMMON }} ${{ env.POCO_CTEST_SANITIZER_EXTRA }} --parallel $(sysctl -n hw.ncpu) ${{ matrix.ctest_exclude && format('-E "{0}"', matrix.ctest_exclude) || '' }}
       - uses: ./.github/actions/upload-test-report
         with:
           suffix: ${{ matrix.name }}
 
-  # POCO_SOO=OFF probe on macos-arm64: Foundation only.
-  macos-clang-cmake-poco-soo-off:
-    runs-on: macos-latest
-    needs: changes
-    if: |
-      needs.changes.outputs.foundation == 'true' ||
-      needs.changes.outputs.ci_core == 'true' ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v5
-      - run: >-
-          cmake -S. -Bcmake-build -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
-          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }} -DPOCO_SOO=OFF
-      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $(sysctl -n hw.ncpu)
-      - name: Run Foundation tests
-        run: >-
-          cd cmake-build &&
-          PWD=`pwd`
-          ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^Foundation$"
-      - uses: ./.github/actions/upload-test-report
-
-  # Long tests on macos-arm64: the suites of POCO_LONG_TEST_SUITES with -long.
-  macos-clang-cmake-long-tests:
-    runs-on: macos-latest
-    needs: changes
-    if: |
-      needs.changes.outputs.foundation == 'true' ||
-      needs.changes.outputs.ci_core == 'true' ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    steps:
-      - uses: actions/checkout@v5
-      - run: >-
-          cmake -S. -Bcmake-build
-          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }}
-      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $(sysctl -n hw.ncpu)
-      - name: Run Foundation long tests
-        timeout-minutes: 30
-        run: >-
-          cd cmake-build/bin &&
-          POCO_BASE="$GITHUB_WORKSPACE" PATH="$PATH:$(pwd)"
-          ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
-
-  # Newer non-Apple compiler probe (brew clang-21). Scope: Foundation + Util
-  # + Crypto (exercises the OpenSSL link path implied by the -openssl3 name).
-  macos-clang-21-cmake-openssl3:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install llvm@21 openssl@3
-      - run: >-
-          CXX=$(brew --prefix llvm@21)/bin/clang++ CC=$(brew --prefix llvm@21)/bin/clang
-          cmake -S. -Bcmake-build -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
-          ${{ env.POCO_CMAKE_FOUNDATION_UTIL }}
-          -DENABLE_CRYPTO=ON
-          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
-      - run: >-
-          cmake --build cmake-build --parallel $(sysctl -n hw.ncpu) --target
-          Foundation Util Crypto Foundation-testrunner Util-testrunner Crypto-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^(Foundation|Util|Crypto)$"
-      - uses: ./.github/actions/upload-test-report
-
-  # Build-only: compile-warnings-as-signal across as many modules as possible.
-  macos-clang-cmake-warnings:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: >-
-          cmake -S. -Bcmake-build
-          ${{ env.POCO_CMAKE_FULL_COMMON }}
-          ${{ env.POCO_CMAKE_WARNINGS_EXTRA }}
-          -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
-          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
-          -DMYSQL_ROOT_DIR=$(brew --prefix mysql-client)
-          -DPostgreSQL_ROOT=$(brew --prefix libpq)
-      - run: cmake --build cmake-build --target all --parallel $(sysctl -n hw.ncpu)
-
   # ------------------------------------------------------------------------
-  # macOS x64 (macos-15-intel) -- de-prioritized, sanitizer-only
+  # macOS x64 (macos-15-intel) -- push and manual runs only
   # ------------------------------------------------------------------------
 
+  # ASan + UBSan on Intel macOS. x86_64 is tested by the Linux and Windows jobs,
+  # macOS by the arm64 jobs; this job covers the combination after the merge.
   macos-x64-clang-cmake-sanitizers:
     runs-on: macos-15-intel
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: asan
-            sanitize_flags: "-fsanitize=address"
-          - name: ubsan
-            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
-          - name: tsan
-            sanitize_flags: "-fsanitize=thread"
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     env:
-      TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
+      # UBSan reports and continues by default, and ctest shows the output of
+      # failing tests only: halt on the first report, so that it fails the test.
+      UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
     steps:
       - uses: actions/checkout@v5
       - name: Install OpenSSL, libssh, Redis, MongoDB
@@ -1012,7 +924,7 @@ jobs:
           brew services start mongodb-community
       - run: >-
           cmake -S. -Bcmake-build
-          -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}"
+          -DPOCO_SANITIZEFLAGS="-fsanitize=address,undefined;-fno-sanitize=vptr"
           -DENABLE_TRACE=ON
           ${{ env.POCO_CMAKE_FULL_COMMON }}
           -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
@@ -1025,12 +937,12 @@ jobs:
           command: >-
             cd cmake-build &&
             sudo -s
-            TSAN_OPTIONS=${TSAN_OPTIONS}
+            UBSAN_OPTIONS=${UBSAN_OPTIONS}
             PWD=`pwd`
             ctest ${{ env.POCO_CTEST_COMMON }} ${{ env.POCO_CTEST_SANITIZER_EXTRA }} --parallel $(sysctl -n hw.ncpu)
       - uses: ./.github/actions/upload-test-report
         with:
-          suffix: ${{ matrix.name }}
+          suffix: asan-ubsan
 
   # ------------------------------------------------------------------------
   # Windows
@@ -1144,10 +1056,15 @@ jobs:
               exit 1
             }
           }
+      # Also the warnings signal: compiler warnings on, and the components that
+      # POCO_CMAKE_WINDOWS_FULL leaves out (Redis and MongoDB tests need a server).
       - run: >-
           cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
           ${{ env.POCO_CMAKE_WINDOWS_FULL }}
+          ${{ env.POCO_CMAKE_WARNINGS_EXTRA }}
+          -DENABLE_SEVENZIP=ON -DENABLE_REDIS=ON -DENABLE_MONGODB=ON
+          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
           -DOPENSSL_ROOT_DIR="${{ env.OPENSSL_ROOT_DIR }}"
           -DCMAKE_PREFIX_PATH="${{ env.LIBSSH_ROOT_DIR }}"
       - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
@@ -1392,29 +1309,17 @@ jobs:
           cd cmake-build/bin;
           ./Foundation-testrunner -long ${{ env.POCO_LONG_TEST_SUITES }}
 
-  # Build-only warnings probe: extra compiler warnings enabled.
-  windows-msvc-cmake-warnings:
-    runs-on: windows-2025
-    steps:
-      - uses: actions/checkout@v5
-      - uses: TheMrMilchmann/setup-msvc-dev@v4
-        with:
-          arch: x64
-      - run: >-
-          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          ${{ env.POCO_CMAKE_FULL_COMMON }}
-          ${{ env.POCO_CMAKE_WARNINGS_EXTRA }}
-          -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_XSD_VALIDATOR=OFF
-          -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF
-      - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
-
   # ------------------------------------------------------------------------
   # Data-env: build-once / test-many. `data-build` compiles every Data/Redis/
   # MongoDB testrunner once and uploads the binaries; each data-test-* job
-  # downloads them and runs only its own driver against a real backend.
+  # downloads them and runs its drivers against real backends.
   # ------------------------------------------------------------------------
 
-  data-test-mysql:
+  # MySQL, PostgreSQL, Redis, MongoDB and ODBC with the PostgreSQL driver, against
+  # one set of service containers. Each driver has its own step, and every step
+  # runs when an earlier one failed, so one job reports each driver separately.
+  # TODO DataPostgreSQL sometimes fails on testTransaction and testReconnect
+  data-test-servers:
     runs-on: ubuntu-24.04
     needs: data-build
     if: needs.data-build.outputs.run == 'true'
@@ -1431,90 +1336,12 @@ jobs:
           MYSQL_DATABASE: pocotest
         ports:
           - 3306:3306
-    steps:
-      - uses: actions/checkout@v5
-      - uses: ./.github/actions/ensure-apt-packages
-        with:
-          packages: libmysqlclient21 mysql-client
-      - uses: actions/download-artifact@v8
-        with:
-          name: data-build-artifacts
-          path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: cd cmake-build/bin && ./DataMySQL-testrunner -all
-
-  # TODO tests sometimes failing on testTransaction and testReconnect
-  data-test-postgres:
-    runs-on: ubuntu-24.04
-    needs: data-build
-    if: needs.data-build.outputs.run == 'true'
-    env:
-      POCO_BASE: ${{ github.workspace }}
-      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
-    services:
       postgres:
         image: postgres:16.0
         env:
           POSTGRES_PASSWORD: postgres
         ports:
           - 5432:5432
-    steps:
-      - uses: actions/checkout@v5
-      - uses: ./.github/actions/ensure-apt-packages
-        with:
-          packages: libpq5
-      - uses: actions/download-artifact@v8
-        with:
-          name: data-build-artifacts
-          path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: cd cmake-build/bin && ./DataPostgreSQL-testrunner -all
-
-  data-test-redis:
-    runs-on: ubuntu-24.04
-    needs: data-build
-    if: needs.data-build.outputs.run == 'true'
-    env:
-      POCO_BASE: ${{ github.workspace }}
-      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
-    steps:
-      - uses: actions/checkout@v5
-      - name: Install Redis server
-        run: |
-          curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-          echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-          sudo apt-get -y update
-          sudo apt-get -y install redis
-      - uses: actions/download-artifact@v8
-        with:
-          name: data-build-artifacts
-          path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: cd cmake-build/bin && ./Redis-testrunner -all
-
-  data-test-mongodb:
-    runs-on: ubuntu-24.04
-    needs: data-build
-    if: needs.data-build.outputs.run == 'true'
-    env:
-      POCO_BASE: ${{ github.workspace }}
-      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
-    services:
       mongodb:
         # mongo:8 refuses to start on the runner kernels 6.19 to 7.0.13 (SERVER-121912, #5575)
         image: mongo:7
@@ -1525,17 +1352,69 @@ jobs:
           --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v5
+      - uses: ./.github/actions/ensure-apt-packages
+        with:
+          packages: libmysqlclient21 mysql-client libpq5
+      - name: Install Redis server
+        run: |
+          curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+          sudo apt-get -y update
+          sudo apt-get -y install redis
+      - name: Install ODBC runtime dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          set -euxo pipefail
+          sudo apt-get update -o Acquire::Retries=3
+          sudo apt-get install -y --no-install-recommends \
+            libodbcinst2 libodbc2 odbcinst odbc-postgresql
       - uses: actions/download-artifact@v8
         with:
           name: data-build-artifacts
           path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
+      - id: artifacts
+        run: chmod +x cmake-build/bin/*-testrunner
+      - name: MySQL
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: cd cmake-build/bin && ./DataMySQL-testrunner -all
+      - name: PostgreSQL
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: cd cmake-build/bin && ./DataPostgreSQL-testrunner -all
+      - name: Redis
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: cd cmake-build/bin && ./Redis-testrunner -all
+      - name: MongoDB
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: cd cmake-build/bin && ./MongoDB-testrunner -all
+      - name: ODBC with PostgreSQL
+        if: ${{ !cancelled() && steps.artifacts.outcome == 'success' }}
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: cd cmake-build/bin && ./DataODBC-testrunner -all
 
   data-test-odbc-oracle:
     runs-on: ubuntu-24.04
@@ -1694,44 +1573,6 @@ jobs:
           rm packages-microsoft-prod.deb
           sudo apt-get update -o Acquire::Retries=3
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
-
-      - uses: actions/download-artifact@v8
-        with:
-          name: data-build-artifacts
-          path: cmake-build
-      - run: chmod +x cmake-build/bin/*-testrunner
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: cd cmake-build/bin && ./DataODBC-testrunner -all
-
-  data-test-odbc-postgres:
-    runs-on: ubuntu-24.04
-    needs: data-build
-    if: needs.data-build.outputs.run == 'true'
-    env:
-      POCO_BASE: ${{ github.workspace }}
-      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
-    services:
-      postgres:
-        image: postgres:16.0
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports:
-          - 5432:5432
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Install ODBC runtime dependencies
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          set -euxo pipefail
-          sudo apt-get update -o Acquire::Retries=3
-          sudo apt-get install -y --no-install-recommends \
-            libodbcinst2 libodbc2 odbcinst odbc-postgresql
 
       - uses: actions/download-artifact@v8
         with:
