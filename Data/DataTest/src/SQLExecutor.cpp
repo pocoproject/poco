@@ -2531,6 +2531,14 @@ void SQLExecutor::recordSet()
 			RecordSet rset(stmt);
 			assertTrue (rset.rowCount() == 1);
 			assertTrue (rset["row_count"].convert<int>() == 0);
+			assertTrue (0 == Poco::icompare(rset.columnName(0), "row_count"));
+
+			stmt.execute();
+			RecordSet rset2(stmt);
+			assertTrue (rset2.rowCount() == 1);
+			assertTrue (rset2["row_count"].convert<int>() == 0);
+			assertTrue (0 == Poco::icompare(rset2.columnName(0), "row_count"));
+			assertTrue (rset2.columnType(0) == rset.columnType(0));
 		}
 
 		{
