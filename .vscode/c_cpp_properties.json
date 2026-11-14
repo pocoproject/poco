@@ -44,7 +44,7 @@
             "forcedInclude": [],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++20",
             "compileCommands": "",
             "browse": {
                 "path": [
@@ -65,7 +65,7 @@
             "forcedInclude": [],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++20",
             "compileCommands": "",
             "browse": {
                 "path": [

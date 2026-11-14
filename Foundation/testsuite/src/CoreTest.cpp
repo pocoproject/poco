@@ -148,6 +148,35 @@ void CoreTest::testPlatform()
 }
 
 
+// The attribute that POCO_API selects, as text. The traditional preprocessor of
+// Visual C++ finishes the expansion of POCO_API only with the third level, and
+// stringizes an empty expansion to nothing at all, so every text below starts
+// with a string literal of its own.
+#define CORETEST_STRINGIZE_3(...) #__VA_ARGS__
+#define CORETEST_STRINGIZE_2(...) CORETEST_STRINGIZE_3(__VA_ARGS__)
+#define CORETEST_STRINGIZE(...) "" CORETEST_STRINGIZE_2(__VA_ARGS__)
+#define CoreTestOne_EXPORTS 1
+#define CoreTestEmpty_EXPORTS
+
+
+void CoreTest::testAPI()
+{
+	const std::string one(CORETEST_STRINGIZE(POCO_API(CoreTestOne_EXPORTS)));
+	const std::string empty(CORETEST_STRINGIZE(POCO_API(CoreTestEmpty_EXPORTS)));
+	const std::string undefined(CORETEST_STRINGIZE(POCO_API(CoreTestUndefined_EXPORTS)));
+
+#if defined(_WIN32) && defined(POCO_DLL)
+	// MinGW defines __declspec itself as a macro.
+	assertEqual (CORETEST_STRINGIZE(__declspec(dllexport)), one);
+	assertEqual (CORETEST_STRINGIZE(__declspec(dllexport)), empty);
+	assertEqual (CORETEST_STRINGIZE(__declspec(dllimport)), undefined);
+#else
+	assertEqual (one, empty);
+	assertEqual (one, undefined);
+#endif
+}
+
+
 void CoreTest::testFixedLength()
 {
 	assertTrue (sizeof(Poco::Int8) == 1);
@@ -1402,6 +1431,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("CoreTest");
 
 	CppUnit_addTest(pSuite, CoreTest, testPlatform);
+	CppUnit_addTest(pSuite, CoreTest, testAPI);
 	CppUnit_addTest(pSuite, CoreTest, testFixedLength);
 	CppUnit_addTest(pSuite, CoreTest, testBugcheck);
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);

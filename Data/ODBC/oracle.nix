@@ -345,7 +345,7 @@ CONTAINERSCONF
 
     # Configure Poco and source environment
     POCO_BASE="$(cd "$DATA_DIR/../../.." && pwd)"
-    (cd "$POCO_BASE" && ./configure)
+    (cd "$POCO_BASE" && ./configure --config=Linux-c++20)
     source "$POCO_BASE/poco_env.bash"
 
     # Add Oracle Instant Client and ODBC dependencies to library path

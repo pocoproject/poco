@@ -1495,8 +1495,8 @@ used instead of an enumerator that only serves as a named integer constant.
 #### Recommendation 72
 
 Declare a function `constexpr` when its result can be computed from its arguments alone and may be needed in a
-constant expression (array sizes, template arguments, `static_assert`). Use `consteval` (C++20, see Rule 105) only when a
-function must be evaluated at compile time.
+constant expression (array sizes, template arguments, `static_assert`). Use `consteval` only when a function must be
+evaluated at compile time.
 
 #### Example 18
 
@@ -2116,20 +2116,21 @@ older versions are dead code and are removed.
 
 #### Rule 104
 
-POCO 2.0 targets C++20. Release branches of POCO 1.x require C++17 and use C++20 when the compiler supports it.
+POCO 2.0 requires C++20: the build and `Poco/Config.h` reject an older language standard. C++20 language features
+are used without a guard. Release branches of POCO 1.x require C++17 and use C++20 when the compiler supports it.
 
-> NOTE: As long as the build accepts a C++17 compiler (the CMake fallback when a compiler lacks C++20 support, and
-> the Emscripten build), language and library features that a C++17 build lacks are used only behind the feature
-> macros of `Poco/Config.h`.
+> NOTE: The supported standard libraries do not implement all of the C++20 library (libc++ before version 20 does
+> not provide `std::jthread` by default; libc++ has no `std::atomic<std::shared_ptr>`). A library feature that one
+> of the supported toolchains lacks is used only behind a feature macro of `Poco/Config.h` (Rule 105).
 
 #### Rule 105
 
-Code that needs a feature beyond the baseline tests the matching macro from `Poco/Config.h` and provides a fallback or
-excludes the functionality: `POCO_HAVE_CPP20_COMPILER`, `POCO_HAVE_CPP23_COMPILER`, `POCO_HAVE_JTHREAD`,
-`POCO_HAVE_ATOMIC_WAIT`, `POCO_HAVE_ATOMIC_SHARED_PTR`, `POCO_HAS_FLOAT_CHARCONV`. A new check is added to
-`Poco/Config.h` as a macro `POCO_HAVE_<FEATURE>`, defined to 1 when the feature is available and left undefined
-otherwise. It is based on the standard feature-test macros (`__cpp_lib_...`, `__has_cpp_attribute`); compiler,
-library or operating system versions are tested only where no feature-test macro reflects the state, as for
+Code that needs a standard library feature that a supported toolchain lacks, or a feature of a later standard, tests the
+matching macro from `Poco/Config.h` and provides a fallback or excludes the functionality: `POCO_HAVE_CPP23_COMPILER`,
+`POCO_HAVE_JTHREAD`, `POCO_HAVE_ATOMIC_WAIT`, `POCO_HAVE_ATOMIC_SHARED_PTR`, `POCO_HAS_FLOAT_CHARCONV`. A new check is
+added to `Poco/Config.h` as a macro `POCO_HAVE_<FEATURE>`, defined to 1 when the feature is available and left undefined
+otherwise. It is based on the standard feature-test macros (`__cpp_lib_...`, `__has_cpp_attribute`); compiler, library
+or operating system versions are tested only where no feature-test macro reflects the state, as for
 `POCO_HAS_FLOAT_CHARCONV` and `POCO_HAVE_ATOMIC_WAIT`.
 
 #### Rule 106
@@ -2183,16 +2184,15 @@ the code does not need the features of `Poco::Thread` (names, priorities, `Poco:
 
 #### Recommendation 85
 
-Use standard library features of C++20 that need a guard on a C++17 build (`std::span`, `std::jthread`,
-`std::atomic::wait`, concepts in the standard library) only as described in Rule 105.
+Use the standard library features that a supported toolchain lacks (`std::jthread` and `std::stop_token`,
+`std::atomic::wait`, `std::atomic<std::shared_ptr>`, the floating-point overloads of `std::to_chars` and
+`std::from_chars`) only as described in Rule 105.
 
 #### Recommendation 86
 
 Use the direct form that the library provides: a membership test is `contains()` (`std::map`, `std::set` and the
-unordered containers in C++20), not `find() != end()` or `count() > 0`; keep an iterator from `find()` only when the
+unordered containers), not `find() != end()` or `count() > 0`; keep an iterator from `find()` only when the
 element is used afterwards.
-
-> NOTE: `contains()` is a C++20 member function; code that must build as C++17 keeps `find()` (Rule 105).
 
 
 ## 22 References and Recommended Reading

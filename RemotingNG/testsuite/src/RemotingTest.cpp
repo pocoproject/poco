@@ -1017,7 +1017,7 @@ void RemotingTest::testOptional(ITester::Ptr pTester)
 		assert (!res.isSpecified());
 	}
 
-#if POCO_HAVE_CPP17_COMPILER && defined(TEST_STD_OPTIONAL)
+#if defined(TEST_STD_OPTIONAL)
 	{
 		std::optional<std::string> value("test");
 		std::optional<std::string> res = pTester->testStdOptional(value);
@@ -1039,7 +1039,7 @@ void RemotingTest::testStruct8(ITester::Ptr pTester)
 	Struct8 value;
 	value.pocoOptional = "test";
 
-#if POCO_HAVE_CPP17_COMPILER && defined(TEST_STD_OPTIONAL)
+#if defined(TEST_STD_OPTIONAL)
 	value.stdOptional = "test2";
 #endif
 
@@ -1047,7 +1047,7 @@ void RemotingTest::testStruct8(ITester::Ptr pTester)
 	assert (res.pocoOptional.isSpecified());
 	assert (res.pocoOptional.value() == value.pocoOptional.value());
 
-#if POCO_HAVE_CPP17_COMPILER && defined(TEST_STD_OPTIONAL)
+#if defined(TEST_STD_OPTIONAL)
 	assert (res.stdOptional.has_value());
 	assert (res.stdOptional.value() == value.stdOptional.value());
 #endif

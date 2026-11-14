@@ -38,9 +38,7 @@
 #include <set>
 #include <unordered_set>
 #include <array>
-#if POCO_HAVE_CPP17_COMPILER
 #include <optional>
-#endif
 #include <memory>
 
 
@@ -273,9 +271,6 @@ public:
 };
 
 
-#if POCO_HAVE_CPP17_COMPILER
-
-
 template <typename T>
 class TypeSerializer<std::optional<T>>
 {
@@ -290,9 +285,6 @@ public:
 		ser.serializeOptionalEnd(name);
 	}
 };
-
-
-#endif // POCO_HAVE_CPP17_COMPILER
 
 
 template <typename T>

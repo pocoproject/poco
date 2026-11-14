@@ -36,7 +36,7 @@ GMAKE = make mode=$(mode)
 NAME := sqlparser
 PARSER_CPP = $(SRCPARSER)/bison_parser.cpp  $(SRCPARSER)/flex_lexer.cpp
 PARSER_H   = $(SRCPARSER)/bison_parser.h    $(SRCPARSER)/flex_lexer.h
-LIB_CFLAGS = -std=c++17 -I. -Isrc/ $(OPT_FLAG)
+LIB_CFLAGS = -std=c++20 -I. -Isrc/ $(OPT_FLAG)
 
 relaxed_build ?= "off"
 ifeq ($(relaxed_build), on)
@@ -114,7 +114,7 @@ install:
 ############## Benchmark ##############
 #######################################
 BM_BUILD  = $(BIN)/benchmark
-BM_CFLAGS = -std=c++17 -Wall -Isrc/ -L./ $(OPT_FLAG)
+BM_CFLAGS = -std=c++20 -Wall -Isrc/ -L./ $(OPT_FLAG)
 BM_PATH   = benchmark
 BM_CPP    = $(shell find $(BM_PATH)/ -name '*.cpp')
 BM_ALL    = $(shell find $(BM_PATH)/ -name '*.cpp' -or -name '*.h')
@@ -138,7 +138,7 @@ $(BM_BUILD): $(BM_ALL) $(LIB_BUILD)
 ############ Test & Example ############
 ########################################
 TEST_BUILD  = $(BIN)/tests
-TEST_CFLAGS = -std=c++17 -Wall -Werror -I. -Isrc/ -Itest/ -L./ $(OPT_FLAG)
+TEST_CFLAGS = -std=c++20 -Wall -Werror -I. -Isrc/ -Itest/ -L./ $(OPT_FLAG)
 TEST_CPP    = $(shell find test/ -name '*.cpp')
 TEST_ALL    = $(shell find test/ -name '*.cpp') $(shell find test/ -name '*.h')
 EXAMPLE_SRC = $(shell find example/ -name '*.cpp') $(shell find example/ -name '*.h')

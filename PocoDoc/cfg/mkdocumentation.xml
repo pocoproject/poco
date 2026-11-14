@@ -46,6 +46,7 @@
 				-I/usr/include/mysql,
 				-I/usr/include/postgresql,
 				-D_DEBUG,
+				-std=c++20,
 				-E,
 				-C,
 				-DPOCO_NO_GCC_API_ATTRIBUTE,

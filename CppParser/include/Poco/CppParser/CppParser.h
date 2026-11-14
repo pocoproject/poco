@@ -24,29 +24,9 @@
 
 
 //
-// The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the CppParser_EXPORTS
-// symbol defined on the command line. This symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file sees
-// CppParser_API functions as being imported from a DLL, whereas this DLL sees symbols
-// defined with this macro as being exported.
+// CppParser_EXPORTS is defined only while this library is compiled (see POCO_API in Poco/Foundation.h).
 //
-#if (defined(_WIN32) || defined(__CYGWIN__)) && defined(POCO_DLL)
-	#if defined(CppParser_EXPORTS)
-		#define CppParser_API __declspec(dllexport)
-	#else
-		#define CppParser_API __declspec(dllimport)
-	#endif
-#endif
-
-
-#if !defined(CppParser_API)
-	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
-		#define CppParser_API __attribute__ ((visibility ("default")))
-	#else
-		#define CppParser_API
-	#endif
-#endif
+#define CppParser_API POCO_API(CppParser_EXPORTS)
 
 
 //

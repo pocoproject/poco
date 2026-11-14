@@ -29,7 +29,7 @@
 #include <cstddef>
 #include <optional>
 
-#if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
+#if defined(POCO_COMPILER_GCC)
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wuse-after-free"
 #elif defined (POCO_COMPILER_MSVC)
@@ -536,7 +536,7 @@ public:
 
 } // namespace Poco::Data
 
-#if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
+#if defined(POCO_COMPILER_GCC)
 	#pragma GCC diagnostic pop
 #elif defined (POCO_COMPILER_MSVC)
 #pragma warning(pop)

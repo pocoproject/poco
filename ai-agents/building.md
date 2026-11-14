@@ -6,14 +6,16 @@ directory.
 
 ## Language standard
 
-- CMake checks for C++20 support (`cmake/CXX2x.cmake`: GCC 10+, Clang 10+, AppleClang 13+, MSVC) and uses C++20 when it
-  is available; otherwise it falls back to C++17 (`cmake/CXX1x.cmake`). Emscripten builds always use C++17. The
-  configure output states which standard is used. The supported compilers in `README.md` are newer than these
-  thresholds.
-- `main` (2.0) targets C++20 and must also build as C++17, so C++20 forms in the code are always guarded (see the
-  section "Language Standard and Feature Guards" of
-  [CODING_STYLE.md](../CODING_STYLE.md#20-language-standard-and-feature-guards)). The 1.x release branches require C++17
-  and use C++20 when it is available.
+- POCO requires C++20. The root `CMakeLists.txt` sets `CMAKE_CXX_STANDARD` to 20 unless a later standard is set,
+  and stops with an error when `CMAKE_CXX_STANDARD` is below 20 or when the compiler fails the C++20 check
+  (`cmake/CXX2x.cmake` compiles `cmake/test_compiler_cxx20.cpp`). A compiler older than the supported compilers
+  in `README.md` that passes the check gets a warning; Emscripten does not, because its SDK version and not its
+  Clang version identifies it. `Poco/Config.h` stops the compilation of a file that includes a POCO header with
+  an older standard. The configure output states which standard is used.
+- C++20 language features need no guard. Standard library features that a supported toolchain lacks are guarded
+  (see the section "Language Standard and Feature Guards" of
+  [CODING_STYLE.md](../CODING_STYLE.md#20-language-standard-and-feature-guards)). The 1.x release branches require
+  C++17 and use C++20 when it is available.
 
 ## Optional components and their packages
 

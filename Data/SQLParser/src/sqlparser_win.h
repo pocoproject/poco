@@ -2,10 +2,8 @@
 #define SQLPARSER_SQLPARSER_WIN_H
 
 
-#if (__cplusplus >= 201703L)
-	#if __has_include("Poco/Data/Data.h")
-		#include "Poco/Data/Data.h"
-	#endif
+#if __has_include("Poco/Data/Data.h")
+	#include "Poco/Data/Data.h"
 #endif
 
 
@@ -32,7 +30,7 @@
 
 
 #if !defined(SQLParser_API)
-	#if defined (__GNUC__) && (__GNUC__ >= 4)
+	#if defined (__GNUC__)
 		#define SQLParser_API __attribute__ ((visibility ("default")))
 	#else
 		#define SQLParser_API

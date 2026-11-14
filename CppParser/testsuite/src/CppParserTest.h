@@ -41,6 +41,7 @@ public:
 	void testParseRepeatedNestedNamespace();
 	void testParseSingleNamespace();
 	void testParseDeepNestedNamespace();
+	void testLookupOverloadedFunction();
 
 	void setUp();
 	void tearDown();

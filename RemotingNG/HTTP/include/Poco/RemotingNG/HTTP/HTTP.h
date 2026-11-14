@@ -26,29 +26,9 @@
 
 
 //
-// The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the RemotingNGHTTP_EXPORTS
-// symbol defined on the command line. This symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file sees
-// RemotingNGHTTP_API functions as being imported from a DLL, whereas this DLL sees symbols
-// defined with this macro as being exported.
+// RemotingNGHTTP_EXPORTS is defined only while this library is compiled (see POCO_API in Poco/Foundation.h).
 //
-#if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(RemotingNGHTTP_EXPORTS)
-		#define RemotingNGHTTP_API __declspec(dllexport)
-	#else
-		#define RemotingNGHTTP_API __declspec(dllimport)
-	#endif
-#endif
-
-
-#if !defined(RemotingNGHTTP_API)
-	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
-		#define RemotingNGHTTP_API __attribute__ ((visibility ("default")))
-	#else
-		#define RemotingNGHTTP_API
-	#endif
-#endif
+#define RemotingNGHTTP_API POCO_API(RemotingNGHTTP_EXPORTS)
 
 
 //

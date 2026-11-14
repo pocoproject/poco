@@ -66,9 +66,10 @@ The classes that use it and the order in which to choose an implementation are i
 
 ## Language level and feature macros
 
-C++20 forms are guarded as described in the section "Language Standard and Feature Guards" of
-[CODING_STYLE.md](../CODING_STYLE.md#20-language-standard-and-feature-guards); `[[nodiscard]]` and `POCO_NODISCARD_CTOR`
-follow [Rule 94](../CODING_STYLE.md#rule-94).
+C++20 is the baseline. Standard library features that a supported toolchain lacks are guarded as described in the
+section "Language Standard and Feature Guards" of
+[CODING_STYLE.md](../CODING_STYLE.md#20-language-standard-and-feature-guards); `[[nodiscard]]` and
+`POCO_NODISCARD_CTOR` follow [Rule 94](../CODING_STYLE.md#rule-94).
 
 ## Deprecation
 

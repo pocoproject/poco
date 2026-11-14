@@ -35,11 +35,9 @@
 	#include <ws2def.h>
 	#include <mstcpip.h> // TCP_KEEPIDLE, TCP_KEEPINTVL, TCP_KEEPCNT
 	#if !defined (POCO_NET_NO_UNIX_SOCKET)
-		#if POCO_HAVE_CPP17_COMPILER
-			#if __has_include(<afunix.h>)
-				#include <afunix.h>
-				#define POCO_HAS_UNIX_SOCKET
-			#endif
+		#if __has_include(<afunix.h>)
+			#include <afunix.h>
+			#define POCO_HAS_UNIX_SOCKET
 		#endif
 	#endif
 	#define POCO_INVALID_SOCKET  INVALID_SOCKET

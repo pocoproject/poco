@@ -20,25 +20,9 @@
 
 
 //
-// The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the ONVIF_EXPORTS
-// symbol defined on the command line. This symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file sees
-// ONVIF_API functions as being imported from a DLL, whereas this DLL sees symbols
-// defined with this macro as being exported.
+// ONVIF_EXPORTS is defined only while this library is compiled (see POCO_API in Poco/Foundation.h).
 //
-#if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(ONVIF_EXPORTS)
-		#define ONVIF_API __declspec(dllexport)
-	#else
-		#define ONVIF_API __declspec(dllimport)
-	#endif
-#endif
-
-
-#if !defined(ONVIF_API)
-	#define ONVIF_API
-#endif
+#define ONVIF_API POCO_API(ONVIF_EXPORTS)
 
 
 //

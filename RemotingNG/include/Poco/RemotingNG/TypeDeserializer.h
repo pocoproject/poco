@@ -39,9 +39,7 @@
 #include <set>
 #include <unordered_set>
 #include <array>
-#if POCO_HAVE_CPP17_COMPILER
 #include <optional>
-#endif
 #include <memory>
 
 
@@ -411,9 +409,6 @@ public:
 };
 
 
-#if POCO_HAVE_CPP17_COMPILER
-
-
 template <typename T>
 class TypeDeserializer<std::optional<T>>
 {
@@ -444,9 +439,6 @@ public:
 			value.reset();
 	}
 };
-
-
-#endif // POCO_HAVE_CPP17_COMPILER
 
 
 template <typename T>

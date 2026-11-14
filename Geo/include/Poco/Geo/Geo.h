@@ -23,29 +23,9 @@
 
 
 //
-// The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the Geo_EXPORTS
-// symbol defined on the command line. This symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file sees
-// Geo_API functions as being imported from a DLL, whereas this DLL sees symbols
-// defined with this macro as being exported.
+// Geo_EXPORTS is defined only while this library is compiled (see POCO_API in Poco/Foundation.h).
 //
-#if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(Geo_EXPORTS)
-		#define Geo_API __declspec(dllexport)
-	#else
-		#define Geo_API __declspec(dllimport)
-	#endif
-#endif
-
-
-#if !defined(Geo_API)
-	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
-		#define Geo_API __attribute__ ((visibility ("default")))
-	#else
-		#define Geo_API
-	#endif
-#endif
+#define Geo_API POCO_API(Geo_EXPORTS)
 
 
 //

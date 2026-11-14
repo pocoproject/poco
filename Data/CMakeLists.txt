@@ -11,7 +11,7 @@ endif()
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 
-if(MSVC AND NOT(MSVC_VERSION LESS 1400))
+if(MSVC)
 	set_source_files_properties(src/StatementImpl.cpp
 		PROPERTIES COMPILE_FLAGS "/bigobj")
 elseif(MINGW)

@@ -154,6 +154,15 @@ Breaking Changes:
 - GH #5510 Poco::Util::Timer::run() is final, and the timer thread runs it without a virtual
   call, so that the thread no longer reads the vptr while the constructor or destructor of a
   subclass writes it; a subclass can no longer override run().
+- GH #5691 C++20 is the minimum language standard. CMake stops at configure time when
+  CMAKE_CXX_STANDARD is below 20 or when the compiler fails the C++20 check
+  (cmake/test_compiler_cxx20.cpp), and warns about a compiler older than GCC 12, Clang 16,
+  Apple Clang 16 or Visual C++ 2022. A CMAKE_CXX_STANDARD above 20 is kept. Poco/Config.h stops
+  the compilation of code that includes a POCO header with an older standard; with Visual C++
+  it reads _MSVC_LANG, so /Zc:__cplusplus is not needed. The installed CMake targets require
+  cxx_std_20. POCO_HAVE_CPP17_COMPILER and POCO_HAVE_CPP20_COMPILER are always 1. RemoteGenNG
+  and PocoDoc pass -std=c++20 (/std:c++20 with Visual C++) to the preprocessor: add the option
+  to configuration files copied from RemoteGenNG.xml.
 
 Bundled Third-Party Library Upgrades:
 
@@ -183,6 +192,12 @@ Features:
   child is spawned without an initial directory and is given variables: it then gets only those.
 - GH #5510 Poco::Util::LayeredConfiguration::replace() replaces a labeled configuration in one
   step, so that readers never see the configuration without it.
+- GH #5691 Poco/Foundation.h defines POCO_API(exports), the attribute that exports the symbols
+  of a shared library or imports them. The export macros of the POCO libraries (Foundation_API,
+  Net_API and the others; not CppUnit_API) are defined with it, and a library that is built on
+  POCO can define its own in one line: #define MyLib_API POCO_API(MyLib_EXPORTS). The headers
+  define these macros also when the including code has defined them before. On Cygwin, CppParser
+  and NetSSL use the GCC visibility attribute, as the other libraries do.
 
 New Components:
 

@@ -6,8 +6,8 @@ the CMake files.
 
 ## Requirements
 
-- A C++17 compiler and standard library. CMake uses C++20 when the compiler supports it (see
-  [building.md](building.md#language-standard)); C++20 forms in the code are guarded (see
+- A C++20 compiler and standard library (see [building.md](building.md#language-standard)). Standard library
+  features that a supported toolchain lacks are guarded (see
   [CODING_STYLE.md](../CODING_STYLE.md#20-language-standard-and-feature-guards)).
 - Threads with a mutex and a condition variable or an equivalent event primitive.
 - A file system API.

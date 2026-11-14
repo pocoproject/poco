@@ -25,6 +25,7 @@ public:
 	~CoreTest();
 
 	void testPlatform();
+	void testAPI();
 	void testFixedLength();
 	void testBugcheck();
 	void testFPE();

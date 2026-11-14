@@ -140,7 +140,7 @@ POLICYJSON
 
     # Configure Poco and source environment
     POCO_BASE="$(cd "$DATA_DIR/../../.." && pwd)"
-    (cd "$POCO_BASE" && ./configure)
+    (cd "$POCO_BASE" && ./configure --config=Linux-c++20)
     source "$POCO_BASE/poco_env.bash"
 
     # Add ODBC driver and its dependencies to library path (after poco_env.bash which sets LD_LIBRARY_PATH)
