@@ -211,9 +211,17 @@ public:
 		/// appended to result, enclosed in double-quotes.
 		/// Otherwise, the value is appended to result as-is.
 
-	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset = "UTF-8");
+	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& toCharset = "UTF-8");
+		/// Decodes a single RFC 2047 encoded word, with or without the enclosing
+		/// "=?" and "?=", and converts it to toCharset. If ins is not a
+		/// well-formed encoded word with the encoding B or Q, or does not decode,
+		/// outs receives ins unchanged.
+
 	[[nodiscard]] static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
-			/// Decode RFC2047 string.
+		/// Decodes the RFC 2047 encoded words in text and converts them to the
+		/// given charset. Text that is not a well-formed encoded word, or does
+		/// not decode, is copied unchanged. White space is removed only between
+		/// two decoded words.
 
 protected:
 	[[nodiscard]] static bool isValidFieldName(const std::string& name);
