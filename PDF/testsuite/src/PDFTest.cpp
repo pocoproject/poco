@@ -9,6 +9,7 @@
 
 
 #include "PDFTest.h"
+#include "Poco/PDF/Document.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 
@@ -49,7 +50,16 @@ void PDFTest::testFont()
 
 void PDFTest::testEncoding()
 {
-	warn("not implemented");
+	Poco::PDF::Document doc;
+	const Poco::PDF::Encoder& enc = doc.loadEncoder("WinAnsiEncoding");
+	assertTrue (enc.name() == "WinAnsiEncoding");
+	assertTrue (enc.getType() == Poco::PDF::Encoder::ENCODER_TYPE_SINGLE_BYTE);
+
+	const Poco::PDF::Encoder& again = doc.loadEncoder("WinAnsiEncoding");
+	assertTrue (&again == &enc);
+
+	const Poco::PDF::Encoder& current = doc.setCurrentEncoder("WinAnsiEncoding");
+	assertTrue (current.name() == "WinAnsiEncoding");
 }
 
 

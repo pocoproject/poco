@@ -414,7 +414,7 @@ void Document::encryption(Encryption mode, Poco::UInt32 keyLength)
 const Encoder& Document::loadEncoder(const std::string& name)
 {
 	auto it = _encoders.find(name);
-	if (_encoders.end() == it) return it->second;
+	if (it != _encoders.end()) return it->second;
 
 	Encoder enc(&_pdf, HPDF_GetEncoder(_pdf, name.c_str()), name);
 	std::pair<EncoderContainer::iterator, bool> ret =
