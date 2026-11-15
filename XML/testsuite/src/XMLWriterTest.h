@@ -43,6 +43,8 @@ public:
 	void testEmptyDataPretty();
 	void testComment();
 	void testPI();
+	void testCommentTerminator();
+	void testPITerminator();
 	void testCharacters();
 	void testCharactersCR();
 	void testEmptyCharacters();

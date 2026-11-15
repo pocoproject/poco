@@ -226,6 +226,9 @@ public:
 
 	void processingInstruction(const XMLString& target, const XMLString& data);
 		/// Writes a processing instruction.
+		///
+		/// Throws an XMLException if the target or the data contains "?>",
+		/// which would end the processing instruction early.
 
 	void startPrefixMapping(const XMLString& prefix, const XMLString& namespaceURI);
 		/// Begin the scope of a prefix-URI Namespace mapping.
@@ -254,6 +257,9 @@ public:
 
 	void comment(const XMLChar ch[], int start, int length);
 		/// Writes a comment.
+		///
+		/// Throws an XMLException if the comment contains "--" or ends
+		/// with "-", which XML does not allow in a comment.
 
 	void startDTD(const XMLString& name, const XMLString& publicId, const XMLString& systemId);
 		/// Writes a DTD declaration.

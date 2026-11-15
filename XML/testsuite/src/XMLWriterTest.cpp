@@ -339,6 +339,60 @@ void XMLWriterTest::testPI()
 }
 
 
+void XMLWriterTest::testCommentTerminator()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, 0);
+	writer.startDocument();
+	writer.startElement("", "", "r");
+	writer.comment("a - b", 0, 5);
+	const std::string invalid[] = {"--><admin/><!--", "a--b", "--", "a-"};
+	for (const auto& text: invalid)
+	{
+		try
+		{
+			writer.comment(text.data(), 0, static_cast<int>(text.size()));
+			fail("comment with \"--\" or a final \"-\" - must throw exception");
+		}
+		catch (const Poco::XML::XMLException&)
+		{
+		}
+	}
+	writer.endElement("", "", "r");
+	writer.endDocument();
+	assertTrue (str.str() == "<r><!--a - b--></r>");
+}
+
+
+void XMLWriterTest::testPITerminator()
+{
+	std::ostringstream str;
+	XMLWriter writer(str, 0);
+	writer.startDocument();
+	writer.startElement("", "", "r");
+	writer.processingInstruction("target", "a? b>");
+	try
+	{
+		writer.processingInstruction("target", "?><admin/><?x");
+		fail("\"?>\" in processing instruction data - must throw exception");
+	}
+	catch (const Poco::XML::XMLException&)
+	{
+	}
+	try
+	{
+		writer.processingInstruction("x?><admin/><?target", "data");
+		fail("\"?>\" in processing instruction target - must throw exception");
+	}
+	catch (const Poco::XML::XMLException&)
+	{
+	}
+	writer.endElement("", "", "r");
+	writer.endDocument();
+	assertTrue (str.str() == "<r><?target a? b>?></r>");
+}
+
+
 void XMLWriterTest::testCharacters()
 {
 	std::ostringstream str;
@@ -794,6 +848,8 @@ CppUnit::Test* XMLWriterTest::suite()
 	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyDataPretty);
 	CppUnit_addTest(pSuite, XMLWriterTest, testComment);
 	CppUnit_addTest(pSuite, XMLWriterTest, testPI);
+	CppUnit_addTest(pSuite, XMLWriterTest, testCommentTerminator);
+	CppUnit_addTest(pSuite, XMLWriterTest, testPITerminator);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCharacters);
 	CppUnit_addTest(pSuite, XMLWriterTest, testCharactersCR);
 	CppUnit_addTest(pSuite, XMLWriterTest, testEmptyCharacters);
