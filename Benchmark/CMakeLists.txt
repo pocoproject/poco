@@ -34,6 +34,6 @@ target_include_directories(Benchmark
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/include
 		${CMAKE_CURRENT_SOURCE_DIR}/src
-		# ChecksumBench measures each CRC implementation through the private header CRC.h
+		# ChecksumBench measures each CRC and Adler-32 implementation through the private headers CRC.h and Adler32.h
 		${PROJECT_SOURCE_DIR}/Foundation/src
 )

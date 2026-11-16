@@ -46,7 +46,7 @@ target_version = 1
 target_libs    = PocoUtil PocoFoundation
 
 SYSLIBS += $(BENCHMARK_LIBS)
-# ChecksumBench measures each CRC implementation through the private header CRC.h
+# ChecksumBench measures each CRC and Adler-32 implementation through the private headers CRC.h and Adler32.h
 INCLUDE += -I$(POCO_BASE)/Benchmark/include -I$(POCO_BASE)/Foundation/src $(BENCHMARK_CFLAGS)
 
 include $(POCO_BASE)/build/rules/exec

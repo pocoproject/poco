@@ -33,6 +33,7 @@ public:
 	void testKnownAnswers();
 	void testIncrementalUpdate();
 	void testImplementationsAgree();
+	void testAdler32ImplementationsAgree();
 	void testLargeInput();
 
 	void setUp() override;
