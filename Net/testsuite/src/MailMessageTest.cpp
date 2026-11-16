@@ -1595,6 +1595,67 @@ void MailMessageTest::testWriteEncodesNonAsciiText()
 }
 
 
+void MailMessageTest::testEncodeWordB()
+{
+	assertEqual ("this is pure ASCII", MailMessage::encodeWord("this is pure ASCII", "UTF-8", MailMessage::WordEncoding::B));
+	assertEqual ("=?UTF-8?b?R3LDvMOfZQ==?=", MailMessage::encodeWord("Gr\xC3\xBC\xC3\x9F" "e", "UTF-8", MailMessage::WordEncoding::B));
+	assertEqual ("=?ISO-8859-1?b?xNY=?=", MailMessage::encodeWord("\304\326", "ISO-8859-1", MailMessage::WordEncoding::B));
+}
+
+
+void MailMessageTest::testEncodeWordAuto()
+{
+	assertEqual ("this is pure ASCII", MailMessage::encodeWord("this is pure ASCII", "UTF-8", MailMessage::WordEncoding::AUTO));
+	assertEqual ("=?UTF-8?q?Gr=C3=BC=C3=9Fe?=", MailMessage::encodeWord("Gr\xC3\xBC\xC3\x9F" "e"));
+	assertEqual ("=?UTF-8?b?R3LDvMOfZQ==?=", MailMessage::encodeWord("Gr\xC3\xBC\xC3\x9F" "e", "UTF-8", MailMessage::WordEncoding::AUTO));
+	assertEqual ("=?UTF-8?q?Gr=C3=BC=C3=9Fe_aus_Ljubljana_und_Wien?=",
+		MailMessage::encodeWord("Gr\xC3\xBC\xC3\x9F" "e aus Ljubljana und Wien", "UTF-8", MailMessage::WordEncoding::AUTO));
+	assertEqual ("=?UTF-8?q?Ferenc_B=C5=91di_Kov=C3=A1cs?=",
+		MailMessage::encodeWord("Ferenc B\xC5\x91" "di Kov\xC3\xA1" "cs", "UTF-8", MailMessage::WordEncoding::AUTO));
+}
+
+
+void MailMessageTest::testEncodeWordLength()
+{
+	assertEqual ("=?UTF-8?q?" + std::string(61, 'a') + "?=\r\n =?UTF-8?q?=C3=A4?=", MailMessage::encodeWord(std::string(61, 'a') + "\xC3\xA4"));
+
+	std::string text;
+	for (int i = 0; i < 40; ++i) text += "\xE2\x82\xAC";
+	for (const auto encoding: {MailMessage::WordEncoding::Q, MailMessage::WordEncoding::B})
+	{
+		const std::string encoded = MailMessage::encodeWord(text, "UTF-8", encoding);
+		assertEqual (text, MessageHeader::decodeWord(encoded));
+		std::string decodedWords;
+		std::string::size_type start = 0;
+		while (start < encoded.size())
+		{
+			const std::string::size_type end = std::min(encoded.find("\r\n ", start), encoded.size());
+			const std::string word = encoded.substr(start, end - start);
+			assertTrue (word.size() <= 75);
+			std::string decoded;
+			MessageHeader::decodeRFC2047(word, decoded);
+			assertTrue (!decoded.empty() && decoded.size() % 3 == 0);
+			assertEqual ("\xE2", decoded.substr(0, 1));
+			decodedWords += decoded;
+			start = end + 3;
+		}
+		assertEqual (text, decodedWords);
+	}
+}
+
+
+void MailMessageTest::testWriteEncodesShorterWord()
+{
+	MailMessage message;
+	message.setSubject("Gr\xC3\xBC\xC3\x9F" "e");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "j@no.where", "J\xC3\xB6rg Doe"));
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertTrue (ostr.str().find("\r\nSubject: =?UTF-8?b?R3LDvMOfZQ==?=\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nTo: =?UTF-8?b?SsO2cmcgRG9l?= <j@no.where>\r\n") != std::string::npos);
+}
+
+
 void MailMessageTest::testWriteKeepsNonUTF8Text()
 {
 	MailMessage message;
@@ -1678,7 +1739,7 @@ void MailMessageTest::testWriteEncodesNameWithComment()
 	message.setSender("J\xC3\xB6rg (Sales) <j@x.example>");
 	std::ostringstream ostr;
 	message.write(ostr);
-	assertTrue (ostr.str().find("\r\nFrom: =?UTF-8?q?J=C3=B6rg?= (Sales) <j@x.example>\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nFrom: =?UTF-8?b?SsO2cmc=?= (Sales) <j@x.example>\r\n") != std::string::npos);
 }
 
 
@@ -1691,9 +1752,9 @@ void MailMessageTest::testWriteEncodesDomainLiteral()
 	message.set("Reply-To", "<a@[x>, J\xC3\xB6rg <b@c.example>");
 	std::ostringstream ostr;
 	message.write(ostr);
-	assertTrue (ostr.str().find("\r\nFrom: =?UTF-8?q?J=C3=B6rg_=5Ba=3Cb=5D?= <c@d.example>\r\n") != std::string::npos);
-	assertTrue (ostr.str().find("\r\nCc: a@[x, =?UTF-8?q?J=C3=B6rg?= <b@c.example>\r\n") != std::string::npos);
-	assertTrue (ostr.str().find("\r\nReply-To: <a@[x>, =?UTF-8?q?J=C3=B6rg?= <b@c.example>\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nFrom: =?UTF-8?b?SsO2cmcgW2E8Yl0=?= <c@d.example>\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nCc: a@[x, =?UTF-8?b?SsO2cmc=?= <b@c.example>\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nReply-To: <a@[x>, =?UTF-8?b?SsO2cmc=?= <b@c.example>\r\n") != std::string::npos);
 }
 
 
@@ -1746,7 +1807,7 @@ void MailMessageTest::testWriteKeepsQuotedLocalPart()
 	std::ostringstream ostr;
 	message.write(ostr);
 	assertTrue (ostr.str().find("\r\nFrom: \"a<b\"@c.example\r\n") != std::string::npos);
-	assertTrue (ostr.str().find("\r\nCc: =?UTF-8?q?J=C3=B6rg?= <\"a<b\"@c.example>, \"x<y\"@d.example\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nCc: =?UTF-8?b?SsO2cmc=?= <\"a<b\"@c.example>, \"x<y\"@d.example\r\n") != std::string::npos);
 }
 
 
@@ -1804,6 +1865,10 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesGroupName);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteEncodedFieldsUnchanged);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesNonAsciiText);
+	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWordB);
+	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWordAuto);
+	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWordLength);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesShorterWord);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteKeepsNonUTF8Text);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsDomainLiteral);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsMalformedDomainLiteral);

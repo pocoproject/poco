@@ -494,7 +494,7 @@ std::string HeaderField::encodeAddressList(std::string_view list)
 		{
 			const auto nameStart = std::min(text.find_first_not_of(" \t"), text.size());
 			result.append(text.substr(0, nameStart));
-			result += MailMessage::encodeWord(mailbox.phrase);
+			result += MailMessage::encodeWord(mailbox.phrase, "UTF-8", MailMessage::WordEncoding::AUTO);
 			// The phrase has no comments; the mailbox is valid here, so they are terminated.
 			const auto nameEnd = mailbox.hasAngleAddress ? findAngleAddress(text) : text.size() - 1;
 			appendComments(text.substr(nameStart, nameEnd - nameStart), result);
