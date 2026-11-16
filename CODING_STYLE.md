@@ -460,6 +460,20 @@ Order the `#include` directives of an implementation file as follows, without em
 #include <sstream>
 ```
 
+#### Rule 107
+
+On Windows, include `<windows.h>` only through `Poco/UnWindows.h`, which defines `WIN32_LEAN_AND_MEAN` and `NOMINMAX`
+first. `Poco/Foundation.h` includes it, so a file that includes a POCO header does not include `<windows.h>` itself.
+Other Windows SDK headers (`<winsock2.h>`, `<wincrypt.h>`, `<iphlpapi.h>`) are included after a POCO header.
+
+Exceptions, where a different order is required:
+
+- `Poco/UnWindows.h` itself includes `<windows.h>`.
+- Bundled third-party sources in `dependencies/` keep the includes of their upstream project.
+- Code built with `POCO_BLOATED_WIN32` that uses POCO Net defines `NOMINMAX` and includes `<winsock2.h>` before the
+  first POCO header; code built with `POCO_NO_WINDOWS_H` defines `NOMINMAX` and `WIN32_LEAN_AND_MEAN` and includes
+  `<windows.h>` before the first POCO header (see `Poco/Config.h`).
+
 ## 5 Names
 
 #### Rule 25
