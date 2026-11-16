@@ -428,6 +428,9 @@ Bug Fixes and Improvements:
   CppUnit compares the names of ignored tests without the "class " and "struct " keywords
   that MSVC writes into type names, so that the Windows ignore lists also apply to MinGW
   builds; a CI job builds and tests POCO with MinGW (MSYS2 UCRT64).
+- PR #5714 Poco::CppParser::Utility and PocoDoc put the configured compiler path before
+  the directories in PATH while they start the preprocessor, and restore PATH afterwards.
+  They set PATH to the configured path alone and did not restore it.
 
 
 Release 1.15.4 (2026-09-22)

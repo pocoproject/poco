@@ -13,17 +13,20 @@
 #include "CppUnit/TestCase.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/CppParser/Utility.h"
+#include "Poco/Environment.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/String.h"
 #include "Poco/TemporaryFile.h"
 #include <filesystem>
+#include <fstream>
 #include <set>
 #include <string>
 #include <vector>
 
 
 using Poco::CppParser::Utility;
+using Poco::Environment;
 using Poco::File;
 using Poco::Path;
 using Poco::TemporaryFile;
@@ -46,6 +49,17 @@ namespace {
 		~FileListUtility() = delete;
 
 		using Utility::buildFileList;
+	};
+
+
+	class PreprocessUtility: public Utility
+		/// Gives the tests the preprocessor call of Utility::parse().
+	{
+	public:
+		PreprocessUtility() = delete;
+		~PreprocessUtility() = delete;
+
+		using Utility::preprocessFile;
 	};
 
 
@@ -330,6 +344,25 @@ void UtilityTest::testAddLanguageStandard()
 }
 
 
+void UtilityTest::testPreprocessFileCompilerPath()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	// The preprocessor is found only in the configured directory, and it runs cat from PATH.
+	File(inRoot("bin/")).createDirectories();
+	{
+		std::ofstream script(inRoot("bin/pocotestcpp"));
+		script << "#!/bin/sh\nfor last; do :; done\ncat \"$last\" > \"$1\"\n";
+	}
+	File(inRoot("bin/pocotestcpp")).setExecutable(true);
+	const std::string savedPath = Environment::get("PATH", "");
+
+	assertEqual ("B.i"s, PreprocessUtility::preprocessFile(inRoot("inc/B.h"), "pocotestcpp", inRoot("%.i"), inRoot("bin")));
+	assertTrue (File(inRoot("B.i")).exists());
+	assertEqual (savedPath, Environment::get("PATH", ""));
+#endif
+}
+
+
 void UtilityTest::setUp()
 {
 	_savedCwd = Path::current();
@@ -378,6 +411,7 @@ CppUnit::Test* UtilityTest::suite()
 	CppUnit_addTest(pSuite, UtilityTest, testCollectDependenciesHomeAndDeviceNames);
 	CppUnit_addTest(pSuite, UtilityTest, testCollectDependenciesFilesAsParsed);
 	CppUnit_addTest(pSuite, UtilityTest, testAddLanguageStandard);
+	CppUnit_addTest(pSuite, UtilityTest, testPreprocessFileCompilerPath);
 
 	return pSuite;
 }
