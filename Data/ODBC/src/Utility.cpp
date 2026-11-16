@@ -21,7 +21,6 @@
 #include "Poco/Exception.h"
 #include "Poco/Format.h"
 #include <algorithm>
-#include <cmath>
 #include <cstdlib>
 #include <limits>
 #include <vector>
@@ -117,8 +116,9 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 
 void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 {
-	double msec = ts.fraction/1000000;
-	double usec = 1000 * (msec - std::floor(msec));
+	constexpr SQLUINTEGER NANOSECONDS_PER_MILLISECOND = 1000000;
+	constexpr SQLUINTEGER NANOSECONDS_PER_MICROSECOND = 1000;
+	constexpr SQLUINTEGER MICROSECONDS_PER_MILLISECOND = 1000;
 
 	dt.assign(ts.year,
 		ts.month,
@@ -126,8 +126,8 @@ void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 		ts.hour,
 		ts.minute,
 		ts.second,
-		(int) std::floor(msec),
-		(int) std::floor(usec));
+		static_cast<int>(ts.fraction / NANOSECONDS_PER_MILLISECOND),
+		static_cast<int>((ts.fraction / NANOSECONDS_PER_MICROSECOND) % MICROSECONDS_PER_MILLISECOND));
 }
 
 
