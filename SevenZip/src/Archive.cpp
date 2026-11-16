@@ -269,7 +269,7 @@ protected:
 			Poco::UTF16Encoding utf16Encoding;
 			Poco::TextConverter converter(utf16Encoding, utf8Encoding);
 			std::string utf8Path;
-			converter.convert(&utf16Path[0], (int) utf16PathLen*sizeof(Poco::UInt16), utf8Path);
+			converter.convert(&utf16Path[0], utf16PathLen*sizeof(Poco::UInt16), utf8Path);
 
 			Poco::Timestamp lastModified(0);
 			if (SzBitWithVals_Check(&_db.MTime, i))

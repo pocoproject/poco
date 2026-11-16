@@ -28,9 +28,12 @@ TextConverter::TextConverter(const TextEncoding& inEncoding, const TextEncoding&
 }
 
 
-int TextConverter::convert(const std::string& source, std::string& destination, Transform trans) const
+std::size_t TextConverter::convert(
+	const std::string& source,
+	std::string& destination,
+	Transform trans) const
 {
-	int errors = 0;
+	std::size_t errors = 0;
 	TextIterator it(source, _inEncoding);
 	TextIterator end(source);
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
@@ -50,12 +53,16 @@ int TextConverter::convert(const std::string& source, std::string& destination, 
 }
 
 
-int TextConverter::convert(const void* source, int length, std::string& destination, Transform trans) const
+std::size_t TextConverter::convert(
+	const void* source,
+	std::size_t length,
+	std::string& destination,
+	Transform trans) const
 {
 	if (length == 0) return 0;
 	poco_check_ptr (source);
 
-	int errors = 0;
+	std::size_t errors = 0;
 	const unsigned char* it  = (const unsigned char*) source;
 	const unsigned char* end = (const unsigned char*) source + length;
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];

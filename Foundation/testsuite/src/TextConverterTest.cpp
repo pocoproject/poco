@@ -51,7 +51,7 @@ void TextConverterTest::testIdentityASCII()
 
 	std::string empty;
 	std::string result0;
-	int errors = converter.convert(empty, result0);
+	std::size_t errors = converter.convert(empty, result0);
 	assertTrue (result0 == empty);
 	assertTrue (errors == 0);
 
@@ -62,7 +62,7 @@ void TextConverterTest::testIdentityASCII()
 	assertTrue (errors == 0);
 
 	std::string result2;
-	errors = converter.convert(fooBar.data(), (int) fooBar.length(), result2);
+	errors = converter.convert(fooBar.data(), fooBar.length(), result2);
 	assertTrue (result2 == fooBar);
 	assertTrue (errors == 0);
 
@@ -91,7 +91,7 @@ void TextConverterTest::testIdentityUTF8()
 
 	std::string empty;
 	std::string result0;
-	int errors = converter.convert(empty, result0);
+	std::size_t errors = converter.convert(empty, result0);
 	assertTrue (result0 == empty);
 	assertTrue (errors == 0);
 
@@ -102,7 +102,7 @@ void TextConverterTest::testIdentityUTF8()
 	assertTrue (errors == 0);
 
 	std::string result2;
-	errors = converter.convert(fooBar.data(), (int) fooBar.length(), result2);
+	errors = converter.convert(fooBar.data(), fooBar.length(), result2);
 	assertTrue (result2 == fooBar);
 	assertTrue (errors == 0);
 
@@ -157,7 +157,7 @@ void TextConverterTest::testUTF8toASCII()
 	const unsigned char greek[] = {0x20, 0xce, 0xba, 0xe1, 0xbd, 0xb9, 0xcf, 0x83, 0xce, 0xbc, 0xce, 0xb5, 0x20, 0x41, 0x42, 0x00};
 	std::string text((const char*) greek);
 	std::string result0;
-	int errors = converter.convert(text, result0);
+	std::size_t errors = converter.convert(text, result0);
 	assertTrue (result0 == " ????? AB");
 	assertTrue (errors == 0);
 
@@ -179,7 +179,7 @@ void TextConverterTest::testLatin1toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latin1Text, result0);
+	std::size_t errors = converter.convert(latin1Text, result0);
 	assertTrue (result0 == utf8Text);
 	assertTrue (errors == 0);
 	assertEqual((long) result0.size(), 7);
@@ -204,7 +204,7 @@ void TextConverterTest::testLatin2toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
 	assertEqual((long) result0.size(), 49);
@@ -230,7 +230,7 @@ void TextConverterTest::testLatin9toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
 	assertEqual((long) result0.size(), 43);
@@ -256,7 +256,7 @@ void TextConverterTest::testCP1250toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
 	assertEqual((long) result0.size(), 49);
@@ -281,7 +281,7 @@ void TextConverterTest::testCP1251toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
 	assertEqual((long) result0.size(), 62);
@@ -307,7 +307,7 @@ void TextConverterTest::testCP1252toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual(result0, utf8Text);
 	assertEqual(errors, 0);
 	assertEqual((long) result0.size(), 43);
@@ -346,7 +346,7 @@ void TextConverterTest::testEmptyBuffer()
 	const std::string unchanged = "unchanged";
 	std::string result = unchanged;
 
-	int errors = converter.convert(nullptr, 0, result);
+	std::size_t errors = converter.convert(nullptr, 0, result);
 	assertEqual (result, unchanged);
 	assertEqual (errors, 0);
 
@@ -366,7 +366,7 @@ void TextConverterTest::testErrors()
 	std::string badText((const char*) badChars);
 
 	std::string result;
-	int errors = converter.convert(badText, result);
+	std::size_t errors = converter.convert(badText, result);
 	assertTrue (errors == 2);
 }
 
