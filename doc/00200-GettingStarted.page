@@ -333,7 +333,7 @@ Here is an overview of POCO build options:
     * ENABLE_DATA_POSTGRESQL           Set to OFF|ON (default is ON if PostgreSQL found) to build Data PostgreSQL support library
     * ENABLE_DATA_ODBC                 Set to OFF|ON (default is ON if ODBC found) to build Data ODBC support library
     * ENABLE_MONGODB                   Set to OFF|ON (default is ON) to build MongoDB support library
-    * ENABLE_REDIS                     Set to OFF|ON (default is ON) to build Redis support library
+    * ENABLE_REDIS                     Set to OFF|ON (default is ON) to build Redis or Valkey support library
     * ENABLE_PDF                       Set to OFF|ON (default is OFF) to build PDF support library
     * ENABLE_UTIL                      Set to OFF|ON (default is ON) to build Util support library
     * ENABLE_ZIP                       Set to OFF|ON (default is ON) to build Zip support library

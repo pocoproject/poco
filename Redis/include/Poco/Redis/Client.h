@@ -34,7 +34,8 @@ namespace Poco::Redis {
 
 
 class Redis_API Client
-	/// Represents a connection to a Redis server.
+	/// Represents a connection to a Redis server, or to another server that
+	/// implements the Redis protocol (RESP), such as Valkey.
 	///
 	/// A command is always made from an Array and a reply can be a signed 64
 	/// bit integer, a simple string, a bulk string, an array or an error. The
