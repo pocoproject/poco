@@ -66,6 +66,7 @@ public:
 	void testNoDecodeStructuredFields();
 	void testWriteReceivedForm();
 	void testEraseDropsReceivedForm();
+	void testMove();
 	void testSplitParametersDecodesNames();
 	void testSwapAndSecureClear();
 	void testSecureEraseIterator();

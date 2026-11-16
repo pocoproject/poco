@@ -61,11 +61,18 @@ public:
 		/// Creates the MessageHeader by copying
 		/// another one.
 
+	MessageHeader(MessageHeader&& messageHeader) noexcept;
+		/// Creates the MessageHeader by moving
+		/// another one.
+
 	virtual ~MessageHeader();
 		/// Destroys the MessageHeader.
 
 	MessageHeader& operator = (const MessageHeader& messageHeader);
 		/// Assigns the content of another MessageHeader.
+
+	MessageHeader& operator = (MessageHeader&& messageHeader) noexcept;
+		/// Moves the content of another MessageHeader.
 
 	using NameValueCollection::erase;
 

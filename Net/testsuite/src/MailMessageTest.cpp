@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -1656,6 +1657,50 @@ void MailMessageTest::testWriteEncodesShorterWord()
 }
 
 
+void MailMessageTest::testMove()
+{
+	MailMessage message;
+	message.setSubject("Test Message");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "jane.doe@no.where"));
+	message.addContent(new StringPartSource("Hello, world!\r\n", "text/plain"));
+	message.addAttachment("a.txt", new StringPartSource("a", "text/plain", "a.txt"));
+	const MailMessage::PartVec parts = message.parts();
+
+	MailMessage moved(std::move(message));
+	assertTrue (message.empty());
+	assertTrue (message.recipients().empty());
+	assertTrue (message.parts().empty());
+	assertEqual ("Test Message", moved.getSubject());
+	assertEqual (1, moved.recipients().size());
+	assertEqual (2, moved.parts().size());
+	assertTrue (moved.parts()[0].pSource == parts[0].pSource);
+	assertTrue (moved.parts()[1].pSource == parts[1].pSource);
+
+	MailMessage assigned;
+	assigned.addAttachment("b.txt", new StringPartSource("b", "text/plain", "b.txt"));
+	assigned = std::move(moved);
+	assertTrue (moved.empty());
+	assertTrue (moved.recipients().empty());
+	assertTrue (moved.parts().empty());
+	assertEqual ("Test Message", assigned.getSubject());
+	assertEqual (1, assigned.recipients().size());
+	assertEqual (2, assigned.parts().size());
+	assertTrue (assigned.parts()[0].pSource == parts[0].pSource);
+	assertTrue (assigned.parts()[1].pSource == parts[1].pSource);
+	std::ostringstream ostr;
+	assigned.write(ostr);
+	assertTrue (ostr.str().find("Hello, world!") != std::string::npos);
+
+	FilePartStoreFactory factory;
+	MailMessage messageWithStore(&factory);
+	MailMessage movedWithStore(std::move(messageWithStore));
+	std::unique_ptr<Poco::Net::PartSource> pStore(movedWithStore.createPartStore("a", "text/plain"));
+	assertTrue (dynamic_cast<FilePartStore*>(pStore.get()) != nullptr);
+	std::unique_ptr<Poco::Net::PartSource> pSource(messageWithStore.createPartStore("a", "text/plain"));
+	assertTrue (dynamic_cast<FilePartStore*>(pSource.get()) == nullptr);
+}
+
+
 void MailMessageTest::testWriteKeepsNonUTF8Text()
 {
 	MailMessage message;
@@ -1869,6 +1914,7 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWordAuto);
 	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWordLength);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesShorterWord);
+	CppUnit_addTest(pSuite, MailMessageTest, testMove);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteKeepsNonUTF8Text);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsDomainLiteral);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsMalformedDomainLiteral);

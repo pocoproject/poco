@@ -40,6 +40,7 @@
 #include <limits>
 #include <sstream>
 #include <string_view>
+#include <utility>
 
 
 using Poco::Base64Encoder;
@@ -331,6 +332,42 @@ MailMessage::MailMessage(PartStoreFactory* pStoreFactory):
 	Poco::Timestamp now;
 	setDate(now);
 	setContentType("text/plain");
+}
+
+
+MailMessage::MailMessage(MailMessage&& message) noexcept:
+	MessageHeader(std::move(message)),
+	_recipients(std::exchange(message._recipients, {})),
+	_parts(std::exchange(message._parts, {})),
+	_content(std::exchange(message._content, {})),
+	_encoding(message._encoding),
+	_boundary(std::exchange(message._boundary, {})),
+	_pStoreFactory(std::exchange(message._pStoreFactory, nullptr)),
+	_isMultipart(std::exchange(message._isMultipart, false)),
+	_recipientsChanged(std::exchange(message._recipientsChanged, false))
+{
+}
+
+
+MailMessage& MailMessage::operator = (MailMessage&& message) noexcept
+{
+	if (&message != this)
+	{
+		MessageHeader::operator = (std::move(message));
+		for (const auto& part: _parts)
+		{
+			delete part.pSource;
+		}
+		_recipients = std::exchange(message._recipients, {});
+		_parts = std::exchange(message._parts, {});
+		_content = std::exchange(message._content, {});
+		_encoding = message._encoding;
+		_boundary = std::exchange(message._boundary, {});
+		_pStoreFactory = std::exchange(message._pStoreFactory, nullptr);
+		_isMultipart = std::exchange(message._isMultipart, false);
+		_recipientsChanged = std::exchange(message._recipientsChanged, false);
+	}
+	return *this;
 }
 
 
