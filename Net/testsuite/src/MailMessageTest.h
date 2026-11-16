@@ -68,6 +68,7 @@ public:
 	void testEncodeWordAuto();
 	void testEncodeWordLength();
 	void testWriteEncodesShorterWord();
+	void testMove();
 	void testWriteKeepsNonUTF8Text();
 	void testReadRecipientsDomainLiteral();
 	void testReadRecipientsMalformedDomainLiteral();

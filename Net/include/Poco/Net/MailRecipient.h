@@ -46,6 +46,9 @@ public:
 	MailRecipient(const MailRecipient& recipient);
 		/// Creates a MailRecipient by copying another one.
 
+	MailRecipient(MailRecipient&& recipient) noexcept = default;
+		/// Creates a MailRecipient by moving another one.
+
 	MailRecipient(RecipientType type, const std::string& address);
 		/// Creates a MailRecipient of the given type.
 
@@ -57,6 +60,9 @@ public:
 
 	MailRecipient& operator = (const MailRecipient& recipient);
 		/// Assigns another recipient.
+
+	MailRecipient& operator = (MailRecipient&& recipient) noexcept = default;
+		/// Moves another recipient.
 
 	void swap(MailRecipient& recipient) noexcept;
 		/// Exchanges the content of two recipients.

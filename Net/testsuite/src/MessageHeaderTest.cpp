@@ -1013,6 +1013,58 @@ void MessageHeaderTest::testEraseDropsReceivedForm()
 }
 
 
+void MessageHeaderTest::testMove()
+{
+	const std::string fields("Subject: =?UTF-8?Q?a=C3=A4?=\r\n");
+	std::istringstream istr(fields + "\r\n");
+	MessageHeader mh;
+	mh.setFieldLimit(5);
+	mh.setNameLengthLimit(7);
+	mh.setValueLengthLimit(9000);
+	mh.read(istr);
+
+	MessageHeader moved(std::move(mh));
+	assertTrue (mh.empty());
+	assertTrue (moved.getAutoDecode());
+	assertEqual (5, moved.getFieldLimit());
+	assertEqual (7, moved.getNameLengthLimit());
+	assertEqual (9000, moved.getValueLengthLimit());
+	assertEqual ("a\xC3\xA4", moved.get("Subject"));
+	std::ostringstream movedStr;
+	moved.write(movedStr);
+	assertEqual (fields, movedStr.str());
+
+	MessageHeader assigned;
+	assigned.setAutoDecode(false);
+	assigned.set("X-A", "b");
+	assigned = std::move(moved);
+	assertTrue (moved.empty());
+	assertTrue (assigned.getAutoDecode());
+	assertEqual (5, assigned.getFieldLimit());
+	assertEqual (7, assigned.getNameLengthLimit());
+	assertEqual (9000, assigned.getValueLengthLimit());
+	assertEqual (1, assigned.size());
+	std::ostringstream assignedStr;
+	assigned.write(assignedStr);
+	assertEqual (fields, assignedStr.str());
+
+	mh.add("X-B", "c");
+	moved.add("X-C", "d");
+	std::ostringstream sourceStr;
+	mh.write(sourceStr);
+	moved.write(sourceStr);
+	assertEqual ("X-B: c\r\nX-C: d\r\n", sourceStr.str());
+
+	std::istringstream undecodedStr(fields + "\r\n");
+	MessageHeader undecoded;
+	undecoded.setAutoDecode(false);
+	undecoded.read(undecodedStr);
+	MessageHeader movedUndecoded(std::move(undecoded));
+	assertTrue (!movedUndecoded.getAutoDecode());
+	assertEqual ("=?UTF-8?Q?a=C3=A4?=", movedUndecoded.get("Subject"));
+}
+
+
 void MessageHeaderTest::testSplitParametersDecodesNames()
 {
 	std::string value;
@@ -1166,6 +1218,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testNoDecodeStructuredFields);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteReceivedForm);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testEraseDropsReceivedForm);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testMove);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParametersDecodesNames);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSwapAndSecureClear);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSecureEraseIterator);

@@ -94,6 +94,16 @@ public:
 		/// the file system in order to avoid potential memory
 		/// exhaustion when attachment files are very large.
 
+	MailMessage(MailMessage&& message) noexcept;
+		/// Creates a MailMessage by moving the header fields, recipients,
+		/// content, parts and part store factory of another one, which
+		/// is left without them.
+
+	MailMessage& operator = (MailMessage&& message) noexcept;
+		/// Deletes the parts of this message and moves the header fields,
+		/// recipients, content, parts and part store factory of another
+		/// one, which is left without them.
+
 	virtual ~MailMessage();
 		/// Destroys the MailMessage.
 
