@@ -17,6 +17,7 @@
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/NameValueCollection.h"
 #include <sstream>
 
 
@@ -27,6 +28,7 @@ using Poco::Net::PartHandler;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPMessage;
 using Poco::Net::MessageHeader;
+using Poco::Net::NameValueCollection;
 
 
 namespace
@@ -269,6 +271,37 @@ void HTMLFormTest::testReadMultipart()
 }
 
 
+void HTMLFormTest::testReadMultipartEncodedFileName()
+{
+	std::istringstream istr(
+		"\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: form-data; name=\"a=?b\"\r\n"
+		"\r\n"
+		"value1\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: form-data; name=\"upload\"; filename=\"=?UTF-8?B?w6TDtsO8LnR4dA==?=\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"This is an attachment\r\n"
+		"--MIME_boundary_0123456789--\r\n"
+	);
+	HTTPRequest req("POST", "/form.cgi");
+	req.setContentType(HTMLForm::ENCODING_MULTIPART + "; boundary=\"MIME_boundary_0123456789\"");
+	StringPartHandler sah;
+	HTMLForm form(req, istr, sah);
+	assertEqual (1, form.size());
+	assertEqual ("value1", form["a=?b"]);
+
+	assertEqual ("form-data; name=\"upload\"; filename=\"=?UTF-8?B?w6TDtsO8LnR4dA==?=\"", sah.disp());
+	std::string disposition;
+	NameValueCollection params;
+	MessageHeader::splitParameters(sah.disp(), disposition, params);
+	assertEqual ("upload", params["name"]);
+	assertEqual ("\xC3\xA4\xC3\xB6\xC3\xBC.txt", params["filename"]);
+}
+
+
 void HTMLFormTest::testSubmit1()
 {
 	HTMLForm form;
@@ -430,6 +463,7 @@ CppUnit::Test* HTMLFormTest::suite()
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlPUT);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlBOM);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadMultipart);
+	CppUnit_addTest(pSuite, HTMLFormTest, testReadMultipartEncodedFileName);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit1);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit2);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit3);

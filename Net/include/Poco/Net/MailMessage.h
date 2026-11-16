@@ -110,10 +110,8 @@ public:
 	void setSubject(const std::string& subject);
 		/// Sets the subject of the message.
 		///
-		/// The subject must not contain any non-ASCII
-		/// characters. To include non-ASCII characters
-		/// in the subject, use RFC 2047 word encoding
-		/// (see encodeWord()).
+		/// Non-ASCII characters in the subject must be UTF-8;
+		/// write() encodes them (see encodeWord()).
 
 	[[nodiscard]] const std::string& getSubject() const;
 		/// Returns the subject of the message.
@@ -126,10 +124,8 @@ public:
 		/// address, or a real name followed by
 		/// an email address enclosed in < and >.
 		///
-		/// The sender must not contain any non-ASCII
-		/// characters. To include non-ASCII characters
-		/// in the sender, use RFC 2047 word encoding
-		/// (see encodeWord()).
+		/// Non-ASCII characters in the real name must be
+		/// UTF-8; write() encodes them (see encodeWord()).
 
 	[[nodiscard]] const std::string& getSender() const;
 		/// Returns the sender of the message (taken
@@ -243,6 +239,14 @@ public:
 		/// Writes the mail message to the given output stream.
 		///
 		/// BCC recipients and Bcc header fields are never written.
+		///
+		/// Non-ASCII text in the header fields, which must be UTF-8, is
+		/// written as RFC 2047 encoded words (see encodeWord()): the whole
+		/// value of an unstructured field such as Subject, and the display
+		/// names in an address field such as From or in the To and CC fields
+		/// written from the recipients. Structured fields such as Content-Type,
+		/// fields as read() received them, and text that is not valid UTF-8
+		/// are written unchanged.
 
 	void validateHeaders() const;
 		/// Throws a MessageException if write() would reject a field of the
@@ -291,6 +295,8 @@ protected:
 	[[nodiscard]] static MessageHeader createPartHeader(const Part& part);
 	static void writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding);
 	void setRecipientHeaders(MessageHeader& headers) const;
+	void encodeFields(MessageHeader& header) const;
+		/// Encodes the non-ASCII text in the fields that write() encodes.
 	void readHeader(std::istream& istr);
 	void readMultipart(std::istream& istr, PartHandler& handler);
 	void readPart(std::istream& istr, const MessageHeader& header, PartHandler& handler);

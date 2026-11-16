@@ -27,7 +27,7 @@ objects = \
 	QuotedPrintableEncoder QuotedPrintableDecoder StringPartSource \
 	FTPClientSession FTPStreamFactory PartHandler PartSource PartStore NullPartHandler \
 	SocketReactor SocketProactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
-	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
+	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession HeaderField \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
 	NTPClient NTPEventArgs NTPPacket \
