@@ -55,3 +55,19 @@ See the following issues for details and explanations:
   * https://github.com/pocoproject/poco/issues/3665
   * https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/
 
+
+!!!Windows Header Files
+
+The header files of the POCO C++ Libraries include <*windows.h*> through <*Poco/UnWindows.h*>,
+which defines <[WIN32_LEAN_AND_MEAN]> and <[NOMINMAX]> first. Code that includes <*windows.h*>
+before a POCO header must define <[NOMINMAX]> and <[WIN32_LEAN_AND_MEAN]> itself.
+
+Two preprocessor symbols change what <*Poco/UnWindows.h*> does:
+
+  * <[POCO_BLOATED_WIN32]>: <[WIN32_LEAN_AND_MEAN]> is not defined, so <*windows.h*>
+    includes all its parts. These include <*winsock.h*>, which conflicts with the
+    <*winsock2.h*> of POCO Net, so code that uses POCO Net must define <[NOMINMAX]> and
+    include <*winsock2.h*> before any POCO header.
+  * <[POCO_NO_WINDOWS_H]>: <*windows.h*> is not included. This is for tools that only
+    preprocess the header files, such as PocoDoc. Code compiled with it must define
+    <[NOMINMAX]> and <[WIN32_LEAN_AND_MEAN]> and include <*windows.h*> before any POCO header.
