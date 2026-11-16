@@ -96,7 +96,7 @@ public:
 		///
 		/// Adds "autoCommit" feature and sets it to true. This property enables automatic commit.
 		/// Setting this feature to  true renders the `sqlParse` property meaningless, because every query
-		/// is automatically commited.
+		/// is automatically committed.
 	{
 		addProperty("storage",
 			&AbstractSessionImpl<C>::setStorage,
@@ -348,7 +348,7 @@ protected:
 
 	void setAutoCommit(const std::string&, bool autoCommit)
 		/// Enables automatic commit. When this feature is true,
-		/// every query is automatically commited. When false,
+		/// every query is automatically committed. When false,
 		/// every query starts a transaction, except SELECT queries
 		/// (if properly detected by parser, see set/getSQLParse() and
 		/// Statement::checkBeginTransaction() documentation).

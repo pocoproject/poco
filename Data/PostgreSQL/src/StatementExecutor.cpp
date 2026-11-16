@@ -39,7 +39,7 @@ namespace
 		//}
 
 		// set to hold the unique placeholders ($1, $2, $3, etc.).
-		// A set is used because the same placeholder can be used muliple times
+		// A set is used because the same placeholder can be used multiple times
 		std::set<std::string> placeholderSet;
 
 		Poco::RegularExpression placeholderRE("[$][0-9]+");
@@ -325,7 +325,7 @@ void StatementExecutor::execute()
 		}
 	}
 	else
-	{	// non Select DML statments also have an affected row count.
+	{	// non Select DML statements also have an affected row count.
 		// unfortunately PostgreSQL offers up this count as a char * - go figure!
 		const char * pNonSelectAffectedRowCountString = PQcmdTuples(_pResultHandle);
 		if (nullptr != pNonSelectAffectedRowCountString)

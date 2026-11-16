@@ -80,7 +80,7 @@ struct Person
 	const std::string& operator () () const
 		/// This method is required so we can extract data to a map!
 	{
-		// we choose the lastName as examplary key
+		// we choose the lastName as exemplary key
 		return lastName;
 	}
 };

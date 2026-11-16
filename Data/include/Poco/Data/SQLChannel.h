@@ -118,7 +118,7 @@ public:
 
 	void open() override;
 		/// Opens the SQLChannel.
-		/// Returns true if succesful.
+		/// Returns true if successful.
 		/// If the connection fails, the logging thread retries it with a back-off.
 
 	void close() override;
@@ -160,8 +160,8 @@ public:
 		///                  Table must exist in the target database. To disable archiving,
 		///                  set this property to empty string.
 		///
-		///     * async:     Indicates asynchronous execution. When excuting asynchronously,
-		///                  messages are sent to the target using asyncronous execution.
+		///     * async:     Indicates asynchronous execution. When executing asynchronously,
+		///                  messages are sent to the target using asynchronous execution.
 		///                  However, prior to the next message being processed and sent to
 		///                  the target, the previous operation must have been either completed
 		///                  or timed out (see timeout and throw properties for details on
@@ -199,7 +199,7 @@ public:
 		///     * flush      Time in seconds to flush outstanding log entries; since logging
 		///                  is performed in batches of entries, the entries that do not make
 		///                  it into the last logged batch may remain unlogged for a long time
-		///                  during an extened period of inactivity. This setting ensures that
+		///                  during an extended period of inactivity. This setting ensures that
 		///                  unlogged entries are flushed in such circumstances, even when the
 		///                  minimum batch size was not reached.
 		///                  Zero value means no flushing. Defaults to 10 seconds.
@@ -287,12 +287,12 @@ private:
 
 	void logLocal(const std::string&, Message::Priority prio = Message::PRIO_ERROR);
 		/// Adds the message to the local SQLChannel log queue, and logs it to the file.
-		/// Typically used to log DB connection/execution erors.
+		/// Typically used to log DB connection/execution errors.
 
 	[[nodiscard]] std::string maskPwd();
 		/// Masks the password in the connection
 		/// string, if detected. This is not a
-		/// bullet-proof method; if not succesful,
+		/// bullet-proof method; if not successful,
 		/// empty string is returned.
 
 	[[nodiscard]] bool shouldFlush() const;

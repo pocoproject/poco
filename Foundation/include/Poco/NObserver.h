@@ -49,7 +49,7 @@ class NObserver: public AbstractObserver
 	///   - In addition to dispatching notifications based on the Notification runtime
 	///     type, NObserver can also notify subscribers based on the Notification name.
 	///     To enable this functionality, a matcher function must be provided.
-	///     Null matcher means no matching is performed and all notificiations
+	///     Null matcher means no matching is performed and all notifications
 	///     of the type subscribed to are dispatched.
 	///
 	/// Thread Safety:

@@ -3,7 +3,7 @@
 # in order for this script to work, docker must be installed
 MYSQL_DOCKER_VER=latest
 
-# trying to conect prematurely will fail, 10s should be enough wait time
+# trying to connect prematurely will fail, 10s should be enough wait time
 MYSQL_DB_START_WAIT=10
 
 echo "running poco-test-mysql docker container"

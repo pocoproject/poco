@@ -80,7 +80,7 @@
 
 
 // Small object size in bytes. When assigned to Any or Var,
-// objects larger than this value will be alocated on the heap,
+// objects larger than this value will be allocated on the heap,
 // while those smaller will be placement new-ed into an
 // internal stack-auto-allocated buffer.
 #if !defined(POCO_SMALL_OBJECT_SIZE)

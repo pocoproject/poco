@@ -55,7 +55,7 @@ public:
 		/// Returns session encoding.
 
 	[[nodiscard]] static bool hasMicrosecond() { return true; }
-		/// Rturns true if microseconds are suported.
+		/// Returns true if microseconds are supported.
 
 	[[nodiscard]] static SessionHandle* handle(Poco::Data::Session& aSession);
 		/// Returns native PostgreSQL handle for the session.

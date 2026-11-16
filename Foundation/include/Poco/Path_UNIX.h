@@ -5,7 +5,7 @@
 // Package: Filesystem
 // Module:  Path
 //
-// Definition of the PathImpl class fo rUnix.
+// Definition of the PathImpl class for Unix.
 //
 // Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
 // and Contributors.

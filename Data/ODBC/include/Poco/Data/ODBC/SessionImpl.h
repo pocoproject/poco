@@ -60,7 +60,7 @@ public:
 		bool autoBind = true,
 		bool autoExtract = true);
 		/// Creates the SessionImpl. Opens a connection to the database.
-		/// Throws NotConnectedException if connection was not succesful.
+		/// Throws NotConnectedException if connection was not successful.
 
 	POCO_DEPRECATED("Use other constructors.") SessionImpl(const std::string& connect,
 		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE,

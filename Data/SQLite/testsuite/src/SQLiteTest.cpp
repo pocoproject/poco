@@ -132,7 +132,7 @@ public:
 	const std::string& operator () () const
 		/// This method is required so we can extract data to a map!
 	{
-		// we choose the lastName as examplary key
+		// we choose the lastName as exemplary key
 		return _lastName;
 	}
 
@@ -3003,7 +3003,7 @@ void SQLiteTest::testSQLChannel()
 		if (sw.elapsedSeconds() > 3)
 			fail ("SQLChannel timed out");
 	}
-	// bulk binding mode is not suported by SQLite, but SQLChannel should handle it internally
+	// bulk binding mode is not supported by SQLite, but SQLChannel should handle it internally
 	pChannel->setProperty("bulk", "true");
 	pChannel->setProperty("keep", "2 seconds");
 
