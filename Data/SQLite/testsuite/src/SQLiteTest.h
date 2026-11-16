@@ -140,6 +140,7 @@ public:
 	void testColumnTypeNullStatement();
 	void testFileToMemoryError();
 	void testPooledConnectionTimeout();
+	void testConnectionTimeoutOverflow();
 
 	void testThreadModes();
 
