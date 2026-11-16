@@ -228,6 +228,25 @@ void AsyncNotificationCenter::stop()
 }
 
 
+void AsyncNotificationCenter::observerRemoved(const AbstractObserverPtr& pObserver)
+{
+#if (POCO_HAVE_JTHREAD)
+	if (_mode == AsyncMode::NOTIFY || _mode == AsyncMode::BOTH)
+	{
+		std::unique_lock<std::mutex> lock(_listsMutex);
+		auto it = _lists.find(pObserver);
+		if (it != _lists.end())
+		{
+			if (_workerIterator == it)
+				_workerIterator = _lists.erase(it);
+			else
+				_lists.erase(it);
+		}
+	}
+#endif
+}
+
+
 void AsyncNotificationCenter::dequeue()
 {
 	Notification::Ptr pNf;
@@ -265,7 +284,8 @@ std::optional<AsyncNotificationCenter::NotificationTuple> AsyncNotificationCente
 {
 	std::unique_lock<std::mutex> lock(_listsMutex);
 
-	for (std::size_t i {0}; i < _lists.size(); ++i)
+	std::size_t listsToCheck = _lists.size();
+	while (listsToCheck > 0)
 	{
 		if (_lists.empty())
 			break;
@@ -273,17 +293,12 @@ std::optional<AsyncNotificationCenter::NotificationTuple> AsyncNotificationCente
 		if (_workerIterator == _lists.end())
 			_workerIterator = _lists.begin();
 
+		--listsToCheck;
 		auto& o = _workerIterator->first;
 		auto& l = _workerIterator->second;
 		if (l.empty())
 		{
 			++_workerIterator;
-			continue;
-		};
-		if (!hasObserver(*o))
-		{
-			// Observer is not registered anymore, remove its list
-			_workerIterator = _lists.erase(_workerIterator);
 			continue;
 		}
 		auto n = l.front();
@@ -306,12 +321,9 @@ void AsyncNotificationCenter::dispatchNotifications(std::stop_token& stopToken, 
 			o->notify(n);
 			continue;
 		}
-		// No notification available, wait for a while
+		// Wait until a notification arrives or stop is requested.
 		std::unique_lock<std::mutex> lock(_listsMutex);
-		_listsEmptyCondition.wait_for(
-			lock, 1s,
-			[&stopToken, this] { return !_listsEmpty || stopToken.stop_requested(); }
-		);
+		_listsEmptyCondition.wait(lock, stopToken, [this] { return !_listsEmpty; });
 		if (stopToken.stop_requested())
 			break;
 	}

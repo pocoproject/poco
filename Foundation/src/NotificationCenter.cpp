@@ -65,7 +65,10 @@ void NotificationCenter::removeObserver(const AbstractObserver& observer)
 	}
 
 	if (pObserverToDisable)
+	{
 		pObserverToDisable->disable();
+		observerRemoved(pObserverToDisable);
+	}
 }
 
 
@@ -161,7 +164,15 @@ void NotificationCenter::clear()
 	}
 
 	for (auto& o: observers)
+	{
 		o->disable();
+		observerRemoved(o);
+	}
+}
+
+
+void NotificationCenter::observerRemoved(const AbstractObserverPtr& pObserver)
+{
 }
 
 
