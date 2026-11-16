@@ -47,6 +47,8 @@ public:
 	void testStoredFunctionAny() override;
 	void testStoredFunctionDynamicAny() override;
 
+	void testDateTimeMicroseconds();
+
 	void testUncommittedWorkRolledBack();
 	void testLostConnection();
 

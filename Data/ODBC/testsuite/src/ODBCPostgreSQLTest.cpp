@@ -417,6 +417,24 @@ void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
 }
 
 
+void ODBCPostgreSQLTest::testDateTimeMicroseconds()
+{
+	for (int k = 0; k < 8;)
+	{
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
+
+		DateTime dt;
+		session() << "SELECT TIMESTAMP '2026-11-16 11:22:33.123456'", into(dt), now;
+		assertEqual (33, dt.second());
+		assertEqual (123, dt.millisecond());
+		assertEqual (456, dt.microsecond());
+
+		k += 2;
+	}
+}
+
+
 void ODBCPostgreSQLTest::configurePLPgSQL()
 {
 	try
@@ -771,6 +789,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunction);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunctionAny);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunctionDynamicAny);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDateTimeMicroseconds);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNull);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRowIterator);
 #ifdef POCO_ODBC_USE_MAMMOTH_NG
