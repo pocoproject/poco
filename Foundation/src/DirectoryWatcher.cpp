@@ -106,8 +106,32 @@ protected:
 		const DirectoryIterator end;
 		while (it != end)
 		{
-			entries[it.path().getFileName()] = ItemInfo(*it);
+			// An entry that is being deleted or cannot be read is skipped.
+			try
+			{
+				entries[it.path().getFileName()] = ItemInfo(*it);
+			}
+			catch (Poco::FileNotFoundException&)
+			{
+			}
+			catch (Poco::FileAccessDeniedException&)
+			{
+			}
 			++it;
+		}
+	}
+
+	void initialScan(ItemInfoMap& entries)
+		/// Scans the directory before changes are watched and
+		/// reports an error through scanError.
+	{
+		try
+		{
+			scan(entries);
+		}
+		catch (Poco::Exception& exc)
+		{
+			owner().scanError(&owner(), exc);
 		}
 	}
 
@@ -174,7 +198,7 @@ public:
 	void run()
 	{
 		ItemInfoMap entries;
-		scan(entries);
+		initialScan(entries);
 
 		DWORD filter = FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME;
 		if (owner().eventMask() & DirectoryWatcher::DW_ITEM_MODIFIED)
@@ -410,7 +434,7 @@ public:
 	{
 		Poco::Timestamp lastScan;
 		ItemInfoMap entries;
-		scan(entries);
+		initialScan(entries);
 
 		while (!_stopped)
 		{
@@ -435,10 +459,17 @@ public:
 			}
 			else if (nEvents > 0 || ((owner().eventMask() & DirectoryWatcher::DW_ITEM_MODIFIED) && lastScan.isElapsed(owner().scanInterval()*1000000)))
 			{
-				ItemInfoMap newEntries;
-				scan(newEntries);
-				compare(entries, newEntries);
-				std::swap(entries, newEntries);
+				try
+				{
+					ItemInfoMap newEntries;
+					scan(newEntries);
+					compare(entries, newEntries);
+					std::swap(entries, newEntries);
+				}
+				catch (Poco::Exception& exc)
+				{
+					owner().scanError(&owner(), exc);
+				}
 				lastScan.update();
 			}
 		}
@@ -479,7 +510,7 @@ public:
 	void run()
 	{
 		ItemInfoMap entries;
-		scan(entries);
+		initialScan(entries);
 		while (!_stopped.tryWait(1000*owner().scanInterval()))
 		{
 			try
