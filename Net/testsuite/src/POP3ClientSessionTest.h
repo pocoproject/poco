@@ -31,6 +31,7 @@ public:
 	void testRetrieveMessage();
 	void testRetrieveHeader();
 	void testRetrieveMessages();
+	void testRetrieveMessageRecipients();
 	void testDeleteMessage();
 	void testSendCommandLineBreak();
 

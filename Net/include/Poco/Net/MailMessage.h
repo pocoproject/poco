@@ -97,6 +97,15 @@ public:
 
 	[[nodiscard]] const Recipients& recipients() const;
 		/// Returns the recipients of the message.
+		///
+		/// read() takes the recipients from the mailboxes in the To, CC and
+		/// BCC header fields; a mailbox that cannot be parsed is skipped.
+		/// RFC 2047 encoded words are decoded in the real names only.
+		///
+		/// write() keeps the To and CC header fields as read. After the
+		/// recipients are changed, it writes a To or CC header field from
+		/// the recipients if there is at least one recipient of that type;
+		/// otherwise the field as read is kept.
 
 	void setSubject(const std::string& subject);
 		/// Sets the subject of the message.
@@ -232,6 +241,8 @@ public:
 
 	void write(std::ostream& ostr) const;
 		/// Writes the mail message to the given output stream.
+		///
+		/// BCC recipients and Bcc header fields are never written.
 
 	void validateHeaders() const;
 		/// Throws a MessageException if write() would reject a field of the
@@ -299,6 +310,7 @@ private:
 	mutable std::string     _boundary;
 	PartStoreFactory*       _pStoreFactory;
 	bool                    _isMultipart = false;
+	bool                    _recipientsChanged = false;
 
 	friend class MultipartSource;
 };

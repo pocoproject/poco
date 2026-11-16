@@ -14,12 +14,14 @@
 #include "DialogServer.h"
 #include "Poco/Net/POP3ClientSession.h"
 #include "Poco/Net/MailMessage.h"
+#include "Poco/Net/MailRecipient.h"
 #include "Poco/Net/NetException.h"
 
 
 using Poco::Net::POP3ClientSession;
 using Poco::Net::MessageHeader;
 using Poco::Net::MailMessage;
+using Poco::Net::MailRecipient;
 using Poco::Net::POP3Exception;
 using Poco::InvalidArgumentException;
 
@@ -252,6 +254,57 @@ void POP3ClientSessionTest::testRetrieveMessages()
 }
 
 
+void POP3ClientSessionTest::testRetrieveMessageRecipients()
+{
+	DialogServer server;
+	server.addResponse("+OK POP3 Ready...");
+	server.addResponse("+OK USER");
+	server.addResponse("+OK PASS");
+	server.addResponse(
+		"+OK Here comes the message\r\n"
+		"From: john.doe@no.where\r\n"
+		"To: \"Jane Doe\" <jane.doe@no.where>, walter.foo@no.where\r\n"
+		"CC: \"Homer Simpson\" <homer.simpson@no.where>, bart.simpson@no.where\r\n"
+		"BCC: lisa.simpson@no.where, Maggie Simpson <maggie.simpson@no.where>\r\n"
+		"Subject: test\r\n"
+		"\r\n"
+		"Hello Jane,\r\n"
+		"."
+	);
+	server.addResponse("+OK QUIT");
+	POP3ClientSession session("127.0.0.1", server.port());
+	session.login("user", "secret");
+	server.clearCommands();
+	MailMessage message;
+	session.retrieveMessage(1, message);
+	std::string cmd = server.popCommand();
+	assertTrue (cmd == "RETR 1");
+
+	const MailMessage::Recipients& recipients = message.recipients();
+	assertEqual (6, recipients.size());
+	assertTrue (recipients[0].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assertEqual ("jane.doe@no.where", recipients[0].getAddress());
+	assertEqual ("Jane Doe", recipients[0].getRealName());
+	assertTrue (recipients[1].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assertEqual ("walter.foo@no.where", recipients[1].getAddress());
+	assertTrue (recipients[1].getRealName().empty());
+	assertTrue (recipients[2].getType() == MailRecipient::CC_RECIPIENT);
+	assertEqual ("homer.simpson@no.where", recipients[2].getAddress());
+	assertEqual ("Homer Simpson", recipients[2].getRealName());
+	assertTrue (recipients[3].getType() == MailRecipient::CC_RECIPIENT);
+	assertEqual ("bart.simpson@no.where", recipients[3].getAddress());
+	assertTrue (recipients[3].getRealName().empty());
+	assertTrue (recipients[4].getType() == MailRecipient::BCC_RECIPIENT);
+	assertEqual ("lisa.simpson@no.where", recipients[4].getAddress());
+	assertTrue (recipients[4].getRealName().empty());
+	assertTrue (recipients[5].getType() == MailRecipient::BCC_RECIPIENT);
+	assertEqual ("maggie.simpson@no.where", recipients[5].getAddress());
+	assertEqual ("Maggie Simpson", recipients[5].getRealName());
+
+	session.close();
+}
+
+
 void POP3ClientSessionTest::testDeleteMessage()
 {
 	DialogServer server;
@@ -364,6 +417,7 @@ CppUnit::Test* POP3ClientSessionTest::suite()
 	CppUnit_addTest(pSuite, POP3ClientSessionTest, testRetrieveMessage);
 	CppUnit_addTest(pSuite, POP3ClientSessionTest, testRetrieveHeader);
 	CppUnit_addTest(pSuite, POP3ClientSessionTest, testRetrieveMessages);
+	CppUnit_addTest(pSuite, POP3ClientSessionTest, testRetrieveMessageRecipients);
 	CppUnit_addTest(pSuite, POP3ClientSessionTest, testDeleteMessage);
 	CppUnit_addTest(pSuite, POP3ClientSessionTest, testSendCommandLineBreak);
 

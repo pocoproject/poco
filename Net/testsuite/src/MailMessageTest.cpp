@@ -554,6 +554,288 @@ void MailMessageTest::testReadMultiPartDefaultContentType()
 }
 
 
+void MailMessageTest::testReadRecipients()
+{
+	const std::string msgin(
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Subject: Test Message\r\n"
+		"To: \"Doe, Jane\" <jane.doe@no.where>, walter.foo@no.where (Walter Foo),\r\n"
+		"\tJohn  \"Q.\" Public <john.public@no.where>\r\n"
+		"CC: Team: Homer Simpson <homer@no.where>, bart@no.where;, Lisa Simpson, nobody,\r\n"
+		"\t<>, <unterminated@no.where, Ned <ned@no.where> trailing text\r\n"
+		"BCC: undisclosed-recipients:;, maggie@no.where\r\n"
+		"\r\n"
+		"Hello, world!\r\n"
+	);
+
+	MailMessage message;
+	std::istringstream istr(msgin);
+	message.read(istr);
+
+	const MailMessage::Recipients& recipients = message.recipients();
+	assertEqual (6, recipients.size());
+	assertTrue (recipients[0].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assertEqual ("jane.doe@no.where", recipients[0].getAddress());
+	assertEqual ("Doe, Jane", recipients[0].getRealName());
+	assertTrue (recipients[1].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assertEqual ("walter.foo@no.where", recipients[1].getAddress());
+	assertTrue (recipients[1].getRealName().empty());
+	assertTrue (recipients[2].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assertEqual ("john.public@no.where", recipients[2].getAddress());
+	assertEqual ("John Q. Public", recipients[2].getRealName());
+	assertTrue (recipients[3].getType() == MailRecipient::CC_RECIPIENT);
+	assertEqual ("homer@no.where", recipients[3].getAddress());
+	assertEqual ("Homer Simpson", recipients[3].getRealName());
+	assertTrue (recipients[4].getType() == MailRecipient::CC_RECIPIENT);
+	assertEqual ("bart@no.where", recipients[4].getAddress());
+	assertTrue (recipients[4].getRealName().empty());
+	assertTrue (recipients[5].getType() == MailRecipient::BCC_RECIPIENT);
+	assertEqual ("maggie@no.where", recipients[5].getAddress());
+	assertEqual ("Hello, world!\r\n", message.getContent());
+
+	std::istringstream istrAgain(msgin);
+	message.read(istrAgain);
+	assertEqual (6, message.recipients().size());
+}
+
+
+void MailMessageTest::testReadRecipientsEncodedWords()
+{
+	std::istringstream istr(
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"To: =?UTF-8?Q?evil@x.example=2C?= <jane@no.where>\r\n"
+		"CC: =?UTF-8?q?Doe=2C_J=C3=B6rg?= <j@no.where>\r\n"
+		"BCC: a@no.where,\r\n"
+		"\t=?UTF-8?q?B=2C_C?= <b@no.where>\r\n"
+		"\r\n"
+		"Hello, world!\r\n"
+	);
+	MailMessage message;
+	message.read(istr);
+
+	const MailMessage::Recipients& recipients = message.recipients();
+	assertEqual (4, recipients.size());
+	assertTrue (recipients[0].getType() == MailRecipient::PRIMARY_RECIPIENT);
+	assertEqual ("jane@no.where", recipients[0].getAddress());
+	assertEqual ("evil@x.example,", recipients[0].getRealName());
+	assertTrue (recipients[1].getType() == MailRecipient::CC_RECIPIENT);
+	assertEqual ("j@no.where", recipients[1].getAddress());
+	assertEqual ("Doe, J\xC3\xB6rg", recipients[1].getRealName());
+	assertTrue (recipients[2].getType() == MailRecipient::BCC_RECIPIENT);
+	assertEqual ("a@no.where", recipients[2].getAddress());
+	assertTrue (recipients[3].getType() == MailRecipient::BCC_RECIPIENT);
+	assertEqual ("b@no.where", recipients[3].getAddress());
+	assertEqual ("B, C", recipients[3].getRealName());
+
+	assertEqual ("evil@x.example, <jane@no.where>", message.get(MailMessage::HEADER_TO));
+	assertEqual ("evil@x.example, <jane@no.where>", message.getDecoded(MailMessage::HEADER_TO));
+	assertEqual ("Hello, world!\r\n", message.getContent());
+
+	std::istringstream istrUndecoded(
+		"To: =?UTF-8?Q?evil@x.example=2C?= <jane@no.where>\n"
+		"\n"
+		"Hello, world!\n"
+	);
+	MailMessage messageUndecoded;
+	messageUndecoded.setAutoDecode(false);
+	messageUndecoded.read(istrUndecoded);
+	assertEqual (1, messageUndecoded.recipients().size());
+	assertEqual ("=?UTF-8?Q?evil@x.example=2C?=", messageUndecoded.recipients()[0].getRealName());
+	assertEqual ("=?UTF-8?Q?evil@x.example=2C?= <jane@no.where>", messageUndecoded.get(MailMessage::HEADER_TO));
+	assertEqual ("evil@x.example, <jane@no.where>", messageUndecoded.getDecoded(MailMessage::HEADER_TO));
+	assertEqual ("Hello, world!\n", messageUndecoded.getContent());
+}
+
+
+void MailMessageTest::testReadWriteRecipientFieldsUnchanged()
+{
+	const std::string recipientFields[] = {
+		"To: jane.doe@no.where\r\n",
+		"To: \"Jane Doe\" <jane.doe@no.where>, walter.foo@no.where\r\n",
+		"To: walter.foo@no.where (Walter Foo)\r\n",
+		"To: Team: a@no.where, b@no.where;\r\n",
+		"To: Lisa Simpson, bart@no.where\r\nCC: Homer <homer@no.where>, <broken\r\n"
+	};
+	for (const auto& fields: recipientFields)
+	{
+		const std::string msgin(
+			"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+			"From: poco@appinf.com\r\n"
+			"Subject: Test Message\r\n" + fields +
+			"\r\n"
+			"Hello, world!\r\n"
+		);
+		std::istringstream istr(msgin);
+		MailMessage message;
+		message.read(istr);
+		assertTrue (!message.recipients().empty());
+
+		std::ostringstream ostr;
+		message.write(ostr);
+		assertEqual (msgin, ostr.str());
+	}
+}
+
+
+void MailMessageTest::testWriteOmitsBccFields()
+{
+	std::istringstream istr(
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Subject: Test Message\r\n"
+		"To: jane.doe@no.where\r\n"
+		"Bcc: walter.foo@no.where\r\n"
+		"\r\n"
+		"Hello, world!\r\n"
+	);
+	MailMessage message;
+	message.read(istr);
+	assertEqual (2, message.recipients().size());
+	assertTrue (message.recipients()[1].getType() == MailRecipient::BCC_RECIPIENT);
+	assertEqual ("walter.foo@no.where", message.recipients()[1].getAddress());
+
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertEqual (
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Subject: Test Message\r\n"
+		"To: jane.doe@no.where\r\n"
+		"\r\n"
+		"Hello, world!\r\n",
+		ostr.str());
+	assertEqual (2, message.recipients().size());
+
+	MailMessage builtMessage;
+	builtMessage.setDate(Timestamp(0));
+	builtMessage.setSender("poco@appinf.com");
+	builtMessage.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "jane.doe@no.where"));
+	builtMessage.set(MailMessage::HEADER_BCC, "walter.foo@no.where");
+	builtMessage.setContent("Hello, world!\r\n", MailMessage::ENCODING_8BIT);
+
+	std::ostringstream builtStr;
+	builtMessage.write(builtStr);
+	assertEqual (
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"Content-Type: text/plain\r\n"
+		"From: poco@appinf.com\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"To: <jane.doe@no.where>\r\n"
+		"\r\n"
+		"Hello, world!\r\n",
+		builtStr.str());
+
+	builtMessage.set(MailMessage::HEADER_BCC, "walter.foo@no.where\r\nX-Injected: 1");
+	builtMessage.validateHeaders();
+}
+
+
+void MailMessageTest::testReadHeaderLineTooLong()
+{
+	const std::string longLine = "To: " + std::string(20000, 'a') + "@no.where\r\n";
+	std::istringstream istr(longLine + "\r\nHello, world!\r\n");
+	MailMessage message;
+	try
+	{
+		message.read(istr);
+		fail("must throw");
+	}
+	catch (MessageException&)
+	{
+	}
+	assertTrue (istr.tellg() < static_cast<std::streamoff>(longLine.size()));
+}
+
+
+void MailMessageTest::testReadAddRecipientEscapesRealName()
+{
+	const std::pair<std::string, std::string> cases[] = {
+		{"To: \"x\\\" <evil@a.com>, \\\"y\" <orig@b.com>\r\n", "x\" <evil@a.com>, \"y"},
+		{"To: =?utf-8?q?x=22_=3Cevil=40a.com=3E=2C_=22y?= <orig@b.com>\r\n", "x\" <evil@a.com>, \"y"},
+		{"To: =?utf-8?q?x=22_=3Cevil=40a.com=3E,_=22y?= <orig@b.com>\r\n", "_=22y?="}
+	};
+	for (const auto& [field, realName]: cases)
+	{
+		std::istringstream istr(
+			"From: poco@appinf.com\r\n" + field +
+			"\r\n"
+			"Hello, world!\r\n"
+		);
+		MailMessage message;
+		message.read(istr);
+		assertEqual (1, message.recipients().size());
+		assertEqual (realName, message.recipients()[0].getRealName());
+		message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "john.doe@no.where", "John Doe"));
+
+		std::ostringstream ostr;
+		message.write(ostr);
+		std::istringstream istrWritten(ostr.str());
+		MailMessage messageWritten;
+		messageWritten.read(istrWritten);
+
+		const MailMessage::Recipients& recipients = messageWritten.recipients();
+		assertEqual (2, recipients.size());
+		assertEqual ("orig@b.com", recipients[0].getAddress());
+		assertEqual (realName, recipients[0].getRealName());
+		assertEqual ("john.doe@no.where", recipients[1].getAddress());
+		assertEqual ("John Doe", recipients[1].getRealName());
+	}
+}
+
+
+void MailMessageTest::testReadAddRecipientRewritesFields()
+{
+	std::istringstream istr(
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Subject: Test Message\r\n"
+		"To: jane.doe@no.where (Jane)\r\n"
+		"\r\n"
+		"Hello, world!\r\n"
+	);
+	MailMessage message;
+	message.read(istr);
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "john.doe@no.where", "John Doe"));
+
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertEqual (
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Subject: Test Message\r\n"
+		"To: <jane.doe@no.where>, John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"Hello, world!\r\n",
+		ostr.str());
+
+	std::istringstream istrTwoFields(
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Subject: Test Message\r\n"
+		"To: jane.doe@no.where\r\n"
+		"To: w@no.where\r\n"
+		"\r\n"
+		"Hello, world!\r\n"
+	);
+	MailMessage messageTwoFields;
+	messageTwoFields.read(istrTwoFields);
+	messageTwoFields.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "john.doe@no.where", "John Doe"));
+
+	std::ostringstream ostrTwoFields;
+	messageTwoFields.write(ostrTwoFields);
+	assertEqual (
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Subject: Test Message\r\n"
+		"To: <jane.doe@no.where>, <w@no.where>, John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"Hello, world!\r\n",
+		ostrTwoFields.str());
+}
+
+
 void MailMessageTest::testReadMultiPartDefaultTransferEncoding()
 {
 	std::istringstream istr(
@@ -1143,6 +1425,13 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartWithAttachmentNames);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartPartParameters);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultContentType);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipients);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsEncodedWords);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteRecipientFieldsUnchanged);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteOmitsBccFields);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadHeaderLineTooLong);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadAddRecipientEscapesRealName);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadAddRecipientRewritesFields);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultTransferEncoding);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartMixedCaseHeaders);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartInvalidContentDisposition);
