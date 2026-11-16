@@ -45,6 +45,7 @@ public:
 	void testCopyDirectoryFailIfExists();
 	void testRename();
 	void testRenameFailIfExists();
+	void testRejectEmbeddedNul();
 	void testRootDir();
 	void testLongPath();
 	void testLongPathUNC();

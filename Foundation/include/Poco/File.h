@@ -52,6 +52,9 @@ class Foundation_API File: private FileImpl
 	/// prefix apply in that case, e.g. the path must
 	/// not contain relative components ("." and "..") and must not
 	/// use the forward slash ("/") as directory separator.
+	///
+	/// A path that contains a NUL character is rejected with a
+	/// PathSyntaxException.
 {
 public:
 	using FileSize = FileSizeImpl;
