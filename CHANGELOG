@@ -377,6 +377,17 @@ Bug Fixes and Improvements:
   (POCO_EMSCRIPTEN_FLAGS), and programs that link the POCO CMake targets get these flags too.
   For Emscripten, Poco::Thread::setAffinity() returns false, and the methods of
   Poco::NamedEvent and Poco::NamedMutex throw Poco::NotImplementedException, as on Android.
+- GH #5436 Shared builds with MinGW link the libraries that use Poco::Dynamic::Struct, the
+  stream buffer templates of Foundation, the shared pointers of Poco::JSON::Array and
+  Poco::JSON::Object, and the error templates of Data/ODBC. In all MinGW builds (GCC and Clang,
+  shared and static), the headers no longer declare these explicit instantiations as extern,
+  because the DLLs did not export their inline members; code that uses them instantiates the
+  templates itself.
+  As in MSVC builds, the MinGW build no longer defines WINVER and uses the default of the
+  toolchain; WINVER=0x500 hid Windows API functions that Foundation uses, such as
+  CompareStringOrdinal().
+  On Windows, CMake stops with an error when the Windows API level of the toolchain
+  (_WIN32_WINNT and WINVER) is older than Windows 10 (0x0A00).
 
 
 Release 1.15.4 (2026-09-22)

@@ -32,12 +32,16 @@ class JSON_API Array;
 } // namespace Poco::JSON
 
 
+// With MinGW, a DLL does not export the inline members of an explicit instantiation,
+// so code that uses the template instantiates it itself.
+#if !defined(POCO_COMPILER_MINGW)
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(JSON_EXPORTS)
 // Explicitly instantiated shared pointer in JSON library
 extern template class Poco::SharedPtr<Poco::JSON::Array>;
 #else
 // Explicitly instantiated shared pointer in JSON library
 extern template class JSON_API Poco::SharedPtr<Poco::JSON::Array>;
+#endif
 #endif
 
 namespace Poco::JSON {
