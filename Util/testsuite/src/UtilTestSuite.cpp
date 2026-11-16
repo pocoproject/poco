@@ -9,6 +9,7 @@
 
 
 #include "UtilTestSuite.h"
+#include "ApplicationTest.h"
 #include "ConfigurationTestSuite.h"
 #include "OptionsTestSuite.h"
 #include "ServerApplicationTest.h"
@@ -22,6 +23,7 @@ CppUnit::Test* UtilTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("UtilTestSuite");
 
+	pSuite->addTest(ApplicationTest::suite());
 	pSuite->addTest(ConfigurationTestSuite::suite());
 	pSuite->addTest(OptionsTestSuite::suite());
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_FORK_EXEC) && POCO_OS != POCO_OS_ANDROID
