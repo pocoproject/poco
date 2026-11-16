@@ -27,6 +27,12 @@ public:
 
 	void testCRC32();
 	void testAdler32();
+	void testCRC64XZ();
+	void testCRC64ECMA182();
+	void testChecksumWidth();
+	void testKnownAnswers();
+	void testIncrementalUpdate();
+	void testImplementationsAgree();
 	void testLargeInput();
 
 	void setUp() override;

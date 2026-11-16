@@ -48,6 +48,8 @@ else()
 endif()
 
 target_link_libraries(Foundation-testrunner PUBLIC Poco::Foundation CppUnit)
+# ChecksumTest compares the CRC implementations through the private header CRC.h
+target_include_directories(Foundation-testrunner PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 if(UNIX AND NOT ANDROID)
 	target_link_libraries(Foundation-testrunner PUBLIC pthread)
 endif(UNIX AND NOT ANDROID)

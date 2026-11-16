@@ -12,6 +12,7 @@
 # Sources
 set(SRCS
 	src/BenchmarkApp.cpp
+	src/ChecksumBench.cpp
 	src/PatternFormatterBench.cpp
 	src/LoggerBench.cpp
 	src/NotificationQueueBench.cpp
@@ -33,4 +34,6 @@ target_include_directories(Benchmark
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/include
 		${CMAKE_CURRENT_SOURCE_DIR}/src
+		# ChecksumBench measures each CRC implementation through the private header CRC.h
+		${PROJECT_SOURCE_DIR}/Foundation/src
 )
