@@ -207,6 +207,17 @@ Features:
   and a library that is built on POCO can define its own in the same way. The headers define
   these macros also when the including code has defined them before. On Cygwin, CppParser and
   NetSSL use the GCC visibility attribute, as the other libraries do.
+- GH #5723 Poco::Checksum computes CRC-64/XZ (TYPE_CRC64_XZ) and CRC-64/ECMA-182
+  (TYPE_CRC64_ECMA182), read with checksum64(); checksum() and checksum64() throw
+  Poco::InvalidAccessException for a type of the other width. CRC-32, CRC-64 and Adler-32 use
+  the CRC32 and PMULL instructions and NEON on ARMv8, and PCLMULQDQ, VPCLMULQDQ, SSSE3, AVX2 and
+  AVX-512 on x86-64, selected at run time; no build option is needed. Throughput of Checksum
+  for a 64 MiB buffer in GB/s, before -> after, with the bundled zlib 1.3.2: x86-64 with
+  AVX-512 and VPCLMULQDQ: CRC-32 9.1 -> 58, Adler-32 5.5 -> 54, CRC-64 59; AArch64 Linux:
+  CRC-32 5.9 -> 31, Adler-32 4.0 -> 45, CRC-64 46; Apple Silicon: CRC-32 unchanged (32),
+  Adler-32 4.3 -> 46, CRC-64/XZ 79. Where the system zlib of an unbundled build is zlib-ng,
+  CRC-32 and Adler-32 were already at this speed on x86-64, and CRC-32 goes from 11 to 29 on
+  AArch64. An unbundled build needs zlib 1.2.9 or later.
 
 New Components:
 
