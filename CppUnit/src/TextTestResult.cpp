@@ -14,9 +14,36 @@
 #include <cstdlib>
 #include <cctype>
 #include <exception>
+#include <string_view>
 
 
 namespace CppUnit {
+
+
+namespace {
+
+
+std::string withoutTypeKeywords(std::string name)
+	// MSVC writes "class " and "struct " into the names of types, GCC and Clang do not.
+	// Removing them lets one list of ignored tests serve all compilers on Windows.
+{
+	static constexpr std::string_view keywords[] = {"class ", "struct "};
+	for (const std::string_view keyword: keywords)
+	{
+		std::string::size_type pos = 0;
+		while ((pos = name.find(keyword, pos)) != std::string::npos)
+		{
+			if (pos == 0 || name[pos - 1] == '<' || name[pos - 1] == ',' || name[pos - 1] == ' ')
+				name.erase(pos, keyword.size());
+			else
+				pos += keyword.size();
+		}
+	}
+	return name;
+}
+
+
+} // namespace
 
 
 TextTestResult::TextTestResult() :
@@ -97,7 +124,7 @@ void TextTestResult::ignoring(const std::string ignore)
 
 		std::string test;
 		while (it != end && *it != ',' && *it != '"' && *it != '\'') test += *it++;
-		if (!test.empty()) _ignored.insert(test.erase(test.find_last_not_of(" \n\r\t") + 1));
+		if (!test.empty()) _ignored.insert(withoutTypeKeywords(test.erase(test.find_last_not_of(" \n\r\t") + 1)));
 	}
 }
 
@@ -115,7 +142,7 @@ void TextTestResult::setup()
 
 void TextTestResult::addError(Test* test, CppUnitException* e)
 {
-	if (_ignored.find(test->toString()) == _ignored.end())
+	if (_ignored.find(withoutTypeKeywords(test->toString())) == _ignored.end())
 	{
 		TestResult::addError(test, e);
 		_ostr << "ERROR" << std::flush;
@@ -130,7 +157,7 @@ void TextTestResult::addError(Test* test, CppUnitException* e)
 
 void TextTestResult::addFailure(Test* test, CppUnitException* e)
 {
-	if (_ignored.find(test->toString()) == _ignored.end())
+	if (_ignored.find(withoutTypeKeywords(test->toString())) == _ignored.end())
 	{
 		TestResult::addFailure(test, e);
 		_ostr << "FAILURE" << std::flush;
