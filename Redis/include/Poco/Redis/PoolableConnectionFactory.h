@@ -89,7 +89,8 @@ public:
 	{
 		try
 		{
-			_pool.returnObject(_client);
+			if (_client != nullptr)
+				_pool.returnObject(_client);
 		}
 		catch (...)
 		{

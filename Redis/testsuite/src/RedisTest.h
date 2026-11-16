@@ -82,6 +82,7 @@ public:
 	void testRPUSH();
 
 	void testPool();
+	void testPooledConnectionExhaustedPool();
 
 	void setUp();
 	void tearDown();
