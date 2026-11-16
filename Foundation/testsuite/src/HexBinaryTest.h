@@ -27,6 +27,7 @@ public:
 	void testEncoder();
 	void testDecoder();
 	void testEncodeDecode();
+	void testDecoderMalformed();
 
 	void setUp();
 	void tearDown();

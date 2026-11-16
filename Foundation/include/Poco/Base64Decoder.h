@@ -48,13 +48,9 @@ private:
 	unsigned char   _group[3];
 	int             _groupLength;
 	int             _groupIndex;
+	std::streamoff  _pos;
 	std::streambuf& _buf;
 	const unsigned char* _pInEncoding;
-
-	static unsigned char IN_ENCODING[256];
-	static bool          IN_ENCODING_INIT;
-	static unsigned char IN_ENCODING_URL[256];
-	static bool          IN_ENCODING_URL_INIT;
 
 private:
 	Base64DecoderBuf(const Base64DecoderBuf&);
