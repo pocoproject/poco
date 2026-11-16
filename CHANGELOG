@@ -154,6 +154,11 @@ Breaking Changes:
 - GH #5510 Poco::Util::Timer::run() is final, and the timer thread runs it without a virtual
   call, so that the thread no longer reads the vptr while the constructor or destructor of a
   subclass writes it; a subclass can no longer override run().
+- GH #5462 Poco::FastMutex is not recursive on Windows either: it is implemented with an SRW
+  lock instead of a critical section. A thread that locks a FastMutex it already holds
+  deadlocks, as on the other platforms; tryLock() by the holding thread returns false, and
+  tryLock(milliseconds) and lock(milliseconds) wait for the timeout, after which tryLock()
+  returns false and lock() throws Poco::TimeoutException. Code that relied on the recursion on Windows must use Poco::Mutex.
 
 Bundled Third-Party Library Upgrades:
 
