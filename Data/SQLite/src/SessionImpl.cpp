@@ -20,9 +20,11 @@
 #include "Poco/Stopwatch.h"
 #include "Poco/String.h"
 #include "Poco/Mutex.h"
+#include "Poco/NumberFormatter.h"
 #include "Poco/Data/DataException.h"
 #include <sqlite3.h>
 #include <cstdlib>
+#include <limits>
 #ifdef POCO_ENABLE_SQLITE_VEC
 // SQLITE_CORE makes sqlite-vec.h use the already-included sqlite3.h instead
 // of sqlite3ext.h (not shipped with the bundled amalgamation).
@@ -69,11 +71,10 @@ SessionImpl::SessionImpl(const std::string& fileName, std::size_t loginTimeout):
 	_connected(false),
 	_isTransaction(false),
 	_transactionType(TransactionType::DEFERRED),
-	_timeout(0),
+	_timeout(busyTimeout(loginTimeout)),
 	_transactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED)
 {
 	open();
-	setConnectionTimeout(loginTimeout);
 	addFeature("autoCommit",
 		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
@@ -312,11 +313,21 @@ bool SessionImpl::isConnected() const
 }
 
 
+int SessionImpl::busyTimeout(std::size_t timeout)
+{
+	constexpr std::size_t MAX_TIMEOUT = std::numeric_limits<int>::max() / 1000;
+	if (timeout > MAX_TIMEOUT)
+		throw RangeException("SQLite connection timeout in seconds", Poco::NumberFormatter::format(timeout));
+
+	return static_cast<int>(1000 * timeout);
+}
+
+
 void SessionImpl::setConnectionTimeout(std::size_t timeout)
 {
+	int tout = busyTimeout(timeout);
 	Poco::Mutex::ScopedLock l(_mutex);
 	poco_check_ptr (_pDB);
-	int tout = static_cast<int>(1000 * timeout);
 	int rc = sqlite3_busy_timeout(_pDB, tout);
 	if (rc != 0) Utility::throwException(_pDB, rc);
 	_timeout = tout;

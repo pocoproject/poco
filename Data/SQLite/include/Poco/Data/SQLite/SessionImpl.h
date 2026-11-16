@@ -44,6 +44,7 @@ public:
 	SessionImpl(const std::string& fileName,
 		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl. Opens a connection to the database.
+		/// Throws RangeException if the login timeout in milliseconds does not fit into an int.
 
 	~SessionImpl() override;
 		/// Destroys the SessionImpl.
@@ -96,6 +97,7 @@ public:
 		/// Sets the session connection timeout value.
 		/// Timeout value is in seconds.
 		/// The connections opened later by open() or reconnect() get it too.
+		/// Throws RangeException if the timeout in milliseconds does not fit into an int.
 		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] std::size_t getConnectionTimeout() const override;
@@ -179,6 +181,10 @@ protected:
 
 private:
 	void setName();
+
+	[[nodiscard]] static int busyTimeout(std::size_t timeout);
+		/// Returns the timeout in seconds as the SQLite busy timeout in milliseconds.
+		/// Throws RangeException if it does not fit into an int.
 
 	[[nodiscard]] sqlite3* handle() const;
 		/// Returns the handle of the current connection, or nullptr

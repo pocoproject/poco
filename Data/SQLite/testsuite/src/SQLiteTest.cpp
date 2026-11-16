@@ -49,6 +49,7 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/Bugcheck.h"
 #include <iostream>
+#include <limits>
 #include <type_traits>
 #include <utility>
 
@@ -3655,6 +3656,40 @@ void SQLiteTest::testPooledConnectionTimeout()
 }
 
 
+void SQLiteTest::testConnectionTimeoutOverflow()
+{
+	constexpr std::size_t MAX_TIMEOUT = std::numeric_limits<int>::max() / 1000;
+
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+	session.setConnectionTimeout(MAX_TIMEOUT);
+	assertTrue (session.getConnectionTimeout() == MAX_TIMEOUT);
+
+	session.setConnectionTimeout(5);
+	try
+	{
+		session.setConnectionTimeout(MAX_TIMEOUT + 1);
+		fail ("must fail");
+	}
+	catch (RangeException&) { }
+	assertTrue (session.getConnectionTimeout() == 5);
+
+	try
+	{
+		session.setProperty("connectionTimeout", -1);
+		fail ("must fail");
+	}
+	catch (RangeException&) { }
+	assertTrue (session.getConnectionTimeout() == 5);
+
+	try
+	{
+		Session tooLong(Poco::Data::SQLite::Connector::KEY, ":memory:", MAX_TIMEOUT + 1);
+		fail ("must fail");
+	}
+	catch (RangeException&) { }
+}
+
+
 void SQLiteTest::testThreadModes()
 {
 	using namespace Poco::Data::SQLite;
@@ -5125,6 +5160,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testColumnTypeNullStatement);
 	CppUnit_addTest(pSuite, SQLiteTest, testFileToMemoryError);
 	CppUnit_addTest(pSuite, SQLiteTest, testPooledConnectionTimeout);
+	CppUnit_addTest(pSuite, SQLiteTest, testConnectionTimeoutOverflow);
 	CppUnit_addTest(pSuite, SQLiteTest, testThreadModes);
 	CppUnit_addTest(pSuite, SQLiteTest, testUpdateCallback);
 	CppUnit_addTest(pSuite, SQLiteTest, testCommitCallback);
