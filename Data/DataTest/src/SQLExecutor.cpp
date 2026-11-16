@@ -2565,6 +2565,16 @@ void SQLExecutor::recordSet()
 		}
 
 		{
+			std::string result;
+			Statement stmt = (session() << "SELECT LastName FROM Person", into(result));
+			for (int i = 0; i < 5; ++i)
+			{
+				stmt.execute();
+				assertTrue (result == lastName);
+			}
+		}
+
+		{
 			Statement stmt = (session() <<
 				formatSQL("DELETE FROM Person WHERE born = ?"), use(born), now);
 			RecordSet rset(stmt);
@@ -3861,16 +3871,18 @@ void SQLExecutor::multipleResults(const std::string& sql)
 	assertTrue (Person("Simpson", "Lisa", "Springfield", 8) == people2[0]);
 	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
 
+	session() << "UPDATE Person SET Address = 'Capital City' WHERE FirstName = 'Homer'", now;
+
 	pHomer = Person();
 	aBart = 0;
 	people2.clear();
 
 	assertTrue (4 == stmt.execute());
-	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == pHomer);
+	assertTrue (Person("Simpson", "Homer", "Capital City", 42) == pHomer);
 	assertTrue (10 == aBart);
 	assertTrue (2 == people2.size());
 	assertTrue (Person("Simpson", "Lisa", "Springfield", 8) == people2[0]);
-	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
+	assertTrue (Person("Simpson", "Homer", "Capital City", 42) == people2[1]);
 }
 
 
