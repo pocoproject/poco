@@ -492,7 +492,7 @@ private:
 };
 
 
-#else
+#endif
 
 
 class PollingDirectoryWatcherStrategy: public DirectoryWatcherStrategy
@@ -542,22 +542,21 @@ private:
 };
 
 
-#endif
-
-
-DirectoryWatcher::DirectoryWatcher(const std::string& path, int eventMask, int scanInterval):
+DirectoryWatcher::DirectoryWatcher(const std::string& path, int eventMask, int scanInterval, bool forceScan):
 	_directory(path),
 	_eventMask(eventMask),
-	_scanInterval(scanInterval)
+	_scanInterval(scanInterval),
+	_forceScan(forceScan)
 {
 	init();
 }
 
 
-DirectoryWatcher::DirectoryWatcher(const Poco::File& directory, int eventMask, int scanInterval):
+DirectoryWatcher::DirectoryWatcher(const Poco::File& directory, int eventMask, int scanInterval, bool forceScan):
 	_directory(directory),
 	_eventMask(eventMask),
-	_scanInterval(scanInterval)
+	_scanInterval(scanInterval),
+	_forceScan(forceScan)
 {
 	init();
 }
@@ -599,15 +598,22 @@ void DirectoryWatcher::init()
 	if (!_directory.isDirectory())
 		throw Poco::InvalidArgumentException("not a directory", _directory.path());
 
+	if (_forceScan)
+	{
+		_pStrategy = new PollingDirectoryWatcherStrategy(*this);
+	}
+	else
+	{
 #if (POCO_OS == POCO_OS_WINDOWS_NT) && !defined(POCO_DW_FORCE_POLLING)
-	_pStrategy = new WindowsDirectoryWatcherStrategy(*this);
+		_pStrategy = new WindowsDirectoryWatcherStrategy(*this);
 #elif (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && !defined(POCO_DW_FORCE_POLLING)
-	_pStrategy = new LinuxDirectoryWatcherStrategy(*this);
+		_pStrategy = new LinuxDirectoryWatcherStrategy(*this);
 #elif (POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_FREE_BSD) && !defined(POCO_DW_FORCE_POLLING)
-	_pStrategy = new BSDDirectoryWatcherStrategy(*this);
+		_pStrategy = new BSDDirectoryWatcherStrategy(*this);
 #else
-	_pStrategy = new PollingDirectoryWatcherStrategy(*this);
+		_pStrategy = new PollingDirectoryWatcherStrategy(*this);
 #endif
+	}
 	_thread.startFunc([this]() { DirectoryWatcher::run(); });
 }
 
