@@ -220,13 +220,6 @@ bool checkIsBrokenTimeout()
 {
 #if defined(POCO_BROKEN_TIMEOUTS)
 	return true;
-#elif defined(POCO_OS_FAMILY_WINDOWS)
-	// on Windows 7 and lower, socket timeouts have a minimum of 500ms, use poll for timeouts on this case
-	// https://social.msdn.microsoft.com/Forums/en-US/76620f6d-22b1-4872-aaf0-833204f3f867/minimum-timeout-value-for-sorcvtimeo
-	OSVERSIONINFO vi;
-	vi.dwOSVersionInfoSize = sizeof(vi);
-	if (GetVersionEx(&vi) == 0) return true;
-	return vi.dwMajorVersion < 6 || (vi.dwMajorVersion == 6 && vi.dwMinorVersion < 2);
 #endif
 	return false;
 }
