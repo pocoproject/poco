@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = AbstractConfigurationTest ConfigurationTestSuite \
+objects = AbstractConfigurationTest ApplicationTest ConfigurationTestSuite \
 	ConfigurationMapperTest ConfigurationViewTest Driver  \
 	HelpFormatterTest IniFileConfigurationTest LayeredConfigurationTest \
 	LocalConfigurationViewTest LoggingConfiguratorTest MapConfigurationTest \
