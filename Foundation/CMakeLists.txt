@@ -208,7 +208,6 @@ if(MINGW)
 			_WIN32
 			MINGW32
 			ODBCVER=0x0350
-			POCO_THREAD_STACK_SIZE
 	)
 endif()
 

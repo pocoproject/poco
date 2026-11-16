@@ -421,6 +421,8 @@ Bug Fixes and Improvements:
   As in MSVC builds, the MinGW build no longer defines WINVER and uses the default of the
   toolchain; WINVER=0x500 hid Windows API functions that Foundation uses, such as
   CompareStringOrdinal().
+  Threads of MinGW builds get the default stack size; the build defined POCO_THREAD_STACK_SIZE
+  without a value, which made it 1.
   Net compiles with MinGW headers that declare close() through <wchar.h>: SocketImpl::poll()
   closes its wepoll handle with epoll_close().
   On Windows, CMake stops with an error when the Windows API level of the toolchain
