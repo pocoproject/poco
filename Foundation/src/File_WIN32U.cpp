@@ -660,7 +660,7 @@ void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 		//   DWORD dw = ::GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
 		utf16Path.push_back(L'\\');
 	}
-	if (utf16Path.size() > MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
+	if (utf16Path.size() >= MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
 	{
 		if (utf16Path[0] == '\\' && utf16Path[1] != '\\')
 		{

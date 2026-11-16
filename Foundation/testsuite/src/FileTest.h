@@ -51,6 +51,7 @@ public:
 	void testLongPathUNC();
 	void testLongPathDevice();
 	void testLongPathRooted();
+	void testCreateDirectoryAtPathLimit();
 	void testUnixFileExtension();
 	void testTemporaryFile();
 	void testGetExecutablePathNonExistent();

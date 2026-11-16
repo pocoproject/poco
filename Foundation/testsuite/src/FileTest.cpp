@@ -1192,6 +1192,41 @@ void FileTest::testLongPathRooted()
 }
 
 
+void FileTest::testCreateDirectoryAtPathLimit()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// CreateDirectory accepts MAX_PATH - 12 characters including the terminator
+	// without the extended-length prefix, so a path of exactly that length needs it.
+	Poco::Path p("longpathlimit");
+	p.makeAbsolute();
+	const std::string base(p.toString());
+	// needs room to pad
+	if (base.size() + 2 > MAX_PATH - 12)
+		return;
+
+	const std::size_t len = MAX_PATH - 12;
+	// fill up to the wanted length with components that any file system accepts
+	std::string path(base);
+	while (path.size() + 65 + 2 <= len)
+	{
+		path.append("\\");
+		path.append(64, 'x');
+	}
+	path.append("\\");
+	path.append(len - path.size(), 'y');
+	assertEqual (len, path.size());
+
+	Poco::File dir(path);
+	dir.createDirectories();
+	assertTrue (dir.exists());
+	assertTrue (dir.isDirectory());
+	dir.remove();
+	assertTrue (!dir.exists());
+	Poco::File(base).remove(true);
+#endif
+}
+
+
 void FileTest::testUnixFileExtension()
 {
 	std::string filePath1 = "/a/b/c/.notextension";
@@ -1565,6 +1600,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testLongPathUNC);
 	CppUnit_addTest(pSuite, FileTest, testLongPathDevice);
 	CppUnit_addTest(pSuite, FileTest, testLongPathRooted);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoryAtPathLimit);
 	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
 	CppUnit_addTest(pSuite, FileTest, testTemporaryFile);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathNonExistent);
