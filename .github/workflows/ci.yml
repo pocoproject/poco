@@ -1287,6 +1287,9 @@ jobs:
           -DENABLE_XML=ON -DENABLE_JSON=ON -DENABLE_UTIL=ON -DENABLE_NET=ON
           -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
       - run: cmake --build cmake-build --parallel $(nproc)
+      # A child process started with an empty environment finds the MinGW runtime DLLs only
+      # in the directory of its executable.
+      - run: cp "$MINGW_PREFIX"/bin/{libgcc_s_seh-1,libstdc++-6,libwinpthread-1}.dll cmake-build/bin/
       # retry-action offers no MSYS2 shell; ctest repeats a failed test instead.
       - run: >-
           cd cmake-build &&
