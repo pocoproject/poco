@@ -41,6 +41,7 @@ public:
 	// Array tests
 	void testArray();
 	void testArrayIndexAccess();
+	void testArrayGetInteger();
 	void testArrayNested();
 
 	// Type tests

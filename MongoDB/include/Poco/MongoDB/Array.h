@@ -41,6 +41,7 @@ public:
 	// Document template functions available for backward compatibility
 	using Document::add;
 	using Document::get;
+	using Document::getInteger;
 
 	template<typename T>
 	Document& add(T value)
@@ -83,6 +84,12 @@ public:
 	[[nodiscard]] Element::Ptr get(std::size_t pos) const;
 		/// Returns the element at the given index.
 		/// An empty element will be returned if the element is not found.
+
+	[[nodiscard]] Int64 getInteger(std::size_t pos) const;
+		/// Returns the element at the given index as an integer. Useful when MongoDB
+		/// returns Int32, Int64 or double for a number. When the element is not found,
+		/// a Poco::NotFoundException will be thrown. If the element is not a number,
+		/// a Poco::BadCastException will be thrown.
 
 	template<typename T>
 	[[nodiscard]] bool isType(std::size_t pos) const
