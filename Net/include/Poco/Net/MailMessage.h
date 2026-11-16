@@ -67,6 +67,14 @@ public:
 		ENCODING_BASE64
 	};
 
+	enum class WordEncoding
+		/// The encoding of RFC 2047 encoded words.
+	{
+		Q,   /// "Q" encoding, similar to quoted-printable
+		B,   /// "B" encoding, base64
+		AUTO /// the encoding that gives the shorter result, "Q" if both are equal
+	};
+
 	struct Part
 	{
 		std::string             name;
@@ -241,12 +249,13 @@ public:
 		/// BCC recipients and Bcc header fields are never written.
 		///
 		/// Non-ASCII text in the header fields, which must be UTF-8, is
-		/// written as RFC 2047 encoded words (see encodeWord()): the whole
-		/// value of an unstructured field such as Subject, and the display
-		/// names in an address field such as From or in the To and CC fields
-		/// written from the recipients. Structured fields such as Content-Type,
-		/// fields as read() received them, and text that is not valid UTF-8
-		/// are written unchanged.
+		/// written as RFC 2047 encoded words (see encodeWord() with
+		/// WordEncoding::AUTO): the whole value of an unstructured field
+		/// such as Subject, and the display names in an address field such
+		/// as From or in the To and CC fields written from the recipients.
+		/// Structured fields such as Content-Type, fields as read()
+		/// received them, and text that is not valid UTF-8 are
+		/// written unchanged.
 
 	void validateHeaders() const;
 		/// Throws a MessageException if write() would reject a field of the
@@ -255,12 +264,17 @@ public:
 		/// Part content is not read, so the headers of the parts inside
 		/// a MultipartSource are checked only when the message is written.
 
-	[[nodiscard]] static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
+	[[nodiscard]] static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8", WordEncoding encoding = WordEncoding::Q);
 		/// If the given string contains non-ASCII characters,
-		/// encodes the given string using RFC 2047 "Q" word encoding.
+		/// encodes the given string using RFC 2047 word encoding
+		/// with the given encoding.
 		///
 		/// The given text must already be encoded in the character set
 		/// given in charset (default is UTF-8).
+		///
+		/// An encoded word is at most 75 characters long; the encoded
+		/// words are separated by a CR LF and a space. With the charset
+		/// UTF-8, a character is not split between two encoded words.
 		///
 		/// Returns the encoded string, or the original string if it
 		/// consists only of ASCII characters.
