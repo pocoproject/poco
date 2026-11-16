@@ -64,6 +64,10 @@ public:
 	void testWriteEncodesGroupName();
 	void testReadWriteEncodedFieldsUnchanged();
 	void testWriteEncodesNonAsciiText();
+	void testEncodeWordB();
+	void testEncodeWordAuto();
+	void testEncodeWordLength();
+	void testWriteEncodesShorterWord();
 	void testWriteKeepsNonUTF8Text();
 	void testReadRecipientsDomainLiteral();
 	void testReadRecipientsMalformedDomainLiteral();

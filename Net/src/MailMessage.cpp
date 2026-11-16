@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <limits>
 #include <sstream>
+#include <string_view>
 
 
 using Poco::Base64Encoder;
@@ -164,6 +165,142 @@ namespace
 			if (*it < 0) return false;
 		}
 		return true;
+	}
+
+
+	constexpr std::string::size_type MAX_ENCODED_WORD_LENGTH = 75; // RFC 2047, section 2
+	constexpr std::string::size_type MAX_UTF8_CHARACTER_LENGTH = 4;
+	constexpr unsigned char UTF8_CONTINUATION_MASK = 0xC0;
+	constexpr unsigned char UTF8_CONTINUATION_BITS = 0x80;
+	constexpr std::string_view ENCODED_WORD_END("?=");
+	// Encoded words of the "Q" encoding end after white space from this length on, or at
+	// the second length, as earlier versions wrote them.
+	constexpr std::string::size_type Q_WORD_LENGTH_BREAK_AT_SPACE = 64;
+	constexpr std::string::size_type Q_WORD_LENGTH_BREAK = 72;
+
+
+	std::string::size_type characterLength(const std::string& text, std::string::size_type pos, bool isUTF8)
+		/// Returns the number of bytes of the character at pos: in UTF-8 the
+		/// first byte and the continuation bytes after it, otherwise one.
+	{
+		std::string::size_type length = 1;
+		while (isUTF8 && length < MAX_UTF8_CHARACTER_LENGTH && pos + length < text.size()
+			&& (static_cast<unsigned char>(text[pos + length]) & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_BITS)
+			++length;
+		return length;
+	}
+
+
+	void appendQ(char ch, std::string& encodedText)
+		/// Appends a byte in the "Q" encoding. The specials of RFC 5322 are encoded
+		/// too, so that an encoded word can be a display name.
+	{
+		switch (ch)
+		{
+		case ' ':
+			encodedText += '_';
+			break;
+		case '=':
+		case '?':
+		case '_':
+		case '(':
+		case ')':
+		case '[':
+		case ']':
+		case '<':
+		case '>':
+		case ',':
+		case ';':
+		case ':':
+		case '.':
+		case '@':
+		case '"':
+		case '\\':
+			encodedText += '=';
+			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
+			break;
+		default:
+			if (ch > 32 && ch < 127)
+			{
+				encodedText += ch;
+			}
+			else
+			{
+				encodedText += '=';
+				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
+			}
+		}
+	}
+
+
+	std::string encodeQ(const std::string& text, const std::string& charset)
+	{
+		const bool isUTF8 = icompare(charset, "UTF-8") == 0;
+		const std::string wordStart = "=?" + charset + "?q?";
+		std::string encodedText;
+		std::string::size_type lineLength = 0;
+		std::string::size_type pos = 0;
+		while (pos < text.size())
+		{
+			const std::string::size_type length = characterLength(text, pos, isUTF8);
+			std::string character;
+			for (std::string::size_type i = pos; i < pos + length; ++i) appendQ(text[i], character);
+			if (lineLength > 0 && lineLength + character.size() + ENCODED_WORD_END.size() > MAX_ENCODED_WORD_LENGTH)
+			{
+				encodedText += "?=\r\n ";
+				lineLength = 0;
+			}
+			if (lineLength == 0)
+			{
+				encodedText += wordStart;
+				lineLength = wordStart.size();
+			}
+			encodedText += character;
+			lineLength += character.size();
+			const char ch = text[pos];
+			pos += length;
+			const bool isSpace = ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n';
+			if (pos < text.size() && ((lineLength >= Q_WORD_LENGTH_BREAK_AT_SPACE && isSpace) || lineLength >= Q_WORD_LENGTH_BREAK))
+			{
+				encodedText += "?=\r\n ";
+				lineLength = 0;
+			}
+		}
+		encodedText += ENCODED_WORD_END;
+		return encodedText;
+	}
+
+
+	std::string encodeB(const std::string& text, const std::string& charset)
+	{
+		const bool isUTF8 = icompare(charset, "UTF-8") == 0;
+		const std::string wordStart = "=?" + charset + "?b?";
+		const std::string::size_type overhead = wordStart.size() + ENCODED_WORD_END.size();
+		// Base64 writes 4 characters for every 3 bytes.
+		const std::string::size_type maxBytes = overhead < MAX_ENCODED_WORD_LENGTH ? (MAX_ENCODED_WORD_LENGTH - overhead) / 4 * 3 : 0;
+		std::string encodedText;
+		std::string::size_type pos = 0;
+		while (pos < text.size())
+		{
+			std::string::size_type length = characterLength(text, pos, isUTF8);
+			while (pos + length < text.size())
+			{
+				const std::string::size_type next = characterLength(text, pos + length, isUTF8);
+				if (length + next > maxBytes) break;
+				length += next;
+			}
+			std::ostringstream ostr;
+			Base64Encoder encoder(ostr);
+			encoder.rdbuf()->setLineLength(0);
+			encoder.write(text.data() + pos, static_cast<std::streamsize>(length));
+			encoder.close();
+			if (!encodedText.empty()) encodedText += "\r\n ";
+			encodedText += wordStart;
+			encodedText += ostr.str();
+			encodedText += ENCODED_WORD_END;
+			pos += length;
+		}
+		return encodedText;
 	}
 }
 
@@ -621,7 +758,7 @@ void MailMessage::encodeFields(MessageHeader& header) const
 			continue;
 		// Every CR LF in a checked value folds it; encoded, it would become text.
 		const std::string text = Poco::replace(value, "\r\n", "");
-		value = syntax == HeaderField::Syntax::ADDRESS_LIST ? HeaderField::encodeAddressList(text) : encodeWord(text);
+		value = syntax == HeaderField::Syntax::ADDRESS_LIST ? HeaderField::encodeAddressList(text) : encodeWord(text, "UTF-8", WordEncoding::AUTO);
 	}
 }
 
@@ -663,7 +800,7 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 	std::string rec;
 	if (!std::all_of(realName.begin(), realName.end(), Poco::Ascii::isAscii) && isValidUTF8(realName))
 	{
-		rec = encodeWord(Poco::replace(realName, "\r\n", ""));
+		rec = encodeWord(Poco::replace(realName, "\r\n", ""), "UTF-8", WordEncoding::AUTO);
 		rec.append(" ");
 	}
 	else if (!realName.empty())
@@ -681,73 +818,17 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 }
 
 
-std::string MailMessage::encodeWord(const std::string& text, const std::string& charset)
+std::string MailMessage::encodeWord(const std::string& text, const std::string& charset, WordEncoding encoding)
 {
 	if (std::none_of(text.begin(), text.end(),
 		[](char ch) { return static_cast<unsigned char>(ch) > 127; }))
 		return text;
 
-	std::string encodedText;
-	std::string::size_type lineLength = 0;
-	for (auto ch: text)
-	{
-		if (lineLength == 0)
-		{
-			encodedText += "=?";
-			encodedText += charset;
-			encodedText += "?q?";
-			lineLength += charset.length() + 5;
-		}
-		switch (ch)
-		{
-		case ' ':
-			encodedText += '_';
-			lineLength++;
-			break;
-		case '=':
-		case '?':
-		case '_':
-		case '(':
-		case ')':
-		case '[':
-		case ']':
-		case '<':
-		case '>':
-		case ',':
-		case ';':
-		case ':':
-		case '.':
-		case '@':
-		case '"':
-		case '\\':
-			encodedText += '=';
-			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
-			lineLength += 3;
-			break;
-		default:
-			if (ch > 32 && ch < 127)
-			{
-				encodedText += ch;
-				lineLength++;
-			}
-			else
-			{
-				encodedText += '=';
-				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
-				lineLength += 3;
-			}
-		}
-		if ((lineLength >= 64 && (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')) || lineLength >= 72)
-		{
-			encodedText += "?=\r\n ";
-			lineLength = 0;
-		}
-	}
-	if (lineLength > 0)
-	{
-		encodedText += "?=";
-	}
-	return encodedText;
+	if (encoding == WordEncoding::Q) return encodeQ(text, charset);
+	if (encoding == WordEncoding::B) return encodeB(text, charset);
+	std::string q = encodeQ(text, charset);
+	std::string b = encodeB(text, charset);
+	return b.size() < q.size() ? b : q;
 }
 
 
