@@ -264,6 +264,10 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 
 	if (hTempStore)
 	{
+		// A file with a certificate chain also holds certificates without a key, in any order:
+		// the certificate of the context is the one with the private key, or the first one if none has a key.
+		PCCERT_CONTEXT pKeyCert = nullptr;
+		PCCERT_CONTEXT pFirstCert = nullptr;
 		PCCERT_CONTEXT pCert = nullptr;
 		pCert = CertEnumCertificatesInStore(hTempStore, pCert);
 		while (pCert)
@@ -272,9 +276,14 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 			BOOL res = CertAddCertificateContextToStore(_hMemCertStore, pCert, CERT_STORE_ADD_REPLACE_EXISTING, &pStoreCert);
 			if (res)
 			{
-				if (!_pCert)
+				DWORD keyInfoSize = 0;
+				if (pKeyCert == nullptr && CertGetCertificateContextProperty(pCert, CERT_KEY_PROV_INFO_PROP_ID, nullptr, &keyInfoSize))
 				{
-					_pCert = pStoreCert;
+					pKeyCert = pStoreCert;
+				}
+				else if (pFirstCert == nullptr)
+				{
+					pFirstCert = pStoreCert;
 				}
 				else
 				{
@@ -285,6 +294,12 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 			pCert = CertEnumCertificatesInStore(hTempStore, pCert);
 		}
 		CertCloseStore(hTempStore, 0);
+		if (pKeyCert != nullptr)
+		{
+			if (pFirstCert != nullptr) CertFreeCertificateContext(pFirstCert);
+			_pCert = pKeyCert;
+		}
+		else _pCert = pFirstCert;
 	}
 	else throw CertificateException("failed to import certificate", GetLastError());
 }

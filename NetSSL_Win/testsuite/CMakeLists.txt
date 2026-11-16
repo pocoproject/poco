@@ -17,4 +17,5 @@ target_link_libraries(NetSSLWin-testrunner PUBLIC Poco::NetSSLWin Poco::Util Poc
 
 # Test data
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/any.pfx ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/any.pfx COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/chain.pfx ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/chain.pfx COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSLWin-testrunner.xml COPYONLY)
