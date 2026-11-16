@@ -108,7 +108,7 @@ public:
 		/// The default implementation returns (int) bytes[0].
 
 	virtual int sequenceLength(const unsigned char* bytes, int length) const;
-		/// The sequenceLength function is used to get the lenth of the sequence pointed
+		/// The sequenceLength function is used to get the length of the sequence pointed
 		/// by bytes. The length parameter should be greater or equal to the length of
 		/// the sequence.
 		///

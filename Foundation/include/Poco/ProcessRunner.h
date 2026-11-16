@@ -103,7 +103,7 @@ public:
 		/// Starts the process and waits for it to be fully initialized.
 		/// Process initialization completion is indicated by a new pid in
 		/// the pid file (if specified at construction, otherwise there
-		/// is no wating for pid).
+		/// is no waiting for pid).
 		/// If pid file is not specified, there is no waiting.
 		///
 		/// Attempting to start a started process results in

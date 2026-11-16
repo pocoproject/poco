@@ -211,11 +211,11 @@ public:
 
 	virtual void convert(long long& val) const;
 		/// Throws BadCastException. Must be overridden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 	virtual void convert(unsigned long long & val) const;
 		/// Throws BadCastException. Must be overridden in a type
-		/// specialization in order to suport the conversion.
+		/// specialization in order to support the conversion.
 
 #endif
 
@@ -315,7 +315,7 @@ protected:
 		///
 		/// Called from clone() member function of the implementation.
 		///
-		/// When the smal object optimization is enabled (POCO_NO_SOO not
+		/// When the small object optimization is enabled (POCO_NO_SOO not
 		/// defined), if size of the wrapper is larger than
 		/// POCO_SMALL_OBJECT_SIZE, holder is instantiated on
 		/// the heap, otherwise it is instantiated in-place (in the

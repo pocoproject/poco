@@ -94,7 +94,7 @@ private:
 		/// Strict weak ordering requirement for sorted containers
 		/// as described in Josuttis "The Standard C++ Library"
 		/// chapter 6.5. pg. 176.
-		/// For this to pass, the following condition must be satisifed:
+		/// For this to pass, the following condition must be satisfied:
 		/// row1 < row2 < row3
 
 	void writeToCLOB(Poco::BinaryWriter& writer);

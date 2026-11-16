@@ -248,7 +248,7 @@ private:
 
 
 //
-// friend comparsion operators
+// friend comparison operators
 //
 template <class T1, class T2>
 [[nodiscard]] inline bool operator == (const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)

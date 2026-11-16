@@ -78,13 +78,13 @@ class Data_API Statement
 	///
 	/// See individual functions documentation for more details.
 	///
-	/// Statement owns the RowFormatter, which can be provided externaly through setFormatter()
+	/// Statement owns the RowFormatter, which can be provided externally through setFormatter()
 	/// member function.
 	/// If no formatter is externally supplied to the statement, the SimpleRowFormatter is lazy
 	/// created and used.
 	///
 	/// If compiled with SQLParser support, Statement knows the number and type of the SQL statement(s)
-	/// it contains, to the extent that the SQL string is a standard SQL and the staement type is supported.
+	/// it contains, to the extent that the SQL string is a standard SQL and the statement type is supported.
 	/// No proprietary SQL extensions are supported.
 	///
 	/// Supported statement types are:
@@ -328,7 +328,7 @@ public:
 		/// Const overload of bindings().
 
 	[[nodiscard]] Optional<std::size_t> statementsCount() const;
-		/// Returns the total number of SQL statements held in the accummulated SQL statement.
+		/// Returns the total number of SQL statements held in the accumulated SQL statement.
 		///
 		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
 		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
@@ -417,7 +417,7 @@ public:
 		/// succeed.
 		///
 		/// For Poco::Data builds without SQLParser support, the behavior is the same as
-		/// for unsuccesful parsing.
+		/// for unsuccessful parsing.
 		///
 		/// Throws NotConnectedException if the session is not connected; no transaction is started then.
 		/// Throws InvalidAccessException while another execution of the statement or of one of

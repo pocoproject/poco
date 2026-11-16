@@ -105,7 +105,7 @@ public:
 	
 	bool visit(const Poco::Dynamic::Var& x) const;
 		/// Find handler for held type and if it exists call handler.
-		/// Returns true if hanlder was found othrewise returns false.
+		/// Returns true if handler was found othrewise returns false.
 };
 
 

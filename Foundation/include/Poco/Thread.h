@@ -122,7 +122,7 @@ public:
 	void setOSPriority(int prio, int policy = POLICY_DEFAULT);
 		/// Sets the thread's priority, using an operating system specific
 		/// priority value. Use getMinOSPriority() and getMaxOSPriority() to
-		/// obtain mininum and maximum priority values. Additionally,
+		/// obtain minimum and maximum priority values. Additionally,
 		/// a scheduling policy can be specified. The policy is currently
 		/// only used on POSIX platforms where the values SCHED_OTHER (default),
 		/// SCHED_FIFO and SCHED_RR are supported.
@@ -232,7 +232,7 @@ public:
 		/// some scenarios, may be desirable behavior).
 		///
 		/// Note that, unlike Thread::sleep(), this function can only
-		/// be succesfully called from a thread started as Poco::Thread.
+		/// be successfully called from a thread started as Poco::Thread.
 
 	void wakeUp();
 		/// Wakes up the thread which is in the state of interruptible
@@ -271,8 +271,8 @@ public:
 
 	bool setAffinity(int coreId);
 		/// Sets the thread affinity to the coreID.
-		/// Returns true if succesful.
-		/// Returns false if not succesful or not
+		/// Returns true if successful.
+		/// Returns false if not successful or not
 		/// implemented.
 
 	[[nodiscard]] int getAffinity() const;

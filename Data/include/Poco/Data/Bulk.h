@@ -40,10 +40,10 @@ public:
 		/// Destroys the bulk.
 
 	[[nodiscard]] const Limit& limit() const;
-		/// Returns the limit asociated with this bulk object.
+		/// Returns the limit associated with this bulk object.
 
 	[[nodiscard]] Poco::UInt32 size() const;
-		/// Returns the value of the limit asociated with
+		/// Returns the value of the limit associated with
 		/// this bulk object.
 
 private:

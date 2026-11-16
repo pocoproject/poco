@@ -95,7 +95,7 @@ std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRI
 	"LOB=T;" // LOB writes (T/F), default T
 	"FDL=0;" // failover delay (default 10)
 	"FRC=0;" // failover retry count (default 10)
-	"QTO=T;" // query timout option (T/F), default T
+	"QTO=T;" // query timeout option (T/F), default T
 	"FEN=F;" // failover (T/F), default T
 	"XSM=Default;" // schema field (Default/Database/Owner), default Default
 	"EXC=F;" // EXEC syntax (T/F), default F
@@ -661,7 +661,7 @@ void ODBCOracleTest::testAutoTransaction()
 	Session localSession("ODBC", _connectString);
 	bool ac = session().getFeature("autoCommit");
 	int count = 0;
-	// enabing SQL parsing is necessary to prevent
+	// enabling SQL parsing is necessary to prevent
 	// starting a transaction for a simple select
 	bool sqlParse = session().getFeature("sqlParse");
 	session().setFeature("sqlParse", true);

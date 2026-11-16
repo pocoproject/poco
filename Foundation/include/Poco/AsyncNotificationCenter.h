@@ -192,7 +192,7 @@ private:
 
 	ObserversMap _lists;
 		/// Each observer has its own list of pending notifications.
-		/// Observers are identifed by their pointers.
+		/// Observers are identified by their pointers.
 		/// When adding to the queue, observersToNotify is used to get the observers
 		/// that are registered for such notification.
 

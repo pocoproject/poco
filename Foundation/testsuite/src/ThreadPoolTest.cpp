@@ -157,7 +157,7 @@ void ThreadPoolTest::testThreadPoolImmediateShutdown()
 
 	Worker worker1; // create worker threads
 	Worker worker2;
-	Worker::Shutdown();  // workers will come up, and then immediatly be told to go away
+	Worker::Shutdown();  // workers will come up, and then immediately be told to go away
 
 	Poco::Timestamp stime;
 

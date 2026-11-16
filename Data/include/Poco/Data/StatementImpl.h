@@ -129,7 +129,7 @@ public:
 		/// affected for all other statements (insert, update, delete).
 		/// If reset is true (default), the underlying bound storage is
 		/// reset and reused. In case of containers, this means they are
-		/// cleared and resized to accomodate the number of rows returned by
+		/// cleared and resized to accommodate the number of rows returned by
 		/// this execution step. When reset is false, data is appended to the
 		/// bound containers during multiple execute calls.
 
@@ -185,7 +185,7 @@ protected:
 
 	[[nodiscard]] virtual std::size_t next() = 0;
 		/// Retrieves the next row or set of rows from the resultset and
-		/// returns the number of rows retreved.
+		/// returns the number of rows retrieved.
 		///
 		/// Will throw, if the resultset is empty.
 		/// Expects the statement to be compiled and bound.
