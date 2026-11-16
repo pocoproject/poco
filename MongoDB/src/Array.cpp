@@ -37,6 +37,12 @@ Element::Ptr Array::get(std::size_t pos) const
 }
 
 
+Int64 Array::getInteger(std::size_t pos) const
+{
+	return Document::getInteger(Poco::NumberFormatter::format(pos));
+}
+
+
 std::string Array::toString(int indent) const
 {
 	std::ostringstream oss;
