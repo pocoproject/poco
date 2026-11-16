@@ -1375,6 +1375,43 @@ void ZipTest::testNulCharacterInName()
 }
 
 
+void ZipTest::testNulCharacterInNewName()
+{
+	const std::string nulName("n\0m.txt", 7);
+	Poco::TemporaryFile zipFile;
+	Poco::TemporaryFile localFile;
+	{
+		Poco::FileOutputStream out(zipFile.path());
+		out << singleEntryArchive(ZipCommon::CM_STORE);
+	}
+	{
+		Poco::FileOutputStream out(localFile.path());
+		out << "data";
+	}
+	// commit() writes the new archive to this file and leaves it behind when it fails.
+	Poco::TemporaryFile::registerForDeletion(zipFile.path() + ".tmp");
+
+	ZipManipulator zm(zipFile.path(), false);
+	try
+	{
+		zm.renameFile(std::string(ENTRY_NAME), nulName);
+		fail("an entry must not be renamed to a name with a NUL character");
+	}
+	catch (const ZipException&)
+	{
+	}
+	zm.addFile(nulName, localFile.path());
+	try
+	{
+		zm.commit();
+		fail("an entry with a NUL character in its name must not be added");
+	}
+	catch (const ZipException&)
+	{
+	}
+}
+
+
 void ZipTest::testDuplicateNamesDataOffsets()
 {
 	const std::string_view contents[] = { "first", "second", "third" };
@@ -1552,6 +1589,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testDataDescriptorCompressedSizeOutOfRange);
 	CppUnit_addTest(pSuite, ZipTest, testSyncAtEndOfArchive);
 	CppUnit_addTest(pSuite, ZipTest, testNulCharacterInName);
+	CppUnit_addTest(pSuite, ZipTest, testNulCharacterInNewName);
 	CppUnit_addTest(pSuite, ZipTest, testDuplicateNamesDataOffsets);
 	CppUnit_addTest(pSuite, ZipTest, testParseContinuesAtEndOfEntryData);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressTruncatedEntryData);

@@ -14,6 +14,7 @@
 
 #include "Poco/Zip/Keep.h"
 #include "Poco/Zip/Compress.h"
+#include "Poco/Zip/ZipUtil.h"
 #include "Poco/Buffer.h"
 #include "Poco/StreamCopier.h"
 
@@ -36,7 +37,7 @@ Keep::Keep(const ZipLocalFileHeader& hdr, const ZipFileInfo& info):
 
 void Keep::execute(Compress& c, std::istream& input)
 {
-	c.addFileRaw(input, _hdr, _hdr.getFileName(), _info);
+	c.addFileRaw(input, _hdr, ZipUtil::validZipEntryFileName(_hdr.getFileName()), _info);
 }
 
 

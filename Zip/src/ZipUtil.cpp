@@ -226,10 +226,16 @@ void ZipUtil::syncDataDescriptor(std::istream & in, bool force64)
 }
 
 
+void ZipUtil::verifyNoNulCharacter(const std::string& name)
+{
+	if (name.find('\0') != std::string::npos)
+		throw ZipException("Illegal entry name containing a NUL character");
+}
+
+
 void ZipUtil::verifyZipEntryFileName(const std::string& fn)
 {
-	if (fn.find('\0') != std::string::npos)
-		throw ZipException("Illegal entry name containing a NUL character");
+	verifyNoNulCharacter(fn);
 	if (fn.find("\\") != std::string::npos)
 		throw ZipException("Illegal entry name " + fn + " containing \\");
 	if (fn == "/")
@@ -255,6 +261,13 @@ std::string ZipUtil::validZipEntryFileName(const Poco::Path& entry)
 	std::string fn = entry.toString(Poco::Path::PATH_UNIX);
 	verifyZipEntryFileName(fn);
 	return fn;
+}
+
+
+std::string ZipUtil::validZipEntryFileName(const std::string& entry)
+{
+	verifyNoNulCharacter(entry);
+	return validZipEntryFileName(Poco::Path(entry));
 }
 
 
