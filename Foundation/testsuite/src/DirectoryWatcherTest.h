@@ -42,6 +42,7 @@ public:
 	void testSuspendMultipleTimes();
 	void testDerivedConstructor();
 	void testReportsAfterFilesDeletedDuringScan();
+	void testForceScan();
 
 	void setUp();
 	void tearDown();
