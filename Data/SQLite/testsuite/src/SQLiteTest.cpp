@@ -2708,6 +2708,19 @@ void SQLiteTest::testNulls()
 }
 
 
+void SQLiteTest::testIntoWithoutRows()
+{
+	Session ses (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	ses << "CREATE TABLE Strings (str VARCHAR)", now;
+	ses << "INSERT INTO Strings VALUES('abc')", now;
+
+	std::string none;
+	Statement stmt = (ses << "SELECT str FROM Strings WHERE str = 'xyz'", into(none));
+	assertTrue (stmt.execute() == 0);
+	assertTrue (none.empty());
+}
+
+
 void SQLiteTest::testRowIterator()
 {
 	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -3714,6 +3727,30 @@ void SQLiteTest::testConnectionTimeoutOverflow()
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
+}
+
+
+void SQLiteTest::testIncrementalVacuum()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+	session << "PRAGMA auto_vacuum = INCREMENTAL", now;
+	int autoVacuum = 0;
+	session << "PRAGMA auto_vacuum", into(autoVacuum), now;
+	assertTrue (autoVacuum == 2);
+
+	session << "CREATE TABLE Strings (str VARCHAR)", now;
+	std::vector<std::string> data(1000, std::string(1000, 'x'));
+	session << "INSERT INTO Strings VALUES(?)", use(data), now;
+	session << "DELETE FROM Strings", now;
+
+	int freePages = 0;
+	session << "PRAGMA freelist_count", into(freePages), now;
+	assertTrue (freePages > 1);
+
+	// the pragma frees one page per result row, so all rows must be stepped through
+	session << "PRAGMA incremental_vacuum", now;
+	session << "PRAGMA freelist_count", into(freePages), now;
+	assertTrue (freePages == 0);
 }
 
 
@@ -5163,6 +5200,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNullable);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullableVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
+	CppUnit_addTest(pSuite, SQLiteTest, testIntoWithoutRows);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorLimit);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorSwap);
@@ -5189,6 +5227,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testFileToMemoryError);
 	CppUnit_addTest(pSuite, SQLiteTest, testPooledConnectionTimeout);
 	CppUnit_addTest(pSuite, SQLiteTest, testConnectionTimeoutOverflow);
+	CppUnit_addTest(pSuite, SQLiteTest, testIncrementalVacuum);
 	CppUnit_addTest(pSuite, SQLiteTest, testThreadModes);
 	CppUnit_addTest(pSuite, SQLiteTest, testUpdateCallback);
 	CppUnit_addTest(pSuite, SQLiteTest, testCommitCallback);

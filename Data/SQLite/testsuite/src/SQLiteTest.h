@@ -112,6 +112,7 @@ public:
 	void testNullable();
 	void testNullableVector();
 	void testNulls();
+	void testIntoWithoutRows();
 	void testRowIterator();
 	void testRowIteratorLimit();
 	void testRowIteratorSwap();
@@ -142,6 +143,7 @@ public:
 	void testFileToMemoryError();
 	void testPooledConnectionTimeout();
 	void testConnectionTimeoutOverflow();
+	void testIncrementalVacuum();
 
 	void testThreadModes();
 
