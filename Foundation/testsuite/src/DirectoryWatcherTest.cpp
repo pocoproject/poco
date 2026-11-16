@@ -19,6 +19,9 @@
 #include "Poco/DirectoryWatcher.h"
 #include "Poco/Delegate.h"
 #include "Poco/FileStream.h"
+#include <algorithm>
+#include <chrono>
+#include <string>
 
 
 using Poco::DirectoryWatcher;
@@ -371,6 +374,34 @@ void DirectoryWatcherTest::testDerivedConstructor()
 }
 
 
+void DirectoryWatcherTest::testReportsAfterFilesDeletedDuringScan()
+{
+	// Files deleted while the watcher scans the directory disappear between
+	// listing the directory and reading their attributes.
+	constexpr int FILE_COUNT = 1000;
+	for (int i = 0; i < FILE_COUNT; ++i)
+	{
+		Poco::Path p(path());
+		p.setFileName("file" + std::to_string(i));
+		Poco::FileOutputStream fos(p.toString());
+	}
+
+	DirectoryWatcher dw(path().toString(), DirectoryWatcher::DW_FILTER_ENABLE_ALL, SCAN_INTERVAL);
+	dw.itemAdded += Poco::delegate(this, &DirectoryWatcherTest::onItemAdded);
+
+	assertTrue (reportsAddedFile("before"));
+
+	for (int i = 0; i < FILE_COUNT; ++i)
+	{
+		Poco::Path p(path());
+		p.setFileName("file" + std::to_string(i));
+		Poco::File(p).remove();
+	}
+
+	assertTrue (reportsAddedFile("after"));
+}
+
+
 void DirectoryWatcherTest::setUp()
 {
 	_error = false;
@@ -412,6 +443,7 @@ void DirectoryWatcherTest::onItemAdded(const Poco::DirectoryWatcher::DirectoryEv
 
 	Poco::Mutex::ScopedLock l(_mutex);
 	_events.push_back(de);
+	_itemAdded.set();
 }
 
 
@@ -478,6 +510,40 @@ Poco::Path DirectoryWatcherTest::path() const
 }
 
 
+bool DirectoryWatcherTest::reportsAddedFile(const std::string& prefix)
+{
+	constexpr int ATTEMPTS = 20;
+	constexpr std::chrono::milliseconds ATTEMPT_TIMEOUT(500);
+
+	const auto isReported = [&]()
+	{
+		Poco::Mutex::ScopedLock l(_mutex);
+		return std::ranges::any_of(_events, [&](const DirEvent& ev)
+		{
+			return ev.type == DirectoryWatcher::DW_ITEM_ADDED && Poco::Path(ev.path).getFileName().starts_with(prefix);
+		});
+	};
+
+	for (int i = 0; i < ATTEMPTS; ++i)
+	{
+		Poco::Path p(path());
+		p.setFileName(prefix + std::to_string(i));
+		Poco::FileOutputStream fos(p.toString());
+		fos.close();
+
+		const auto deadline = std::chrono::steady_clock::now() + ATTEMPT_TIMEOUT;
+		while (!isReported())
+		{
+			const auto remaining = std::chrono::ceil<std::chrono::milliseconds>(deadline - std::chrono::steady_clock::now());
+			if (remaining.count() <= 0) break;
+			_itemAdded.tryWait(static_cast<long>(remaining.count()));
+		}
+		if (isReported()) return true;
+	}
+	return false;
+}
+
+
 CppUnit::Test* DirectoryWatcherTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("DirectoryWatcherTest");
@@ -490,6 +556,7 @@ CppUnit::Test* DirectoryWatcherTest::suite()
 	CppUnit_addTest(pSuite, DirectoryWatcherTest, testResume);
 	CppUnit_addTest(pSuite, DirectoryWatcherTest, testSuspendMultipleTimes);
 	CppUnit_addTest(pSuite, DirectoryWatcherTest, testDerivedConstructor);
+	CppUnit_addTest(pSuite, DirectoryWatcherTest, testReportsAfterFilesDeletedDuringScan);
 
 	return pSuite;
 }

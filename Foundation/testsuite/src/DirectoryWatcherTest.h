@@ -23,6 +23,7 @@
 #include "Poco/DirectoryWatcher.h"
 #include "Poco/Path.h"
 #include "Poco/Mutex.h"
+#include "Poco/Event.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -40,6 +41,7 @@ public:
 	void testResume();
 	void testSuspendMultipleTimes();
 	void testDerivedConstructor();
+	void testReportsAfterFilesDeletedDuringScan();
 
 	void setUp();
 	void tearDown();
@@ -55,6 +57,10 @@ protected:
 	void onError(const Poco::Exception& exc);
 
 	Poco::Path path() const;
+	[[nodiscard]] bool reportsAddedFile(const std::string& prefix);
+		/// Creates files named prefix0, prefix1, ... until the watcher reports
+		/// one of them as added. A native watcher misses the files created
+		/// before it has been set up, so one file is not enough.
 
 private:
 	struct DirEvent
@@ -66,6 +72,7 @@ private:
 	std::vector<DirEvent> _events;
 	bool _error;
 	Poco::Mutex _mutex;
+	Poco::Event _itemAdded;
 };
 
 
