@@ -70,6 +70,7 @@ public:
 	void testSplitParametersDecodesNames();
 	void testSwapAndSecureClear();
 	void testSecureEraseIterator();
+	void testQuote();
 
 	void setUp();
 	void tearDown();

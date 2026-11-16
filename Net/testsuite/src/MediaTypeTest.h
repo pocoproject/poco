@@ -26,6 +26,7 @@ public:
 
 	void testParse();
 	void testToString();
+	void testToStringQuotedPair();
 	void testMatch();
 	void testMatchRange();
 

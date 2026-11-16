@@ -70,6 +70,18 @@ void MediaTypeTest::testToString()
 }
 
 
+void MediaTypeTest::testToStringQuotedPair()
+{
+	MediaType mt("application", "test");
+	mt.setParameter("name", "a\"; boundary=\"b\\");
+	assertEqual ("application/test; name=\"a\\\"; boundary=\\\"b\\\\\"", mt.toString());
+
+	MediaType parsed(mt.toString());
+	assertEqual (1, parsed.parameters().size());
+	assertEqual ("a\"; boundary=\"b\\", parsed.getParameter("name"));
+}
+
+
 void MediaTypeTest::testMatch()
 {
 	MediaType mt1("Text/Plain");
@@ -131,6 +143,7 @@ CppUnit::Test* MediaTypeTest::suite()
 
 	CppUnit_addTest(pSuite, MediaTypeTest, testParse);
 	CppUnit_addTest(pSuite, MediaTypeTest, testToString);
+	CppUnit_addTest(pSuite, MediaTypeTest, testToStringQuotedPair);
 	CppUnit_addTest(pSuite, MediaTypeTest, testMatch);
 	CppUnit_addTest(pSuite, MediaTypeTest, testMatchRange);
 
