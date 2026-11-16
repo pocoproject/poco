@@ -251,10 +251,10 @@ public:
 		/// the handshake.
 
 	// SocketImpl
-	virtual void setBlocking(bool flag) override;
-	[[nodiscard]] virtual bool getBlocking() const override;
-	virtual void setRawOption(int level, int option, const void* value, poco_socklen_t length) override;
-	[[nodiscard]] virtual void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
+	void setBlocking(bool flag) override;
+	[[nodiscard]] bool getBlocking() const override;
+	void setRawOption(int level, int option, const void* value, poco_socklen_t length) override;
+	[[nodiscard]] void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
 	
 protected:
 	void acceptSSL();
@@ -263,7 +263,7 @@ protected:
 	void connectSSL();
 		/// Performs a SSL client-side handshake on an already connected TCP socket.
 
-	~SecureStreamSocketImpl();
+	~SecureStreamSocketImpl() override;
 		/// Destroys the SecureStreamSocketImpl.
 
 	[[nodiscard]] static int lastError();
