@@ -895,6 +895,29 @@ void PathTest::testParseWindows5()
 }
 
 
+void PathTest::testParseWindowsSlashBeforeDrive()
+{
+	// the path of a file URI such as file:///c:/dir/file
+	Path p;
+	p.parse("/c:/dir/file", Path::PATH_WINDOWS);
+	assertTrue (p.isAbsolute());
+	assertTrue (p.getDevice() == "c");
+	assertTrue (p.depth() == 1);
+	assertTrue (p[0] == "dir");
+	assertTrue (p.isFile());
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "c:\\dir\\file");
+
+	p.parse("/C:/", Path::PATH_WINDOWS);
+	assertTrue (p.isAbsolute());
+	assertTrue (p.getDevice() == "C");
+	assertTrue (p.depth() == 0);
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "C:\\");
+
+	assertTrue (throwsPathSyntaxException([&]() { p.parse("\\c:\\dir", Path::PATH_WINDOWS); }));
+	assertTrue (throwsPathSyntaxException([&]() { p.parse("/1:/dir", Path::PATH_WINDOWS); }));
+}
+
+
 void PathTest::testParseVMS1()
 {
 	Path p;
@@ -1877,6 +1900,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testParseWindows3);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows4);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows5);
+	CppUnit_addTest(pSuite, PathTest, testParseWindowsSlashBeforeDrive);
 	CppUnit_addTest(pSuite, PathTest, testParseVMS1);
 	CppUnit_addTest(pSuite, PathTest, testParseVMS2);
 	CppUnit_addTest(pSuite, PathTest, testParseVMS3);
