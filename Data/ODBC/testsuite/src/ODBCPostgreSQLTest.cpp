@@ -16,6 +16,8 @@
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/DateTime.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/Data/LOB.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/Connector.h"
@@ -34,6 +36,12 @@ using Poco::Any;
 using Poco::AnyCast;
 using Poco::Dynamic::Var;
 using Poco::DateTime;
+using Poco::UnicodeConverter;
+using Poco::UTF16String;
+using Poco::Data::BLOB;
+using Poco::Data::CLOB;
+using Poco::Data::AbstractExtraction;
+using Poco::Data::Extraction;
 
 
 #define POSTGRESQL_DSN "PocoDataPgSQLTest"
@@ -417,6 +425,75 @@ void ODBCPostgreSQLTest::testStoredFunctionDynamicAny()
 }
 
 
+void ODBCPostgreSQLTest::testStoredFunctionUTF16String()
+{
+	configurePLPgSQL();
+
+	dropObject("FUNCTION", "storedFunction(TEXT, TEXT)");
+	session() << "CREATE FUNCTION storedFunction(TEXT,TEXT) RETURNS TEXT AS '"
+		"BEGIN "
+		" RETURN $1 || '', '' || $2 || ''!'';"
+		"END;'"
+		"LANGUAGE 'plpgsql'" , now;
+
+	UTF16String param1;
+	UnicodeConverter::convert(std::string("Hello"), param1);
+	UTF16String param2;
+	UnicodeConverter::convert(std::string("world"), param2);
+	UTF16String expected;
+	UnicodeConverter::convert(std::string("Hello, world!"), expected);
+
+	for (int k = 0; k < 8;)
+	{
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
+
+		UTF16String ret;
+		session() << "{? = call storedFunction(?,?)}", out(ret), in(param1), in(param2), now;
+		assertTrue (ret == expected);
+
+		k += 2;
+	}
+
+	dropObject("FUNCTION", "storedFunction(TEXT, TEXT)");
+}
+
+
+void ODBCPostgreSQLTest::testStoredFunctionInOutString()
+{
+	configurePLPgSQL();
+
+	dropObject("FUNCTION", "storedFunction(TEXT)");
+	session() << "CREATE FUNCTION storedFunction(INOUT str TEXT) AS '"
+		"BEGIN "
+		" str := str || '', world!'';"
+		"END;'"
+		"LANGUAGE 'plpgsql'" , now;
+
+	UTF16String expected;
+	UnicodeConverter::convert(std::string("Hello, world!"), expected);
+
+	for (int k = 0; k < 8;)
+	{
+		session().setFeature("autoBind", bindValue(k));
+		session().setFeature("autoExtract", bindValue(k+1));
+
+		std::string str("Hello");
+		session() << "{call storedFunction(?)}", io(str), now;
+		assertEqual ("Hello, world!", str);
+
+		UTF16String utf16Str;
+		UnicodeConverter::convert(std::string("Hello"), utf16Str);
+		session() << "{call storedFunction(?)}", io(utf16Str), now;
+		assertTrue (utf16Str == expected);
+
+		k += 2;
+	}
+
+	dropObject("FUNCTION", "storedFunction(TEXT)");
+}
+
+
 void ODBCPostgreSQLTest::testDateTimeMicroseconds()
 {
 	for (int k = 0; k < 8;)
@@ -432,6 +509,123 @@ void ODBCPostgreSQLTest::testDateTimeMicroseconds()
 
 		k += 2;
 	}
+}
+
+
+void ODBCPostgreSQLTest::testLOBManualExtractionDistinctValues()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	recreatePersonBLOBTable();
+
+	const std::vector<std::string> images = {"image0", "image01", "image012"};
+	for (std::size_t i = 0; i < images.size(); ++i)
+	{
+		std::string lastName = format("ln%z", i);
+		CLOB img(images[i]);
+		session() << "INSERT INTO Person VALUES (?, 'fn', 'addr', ?)", use(lastName), use(img), now;
+	}
+
+	const std::string defaultImage("default");
+	const auto toBLOB = [](const std::string& s) { return BLOB(std::vector<unsigned char>(s.begin(), s.end())); };
+
+	const bool autoExtract = session().getFeature("autoExtract");
+	try
+	{
+		session().setFeature("autoExtract", false);
+
+		BLOB blobDefault = toBLOB(defaultImage);
+		std::vector<BLOB> blobs;
+		session() << "SELECT Image FROM Person ORDER BY LastName",
+			AbstractExtraction::Ptr(new Extraction<std::vector<BLOB>>(blobs, blobDefault)), now;
+		assertEqual (images.size(), blobs.size());
+		for (std::size_t i = 0; i < images.size(); ++i)
+			assertTrue (blobs[i] == toBLOB(images[i]));
+		assertTrue (blobDefault == toBLOB(defaultImage));
+
+		CLOB clobDefault(defaultImage);
+		std::vector<CLOB> clobs;
+		session() << "SELECT Image FROM Person ORDER BY LastName",
+			AbstractExtraction::Ptr(new Extraction<std::vector<CLOB>>(clobs, clobDefault)), now;
+		assertEqual (images.size(), clobs.size());
+		for (std::size_t i = 0; i < images.size(); ++i)
+			assertTrue (clobs[i] == CLOB(images[i]));
+		assertTrue (clobDefault == CLOB(defaultImage));
+	}
+	catch (...)
+	{
+		session().setFeature("autoExtract", autoExtract);
+		throw;
+	}
+	session().setFeature("autoExtract", autoExtract);
+}
+
+
+void ODBCPostgreSQLTest::testLOBManualExtractionNull()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	recreatePersonBLOBTable();
+	session() << "INSERT INTO Person VALUES ('ln0', 'fn', 'addr', NULL)", now;
+	session() << "INSERT INTO Person VALUES ('ln1', 'fn', 'addr', '')", now;
+
+	const bool autoExtract = session().getFeature("autoExtract");
+	try
+	{
+		session().setFeature("autoExtract", false);
+
+		std::vector<BLOB> blobs;
+		AbstractExtraction::Ptr pBlobs = new Extraction<std::vector<BLOB>>(blobs);
+		session() << "SELECT Image FROM Person ORDER BY LastName", pBlobs, now;
+		assertEqual (2u, blobs.size());
+		assertTrue (pBlobs->isNull(0));
+		assertTrue (!pBlobs->isNull(1));
+		assertEqual (0u, blobs[1].size());
+
+		std::vector<CLOB> clobs;
+		AbstractExtraction::Ptr pClobs = new Extraction<std::vector<CLOB>>(clobs);
+		session() << "SELECT Image FROM Person ORDER BY LastName", pClobs, now;
+		assertEqual (2u, clobs.size());
+		assertTrue (pClobs->isNull(0));
+		assertTrue (!pClobs->isNull(1));
+		assertEqual (0u, clobs[1].size());
+	}
+	catch (...)
+	{
+		session().setFeature("autoExtract", autoExtract);
+		throw;
+	}
+	session().setFeature("autoExtract", autoExtract);
+}
+
+
+void ODBCPostgreSQLTest::testTranscodedStringWithUTF16StringAndLOB()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	recreatePersonBLOBTable();
+
+	// a database encoding other than UTF-8 makes the binder transcode std::string input
+	Poco::Data::Session s(Poco::Data::ODBC::Connector::KEY, _connectString);
+	s.setProperty("dbEncoding", std::string("ISO-8859-1"));
+
+	std::string lastName("LN");
+	UTF16String firstName;
+	UnicodeConverter::convert(std::string("FN"), firstName);
+	std::string address("ADDR");
+	CLOB img(std::string("image"));
+	s << "INSERT INTO Person VALUES (?, ?, ?, ?)", use(lastName), use(firstName), use(address), use(img), now;
+
+	std::string resultLastName;
+	std::string resultFirstName;
+	std::string resultAddress;
+	CLOB resultImg;
+	s << "SELECT LastName, FirstName, Address, Image FROM Person",
+		into(resultLastName), into(resultFirstName), into(resultAddress), into(resultImg), now;
+	assertEqual (lastName, resultLastName);
+	assertEqual ("FN", resultFirstName);
+	assertEqual (address, resultAddress);
+	assertTrue (resultImg == img);
 }
 
 
@@ -789,7 +983,12 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunction);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunctionAny);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunctionDynamicAny);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunctionUTF16String);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testStoredFunctionInOutString);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDateTimeMicroseconds);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLOBManualExtractionDistinctValues);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLOBManualExtractionNull);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTranscodedStringWithUTF16StringAndLOB);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNull);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRowIterator);
 #ifdef POCO_ODBC_USE_MAMMOTH_NG

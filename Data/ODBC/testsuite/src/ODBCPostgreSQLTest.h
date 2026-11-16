@@ -46,8 +46,13 @@ public:
 	void testStoredFunction() override;
 	void testStoredFunctionAny() override;
 	void testStoredFunctionDynamicAny() override;
+	void testStoredFunctionUTF16String();
+	void testStoredFunctionInOutString();
 
 	void testDateTimeMicroseconds();
+	void testLOBManualExtractionDistinctValues();
+	void testLOBManualExtractionNull();
+	void testTranscodedStringWithUTF16StringAndLOB();
 
 	void testUncommittedWorkRolledBack();
 	void testLostConnection();
