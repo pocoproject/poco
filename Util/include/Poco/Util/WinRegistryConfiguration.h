@@ -57,7 +57,6 @@ protected:
 		/// Takes a key in the format of A.B.C and converts it to
 		/// registry format A\B\C, the last entry is the keyName, the rest is returned as path
 
-	friend class WinConfigurationTest;
 private:
 	std::string _rootPath;
 	REGSAM _extraSam;
