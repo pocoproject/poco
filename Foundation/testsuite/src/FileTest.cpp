@@ -38,7 +38,6 @@
 #endif
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#include <Windows.h>
 #include <direct.h>
 #endif
 
