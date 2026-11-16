@@ -343,10 +343,11 @@ std::string PathImpl::expandImpl(const std::string& path)
 		if (*it == '\\')
 		{
 			++it;
-			if (*it == '$')
+			if (it != end && *it == '$')
 			{
 				result += *it++;
 			}
+			else result += '\\';
 		}
 		else if (*it == '$')
 		{
@@ -371,7 +372,7 @@ std::string PathImpl::expandImpl(const std::string& path)
 	while (found != std::string::npos)
 	{
 		result.replace(found, 2, "/");
-		found = result.find("//", found+1);
+		found = result.find("//", found);
 	}
 	return result;
 }

@@ -355,6 +355,8 @@ public:
 		///
 		/// On Unix, a tilde as first character in the path is
 		/// replaced with the path to user's home directory.
+		/// A backslash before a dollar sign makes the dollar sign
+		/// a literal character; other backslashes are kept.
 
 	static void listRoots(std::vector<std::string>& roots);
 		/// Fills the vector with all filesystem roots available on the
