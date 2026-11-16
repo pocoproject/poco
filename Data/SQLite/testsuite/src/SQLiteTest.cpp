@@ -65,7 +65,6 @@ using Poco::Data::SQLChannel;
 using Poco::Data::LimitException;
 using Poco::Data::ConnectionFailedException;
 using Poco::Data::CLOB;
-using Poco::Data::BLOB;
 using Poco::Data::Date;
 using Poco::Data::Time;
 using Poco::Data::Transaction;
@@ -1678,13 +1677,13 @@ void SQLiteTest::testBLOB()
 
 	DataStruct ds;
 	strcpy(ds.c, "123456789ABCDEF");
-	BLOB img(reinterpret_cast<unsigned char*>(&ds), sizeof(ds));
+	Poco::Data::BLOB img(reinterpret_cast<unsigned char*>(&ds), sizeof(ds));
 	assertTrue(img.size() == sizeof(ds));
 	int count = 0;
 	tmp << "INSERT INTO PERSON VALUES(:ln, :fn, :ad, :img)", use(lastName), use(firstName), use(address), use(img), now;
 	tmp << "SELECT COUNT(*) FROM PERSON", into(count), now;
 	assertTrue(count == 1);
-	BLOB res;
+	Poco::Data::BLOB res;
 	assertTrue(res.size() == 0);
 
 	tmp << "SELECT Image FROM Person WHERE LastName == :ln", bind("lastname"), into(res), now;

@@ -71,18 +71,6 @@ using Poco::NumberFormatter;
 using Poco::Timespan;
 
 
-#ifdef WEPOLL_H_
-namespace {
-
-	int close(HANDLE h)
-	{
-		return epoll_close(h);
-	}
-
-}
-#endif // WEPOLL_H_
-
-
 namespace Poco::Net {
 
 
@@ -1006,7 +994,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 
 	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &evin) < 0)
 	{
-		::close(epollfd);
+		epoll_close(epollfd);
 		error("Can't insert socket to epoll queue");
 	}
 
@@ -1033,7 +1021,7 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	}
 	while (rc < 0 && lastError() == POCO_EINTR);
 
-	::close(epollfd);
+	epoll_close(epollfd);
 	if (rc < 0) error();
 	return rc > 0;
 
