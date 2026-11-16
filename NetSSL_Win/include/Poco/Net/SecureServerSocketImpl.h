@@ -135,6 +135,11 @@ public:
 	void close() override;
 		/// Close the socket.
 
+	[[nodiscard]] poco_socket_t releaseSocket() override;
+		/// Not supported by this kind of socket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	int sendBytes(const void* buffer, int length, int flags = 0) override;
 		/// Not supported by this kind of socket.
 		///

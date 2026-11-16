@@ -175,6 +175,20 @@ public:
 	virtual void close();
 		/// Close the socket.
 
+	[[nodiscard]] virtual poco_socket_t releaseSocket();
+		/// Returns the native socket and detaches it from this
+		/// object without closing it. Afterwards this object is in
+		/// the same state as after close(), and the caller owns the
+		/// native socket. Returns POCO_INVALID_SOCKET if no native
+		/// socket is set.
+		///
+		/// The socket must not be registered with a SocketReactor
+		/// or a PollSet.
+		///
+		/// Socket implementations that keep the native socket in an
+		/// inner socket or keep protocol state for it (TLS, WebSocket)
+		/// throw a Poco::InvalidAccessException.
+
 	virtual void shutdownReceive();
 		/// Shuts down the receiving part of the socket connection.
 

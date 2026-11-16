@@ -28,6 +28,7 @@ public:
 	void testSendReceive();
 	void testPeek();
 	void testBufVecAndBufferOverloadsRefused();
+	void testReleaseSocketRefused();
 	void testNB();
 	void testHandshakeTimeout();
 	void testServerDropsPlainClient();
