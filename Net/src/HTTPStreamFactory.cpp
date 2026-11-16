@@ -130,7 +130,12 @@ std::istream* HTTPStreamFactory::open(const URI& uri)
 			if (moved)
 			{
 				resolvedURI.resolve(res.get("Location"s));
-				if (!username.empty())
+				// The credentials belong to the origin (scheme, host and port)
+				// of the URI; a redirect to another origin does not get them.
+				const bool sameOrigin = resolvedURI.getScheme() == uri.getScheme() &&
+					resolvedURI.getHost() == uri.getHost() &&
+					resolvedURI.getPort() == uri.getPort();
+				if (!username.empty() && sameOrigin)
 				{
 					resolvedURI.setUserInfo(username + ":" + password);
 				}

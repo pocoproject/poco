@@ -113,7 +113,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 
 			if (authorize)
 			{
-				HTTPCredentials::extractCredentials(uri, username, password);
+				HTTPCredentials::extractCredentials(resolvedURI, username, password);
 				HTTPCredentials cred(username, password);
 				cred.authenticate(req, res);
 			}
@@ -132,6 +132,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 						  res.getStatus() == HTTPResponse::HTTP_TEMPORARY_REDIRECT);
 			if (moved)
 			{
+				const URI previousURI(resolvedURI);
 				resolvedURI.resolve(res.get("Location"));
 				// A redirect must stay within the web schemes; anything else is
 				// treated as https below and would be requested against a host
@@ -139,10 +140,23 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 				const std::string& redirectedScheme(resolvedURI.getScheme());
 				if (redirectedScheme != "http" && redirectedScheme != "https")
 					throw UnknownURISchemeException(resolvedURI.toString() + "; cross-scheme redirect from " + uri.toString());
+				// The credentials belong to the origin (scheme, host and port)
+				// of the URI; a redirect to another origin does not get them.
+				const bool sameOrigin = resolvedURI.getScheme() == previousURI.getScheme() &&
+					resolvedURI.getHost() == previousURI.getHost() &&
+					resolvedURI.getPort() == previousURI.getPort();
 				if (!username.empty())
 				{
-					resolvedURI.setUserInfo(username + ":" + password);
 					authorize = false;
+				}
+				if (!sameOrigin)
+				{
+					username.clear();
+					password.clear();
+				}
+				else if (resolvedURI.getUserInfo().empty())
+				{
+					resolvedURI.setUserInfo(previousURI.getUserInfo());
 				}
 				delete pSession;
 				pSession = nullptr;
