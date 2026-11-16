@@ -23,6 +23,7 @@
 #include "Poco/Net/QuotedPrintableEncoder.h"
 #include "Poco/Net/QuotedPrintableDecoder.h"
 #include "Poco/Net/NameValueCollection.h"
+#include "HeaderField.h"
 #include "Poco/Ascii.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/Base64Decoder.h"
@@ -33,11 +34,11 @@
 #include "Poco/String.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/TextIterator.h"
+#include "Poco/UTF8Encoding.h"
 #include <algorithm>
-#include <cstdint>
 #include <limits>
 #include <sstream>
-#include <string_view>
 
 
 using Poco::Base64Encoder;
@@ -152,186 +153,17 @@ namespace
 	};
 
 
-	bool skipComment(std::string_view::const_iterator& it, std::string_view::const_iterator end)
-		/// Skips a comment, which may be nested, starting at its opening parenthesis.
-		/// Returns false if the comment is not terminated.
+	bool isValidUTF8(const std::string& text)
+		/// Returns true if text is valid UTF-8.
 	{
-		int depth = 0;
-		while (it != end)
+		Poco::UTF8Encoding utf8;
+		Poco::TextIterator it(text, utf8);
+		const Poco::TextIterator end(text);
+		for (; it != end; ++it)
 		{
-			const char ch = *it++;
-			if (ch == '\\')
-			{
-				if (it == end) return false;
-				++it;
-			}
-			else if (ch == '(') ++depth;
-			else if (ch == ')' && --depth == 0) return true;
+			if (*it < 0) return false;
 		}
-		return false;
-	}
-
-
-	bool readQuotedString(std::string_view::const_iterator& it, std::string_view::const_iterator end, std::string& text)
-		/// Appends the content of a quoted string, starting at its opening quote, to text.
-		/// Returns false if the quoted string is not terminated.
-	{
-		++it;
-		while (it != end)
-		{
-			const char ch = *it++;
-			if (ch == '"') return true;
-			if (ch == '\\')
-			{
-				if (it == end) return false;
-				text += *it++;
-			}
-			else text += ch;
-		}
-		return false;
-	}
-
-
-	bool readAngleAddress(std::string_view::const_iterator& it, std::string_view::const_iterator end, std::string& address)
-		/// Reads an address enclosed in angle brackets, starting at the opening bracket.
-		/// Returns false if the address is not terminated by '>'.
-	{
-		// Stopping at ',' keeps an unterminated address from taking in the next mailbox.
-		const auto close = std::find_if(it + 1, end, [](char c) { return c == '>' || c == ',' || c == '<'; });
-		address.assign(it + 1, close);
-		Poco::trimInPlace(address);
-		const bool terminated = close != end && *close == '>';
-		it = terminated ? close + 1 : close;
-		return terminated;
-	}
-
-
-	struct Mailbox
-	{
-		std::string phrase;
-		std::string address;
-		bool hasAngleAddress = false;
-		bool valid = true;
-	};
-
-
-	char readMailbox(std::string_view::const_iterator& it, std::string_view::const_iterator end, Mailbox& mailbox)
-		/// Reads a mailbox up to the next ',', ';' or ':' outside of quoted strings,
-		/// comments and angle brackets. Returns that delimiter, or '\0' at the end.
-	{
-		while (it != end)
-		{
-			const char ch = *it;
-			if (ch == ',' || ch == ';' || ch == ':')
-			{
-				++it;
-				return ch;
-			}
-			if (ch == '(')
-			{
-				if (!skipComment(it, end)) mailbox.valid = false;
-			}
-			else if (Poco::Ascii::isSpace(ch))
-			{
-				if (!mailbox.phrase.empty() && mailbox.phrase.back() != ' ') mailbox.phrase += ' ';
-				++it;
-			}
-			else if (mailbox.hasAngleAddress)
-			{
-				mailbox.valid = false;
-				++it;
-			}
-			else if (ch == '"')
-			{
-				if (!readQuotedString(it, end, mailbox.phrase)) mailbox.valid = false;
-			}
-			else if (ch == '<')
-			{
-				if (!readAngleAddress(it, end, mailbox.address)) mailbox.valid = false;
-				mailbox.hasAngleAddress = true;
-			}
-			else
-			{
-				mailbox.phrase += ch;
-				++it;
-			}
-		}
-		return '\0';
-	}
-
-
-	void addMailbox(Mailbox& mailbox, MailRecipient::RecipientType type, MailMessage::Recipients& recipients)
-		/// Appends a recipient for the mailbox, unless it is not valid.
-	{
-		Poco::trimInPlace(mailbox.phrase);
-		if (!mailbox.valid) return;
-		if (mailbox.hasAngleAddress && !mailbox.address.empty())
-			recipients.emplace_back(type, mailbox.address, mailbox.phrase);
-		else if (!mailbox.hasAngleAddress && mailbox.phrase.find('@') != std::string::npos
-			&& std::none_of(mailbox.phrase.begin(), mailbox.phrase.end(), Poco::Ascii::isSpace))
-			recipients.emplace_back(type, mailbox.phrase);
-	}
-
-
-	void parseAddressList(std::string_view list, MailRecipient::RecipientType type, MailMessage::Recipients& recipients)
-		/// Appends a recipient of the given type for every mailbox of an RFC 5322
-		/// address list, including the members of groups. A mailbox that cannot be
-		/// parsed is skipped.
-	{
-		bool inGroup = false;
-		auto it = list.begin();
-		const auto end = list.end();
-		while (it != end)
-		{
-			Mailbox mailbox;
-			char delimiter = readMailbox(it, end, mailbox);
-			while (delimiter == ':' && (inGroup || mailbox.hasAngleAddress))
-			{
-				mailbox.valid = false;
-				delimiter = readMailbox(it, end, mailbox);
-			}
-			if (delimiter == ':')
-			{
-				// The display name of a group is not a recipient.
-				inGroup = true;
-				continue;
-			}
-			// ';' ends a group; it also separates mailboxes in lists written by some clients.
-			if (delimiter == ';') inGroup = false;
-			addMailbox(mailbox, type, recipients);
-		}
-	}
-
-
-	std::string readHeaderBlock(std::istream& istr, const MessageHeader& header)
-		/// Reads the header fields up to, but not including, the empty line that ends them.
-		/// Throws a MessageException if the fields are longer than MessageHeader::read()
-		/// accepts with the limits of the given header.
-	{
-		static constexpr int eof = std::char_traits<char>::eof();
-		// Per field: the name, the colon, white space before the value, the value and a
-		// line break for every line; each folded line adds at least one character to the value.
-		const std::uint64_t maxFieldSize = static_cast<std::uint64_t>(header.getNameLengthLimit())
-			+ 4 * static_cast<std::uint64_t>(header.getValueLengthLimit()) + 3;
-		const std::uint64_t maxSize = header.getFieldLimit() > 0
-			? maxFieldSize * static_cast<std::uint64_t>(header.getFieldLimit())
-			: std::numeric_limits<std::uint64_t>::max();
-		// Per line: the name, the colon, white space before the value (limited in strict
-		// parsing to the value length), the value and CR LF.
-		const std::uint64_t maxLineSize = static_cast<std::uint64_t>(header.getNameLengthLimit())
-			+ 2 * static_cast<std::uint64_t>(header.getValueLengthLimit()) + 3;
-		std::streambuf& buf = *istr.rdbuf();
-		std::string block;
-		std::uint64_t lineSize = 0;
-		int ch = buf.sgetc();
-		while (ch != eof && !(lineSize == 0 && (ch == '\r' || ch == '\n')))
-		{
-			if (block.size() >= maxSize || lineSize >= maxLineSize) throw MessageException("Message header too long");
-			block += static_cast<char>(buf.sbumpc());
-			lineSize = (ch == '\n') ? 0 : lineSize + 1;
-			ch = buf.sgetc();
-		}
-		return block;
+		return true;
 	}
 }
 
@@ -531,6 +363,9 @@ void MailMessage::write(std::ostream& ostr) const
 	// Every recipient receives the written header, so a Bcc field would disclose the blind copies.
 	header.erase(HEADER_BCC);
 	if (_recipientsChanged) setRecipientHeaders(header);
+	// A control character must be rejected before encoding would hide it in an encoded word.
+	checkFields(header, true);
+	encodeFields(header);
 	if (isMultipart())
 	{
 		writeMultipart(header, ostr);
@@ -550,6 +385,7 @@ void MailMessage::validateHeaders() const
 	header.erase(HEADER_BCC);
 	if (_recipientsChanged) setRecipientHeaders(header);
 	checkFields(header, true);
+	encodeFields(header);
 	for (const auto& part: _parts)
 	{
 		checkFields(createPartHeader(part), true);
@@ -657,38 +493,19 @@ void MailMessage::readHeader(std::istream& istr)
 {
 	clear();
 	_recipients.clear();
-	const std::string block = readHeaderBlock(istr, *this);
-	std::istringstream blockStream(block);
-	MessageHeader::read(blockStream);
+	MessageHeader::read(istr);
 	istr.get(); // \r
 	if ('\n' == istr.peek()) istr.get(); // \n
 
-	// The address lists are parsed undecoded: a decoded encoded word could
-	// contain a ',' or '<' and so add a recipient.
-	MessageHeader rawHeader;
-	rawHeader.setFieldLimit(getFieldLimit());
-	rawHeader.setNameLengthLimit(getNameLengthLimit());
-	rawHeader.setValueLengthLimit(getValueLengthLimit());
-	rawHeader.setStrictParsing(getStrictParsing());
-	rawHeader.setAutoDecode(false);
-	std::istringstream rawStream(block);
-	rawHeader.read(rawStream);
-	for (const auto& [name, value]: rawHeader)
+	// Decoding keeps the mailboxes of an address list, so the recipients are parsed from the stored values.
+	for (const auto& [name, value]: *this)
 	{
 		if (icompare(name, HEADER_TO) == 0)
-			parseAddressList(value, MailRecipient::PRIMARY_RECIPIENT, _recipients);
+			HeaderField::parseAddressList(value, MailRecipient::PRIMARY_RECIPIENT, _recipients);
 		else if (icompare(name, HEADER_CC) == 0)
-			parseAddressList(value, MailRecipient::CC_RECIPIENT, _recipients);
+			HeaderField::parseAddressList(value, MailRecipient::CC_RECIPIENT, _recipients);
 		else if (icompare(name, HEADER_BCC) == 0)
-			parseAddressList(value, MailRecipient::BCC_RECIPIENT, _recipients);
-	}
-	if (getAutoDecode())
-	{
-		for (auto& recipient: _recipients)
-		{
-			const std::string realName = decodeWord(recipient.getRealName());
-			if (std::none_of(realName.begin(), realName.end(), isInvalidValueChar)) recipient.setRealName(realName);
-		}
+			HeaderField::parseAddressList(value, MailRecipient::BCC_RECIPIENT, _recipients);
 	}
 	_recipientsChanged = false;
 }
@@ -768,9 +585,12 @@ void MailMessage::setRecipientHeaders(MessageHeader& headers) const
 		switch (rec.getType())
 		{
 		case MailRecipient::PRIMARY_RECIPIENT:
+			// A control character must be rejected before encoding would hide it in an encoded word.
+			checkFieldValue(HEADER_TO, rec.getRealName(), true);
 			appendRecipient(rec, to);
 			break;
 		case MailRecipient::CC_RECIPIENT:
+			checkFieldValue(HEADER_CC, rec.getRealName(), true);
 			appendRecipient(rec, cc);
 			break;
 		case MailRecipient::BCC_RECIPIENT:
@@ -787,6 +607,21 @@ void MailMessage::setRecipientHeaders(MessageHeader& headers) const
 	{
 		headers.erase(HEADER_CC);
 		headers.set(HEADER_CC, cc);
+	}
+}
+
+
+void MailMessage::encodeFields(MessageHeader& header) const
+{
+	for (auto& [name, value]: header)
+	{
+		const HeaderField::Syntax syntax = HeaderField::syntax(name);
+		if (syntax == HeaderField::Syntax::STRUCTURED || isReceived(name, value)
+			|| std::all_of(value.begin(), value.end(), Poco::Ascii::isAscii) || !isValidUTF8(value))
+			continue;
+		// Every CR LF in a checked value folds it; encoded, it would become text.
+		const std::string text = Poco::replace(value, "\r\n", "");
+		value = syntax == HeaderField::Syntax::ADDRESS_LIST ? HeaderField::encodeAddressList(text) : encodeWord(text);
 	}
 }
 
@@ -826,7 +661,12 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 	const std::string& realName = recipient.getRealName();
 	const std::string& address  = recipient.getAddress();
 	std::string rec;
-	if (!realName.empty())
+	if (!std::all_of(realName.begin(), realName.end(), Poco::Ascii::isAscii) && isValidUTF8(realName))
+	{
+		rec = encodeWord(Poco::replace(realName, "\r\n", ""));
+		rec.append(" ");
+	}
+	else if (!realName.empty())
 	{
 		// A '"' or '\' in the name is written as a quoted-pair (RFC 5322) so that it
 		// cannot end the quoted string; an escaped name always needs quoting.
@@ -878,6 +718,8 @@ std::string MailMessage::encodeWord(const std::string& text, const std::string& 
 		case ':':
 		case '.':
 		case '@':
+		case '"':
+		case '\\':
 			encodedText += '=';
 			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
 			lineLength += 3;
