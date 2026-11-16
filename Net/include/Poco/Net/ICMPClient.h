@@ -49,19 +49,19 @@ public:
 	~ICMPClient();
 		/// Destroys the ICMP client.
 
-	[[nodiscard]] int ping(SocketAddress& address, int repeat = 1) const;
+	[[nodiscard]] int ping(const SocketAddress& address, int repeat = 1) const;
 		/// Pings the specified address [repeat] times.
 		/// Notifications are posted for events.
 		///
 		/// Returns the number of valid replies.
 
 	[[nodiscard]] int ping(const std::string& address, int repeat = 1) const;
-		/// Calls ICMPClient::ping(SocketAddress&, int) and
+		/// Calls ICMPClient::ping(const SocketAddress&, int) and
 		/// returns the result.
 		///
 		/// Returns the number of valid replies.
 
-	[[nodiscard]] static int ping(SocketAddress& address,
+	[[nodiscard]] static int ping(const SocketAddress& address,
 		SocketAddress::Family family,
 		int repeat = 1,
 		int dataSize = 48,
@@ -77,7 +77,7 @@ public:
 		int dataSize = 48,
 		int ttl = 128,
 		int timeout = 100000);
-		/// Calls ICMPClient::ping(SocketAddress&, int) and
+		/// Calls ICMPClient::ping(const SocketAddress&, SocketAddress::Family, int, int, int, int) and
 		/// returns the result.
 		///
 		/// Returns the number of valid replies.

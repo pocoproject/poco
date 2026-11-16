@@ -131,6 +131,24 @@ void ICMPClientTest::testBigPing()
 }
 
 
+void ICMPClientTest::testPingConstAddress()
+{
+	if (!icmpAvailable()) return;
+
+	const SocketAddress expected("127.0.0.1", 0);
+	ICMPClient icmpClient(IPAddress::IPv4);
+	assertTrue (icmpClient.ping(expected) > 0);
+	assertTrue (icmpClient.ping(SocketAddress("127.0.0.1", 0)) > 0);
+	assertTrue (ICMPClient::ping(expected, IPAddress::IPv4) > 0);
+	assertTrue (ICMPClient::ping(SocketAddress("127.0.0.1", 0), IPAddress::IPv4) > 0);
+
+	SocketAddress address(expected);
+	assertTrue (icmpClient.ping(address) > 0);
+	assertTrue (ICMPClient::ping(address, IPAddress::IPv4) > 0);
+	assertTrue (address == expected);
+}
+
+
 void ICMPClientTest::testPacketTime()
 {
 	// In a reply, the time value follows the IPv4 header (20 bytes) and the
@@ -251,6 +269,7 @@ CppUnit::Test* ICMPClientTest::suite()
 
 	CppUnit_addTest(pSuite, ICMPClientTest, testPing);
 	CppUnit_addTest(pSuite, ICMPClientTest, testBigPing);
+	CppUnit_addTest(pSuite, ICMPClientTest, testPingConstAddress);
 	CppUnit_addTest(pSuite, ICMPClientTest, testPacketTime);
 
 	return pSuite;
