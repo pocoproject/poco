@@ -26,6 +26,7 @@ public:
 	~ContextTest() override;
 
 	void testImportPKCS12FileWithChain();
+	void testImportPKCS12FileWithNonASCIIPassword();
 
 	void setUp() override;
 	void tearDown() override;
