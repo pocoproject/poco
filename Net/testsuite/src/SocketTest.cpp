@@ -1112,6 +1112,30 @@ void SocketTest::testUseFd()
 }
 
 
+void SocketTest::testReleaseSocket()
+{
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+	const poco_socket_t fd = ss.impl()->releaseSocket();
+	assertTrue (fd != POCO_INVALID_SOCKET);
+	assertTrue (ss.impl()->sockfd() == POCO_INVALID_SOCKET);
+
+	// closing and destroying the original socket must leave the released descriptor open
+	ss.close();
+	ss = StreamSocket();
+
+	StreamSocket released(Socket::fromFileDescriptor(fd));
+	int n = released.sendBytes("hello", 5);
+	assertTrue (n == 5);
+	char buffer[256];
+	n = released.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 5);
+	assertTrue (std::string(buffer, n) == "hello");
+	released.close();
+}
+
+
 void SocketTest::testSendFile()
 {
 	ServerSocket svs(0);
@@ -1980,6 +2004,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testEchoUnixLocal);
 	CppUnit_addTest(pSuite, SocketTest, testUnixLocalAbstract);
 	CppUnit_addTest(pSuite, SocketTest, testUseFd);
+	CppUnit_addTest(pSuite, SocketTest, testReleaseSocket);
 	CppUnit_addTest(pSuite, SocketTest, testSendFile);
 	CppUnit_addTest(pSuite, SocketTest, testSendFileLarge);
 	CppUnit_addTest(pSuite, SocketTest, testSendFileRange);

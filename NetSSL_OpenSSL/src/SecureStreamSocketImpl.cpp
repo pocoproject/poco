@@ -129,6 +129,12 @@ void SecureStreamSocketImpl::close()
 }
 
 
+poco_socket_t SecureStreamSocketImpl::releaseSocket()
+{
+	throw Poco::InvalidAccessException("Cannot releaseSocket() of a SecureStreamSocketImpl");
+}
+
+
 void SecureStreamSocketImpl::abort()
 {
 	reset();

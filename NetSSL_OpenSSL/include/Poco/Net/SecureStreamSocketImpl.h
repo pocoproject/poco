@@ -84,6 +84,11 @@ public:
 	void close() override;
 		/// Close the socket.
 
+	[[nodiscard]] poco_socket_t releaseSocket() override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	int sendBytes(const void* buffer, int length, int flags = 0) override;
 		/// Sends the contents of the given buffer through
 		/// the socket. Any specified flags are ignored.

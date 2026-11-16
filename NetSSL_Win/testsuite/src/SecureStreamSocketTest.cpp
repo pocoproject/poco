@@ -481,6 +481,45 @@ void SecureStreamSocketTest::testBufVecAndBufferOverloadsRefused()
 }
 
 
+void SecureStreamSocketTest::testReleaseSocketRefused()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureServerSocket listener(0);
+	try
+	{
+		[[maybe_unused]] const poco_socket_t fd = listener.impl()->releaseSocket();
+		fail("releaseSocket() on a SecureServerSocket must throw");
+	}
+	catch (Poco::InvalidAccessException&)
+	{
+	}
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+	SecureStreamSocket ss(sa);
+	ss.setReceiveTimeout(Poco::Timespan(10, 0));
+	try
+	{
+		[[maybe_unused]] const poco_socket_t fd = ss.impl()->releaseSocket();
+		fail("releaseSocket() on a SecureStreamSocket must throw");
+	}
+	catch (Poco::InvalidAccessException&)
+	{
+	}
+
+	// the echo arrives intact only if the refused call did not touch the connection
+	int n = ss.sendBytes("hello, world!", 13);
+	assertTrue (n == 13);
+	char buffer[256];
+	n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n == 13);
+	assertTrue (std::string(buffer, n) == "hello, world!");
+	ss.close();
+}
+
+
 void SecureStreamSocketTest::testNB()
 {
 	SecureServerSocket svs(0);
@@ -1187,6 +1226,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendReceive);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testPeek);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testBufVecAndBufferOverloadsRefused);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testReleaseSocketRefused);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testServerDropsPlainClient);
