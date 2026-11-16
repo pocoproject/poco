@@ -160,6 +160,70 @@ void DirectoryIteratorsTest::testSiblingsFirstRecursiveDirectoryIterator()
 }
 
 
+void DirectoryIteratorsTest::testRecursiveDirectoryIteratorCopy()
+{
+	std::vector<std::string> result;
+	{
+		SimpleRecursiveDirectoryIterator dirIterator(path());
+		const SimpleRecursiveDirectoryIterator& self = dirIterator;
+		dirIterator = self;
+		SimpleRecursiveDirectoryIterator copy(dirIterator);
+		SimpleRecursiveDirectoryIterator end;
+
+		while (copy != end)
+		{
+			result.push_back(copy->path());
+			++copy;
+		}
+	}
+
+	assertEqual(20, result.size());
+}
+
+
+void DirectoryIteratorsTest::testRecursiveDirectoryIteratorAssignNonexistent()
+{
+	Path missing(path());
+	missing.pushDirectory("missing");
+	SimpleRecursiveDirectoryIterator dirIterator(path());
+
+	try
+	{
+		dirIterator = missing;
+		failmsg("nonexistent directory - must throw exception");
+	}
+	catch (FileException&)
+	{
+	}
+	try
+	{
+		dirIterator = missing.toString();
+		failmsg("nonexistent directory - must throw exception");
+	}
+	catch (FileException&)
+	{
+	}
+	try
+	{
+		dirIterator = File(missing);
+		failmsg("nonexistent directory - must throw exception");
+	}
+	catch (FileException&)
+	{
+	}
+
+	SimpleRecursiveDirectoryIterator end;
+	std::vector<std::string> result;
+	while (dirIterator != end)
+	{
+		result.push_back(dirIterator->path());
+		++dirIterator;
+	}
+
+	assertEqual(20, result.size());
+}
+
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 void DirectoryIteratorsTest::testSimpleRecursiveDirectoryIteratorOnError()
 {
@@ -310,6 +374,8 @@ CppUnit::Test* DirectoryIteratorsTest::suite()
 	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSortedDirectoryIterator);
 	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSimpleRecursiveDirectoryIterator);
 	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSiblingsFirstRecursiveDirectoryIterator);
+	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testRecursiveDirectoryIteratorCopy);
+	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testRecursiveDirectoryIteratorAssignNonexistent);
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSimpleRecursiveDirectoryIteratorOnError);
 	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSiblingsFirstRecursiveDirectoryIteratorOnError);

@@ -31,6 +31,8 @@ public:
 	void testSortedDirectoryIterator();
 	void testSimpleRecursiveDirectoryIterator();
 	void testSiblingsFirstRecursiveDirectoryIterator();
+	void testRecursiveDirectoryIteratorCopy();
+	void testRecursiveDirectoryIteratorAssignNonexistent();
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	void testSimpleRecursiveDirectoryIteratorOnError();
 	void testSiblingsFirstRecursiveDirectoryIteratorOnError();
