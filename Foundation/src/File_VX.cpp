@@ -16,6 +16,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include "Poco/Path.h"
+#include "Poco/Error.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -24,7 +25,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <utime.h>
-#include <cstring>
 
 
 namespace Poco {
@@ -458,7 +458,7 @@ void FileImpl::handleLastErrorImpl(int err, const std::string& path)
 	case EMFILE:
 		throw FileException("too many open files", path);
 	default:
-		throw FileException(std::strerror(err), path);
+		throw FileException(Error::getMessage(err), path);
 	}
 }
 
