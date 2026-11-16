@@ -11,6 +11,8 @@
 #include "ServerApplicationTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/Util/ServerApplication.h"
+#include "Poco/AutoPtr.h"
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_FORK_EXEC) && POCO_OS != POCO_OS_ANDROID
 #include "Poco/NumberFormatter.h"
 #include "Poco/Path.h"
@@ -28,10 +30,52 @@
 #endif
 
 
-#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_FORK_EXEC) && POCO_OS != POCO_OS_ANDROID
+using Poco::Util::ServerApplication;
 using namespace std::string_literals;
 
 
+namespace
+{
+	class WaitingServer: public ServerApplication
+		/// Waits for the termination request at the end of main(),
+		/// as a server application does.
+	{
+	protected:
+		~WaitingServer() override = default;
+
+		int main(const ArgVec&) override
+		{
+			waitForTerminationRequest();
+			return EXIT_OK;
+		}
+	};
+
+
+	class CustomWaitServer: public WaitingServer
+		/// Records the wait for the termination request instead of
+		/// waiting for a signal.
+	{
+	public:
+		[[nodiscard]] bool waited() const
+		{
+			return _waited;
+		}
+
+	protected:
+		~CustomWaitServer() override = default;
+
+		void waitForTerminationRequest() override
+		{
+			_waited = true;
+		}
+
+	private:
+		bool _waited = false;
+	};
+}
+
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_FORK_EXEC) && POCO_OS != POCO_OS_ANDROID
 namespace
 {
 	[[nodiscard]] std::vector<std::string> readLines(const std::string& path)
@@ -57,6 +101,14 @@ ServerApplicationTest::ServerApplicationTest(const std::string& name): CppUnit::
 
 
 ServerApplicationTest::~ServerApplicationTest() = default;
+
+
+void ServerApplicationTest::testOverriddenWaitForTerminationRequest()
+{
+	Poco::AutoPtr<CustomWaitServer> pApp = new CustomWaitServer;
+	assertTrue (pApp->run(ServerApplication::ArgVec{"ServerApplicationTest"s}) == ServerApplication::EXIT_OK);
+	assertTrue (pApp->waited());
+}
 
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_FORK_EXEC) && POCO_OS != POCO_OS_ANDROID
@@ -131,6 +183,7 @@ CppUnit::Test* ServerApplicationTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ServerApplicationTest");
 
+	CppUnit_addTest(pSuite, ServerApplicationTest, testOverriddenWaitForTerminationRequest);
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_FORK_EXEC) && POCO_OS != POCO_OS_ANDROID
 	CppUnit_addTest(pSuite, ServerApplicationTest, testDaemonParentSkipsExitHandlers);
 	CppUnit_addTest(pSuite, ServerApplicationTest, testDaemonFlushesWideOutput);
