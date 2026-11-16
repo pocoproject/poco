@@ -470,6 +470,90 @@ void MailMessageTest::testReadMultiPartWithAttachmentNames()
 }
 
 
+void MailMessageTest::testReadMultiPartPartParameters()
+{
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: Inline; FileName=\"note.txt\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=\"my file; v1.dat\"\r\n"
+		"Content-Type: application/octet-stream; NAME=\"my file.dat\"\r\n"
+		"\r\n"
+		"data\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: ATTACHMENT\r\n"
+		"Content-Type: application/pdf; name=report.pdf\r\n"
+		"\r\n"
+		"data\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=data.bin\r\n"
+		"Content-Type: application/octet-stream\r\n"
+		"\r\n"
+		"data\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+
+	MailMessage message;
+	message.read(istr);
+
+	assertTrue (message.parts().size() == 4);
+	assertTrue (message.parts()[0].disposition == MailMessage::CONTENT_INLINE);
+	assertTrue (message.parts()[0].pSource->filename() == "note.txt");
+
+	assertTrue (message.parts()[1].disposition == MailMessage::CONTENT_ATTACHMENT);
+	assertTrue (message.parts()[1].name == "my file.dat");
+	assertTrue (message.parts()[1].pSource->filename() == "my file; v1.dat");
+
+	assertTrue (message.parts()[2].disposition == MailMessage::CONTENT_ATTACHMENT);
+	assertTrue (message.parts()[2].name == "report.pdf");
+	assertTrue (message.parts()[2].pSource->filename() == "report.pdf");
+
+	assertTrue (message.parts()[3].disposition == MailMessage::CONTENT_ATTACHMENT);
+	assertTrue (message.parts()[3].name == "data.bin");
+	assertTrue (message.parts()[3].pSource->filename() == "data.bin");
+}
+
+
+void MailMessageTest::testReadMultiPartDefaultContentType()
+{
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Test Message\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+
+	MailMessage message;
+	message.read(istr);
+
+	assertTrue (message.parts().size() == 1);
+	assertTrue (message.parts()[0].disposition == MailMessage::CONTENT_INLINE);
+	assertTrue (message.parts()[0].pSource->mediaType() == "text/plain; charset=us-ascii");
+}
+
+
 void MailMessageTest::testReadMultiPartDefaultTransferEncoding()
 {
 	std::istringstream istr(
@@ -1056,6 +1140,9 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadDefaultTransferEncoding);
 	CppUnit_addTest(pSuite, MailMessageTest, testRead8Bit);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPart);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartWithAttachmentNames);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartPartParameters);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultContentType);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartDefaultTransferEncoding);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartMixedCaseHeaders);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartInvalidContentDisposition);

@@ -30,7 +30,6 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/String.h"
-#include "Poco/StringTokenizer.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/NumberFormatter.h"
 #include <algorithm>
@@ -44,7 +43,6 @@ using Poco::StreamCopier;
 using Poco::DateTimeFormat;
 using Poco::DateTimeFormatter;
 using Poco::DateTimeParser;
-using Poco::StringTokenizer;
 using Poco::icompare;
 
 
@@ -92,60 +90,33 @@ namespace
 						cte = MailMessage::ENCODING_BASE64;
 				}
 
-				std::string contentType = header.get(MailMessage::HEADER_CONTENT_TYPE, "");
-				std::string contentDisp = header.get(MailMessage::HEADER_CONTENT_DISPOSITION, "");
-				std::string filename;
-				if (!contentDisp.empty())
-					filename = getParamFromHeader(contentDisp, "filename");
-				if (filename.empty())
-					filename = getParamFromHeader(contentType, "name");
+				// RFC 2045, section 5.2: a part without Content-Type is US-ASCII plain text.
+				static const std::string DEFAULT_CONTENT_TYPE("text/plain; charset=us-ascii");
+				const std::string contentType = header.get(MailMessage::HEADER_CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+				std::string mediaType;
+				NameValueCollection typeParams;
+				MessageHeader::splitParameters(contentType, mediaType, typeParams);
+				const std::string contentDisp = header.get(MailMessage::HEADER_CONTENT_DISPOSITION, MailMessage::EMPTY_HEADER);
+				std::string disposition;
+				NameValueCollection dispParams;
+				MessageHeader::splitParameters(contentDisp, disposition, dispParams);
+				const std::string filename = dispParams.get("filename", typeParams.get("name", MailMessage::EMPTY_HEADER));
 				PartSource* pPS = _pMsg->createPartStore(tmp, contentType, filename);
 				poco_check_ptr (pPS);
-				bool added = false;
 
-				if (contentDisp.empty())
-				{
+				if (disposition.empty() || icompare(disposition, "inline") == 0)
 					_pMsg->addContent(pPS, cte);
-					added = true;
-				}
-
-				static const auto lcContentDisposition = Poco::toLower(MailMessage::HEADER_CONTENT_DISPOSITION);
+				else
+					_pMsg->addAttachment(typeParams.get("name", filename), pPS, cte);
 
 				for (const auto& [key, value] : header)
 				{
-					const auto lcHdr = Poco::toLower(key);
-					if (!added && lcContentDisposition == lcHdr)
-					{
-						if (value == "inline")
-							_pMsg->addContent(pPS, cte);
-						else
-							_pMsg->addAttachment("", pPS, cte);
-						added = true;
-					}
-
 					pPS->headers().set(key, value);
 				}
-
-				if (!added) delete pPS;
 			}
 		}
 
 	private:
-		std::string getParamFromHeader(const std::string& header, const std::string& param)
-		{
-			StringTokenizer st(header, ";=", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-			StringTokenizer::Iterator it = st.begin();
-			StringTokenizer::Iterator end = st.end();
-			for (; it != end; ++it) { if (*it == param) break; }
-			if (it != end)
-			{
-				++it;
-				if (it == end) return "";
-				return *it;
-			}
-			return "";
-		}
-
 		MailMessage* _pMsg;
 	};
 

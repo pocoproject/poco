@@ -36,6 +36,8 @@ public:
 	void testRead8Bit();
 	void testReadMultiPart();
 	void testReadMultiPartWithAttachmentNames();
+	void testReadMultiPartPartParameters();
+	void testReadMultiPartDefaultContentType();
 	void testReadMultiPartDefaultTransferEncoding();
 	void testReadMultiPartMixedCaseHeaders();
 	void testReadMultiPartInvalidContentDisposition();
