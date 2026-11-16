@@ -41,8 +41,9 @@ class Foundation_API Checksum
 	/// CRC-64/XZ, used by xz and 7-Zip, and CRC-64/ECMA-182.
 	///
 	/// CRC-32 uses the CRC32 instructions of ARMv8 and carry-less
-	/// multiplication on x86-64; CRC-64 uses carry-less multiplication on both.
-	/// The implementation is selected at run time.
+	/// multiplication on x86-64; CRC-64 uses carry-less multiplication on both;
+	/// Adler-32 uses their vector instructions. The implementation is selected
+	/// at run time.
 
 {
 public:

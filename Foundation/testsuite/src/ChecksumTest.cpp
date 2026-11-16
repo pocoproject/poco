@@ -15,6 +15,7 @@
 #include "Poco/Checksum.h"
 #include "Poco/Exception.h"
 #include "Poco/Random.h"
+#include "Adler32.h"
 #include "CRC.h"
 #if (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && defined(POCO_PTR_IS_64_BIT)
 #include <sys/mman.h>
@@ -26,8 +27,10 @@
 #include <vector>
 
 
+using Poco::Adler32;
 using Poco::Checksum;
 using Poco::CRC;
+using Poco::UInt32;
 using Poco::UInt64;
 
 
@@ -254,6 +257,81 @@ void ChecksumTest::testImplementationsAgree()
 }
 
 
+void ChecksumTest::testAdler32ImplementationsAgree()
+{
+	constexpr std::size_t MAX_LENGTH = 512;
+	constexpr std::size_t MAX_OFFSET = 32;
+	constexpr UInt32 INITIAL = 1;
+	// the largest register value: both sums at 65520
+	constexpr UInt32 LARGEST = 0xFFF0FFF0;
+	// both sums above the modulus
+	constexpr UInt32 UNREDUCED = 0xFFFFFFFF;
+	constexpr std::size_t MIB = static_cast<std::size_t>(1024) * 1024;
+	const std::string data = randomData(MAX_LENGTH + MAX_OFFSET, 4);
+	const auto bytes = bytesOf(data);
+	// all bytes 0xFF give the largest sums; 5 MiB spans many reductions
+	const std::string large[] = {
+		randomData(MIB, 5),
+		randomData(5 * MIB, 6),
+		std::string(MIB, '\xFF'),
+		std::string(5 * MIB, '\xFF')
+	};
+	const std::string check("123456789");
+
+	const std::vector<Adler32::Implementation> implementations = Adler32::implementations();
+	assertTrue (!implementations.empty());
+	assertTrue (Adler32::implementation() == implementations.back().update);
+
+	const Adler32::Update portable = implementations.front().update;
+	for (const auto& impl: implementations)
+	{
+		const std::string name(impl.name);
+		if (impl.update(INITIAL, bytesOf(check)) != 0x091E01DE)
+			fail(name + " gives the wrong check value");
+		if (impl.update(LARGEST, {}) != LARGEST)
+			fail(name + " changes the checksum on an empty update");
+		for (const UInt32 initial: {INITIAL, UNREDUCED})
+		{
+			for (std::size_t offset = 0; offset < MAX_OFFSET; ++offset)
+			{
+				for (std::size_t length = 0; length <= MAX_LENGTH; ++length)
+				{
+					if (impl.update(initial, bytes.subspan(offset, length)) != portable(initial, bytes.subspan(offset, length)))
+						fail(name + " differs at offset " + std::to_string(offset) + ", length " + std::to_string(length) + " from " + std::to_string(initial));
+				}
+			}
+		}
+		for (const auto& input: large)
+		{
+			const auto largeBytes = bytesOf(input);
+			const UInt32 expected = portable(INITIAL, largeBytes);
+			if (impl.update(INITIAL, largeBytes) != expected)
+				fail(name + " differs on " + std::to_string(input.size()) + " bytes");
+			if (impl.update(LARGEST, largeBytes) != portable(LARGEST, largeBytes))
+				fail(name + " differs on " + std::to_string(input.size()) + " bytes from the largest initial value");
+			if (impl.update(UNREDUCED, largeBytes) != portable(UNREDUCED, largeBytes))
+				fail(name + " differs on " + std::to_string(input.size()) + " bytes from an unreduced initial value");
+
+			// uneven pieces, so that the vector steps start at varying alignments
+			UInt32 pieces = INITIAL;
+			std::size_t offset = 0;
+			std::size_t piece = 1;
+			while (offset < input.size())
+			{
+				const std::size_t length = std::min(piece, input.size() - offset);
+				pieces = impl.update(pieces, largeBytes.subspan(offset, length));
+				offset += length;
+				piece = piece * 5 + 3;
+				if (piece > 200000)
+					piece = 11;
+			}
+			if (pieces != expected)
+				fail(name + " differs on " + std::to_string(input.size()) + " bytes in pieces");
+		}
+	}
+}
+
+
 void ChecksumTest::testLargeInput()
 {
 #if (POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID) && defined(POCO_PTR_IS_64_BIT)
@@ -304,6 +382,7 @@ CppUnit::Test* ChecksumTest::suite()
 	CppUnit_addTest(pSuite, ChecksumTest, testKnownAnswers);
 	CppUnit_addTest(pSuite, ChecksumTest, testIncrementalUpdate);
 	CppUnit_addTest(pSuite, ChecksumTest, testImplementationsAgree);
+	CppUnit_addTest(pSuite, ChecksumTest, testAdler32ImplementationsAgree);
 	CppUnit_addLongTest(pSuite, ChecksumTest, testLargeInput);
 
 	return pSuite;

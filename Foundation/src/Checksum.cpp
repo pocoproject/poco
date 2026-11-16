@@ -14,10 +14,9 @@
 
 #include "Poco/Checksum.h"
 #include "Poco/Exception.h"
+#include "Adler32.h"
 #include "CRC.h"
 #include <zlib.h>
-#include <algorithm>
-#include <limits>
 #include <span>
 
 
@@ -63,17 +62,7 @@ void Checksum::update(const char* data, std::size_t length)
 	switch (_type)
 	{
 	case TYPE_ADLER32:
-		{
-			// zlib takes the length as uInt, so a longer input is passed in parts
-			constexpr std::size_t maxPart = std::numeric_limits<uInt>::max();
-			std::span<const unsigned char> rest = bytes;
-			while (!rest.empty())
-			{
-				const uInt part = static_cast<uInt>(std::min(rest.size(), maxPart));
-				_value = ::adler32(static_cast<uLong>(_value), rest.data(), part);
-				rest = rest.subspan(part);
-			}
-		}
+		_value = Adler32::implementation()(static_cast<UInt32>(_value), bytes);
 		break;
 	case TYPE_CRC32:
 		_value = CRC::implementation(_type)(_value ^ CRC32_INVERSION, bytes) ^ CRC32_INVERSION;
