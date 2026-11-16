@@ -6,6 +6,9 @@
 
 include $(POCO_BASE)/build/rules/global
 
+# ChecksumTest compares the CRC implementations through the private header CRC.h
+INCLUDE += -I$(POCO_BASE)/Foundation/src
+
 objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	AutoPtrTest ArrayTest SharedPtrTest AutoReleasePoolTest \
 	Base32Test Base64Test BinaryReaderWriterTest BufferedStreamBufTest LineEndingConverterTest \

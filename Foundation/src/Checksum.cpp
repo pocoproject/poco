@@ -13,12 +13,27 @@
 
 
 #include "Poco/Checksum.h"
+#include "Poco/Exception.h"
+#include "CRC.h"
 #include <zlib.h>
 #include <algorithm>
 #include <limits>
+#include <span>
 
 
 namespace Poco {
+
+
+namespace {
+
+
+// _value holds the checksum, the register after the final XOR: for CRC-32
+// and CRC-64/XZ, _value 0 is the initial register of all ones
+constexpr UInt64 CRC32_INVERSION = 0xFFFFFFFF;
+constexpr UInt64 CRC64_XZ_INVERSION = ~static_cast<UInt64>(0);
+
+
+} // namespace
 
 
 Checksum::Checksum():
@@ -32,10 +47,8 @@ Checksum::Checksum(Type t):
 	_type(t),
 	_value(0)
 {
-	if (t == TYPE_CRC32)
-		_value = crc32(0L, nullptr, 0);
-	else
-		_value = adler32(0L, nullptr, 0);
+	if (t == TYPE_ADLER32)
+		_value = ::adler32(0L, nullptr, 0);
 }
 
 
@@ -46,18 +59,50 @@ Checksum::~Checksum()
 
 void Checksum::update(const char* data, std::size_t length)
 {
-	// zlib takes the length as uInt, so a longer input is passed in parts
-	constexpr std::size_t maxPart = std::numeric_limits<uInt>::max();
-	while (length > 0)
+	const std::span<const unsigned char> bytes(reinterpret_cast<const unsigned char*>(data), length);
+	switch (_type)
 	{
-		const uInt part = static_cast<uInt>(std::min(length, maxPart));
-		if (_type == TYPE_ADLER32)
-			_value = adler32(_value, reinterpret_cast<const Bytef*>(data), part);
-		else
-			_value = crc32(_value, reinterpret_cast<const Bytef*>(data), part);
-		data += part;
-		length -= part;
+	case TYPE_ADLER32:
+		{
+			// zlib takes the length as uInt, so a longer input is passed in parts
+			constexpr std::size_t maxPart = std::numeric_limits<uInt>::max();
+			std::span<const unsigned char> rest = bytes;
+			while (!rest.empty())
+			{
+				const uInt part = static_cast<uInt>(std::min(rest.size(), maxPart));
+				_value = ::adler32(static_cast<uLong>(_value), rest.data(), part);
+				rest = rest.subspan(part);
+			}
+		}
+		break;
+	case TYPE_CRC32:
+		_value = CRC::implementation(_type)(_value ^ CRC32_INVERSION, bytes) ^ CRC32_INVERSION;
+		break;
+	case TYPE_CRC64_XZ:
+		_value = CRC::implementation(_type)(_value ^ CRC64_XZ_INVERSION, bytes) ^ CRC64_XZ_INVERSION;
+		break;
+	case TYPE_CRC64_ECMA182:
+		_value = CRC::implementation(_type)(_value, bytes);
+		break;
+	default:
+		poco_bugcheck();
 	}
+}
+
+
+Poco::UInt32 Checksum::checksum() const
+{
+	if (_type != TYPE_CRC32 && _type != TYPE_ADLER32)
+		throw InvalidAccessException("checksum() returns 32-bit checksums only; use checksum64()");
+	return static_cast<Poco::UInt32>(_value);
+}
+
+
+Poco::UInt64 Checksum::checksum64() const
+{
+	if (_type != TYPE_CRC64_XZ && _type != TYPE_CRC64_ECMA182)
+		throw InvalidAccessException("checksum64() returns CRC-64 checksums only; use checksum()");
+	return _value;
 }
 
 
