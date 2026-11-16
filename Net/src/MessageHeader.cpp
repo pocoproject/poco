@@ -14,6 +14,7 @@
 
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
+#include "HeaderField.h"
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
 #include "Poco/TextConverter.h"
@@ -23,6 +24,7 @@
 #include <charconv>
 #include <sstream>
 #include <string_view>
+#include <utility>
 
 
 namespace Poco::Net {
@@ -42,31 +44,6 @@ namespace
 	}
 
 
-	struct EncodedWord
-	{
-		std::string_view charset;
-		char encoding = 0; // 'B' or 'Q'
-		std::string_view text;
-	};
-
-
-	constexpr std::string_view ESPECIALS("()<>@,;:\"/[]?.="); // RFC 2047, section 2
-
-
-	bool isValidCharset(std::string_view s)
-	{
-		return !s.empty() && std::all_of(s.begin(), s.end(),
-			[](char c) { return Poco::Ascii::hasProperties(c, Poco::Ascii::ACP_GRAPH) && ESPECIALS.find(c) == std::string_view::npos; });
-	}
-
-
-	bool isValidEncodedText(std::string_view s)
-	{
-		return !s.empty() && std::all_of(s.begin(), s.end(),
-			[](char c) { return Poco::Ascii::hasProperties(c, Poco::Ascii::ACP_GRAPH) && c != '?'; });
-	}
-
-
 	bool isValidBase64(std::string_view s)
 	{
 		if (s.empty() || s.size() % 4 != 0) return false;
@@ -77,24 +54,7 @@ namespace
 	}
 
 
-	// word is "charset?encoding?encoded-text", without the enclosing "=?" and "?=".
-	bool parseEncodedWord(std::string_view word, EncodedWord& parts)
-	{
-		const std::size_t pos1 = word.find('?');
-		if (pos1 == std::string_view::npos) return false;
-		const std::size_t pos2 = word.find('?', pos1 + 1);
-		if (pos2 == std::string_view::npos) return false;
-		const std::string_view encoding = word.substr(pos1 + 1, pos2 - pos1 - 1);
-		if (encoding.size() != 1) return false;
-		parts.charset = word.substr(0, pos1);
-		parts.encoding = static_cast<char>(Poco::Ascii::toUpper(encoding[0]));
-		parts.text = word.substr(pos2 + 1);
-		if (parts.encoding != 'B' && parts.encoding != 'Q') return false;
-		return isValidCharset(parts.charset) && isValidEncodedText(parts.text);
-	}
-
-
-	bool decodeEncodedWord(const EncodedWord& word, const std::string& toCharset, std::string& decoded)
+	bool decodeEncodedWord(const HeaderField::EncodedWord& word, const std::string& toCharset, std::string& decoded)
 	{
 		std::string bytes;
 		if (word.encoding == 'B')
@@ -154,6 +114,31 @@ namespace
 		decoded = std::move(result);
 		return true;
 	}
+
+
+	std::pair<std::string, std::string> receivedKey(const std::string& name, const std::string& value)
+	{
+		return {Poco::toLower(name), value};
+	}
+
+
+	std::string decodeField(const std::string& name, const std::string& value)
+	{
+		if (value.find("=?") == std::string::npos) return value;
+		const HeaderField::Syntax syntax = HeaderField::syntax(name);
+		if (syntax == HeaderField::Syntax::ADDRESS_LIST) return HeaderField::decodeAddressList(value, "UTF-8");
+		if (syntax == HeaderField::Syntax::STRUCTURED) return value;
+		return MessageHeader::decodeWord(value);
+	}
+
+
+	template <typename Node>
+	void secureClearReceived(Node& node)
+		/// Overwrites the stored value and the received form of an extracted received field.
+	{
+		Poco::secureClear(node.key().second);
+		Poco::secureClear(node.mapped());
+	}
 }
 
 
@@ -176,7 +161,8 @@ MessageHeader::MessageHeader(const MessageHeader& messageHeader):
 	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT),
 	_autoDecode(messageHeader._autoDecode),
 	_decodedOnRead(messageHeader._decodedOnRead),
-	_strictParsing(messageHeader._strictParsing)
+	_strictParsing(messageHeader._strictParsing),
+	_receivedFields(messageHeader._receivedFields)
 {
 }
 
@@ -192,14 +178,86 @@ MessageHeader& MessageHeader::operator = (const MessageHeader& messageHeader)
 	_autoDecode = messageHeader._autoDecode;
 	_decodedOnRead = messageHeader._decodedOnRead;
 	_strictParsing = messageHeader._strictParsing;
+	_receivedFields = messageHeader._receivedFields;
 	return *this;
+}
+
+
+void MessageHeader::erase(const std::string& name)
+{
+	NameValueCollection::erase(name);
+	eraseReceived(name, false);
+}
+
+
+void MessageHeader::clear()
+{
+	NameValueCollection::clear();
+	_receivedFields.clear();
+}
+
+
+void MessageHeader::secureErase(const std::string& name)
+{
+	NameValueCollection::secureErase(name);
+	eraseReceived(name, true);
+}
+
+
+void MessageHeader::secureErase(Iterator it)
+{
+	if (it != end())
+	{
+		auto key = receivedKey(it->first, it->second);
+		auto node = _receivedFields.extract(key);
+		if (!node.empty()) secureClearReceived(node);
+		// The lookup key holds a copy of the value.
+		Poco::secureClear(key.second);
+	}
+	NameValueCollection::secureErase(it);
+}
+
+
+void MessageHeader::secureClear()
+{
+	NameValueCollection::secureClear();
+	while (!_receivedFields.empty())
+	{
+		auto node = _receivedFields.extract(_receivedFields.begin());
+		secureClearReceived(node);
+	}
+}
+
+
+void MessageHeader::swap(MessageHeader& messageHeader) noexcept
+{
+	NameValueCollection::swap(messageHeader);
+	std::swap(_fieldLimit, messageHeader._fieldLimit);
+	std::swap(_nameLengthLimit, messageHeader._nameLengthLimit);
+	std::swap(_valueLengthLimit, messageHeader._valueLengthLimit);
+	std::swap(_autoDecode, messageHeader._autoDecode);
+	std::swap(_decodedOnRead, messageHeader._decodedOnRead);
+	std::swap(_strictParsing, messageHeader._strictParsing);
+	_receivedFields.swap(messageHeader._receivedFields);
 }
 
 
 void MessageHeader::write(std::ostream& ostr) const
 {
-	checkFields(*this, true);
-	writeFields(*this, ostr);
+	if (_receivedFields.empty())
+	{
+		checkFields(*this, true);
+		writeFields(*this, ostr);
+		return;
+	}
+	NameValueCollection fields(*this);
+	for (auto& [name, value]: fields)
+	{
+		if (const auto it = _receivedFields.find(receivedKey(name, value)); it != _receivedFields.end())
+			value = it->second;
+	}
+	checkFields(fields, true);
+	writeFields(fields, ostr);
 }
 
 
@@ -274,17 +332,13 @@ void MessageHeader::read(std::istream& istr)
 		else
 			Poco::trimRightInPlace(value);
 
-		if (_autoDecode && !isFramingHeader(name))
-		{
-			// A decoded CR or LF would split the field when the value is written again.
-			const std::string decoded = decodeWord(value);
-			if (std::any_of(decoded.begin(), decoded.end(), isInvalidValueChar))
-				add(name, value);
-			else
-				add(name, decoded);
-		}
-		else
-			add(name, value);
+		const std::string decoded = (_autoDecode && !isFramingHeader(name)) ? decodeField(name, value) : value;
+		// A decoded CR or LF would split the field when the value is written again.
+		const std::string& stored = std::any_of(decoded.begin(), decoded.end(), isInvalidValueChar) ? value : decoded;
+		// write() writes a decoded field as received, and MailMessage::write() does not encode received text.
+		if (stored != value || !std::all_of(stored.begin(), stored.end(), Poco::Ascii::isAscii))
+			_receivedFields.emplace(receivedKey(name, stored), value);
+		add(name, stored);
 
 		++fields;
 	}
@@ -327,7 +381,7 @@ std::string MessageHeader::getDecoded(const std::string& name) const
 		// Already decoded, just return the value
 		return value;
 	}
-	return decodeWord(value);
+	return decodeField(name, value);
 }
 
 
@@ -453,6 +507,11 @@ void MessageHeader::splitParameters(const std::string& s, std::string& value, Na
 	Poco::trimRightInPlace(value);
 	if (it != end) ++it;
 	splitParameters(it, end, parameters);
+	for (auto& [name, parameter]: parameters)
+	{
+		if (Poco::icompare(name, "name") == 0 || Poco::icompare(name, "filename") == 0)
+			HeaderField::decodeParameter(parameter);
+	}
 }
 
 
@@ -521,9 +580,9 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 	std::string_view word(ins);
 	if (word.size() >= 4 && word.starts_with("=?") && word.ends_with("?="))
 		word = word.substr(2, word.size() - 4);
-	EncodedWord parts;
+	HeaderField::EncodedWord parts;
 	std::string decoded;
-	if (parseEncodedWord(word, parts) && decodeEncodedWord(parts, toCharset, decoded))
+	if (HeaderField::parseEncodedWord(word, parts) && decodeEncodedWord(parts, toCharset, decoded))
 		outs = std::move(decoded);
 	else
 		outs = ins;
@@ -543,10 +602,10 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 		std::size_t end = pos + 1;
 		for (int i = 0; i < 3 && end != std::string::npos; ++i)
 			end = text.find('?', end + 1);
-		EncodedWord parts;
+		HeaderField::EncodedWord parts;
 		std::string decoded;
 		const bool isDecoded = end != std::string::npos && end + 1 < text.size() && text[end + 1] == '='
-			&& parseEncodedWord(std::string_view(text).substr(pos + 2, end - pos - 2), parts)
+			&& HeaderField::parseEncodedWord(std::string_view(text).substr(pos + 2, end - pos - 2), parts)
 			&& decodeEncodedWord(parts, charset, decoded);
 		if (!isDecoded)
 		{
@@ -578,7 +637,7 @@ bool MessageHeader::isValidFieldName(const std::string& name)
 
 bool MessageHeader::isInvalidValueChar(char c)
 {
-	return c != '\t' && Poco::Ascii::hasProperties(c, Poco::Ascii::ACP_CONTROL);
+	return HeaderField::isInvalidValueChar(c);
 }
 
 
@@ -592,21 +651,27 @@ void MessageHeader::checkFields(const NameValueCollection& fields, bool allowFol
 			: isValidFieldName(name);
 		if (!validName)
 			throw MessageException("Invalid header field name");
-		for (std::string::size_type i = 0; i < value.size(); ++i)
-		{
-			if (!isInvalidValueChar(value[i])) continue;
-			// CR LF folds the value, as MailMessage::encodeWord() writes it, only when
-			// white space and then other text follow; any other CR or LF would start
-			// a new field or, as a line of white space only, end the header.
-			const std::string::size_type text = value.find_first_not_of(" \t", i + 2);
-			const bool isFold = allowFolding && value.compare(i, 2, "\r\n") == 0
-				&& text != std::string::npos && text > i + 2
-				&& value[text] != '\r' && value[text] != '\n';
-			if (isFold)
-				++i;
-			else
-				throw MessageException("Invalid character in header field value", name);
-		}
+		checkFieldValue(name, value, allowFolding);
+	}
+}
+
+
+void MessageHeader::checkFieldValue(const std::string& name, const std::string& value, bool allowFolding)
+{
+	for (std::string::size_type i = 0; i < value.size(); ++i)
+	{
+		if (!isInvalidValueChar(value[i])) continue;
+		// CR LF folds the value, as MailMessage::encodeWord() writes it, only when
+		// white space and then other text follow; any other CR or LF would start
+		// a new field or, as a line of white space only, end the header.
+		const std::string::size_type text = value.find_first_not_of(" \t", i + 2);
+		const bool isFold = allowFolding && value.compare(i, 2, "\r\n") == 0
+			&& text != std::string::npos && text > i + 2
+			&& value[text] != '\r' && value[text] != '\n';
+		if (isFold)
+			++i;
+		else
+			throw MessageException("Invalid character in header field value", name);
 	}
 }
 
@@ -615,6 +680,25 @@ void MessageHeader::writeFields(const NameValueCollection& fields, std::ostream&
 {
 	for (const auto& [name, value]: fields)
 		ostr << name << ": " << value << "\r\n";
+}
+
+
+void MessageHeader::eraseReceived(const std::string& name, bool secure)
+{
+	if (_receivedFields.empty()) return;
+	const std::string key = Poco::toLower(name);
+	auto it = _receivedFields.lower_bound({key, std::string()});
+	while (it != _receivedFields.end() && it->first.first == key)
+	{
+		auto node = _receivedFields.extract(it++);
+		if (secure) secureClearReceived(node);
+	}
+}
+
+
+bool MessageHeader::isReceived(const std::string& name, const std::string& value) const
+{
+	return _receivedFields.contains(receivedKey(name, value));
 }
 
 

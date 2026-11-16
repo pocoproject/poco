@@ -37,6 +37,7 @@ public:
 	void testInvalid3();
 	void testInvalidControlCharacter();
 	void testCookies();
+	void testCookiesNotDecoded();
 	void testTooManyCookies();
 	void testWriteInvalid();
 	void testWhiteSpaceLimit();

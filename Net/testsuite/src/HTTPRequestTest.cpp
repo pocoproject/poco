@@ -220,6 +220,17 @@ void HTTPRequestTest::testInvalidControlCharacter()
 }
 
 
+void HTTPRequestTest::testCookiesNotDecoded()
+{
+	HTTPRequest request;
+	request.set("Cookie", "name==?UTF-8?Q?a?=; filename=\"=?UTF-8?B?w6Q=?=\"");
+	NameValueCollection cookies;
+	request.getCookies(cookies);
+	assertEqual ("=?UTF-8?Q?a?=", cookies["name"]);
+	assertEqual ("=?UTF-8?B?w6Q=?=", cookies["filename"]);
+}
+
+
 void HTTPRequestTest::testCookies()
 {
 	HTTPRequest request1;
@@ -392,6 +403,7 @@ CppUnit::Test* HTTPRequestTest::suite()
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalid3);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testInvalidControlCharacter);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testCookies);
+	CppUnit_addTest(pSuite, HTTPRequestTest, testCookiesNotDecoded);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testTooManyCookies);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWriteInvalid);
 	CppUnit_addTest(pSuite, HTTPRequestTest, testWhiteSpaceLimit);
