@@ -96,6 +96,12 @@ void SecureServerSocketImpl::close()
 }
 
 
+poco_socket_t SecureServerSocketImpl::releaseSocket()
+{
+	throw Poco::InvalidAccessException("Cannot releaseSocket() of a SecureServerSocket");
+}
+
+
 int SecureServerSocketImpl::sendBytes(const void* buffer, int length, int flags)
 {
 	throw Poco::InvalidAccessException("Cannot sendBytes() on a SecureServerSocket");

@@ -676,6 +676,12 @@ void WebSocketImpl::close()
 }
 
 
+poco_socket_t WebSocketImpl::releaseSocket()
+{
+	throw Poco::InvalidAccessException("Cannot releaseSocket() of a WebSocketImpl");
+}
+
+
 void WebSocketImpl::shutdownReceive()
 {
 	_pStreamSocketImpl->shutdownReceive();

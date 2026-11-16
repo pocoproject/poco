@@ -67,6 +67,11 @@ public:
 		///
 		/// Throws a Poco::InvalidAccessException.
 
+	[[nodiscard]] poco_socket_t releaseSocket() override;
+		/// Not supported by a WebSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	SocketImpl* acceptConnection(SocketAddress& clientAddr) override;
 	void connect(const SocketAddress& address) override;
 	void connect(const SocketAddress& address, const Poco::Timespan& timeout) override;

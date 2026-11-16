@@ -437,6 +437,40 @@ void WebSocketTest::testBufVecOverloadsRefused()
 }
 
 
+void WebSocketTest::testReleaseSocketRefused()
+{
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new WebSocketRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+	HTTPResponse response;
+	WebSocket ws(cs, request, response);
+
+	try
+	{
+		[[maybe_unused]] const poco_socket_t fd = ws.impl()->releaseSocket();
+		fail("releaseSocket() on a WebSocket must throw");
+	}
+	catch (Poco::InvalidAccessException&)
+	{
+	}
+
+	// the echo arrives intact only if the refused call did not touch the connection
+	std::string payload("Hello, world!");
+	ws.sendFrame(payload.data(), static_cast<int>(payload.size()));
+	char buffer[1024] = {};
+	int flags = 0;
+	int n = ws.receiveFrame(buffer, sizeof(buffer), flags);
+	assertTrue (n == static_cast<int>(payload.size()));
+	assertTrue (payload.compare(0, payload.size(), buffer, n) == 0);
+
+	ws.close();
+	server.stop();
+}
+
+
 void WebSocketTest::testWebSocketLarge()
 {
 	const int msgSize = 64000;
@@ -1167,6 +1201,7 @@ CppUnit::Test* WebSocketTest::suite()
 
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocket);
 	CppUnit_addTest(pSuite, WebSocketTest, testBufVecOverloadsRefused);
+	CppUnit_addTest(pSuite, WebSocketTest, testReleaseSocketRefused);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLarge);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLargeInOneFrame);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketNB);

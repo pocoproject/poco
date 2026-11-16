@@ -466,6 +466,12 @@ void SocketImpl::close()
 }
 
 
+poco_socket_t SocketImpl::releaseSocket()
+{
+	return _sockfd.exchange(POCO_INVALID_SOCKET);
+}
+
+
 void SocketImpl::shutdownReceive()
 {
 	if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
