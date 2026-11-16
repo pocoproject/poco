@@ -2740,6 +2740,33 @@ void SQLiteTest::testRowIterator()
 }
 
 
+void SQLiteTest::testRowIteratorLimit()
+{
+	Session ses (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	ses << "CREATE TABLE Ints (int0 INTEGER)", now;
+	std::vector<int> v{1, 2, 3, 4};
+	ses << "INSERT INTO Ints VALUES (?)", use(v), now;
+
+	Statement stmt = (ses << "SELECT int0 FROM Ints ORDER BY int0", limit(1));
+	std::size_t count = 0;
+	while (!stmt.done())
+	{
+		stmt.execute(false);
+		RecordSet rset(stmt);
+		++count;
+		assertEqual (count, rset.rowCount());
+
+		int expected = 0;
+		for (auto& row: rset)
+		{
+			assertTrue (row["int0"] == ++expected);
+		}
+		assertTrue (expected == static_cast<int>(count));
+	}
+	assertTrue (count == v.size());
+}
+
+
 void SQLiteTest::testRowIteratorSwap()
 {
 	static_assert(std::is_nothrow_swappable_v<Poco::Data::RowIterator>);
@@ -5137,6 +5164,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNullableVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
+	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorLimit);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorSwap);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 	CppUnit_addTest(pSuite, SQLiteTest, testAny);
