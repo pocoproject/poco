@@ -250,10 +250,10 @@ public:
 		/// the handshake.
 
 	// SocketImpl
-	virtual void setBlocking(bool flag) override;
-	[[nodiscard]] virtual bool getBlocking() const override;
-	virtual void setRawOption(int level, int option, const void* value, poco_socklen_t length) override;
-	virtual void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
+	void setBlocking(bool flag) override;
+	[[nodiscard]] bool getBlocking() const override;
+	void setRawOption(int level, int option, const void* value, poco_socklen_t length) override;
+	void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
 	
 protected:
 	void acceptSSL();
