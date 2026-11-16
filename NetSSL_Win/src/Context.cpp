@@ -375,7 +375,7 @@ SECURITY_STATUS Context::acquireSchannelCredentials(CredHandle& credHandle) cons
 		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
 #endif
 
-	schannelCred.hRootStore = schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : NULL;
+	schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : nullptr;
 
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;
@@ -440,7 +440,7 @@ SECURITY_STATUS Context::acquireSchannelCredentialsLegacy(CredHandle& credHandle
 		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
 #endif
 
-	schannelCred.hRootStore = schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : nullptr;
+	schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : nullptr;
 
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;
