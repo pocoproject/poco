@@ -1172,6 +1172,33 @@ void MessageHeaderTest::testSecureEraseIterator()
 }
 
 
+void MessageHeaderTest::testQuote()
+{
+	const auto quoted = [](const std::string& value, bool allowSpace)
+	{
+		std::string result;
+		MessageHeader::quote(value, result, allowSpace);
+		return result;
+	};
+	assertEqual ("\"a\\\"b\"", quoted("a\"b", false));
+	assertEqual ("\"a\\\\b\"", quoted("a\\b", false));
+	assertEqual ("\"a\\\\\\\"b\"", quoted("a\\\"b", false));
+	assertEqual ("a-1.2_b", quoted("a-1.2_b", false));
+	assertEqual ("\"a b\"", quoted("a b", false));
+	assertEqual ("a b", quoted("a b", true));
+	assertEqual ("\"a \\\"b\\\"\"", quoted("a \"b\"", true));
+
+	for (const std::string original: {"a\"b", "a\\b", "\\\"", "\"", "a\"; q=\"b", "x=y; z", "a \\\"b\\\" c"})
+	{
+		std::string value;
+		NameValueCollection params;
+		MessageHeader::splitParameters("x; p=" + quoted(original, false), value, params);
+		assertEqual (1, params.size());
+		assertEqual (original, params["p"]);
+	}
+}
+
+
 CppUnit::Test* MessageHeaderTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MessageHeaderTest");
@@ -1222,6 +1249,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParametersDecodesNames);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSwapAndSecureClear);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSecureEraseIterator);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testQuote);
 
 	return pSuite;
 }

@@ -268,7 +268,8 @@ public:
 
 	static void quote(const std::string& value, std::string& result, bool allowSpace = false);
 		/// Checks if the value must be quoted. If so, the value is
-		/// appended to result, enclosed in double-quotes.
+		/// appended to result, enclosed in double-quotes, with each '"'
+		/// and '\' preceded by a backslash (an RFC 5322 quoted-string).
 		/// Otherwise, the value is appended to result as-is.
 
 	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& toCharset = "UTF-8");

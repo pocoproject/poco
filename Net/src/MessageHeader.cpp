@@ -595,7 +595,12 @@ void MessageHeader::quote(const std::string& value, std::string& result, bool al
 			mustQuote = true;
 	}
 	if (mustQuote) result += '"';
-	result.append(value);
+	for (const char c: value)
+	{
+		// A '"' or '\' always makes the value quoted, and is written as a quoted-pair (RFC 5322).
+		if (c == '"' || c == '\\') result += '\\';
+		result += c;
+	}
 	if (mustQuote) result += '"';
 }
 

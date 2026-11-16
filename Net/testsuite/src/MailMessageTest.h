@@ -74,6 +74,8 @@ public:
 	void testReadRecipientsMalformedDomainLiteral();
 	void testWriteEncodesNameWithComment();
 	void testWriteEncodesDomainLiteral();
+	void testWriteEscapesPartParameters();
+	void testWriteRealNameQuotedPair();
 	void testReadRecipientsQuotedLocalPart();
 	void testWriteKeepsQuotedLocalPart();
 
