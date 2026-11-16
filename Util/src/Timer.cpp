@@ -237,6 +237,13 @@ Timer::Timer(Poco::Thread::Priority priority)
 }
 
 
+Timer::Timer(int osPriority, int policy)
+{
+	_thread.setOSPriority(osPriority, policy);
+	_thread.startFunc([this]() { Timer::run(); });
+}
+
+
 Timer::~Timer()
 {
 	try
