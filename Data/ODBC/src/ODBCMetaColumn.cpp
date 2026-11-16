@@ -92,6 +92,11 @@ void ODBCMetaColumn::init()
 	setLength(_columnDesc.size);
 	setPrecision(_columnDesc.decimalDigits);
 	setNullable(SQL_NULLABLE == _columnDesc.isNullable);
+
+	// IBM DB2 non-standard types
+	constexpr SQLSMALLINT DB2_DBCLOB = -350;
+	constexpr SQLSMALLINT DB2_DECFLOAT = -360;
+
 	switch(_columnDesc.dataType)
 	{
 	case SQL_BIT:
@@ -105,6 +110,7 @@ void ODBCMetaColumn::init()
 	case SQL_WCHAR:
 	case SQL_WVARCHAR:
 	case SQL_WLONGVARCHAR:
+	case DB2_DBCLOB:
 		setType(MetaColumn::FDT_WSTRING); break;
 
 	case SQL_TINYINT:
@@ -127,6 +133,7 @@ void ODBCMetaColumn::init()
 	case SQL_FLOAT:
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
+	case DB2_DECFLOAT:
 		setType(MetaColumn::FDT_DOUBLE); break;
 
 	case SQL_REAL:
