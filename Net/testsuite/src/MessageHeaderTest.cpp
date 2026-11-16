@@ -1013,6 +1013,26 @@ void MessageHeaderTest::testEraseDropsReceivedForm()
 }
 
 
+void MessageHeaderTest::testCopyKeepsLimits()
+{
+	MessageHeader mh;
+	mh.setFieldLimit(5);
+	mh.setNameLengthLimit(7);
+	mh.setValueLengthLimit(9000);
+
+	const MessageHeader copied(mh);
+	assertEqual (5, copied.getFieldLimit());
+	assertEqual (7, copied.getNameLengthLimit());
+	assertEqual (9000, copied.getValueLengthLimit());
+
+	MessageHeader assigned;
+	assigned = mh;
+	assertEqual (5, assigned.getFieldLimit());
+	assertEqual (7, assigned.getNameLengthLimit());
+	assertEqual (9000, assigned.getValueLengthLimit());
+}
+
+
 void MessageHeaderTest::testMove()
 {
 	const std::string fields("Subject: =?UTF-8?Q?a=C3=A4?=\r\n");
@@ -1245,6 +1265,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testNoDecodeStructuredFields);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testWriteReceivedForm);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testEraseDropsReceivedForm);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testCopyKeepsLimits);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testMove);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParametersDecodesNames);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSwapAndSecureClear);

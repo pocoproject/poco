@@ -156,9 +156,9 @@ MessageHeader::MessageHeader():
 
 MessageHeader::MessageHeader(const MessageHeader& messageHeader):
 	NameValueCollection(messageHeader),
-	_fieldLimit(DFL_FIELD_LIMIT),
-	_nameLengthLimit(DFL_NAME_LENGTH_LIMIT),
-	_valueLengthLimit(DFL_VALUE_LENGTH_LIMIT),
+	_fieldLimit(messageHeader._fieldLimit),
+	_nameLengthLimit(messageHeader._nameLengthLimit),
+	_valueLengthLimit(messageHeader._valueLengthLimit),
 	_autoDecode(messageHeader._autoDecode),
 	_decodedOnRead(messageHeader._decodedOnRead),
 	_strictParsing(messageHeader._strictParsing),
@@ -188,6 +188,9 @@ MessageHeader::~MessageHeader()
 MessageHeader& MessageHeader::operator = (const MessageHeader& messageHeader)
 {
 	NameValueCollection::operator = (messageHeader);
+	_fieldLimit = messageHeader._fieldLimit;
+	_nameLengthLimit = messageHeader._nameLengthLimit;
+	_valueLengthLimit = messageHeader._valueLengthLimit;
 	_autoDecode = messageHeader._autoDecode;
 	_decodedOnRead = messageHeader._decodedOnRead;
 	_strictParsing = messageHeader._strictParsing;
