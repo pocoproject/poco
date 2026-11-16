@@ -10,6 +10,7 @@
 
 #include "MailTestSuite.h"
 #include "MailMessageTest.h"
+#include "MailRecipientTest.h"
 #include "MailStreamTest.h"
 #include "SMTPClientSessionTest.h"
 #include "POP3ClientSessionTest.h"
@@ -20,6 +21,7 @@ CppUnit::Test* MailTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MailTestSuite");
 
 	pSuite->addTest(MailMessageTest::suite());
+	pSuite->addTest(MailRecipientTest::suite());
 	pSuite->addTest(MailStreamTest::suite());
 	pSuite->addTest(SMTPClientSessionTest::suite());
 	pSuite->addTest(POP3ClientSessionTest::suite());

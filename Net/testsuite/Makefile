@@ -23,7 +23,7 @@ objects = \
 	FTPStreamFactoryTest DialogServer \
 	SocketReactorTest SocketConnectorTest ReactorTestSuite \
 	SocketProactorTest \
-	MailTestSuite MailMessageTest MailStreamTest \
+	MailTestSuite MailMessageTest MailRecipientTest MailStreamTest \
 	SMTPClientSessionTest POP3ClientSessionTest \
 	RawSocketTest ICMPClientTest ICMPSocketTest ICMPClientTestSuite \
 	NTPClientTest NTPClientTestSuite \

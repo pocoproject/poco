@@ -167,6 +167,19 @@ MessageHeader::MessageHeader(const MessageHeader& messageHeader):
 }
 
 
+MessageHeader::MessageHeader(MessageHeader&& messageHeader) noexcept:
+	NameValueCollection(std::move(messageHeader)),
+	_fieldLimit(messageHeader._fieldLimit),
+	_nameLengthLimit(messageHeader._nameLengthLimit),
+	_valueLengthLimit(messageHeader._valueLengthLimit),
+	_autoDecode(messageHeader._autoDecode),
+	_decodedOnRead(messageHeader._decodedOnRead),
+	_strictParsing(messageHeader._strictParsing),
+	_receivedFields(std::exchange(messageHeader._receivedFields, {}))
+{
+}
+
+
 MessageHeader::~MessageHeader()
 {
 }
@@ -179,6 +192,18 @@ MessageHeader& MessageHeader::operator = (const MessageHeader& messageHeader)
 	_decodedOnRead = messageHeader._decodedOnRead;
 	_strictParsing = messageHeader._strictParsing;
 	_receivedFields = messageHeader._receivedFields;
+	return *this;
+}
+
+
+MessageHeader& MessageHeader::operator = (MessageHeader&& messageHeader) noexcept
+{
+	if (&messageHeader != this)
+	{
+		// Swapping and clearing leaves the source empty, as the move constructor does.
+		swap(messageHeader);
+		messageHeader.clear();
+	}
 	return *this;
 }
 
