@@ -59,7 +59,7 @@ public:
 
 	MessageHeader(const MessageHeader& messageHeader);
 		/// Creates the MessageHeader by copying
-		/// another one.
+		/// another one, including its limits.
 
 	MessageHeader(MessageHeader&& messageHeader) noexcept;
 		/// Creates the MessageHeader by moving
@@ -69,7 +69,7 @@ public:
 		/// Destroys the MessageHeader.
 
 	MessageHeader& operator = (const MessageHeader& messageHeader);
-		/// Assigns the content of another MessageHeader.
+		/// Assigns the content and the limits of another MessageHeader.
 
 	MessageHeader& operator = (MessageHeader&& messageHeader) noexcept;
 		/// Moves the content of another MessageHeader.
