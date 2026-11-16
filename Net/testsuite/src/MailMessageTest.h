@@ -38,6 +38,13 @@ public:
 	void testReadMultiPartWithAttachmentNames();
 	void testReadMultiPartPartParameters();
 	void testReadMultiPartDefaultContentType();
+	void testReadRecipients();
+	void testReadRecipientsEncodedWords();
+	void testReadWriteRecipientFieldsUnchanged();
+	void testWriteOmitsBccFields();
+	void testReadHeaderLineTooLong();
+	void testReadAddRecipientEscapesRealName();
+	void testReadAddRecipientRewritesFields();
 	void testReadMultiPartDefaultTransferEncoding();
 	void testReadMultiPartMixedCaseHeaders();
 	void testReadMultiPartInvalidContentDisposition();
