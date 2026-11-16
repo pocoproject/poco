@@ -1264,6 +1264,41 @@ jobs:
         with:
           suffix: ${{ matrix.name }}
 
+  # MinGW (MSYS2 UCRT64, GCC) on Windows x64 with shared libraries, whose DLLs differ from
+  # MSVC's in what they export from explicitly instantiated templates.
+  windows-2025-mingw-cmake:
+    runs-on: windows-2025
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation_util == 'true' ||
+      needs.changes.outputs.data == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: false
+          pacboy: gcc:p cmake:p ninja:p
+      - run: >-
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
+          -DENABLE_XML=ON -DENABLE_JSON=ON -DENABLE_UTIL=ON -DENABLE_NET=ON
+          -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
+      - run: cmake --build cmake-build --parallel $(nproc)
+      # retry-action offers no MSYS2 shell; ctest repeats a failed test instead.
+      - run: >-
+          cd cmake-build &&
+          ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) --repeat until-pass:3
+          -R "^(Foundation|XML|JSON|Util)$"
+        env:
+          CPPUNIT_IGNORE: ${{ env.POCO_WIN_CPPUNIT_IGNORE }}
+      - uses: ./.github/actions/upload-test-report
+
   # Long tests on Windows x64: the suites of POCO_LONG_TEST_SUITES with -long.
   windows-2025-msvc-cmake-long-tests:
     runs-on: windows-2025

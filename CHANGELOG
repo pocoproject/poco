@@ -423,6 +423,9 @@ Bug Fixes and Improvements:
   CompareStringOrdinal().
   On Windows, CMake stops with an error when the Windows API level of the toolchain
   (_WIN32_WINNT and WINVER) is older than Windows 10 (0x0A00).
+  CppUnit compares the names of ignored tests without the "class " and "struct " keywords
+  that MSVC writes into type names, so that the Windows ignore lists also apply to MinGW
+  builds; a CI job builds and tests POCO with MinGW (MSYS2 UCRT64).
 
 
 Release 1.15.4 (2026-09-22)
