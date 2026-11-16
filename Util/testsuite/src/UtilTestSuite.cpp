@@ -26,10 +26,7 @@ CppUnit::Test* UtilTestSuite::suite()
 	pSuite->addTest(ApplicationTest::suite());
 	pSuite->addTest(ConfigurationTestSuite::suite());
 	pSuite->addTest(OptionsTestSuite::suite());
-#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_FORK_EXEC) && POCO_OS != POCO_OS_ANDROID
-	// The suite has a test only where a daemon can be forked.
 	pSuite->addTest(ServerApplicationTest::suite());
-#endif
 	pSuite->addTest(TimerTestSuite::suite());
 #if defined(_MSC_VER)
 	pSuite->addTest(WindowsTestSuite::suite());
