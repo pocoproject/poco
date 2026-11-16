@@ -67,7 +67,14 @@ public:
 
 	static std::string validZipEntryFileName(const Poco::Path& entry);
 
+	static std::string validZipEntryFileName(const std::string& entry);
+		/// Returns the entry name in the form validZipEntryFileName(const Poco::Path&) returns.
+		/// A NUL character is rejected with a ZipException before the name is parsed as a Path.
+
 private:
+	static void verifyNoNulCharacter(const std::string& name);
+		/// Throws a ZipException if name contains a NUL character.
+
 	ZipUtil();
 	~ZipUtil();
 	ZipUtil(const ZipUtil&);

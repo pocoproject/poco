@@ -14,6 +14,7 @@
 
 #include "Poco/Zip/Add.h"
 #include "Poco/Zip/Compress.h"
+#include "Poco/Zip/ZipUtil.h"
 
 
 namespace Poco::Zip {
@@ -30,7 +31,7 @@ Add::Add(const std::string& zipPath, const std::string& localPath, ZipCommon::Co
 
 void Add::execute(Compress& c, std::istream& input)
 {
-	c.addFile(Poco::Path(_localPath), Poco::Path(_zipPath), _cm, _cl);
+	c.addFile(Poco::Path(_localPath), Poco::Path(ZipUtil::validZipEntryFileName(_zipPath)), _cm, _cl);
 }
 
 
