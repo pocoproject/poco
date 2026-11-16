@@ -39,6 +39,8 @@ public:
 	void testFunc();
 	void testIdle();
 	void testDerivedConstructor();
+	void testOSPriority();
+	void testOSPriorityFailure();
 
 	void setUp();
 	void tearDown();
