@@ -112,6 +112,7 @@ public:
 	void testClosedSession();
 	void testOpenConnectedSession();
 	void testLostConnection();
+	void testExceptionCode();
 	void testSessionPoolAndUnicode();
 
 	void setUp();
