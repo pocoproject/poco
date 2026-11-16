@@ -1803,6 +1803,50 @@ void MailMessageTest::testWriteEncodesDomainLiteral()
 }
 
 
+void MailMessageTest::testWriteEscapesPartParameters()
+{
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Mime-Version: 1.0\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=\"=?UTF-8?Q?a=22=3B_x=3D=22y?=\"\r\n"
+		"Content-Type: application/octet-stream; name=\"=?UTF-8?Q?n=22=3B_boundary=3D=22Z?=\"\r\n"
+		"\r\n"
+		"a\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+	MailMessage message;
+	message.read(istr);
+	assertEqual (1, message.parts().size());
+	assertEqual ("n\"; boundary=\"Z", message.parts()[0].name);
+	assertEqual ("a\"; x=\"y", message.parts()[0].pSource->filename());
+
+	std::ostringstream ostr;
+	message.write(ostr);
+	const std::string written = ostr.str();
+	assertTrue (written.find("\r\nContent-Type: application/octet-stream; name=\"n\\\"; boundary=\\\"Z\"\r\n") != std::string::npos);
+	assertTrue (written.find("\r\nContent-Disposition: attachment; filename=\"a\\\"; x=\\\"y\"\r\n") != std::string::npos);
+
+	std::istringstream istrWritten(written);
+	MailMessage messageWritten;
+	messageWritten.read(istrWritten);
+	assertEqual (1, messageWritten.parts().size());
+	assertEqual ("n\"; boundary=\"Z", messageWritten.parts()[0].name);
+	assertEqual ("a\"; x=\"y", messageWritten.parts()[0].pSource->filename());
+}
+
+
+void MailMessageTest::testWriteRealNameQuotedPair()
+{
+	MailMessage message;
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "r@no.where", "a\"b\\c"));
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertTrue (ostr.str().find("\r\nTo: \"a\\\"b\\\\c\" <r@no.where>\r\n") != std::string::npos);
+}
+
+
 void MailMessageTest::testReadRecipientsQuotedLocalPart()
 {
 	const auto readRecipients = [](const std::string& to)
@@ -1920,6 +1964,8 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsMalformedDomainLiteral);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesNameWithComment);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesDomainLiteral);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteEscapesPartParameters);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteRealNameQuotedPair);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsQuotedLocalPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteKeepsQuotedLocalPart);
 

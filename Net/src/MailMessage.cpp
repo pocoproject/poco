@@ -842,9 +842,7 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 	}
 	else if (!realName.empty())
 	{
-		// A '"' or '\' in the name is written as a quoted-pair (RFC 5322) so that it
-		// cannot end the quoted string; an escaped name always needs quoting.
-		quote(Poco::replace(Poco::replace(realName, "\\", "\\\\"), "\"", "\\\""), rec, true);
+		quote(realName, rec, true);
 		rec.append(" ");
 	}
 	rec.append("<");
