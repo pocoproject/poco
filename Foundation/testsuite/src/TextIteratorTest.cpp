@@ -14,11 +14,14 @@
 #include "Poco/TextIterator.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/UTF8Encoding.h"
+#include "Poco/Exception.h"
 #include "Poco/UTF16Encoding.h"
 #include "Poco/UTF32Encoding.h"
 #include <type_traits>
 
 
+using Poco::AssertionViolationException;
+using Poco::TextEncoding;
 using Poco::TextIterator;
 using Poco::Latin1Encoding;
 using Poco::UTF8Encoding;
@@ -34,6 +37,33 @@ static_assert(!std::is_constructible_v<TextIterator, const std::string&, UTF8Enc
 static_assert(!std::is_constructible_v<TextIterator, std::string, const UTF8Encoding&>);
 static_assert(!std::is_constructible_v<TextIterator, std::string, UTF8Encoding>,
 	"TextIterator must not accept temporary strings or encodings, as they would dangle");
+
+
+namespace
+{
+	class FaultyEncoding: public Latin1Encoding
+		/// Always returns the given negative length, as a faulty
+		/// encoding could.
+	{
+	public:
+		FaultyEncoding(int n): _n(n)
+		{
+		}
+
+		int queryConvert(const unsigned char*, int) const override
+		{
+			return _n;
+		}
+
+		int sequenceLength(const unsigned char*, int) const override
+		{
+			return _n;
+		}
+
+	private:
+		int _n;
+	};
+}
 
 
 TextIteratorTest::TextIteratorTest(const std::string& name): CppUnit::TestCase(name)
@@ -255,6 +285,34 @@ void TextIteratorTest::testSwap()
 }
 
 
+void TextIteratorTest::testFaultyEncoding1()
+{
+	FaultyEncoding encoding(-2);
+	std::string text("ab");
+	TextIterator it(text, encoding);
+	TextIterator end(text);
+	assertTrue (*it == -1);
+	++it;
+	assertTrue (it == end);
+}
+
+
+void TextIteratorTest::testFaultyEncoding2()
+{
+	FaultyEncoding encoding(-TextEncoding::MAX_SEQUENCE_LENGTH - 1);
+	std::string text(TextEncoding::MAX_SEQUENCE_LENGTH + 1, 'a');
+	TextIterator it(text, encoding);
+	try
+	{
+		++it;
+		fail ("must fail");
+	}
+	catch (AssertionViolationException&)
+	{
+	}
+}
+
+
 void TextIteratorTest::testUTF32Invalid1()
 {
 	UTF32Encoding encoding;
@@ -323,6 +381,8 @@ CppUnit::Test* TextIteratorTest::suite()
 	CppUnit_addTest(pSuite, TextIteratorTest, testUTF8Supplementary);
 	CppUnit_addTest(pSuite, TextIteratorTest, testUTF16Supplementary);
 	CppUnit_addTest(pSuite, TextIteratorTest, testSwap);
+	CppUnit_addTest(pSuite, TextIteratorTest, testFaultyEncoding1);
+	CppUnit_addTest(pSuite, TextIteratorTest, testFaultyEncoding2);
 	CppUnit_addTest(pSuite, TextIteratorTest, testUTF32Invalid1);
 	CppUnit_addTest(pSuite, TextIteratorTest, testUTF32Invalid2);
 	CppUnit_addTest(pSuite, TextIteratorTest, testUTF16Invalid);

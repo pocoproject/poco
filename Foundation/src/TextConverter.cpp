@@ -73,7 +73,7 @@ std::size_t TextConverter::convert(
 		int uc;
 		int read = 1;
 
-		while (-1 > n && (end - it) >= -n)
+		while (-1 > n && -n > read && (end - it) >= -n)
 		{
 			read = -n;
 			n = _inEncoding.queryConvert(it, read);

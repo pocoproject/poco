@@ -107,7 +107,7 @@ int TextBufferIterator::operator * () const
 	int read = 1;
 	int n = _pEncoding->queryConvert(buffer, 1);
 
-	while (-1 > n && (_end - it) >= -n - read)
+	while (-1 > n && -n > read && (_end - it) >= -n - read)
 	{
 		while (read < -n && it != _end)
 		{
@@ -136,6 +136,7 @@ TextBufferIterator& TextBufferIterator::operator ++ ()
 
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
 	unsigned char* p = buffer;
+	unsigned char* pend = p + TextEncoding::MAX_SEQUENCE_LENGTH;
 
 	if (_it != _end)
 		*p++ = *_it++;
@@ -145,10 +146,11 @@ TextBufferIterator& TextBufferIterator::operator ++ ()
 	int read = 1;
 	int n = _pEncoding->sequenceLength(buffer, 1);
 
-	while (-1 > n && (_end - _it) >= -n - read)
+	while (-1 > n && -n > read && (_end - _it) >= -n - read)
 	{
 		while (read < -n && _it != _end)
 		{
+			poco_assert(p != pend);
 			*p++ = *_it++;
 			read++;
 		}

@@ -14,14 +14,17 @@
 #include "Poco/TextBufferIterator.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/UTF8Encoding.h"
+#include "Poco/Exception.h"
 #include "Poco/UTF16Encoding.h"
 #include <type_traits>
 
 
+using Poco::AssertionViolationException;
 using Poco::TextBufferIterator;
 using Poco::Latin1Encoding;
 using Poco::UTF8Encoding;
 using Poco::UTF16Encoding;
+using Poco::TextEncoding;
 
 
 static_assert(std::is_constructible_v<TextBufferIterator, const char*, const UTF8Encoding&>);
@@ -33,6 +36,33 @@ static_assert(!std::is_constructible_v<TextBufferIterator, const char*, std::siz
 static_assert(std::is_constructible_v<TextBufferIterator, const char*, const char*, const UTF8Encoding&>);
 static_assert(!std::is_constructible_v<TextBufferIterator, const char*, const char*, UTF8Encoding>,
 	"TextBufferIterator must not accept temporary encodings, as they would dangle");
+
+
+namespace
+{
+	class FaultyEncoding: public Latin1Encoding
+		/// Always returns the given negative length, as a faulty
+		/// encoding could.
+	{
+	public:
+		FaultyEncoding(int n): _n(n)
+		{
+		}
+
+		int queryConvert(const unsigned char*, int) const override
+		{
+			return _n;
+		}
+
+		int sequenceLength(const unsigned char*, int) const override
+		{
+			return _n;
+		}
+
+	private:
+		int _n;
+	};
+}
 
 
 TextBufferIteratorTest::TextBufferIteratorTest(const std::string& name): CppUnit::TestCase(name)
@@ -232,6 +262,34 @@ void TextBufferIteratorTest::testUTF16Supplementary()
 }
 
 
+void TextBufferIteratorTest::testFaultyEncoding1()
+{
+	FaultyEncoding encoding(-2);
+	std::string text("ab");
+	TextBufferIterator it(text.data(), text.size(), encoding);
+	TextBufferIterator end(it.end());
+	assertTrue (*it == -1);
+	++it;
+	assertTrue (it == end);
+}
+
+
+void TextBufferIteratorTest::testFaultyEncoding2()
+{
+	FaultyEncoding encoding(-TextEncoding::MAX_SEQUENCE_LENGTH - 1);
+	std::string text(TextEncoding::MAX_SEQUENCE_LENGTH + 1, 'a');
+	TextBufferIterator it(text.data(), text.size(), encoding);
+	try
+	{
+		++it;
+		fail ("must fail");
+	}
+	catch (AssertionViolationException&)
+	{
+	}
+}
+
+
 void TextBufferIteratorTest::testSwap()
 {
 	Latin1Encoding encoding;
@@ -270,6 +328,8 @@ CppUnit::Test* TextBufferIteratorTest::suite()
 	CppUnit_addTest(pSuite, TextBufferIteratorTest, testUTF8);
 	CppUnit_addTest(pSuite, TextBufferIteratorTest, testUTF8Supplementary);
 	CppUnit_addTest(pSuite, TextBufferIteratorTest, testUTF16Supplementary);
+	CppUnit_addTest(pSuite, TextBufferIteratorTest, testFaultyEncoding1);
+	CppUnit_addTest(pSuite, TextBufferIteratorTest, testFaultyEncoding2);
 	CppUnit_addTest(pSuite, TextBufferIteratorTest, testSwap);
 
 	return pSuite;

@@ -34,6 +34,24 @@ static_assert(!std::is_constructible_v<TextConverter, UTF8Encoding, ASCIIEncodin
 	"TextConverter must not accept temporary encodings, as they would dangle");
 
 
+namespace
+{
+	class FaultyEncoding: public ASCIIEncoding
+	{
+	public:
+		int queryConvert(const unsigned char*, int) const override
+		{
+			return -2;
+		}
+
+		int sequenceLength(const unsigned char*, int) const override
+		{
+			return -2;
+		}
+	};
+}
+
+
 TextConverterTest::TextConverterTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -320,6 +338,24 @@ void TextConverterTest::testCP1252toUTF8()
 }
 
 
+void TextConverterTest::testFaultyEncoding()
+{
+	FaultyEncoding faultyEncoding;
+	ASCIIEncoding asciiEncoding;
+	TextConverter converter(faultyEncoding, asciiEncoding);
+
+	std::string result0;
+	std::size_t errors = converter.convert("ab", 2, result0);
+	assertEqual (result0, "?");
+	assertEqual (errors, 1);
+
+	std::string result1;
+	errors = converter.convert("ab", result1);
+	assertEqual (result1, "?");
+	assertEqual (errors, 1);
+}
+
+
 void TextConverterTest::testInvalidBuffer()
 {
 	ASCIIEncoding encoding;
@@ -394,6 +430,7 @@ CppUnit::Test* TextConverterTest::suite()
 	CppUnit_addTest(pSuite, TextConverterTest, testCP1250toUTF8);
 	CppUnit_addTest(pSuite, TextConverterTest, testCP1251toUTF8);
 	CppUnit_addTest(pSuite, TextConverterTest, testCP1252toUTF8);
+	CppUnit_addTest(pSuite, TextConverterTest, testFaultyEncoding);
 	CppUnit_addTest(pSuite, TextConverterTest, testInvalidBuffer);
 	CppUnit_addTest(pSuite, TextConverterTest, testEmptyBuffer);
 	CppUnit_addTest(pSuite, TextConverterTest, testErrors);
