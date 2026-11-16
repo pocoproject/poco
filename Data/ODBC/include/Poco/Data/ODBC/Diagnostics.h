@@ -257,6 +257,9 @@ private:
 // explicit instantiation definition
 #ifndef POCO_DOC
 
+// With MinGW, a DLL does not export the inline members of an explicit instantiation,
+// so code that uses the template instantiates it itself.
+#if !defined(POCO_COMPILER_MINGW)
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
 extern template class Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
 extern template class Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
@@ -267,6 +270,7 @@ extern template class ODBC_API Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
 extern template class ODBC_API Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
 extern template class ODBC_API Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
 extern template class ODBC_API Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
 #endif
 
 #endif
