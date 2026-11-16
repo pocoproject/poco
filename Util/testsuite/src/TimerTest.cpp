@@ -13,6 +13,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Util/Timer.h"
 #include "Poco/Util/TimerTaskAdapter.h"
+#include "Poco/Exception.h"
+#include "Poco/Thread.h"
 
 
 using Poco::Util::Timer;
@@ -371,6 +373,47 @@ void TimerTest::testDerivedConstructor()
 }
 
 
+void TimerTest::testOSPriority()
+{
+	const int osPriority = Poco::Thread::getMinOSPriority(Poco::Thread::POLICY_DEFAULT);
+	// Declared before the timer, whose thread uses them until the timer is destroyed.
+	Poco::Event taskRun;
+	int taskOSPriority = 0;
+	Timer timer(osPriority, Poco::Thread::POLICY_DEFAULT);
+
+	timer.schedule(Timer::func([&taskRun, &taskOSPriority]()
+	{
+		taskOSPriority = Poco::Thread::current()->getOSPriority();
+		taskRun.set();
+	}), Poco::Clock());
+
+	assertTrue (taskRun.tryWait(TASK_TIMEOUT_MS));
+	assertEqual (osPriority, taskOSPriority);
+}
+
+
+void TimerTest::testOSPriorityFailure()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// Not a THREAD_PRIORITY_* value, so SetThreadPriority() fails.
+	constexpr int OS_PRIORITY = 100;
+	constexpr int POLICY = Poco::Thread::POLICY_DEFAULT;
+#else
+	// No scheduling policy has this value, so pthread_setschedparam() fails.
+	constexpr int OS_PRIORITY = 0;
+	constexpr int POLICY = 999;
+#endif
+	try
+	{
+		Timer timer(OS_PRIORITY, POLICY);
+		fail("the timer must not start with a priority that cannot be set");
+	}
+	catch (const Poco::SystemException&)
+	{
+	}
+}
+
+
 void TimerTest::setUp()
 {
 }
@@ -405,6 +448,8 @@ CppUnit::Test* TimerTest::suite()
 	CppUnit_addTest(pSuite, TimerTest, testFunc);
 	CppUnit_addTest(pSuite, TimerTest, testIdle);
 	CppUnit_addTest(pSuite, TimerTest, testDerivedConstructor);
+	CppUnit_addTest(pSuite, TimerTest, testOSPriority);
+	CppUnit_addTest(pSuite, TimerTest, testOSPriorityFailure);
 
 	return pSuite;
 }
