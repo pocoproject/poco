@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/DirectoryIterator.h"
+#include "Poco/BasicEvent.h"
 #include <stack>
 #include <queue>
 #include <functional>
@@ -38,6 +39,12 @@ public:
 	{
 		D_INFINITE = 0 /// Special value for infinite traverse depth.
 	};
+
+	Poco::BasicEvent<const std::string> traverseError;
+		/// Fired with the path of a subdirectory that cannot be read.
+		/// The traversal skips the subdirectory and continues.
+		/// A handler must not throw: an exception leaves the traversal
+		/// at the subdirectory that cannot be read.
 
 	TraverseBase(DepthFun depthDeterminer, UInt16 maxDepth = D_INFINITE);
 

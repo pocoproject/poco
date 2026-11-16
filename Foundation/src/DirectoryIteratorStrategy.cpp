@@ -13,6 +13,7 @@
 
 
 #include "Poco/DirectoryIteratorStrategy.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -66,12 +67,19 @@ const std::string ChildrenFirstTraverse::next(Stack* itStack, bool* isFinished)
 	bool isDepthLimitReached = isFiniteDepth() && _depthDeterminer(*itStack) >= _maxDepth;
 	if (!isDepthLimitReached && isDirectory(*itStack->top()))
 	{
-		DirectoryIterator child_it(itStack->top().path());
-		// check if directory is empty
-		if (child_it != _itEnd)
+		try
 		{
-			itStack->push(child_it);
-			return child_it->path();
+			DirectoryIterator child_it(itStack->top().path());
+			// check if directory is empty
+			if (child_it != _itEnd)
+			{
+				itStack->push(child_it);
+				return child_it->path();
+			}
+		}
+		catch (Poco::FileException&)
+		{
+			traverseError.notify(this, itStack->top()->path());
 		}
 	}
 
@@ -134,14 +142,21 @@ const std::string SiblingsFirstTraverse::next(Stack* itStack, bool* isFinished)
 		{
 			std::string dir = _dirsStack.top().front();
 			_dirsStack.top().pop();
-			DirectoryIterator child_it(dir);
-
-			// check if directory is empty
-			if (child_it != _itEnd)
+			try
 			{
-				itStack->push(child_it);
-				_dirsStack.push(std::queue<std::string>());
-				return child_it->path();
+				DirectoryIterator child_it(dir);
+
+				// check if directory is empty
+				if (child_it != _itEnd)
+				{
+					itStack->push(child_it);
+					_dirsStack.push(std::queue<std::string>());
+					return child_it->path();
+				}
+			}
+			catch (Poco::FileException&)
+			{
+				traverseError.notify(this, dir);
 			}
 		}
 
