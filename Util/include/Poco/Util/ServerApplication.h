@@ -183,7 +183,13 @@ public:
 
 protected:
 	using Application::run;
-	void waitForTerminationRequest();
+	virtual void waitForTerminationRequest();
+		/// Waits until the application receives a termination request
+		/// and then calls the registered termination callback.
+		///
+		/// A subclass can override it, for example to wait for
+		/// further events or to shut down in a different way.
+
 	void defineOptions(OptionSet& options) override;
 
 private:
