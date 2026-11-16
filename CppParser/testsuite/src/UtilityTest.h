@@ -38,6 +38,7 @@ public:
 	void testCollectDependenciesHomeAndDeviceNames();
 	void testCollectDependenciesFilesAsParsed();
 	void testAddLanguageStandard();
+	void testPreprocessFileCompilerPath();
 
 	void setUp() override;
 	void tearDown() override;
