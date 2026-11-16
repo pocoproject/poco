@@ -17,6 +17,7 @@
 #include "Poco/DirectoryIterator.h"
 #include "Poco/Environment.h"
 #include "Poco/StringTokenizer.h"
+#include "EmbeddedNul.h"
 #include <mutex>
 
 
@@ -122,6 +123,7 @@ File::File()
 
 File::File(const std::string& path): FileImpl(path)
 {
+	rejectEmbeddedNul(path);
 }
 
 
@@ -154,6 +156,7 @@ File& File::operator = (const File& file)
 
 File& File::operator = (const std::string& path)
 {
+	rejectEmbeddedNul(path);
 	setPathImpl(path);
 	return *this;
 }
@@ -360,6 +363,7 @@ void File::moveTo(const std::string& path, int options)
 
 void File::renameTo(const std::string& path, int options)
 {
+	rejectEmbeddedNul(path);
 	renameToImpl(path, options);
 	setPathImpl(path);
 }
@@ -367,6 +371,7 @@ void File::renameTo(const std::string& path, int options)
 
 void File::linkTo(const std::string& path, LinkType type) const
 {
+	rejectEmbeddedNul(path);
 	linkToImpl(path, type);
 }
 

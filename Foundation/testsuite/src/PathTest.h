@@ -61,6 +61,7 @@ public:
 	void testPushPop();
 	void testWindowsSystem();
 	void testSelf();
+	void testRejectEmbeddedNul();
 
 	void setUp();
 	void tearDown();

@@ -36,6 +36,9 @@ class Foundation_API Path
 	/// device name (also only Windows and OpenVMS),
 	/// a list of directory names and an optional
 	/// filename.
+	///
+	/// A path string or path component that contains a NUL
+	/// character is rejected with a PathSyntaxException.
 {
 public:
 	enum Style

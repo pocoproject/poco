@@ -45,8 +45,28 @@ using Poco::File;
 using Poco::TemporaryFile;
 using Poco::Path;
 using Poco::Exception;
+using Poco::PathSyntaxException;
 using Poco::Timestamp;
 using Poco::Thread;
+
+
+namespace
+{
+	template <typename F>
+	bool throwsPathSyntaxException(const F& func)
+		/// Returns true if calling func throws a PathSyntaxException.
+	{
+		try
+		{
+			func();
+		}
+		catch (PathSyntaxException&)
+		{
+			return true;
+		}
+		return false;
+	}
+}
 
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
@@ -320,6 +340,7 @@ void FileTest::testExists()
 		UINT r = GetSystemDirectoryA(buffer.data(), static_cast<UINT>(buffer.size()));
 		if (r)
 		{
+			buffer.resize(r);
 			Path p(buffer);
 			p.makeDirectory().makeAbsolute().makeParent();
 			buffer = p.toString();
@@ -1008,6 +1029,29 @@ void FileTest::testRenameFailIfExists() {
 }
 
 
+void FileTest::testRejectEmbeddedNul()
+{
+	// The operating system sees a path only up to the first NUL character,
+	// so "testfile2.dat\0.exe" would act on "testfile2.dat".
+	const std::string withNul("testfile2.dat\0.exe", 18);
+	std::ofstream ostr("testfile.dat");
+	ostr << "Hello, world!" << std::endl;
+	ostr.close();
+	File f("testfile.dat");
+
+	assertTrue (throwsPathSyntaxException([&]() { File g(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { File g; g = withNul; }));
+	assertTrue (throwsPathSyntaxException([&]() { f.copyTo(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { f.moveTo(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { f.renameTo(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { f.linkTo(withNul); }));
+
+	assertEqual ("testfile.dat", f.path());
+	assertTrue (f.exists());
+	assertTrue (!File("testfile2.dat").exists());
+}
+
+
 void FileTest::testLongPath()
 {
 #if defined(_WIN32)
@@ -1515,6 +1559,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testCopyDirectoryFailIfExists);
 	CppUnit_addTest(pSuite, FileTest, testRename);
 	CppUnit_addTest(pSuite, FileTest, testRenameFailIfExists);
+	CppUnit_addTest(pSuite, FileTest, testRejectEmbeddedNul);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
 	CppUnit_addTest(pSuite, FileTest, testLongPathUNC);
