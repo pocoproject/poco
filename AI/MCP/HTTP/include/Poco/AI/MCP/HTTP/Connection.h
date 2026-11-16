@@ -41,7 +41,10 @@ namespace Impl {
 
 AIMCPHTTP_API void interrupt(poco_socket_t fd);
 	/// Ends what another thread sends or receives on the connection of fd:
-	/// shuts both directions down. Does nothing when fd is invalid.
+	/// shuts both directions down. A receive that already waits ends with
+	/// that on POSIX systems. On Windows it would wait until the peer closes
+	/// its side, or until its timeout: there the pending operations of the
+	/// connection are cancelled as well. Does nothing when fd is invalid.
 
 
 } // namespace Impl

@@ -62,6 +62,12 @@ void interrupt(poco_socket_t fd)
 	if (fd == POCO_INVALID_SOCKET) return;
 	// 2 shuts both directions down, on every platform.
 	(void) ::shutdown(fd, 2);
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// A receive that waits stays where it is after the shutdown, as long as
+	// the peer keeps its side open. Cancelled, it returns; a receive that
+	// follows fails at once, because the connection is shut down.
+	(void) ::CancelIoEx(reinterpret_cast<HANDLE>(fd), nullptr);
+#endif
 }
 
 
