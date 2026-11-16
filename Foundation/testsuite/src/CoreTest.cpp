@@ -1085,6 +1085,55 @@ void CoreTest::testFIFOBufferInt()
 }
 
 
+void CoreTest::testFIFOBufferNextWrite()
+{
+	const std::string text("The Quick Brown Dog Jumps Over The Lazy Fox.");
+	BasicFIFOBuffer<char> f(128);
+	f.write(text.data(), text.size());
+	std::vector<char> data(f.size());
+
+	assertTrue (4 == f.read(data.data(), 4));
+	assertEqual ("The ", std::string(data.data(), 4));
+
+	std::size_t n = f.peek(data.data(), f.used());
+	assertEqual ("Quick Brown Dog Jumps Over The Lazy Fox.", std::string(data.data(), n));
+
+	std::memcpy(f.next(), "The ", 4);
+	f.advance(4);
+
+	n = f.peek(data.data(), f.used());
+	assertEqual ("Quick Brown Dog Jumps Over The Lazy Fox.The ", std::string(data.data(), n));
+}
+
+
+void CoreTest::testFIFOBufferAdvanceAfterDrain()
+{
+	BasicFIFOBuffer<char> f(10);
+	f.write("abcdef", 6);
+	char* pNext = f.next();
+	f.drain(3);
+
+	// Draining frees space before the data, but data written at pNext
+	// can only use the 4 elements after the data.
+	assertTrue (7 == f.available());
+	try
+	{
+		f.advance(5);
+		failmsg("advance beyond the end of the buffer - must throw exception");
+	}
+	catch (InvalidAccessException&)
+	{
+	}
+
+	std::memcpy(pNext, "ghij", 4);
+	f.advance(4);
+
+	std::vector<char> data(f.size());
+	const std::size_t n = f.peek(data.data(), f.used());
+	assertEqual ("defghij", std::string(data.data(), n));
+}
+
+
 void CoreTest::testAtomicCounter()
 {
 	AtomicCounter ac;
@@ -1411,6 +1460,8 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferChar);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferInt);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferEOFAndError);
+	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferNextWrite);
+	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferAdvanceAfterDrain);
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
