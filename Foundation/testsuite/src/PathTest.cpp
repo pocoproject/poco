@@ -1603,6 +1603,30 @@ void PathTest::testExpand()
 }
 
 
+#if defined(POCO_OS_FAMILY_UNIX)
+void PathTest::testExpandEscapedDollar()
+{
+	assertEqual ("/usr/share/O1$$/folder", Path::expand("/usr/share/O1\\$\\$/folder"));
+}
+
+
+void PathTest::testExpandKeepsBackslash()
+{
+	assertEqual ("/usr/share\\", Path::expand("/usr/share\\"));
+	assertEqual ("\\", Path::expand("\\"));
+	assertEqual ("/usr/sh\\are", Path::expand("/usr/sh\\are"));
+	assertEqual ("/usr/share\\$", Path::expand("/usr/share\\\\$"));
+}
+
+
+void PathTest::testExpandCollapsesSlashes()
+{
+	assertEqual ("/usr/share", Path::expand("/usr///share"));
+	assertEqual ("/usr/share/", Path::expand("/usr////share//"));
+}
+#endif
+
+
 void PathTest::testHomeWithoutHomeEnv()
 {
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
@@ -1811,6 +1835,11 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testForDirectory);
 	CppUnit_addTest(pSuite, PathTest, testAddDirectorySeparator);
 	CppUnit_addTest(pSuite, PathTest, testExpand);
+#if defined(POCO_OS_FAMILY_UNIX)
+	CppUnit_addTest(pSuite, PathTest, testExpandEscapedDollar);
+	CppUnit_addTest(pSuite, PathTest, testExpandKeepsBackslash);
+	CppUnit_addTest(pSuite, PathTest, testExpandCollapsesSlashes);
+#endif
 	CppUnit_addTest(pSuite, PathTest, testHomeWithoutHomeEnv);
 	CppUnit_addTest(pSuite, PathTest, testListRoots);
 	CppUnit_addTest(pSuite, PathTest, testFind);
