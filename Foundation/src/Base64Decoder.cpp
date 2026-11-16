@@ -26,14 +26,14 @@ namespace
 {
 	constexpr unsigned char INVALID = 0xFF;
 
-	constexpr std::array<unsigned char, 256> makeDecodingTable(const char* alphabet)
+	constexpr auto makeDecodingTable = [](const char* alphabet)
 	{
 		std::array<unsigned char, 256> table{};
 		for (auto& value: table) value = INVALID;
 		for (unsigned i = 0; i < 64; ++i)
 			table[static_cast<unsigned char>(alphabet[i])] = static_cast<unsigned char>(i);
 		return table;
-	}
+	};
 
 	constexpr std::array<unsigned char, 256> DECODING = makeDecodingTable(
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");

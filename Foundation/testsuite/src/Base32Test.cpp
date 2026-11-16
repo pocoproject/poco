@@ -38,7 +38,9 @@ namespace
 		}
 		catch (DataFormatException& exc)
 		{
-			return "exception: " + exc.message();
+			// A build with ENABLE_TRACE appends a stack trace after a line break.
+			const std::string& msg = exc.message();
+			return "exception: " + msg.substr(0, msg.find('\n'));
 		}
 		return result;
 	}
