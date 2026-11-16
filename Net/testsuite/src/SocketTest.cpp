@@ -165,6 +165,46 @@ namespace
 	};
 #endif
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	bool endsWhenCancelled(const StreamSocket& socket, const std::function<void()>& blockingCall, Timespan& elapsed)
+		/// Runs the call while another thread cancels the pending
+		/// operations of the socket. Returns true if the call ended
+		/// with an IOException for WSAEINTR; stores the time the call
+		/// took in elapsed.
+	{
+		const HANDLE handle = reinterpret_cast<HANDLE>(socket.impl()->sockfd());
+		Poco::Event ended;
+		Poco::Thread cancellerThread;
+		cancellerThread.startFunc([handle, &ended]
+			{
+				// CancelIoEx() does nothing as long as no operation waits
+				while (!ended.tryWait(10))
+				{
+					CancelIoEx(handle, nullptr);
+				}
+			});
+
+		bool cancelled = false;
+		Poco::Clock start;
+		try
+		{
+			blockingCall();
+		}
+		catch (Poco::IOException& exc)
+		{
+			cancelled = exc.code() == POCO_EINTR;
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		elapsed = start.elapsed();
+
+		ended.set();
+		cancellerThread.join();
+		return cancelled;
+	}
+#endif
+
 	class CopyToStringConnection: public TCPServerConnection
 	{
 	public:
@@ -1899,6 +1939,53 @@ void SocketTest::testSendDontWaitBlocking()
 #endif
 
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+void SocketTest::testReceiveCancelled()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	ss.setReceiveTimeout(Timespan(30, 0));
+
+	Timespan elapsed;
+	const bool cancelled = endsWhenCancelled(ss, [&ss]
+		{
+			char buffer[256];
+			ss.receiveBytes(buffer, sizeof(buffer));
+		}, elapsed);
+
+	// the cancelled receive is not repeated until its timeout
+	assertTrue (cancelled);
+	assertTrue (elapsed < Timespan(10, 0));
+}
+
+
+void SocketTest::testSendCancelled()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	ss.setSendTimeout(Timespan(30, 0));
+
+	Timespan elapsed;
+	const bool cancelled = endsWhenCancelled(ss, [&ss]
+		{
+			// the peer does not read, so a send blocks once the buffers are full
+			const Buffer<char> data(65536);
+			const Poco::Clock start;
+			while (start.elapsed() < 10000000)
+			{
+				ss.sendBytes(data.begin(), static_cast<int>(data.size()));
+			}
+		}, elapsed);
+
+	// the cancelled send is not repeated until its timeout
+	assertTrue (cancelled);
+	assertTrue (elapsed < Timespan(10, 0));
+}
+#endif
+
+
 void SocketTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -2003,6 +2090,10 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testReceiveDontWaitBlocking);
 	CppUnit_addTest(pSuite, SocketTest, testSendDontWaitBlocking);
 #endif
+#endif
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	CppUnit_addTest(pSuite, SocketTest, testReceiveCancelled);
+	CppUnit_addTest(pSuite, SocketTest, testSendCancelled);
 #endif
 
 	return pSuite;

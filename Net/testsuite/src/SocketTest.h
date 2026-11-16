@@ -83,6 +83,10 @@ public:
 	void testSendDontWaitBlocking();
 #endif
 #endif
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	void testReceiveCancelled();
+	void testSendCancelled();
+#endif
 
 	void setUp() override;
 	void tearDown() override;

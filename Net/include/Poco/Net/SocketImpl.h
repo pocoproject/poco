@@ -620,6 +620,10 @@ private:
 		/// A system call that the operating system restarts after a
 		/// signal (SA_RESTART on macOS and BSD) does not return here,
 		/// so its timeout cannot be limited this way.
+		///
+		/// On Windows no signal interrupts a call: WSAEINTR means that
+		/// another thread cancelled it. The call is not repeated; an
+		/// IOException is thrown.
 
 	void setTimeoutOption(SelectMode mode, const Poco::Timespan& timeout);
 		/// Sets SO_RCVTIMEO (SELECT_READ) or SO_SNDTIMEO (SELECT_WRITE) on
