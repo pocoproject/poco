@@ -25,6 +25,8 @@ public:
 	~MutexTest();
 
 	void testScopedLockWithUnlockTryLock();
+	void testFastMutexNotRecursive();
+	void testMutexRecursive();
 
 	void setUp();
 	void tearDown();
