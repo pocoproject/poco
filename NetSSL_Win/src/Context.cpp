@@ -231,8 +231,10 @@ void Context::importCertificate()
 {
 	Poco::File certFile(_certInfoOrPath);
 	if (!certFile.exists()) throw Poco::FileNotFoundException(_certInfoOrPath);
+	// far above a key with its certificate chain, so that a wrong path does not read a large file into memory
+	constexpr Poco::File::FileSize MAX_PKCS12_FILE_SIZE = 1024*1024;
 	Poco::File::FileSize size = certFile.getSize();
-	if (size > 4096) throw Poco::DataFormatException("PKCS #12 certificate file too large", _certInfoOrPath);
+	if (size > MAX_PKCS12_FILE_SIZE) throw Poco::DataFormatException("PKCS #12 certificate file too large", _certInfoOrPath);
 	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
 	Poco::FileInputStream istr(_certInfoOrPath);
 	istr.read(buffer.begin(), buffer.size());
