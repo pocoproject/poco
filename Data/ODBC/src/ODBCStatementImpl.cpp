@@ -135,7 +135,6 @@ void ODBCStatementImpl::resetImpl()
 {
 	checkConnection();
 
-	_prepared = false;
 	_stepCalled = false;
 	_nextResponse = 0;
 	_affectedRowCount = 0;
@@ -144,14 +143,14 @@ void ODBCStatementImpl::resetImpl()
 	SQLRETURN rc = SQLFreeStmt(_stmt, SQL_CLOSE);
 	checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_CLOSE)");
 
-	rc = SQLFreeStmt(_stmt, SQL_UNBIND);
-	checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_UNBIND)");
-
 	if (_preparations.size() > 1)
+	{
+		rc = SQLFreeStmt(_stmt, SQL_UNBIND);
+		checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_UNBIND)");
 		_preparations.resize(1);
-
-	if (_extractors.size() > 1)
 		_extractors.resize(1);
+		_prepared = false;
+	}
 }
 
 
