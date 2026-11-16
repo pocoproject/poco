@@ -57,6 +57,14 @@ poco_socket_t duplicate(poco_socket_t fd)
 }
 
 
+void interrupt(poco_socket_t fd)
+{
+	if (fd == POCO_INVALID_SOCKET) return;
+	// 2 shuts both directions down, on every platform.
+	(void) ::shutdown(fd, 2);
+}
+
+
 } // namespace Impl
 
 

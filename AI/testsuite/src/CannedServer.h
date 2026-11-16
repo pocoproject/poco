@@ -57,6 +57,9 @@ public:
 		bool stallBeforeBody = false;
 			/// Reads next to nothing of the request and sends nothing until the
 			/// server stops or the client goes away: an upload blocks.
+		bool ignoreClient = false;
+			/// Where the server waits, it waits until it stops, also when the
+			/// client goes away: a server that keeps the connection.
 		std::vector<std::pair<std::string, std::string>> headers;
 			/// More headers of the response.
 	};
@@ -221,7 +224,7 @@ private:
 
 			if (canned.waitBeforeHeaders || canned.stallBeforeBody)
 			{
-				waitForEnd(request);
+				waitForEnd(request, canned.ignoreClient);
 				return;
 			}
 			response.setStatus(static_cast<Poco::Net::HTTPResponse::HTTPStatus>(canned.status));
@@ -243,19 +246,21 @@ private:
 			{
 				out << canned.body.substr(0, canned.pauseAt);
 				out.flush();
-				waitForEnd(request);
+				waitForEnd(request, canned.ignoreClient);
 				return;
 			}
 			out << canned.body;
 		}
 
-		void waitForEnd(Poco::Net::HTTPServerRequest& request)
-			/// Waits until the server stops or the client closes the connection.
+		void waitForEnd(Poco::Net::HTTPServerRequest& request, bool ignoreClient)
+			/// Waits until the server stops or, unless ignoreClient is set, the
+			/// client closes the connection.
 		{
 			Poco::Net::StreamSocket& socket = static_cast<Poco::Net::HTTPServerRequestImpl&>(request).socket();
 			for (;;)
 			{
 				if (_pState->stopping.tryWait(20)) return;
+				if (ignoreClient) continue;
 				try
 				{
 					if (socket.poll(Poco::Timespan(0), Poco::Net::Socket::SELECT_READ | Poco::Net::Socket::SELECT_ERROR))

@@ -37,12 +37,15 @@
 #include "Poco/Logger.h"
 #include "Poco/Message.h"
 #include "Poco/Mutex.h"
+#include "Poco/Thread.h"
 #include "Poco/Timestamp.h"
+#include <atomic>
 #include <limits>
 #include <memory>
 #include <sstream>
 #include <streambuf>
 #include <algorithm>
+#include <thread>
 #include <typeinfo>
 #if !defined(POCO_OS_FAMILY_WINDOWS)
 #include <fcntl.h>
@@ -807,6 +810,46 @@ void HTTPTest::testDuplicateNotInherited()
 }
 
 
+void HTTPTest::testInterruptEndsReceive()
+{
+	// A receive that waits for a peer that keeps the connection and sends
+	// nothing ends when Impl::interrupt() is called with a second descriptor
+	// of the connection, long before its timeout of 30 seconds.
+	Poco::Net::ServerSocket listener(Poco::Net::SocketAddress("127.0.0.1", 0));
+	Poco::Net::StreamSocket client(listener.address());
+	Poco::Net::StreamSocket peer = listener.acceptConnection();
+	client.setReceiveTimeout(Poco::Timespan(30, 0));
+	const poco_socket_t copy = Poco::AI::MCP::HTTP::Impl::duplicate(client.impl()->sockfd());
+	assertTrue(copy != POCO_INVALID_SOCKET);
+
+	std::atomic<bool> receiving{false};
+	std::thread reader([&client, &receiving]()
+	{
+		try
+		{
+			char c = 0;
+			receiving = true;
+			(void) client.receiveBytes(&c, 1);
+		}
+		catch (const Poco::Exception&)
+		{
+		}
+	});
+	while (!receiving) Poco::Thread::sleep(1);
+	// The receive is entered a moment after the flag is set.
+	Poco::Thread::sleep(200);
+	const Poco::Timestamp start;
+	Poco::AI::MCP::HTTP::Impl::interrupt(copy);
+	reader.join();
+	const Poco::Timestamp::TimeDiff taken = start.elapsed();
+	poco_closesocket(copy);
+	assertTrue(taken < 5 * Poco::Timestamp::resolution());
+
+	// An invalid descriptor is taken, without an effect.
+	Poco::AI::MCP::HTTP::Impl::interrupt(POCO_INVALID_SOCKET);
+}
+
+
 void HTTPTest::testEventStreamFraming()
 {
 	// A byte order mark at the start of the stream is skipped.
@@ -1154,6 +1197,7 @@ CppUnit::Test* HTTPTest::suite()
 	CppUnit_addTest(pSuite, HTTPTest, testReadsBoundedByTheTimeout);
 	CppUnit_addTest(pSuite, HTTPTest, testHeadBoundedByTheTimeout);
 	CppUnit_addTest(pSuite, HTTPTest, testDuplicateNotInherited);
+	CppUnit_addTest(pSuite, HTTPTest, testInterruptEndsReceive);
 	CppUnit_addTest(pSuite, HTTPTest, testEventStreamFraming);
 	CppUnit_addTest(pSuite, HTTPTest, testLogShowsNoSecrets);
 	CppUnit_addTest(pSuite, HTTPTest, testRequestHook);

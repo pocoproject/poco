@@ -39,6 +39,11 @@ namespace Impl {
 	/// descriptor can be made.
 
 
+AIMCPHTTP_API void interrupt(poco_socket_t fd);
+	/// Ends what another thread sends or receives on the connection of fd:
+	/// shuts both directions down. Does nothing when fd is invalid.
+
+
 } // namespace Impl
 
 
