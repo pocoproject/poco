@@ -255,30 +255,17 @@ void ProcessImpl::timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kern
 
 bool ProcessImpl::mustEscapeArg(const std::string& arg)
 {
-	bool result = false;
-	bool inQuotes = false;
-	bool escaped = false;
+	// The argument is quoted whenever it would not arrive whole otherwise:
+	// an empty argument disappears from the command line, white space
+	// separates arguments, and the child's parser removes a double quote
+	// and treats a preceding backslash as an escape.
+	if (arg.empty()) return true;
+
 	for (char c: arg)
 	{
-		if (Poco::Ascii::isSpace(c) && !inQuotes && !escaped)
-		{
-			result = true;
-			break;
-		}
-		else if (c == '"' && !escaped)
-		{
-			inQuotes = !inQuotes;
-		}
-		else if (c == '\\' && !escaped)
-		{
-			escaped = true;
-		}
-		else
-		{
-			escaped = false;
-		}
+		if (Poco::Ascii::isSpace(c) || c == '"') return true;
 	}
-	return result || inQuotes;
+	return false;
 }
 
 

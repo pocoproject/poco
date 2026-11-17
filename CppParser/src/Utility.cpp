@@ -340,14 +340,7 @@ std::string Utility::preprocessFile(const std::string& file, const std::string& 
 	StringTokenizer tokenizer(popts, ",;\n", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 	std::vector<std::string> args(tokenizer.begin(), tokenizer.end());
 	Utility::addLanguageStandard(exec, args);
-#ifdef _WIN32
-	std::string quotedFile("\"");
-	quotedFile += file;
-	quotedFile += "\"";
-	args.push_back(quotedFile);
-#else
 	args.push_back(file);
-#endif
 	// The directories in path are searched before those in PATH. PATH is restored after the
 	// launch, so that the call for each file does not extend it again.
 	const auto launch = [&exec, &args, &path]()
