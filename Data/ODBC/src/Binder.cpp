@@ -136,7 +136,12 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		// it is otherwise unused)
 		_transcodedStrings.push_back(pTCVal);
 	}
-	else size = static_cast<SQLINTEGER>(val.size());
+	else
+	{
+		if (val.size() > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()))
+			throw LengthExceededException("ODBC::Binder::bind(string): the value is too long.");
+		size = static_cast<SQLINTEGER>(val.size());
+	}
 	SQLPOINTER pVal = nullptr;
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
@@ -212,7 +217,10 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 	typedef UTF16String::value_type CharT;
 
 	SQLPOINTER pVal = nullptr;
-	SQLINTEGER size = (SQLINTEGER)(val.size() * sizeof(CharT));
+	// the length is passed to the driver as an SQLINTEGER
+	if (val.size() > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()) / sizeof(CharT))
+		throw LengthExceededException("ODBC::Binder::bind(UTF16String): the value is too long.");
+	SQLINTEGER size = static_cast<SQLINTEGER>(val.size() * sizeof(CharT));
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
 	getColSizeAndPrecision(pos, SQL_C_WCHAR, colSize, decDigits);

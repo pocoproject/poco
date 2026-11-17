@@ -243,7 +243,7 @@ void* Utility::allocArray(std::size_t rows, std::size_t rowLength, std::size_t e
 	// at least one element, so the result does not depend on how calloc() treats a zero size
 	if (0 == size) size = (0 == elementSize) ? 1 : elementSize;
 	void* pArray = std::calloc(size, 1);
-	if (!pArray)
+	if (pArray == nullptr)
 		throw OutOfMemoryException(Poco::format("ODBC::Utility::allocArray(): %z bytes", size));
 	return pArray;
 }

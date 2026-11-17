@@ -480,7 +480,10 @@ private:
 			throw NotImplementedException("LOB parameter type can only be inbound.");
 
 		SQLPOINTER pVal = (SQLPOINTER) val.rawContent();
-		SQLINTEGER size = (SQLINTEGER) val.size();
+		// the length is passed to the driver as an SQLINTEGER
+		if (val.size() > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()))
+			throw LengthExceededException("ODBC::Binder::bindImplLOB(): the value is too long.");
+		SQLINTEGER size = static_cast<SQLINTEGER>(val.size());
 
 		_inParams.insert(ParamMap::value_type(pVal, size));
 

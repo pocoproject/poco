@@ -80,7 +80,7 @@ public:
 		_bound = false;
 		// a binding added after the statement was compiled has no binder yet
 		AbstractBinder::Ptr pBinder = getBinder();
-		if (pBinder) pBinder->reset();
+		if (pBinder != nullptr) pBinder->reset();
 	}
 
 private:
