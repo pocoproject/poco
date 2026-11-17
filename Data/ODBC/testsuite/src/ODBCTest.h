@@ -55,6 +55,7 @@ public:
 	virtual void testClosedSession();
 	virtual void testExceptionCopy();
 	virtual void testSQLGetInfo();
+	virtual void testNonASCIIText();
 
 	virtual void testZeroRows();
 	virtual void testSimpleAccess();

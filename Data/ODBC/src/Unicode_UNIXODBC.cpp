@@ -21,6 +21,7 @@
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <cstring>
 #include <iostream>
 
 
@@ -48,6 +49,19 @@ void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target)
 	if (0 != converter.convert(pSQLChar, len, target))
 		throw DataFormatException("Error converting UTF-8 to UTF-16");
 }
+
+
+namespace {
+
+
+SQLINTEGER charCount(const std::string& utf16)
+	/// Returns the number of UTF-16 code units in a string made by makeUTF16().
+{
+	return static_cast<SQLINTEGER>(utf16.size() / sizeof(SQLWCHAR));
+}
+
+
+} // namespace
 
 
 void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, SQLINTEGER length, SQLPOINTER pTarget, SQLINTEGER targetLength)
@@ -81,8 +95,10 @@ void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, SQLINTEGER length, SQLPOINTER pTar
 	if (0 != converter.convert(buffer.begin(), length, result))
 		throw DataFormatException("Error converting UTF-16 to UTF-8");
 
+	// the value is truncated so that the terminator fits into the target
 	std::memset(pTarget, 0, targetLength);
-	std::strncpy((char*) pTarget, result.c_str(), std::min(result.size(), static_cast<std::size_t>(targetLength)));
+	if (targetLength > 0)
+		std::memcpy(pTarget, result.data(), std::min(result.size(), static_cast<std::size_t>(targetLength - 1)));
 }
 
 
@@ -166,9 +182,9 @@ SQLRETURN SQLConnect(SQLHDBC hdbc,
 	makeUTF16(szAuthStr, cbAuthStr, sqlPWD);
 
 	return SQLConnectW(hdbc,
-		(SQLWCHAR*) sqlDSN.c_str(), cbDSN,
-		(SQLWCHAR*) sqlUID.c_str(), cbUID,
-		(SQLWCHAR*) sqlPWD.c_str(), cbAuthStr);
+		reinterpret_cast<SQLWCHAR*>(sqlDSN.data()), static_cast<SQLSMALLINT>(charCount(sqlDSN)),
+		reinterpret_cast<SQLWCHAR*>(sqlUID.data()), static_cast<SQLSMALLINT>(charCount(sqlUID)),
+		reinterpret_cast<SQLWCHAR*>(sqlPWD.data()), static_cast<SQLSMALLINT>(charCount(sqlPWD)));
 }
 
 
@@ -232,7 +248,7 @@ SQLRETURN SQLExecDirect(SQLHSTMT hstmt,
 	std::string sqlStr;
 	makeUTF16(szSqlStr, cbSqlStr, sqlStr);
 
-	return SQLExecDirectW(hstmt, (SQLWCHAR*) sqlStr.c_str(), cbSqlStr);
+	return SQLExecDirectW(hstmt, reinterpret_cast<SQLWCHAR*>(sqlStr.data()), charCount(sqlStr));
 }
 
 
@@ -292,8 +308,8 @@ SQLRETURN SQLSetDescField(SQLHDESC hdesc,
 		return SQLSetDescFieldW(hdesc,
 			iRecord,
 			iField,
-			(SQLPOINTER) str.c_str(),
-			(SQLINTEGER) str.size() * sizeof(SQLWCHAR));
+			str.data(),
+			static_cast<SQLINTEGER>(str.size()));
 	}
 
 	return SQLSetDescFieldW(hdesc,
@@ -369,14 +385,19 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT fHandleType,
 
 	if (isString(rgbDiagInfo, cbDiagInfoMax))
 	{
-		Buffer<SQLWCHAR> buffer(stringLength(rgbDiagInfo, cbDiagInfoMax));
+		// For a driver without SQLGetDiagFieldW(), unixODBC reads the message
+		// into a buffer of the given length in bytes and converts every
+		// character of it, as SQLGetInfo() describes.
+		const SQLINTEGER length = stringLength(rgbDiagInfo, cbDiagInfoMax);
+		Buffer<SQLWCHAR> buffer(2 * length + 1);
+		std::fill(buffer.begin(), buffer.end(), 0);
 
 		SQLRETURN rc = SQLGetDiagFieldW(fHandleType,
 			handle,
 			iRecord,
 			fDiagField,
 			buffer.begin(),
-			(SQLSMALLINT) buffer.sizeBytes(),
+			static_cast<SQLSMALLINT>(length * sizeof(SQLWCHAR)),
 			pcbDiagInfo);
 
 		if (!Utility::isError(rc))
@@ -439,7 +460,7 @@ SQLRETURN SQLPrepare(SQLHSTMT hstmt,
 	std::string sqlStr;
 	makeUTF16(szSqlStr, cbSqlStr, sqlStr);
 
-	return SQLPrepareW(hstmt, (SQLWCHAR*) sqlStr.c_str(), (SQLINTEGER) sqlStr.size());
+	return SQLPrepareW(hstmt, reinterpret_cast<SQLWCHAR*>(sqlStr.data()), charCount(sqlStr));
 }
 
 
@@ -455,8 +476,8 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC hdbc,
 
 		return SQLSetConnectAttrW(hdbc,
 			fAttribute,
-			(SQLWCHAR*) str.c_str(),
-			(SQLINTEGER) str.size() * sizeof(SQLWCHAR));
+			str.data(),
+			static_cast<SQLINTEGER>(str.size()));
 	}
 
 	return SQLSetConnectAttrW(hdbc,	fAttribute,	rgbValue, cbValue);
@@ -548,12 +569,17 @@ SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 
 	if (cbInfoValueMax)
 	{
-		Buffer<SQLWCHAR> buffer(cbInfoValueMax);
+		// For a driver without SQLGetInfoW(), unixODBC reads the value into
+		// a buffer of the given length in bytes and converts every character
+		// of it into the given buffer, which then needs twice the length and
+		// a terminator. The driver is told about the first half only.
+		Buffer<SQLWCHAR> buffer(2 * cbInfoValueMax + 1);
+		std::fill(buffer.begin(), buffer.end(), 0);
 
 		SQLRETURN rc = SQLGetInfoW(hdbc,
 			fInfoType,
 			(SQLPOINTER) buffer.begin(),
-			(SQLSMALLINT) buffer.sizeBytes(),
+			static_cast<SQLSMALLINT>(cbInfoValueMax * sizeof(SQLWCHAR)),
 			pcbInfoValue);
 
 		if (!Utility::isError(rc))
@@ -672,7 +698,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 
 	SQLSMALLINT len = cbConnStrIn;
 	if (SQL_NTS == len)
-		len = (SQLSMALLINT) std::strlen((const char*) szConnStrIn) + 1;
+		len = static_cast<SQLSMALLINT>(std::strlen(reinterpret_cast<const char*>(szConnStrIn)));
 
 	std::string connStrIn;
 	makeUTF16(szConnStrIn, len, connStrIn);
@@ -680,15 +706,15 @@ SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 	Buffer<SQLWCHAR> out(cbConnStrOutMax);
 	SQLRETURN rc = SQLDriverConnectW(hdbc,
 		hwnd,
-		(SQLWCHAR*) connStrIn.c_str(),
-		(SQLSMALLINT) connStrIn.size(),
+		reinterpret_cast<SQLWCHAR*>(connStrIn.data()),
+		static_cast<SQLSMALLINT>(charCount(connStrIn)),
 		out.begin(),
 		cbConnStrOutMax,
 		pcbConnStrOut,
 		fDriverCompletion);
 
-	if (!Utility::isError(rc))
-		makeUTF8(out, *pcbConnStrOut * sizeof(SQLWCHAR), pcbConnStrOut, cbConnStrOutMax);
+	if (!Utility::isError(rc) && szConnStrOut)
+		makeUTF8(out, *pcbConnStrOut * sizeof(SQLWCHAR), szConnStrOut, cbConnStrOutMax);
 
 	return rc;
 }
@@ -710,8 +736,8 @@ SQLRETURN SQLBrowseConnect(SQLHDBC hdbc,
 	Buffer<SQLWCHAR> bufConnStrOut(cbConnStrOutMax);
 
 	SQLRETURN rc = SQLBrowseConnectW(hdbc,
-		(SQLWCHAR*) str.c_str(),
-		(SQLSMALLINT) str.size(),
+		reinterpret_cast<SQLWCHAR*>(str.data()),
+		static_cast<SQLSMALLINT>(charCount(str)),
 		bufConnStrOut.begin(),
 		(SQLSMALLINT) bufConnStrOut.size(),
 		pcbConnStrOut);
@@ -771,8 +797,8 @@ SQLRETURN SQLNativeSql(SQLHDBC hdbc,
 	Buffer<SQLWCHAR> bufSQLOut(cbSqlStrMax);
 
 	SQLRETURN rc = SQLNativeSqlW(hdbc,
-		(SQLWCHAR*) str.c_str(),
-		(SQLINTEGER) str.size(),
+		reinterpret_cast<SQLWCHAR*>(str.data()),
+		charCount(str),
 		bufSQLOut.begin(),
 		(SQLINTEGER) bufSQLOut.size(),
 		pcbSqlStr);

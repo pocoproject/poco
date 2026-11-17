@@ -45,6 +45,7 @@
 #include <list>
 #include <string>
 #include <typeinfo>
+#include <utility>
 #include <vector>
 
 
@@ -202,6 +203,118 @@ void ODBCTest::testSQLGetInfo()
 	}
 	catch (Poco::InvalidArgumentException&)
 	{
+	}
+}
+
+
+void ODBCTest::testNonASCIIText()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Every Euro sign takes three bytes in UTF-8 and one UTF-16 code unit;
+	// in Unicode builds the lengths given to the wide-character API count
+	// the code units of the converted text, not the bytes of the UTF-8 text.
+	std::string euros;
+	for (int i = 0; i < 8; ++i) euros.append("\xE2\x82\xAC");
+
+	recreatePersonTable();
+	const std::string sql("DELETE FROM Person WHERE LastName = '" + euros + "'");
+	Poco::Data::Statement stmt(session());
+	stmt.executeDirect(sql);
+
+	auto* pImpl = dynamic_cast<Poco::Data::ODBC::SessionImpl*>(session().impl());
+	assertNotNullPtr (pImpl);
+	std::vector<SQLCHAR> nativeSql(1024, 0);
+	SQLINTEGER nativeLength = 0;
+	assertTrue (!Utility::isError(Poco::Data::ODBC::SQLNativeSql(pImpl->dbc().handle(),
+		reinterpret_cast<SQLCHAR*>(const_cast<char*>(sql.data())), static_cast<SQLINTEGER>(sql.size()),
+		nativeSql.data(), static_cast<SQLINTEGER>(nativeSql.size()), &nativeLength)));
+	const std::string native(reinterpret_cast<const char*>(nativeSql.data()));
+	assertTrue (native.find("Person") != std::string::npos);
+
+	// A value that does not fit is converted from UTF-16 into the buffer and
+	// truncated before its terminator. Through the ANSI API, unixODBC can
+	// leave a truncated value without a terminator and write one after it
+	// (see Utility::sqlGetInfo()).
+	std::vector<SQLCHAR> dbmsName(5, 'X');
+	SQLSMALLINT dbmsNameLength = 0;
+	assertTrue (!Utility::isError(Poco::Data::ODBC::SQLGetInfo(pImpl->dbc().handle(), SQL_DBMS_NAME,
+		dbmsName.data(), 4, &dbmsNameLength)));
+#if defined(POCO_ODBC_UNICODE)
+	assertTrue (dbmsName[3] == 0);
+	assertTrue (dbmsName[4] == 'X');
+#endif
+
+#if defined(POCO_ODBC_UNICODE)
+	// A message of the driver that does not fit into the buffer; for a driver
+	// without wide-character functions, unixODBC converts as many characters
+	// as the buffer has bytes. (Through the ANSI API, unixODBC 2.3.12 reads
+	// past its own buffer when it truncates the message of a driver with
+	// wide-character functions.)
+	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+	assertTrue (SQL_SUCCEEDED(SQLAllocHandle(SQL_HANDLE_STMT, pImpl->dbc().handle(), &hstmt)));
+	std::string badSql("SELECT * FROM PocoNoSuchTable");
+	const SQLRETURN execRc = Poco::Data::ODBC::SQLExecDirect(hstmt,
+		reinterpret_cast<SQLCHAR*>(badSql.data()), static_cast<SQLINTEGER>(badSql.size()));
+	std::vector<SQLCHAR> message(16, 'X');
+	SQLSMALLINT messageLength = 0;
+	const SQLRETURN diagRc = Poco::Data::ODBC::SQLGetDiagField(SQL_HANDLE_STMT, hstmt, 1,
+		SQL_DIAG_MESSAGE_TEXT, message.data(), static_cast<SQLSMALLINT>(message.size()), &messageLength);
+	static_cast<void>(SQLFreeHandle(SQL_HANDLE_STMT, hstmt));
+	assertTrue (Utility::isError(execRc));
+	assertTrue (!Utility::isError(diagRc));
+	assertTrue (message[0] != 0);
+	assertTrue (message.back() == 0);
+#endif
+
+	// the connection string is passed without its terminator, and the
+	// completed connection string comes back in the output buffer
+	{
+		Poco::Data::ODBC::ConnectionHandle connection;
+		const SQLHDBC hdbc = std::as_const(connection).handle();
+		std::vector<SQLCHAR> connectOut(1024, 0);
+		SQLSMALLINT connectOutLength = 0;
+		const SQLRETURN rc = Poco::Data::ODBC::SQLDriverConnect(hdbc, nullptr,
+			reinterpret_cast<SQLCHAR*>(const_cast<char*>(dbConnString().c_str())), SQL_NTS,
+			connectOut.data(), static_cast<SQLSMALLINT>(connectOut.size()), &connectOutLength,
+			SQL_DRIVER_NOPROMPT);
+		if (!Utility::isError(rc)) static_cast<void>(SQLDisconnect(hdbc));
+		assertTrue (!Utility::isError(rc));
+		assertTrue (connectOutLength > 0);
+		assertTrue (connectOut[0] != 0);
+	}
+
+	// The data source name has 14 characters in 34 bytes. A name longer than
+	// SQL_MAX_DSN_LENGTH (32) is rejected with SQLSTATE HY090: the ANSI API
+	// counts bytes, the wide-character API characters, which leaves a valid
+	// name of a data source that does not exist (IM002).
+	{
+		const std::string dsn("POCO" + euros + "\xE2\x82\xAC\xE2\x82\xAC");
+		const std::string empty;
+		Poco::Data::ODBC::ConnectionHandle connection;
+		const SQLHDBC hdbc = std::as_const(connection).handle();
+		assertTrue (Utility::isError(Poco::Data::ODBC::SQLConnect(hdbc,
+			reinterpret_cast<SQLCHAR*>(const_cast<char*>(dsn.data())), static_cast<SQLSMALLINT>(dsn.size()),
+			reinterpret_cast<SQLCHAR*>(const_cast<char*>(empty.c_str())), 0,
+			reinterpret_cast<SQLCHAR*>(const_cast<char*>(empty.c_str())), 0)));
+		const Poco::Data::ODBC::ConnectionError error(hdbc);
+		assertTrue (error.diagnostics().count() > 0);
+		const std::string state = error.diagnostics().sqlState(0);
+#if defined(POCO_ODBC_UNICODE)
+		assertEqual ("IM002", state);
+#else
+		// iODBC reports a name that is too long as invalid (IM010)
+		assertTrue (state == "HY090" || state == "IM010");
+#endif
+
+		// unixODBC rejects the browse request (IM012) whatever its length;
+		// the call is made for the sanitizers
+		const std::string browse("DSN=" + dsn);
+		std::vector<SQLCHAR> browseOut(1024, 0);
+		SQLSMALLINT browseOutLength = 0;
+		assertTrue (Utility::isError(Poco::Data::ODBC::SQLBrowseConnect(hdbc,
+			reinterpret_cast<SQLCHAR*>(const_cast<char*>(browse.data())), static_cast<SQLSMALLINT>(browse.size()),
+			browseOut.data(), static_cast<SQLSMALLINT>(browseOut.size()), &browseOutLength)));
 	}
 }
 

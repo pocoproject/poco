@@ -925,6 +925,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testClosedSession);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testExceptionCopy);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLGetInfo);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testRecordSetBeforeExecute);
 
 		return pSuite;

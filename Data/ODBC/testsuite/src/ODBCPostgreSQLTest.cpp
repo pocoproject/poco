@@ -801,6 +801,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testClosedSession);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExceptionCopy);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLGetInfo);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNonASCIIText);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRecordSetBeforeExecute);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testUncommittedWorkRolledBack);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLostConnection);

@@ -316,6 +316,7 @@ CppUnit::Test* ODBCInformixTest::suite()
 		CppUnit_addTest(pSuite, ODBCInformixTest, testClosedSession);
 		CppUnit_addTest(pSuite, ODBCInformixTest, testExceptionCopy);
 		CppUnit_addTest(pSuite, ODBCInformixTest, testSQLGetInfo);
+		CppUnit_addTest(pSuite, ODBCInformixTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCInformixTest, testRecordSetBeforeExecute);
 
 		return pSuite;
