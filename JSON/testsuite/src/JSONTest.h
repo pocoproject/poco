@@ -85,6 +85,7 @@ public:
 	void testConcurrentStringify();
 
 	void testCopy();
+	void testCopyAssign();
 	void testMove();
 	void testRemove();
 	void testSetExistingKey();

@@ -2319,6 +2319,36 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 }
 
 
+void JSONTest::testCopyAssign()
+{
+	Object target(Poco::JSON_PRESERVE_KEY_ORDER);
+	target.set("old", 1);
+	{
+		Object source(Poco::JSON_PRESERVE_KEY_ORDER);
+		source.set("foo", 1);
+		source.set("bar", 2);
+		source.set("baz", 3);
+		target = source;
+	}
+
+	// the key order of the copy must refer to the values of the copy
+	Object::NameList nl = target.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+
+	std::ostringstream ostr;
+	target.stringify(ostr);
+	assertTrue (ostr.str() == "{\"foo\":1,\"bar\":2,\"baz\":3}");
+
+	target.set("foo", 10);
+	std::ostringstream ostr2;
+	target.stringify(ostr2);
+	assertTrue (ostr2.str() == "{\"foo\":10,\"bar\":2,\"baz\":3}");
+}
+
+
 void JSONTest::testCopy()
 {
 	Object obj1(Poco::JSON_PRESERVE_KEY_ORDER);
@@ -2850,6 +2880,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testStringifyKeepsFlags);
 	CppUnit_addTest(pSuite, JSONTest, testConcurrentStringify);
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
+	CppUnit_addTest(pSuite, JSONTest, testCopyAssign);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
 	CppUnit_addTest(pSuite, JSONTest, testRemove);
 	CppUnit_addTest(pSuite, JSONTest, testSetExistingKey);

@@ -77,7 +77,6 @@ Object &Object::operator = (const Object &other)
 	if (&other != this)
 	{
 		_values = other._values;
-		_keys = other._keys;
 		_preserveInsOrder = other._preserveInsOrder;
 		_escapeUnicode = other._escapeUnicode;
 		_lowercaseHex = other._lowercaseHex;
@@ -85,6 +84,8 @@ Object &Object::operator = (const Object &other)
 		_pOrdStruct = !other._ordStructModified ? other._pOrdStruct : nullptr;
 		_structModified = other._structModified;
 		_ordStructModified = other._ordStructModified;
+		_keys.clear();
+		syncKeys(other._keys);
 	}
 	return *this;
 }
