@@ -260,7 +260,9 @@ bool ProcessImpl::mustEscapeArg(const std::string& arg)
 	bool escaped = false;
 	for (char c: arg)
 	{
-		if (Poco::Ascii::isSpace(c) && !inQuotes && !escaped)
+		// A backslash escapes only a double quote; before white space it is
+		// literal, and the white space still separates arguments.
+		if (Poco::Ascii::isSpace(c) && !inQuotes)
 		{
 			result = true;
 			break;
@@ -278,7 +280,8 @@ bool ProcessImpl::mustEscapeArg(const std::string& arg)
 			escaped = false;
 		}
 	}
-	return result || inQuotes;
+	// An empty argument disappears from the command line unless it is quoted.
+	return result || inQuotes || arg.empty();
 }
 
 
