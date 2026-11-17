@@ -30,6 +30,7 @@
 #include "Poco/Nullable.h"
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/Test/AsyncWait.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
@@ -74,6 +75,7 @@ using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBindingVec;
 using Poco::Data::NullData;
 using Poco::Data::NotConnectedException;
+using Poco::Data::Test::AsyncWait;
 using Poco::Data::SQLite::Notifier;
 using Poco::Nullable;
 using Poco::Tuple;
@@ -457,7 +459,7 @@ void SQLiteTest::testAddBindingReuse()
 	stmt.execute();
 	assertTrue (name == "Alice");
 
-	// second execute with new binding — this is the bug scenario from #5220
+	// second execute with a new binding: addBinding() with reset replaces the first binding
 	id = 2;
 	Poco::Data::AbstractBindingVec bindings2;
 	bindings2.push_back(Poco::Data::Keywords::bind(id, "id"));
@@ -2759,38 +2761,6 @@ void SQLiteTest::testRowIteratorSwap()
 	swap(it1, it2);
 	assertTrue (it1 == rset.begin());
 	assertTrue (it2 == rset.end());
-}
-
-
-namespace
-{
-	class AsyncWait
-		/// Waits for the asynchronous execution of a statement when it goes out
-		/// of scope, so that a failed check does not return while an execution
-		/// still uses the session and the variables of the test.
-	{
-	public:
-		explicit AsyncWait(Statement& stmt): _stmt(stmt)
-		{
-		}
-
-		~AsyncWait()
-		{
-			try
-			{
-				_stmt.wait();
-			}
-			catch (...)
-			{
-			}
-		}
-
-		AsyncWait(const AsyncWait&) = delete;
-		AsyncWait& operator = (const AsyncWait&) = delete;
-
-	private:
-		Statement& _stmt;
-	};
 }
 
 

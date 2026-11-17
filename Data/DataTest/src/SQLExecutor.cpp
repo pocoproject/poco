@@ -11,6 +11,7 @@
 #include "CppUnit/TestCase.h"
 #include "CppUnit/CppUnitException.h"
 #include "Poco/Data/Test/SQLExecutor.h"
+#include "Poco/Data/Test/AsyncWait.h"
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Tuple.h"
@@ -3686,38 +3687,6 @@ void SQLExecutor::stdVectorBool()
 	for (int i = 0; i < 4; ++i)
 		t += rset.value<bool>(0, i) ? 1 : 0;
 	assertTrue (2 == t);
-}
-
-
-namespace
-{
-	class AsyncWait
-		/// Waits for the asynchronous execution of a statement when it goes out
-		/// of scope, so that a failed check does not return while an execution
-		/// still uses the session and the variables of the test.
-	{
-	public:
-		explicit AsyncWait(Statement& stmt): _stmt(stmt)
-		{
-		}
-
-		~AsyncWait()
-		{
-			try
-			{
-				_stmt.wait();
-			}
-			catch (...)
-			{
-			}
-		}
-
-		AsyncWait(const AsyncWait&) = delete;
-		AsyncWait& operator = (const AsyncWait&) = delete;
-
-	private:
-		Statement& _stmt;
-	};
 }
 
 
