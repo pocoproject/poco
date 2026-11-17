@@ -1540,6 +1540,60 @@ void ODBCTest::testTranscodedBindingOwnership()
 }
 
 
+void ODBCTest::testManualUUIDLength()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// Manual extraction reads a UUID as 16 bytes; a value of another length is
+	// not a UUID.
+	recreatePersonBLOBTable();
+	std::vector<unsigned char> bytes(20);
+	for (std::size_t i = 0; i < bytes.size(); ++i)
+		bytes[i] = static_cast<unsigned char>(i + 1);
+	Poco::Data::BLOB shortValue(&bytes[0], 8);
+	Poco::Data::BLOB exactValue(&bytes[0], 16);
+	Poco::Data::BLOB longValue(bytes);
+	session() << "INSERT INTO Person VALUES ('a', 'short', 'x', ?)", use(shortValue), now;
+	session() << "INSERT INTO Person VALUES ('b', 'exact', 'x', ?)", use(exactValue), now;
+	session() << "INSERT INTO Person VALUES ('c', 'long', 'x', ?)", use(longValue), now;
+
+	const bool autoBind = _pSession->getFeature("autoBind");
+	const bool autoExtract = _pSession->getFeature("autoExtract");
+	try
+	{
+		_pSession->setFeature("autoBind", true);
+		_pSession->setFeature("autoExtract", false);
+
+		Poco::UUID uuid;
+		session() << "SELECT Image FROM Person WHERE LastName = 'b'", into(uuid), now;
+		Poco::UUID expected;
+		expected.copyFrom(reinterpret_cast<const char*>(&bytes[0]));
+		assertTrue (uuid == expected);
+
+		for (const char* lastName: {"a", "c"})
+		{
+			try
+			{
+				session() << "SELECT Image FROM Person WHERE LastName = ?", bind(std::string(lastName)), into(uuid), now;
+				fail ("a value that is not 16 bytes long was extracted as UUID");
+			}
+			catch (Poco::Data::DataException& ex)
+			{
+				assertTrue (ex.message().find("a UUID has 16") != std::string::npos);
+			}
+		}
+	}
+	catch (...)
+	{
+		_pSession->setFeature("autoBind", autoBind);
+		_pSession->setFeature("autoExtract", autoExtract);
+		throw;
+	}
+	_pSession->setFeature("autoBind", autoBind);
+	_pSession->setFeature("autoExtract", autoExtract);
+}
+
+
 template <typename S>
 void ODBCTest::checkManualString(const std::string& query, std::size_t length, std::size_t maxFieldSize)
 {

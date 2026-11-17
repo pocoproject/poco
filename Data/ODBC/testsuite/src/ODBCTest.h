@@ -122,6 +122,7 @@ public:
 	virtual void testParameterArraySize();
 	virtual void testBulkFullWidthStrings();
 	virtual void testManualBLOB();
+	virtual void testManualUUIDLength();
 	virtual void testTranscodedBindingOwnership();
 	virtual void testManualStringChunks();
 

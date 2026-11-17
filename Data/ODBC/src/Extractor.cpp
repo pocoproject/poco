@@ -558,7 +558,7 @@ bool Extractor::extractManualImpl<Poco::UUID>(std::size_t pos,
 	Poco::UUID& val,
 	SQLSMALLINT cType)
 {
-	char buffer[16];
+	char buffer[16] = {};
 	resizeLengths(pos);
 
 	SQLRETURN rc = SQLGetData(_rStmt,
@@ -573,8 +573,14 @@ bool Extractor::extractManualImpl<Poco::UUID>(std::size_t pos,
 
 	if (isNullLengthIndicator(_lengths[pos]))
 		return false;
-	else
-		val.copyFrom(buffer);
+
+	// a shorter value leaves part of the buffer unset, a longer one is truncated
+	if (static_cast<SQLLEN>(sizeof(buffer)) != _lengths[pos])
+	{
+		throw DataException(format("ODBC::Extractor::extractManualImpl(UUID): column %z: "
+			"the value has %?d bytes, a UUID has 16.", pos, _lengths[pos]));
+	}
+	val.copyFrom(buffer);
 
 	return true;
 }
