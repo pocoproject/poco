@@ -15,7 +15,6 @@
 #include "Poco/Net/NTPEventArgs.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
-#include "Poco/Net/ICMPClient.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Delegate.h"
 #include "Poco/DateTimeFormatter.h"
@@ -28,7 +27,6 @@ using Poco::Net::NTPClient;
 using Poco::Net::NTPEventArgs;
 using Poco::Net::SocketAddress;
 using Poco::Net::IPAddress;
-using Poco::Net::ICMPClient;
 using Poco::Net::HostNotFoundException;
 using Poco::Delegate;
 using Poco::AutoPtr;
@@ -48,25 +46,20 @@ NTPClientTest::~NTPClientTest()
 
 void NTPClientTest::testTimeSync()
 {
-#if POCO_OS != POCO_OS_ANDROID
-	// pingIPv4 throws when ICMP (raw) sockets are unavailable, which the
-	// <= 0 check alone does not cover.
-	bool reachable = false;
+	// The server is resolved once and asked directly: pool.ntp.org names a
+	// different server on every lookup, and not every server answers ICMP.
+	SocketAddress server;
 	try
 	{
-		reachable = ICMPClient::pingIPv4("pool.ntp.org") > 0;
+		server = SocketAddress(SocketAddress::IPv4, "pool.ntp.org", 123);
 	}
-	catch (Poco::Exception&)
+	catch (Poco::Net::DNSException&)
 	{
-	}
-	if (!reachable)
-	{
-		std::cerr << "pool.ntp.org not accessible, test skipped" << std::endl;
+		std::cerr << "pool.ntp.org cannot be resolved, test skipped" << std::endl;
 		return;
 	}
-#endif
 
-	assertTrue (_ntpClient.request("pool.ntp.org") > 0);
+	assertTrue (_ntpClient.request(server) > 0);
 }
 
 
