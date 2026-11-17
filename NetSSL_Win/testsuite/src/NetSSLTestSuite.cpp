@@ -18,6 +18,7 @@
 #include "SecureSyslogTest.h"
 #include "SecureSMTPClientSessionTest.h"
 #include "OpenSSLPeerTest.h"
+#include "AutoSecBufferDescTest.h"
 
 
 CppUnit::Test* NetSSLTestSuite::suite()
@@ -33,6 +34,7 @@ CppUnit::Test* NetSSLTestSuite::suite()
 	pSuite->addTest(SecureSyslogTest::suite());
 	pSuite->addTest(SecureSMTPClientSessionTest::suite());
 	pSuite->addTest(OpenSSLPeerTest::suite());
+	pSuite->addTest(AutoSecBufferDescTest::suite());
 
 	return pSuite;
 }

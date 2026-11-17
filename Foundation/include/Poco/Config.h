@@ -96,6 +96,24 @@
 // #define POCO_DW_FORCE_POLLING
 
 
+// Define to get the complete <windows.h>. If not
+// defined, Poco/UnWindows.h defines WIN32_LEAN_AND_MEAN
+// before it includes <windows.h>. The complete
+// <windows.h> includes <winsock.h>, which conflicts with
+// the <winsock2.h> of POCO Net, so code that uses POCO Net
+// must define NOMINMAX and include <winsock2.h> before
+// any POCO header.
+// #define POCO_BLOATED_WIN32
+
+
+// Define to keep Poco/UnWindows.h from including
+// <windows.h>. This is for tools that only preprocess
+// the header files, such as PocoDoc. Code compiled with
+// it must define NOMINMAX and WIN32_LEAN_AND_MEAN and
+// include <windows.h> before any POCO header.
+// #define POCO_NO_WINDOWS_H
+
+
 // Following are options to remove certain features
 // to reduce library/executable size for smaller
 // embedded platforms. By enabling these options,

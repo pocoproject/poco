@@ -24,8 +24,8 @@
 #include <wincrypt.h>
 #ifndef SECURITY_WIN32
 #define SECURITY_WIN32
-#include <sspi.h>
 #endif
+#include <sspi.h>
 #endif
 
 

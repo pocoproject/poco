@@ -64,6 +64,9 @@ The same pattern uses the suffixes `_POSIX`, `_UNIX`, `_WIN32`, `_WIN32U`, `_VX`
 `_HPUX`, `_QNX`, `_SUN` and `_DUMMY`, with matching headers in `include/` (`Timezone` has no implementation headers).
 The classes that use it and the order in which to choose an implementation are in [porting.md](porting.md).
 
+Windows SDK headers are included as [Rule 107 of CODING_STYLE.md](../CODING_STYLE.md#rule-107) states: `<windows.h>`
+only through `Poco/UnWindows.h`, other SDK headers after a POCO header.
+
 ## Language level and feature macros
 
 C++20 is the baseline. Standard library features that a supported toolchain lacks are guarded as described in the
