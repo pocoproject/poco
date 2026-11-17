@@ -14,12 +14,37 @@
 #include "Poco/HexBinaryEncoder.h"
 #include "Poco/HexBinaryDecoder.h"
 #include "Poco/Exception.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
 using Poco::HexBinaryEncoder;
 using Poco::HexBinaryDecoder;
 using Poco::DataFormatException;
+
+
+namespace
+{
+	std::string decode(const std::string& encoded)
+		/// Returns the decoded data, or the message of the DataFormatException thrown.
+	{
+		std::istringstream istr(encoded);
+		HexBinaryDecoder decoder(istr);
+		decoder.exceptions(std::ios::badbit);
+		std::string result;
+		try
+		{
+			Poco::StreamCopier::copyToString(decoder, result);
+		}
+		catch (DataFormatException& exc)
+		{
+			// A build with ENABLE_TRACE appends a stack trace after a line break.
+			const std::string& msg = exc.message();
+			return "exception: " + msg.substr(0, msg.find('\n'));
+		}
+		return result;
+	}
+}
 
 
 HexBinaryTest::HexBinaryTest(const std::string& name): CppUnit::TestCase(name)
@@ -217,6 +242,16 @@ void HexBinaryTest::testEncodeDecode()
 }
 
 
+void HexBinaryTest::testDecoderMalformed()
+{
+	assertEqual (std::string("AB"), decode("4142"));
+	assertEqual (std::string("AB"), decode("41 42"));
+	assertEqual (std::string("exception: invalid hex digit 'g' at position 1"), decode("0g"));
+	assertEqual (std::string("exception: invalid hex digit 'z' at position 4"), decode("00 1z"));
+	assertEqual (std::string("exception: odd number of hex digits"), decode("414"));
+}
+
+
 void HexBinaryTest::setUp()
 {
 }
@@ -234,6 +269,7 @@ CppUnit::Test* HexBinaryTest::suite()
 	CppUnit_addTest(pSuite, HexBinaryTest, testEncoder);
 	CppUnit_addTest(pSuite, HexBinaryTest, testDecoder);
 	CppUnit_addTest(pSuite, HexBinaryTest, testEncodeDecode);
+	CppUnit_addTest(pSuite, HexBinaryTest, testDecoderMalformed);
 
 	return pSuite;
 }
