@@ -43,6 +43,7 @@ public:
 	void testReadsBoundedByTheTimeout();
 	void testHeadBoundedByTheTimeout();
 	void testDuplicateNotInherited();
+	void testInterruptEndsReceive();
 	void testEventStreamFraming();
 	void testLogShowsNoSecrets();
 	void testRequestHook();

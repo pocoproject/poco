@@ -117,8 +117,7 @@ namespace
 					if (!_ready.wait_until(lock, until, [this]() { return _stopped; }))
 					{
 						_fired = true;
-						// 2 shuts both directions down, on every platform.
-						(void) ::shutdown(_fd, 2);
+						Impl::interrupt(_fd);
 					}
 				});
 			}

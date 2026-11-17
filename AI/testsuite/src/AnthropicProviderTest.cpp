@@ -753,6 +753,30 @@ void AnthropicProviderTest::testCancelDuringStream()
 }
 
 
+void AnthropicProviderTest::testCancelSilentServer()
+{
+	// The server keeps the connection and does not notice that the client
+	// gave up: the cancel ends the call all the same, long before the timeout
+	// of 30 seconds would.
+	CannedServer::Response response;
+	response.waitBeforeHeaders = true;
+	response.ignoreClient = true;
+	CannedServer server(response);
+	AnthropicProvider provider(params(server.baseUrl()));
+	ChatThread chat(provider, userRequest("Hi"));
+	assertTrue(server.waitForRequest(10000));
+	// The call waits for the answer a moment after the server has the request.
+	Poco::Thread::sleep(200);
+	const Poco::Timestamp start;
+	chat.cancellation.cancel();
+	chat.join();
+	assertTrue(start.elapsed() < 5 * Poco::Timestamp::resolution());
+	assertTrue(chat.result.stopReason == StopReason::CANCELLED);
+	assertTrue(chat.error.empty());
+	assertEqual(0, chat.events.errors());
+}
+
+
 void AnthropicProviderTest::testCancelDuringUpload()
 {
 	// The server reads nothing of a large request: the cancel ends the call
@@ -1066,6 +1090,7 @@ CppUnit::Test* AnthropicProviderTest::suite()
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testListModels);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelBeforeHeaders);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelDuringStream);
+	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelSilentServer);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testConcurrentCalls);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCancelStress);
 	CppUnit_addTest(pSuite, AnthropicProviderTest, testCacheMarkers);
