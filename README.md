@@ -25,11 +25,11 @@ and [Getting Started](https://docs.pocoproject.org/current/00200-GettingStarted.
 ### Prerequisites
 
 - CMake 3.26 or newer
-- A C++20 compiler (Visual C++ 2022, GCC 12, Clang 16, Apple Clang 16, or newer). CMake selects C++20 when the
-  compiler supports it and falls back to C++17 otherwise; some features are only available with C++20.
+- A C++20 compiler and standard library (Visual C++ 2022, GCC 12, Clang 16, Apple Clang 16, or newer). A build
+  with an older language standard stops with an error.
 - OpenSSL 1.1.1 or newer headers and libraries (optional, but recommended)
 - MySQL, PostgreSQL, ODBC, and Apache/APR client libraries (optional)
-- C++20, CMake 3.28 or later, and Ninja (for C++ modules)
+- CMake 3.28 or later and Ninja (for C++ modules)
 
 Most Unix/Linux systems already have OpenSSL preinstalled. If your system
 does not have OpenSSL, please get it from <https://www.openssl.org> or

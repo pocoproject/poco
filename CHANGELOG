@@ -159,6 +159,19 @@ Breaking Changes:
   deadlocks, as on the other platforms; tryLock() by the holding thread returns false, and
   tryLock(milliseconds) and lock(milliseconds) wait for the timeout, after which tryLock()
   returns false and lock() throws Poco::TimeoutException. Code that relied on the recursion on Windows must use Poco::Mutex.
+- GH #5691 C++20 is the minimum language standard. CMake stops at configure time when
+  CMAKE_CXX_STANDARD is below 20 or when the compiler fails the C++20 check
+  (cmake/test_compiler_cxx20.cpp), and gives a deprecation warning for a compiler older than
+  GCC 12, Clang 16, Apple Clang 16 or Visual C++ 2022. A CMAKE_CXX_STANDARD above 20 is kept.
+  Poco/Config.h stops the compilation of code that includes a POCO header with an older
+  standard; with Visual C++ it reads _MSVC_LANG, so /Zc:__cplusplus is not needed. The installed
+  CMake targets require cxx_std_20. The make configurations in build/config that selected C++17
+  select C++20; a configuration without a -std option uses the default of its compiler.
+  POCO_HAVE_CPP17_COMPILER and POCO_HAVE_CPP20_COMPILER are always 1.
+  Poco::CppParser::Utility::parse() and parseDir(), which RemoteGenNG uses, and PocoDoc add
+  -std=c++20 (/std:c++20 for cl and clang-cl) to preprocessor options that select no language
+  standard (Poco::CppParser::Utility::addLanguageStandard()), so that existing configuration
+  files keep working.
 
 Bundled Third-Party Library Upgrades:
 
@@ -188,6 +201,12 @@ Features:
   child is spawned without an initial directory and is given variables: it then gets only those.
 - GH #5510 Poco::Util::LayeredConfiguration::replace() replaces a labeled configuration in one
   step, so that readers never see the configuration without it.
+- GH #5691 Poco/Foundation.h defines POCO_API_EXPORT and POCO_API_IMPORT, the attributes that
+  export the symbols of a shared library and import them. The export macros of the POCO
+  libraries (Foundation_API, Net_API and the others; not CppUnit_API) are defined with them,
+  and a library that is built on POCO can define its own in the same way. The headers define
+  these macros also when the including code has defined them before. On Cygwin, CppParser and
+  NetSSL use the GCC visibility attribute, as the other libraries do.
 
 New Components:
 

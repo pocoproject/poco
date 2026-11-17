@@ -42,7 +42,7 @@ and not practical to extract as separate libraries.
 | RSA MD5 algorithm | `Foundation/src/MD5Engine.cpp`, `Foundation/include/Poco/MD5Engine.h` | RSA-MD | 1991-1992 RSA Data Security, Inc. | RFC 1321 reference implementation |
 | SHA-1 algorithm | `Foundation/src/SHA1Engine.cpp` | Public Domain | Peter C. Gutmann (1992), modified by Carl Ellison | Based on public domain implementation |
 | SHA-2 algorithm | `Foundation/src/SHA2Engine.cpp` | Apache-2.0 | mbed TLS project (ARM) | FIPS 180-4 (SHA-224/256/384/512) |
-| CMake C++17 detection | `cmake/CXX1x.cmake` | MIT | Nathan Osman (2013) | C++17 compiler feature detection module |
+| CMake C++20 compiler check | `cmake/CXX2x.cmake` | MIT | Nathan Osman (2013) | Based on his CMake module for compiler feature detection; the check itself is reimplemented as a compile test |
 | PostgreSQL large object header | `Data/PostgreSQL/include/libpq/libpq-fs.h` | PostgreSQL License | PostgreSQL Global Development Group | Minimal header for large object definitions |
 | NASA WorldWind geodesy | `Geo/include/Poco/Geo/Angle.h`, `Geo/src/Angle.cpp`, `Geo/include/Poco/Geo/LatLon.h`, `Geo/src/LatLon.cpp` | Apache-2.0 | United States Government, as represented by the Administrator of NASA | Angle and LatLon are based on the WorldWind Java classes of the same names |
 | WGS84 cartesian conversion | `Geo/src/LatLon.cpp` | MIT | Christian Berger (2018) | LatLon::toCartesian(), from WGS84toCartesian.hpp |
