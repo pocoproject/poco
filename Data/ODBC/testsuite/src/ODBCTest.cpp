@@ -227,7 +227,10 @@ void ODBCTest::testNonASCIIText()
 
 	auto* pImpl = dynamic_cast<Poco::Data::ODBC::SessionImpl*>(session().impl());
 	assertNotNullPtr (pImpl);
-	std::vector<SQLCHAR> nativeSql(1024, 0);
+	// The SQLite ODBC driver (0.99991) writes a terminator into the input at
+	// the position of the output buffer length, so the output buffer is not
+	// longer than the input and its terminator.
+	std::vector<SQLCHAR> nativeSql(sql.size() + 1, 0);
 	SQLINTEGER nativeLength = 0;
 	assertTrue (!Utility::isError(Poco::Data::ODBC::SQLNativeSql(pImpl->dbc().handle(),
 		reinterpret_cast<SQLCHAR*>(const_cast<char*>(sql.data())), static_cast<SQLINTEGER>(sql.size()),
