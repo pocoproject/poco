@@ -15,6 +15,7 @@
 #include "Poco/HexBinaryDecoder.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
+#include "DecoderError.h"
 
 
 namespace Poco {
@@ -22,7 +23,12 @@ namespace Poco {
 
 namespace
 {
-	int decodeDigit(int n, std::streamoff pos)
+	[[noreturn]] void throwInvalidDigit(int n, std::streamoff pos)
+	{
+		throw DataFormatException("invalid hex digit " + describeDecoderChar(n) + " at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+	}
+
+	inline int decodeDigit(int n, std::streamoff pos)
 		/// Returns the value of the hex digit n, or throws if n is not a hex digit.
 	{
 		if (n >= '0' && n <= '9')
@@ -31,11 +37,7 @@ namespace
 			return n - 'A' + 10;
 		else if (n >= 'a' && n <= 'f')
 			return n - 'a' + 10;
-
-		const std::string digit = (n > 0x20 && n < 0x7F) ?
-			std::string(1, '\'') + static_cast<char>(n) + '\'' :
-			"0x" + NumberFormatter::formatHex(static_cast<unsigned>(n), 2);
-		throw DataFormatException("invalid hex digit " + digit + " at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+		throwInvalidDigit(n, pos);
 	}
 }
 
@@ -66,11 +68,11 @@ int HexBinaryDecoderBuf::readFromDevice()
 int HexBinaryDecoderBuf::readOne()
 {
 	int ch = _buf.sbumpc();
-	if (ch != -1) ++_pos;
+	++_pos;
 	while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n')
 	{
 		ch = _buf.sbumpc();
-		if (ch != -1) ++_pos;
+		++_pos;
 	}
 	return ch;
 }

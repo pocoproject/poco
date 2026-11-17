@@ -16,6 +16,7 @@
 #include "Poco/Base64Encoder.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
+#include "DecoderError.h"
 #include <array>
 
 
@@ -26,27 +27,19 @@ namespace
 {
 	constexpr unsigned char INVALID = 0xFF;
 
-	constexpr auto makeDecodingTable = [](const char* alphabet)
+	constexpr std::array<unsigned char, 256> makeDecodingTable(const char* alphabet)
 	{
 		std::array<unsigned char, 256> table{};
 		for (auto& value: table) value = INVALID;
 		for (unsigned i = 0; i < 64; ++i)
 			table[static_cast<unsigned char>(alphabet[i])] = static_cast<unsigned char>(i);
 		return table;
-	};
+	}
 
 	constexpr std::array<unsigned char, 256> DECODING = makeDecodingTable(
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/");
 	constexpr std::array<unsigned char, 256> DECODING_URL = makeDecodingTable(
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_");
-
-	std::string describe(int c)
-	{
-		if (c > 0x20 && c < 0x7F)
-			return std::string(1, '\'') + static_cast<char>(c) + '\'';
-		else
-			return "0x" + NumberFormatter::formatHex(static_cast<unsigned>(c), 2);
-	}
 
 	[[noreturn]] void throwIncompleteGroup()
 	{
@@ -55,17 +48,21 @@ namespace
 
 	[[noreturn]] void throwDataAfterPadding(int c, std::streamoff pos)
 	{
-		throw DataFormatException("Base64 data after padding: " + describe(c) + " at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+		throw DataFormatException("Base64 data after padding: " + describeDecoderChar(c) + " at position " + NumberFormatter::format(static_cast<Int64>(pos)));
 	}
 
-	unsigned char decodeChar(const unsigned char* pTable, int c, std::streamoff pos)
-		/// Returns the 6-bit value of c, or throws if c is padding or not in the alphabet.
+	[[noreturn]] void throwInvalidChar(int c, std::streamoff pos)
 	{
 		if (c == '=')
 			throw DataFormatException("unexpected Base64 padding at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+		throw DataFormatException("invalid Base64 character " + describeDecoderChar(c) + " at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+	}
+
+	inline unsigned char decodeChar(const unsigned char* pTable, int c, std::streamoff pos)
+		/// Returns the 6-bit value of c, or throws if c is padding or not in the alphabet.
+	{
 		const unsigned char value = pTable[static_cast<unsigned char>(c)];
-		if (value == INVALID)
-			throw DataFormatException("invalid Base64 character " + describe(c) + " at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+		if (c == '=' || value == INVALID) throwInvalidChar(c, pos);
 		return value;
 	}
 }
@@ -157,13 +154,13 @@ int Base64DecoderBuf::readFromDevice()
 int Base64DecoderBuf::readOne()
 {
 	int ch = _buf.sbumpc();
-	if (ch != -1) ++_pos;
+	++_pos;
 	if (!(_options & BASE64_URL_ENCODING))
 	{
 		while (ch == ' ' || ch == '\r' || ch == '\t' || ch == '\n')
 		{
 			ch = _buf.sbumpc();
-			if (ch != -1) ++_pos;
+			++_pos;
 		}
 	}
 	return ch;

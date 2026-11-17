@@ -16,6 +16,7 @@
 #include "Poco/Base32Encoder.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
+#include "DecoderError.h"
 #include <array>
 
 
@@ -135,22 +136,18 @@ const unsigned char Base32DecoderBuf::REVERSE_CROCKFORD_ENCODING[256] =
 
 namespace
 {
-	std::string describe(int c)
-	{
-		if (c > 0x20 && c < 0x7F)
-			return std::string(1, '\'') + static_cast<char>(c) + '\'';
-		else
-			return "0x" + NumberFormatter::formatHex(static_cast<unsigned>(c), 2);
-	}
-
-	unsigned char decodeChar(const unsigned char* pEncoding, int c, std::streamoff pos)
-		/// Returns the 5-bit value of c, or throws if c is padding or not in the alphabet.
+	[[noreturn]] void throwInvalidChar(int c, std::streamoff pos)
 	{
 		if (c == '=')
 			throw DataFormatException("unexpected Base32 padding at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+		throw DataFormatException("invalid Base32 character " + describeDecoderChar(c) + " at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+	}
+
+	inline unsigned char decodeChar(const unsigned char* pEncoding, int c, std::streamoff pos)
+		/// Returns the 5-bit value of c, or throws if c is padding or not in the alphabet.
+	{
 		const unsigned char value = pEncoding[static_cast<unsigned char>(c)];
-		if (value == 0xFF)
-			throw DataFormatException("invalid Base32 character " + describe(c) + " at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+		if (c == '=' || value == 0xFF) throwInvalidChar(c, pos);
 		return value;
 	}
 }
@@ -183,7 +180,7 @@ int Base32DecoderBuf::readFromDevice()
 	{
 		// The previous group was the final one; nothing may follow.
 		if ((c = readOne()) != -1)
-			throw DataFormatException("Base32 data after padding: " + describe(c) + " at position " + NumberFormatter::format(static_cast<Int64>(_pos - 1)));
+			throw DataFormatException("Base32 data after padding: " + describeDecoderChar(c) + " at position " + NumberFormatter::format(static_cast<Int64>(_pos - 1)));
 		return -1;
 	}
 
@@ -213,7 +210,7 @@ int Base32DecoderBuf::readFromDevice()
 			if ((c = readOne()) == -1)
 				throw DataFormatException("incomplete Base32 group at end of input");
 			if (c != '=')
-				throw DataFormatException("Base32 data after padding: " + describe(c) + " at position " + NumberFormatter::format(static_cast<Int64>(_pos - 1)));
+				throw DataFormatException("Base32 data after padding: " + describeDecoderChar(c) + " at position " + NumberFormatter::format(static_cast<Int64>(_pos - 1)));
 		}
 	}
 
@@ -249,7 +246,7 @@ int Base32DecoderBuf::readFromDevice()
 int Base32DecoderBuf::readOne()
 {
 	int ch = _buf.sbumpc();
-	if (ch != -1) ++_pos;
+	++_pos;
 	return ch;
 }
 
