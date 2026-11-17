@@ -385,7 +385,11 @@ public:
 		/// holders back into the externally supplied buffers.
 		/// Throws LengthExceededException once all are transferred if the value
 		/// of a string output parameter did not fit into its buffer; the string
-		/// then holds the part that did.
+		/// then holds the part that did. The statement has executed at that point.
+		/// The buffer of a std::string output parameter has as many bytes as the
+		/// driver reports characters for the parameter, so a value of multibyte
+		/// characters can exceed it; an output string sized in advance (or io())
+		/// gets a buffer of at least its size.
 
 	void reset() override;
 		/// Clears the cached storage.

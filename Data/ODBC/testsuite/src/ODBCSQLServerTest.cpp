@@ -655,7 +655,24 @@ void ODBCSQLServerTest::testStringOutputParameters()
 	// value that does not fit is reported, and io() sends the value it is given.
 	session().setFeature("autoBind", true);
 	session().setFeature("autoExtract", true);
-	const Poco::Any maxFieldSize = session().getProperty("maxFieldSize");
+
+	// maxFieldSize and the procedure are restored on every exit
+	struct Restore
+	{
+		ODBCSQLServerTest& test;
+		const Poco::Any maxFieldSize;
+		~Restore()
+		{
+			try
+			{
+				test.session().setProperty("maxFieldSize", maxFieldSize);
+				test.dropObject("PROCEDURE", "storedProcedure");
+			}
+			catch (...)
+			{
+			}
+		}
+	} restore{*this, session().getProperty("maxFieldSize")};
 	session().setProperty("maxFieldSize", Poco::Any(std::size_t(1024)));
 
 	dropObject("PROCEDURE", "storedProcedure");
@@ -725,8 +742,11 @@ void ODBCSQLServerTest::testStringOutputParameters()
 		session() << "{call storedProcedure(?)}", out(outParam), now;
 		fail ("truncated output parameter value returned");
 	}
-	catch (DataException&)
+	catch (Poco::Data::LengthExceededException&)
 	{
+		// the part that fits into the buffer of the empty output string
+		assertTrue (outParam.size() < 2000);
+		assertEqual (std::string(outParam.size(), 'x'), outParam);
 	}
 	outParam.assign(2000, ' ');
 	session() << "{call storedProcedure(?)}", out(outParam), now;
@@ -755,9 +775,6 @@ void ODBCSQLServerTest::testStringOutputParameters()
 	session() << "{call storedProcedure(?)}", io(utf16Param), now;
 	Poco::UnicodeConverter::convert(utf16Param, text);
 	assertEqual ("abcdefghix", text);
-	dropObject("PROCEDURE", "storedProcedure");
-
-	session().setProperty("maxFieldSize", maxFieldSize);
 }
 
 
