@@ -134,19 +134,18 @@ DateTime& DateTime::operator = (const DateTime& dateTime)
 
 DateTime& DateTime::operator = (const Timestamp& timestamp)
 {
-	_utcTime = timestamp.utcTime();
-	computeGregorian(julianDay());
-	computeDaytime();
-	checkValid();
+	// the constructor validates; an invalid value leaves *this unchanged
+	DateTime dateTime(timestamp);
+	swap(dateTime);
 	return *this;
 }
 
 
 DateTime& DateTime::operator = (double julianDay)
 {
-	_utcTime = toUtcTime(julianDay);
-	computeGregorian(julianDay);
-	checkValid();
+	// the constructor validates; an invalid value leaves *this unchanged
+	DateTime dateTime(julianDay);
+	swap(dateTime);
 	return *this;
 }
 

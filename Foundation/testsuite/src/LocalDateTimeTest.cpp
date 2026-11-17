@@ -484,6 +484,29 @@ void LocalDateTimeTest::testTimezone2()
 }
 
 
+void LocalDateTimeTest::testInvalidAssignJulianDay()
+{
+	// 10000-01-01 00:00:00 is out of range; a failed assignment keeps the
+	// value and the time zone differential
+	const double julianDay = 5373484.5;
+	const LocalDateTime orig(3600, 2024, 5, 17, 10, 20, 30, 400, 500);
+
+	LocalDateTime ldt(orig);
+	try
+	{
+		ldt.assign(7200, julianDay);
+		fail("Invalid julian day, must throw");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+	assertEqual (orig.tzd(), ldt.tzd());
+	assertTrue (ldt.utcTime() == orig.utcTime());
+	assertEqual (orig.year(), ldt.year());
+	assertEqual (orig.month(), ldt.month());
+	assertEqual (orig.day(), ldt.day());
+	assertEqual (orig.hour(), ldt.hour());
+}
+
+
 void LocalDateTimeTest::testInvalidAssign()
 {
 	static constexpr struct
@@ -587,6 +610,7 @@ CppUnit::Test* LocalDateTimeTest::suite()
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testTimezone);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testTimezone2);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testInvalidAssign);
+	CppUnit_addTest(pSuite, LocalDateTimeTest, testInvalidAssignJulianDay);
 
 	return pSuite;
 }

@@ -1022,6 +1022,39 @@ void DateTimeTest::testInvalid()
 }
 
 
+void DateTimeTest::testInvalidAssignJulianDay()
+{
+	// 10000-01-01 00:00:00 is out of range; a failed assignment keeps the value
+	const double julianDay = 5373484.5;
+	const Timestamp timestamp(253402300800000000LL);
+	const DateTime orig(2024, 5, 17, 10, 20, 30, 400, 500);
+
+	DateTime dt1(orig);
+	try
+	{
+		dt1 = julianDay;
+		fail("Invalid julian day, must throw");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+	assertTrue (dt1 == orig);
+	assertEqual (orig.year(), dt1.year());
+	assertEqual (orig.month(), dt1.month());
+	assertEqual (orig.day(), dt1.day());
+
+	DateTime dt2(orig);
+	try
+	{
+		dt2 = timestamp;
+		fail("Invalid timestamp, must throw");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+	assertTrue (dt2 == orig);
+	assertEqual (orig.year(), dt2.year());
+	assertEqual (orig.month(), dt2.month());
+	assertEqual (orig.day(), dt2.day());
+}
+
+
 void DateTimeTest::testInvalidAssign()
 {
 	static constexpr struct
@@ -1125,6 +1158,7 @@ CppUnit::Test* DateTimeTest::suite()
 	CppUnit_addTest(pSuite, DateTimeTest, testTM);
 	CppUnit_addTest(pSuite, DateTimeTest, testInvalid);
 	CppUnit_addTest(pSuite, DateTimeTest, testInvalidAssign);
+	CppUnit_addTest(pSuite, DateTimeTest, testInvalidAssignJulianDay);
 
 	return pSuite;
 }

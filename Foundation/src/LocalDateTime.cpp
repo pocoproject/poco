@@ -158,9 +158,9 @@ LocalDateTime& LocalDateTime::assign(int tzd, int year, int month, int day, int 
 
 LocalDateTime& LocalDateTime::assign(int tzd, double julianDay)
 {
-	_tzd      = tzd;
-	_dateTime = julianDay;
-	adjustForTzd();
+	// the constructor validates; an invalid value leaves *this unchanged
+	LocalDateTime dateTime(tzd, julianDay);
+	swap(dateTime);
 	return *this;
 }
 
