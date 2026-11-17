@@ -703,12 +703,18 @@ SQLRETURN SQLNativeSql(SQLHDBC hdbc,
 {
 	std::wstring str;
 	makeUTF16(szSqlStrIn, cbSqlStrIn, str);
+	const SQLINTEGER inLength = static_cast<SQLINTEGER>(str.size());
+	// Some drivers (SQLite ODBC 0.99991) write a terminator into the input,
+	// at the position of the output buffer length, so the input is as long
+	// as the output buffer.
+	if (cbSqlStrMax > inLength)
+		str.resize(static_cast<std::size_t>(cbSqlStrMax) + 1, L'\0');
 
 	Buffer<wchar_t> bufSQLOut(cbSqlStrMax);
 
 	SQLRETURN rc = SQLNativeSqlW(hdbc,
-		(SQLWCHAR*) str.c_str(),
-		(SQLINTEGER) str.size(),
+		reinterpret_cast<SQLWCHAR*>(str.data()),
+		inLength,
 		bufSQLOut.begin(),
 		(SQLINTEGER) bufSQLOut.size(),
 		pcbSqlStr);

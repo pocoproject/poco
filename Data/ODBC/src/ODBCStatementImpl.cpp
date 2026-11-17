@@ -17,7 +17,12 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractPreparation.h"
+#include "Poco/Data/DataException.h"
 #include "Poco/Exception.h"
+#include <algorithm>
+#include <cstring>
+#include <limits>
+#include <vector>
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -508,34 +513,40 @@ std::size_t ODBCStatementImpl::next()
 std::string ODBCStatementImpl::nativeSQL()
 {
 	poco_check_ptr (_rConnection);
-	std::string statement = toString();
+	const std::string statement = toString();
 
-	SQLINTEGER length = (SQLINTEGER) statement.size() * 2;
+	constexpr SQLINTEGER maxLength = (std::numeric_limits<SQLINTEGER>::max)() / 2 - 1;
+	if (statement.size() > static_cast<std::size_t>(maxLength))
+		throw LengthExceededException("ODBCStatementImpl::nativeSQL(): statement too long");
 
-	char* pNative = nullptr;
-	SQLINTEGER retlen = length;
-	do
+	SQLINTEGER length = static_cast<SQLINTEGER>(statement.size()) * 2 + 1;
+	for (;;)
 	{
-		delete [] pNative;
-		pNative = new char[retlen];
-		std::memset(pNative, 0, retlen);
-		length = retlen;
+		// Some drivers (SQLite ODBC 0.99991) write a terminator into the input,
+		// at the position of the output buffer length, so the driver gets a
+		// writable copy of the statement that is as long as the output buffer.
+		std::vector<SQLCHAR> input((std::max)(statement.size(), static_cast<std::size_t>(length)) + 1, 0);
+		std::memcpy(input.data(), statement.data(), statement.size());
+		// the last byte is not given to the driver and terminates the output
+		std::vector<SQLCHAR> native(static_cast<std::size_t>(length) + 1, 0);
+		SQLINTEGER nativeLength = 0;
 		if (Utility::isError(SQLNativeSql(_rConnection,
-			(SQLCHAR*) statement.c_str(),
-			(SQLINTEGER) statement.size(),
-			(SQLCHAR*) pNative,
+			input.data(),
+			static_cast<SQLINTEGER>(statement.size()),
+			native.data(),
 			length,
-			&retlen)))
+			&nativeLength)))
 		{
-			delete [] pNative;
 			throw ConnectionException(_rConnection, "SQLNativeSql()");
 		}
-		++retlen;//accomodate for terminating '\0'
-	}while (retlen > length);
 
-	std::string sql(pNative);
-	delete [] pNative;
-	return sql;
+		if (nativeLength < length || nativeLength > maxLength)
+		{
+			const auto end = std::find(native.begin(), native.end(), 0);
+			return std::string(native.begin(), end);
+		}
+		length = nativeLength + 1;
+	}
 }
 
 

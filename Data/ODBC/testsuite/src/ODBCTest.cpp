@@ -43,6 +43,7 @@
 #include <iostream>
 #include <limits>
 #include <list>
+#include <memory>
 #include <string>
 #include <typeinfo>
 #include <utility>
@@ -227,19 +228,25 @@ void ODBCTest::testNonASCIIText()
 
 	auto* pImpl = dynamic_cast<Poco::Data::ODBC::SessionImpl*>(session().impl());
 	assertNotNullPtr (pImpl);
-	// The SQLite ODBC driver (0.99991) writes the terminator of the native SQL
-	// into the input, at the position of the output buffer length, instead of
-	// into the output, so it is not called with it.
-	if (Utility::dbmsName(pImpl->dbc()) != "SQLite")
-	{
-		std::vector<SQLCHAR> nativeSql(1024, 0);
-		SQLINTEGER nativeLength = 0;
-		assertTrue (!Utility::isError(Poco::Data::ODBC::SQLNativeSql(pImpl->dbc().handle(),
-			reinterpret_cast<SQLCHAR*>(const_cast<char*>(sql.data())), static_cast<SQLINTEGER>(sql.size()),
-			nativeSql.data(), static_cast<SQLINTEGER>(nativeSql.size()), &nativeLength)));
-		const std::string native(reinterpret_cast<const char*>(nativeSql.data()));
-		assertTrue (native.find("Person") != std::string::npos);
-	}
+	// The SQLite ODBC driver (0.99991) writes a terminator into the input, at
+	// the position of the output buffer length, so the input is a writable
+	// copy as long as the output buffer. (In Unicode builds the wrapper gives
+	// the driver its own converted copy.)
+	std::vector<SQLCHAR> nativeSql(1024, 0);
+	std::vector<SQLCHAR> sqlIn(nativeSql.size(), 0);
+	std::copy(sql.begin(), sql.end(), sqlIn.begin());
+	SQLINTEGER nativeLength = 0;
+	assertTrue (!Utility::isError(Poco::Data::ODBC::SQLNativeSql(pImpl->dbc().handle(),
+		sqlIn.data(), static_cast<SQLINTEGER>(sql.size()),
+		nativeSql.data(), static_cast<SQLINTEGER>(nativeSql.size() - 1), &nativeLength)));
+	const std::string native(reinterpret_cast<const char*>(nativeSql.data()));
+	assertTrue (native.find("Person") != std::string::npos);
+
+	// the statement's own native SQL, which is also part of its error messages
+	auto pStmtImpl = std::make_shared<Poco::Data::ODBC::ODBCStatementImpl>(*pImpl);
+	pStmtImpl->add(sql);
+	const std::string stmtNative = pStmtImpl->nativeSQL();
+	assertTrue (stmtNative.find("Person") != std::string::npos);
 
 	// A value that does not fit is converted from UTF-16 into the buffer and
 	// truncated before its terminator. Through the ANSI API, unixODBC can
