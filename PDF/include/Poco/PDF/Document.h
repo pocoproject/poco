@@ -30,6 +30,7 @@ namespace Poco {
 
 
 class LocalDateTime;
+class Path;
 
 
 namespace PDF {
@@ -206,11 +207,17 @@ public:
 		Page::Size pageSize= Page::PAGE_SIZE_LETTER,
 		Page::Orientation orientation = Page::ORIENTATION_PORTRAIT);
 		/// Inserts the page before the page at index position and returns the reference to it.
+		///
+		/// Note: inserting a page invalidates all references to pages
+		/// previously returned by addPage(), getPage(),
+		/// insertPage() and operator [].
 
 	//void openAction();
 		/// Sets the first page that appears when document is opened.
 
 	const Font& loadFont(const std::string& name, const std::string& encoding);
+		/// Loads the font with the given name and encoding, or returns
+		/// the already loaded font for the same name and encoding.
 
 	[[nodiscard]] const Font& font(const std::string& name, const std::string& encoding = "");
 		/// Looks for the font with specified name in the font container.
@@ -322,6 +329,9 @@ private:
 		/// the resources are not unloaded.
 
 	const Image& loadPNGImageImpl(const std::string& fileName, bool doLoad);
+
+	static std::string fontKey(const std::string& name, const std::string& encoding);
+	static std::string imageKey(const Path& path, const std::string& kind);
 
 	HPDF_Doc         _pdf;
 	std::string      _fileName;

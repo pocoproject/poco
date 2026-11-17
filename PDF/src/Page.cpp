@@ -749,12 +749,7 @@ const Destination& Page::createDestination(const std::string& name)
 		throw InvalidArgumentException("Destination already exists.");
 
 	Destination dest(&_pDocument->handle(), HPDF_Page_CreateDestination(_page), name);
-	std::pair<DestinationContainer::iterator, bool> ret =
-		_destinations.insert(DestinationContainer::value_type(name, dest));
-
-	if (ret.second) return ret.first->second;
-
-	throw IllegalStateException("Could not create destination.");
+	return _destinations.try_emplace(name, dest).first->second;
 }
 
 
@@ -771,12 +766,7 @@ const TextAnnotation& Page::createTextAnnotation(const std::string& name,
 		HPDF_Page_CreateTextAnnot(_page, rect, text.c_str(), encoder),
 		name);
 
-	std::pair<TextAnnotationContainer::iterator, bool> ret =
-		_textAnnotations.insert(TextAnnotationContainer::value_type(name, ann));
-
-	if (ret.second) return ret.first->second;
-
-	throw IllegalStateException("Could not create annotation.");
+	return _textAnnotations.try_emplace(name, ann).first->second;
 }
 
 
@@ -791,12 +781,7 @@ const LinkAnnotation& Page::createLinkAnnotation(const std::string& name,
 	LinkAnnotation ann(&_pDocument->handle(),
 		HPDF_Page_CreateLinkAnnot(_page, rect, dest),
 		name);
-	std::pair<LinkAnnotationContainer::iterator, bool> ret =
-		_linkAnnotations.insert(LinkAnnotationContainer::value_type(name, ann));
-
-	if (ret.second) return ret.first->second;
-
-	throw IllegalStateException("Could not create annotation.");
+	return _linkAnnotations.try_emplace(name, ann).first->second;
 }
 
 
@@ -811,12 +796,7 @@ const LinkAnnotation& Page::createURILinkAnnotation(const std::string& name,
 	LinkAnnotation ann(&_pDocument->handle(),
 		HPDF_Page_CreateURILinkAnnot(_page, rect, uri.c_str()),
 		name);
-	std::pair<LinkAnnotationContainer::iterator, bool> ret =
-		_linkAnnotations.insert(LinkAnnotationContainer::value_type(name, ann));
-
-	if (ret.second) return ret.first->second;
-
-	throw IllegalStateException("Could not create annotation.");
+	return _linkAnnotations.try_emplace(name, ann).first->second;
 }
 
 
