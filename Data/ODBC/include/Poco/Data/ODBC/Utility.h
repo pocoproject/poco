@@ -177,7 +177,9 @@ public:
 		/// Returns the requested info about the DBMS or ODBC driver.
 		/// A value that does not fit into a buffer of bufferSize bytes
 		/// is truncated to the part that does, which can end inside a
-		/// multi-byte character.
+		/// multi-byte character. Buffer sizes above 16382 bytes are
+		/// reduced to 16382, the size whose UTF-16 form, with its
+		/// terminator, fits the SQLSMALLINT length of the ODBC API.
 		/// On error, returns "unknown".
 		/// Throws InvalidArgumentException if bufferSize is not positive.
 		/// Throws NullPointerException if db has no connection handle,

@@ -196,6 +196,9 @@ void ODBCTest::testSQLGetInfo()
 		assertTrue (0 == keywords.compare(0, value.size(), value));
 	}
 
+	// a buffer larger than an SQLSMALLINT can describe in UTF-16 bytes
+	assertEqual (dbms, Utility::sqlGetInfo(dbc, SQL_DBMS_NAME, 20000));
+
 	try
 	{
 		static_cast<void>(Utility::sqlGetInfo(dbc, SQL_DBMS_NAME, 0));

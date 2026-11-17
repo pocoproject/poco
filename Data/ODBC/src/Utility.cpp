@@ -171,6 +171,10 @@ std::string Utility::sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type, S
 {
 	if (bufferSize <= 0)
 		throw InvalidArgumentException("ODBC::Utility::sqlGetInfo(): buffer size must be positive.");
+	// The driver manager or the Unicode wrapper converts the value through a
+	// UTF-16 buffer with room for a terminator, whose length in bytes is an
+	// SQLSMALLINT: (16382 + 1) * 2 = 32766.
+	bufferSize = (std::min)(bufferSize, static_cast<SQLSMALLINT>((std::numeric_limits<SQLSMALLINT>::max)() / 2 - 1));
 
 	std::string ret = "unknown"s;
 	// One zero byte more than the driver is told about: the driver manager can

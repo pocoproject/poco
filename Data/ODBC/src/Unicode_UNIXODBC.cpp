@@ -22,6 +22,7 @@
 #include "Poco/Exception.h"
 #include <algorithm>
 #include <cstring>
+#include <limits>
 #include <iostream>
 
 
@@ -388,7 +389,8 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT fHandleType,
 		// For a driver without SQLGetDiagFieldW(), unixODBC reads the message
 		// into a buffer of the given length in bytes and converts every
 		// character of it, as SQLGetInfo() describes.
-		const SQLINTEGER length = stringLength(rgbDiagInfo, cbDiagInfoMax);
+		const SQLINTEGER length = std::min<SQLINTEGER>(stringLength(rgbDiagInfo, cbDiagInfoMax),
+			std::numeric_limits<SQLSMALLINT>::max() / sizeof(SQLWCHAR));
 		Buffer<SQLWCHAR> buffer(2 * length + 1);
 		std::fill(buffer.begin(), buffer.end(), 0);
 
@@ -567,19 +569,23 @@ SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 	SQLSMALLINT cbInfoValue = 0;
 	if (!pcbInfoValue) pcbInfoValue = &cbInfoValue;
 
-	if (cbInfoValueMax)
+	if (cbInfoValueMax > 0)
 	{
 		// For a driver without SQLGetInfoW(), unixODBC reads the value into
 		// a buffer of the given length in bytes and converts every character
 		// of it into the given buffer, which then needs twice the length and
-		// a terminator. The driver is told about the first half only.
-		Buffer<SQLWCHAR> buffer(2 * cbInfoValueMax + 1);
+		// a terminator. The driver is told about the first half only, in bytes
+		// as an SQLSMALLINT; a longer value is truncated like any value that
+		// does not fit.
+		const SQLSMALLINT chars = std::min<SQLSMALLINT>(cbInfoValueMax,
+			static_cast<SQLSMALLINT>(std::numeric_limits<SQLSMALLINT>::max() / sizeof(SQLWCHAR)));
+		Buffer<SQLWCHAR> buffer(2 * chars + 1);
 		std::fill(buffer.begin(), buffer.end(), 0);
 
 		SQLRETURN rc = SQLGetInfoW(hdbc,
 			fInfoType,
 			(SQLPOINTER) buffer.begin(),
-			static_cast<SQLSMALLINT>(cbInfoValueMax * sizeof(SQLWCHAR)),
+			static_cast<SQLSMALLINT>(chars * sizeof(SQLWCHAR)),
 			pcbInfoValue);
 
 		if (!Utility::isError(rc))

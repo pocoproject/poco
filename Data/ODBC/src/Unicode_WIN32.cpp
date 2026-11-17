@@ -17,6 +17,8 @@
 #include "Poco/Data/ODBC/Unicode_WIN32.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include <algorithm>
+#include <limits>
 
 
 using Poco::Buffer;
@@ -485,14 +487,18 @@ SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 	SQLSMALLINT cbValue = 0;
 	if (!pcbInfoValue) pcbInfoValue = &cbValue;
 
-	if (cbInfoValueMax)
+	if (cbInfoValueMax > 0)
 	{
-		Buffer<wchar_t> buffer(cbInfoValueMax);
+		// the length in bytes is passed as an SQLSMALLINT; a longer value is
+		// truncated like any value that does not fit
+		const SQLSMALLINT chars = (std::min<SQLSMALLINT>)(cbInfoValueMax,
+			static_cast<SQLSMALLINT>((std::numeric_limits<SQLSMALLINT>::max)() / sizeof(wchar_t)));
+		Buffer<wchar_t> buffer(chars);
 
 		SQLRETURN rc = SQLGetInfoW(hdbc,
 			fInfoType,
 			(SQLPOINTER) buffer.begin(),
-			(SQLSMALLINT) buffer.sizeBytes(),
+			static_cast<SQLSMALLINT>(buffer.sizeBytes()),
 			pcbInfoValue);
 
 		if (!Utility::isError(rc))

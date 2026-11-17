@@ -21,6 +21,8 @@
 #include "Poco/UnicodeConverter.h"
 #include <sql.h>
 #include <sqltypes.h>
+#include <algorithm>
+#include <cstring>
 #include <string>
 
 namespace Poco::Data::ODBC {
@@ -65,15 +67,10 @@ inline void makeUTF8(Poco::Buffer<wchar_t>& buffer, SQLINTEGER length, SQLPOINTE
 	std::string result;
 	UnicodeConverter::toUTF8(buffer.begin(), length, result);
 
+	// the value is truncated so that the terminator fits into the target
 	std::memset(pTarget, 0, targetLength);
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4996) // deprecation warnings
-#endif
-	std::strncpy((char*) pTarget, result.c_str(), result.size() < targetLength ? result.size() : targetLength);
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
+	if (targetLength > 0)
+		std::memcpy(pTarget, result.data(), (std::min)(result.size(), static_cast<std::size_t>(targetLength - 1)));
 }
 
 
