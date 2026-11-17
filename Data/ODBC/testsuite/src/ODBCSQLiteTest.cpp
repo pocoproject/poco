@@ -845,6 +845,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testParameterArraySize);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkFullWidthStrings);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testManualBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTranscodedBindingOwnership);
 
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBareboneODBC);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testConnection);

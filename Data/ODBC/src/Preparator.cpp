@@ -15,6 +15,7 @@
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Exception.h"
+#include <limits>
 
 
 using Poco::InvalidArgumentException;
@@ -194,8 +195,10 @@ std::size_t Preparator::actualDataSize(std::size_t col, std::size_t row) const
 		_lenLengths.at(col).at(row);
 
 	// workaround for drivers returning negative length;
-	// SQL_NULL_DATA and SQL_NO_TOTAL are not lengths and are returned unchanged
-	if (size < 0 && SQL_NULL_DATA != size && SQL_NO_TOTAL != size) size *= -1;
+	// SQL_NULL_DATA and SQL_NO_TOTAL are not lengths and are returned unchanged.
+	// The most negative value has no positive counterpart and is an unknown length.
+	if (std::numeric_limits<SQLLEN>::min() == size) size = SQL_NO_TOTAL;
+	else if (size < 0 && SQL_NULL_DATA != size && SQL_NO_TOTAL != size) size *= -1;
 
 	return size;
 }
@@ -210,7 +213,7 @@ void Preparator::prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::s
 	poco_assert (pos < _lenLengths.size());
 
 	bool* pArray = (bool*) std::calloc(length, sizeof(bool));
-	if (!pArray && length != 0)
+	if (pArray == nullptr && length != 0)
 		throw OutOfMemoryException("ODBC::Preparator::prepareBoolArray()");
 
 	_values[pos] = Any(pArray);

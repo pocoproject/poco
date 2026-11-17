@@ -633,7 +633,7 @@ private:
 			throw InvalidArgumentException("ODBC::Preparator::prepareCharArray(): bulk buffer too large");
 
 		T* pArray = (T*) std::calloc(length * size, sizeof(T));
-		if (!pArray && length * size != 0)
+		if (pArray == nullptr && length * size != 0)
 			throw OutOfMemoryException("ODBC::Preparator::prepareCharArray()");
 
 		_values[pos] = Any(pArray);

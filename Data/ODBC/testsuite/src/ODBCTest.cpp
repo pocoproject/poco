@@ -1500,6 +1500,46 @@ void ODBCTest::testManualBLOB()
 }
 
 
+void ODBCTest::testTranscodedBindingOwnership()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	// A database encoding other than UTF-8 makes the binder transcode std::string
+	// input into copies it owns. It frees only these, not the buffers of the
+	// UTF-16 string and the BLOB, which belong to the caller; the statement runs
+	// twice with the same bindings.
+	recreatePersonBLOBTable();
+	Poco::Data::Session s(Poco::Data::ODBC::Connector::KEY, dbConnString());
+	s.setProperty("dbEncoding", std::string("ISO-8859-1"));
+
+	std::string lastName("LN");
+	Poco::UTF16String firstName;
+	Poco::UnicodeConverter::convert(std::string("FN"), firstName);
+	std::string address("ADDR");
+	const unsigned char bytes[] = { 1, 2, 3, 4, 5 };
+	Poco::Data::BLOB image(bytes, sizeof(bytes));
+	{
+		Poco::Data::Statement insert = (s << "INSERT INTO Person VALUES (?, ?, ?, ?)",
+			use(lastName), use(firstName), use(address), use(image));
+		insert.execute();
+		insert.execute();
+	}
+
+	int count = 0;
+	s << "SELECT COUNT(*) FROM Person WHERE LastName = 'LN'", into(count), now;
+	assertEqual (2, count);
+
+	std::vector<std::string> firstNames;
+	std::vector<Poco::Data::BLOB> images;
+	s << "SELECT FirstName, Image FROM Person WHERE LastName = 'LN'", into(firstNames), into(images), now;
+	assertEqual (2, static_cast<int>(firstNames.size()));
+	assertEqual (std::string("FN"), firstNames[0]);
+	assertEqual (std::string("FN"), firstNames[1]);
+	assertTrue (images[0] == image);
+	assertTrue (images[1] == image);
+}
+
+
 template <typename S>
 void ODBCTest::checkManualString(const std::string& query, std::size_t length, std::size_t maxFieldSize)
 {
