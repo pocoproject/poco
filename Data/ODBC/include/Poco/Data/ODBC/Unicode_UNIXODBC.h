@@ -17,6 +17,7 @@
 #ifndef Data_ODBC_Unicode_UNIX_INCLUDED
 #define Data_ODBC_Unicode_UNIX_INCLUDED
 
+#include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Buffer.h"
 #include <sqltypes.h>
 #include <string>
@@ -35,8 +36,9 @@ inline void makeUTF16(SQLCHAR* pSQLChar, SQLSMALLINT length, std::string& target
 }
 
 
-void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, SQLINTEGER length, SQLPOINTER pTarget, SQLINTEGER targetLength);
-	/// Utility function for conversion from UTF-16 to UTF-8.
+ODBC_API void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, SQLINTEGER length, SQLPOINTER pTarget, SQLINTEGER targetLength);
+	/// Utility function for conversion from UTF-16 to UTF-8. Length is in
+	/// bytes; the value ends at its terminator, or at the end of the buffer.
 
 
 inline void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, int length, SQLPOINTER pTarget, SQLSMALLINT targetLength)

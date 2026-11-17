@@ -49,10 +49,11 @@ inline void makeUTF8(Poco::Buffer<wchar_t>& buffer, SQLINTEGER length, SQLPOINTE
 	// with non-conformant length reporting.
 	//
 	// Note: this function handles metadata strings (column names,
-	// diagnostics, driver info), not row data. The driver has already
-	// written into the buffer, so clamping to the actual buffer size
-	// converts exactly what is available — this is the only viable
-	// approach when the reported length is unreliable.
+	// diagnostics, driver info), not row data, which the driver terminates.
+	// A driver may also report more than it wrote (the Oracle driver reports
+	// the length of a diagnostic message in bytes), so the value ends at its
+	// terminator and the rest of the buffer, which may be uninitialised, is
+	// not converted.
 	if (length <= 0)
 	{
 		std::memset(pTarget, 0, targetLength);
@@ -64,6 +65,7 @@ inline void makeUTF8(Poco::Buffer<wchar_t>& buffer, SQLINTEGER length, SQLPOINTE
 	length -= length % sizeof(wchar_t);
 
 	length /= sizeof(wchar_t);
+	length = static_cast<SQLINTEGER>(std::find(buffer.begin(), buffer.begin() + length, L'\0') - buffer.begin());
 	std::string result;
 	UnicodeConverter::toUTF8(buffer.begin(), length, result);
 

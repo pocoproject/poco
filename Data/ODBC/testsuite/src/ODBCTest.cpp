@@ -28,6 +28,11 @@
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/Extractor.h"
 #include "Poco/Data/ODBC/SessionImpl.h"
+#if defined(POCO_ODBC_UNICODE_UNIXODBC)
+#include "Poco/Data/ODBC/Unicode_UNIXODBC.h"
+#elif defined(POCO_ODBC_UNICODE_WINDOWS)
+#include "Poco/Data/ODBC/Unicode_WIN32.h"
+#endif
 #include "Poco/Data/DataException.h"
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
@@ -39,6 +44,7 @@
 #include <sqltypes.h>
 #include <algorithm>
 #include <cstdlib>
+#include <cstring>
 #include <deque>
 #include <iostream>
 #include <limits>
@@ -214,6 +220,21 @@ void ODBCTest::testSQLGetInfo()
 void ODBCTest::testNonASCIIText()
 {
 	if (!_pSession) failmsg ("Test not available.");
+
+#if defined(POCO_ODBC_UNICODE_UNIXODBC) || defined(POCO_ODBC_UNICODE_WINDOWS)
+	{
+		// A driver may report more than it wrote (the Oracle driver reports the
+		// length of a diagnostic message in bytes); the value ends at its
+		// terminator, and what follows in the buffer, here unpaired surrogates,
+		// is not converted.
+		const SQLWCHAR text[] = {'a', 'b', 'c', 0, 0xD800, 0xD800, 0xD800, 0xD800};
+		Poco::Buffer<SQLWCHAR> wide(text, sizeof(text) / sizeof(text[0]));
+		char narrow[16];
+		std::memset(narrow, 'X', sizeof(narrow));
+		Poco::Data::ODBC::makeUTF8(wide, static_cast<SQLINTEGER>(wide.sizeBytes()), narrow, static_cast<SQLINTEGER>(sizeof(narrow)));
+		assertEqual (std::string("abc"), std::string(narrow));
+	}
+#endif
 
 	// Every Euro sign takes three bytes in UTF-8 and one UTF-16 code unit;
 	// in Unicode builds the lengths given to the wide-character API count
