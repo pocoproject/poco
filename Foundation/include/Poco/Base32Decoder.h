@@ -49,6 +49,7 @@ private:
 	unsigned char   _group[8];
 	int             _groupLength;
 	int             _groupIndex;
+	std::streamoff  _pos;
 	std::streambuf& _buf;
 	const unsigned char* _encoding;
 

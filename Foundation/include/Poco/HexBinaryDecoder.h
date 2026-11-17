@@ -48,6 +48,7 @@ private:
 	int readFromDevice() override;
 	int readOne();
 
+	std::streamoff  _pos;
 	std::streambuf& _buf;
 };
 

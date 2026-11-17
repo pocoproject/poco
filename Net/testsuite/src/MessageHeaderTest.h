@@ -44,6 +44,11 @@ public:
 	void testValueLengthLimit();
 	void testLongValue();
 	void testDecodeWord();
+	void testDecodeWordNotEncoded();
+	void testDecodeWordMalformed();
+	void testDecodeWordAdjacent();
+	void testDecodeRFC2047();
+	void testDecodeWordLongValue();
 	void testNoDecodeFramingHeaders();
 	void testAutoDecode();
 	void testStrictFieldName();

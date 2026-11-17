@@ -1,0 +1,15 @@
+#
+# Makefile
+#
+# Makefile for Poco DaemonTestApp
+#
+
+include $(POCO_BASE)/build/rules/global
+
+objects = DaemonTestApp
+
+target         = DaemonTestApp
+target_version = 1
+target_libs    = PocoUtil PocoJSON PocoXML PocoFoundation
+
+include $(POCO_BASE)/build/rules/exec

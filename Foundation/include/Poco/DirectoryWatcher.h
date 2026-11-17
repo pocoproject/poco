@@ -177,7 +177,11 @@ public:
 protected:
 	void init();
 	void stop();
-	void run() override;
+	void run() override final;
+		/// Runs the watcher strategy until stop() is called.
+		/// The thread calls this function without a virtual call, so that the call
+		/// does not race with the constructor or destructor of a subclass; it is
+		/// final because an override would never be called.
 
 private:
 	DirectoryWatcher();

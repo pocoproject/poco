@@ -31,9 +31,16 @@ zip -q -r -j $OUT/http_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed
 zip -q -r -j $OUT/mcp_server_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Server
 zip -q -r -j $OUT/mcp_client_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Client
 zip -q -r -j $OUT/mcp_event_stream_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/HTTP/fuzzing/seed/EventStream
+zip -q -r -j $OUT/date_time_fuzzer_seed_corpus.zip $SRC/poco/Foundation/fuzzing/seed/DateTime
+zip -q -r -j $OUT/jwt_decode_fuzzer_seed_corpus.zip $SRC/poco/JWT/fuzzing/seed/Token
+zip -q -r -j $OUT/json_parser_fuzzer_seed_corpus.zip $SRC/poco/JSON/fuzzing/seed/JSON
 
 # Dictionaries
 cp $SRC/poco/XML/fuzzing/xml.dict $OUT/xml_parser_fuzzer.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_server_fuzzer.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_client_fuzzer.dict
 cp $SRC/poco/AI/MCP/HTTP/fuzzing/eventstream.dict $OUT/mcp_event_stream_fuzzer.dict
+cp $SRC/poco/JWT/fuzzing/jwt.dict $OUT/jwt_decode_fuzzer.dict
+cp $SRC/poco/JSON/fuzzing/json.dict $OUT/json_parser_fuzzer.dict
+cp $SRC/poco/Net/fuzzing/http.dict $OUT/http_message_fuzzer.dict
+cp $SRC/poco/Net/fuzzing/mail.dict $OUT/mail_message_fuzzer.dict

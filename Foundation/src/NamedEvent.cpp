@@ -17,7 +17,7 @@
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "NamedEvent_WIN32U.cpp"
-#elif POCO_OS == POCO_OS_ANDROID
+#elif (POCO_OS == POCO_OS_ANDROID) || defined(POCO_EMSCRIPTEN)
 #include "NamedEvent_Android.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "NamedEvent_UNIX.cpp"

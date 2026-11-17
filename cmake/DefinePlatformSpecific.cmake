@@ -100,6 +100,16 @@ if (DEFINED POCO_SANITIZEFLAGS AND NOT "${POCO_SANITIZEFLAGS}" STREQUAL "")
 	unset(_poco_san_flags)
 endif()
 
+# Directory scope reaches the bundled libraries, which do not link Foundation;
+# Foundation/CMakeLists.txt exports the same flags to programs that use POCO.
+if(EMSCRIPTEN AND NOT "${POCO_EMSCRIPTEN_FLAGS}" STREQUAL "")
+	separate_arguments(_poco_em_flags UNIX_COMMAND "${POCO_EMSCRIPTEN_FLAGS}")
+	message(STATUS "Using Emscripten flags: ${_poco_em_flags}")
+	add_compile_options(${_poco_em_flags})
+	add_link_options(${_poco_em_flags})
+	unset(_poco_em_flags)
+endif()
+
 #################################################################################
 # Compiler warnings for Poco code only
 #################################################################################

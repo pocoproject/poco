@@ -26,6 +26,8 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Thread.h"
+#include "Poco/Timestamp.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/Buffer.h"
@@ -65,6 +67,24 @@ using Poco::Path;
 
 namespace
 {
+	const Poco::Timespan KEEP_ALIVE_TEST_TIMEOUT(10, 0);
+		/// Limits the socket operations of the sessions in the Keep-Alive timeout tests.
+
+	const Poco::Timespan WAIT_STEP(0, 10000);
+		/// The interval at which waitAtLeast() checks the clock.
+
+	void waitAtLeast(const Poco::Timespan& span)
+		/// Returns once span has passed on the clock of Poco::Timestamp,
+		/// which HTTPClientSession uses; a single sleep can end early on
+		/// some platforms.
+	{
+		const Poco::Timestamp start;
+		while (!start.isElapsed(span.totalMicroseconds()))
+		{
+			Poco::Thread::sleep(static_cast<long>(WAIT_STEP.totalMilliseconds()));
+		}
+	}
+
 	class TunnelClientSession: public HTTPClientSession
 		/// Gives the tests access to proxyTunnel().
 	{
@@ -888,6 +908,19 @@ void HTTPClientSessionTest::assertNewConnectionServes(HTTPClientSession& session
 	std::string body;
 	StreamCopier::copyToString(rs, body);
 	assertTrue (body == "fresh");
+}
+
+
+StreamSocket HTTPClientSessionTest::answerWithKeepAlive(HTTPClientSession& session, ServerSocket& server, HTTPRequest& request, const std::string& keepAliveFields)
+{
+	session.sendRequest(request).flush();
+	StreamSocket connection = server.acceptConnection();
+	receiveHeader(connection);
+	const std::string reply("HTTP/1.1 200 OK\r\nConnection: Keep-Alive\r\n" + keepAliveFields + "Content-Length: 0\r\n\r\n");
+	connection.sendBytes(reply.data(), static_cast<int>(reply.size()));
+	HTTPResponse response;
+	session.receiveResponse(response);
+	return connection;
 }
 
 
@@ -1725,6 +1758,167 @@ void HTTPClientSessionTest::testFixedLengthResponseInPartsNonBlocking()
 }
 
 
+void HTTPClientSessionTest::testServerKeepAliveTimeoutReconnects()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(KEEP_ALIVE_TEST_TIMEOUT);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	// The first connection stays open, so that the timeout is the only reason to reconnect.
+	StreamSocket first = answerWithKeepAlive(cs, server, request, "Keep-Alive: timeout=0\r\n");
+	assertTrue (!cs.canReuse());
+
+	assertNewConnectionServes(cs, server, request);
+}
+
+
+void HTTPClientSessionTest::testServerKeepAliveTimeoutKeepsConnection()
+{
+	for (const std::string& keepAliveFields: {std::string("Keep-Alive: timeout=1\r\n"), std::string("Keep-Alive: timeout=5\r\n"), std::string()})
+	{
+		ServerSocket server(SocketAddress("127.0.0.1", 0));
+		HTTPClientSession cs("127.0.0.1", server.address().port());
+		cs.setKeepAlive(true);
+		cs.setTimeout(KEEP_ALIVE_TEST_TIMEOUT);
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+		StreamSocket first = answerWithKeepAlive(cs, server, request, keepAliveFields);
+		assertTrue (cs.canReuse());
+
+		cs.sendRequest(request).flush();
+		receiveHeader(first);
+		assertTrue (!server.poll(Poco::Timespan(), Socket::SELECT_READ));
+	}
+}
+
+
+void HTTPClientSessionTest::testSessionKeepAliveTimeoutShorterThanServerReconnects()
+{
+	const Poco::Timespan EXPIRED_KEEP_ALIVE_TIMEOUT;
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setKeepAliveTimeout(EXPIRED_KEEP_ALIVE_TIMEOUT);
+	cs.setTimeout(KEEP_ALIVE_TEST_TIMEOUT);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	StreamSocket first = answerWithKeepAlive(cs, server, request, "Keep-Alive: timeout=100\r\n");
+
+	assertNewConnectionServes(cs, server, request);
+}
+
+
+void HTTPClientSessionTest::testProxyTunnelIgnoresServerKeepAliveTimeout()
+{
+	const Poco::Timespan ACCEPT_TIMEOUT(5, 0);
+	const std::string GET_REQUEST_START("GET ");
+	ServerSocket proxy(SocketAddress("127.0.0.1", 0));
+	TunnelClientSession cs("www.somehost.com", HTTPSession::HTTP_PORT);
+	cs.setProxy("127.0.0.1", proxy.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(KEEP_ALIVE_TEST_TIMEOUT);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	// The announced timeout has expired before the tunnel is used.
+	StreamSocket first = answerWithKeepAlive(cs, proxy, request, "Keep-Alive: timeout=0\r\n");
+
+	auto accepted = std::async(std::launch::async, [this, &proxy, &ACCEPT_TIMEOUT]()
+	{
+		StreamSocket connection;
+		if (proxy.poll(ACCEPT_TIMEOUT, Socket::SELECT_READ))
+		{
+			connection = proxy.acceptConnection();
+			receiveHeader(connection);
+			const std::string established("HTTP/1.1 200 Connection established\r\n\r\n");
+			connection.sendBytes(established.data(), static_cast<int>(established.size()));
+		}
+		return connection;
+	});
+	cs.proxyTunnel();
+	StreamSocket tunnel = accepted.get();
+
+	cs.sendRequest(request).flush();
+	assertTrue (!proxy.poll(Poco::Timespan(), Socket::SELECT_READ));
+	assertTrue (receiveHeader(tunnel).compare(0, GET_REQUEST_START.size(), GET_REQUEST_START) == 0);
+}
+
+
+void HTTPClientSessionTest::testServerKeepAliveTimeoutCountedFromResponse()
+{
+	// Longer than the reuse limit of the announced timeout, had it been counted from the request.
+	const Poco::Timespan RESPONSE_DELAY(0, 700000);
+	// Longer than the announced timeout less half of it, shorter than the timeout itself.
+	const Poco::Timespan REUSE_LIMIT_PASSED(0, 600000);
+	const std::string reply("HTTP/1.1 200 OK\r\nConnection: Keep-Alive\r\nKeep-Alive: timeout=1\r\nContent-Length: 0\r\n\r\n");
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(KEEP_ALIVE_TEST_TIMEOUT);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	HTTPResponse response;
+
+	cs.sendRequest(request).flush();
+	StreamSocket first = server.acceptConnection();
+	receiveHeader(first);
+	waitAtLeast(RESPONSE_DELAY);
+	first.sendBytes(reply.data(), static_cast<int>(reply.size()));
+	cs.receiveResponse(response);
+
+	cs.sendRequest(request).flush();
+	receiveHeader(first);
+	assertTrue (!server.poll(Poco::Timespan(), Socket::SELECT_READ));
+	first.sendBytes(reply.data(), static_cast<int>(reply.size()));
+	cs.receiveResponse(response);
+
+	waitAtLeast(REUSE_LIMIT_PASSED);
+	assertNewConnectionServes(cs, server, request);
+}
+
+
+void HTTPClientSessionTest::testServerKeepAliveTimeoutCountedFromPeekedResponse()
+{
+	// Longer than the announced timeout less half of it, shorter than the timeout itself.
+	const Poco::Timespan REUSE_LIMIT_PASSED(0, 600000);
+	const std::string reply("HTTP/1.1 200 OK\r\nConnection: Keep-Alive\r\nKeep-Alive: timeout=1\r\nContent-Length: 0\r\n\r\n");
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(KEEP_ALIVE_TEST_TIMEOUT);
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/", HTTPMessage::HTTP_1_1);
+	request.setExpectContinue(true);
+	request.setContentLength(0);
+	HTTPResponse response;
+
+	cs.sendRequest(request).flush();
+	StreamSocket first = server.acceptConnection();
+	receiveHeader(first);
+	first.sendBytes(reply.data(), static_cast<int>(reply.size()));
+	assertTrue (!cs.peekResponse(response));
+
+	waitAtLeast(REUSE_LIMIT_PASSED);
+	cs.receiveResponse(response);
+	assertTrue (!cs.canReuse());
+}
+
+
+void HTTPClientSessionTest::testServerKeepAliveTimeoutLessOneSecond()
+{
+	// Longer than half of the announced timeout, shorter than the timeout less one second.
+	const Poco::Timespan BEYOND_HALF_TIMEOUT(2, 300000);
+	// Added to the first wait, longer than the timeout less one second, shorter than the timeout itself.
+	const Poco::Timespan BEYOND_REUSE_LIMIT(0, 900000);
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	HTTPClientSession cs("127.0.0.1", server.address().port());
+	cs.setKeepAlive(true);
+	cs.setTimeout(KEEP_ALIVE_TEST_TIMEOUT);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/", HTTPMessage::HTTP_1_1);
+	StreamSocket first = answerWithKeepAlive(cs, server, request, "Keep-Alive: timeout=4\r\n");
+
+	waitAtLeast(BEYOND_HALF_TIMEOUT);
+	assertTrue (cs.canReuse());
+	waitAtLeast(BEYOND_REUSE_LIMIT);
+	assertTrue (!cs.canReuse());
+}
+
+
 StreamSocket HTTPClientSessionTest::sendBodyUntilFailure(HTTPClientSession& session, ServerSocket& server)
 {
 	const Poco::Int64 contentLength = 64 * 1024 * 1024;
@@ -1899,6 +2093,13 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testShortRequestWriteClosesConnection);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testFailedChunkedHeaderSendThrows);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testFailedReconnectIsNotRetried);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testServerKeepAliveTimeoutReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testServerKeepAliveTimeoutKeepsConnection);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testSessionKeepAliveTimeoutShorterThanServerReconnects);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyTunnelIgnoresServerKeepAliveTimeout);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testServerKeepAliveTimeoutCountedFromResponse);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testServerKeepAliveTimeoutCountedFromPeekedResponse);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testServerKeepAliveTimeoutLessOneSecond);
 
 	return pSuite;
 }

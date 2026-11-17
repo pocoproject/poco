@@ -217,7 +217,7 @@ int UTF16Encoding::queryConvert(const unsigned char* bytes, int length) const
 				{
 					uc2 = ByteOrder::flipBytes(uc2);
 				}
-				if (uc2 >= 0xdc00 && uc < 0xe000)
+				if (uc2 >= 0xdc00 && uc2 < 0xe000)
 				{
 					ret = ((uc & 0x3ff) << 10) + (uc2 & 0x3ff) + 0x10000;
 				}

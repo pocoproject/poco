@@ -20,6 +20,8 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/MessageHeader.h"
+#include "Poco/Timespan.h"
+#include <optional>
 
 
 namespace Poco::Net {
@@ -131,6 +133,11 @@ public:
 		///   * the message has a Connection header field and its value is "Keep-Alive"
 		///   * the message is a HTTP/1.1 message and not Connection header is set
 		/// Returns false otherwise.
+
+	[[nodiscard]] std::optional<Poco::Timespan> getKeepAliveTimeout() const;
+		/// Returns the timeout parameter of the Keep-Alive header,
+		/// or std::nullopt if the header or the parameter is missing
+		/// or not a non-negative integer number of seconds.
 
 	void write(std::ostream& ostr) const override;
 		/// Writes the header fields as MessageHeader::write() does,

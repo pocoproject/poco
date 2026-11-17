@@ -15,10 +15,13 @@
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "Poco/Zip/ZipDataInfo.h"
 #include "Poco/Zip/ParseCallback.h"
+#include "Poco/Zip/ZipException.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
 #include "Poco/File.h"
+#include "Poco/Format.h"
 #include <cstring>
+#include <ios>
 
 
 namespace Poco::Zip {
@@ -71,31 +74,64 @@ ZipLocalFileHeader::ZipLocalFileHeader(std::istream& inp, bool assumeHeaderRead,
 
     bool ok = callback.handleZipEntry(inp, *this);
 
-    if (ok)
+    // The stream is repositioned only if it can report its position (_startPos is not negative) and the
+    // callback has not read past its end, which it does if the entry data is truncated.
+    const bool reposition = _startPos >= 0 && inp.good();
+    if (searchCRCAndSizesAfterData())
     {
-        if (searchCRCAndSizesAfterData())
+        bool atDataDescriptor = ok;
+        if (!ok && reposition)
+        {
+            // A declined entry may have left the stream anywhere in its data: search its data descriptor from the start.
+            // If there is none before the end of the stream, the parse ends there.
+            inp.seekg(getDataStartPos(), std::ios::beg);
+            if (!inp.good()) throw Poco::IOException("Failed to seek on input stream");
+            ZipUtil::syncDataDescriptor(inp, _forceZip64);
+            atDataDescriptor = inp.good();
+        }
+        if (atDataDescriptor)
         {
             char header[ZipCommon::HEADER_SIZE]={'\x00', '\x00', '\x00', '\x00'};
             inp.read(header, ZipCommon::HEADER_SIZE);
+            if (inp.gcount() != ZipCommon::HEADER_SIZE)
+                throw Poco::IOException("Failed to read data info header");
             if (_forceZip64)
             {
                 ZipDataInfo64 nfo(inp, true);
+                if (!nfo.isValid())
+                    throw Poco::IOException("Failed to read data info header");
                 setCRC(nfo.getCRC32());
                 setCompressedSize(nfo.getCompressedSize());
                 setUncompressedSize(nfo.getUncompressedSize());
+                ZipUtil::verifySizeOrOffset(_compressedSize, "Compressed size out of range", _fileName);
+                ZipUtil::verifySizeOrOffset(_uncompressedSize, "Uncompressed size out of range", _fileName);
             }
             else
             {
                 ZipDataInfo nfo(inp, true);
+                if (!nfo.isValid())
+                    throw Poco::IOException("Failed to read data info header");
                 setCRC(nfo.getCRC32());
                 setCompressedSize(nfo.getCompressedSize());
                 setUncompressedSize(nfo.getUncompressedSize());
             }
         }
+        else if (!reposition)
+        {
+            // A declined entry may have a data descriptor after its data, so the next record is searched for.
+            ZipUtil::sync(inp);
+        }
     }
-    else
+    else if (reposition)
     {
-        poco_assert_dbg(!searchCRCAndSizesAfterData());
+        // The callback may have read less than the data of the entry, or nothing. If the data runs past the
+        // end of the stream, the seek fails or the next read finds the end, and the parse ends there.
+        const std::streamoff dataEnd = getDataEndPos();
+        if (inp.tellg() != dataEnd)
+            inp.seekg(dataEnd, std::ios::beg);
+    }
+    else if (!ok)
+    {
         ZipUtil::sync(inp);
     }
     _endPos = _startPos + getHeaderSize() + _compressedSize; // exclude the data block!
@@ -124,8 +160,14 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 
     // read the rest of the header
     inp.read(_rawHeader + ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
-    poco_assert (_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED);
-    poco_assert (getMajorVersionNumber() <= 4); // Allow for Zip64 version 4.5
+    if (inp.gcount() != static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE)
+        throw Poco::IOException("Failed to read local file header");
+    const int hostSystem = static_cast<unsigned char>(_rawHeader[VERSION_POS + 1]);
+    if (hostSystem >= ZipCommon::HS_UNUSED)
+        throw ZipException(Poco::format("Unsupported host system (%d)", hostSystem));
+    const int version = static_cast<unsigned char>(_rawHeader[VERSION_POS]);
+    if (version / 10 > 4) // ZIP64 needs version 4.5
+        throw ZipException(Poco::format("Unsupported version needed to extract (%d.%d)", version / 10, version % 10));
     // Note: compression method is not validated here to allow parsing archives with
     // unsupported methods (BZIP2, LZMA, etc.). Validation happens at decompression time.
     parseDateTime();
@@ -134,6 +176,8 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     {
     	Poco::Buffer<char> buf(len);
     	inp.read(buf.begin(), len);
+		if (inp.gcount() != len)
+			throw Poco::IOException("Failed to read file name");
     	_fileName = std::string(buf.begin(), len);
 	}
 
@@ -151,6 +195,8 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
         {
 			Poco::Buffer<char> xtra(len);
 			inp.read(xtra.begin(), len);
+			if (inp.gcount() != len)
+				throw Poco::IOException("Failed to read extra field");
 			_extraField = std::string(xtra.begin(), len);
 			// The field sizes come from the archive, so every read is bounded by
 			// the buffer that was actually read rather than by the declared size.
@@ -182,6 +228,8 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 			}
         }
     }
+    ZipUtil::verifySizeOrOffset(_compressedSize, "Compressed size out of range", _fileName);
+    ZipUtil::verifySizeOrOffset(_uncompressedSize, "Uncompressed size out of range", _fileName);
 }
 
 

@@ -42,7 +42,21 @@ private:
 };
 
 
-typedef MutexImpl FastMutexImpl;
+class Foundation_API FastMutexImpl
+	/// Non-recursive mutex based on an SRW lock;
+	/// a CRITICAL_SECTION would be recursive.
+{
+protected:
+	FastMutexImpl() = default;
+	~FastMutexImpl() = default;
+	void lockImpl();
+	[[nodiscard]] bool tryLockImpl();
+	[[nodiscard]] bool tryLockImpl(long milliseconds);
+	void unlockImpl();
+
+private:
+	SRWLOCK _lock = SRWLOCK_INIT;
+};
 
 
 //
@@ -77,6 +91,24 @@ inline bool MutexImpl::tryLockImpl()
 inline void MutexImpl::unlockImpl()
 {
 	LeaveCriticalSection(&_cs);
+}
+
+
+inline void FastMutexImpl::lockImpl()
+{
+	::AcquireSRWLockExclusive(&_lock);
+}
+
+
+inline bool FastMutexImpl::tryLockImpl()
+{
+	return ::TryAcquireSRWLockExclusive(&_lock) != 0;
+}
+
+
+inline void FastMutexImpl::unlockImpl()
+{
+	::ReleaseSRWLockExclusive(&_lock);
 }
 
 

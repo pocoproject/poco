@@ -14,12 +14,37 @@
 #include "Poco/Base32Encoder.h"
 #include "Poco/Base32Decoder.h"
 #include "Poco/Exception.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
 using Poco::Base32Encoder;
 using Poco::Base32Decoder;
 using Poco::DataFormatException;
+
+
+namespace
+{
+	std::string decode(const std::string& encoded)
+		/// Returns the decoded data, or the message of the DataFormatException thrown.
+	{
+		std::istringstream istr(encoded);
+		Base32Decoder decoder(istr);
+		decoder.exceptions(std::ios::badbit);
+		std::string result;
+		try
+		{
+			Poco::StreamCopier::copyToString(decoder, result);
+		}
+		catch (DataFormatException& exc)
+		{
+			// A build with ENABLE_TRACE appends a stack trace after a line break.
+			const std::string& msg = exc.message();
+			return "exception: " + msg.substr(0, msg.find('\n'));
+		}
+		return result;
+	}
+}
 
 
 Base32Test::Base32Test(const std::string& name): CppUnit::TestCase(name)
@@ -441,6 +466,26 @@ void Base32Test::testEncodeDecodeCrockford()
 }
 
 
+void Base32Test::testDecoderMalformed()
+{
+	assertEqual (std::string("f"), decode("MY======"));
+	assertEqual (std::string("foo"), decode("MZXW6==="));
+	assertEqual (std::string("fooba"), decode("MZXW6YTB"));
+	assertEqual (std::string("foobar"), decode("MZXW6YTBOI======"));
+	assertEqual (std::string("f"), decode("MY"));
+	assertEqual (std::string("foo"), decode("MZXW6"));
+	assertEqual (std::string("exception: unexpected Base32 padding at position 0"), decode("========"));
+	assertEqual (std::string("exception: unexpected Base32 padding at position 3"), decode("MZX====="));
+	assertEqual (std::string("exception: Base32 data after padding: 'A' at position 3"), decode("MY=A===="));
+	assertEqual (std::string("exception: Base32 data after padding: 'A' at position 6"), decode("MZXW6=A="));
+	assertEqual (std::string("exception: Base32 data after padding: 'M' at position 8"), decode("MY======MY======"));
+	assertEqual (std::string("exception: incomplete Base32 group at end of input"), decode("M"));
+	assertEqual (std::string("exception: incomplete Base32 group at end of input"), decode("MZX"));
+	assertEqual (std::string("exception: incomplete Base32 group at end of input"), decode("MY=="));
+	assertEqual (std::string("exception: invalid Base32 character '#' at position 2"), decode("MY#====="));
+}
+
+
 void Base32Test::setUp()
 {
 }
@@ -464,6 +509,7 @@ CppUnit::Test* Base32Test::suite()
 	CppUnit_addTest(pSuite, Base32Test, testEncodeDecode);
 	CppUnit_addTest(pSuite, Base32Test, testEncodeDecodeHex);
 	CppUnit_addTest(pSuite, Base32Test, testEncodeDecodeCrockford);
+	CppUnit_addTest(pSuite, Base32Test, testDecoderMalformed);
 
 	return pSuite;
 }

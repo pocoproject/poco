@@ -15,10 +15,14 @@
 #include "Poco/DOM/DOMWriter.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
+#include "Poco/DOM/Comment.h"
+#include "Poco/DOM/ProcessingInstruction.h"
 #include "Poco/DOM/NodeList.h"
+#include "Poco/DOM/Text.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/XML/XMLWriter.h"
+#include "Poco/XML/XMLException.h"
 #include <sstream>
 
 
@@ -28,6 +32,10 @@ using Poco::XML::XMLReader;
 using Poco::XML::XMLWriter;
 using Poco::XML::Document;
 using Poco::XML::NodeList;
+using Poco::XML::Element;
+using Poco::XML::Text;
+using Poco::XML::Comment;
+using Poco::XML::ProcessingInstruction;
 using Poco::XML::AutoPtr;
 using Poco::XML::InputSource;
 
@@ -123,6 +131,40 @@ void ParserWriterTest::testParseWriteCDATATerminator()
 }
 
 
+void ParserWriterTest::testWriteCommentPITerminator()
+{
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElement("r");
+	AutoPtr<Comment> pComment = pDoc->createComment("--><admin/><!--");
+	pRoot->appendChild(pComment);
+	pDoc->appendChild(pRoot);
+
+	DOMWriter writer;
+	try
+	{
+		std::ostringstream ostr;
+		writer.writeNode(ostr, pDoc);
+		fail("comment with \"--\" - must throw exception");
+	}
+	catch (const Poco::XML::XMLException&)
+	{
+	}
+
+	pRoot->removeChild(pComment);
+	AutoPtr<ProcessingInstruction> pPI = pDoc->createProcessingInstruction("target", "?><admin/><?x");
+	pRoot->appendChild(pPI);
+	try
+	{
+		std::ostringstream ostr;
+		writer.writeNode(ostr, pDoc);
+		fail("\"?>\" in processing instruction data - must throw exception");
+	}
+	catch (const Poco::XML::XMLException&)
+	{
+	}
+}
+
+
 void ParserWriterTest::testMaxElementDepth()
 {
 	DOMParser parser;
@@ -137,6 +179,27 @@ void ParserWriterTest::testMaxElementDepth()
 	{
 		
 	}
+}
+
+
+void ParserWriterTest::testWriteParseTextCR()
+{
+	const std::string CR_TEXT("a\r\nb\rc");
+
+	AutoPtr<Document> pDoc = new Document;
+	AutoPtr<Element> pRoot = pDoc->createElement("v");
+	AutoPtr<Text> pText = pDoc->createTextNode(CR_TEXT);
+	pRoot->appendChild(pText);
+	pDoc->appendChild(pRoot);
+
+	std::ostringstream ostr;
+	DOMWriter writer;
+	writer.writeNode(ostr, pDoc);
+	assertEqual ("<v>a&#xD;\nb&#xD;c</v>", ostr.str());
+
+	DOMParser parser;
+	AutoPtr<Document> pParsedDoc = parser.parseString(ostr.str());
+	assertEqual (CR_TEXT, pParsedDoc->documentElement()->innerText());
 }
 
 
@@ -158,7 +221,9 @@ CppUnit::Test* ParserWriterTest::suite()
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteXHTML2);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteSimple);
 	CppUnit_addTest(pSuite, ParserWriterTest, testParseWriteCDATATerminator);
+	CppUnit_addTest(pSuite, ParserWriterTest, testWriteCommentPITerminator);
 	CppUnit_addTest(pSuite, ParserWriterTest, testMaxElementDepth);
+	CppUnit_addTest(pSuite, ParserWriterTest, testWriteParseTextCR);
 
 	return pSuite;
 }

@@ -19,6 +19,11 @@
 #include "Poco/PatternFormatter.h"
 #include "Poco/FormattingChannel.h"
 #include "Poco/NullChannel.h"
+#include "Poco/FileStream.h"
+#include "Poco/Process.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Bugcheck.h"
 #include <atomic>
 #include <functional>
 #include <thread>
@@ -296,6 +301,37 @@ namespace
 
 
 	thread_local LastWords lastWords;
+
+
+	// These detect the defect only when Foundation is linked statically, where they are constructed before and destroyed after the logger map:
+	// the construction where a zero-filled mutex cannot be locked, such as on macOS, the destruction under AddressSanitizer.
+	Logger& staticInitLogger = Logger::get("LoggerTest.StaticInit");
+		/// Asked for while the static objects of the program are constructed.
+
+
+	struct LogsWhenDestroyed
+		/// Logs while the static objects of the program are destroyed.
+	{
+		LogsWhenDestroyed() = default;
+		~LogsWhenDestroyed();
+	};
+
+
+	LogsWhenDestroyed::~LogsWhenDestroyed()
+	{
+		try
+		{
+			Logger::get("LoggerTest.StaticDestruction").information("static object destroyed");
+			staticInitLogger.information("static object destroyed");
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
+	}
+
+
+	LogsWhenDestroyed logsWhenDestroyed;
 }
 
 
@@ -342,7 +378,7 @@ void LoggerTest::testLogger()
 
 	std::vector<std::string> loggers;
 	Logger::names(loggers);
-	assertTrue (loggers.size() == 7);
+	assertTrue (loggers.size() == 8);
 	assertTrue (loggers[0] == "");
 	assertTrue (loggers[1] == "Logger1");
 	assertTrue (loggers[2] == "Logger1.Logger1");
@@ -350,6 +386,7 @@ void LoggerTest::testLogger()
 	assertTrue (loggers[4] == "Logger2");
 	assertTrue (loggers[5] == "Logger2.Logger1");
 	assertTrue (loggers[6] == "Logger2.Logger2");
+	assertTrue (loggers[7] == "LoggerTest.StaticInit");
 
 	Logger::setLevel("Logger1", Message::PRIO_DEBUG);
 	assertTrue (logger1.is(Message::PRIO_DEBUG));
@@ -806,6 +843,19 @@ void LoggerTest::testGetDuringDestructionOfDetached()
 }
 
 
+void LoggerTest::testGetDuringDestroy()
+{
+	// While destroy() releases a logger and its channel, any thread may
+	// ask for a logger.
+	auto getOne = [] { Logger::get("TestLogger.AskedFor").information("asked for while a logger is destroyed"); };
+
+	auto pBystander = std::make_shared<Bystander>(getOne);
+	Logger::get("TestLogger.Destroyed").setChannel(new LastWordsChannel(pBystander));
+	Logger::destroy("TestLogger.Destroyed");
+	assertTrue (pBystander->couldLog());
+}
+
+
 void LoggerTest::testConcurrentSetLevel()
 {
 	Logger& logger = Logger::get("TestLogger.ConcurrentLevel");
@@ -1038,6 +1088,74 @@ void LoggerTest::testLogWhileThreadEnds()
 }
 
 
+void LoggerTest::testChannelsReleasedAtExit()
+{
+// In a Windows DLL build, ExitProcess ends the AsyncChannel worker before the DLL's static objects are destroyed, so its queue cannot be drained.
+#if !defined(POCO_VXWORKS) && !defined(POCO_NO_FORK_EXEC) && !(defined(_WIN32) && defined(POCO_DLL))
+	std::string name("TestApp");
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+	// TestApp writes the last line, "released", when the channel in front of
+	// its FileChannel is destroyed. That happens only when the AsyncChannel is
+	// destroyed, after its worker has written every message, and at exit only
+	// through the release of the channels, so neither the line count nor the
+	// last line depends on how fast the worker is. The worker passes every
+	// message through a FormattingChannel, slowly, so it is still there when
+	// TestApp's main() returns: released by the worker, the AsyncChannel
+	// would wait for itself.
+#if defined(_WIN32)
+	// The pause of 1 ms per message lasts a timer tick of about 15 ms there.
+	constexpr int COUNT = 200;
+#else
+	constexpr int COUNT = 1000;
+#endif
+	constexpr Poco::Timestamp::TimeDiff EXIT_TIMEOUT = 30*Poco::Timestamp::resolution();
+	Poco::TemporaryFile logFile;
+	std::vector<std::string> args;
+	args.push_back("-log-async");
+	args.push_back(logFile.path());
+	args.push_back(std::to_string(COUNT));
+	Poco::ProcessHandle ph = Poco::Process::launch(name, args);
+	Poco::Timestamp waitStart;
+	int rc = ph.tryWait();
+	while (rc == -1)
+	{
+		if (waitStart.isElapsed(EXIT_TIMEOUT))
+		{
+			try
+			{
+				Poco::Process::kill(ph);
+				ph.wait();
+			}
+			catch (...)
+			{
+			}
+			fail("TestApp did not exit in time");
+		}
+		Thread::sleep(10);
+		rc = ph.tryWait();
+	}
+	assertEqual (0, rc);
+
+	Poco::FileInputStream istr(logFile.path());
+	int lines = 0;
+	std::string line;
+	std::string lastLine;
+	while (std::getline(istr, line))
+	{
+		// LogFile ends lines with "\r\n" on Windows.
+		if (!line.empty() && line.back() == '\r') line.pop_back();
+		++lines;
+		lastLine = line;
+	}
+	assertEqual (COUNT + 1, lines);
+	assertEqual (std::string("released"), lastLine);
+#endif
+}
+
+
 void LoggerTest::setUp()
 {
 	Logger::shutdown();
@@ -1064,6 +1182,7 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testConcurrentShutdown);
 	CppUnit_addTest(pSuite, LoggerTest, testLogDuringDestructionOfReplaced);
 	CppUnit_addTest(pSuite, LoggerTest, testGetDuringDestructionOfDetached);
+	CppUnit_addTest(pSuite, LoggerTest, testGetDuringDestroy);
 	CppUnit_addTest(pSuite, LoggerTest, testConcurrentSetLevel);
 	CppUnit_addTest(pSuite, LoggerTest, testReplacedChannelReleased);
 	CppUnit_addTest(pSuite, LoggerTest, testReplaceChannelWithMessageOnItsWay);
@@ -1071,6 +1190,7 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testReplacedChannelNotKeptByLaterMessage);
 	CppUnit_addTest(pSuite, LoggerTest, testChannelReplacesItself);
 	CppUnit_addTest(pSuite, LoggerTest, testLogWhileThreadEnds);
+	CppUnit_addTest(pSuite, LoggerTest, testChannelsReleasedAtExit);
 
 	return pSuite;
 }

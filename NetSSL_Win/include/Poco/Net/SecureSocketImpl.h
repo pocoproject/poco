@@ -316,6 +316,18 @@ protected:
 
 	void sendOutSecBufferAndAdvanceState(State state);
 	void drainExtraBuffer();
+	[[nodiscard]] bool processPostHandshakeRecord();
+		/// Hands the post-handshake record at the start of _recvBuffer to the handshake
+		/// state machine of the socket's mode. The records after it are read again before
+		/// anything from the socket.
+		/// Returns true when the state machine has reached ST_DONE, false when a non-blocking
+		/// socket has to wait for the peer.
+		/// A server ends the connection with an SSLException when the record starts a
+		/// renegotiation (any post-handshake message before TLS 1.3).
+	[[noreturn]] void failConnection(const std::string& message, const std::string& detail = std::string());
+		/// Releases the security context and the buffers (see cleanup()), puts the
+		/// socket into the error state and throws an SSLException with the message
+		/// and the detail.
 	[[nodiscard]] static int recordLength(const BYTE* pBuffer, int length);
 	[[nodiscard]] static bool bufferHasCompleteRecords(const BYTE* pBuffer, int length);
 	[[nodiscard]] static bool isRecordStart(BYTE firstByte);

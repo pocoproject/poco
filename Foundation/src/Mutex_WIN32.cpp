@@ -14,9 +14,39 @@
 
 #include "Poco/Mutex_WIN32.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
+#include <type_traits>
 
 
 namespace Poco {
+
+
+namespace {
+
+
+template <typename TryLock>
+[[nodiscard]] bool pollTryLock(TryLock tryLock, long milliseconds)
+	/// Calls tryLock() until it returns true or the given number of
+	/// milliseconds has elapsed. Returns true if the lock was acquired.
+	/// Win32 has no timed acquire for critical sections and SRW locks.
+{
+	static_assert(std::is_invocable_r_v<bool, TryLock&>, "pollTryLock() requires a callable that returns bool");
+
+	constexpr DWORD SLEEP_MILLISECONDS = 5;
+	const Timestamp start;
+	const Timestamp::TimeDiff timeout = static_cast<Timestamp::TimeDiff>(milliseconds)*Timespan::MILLISECONDS;
+	do
+	{
+		if (tryLock())
+			return true;
+		::Sleep(SLEEP_MILLISECONDS);
+	}
+	while (!start.isElapsed(timeout));
+	return false;
+}
+
+
+} // namespace
 
 
 MutexImpl::MutexImpl()
@@ -35,24 +65,13 @@ MutexImpl::~MutexImpl()
 
 bool MutexImpl::tryLockImpl(long milliseconds)
 {
-	constexpr int sleepMillis = 5;
-	Timestamp now;
-	Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
-	do
-	{
-		try
-		{
-			if (TryEnterCriticalSection(&_cs) == TRUE)
-				return true;
-		}
-		catch (...)
-		{
-			throw SystemException("cannot lock mutex", Error::getLastMessage());
-		}
-		Sleep(sleepMillis);
-	}
-	while (!now.isElapsed(diff));
-	return false;
+	return pollTryLock([this] { return tryLockImpl(); }, milliseconds);
+}
+
+
+bool FastMutexImpl::tryLockImpl(long milliseconds)
+{
+	return pollTryLock([this] { return tryLockImpl(); }, milliseconds);
 }
 
 

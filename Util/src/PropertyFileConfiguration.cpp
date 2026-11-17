@@ -31,6 +31,23 @@ using Poco::Path;
 namespace Poco::Util {
 
 
+namespace {
+
+
+bool isContinued(const std::string& line)
+	/// Returns true if the line ends in an odd number of backslashes: the
+	/// last one is then not escaped and continues the value on the next
+	/// line, as readChar() reads it.
+{
+	std::string::size_type count = 0;
+	for (auto it = line.rbegin(); it != line.rend() && *it == '\\'; ++it) ++count;
+	return (count % 2) != 0;
+}
+
+
+} // namespace
+
+
 PropertyFileConfiguration::~PropertyFileConfiguration() = default;
 
 
@@ -245,8 +262,8 @@ void PropertyFileConfiguration::saveToFile(const std::string& path, const std::m
 				}
 				// Key not in values (removed) — skip line
 
-				// Skip any continuation lines (trailing backslash)
-				while (!line.empty() && line.back() == '\\')
+				// Skip any continuation lines (unescaped trailing backslash)
+				while (isContinued(line))
 				{
 					if (!std::getline(istr, line)) break;
 					if (!line.empty() && line.back() == '\r')

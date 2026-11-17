@@ -1,5 +1,6 @@
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
+list(REMOVE_ITEM SRCS_G ${CMAKE_CURRENT_SOURCE_DIR}/src/DaemonTestApp.cpp)
 POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 
 # Headers
@@ -33,3 +34,15 @@ else()
 	)
 endif()
 target_link_libraries(Util-testrunner PUBLIC Poco::Util Poco::JSON Poco::XML CppUnit)
+
+if(UNIX AND NOT ANDROID)
+	poco_add_executable(DaemonTestApp src/DaemonTestApp.cpp)
+	# DaemonTestApp is built into the runtime directory, which the Util test puts on PATH,
+	# so that ServerApplicationTest can launch it.
+	set_target_properties(DaemonTestApp PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+	)
+	target_link_libraries(DaemonTestApp PUBLIC Poco::Util)
+	add_dependencies(Util-testrunner DaemonTestApp)
+	set_property(TEST Util APPEND PROPERTY ENVIRONMENT "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}:$ENV{PATH}")
+endif()

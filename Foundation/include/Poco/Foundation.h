@@ -37,28 +37,30 @@
 
 
 //
-// The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the Foundation_EXPORTS
-// symbol defined on the command line. This symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file sees
-// Foundation_API functions as being imported from a DLL, whereas this DLL sees symbols
-// defined with this macro as being exported.
+// POCO_API_EXPORT and POCO_API_IMPORT are the attributes of the classes and
+// functions of a shared library. The library uses POCO_API_EXPORT while it is
+// compiled, when its <Library>_EXPORTS symbol is defined; code that uses the
+// library uses POCO_API_IMPORT.
 //
 #if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(Foundation_EXPORTS)
-		#define Foundation_API __declspec(dllexport)
-	#else
-		#define Foundation_API __declspec(dllimport)
-	#endif
+	#define POCO_API_EXPORT __declspec(dllexport)
+	#define POCO_API_IMPORT __declspec(dllimport)
+#elif !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined(__GNUC__)
+	#define POCO_API_EXPORT __attribute__ ((visibility ("default")))
+	#define POCO_API_IMPORT __attribute__ ((visibility ("default")))
+#else
+	#define POCO_API_EXPORT
+	#define POCO_API_IMPORT
 #endif
 
 
-#if !defined(Foundation_API)
-	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
-		#define Foundation_API __attribute__ ((visibility ("default")))
-	#else
-		#define Foundation_API
-	#endif
+//
+// Foundation_EXPORTS is defined only while this library is compiled.
+//
+#if defined(Foundation_EXPORTS)
+	#define Foundation_API POCO_API_EXPORT
+#else
+	#define Foundation_API POCO_API_IMPORT
 #endif
 
 

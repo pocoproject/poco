@@ -1,0 +1,18 @@
+From: alice@example.com
+To: bob@example.org
+Subject: Weekly report
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="part-boundary"
+
+--part-boundary
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+The report is attached.
+--part-boundary
+Content-Type: application/octet-stream; name="report.bin"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="report.bin"
+
+AAECAwQFBgcICQoLDA0ODw==
+--part-boundary--

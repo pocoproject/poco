@@ -124,6 +124,23 @@ void FormattingChannel::log(const Message& msg)
 }
 
 
+void FormattingChannel::log(Message&& msg)
+{
+	DeferredRelease::Reader reader;
+	Parts& parts = *_pCurrentParts.load();
+	if (parts.pChannel != nullptr)
+	{
+		if (parts.pFormatter != nullptr)
+		{
+			std::string text;
+			parts.pFormatter->format(msg, text);
+			msg.setText(std::move(text));
+		}
+		parts.pChannel->log(std::move(msg));
+	}
+}
+
+
 void FormattingChannel::setProperty(const std::string& name, const std::string& value)
 {
 	if (name == "channel")

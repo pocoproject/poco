@@ -24,6 +24,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Runnable.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Notification.h"
 #include "Poco/NotificationQueue.h"
 #include <atomic>
 
@@ -68,18 +69,27 @@ public:
 	void open() override;
 	/// Opens the channel and creates the
 	/// background logging thread.
+	///
+	/// open() after close() makes the channel accept messages again.
 
 	void close() override;
-	/// Closes the channel and stops the background
-	/// logging thread.
+	/// Closes the channel: delivers the queued messages and then
+	/// stops the background logging thread.
+	///
+	/// A message logged after close() is discarded; a message logged
+	/// while close() runs may be delivered only after a later open().
 
 	void log(const Message& msg) override;
 		/// Queues the message for processing by the
 		/// background thread.
+		///
+		/// log() starts the background thread without calling open().
 
 	void log(Message&& msg) override;
 		/// Queues the message for processing by the
 		/// background thread, moving the message to avoid copying.
+		///
+		/// log() starts the background thread without calling open().
 
 	void setProperty(const std::string& name, const std::string& value) override;
 	/// Sets or changes a configuration property.
@@ -129,16 +139,28 @@ private:
 	template <typename M>
 	void logImpl(M&& msg);
 
+	void startWorker();
+		/// Starts the background logging thread unless the
+		/// channel is closed or the thread is running.
+
+	void startThread();
+		/// Starts the background logging thread and marks it
+		/// as running. The caller holds _threadMutex.
+
 	Channel::Ptr _pChannel;
 	Thread    _thread;
 	FastMutex _threadMutex;
 	mutable FastMutex _channelMutex;
 	NotificationQueue _queue;
-	std::size_t _queueSize = 0;
-	std::size_t _dropCount = 0;
+	std::atomic<std::size_t> _queueSize{0};
+	std::atomic<std::size_t> _dropCount{0};
 	std::atomic<bool> _closed;
+	std::atomic<bool> _running{false};
 	std::atomic<bool> _inErrorHandler{false};
-	bool _enableCpuAffinity = false;
+	std::atomic<bool> _enableCpuAffinity{false};
+	Notification::Ptr _pStop;
+		/// Queued by close(), it ends the background thread after the
+		/// messages queued before it.
 };
 
 

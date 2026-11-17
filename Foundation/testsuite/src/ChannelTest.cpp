@@ -17,12 +17,16 @@
 #include "Poco/Message.h"
 #include "Poco/Formatter.h"
 #include "Poco/FormattingChannel.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/Logger.h"
 #include "Poco/ConsoleChannel.h"
 #include "Poco/StreamChannel.h"
 #include "Poco/Event.h"
 #include "Poco/ErrorHandler.h"
 #include "Poco/Exception.h"
 #include "Poco/Mutex.h"
+#include "Poco/NumberParser.h"
+#include "Poco/String.h"
 #include "TestChannel.h"
 #include <atomic>
 #include <limits>
@@ -40,6 +44,8 @@ using Poco::ConsoleChannel;
 using Poco::StreamChannel;
 using Poco::Channel;
 using Poco::Formatter;
+using Poco::PatternFormatter;
+using Poco::Logger;
 using Poco::Message;
 using Poco::AutoPtr;
 using Poco::Event;
@@ -180,6 +186,12 @@ namespace
 			return _allCalled.tryWait(milliseconds);
 		}
 
+		[[nodiscard]] int calls() const
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _calls;
+		}
+
 		[[nodiscard]] std::size_t threadCount() const
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
@@ -233,13 +245,19 @@ namespace
 
 	class LoggingErrorHandler: public Poco::ErrorHandler
 		/// Counts its calls and logs a message through the given channel in each.
+		/// Given a release event, it signals that it was entered and waits for
+		/// the event before it logs.
 	{
 	public:
-		LoggingErrorHandler(Channel& channel, int calls):
+		LoggingErrorHandler(Channel& channel, int calls, Event* pRelease = nullptr):
 			_channel(channel),
+			_pRelease(pRelease),
 			_calls(calls)
 		{
 		}
+
+		LoggingErrorHandler(const LoggingErrorHandler&) = delete;
+		LoggingErrorHandler& operator = (const LoggingErrorHandler&) = delete;
 
 		void exception(const Poco::Exception&) override
 		{
@@ -261,6 +279,11 @@ namespace
 			return _allCalled.tryWait(milliseconds);
 		}
 
+		[[nodiscard]] bool waitEntered(long milliseconds)
+		{
+			return _entered.tryWait(milliseconds);
+		}
+
 		[[nodiscard]] int count() const
 		{
 			return _count.load();
@@ -269,11 +292,20 @@ namespace
 	private:
 		void report()
 		{
+			constexpr long TIMEOUT = 10000;
+
+			if (_pRelease != nullptr)
+			{
+				_entered.set();
+				(void) _pRelease->tryWait(TIMEOUT);
+			}
 			_channel.log(Message("Handler", "Target failed", Message::PRIO_ERROR));
 			if (++_count == _calls) _allCalled.set();
 		}
 
 		Channel& _channel;
+		Event* _pRelease;
+		Event _entered;
 		Event _allCalled;
 		std::atomic<int> _count{0};
 		int _calls;
@@ -301,6 +333,135 @@ namespace
 		int _generation;
 		std::atomic<int>& _torn;
 	};
+
+
+	struct MoveTally
+		/// The messages that a MoveCountingChannel has got.
+	{
+		int copied = 0;
+		int moved = 0;
+		bool inPlace = false;
+		Message last;
+	};
+
+
+	class MoveCountingChannel: public Channel
+		/// Counts the messages it gets as rvalues and as const references,
+		/// and keeps a copy of the last one. log(Message&&) also notes
+		/// whether it got the very message that the test logged.
+	{
+	public:
+		explicit MoveCountingChannel(MoveTally& tally, const Message* pOriginal = nullptr);
+		MoveCountingChannel() = delete;
+		MoveCountingChannel(const MoveCountingChannel&) = delete;
+		MoveCountingChannel& operator = (const MoveCountingChannel&) = delete;
+
+		void log(const Message& msg) override;
+		void log(Message&& msg) override;
+
+	protected:
+		~MoveCountingChannel() override = default;
+
+	private:
+		MoveTally& _tally;
+		const Message* _pOriginal;
+	};
+
+
+	MoveCountingChannel::MoveCountingChannel(MoveTally& tally, const Message* pOriginal):
+		_tally(tally),
+		_pOriginal(pOriginal)
+	{
+	}
+
+
+	void MoveCountingChannel::log(const Message& msg)
+	{
+		++_tally.copied;
+		_tally.last = msg;
+	}
+
+
+	void MoveCountingChannel::log(Message&& msg)
+	{
+		++_tally.moved;
+		_tally.inPlace = (&msg == _pOriginal);
+		_tally.last = std::move(msg);
+	}
+
+
+	struct DropTally
+		/// The messages that a DropCountingChannel has got.
+	{
+		int delivered = 0;
+		int reported = 0;
+	};
+
+
+	class DropCountingChannel: public Channel
+		/// Counts the messages it gets and adds up the numbers of
+		/// dropped messages that an AsyncChannel reports.
+	{
+	public:
+		explicit DropCountingChannel(DropTally& tally);
+		DropCountingChannel() = delete;
+
+		void log(const Message& msg) override;
+
+	protected:
+		~DropCountingChannel() override = default;
+
+	private:
+		DropTally& _tally;
+	};
+
+
+	DropCountingChannel::DropCountingChannel(DropTally& tally):
+		_tally(tally)
+	{
+	}
+
+
+	void DropCountingChannel::log(const Message& msg)
+	{
+		static const std::string PREFIX("Dropped ");
+		const std::string& text = msg.getText();
+		if (Poco::startsWith(text, PREFIX))
+			_tally.reported += Poco::NumberParser::parse(text.substr(PREFIX.size(), text.find(' ', PREFIX.size()) - PREFIX.size()));
+		else
+			++_tally.delivered;
+	}
+
+
+	class LogBackChannel: public Channel
+		/// Logs one further message through a logger for every message
+		/// that is not itself such a further message.
+	{
+	public:
+		explicit LogBackChannel(Logger& logger);
+		LogBackChannel() = delete;
+
+		void log(const Message& msg) override;
+
+	protected:
+		~LogBackChannel() override = default;
+
+	private:
+		Logger& _logger;
+	};
+
+
+	LogBackChannel::LogBackChannel(Logger& logger):
+		_logger(logger)
+	{
+	}
+
+
+	void LogBackChannel::log(const Message& msg)
+	{
+		static const std::string BACK("Back");
+		if (msg.getText() != BACK) _logger.information(BACK);
+	}
 }
 
 
@@ -441,6 +602,7 @@ void ChannelTest::testAsyncTargetThrows()
 
 void ChannelTest::testAsyncErrorHandlerLogsToChannel()
 {
+	// The ErrorHandler logs to the channel whose target failed.
 	constexpr int MESSAGES = 5;
 	constexpr long TIMEOUT = 10000;
 
@@ -463,7 +625,194 @@ void ChannelTest::testAsyncErrorHandlerLogsToChannel()
 
 	assertTrue(allCalled);
 	assertTrue(closed);
+	assertEqual(MESSAGES, pChannel->calls());
 	assertEqual(MESSAGES, handler.count());
+}
+
+
+void ChannelTest::testAsyncReopen()
+{
+	AutoPtr<TestChannel> pChannel = new TestChannel;
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pChannel);
+	pAsync->open();
+	pAsync->log(Message("Source", "first", Message::PRIO_INFORMATION));
+	pAsync->close();
+	pAsync->open();
+	pAsync->log(Message("Source", "second", Message::PRIO_INFORMATION));
+	pAsync->close();
+
+	assertTrue(pChannel->list().size() == 2);
+	assertTrue(pChannel->list().back().getText() == "second");
+}
+
+
+void ChannelTest::testAsyncCloseDeliversQueued()
+{
+	constexpr int MESSAGES = 10000;
+
+	AutoPtr<TestChannel> pChannel = new TestChannel;
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pChannel);
+	for (int i = 0; i < MESSAGES; ++i)
+	{
+		pAsync->log(Message("Source", "Text", Message::PRIO_INFORMATION));
+	}
+	pAsync->close();
+
+	assertEqual(MESSAGES, static_cast<int>(pChannel->list().size()));
+}
+
+
+void ChannelTest::testAsyncCloseWhileLogging()
+{
+	// Messages are logged while close() runs: none of them starts the
+	// background thread again, so nothing reaches the target after close().
+	// The test guards against log() reopening a closed channel; the race in
+	// which a message logged during close() started the thread again depends
+	// on timing and cannot be reproduced deterministically.
+	constexpr int THREADS = 4;
+	constexpr int MESSAGES = 100000;
+	constexpr long TIMEOUT = 10000;
+
+	Tally tally;
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(new TallyChannel(tally));
+
+	Event loggedOne;
+	std::vector<std::thread> threads;
+	for (int i = 0; i < THREADS; ++i)
+	{
+		threads.emplace_back([&]()
+		{
+			Message msg("Source", "Text", Message::PRIO_INFORMATION);
+			for (int j = 0; j < MESSAGES; ++j)
+			{
+				pAsync->log(msg);
+				loggedOne.set();
+			}
+		});
+	}
+
+	const bool logging = loggedOne.tryWait(TIMEOUT);
+	pAsync->close();
+	const int delivered = tally.plain;
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+	// A background thread started again would deliver the queued messages;
+	// 200 ms is long enough for it to deliver at least one of them.
+	Thread::sleep(200);
+
+	assertTrue(logging);
+	assertEqual(delivered, tally.plain.load());
+}
+
+
+void ChannelTest::testAsyncCloseWhileTargetLogs()
+{
+	// The target channel logs back into the AsyncChannel while close()
+	// waits for the background thread to deliver the queued messages.
+	// The threads hold the channel themselves: after a failure they may
+	// still be blocked in it.
+	// This is a stress test: a message logged back must pass the check of the
+	// closed state before close() takes the mutex, so the test detects a
+	// deadlock with high but not certain probability.
+	constexpr int ROUNDS = 100;
+	constexpr int MESSAGES = 1000;
+	constexpr long TIMEOUT = 10000;
+
+	Logger& logger = Logger::get("ChannelTest.LogBack");
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(new LogBackChannel(logger));
+	logger.setChannel(pAsync);
+	logger.setLevel(Message::PRIO_INFORMATION);
+
+	bool closed = true;
+	for (int round = 0; round < ROUNDS && closed; ++round)
+	{
+		pAsync->open();
+		Thread logging;
+		logging.startFunc([pAsync]() mutable
+		{
+			Message msg("Source", "Text", Message::PRIO_INFORMATION);
+			for (int i = 0; i < MESSAGES; ++i)
+			{
+				pAsync->log(msg);
+			}
+		});
+		Thread closing;
+		closing.startFunc([pAsync]() mutable
+		{
+			pAsync->close();
+		});
+		closed = closing.tryJoin(TIMEOUT) && logging.tryJoin(TIMEOUT);
+	}
+
+	assertTrue(closed);
+	Logger::destroy("ChannelTest.LogBack");
+}
+
+
+void ChannelTest::testAsyncDropCountConcurrent()
+{
+	// Several threads log into a queue of one message: every message is
+	// either delivered or counted in a report of dropped messages.
+	constexpr int THREADS = 4;
+	constexpr int MESSAGES = 10000;
+
+	DropTally tally;
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(new DropCountingChannel(tally));
+	pAsync->setProperty("queueSize", "1");
+
+	std::vector<std::thread> threads;
+	for (int i = 0; i < THREADS; ++i)
+	{
+		threads.emplace_back([&]()
+		{
+			Message msg("Source", "Text", Message::PRIO_INFORMATION);
+			for (int j = 0; j < MESSAGES; ++j)
+			{
+				pAsync->log(msg);
+			}
+		});
+	}
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+
+	// Drops are reported with the next message that the queue takes, so the
+	// last message is logged without a limit to report the remaining drops.
+	pAsync->setProperty("queueSize", "none");
+	pAsync->log(Message("Source", "Text", Message::PRIO_INFORMATION));
+	pAsync->close();
+
+	assertEqual(THREADS * MESSAGES + 1, tally.delivered + tally.reported);
+}
+
+
+void ChannelTest::testAsyncAppThreadLogsWhileHandling()
+{
+	// Another thread logs while the background thread reports a failure of
+	// the target to the ErrorHandler: its message is delivered, and the
+	// message that the ErrorHandler logs from the background thread is dropped.
+	constexpr long TIMEOUT = 10000;
+
+	AutoPtr<FailingChannel> pChannel = new FailingChannel(1, 2);
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(pChannel);
+	Event release;
+	LoggingErrorHandler handler(*pAsync, 1, &release);
+	Poco::ErrorHandler* pOldHandler = Poco::ErrorHandler::set(&handler);
+	pAsync->log(Message("Source", "first", Message::PRIO_INFORMATION));
+	const bool entered = handler.waitEntered(TIMEOUT);
+	pAsync->log(Message("Source", "second", Message::PRIO_INFORMATION));
+	release.set();
+	const bool deliveredSecond = pChannel->waitAllCalled(TIMEOUT);
+	pAsync->close();
+	Poco::ErrorHandler::set(pOldHandler);
+
+	assertTrue(entered);
+	assertTrue(deliveredSecond);
+	assertEqual(2, pChannel->calls());
+	assertEqual(1, handler.count());
 }
 
 
@@ -483,7 +832,8 @@ void ChannelTest::testFormattingConcurrentReplacement()
 {
 	// Messages are logged while another thread replaces the formatter and
 	// the destination: each one is formatted by a formatter or by none,
-	// and gets to a destination.
+	// and gets to a destination. Lvalues and rvalues take turns, so that
+	// both overloads of log() meet the replacement.
 	constexpr int THREADS = 4;
 	constexpr int ROUNDS = 1000;
 	constexpr long TIMEOUT = 10000;
@@ -501,11 +851,14 @@ void ChannelTest::testFormattingConcurrentReplacement()
 		threads.emplace_back([&]()
 		{
 			Message msg("Source", "Text", Message::PRIO_INFORMATION);
+			bool asRvalue = false;
 			while (!stop)
 			{
 				try
 				{
-					pFormatterChannel->log(msg);
+					if (asRvalue) pFormatterChannel->log(Message(msg));
+					else pFormatterChannel->log(msg);
+					asRvalue = !asRvalue;
 					++logged;
 				}
 				catch (...)
@@ -570,6 +923,8 @@ void ChannelTest::testFormattingPairNeverTorn()
 	// and then the channel, generation after generation. A message is
 	// formatted by the formatter and sent to the channel of one moment, so
 	// none that an older formatter formatted reaches a newer channel.
+	// Lvalues and rvalues take turns, so that both overloads of log()
+	// meet the replacement.
 	constexpr int THREADS = 4;
 	constexpr int ROUNDS = 1000;
 	constexpr long TIMEOUT = 10000;
@@ -585,9 +940,12 @@ void ChannelTest::testFormattingPairNeverTorn()
 		threads.emplace_back([&]()
 		{
 			Message msg("Source", "Text", Message::PRIO_INFORMATION);
+			bool asRvalue = false;
 			while (!stop)
 			{
-				pFormatterChannel->log(msg);
+				if (asRvalue) pFormatterChannel->log(Message(msg));
+				else pFormatterChannel->log(msg);
+				asRvalue = !asRvalue;
 				loggedOne.set();
 			}
 		});
@@ -608,6 +966,77 @@ void ChannelTest::testFormattingPairNeverTorn()
 
 	assertEqual(ROUNDS, rounds);
 	assertEqual(0, torn.load());
+}
+
+
+void ChannelTest::testFormattingRvalueInPlace()
+{
+	// An rvalue message is formatted in place and passed on as the same
+	// object, with its source, priority and parameters.
+	MoveTally tally;
+	Message msg("Source", "Text", Message::PRIO_INFORMATION);
+	msg.set("k", "v");
+	AutoPtr<MoveCountingChannel> pChannel = new MoveCountingChannel(tally, &msg);
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel(new PatternFormatter("%s: %p: %t [%[k]]"), pChannel);
+	pFormatterChannel->log(std::move(msg));
+
+	assertEqual(1, tally.moved);
+	assertEqual(0, tally.copied);
+	assertTrue(tally.inPlace);
+	assertTrue(tally.last.getText() == "Source: Information: Text [v]");
+	assertTrue(tally.last.getSource() == "Source");
+	assertTrue(tally.last.getPriority() == Message::PRIO_INFORMATION);
+	assertTrue(tally.last.get("k") == "v");
+}
+
+
+void ChannelTest::testFormattingRvalueWithoutFormatter()
+{
+	MoveTally tally;
+	Message msg("Source", "Text", Message::PRIO_INFORMATION);
+	AutoPtr<MoveCountingChannel> pChannel = new MoveCountingChannel(tally, &msg);
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel;
+	pFormatterChannel->setChannel(pChannel);
+	pFormatterChannel->log(std::move(msg));
+
+	assertEqual(1, tally.moved);
+	assertEqual(0, tally.copied);
+	assertTrue(tally.inPlace);
+	assertTrue(tally.last.getText() == "Text");
+}
+
+
+void ChannelTest::testFormattingConstLeavesMessage()
+{
+	MoveTally tally;
+	const Message msg("Source", "Text", Message::PRIO_INFORMATION);
+	AutoPtr<MoveCountingChannel> pChannel = new MoveCountingChannel(tally, &msg);
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel(new SimpleFormatter, pChannel);
+	pFormatterChannel->log(msg);
+
+	assertTrue(msg.getText() == "Text");
+	assertFalse(tally.inPlace);
+	assertTrue(tally.last.getText() == "Source: Text");
+}
+
+
+void ChannelTest::testFormattingRvalueFromLogger()
+{
+	// Without a formatter, only the overload that the FormattingChannel
+	// calls decides whether the message arrives as an rvalue.
+	MoveTally tally;
+	AutoPtr<MoveCountingChannel> pChannel = new MoveCountingChannel(tally);
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel;
+	pFormatterChannel->setChannel(pChannel);
+	Logger& logger = Logger::get("ChannelTest.FormattingRvalue");
+	logger.setLevel(Message::PRIO_INFORMATION);
+	logger.setChannel(pFormatterChannel);
+	logger.information("x");
+	Logger::destroy("ChannelTest.FormattingRvalue");
+
+	assertEqual(1, tally.moved);
+	assertEqual(0, tally.copied);
+	assertTrue(tally.last.getText() == "x");
 }
 
 
@@ -653,10 +1082,20 @@ CppUnit::Test* ChannelTest::suite()
 	CppUnit_addTest(pSuite, ChannelTest, testAsyncConcurrentReplacement);
 	CppUnit_addTest(pSuite, ChannelTest, testAsyncTargetThrows);
 	CppUnit_addTest(pSuite, ChannelTest, testAsyncErrorHandlerLogsToChannel);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncReopen);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncCloseDeliversQueued);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncCloseWhileLogging);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncCloseWhileTargetLogs);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncDropCountConcurrent);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncAppThreadLogsWhileHandling);
 	CppUnit_addTest(pSuite, ChannelTest, testFormatting);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingConcurrentReplacement);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingMessageKeepsItsPair);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingPairNeverTorn);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingRvalueInPlace);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingRvalueWithoutFormatter);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingConstLeavesMessage);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingRvalueFromLogger);
 	CppUnit_addTest(pSuite, ChannelTest, testConsole);
 	CppUnit_addTest(pSuite, ChannelTest, testStream);
 

@@ -256,7 +256,10 @@ public:
 
 	[[nodiscard]] bool createDirectory();
 		/// Creates a directory. Returns true if the directory
-		/// has been created and false if it already exists.
+		/// has been created and false if a directory already exists
+		/// at the path, also when another thread or process created
+		/// it at the same time. Throws a FileExistsException if
+		/// something other than a directory exists at the path.
 		/// Throws an exception if an error occurs.
 
 	void createDirectories();

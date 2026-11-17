@@ -14,12 +14,37 @@
 #include "Poco/Base64Encoder.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/Exception.h"
+#include "Poco/StreamCopier.h"
 #include <sstream>
 
 
 using Poco::Base64Encoder;
 using Poco::Base64Decoder;
 using Poco::DataFormatException;
+
+
+namespace
+{
+	std::string decode(const std::string& encoded, int options = 0)
+		/// Returns the decoded data, or the message of the DataFormatException thrown.
+	{
+		std::istringstream istr(encoded);
+		Base64Decoder decoder(istr, options);
+		decoder.exceptions(std::ios::badbit);
+		std::string result;
+		try
+		{
+			Poco::StreamCopier::copyToString(decoder, result);
+		}
+		catch (DataFormatException& exc)
+		{
+			// A build with ENABLE_TRACE appends a stack trace after a line break.
+			const std::string& msg = exc.message();
+			return "exception: " + msg.substr(0, msg.find('\n'));
+		}
+		return result;
+	}
+}
 
 
 Base64Test::Base64Test(const std::string& name): CppUnit::TestCase(name)
@@ -377,6 +402,27 @@ void Base64Test::testEncodeDecode()
 }
 
 
+void Base64Test::testDecoderMalformed()
+{
+	assertEqual (std::string("abc"), decode("YWJj"));
+	assertEqual (std::string("ab"), decode("YWI="));
+	assertEqual (std::string("a"), decode("YQ=="));
+	assertEqual (std::string("a"), decode("YQ==\r\n"));
+	assertEqual (std::string("exception: unexpected Base64 padding at position 4"), decode("YWJj===="));
+	assertEqual (std::string("exception: Base64 data after padding: 'j' at position 3"), decode("YW=j"));
+	assertEqual (std::string("exception: Base64 data after padding: 'Y' at position 4"), decode("YQ==YQ=="));
+	assertEqual (std::string("exception: incomplete Base64 group at end of input"), decode("Y"));
+	assertEqual (std::string("exception: incomplete Base64 group at end of input"), decode("YWJjY"));
+	assertEqual (std::string("exception: invalid Base64 character '*' at position 2"), decode("YW*j"));
+	assertEqual (std::string("exception: invalid Base64 character '*' at position 4"), decode("YW\r\n*j"));
+	assertEqual (std::string("exception: invalid Base64 character 0x01 at position 2"), decode("YW\x01j"));
+
+	assertEqual (std::string("a"), decode("YQ", Poco::BASE64_NO_PADDING));
+	assertEqual (std::string("ab"), decode("YWI", Poco::BASE64_NO_PADDING));
+	assertEqual (std::string("exception: incomplete Base64 group at end of input"), decode("Y", Poco::BASE64_NO_PADDING));
+}
+
+
 void Base64Test::setUp()
 {
 }
@@ -398,6 +444,7 @@ CppUnit::Test* Base64Test::suite()
 	CppUnit_addTest(pSuite, Base64Test, testDecoderURL);
 	CppUnit_addTest(pSuite, Base64Test, testDecoderNoPadding);
 	CppUnit_addTest(pSuite, Base64Test, testEncodeDecode);
+	CppUnit_addTest(pSuite, Base64Test, testDecoderMalformed);
 
 	return pSuite;
 }

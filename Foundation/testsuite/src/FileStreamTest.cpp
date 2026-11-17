@@ -481,7 +481,7 @@ CppUnit::Test* FileStreamTest::suite()
 	CppUnit_addTest(pSuite, FileStreamTest, testSeek);
 	CppUnit_addTest(pSuite, FileStreamTest, testMultiOpen);
 	CppUnit_addTest(pSuite, FileStreamTest, testBufferSize);
-	CppUnit_addTest(pSuite, FileStreamTest, testBufferSizePerformance);
+	CppUnit_addLongTest(pSuite, FileStreamTest, testBufferSizePerformance);
 
 	return pSuite;
 }

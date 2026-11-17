@@ -226,14 +226,14 @@ private:
 
 Timer::Timer()
 {
-	_thread.start(*this);
+	_thread.startFunc([this]() { Timer::run(); });
 }
 
 
 Timer::Timer(Poco::Thread::Priority priority)
 {
 	_thread.setPriority(priority);
-	_thread.start(*this);
+	_thread.startFunc([this]() { Timer::run(); });
 }
 
 

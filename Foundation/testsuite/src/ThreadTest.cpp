@@ -15,6 +15,8 @@
 #include "Poco/Runnable.h"
 #include "Poco/ThreadTarget.h"
 #include "Poco/Event.h"
+#include "Poco/Exception.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #if defined(__sun) && defined(__SVR4) && !defined(__EXTENSIONS__)
@@ -674,6 +676,96 @@ void ThreadTest::testInterrupt()
 }
 
 
+void ThreadTest::testStartFailureLeavesNoThread()
+{
+	Thread thread;
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// Not a THREAD_PRIORITY_* value, so SetThreadPriority() fails.
+	constexpr int NO_SUCH_PRIORITY = 100;
+	thread.setOSPriority(NO_SUCH_PRIORITY);
+#else
+	// No scheduling policy has this value, so pthread_setschedparam() fails.
+	constexpr int NO_SUCH_POLICY = 999;
+	thread.setOSPriority(0, NO_SUCH_POLICY);
+#endif
+
+	std::atomic<bool> ran(false);
+	try
+	{
+		thread.startFunc([&ran]() { ran = true; });
+		fail("start must fail");
+	}
+	catch (const Poco::SystemException&)
+	{
+	}
+	assertTrue (!thread.isRunning());
+	thread.join();
+	assertTrue (!ran);
+
+	thread.setPriority(Thread::PRIO_LOW);
+	thread.startFunc([&ran]() { ran = true; });
+	thread.join();
+	assertTrue (ran);
+}
+
+
+void ThreadTest::testStartWithPriority()
+{
+	Thread thread;
+	std::atomic<bool> ran(false);
+	thread.setPriority(Thread::PRIO_LOW);
+	thread.startFunc([&ran]() { ran = true; });
+	thread.join();
+	assertTrue (ran);
+	assertTrue (!thread.isRunning());
+}
+
+
+void ThreadTest::testStartNullTarget()
+{
+	Thread thread;
+	try
+	{
+		thread.start(Poco::SharedPtr<Poco::Runnable>());
+		fail("start must fail");
+	}
+	catch (const Poco::NullPointerException&)
+	{
+	}
+	assertTrue (!thread.isRunning());
+}
+
+
+void ThreadTest::testSetPriorityFailureKeepsPriority()
+{
+	// Not a Thread::Priority value, but within the range of the enumeration: on a running thread,
+	// mapPrio() rejects it (POSIX) and SetThreadPriority() fails (Windows).
+	constexpr auto NO_SUCH_PRIORITY = static_cast<Thread::Priority>(Thread::PRIO_HIGHEST + 1);
+
+	Thread thread;
+	Event go;
+	thread.startFunc([&go]() { go.wait(); });
+	bool failed = false;
+	try
+	{
+		thread.setPriority(NO_SUCH_PRIORITY);
+	}
+	catch (const Poco::Exception&)
+	{
+		failed = true;
+	}
+	const Thread::Priority prioAfterFailure = thread.getPriority();
+	thread.setPriority(Thread::PRIO_LOW);
+	const Thread::Priority prioAfterSuccess = thread.getPriority();
+	go.set();
+	thread.join();
+
+	assertTrue (failed);
+	assertTrue (prioAfterFailure == Thread::PRIO_NORMAL);
+	assertTrue (prioAfterSuccess == Thread::PRIO_LOW);
+}
+
+
 void ThreadTest::setUp()
 {
 }
@@ -705,6 +797,10 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testSleep);
 	CppUnit_addTest(pSuite, ThreadTest, testAffinity);
 	CppUnit_addTest(pSuite, ThreadTest, testInterrupt);
+	CppUnit_addTest(pSuite, ThreadTest, testStartFailureLeavesNoThread);
+	CppUnit_addTest(pSuite, ThreadTest, testStartWithPriority);
+	CppUnit_addTest(pSuite, ThreadTest, testStartNullTarget);
+	CppUnit_addTest(pSuite, ThreadTest, testSetPriorityFailureKeepsPriority);
 
 	return pSuite;
 }

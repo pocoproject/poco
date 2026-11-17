@@ -276,6 +276,28 @@ void HTTPReactorServerSessionTest::testChunkExtensionHighByte()
 	assertTrue(body == "hello");
 }
 
+
+void HTTPReactorServerSessionTest::testCheckRequestCompleteBareLF()
+{
+	// HTTPRequest::read() ends a line at a bare LF. Framing that ends it only at
+	// CR LF would miss the Content-Length below and run the body as a request,
+	// or take the second request into the first one.
+	const std::string requests[] = {
+		"POST / HTTP/1.1\nContent-Length: 32\r\nHost: localhost\r\n\r\nGET /admin HTTP/1.1\r\nHost: x\r\n\r\n",
+		"GET / HTTP/1.1\r\nHost: localhost\n\nGET /admin HTTP/1.1\r\nHost: x\r\n\r\n",
+		"GET / HTTP/1.1\r\nHost: localhost\nContent-Length: 0\r\n\r\n",
+		"GET / HTTP/1.1\nHost: localhost\n\n"};
+	for (const std::string& request: requests)
+	{
+		assertTrue(checkComplete(request).outcome == ParseOutcome::MALFORMED);
+	}
+	const std::string request("POST / HTTP/1.1\r\nContent-Length: 32\r\nHost: localhost\r\n\r\nGET /admin HTTP/1.1\r\nHost: x\r\n\r\n");
+	const ParseResult result = checkComplete(request);
+	assertTrue(result.outcome == ParseOutcome::COMPLETE);
+	assertTrue(result.remaining == 0);
+}
+
+
 CppUnit::Test* HTTPReactorServerSessionTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPReactorServerSessionTest");
@@ -293,6 +315,7 @@ CppUnit::Test* HTTPReactorServerSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPReactorServerSessionTest, testCheckRequestCompleteChunkedSizeExtension);
 	CppUnit_addTest(pSuite, HTTPReactorServerSessionTest, testCheckRequestCompleteChunkedMissingCRLF);
 	CppUnit_addTest(pSuite, HTTPReactorServerSessionTest, testChunkExtensionHighByte);
+	CppUnit_addTest(pSuite, HTTPReactorServerSessionTest, testCheckRequestCompleteBareLF);
 
 	return pSuite;
 }

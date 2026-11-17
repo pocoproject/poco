@@ -17,6 +17,8 @@
 #include "Poco/Runnable.h"
 #include "Poco/RunnableAdapter.h"
 #include "Poco/Random.h"
+#include <array>
+#include <atomic>
 
 
 using Poco::PriorityNotificationQueue;
@@ -137,7 +139,10 @@ void PriorityNotificationQueueTest::testWaitDequeue()
 
 void PriorityNotificationQueueTest::testThreads()
 {
-	const int NOTIFICATION_COUNT = 2000;
+	// The workers sleep up to 4 ms after each notification. Windows rounds each
+	// sleep up to its timer tick of about 15.6 ms, so the count is kept small
+	// enough for the queue to drain well within the wait below.
+	const int NOTIFICATION_COUNT = 500;
 
 	Thread t1("thread1");
 	Thread t2("thread2");
@@ -172,6 +177,58 @@ void PriorityNotificationQueueTest::testDefaultQueue()
 	PriorityNotificationQueue& queue = PriorityNotificationQueue::defaultQueue();
 	assertTrue (queue.empty());
 	assertTrue (queue.size() == 0);
+}
+
+
+void PriorityNotificationQueueTest::testWakeUpAllBeforeWait()
+{
+	constexpr int NUM_THREADS = 3;
+	constexpr long JOIN_TIMEOUT = 5000;
+	PriorityNotificationQueue queue;
+	queue.wakeUpAll();
+
+	// The threads start to wait only after wakeUpAll().
+	std::atomic<int> returnedNull(0);
+	std::array<Thread, NUM_THREADS> threads;
+	for (auto& thread: threads)
+	{
+		thread.startFunc([&queue, &returnedNull]()
+		{
+			Notification::Ptr pNf = queue.waitDequeueNotification();
+			if (pNf.isNull()) ++returnedNull;
+		});
+	}
+	bool allJoined = true;
+	for (auto& thread: threads)
+	{
+		if (!thread.tryJoin(JOIN_TIMEOUT)) allJoined = false;
+	}
+	if (!allJoined)
+	{
+		// Releases the waiting threads before the Thread objects are destroyed.
+		queue.wakeUpAll();
+		for (auto& thread: threads) thread.join();
+	}
+	assertTrue (allJoined);
+	assertTrue (returnedNull == NUM_THREADS);
+
+	// After an enqueue, a thread waits again until it gets a notification.
+	queue.enqueueNotification(new QTestNotification("first"), 1);
+	Notification::Ptr pFirst = queue.dequeueNotification();
+	assertTrue (!pFirst.isNull());
+	std::string received;
+	Thread waiter;
+	waiter.startFunc([&queue, &received]()
+	{
+		Notification::Ptr pNf = queue.waitDequeueNotification();
+		auto* pTNf = dynamic_cast<QTestNotification*>(pNf.get());
+		if (pTNf != nullptr) received = pTNf->data();
+	});
+	const bool waited = waitForCondition([&queue]() { return queue.hasIdleThreads(); }, JOIN_TIMEOUT, 10);
+	queue.enqueueNotification(new QTestNotification("second"), 1);
+	assertTrue (waiter.tryJoin(JOIN_TIMEOUT));
+	assertTrue (waited);
+	assertTrue (received == "second");
 }
 
 
@@ -211,6 +268,7 @@ CppUnit::Test* PriorityNotificationQueueTest::suite()
 	CppUnit_addTest(pSuite, PriorityNotificationQueueTest, testWaitDequeue);
 	CppUnit_addTest(pSuite, PriorityNotificationQueueTest, testThreads);
 	CppUnit_addTest(pSuite, PriorityNotificationQueueTest, testDefaultQueue);
+	CppUnit_addTest(pSuite, PriorityNotificationQueueTest, testWakeUpAllBeforeWait);
 
 	return pSuite;
 }

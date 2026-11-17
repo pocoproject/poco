@@ -19,6 +19,7 @@
 #include "Poco/NumberParser.h"
 #include "Poco/Ascii.h"
 #include "Poco/String.h"
+#include "Poco/StringTokenizer.h"
 #include <algorithm>
 #include <charconv>
 
@@ -26,9 +27,20 @@
 using Poco::NumberFormatter;
 using Poco::NumberParser;
 using Poco::icompare;
+using Poco::StringTokenizer;
 
 
 namespace Poco::Net {
+
+
+namespace {
+
+
+const std::string KEEP_ALIVE = "Keep-Alive";
+const std::string KEEP_ALIVE_TIMEOUT = "timeout";
+
+
+} // namespace
 
 
 const std::string HTTPMessage::HTTP_1_0                   = "HTTP/1.0";
@@ -233,6 +245,23 @@ bool HTTPMessage::getKeepAlive() const
 		return icompare(connection, CONNECTION_CLOSE) != 0;
 	else
 		return getVersion() == HTTP_1_1;
+}
+
+
+std::optional<Poco::Timespan> HTTPMessage::getKeepAliveTimeout() const
+{
+	const StringTokenizer parameters(get(KEEP_ALIVE, EMPTY), ",", StringTokenizer::TOK_TRIM | StringTokenizer::TOK_IGNORE_EMPTY);
+	for (const auto& parameter: parameters)
+	{
+		const std::string::size_type separator = parameter.find('=');
+		if (separator == std::string::npos || icompare(Poco::trim(parameter.substr(0, separator)), KEEP_ALIVE_TIMEOUT) != 0)
+			continue;
+		int timeout = 0;
+		if (NumberParser::tryParse(Poco::trim(parameter.substr(separator + 1)), timeout) && timeout >= 0)
+			return Poco::Timespan(timeout, 0);
+		return std::nullopt;
+	}
+	return std::nullopt;
 }
 
 

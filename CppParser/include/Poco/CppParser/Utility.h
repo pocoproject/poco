@@ -73,6 +73,12 @@ public:
 	static void removeFile(const std::string& preprocessedfile);
 		/// Tries to remove the file. If it fails, the error is silently ignored.
 
+	static void addLanguageStandard(const std::string& exec, std::vector<std::string>& options);
+		/// Appends the option that selects C++20, which the POCO headers require, to the
+		/// preprocessor options, unless an option already selects a language standard:
+		/// /std:c++20 if exec names cl or clang-cl (also with a version suffix, as in
+		/// clang-cl-18), otherwise -std=c++20. parse() and parseDir() apply it to their options.
+
 protected:
 	static std::string preprocessFile(const std::string& file, const std::string& exec, const std::string& options, const std::string& path);
 		/// Preprocess the include file with name file. Parameter exec must contain the name of the preprocessor binary (e.g.: "cl" for Visual Studio).

@@ -259,7 +259,7 @@ public:
 	void rowIterator();
 	void stdVectorBool();
 
-	void asynchronous(int rowCount = 500);
+	void asynchronous(std::size_t rowCount = 500);
 
 	void any();
 	void dynamicAny();

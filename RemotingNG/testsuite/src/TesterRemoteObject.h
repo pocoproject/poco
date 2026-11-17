@@ -90,6 +90,8 @@ public:
 
 	std::array<int, 4> testStdArray(const std::array<int, 4>& arr);
 
+	std::optional<std::string> testStdOptional(const std::optional<std::string>& value);
+
 	std::shared_ptr<Struct1> testStdSharedPtr(const std::shared_ptr<Struct1>& pStruct1);
 
 	Struct1 testStruct11(const Struct1& s1);
@@ -317,6 +319,12 @@ inline Poco::SharedPtr<Struct1> TesterRemoteObject::testPtr(Poco::SharedPtr<Stru
 inline std::array<int, 4> TesterRemoteObject::testStdArray(const std::array<int, 4>& arr)
 {
 	return _pServiceObject->testStdArray(arr);
+}
+
+
+inline std::optional<std::string> TesterRemoteObject::testStdOptional(const std::optional<std::string>& value)
+{
+	return _pServiceObject->testStdOptional(value);
 }
 
 

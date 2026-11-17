@@ -958,6 +958,7 @@ export namespace Poco {
 		using Poco::Dynamic::operator>;
 		using Poco::Dynamic::operator>=;
 		using Poco::Dynamic::structToString;
+		using Poco::Dynamic::swap;
 
 		namespace Impl {
 			using Poco::Dynamic::Impl::appendJSONKey;

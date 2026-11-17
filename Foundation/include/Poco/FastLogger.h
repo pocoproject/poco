@@ -381,8 +381,8 @@ public:
 		///   - transitEventBufferInitialCapacity: Initial transit buffer size (default: 256)
 		///   - transitEventsSoftLimit: Soft limit for transit events (default: 8192)
 		///   - transitEventsHardLimit: Hard limit for transit events (default: 65536)
-		///   - logTimestampOrderingGracePeriod: Grace period in microseconds (default: 5)
-		///   - sinkMinFlushInterval: Min flush interval in milliseconds (default: 200)
+		///   - logTimestampOrderingGracePeriod: Grace period in microseconds (default: 0, no ordering delay)
+		///   - sinkMinFlushInterval: Min flush interval in milliseconds (default: 0, flush after every batch)
 		///   - waitForQueuesToEmptyBeforeExit: Wait on exit (default: true)
 
 	static const std::string ROOT; /// The name of the root logger ("").

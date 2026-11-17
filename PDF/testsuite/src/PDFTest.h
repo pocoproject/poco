@@ -25,10 +25,12 @@ public:
 	~PDFTest();
 
 	void testDocument();
+	void testInsertPage();
 	void testPage();
 	void testImage();
 	void testFont();
 	void testEncoding();
+	void testNoCurrentEncoder();
 	void testOutline();
 	void testDestination();
 	void testAnnotation();

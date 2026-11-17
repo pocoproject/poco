@@ -112,6 +112,9 @@ public:
 		///
 		/// Some platform only allow changing a thread's priority
 		/// if the process has certain privileges.
+		///
+		/// If the priority cannot be set, an exception is thrown
+		/// and the priority of the thread does not change.
 
 	[[nodiscard]] Priority getPriority() const;
 		/// Returns the thread's priority.
@@ -123,6 +126,9 @@ public:
 		/// a scheduling policy can be specified. The policy is currently
 		/// only used on POSIX platforms where the values SCHED_OTHER (default),
 		/// SCHED_FIFO and SCHED_RR are supported.
+		///
+		/// If the priority cannot be set, an exception is thrown
+		/// and the priority of the thread does not change.
 
 	[[nodiscard]] int getOSPriority() const;
 		/// Returns the thread's priority, expressed as an operating system
@@ -154,12 +160,19 @@ public:
 		/// Note that the given Runnable object must remain
 		/// valid during the entire lifetime of the thread, as
 		/// only a reference to it is stored internally.
+		///
+		/// Throws a SystemException if the thread cannot be started,
+		/// for example because its priority cannot be applied. The
+		/// target is not run in that case. This also applies to the
+		/// other start() variants and to startFunc().
 
 	void start(Poco::SharedPtr<Runnable> pTarget);
 		/// Starts the thread with the given target.
 		///
 		/// The Thread ensures that the given target stays
 		/// alive while the thread is running.
+		///
+		/// Throws a NullPointerException if pTarget is null.
 
 	void start(Callable target, void* pData = nullptr);
 		/// Starts the thread with the given target and parameter.

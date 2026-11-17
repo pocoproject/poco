@@ -54,8 +54,14 @@ public:
 	HostEntry(const HostEntry& entry);
 		/// Creates the HostEntry by copying another one.
 
+	HostEntry(HostEntry&& entry) noexcept;
+		/// Creates the HostEntry by moving another one.
+
 	HostEntry& operator = (const HostEntry& entry);
 		/// Assigns another HostEntry.
+
+	HostEntry& operator = (HostEntry&& entry) noexcept;
+		/// Move-assigns another HostEntry.
 
 	void swap(HostEntry& hostEntry) noexcept;
 		/// Swaps the HostEntry with another one.

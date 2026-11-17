@@ -196,7 +196,7 @@ public:
 	~Session();
 		/// Destroys the Session.
 
-	void swap(Session& other);
+	void swap(Session& other) noexcept;
 		/// Swaps the session with another one.
 
 	template <typename T>
@@ -531,24 +531,14 @@ inline SessionImpl* Session::impl()
 }
 
 
-inline void swap(Session& s1, Session& s2)
+inline void swap(Session& s1, Session& s2) noexcept
+	/// Swaps s1 with s2.
 {
 	s1.swap(s2);
 }
 
 
 } // namespace Poco::Data
-
-
-namespace std
-{
-	template<>
-	inline void swap<Poco::Data::Session>(Poco::Data::Session& s1, Poco::Data::Session& s2) noexcept
-		/// Full template specalization of std:::swap for Session
-	{
-		s1.swap(s2);
-	}
-}
 
 
 #endif // Data_Session_INCLUDED

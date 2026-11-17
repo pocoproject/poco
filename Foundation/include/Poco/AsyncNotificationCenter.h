@@ -25,10 +25,8 @@
 #include "Poco/NotificationQueue.h"
 #include "Poco/AsyncObserver.h"
 
-#if (POCO_HAVE_CPP20_COMPILER)
-	#if !(POCO_HAVE_JTHREAD)
-		#pragma message ("NOTE: std::jthread is expected but is not available. Please check your compiler version and settings.")
-	#endif
+#if !(POCO_HAVE_JTHREAD)
+	#pragma message ("NOTE: std::jthread is expected but is not available. Please check your compiler version and settings.")
 #endif
 
 #include <thread>
@@ -60,7 +58,7 @@ class Foundation_API AsyncNotificationCenter: public NotificationCenter
 	///
 	/// NOTIFY and BOTH mode:
 	///
-	/// These modes are only available if the compiler supports C++20 std::jthread.
+	/// These modes are only available if the standard library provides std::jthread.
 	///
 	/// Notifications can be delivered to observers in a different order than they
 	/// were posted, as they are processed by multiple worker threads. Observer

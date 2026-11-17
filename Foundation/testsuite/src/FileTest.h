@@ -33,6 +33,10 @@ public:
 	void testSwap();
 	void testSize();
 	void testDirectory();
+	void testCreateDirectoryExisting();
+	void testCreateDirectoryConcurrent();
+	void testCreateDirectoriesDeep();
+	void testCreateDirectoriesExtendedPath();
 	void testCopy();
 	void testCopyFailIfDestinationFileExists();
 	void testMove();
@@ -60,6 +64,7 @@ public:
 #if defined(POCO_OS_FAMILY_UNIX)
 #if !defined(POCO_VXWORKS)
 	void testPermissionsMatchAccess();
+	void testCreateDirectorySymlinkLoop();
 #endif
 	void testGetExecutablePathThreadSafety();
 #endif

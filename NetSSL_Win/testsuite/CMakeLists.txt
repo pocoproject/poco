@@ -13,7 +13,7 @@ add_test(
 	WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 	COMMAND NetSSLWin-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.win -all
 )
-target_link_libraries(NetSSLWin-testrunner PUBLIC Poco::NetSSLWin Poco::Util Poco::XML CppUnit)
+target_link_libraries(NetSSLWin-testrunner PUBLIC Poco::NetSSLWin Poco::Util Poco::XML CppUnit Secur32.lib)
 
 # Test data
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/any.pfx ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/any.pfx COPYONLY)

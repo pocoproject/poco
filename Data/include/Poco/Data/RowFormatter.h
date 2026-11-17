@@ -149,6 +149,9 @@ protected:
 	void setPostfix(const std::string& postfix);
 		/// Sets the postfix for the formatter
 
+	void swapPrefixAndPostfix(RowFormatter& other) noexcept;
+		/// Exchanges the prefix and the postfix with those of other.
+
 private:
 
 	mutable std::string _prefix;
@@ -188,6 +191,13 @@ inline void RowFormatter::setPrefix(const std::string& prefix) const
 inline void RowFormatter::setPostfix(const std::string& postfix)
 {
 	_postfix = postfix;
+}
+
+
+inline void RowFormatter::swapPrefixAndPostfix(RowFormatter& other) noexcept
+{
+	_prefix.swap(other._prefix);
+	_postfix.swap(other._postfix);
 }
 
 

@@ -42,6 +42,7 @@ public:
 	explicit HTTPBasicCredentials(const HTTPRequest& request);
 		/// Creates a HTTPBasicCredentials object with the authentication information
 		/// from the given request.
+		/// The base64 encoding is accepted with or without the trailing '=' padding.
 		///
 		/// Throws a NotAuthenticatedException if the request does
 		/// not contain basic authentication information.
@@ -50,6 +51,7 @@ public:
 		/// Creates a HTTPBasicCredentials object with the authentication information
 		/// in the given string. The authentication information can be extracted
 		/// from a HTTPRequest object by calling HTTPRequest::getCredentials().
+		/// The base64 encoding is accepted with or without the trailing '=' padding.
 
 	~HTTPBasicCredentials();
 		/// Destroys the HTTPBasicCredentials.
@@ -84,7 +86,8 @@ protected:
 	void parseAuthInfo(const std::string& authInfo);
 		/// Extracts username and password from Basic authentication info
 		/// by base64-decoding authInfo and splitting the resulting
-		/// string at the ':' delimiter.
+		/// string at the ':' delimiter. The base64 encoding is accepted
+		/// with or without the trailing '=' padding.
 
 private:
 	HTTPBasicCredentials(const HTTPBasicCredentials&);

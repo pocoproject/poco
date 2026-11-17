@@ -3689,7 +3689,7 @@ void SQLExecutor::stdVectorBool()
 }
 
 
-void SQLExecutor::asynchronous(int rowCount)
+void SQLExecutor::asynchronous(std::size_t rowCount)
 {
 	Session tmp = session();
 
@@ -3703,37 +3703,21 @@ void SQLExecutor::asynchronous(int rowCount)
 	assertTrue (stmt1.isAsync());
 	assertTrue (stmt1.wait() == rowCount);
 
-	// +++ if this part of the test case fails, increase the rowCount until achieved
-	//  that first execute is still executing when the second one is called
+	// whether a second execution is refused depends on whether the first one
+	// has ended; DataTest::testStatementExecuteWhileExecuting() holds the
+	// execution to test the refusal
 	stmt1.execute();
-	try {
-		stmt1.execute();
-		fail ("execute() must fail");
-	} catch (InvalidAccessException&)
-	{
-		stmt1.wait();
-		stmt1.execute();
-		stmt1.wait();
-	}
-	// ---
+	stmt1.wait();
+	stmt1.execute();
+	stmt1.wait();
 
 	stmt = tmp << "SELECT * FROM Strings", into(data), async, now;
 	assertTrue (stmt.isAsync());
 	stmt.wait();
 	assertTrue (stmt.execute() == 0);
-
-	// +++ if this part of the test case fails, increase the rowCount until achieved
-	//  that first execute is still executing when the second one is called
-	try {
-		result = stmt.executeAsync();
-		fail ("executeAsync() must fail");
-	} catch (InvalidAccessException&)
-	{
-		assertTrue (stmt.isAsync());
-		stmt.wait();
-		result = stmt.executeAsync();
-	}
-	// ---
+	assertTrue (stmt.isAsync());
+	stmt.wait();
+	result = stmt.executeAsync();
 
 	assertTrue (stmt.wait() == rowCount);
 	assertTrue (result.data() == rowCount);
@@ -3751,14 +3735,14 @@ void SQLExecutor::asynchronous(int rowCount)
 	assertTrue (result.data() == rowCount);
 
 	assertTrue (0 == rowCount % 10);
-	int step = (int) (rowCount/10);
+	std::size_t step = rowCount/10;
 	data.clear();
 	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;
 
-	for (int i = 0; !stmt2.done(); i += step)
+	for (std::size_t i = 0; !stmt2.done(); i += step)
 	{
 		stmt2.execute();
 		rows = stmt2.wait();
@@ -4602,6 +4586,30 @@ void SQLExecutor::encoding(const std::string& dbConnString)
 		assertTrue(textOutVec.size() == 2);
 		assertTrue(textOutVec[0] == utf8TextIn);
 		assertTrue(textOutVec[1] == utf8TextIn2);
+
+		textOutVec.clear();
+		session() << "SELECT str FROM Latin1Table", into(textOutVec, bulk(2)), now;
+		assertTrue(textOutVec.size() == 2);
+		assertTrue(textOutVec[0] == latinText);
+		assertTrue(textOutVec[1] == latinText2);
+
+		textOutVec.clear();
+		session(true) << "SELECT str FROM Latin1Table", into(textOutVec, bulk(2)), now;
+		assertTrue(textOutVec.size() == 2);
+		assertTrue(textOutVec[0] == utf8TextIn);
+		assertTrue(textOutVec[1] == utf8TextIn2);
+
+		std::deque<std::string> textOutDeque;
+		session(true) << "SELECT str FROM Latin1Table", into(textOutDeque, bulk(2)), now;
+		assertTrue(textOutDeque.size() == 2);
+		assertTrue(textOutDeque[0] == utf8TextIn);
+		assertTrue(textOutDeque[1] == utf8TextIn2);
+
+		std::list<std::string> textOutList;
+		session(true) << "SELECT str FROM Latin1Table", into(textOutList, bulk(2)), now;
+		assertTrue(textOutList.size() == 2);
+		assertTrue(*textOutList.begin() == utf8TextIn);
+		assertTrue(*std::next(textOutList.begin()) == utf8TextIn2);
 	}
 	catch (Poco::Exception& ex)
 	{

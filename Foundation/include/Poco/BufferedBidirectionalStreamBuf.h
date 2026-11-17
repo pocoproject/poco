@@ -37,6 +37,12 @@ class BasicBufferedBidirectionalStreamBuf: public std::basic_streambuf<ch, tr>
 	/// Derived classes only have to override the methods
 	/// readFromDevice() or writeToDevice().
 	///
+	/// writeToDevice() may write fewer bytes than requested and
+	/// returns the number of bytes written; it is called again for
+	/// the rest. A return value of 0 or less is a failure.
+	/// After a failure, only the bytes that writeToDevice() has not
+	/// accepted stay in the buffer.
+	///
 	/// In contrast to BasicBufferedStreambuf, this class supports
 	/// simultaneous read and write access, so in addition to
 	/// istream and ostream this streambuf can also be used
@@ -162,13 +168,37 @@ private:
 
 	std::streamsize flushBuffer()
 	{
-		std::streamsize n = this->pptr() - this->pbase();
-		if (writeToDevice(this->pbase(), n) == n)
+		const std::streamsize n = this->pptr() - this->pbase();
+		std::streamsize written = 0;
+		try
 		{
-			this->pbump(static_cast<int>(-n));
-			return n;
+			while (written < n)
+			{
+				const std::streamsize r = writeToDevice(this->pbase() + written, n - written);
+				if (r <= 0)
+				{
+					discardWritten(written, n);
+					return -1;
+				}
+				written += r;
+			}
 		}
-		return -1;
+		catch (...)
+		{
+			discardWritten(written, n);
+			throw;
+		}
+		this->pbump(static_cast<int>(-n));
+		return n;
+	}
+
+	void discardWritten(std::streamsize written, std::streamsize n)
+		/// Keeps only the buffered bytes the device has not accepted, so that
+		/// a retried flush does not write the accepted ones again.
+	{
+		if (written == 0) return;
+		char_traits::move(this->pbase(), this->pbase() + written, static_cast<std::size_t>(n - written));
+		this->pbump(static_cast<int>(-written));
 	}
 
 	std::streamsize _bufsize {0};

@@ -17,6 +17,7 @@
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowFilter.h"
+#include "Poco/Data/RowIterator.h"
 #include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/SessionPool.h"
@@ -47,6 +48,8 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/Bugcheck.h"
 #include <iostream>
+#include <type_traits>
+#include <utility>
 
 
 using namespace std::string_literals;
@@ -2734,13 +2737,38 @@ void SQLiteTest::testRowIterator()
 }
 
 
+void SQLiteTest::testRowIteratorSwap()
+{
+	static_assert(std::is_nothrow_swappable_v<Poco::Data::RowIterator>);
+
+	Session ses (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	ses << "CREATE TABLE Ints (int0 INTEGER)", now;
+	std::vector<int> v{1, 2, 3};
+	ses << "INSERT INTO Ints VALUES (?)", use(v), now;
+
+	RecordSet rset(ses, "SELECT * FROM Ints");
+	RecordSet::Iterator it1 = rset.begin();
+	RecordSet::Iterator it2 = rset.end();
+	assertTrue (it1 != it2);
+
+	Poco::Data::swap(it1, it2);
+	assertTrue (it1 == rset.end());
+	assertTrue (it2 == rset.begin());
+
+	using std::swap;
+	swap(it1, it2);
+	assertTrue (it1 == rset.begin());
+	assertTrue (it2 == rset.end());
+}
+
+
 void SQLiteTest::testAsync()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 
-	int rowCount = 500;
+	std::size_t rowCount = 500;
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(:str)", use(data));
 	Statement::Result result = stmt.executeAsync();
@@ -2752,18 +2780,13 @@ void SQLiteTest::testAsync()
 	assertTrue (stmt1.isAsync());
 	assertTrue (stmt1.wait() == rowCount);
 
+	// whether a second execution is refused depends on whether the first one
+	// has ended; DataTest::testStatementExecuteWhileExecuting() holds the
+	// execution to test the refusal
 	stmt1.execute();
-	try
-	{
-		stmt1.execute();
-		fail ("must fail");
-	}
-	catch (InvalidAccessException&)
-	{
-		stmt1.wait();
-		stmt1.execute();
-		stmt1.wait();
-	}
+	stmt1.wait();
+	stmt1.execute();
+	stmt1.wait();
 
 	stmt = tmp << "SELECT * FROM Strings", into(data), async, now;
 	assertTrue (stmt.isAsync());
@@ -2771,16 +2794,8 @@ void SQLiteTest::testAsync()
 
 	assertTrue (stmt.execute() == 0);
 	assertTrue (stmt.isAsync());
-	try
-	{
-		result = stmt.executeAsync();
-		fail ("must fail");
-	}
-	catch (InvalidAccessException&)
-	{
-		stmt.wait();
-		result = stmt.executeAsync();
-	}
+	stmt.wait();
+	result = stmt.executeAsync();
 
 	assertTrue (stmt.wait() == rowCount);
 	assertTrue (result.data() == rowCount);
@@ -2798,14 +2813,14 @@ void SQLiteTest::testAsync()
 	assertTrue (result.data() == rowCount);
 
 	assertTrue (0 == rowCount % 10);
-	int step = (int) (rowCount/10);
+	std::size_t step = rowCount/10;
 	data.clear();
 	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;
 
-	for (int i = 0; !stmt2.done(); i += step)
+	for (std::size_t i = 0; !stmt2.done(); i += step)
 	{
 		stmt2.execute();
 		rows = stmt2.wait();
@@ -5082,6 +5097,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNullableVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
+	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorSwap);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 	CppUnit_addTest(pSuite, SQLiteTest, testAny);
 	CppUnit_addTest(pSuite, SQLiteTest, testDynamicAny);

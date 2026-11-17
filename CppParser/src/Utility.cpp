@@ -16,6 +16,7 @@
 #include "Poco/CppParser/Parser.h"
 #include "Poco/CppParser/Struct.h"
 #include "Poco/StringTokenizer.h"
+#include "Poco/String.h"
 #include "Poco/Glob.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
@@ -23,7 +24,7 @@
 #include "Poco/Environment.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Exception.h"
-#include "Poco/Config.h"
+#include <algorithm>
 #include <fstream>
 #include <cstddef>
 #include <filesystem>
@@ -63,11 +64,7 @@ namespace {
 	// Poco paths are UTF-8, which std::filesystem::path takes as char8_t since C++20.
 	[[nodiscard]] std::filesystem::path toFilesystemPath(const std::string& path)
 	{
-#if (POCO_HAVE_CPP20_COMPILER)
 		return {std::u8string(path.begin(), path.end())};
-#else
-		return std::filesystem::u8path(path);
-#endif
 	}
 
 
@@ -342,6 +339,7 @@ std::string Utility::preprocessFile(const std::string& file, const std::string& 
 	}
 	StringTokenizer tokenizer(popts, ",;\n", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 	std::vector<std::string> args(tokenizer.begin(), tokenizer.end());
+	Utility::addLanguageStandard(exec, args);
 #ifdef _WIN32
 	std::string quotedFile("\"");
 	quotedFile += file;
@@ -404,6 +402,22 @@ void Utility::removeFile(const std::string& preprocessedfile)
 	catch (Exception&)
 	{
 	}
+}
+
+
+void Utility::addLanguageStandard(const std::string& exec, std::vector<std::string>& options)
+{
+	const bool hasStandard = std::ranges::any_of(options, [](const std::string& option)
+	{
+		return option.starts_with("-std=") || option.starts_with("--std=") || option.starts_with("/std:") || option.starts_with("-std:");
+	});
+	if (hasStandard) return;
+
+	const std::string compiler = Poco::toLower(Path(exec).getBaseName());
+	if (compiler == "cl" || compiler.starts_with("clang-cl"))
+		options.emplace_back("/std:c++20");
+	else
+		options.emplace_back("-std=c++20");
 }
 
 

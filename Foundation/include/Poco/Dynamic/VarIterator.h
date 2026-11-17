@@ -111,7 +111,7 @@ public:
 		/// Returns a copy the VarIterator backed by diff positions.
 		/// Throws RangeException if diff is larger than current position.
 
-	void swap(VarIterator& other);
+	void swap(VarIterator& other) noexcept;
 		/// Swaps the VarIterator with another one.
 
 private:
@@ -177,18 +177,14 @@ inline bool VarIterator::operator >= (const VarIterator& other) const
 }
 
 
-} // namespace Poco::Dynamic
-
-
-namespace std
+inline void swap(VarIterator& it1, VarIterator& it2) noexcept
+	/// Swaps it1 with it2.
 {
-	template<>
-	inline void swap<Poco::Dynamic::VarIterator>(Poco::Dynamic::VarIterator& s1, Poco::Dynamic::VarIterator& s2) noexcept
-		/// Full template specialization of std:::swap for VarIterator
-	{
-		s1.swap(s2);
-	}
+	it1.swap(it2);
 }
+
+
+} // namespace Poco::Dynamic
 
 
 #endif // Foundation_VarIterator_INCLUDED

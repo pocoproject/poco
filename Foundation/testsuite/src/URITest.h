@@ -37,6 +37,12 @@ public:
 	void testQueryParameters();
 	void testQueryParametersPlus();
 	void testControlCharacters();
+	void testRawPath();
+	void testSetRawPath();
+	void testRawPathCopyMoveSwap();
+	void testResolveRawPath();
+	void testNormalizeRawPath();
+	void testCompareRawPath();
 
 	void setUp();
 	void tearDown();

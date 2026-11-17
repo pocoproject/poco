@@ -286,6 +286,16 @@ void NumberParserTest::testParseError()
 
 	try
 	{
+		(void) NumberParser::parse64("1.5");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual("Not a valid integer: '1.5'", e.message());
+	}
+
+	try
+	{
 		(void) NumberParser::parse64("asd");
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
@@ -333,6 +343,116 @@ void NumberParserTest::testParseError()
 }
 
 
+void NumberParserTest::testParseErrorMessages()
+{
+	const std::string OCTAL_MESSAGE = "Not a valid octal integer: '9'";
+
+	try
+	{
+		(void) NumberParser::parse("2 ");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual("Not a valid integer: '2 '", e.message());
+	}
+
+	try
+	{
+		(void) NumberParser::parse("");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual("Not a valid integer: ''", e.message());
+	}
+
+	try
+	{
+		(void) NumberParser::parseUnsigned(" ");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual("Not a valid unsigned integer: ' '", e.message());
+	}
+
+	try
+	{
+		(void) NumberParser::parseHex("xyz");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual("Not a valid hexadecimal integer: 'xyz'", e.message());
+	}
+
+	try
+	{
+		(void) NumberParser::parseOct("9");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual(OCTAL_MESSAGE, e.message());
+	}
+
+	try
+	{
+		(void) NumberParser::parseFloat("abc");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual("Not a valid floating-point number: 'abc'", e.message());
+	}
+
+	try
+	{
+		(void) NumberParser::parseBool("maybe");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual("Not a valid bool number: 'maybe'", e.message());
+	}
+
+#if defined(POCO_HAVE_INT64)
+
+	try
+	{
+		(void) NumberParser::parseUnsigned64("-1");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual("Not a valid unsigned integer: '-1'", e.message());
+	}
+
+	try
+	{
+		(void) NumberParser::parseHex64("g1");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual("Not a valid hexadecimal integer: 'g1'", e.message());
+	}
+
+	try
+	{
+		(void) NumberParser::parseOct64("9");
+		failmsg("must throw SyntaxException");
+	}
+	catch (SyntaxException& e)
+	{
+		assertMessageEqual(OCTAL_MESSAGE, e.message());
+	}
+
+#endif // POCO_HAVE_INT64
+}
+
+
 void NumberParserTest::setUp()
 {
 }
@@ -350,6 +470,7 @@ CppUnit::Test* NumberParserTest::suite()
 	CppUnit_addTest(pSuite, NumberParserTest, testParse);
 	CppUnit_addTest(pSuite, NumberParserTest, testLimits);
 	CppUnit_addTest(pSuite, NumberParserTest, testParseError);
+	CppUnit_addTest(pSuite, NumberParserTest, testParseErrorMessages);
 
 	return pSuite;
 }

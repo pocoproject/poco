@@ -59,6 +59,8 @@ class Foundation_API SimpleFileChannel: public Channel
 	///                    <n> Kilobytes.
 	///   * <n> M:         the file is rotated when its size exceeds
 	///                    <n> Megabytes.
+	///   * <n> G:         the file is rotated when its size exceeds
+	///                    <n> Gigabytes.
 	///
 	/// The path of the (primary) log file can be specified with
 	/// the "path" property. Optionally, the path of the secondary
@@ -118,10 +120,10 @@ public:
 	[[nodiscard]] UInt64 size() const;
 		/// Returns the log file's current size in bytes.
 
-	[[nodiscard]] const std::string& path() const;
+	[[nodiscard]] std::string path() const;
 		/// Returns the log file's primary path.
 
-	[[nodiscard]] const std::string& secondaryPath() const;
+	[[nodiscard]] std::string secondaryPath() const;
 		/// Returns the log file's secondary path.
 
 	static const std::string PROP_PATH;
@@ -142,7 +144,7 @@ private:
 	UInt64           _limit;
 	bool             _flush;
 	LogFile*         _pFile;
-	FastMutex        _mutex;
+	mutable FastMutex _mutex;
 };
 
 

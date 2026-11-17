@@ -31,6 +31,7 @@ public:
 	void testDecoderURL();
 	void testDecoderNoPadding();
 	void testEncodeDecode();
+	void testDecoderMalformed();
 
 	void setUp();
 	void tearDown();

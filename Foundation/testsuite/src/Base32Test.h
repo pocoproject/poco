@@ -33,6 +33,7 @@ public:
 	void testEncodeDecode();
 	void testEncodeDecodeHex();
 	void testEncodeDecodeCrockford();
+	void testDecoderMalformed();
 
 	void setUp();
 	void tearDown();

@@ -200,6 +200,13 @@ public:
 		/// Prints the array to out. When indent has zero value,
 		/// the array will be printed without newline breaks and spaces between elements.
 
+	void stringify(std::ostream& out, unsigned int indent, int step, int options) const;
+		/// Prints the array to out, like stringify(out, indent, step),
+		/// but with the given options instead of the stored escape and
+		/// lowercase-hex flags, which are neither read nor changed.
+		/// Only JSON_ESCAPE_UNICODE and JSON_LOWERCASE_HEX are used from options;
+		/// they apply to nested objects and arrays as well.
+
 	void remove(unsigned int index);
 		/// Removes the element on the given index.
 
@@ -221,9 +228,8 @@ private:
 	mutable ArrayPtr _pArray;
 	mutable bool     _modified;
 	// Note:
-	//  The reason we have this flag here (rather than as argument to stringify())
-	//  is because Array can be returned stringified from a Dynamic::Var:toString(),
-	//  so it must know whether to escape unicode or not.
+	//  The flags are the defaults for stringify(out, indent, step) and
+	//  Dynamic::Var::toString(), which have no options argument.
 	bool             _escapeUnicode;
 	bool             _lowercaseHex;
 };

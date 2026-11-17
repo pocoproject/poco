@@ -17,6 +17,7 @@
 #include "Poco/Exception.h"
 #include "Poco/String.h"
 #include "Poco/NumberParser.h"
+#include "Poco/NumericString.h"
 #include "Poco/Path.h"
 #include "Poco/Ascii.h"
 
@@ -29,6 +30,92 @@ const std::string URI::RESERVED_QUERY       = "?#/:;+@";
 const std::string URI::RESERVED_QUERY_PARAM = "?#/:;+@&=";
 const std::string URI::RESERVED_FRAGMENT    = "";
 const std::string URI::ILLEGAL              = "%<>{}|\\\"^`!*'()$,[]";
+
+
+namespace {
+
+
+constexpr std::string::size_type ESCAPE_LENGTH = 3;
+	/// The length of a percent-encoded character: '%' and two hex digits.
+
+
+constexpr char ASCII_SPACE = 0x20;
+	/// The space character; encode() percent-encodes it and the control characters below it.
+
+
+constexpr char ASCII_DEL = 0x7F;
+	/// The delete control character, which encode() percent-encodes.
+
+
+[[nodiscard]] constexpr bool isUnreserved(char c)
+	/// Returns true if c is an unreserved character of RFC 3986, section 2.3:
+	/// ALPHA, DIGIT, '-', '.', '_' or '~'. The letters and digits are checked as
+	/// character ranges, so that non-ASCII bytes are not unreserved.
+{
+	return (c >= 'a' && c <= 'z')
+		|| (c >= 'A' && c <= 'Z')
+		|| (c >= '0' && c <= '9')
+		|| c == '-' || c == '.' || c == '_' || c == '~';
+}
+
+
+[[nodiscard]] std::string decodeDotSegments(const std::string& rawPath)
+	/// Returns rawPath with the segments that decode to "." or ".." in literal form.
+{
+	std::string result;
+	std::string::size_type start = 0;
+	while (true)
+	{
+		const std::string::size_type slash = rawPath.find('/', start);
+		const std::string segment = rawPath.substr(start, slash - start);
+		std::string decodedSegment;
+		URI::decode(segment, decodedSegment);
+		if (decodedSegment == "." || decodedSegment == "..")
+			result += decodedSegment;
+		else
+			result += segment;
+		if (slash == std::string::npos) break;
+		result += '/';
+		start = slash + 1;
+	}
+	return result;
+}
+
+
+[[nodiscard]] std::string normalizePercentEncoding(const std::string& rawPath)
+	/// Decodes the percent-encoded unreserved characters of rawPath and upper-cases
+	/// the hex digits of the other percent-encoded characters (RFC 3986, section 6.2.2).
+	/// Every '%' in rawPath must start a well-formed percent-encoded character, which
+	/// getRawPath() guarantees, as decode() checks every stored raw path.
+{
+	std::string result;
+	std::string::size_type pos = 0;
+	while (pos < rawPath.size())
+	{
+		if (rawPath[pos] == '%')
+		{
+			const char* const hexBegin = rawPath.data() + pos + 1;
+			const char* const hexEnd = rawPath.data() + pos + ESCAPE_LENGTH;
+			unsigned char c = 0;
+			if (strToInt(hexBegin, hexEnd, c, NumberParser::NUM_BASE_HEX) && isUnreserved(static_cast<char>(c)))
+			{
+				result += static_cast<char>(c);
+			}
+			else
+			{
+				result += '%';
+				for (const char* it = hexBegin; it != hexEnd; ++it)
+					result += static_cast<char>(Ascii::toUpper(*it));
+			}
+			pos += ESCAPE_LENGTH;
+		}
+		else result += rawPath[pos++];
+	}
+	return result;
+}
+
+
+} // namespace
 
 
 URI::URI():
@@ -112,6 +199,7 @@ URI::URI(const URI& uri):
 	_host(uri._host),
 	_port(uri._port),
 	_path(uri._path),
+	_rawPath(uri._rawPath),
 	_query(uri._query),
 	_fragment(uri._fragment)
 {
@@ -124,6 +212,7 @@ URI::URI(URI&& uri) noexcept:
 	_host(std::move(uri._host)),
 	_port(std::move(uri._port)),
 	_path(std::move(uri._path)),
+	_rawPath(std::move(uri._rawPath)),
 	_query(std::move(uri._query)),
 	_fragment(std::move(uri._fragment))
 {
@@ -136,6 +225,7 @@ URI::URI(const URI& baseURI, const std::string& relativeURI):
 	_host(baseURI._host),
 	_port(baseURI._port),
 	_path(baseURI._path),
+	_rawPath(baseURI._rawPath),
 	_query(baseURI._query),
 	_fragment(baseURI._fragment)
 {
@@ -166,7 +256,7 @@ URI& URI::operator = (const URI& uri)
 		_userInfo = uri._userInfo;
 		_host     = uri._host;
 		_port     = uri._port;
-		_path     = uri._path;
+		copyPath(uri);
 		_query    = uri._query;
 		_fragment = uri._fragment;
 	}
@@ -181,6 +271,7 @@ URI& URI::operator = (URI&& uri) noexcept
 	_host     = std::move(uri._host);
 	_port     = std::move(uri._port);
 	_path     = std::move(uri._path);
+	_rawPath  = std::move(uri._rawPath);
 	_query    = std::move(uri._query);
 	_fragment = std::move(uri._fragment);
 
@@ -211,6 +302,7 @@ void URI::swap(URI& uri) noexcept
 	std::swap(_host, uri._host);
 	std::swap(_port, uri._port);
 	std::swap(_path, uri._path);
+	std::swap(_rawPath, uri._rawPath);
 	std::swap(_query, uri._query);
 	std::swap(_fragment, uri._fragment);
 }
@@ -223,6 +315,7 @@ void URI::clear()
 	_host.clear();
 	_port = 0;
 	_path.clear();
+	_rawPath.clear();
 	_query.clear();
 	_fragment.clear();
 }
@@ -233,7 +326,7 @@ std::string URI::toString() const
 	std::string uri;
 	if (isRelative())
 	{
-		encode(_path, RESERVED_PATH, uri);
+		uri = getRawPath();
 	}
 	else
 	{
@@ -249,7 +342,7 @@ std::string URI::toString() const
 		{
 			if (!auth.empty() && _path[0] != '/')
 				uri += '/';
-			encode(_path, RESERVED_PATH, uri);
+			uri += getRawPath();
 		}
 		else if (!_query.empty() || !_fragment.empty())
 		{
@@ -345,8 +438,38 @@ void URI::setAuthority(const std::string& authority)
 
 void URI::setPath(const std::string& path)
 {
-	_path.clear();
-	decode(path, _path);
+	// path may refer to _path, and a malformed escape must leave the URI unchanged.
+	std::string decodedPath;
+	decode(path, decodedPath);
+	_path = std::move(decodedPath);
+	_rawPath.clear();
+}
+
+
+std::string URI::getRawPath() const
+{
+	if (!_rawPath.empty() && isRawPathUsable(_rawPath))
+		return _rawPath;
+	std::string rawPath;
+	encode(_path, RESERVED_PATH, rawPath);
+	return rawPath;
+}
+
+
+void URI::setRawPath(const std::string& path)
+{
+	checkControlChars(path);
+	if (path.find_first_of("?# ") != std::string::npos)
+		throw URISyntaxException("URI path contains a character that must be percent-encoded", path);
+	std::string decodedPath;
+	decode(path, decodedPath);
+	// Without '%', the raw path equals the percent-encoded _path that getRawPath() returns.
+	std::string rawPath;
+	if (path.find('%') != std::string::npos)
+		rawPath = encodeKeepingEscapes(path, RESERVED_PATH);
+	// Moving a std::string does not throw, so an exception above leaves both members unchanged.
+	_path    = std::move(decodedPath);
+	_rawPath = std::move(rawPath);
 }
 
 
@@ -456,6 +579,7 @@ void URI::setRawFragment(const std::string& fragment)
 void URI::setPathEtc(const std::string& pathEtc)
 {
 	_path.clear();
+	_rawPath.clear();
 	_query.clear();
 	_fragment.clear();
 	std::string::const_iterator beg = pathEtc.begin();
@@ -466,8 +590,7 @@ void URI::setPathEtc(const std::string& pathEtc)
 
 std::string URI::getPathEtc() const
 {
-	std::string pathEtc;
-	encode(_path, RESERVED_PATH, pathEtc);
+	std::string pathEtc = getRawPath();
 	if (!_query.empty())
 	{
 		pathEtc += '?';
@@ -484,8 +607,7 @@ std::string URI::getPathEtc() const
 
 std::string URI::getPathAndQuery() const
 {
-	std::string pathAndQuery;
-	encode(_path, RESERVED_PATH, pathAndQuery);
+	std::string pathAndQuery = getRawPath();
 	if (!_query.empty())
 	{
 		pathAndQuery += '?';
@@ -510,7 +632,7 @@ void URI::resolve(const URI& relativeURI)
 		_userInfo = relativeURI._userInfo;
 		_host     = relativeURI._host;
 		_port     = relativeURI._port;
-		_path     = relativeURI._path;
+		copyPath(relativeURI);
 		_query    = relativeURI._query;
 		removeDotSegments();
 	}
@@ -521,7 +643,7 @@ void URI::resolve(const URI& relativeURI)
 			_userInfo = relativeURI._userInfo;
 			_host     = relativeURI._host;
 			_port     = relativeURI._port;
-			_path     = relativeURI._path;
+			copyPath(relativeURI);
 			_query    = relativeURI._query;
 			removeDotSegments();
 		}
@@ -536,12 +658,19 @@ void URI::resolve(const URI& relativeURI)
 			{
 				if (relativeURI._path[0] == '/')
 				{
-					_path = relativeURI._path;
+					copyPath(relativeURI);
 					removeDotSegments();
+				}
+				else if (_rawPath.empty() && relativeURI._rawPath.empty())
+				{
+					mergePath(relativeURI._path);
 				}
 				else
 				{
+					URI rawURI = rawPathURI();
+					rawURI.mergePath(decodeDotSegments(relativeURI.getRawPath()));
 					mergePath(relativeURI._path);
+					setRawPathIfEquivalent(rawURI._path);
 				}
 				_query = relativeURI._query;
 			}
@@ -591,13 +720,18 @@ bool URI::operator != (const std::string& uri) const
 
 bool URI::equals(const URI& uri) const
 {
+	// A normalized raw path decodes to the same string as the raw path, so different
+	// decoded paths imply different normalized raw paths; normalizing runs last.
+	// Without stored raw paths, equal decoded paths have equal encoded forms.
 	return _scheme   == uri._scheme
 		&& _userInfo == uri._userInfo
 		&& _host     == uri._host
 		&& getPort() == uri.getPort()
 		&& _path     == uri._path
 		&& _query    == uri._query
-		&& _fragment == uri._fragment;
+		&& _fragment == uri._fragment
+		&& ((_rawPath.empty() && uri._rawPath.empty())
+			|| normalizePercentEncoding(getRawPath()) == normalizePercentEncoding(uri.getRawPath()));
 }
 
 
@@ -611,6 +745,13 @@ void URI::removeDotSegments(bool removeLeading)
 {
 	if (_path.empty()) return;
 
+	std::string rawPath;
+	if (!_rawPath.empty())
+	{
+		URI rawURI = rawPathURI();
+		rawURI.removeDotSegments(removeLeading);
+		rawPath = std::move(rawURI._path);
+	}
 	bool leadingSlash  = *(_path.begin()) == '/';
 	bool trailingSlash = *(_path.rbegin()) == '/';
 	std::vector<std::string> segments;
@@ -638,6 +779,7 @@ void URI::removeDotSegments(bool removeLeading)
 		}
 	}
 	buildPath(normalizedSegments, leadingSlash, trailingSlash);
+	setRawPathIfEquivalent(rawPath);
 }
 
 
@@ -673,22 +815,40 @@ void URI::getPathSegments(const std::string& path, std::vector<std::string>& seg
 void URI::encode(const std::string& str, const std::string& reserved, std::string& encodedStr)
 {
 	for (auto c: str)
+		encodeChar(c, reserved, encodedStr);
+}
+
+
+void URI::encodeChar(char c, const std::string& reserved, std::string& encodedStr)
+{
+	if (isUnreserved(c))
 	{
-		if ((c >= 'a' && c <= 'z') ||
-			(c >= 'A' && c <= 'Z') ||
-			(c >= '0' && c <= '9') ||
-			c == '-' || c == '_' ||
-			c == '.' || c == '~')
-		{
-			encodedStr += c;
-		}
-		else if (c <= 0x20 || c >= 0x7F || ILLEGAL.find(c) != std::string::npos || reserved.find(c) != std::string::npos)
-		{
-			encodedStr += '%';
-			encodedStr += NumberFormatter::formatHex((unsigned) (unsigned char) c, 2);
-		}
-		else encodedStr += c;
+		encodedStr += c;
 	}
+	else if (c <= ASCII_SPACE || c >= ASCII_DEL || ILLEGAL.find(c) != std::string::npos || reserved.find(c) != std::string::npos)
+	{
+		encodedStr += '%';
+		encodedStr += NumberFormatter::formatHex(static_cast<unsigned>(static_cast<unsigned char>(c)), 2);
+	}
+	else encodedStr += c;
+}
+
+
+std::string URI::encodeKeepingEscapes(const std::string& str, const std::string& reserved)
+{
+	std::string encodedStr;
+	encodedStr.reserve(str.size());
+	std::string::size_type pos = 0;
+	while (pos < str.size())
+	{
+		if (str[pos] == '%')
+		{
+			encodedStr.append(str, pos, ESCAPE_LENGTH);
+			pos += ESCAPE_LENGTH;
+		}
+		else encodeChar(str[pos++], reserved, encodedStr);
+	}
+	return encodedStr;
 }
 
 
@@ -881,6 +1041,8 @@ void URI::parsePath(std::string::const_iterator& it, const std::string::const_it
 	std::string path;
 	while (it != end && *it != '?' && *it != '#') path += *it++;
 	decode(path, _path);
+	if (path.find('%') != std::string::npos)
+		_rawPath = encodeKeepingEscapes(path, RESERVED_PATH);
 }
 
 
@@ -959,6 +1121,7 @@ void URI::mergePath(const std::string& path)
 void URI::buildPath(const std::vector<std::string>& segments, bool leadingSlash, bool trailingSlash)
 {
 	_path.clear();
+	_rawPath.clear();
 	bool first = true;
 	for (const auto& s: segments)
 	{
@@ -985,6 +1148,44 @@ void URI::checkControlChars(const std::string& str)
 		if (Ascii::hasProperties(c, Ascii::ACP_CONTROL))
 			throw URISyntaxException("URI contains control characters", str);
 	}
+}
+
+
+URI URI::rawPathURI() const
+{
+	// The path algorithms split at '/' and compare segments with "." and "..";
+	// on the raw path "%2F" then stays inside its segment.
+	URI rawURI;
+	rawURI._scheme = _scheme;
+	rawURI._path = decodeDotSegments(getRawPath());
+	return rawURI;
+}
+
+
+bool URI::isRawPathUsable(const std::string& rawPath) const
+{
+	const bool rawLeadingSlash = !rawPath.empty() && rawPath[0] == '/';
+	const bool leadingSlash = !_path.empty() && _path[0] == '/';
+	return rawLeadingSlash == leadingSlash || (getAuthority().empty() && _scheme != "file");
+}
+
+
+void URI::setRawPathIfEquivalent(const std::string& rawPath)
+{
+	std::string decodedPath;
+	decode(rawPath, decodedPath);
+	if (rawPath.find('%') != std::string::npos && decodedPath == _path && isRawPathUsable(rawPath))
+		_rawPath = rawPath;
+	else
+		_rawPath.clear();
+}
+
+
+void URI::copyPath(const URI& uri)
+{
+	std::string rawPath = uri._rawPath;
+	_path    = uri._path;
+	_rawPath = std::move(rawPath);
 }
 
 

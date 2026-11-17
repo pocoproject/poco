@@ -19,6 +19,8 @@
 #include "Poco/Net/HTTPCredentials.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/URI.h"
+#include <utility>
+#include <vector>
 
 
 using Poco::Net::HTTPRequest;
@@ -104,6 +106,32 @@ void HTTPCredentialsTest::testBadCredentials()
 	catch (NotAuthenticatedException&)
 	{
 	}
+}
+
+
+void HTTPCredentialsTest::testBasicCredentialsNoPadding()
+{
+	const std::string username("user");
+	const std::vector<std::pair<std::string, std::string>> cases = {
+		{"dXNlcjpzM2NyM3Q=", "s3cr3t"},
+		{"dXNlcjpzM2NyM3Q", "s3cr3t"},
+		{"dXNlcjpwdw==", "pw"},
+		{"dXNlcjpwdw", "pw"},
+		{"dXNlcjpwdw=", "pw"},
+		{"dXNlcjpzM2Ny", "s3cr"}
+	};
+	for (const auto& [authInfo, password]: cases)
+	{
+		HTTPBasicCredentials cred(authInfo);
+		assertEqual (username, cred.getUsername());
+		assertEqual (password, cred.getPassword());
+	}
+
+	HTTPRequest request;
+	request.setCredentials("Basic", "dXNlcjpwdw");
+	HTTPBasicCredentials cred(request);
+	assertEqual (username, cred.getUsername());
+	assertEqual ("pw", cred.getPassword());
 }
 
 
@@ -405,6 +433,7 @@ CppUnit::Test* HTTPCredentialsTest::suite()
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testBasicCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testProxyBasicCredentials);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testBadCredentials);
+	CppUnit_addTest(pSuite, HTTPCredentialsTest, testBasicCredentialsNoPadding);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testAuthenticationParams);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testAuthenticationParamsMultipleHeaders);
 	CppUnit_addTest(pSuite, HTTPCredentialsTest, testDigestCredentials);

@@ -80,7 +80,8 @@ public:
 		/// expire at the time given in expireTime.
 		///
 		/// If a subscription with the given subscriberURI already exists,
-		/// the expireTime of the existing subscription will be updated.
+		/// the expireTime of the existing subscription will be updated,
+		/// and events go to the given endpoint from then on.
 
 	void unsubscribe(const std::string& subscriberURI);
 		/// Unregisters the remote EventSubscriber identified

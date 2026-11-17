@@ -23,6 +23,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/Path.h"
 #include <istream>
+#include <string_view>
 
 
 namespace Poco::Zip {
@@ -58,6 +59,11 @@ public:
 
 	static void verifyZipEntryFileName(const std::string& zipPath);
 		/// Verifies that the name of the ZipEntry is a valid path
+
+	static void verifySizeOrOffset(Poco::UInt64 value, std::string_view message, const std::string& fileName);
+		/// Throws a ZipException with the given message and file name if value, a size or an offset
+		/// read from an archive, is above 2^61. Up to that limit, an offset, a header size and a size
+		/// added together fit std::streamoff.
 
 	static std::string validZipEntryFileName(const Poco::Path& entry);
 

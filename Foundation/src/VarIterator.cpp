@@ -62,7 +62,7 @@ VarIterator& VarIterator::operator = (VarIterator&& other) noexcept
 }
 
 
-void VarIterator::swap(VarIterator& other)
+void VarIterator::swap(VarIterator& other) noexcept
 {
 	using std::swap;
 

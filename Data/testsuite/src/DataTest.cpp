@@ -59,6 +59,10 @@
 #include <sstream>
 #include <iomanip>
 #include <set>
+#include <type_traits>
+#include <utility>
+#include <array>
+#include <exception>
 
 
 using namespace Poco;
@@ -66,6 +70,26 @@ using Poco::Dynamic::Var;
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 using namespace std::string_literals;
+
+
+namespace
+{
+	class AffixRowFormatter: public SimpleRowFormatter
+		/// Sets the prefix and the postfix, which SimpleRowFormatter leaves empty.
+	{
+	public:
+		AffixRowFormatter() = delete;
+		AffixRowFormatter(const std::string& prefix, const std::string& postfix);
+		~AffixRowFormatter() override = default;
+	};
+
+
+	AffixRowFormatter::AffixRowFormatter(const std::string& prefix, const std::string& postfix)
+	{
+		setPrefix(prefix);
+		setPostfix(postfix);
+	}
+}
 
 
 DataTest::DataTest(const std::string& name): CppUnit::TestCase(name)
@@ -82,6 +106,8 @@ DataTest::~DataTest()
 
 void DataTest::testSession()
 {
+	static_assert(std::is_nothrow_swappable_v<Poco::Data::Session>);
+
 	Session sess(SessionFactory::instance().create("test", "cs"));
 	assertTrue ("test" == sess.impl()->connectorName());
 	assertTrue (sess.connector() == sess.impl()->connectorName());
@@ -97,6 +123,7 @@ void DataTest::testSession()
 	assertTrue ("test" == sess2.impl()->connectorName());
 	assertTrue ("Cs" == sess2.impl()->connectionString());
 	assertTrue ("test:///Cs" == sess2.uri());
+	static_assert(noexcept(sess.swap(sess2)));
 
 	sess << "DROP TABLE IF EXISTS Test", now;
 	int count;
@@ -182,6 +209,26 @@ void DataTest::testStatementMoveAssignment()
 	assertTrue (target.toString() == "SELEC * FROM Person");
 	assertTrue (target.parseError() == parseError);
 	assertTrue (source.parseError().empty());
+}
+
+
+void DataTest::testStatementSwap()
+{
+	static_assert(std::is_nothrow_swappable_v<Statement>);
+
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	Statement stmt1 = (sess << "SELECT 1");
+	Statement stmt2 = (sess << "SELECT 2");
+
+	Poco::Data::swap(stmt1, stmt2);
+	assertEqual ("SELECT 2"s, stmt1.toString());
+	assertEqual ("SELECT 1"s, stmt2.toString());
+
+	using std::swap;
+	swap(stmt1, stmt2);
+	assertEqual ("SELECT 1"s, stmt1.toString());
+	assertEqual ("SELECT 2"s, stmt2.toString());
 }
 
 
@@ -1278,6 +1325,36 @@ void DataTest::testSimpleRowFormatter()
 }
 
 
+void DataTest::testSimpleRowFormatterSwap()
+{
+	static_assert(std::is_nothrow_swappable_v<SimpleRowFormatter>);
+
+	SimpleRowFormatter rf1(10, 2);
+	SimpleRowFormatter rf2(20, 4);
+
+	Poco::Data::swap(rf1, rf2);
+	assertEqual (20, rf1.getColumnWidth());
+	assertEqual (4, rf1.getSpacing());
+	assertEqual (10, rf2.getColumnWidth());
+	assertEqual (2, rf2.getSpacing());
+
+	using std::swap;
+	swap(rf1, rf2);
+	assertEqual (10, rf1.getColumnWidth());
+	assertEqual (2, rf1.getSpacing());
+	assertEqual (20, rf2.getColumnWidth());
+	assertEqual (4, rf2.getSpacing());
+
+	AffixRowFormatter af1("prefix1", "postfix1");
+	AffixRowFormatter af2("prefix2", "postfix2");
+	Poco::Data::swap(af1, af2);
+	assertEqual ("prefix2"s, af1.prefix());
+	assertEqual ("postfix2"s, af1.postfix());
+	assertEqual ("prefix1"s, af2.prefix());
+	assertEqual ("postfix1"s, af2.postfix());
+}
+
+
 void DataTest::testJSONRowFormatter()
 {
 	Row row1;
@@ -2133,14 +2210,16 @@ namespace
 
 
 	class ExecutionHold
-		/// Holds the next execution of a TestStatementImpl in hasNext()
+		/// Holds the next execution of a TestStatementImpl at the given point
 		/// until the hold is destroyed, so that a failing test never
 		/// leaves the execution waiting.
 	{
 	public:
-		POCO_NODISCARD_CTOR ExecutionHold()
+		using HoldPoint = Poco::Data::Test::TestStatementImpl::HoldPoint;
+
+		POCO_NODISCARD_CTOR explicit ExecutionHold(HoldPoint point = HoldPoint::HAS_NEXT)
 		{
-			Poco::Data::Test::TestStatementImpl::holdNextExecution();
+			Poco::Data::Test::TestStatementImpl::holdNextExecution(point);
 		}
 
 		~ExecutionHold()
@@ -2160,6 +2239,50 @@ namespace
 		ExecutionHold& operator = (const ExecutionHold&) = delete;
 		ExecutionHold& operator = (ExecutionHold&&) = delete;
 	};
+
+
+	template <typename Call>
+	[[nodiscard]] bool refused(Call call)
+		/// Returns true if call() throws InvalidAccessException.
+	{
+		try
+		{
+			call();
+		}
+		catch (InvalidAccessException&)
+		{
+			return true;
+		}
+		return false;
+	}
+
+
+	template <typename Checks>
+	[[nodiscard]] bool checkWhileHeld(std::exception_ptr& pError, Checks checks)
+		/// Runs checks() once the execution held by an ExecutionHold waits. Returns false if it
+		/// does not wait within ten seconds. An exception from checks() is stored in pError, so
+		/// that the test lets the executions end before it rethrows it: they use its locals.
+	{
+		if (!Poco::Data::Test::TestStatementImpl::waitUntilHeld(10000)) return false;
+		try
+		{
+			checks();
+		}
+		catch (...)
+		{
+			pError = std::current_exception();
+		}
+		return true;
+	}
+
+
+	constexpr std::array HOLD_POINTS{
+		Poco::Data::Test::TestStatementImpl::HoldPoint::COMPILE,
+		Poco::Data::Test::TestStatementImpl::HoldPoint::HAS_NEXT,
+		Poco::Data::Test::TestStatementImpl::HoldPoint::AFFECTED_ROW_COUNT
+	};
+		/// The points at which the tests hold an execution: before it has changed the state,
+		/// while it runs, and after it has set the state to done.
 
 
 	[[nodiscard]] std::string contentOf(const Path& dir)
@@ -2408,17 +2531,151 @@ void DataTest::testStatementAsyncError()
 
 void DataTest::testStatementWaitErrorType()
 {
-	// wait() rethrows the error of an asynchronous execution with its type.
+	// wait() rethrows the error of an asynchronous execution with its type. The failed
+	// execution has ended, so the statement accepts the next one, which fails the same way.
 	Session sess(SessionFactory::instance().create("test", "cs"));
 	sess.setFeature("throwOnHasNext", true);
 	Statement stmt = (sess << "SELECT * FROM Strings");
-	stmt.executeAsync();
-	try
+	for (int i = 0; i < 2; ++i)
 	{
-		stmt.wait();
-		fail ("must throw UnknownDataBaseException");
+		stmt.executeAsync();
+		try
+		{
+			stmt.wait();
+			fail ("must throw UnknownDataBaseException");
+		}
+		catch (UnknownDataBaseException&) { }
 	}
-	catch (UnknownDataBaseException&) { }
+}
+
+
+void DataTest::testStatementExecuteWhileExecuting()
+{
+	// A statement and its copies refuse to execute while an asynchronous execution
+	// runs: before it has changed the state, while it runs, and after it has set the
+	// state to done, which an execution with a limit does before it ends.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	for (const auto point: HOLD_POINTS)
+	{
+		Statement stmt = (sess << "SELECT * FROM Strings", limit(1));
+		Statement copy(stmt);
+		SharedPtr<Statement::Result> pResult;
+		std::exception_ptr pCheckError;
+		bool held = false;
+		bool executeRefused = false;
+		bool executeAsyncRefused = false;
+		bool executeDirectRefused = false;
+		bool copyExecuteRefused = false;
+		{
+			ExecutionHold hold(point);
+			pResult = new Statement::Result(stmt.executeAsync());
+			held = checkWhileHeld(pCheckError, [&]
+			{
+				executeRefused = refused([&stmt] { stmt.execute(); });
+				executeAsyncRefused = refused([&stmt] { stmt.executeAsync(); });
+				executeDirectRefused = refused([&stmt] { stmt.executeDirect("SELECT * FROM Strings"); });
+				copyExecuteRefused = refused([&copy] { copy.execute(); });
+			});
+		}
+		pResult->wait();
+		// if executeAsync() was not refused, its execution has to end before the next round
+		stmt.wait();
+		if (pCheckError != nullptr) std::rethrow_exception(pCheckError);
+		assertTrue (held);
+		assertTrue (executeRefused);
+		assertTrue (executeAsyncRefused);
+		assertTrue (executeDirectRefused);
+		assertTrue (copyExecuteRefused);
+		assertTrue (!pResult->failed());
+		// once the execution has ended, the next one is accepted, also through the copy
+		copy.execute();
+	}
+}
+
+
+void DataTest::testStatementExecuteWhileExecutingSync()
+{
+	// A synchronous execution through a copy in another thread makes the statement refuse to
+	// execute as well: before the execution has changed the state, while it runs, and after it
+	// has set the state to done, which an execution with a limit does before it ends.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	for (const auto point: HOLD_POINTS)
+	{
+		Statement stmt = (sess << "SELECT * FROM Strings", limit(1));
+		Statement copy(stmt);
+		std::exception_ptr pCopyError;
+		std::exception_ptr pCheckError;
+		Thread thread;
+		bool held = false;
+		bool executeRefused = false;
+		bool executeAsyncRefused = false;
+		bool executeDirectRefused = false;
+		{
+			ExecutionHold hold(point);
+			thread.startFunc([&copy, &pCopyError]
+			{
+				try
+				{
+					copy.execute();
+				}
+				catch (...)
+				{
+					pCopyError = std::current_exception();
+				}
+			});
+			held = checkWhileHeld(pCheckError, [&]
+			{
+				executeRefused = refused([&stmt] { stmt.execute(); });
+				executeAsyncRefused = refused([&stmt] { stmt.executeAsync(); });
+				executeDirectRefused = refused([&stmt] { stmt.executeDirect("SELECT * FROM Strings"); });
+			});
+		}
+		thread.join();
+		// if executeAsync() was not refused, its execution has to end before the next round
+		stmt.wait();
+		if (pCheckError != nullptr) std::rethrow_exception(pCheckError);
+		if (pCopyError != nullptr) std::rethrow_exception(pCopyError);
+		assertTrue (held);
+		assertTrue (executeRefused);
+		assertTrue (executeAsyncRefused);
+		assertTrue (executeDirectRefused);
+		// once the execution has ended, the next one is accepted
+		stmt.execute();
+	}
+}
+
+
+void DataTest::testStatementExecuteWhileExecutingAsyncStatement()
+{
+	// execute() on an asynchronous statement hands its claim over to the execution as well,
+	// so a copy refuses to execute until that execution has ended.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	for (const auto point: HOLD_POINTS)
+	{
+		Statement stmt = (sess << "SELECT * FROM Strings", limit(1));
+		stmt.setAsync(true);
+		Statement copy(stmt);
+		std::exception_ptr pCheckError;
+		bool held = false;
+		bool copyExecuteRefused = false;
+		{
+			ExecutionHold hold(point);
+			stmt.execute();
+			held = checkWhileHeld(pCheckError, [&]
+			{
+				copyExecuteRefused = refused([&copy] { copy.execute(); });
+			});
+		}
+		stmt.wait();
+		// if copy.execute() was not refused, its execution has to end before the next round
+		copy.wait();
+		if (pCheckError != nullptr) std::rethrow_exception(pCheckError);
+		assertTrue (held);
+		assertTrue (copyExecuteRefused);
+		// once the execution has ended, the next one is accepted
+		copy.execute();
+		copy.wait();
+	}
 }
 
 
@@ -2806,6 +3063,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testSession);
 	CppUnit_addTest(pSuite, DataTest, testStatementFormatting);
 	CppUnit_addTest(pSuite, DataTest, testStatementMoveAssignment);
+	CppUnit_addTest(pSuite, DataTest, testStatementSwap);
 	CppUnit_addTest(pSuite, DataTest, testFeatures);
 	CppUnit_addTest(pSuite, DataTest, testProperties);
 	CppUnit_addTest(pSuite, DataTest, testLOB);
@@ -2818,6 +3076,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testRow);
 	CppUnit_addTest(pSuite, DataTest, testRowSort);
 	CppUnit_addTest(pSuite, DataTest, testSimpleRowFormatter);
+	CppUnit_addTest(pSuite, DataTest, testSimpleRowFormatterSwap);
 	CppUnit_addTest(pSuite, DataTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
@@ -2839,6 +3098,9 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyReopen);
 	CppUnit_addTest(pSuite, DataTest, testStatementAsyncError);
 	CppUnit_addTest(pSuite, DataTest, testStatementWaitErrorType);
+	CppUnit_addTest(pSuite, DataTest, testStatementExecuteWhileExecuting);
+	CppUnit_addTest(pSuite, DataTest, testStatementExecuteWhileExecutingSync);
+	CppUnit_addTest(pSuite, DataTest, testStatementExecuteWhileExecutingAsyncStatement);
 	CppUnit_addTest(pSuite, DataTest, testStatementSetAsyncMovedFrom);
 	CppUnit_addTest(pSuite, DataTest, testTransactionNotConnectedLog);
 	CppUnit_addTest(pSuite, DataTest, testTransactorFailureLog);

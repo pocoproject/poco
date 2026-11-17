@@ -130,20 +130,11 @@ target_compile_definitions(Foundation
 	PUBLIC
 		$<$<CONFIG:Debug>:_DEBUG>
 )
-target_compile_features(Foundation
-	PUBLIC
-		$<$<NOT:$<BOOL:${DISABLE_CPP11}>>:cxx_defaulted_move_initializers>
-)
 
 #
-# Set target C++ standard compile features for exported target.
+# Code that uses Poco is compiled as C++20 or later.
 #
-target_compile_features(Foundation PUBLIC cxx_std_17)
-# Code that uses Poco is compiled with the standard Poco was built with: some
-# class layouts depend on the C++ standard (feature macros in Poco/Config.h).
-if (CMAKE_CXX_STANDARD GREATER_EQUAL 20)
-	target_compile_features(Foundation PUBLIC cxx_std_20)
-endif()
+target_compile_features(Foundation PUBLIC cxx_std_20)
 
 if(NOT BUILD_SHARED_LIBS)
 	# The define must be set here to be included in the generated CMake files
@@ -180,6 +171,10 @@ else()
 				find_package(Threads REQUIRED)
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_POLL)
 				target_link_libraries(Foundation PUBLIC ${CMAKE_DL_LIBS} rt Threads::Threads)
+			elseif(EMSCRIPTEN)
+				# No eventfd(), which PollSet needs with epoll
+				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_POLL)
+				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt ${Poco_ATOMIC_LIBRARIES})
 			else()
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_EPOLL)
 				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt ${Poco_ATOMIC_LIBRARIES})
@@ -232,6 +227,14 @@ endif()
 # Emscripten currently doesn't support thread names
 if(EMSCRIPTEN)
 	target_compile_definitions(Foundation PUBLIC POCO_NO_THREADNAME)
+endif()
+
+# A program that uses POCO needs the thread and exception flags of the libraries
+if(EMSCRIPTEN AND NOT "${POCO_EMSCRIPTEN_FLAGS}" STREQUAL "")
+	separate_arguments(_poco_em_flags UNIX_COMMAND "${POCO_EMSCRIPTEN_FLAGS}")
+	target_compile_options(Foundation PUBLIC ${_poco_em_flags})
+	target_link_options(Foundation PUBLIC ${_poco_em_flags})
+	unset(_poco_em_flags)
 endif()
 
 # iOS

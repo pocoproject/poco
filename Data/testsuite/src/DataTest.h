@@ -30,6 +30,7 @@ public:
 	void testSession();
 	void testStatementFormatting();
 	void testStatementMoveAssignment();
+	void testStatementSwap();
 	void testFeatures();
 	void testProperties();
 	void testLOB();
@@ -42,6 +43,7 @@ public:
 	void testRow();
 	void testRowSort();
 	void testSimpleRowFormatter();
+	void testSimpleRowFormatterSwap();
 	void testJSONRowFormatter();
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
@@ -63,6 +65,9 @@ public:
 	void testArchiveStrategyReopen();
 	void testStatementAsyncError();
 	void testStatementWaitErrorType();
+	void testStatementExecuteWhileExecuting();
+	void testStatementExecuteWhileExecutingSync();
+	void testStatementExecuteWhileExecutingAsyncStatement();
 	void testStatementSetAsyncMovedFrom();
 	void testTransactionNotConnectedLog();
 	void testTransactorFailureLog();

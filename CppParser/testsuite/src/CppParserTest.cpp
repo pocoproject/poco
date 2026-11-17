@@ -352,7 +352,8 @@ public:
 )", st);
 	assertTrue (st.find("Foo") != st.end());
 
-	Symbol* pSym = st.find("Foo")->second;
+	// The class and its constructors have the same name; the class is declared first.
+	Symbol* pSym = st.lower_bound("Foo")->second;
 	Struct* pClass = dynamic_cast<Struct*>(pSym);
 	assertTrue (pClass != nullptr);
 
@@ -596,6 +597,30 @@ class GlobalAfter {};
 }
 
 
+void CppParserTest::testLookupOverloadedFunction()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace Overloaded
+{
+	void func();
+	void func(int a);
+	void func(int a, int b);
+}
+)", st);
+
+	const auto itNS = st.find("Overloaded");
+	assertTrue (itNS != st.end());
+	auto* pNS = dynamic_cast<NameSpace*>(itNS->second);
+	assertTrue (pNS != nullptr);
+
+	auto* pFunc = dynamic_cast<Function*>(pNS->lookup("func"));
+	assertTrue (pFunc != nullptr);
+	assertTrue (pFunc->fullName() == "Overloaded::func");
+	assertTrue (pFunc->countParameters() == 0);
+}
+
+
 void CppParserTest::setUp()
 {
 }
@@ -626,6 +651,7 @@ CppUnit::Test* CppParserTest::suite()
 	CppUnit_addTest(pSuite, CppParserTest, testParseRepeatedNestedNamespace);
 	CppUnit_addTest(pSuite, CppParserTest, testParseSingleNamespace);
 	CppUnit_addTest(pSuite, CppParserTest, testParseDeepNestedNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testLookupOverloadedFunction);
 
 	return pSuite;
 }

@@ -66,6 +66,9 @@ public:
 		/// and returns the corresponding symbol, or null
 		/// if no symbol can be found. The name can include
 		/// a namespace.
+		///
+		/// If more than one symbol has the name (overloaded
+		/// functions), the one declared first is returned.
 
 	[[nodiscard]] static NameSpace* root();
 		/// Returns the root namespace. Never delete this one!

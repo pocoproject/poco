@@ -184,12 +184,10 @@ Poco::Optional<std::string> Tester::testPocoOptional(const Poco::Optional<std::s
 }
 
 
-#if POCO_HAVE_CPP17_COMPILER
 std::optional<std::string> Tester::testStdOptional(const std::optional<std::string>& value)
 {
 	return value;
 }
-#endif
 
 
 Struct8 Tester::testStruct8(const Struct8& value)

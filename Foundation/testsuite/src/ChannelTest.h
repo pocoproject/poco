@@ -30,10 +30,20 @@ public:
 	void testAsyncConcurrentReplacement();
 	void testAsyncTargetThrows();
 	void testAsyncErrorHandlerLogsToChannel();
+	void testAsyncReopen();
+	void testAsyncCloseDeliversQueued();
+	void testAsyncCloseWhileLogging();
+	void testAsyncCloseWhileTargetLogs();
+	void testAsyncDropCountConcurrent();
+	void testAsyncAppThreadLogsWhileHandling();
 	void testFormatting();
 	void testFormattingConcurrentReplacement();
 	void testFormattingMessageKeepsItsPair();
 	void testFormattingPairNeverTorn();
+	void testFormattingRvalueInPlace();
+	void testFormattingRvalueWithoutFormatter();
+	void testFormattingConstLeavesMessage();
+	void testFormattingRvalueFromLogger();
 	void testConsole();
 	void testStream();
 

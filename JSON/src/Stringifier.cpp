@@ -25,38 +25,23 @@ namespace Poco::JSON {
 
 void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, int options)
 {
-	bool escapeUnicode = ((options & Poco::JSON_ESCAPE_UNICODE) != 0);
-	bool lowercaseHex = ((options & Poco::JSON_LOWERCASE_HEX) != 0);
-
 	if (step == -1) step = static_cast<int>(indent);
 
 	if (any.type() == typeid(Object))
 	{
-		auto& o = const_cast<Object&>(any.extract<Object>());
-		o.setEscapeUnicode(escapeUnicode);
-		o.setLowercaseHex(lowercaseHex);
-		o.stringify(out, indent == 0 ? 0 : indent, step);
+		any.extract<Object>().stringify(out, indent, step, options);
 	}
 	else if (any.type() == typeid(Array))
 	{
-		auto& a = const_cast<Array&>(any.extract<Array>());
-		a.setEscapeUnicode(escapeUnicode);
-		a.setLowercaseHex(lowercaseHex);
-		a.stringify(out, indent == 0 ? 0 : indent, step);
+		any.extract<Array>().stringify(out, indent, step, options);
 	}
 	else if (any.type() == typeid(Object::Ptr))
 	{
-		auto& o = const_cast<Object::Ptr&>(any.extract<Object::Ptr>());
-		o->setEscapeUnicode(escapeUnicode);
-		o->setLowercaseHex(lowercaseHex);
-		o->stringify(out, indent == 0 ? 0 : indent, step);
+		any.extract<Object::Ptr>()->stringify(out, indent, step, options);
 	}
 	else if (any.type() == typeid(Array::Ptr))
 	{
-		auto& a = const_cast<Array::Ptr&>(any.extract<Array::Ptr>());
-		a->setEscapeUnicode(escapeUnicode);
-		a->setLowercaseHex(lowercaseHex);
-		a->stringify(out, indent == 0 ? 0 : indent, step);
+		any.extract<Array::Ptr>()->stringify(out, indent, step, options);
 	}
 	else if (any.isEmpty())
 	{

@@ -13,6 +13,7 @@ endif
 objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCenter ActiveThreadPool\
 	Base32Decoder Base32Encoder Base64Decoder Base64Encoder \
 	BinaryReader BinaryWriter Bugcheck ByteOrder Channel Checksum Clock Configurable ConsoleChannel \
+	Adler32 CpuFeatures CRC \
 	Condition CountingStream DateTime LocalDateTime DateTimeFormat DateTimeFormatter DateTimeParser \
 	Debugger DeferredRelease DeflatingStream DigestEngine DigestStream DirectoryIterator DirectoryWatcher \
 	Environment Event EventChannel Error EventArgs ErrorHandler Exception FIFOBufferStream FPEnvironment File \

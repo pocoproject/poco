@@ -1,0 +1,4 @@
+HTTP/1.1 401 Unauthorized
+Content-Length: 0
+WWW-Authenticate: Digest realm="api@example.org", qop="auth", algorithm=SHA-256, nonce="5f3c9a1e7b2d4c6a8e0f1b3d5a7c9e1f", opaque="0c1d2e3f4a5b6c7d"
+

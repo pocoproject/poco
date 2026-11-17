@@ -14,10 +14,14 @@
 
 #include "Poco/Util/LayeredConfiguration.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <set>
+#include <utility>
 
 
 using Poco::AutoPtr;
+using Poco::InvalidArgumentException;
+using Poco::NullPointerException;
 using Poco::RuntimeException;
 
 
@@ -70,15 +74,32 @@ void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig, const std::st
 {
 	AbstractConfiguration::ScopedLock lock(*this);
 
-	ConfigItem item;
-	item.pConfig   = pConfig;
-	item.priority  = priority;
-	item.writeable = writeable;
-	item.label     = label;
+	const ConfigItem item{std::move(pConfig), priority, writeable, label};
 
-	ConfigList::iterator it = _configs.begin();
-	while (it != _configs.end() && it->priority < priority) ++it;
-	_configs.insert(it, item);
+	insert(item);
+}
+
+
+void LayeredConfiguration::replace(AbstractConfiguration::Ptr pConfig, const std::string& label, int priority, bool writeable)
+{
+	if (label.empty()) throw InvalidArgumentException("LayeredConfiguration::replace() requires a label");
+	if (pConfig == nullptr) throw NullPointerException("LayeredConfiguration::replace() requires a configuration");
+
+	const ConfigItem item{std::move(pConfig), priority, writeable, label};
+
+	// Declared before the lock, so that the old configuration is released after the lock.
+	AbstractConfiguration::Ptr pOld;
+	AbstractConfiguration::ScopedLock lock(*this);
+
+	auto itOld = std::find_if(_configs.begin(), _configs.end(),
+		[&label](const ConfigItem& config) { return config.label == label; });
+	// Insert before erasing: if the insertion throws, the configuration is unchanged.
+	insert(item);
+	if (itOld != _configs.end())
+	{
+		pOld = std::move(itOld->pConfig);
+		_configs.erase(itOld);
+	}
 }
 
 
@@ -180,6 +201,14 @@ int LayeredConfiguration::highest() const
 		return 0;
 	else
 		return _configs.back().priority + 1;
+}
+
+
+void LayeredConfiguration::insert(const ConfigItem& item)
+{
+	ConfigList::iterator it = _configs.begin();
+	while (it != _configs.end() && it->priority < item.priority) ++it;
+	_configs.insert(it, item);
 }
 
 

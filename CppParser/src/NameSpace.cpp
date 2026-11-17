@@ -120,8 +120,9 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 		alreadyVisited.insert(this);
 		return root()->lookup(tail, alreadyVisited);
 	}
-	const auto it = _symbols.find(head);
-	if (it != _symbols.end())
+	// find() may return any of several symbols with the same name
+	const auto [it, itEnd] = _symbols.equal_range(head);
+	if (it != itEnd)
 	{
 		pSymbol = it->second;
 		if (!tail.empty())

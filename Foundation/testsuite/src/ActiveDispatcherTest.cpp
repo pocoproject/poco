@@ -16,8 +16,9 @@
 #include "Poco/Thread.h"
 #include "Poco/Event.h"
 #include "Poco/Exception.h"
-#include "Poco/Environment.h"
-#include <iostream>
+#include <atomic>
+#include <thread>
+#include <vector>
 
 
 using Poco::ActiveDispatcher;
@@ -27,7 +28,6 @@ using Poco::ActiveStarter;
 using Poco::Thread;
 using Poco::Event;
 using Poco::Exception;
-using Poco::Environment;
 
 
 namespace
@@ -86,6 +86,57 @@ namespace
 	private:
 		Event _continue;
 	};
+
+
+	constexpr long RESULT_TIMEOUT = 10000;
+
+
+	class SerialActiveObject: public ActiveDispatcher
+		/// An active object that records whether a call of its active method
+		/// started while another call was running.
+	{
+	public:
+		SerialActiveObject();
+			/// Creates the active object.
+
+		~SerialActiveObject() override = default;
+			/// Destroys the active object.
+
+		ActiveMethod<int, int, SerialActiveObject, ActiveStarter<ActiveDispatcher>> echo;
+			/// Returns its argument.
+
+		[[nodiscard]] bool overlapped() const;
+			/// Returns true if two calls of echo ran at the same time.
+
+	private:
+		int echoImpl(const int& n);
+
+		std::atomic<int> _inProgress{0};
+		std::atomic<bool> _overlapped{false};
+	};
+
+
+	SerialActiveObject::SerialActiveObject():
+		echo(this, &SerialActiveObject::echoImpl)
+	{
+	}
+
+
+	bool SerialActiveObject::overlapped() const
+	{
+		return _overlapped;
+	}
+
+
+	int SerialActiveObject::echoImpl(const int& n)
+	{
+		if (++_inProgress > 1) _overlapped = true;
+		// Gives a second dispatcher thread, if there were one, the chance to
+		// run a call at the same time.
+		Thread::yield();
+		--_inProgress;
+		return n;
+	}
 }
 
 
@@ -196,9 +247,37 @@ void ActiveDispatcherTest::testVoidIn()
 }
 
 
-void ActiveDispatcherTest::testActiveDispatcher()
+void ActiveDispatcherTest::testConcurrentFirstCalls()
 {
-	std::cout << "(disabled on TSAN runs)";
+	constexpr int CALLER_COUNT = 8;
+	constexpr int NO_RESULT = -1;
+
+	SerialActiveObject activeObj;
+	std::vector<int> results(CALLER_COUNT, NO_RESULT);
+	Event start(Event::EVENT_MANUALRESET);
+	std::vector<std::thread> callers;
+	callers.reserve(CALLER_COUNT);
+	for (int i = 0; i < CALLER_COUNT; ++i)
+	{
+		callers.emplace_back([&, i]()
+		{
+			start.wait();
+			ActiveResult<int> result = activeObj.echo(i);
+			if (result.tryWait(RESULT_TIMEOUT) && !result.failed())
+				results[i] = result.data();
+		});
+	}
+	start.set();
+	for (auto& caller: callers)
+	{
+		caller.join();
+	}
+
+	for (int i = 0; i < CALLER_COUNT; ++i)
+	{
+		assertEqual (i, results[i]);
+	}
+	assertTrue (!activeObj.overlapped());
 }
 
 
@@ -216,19 +295,14 @@ CppUnit::Test* ActiveDispatcherTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ActiveDispatcherTest");
 
-	// see https://github.com/pocoproject/poco/pull/3617
-	if (!Environment::has("TSAN_OPTIONS"))
-	{
-		CppUnit_addTest(pSuite, ActiveDispatcherTest, testWait);
-		CppUnit_addTest(pSuite, ActiveDispatcherTest, testWaitInterval);
-		CppUnit_addTest(pSuite, ActiveDispatcherTest, testTryWait);
-		CppUnit_addTest(pSuite, ActiveDispatcherTest, testFailure);
-		CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoid);
-		CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidIn);
-		CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidInOut);
-	}
-	else
-		CppUnit_addTest(pSuite, ActiveDispatcherTest, testActiveDispatcher);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testWait);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testWaitInterval);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testTryWait);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testFailure);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoid);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidIn);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testVoidInOut);
+	CppUnit_addTest(pSuite, ActiveDispatcherTest, testConcurrentFirstCalls);
 
 	return pSuite;
 }

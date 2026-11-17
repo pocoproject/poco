@@ -44,6 +44,7 @@ public:
 	void testCertificateSubjectAltName();
 	void testCertificateDuplicate();
 	void testCertificateSaveCannotCreateFile();
+	void testCertificateLoadNotPEM();
 	void testCertificate();
 	void testCertificateUTF8();
 	void testCertificateNameEntries();

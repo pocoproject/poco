@@ -17,17 +17,14 @@
 #include "Poco/Dynamic/Struct.h"
 #include "Poco/Dynamic/Pair.h"
 #include "Poco/Dynamic/VarVisitor.h"
+#include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Thread.h"
 #include <map>
 #include <utility>
+#include <type_traits>
 #include <iostream>
 #include <atomic>
 #include <memory>
-
-
-#if defined(_MSC_VER) && _MSC_VER < 1400
-	#pragma warning(disable:4800)//forcing value to bool 'true' or 'false'
-#endif
 
 
 using namespace Poco;
@@ -1749,6 +1746,16 @@ void VarTest::testEnumType()
 	assertTrue (a3 == 32);
 	a3 *= 2;
 	assertTrue (a3 == 64);
+
+	enum class charSrc: char {
+		value = 'A'
+	};
+
+	Var c1 = charSrc::value;
+	assertTrue (c1.convert<Int8>() == 65);
+	assertTrue (c1.convert<UInt8>() == 65);
+	assertTrue (c1.convert<Int64>() == 65);
+	assertTrue (c1.convert<UInt64>() == 65);
 }
 
 
@@ -2061,6 +2068,9 @@ void VarTest::testLimitsInt()
 	testLimitsSigned<Int64, Int32>();
 	testLimitsFloatToInt<float, Int32>();
 	testLimitsFloatToInt<double, Int32>();
+
+	testLimitsFloatToInt<float, Int64>();
+	testLimitsFloatToInt<double, Int64>();
 
 	testLimitsSignedUnsigned<Int8, UInt8>();
 	testLimitsSignedUnsigned<Int16, UInt8>();
@@ -3317,6 +3327,28 @@ void VarTest::testIterator()
 }
 
 
+void VarTest::testIteratorSwap()
+{
+	static_assert(std::is_nothrow_swappable_v<Poco::Dynamic::VarIterator>);
+
+	Poco::Dynamic::Array arr{1, 2, 3};
+	Var v = arr;
+	Var::Iterator it1 = v.begin();
+	Var::Iterator it2 = v.end();
+	static_assert(noexcept(it1.swap(it2)));
+	assertTrue (it1 != it2);
+
+	Poco::Dynamic::swap(it1, it2);
+	assertTrue (it1 == v.end());
+	assertTrue (it2 == v.begin());
+
+	using std::swap;
+	swap(it1, it2);
+	assertTrue (it1 == v.begin());
+	assertTrue (it2 == v.end());
+}
+
+
 void VarTest::testSharedPtr()
 {
 	Poco::SharedPtr<int> p = new int(42);
@@ -3570,6 +3602,7 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testUUID);
 	CppUnit_addTest(pSuite, VarTest, testEmpty);
 	CppUnit_addTest(pSuite, VarTest, testIterator);
+	CppUnit_addTest(pSuite, VarTest, testIteratorSwap);
 	CppUnit_addTest(pSuite, VarTest, testVarVisitor);
 	CppUnit_addTest(pSuite, VarTest, testEnumType);
 

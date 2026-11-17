@@ -23,7 +23,7 @@
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/NamedEvent_WIN32U.h"
-#elif POCO_OS == POCO_OS_ANDROID
+#elif (POCO_OS == POCO_OS_ANDROID) || defined(POCO_EMSCRIPTEN)
 #include "Poco/NamedEvent_Android.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/NamedEvent_UNIX.h"
@@ -46,6 +46,9 @@ class Foundation_API NamedEvent: public NamedEventImpl
 	/// to the same actual synchronization object.
 	///
 	/// NamedEvents are always autoresetting.
+	///
+	/// On Android and Emscripten, set() and wait() throw a
+	/// NotImplementedException.
 	///
 	/// There should not be more than one instance of NamedEvent for
 	/// a given name in a process. Otherwise, the instances may

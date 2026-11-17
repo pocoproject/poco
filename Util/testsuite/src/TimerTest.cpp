@@ -22,6 +22,24 @@ using Poco::Timestamp;
 using Poco::Clock;
 
 
+namespace
+{
+	constexpr long TASK_TIMEOUT_MS = 10000;
+
+	class DerivedTimer: public Timer
+		/// A class derived from Timer. Its constructor writes the vptr
+		/// after the Timer constructor has started the timer thread.
+	{
+	public:
+		DerivedTimer() = default;
+			/// Creates the DerivedTimer.
+
+		~DerivedTimer() override = default;
+			/// Destroys the DerivedTimer.
+	};
+}
+
+
 TimerTest::TimerTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -336,6 +354,23 @@ void TimerTest::testIdle()
 }
 
 
+void TimerTest::testDerivedConstructor()
+{
+	// Only ThreadSanitizer shows the defect: a data race on the vptr between the
+	// constructor of the derived class and a virtual call of run() in the timer thread.
+	// The assertion checks that a derived timer runs its tasks.
+	Poco::Event taskRun;
+	DerivedTimer timer;
+
+	timer.schedule(Timer::func([&taskRun]()
+	{
+		taskRun.set();
+	}), Poco::Clock());
+
+	assertTrue (taskRun.tryWait(TASK_TIMEOUT_MS));
+}
+
+
 void TimerTest::setUp()
 {
 }
@@ -369,6 +404,7 @@ CppUnit::Test* TimerTest::suite()
 	CppUnit_addTest(pSuite, TimerTest, testMultiCancelAllWaitStop);
 	CppUnit_addTest(pSuite, TimerTest, testFunc);
 	CppUnit_addTest(pSuite, TimerTest, testIdle);
+	CppUnit_addTest(pSuite, TimerTest, testDerivedConstructor);
 
 	return pSuite;
 }
