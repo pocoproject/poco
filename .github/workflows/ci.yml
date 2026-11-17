@@ -104,10 +104,12 @@ env:
   # Foundation suites that hold long tests (CppUnit_addLongTest). Long tests run
   # only with -long, which ctest does not pass; the *-long-tests jobs and
   # macos-clang-21-cmake-modules run these without an ignore list, so every
-  # failure fails the job.
+  # failure fails the job. LinearHashTableTest is not listed: its long tests
+  # are tests of deprecated API, which these jobs do not build.
   POCO_LONG_TEST_SUITES: >-
     RWLockTest PBKDF2EngineTest FileStreamRWLockTest FileChannelTest
     MD5EngineTest MD4EngineTest SHA1EngineTest SHA2EngineTest ChecksumTest
+    StringTest FileStreamTest
 
 jobs:
   # Change detection. Narrow-scope jobs gate on
