@@ -407,10 +407,15 @@ void XMLWriter::ignorableWhitespace(const XMLChar ch[], int start, int length)
 }
 
 
+namespace
+{
+	// "?>" would end a processing instruction early.
+	static const XMLString PI_END = toXMLString("?>"s);
+}
+
+
 void XMLWriter::processingInstruction(const XMLString& target, const XMLString& data)
 {
-	// "?>" would end the processing instruction early.
-	static const XMLString PI_END = toXMLString("?>"s);
 	if (target.find(PI_END) != XMLString::npos || data.find(PI_END) != XMLString::npos)
 		throw XMLException("Processing instruction must not contain \"?>\"");
 
