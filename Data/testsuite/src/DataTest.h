@@ -49,6 +49,7 @@ public:
 	void testExternalBindingAndExtraction();
 	void testTranscode();
 	void testSQLParse();
+	void testTransactionUnparsedStatement();
 	void testSQLChannel();
 	void testNullableExtract();
 	void testTransactionAutoCommit();

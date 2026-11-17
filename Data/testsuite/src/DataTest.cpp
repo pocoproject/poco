@@ -1584,6 +1584,32 @@ void DataTest::testTranscode()
 }
 
 
+void DataTest::testTransactionUnparsedStatement()
+{
+#ifndef POCO_DATA_NO_SQL_PARSER
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	sess.setFeature("autoCommit", false);
+	sess.setFeature("sqlParse", true);
+	assertTrue (!sess.isTransaction());
+
+	// a SELECT runs without a transaction
+	Statement select = (sess << "SELECT * FROM Person");
+	select.execute();
+	assertTrue (!sess.isTransaction());
+
+	// a statement the parser cannot read may write, so it runs in a transaction
+	Statement unparsed = (sess << "SELECT 1 ~ 2; DELETE FROM Person");
+	const Poco::Optional<bool> parsed = unparsed.parse();
+	assertTrue (parsed.isSpecified() && !parsed.value());
+	unparsed.execute();
+	assertTrue (sess.isTransaction());
+	sess.rollback();
+#else
+	std::cout << "test not available (parser not available)";
+#endif
+}
+
+
 void DataTest::testSQLParse()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
@@ -3082,6 +3108,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
 	CppUnit_addTest(pSuite, DataTest, testTranscode);
 	CppUnit_addTest(pSuite, DataTest, testSQLParse);
+	CppUnit_addTest(pSuite, DataTest, testTransactionUnparsedStatement);
 	CppUnit_addTest(pSuite, DataTest, testSQLChannel);
 	CppUnit_addTest(pSuite, DataTest, testNullableExtract);
 	CppUnit_addTest(pSuite, DataTest, testTransactionAutoCommit);

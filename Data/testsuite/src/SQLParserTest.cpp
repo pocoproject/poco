@@ -877,6 +877,19 @@ void SQLParserTest::testUnreadableInput()
 		assertEqual(0, static_cast<int>(result.size()));
 	}
 
+	// The lexer would stop at an embedded NUL character and parse the first
+	// statement only.
+	const std::string withNul("SELECT 1;\0DROP TABLE Test;", 26);
+	{
+		SQLParserResult nulResult;
+		SQLParser::parse(withNul, &nulResult);
+		assertTrue (!nulResult.isValid());
+		assertEqual(0, static_cast<int>(nulResult.size()));
+		std::vector<int16_t> nulTokens;
+		assertTrue (!SQLParser::tokenize(withNul, &nulTokens));
+		assertTrue (nulTokens.empty());
+	}
+
 	// Inside a string or a quoted identifier, any byte belongs to the value.
 	SQLParserResult result;
 	SQLParser::parse("SELECT 'caf\xc3\xa9', \"caf\xc3\xa9\" FROM Test;", &result);

@@ -15,6 +15,7 @@ class SQLParser_API SQLParser {
   static bool parse(const std::string& sql, SQLParserResult* result);
 
   // Run tokenization on the given string and store the tokens in the output vector.
+  // Returns false if the string contains a NUL character, which would end the input.
   static bool tokenize(const std::string& sql, std::vector<int16_t>* tokens);
 
   // Old method to parse SQL strings. Replaced by parse().

@@ -16,6 +16,19 @@ bool SQLParser::parse(const std::string& sql, SQLParserResult* result) {
   yyscan_t scanner;
   YY_BUFFER_STATE state;
 
+  // The lexer reads up to the first NUL character, so input with an embedded
+  // NUL would be parsed only in part.
+  const std::string::size_type nul = sql.find('\0');
+  if (nul != std::string::npos) {
+    static const char nulMessage[] = "embedded NUL character";
+    char* copy = static_cast<char*>(malloc(sizeof(nulMessage)));
+    if (copy != nullptr) memcpy(copy, nulMessage, sizeof(nulMessage));
+    result->reset();
+    result->setErrorDetails(copy, 0, static_cast<int>(nul));
+    result->setIsValid(false);
+    return true;
+  }
+
   if (hsql_lex_init(&scanner)) {
     // Couldn't initialize the lexer.
     fprintf(stderr, "SQLParser: Error when initializing lexer!\n");
@@ -34,16 +47,15 @@ bool SQLParser::parse(const std::string& sql, SQLParserResult* result) {
     // so that a part of the input does not pass for the whole; the error
     // details stay.
     const char* message = result->errorMsg();
-    const std::string errorMsg = message ? message : "";
-    const bool hasMessage = message != nullptr;
+    char* copy = nullptr;
+    if (message != nullptr) {
+      const size_t size = strlen(message) + 1;
+      copy = static_cast<char*>(malloc(size));
+      if (copy != nullptr) memcpy(copy, message, size);
+    }
     const int errorLine = result->errorLine();
     const int errorColumn = result->errorColumn();
     result->reset();
-    char* copy = nullptr;
-    if (hasMessage) {
-      copy = static_cast<char*>(malloc(errorMsg.size() + 1));
-      memcpy(copy, errorMsg.c_str(), errorMsg.size() + 1);
-    }
     result->setErrorDetails(copy, errorLine, errorColumn);
   }
   result->setIsValid(success);
@@ -61,6 +73,9 @@ bool SQLParser::parseSQLString(const std::string& sql, SQLParserResult* result) 
 
 // static
 bool SQLParser::tokenize(const std::string& sql, std::vector<int16_t>* tokens) {
+  // The lexer would end the input at an embedded NUL character.
+  if (sql.find('\0') != std::string::npos) return false;
+
   // Initialize the scanner.
   yyscan_t scanner;
   if (hsql_lex_init(&scanner)) {

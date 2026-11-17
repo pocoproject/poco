@@ -507,8 +507,10 @@ void Statement::checkBeginTransaction()
 		if (!session.isConnected()) return;
 		if (session.shouldParse())
 		{
+			// only a statement that parsed as SELECT runs without a transaction;
+			// one that does not parse may write
 			auto result = parse();
-			if (result.isSpecified() && result.value() && !isSelect().value())
+			if (!(result.isSpecified() && result.value() && isSelect().value()))
 				session.begin();
 		} else
 		{

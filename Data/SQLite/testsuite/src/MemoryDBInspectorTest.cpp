@@ -570,6 +570,19 @@ void MemoryDBInspectorTest::testReadOnlyUnreadableInput()
 	// the query is refused instead of passing as the SELECT before it.
 	const MemoryDBInspector::QueryResult r = insp.query("SELECT 1 `x`; DROP TABLE t");
 	assertTrue (!r.ok);
+	assertTrue (r.error.find("read-only: cannot parse") != std::string::npos);
+
+	// The lexer would end the input at an embedded NUL character.
+	const std::string withNul("SELECT 1;\0DROP TABLE t", 22);
+	try
+	{
+		insp.checkSQLAllowed(withNul);
+		fail("checkSQLAllowed must refuse a statement with an embedded NUL");
+	}
+	catch (const Poco::InvalidAccessException& e)
+	{
+		assertTrue (e.message().find("read-only: cannot parse") != std::string::npos);
+	}
 
 	int n = 0;
 	db << "SELECT count(*) FROM t", into(n), now;

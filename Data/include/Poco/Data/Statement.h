@@ -581,7 +581,8 @@ private:
 		/// transaction does not need to started.
 		/// However, due to many SQL dialects, this logic is
 		/// not 100% accurate and transaction MAY be started
-		/// for SELECT-only queries.
+		/// for SELECT-only queries. A query that the parser
+		/// cannot read always starts a transaction.
 
 #ifndef POCO_DATA_NO_SQL_PARSER
 
