@@ -22,8 +22,11 @@ fi
 git -C source fetch --depth 1 -- origin "$source_ref"
 git -C source reset --hard FETCH_HEAD
 git -C source clean -ffdx
-rm -rf "$logs" "$build" "$unicode_build"
-mkdir -p "$logs"
+rm -rf "$logs" "$build" "$unicode_build" "$nightly_root/tmp"
+mkdir -p "$logs" "$nightly_root/tmp"
+# Tests create files with fixed names in the temporary directory; a shared /tmp can hold
+# files of another account with the same names.
+export TMPDIR="$nightly_root/tmp"
 git -C source rev-parse HEAD > "$logs/commit.txt"
 cmake -S source -B "$build" -G Ninja \
     -DCMAKE_C_COMPILER=clang-21 -DCMAKE_CXX_COMPILER=clang++-21 \
