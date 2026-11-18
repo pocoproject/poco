@@ -221,7 +221,7 @@ void ODBCStatementImpl::doPrepare()
 			checkError(SQLFreeStmt(_stmt, SQL_UNBIND), "SQLFreeStmt(SQL_UNBIND)");
 		if (bulk || curDataSet > 0)
 		{
-			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) rowsetSize, 0),
+			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, reinterpret_cast<SQLPOINTER>(static_cast<SQLULEN>(rowsetSize)), 0),
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
 		}
 

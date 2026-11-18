@@ -157,7 +157,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		// reports, or DEFAULT_PARAM_SIZE, limited to the maximum field size, and
 		// no shorter than the value: io() sends all of it, and an output string
 		// sized in advance keeps its length.
-		const std::size_t valueLength = pTCVal ? static_cast<std::size_t>(size) : val.size();
+		const std::size_t valueLength = (pTCVal != nullptr) ? static_cast<std::size_t>(size) : val.size();
 		getColumnOrParameterSize(pos, size);
 		std::size_t bufferLength = (size > 0) ? static_cast<std::size_t>(size) : std::size_t(0);
 		if (bufferLength < valueLength) bufferLength = valueLength;
@@ -168,7 +168,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		_strings.insert(StringMap::value_type(pChar,
 			OutString<std::string>{const_cast<std::string*>(&val), static_cast<SQLLEN>(bufferLength), pLenIn}));
 		if (isInBound(dir))
-			std::memcpy(pChar, pTCVal ? pTCVal : val.data(), valueLength);
+			std::memcpy(pChar, (pTCVal != nullptr) ? pTCVal : val.data(), valueLength);
 		pVal = static_cast<SQLPOINTER>(pChar);
 		size = static_cast<SQLINTEGER>(bufferLength);
 		// SQLPutData() sends the value of io(), not the whole buffer

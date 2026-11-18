@@ -433,8 +433,8 @@ private:
 	typedef std::vector<DateTimeVec*>                        DateTimeVecVec;
 	typedef std::vector<Poco::Any>                           AnyVec;
 	typedef std::vector<AnyVec>                              AnyVecVec;
-	typedef std::map<char*, OutString<std::string>>          StringMap;
-	typedef std::map<UTF16Char*, OutString<UTF16String>>     UTF16StringMap;
+	using StringMap = std::map<char*, OutString<std::string>>;
+	using UTF16StringMap = std::map<UTF16Char*, OutString<UTF16String>>;
 	typedef std::map<char*, UUID*>                           UUIDMap;
 	typedef std::map<SQL_DATE_STRUCT*, Date*>                DateMap;
 	typedef std::map<SQL_TIME_STRUCT*, Time*>                TimeMap;

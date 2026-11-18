@@ -723,7 +723,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 		pcbConnStrOut,
 		fDriverCompletion);
 
-	if (!Utility::isError(rc) && szConnStrOut)
+	if (!Utility::isError(rc) && szConnStrOut != nullptr)
 		makeUTF8(out, *pcbConnStrOut * sizeof(SQLWCHAR), szConnStrOut, cbConnStrOutMax);
 
 	return rc;

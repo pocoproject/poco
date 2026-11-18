@@ -609,7 +609,7 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			valueType,
 			(SQLPOINTER) pCache,
-			(SQLLEN) _bufferSizes[pos],
+			static_cast<SQLLEN>(_bufferSizes[pos]),
 			&_lengths[pos])))
 		{
 			throw StatementException(_rStmt, "ODBC::Preparator::prepareVariableLen():SQLBindCol()");
@@ -646,7 +646,7 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			valueType,
 			(SQLPOINTER) pArray,
-			(SQLLEN) _bufferSizes[pos],
+			static_cast<SQLLEN>(_bufferSizes[pos]),
 			&_lenLengths[pos][0])))
 		{
 			throw StatementException(_rStmt, "ODBC::Preparator::prepareCharArray():SQLBindCol()");

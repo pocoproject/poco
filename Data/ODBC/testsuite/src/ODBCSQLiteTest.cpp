@@ -409,7 +409,7 @@ void ODBCSQLiteTest::checkBoundLOB(const std::string& query, const L& expected, 
 template <typename C>
 void ODBCSQLiteTest::checkBoundLOBBulk(const std::string& query, const std::vector<Poco::Data::CLOB>& expected)
 {
-	typedef typename C::value_type L;
+	using L = typename C::value_type;
 	const Poco::UInt32 rows = static_cast<Poco::UInt32>(expected.size());
 	// BulkExtraction keeps a container of the right size, so every element must
 	// be overwritten: NULL rows with an empty LOB, not left stale. The elements

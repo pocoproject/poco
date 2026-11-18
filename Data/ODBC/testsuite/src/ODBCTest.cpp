@@ -147,7 +147,7 @@ void ODBCTest::testExceptionCopy()
 
 void ODBCTest::testSQLGetInfo()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// Utility::sqlGetInfo() reads the value into a buffer of 1024 bytes, or
 	// of the given size. Its results are compared with the values read
@@ -219,7 +219,7 @@ void ODBCTest::testSQLGetInfo()
 
 void ODBCTest::testNonASCIIText()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 #if defined(POCO_ODBC_UNICODE_UNIXODBC) || defined(POCO_ODBC_UNICODE_WINDOWS)
 	{
@@ -1120,7 +1120,7 @@ void ODBCTest::testBLOBContainer()
 
 void ODBCTest::testBulkRowsetBackstop()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// Statement rejects mixing bulk and non-bulk extractions. This adds the
 	// non-bulk extraction directly to the implementation, to check the backstop
@@ -1165,7 +1165,7 @@ void ODBCTest::testBulkRowsetBackstop()
 
 void ODBCTest::testBulkBindingBackstops()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// The row count shows how many parameter sets the driver processed: it
 	// reads SQL_ATTR_PARAMSET_SIZE values from every bound parameter buffer.
@@ -1411,7 +1411,7 @@ void ODBCTest::testParameterArraySize()
 
 void ODBCTest::testBulkFullWidthStrings()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// Bulk bound strings that fill their element of the parameter array, in the
 	// first and in the last row: no terminator follows them. Every row is passed
@@ -1468,7 +1468,7 @@ void ODBCTest::testBLOBStmt()
 
 void ODBCTest::testManualBLOB()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// Manual extraction reads BLOB values in chunks with SQLGetData(), as CLOB
 	// values. The values are longer than the BLOB object (19 bytes) and than
@@ -1539,7 +1539,7 @@ void ODBCTest::testManualBLOB()
 
 void ODBCTest::testTranscodedBindingOwnership()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// A database encoding other than UTF-8 makes the binder transcode std::string
 	// input into copies it owns. It frees only these, not the buffers of the
@@ -1606,7 +1606,7 @@ void ODBCTest::testBindingOutlivesStatement()
 
 void ODBCTest::testManualUUIDLength()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// Manual extraction reads a UUID as 16 bytes; a value of another length is
 	// not a UUID.
@@ -1684,7 +1684,7 @@ void ODBCTest::checkManualString(const std::string& query, std::size_t length, s
 
 void ODBCTest::testManualStringChunks()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// Manual extraction reads strings in chunks with SQLGetData() into a
 	// buffer of 1024 bytes, which holds 1023 characters or 511 UTF-16 code
@@ -2049,7 +2049,7 @@ namespace
 
 void ODBCTest::testAnyDateTime()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// Bound extraction into Poco::Any and Poco::Dynamic::Var binds DATE and
 	// TIMESTAMP columns as the ODBC structures the extraction of
@@ -2106,7 +2106,7 @@ void ODBCTest::testAnyDateTime()
 
 void ODBCTest::testAnyTime()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// TIME columns are bound as the ODBC structure the extraction of
 	// Poco::Data::Time reads.
@@ -2133,7 +2133,7 @@ void ODBCTest::testAnyTime()
 
 void ODBCTest::testAnyUUID()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// GUID columns are bound as the 16-byte buffer the extraction of
 	// Poco::UUID reads.
@@ -2175,7 +2175,7 @@ void ODBCTest::checkBulkAnyRejected(const std::string& query)
 
 void ODBCTest::testAnyBulk()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// Bulk extraction into containers of Poco::Any and Poco::Dynamic::Var is
 	// not supported. The statement is rejected before any column is bound.
@@ -2196,7 +2196,7 @@ void ODBCTest::testAnyBulk()
 
 void ODBCTest::testAnyBoundType()
 {
-	if (!_pSession) failmsg ("Test not available.");
+	if (_pSession == nullptr) failmsg ("Test not available.");
 
 	// Bound extraction into Poco::Any and Poco::Dynamic::Var reads the buffer as
 	// the type the Preparator bound it for, which the driver described before
