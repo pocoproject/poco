@@ -86,7 +86,7 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 				session.requestTrailer().clear();
 				session.responseTrailer().clear();
 				std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
-				if (pHandler.get())
+				if (pHandler != nullptr)
 				{
 					if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
 						response.sendContinue();
@@ -118,7 +118,9 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 				throw;
 			}
 		}
-		if (session.networkException()) conn->handleClose();
+		// The block above ends before this check: the response stream writes the
+		// rest of the body in its destructor, and that write can fail too.
+		if (session.networkException() != nullptr) conn->handleClose();
 	}
 	catch (const Poco::Exception& ex)
 	{

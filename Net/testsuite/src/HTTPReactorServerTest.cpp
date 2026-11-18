@@ -99,7 +99,7 @@ namespace
 		{
 		}
 
-		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override
 		{
 			static_cast<Poco::Net::HTTPServerRequestImpl&>(request).socket().setSendBufferSize(8192);
 			const std::size_t chunk = 64 * 1024;
@@ -172,12 +172,23 @@ namespace
 			}
 			if (request.getURI() == "/throw-poco") return new ThrowPocoRequestHandler;
 			if (request.getURI() == "/throw-std")  return new ThrowStdRequestHandler;
-			if (request.getURI() == "/big")        return new BigBodyRequestHandler(failed, stopped);
+			if (request.getURI() == "/big")        return new BigBodyRequestHandler(_failed, _stopped);
 			return new EchoBodyRequestHandler;
 		}
 
-		bool failed = false;
-		Poco::Event stopped;
+		bool failed() const
+		{
+			return _failed;
+		}
+
+		Poco::Event& stopped()
+		{
+			return _stopped;
+		}
+
+	private:
+		bool _failed = false;
+		Poco::Event _stopped;
 	};
 
 	// Opens a raw keep-alive connection and completes the given number of
@@ -854,8 +865,8 @@ void HTTPReactorServerTest::testSendTimeoutClosesStalledClient()
 		s.sendBytes(req.data(), static_cast<int>(req.size()));
 
 		// Give the server's send time to stall and time out (timeout is 1 s).
-		assertTrue(factory->stopped.tryWait(15000));
-		assertTrue(factory->failed);
+		assertTrue(factory->stopped().tryWait(15000));
+		assertTrue(factory->failed());
 
 		s.setReceiveTimeout(Poco::Timespan(5, 0));
 		std::size_t total = 0;
