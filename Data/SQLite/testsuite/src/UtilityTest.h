@@ -55,6 +55,10 @@ public:
 	void testBoundSQLFromStatementVectorBulk();
 	void testBoundSQLFromStatementCustomTypeHandler();
 	void testBoundSQLFromStatementPreservesExecute();
+	void testBoundSQLUnreadableAfterPlaceholders();
+	void testBoundSQLUnreadableBeforePlaceholders();
+	void testBoundSQLHashComment();
+	void testBoundSQLUnreadableBulk();
 
 	void setUp();
 	void tearDown();
