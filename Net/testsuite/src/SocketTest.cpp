@@ -1012,7 +1012,8 @@ void SocketTest::testEchoUnixLocal()
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	File socketFile(Path::tempHome() + "SocketTest.sock");
 #else
-	File socketFile("/tmp/SocketTest.sock");
+	// a name of its own, removed at the end even if the test fails
+	Poco::TemporaryFile socketFile;
 #endif // POCO_OS == POCO_OS_ANDROID
 	if (socketFile.exists()) socketFile.remove();
 	SocketAddress localAddr(SocketAddress::UNIX_LOCAL, socketFile.path());

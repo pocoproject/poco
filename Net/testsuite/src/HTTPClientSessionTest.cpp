@@ -30,6 +30,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
+#include "Poco/TemporaryFile.h"
 #include "Poco/Buffer.h"
 #include "HTTPTestServer.h"
 #include <future>
@@ -281,7 +282,8 @@ void HTTPClientSessionTest::testGetSmallUnix()
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 	File socketFile(Path::tempHome() + "SocketTest.sock");
 #else
-	File socketFile("/tmp/SocketTest.sock");
+	// a name of its own, removed at the end even if the test fails
+	Poco::TemporaryFile socketFile;
 #endif // POCO_OS == POCO_OS_ANDROID
 	if (socketFile.exists()) socketFile.remove();
 	HTTPTestServer srv(socketFile.path());
