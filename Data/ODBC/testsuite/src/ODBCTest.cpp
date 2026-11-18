@@ -1667,6 +1667,51 @@ void ODBCTest::testBoundLongValue()
 }
 
 
+void ODBCTest::testBulkLongStrings()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	// The rows of a bulk string parameter are as long as the size the driver
+	// describes for the parameter, or, if it describes none, as the longest
+	// value, limited by maxFieldSize.
+	dropObject("TABLE", "BulkLongStrings");
+	session() << "CREATE TABLE BulkLongStrings (Id INTEGER, Str VARCHAR(4000))", now;
+
+	const Poco::Any maxFieldSize = session().getProperty("maxFieldSize");
+	try
+	{
+		session().setProperty("maxFieldSize", Poco::Any(std::size_t(4096)));
+		std::vector<int> ids = {1, 2, 3};
+		std::vector<std::string> strings = {std::string(3000, 'a'), std::string(10, 'b'), std::string(1500, 'c')};
+		session() << "INSERT INTO BulkLongStrings VALUES (?, ?)", use(ids, bulk), use(strings, bulk), now;
+
+		std::vector<Poco::UTF16String> utf16;
+		for (const auto& str: strings)
+		{
+			Poco::UTF16String u;
+			Poco::UnicodeConverter::convert(str, u);
+			utf16.push_back(u);
+		}
+		std::vector<int> utf16Ids = {4, 5, 6};
+		session() << "INSERT INTO BulkLongStrings VALUES (?, ?)", use(utf16Ids, bulk), use(utf16, bulk), now;
+
+		for (int id = 1; id <= 6; ++id)
+		{
+			std::string str;
+			session() << "SELECT Str FROM BulkLongStrings WHERE Id = ?", use(id), into(str), now;
+			assertEqual (strings[static_cast<std::size_t>((id - 1) % 3)], str);
+		}
+	}
+	catch (...)
+	{
+		session().setProperty("maxFieldSize", maxFieldSize);
+		throw;
+	}
+	session().setProperty("maxFieldSize", maxFieldSize);
+	dropObject("TABLE", "BulkLongStrings");
+}
+
+
 void ODBCTest::testManualUUIDLength()
 {
 	if (_pSession == nullptr) failmsg ("Test not available.");

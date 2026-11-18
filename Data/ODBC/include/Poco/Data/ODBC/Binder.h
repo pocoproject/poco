@@ -30,6 +30,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <algorithm>
 #include <limits>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include "Poco/UnWindows.h"
@@ -644,7 +645,13 @@ private:
 		setParamSetSize(length);
 
 		SQLINTEGER size = 0;
-		getColumnOrParameterSize(pos, size);
+		if (!getColumnOrParameterSize(pos, size))
+		{
+			// without a size from the driver, the rows are as long as the longest
+			// value (see below), limited by maxFieldSize, not DEFAULT_PARAM_SIZE
+			size = static_cast<SQLINTEGER>((std::min)(_maxFieldSize,
+				static_cast<std::size_t>((std::numeric_limits<SQLINTEGER>::max)())));
+		}
 		poco_assert (size > 0);
 
 		if (static_cast<std::size_t>(size) == _maxFieldSize)
@@ -716,7 +723,13 @@ private:
 
 		// the column size, the row length and the maximum field size count characters
 		SQLINTEGER size = 0;
-		getColumnOrParameterSize(pos, size);
+		if (!getColumnOrParameterSize(pos, size))
+		{
+			// without a size from the driver, the rows are as long as the longest
+			// value (see below), limited by maxFieldSize, not DEFAULT_PARAM_SIZE
+			size = static_cast<SQLINTEGER>((std::min)(_maxFieldSize,
+				static_cast<std::size_t>((std::numeric_limits<SQLINTEGER>::max)())));
+		}
 		poco_assert(size > 0);
 
 		if (static_cast<std::size_t>(size) == _maxFieldSize)
@@ -1164,16 +1177,17 @@ private:
 	void setParamSetSize(std::size_t length);
 		/// Sets the parameter set size. Used for column-wise binding.
 
-	void getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size);
+	bool getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size);
 		/// Fills the size the driver describes for the parameter into the 'size'
 		/// argument, or, if it describes none, the size of the result column at
 		/// the same position, or DEFAULT_PARAM_SIZE if neither can be obtained
 		/// from the driver (see getParamSizeDirect()), limited to the maximum
-		/// field size and to the largest SQLINTEGER.
+		/// field size and to the largest SQLINTEGER. Returns false if the size
+		/// is DEFAULT_PARAM_SIZE because the driver gave none.
 
 	[[nodiscard]] std::size_t getParamSizeDirect(std::size_t pos);
 		/// A "last ditch" attempt" to obtain parameter size directly from the driver.
-		/// Returns DEFAULT_PARAM_SIZE if it can not be obtained.
+		/// Returns 0 if it can not be obtained.
 
 	void freeMemory();
 		/// Frees all dynamically allocated memory resources.

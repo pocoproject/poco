@@ -516,6 +516,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testTranscodedBindingOwnership);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBindingOutlivesStatement);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBoundLongValue);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkLongStrings);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testDate);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testTime);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testDateTime);

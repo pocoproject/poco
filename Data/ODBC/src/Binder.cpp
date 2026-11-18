@@ -724,8 +724,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 
 std::size_t Binder::getParamSizeDirect(std::size_t pos)
 {
-	// on every platform, so that no parameter gets an empty buffer
-	std::size_t size = DEFAULT_PARAM_SIZE;
+	std::size_t size = 0;
 //On Linux, PostgreSQL driver segfaults on SQLGetDescField, so this is disabled for now
 #ifdef POCO_OS_FAMILY_WINDOWS
 	SQLHDESC hIPD = 0;
@@ -743,7 +742,7 @@ std::size_t Binder::getParamSizeDirect(std::size_t pos)
 }
 
 
-void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
+bool Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 {
 	// The size the driver describes for the parameter. The result column at the
 	// same position is in general a different value, so it neither shortens nor
@@ -772,9 +771,15 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 	if (0 == paramSize)
 		paramSize = getParamSizeDirect(pos);
 
+	// on every platform, so that no parameter gets an empty buffer
+	const bool described = (0 != paramSize);
+	if (!described)
+		paramSize = DEFAULT_PARAM_SIZE;
+
 	// limited before it is narrowed, so that a larger size can not wrap around
 	size = static_cast<SQLINTEGER>(std::min({paramSize, _maxFieldSize,
 		static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max())}));
+	return described;
 }
 
 

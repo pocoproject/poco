@@ -1010,6 +1010,8 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTranscodedBindingOwnership);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBindingOutlivesStatement);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBoundLongValue);
+		// not testBulkLongStrings: the driver describes the parameter of a VARCHAR(4000)
+		// column with 999 characters, so its long values do not fit
 		CppUnit_addTest(pSuite, ODBCOracleTest, testManualStringChunks);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDate);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDateTime);

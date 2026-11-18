@@ -1417,6 +1417,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTranscodedBindingOwnership);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBindingOutlivesStatement);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBoundLongValue);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkLongStrings);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testManualStringChunks);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSet);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDateTime);
