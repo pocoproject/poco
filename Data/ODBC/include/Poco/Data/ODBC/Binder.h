@@ -492,12 +492,14 @@ private:
 		_inParams.insert(ParamMap::value_type(pVal, size));
 
 		SQLLEN* pLenIn = new SQLLEN;
-		*pLenIn  = size;
+		*pLenIn  = static_cast<SQLLEN>(val.size());
 		// prevent SQLSTATE = HY104 "Invalid precision value"
 		SQLULEN columnSize = size ? size : 1;
 
+		// SQL_LEN_DATA_AT_EXEC() negates its argument and subtracts 100, so the
+		// length is passed as SQLLEN, in which that can not overflow
 		if (PB_AT_EXEC == _paramBinding)
-			*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
+			*pLenIn  = SQL_LEN_DATA_AT_EXEC(static_cast<SQLLEN>(val.size()));
 
 		_lengthIndicator.push_back(pLenIn);
 
@@ -509,7 +511,7 @@ private:
 			columnSize,
 			0,
 			pVal,
-			(SQLINTEGER) size,
+			size,
 			_lengthIndicator.back())))
 		{
 			throw StatementException(_rStmt, "ODBC::Binder::SQLBindParameter(LOB)");
