@@ -52,6 +52,7 @@ public:
 	void testWSSEInterceptor();
 	void testWSSEAuthenticatorPlain();
 	void testWSSEAuthenticatorDigest();
+	void testWSDLFileName();
 
 	void setUp() override;
 	void tearDown() override;

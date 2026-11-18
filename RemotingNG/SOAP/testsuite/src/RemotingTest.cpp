@@ -29,6 +29,17 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPMessage.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/SocketAddress.h"
+#include "Poco/Types.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
+#include "Poco/Path.h"
+#include "Poco/File.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NullStream.h"
@@ -41,6 +52,7 @@
 #include "TesterClientHelper.h"
 #include "TesterRemoteObject.h"
 #include "TesterProxy.h"
+#include <istream>
 #include <sstream>
 
 
@@ -714,6 +726,85 @@ void RemotingTest::testWSSEAuthenticatorDigest()
 }
 
 
+void RemotingTest::testWSDLFileName()
+{
+	Poco::Path base(Poco::TemporaryFile::tempName());
+	base.makeDirectory();
+	Poco::TemporaryFile::registerForDeletion(base.toString());
+	Poco::Path wsdlDir(base);
+	wsdlDir.pushDirectory("wsdl");
+	Poco::File(wsdlDir).createDirectories();
+	const auto writeFile = [](const Poco::Path& dir, const std::string& name, const std::string& content)
+	{
+		Poco::FileOutputStream ostr(Poco::Path(dir, name).toString());
+		ostr << content;
+	};
+	writeFile(wsdlDir, "Tester.wsdl", "<definitions/>");
+	writeFile(wsdlDir, "secret.txt", "secret");
+	writeFile(base, "secret.txt", "secret");
+	// A colon is a regular character of a file name on Unix and names an alternate data stream
+	// of the file 'x' of the WSDL directory on NTFS.
+	writeFile(wsdlDir, "x:y.wsdl", "stream");
+#if defined(POCO_OS_FAMILY_UNIX)
+	// A file name with a backslash exists on Unix only.
+	writeFile(wsdlDir, "a\\b.wsdl", "backslash");
+#endif
+
+	Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
+	const Poco::UInt16 port = socket.address().port();
+	Poco::RemotingNG::SOAP::Listener::Ptr pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:" + Poco::NumberFormatter::format(port), wsdlDir.toString(), socket);
+	pListener->start();
+
+	const auto get = [port](const std::string& uri, std::string& body)
+	{
+		Poco::Net::HTTPClientSession session("127.0.0.1", port);
+		Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, uri, Poco::Net::HTTPMessage::HTTP_1_1);
+		session.sendRequest(request);
+		Poco::Net::HTTPResponse response;
+		std::istream& rs = session.receiveResponse(response);
+		body.clear();
+		Poco::StreamCopier::copyToString(rs, body);
+		return response.getStatus();
+	};
+
+	std::string body;
+	assert (get("/soap/Tester", body) == Poco::Net::HTTPResponse::HTTP_OK);
+	assert (body == "<definitions/>");
+
+	// A NUL character would end the file name before the extension.
+	assert (get("/soap/secret.txt%00.x", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body.find("secret") == std::string::npos);
+
+	// A colon separates the name of an alternate data stream on Windows.
+	assert (get("/soap/x%3Ay", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body.find("stream") == std::string::npos);
+
+	// A backslash separates directories on Windows and is part of the name on Unix.
+	assert (get("/soap/..%5Csecret.txt%00.x", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body.find("secret") == std::string::npos);
+	assert (get("/soap/..%5Cwsdl%5CTester.x", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (get("/soap/a%5Cb", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body.find("backslash") == std::string::npos);
+
+	// The page of a missing file names the file and not the server path.
+	assert (get("/soap/Missing", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body.find("Missing.wsdl") != std::string::npos);
+	assert (body.find(wsdlDir.toString()) == std::string::npos);
+
+	// An ampersand is a regular character of a file name, so the name reaches the page on every
+	// platform, where it is escaped.
+	assert (get("/soap/c%26d", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body.find("c&amp;d.wsdl") != std::string::npos);
+	assert (body.find("c&d.wsdl") == std::string::npos);
+
+	// A name with markup is refused before anything is built from it, so it never reaches the page.
+	assert (get("/soap/%3Cimg%20src=x%20onerror=alert(1)%3E", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body.find("<img") == std::string::npos);
+
+	pListener->stop();
+}
+
+
 void RemotingTest::testInt(ITester::Ptr pTester)
 {
 	int i = pTester->testInt1(42);
@@ -1065,6 +1156,7 @@ CppUnit::Test* RemotingTestSOAP11::suite()
 	CppUnit_addTest(pSuite, RemotingTestSOAP11, testWSSEInterceptor);
 	CppUnit_addTest(pSuite, RemotingTestSOAP11, testWSSEAuthenticatorPlain);
 	CppUnit_addTest(pSuite, RemotingTestSOAP11, testWSSEAuthenticatorDigest);
+	CppUnit_addTest(pSuite, RemotingTestSOAP11, testWSDLFileName);
 
 	return pSuite;
 }
