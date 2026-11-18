@@ -30,6 +30,7 @@
 #include "Poco/Nullable.h"
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/Test/AsyncWait.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
@@ -74,6 +75,7 @@ using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBindingVec;
 using Poco::Data::NullData;
 using Poco::Data::NotConnectedException;
+using Poco::Data::Test::AsyncWait;
 using Poco::Data::SQLite::Notifier;
 using Poco::Nullable;
 using Poco::Tuple;
@@ -457,7 +459,7 @@ void SQLiteTest::testAddBindingReuse()
 	stmt.execute();
 	assertTrue (name == "Alice");
 
-	// second execute with new binding — this is the bug scenario from #5220
+	// second execute with a new binding: addBinding() with reset replaces the first binding
 	id = 2;
 	Poco::Data::AbstractBindingVec bindings2;
 	bindings2.push_back(Poco::Data::Keywords::bind(id, "id"));
@@ -1760,7 +1762,7 @@ void SQLiteTest::testTupleVector10()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1808,7 +1810,7 @@ void SQLiteTest::testTupleVector9()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1856,7 +1858,7 @@ void SQLiteTest::testTupleVector8()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1902,7 +1904,7 @@ void SQLiteTest::testTupleVector7()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1948,7 +1950,7 @@ void SQLiteTest::testTupleVector6()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1994,7 +1996,7 @@ void SQLiteTest::testTupleVector5()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -2040,7 +2042,7 @@ void SQLiteTest::testTupleVector4()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -2086,7 +2088,7 @@ void SQLiteTest::testTupleVector3()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int> > ret;
 	assertTrue (ret != v);
@@ -2130,7 +2132,7 @@ void SQLiteTest::testTupleVector2()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int> > ret;
 	assertTrue (ret != v);
@@ -2174,7 +2176,7 @@ void SQLiteTest::testTupleVector1()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int> > ret;
 	assertTrue (ret != v);
@@ -2768,15 +2770,17 @@ void SQLiteTest::testAsync()
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 
-	std::size_t rowCount = 500;
+	const std::size_t rowCount = 500;
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(:str)", use(data));
+	AsyncWait waitStmt(stmt);
 	Statement::Result result = stmt.executeAsync();
 	assertTrue (!stmt.isAsync());
 	result.wait();
 	assertTrue (500 == result.data());
 
 	Statement stmt1 = (tmp << "SELECT * FROM Strings", into(data), async, now);
+	AsyncWait waitStmt1(stmt1);
 	assertTrue (stmt1.isAsync());
 	assertTrue (stmt1.wait() == rowCount);
 
@@ -2813,9 +2817,10 @@ void SQLiteTest::testAsync()
 	assertTrue (result.data() == rowCount);
 
 	assertTrue (0 == rowCount % 10);
-	std::size_t step = rowCount/10;
+	const std::size_t step = rowCount/10;
 	data.clear();
 	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
+	AsyncWait waitStmt2(stmt2);
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;

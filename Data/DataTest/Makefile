@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = SQLExecutor
+objects = SQLExecutor AsyncWait
 
 target          = PocoDataTest
 target_version  = 1
