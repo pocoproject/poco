@@ -2940,28 +2940,10 @@ void SQLExecutor::internalExtraction()
 
 		rset = (session() << "SELECT COUNT(*) AS cnt FROM Vectors", now);
 
-		//various results for COUNT(*) are received from different drivers
-		try
-		{
-			//this is what most drivers will return
-			int ii = rset.value<int>(0,0);
-			assertEqual (4, ii);
-		}
-		catch(BadCastException&)
-		{
-			try
-			{
-				//this is for Oracle
-				double d = rset.value<double>(0,0);
-				assertEqual (4, int(d));
-			}
-			catch(BadCastException&)
-			{
-				//this is for PostgreSQL
-				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-				assertEqual (4, big);
-			}
-		}
+		// The drivers describe COUNT(*) as different types: an integer of some
+		// size, a number (Oracle), or, before the execution, VARCHAR (the SQLite
+		// ODBC driver), so the count is read through Var.
+		assertEqual (4, rset.value(0, 0).convert<int>());
 
 		s = rset.value("cnt", 0).convert<std::string>();
 		assertTrue ("4" == s);
@@ -2969,8 +2951,12 @@ void SQLExecutor::internalExtraction()
 		try { (void) rset.column<std::deque<int> >(100); fail ("must fail"); }
 		catch (RangeException&) { }
 
-		try	{ (void) rset.value<std::string>(0,0); fail ("must fail"); }
-		catch (BadCastException&) {	}
+		const MetaColumn::ColumnDataType countType = rset.columnType(0);
+		if (countType != MetaColumn::FDT_STRING && countType != MetaColumn::FDT_WSTRING)
+		{
+			try	{ (void) rset.value<std::string>(0,0); fail ("must fail"); }
+			catch (BadCastException&) {	}
+		}
 
 		stmt = (session() << "DELETE FROM Vectors", now);
 		rset = stmt;
@@ -4026,11 +4012,8 @@ void SQLExecutor::transactionIsolation()
 	}
 	catch(const Poco::Exception& ex)
 	{
+		// a failed assertion is not caught here
 		std::cerr << ex.displayText() << std::endl;
-	}
-	catch(const std::exception& ex)
-	{
-		std::cerr << ex.what() << std::endl;
 	}
 }
 
