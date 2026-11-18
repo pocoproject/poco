@@ -23,6 +23,8 @@ jobs:
     env:
       NIGHTLY_INTERNAL_HOSTNAME: ${{ secrets.NIGHTLY_INTERNAL_HOSTNAME }}
       NIGHTLY_INTERNAL_HOME: ${{ secrets.NIGHTLY_INTERNAL_HOME }}
+      # The commit of the run: main for the scheduled run, the chosen branch for a run started by hand.
+      POCO_REF: ${{ github.sha }}
     runs-on: [poco-nightly]
     timeout-minutes: 360
     steps:
@@ -30,7 +32,7 @@ jobs:
         with:
           persist-credentials: false
           sparse-checkout: ci/nightly
-      - name: Build main and run all tests including long tests
+      - name: Build and run all tests including long tests
         run: bash ci/nightly/poco-nightly.sh
       - name: Collect logs
         if: always()

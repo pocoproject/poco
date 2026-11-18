@@ -9,9 +9,10 @@ four compiler jobs, starts the test services and runs CTest and the standalone S
 tests. A second, minimal build with `POCO_DATA_ODBC_UNICODE` runs the ODBC suites on
 the wide-character API of unixODBC, whose Unicode and encoding tests the first build
 skips. Its SQL Server suite runs in the `en_US.ISO-8859-1` locale, because the driver
-reads and writes narrow strings in the character set of the client locale. Scheduled runs
-build main; when the script is run by hand on the runner host, `POCO_REF` selects another
-branch or commit. GCC 14 can crash internally when compiling the Data module.
+reads and writes narrow strings in the character set of the client locale. The workflow
+builds the commit it runs for: main for the scheduled run, the chosen branch for a run
+started by hand. When the script is run by hand on the runner host, `POCO_REF` selects the
+branch or commit; it defaults to main. GCC 14 can crash internally when compiling the Data module.
 
 Every suite runs with `-long` and without ignore files; `CPPUNIT_IGNORE` is unset. Tests
 run serially without retries. Failures, crashes, timeouts, skipped tests, ignored failures
