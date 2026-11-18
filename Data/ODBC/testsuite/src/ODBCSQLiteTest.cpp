@@ -848,6 +848,7 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testManualUUIDLength);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTranscodedBindingOwnership);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBindingOutlivesStatement);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundLongValue);
 
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBareboneODBC);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testConnection);

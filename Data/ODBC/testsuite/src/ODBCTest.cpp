@@ -1604,12 +1604,75 @@ void ODBCTest::testBindingOutlivesStatement()
 }
 
 
+void ODBCTest::testBoundLongValue()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	// Bound extraction reads a string into a buffer of at most maxFieldSize
+	// bytes; a longer value throws, scalar and in bulk, instead of being cut.
+	dropObject("TABLE", "BoundLongValue");
+	session() << "CREATE TABLE BoundLongValue (Id INTEGER, Str VARCHAR(2000))", now;
+	session() << format("INSERT INTO BoundLongValue VALUES (1, '%s')", std::string(1500, 'x')), now;
+
+	const Poco::Any maxFieldSize = session().getProperty("maxFieldSize");
+	const bool autoBind = _pSession->getFeature("autoBind");
+	const bool autoExtract = _pSession->getFeature("autoExtract");
+	try
+	{
+		_pSession->setFeature("autoBind", true);
+		_pSession->setFeature("autoExtract", true);
+		session().setProperty("maxFieldSize", Poco::Any(std::size_t(1024)));
+		const std::string query("SELECT Str FROM BoundLongValue");
+
+		std::string str;
+		try
+		{
+			session() << query, into(str), now;
+			fail ("a string longer than maxFieldSize was extracted");
+		}
+		catch (Poco::Data::DataException&) { }
+
+		Poco::UTF16String utf16;
+		try
+		{
+			session() << query, into(utf16), now;
+			fail ("a UTF-16 string longer than maxFieldSize was extracted");
+		}
+		catch (Poco::Data::DataException&) { }
+
+		std::vector<std::string> strings;
+		try
+		{
+			session() << query, into(strings, bulk(1)), now;
+			fail ("a string longer than maxFieldSize was extracted in bulk");
+		}
+		catch (Poco::Data::DataException&) { }
+
+		// the value fits again
+		session().setProperty("maxFieldSize", Poco::Any(std::size_t(4096)));
+		session() << query, into(str), now;
+		assertEqual (std::string(1500, 'x'), str);
+	}
+	catch (...)
+	{
+		session().setProperty("maxFieldSize", maxFieldSize);
+		_pSession->setFeature("autoBind", autoBind);
+		_pSession->setFeature("autoExtract", autoExtract);
+		throw;
+	}
+	session().setProperty("maxFieldSize", maxFieldSize);
+	_pSession->setFeature("autoBind", autoBind);
+	_pSession->setFeature("autoExtract", autoExtract);
+	dropObject("TABLE", "BoundLongValue");
+}
+
+
 void ODBCTest::testManualUUIDLength()
 {
 	if (_pSession == nullptr) failmsg ("Test not available.");
 
-	// Manual extraction reads a UUID as 16 bytes; a value of another length is
-	// not a UUID.
+	// Manual and bound extraction read a UUID as 16 bytes; a value of another
+	// length is not a UUID.
 	recreatePersonBLOBTable();
 	std::vector<unsigned char> bytes(20);
 	for (std::size_t i = 0; i < bytes.size(); ++i)
@@ -1626,24 +1689,29 @@ void ODBCTest::testManualUUIDLength()
 	try
 	{
 		_pSession->setFeature("autoBind", true);
-		_pSession->setFeature("autoExtract", false);
-
-		Poco::UUID uuid;
-		session() << "SELECT Image FROM Person WHERE LastName = 'b'", into(uuid), now;
-		Poco::UUID expected;
-		expected.copyFrom(reinterpret_cast<const char*>(&bytes[0]));
-		assertTrue (uuid == expected);
-
-		for (const char* lastName: {"a", "c"})
+		for (bool bound: {false, true})
 		{
-			try
+			_pSession->setFeature("autoExtract", bound);
+
+			Poco::UUID uuid;
+			session() << "SELECT Image FROM Person WHERE LastName = 'b'", into(uuid), now;
+			Poco::UUID expected;
+			expected.copyFrom(reinterpret_cast<const char*>(&bytes[0]));
+			assertTrue (uuid == expected);
+
+			for (const char* lastName: {"a", "c"})
 			{
-				session() << "SELECT Image FROM Person WHERE LastName = ?", bind(std::string(lastName)), into(uuid), now;
-				fail ("a value that is not 16 bytes long was extracted as UUID");
-			}
-			catch (Poco::Data::DataException& ex)
-			{
-				assertTrue (ex.message().find("a UUID has 16") != std::string::npos);
+				try
+				{
+					session() << "SELECT Image FROM Person WHERE LastName = ?", bind(std::string(lastName)), into(uuid), now;
+					fail ("a value that is not 16 bytes long was extracted as UUID");
+				}
+				catch (Poco::Data::DataException& ex)
+				{
+					// a bound value longer than the buffer of 16 bytes does not fit into it
+					assertTrue (ex.message().find("a UUID has 16") != std::string::npos ||
+						(bound && std::string(lastName) == "c"));
+				}
 			}
 		}
 	}

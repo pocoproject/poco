@@ -84,7 +84,9 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _pPreparator->actualDataSize(pos);
+	// a value that does not fit into the bound buffer with its terminator, or
+	// whose length the driver does not know, throws instead of being truncated
+	std::size_t dataSize = boundDataSize(pos, POCO_DATA_INVALID_ROW, sizeof(char));
 	char* sp = AnyCast<char*>(_pPreparator->at(pos));
 	// look for the terminator only inside the bound buffer
 	std::size_t len = std::find(sp, sp + _pPreparator->boundBufferSize(pos), '\0') - sp;
@@ -99,29 +101,33 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 template<>
 bool Extractor::extractBoundImpl<UTF16String>(std::size_t pos, UTF16String& val)
 {
-	typedef UTF16String::value_type CharT;
+	using CharT = UTF16String::value_type;
 	if (isNull(pos)) return false;
-	std::size_t dataSize = _pPreparator->actualDataSize(pos);
+	std::size_t dataSize = 0;
 	// look for the terminator only inside the bound buffer
 	const std::size_t bufferSize = _pPreparator->boundBufferSize(pos);
 	const CharT* sp = nullptr;
 	std::size_t len = 0;
 	UTF16String us;
 	const std::type_info& ti = _pPreparator->at(pos).type();
+	// a value that does not fit into the bound buffer with its terminator, or
+	// whose length the driver does not know, throws instead of being truncated
 	if (ti == typeid(CharT*))
 	{
+		// the length indicator counts bytes
+		dataSize = boundDataSize(pos, POCO_DATA_INVALID_ROW, sizeof(CharT)) / sizeof(CharT);
 		sp = AnyCast<CharT*>(_pPreparator->at(pos));
 		len = std::find(sp, sp + bufferSize / sizeof(CharT), CharT(0)) - sp;
-		// the length indicator counts bytes
-		if (dataSize != static_cast<std::size_t>(SQL_NO_TOTAL)) dataSize /= sizeof(CharT);
 	}
 	else if (ti == typeid(char*))
 	{
+		const std::size_t byteSize = boundDataSize(pos, POCO_DATA_INVALID_ROW, sizeof(char));
 		const char* cp = AnyCast<char*>(_pPreparator->at(pos));
-		std::string s(cp, std::find(cp, cp + bufferSize, '\0'));
+		std::string s(cp, std::find(cp, cp + (std::min)(byteSize, bufferSize), '\0'));
 		Poco::UnicodeConverter::convert(s, us);
 		sp = us.c_str();
 		len = us.size();
+		dataSize = len;
 	}
 	else
 	{
@@ -272,8 +278,13 @@ bool Extractor::extractBoundImpl<Poco::UUID>(std::size_t pos, Poco::UUID& val)
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _pPreparator->actualDataSize(pos);
-	checkDataSize(dataSize);
+	// a shorter value leaves part of the buffer from an earlier row, a longer one is truncated
+	const std::size_t dataSize = boundDataSize(pos);
+	if (dataSize != 16)
+	{
+		throw DataException(format("ODBC::Extractor::extractBoundImpl(UUID): column %z: "
+			"the value has %z bytes, a UUID has 16.", pos, dataSize));
+	}
 	// throws BadCastException if the column is bound to another type
 	char* pBuffer = AnyCast<char*>(_pPreparator->at(pos));
 	val.copyFrom(pBuffer);

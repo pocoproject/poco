@@ -1009,6 +1009,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testManualUUIDLength);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTranscodedBindingOwnership);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBindingOutlivesStatement);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBoundLongValue);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testManualStringChunks);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDate);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDateTime);
