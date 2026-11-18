@@ -85,6 +85,9 @@ protected:
 	void bindImpl() override;
 		/// Binds all parameters and executes the statement.
 
+	void resetImpl() override;
+		/// Resets connector-specific state before re-execution.
+
 	[[nodiscard]] AbstractExtraction::ExtractorPtr extractor() override;
 		/// Returns the concrete extractor used by the statement.
 

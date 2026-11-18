@@ -625,6 +625,7 @@ private:
 		poco_assert (DE_BOUND == _dataExtraction);
 		poco_assert (pos < _values.size());
 
+		freeCachedArray(pos);
 		T* pCache = new T[size];
 		std::memset(pCache, 0, size);
 
@@ -652,6 +653,7 @@ private:
 		poco_assert_dbg (pos < _lengths.size());
 		poco_assert_dbg (pos < _lenLengths.size());
 
+		freeCachedArray(pos);
 		T* pArray = (T*) std::calloc(length * size, sizeof(T));
 
 		_values[pos] = Any(pArray);
@@ -681,6 +683,64 @@ private:
 	{
 		T** p = Poco::AnyCast<T*>(&_values[pos]);
 		if (p) delete [] *p;
+	}
+
+	void freeCachedArray(std::size_t pos) const
+	{
+		IndexMap::iterator it = _varLengthArrays.find(pos);
+		if (it == _varLengthArrays.end()) return;
+
+		switch (it->second)
+		{
+			case DT_BOOL:
+				deleteCachedArray<bool>(pos);
+				break;
+
+			case DT_CHAR:
+				deleteCachedArray<char>(pos);
+				break;
+
+			case DT_WCHAR:
+				deleteCachedArray<UTF16String::value_type>(pos);
+				break;
+
+			case DT_UCHAR:
+				deleteCachedArray<unsigned char>(pos);
+				break;
+
+			case DT_CHAR_ARRAY:
+			{
+				char** p = AnyCast<char*>(&_values[pos]);
+				if (p) std::free(*p);
+				break;
+			}
+
+			case DT_WCHAR_ARRAY:
+			{
+				UTF16String::value_type** p = AnyCast<UTF16String::value_type*>(&_values[pos]);
+				if (p) std::free(*p);
+				break;
+			}
+
+			case DT_UCHAR_ARRAY:
+			{
+				unsigned char** p = AnyCast<unsigned char*>(&_values[pos]);
+				if (p) std::free(*p);
+				break;
+			}
+
+			case DT_BOOL_ARRAY:
+			{
+				bool** p = AnyCast<bool*>(&_values[pos]);
+				if (p) std::free(*p);
+				break;
+			}
+
+			default:
+				break;
+		}
+
+		_varLengthArrays.erase(it);
 	}
 
 	const StatementHandle&  _rStmt;

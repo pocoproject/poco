@@ -234,7 +234,14 @@ void StatementImpl::bind()
 void StatementImpl::reset()
 {
 	resetBinding();
-	resetExtraction();
+	_curDataSet = 0;
+	for (auto& extVec: _extractors)
+	{
+		for (auto& pExt: extVec) pExt->reset();
+	}
+	for (auto& count: _columnsExtracted) count = 0;
+	for (auto& count: _subTotalRowCount) count = 0;
+	resetImpl();
 	_state = ST_RESET;
 }
 
@@ -394,6 +401,11 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 void StatementImpl::execDirectImpl(const std::string& /*query*/)
 {
 	throw NotImplementedException("executeDirect() is not supported by the connector", _rSession.connectorName());
+}
+
+
+void StatementImpl::resetImpl()
+{
 }
 
 

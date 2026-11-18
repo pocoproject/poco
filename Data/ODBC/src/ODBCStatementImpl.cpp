@@ -121,6 +121,29 @@ void ODBCStatementImpl::compileImpl()
 }
 
 
+void ODBCStatementImpl::resetImpl()
+{
+	checkConnection();
+
+	_stepCalled = false;
+	_nextResponse = 0;
+	_affectedRowCount = 0;
+	_errorInfo.clear();
+
+	SQLRETURN rc = SQLFreeStmt(_stmt, SQL_CLOSE);
+	checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_CLOSE)");
+
+	if (_preparations.size() > 1)
+	{
+		rc = SQLFreeStmt(_stmt, SQL_UNBIND);
+		checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_UNBIND)");
+		_preparations.resize(1);
+		_extractors.resize(1);
+		_prepared = false;
+	}
+}
+
+
 void ODBCStatementImpl::makeInternalExtractors()
 {
 	if (hasData() && !extractions().size())
@@ -349,12 +372,13 @@ bool ODBCStatementImpl::hasNext()
 
 		if (!nextRowReady())
 		{
-			if (hasMoreDataSets()) (void)activateNextDataSet();
-			else return false;
+			if (!hasMoreDataSets()) return false;
 
-			if (SQL_NO_DATA == SQLMoreResults(_stmt))
-				return false;
+			SQLRETURN rc = SQLMoreResults(_stmt);
+			if (SQL_NO_DATA == rc) return false;
+			checkError(rc, "SQLMoreResults()");
 
+			(void)activateNextDataSet();
 			addPreparator();
 			doPrepare();
 			fixupExtraction();
