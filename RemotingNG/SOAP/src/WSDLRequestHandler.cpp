@@ -18,6 +18,7 @@
 #include "Poco/File.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/Net.h"
 
 
 namespace Poco::RemotingNG::SOAP {
@@ -52,8 +53,11 @@ void WSDLRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Po
 		filePath = p.toString();
 	}
 
-	Poco::File file(filePath);	
-	if (file.exists())
+	// The file name comes from the request: a NUL character would end it before the extension,
+	// and a backslash or a colon would name a file in another directory on Windows.
+	const bool validName = fileName.find_first_of(std::string("\\:\0", 3)) == std::string::npos;
+	Poco::File file(filePath);
+	if (validName && file.exists())
 	{
 		response.sendFile(filePath, "text/xml");
 	}
@@ -64,7 +68,7 @@ void WSDLRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Po
 			"<html><head><title>WSDL Document Not Found</title></head>"
 			"<body><h1>WSDL Document Not Found</h1>"
 			"<p>No such file: ");
-		message += filePath;
+		message += Poco::Net::htmlize(fileName);
 		message += "</p></body></html>";
 		response.setContentLength(static_cast<int>(message.length()));
 		response.setChunkedTransferEncoding(false);
