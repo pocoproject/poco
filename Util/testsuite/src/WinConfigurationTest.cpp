@@ -27,6 +27,18 @@ using Poco::Int64;
 using Poco::UInt64;
 
 
+namespace
+{
+	class TestRegistryConfiguration: public WinRegistryConfiguration
+		// Gives the test access to the protected key conversion.
+	{
+	public:
+		using WinRegistryConfiguration::WinRegistryConfiguration;
+		using WinRegistryConfiguration::convertToRegFormat;
+	};
+}
+
+
 WinConfigurationTest::WinConfigurationTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -43,7 +55,7 @@ void WinConfigurationTest::testConfiguration()
 	if (regKey.exists()) regKey.deleteKey();
 	assertTrue (!regKey.exists());
 
-	AutoPtr<WinRegistryConfiguration> pReg = new WinRegistryConfiguration("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test");
+	AutoPtr<TestRegistryConfiguration> pReg = new TestRegistryConfiguration("HKEY_CURRENT_USER\\Software\\Applied Informatics\\Test");
 	pReg->setString("name1", "value1");
 	assertTrue (pReg->getString("name1") == "value1");
 	pReg->setInt("name1", 1); // overwrite should also change type

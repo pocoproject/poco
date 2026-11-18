@@ -88,6 +88,29 @@ else(MSVC)
 	endif()
 endif(MSVC)
 
+# POCO uses Windows 10 APIs. The Windows SDK of MSVC defaults to that level, but a MinGW
+# toolchain may default to an older one, which hides functions that POCO calls. The check
+# stops the configuration with a clear message instead of a compile error in a POCO source.
+# The cached result is removed first, so that a changed _WIN32_WINNT or WINVER is checked again.
+if(WIN32)
+	include(CheckCXXSourceCompiles)
+	unset(POCO_WINDOWS_10_API CACHE)
+	check_cxx_source_compiles("
+		// <windows.h> defines _WIN32_WINNT and WINVER with the default of the SDK or the
+		// toolchain unless the build defines them; they select the declared Windows functions.
+		#include <windows.h>
+		// An undefined macro is 0 in #if, so the constant must be defined for the comparisons to fail.
+		#if !defined(_WIN32_WINNT_WIN10) || _WIN32_WINNT < _WIN32_WINNT_WIN10 || WINVER < _WIN32_WINNT_WIN10
+		#error Windows API level is older than Windows 10
+		#endif
+		int main() { return 0; }
+	" POCO_WINDOWS_10_API)
+	if(NOT POCO_WINDOWS_10_API)
+		message(FATAL_ERROR "POCO requires the Windows 10 API level: _WIN32_WINNT and WINVER must be "
+			"0x0A00 or higher. Use a newer toolchain or define _WIN32_WINNT=0x0A00 and WINVER=0x0A00.")
+	endif()
+endif()
+
 if (DEFINED POCO_SANITIZEFLAGS AND NOT "${POCO_SANITIZEFLAGS}" STREQUAL "")
 	# separate_arguments splits the space-separated string into individual
 	# tokens. Passing the raw variable to add_compile_options would treat a

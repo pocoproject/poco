@@ -285,6 +285,9 @@ private:
 };
 
 
+// With MinGW, a DLL does not export the inline members of an explicit instantiation,
+// so code that uses the template instantiates it itself.
+#if !defined(POCO_COMPILER_MINGW)
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(Foundation_EXPORTS)
 
 extern template class Struct<std::string>;
@@ -301,6 +304,7 @@ extern template class Foundation_API Struct<int>;
 extern template class Foundation_API Struct<std::string, Poco::OrderedMap<std::string, Var>, Poco::OrderedSet<std::string>>;
 extern template class Foundation_API Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
 
+#endif
 #endif
 
 

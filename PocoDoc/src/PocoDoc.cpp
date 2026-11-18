@@ -283,23 +283,35 @@ protected:
 		Poco::CppParser::Utility::addLanguageStandard(exec, args);
 		args.push_back(file);
 
-		if (!path.empty())
+		// The directories in path are searched before those in PATH. PATH is restored after the
+		// launch, so that the call for each file does not extend it again.
+		Poco::Pipe inPipe;
+		const auto launch = [&exec, &args, &path, &inPipe, usePipe]()
 		{
-			std::string newPath(Environment::get("PATH"));
-			newPath += Path::pathSeparator();
-			newPath += path;
-			Environment::set("PATH", path);
-		}
+			Poco::Pipe* pOutPipe = usePipe ? &inPipe : nullptr;
+			if (path.empty()) return Process::launch(exec, args, nullptr, pOutPipe, nullptr);
+			const std::string savedPath = Environment::get("PATH", "");
+			Environment::set("PATH", path + Path::pathSeparator() + savedPath);
+			try
+			{
+				ProcessHandle proc = Process::launch(exec, args, nullptr, pOutPipe, nullptr);
+				Environment::set("PATH", savedPath);
+				return proc;
+			}
+			catch (...)
+			{
+				Environment::set("PATH", savedPath);
+				throw;
+			}
+		};
+		ProcessHandle proc = launch();
 
 		if (usePipe)
 		{
-			Poco::Pipe inPipe;
-			ProcessHandle proc = Process::launch(exec, args, nullptr, &inPipe, nullptr);
 			return new Preprocessor(proc, new Poco::PipeInputStream(inPipe));
 		}
 		else
 		{
-			ProcessHandle proc = Process::launch(exec, args);
 			proc.wait();
 			return new Preprocessor(proc, new std::ifstream(pp.getFileName().c_str()), pp.getFileName());
 		}

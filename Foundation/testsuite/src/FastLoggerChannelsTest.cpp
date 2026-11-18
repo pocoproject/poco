@@ -678,6 +678,8 @@ void FastLoggerChannelsTest::setUp()
 
 void FastLoggerChannelsTest::tearDown()
 {
+	// No backend thread may be running at process exit (see FastLogger::shutdown()).
+	FastLogger::shutdown();
 }
 
 

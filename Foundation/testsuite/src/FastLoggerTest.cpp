@@ -828,6 +828,8 @@ void FastLoggerTest::setUp()
 
 void FastLoggerTest::tearDown()
 {
+	// No backend thread may be running at process exit (see FastLogger::shutdown()).
+	FastLogger::shutdown();
 }
 
 
