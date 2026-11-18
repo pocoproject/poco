@@ -124,6 +124,7 @@ public:
 	virtual void testManualBLOB();
 	virtual void testManualUUIDLength();
 	virtual void testTranscodedBindingOwnership();
+	virtual void testBindingOutlivesStatement();
 	virtual void testManualStringChunks();
 
 	virtual void testRecordSet();

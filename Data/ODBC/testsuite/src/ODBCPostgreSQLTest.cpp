@@ -749,6 +749,7 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testManualBLOB);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testManualUUIDLength);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTranscodedBindingOwnership);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBindingOutlivesStatement);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testManualStringChunks);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDate);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTime);

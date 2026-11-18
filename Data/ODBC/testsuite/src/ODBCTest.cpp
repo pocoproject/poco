@@ -1577,6 +1577,33 @@ void ODBCTest::testTranscodedBindingOwnership()
 }
 
 
+void ODBCTest::testBindingOutlivesStatement()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	// A binding shares ownership of the Binder, which refers to the handle of
+	// its statement. The statement detaches the Binder before it destroys the
+	// handle, so a binding reset after the statement is gone does not use it.
+	recreatePersonTable();
+	std::string lastName("Simpson");
+	Poco::Data::AbstractBindingVec bindings;
+	{
+		Poco::Data::Statement stmt(session());
+		stmt << "INSERT INTO Person (LastName, FirstName, Address, Age) VALUES (?, 'Bart', 'Springfield', 12)",
+			use(lastName);
+		stmt.execute();
+		bindings = stmt.bindings();
+	}
+	assertEqual (std::size_t(1), bindings.size());
+	bindings[0]->reset();
+	bindings.clear();
+
+	int count = 0;
+	session() << "SELECT COUNT(*) FROM Person WHERE LastName = 'Simpson'", into(count), now;
+	assertEqual (1, count);
+}
+
+
 void ODBCTest::testManualUUIDLength()
 {
 	if (!_pSession) failmsg ("Test not available.");
