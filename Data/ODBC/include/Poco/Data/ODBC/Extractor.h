@@ -710,10 +710,10 @@ private:
 			{ return extAny<T, Poco::UUID>(pos, val); }
 
 			default:
-				throw DataFormatException("Unsupported data type.");
+				break;
 		}
 
-		return false;
+		throw DataFormatException("Unsupported data type.");
 	}
 
 	template <typename C>

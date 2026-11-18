@@ -344,8 +344,9 @@ void ODBCTest::testNonASCIIText()
 		assertTrue (state == "HY090" || state == "IM010");
 #endif
 
-		// unixODBC rejects the browse request (IM012) whatever its length;
-		// the call is made for the sanitizers
+		// unixODBC rejects the browse request: with IM012 for this DSN, which is
+		// longer than 32 bytes, and with IM002 for an unknown shorter one; the
+		// call is made for the sanitizers (see lsan.suppress for IM012)
 		const std::string browse("DSN=" + dsn);
 		std::vector<SQLCHAR> browseOut(1024, 0);
 		SQLSMALLINT browseOutLength = 0;
