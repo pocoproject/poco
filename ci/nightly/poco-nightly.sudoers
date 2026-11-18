@@ -1,0 +1,8 @@
+# The runner account of the nightly may run the privileged helper, with one of its
+# actions, and nothing else as root. provision.sh installs this file as
+# /etc/sudoers.d/poco-nightly with RUNNER_USER replaced by the account name.
+Cmnd_Alias POCO_NIGHTLY = /usr/local/sbin/poco-nightly-root services-start, \
+                          /usr/local/sbin/poco-nightly-root services-stop, \
+                          /usr/local/sbin/poco-nightly-root setcap-net-testrunner
+Defaults!POCO_NIGHTLY env_reset
+RUNNER_USER ALL = (root) NOPASSWD: POCO_NIGHTLY

@@ -57,7 +57,7 @@ cmake -S source -B "$unicode_build" -G Ninja \
     && unicode_built=1
 test -x "$build/bin/Benchmark"
 test -x "$build/bin/sample-json-benchmark"
-sudo -n setcap cap_net_raw+ep "$build/bin/Net-testrunner"
+sudo -n /usr/local/sbin/poco-nightly-root setcap-net-testrunner
 bash "$script_dir/poco-test-services.sh" start 2>&1 | tee "$logs/services.log"
 
 # Every suite runs with -long and without ignore lists; DataODBC runs each database suite.

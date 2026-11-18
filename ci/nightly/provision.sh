@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Run by an administrator; the argument is the account the runner runs as.
+runner_user="${1:-}"
+if [[ ! "$runner_user" =~ ^[a-z_][a-z0-9_-]*$ ]] || ! getent passwd "$runner_user" > /dev/null; then
+    echo "usage: $0 RUNNER_USER (an existing account)" >&2
+    exit 2
+fi
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 sudo -n apt-get update
 sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -19,6 +25,13 @@ sudo -n systemctl stop squid
 sudo -n install -m 644 "$script_dir/poco-squid.conf" /etc/squid/squid.conf
 sudo -n systemctl disable squid
 sudo -n odbcinst -i -d -f "$script_dir/poco-odbc.ini"
+# the privileged part of the nightly, the only command the runner account may run as root
+sudo -n install -o root -g root -m 755 "$script_dir/poco-nightly-root.sh" /usr/local/sbin/poco-nightly-root
+sudoers="$(mktemp)"
+trap 'rm -f "$sudoers"' EXIT
+sed "s/^RUNNER_USER /$runner_user /" "$script_dir/poco-nightly.sudoers" > "$sudoers"
+sudo -n visudo -cf "$sudoers"
+sudo -n install -o root -g root -m 440 "$sudoers" /etc/sudoers.d/poco-nightly
 mkdir -p "$HOME/poco-nightly/provision"
 cd "$HOME/poco-nightly/provision"
 curl -fsSLo packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/13/packages-microsoft-prod.deb
