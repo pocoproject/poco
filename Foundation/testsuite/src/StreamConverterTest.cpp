@@ -17,14 +17,49 @@
 #include "Poco/UTF8Encoding.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
+#include <type_traits>
 
 
 using Poco::InputStreamConverter;
 using Poco::OutputStreamConverter;
+using Poco::StreamConverterBuf;
+using Poco::StreamConverterIOS;
 using Poco::Latin1Encoding;
 using Poco::UTF8Encoding;
 using Poco::ASCIIEncoding;
 using Poco::StreamCopier;
+
+
+static_assert(std::is_constructible_v<InputStreamConverter, std::istream&, const UTF8Encoding&, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<InputStreamConverter, std::istream&, UTF8Encoding, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<InputStreamConverter, std::istream&, const UTF8Encoding&, ASCIIEncoding>);
+static_assert(!std::is_constructible_v<InputStreamConverter, std::istream&, UTF8Encoding, ASCIIEncoding>);
+
+static_assert(std::is_constructible_v<OutputStreamConverter, std::ostream&, const UTF8Encoding&, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<OutputStreamConverter, std::ostream&, UTF8Encoding, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<OutputStreamConverter, std::ostream&, const UTF8Encoding&, ASCIIEncoding>);
+static_assert(!std::is_constructible_v<OutputStreamConverter, std::ostream&, UTF8Encoding, ASCIIEncoding>);
+
+static_assert(std::is_constructible_v<StreamConverterBuf, std::istream&, const UTF8Encoding&, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<StreamConverterBuf, std::istream&, UTF8Encoding, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<StreamConverterBuf, std::istream&, const UTF8Encoding&, ASCIIEncoding>);
+static_assert(!std::is_constructible_v<StreamConverterBuf, std::istream&, UTF8Encoding, ASCIIEncoding>);
+
+static_assert(std::is_constructible_v<StreamConverterBuf, std::ostream&, const UTF8Encoding&, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<StreamConverterBuf, std::ostream&, UTF8Encoding, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<StreamConverterBuf, std::ostream&, const UTF8Encoding&, ASCIIEncoding>);
+static_assert(!std::is_constructible_v<StreamConverterBuf, std::ostream&, UTF8Encoding, ASCIIEncoding>);
+
+static_assert(std::is_constructible_v<StreamConverterIOS, std::istream&, const UTF8Encoding&, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<StreamConverterIOS, std::istream&, UTF8Encoding, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<StreamConverterIOS, std::istream&, const UTF8Encoding&, ASCIIEncoding>);
+static_assert(!std::is_constructible_v<StreamConverterIOS, std::istream&, UTF8Encoding, ASCIIEncoding>);
+
+static_assert(std::is_constructible_v<StreamConverterIOS, std::ostream&, const UTF8Encoding&, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<StreamConverterIOS, std::ostream&, UTF8Encoding, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<StreamConverterIOS, std::ostream&, const UTF8Encoding&, ASCIIEncoding>);
+static_assert(!std::is_constructible_v<StreamConverterIOS, std::ostream&, UTF8Encoding, ASCIIEncoding>,
+	"stream converters must not accept temporary encodings, as they would dangle");
 
 
 StreamConverterTest::StreamConverterTest(const std::string& name): CppUnit::TestCase(name)

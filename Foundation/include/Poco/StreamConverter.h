@@ -40,13 +40,22 @@ public:
 	StreamConverterBuf(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 		/// Creates the StreamConverterBuf and connects it
 		/// to the given input stream.
+		/// The encoding objects must outlive the StreamConverterBuf.
 
 	StreamConverterBuf(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 		/// Creates the StreamConverterBuf and connects it
 		/// to the given output stream.
+		/// The encoding objects must outlive the StreamConverterBuf.
 
 	~StreamConverterBuf() override;
-	/// Destroys the StreamConverterBuf.
+		/// Destroys the StreamConverterBuf.
+
+	StreamConverterBuf(std::istream&, const TextEncoding&&, const TextEncoding&&, int = '?') = delete;
+	StreamConverterBuf(std::istream&, const TextEncoding&&, const TextEncoding&, int = '?') = delete;
+	StreamConverterBuf(std::istream&, const TextEncoding&, const TextEncoding&&, int = '?') = delete;
+	StreamConverterBuf(std::ostream&, const TextEncoding&&, const TextEncoding&&, int = '?') = delete;
+	StreamConverterBuf(std::ostream&, const TextEncoding&&, const TextEncoding&, int = '?') = delete;
+	StreamConverterBuf(std::ostream&, const TextEncoding&, const TextEncoding&&, int = '?') = delete;
 
 	[[nodiscard]] int errors() const;
 		/// Returns the number of encoding errors encountered.
@@ -78,6 +87,14 @@ public:
 	StreamConverterIOS(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 	StreamConverterIOS(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 	~StreamConverterIOS() override;
+
+	StreamConverterIOS(std::istream&, const TextEncoding&&, const TextEncoding&&, int = '?') = delete;
+	StreamConverterIOS(std::istream&, const TextEncoding&&, const TextEncoding&, int = '?') = delete;
+	StreamConverterIOS(std::istream&, const TextEncoding&, const TextEncoding&&, int = '?') = delete;
+	StreamConverterIOS(std::ostream&, const TextEncoding&&, const TextEncoding&&, int = '?') = delete;
+	StreamConverterIOS(std::ostream&, const TextEncoding&&, const TextEncoding&, int = '?') = delete;
+	StreamConverterIOS(std::ostream&, const TextEncoding&, const TextEncoding&&, int = '?') = delete;
+
 	[[nodiscard]] StreamConverterBuf* rdbuf();
 	[[nodiscard]] int errors() const;
 
@@ -96,11 +113,16 @@ class Foundation_API InputStreamConverter: public StreamConverterIOS, public std
 {
 public:
 	InputStreamConverter(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
-		/// Creates the InputStreamConverter and connects it
-		/// to the given input stream.
+		/// Creates the InputStreamConverter and connects it to the given
+		/// input stream.
+		/// The encoding objects must outlive the InputStreamConverter.
 
 	~InputStreamConverter() override;
-	/// Destroys the stream.
+		/// Destroys the stream.
+
+	InputStreamConverter(std::istream&, const TextEncoding&&, const TextEncoding&, int = '?') = delete;
+	InputStreamConverter(std::istream&, const TextEncoding&, const TextEncoding&&, int = '?') = delete;
+	InputStreamConverter(std::istream&, const TextEncoding&&, const TextEncoding&&, int = '?') = delete;
 };
 
 
@@ -114,11 +136,16 @@ class Foundation_API OutputStreamConverter: public StreamConverterIOS, public st
 {
 public:
 	OutputStreamConverter(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
-		/// Creates the OutputStreamConverter and connects it
-		/// to the given input stream.
+		/// Creates the OutputStreamConverter and connects it to the
+		/// given output stream.
+		/// The encoding objects must outlive the OutputStreamConverter.
 
 	~OutputStreamConverter() override;
-	/// Destroys the CountingOutputStream.
+		/// Destroys the OutputStreamConverter.
+
+	OutputStreamConverter(std::ostream&, const TextEncoding&&, const TextEncoding&&, int = '?') = delete;
+	OutputStreamConverter(std::ostream&, const TextEncoding&&, const TextEncoding&, int = '?') = delete;
+	OutputStreamConverter(std::ostream&, const TextEncoding&, const TextEncoding&&, int = '?') = delete;
 };
 
 

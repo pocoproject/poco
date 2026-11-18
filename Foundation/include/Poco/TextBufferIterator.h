@@ -72,11 +72,15 @@ public:
 	TextBufferIterator(const char* end);
 		/// Creates an end TextBufferIterator for the given buffer.
 
-	~TextBufferIterator();
+	~TextBufferIterator() = default;
 		/// Destroys the TextBufferIterator.
 
 	TextBufferIterator(const TextBufferIterator& it);
 		/// Copy constructor.
+
+	TextBufferIterator(const char*, std::size_t, const TextEncoding&&) = delete;
+	TextBufferIterator(const char*, const char*, const TextEncoding&&) = delete;
+	TextBufferIterator(const char*, const TextEncoding&&) = delete;
 
 	TextBufferIterator& operator = (const TextBufferIterator& it);
 		/// Assignment operator.

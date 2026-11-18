@@ -32,6 +32,8 @@ public:
 	void testUTF8();
 	void testUTF8Supplementary();
 	void testUTF16Supplementary();
+	void testFaultyEncoding1();
+	void testFaultyEncoding2();
 	void testSwap();
 
 	void setUp();

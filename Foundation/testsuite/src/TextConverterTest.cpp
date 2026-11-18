@@ -12,6 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/TextConverter.h"
+#include "Poco/Exception.h"
 #include "Poco/ASCIIEncoding.h"
 #include "Poco/Latin1Encoding.h"
 #include "Poco/Latin2Encoding.h"
@@ -20,9 +21,35 @@
 #include "Poco/Windows1251Encoding.h"
 #include "Poco/Windows1252Encoding.h"
 #include "Poco/UTF8Encoding.h"
+#include <type_traits>
 
 
 using namespace Poco;
+
+
+static_assert(std::is_constructible_v<TextConverter, const UTF8Encoding&, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<TextConverter, UTF8Encoding, const ASCIIEncoding&>);
+static_assert(!std::is_constructible_v<TextConverter, const UTF8Encoding&, ASCIIEncoding>);
+static_assert(!std::is_constructible_v<TextConverter, UTF8Encoding, ASCIIEncoding>,
+	"TextConverter must not accept temporary encodings, as they would dangle");
+
+
+namespace
+{
+	class FaultyEncoding: public ASCIIEncoding
+	{
+	public:
+		int queryConvert(const unsigned char*, int) const override
+		{
+			return -2;
+		}
+
+		int sequenceLength(const unsigned char*, int) const override
+		{
+			return -2;
+		}
+	};
+}
 
 
 TextConverterTest::TextConverterTest(const std::string& name): CppUnit::TestCase(name)
@@ -42,7 +69,7 @@ void TextConverterTest::testIdentityASCII()
 
 	std::string empty;
 	std::string result0;
-	int errors = converter.convert(empty, result0);
+	std::size_t errors = converter.convert(empty, result0);
 	assertTrue (result0 == empty);
 	assertTrue (errors == 0);
 
@@ -53,7 +80,7 @@ void TextConverterTest::testIdentityASCII()
 	assertTrue (errors == 0);
 
 	std::string result2;
-	errors = converter.convert(fooBar.data(), (int) fooBar.length(), result2);
+	errors = converter.convert(fooBar.data(), fooBar.length(), result2);
 	assertTrue (result2 == fooBar);
 	assertTrue (errors == 0);
 
@@ -82,7 +109,7 @@ void TextConverterTest::testIdentityUTF8()
 
 	std::string empty;
 	std::string result0;
-	int errors = converter.convert(empty, result0);
+	std::size_t errors = converter.convert(empty, result0);
 	assertTrue (result0 == empty);
 	assertTrue (errors == 0);
 
@@ -93,7 +120,7 @@ void TextConverterTest::testIdentityUTF8()
 	assertTrue (errors == 0);
 
 	std::string result2;
-	errors = converter.convert(fooBar.data(), (int) fooBar.length(), result2);
+	errors = converter.convert(fooBar.data(), fooBar.length(), result2);
 	assertTrue (result2 == fooBar);
 	assertTrue (errors == 0);
 
@@ -148,7 +175,7 @@ void TextConverterTest::testUTF8toASCII()
 	const unsigned char greek[] = {0x20, 0xce, 0xba, 0xe1, 0xbd, 0xb9, 0xcf, 0x83, 0xce, 0xbc, 0xce, 0xb5, 0x20, 0x41, 0x42, 0x00};
 	std::string text((const char*) greek);
 	std::string result0;
-	int errors = converter.convert(text, result0);
+	std::size_t errors = converter.convert(text, result0);
 	assertTrue (result0 == " ????? AB");
 	assertTrue (errors == 0);
 
@@ -170,7 +197,7 @@ void TextConverterTest::testLatin1toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latin1Text, result0);
+	std::size_t errors = converter.convert(latin1Text, result0);
 	assertTrue (result0 == utf8Text);
 	assertTrue (errors == 0);
 	assertEqual((long) result0.size(), 7);
@@ -195,7 +222,7 @@ void TextConverterTest::testLatin2toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
 	assertEqual((long) result0.size(), 49);
@@ -221,7 +248,7 @@ void TextConverterTest::testLatin9toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
 	assertEqual((long) result0.size(), 43);
@@ -247,7 +274,7 @@ void TextConverterTest::testCP1250toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
 	assertEqual((long) result0.size(), 49);
@@ -272,7 +299,7 @@ void TextConverterTest::testCP1251toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual (result0, utf8Text);
 	assertEqual (errors, 0);
 	assertEqual((long) result0.size(), 62);
@@ -298,7 +325,7 @@ void TextConverterTest::testCP1252toUTF8()
 	std::string utf8Text((const char*) utf8Chars);
 
 	std::string result0;
-	int errors = converter.convert(latinText, result0);
+	std::size_t errors = converter.convert(latinText, result0);
 	assertEqual(result0, utf8Text);
 	assertEqual(errors, 0);
 	assertEqual((long) result0.size(), 43);
@@ -308,6 +335,60 @@ void TextConverterTest::testCP1252toUTF8()
 	assertEqual(result1, utf8Text);
 	assertEqual(errors, 0);
 	assertEqual((long) result1.size(), 43);
+}
+
+
+void TextConverterTest::testFaultyEncoding()
+{
+	FaultyEncoding faultyEncoding;
+	ASCIIEncoding asciiEncoding;
+	TextConverter converter(faultyEncoding, asciiEncoding);
+
+	std::string result0;
+	std::size_t errors = converter.convert("ab", 2, result0);
+	assertEqual (result0, "?");
+	assertEqual (errors, 1);
+
+	std::string result1;
+	errors = converter.convert("ab", result1);
+	assertEqual (result1, "?");
+	assertEqual (errors, 1);
+}
+
+
+void TextConverterTest::testInvalidBuffer()
+{
+	ASCIIEncoding encoding;
+	TextConverter converter(encoding, encoding);
+	const std::string unchanged = "unchanged";
+	std::string result = unchanged;
+
+	try
+	{
+		converter.convert(nullptr, 1, result);
+		fail ("must fail");
+	}
+	catch (NullPointerException&)
+	{
+	}
+	assertEqual (result, unchanged);
+}
+
+
+void TextConverterTest::testEmptyBuffer()
+{
+	ASCIIEncoding encoding;
+	TextConverter converter(encoding, encoding);
+	const std::string unchanged = "unchanged";
+	std::string result = unchanged;
+
+	std::size_t errors = converter.convert(nullptr, 0, result);
+	assertEqual (result, unchanged);
+	assertEqual (errors, 0);
+
+	errors = converter.convert("x", 0, result);
+	assertEqual (result, unchanged);
+	assertEqual (errors, 0);
 }
 
 
@@ -321,7 +402,7 @@ void TextConverterTest::testErrors()
 	std::string badText((const char*) badChars);
 
 	std::string result;
-	int errors = converter.convert(badText, result);
+	std::size_t errors = converter.convert(badText, result);
 	assertTrue (errors == 2);
 }
 
@@ -349,6 +430,9 @@ CppUnit::Test* TextConverterTest::suite()
 	CppUnit_addTest(pSuite, TextConverterTest, testCP1250toUTF8);
 	CppUnit_addTest(pSuite, TextConverterTest, testCP1251toUTF8);
 	CppUnit_addTest(pSuite, TextConverterTest, testCP1252toUTF8);
+	CppUnit_addTest(pSuite, TextConverterTest, testFaultyEncoding);
+	CppUnit_addTest(pSuite, TextConverterTest, testInvalidBuffer);
+	CppUnit_addTest(pSuite, TextConverterTest, testEmptyBuffer);
 	CppUnit_addTest(pSuite, TextConverterTest, testErrors);
 
 	return pSuite;
