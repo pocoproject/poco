@@ -706,7 +706,9 @@ SQLRETURN SQLNativeSql(SQLHDBC hdbc,
 	const SQLINTEGER inLength = static_cast<SQLINTEGER>(str.size());
 	// Some drivers (SQLite ODBC 0.99991) write a terminator into the input,
 	// at the position of the output buffer length, so the input is as long
-	// as the output buffer.
+	// as the output buffer. This covers drivers with wide-character functions
+	// only: for a driver without them, the driver manager passes its own
+	// converted copy of the input.
 	if (cbSqlStrMax > inLength)
 		str.resize(static_cast<std::size_t>(cbSqlStrMax) + 1, L'\0');
 
