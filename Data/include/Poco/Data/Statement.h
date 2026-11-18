@@ -330,7 +330,8 @@ public:
 	[[nodiscard]] Optional<std::size_t> statementsCount() const;
 		/// Returns the total number of SQL statements held in the accummulated SQL statement.
 		///
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	Optional<bool> parse();
 		/// Parses the SQL statement and returns true if successful.
@@ -348,35 +349,43 @@ public:
 
 	[[nodiscard]] Optional<bool> isSelect() const;
 		/// Returns true if the statement consists only of SELECT statement(s).
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> isInsert() const;
 		/// Returns true if the statement consists only of INSERT statement(s).
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> isUpdate() const;
 		/// Returns true if the statement consists only of UPDATE statement(s).
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> isDelete() const;
 		/// Returns true if the statement consists only of DELETE statement(s).
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	Optional<bool> hasSelect() const;
 		/// Returns true if the statement contains a SELECT statement.
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> hasInsert() const;
 		/// Returns true if the statement contains an INSERT statement.
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> hasUpdate() const;
 		/// Returns true if the statement contains an UPDATE statement.
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> hasDelete() const;
 		/// Returns true if the statement contains a DELETE statement.
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	std::size_t execute(bool reset = true);
 		/// Executes the statement synchronously or asynchronously.
@@ -585,6 +594,10 @@ private:
 		/// cannot read always starts a transaction.
 
 #ifndef POCO_DATA_NO_SQL_PARSER
+
+	[[nodiscard]] bool isParsed() const;
+		/// Returns true if parsing is enabled for the session and the
+		/// last parse() succeeded.
 
 	[[nodiscard]] bool isType(unsigned int type) const;
 		/// Returns true if the statement is of the argument type.

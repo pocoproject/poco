@@ -1659,14 +1659,28 @@ void DataTest::testSQLParse()
 	assertTrue (!stmt.isDelete().value());
 	assertTrue (stmt.hasDelete().value());
 
-	// A statement that fails to parse has no statements to classify, also when
-	// its start parses on its own.
+	// A statement that fails to parse is not classified, also when its start
+	// parses on its own, and neither is one that has not been parsed.
 	stmt.reset();
 	stmt = (sess << "SELECT 1 DELETE FROM Test");
 	assertTrue (!stmt.parse().value());
-	assertEqual (0u, stmt.statementsCount().value());
-	assertTrue (!stmt.isSelect().value());
-	assertTrue (!stmt.hasDelete().value());
+	assertTrue (!stmt.statementsCount().isSpecified());
+	assertTrue (!stmt.isSelect().isSpecified());
+	assertTrue (!stmt.hasSelect().isSpecified());
+	assertTrue (!stmt.isDelete().isSpecified());
+	assertTrue (!stmt.hasDelete().isSpecified());
+	assertTrue (!stmt.parseError().empty());
+
+	sess.setFeature("autoCommit", true);
+	stmt.reset();
+	stmt = (sess << "DELETE FROM Test");
+	assertTrue (!stmt.statementsCount().isSpecified());
+	assertTrue (!stmt.hasDelete().isSpecified());
+	assertTrue (stmt.parse().value());
+	assertTrue (stmt.parseError().empty());
+	assertEqual (1u, stmt.statementsCount().value());
+	assertTrue (stmt.hasDelete().value());
+	sess.setFeature("autoCommit", false);
 
 	sess.setFeature("sqlParse", false);
 	assertTrue (!sess.getFeature("sqlParse"));
