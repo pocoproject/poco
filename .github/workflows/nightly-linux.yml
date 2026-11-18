@@ -34,13 +34,19 @@ jobs:
         run: bash ci/nightly/poco-nightly.sh
       - name: Collect logs
         if: always()
-        # Artifacts are not masked: the machine name and home directory are replaced.
+        # Artifacts are not masked: the machine name, the home directory and the network
+        # details are replaced.
         run: |
           out="$RUNNER_TEMP/poco-nightly-logs"
           mkdir -p "$out"
           if [ -d "$HOME/poco-nightly/logs" ]; then
             cp -R "$HOME/poco-nightly/logs/." "$out/"
             find "$out" -type f -exec sed -i -e "s|$HOME|\$HOME|g" -e "s|$(hostname)|[runner]|g" {} +
+            NIGHTLY_ADDRESSES="$( (ip -o addr show; ip -o link show) | grep -oE '(inet6?|brd|link/ether) [0-9a-fA-F.:]+' \
+              | cut -d' ' -f2 | grep -vxE '127\.0\.0\.1|::1|(ff:){5}ff|(00:){5}00' | sort -u | tr '\n' ' ')"
+            NIGHTLY_INTERFACES="$(ip -o link show | cut -d: -f2 | cut -d@ -f1 | tr -d ' ' | grep -vx lo | tr '\n' ' ')"
+            export NIGHTLY_ADDRESSES NIGHTLY_INTERFACES
+            find "$out" -type f -exec perl -pi ci/nightly/redact-logs.pl {} +
           fi
       - name: Upload logs
         if: always()

@@ -102,6 +102,14 @@ for suite in $required; do
 done
 ctest --test-dir "$build" --verbose --no-tests=error --timeout 7200 --parallel 1 \
     --output-junit "$logs/tests.xml" > "$logs/tests.log" 2>&1 || status=1
+# These suites register no tests and pass when they cannot connect to their server, so the
+# banner each prints after connecting must be in the log.
+for banner in '*** Connected to [MySQL] test database.' '*** Connected to [PostgreSQL] test database.' \
+    'Connected to [127.0.0.1:27017]'; do
+    if ! grep -aFq "$banner" "$logs/tests.log"; then
+        echo "Server missing, no \"$banner\" in tests.log" >> "$logs/coverage-gaps.txt"
+    fi
+done
 # SQL Server reads and writes narrow strings in the character set of the client locale, which
 # testEncoding expects to be Latin-1.
 if [[ "$unicode_built" != 1 ]]; then
