@@ -12,6 +12,8 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/NTPClient.h"
+#include "Poco/Net/DNS.h"
+#include "Poco/Net/HostEntry.h"
 #include "Poco/Net/NTPEventArgs.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
@@ -46,12 +48,13 @@ NTPClientTest::~NTPClientTest()
 
 void NTPClientTest::testTimeSync()
 {
-	// The server is resolved once and asked directly: pool.ntp.org names a
-	// different server on every lookup, and not every server answers ICMP.
-	SocketAddress server;
+	// The pool is resolved once and its servers are asked directly, one after
+	// the other, until one answers: pool.ntp.org names different servers on
+	// every lookup, and a single server does not always answer.
+	Poco::Net::HostEntry::AddressList addresses;
 	try
 	{
-		server = SocketAddress(SocketAddress::IPv4, "pool.ntp.org", 123);
+		addresses = Poco::Net::DNS::hostByName("pool.ntp.org").addresses();
 	}
 	catch (Poco::Net::DNSException&)
 	{
@@ -59,7 +62,18 @@ void NTPClientTest::testTimeSync()
 		return;
 	}
 
-	assertTrue (_ntpClient.request(server) > 0);
+	bool answered = false;
+	for (const auto& address: addresses)
+	{
+		if (address.family() != IPAddress::IPv4) continue;
+		SocketAddress server(address, 123);
+		if (_ntpClient.request(server) > 0)
+		{
+			answered = true;
+			break;
+		}
+	}
+	assertTrue (answered);
 }
 
 
