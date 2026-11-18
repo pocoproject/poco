@@ -24,6 +24,18 @@
 namespace Poco {
 
 
+namespace {
+
+
+// Julian days of -4713-01-01 00:00:00 and 10000-01-01 00:00:00, the
+// range of the years DateTime accepts (the upper bound is exclusive).
+constexpr double MIN_JULIAN_DAY = -327.5;
+constexpr double MAX_JULIAN_DAY = 5373484.5;
+
+
+} // namespace
+
+
 DateTime::DateTime()
 {
 	Timestamp now;
@@ -79,6 +91,7 @@ DateTime::DateTime(int year, int month, int day, int hour, int minute, int secon
 
 
 DateTime::DateTime(double julianDay):
+	// toUtcTime() rejects a julian day out of range before any conversion
 	_utcTime(toUtcTime(julianDay))
 {
 	computeGregorian(julianDay);
@@ -292,20 +305,18 @@ Timespan DateTime::operator - (const DateTime& dateTime) const
 
 DateTime& DateTime::operator += (const Timespan& span)
 {
-	_utcTime += span.totalMicroseconds()*10;
-	computeGregorian(julianDay());
-	computeDaytime();
-	checkValid();
+	// the constructor validates; an invalid value leaves *this unchanged
+	DateTime dateTime(_utcTime, span.totalMicroseconds());
+	swap(dateTime);
 	return *this;
 }
 
 
 DateTime& DateTime::operator -= (const Timespan& span)
 {
-	_utcTime -= span.totalMicroseconds()*10;
-	computeGregorian(julianDay());
-	computeDaytime();
-	checkValid();
+	// the constructor validates; an invalid value leaves *this unchanged
+	DateTime dateTime(_utcTime, -span.totalMicroseconds());
+	swap(dateTime);
 	return *this;
 }
 
@@ -358,6 +369,19 @@ double DateTime::toJulianDay(int year, int month, int day, int hour, int minute,
 	}
 	double dyear = double(year);
 	return dday + lookup[month] + 365*year + std::floor(dyear/4) - std::floor(dyear/100) + std::floor(dyear/400) + 1721118.5;
+}
+
+
+Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
+{
+	// check before the conversion: converting a non-finite or out of range
+	// double to an integer is undefined
+	if (!std::isfinite(julianDay) || julianDay < MIN_JULIAN_DAY || julianDay >= MAX_JULIAN_DAY)
+		throw Poco::InvalidArgumentException(Poco::format("Julian day %f is out of range\n"
+				"Valid values:\n"
+				"%f <= julian day < %f",
+				julianDay, MIN_JULIAN_DAY, MAX_JULIAN_DAY));
+	return static_cast<Timestamp::UtcTimeVal>((julianDay - 2299160.5)*864000000000.0);
 }
 
 

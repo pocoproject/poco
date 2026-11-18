@@ -45,6 +45,8 @@ public:
 	void testInvalid();
 	void testInvalidAssign();
 	void testInvalidAssignJulianDay();
+	void testInvalidJulianDay();
+	void testInvalidArithmetics();
 
 	void setUp();
 	void tearDown();

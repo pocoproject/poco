@@ -38,6 +38,8 @@ public:
 	void testTimezone2();
 	void testInvalidAssign();
 	void testInvalidAssignJulianDay();
+	void testInvalidJulianDay();
+	void testInvalidAssignLocalTime();
 
 	void setUp();
 	void tearDown();

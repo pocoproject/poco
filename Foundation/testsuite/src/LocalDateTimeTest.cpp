@@ -25,8 +25,11 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/Exception.h"
 #include <climits>
+#include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <limits>
+#include <string>
 
 
 using Poco::LocalDateTime;
@@ -507,6 +510,136 @@ void LocalDateTimeTest::testInvalidAssignJulianDay()
 }
 
 
+void LocalDateTimeTest::testInvalidJulianDay()
+{
+	// a julian day or timestamp that is not finite or out of range is
+	// rejected; a failed assignment keeps the value and the time zone
+	// differential
+	static constexpr double invalid[] =
+	{
+		std::numeric_limits<double>::quiet_NaN(),
+		std::numeric_limits<double>::infinity(),
+		-std::numeric_limits<double>::infinity(),
+		1e300,
+		-1e300,
+		5373484.5  // 10000-01-01 00:00:00
+	};
+	const LocalDateTime orig(3600, 2024, 5, 17, 10, 20, 30, 400, 500);
+
+	for (const double julianDay: invalid)
+	{
+		try
+		{
+			LocalDateTime ldt(julianDay);
+			fail("Invalid julian day, must throw");
+		}
+		catch (const Poco::InvalidArgumentException&) { }
+
+		try
+		{
+			LocalDateTime ldt(7200, julianDay);
+			fail("Invalid julian day, must throw");
+		}
+		catch (const Poco::InvalidArgumentException&) { }
+
+		LocalDateTime ldt1(orig);
+		try
+		{
+			ldt1 = julianDay;
+			fail("Invalid julian day, must throw");
+		}
+		catch (const Poco::InvalidArgumentException&) { }
+		assertEqual (orig.tzd(), ldt1.tzd());
+		assertTrue (ldt1.utcTime() == orig.utcTime());
+		assertEqual (orig.year(), ldt1.year());
+		assertEqual (orig.hour(), ldt1.hour());
+
+		LocalDateTime ldt2(orig);
+		try
+		{
+			ldt2.assign(7200, julianDay);
+			fail("Invalid julian day, must throw");
+		}
+		catch (const Poco::InvalidArgumentException&) { }
+		assertEqual (orig.tzd(), ldt2.tzd());
+		assertTrue (ldt2.utcTime() == orig.utcTime());
+		assertEqual (orig.year(), ldt2.year());
+		assertEqual (orig.hour(), ldt2.hour());
+	}
+
+	// 10000-01-01 00:00:00
+	LocalDateTime ldt3(orig);
+	try
+	{
+		ldt3 = Timestamp(253402300800000000LL);
+		fail("Invalid timestamp, must throw");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+	assertEqual (orig.tzd(), ldt3.tzd());
+	assertTrue (ldt3.utcTime() == orig.utcTime());
+	assertEqual (orig.year(), ldt3.year());
+	assertEqual (orig.hour(), ldt3.hour());
+}
+
+
+void LocalDateTimeTest::testInvalidAssignLocalTime()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	// a valid UTC time that the local time zone moves out of range;
+	// a failed assignment keeps the value and the time zone differential
+	struct TZGuard
+	{
+		explicit TZGuard(const char* tz)
+		{
+			const char* old = std::getenv("TZ");
+			_hadTZ = old != nullptr;
+			if (_hadTZ) _oldTZ = old;
+			setenv("TZ", tz, 1); // POSIX-specific
+		}
+
+		~TZGuard()
+		{
+			if (_hadTZ)
+				setenv("TZ", _oldTZ.c_str(), 1);
+			else
+				unsetenv("TZ");
+		}
+
+		bool _hadTZ = false;
+		std::string _oldTZ;
+	};
+	TZGuard guard("XXX-2"); // UTC+2, no daylight saving time
+
+	const LocalDateTime orig(3600, 2024, 5, 17, 10, 20, 30, 400, 500);
+	const DateTime lastUTC(9999, 12, 31, 23, 0, 0);
+
+	LocalDateTime ldt1(orig);
+	try
+	{
+		ldt1 = lastUTC.julianDay();
+		fail("Local time out of range, must throw");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+	assertEqual (orig.tzd(), ldt1.tzd());
+	assertTrue (ldt1.utcTime() == orig.utcTime());
+	assertEqual (orig.year(), ldt1.year());
+	assertEqual (orig.hour(), ldt1.hour());
+
+	LocalDateTime ldt2(orig);
+	try
+	{
+		ldt2 = lastUTC.timestamp();
+		fail("Local time out of range, must throw");
+	}
+	catch (const Poco::InvalidArgumentException&) { }
+	assertEqual (orig.tzd(), ldt2.tzd());
+	assertTrue (ldt2.utcTime() == orig.utcTime());
+	assertEqual (orig.year(), ldt2.year());
+	assertEqual (orig.hour(), ldt2.hour());
+#endif
+}
+
+
 void LocalDateTimeTest::testInvalidAssign()
 {
 	static constexpr struct
@@ -611,6 +744,8 @@ CppUnit::Test* LocalDateTimeTest::suite()
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testTimezone2);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testInvalidAssign);
 	CppUnit_addTest(pSuite, LocalDateTimeTest, testInvalidAssignJulianDay);
+	CppUnit_addTest(pSuite, LocalDateTimeTest, testInvalidJulianDay);
+	CppUnit_addTest(pSuite, LocalDateTimeTest, testInvalidAssignLocalTime);
 
 	return pSuite;
 }
