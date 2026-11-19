@@ -80,6 +80,39 @@ void HTTPSStreamFactoryTest::testRedirect()
 }
 
 
+void HTTPSStreamFactoryTest::testRedirectCredentials()
+{
+	// The credentials of the URI ("user:secret", base64 "dXNlcjpzZWNyZXQ=")
+	// go to the redirect target only when it has the same origin.
+	HTTPSTestServer server;
+	HTTPSTestServer otherServer;
+	HTTPSStreamFactory factory;
+
+	URI uri("https://user:secret@127.0.0.1/authRedirect?to=/auth");
+	uri.setPort(server.port());
+	std::unique_ptr<std::istream> pStr(factory.open(uri));
+	std::ostringstream ostr;
+	StreamCopier::copyStream(*pStr.get(), ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
+	assertTrue (server.lastRequest().find("Authorization: Basic dXNlcjpzZWNyZXQ=") != std::string::npos);
+
+	// A 401 and then a redirect to another origin.
+	const std::string otherLocation("https://127.0.0.1:" + std::to_string(otherServer.port()) + "/auth");
+	uri = URI("https://user:secret@127.0.0.1/authRedirect?to=" + otherLocation);
+	uri.setPort(server.port());
+	pStr.reset(factory.open(uri));
+	assertTrue (otherServer.lastRequest().substr(0, 9) == "GET /auth");
+	assertTrue (otherServer.lastRequest().find("dXNlcjpzZWNyZXQ=") == std::string::npos);
+
+	// A redirect to another origin before any 401.
+	uri = URI("https://user:secret@127.0.0.1/moved?to=" + otherLocation);
+	uri.setPort(server.port());
+	pStr.reset(factory.open(uri));
+	assertTrue (otherServer.lastRequest().substr(0, 9) == "GET /auth");
+	assertTrue (otherServer.lastRequest().find("dXNlcjpzZWNyZXQ=") == std::string::npos);
+}
+
+
 void HTTPSStreamFactoryTest::testProxy()
 {
 	HTTPSTestServer server;
@@ -130,6 +163,7 @@ CppUnit::Test* HTTPSStreamFactoryTest::suite()
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testNoRedirect);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testEmptyPath);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testRedirect);
+	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testRedirectCredentials);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPSStreamFactoryTest, testError);
 

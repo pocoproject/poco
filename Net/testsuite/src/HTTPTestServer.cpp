@@ -237,8 +237,8 @@ std::string HTTPTestServer::handleRequest() const
 		response.append("Location: /large\r\n");
 		response.append("\r\n");
 	}
-	else if (_lastRequest.substr(0, 17) == "GET /authRedirect" ||
-			 _lastRequest.substr(0, 9) == "GET /auth")
+	else if (_lastRequest.substr(0, 10) == "GET /auth " ||
+			 _lastRequest.substr(0, 21) == "GET /authRedirect?to=")
 	{
 		// Basic authentication is required; /authRedirect?to=<location>
 		// then redirects to the location given in its query.
@@ -248,12 +248,11 @@ std::string HTTPTestServer::handleRequest() const
 			response.append("WWW-Authenticate: Basic realm=\"test\"\r\n");
 			response.append("\r\n");
 		}
-		else if (_lastRequest.substr(0, 17) == "GET /authRedirect")
+		else if (_lastRequest.substr(0, 21) == "GET /authRedirect?to=")
 		{
-			const std::string::size_type pos = _lastRequest.find("?to=") + 4;
 			response.append("HTTP/1.0 302 Found\r\n");
 			response.append("Location: ");
-			response.append(_lastRequest, pos, _lastRequest.find(' ', pos) - pos);
+			response.append(_lastRequest, 21, _lastRequest.find(' ', 21) - 21);
 			response.append("\r\n\r\n");
 		}
 		else

@@ -174,6 +174,13 @@ public:
 	static void extractCredentials(const Poco::URI& uri, std::string& username, std::string& password);
 		/// Extracts username and password from the given URI (e.g.: "http://user:pass@sample.com/secret").
 
+	[[nodiscard]] static bool isSameOrigin(const Poco::URI& uri, const Poco::URI& otherURI);
+		/// Returns true if both URIs have the same scheme, host and port.
+		///
+		/// The HTTP and HTTPS stream factories pass the credentials from
+		/// the user info of a URI to a redirect target only if it has the
+		/// same origin.
+
 private:
 	HTTPCredentials(const HTTPCredentials&);
 	HTTPCredentials& operator = (const HTTPCredentials&);

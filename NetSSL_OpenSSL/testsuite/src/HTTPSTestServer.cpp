@@ -237,6 +237,45 @@ std::string HTTPSTestServer::handleRequest() const
 		response.append("Location: /large\r\n");
 		response.append("\r\n");
 	}
+	else if (_lastRequest.substr(0, 10) == "GET /auth " ||
+			 _lastRequest.substr(0, 21) == "GET /authRedirect?to=")
+	{
+		// Basic authentication is required; /authRedirect?to=<location>
+		// then redirects to the location given in its query.
+		if (_lastRequest.find("\r\nAuthorization: ") == std::string::npos)
+		{
+			response.append("HTTP/1.0 401 Unauthorized\r\n");
+			response.append("WWW-Authenticate: Basic realm=\"test\"\r\n");
+			response.append("\r\n");
+		}
+		else if (_lastRequest.substr(0, 21) == "GET /authRedirect?to=")
+		{
+			response.append("HTTP/1.0 302 Found\r\n");
+			response.append("Location: ");
+			response.append(_lastRequest, 21, _lastRequest.find(' ', 21) - 21);
+			response.append("\r\n\r\n");
+		}
+		else
+		{
+			std::string body(SMALL_BODY);
+			response.append("HTTP/1.0 200 OK\r\n");
+			response.append("Content-Type: text/plain\r\n");
+			response.append("Content-Length: ");
+			response.append(NumberFormatter::format((int) body.size()));
+			response.append("\r\n");
+			response.append("Connection: Close\r\n");
+			response.append("\r\n");
+			response.append(body);
+		}
+	}
+	else if (_lastRequest.substr(0, 14) == "GET /moved?to=")
+	{
+		// Redirects to the location given in the query without authentication.
+		response.append("HTTP/1.0 302 Found\r\n");
+		response.append("Location: ");
+		response.append(_lastRequest, 14, _lastRequest.find(' ', 14) - 14);
+		response.append("\r\n\r\n");
+	}
 	else if (_lastRequest.substr(0, 13) == "GET /notfound")
 	{
 		response.append("HTTP/1.0 404 Not Found\r\n");
