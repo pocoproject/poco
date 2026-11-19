@@ -454,6 +454,69 @@ void MultipartReaderTest::testGuessBoundaryEmptyArgument()
 }
 
 
+void MultipartReaderTest::testPartContentLength()
+{
+	// The boundary ends a part; a Content-Length header in the part does not.
+	std::string s("\r\n--MIME_boundary_01234567\r\nname1: value1\r\nContent-Length: 73\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\nname2: value2\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
+	std::istringstream istr(s);
+	MultipartReader r(istr, "MIME_boundary_01234567");
+	assertTrue (r.hasNextPart());
+	MessageHeader h;
+	r.nextPart(h);
+	assertTrue (h["name1"] == "value1");
+	std::istream& i = r.stream();
+	int ch = i.get();
+	std::string part;
+	while (ch >= 0)
+	{
+		part += (char) ch;
+		ch = i.get();
+	}
+	assertTrue (part == "this is part 1");
+	assertTrue (r.hasNextPart());
+	r.nextPart(h);
+	assertTrue (h.size() == 1);
+	assertTrue (h["name2"] == "value2");
+	std::istream& ii = r.stream();
+	part.clear();
+	ch = ii.get();
+	while (ch >= 0)
+	{
+		part += (char) ch;
+		ch = ii.get();
+	}
+	assertTrue (part == "this is part 2");
+	assertTrue (!r.hasNextPart());
+
+	std::string s2("\r\n--MIME_boundary_01234567\r\nContent-Length: 0\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
+	std::istringstream istr2(s2);
+	MultipartReader r2(istr2, "MIME_boundary_01234567");
+	assertTrue (r2.hasNextPart());
+	r2.nextPart(h);
+	std::istream& i2 = r2.stream();
+	part.clear();
+	ch = i2.get();
+	while (ch >= 0)
+	{
+		part += (char) ch;
+		ch = i2.get();
+	}
+	assertTrue (part == "this is part 1");
+	assertTrue (r2.hasNextPart());
+	r2.nextPart(h);
+	std::istream& ii2 = r2.stream();
+	part.clear();
+	ch = ii2.get();
+	while (ch >= 0)
+	{
+		part += (char) ch;
+		ch = ii2.get();
+	}
+	assertTrue (part == "this is part 2");
+	assertTrue (!r2.hasNextPart());
+}
+
+
 void MultipartReaderTest::setUp()
 {
 }
@@ -481,6 +544,7 @@ CppUnit::Test* MultipartReaderTest::suite()
 	CppUnit_addTest(pSuite, MultipartReaderTest, testBoundaryAtWindowEnd);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testDelimiterLookalikes);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testGuessBoundaryEmptyArgument);
+	CppUnit_addTest(pSuite, MultipartReaderTest, testPartContentLength);
 
 	return pSuite;
 }

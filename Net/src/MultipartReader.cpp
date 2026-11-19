@@ -16,10 +16,8 @@
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Ascii.h"
-#include "Poco/NumberParser.h"
 #include <algorithm>
 #include <functional>
-#include <limits>
 #include <optional>
 #include <string>
 
@@ -543,18 +541,10 @@ void MultipartReader::nextPart(MessageHeader& messageHeader)
 	}
 
 	parseHeader(messageHeader);
-	std::streamsize contentLength = -1;
-	if (messageHeader.has("Content-Length"))
-	{
-		Poco::Int64 len = 0;
-		if (Poco::NumberParser::tryParse64(messageHeader.get("Content-Length"), len)
-			&& len >= 0
-			&& len <= static_cast<Poco::Int64>(std::numeric_limits<std::streamsize>::max()))
-		{
-			contentLength = static_cast<std::streamsize>(len);
-		}
-	}
-	_pMPI = std::make_unique<MultipartInputStream>(*_windowStr, _boundary, contentLength);
+	// The boundary ends the part (RFC 2046, section 5.1.1). A Content-Length
+	// header in the part is not used, as other parsers of the message ignore it
+	// (RFC 7578, section 4.8).
+	_pMPI = std::make_unique<MultipartInputStream>(*_windowStr, _boundary);
 }
 
 
