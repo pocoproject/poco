@@ -1,6 +1,6 @@
 # Nightly Linux
 
-The nightly builds main at 09:15 UTC on the dedicated `poco-nightly` runner. It has no
+The nightly builds main at 03:00 UTC on the dedicated `poco-nightly` runner. It has no
 pull-request trigger. Only this workflow on main can use the runner (see Provisioning).
 
 `poco-nightly.sh` configures a clean Clang 21 Release build with the Linux components,
@@ -25,9 +25,6 @@ the distribution driver. A local proxy serves the HTTPS proxy tests. Raw-socket 
 CAP_NET_RAW; all other tests run as the runner account. Fixed passwords are test values.
 The runner account runs nothing else as root: starting and stopping the proxy and the
 containers and setting the capability go through `poco-nightly-root.sh`.
-
-NOTE: The host also runs another nightly at 03:00 UTC with a 6-hour limit. The 09:15
-start keeps the two apart; there is no lock between them.
 
 ## Provisioning
 
