@@ -17,8 +17,17 @@
 #include "Poco/Observer.h"
 #include "Poco/NObserver.h"
 #include "Poco/AsyncObserver.h"
+#include "Poco/AbstractObserver.h"
 #include "Poco/AutoPtr.h"
+#include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <memory>
+#include <mutex>
 #include <thread>
+#include <utility>
+#include <vector>
 
 
 using Poco::NotificationCenter;
@@ -42,6 +51,86 @@ public:
 		Notification(name)
 	{}
 };
+
+
+#if (POCO_HAVE_JTHREAD)
+
+struct TestObserverState
+{
+	std::atomic<int> notificationCount {0};
+	std::atomic<int> cloneCount {0};
+	std::atomic<int> destructionCount {0};
+	const Poco::AbstractObserver* observer {nullptr};
+	std::mutex mutex;
+	std::condition_variable condition;
+	bool blockNotification {false};
+	bool notificationEntered {false};
+	bool releaseNotification {false};
+};
+
+
+class TestObserver: public Poco::AbstractObserver
+{
+public:
+	explicit TestObserver(std::shared_ptr<TestObserverState> state, bool trackedClone = false):
+		_state(std::move(state)),
+		_trackedClone(trackedClone)
+	{
+	}
+
+	~TestObserver() override
+	{
+		if (_trackedClone)
+			++_state->destructionCount;
+	}
+
+	void notify(Poco::Notification* pNotification) const override
+	{
+		++_state->notificationCount;
+
+		std::unique_lock<std::mutex> lock(_state->mutex);
+		if (_state->blockNotification)
+		{
+			_state->notificationEntered = true;
+			_state->condition.notify_all();
+			_state->condition.wait(lock, [this] { return _state->releaseNotification; });
+		}
+	}
+
+	[[nodiscard]] bool equals(const Poco::AbstractObserver& observer) const override
+	{
+		const TestObserver* pObserver = dynamic_cast<const TestObserver*>(&observer);
+		return pObserver != nullptr && pObserver->_state == _state;
+	}
+
+	[[nodiscard]] bool accepts(Poco::Notification* /*pNotification*/, const char* /*pName*/) const override
+	{
+		return true;
+	}
+
+	[[nodiscard]] bool accepts(const Poco::Notification::Ptr& /*pNotification*/) const override
+	{
+		return true;
+	}
+
+	[[nodiscard]] Poco::AbstractObserver* clone() const override
+	{
+		TestObserver* pObserver = new TestObserver(_state, true);
+		++_state->cloneCount;
+		_state->observer = pObserver;
+		return pObserver;
+	}
+
+	void disable() override
+	{
+	}
+
+private:
+	std::shared_ptr<TestObserverState> _state;
+	bool _trackedClone;
+};
+
+#endif
 
 
 // Custom observer that supports synchronous dispatch
@@ -493,6 +582,126 @@ void AsyncNotificationCenterTest::testCleanupDestruction()
 }
 
 
+void AsyncNotificationCenterTest::testStopWakesIdleWorkers()
+{
+#if (POCO_HAVE_JTHREAD)
+	using Clock = std::chrono::steady_clock;
+	constexpr auto stopLimit = std::chrono::milliseconds(500);
+	constexpr long idleTime = 50;
+
+	Clock::duration stopDuration {};
+	{
+		AsyncNotificationCenter nc(AsyncMode::NOTIFY, 2);
+		Poco::Thread::sleep(idleTime);
+
+		const auto start = Clock::now();
+		nc.stop();
+		stopDuration = Clock::now() - start;
+	}
+	assertTrue(stopDuration < stopLimit);
+
+	Clock::time_point destructionStart {};
+	{
+		AsyncNotificationCenter nc(AsyncMode::NOTIFY, 2);
+		Poco::Thread::sleep(idleTime);
+		destructionStart = Clock::now();
+	}
+	const auto destructionDuration = Clock::now() - destructionStart;
+	assertTrue(destructionDuration < stopLimit);
+#endif
+}
+
+
+void AsyncNotificationCenterTest::testRemoveDuringDispatch()
+{
+#if (POCO_HAVE_JTHREAD)
+	AsyncNotificationCenter nc(AsyncMode::NOTIFY, 1);
+	auto firstState = std::make_shared<TestObserverState>();
+	auto secondState = std::make_shared<TestObserverState>();
+	auto thirdState = std::make_shared<TestObserverState>();
+	std::vector<std::shared_ptr<TestObserverState>> states {firstState, secondState, thirdState};
+	std::vector<TestObserver> observers;
+	observers.emplace_back(firstState);
+	observers.emplace_back(secondState);
+	observers.emplace_back(thirdState);
+
+	for (const auto& observer : observers)
+		nc.addObserver(observer);
+
+	// _lists is ordered by observer clone address. Sort the states by those
+	// addresses so states.front() is dispatched first and states[1] is next.
+	std::ranges::sort(states, [](const auto& lhs, const auto& rhs) {
+		return lhs->observer < rhs->observer;
+	});
+	{
+		std::lock_guard<std::mutex> lock(states.front()->mutex);
+		states.front()->blockNotification = true;
+	}
+
+	nc.postNotification(new Notification);
+	assertTrue(waitForCondition([&] {
+		std::lock_guard<std::mutex> lock(states.front()->mutex);
+		return states.front()->notificationEntered;
+	}, 5000));
+
+	// Remove the next observer while the worker is blocked dispatching states.front().
+	nc.removeObserver(TestObserver(states[1]));
+	{
+		std::lock_guard<std::mutex> lock(states.front()->mutex);
+		states.front()->releaseNotification = true;
+	}
+	states.front()->condition.notify_all();
+
+	assertTrue(waitForCondition([&] { return states.back()->notificationCount > 0; }, 5000));
+#endif
+}
+
+
+void AsyncNotificationCenterTest::testRemovedObserverReleased()
+{
+#if (POCO_HAVE_JTHREAD)
+	AsyncNotificationCenter nc(AsyncMode::NOTIFY, 1);
+	auto removedState = std::make_shared<TestObserverState>();
+	auto activeState = std::make_shared<TestObserverState>();
+	TestObserver removedObserver(removedState);
+	TestObserver activeObserver(activeState);
+
+	nc.addObserver(removedObserver);
+	nc.addObserver(activeObserver);
+	nc.postNotification(new Notification);
+	assertTrue(waitForCondition([&] { return removedState->notificationCount > 0; }, 5000));
+	nc.removeObserver(removedObserver);
+
+	nc.postNotification(new Notification);
+	assertTrue(waitForCondition([&] { return activeState->notificationCount > 1; }, 5000));
+	assertTrue(waitForCondition([&] { return removedState->destructionCount > 0; }, 5000));
+#endif
+}
+
+
+void AsyncNotificationCenterTest::testRemoveAndReaddCycles()
+{
+#if (POCO_HAVE_JTHREAD)
+	AsyncNotificationCenter nc(AsyncMode::NOTIFY, 1);
+	auto state = std::make_shared<TestObserverState>();
+	TestObserver observer(state);
+	constexpr int cycles = 50;
+
+	for (int i = 0; i < cycles; ++i)
+	{
+		nc.addObserver(observer);
+		nc.postNotification(new Notification);
+		assertTrue(waitForCondition([&] { return state->notificationCount > i; }, 5000));
+		nc.removeObserver(observer);
+		assertTrue(waitForCondition([&] { return state->destructionCount > i; }, 5000));
+	}
+
+	assertEqual(cycles, state->cloneCount.load());
+	assertEqual(state->cloneCount.load(), state->destructionCount.load());
+#endif
+}
+
+
 void AsyncNotificationCenterTest::testEdgeCases()
 {
 #if (POCO_HAVE_JTHREAD)
@@ -799,6 +1008,10 @@ CppUnit::Test* AsyncNotificationCenterTest::suite()
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testThreadSafety);
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testObserverLifecycle);
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testCleanupDestruction);
+	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testStopWakesIdleWorkers);
+	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testRemoveDuringDispatch);
+	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testRemovedObserverReleased);
+	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testRemoveAndReaddCycles);
 	CppUnit_addTest(pSuite, AsyncNotificationCenterTest, testEdgeCases);
 
 	return pSuite;
