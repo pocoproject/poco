@@ -20,6 +20,7 @@
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <limits>
 #include <sql.h>
 
 
@@ -74,6 +75,10 @@ void Binder::freeMemory()
 	StringMap::iterator itStrEnd = _strings.end();
 	for(; itStr != itStrEnd; ++itStr) std::free(itStr->first);
 
+	UTF16StringMap::iterator itUTF16Str = _utf16Strings.begin();
+	UTF16StringMap::iterator itUTF16StrEnd = _utf16Strings.end();
+	for (; itUTF16Str != itUTF16StrEnd; ++itUTF16Str) std::free(itUTF16Str->first);
+
 	CharPtrVec::iterator itChr = _charPtrs.begin();
 	CharPtrVec::iterator endChr = _charPtrs.end();
 	for (; itChr != endChr; ++itChr) std::free(*itChr);
@@ -102,40 +107,72 @@ void Binder::freeMemory()
 	DateTimeVecVec::iterator itDateTimeVecEnd = _dateTimeVecVec.end();
 	for (; itDateTimeVec != itDateTimeVecEnd; ++itDateTimeVec) delete *itDateTimeVec;
 
-	if (transcodeRequired() && _inParams.size())
-	{
-		ParamMap::iterator itInParams = _inParams.begin();
-		ParamMap::iterator itInParamsEnd = _inParams.end();
-		for (; itInParams != itInParamsEnd; ++itInParams) free(itInParams->first);
-	}
+	// Free only the transcoded copies the binder allocated. The _inParams keys
+	// can be memory the caller owns (a LOB's content, a UTF16String's buffer),
+	// so they must not be freed here.
+	CharPtrVec::iterator itTC = _transcodedStrings.begin();
+	CharPtrVec::iterator endTC = _transcodedStrings.end();
+	for (; itTC != endTC; ++itTC) std::free(*itTC);
 }
 
 
 void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	char* pTCVal = nullptr;
 	SQLINTEGER size = 0;
 	if (transcodeRequired())
 	{
 		std::string tcVal;
 		transcode(val, tcVal);
+		// the length is passed to the driver as an SQLINTEGER
+		if (tcVal.size() > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()))
+			throw LengthExceededException("ODBC::Binder::bind(string): the transcoded value is too long.");
 		size = static_cast<SQLINTEGER>(tcVal.size());
-		pTCVal = reinterpret_cast<char*>(std::calloc((size_t)size+1, 1));
-		std::memcpy(pTCVal, tcVal.data(), size);
+		pTCVal = static_cast<char*>(Utility::allocArray(1, tcVal.size() + 1, sizeof(char)));
+		std::memcpy(pTCVal, tcVal.data(), tcVal.size());
+		// the binder owns this copy and frees it in freeMemory(), on every exit
+		// path (also when a later step throws, and for outbound parameters where
+		// it is otherwise unused)
+		_transcodedStrings.push_back(pTCVal);
 	}
-	else size = static_cast<SQLINTEGER>(val.size());
+	else
+	{
+		if (val.size() > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()))
+			throw LengthExceededException("ODBC::Binder::bind(string): the value is too long.");
+		size = static_cast<SQLINTEGER>(val.size());
+	}
 	SQLPOINTER pVal = nullptr;
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
 	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits, val.size());
 
+	SQLLEN* pLenIn = new SQLLEN(SQL_NTS);
+	_lengthIndicator.push_back(pLenIn);
+
 	if (isOutBound(dir))
 	{
+		// The buffer receives the value and the terminator the driver appends,
+		// and holds the value io() sends. It is as long as the size the driver
+		// reports, or DEFAULT_PARAM_SIZE, limited to the maximum field size, and
+		// no shorter than the value: io() sends all of it, and an output string
+		// sized in advance keeps its length.
+		const std::size_t valueLength = (pTCVal != nullptr) ? static_cast<std::size_t>(size) : val.size();
 		getColumnOrParameterSize(pos, size);
-		char* pChar = (char*) std::calloc(size, sizeof(char));
+		std::size_t bufferLength = (size > 0) ? static_cast<std::size_t>(size) : std::size_t(0);
+		if (bufferLength < valueLength) bufferLength = valueLength;
+		++bufferLength;
+		if (bufferLength > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()))
+			throw LengthExceededException("ODBC::Binder::bind(string): the output parameter buffer is too long.");
+		char* pChar = static_cast<char*>(Utility::allocArray(1, bufferLength, sizeof(char)));
+		_strings.insert(StringMap::value_type(pChar,
+			OutString<std::string>{const_cast<std::string*>(&val), static_cast<SQLLEN>(bufferLength), pLenIn}));
+		if (isInBound(dir))
+			std::memcpy(pChar, (pTCVal != nullptr) ? pTCVal : val.data(), valueLength);
 		pVal = static_cast<SQLPOINTER>(pChar);
-		_outParams.insert(ParamMap::value_type(pVal, size));
-		_strings.insert(StringMap::value_type(pChar, const_cast<std::string*>(&val)));
+		size = static_cast<SQLINTEGER>(bufferLength);
+		// SQLPutData() sends the value of io(), not the whole buffer
+		_outParams.insert(ParamMap::value_type(pVal, isInBound(dir) ? static_cast<SQLLEN>(valueLength) : static_cast<SQLLEN>(size)));
 	}
 	else if (isInBound(dir))
 	{
@@ -153,12 +190,8 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 	else
 		throw InvalidArgumentException("ODBC::Binder::bind(string):Parameter must be [in] OR [out] bound.");
 
-	SQLLEN* pLenIn = new SQLLEN(SQL_NTS);
-
 	if (PB_AT_EXEC == _paramBinding)
-		*pLenIn = SQL_LEN_DATA_AT_EXEC(size);
-
-	_lengthIndicator.push_back(pLenIn);
+		*pLenIn = SQL_LEN_DATA_AT_EXEC(static_cast<SQLLEN>(parameterSize(pVal)));
 
 	int rc = SQLBindParameter(_rStmt,
 		(SQLUSMALLINT)pos + 1,
@@ -180,21 +213,41 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	typedef UTF16String::value_type CharT;
 
 	SQLPOINTER pVal = nullptr;
-	SQLINTEGER size = (SQLINTEGER)(val.size() * sizeof(CharT));
+	// the length is passed to the driver as an SQLINTEGER
+	if (val.size() > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()) / sizeof(CharT))
+		throw LengthExceededException("ODBC::Binder::bind(UTF16String): the value is too long.");
+	SQLINTEGER size = static_cast<SQLINTEGER>(val.size() * sizeof(CharT));
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
 	getColSizeAndPrecision(pos, SQL_C_WCHAR, colSize, decDigits);
 
+	SQLLEN* pLenIn = new SQLLEN(SQL_NTS);
+	_lengthIndicator.push_back(pLenIn);
+
 	if (isOutBound(dir))
 	{
-		getColumnOrParameterSize(pos, size);
-		CharT* pChar = (CharT*)std::calloc(size, 1);
+		// as for std::string, but in characters, as the size the driver reports
+		SQLINTEGER chars = 0;
+		getColumnOrParameterSize(pos, chars);
+		std::size_t bufferChars = (chars > 0) ? static_cast<std::size_t>(chars) : std::size_t(0);
+		if (bufferChars < val.size()) bufferChars = val.size();
+		++bufferChars;
+		if (bufferChars > static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max()) / sizeof(CharT))
+			throw LengthExceededException("ODBC::Binder::bind(UTF16String): the output parameter buffer is too long.");
+		CharT* pChar = static_cast<CharT*>(Utility::allocArray(1, bufferChars, sizeof(CharT)));
+		_utf16Strings.insert(UTF16StringMap::value_type(pChar,
+			OutString<UTF16String>{const_cast<UTF16String*>(&val), static_cast<SQLLEN>(bufferChars * sizeof(CharT)), pLenIn}));
+		if (isInBound(dir))
+			std::memcpy(pChar, val.data(), val.size() * sizeof(CharT));
 		pVal = (SQLPOINTER)pChar;
-		_outParams.insert(ParamMap::value_type(pVal, size));
-		_utf16Strings.insert(UTF16StringMap::value_type(pChar, const_cast<UTF16String*>(&val)));
+		const SQLLEN valueLength = static_cast<SQLLEN>(val.size() * sizeof(CharT));
+		size = static_cast<SQLINTEGER>(bufferChars * sizeof(CharT));
+		// SQLPutData() sends the value of io(), not the whole buffer
+		_outParams.insert(ParamMap::value_type(pVal, isInBound(dir) ? valueLength : static_cast<SQLLEN>(size)));
 	}
 	else if (isInBound(dir))
 	{
@@ -204,14 +257,10 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 	else
 		throw InvalidArgumentException("ODBC::Binder::bind():Parameter must be [in] OR [out] bound.");
 
-	SQLLEN* pLenIn = new SQLLEN(SQL_NTS);
-
 	if (PB_AT_EXEC == _paramBinding)
 	{
-		*pLenIn = SQL_LEN_DATA_AT_EXEC(size);
+		*pLenIn = SQL_LEN_DATA_AT_EXEC(static_cast<SQLLEN>(parameterSize(pVal)));
 	}
-
-	_lengthIndicator.push_back(pLenIn);
 
 	if (Utility::isError(SQLBindParameter(_rStmt,
 		(SQLUSMALLINT)pos + 1,
@@ -231,6 +280,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
@@ -264,6 +314,7 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
@@ -297,6 +348,7 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = size;
@@ -330,6 +382,7 @@ void Binder::bind(std::size_t pos, const Poco::DateTime& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	SQLINTEGER size = Utility::sizeOf(val);
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn = size;
@@ -362,6 +415,7 @@ void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 {
+	rejectScalarWithParamArray();
 	if (isOutBound(dir) || !isInBound(dir))
 		throw NotImplementedException("NULL parameter type can only be inbound.");
 
@@ -424,6 +478,36 @@ SQLSMALLINT Binder::toODBCDirection(Direction dir) const
 }
 
 
+namespace {
+
+
+// Returns the number of characters of the value the driver returned in the
+// buffer of a string output parameter. NULL is empty. A length the driver
+// returned (in bytes) that fits into the buffer is the length of the value,
+// which can contain NUL characters. Otherwise the value ends at the
+// terminator, and no further than the buffer: the driver did not set the
+// length (SQL_NTS, or the length of data at execution), or it truncated the
+// value (SQL_NO_TOTAL, or a longer length), which sets truncated.
+template <typename C>
+std::size_t outputLength(const C* pBuffer, SQLLEN bufferLength, SQLLEN length, bool& truncated)
+{
+	if (SQL_NULL_DATA == length) return 0;
+
+	// the buffer holds this many characters and the terminator
+	const std::size_t limit = static_cast<std::size_t>(bufferLength) / sizeof(C) - 1;
+	if (length >= 0 && static_cast<std::size_t>(length) / sizeof(C) <= limit)
+		return static_cast<std::size_t>(length) / sizeof(C);
+
+	if (length >= 0 || SQL_NO_TOTAL == length)
+		truncated = true;
+
+	return static_cast<std::size_t>(std::find(pBuffer, pBuffer + limit, C(0)) - pBuffer);
+}
+
+
+} // namespace
+
+
 void Binder::synchronize()
 {
 	if (_dates.size())
@@ -450,28 +534,27 @@ void Binder::synchronize()
 			Utility::dateTimeSync(*it->second, *it->first);
 	}
 
-	if (!transcodeRequired())
+	// a value that did not fit is reported once every output parameter is transferred
+	bool truncated = false;
+
+	StringMap::iterator itStr = _strings.begin();
+	StringMap::iterator itStrEnd = _strings.end();
+	for (; itStr != itStrEnd; ++itStr)
 	{
-		if (_strings.size())
-		{
-			StringMap::iterator it = _strings.begin();
-			StringMap::iterator end = _strings.end();
-			for (; it != end; ++it)
-				it->second->assign(it->first, std::strlen(it->first));
-		}
+		const OutString<std::string>& out = itStr->second;
+		const std::size_t length = outputLength(itStr->first, out.bufferLength, *out.pLength, truncated);
+		if (!transcodeRequired())
+			out.pValue->assign(itStr->first, length);
+		else
+			reverseTranscode(std::string(itStr->first, length), *out.pValue);
 	}
-	else
+
+	UTF16StringMap::iterator itUTF16Str = _utf16Strings.begin();
+	UTF16StringMap::iterator itUTF16StrEnd = _utf16Strings.end();
+	for (; itUTF16Str != itUTF16StrEnd; ++itUTF16Str)
 	{
-		if (_strings.size())
-		{
-			StringMap::iterator it = _strings.begin();
-			StringMap::iterator end = _strings.end();
-			for (; it != end; ++it)
-			{
-				std::string str(it->first, std::strlen(it->first));
-				reverseTranscode(str, *it->second);
-			}
-		}
+		const OutString<UTF16String>& out = itUTF16Str->second;
+		out.pValue->assign(itUTF16Str->first, outputLength(itUTF16Str->first, out.bufferLength, *out.pLength, truncated));
 	}
 
 	if (_uuids.size())
@@ -481,27 +564,61 @@ void Binder::synchronize()
 		for(; it != end; ++it)
 			it->second->copyFrom(it->first);
 	}
+
+	if (truncated)
+	{
+		throw LengthExceededException("ODBC::Binder::synchronize(): the value of a string output parameter "
+			"was truncated to fit into its buffer. Resize the output string to the length of the value "
+			"before the execution, or, if the driver reports a parameter size larger than the session "
+			"property maxFieldSize, raise maxFieldSize.");
+	}
 }
 
 
 void Binder::reset()
 {
+	if (!_detached && _rStmt.isValid())
+	{
+		// The driver must not keep the addresses of the buffers freed below: a
+		// parameter that is not bound again would be read from (or, for an
+		// output parameter, written to) freed memory. Unbound markers make the
+		// next execution fail instead. Nothing to do if this fails.
+		static_cast<void>(SQLFreeStmt(_rStmt, SQL_RESET_PARAMS));
+	}
 	freeMemory();
 	LengthPtrVec().swap(_lengthIndicator);
+	// freeMemory() deleted these: the next bind must allocate them again
+	LengthVecVec().swap(_vecLengthIndicator);
 	_inParams.clear();
 	_outParams.clear();
 	_dates.clear();
 	_times.clear();
 	_timestamps.clear();
 	_strings.clear();
+	_utf16Strings.clear();
 	_uuids.clear();
 	_dateVecVec.clear();
 	_timeVecVec.clear();
 	_dateTimeVecVec.clear();
 	_charPtrs.clear();
+	_utf16CharPtrs.clear();
 	_boolPtrs.clear();
 	_containers.clear();
+	_transcodedStrings.clear();
+	if (!_detached && _paramSetSize > 1 && _rStmt.isValid())
+	{
+		// the next execution may bind scalars only; nothing to do if this fails
+		static_cast<void>(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, reinterpret_cast<SQLPOINTER>(static_cast<SQLULEN>(1)), SQL_IS_UINTEGER));
+	}
 	_paramSetSize = 0;
+}
+
+
+void Binder::detach()
+{
+	// run while the handle is still valid, then stop touching it
+	reset();
+	_detached = true;
 }
 
 
@@ -605,11 +722,11 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 }
 
 
-std::size_t Binder::getParamSizeDirect(std::size_t pos, SQLINTEGER& size)
+std::size_t Binder::getParamSizeDirect(std::size_t pos)
 {
+	std::size_t size = 0;
 //On Linux, PostgreSQL driver segfaults on SQLGetDescField, so this is disabled for now
 #ifdef POCO_OS_FAMILY_WINDOWS
-	size = DEFAULT_PARAM_SIZE;
 	SQLHDESC hIPD = 0;
 	if (!Utility::isError(SQLGetStmtAttr(_rStmt, SQL_ATTR_IMP_PARAM_DESC, &hIPD, SQL_IS_POINTER, 0)))
 	{
@@ -617,25 +734,22 @@ std::size_t Binder::getParamSizeDirect(std::size_t pos, SQLINTEGER& size)
 		if (!Utility::isError(SQLGetDescField(hIPD, (SQLSMALLINT)pos + 1, SQL_DESC_LENGTH, &sz, SQL_IS_UINTEGER, 0)) &&
 			sz > 0)
 		{
-			size = (SQLINTEGER)sz;
+			size = static_cast<std::size_t>(sz);
 		}
 	}
 #endif
-	return static_cast<std::size_t>(size);
+	return size;
 }
 
 
-void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
+bool Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 {
-	std::size_t colSize = 0;
+	// The size the driver describes for the parameter. The result column at the
+	// same position is in general a different value, so it neither shortens nor
+	// replaces that size. It gives the size only if the driver describes none,
+	// as for the return value of {? = call ...} with drivers that return it as
+	// a result column.
 	std::size_t paramSize = 0;
-
-	try
-	{
-		ODBCMetaColumn col(_rStmt, pos);
-		colSize = col.length();
-	}
-	catch (StatementException&){}
 
 	try
 	{
@@ -644,22 +758,37 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 	}
 	catch (StatementException&){}
 
-	if (colSize == 0 && paramSize == 0)
-		paramSize = getParamSizeDirect(pos, size);
+	if (0 == paramSize)
+	{
+		try
+		{
+			ODBCMetaColumn col(_rStmt, pos);
+			paramSize = col.length();
+		}
+		catch (StatementException&){}
+	}
 
-	if (colSize > 0 && paramSize > 0)
-		size = static_cast<SQLINTEGER>(std::min(colSize, paramSize));
-	else if (colSize > 0)
-		size = static_cast<SQLINTEGER>(colSize);
-	else if (paramSize > 0)
-		size = static_cast<SQLINTEGER>(paramSize);
+	if (0 == paramSize)
+		paramSize = getParamSizeDirect(pos);
 
-	if (static_cast<std::size_t>(size) > _maxFieldSize) size = static_cast<SQLINTEGER>(_maxFieldSize);
+	// on every platform, so that no parameter gets an empty buffer
+	const bool described = (0 != paramSize);
+	if (!described)
+		paramSize = DEFAULT_PARAM_SIZE;
+
+	// limited before it is narrowed, so that a larger size can not wrap around
+	size = static_cast<SQLINTEGER>(std::min({paramSize, _maxFieldSize,
+		static_cast<std::size_t>(std::numeric_limits<SQLINTEGER>::max())}));
+	return described;
 }
 
 
 void Binder::setParamSetSize(std::size_t length)
 {
+	if (0 == length)
+		throw InvalidArgumentException("ODBC::Binder::setParamSetSize(): empty container not allowed.");
+	if (length > 1 && !_lengthIndicator.empty())
+		throw InvalidArgumentException("ODBC::Binder: a single value and a parameter array can not be bound together.");
 	if (0 == _paramSetSize)
 	{
 		if (Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAM_BIND_TYPE, reinterpret_cast<SQLPOINTER>(SQL_PARAM_BIND_BY_COLUMN), SQL_IS_UINTEGER)) ||
@@ -667,6 +796,11 @@ void Binder::setParamSetSize(std::size_t length)
 				throw StatementException(_rStmt, "ODBC::Binder::setParamSetSize():SQLSetStmtAttr()");
 
 		_paramSetSize = static_cast<SQLINTEGER>(length);
+	}
+	else if (static_cast<std::size_t>(_paramSetSize) != length)
+	{
+		// the driver reads _paramSetSize values from every parameter array
+		throw InvalidArgumentException("ODBC::Binder::setParamSetSize(): parameter arrays of different sizes can not be bound together.");
 	}
 }
 

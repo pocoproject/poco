@@ -18,10 +18,14 @@
 #include "Poco/Tuple.h"
 #include "Poco/DateTime.h"
 #include "Poco/Data/RecordSet.h"
+#include "Poco/UnicodeConverter.h"
+#include "Poco/UTFString.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
 #include <iostream>
+#include <string>
+#include <vector>
 
 
 using namespace std::string_literals;
@@ -642,6 +646,138 @@ void ODBCSQLServerTest::testCursorStoredProcedure()
 }
 
 
+void ODBCSQLServerTest::testStringOutputParameters()
+{
+	// A string output parameter gets a buffer with room for the value and its
+	// terminator, also for an empty output string when the driver reports no
+	// size for the parameter, as for VARCHAR(MAX). The value is copied back with
+	// the length the driver returns, also if it contains a NUL character, a
+	// value that does not fit is reported, and io() sends the value it is given.
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+
+	// maxFieldSize and the procedure are restored on every exit
+	struct Restore
+	{
+		ODBCSQLServerTest& test;
+		const Poco::Any maxFieldSize;
+		~Restore()
+		{
+			try
+			{
+				test.session().setProperty("maxFieldSize", maxFieldSize);
+				test.dropObject("PROCEDURE", "storedProcedure");
+			}
+			catch (...)
+			{
+			}
+		}
+	} restore{*this, session().getProperty("maxFieldSize")};
+	session().setProperty("maxFieldSize", Poco::Any(std::size_t(1024)));
+
+	dropObject("PROCEDURE", "storedProcedure");
+	session() << "CREATE PROCEDURE storedProcedure(@outParam VARCHAR(MAX) OUTPUT) AS "
+		"BEGIN "
+		" SET @outParam = 'abc'; "
+		"END;"
+		, now;
+	std::string outParam;
+	session() << "{call storedProcedure(?)}", out(outParam), now;
+	assertEqual ("abc", outParam);
+	dropObject("PROCEDURE", "storedProcedure");
+
+	// a value as long as the declared size keeps its last character
+	session() << "CREATE PROCEDURE storedProcedure(@outParam VARCHAR(8) OUTPUT) AS "
+		"BEGIN "
+		" SET @outParam = '12345678'; "
+		"END;"
+		, now;
+	outParam.clear();
+	session() << "{call storedProcedure(?)}", out(outParam), now;
+	assertEqual ("12345678", outParam);
+	dropObject("PROCEDURE", "storedProcedure");
+
+	// a NUL character does not end the value
+	session() << "CREATE PROCEDURE storedProcedure(@outParam VARCHAR(8) OUTPUT) AS "
+		"BEGIN "
+		" SET @outParam = 'ab' + CHAR(0) + 'cd'; "
+		"END;"
+		, now;
+	outParam.clear();
+	session() << "{call storedProcedure(?)}", out(outParam), now;
+	assertEqual (std::string("ab\0cd", 5), outParam);
+	dropObject("PROCEDURE", "storedProcedure");
+
+	// NULL comes back as an empty string
+	session() << "CREATE PROCEDURE storedProcedure(@outParam VARCHAR(8) OUTPUT) AS "
+		"BEGIN "
+		" SET @outParam = NULL; "
+		"END;"
+		, now;
+	outParam = "stale";
+	session() << "{call storedProcedure(?)}", out(outParam), now;
+	assertTrue (outParam.empty());
+	dropObject("PROCEDURE", "storedProcedure");
+
+	session() << "CREATE PROCEDURE storedProcedure(@ioParam VARCHAR(32) OUTPUT) AS "
+		"BEGIN "
+		" SET @ioParam = @ioParam + 'x'; "
+		"END;"
+		, now;
+	std::string ioParam = "abc";
+	session() << "{call storedProcedure(?)}", io(ioParam), now;
+	assertEqual ("abcx", ioParam);
+	dropObject("PROCEDURE", "storedProcedure");
+
+	// a value longer than the buffer is reported, not returned shortened;
+	// an output string sized in advance holds it
+	session() << "CREATE PROCEDURE storedProcedure(@outParam VARCHAR(MAX) OUTPUT) AS "
+		"BEGIN "
+		" SET @outParam = REPLICATE('x', 2000); "
+		"END;"
+		, now;
+	outParam.clear();
+	try
+	{
+		session() << "{call storedProcedure(?)}", out(outParam), now;
+		fail ("truncated output parameter value returned");
+	}
+	catch (Poco::Data::LengthExceededException&)
+	{
+		// the part that fits into the buffer of the empty output string
+		assertTrue (outParam.size() < 2000);
+		assertEqual (std::string(outParam.size(), 'x'), outParam);
+	}
+	outParam.assign(2000, ' ');
+	session() << "{call storedProcedure(?)}", out(outParam), now;
+	assertEqual (std::string(2000, 'x'), outParam);
+	dropObject("PROCEDURE", "storedProcedure");
+
+	// UTF-16 strings are copied back, for out() and for io()
+	session() << "CREATE PROCEDURE storedProcedure(@outParam NVARCHAR(MAX) OUTPUT) AS "
+		"BEGIN "
+		" SET @outParam = N'abc'; "
+		"END;"
+		, now;
+	Poco::UTF16String utf16Param;
+	session() << "{call storedProcedure(?)}", out(utf16Param), now;
+	std::string text;
+	Poco::UnicodeConverter::convert(utf16Param, text);
+	assertEqual ("abc", text);
+	dropObject("PROCEDURE", "storedProcedure");
+
+	session() << "CREATE PROCEDURE storedProcedure(@ioParam NVARCHAR(10) OUTPUT) AS "
+		"BEGIN "
+		" SET @ioParam = @ioParam + N'x'; "
+		"END;"
+		, now;
+	Poco::UnicodeConverter::convert(std::string("abcdefghi"), utf16Param);
+	session() << "{call storedProcedure(?)}", io(utf16Param), now;
+	Poco::UnicodeConverter::convert(utf16Param, text);
+	assertEqual ("abcdefghix", text);
+}
+
+
 void ODBCSQLServerTest::testStoredProcedureAny()
 {
 	try
@@ -1107,6 +1243,97 @@ void ODBCSQLServerTest::recreateEncodingTables()
 }
 
 
+void ODBCSQLServerTest::testBoundUTF16StringBulk()
+{
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	dropObject("TABLE", "BoundUTF16StringBulk");
+	session() << "CREATE TABLE BoundUTF16StringBulk (Id INTEGER, Text NVARCHAR(10))", now;
+	// a short value, NULL, and a value as long as the column
+	const std::vector<std::string> texts = {"abcdef", "", "ghijklmnop"};
+	for (std::size_t i = 0; i < texts.size(); ++i)
+	{
+		int id = static_cast<int>(i);
+		if (texts[i].empty())
+		{
+			session() << "INSERT INTO BoundUTF16StringBulk VALUES (?, NULL)", use(id), now;
+			continue;
+		}
+		Poco::UTF16String text;
+		Poco::UnicodeConverter::convert(texts[i], text);
+		session() << "INSERT INTO BoundUTF16StringBulk VALUES (?, ?)", use(id), use(text), now;
+	}
+
+	// The length indicator counts bytes, and a bulk row holds the whole column
+	// plus the terminator: every value comes back unchanged and in its own row,
+	// NULL as an empty string, both in a one-row and in a three-row batch.
+	Poco::UTF16String stale;
+	Poco::UnicodeConverter::convert(std::string("stale"), stale);
+	for (Poco::UInt32 rows: {Poco::UInt32(1), Poco::UInt32(3)})
+	{
+		std::vector<Poco::UTF16String> output(rows, stale);
+		session() << Poco::format("SELECT TOP %u Text FROM BoundUTF16StringBulk ORDER BY Id", rows), into(output, bulk(rows)), now;
+		for (Poco::UInt32 row = 0; row < rows; ++row)
+		{
+			std::string text;
+			Poco::UnicodeConverter::convert(output[row], text);
+			assertTrue(text == texts[row]);
+		}
+	}
+	dropObject("TABLE", "BoundUTF16StringBulk");
+}
+
+
+void ODBCSQLServerTest::testBulkStringLengths()
+{
+	// Every row of a bulk bound string is passed with its length: the driver
+	// does not look for a terminator, which a value that fills its row does not
+	// have, and a NUL character does not end a value. The size of an NVARCHAR(n)
+	// parameter counts characters: UTF-16 values of n characters are accepted,
+	// and the rows are n characters apart, also for an odd n.
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	dropObject("TABLE", "BulkStringLengths");
+	session() << "CREATE TABLE BulkStringLengths (Id INTEGER, Txt VARCHAR(10), Even NVARCHAR(10), Odd NVARCHAR(5))", now;
+
+	std::vector<std::string> txt = {std::string("ab\0cd", 5), "efghijklmn", "o"};
+	const std::vector<std::string> even = {"abcdefghij", "klmno", "pqrstuvwxy"};
+	const std::vector<std::string> odd = {"abcde", "fg", "hijkl"};
+	std::vector<int> ids;
+	std::vector<Poco::UTF16String> evenIn;
+	std::vector<Poco::UTF16String> oddIn;
+	for (std::size_t i = 0; i < even.size(); ++i)
+	{
+		ids.push_back(static_cast<int>(i));
+		evenIn.push_back(Poco::UnicodeConverter::to<Poco::UTF16String>(even[i]));
+		oddIn.push_back(Poco::UnicodeConverter::to<Poco::UTF16String>(odd[i]));
+	}
+	session() << "INSERT INTO BulkStringLengths VALUES (?, ?, ?, ?)",
+		use(ids, bulk), use(txt, bulk), use(evenIn, bulk), use(oddIn, bulk), now;
+
+	std::vector<int> txtLength;
+	session() << "SELECT DATALENGTH(Txt) FROM BulkStringLengths ORDER BY Id", into(txtLength), now;
+	assertEqual (txt.size(), txtLength.size());
+	for (std::size_t i = 0; i < txt.size(); ++i)
+		assertEqual (txt[i].size(), txtLength[i]);
+
+	std::vector<Poco::UTF16String> evenOut;
+	std::vector<Poco::UTF16String> oddOut;
+	session() << "SELECT Even, Odd FROM BulkStringLengths ORDER BY Id", into(evenOut), into(oddOut), now;
+	assertEqual (even.size(), evenOut.size());
+	assertEqual (odd.size(), oddOut.size());
+	for (std::size_t i = 0; i < even.size(); ++i)
+	{
+		std::string text;
+		Poco::UnicodeConverter::convert(evenOut[i], text);
+		assertEqual (even[i], text);
+		Poco::UnicodeConverter::convert(oddOut[i], text);
+		assertEqual (odd[i], text);
+	}
+	dropObject("TABLE", "BulkStringLengths");
+}
+
+
 CppUnit::Test* ODBCSQLServerTest::suite()
 {
 	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString, _db)))
@@ -1179,6 +1406,19 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBigBatch);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBoundUTF16StringBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkBindingBackstops);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testParameterArraySize);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkFullWidthStrings);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkStringLengths);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testManualBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testManualUUIDLength);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTranscodedBindingOwnership);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBindingOutlivesStatement);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBoundLongValue);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkLongStrings);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testManualStringChunks);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSet);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDateTime);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testFloat);
@@ -1188,6 +1428,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTupleVector);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedure);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testCursorStoredProcedure);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStringOutputParameters);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureAny);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureDynamicVar);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStoredProcedureReturn);
@@ -1202,6 +1443,10 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAny);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testDynamicAny);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAnyDateTime);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAnyUUID);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAnyBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testAnyBoundType);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testMultipleResults);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLLogger);
@@ -1219,6 +1464,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testReconnect);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testClosedSession);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testExceptionCopy);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLGetInfo);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSetBeforeExecute);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLServerTime);
 

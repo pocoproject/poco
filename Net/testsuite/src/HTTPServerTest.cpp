@@ -28,9 +28,8 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/StreamCopier.h"
-#include "Poco/Path.h"
 #include "Poco/FileStream.h"
-#include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
 #include "Poco/Stopwatch.h"
 #include <chrono>
 #include <optional>
@@ -53,8 +52,6 @@ using Poco::Net::HTTPServerResponse;
 using Poco::Net::HTTPMessage;
 using Poco::Net::ServerSocket;
 using Poco::StreamCopier;
-using Poco::Path;
-using Poco::File;
 using Poco::FileOutputStream;
 
 
@@ -171,15 +168,8 @@ namespace
 		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 		{
 			std::string payload(sendFileSize, 'x');
-			Poco::Path testFilePath = Poco::Path::temp().append("test.http.server.sendfile.txt");
-			const std::string fileName = testFilePath.toString();
-			{
-				File f(fileName);
-				if (f.exists())
-				{
-					f.remove();
-				}
-			}
+			Poco::TemporaryFile testFile;
+			const std::string fileName = testFile.path();
 			FileOutputStream fout(fileName);
 			fout << payload;
 			fout.close();
@@ -192,8 +182,8 @@ namespace
 	public:
 		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 		{
-			Poco::Path testFilePath = Poco::Path::temp().append("test.http.server.sendfile.empty.txt");
-			const std::string fileName = testFilePath.toString();
+			Poco::TemporaryFile testFile;
+			const std::string fileName = testFile.path();
 			FileOutputStream fout(fileName);
 			fout.close();
 			response.sendFile(fileName, "text/plain");

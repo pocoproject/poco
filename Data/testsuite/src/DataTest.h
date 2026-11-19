@@ -49,6 +49,7 @@ public:
 	void testExternalBindingAndExtraction();
 	void testTranscode();
 	void testSQLParse();
+	void testTransactionUnparsedStatement();
 	void testSQLChannel();
 	void testNullableExtract();
 	void testTransactionAutoCommit();
@@ -78,6 +79,8 @@ public:
 	void testSQLChannelDrainFallback();
 	void testSQLChannelDrainRejected();
 	void testArchiveStrategyOpenReleasesStatements();
+	void testBulkModeMixing();
+	void testBulkBindingReset();
 
 	void setUp();
 	void tearDown();

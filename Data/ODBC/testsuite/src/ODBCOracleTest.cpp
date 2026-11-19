@@ -1001,8 +1001,23 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkBindingBackstops);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testParameterArraySize);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkFullWidthStrings);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testManualBLOB);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testManualUUIDLength);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testTranscodedBindingOwnership);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBindingOutlivesStatement);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBoundLongValue);
+		// not testBulkLongStrings: the driver describes the parameter of a VARCHAR(4000)
+		// column with 999 characters, so its long values do not fit
+		CppUnit_addTest(pSuite, ODBCOracleTest, testManualStringChunks);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDate);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDateTime);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAnyDateTime);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAnyBulk);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAnyBoundType);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDouble);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);
@@ -1033,6 +1048,8 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testReconnect);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testClosedSession);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testExceptionCopy);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLGetInfo);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testRecordSetBeforeExecute);
 
 		return pSuite;

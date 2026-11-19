@@ -166,7 +166,22 @@ public:
 
 	[[nodiscard]] static std::string sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type);
 		/// Returns the requested info about the DBMS or ODBC driver.
+		/// A value that does not fit into a buffer of 1024 bytes is
+		/// truncated to the part that does, which can end inside a
+		/// multi-byte character.
 		/// On error, returns "unknown".
+		/// Throws NullPointerException if db has no connection handle,
+		/// e.g. after disconnect().
+
+	[[nodiscard]] static std::string sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type, SQLSMALLINT bufferSize);
+		/// Returns the requested info about the DBMS or ODBC driver.
+		/// A value that does not fit into a buffer of bufferSize bytes
+		/// is truncated to the part that does, which can end inside a
+		/// multi-byte character. Buffer sizes above 16382 bytes are
+		/// reduced to 16382, the size whose UTF-16 form, with its
+		/// terminator, fits the SQLSMALLINT length of the ODBC API.
+		/// On error, returns "unknown".
+		/// Throws InvalidArgumentException if bufferSize is not positive.
 		/// Throws NullPointerException if db has no connection handle,
 		/// e.g. after disconnect().
 
@@ -214,6 +229,19 @@ public:
 	{
 		return sizeOf<std::remove_const_t<std::remove_reference_t<T>>>();
 	}
+
+	[[nodiscard]] static std::size_t arraySize(std::size_t rows, std::size_t rowLength, std::size_t elementSize);
+		/// Returns the size in bytes of an array of rows rows, each of rowLength
+		/// elements of elementSize bytes, such as a bulk parameter buffer.
+		/// Throws LengthExceededException if the size does not fit into std::size_t.
+
+	[[nodiscard]] static void* allocArray(std::size_t rows, std::size_t rowLength, std::size_t elementSize);
+		/// Allocates a zero-filled array of rows rows, each of rowLength elements
+		/// of elementSize bytes, with std::calloc(); the caller frees it with std::free().
+		/// At least one element is allocated, also for an empty array.
+		/// Throws LengthExceededException if the size of the array does not fit
+		/// into std::size_t (see arraySize()), or OutOfMemoryException if the
+		/// array can not be allocated.
 
 private:
 	static const TypeInfo _dataTypes;

@@ -309,6 +309,9 @@ option(ENABLE_TEST_DEPRECATED
 
 option(POCO_DATA_NO_SQL_PARSER "Set to OFF|ON (default is OFF) to build Poco::Data without the SQL parser" OFF)
 
+option(POCO_DATA_ODBC_UNICODE
+	"Set to OFF|ON (default is OFF) to build Poco::Data::ODBC on the wide-character (UTF-16) API of unixODBC; Windows always uses it" OFF)
+
 option(ENABLE_COMPILER_WARNINGS
 	"Set to OFF|ON (default is OFF) to enable additional compiler warnings. Intended primarily for maintainers." OFF)
 

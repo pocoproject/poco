@@ -629,6 +629,71 @@ void UtilityTest::testBoundSQLFromStatementPreservesExecute()
 }
 
 
+void UtilityTest::testBoundSQLUnreadableAfterPlaceholders()
+{
+	// The parser's lexer does not read PostgreSQL's ~ operator; the scanner
+	// renders the statement instead.
+	const std::string s = Utility::boundSQL(
+		"SELECT * FROM t WHERE id = ? AND name ~ '^a'", 7);
+	assertEqual (std::string("SELECT * FROM t WHERE id = 7 AND name ~ '^a'"), s);
+}
+
+
+void UtilityTest::testBoundSQLUnreadableBeforePlaceholders()
+{
+	const std::string s = Utility::boundSQL(
+		"SELECT * FROM t WHERE name ~ ? AND id = ? AND note = 'x?'", std::string("^a"), 7);
+	assertEqual (std::string("SELECT * FROM t WHERE name ~ '^a' AND id = 7 AND note = 'x?'"), s);
+
+	const std::string d = Utility::boundSQL(
+		"SELECT * FROM t WHERE name ~ $2 AND id = $1 OR parent = $1", 7, std::string("^a"));
+	assertEqual (std::string("SELECT * FROM t WHERE name ~ '^a' AND id = 7 OR parent = 7"), d);
+
+	try
+	{
+		Utility::boundSQL("SELECT * FROM t WHERE name ~ ? AND id = ?", 7);
+		fail("must fail with too-few-args");
+	}
+	catch (const InvalidArgumentException&)
+	{
+	}
+}
+
+
+void UtilityTest::testBoundSQLHashComment()
+{
+	// A MySQL # comment is not read by the parser's lexer either.
+	const std::string s = Utility::boundSQL(
+		"SELECT * FROM t WHERE id = ? # by id", 7);
+	assertEqual (std::string("SELECT * FROM t WHERE id = 7 # by id"), s);
+}
+
+
+void UtilityTest::testBoundSQLUnreadableBulk()
+{
+	const std::vector<int> rows{1, 2, 3};
+	const std::string s = Utility::boundSQLBulk(
+		"SELECT * FROM t WHERE id = ? AND name ~ 'a'", 2, rows);
+	assertEqual (std::string(
+		"SELECT * FROM t WHERE id = 1 AND name ~ 'a';\n"
+		"SELECT * FROM t WHERE id = 2 AND name ~ 'a'\n"
+		"-- (+1 more row)"), s);
+
+	Session session(Connector::KEY, ":memory:");
+	std::vector<int> ids{4, 5};
+	Poco::Data::Statement stmt(session);
+	stmt << "SELECT * FROM t WHERE name ~ 'a' AND id = ? # by id",
+		Poco::Data::Keywords::use(ids);
+
+	assertEqual (std::string(
+		"SELECT * FROM t WHERE name ~ 'a' AND id = 4 # by id\n"
+		"-- (+1 more row)"), Utility::boundSQL(stmt));
+	assertEqual (std::string(
+		"SELECT * FROM t WHERE name ~ 'a' AND id = 4 # by id;\n"
+		"SELECT * FROM t WHERE name ~ 'a' AND id = 5 # by id"), Utility::boundSQLBulk(stmt, 2));
+}
+
+
 CppUnit::Test* UtilityTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("UtilityTest");
@@ -664,6 +729,10 @@ CppUnit::Test* UtilityTest::suite()
 	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLFromStatementVectorBulk);
 	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLFromStatementCustomTypeHandler);
 	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLFromStatementPreservesExecute);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLUnreadableAfterPlaceholders);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLUnreadableBeforePlaceholders);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLHashComment);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLUnreadableBulk);
 
 	return pSuite;
 }

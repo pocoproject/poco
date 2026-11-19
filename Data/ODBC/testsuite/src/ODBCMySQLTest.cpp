@@ -508,6 +508,15 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOB);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBContainer);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkRowsetBackstop);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testParameterArraySize);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkFullWidthStrings);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testManualBLOB);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testManualUUIDLength);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testTranscodedBindingOwnership);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testBindingOutlivesStatement);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testBoundLongValue);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkLongStrings);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testDate);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testTime);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testDateTime);
@@ -526,6 +535,10 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testAsync);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testAny);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testDynamicAny);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testAnyDateTime);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testAnyTime);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testAnyBulk);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testAnyBoundType);
 	//CppUnit_addTest(pSuite, ODBCMySQLTest, testMultipleResults);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLChannel);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLLogger);
@@ -541,6 +554,8 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testReconnect);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testClosedSession);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testExceptionCopy);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLGetInfo);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testNonASCIIText);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testRecordSetBeforeExecute);
 
 	return pSuite;

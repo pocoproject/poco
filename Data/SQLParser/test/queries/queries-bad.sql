@@ -163,3 +163,9 @@
 !(WITH c AS (SELECT 1) SELECT * FROM c) UNION SELECT 2;
 !((WITH c AS (SELECT 1) SELECT * FROM c)) UNION (SELECT 2);
 !SELECT * FROM t WHERE a IN ((WITH c AS (SELECT 1) SELECT * FROM c) EXCEPT SELECT 2);
+# Input the lexer cannot read fails the parse; the statements before it do not look complete
+!SELECT 1 `x`; DROP TABLE t;
+!SELECT 1 ~ 2; DELETE FROM t;
+!SELECT a FROM t WHERE b = 1 $ OR 1 = 1;
+!SELECT 1 'abc
+!SELECT 99999999999999999999;

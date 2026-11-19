@@ -14,7 +14,13 @@
 #include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+#include "Poco/Any.h"
+#include "Poco/Dynamic/Var.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/Data/RecordSet.h"
+#include "Poco/Data/MetaColumn.h"
+#include "Poco/Data/BulkExtraction.h"
+#include "Poco/Nullable.h"
 #include "Poco/Data/StatementImpl.h"
 #include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/Utility.h"
@@ -23,6 +29,11 @@
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
 #include <sqltypes.h>
 #include <iostream>
+#include <exception>
+#include <deque>
+#include <list>
+#include <string>
+#include <vector>
 
 
 using namespace Poco::Data::Keywords;
@@ -186,7 +197,9 @@ void ODBCSQLiteTest::recreatePersonTable()
 void ODBCSQLiteTest::recreatePersonBLOBTable()
 {
 	dropObject("TABLE", "Person");
-	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB)", now; }
+	// Bound LOB buffers are sized from the column size the driver reports (the declared
+	// size for SQLite ODBC) and longer values are rejected; blob() round-trips 1024 bytes.
+	try { session() << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Image BLOB(1024))", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonBLOBTable()"); }
 }
@@ -312,6 +325,505 @@ void ODBCSQLiteTest::recreateLogTable()
 }
 
 
+namespace
+{
+	std::string boundSizeExceeded(std::size_t dataSize, std::size_t capacity)
+		/// The part of Extractor::BOUND_SIZE_EXCEEDED_FMT that identifies the bound
+		/// buffer check. Driver errors, checkDataSize() and other DataException
+		/// subclasses carry different text.
+	{
+		return Poco::format("the value (%z bytes) does not fit into the bound buffer (%z bytes)", dataSize, capacity);
+	}
+
+
+	template <typename L>
+	L makeLOB(std::size_t size, char fill)
+	{
+		L lob;
+		lob.assignVal(size, static_cast<typename L::ValueType>(fill));
+		return lob;
+	}
+
+
+	template <typename L>
+	L toLOB(const Poco::Data::CLOB& clob)
+	{
+		return L(std::vector<typename L::ValueType>(clob.begin(), clob.end()));
+	}
+}
+
+
+std::size_t ODBCSQLiteTest::probeColumnLength(const std::string& query, bool character)
+{
+	// Column metadata is only filled for statements without user extractions
+	// (ODBCStatementImpl::makeInternalExtractors), hence no into(). The probe
+	// extracts existing rows itself, so it must run on the empty table.
+	Poco::Data::Statement probe(session());
+	probe << query, now;
+	Poco::Data::RecordSet rs(probe);
+	const Poco::Data::MetaColumn::ColumnDataType type = rs.columnType(0);
+	if (character)
+		assertTrue(type == Poco::Data::MetaColumn::FDT_STRING || type == Poco::Data::MetaColumn::FDT_WSTRING);
+	else
+		assertTrue(type == Poco::Data::MetaColumn::FDT_BLOB);
+	// Below maxFieldSize (default 1024) the bound buffer is the described size;
+	// Preparator::maxDataSize() adds room for the terminator of character columns.
+	const std::size_t length = rs.columnLength(0);
+	assertTrue(length > 1 && length < 1024);
+	return length;
+}
+
+
+template <typename L>
+void ODBCSQLiteTest::checkBoundLOB(const std::string& query, const L& expected, std::size_t capacity)
+{
+	L output;
+	bool rejected = false;
+	try
+	{
+		session() << query, into(output), now;
+	}
+	catch (const Poco::Data::ODBC::UnknownDataLengthException& ex)
+	{
+		failmsg("the driver reported an unknown length (SQL_NO_TOTAL): " + ex.displayText());
+	}
+	catch (const Poco::Data::ODBC::ODBCException& ex)
+	{
+		// ODBC errors are DataExceptions too; they must not pass for the capacity check.
+		failmsg("driver error instead of the capacity check: " + ex.displayText());
+	}
+	catch (const Poco::Data::DataException& ex)
+	{
+		assertTrue(ex.message().find(boundSizeExceeded(expected.size(), capacity)) != std::string::npos);
+		rejected = true;
+	}
+	if (expected.size() > capacity) assertTrue(rejected);
+	else
+	{
+		assertFalse(rejected);
+		assertTrue(output == expected);
+	}
+}
+
+
+template <typename C>
+void ODBCSQLiteTest::checkBoundLOBBulk(const std::string& query, const std::vector<Poco::Data::CLOB>& expected)
+{
+	using L = typename C::value_type;
+	const Poco::UInt32 rows = static_cast<Poco::UInt32>(expected.size());
+	// BulkExtraction keeps a container of the right size, so every element must
+	// be overwritten: NULL rows with an empty LOB, not left stale. The elements
+	// share the sentinel's content, so emptying one in place would empty it too.
+	const L sentinel = makeLOB<L>(5, 's');
+	C output(rows, sentinel);
+	Poco::Data::Statement stmt(session());
+	stmt << query, into(output, bulk(rows));
+	try
+	{
+		stmt.execute();
+	}
+	catch (const Poco::Exception& ex)
+	{
+		failmsg("bulk LOB extraction failed: " + ex.displayText());
+	}
+	catch (const std::exception& ex)
+	{
+		// for example std::length_error, if a NULL indicator were used as a length
+		failmsg(std::string("bulk LOB extraction failed: ") + ex.what());
+	}
+	assertTrue(sentinel == makeLOB<L>(5, 's'));
+	assertTrue(output.size() == rows);
+	typename C::const_iterator it = output.begin();
+	for (Poco::UInt32 row = 0; row < rows; ++row, ++it)
+	{
+		assertTrue(*it == toLOB<L>(expected[row]));
+	}
+}
+
+
+template <typename C>
+void ODBCSQLiteTest::checkBoundLOBBulkRejected(const std::string& query, Poco::UInt32 rows, std::size_t capacity)
+{
+	C output;
+	bool rejected = false;
+	try
+	{
+		session() << query, into(output, bulk(rows)), now;
+	}
+	catch (const Poco::Data::ODBC::UnknownDataLengthException& ex)
+	{
+		failmsg("the driver reported an unknown length (SQL_NO_TOTAL): " + ex.displayText());
+	}
+	catch (const Poco::Data::ODBC::ODBCException& ex)
+	{
+		failmsg("driver error instead of the capacity check: " + ex.displayText());
+	}
+	catch (const Poco::Data::DataException& ex)
+	{
+		assertTrue(ex.message().find(boundSizeExceeded(capacity + 1, capacity)) != std::string::npos);
+		rejected = true;
+	}
+	assertTrue(rejected);
+}
+
+
+void ODBCSQLiteTest::testBoundLOBCapacity()
+{
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	session() << "DROP TABLE IF EXISTS BoundLOBCapacity", now;
+	session() << "CREATE TABLE BoundLOBCapacity (Payload BLOB(32))", now;
+	const std::string query("SELECT Payload FROM BoundLOBCapacity");
+	const std::size_t capacity = probeColumnLength(query, false);
+
+	// NULL must stay NULL: Preparator::actualDataSize() returns SQL_NULL_DATA
+	// as SIZE_MAX, so isNull() has to come before the size check.
+	session() << "INSERT INTO BoundLOBCapacity VALUES (NULL)", now;
+	try
+	{
+		Poco::Nullable<Poco::Data::CLOB> nullable(Poco::Data::CLOB("stale", 5));
+		session() << query, into(nullable), now;
+		assertTrue(nullable.isNull());
+		Poco::Data::BLOB output = makeLOB<Poco::Data::BLOB>(5, 's');
+		session() << query, into(output), now;
+		assertTrue(output.size() == 0);
+	}
+	catch (const Poco::Data::DataException& ex)
+	{
+		failmsg("NULL LOB rejected: " + ex.displayText());
+	}
+
+	for (std::size_t size: {std::size_t(0), capacity - 1, capacity, capacity + 1, std::size_t(1024)})
+	{
+		session() << "DELETE FROM BoundLOBCapacity", now;
+		Poco::Data::CLOB input = makeLOB<Poco::Data::CLOB>(size, 'x');
+		session() << "INSERT INTO BoundLOBCapacity VALUES (?)", use(input), now;
+		// scalar CLOB, then BLOB
+		checkBoundLOB(query, input, capacity);
+		checkBoundLOB(query, makeLOB<Poco::Data::BLOB>(size, 'x'), capacity);
+	}
+	session() << "DROP TABLE BoundLOBCapacity", now;
+}
+
+
+void ODBCSQLiteTest::testBoundLOBBulkCapacity()
+{
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	session() << "DROP TABLE IF EXISTS BoundLOBBulkCapacity", now;
+	session() << "CREATE TABLE BoundLOBBulkCapacity (Id INTEGER, Payload BLOB(32))", now;
+	const std::string query("SELECT Payload FROM BoundLOBBulkCapacity ORDER BY Id");
+	const std::size_t capacity = probeColumnLength(query, false);
+
+	// One row per bulk slot: POCO sets no SQL_ATTR_ROWS_FETCHED_PTR and extracts
+	// all bulk(rows) slots. Distinct fill bytes expose a stride mismatch; the last
+	// row fills the last slot exactly. This also shows that the driver fills
+	// bulk row arrays at all.
+	const Poco::UInt32 rows = 4;
+	std::vector<Poco::Data::CLOB> expected(rows);
+	for (Poco::UInt32 row = 0; row < rows; ++row)
+	{
+		int id = static_cast<int>(row);
+		expected[row] = makeLOB<Poco::Data::CLOB>((row % 2) ? capacity : capacity - 1, static_cast<char>('a' + row));
+		session() << "INSERT INTO BoundLOBBulkCapacity VALUES (?, ?)", use(id), use(expected[row]), now;
+	}
+	checkBoundLOBBulk<std::vector<Poco::Data::CLOB>>(query, expected);
+	session() << "DROP TABLE BoundLOBBulkCapacity", now;
+}
+
+
+void ODBCSQLiteTest::testBoundLOBBulkNull()
+{
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	session() << "DROP TABLE IF EXISTS BoundLOBBulkNull", now;
+	session() << "CREATE TABLE BoundLOBBulkNull (Id INTEGER, Payload BLOB(32))", now;
+	const std::string query("SELECT Payload FROM BoundLOBBulkNull ORDER BY Id");
+	const std::size_t capacity = probeColumnLength(query, false);
+
+	// NULL in the first, a middle and the last slot. For NULL the driver sets the
+	// indicator to SQL_NULL_DATA, which Preparator::actualDataSize() returns as
+	// SIZE_MAX; the values between the NULLs must keep their rows.
+	const Poco::UInt32 rows = 5;
+	std::vector<Poco::Data::CLOB> expected(rows);
+	for (Poco::UInt32 row = 0; row < rows; ++row)
+	{
+		int id = static_cast<int>(row);
+		if (row % 2 == 0)
+		{
+			session() << "INSERT INTO BoundLOBBulkNull VALUES (?, NULL)", use(id), now;
+		}
+		else
+		{
+			expected[row] = makeLOB<Poco::Data::CLOB>((row == 1) ? capacity - 1 : capacity, static_cast<char>('a' + row));
+			session() << "INSERT INTO BoundLOBBulkNull VALUES (?, ?)", use(id), use(expected[row]), now;
+		}
+	}
+	checkBoundLOBBulk<std::vector<Poco::Data::CLOB>>(query, expected);
+	session() << "DROP TABLE BoundLOBBulkNull", now;
+}
+
+
+void ODBCSQLiteTest::testBoundLOBBulkOverflow()
+{
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	session() << "DROP TABLE IF EXISTS BoundLOBBulkOverflow", now;
+	session() << "CREATE TABLE BoundLOBBulkOverflow (Id INTEGER, Payload BLOB(32))", now;
+	const std::string query("SELECT Payload FROM BoundLOBBulkOverflow ORDER BY Id");
+	const std::size_t capacity = probeColumnLength(query, false);
+
+	// The bulk buffer holds rows * capacity bytes. The oversized value is first
+	// the last row, whose slot ends the allocation, then a middle row, whose slot
+	// is followed by the next row: both must be rejected.
+	const Poco::UInt32 rows = 4;
+	for (Poco::UInt32 oversized: {Poco::UInt32(rows - 1), Poco::UInt32(1)})
+	{
+		session() << "DELETE FROM BoundLOBBulkOverflow", now;
+		for (Poco::UInt32 row = 0; row < rows; ++row)
+		{
+			int id = static_cast<int>(row);
+			Poco::Data::CLOB input = makeLOB<Poco::Data::CLOB>((row == oversized) ? capacity + 1 : capacity, static_cast<char>('a' + row));
+			session() << "INSERT INTO BoundLOBBulkOverflow VALUES (?, ?)", use(id), use(input), now;
+		}
+		checkBoundLOBBulkRejected<std::vector<Poco::Data::CLOB>>(query, rows, capacity);
+	}
+	session() << "DROP TABLE BoundLOBBulkOverflow", now;
+}
+
+
+void ODBCSQLiteTest::testBoundBLOBBulk()
+{
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	session() << "DROP TABLE IF EXISTS BoundBLOBBulk", now;
+	session() << "CREATE TABLE BoundBLOBBulk (Id INTEGER, Payload BLOB(32))", now;
+	const std::string query("SELECT Payload FROM BoundBLOBBulk ORDER BY Id");
+	const std::size_t capacity = probeColumnLength(query, false);
+
+	// BLOB containers used to be bound as char arrays but read as unsigned char
+	// arrays (null pointer dereference). NULLs and in-capacity values first ...
+	const Poco::UInt32 rows = 4;
+	std::vector<Poco::Data::CLOB> expected(rows);
+	for (Poco::UInt32 row = 0; row < rows; ++row)
+	{
+		int id = static_cast<int>(row);
+		if (row % 2 == 0)
+		{
+			session() << "INSERT INTO BoundBLOBBulk VALUES (?, NULL)", use(id), now;
+		}
+		else
+		{
+			expected[row] = makeLOB<Poco::Data::CLOB>((row == 1) ? capacity - 1 : capacity, static_cast<char>('a' + row));
+			session() << "INSERT INTO BoundBLOBBulk VALUES (?, ?)", use(id), use(expected[row]), now;
+		}
+	}
+	checkBoundLOBBulk<std::vector<Poco::Data::BLOB>>(query, expected);
+	checkBoundLOBBulk<std::deque<Poco::Data::BLOB>>(query, expected);
+	checkBoundLOBBulk<std::list<Poco::Data::BLOB>>(query, expected);
+
+	// ... then an oversized last row.
+	session() << "DELETE FROM BoundBLOBBulk", now;
+	for (Poco::UInt32 row = 0; row < rows; ++row)
+	{
+		int id = static_cast<int>(row);
+		Poco::Data::CLOB input = makeLOB<Poco::Data::CLOB>((row == rows - 1) ? capacity + 1 : capacity, static_cast<char>('a' + row));
+		session() << "INSERT INTO BoundBLOBBulk VALUES (?, ?)", use(id), use(input), now;
+	}
+	checkBoundLOBBulkRejected<std::vector<Poco::Data::BLOB>>(query, rows, capacity);
+	checkBoundLOBBulkRejected<std::deque<Poco::Data::BLOB>>(query, rows, capacity);
+	checkBoundLOBBulkRejected<std::list<Poco::Data::BLOB>>(query, rows, capacity);
+	session() << "DROP TABLE BoundBLOBBulk", now;
+}
+
+
+void ODBCSQLiteTest::testBoundStringBulk()
+{
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	session().setFeature("emptyStringIsNull", false);
+	session().setFeature("forceEmptyString", false);
+	session() << "DROP TABLE IF EXISTS BoundStringBulk", now;
+	session() << "CREATE TABLE BoundStringBulk (Id INTEGER, Text VARCHAR(32))", now;
+	const std::string query("SELECT Text FROM BoundStringBulk ORDER BY Id");
+	const std::size_t capacity = probeColumnLength(query, true);
+
+	// NULL in the first, a middle and the last slot, values of different lengths
+	// between them. A bulk row holds the column size plus the terminator, so a
+	// value as long as the column comes back unchanged.
+	// Literals rather than parameters keep the Binder's size checks out of the test.
+	const Poco::UInt32 rows = 5;
+	std::vector<std::string> expected(rows);
+	for (Poco::UInt32 row = 0; row < rows; ++row)
+	{
+		if (row % 2 == 0)
+		{
+			session() << Poco::format("INSERT INTO BoundStringBulk VALUES (%u, NULL)", row), now;
+		}
+		else
+		{
+			expected[row].assign((row == 1) ? capacity : 1, static_cast<char>('a' + row));
+			session() << Poco::format("INSERT INTO BoundStringBulk VALUES (%u, '%s')", row, expected[row]), now;
+		}
+	}
+
+	{
+		// Pre-filled container: NULL rows must come back empty, neither stale
+		// nor by passing SQL_NULL_DATA (SIZE_MAX) to std::string::assign().
+		std::vector<std::string> output(rows, std::string("stale"));
+		Poco::Data::Statement stmt(session());
+		stmt << query, into(output, bulk(rows));
+		try
+		{
+			stmt.execute();
+		}
+		catch (const Poco::Exception& ex)
+		{
+			failmsg("bulk string extraction failed: " + ex.displayText());
+		}
+		catch (const std::exception& ex)
+		{
+			// for example std::length_error, if a NULL indicator were used as a length
+			failmsg(std::string("bulk string extraction failed: ") + ex.what());
+		}
+		for (Poco::UInt32 row = 0; row < rows; ++row)
+		{
+			assertTrue(output[row] == expected[row]);
+		}
+	}
+	session() << "DROP TABLE BoundStringBulk", now;
+}
+
+
+void ODBCSQLiteTest::testBoundStringBulkOverflow()
+{
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	session() << "DROP TABLE IF EXISTS BoundStringBulkOverflow", now;
+	session() << "CREATE TABLE BoundStringBulkOverflow (Id INTEGER, Text VARCHAR(32))", now;
+	const std::string query("SELECT Text FROM BoundStringBulkOverflow ORDER BY Id");
+	const std::size_t capacity = probeColumnLength(query, true);
+
+	// The two cases of testBoundLOBBulkOverflow for std::string containers. A row
+	// holds capacity characters plus the terminator; the driver truncates a longer
+	// value and reports its full length.
+	const Poco::UInt32 rows = 4;
+	for (Poco::UInt32 oversized: {Poco::UInt32(rows - 1), Poco::UInt32(1)})
+	{
+		session() << "DELETE FROM BoundStringBulkOverflow", now;
+		for (Poco::UInt32 row = 0; row < rows; ++row)
+		{
+			std::string text((row == oversized) ? capacity + 1 : capacity, static_cast<char>('a' + row));
+			session() << Poco::format("INSERT INTO BoundStringBulkOverflow VALUES (%u, '%s')", row, text), now;
+		}
+
+		std::vector<std::string> output;
+		bool rejected = false;
+		try
+		{
+			session() << query, into(output, bulk(rows)), now;
+		}
+		catch (const Poco::Data::ODBC::UnknownDataLengthException& ex)
+		{
+			failmsg("the driver reported an unknown length (SQL_NO_TOTAL): " + ex.displayText());
+		}
+		catch (const Poco::Data::ODBC::ODBCException& ex)
+		{
+			// ODBC errors are DataExceptions too; they must not pass for the capacity check.
+			failmsg("driver error instead of the capacity check: " + ex.displayText());
+		}
+		catch (const Poco::Data::DataException& ex)
+		{
+			assertTrue(ex.message().find(boundSizeExceeded(capacity + 1, capacity + 1)) != std::string::npos);
+			rejected = true;
+		}
+		assertTrue(rejected);
+	}
+	session() << "DROP TABLE BoundStringBulkOverflow", now;
+}
+
+
+void ODBCSQLiteTest::testBulkThenScalarLOB()
+{
+	// A bulk extraction sets the rowset size and a non-bulk extraction is bound
+	// to one row, so Statement must reject the mix, also when a scalar parameter
+	// in between resets the bulk mode flags. The statements are built, never
+	// executed, so a regression cannot write past a buffer.
+	std::vector<int> ids;
+	Poco::Data::CLOB payload;
+	int minId = 0;
+	{
+		Poco::Data::Statement stmt(session());
+		stmt << "SELECT Id, Payload FROM BulkThenScalarLOB", into(ids, bulk(100));
+		try
+		{
+			stmt, into(payload);
+			fail("non-bulk extraction accepted after bulk extraction");
+		}
+		catch (const Poco::InvalidAccessException&)
+		{
+		}
+	}
+	{
+		Poco::Data::Statement stmt(session());
+		stmt << "SELECT Id, Payload FROM BulkThenScalarLOB WHERE Id >= ?", into(ids, bulk(100)), use(minId);
+		try
+		{
+			stmt, into(payload);
+			fail("non-bulk extraction accepted after bulk extraction and a scalar parameter");
+		}
+		catch (const Poco::InvalidAccessException&)
+		{
+		}
+	}
+	{
+		Poco::Data::Statement stmt(session());
+		stmt << "SELECT Id FROM BulkThenScalarLOB WHERE Id >= ?", into(ids, bulk(4)), use(minId);
+		try
+		{
+			stmt, limit(100);
+			fail("limit different from the bulk size accepted after a scalar parameter");
+		}
+		catch (const Poco::InvalidArgumentException&)
+		{
+		}
+	}
+}
+
+
+void ODBCSQLiteTest::testAnyUntypedColumn()
+{
+	// The driver can describe a result column without a declared type, such as
+	// COUNT(*) or an expression, differently after the fetch than before the
+	// execution. Bound extraction into Poco::Any and Poco::Dynamic::Var reads
+	// the value as the type its buffer was bound for. SQLChannel extracts its
+	// archive row count this way.
+	session().setFeature("autoBind", true);
+	session().setFeature("autoExtract", true);
+	session() << "DROP TABLE IF EXISTS AnyUntypedColumn", now;
+	session() << "CREATE TABLE AnyUntypedColumn (Id INTEGER)", now;
+	session() << "INSERT INTO AnyUntypedColumn VALUES (1)", now;
+	session() << "INSERT INTO AnyUntypedColumn VALUES (2)", now;
+
+	Poco::Dynamic::Var count;
+	session() << "SELECT COUNT(*) FROM AnyUntypedColumn", into(count), now;
+	assertTrue (count == 2);
+	Poco::Any anyCount;
+	session() << "SELECT COUNT(*) FROM AnyUntypedColumn", into(anyCount), now;
+	assertFalse (anyCount.empty());
+	assertTrue (anyCount.type() == count.type());
+
+	Poco::Dynamic::Var sum;
+	session() << "SELECT Id + 40 FROM AnyUntypedColumn WHERE Id = 2", into(sum), now;
+	assertTrue (sum == 42);
+	Poco::Any anySum;
+	session() << "SELECT Id + 40 FROM AnyUntypedColumn WHERE Id = 2", into(anySum), now;
+	assertFalse (anySum.empty());
+	assertTrue (anySum.type() == sum.type());
+	session() << "DROP TABLE AnyUntypedColumn", now;
+}
+
+
 CppUnit::Test* ODBCSQLiteTest::suite()
 {
 	if ((_pSession = init(_driver, _dsn, _uid, _pwd, _connectString)))
@@ -321,6 +833,23 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		_pExecutor = new SQLExecutor(_driver + " SQL Executor", _pSession);
 
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLiteTest");
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundLOBCapacity);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundLOBBulkCapacity);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundLOBBulkNull);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundLOBBulkOverflow);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundBLOBBulk);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundStringBulk);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundStringBulkOverflow);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkThenScalarLOB);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testParameterArraySize);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkFullWidthStrings);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testManualBLOB);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testManualUUIDLength);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTranscodedBindingOwnership);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBindingOutlivesStatement);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundLongValue);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkLongStrings);
 
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBareboneODBC);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testConnection);
@@ -386,6 +915,10 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAsync);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAny);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testDynamicAny);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAnyDateTime);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAnyBulk);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAnyBoundType);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAnyUntypedColumn);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLLogger);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAutoCommit);
@@ -396,6 +929,8 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testReconnect);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testClosedSession);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testExceptionCopy);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLGetInfo);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testRecordSetBeforeExecute);
 
 		return pSuite;

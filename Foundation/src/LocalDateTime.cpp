@@ -125,8 +125,9 @@ LocalDateTime& LocalDateTime::operator = (const Timestamp& timestamp)
 {
 	if (timestamp != this->timestamp())
 	{
-		_dateTime = timestamp;
-		determineTzd(true);
+		// the constructors validate; an invalid value leaves *this unchanged
+		LocalDateTime dateTime{DateTime(timestamp)};
+		swap(dateTime);
 	}
 	return *this;
 }
@@ -134,8 +135,9 @@ LocalDateTime& LocalDateTime::operator = (const Timestamp& timestamp)
 
 LocalDateTime& LocalDateTime::operator = (double julianDay)
 {
-	_dateTime = julianDay;
-	determineTzd(true);
+	// the constructor validates; an invalid value leaves *this unchanged
+	LocalDateTime dateTime(julianDay);
+	swap(dateTime);
 	return *this;
 }
 
@@ -158,9 +160,9 @@ LocalDateTime& LocalDateTime::assign(int tzd, int year, int month, int day, int 
 
 LocalDateTime& LocalDateTime::assign(int tzd, double julianDay)
 {
-	_tzd      = tzd;
-	_dateTime = julianDay;
-	adjustForTzd();
+	// the constructor validates; an invalid value leaves *this unchanged
+	LocalDateTime dateTime(tzd, julianDay);
+	swap(dateTime);
 	return *this;
 }
 

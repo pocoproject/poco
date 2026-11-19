@@ -14,6 +14,8 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
+#include "Poco/Data/BulkBinding.h"
+#include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/RecordSet.h"
@@ -1582,6 +1584,32 @@ void DataTest::testTranscode()
 }
 
 
+void DataTest::testTransactionUnparsedStatement()
+{
+#ifndef POCO_DATA_NO_SQL_PARSER
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	sess.setFeature("autoCommit", false);
+	sess.setFeature("sqlParse", true);
+	assertTrue (!sess.isTransaction());
+
+	// a SELECT runs without a transaction
+	Statement select = (sess << "SELECT * FROM Person");
+	select.execute();
+	assertTrue (!sess.isTransaction());
+
+	// a statement the parser cannot read may write, so it runs in a transaction
+	Statement unparsed = (sess << "SELECT 1 ~ 2; DELETE FROM Person");
+	const Poco::Optional<bool> parsed = unparsed.parse();
+	assertTrue (parsed.isSpecified() && !parsed.value());
+	unparsed.execute();
+	assertTrue (sess.isTransaction());
+	sess.rollback();
+#else
+	std::cout << "test not available (parser not available)";
+#endif
+}
+
+
 void DataTest::testSQLParse()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
@@ -1630,6 +1658,29 @@ void DataTest::testSQLParse()
 	assertTrue (stmt.hasInsert().value());
 	assertTrue (!stmt.isDelete().value());
 	assertTrue (stmt.hasDelete().value());
+
+	// A statement that fails to parse is not classified, also when its start
+	// parses on its own, and neither is one that has not been parsed.
+	stmt.reset();
+	stmt = (sess << "SELECT 1 DELETE FROM Test");
+	assertTrue (!stmt.parse().value());
+	assertTrue (!stmt.statementsCount().isSpecified());
+	assertTrue (!stmt.isSelect().isSpecified());
+	assertTrue (!stmt.hasSelect().isSpecified());
+	assertTrue (!stmt.isDelete().isSpecified());
+	assertTrue (!stmt.hasDelete().isSpecified());
+	assertTrue (!stmt.parseError().empty());
+
+	sess.setFeature("autoCommit", true);
+	stmt.reset();
+	stmt = (sess << "DELETE FROM Test");
+	assertTrue (!stmt.statementsCount().isSpecified());
+	assertTrue (!stmt.hasDelete().isSpecified());
+	assertTrue (stmt.parse().value());
+	assertTrue (stmt.parseError().empty());
+	assertEqual (1u, stmt.statementsCount().value());
+	assertTrue (stmt.hasDelete().value());
+	sess.setFeature("autoCommit", false);
 
 	sess.setFeature("sqlParse", false);
 	assertTrue (!sess.getFeature("sqlParse"));
@@ -2974,6 +3025,67 @@ void DataTest::testArchiveStrategyOpenReleasesStatements()
 }
 
 
+void DataTest::testBulkModeMixing()
+{
+	// Statements are built, never executed. ODBC sets the rowset (parameter set)
+	// size from the bulk extractions (bindings) and binds one row for a non-bulk
+	// one, so the modes must not be mixed. A non-bulk binding resets the bulk
+	// mode flags, so the checks must not depend on the flags alone.
+	Session sess(Poco::Data::Test::Connector::KEY, "dummy.db");
+	sess.setFeature("bulk", true);
+	std::vector<int> ids;
+	std::vector<int> other;
+	int minId = 0;
+	std::string payload;
+
+	{
+		Statement stmt(sess);
+		stmt << "SELECT Id, Payload FROM T WHERE Id >= ?", into(ids, bulk(4)), use(minId);
+		try { stmt, into(payload); fail ("non-bulk extraction accepted after bulk extraction"); }
+		catch (InvalidAccessException&) { }
+	}
+	{
+		Statement stmt(sess);
+		stmt << "SELECT Id FROM T WHERE Id >= ?", into(ids, bulk(4)), use(minId), limit(4);
+		try { stmt, limit(100); fail ("limit that differs from the bulk size accepted"); }
+		catch (InvalidArgumentException&) { }
+		try { stmt, range(0, 100); fail ("range accepted for bulk extraction"); }
+		catch (InvalidAccessException&) { }
+	}
+	{
+		// as documented, the bulk keyword must come before extractions and bindings
+		Statement stmt(sess);
+		int id = 0;
+		stmt << "SELECT Id FROM T", into(id), limit(4);
+		try { stmt, bulk; fail ("bulk keyword accepted after an extraction"); }
+		catch (InvalidAccessException&) { }
+	}
+	{
+		Statement stmt(sess);
+		std::vector<int> values(4);
+		stmt << "INSERT INTO T VALUES (?, ?)", use(values, bulk);
+		try { stmt, use(minId); fail ("non-bulk binding accepted after bulk binding"); }
+		catch (InvalidAccessException&) { }
+	}
+	{
+		// still accepted: bulk extractions, a scalar parameter and the same limit
+		Statement stmt(sess);
+		stmt << "SELECT Id, Other FROM T WHERE Id >= ?", into(ids, bulk(4)), into(other, bulk(4)), use(minId), limit(4);
+	}
+}
+
+
+void DataTest::testBulkBindingReset()
+{
+	// Re-executing a statement resets its bindings, also those added since
+	// the last execution, which do not hold a binder yet.
+	std::vector<int> values(4, 1);
+	BulkBinding<std::vector<int>> binding(values, 4);
+	binding.reset();
+	assertTrue (binding.canBind());
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -3010,6 +3122,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
 	CppUnit_addTest(pSuite, DataTest, testTranscode);
 	CppUnit_addTest(pSuite, DataTest, testSQLParse);
+	CppUnit_addTest(pSuite, DataTest, testTransactionUnparsedStatement);
 	CppUnit_addTest(pSuite, DataTest, testSQLChannel);
 	CppUnit_addTest(pSuite, DataTest, testNullableExtract);
 	CppUnit_addTest(pSuite, DataTest, testTransactionAutoCommit);
@@ -3039,6 +3152,8 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testSQLChannelDrainFallback);
 	CppUnit_addTest(pSuite, DataTest, testSQLChannelDrainRejected);
 	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyOpenReleasesStatements);
+	CppUnit_addTest(pSuite, DataTest, testBulkModeMixing);
+	CppUnit_addTest(pSuite, DataTest, testBulkBindingReset);
 
 	return pSuite;
 }

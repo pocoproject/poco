@@ -245,8 +245,10 @@ public:
 		/// For bulk container bindings, only the first row is rendered by
 		/// default; use boundSQLBulk to render more.
 		///
-		/// When the parser is disabled (POCO_DATA_NO_SQL_PARSER), falls back to
-		/// a hand-rolled scanner that supports `?` and `$N` only.
+		/// When the parser is disabled (POCO_DATA_NO_SQL_PARSER), or its lexer
+		/// cannot read the SQL (for example PostgreSQL's `~` operator or a MySQL
+		/// `#` comment), falls back to a hand-rolled scanner that supports `?`
+		/// and `$N` only and skips single-quoted literals, but not comments.
 	{
 		return boundSQLBulk(sql, 1, bindings...);
 	}

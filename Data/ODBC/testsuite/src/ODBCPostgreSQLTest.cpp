@@ -742,6 +742,17 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOB);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBContainer);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBStmt);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkRowsetBackstop);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkBindingBackstops);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testParameterArraySize);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkFullWidthStrings);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testManualBLOB);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testManualUUIDLength);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTranscodedBindingOwnership);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBindingOutlivesStatement);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBoundLongValue);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkLongStrings);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testManualStringChunks);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDate);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testTime);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDateTime);
@@ -771,6 +782,10 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAsync);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAny);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testDynamicAny);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAnyDateTime);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAnyTime);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAnyBulk);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testAnyBoundType);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testMultipleResults);
 	//CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLChannel);
 	//CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLLogger);
@@ -790,6 +805,8 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testReconnect);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testClosedSession);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExceptionCopy);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testSQLGetInfo);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNonASCIIText);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRecordSetBeforeExecute);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testUncommittedWorkRolledBack);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLostConnection);

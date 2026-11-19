@@ -1191,6 +1191,48 @@ TEST(OdbcCallEscapeTest) {
   ASSERT_STREQ(((ExecuteStatement*)execResult.getStatement(0))->name, "some_proc");
 }
 
+TEST(FailedParseHasNoStatementsTest) {
+  // A statement list is complete before the token after it is read, so a parse
+  // can fail after statements were built. The result holds none of them, and
+  // no parameter, but keeps the error.
+  SQLParserResult result;
+  SQLParser::parse("SELECT ? DELETE FROM t WHERE a = ?", &result);
+  ASSERT_FALSE(result.isValid());
+  ASSERT_EQ(result.size(), 0);
+  ASSERT_EQ(result.parameters().size(), 0);
+  ASSERT_NOTNULL(result.errorMsg());
+  ASSERT_EQ(result.errorLine(), 0);
+  ASSERT_EQ(result.errorColumn(), 9);
+}
+
+TEST(UnreadableInputTest) {
+  // Input the lexer cannot read fails the parse instead of ending the input, so
+  // the statements before it do not look complete: a byte outside the
+  // characters SQL uses, an unterminated string, an integer out of range.
+  const char* invalid[] = {"SELECT 1 \xc3\xa9 DELETE FROM t;",
+                           "SELECT 1 `x`; DROP TABLE t;",
+                           "SELECT 1 ~ 2; DELETE FROM t;",
+                           "SELECT a FROM t WHERE b = 1 $ OR 1 = 1;",
+                           "SELECT 1 'abc",
+                           "SELECT 99999999999999999999;"};
+  for (const char* query : invalid) {
+    SQLParserResult result;
+    SQLParser::parse(query, &result);
+    ASSERT_FALSE(result.isValid());
+    ASSERT_EQ(result.size(), 0);
+  }
+
+  // Inside a string or a quoted identifier, any byte belongs to the value.
+  TEST_PARSE_SINGLE_SQL("SELECT 'caf\xc3\xa9', \"caf\xc3\xa9\" FROM t;", kStmtSelect, SelectStatement, result, stmt);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "caf\xc3\xa9");
+  ASSERT_STREQ(stmt->selectList->at(1)->name, "caf\xc3\xa9");
+
+  // Tokenizing goes on past unreadable input and ends with the input.
+  std::vector<int16_t> tokens;
+  ASSERT_TRUE(SQLParser::tokenize("SELECT 1 \xc3\xa9 'abc", &tokens));
+  ASSERT_EQ(tokens.size(), 5);
+}
+
 }  // namespace hsql
 
 TEST_MAIN();

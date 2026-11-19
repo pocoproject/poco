@@ -20,6 +20,7 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <typeinfo>
 
 
@@ -30,6 +31,36 @@ const std::string Extractor::FLD_SIZE_EXCEEDED_FMT = "Specified data size (%z by
 	"exceeds maximum value (%z).\n"
 	"Use Session.setProperty(\"maxFieldSize\", value) "
 	"to increase the maximum allowed data size\n";
+
+
+const std::string Extractor::BOUND_SIZE_EXCEEDED_FMT = "Column %z: the value (%z bytes) "
+	"does not fit into the bound buffer (%z bytes).\n"
+	"The buffer is sized from the column size reported by the driver, "
+	"limited by the session property \"maxFieldSize\".\n";
+
+
+namespace {
+
+
+std::size_t chunkLength(std::size_t pos, SQLLEN len, std::size_t capacity)
+	// Returns the number of bytes SQLGetData() wrote into a chunk buffer that
+	// holds capacity bytes of data, not counting the terminator it appends to
+	// character data. len is the length indicator SQLGetData() returned: the
+	// length of the data that was available, or SQL_NO_TOTAL. Data that did
+	// not fit fills the buffer. SQL_NULL_DATA must be handled by the caller;
+	// other negative lengths are rejected.
+{
+	if (SQL_NO_TOTAL == len) return capacity;
+	if (len < 0)
+	{
+		throw DataException(format("ODBC::Extractor: column %z: SQLGetData() "
+			"returned the invalid length %?d.", pos, len));
+	}
+	return std::min(static_cast<std::size_t>(len), capacity);
+}
+
+
+} // namespace
 
 
 Extractor::Extractor(const StatementHandle& rStmt,
@@ -53,9 +84,12 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _pPreparator->actualDataSize(pos);
+	// a value that does not fit into the bound buffer with its terminator, or
+	// whose length the driver does not know, throws instead of being truncated
+	std::size_t dataSize = boundDataSize(pos, POCO_DATA_INVALID_ROW, sizeof(char));
 	char* sp = AnyCast<char*>(_pPreparator->at(pos));
-	std::size_t len = std::strlen(sp);
+	// look for the terminator only inside the bound buffer
+	std::size_t len = std::find(sp, sp + _pPreparator->boundBufferSize(pos), '\0') - sp;
 	if (len < dataSize) dataSize = len;
 	checkDataSize(dataSize);
 	val.assign(sp, dataSize);
@@ -67,27 +101,38 @@ bool Extractor::extractBoundImpl<std::string>(std::size_t pos, std::string& val)
 template<>
 bool Extractor::extractBoundImpl<UTF16String>(std::size_t pos, UTF16String& val)
 {
-	typedef UTF16String::value_type CharT;
+	using CharT = UTF16String::value_type;
 	if (isNull(pos)) return false;
-	std::size_t dataSize = _pPreparator->actualDataSize(pos);
-	CharT* sp = nullptr;
+	std::size_t dataSize = 0;
+	// look for the terminator only inside the bound buffer
+	const std::size_t bufferSize = _pPreparator->boundBufferSize(pos);
+	const CharT* sp = nullptr;
+	std::size_t len = 0;
 	UTF16String us;
 	const std::type_info& ti = _pPreparator->at(pos).type();
+	// a value that does not fit into the bound buffer with its terminator, or
+	// whose length the driver does not know, throws instead of being truncated
 	if (ti == typeid(CharT*))
 	{
+		// the length indicator counts bytes
+		dataSize = boundDataSize(pos, POCO_DATA_INVALID_ROW, sizeof(CharT)) / sizeof(CharT);
 		sp = AnyCast<CharT*>(_pPreparator->at(pos));
+		len = std::find(sp, sp + bufferSize / sizeof(CharT), CharT(0)) - sp;
 	}
 	else if (ti == typeid(char*))
 	{
-		std::string s(AnyCast<char*>(_pPreparator->at(pos)));
+		const std::size_t byteSize = boundDataSize(pos, POCO_DATA_INVALID_ROW, sizeof(char));
+		const char* cp = AnyCast<char*>(_pPreparator->at(pos));
+		std::string s(cp, std::find(cp, cp + (std::min)(byteSize, bufferSize), '\0'));
 		Poco::UnicodeConverter::convert(s, us);
-		sp = const_cast<CharT*>(us.c_str());
+		sp = us.c_str();
+		len = us.size();
+		dataSize = len;
 	}
 	else
 	{
 		throw Poco::Data::ExtractException("Unsupported string type: " + std::string(ti.name()));
 	}
-	std::size_t len = Poco::UnicodeConverter::UTFStrlen(sp);
 	if (len < dataSize) dataSize = len;
 	checkDataSize(dataSize);
 	val.assign(sp, dataSize);
@@ -100,7 +145,8 @@ template<>
 bool Extractor::extractBoundImpl<Poco::Data::Date>(std::size_t pos, Poco::Data::Date& val)
 {
 	if (isNull(pos)) return false;
-	SQL_DATE_STRUCT& ds = *AnyCast<SQL_DATE_STRUCT>(&(_pPreparator->at(pos)));
+	// throws BadCastException if the column is bound to another type
+	SQL_DATE_STRUCT& ds = RefAnyCast<SQL_DATE_STRUCT>(_pPreparator->at(pos));
 	Utility::dateSync(val, ds);
 	return true;
 }
@@ -144,7 +190,8 @@ bool Extractor::extractBoundImpl<Poco::Data::Time>(std::size_t pos, Poco::Data::
 
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
 	checkDataSize(dataSize);
-	SQL_TIME_STRUCT& ts = *AnyCast<SQL_TIME_STRUCT>(&_pPreparator->at(pos));
+	// throws BadCastException if the column is bound to another type
+	SQL_TIME_STRUCT& ts = RefAnyCast<SQL_TIME_STRUCT>(_pPreparator->at(pos));
 	Utility::timeSync(val, ts);
 
 	return true;
@@ -188,7 +235,8 @@ bool Extractor::extractBoundImpl<Poco::DateTime>(std::size_t pos, Poco::DateTime
 
 	std::size_t dataSize = _pPreparator->actualDataSize(pos);
 	checkDataSize(dataSize);
-	SQL_TIMESTAMP_STRUCT& tss = *AnyCast<SQL_TIMESTAMP_STRUCT>(&_pPreparator->at(pos));
+	// throws BadCastException if the column is bound to another type
+	SQL_TIMESTAMP_STRUCT& tss = RefAnyCast<SQL_TIMESTAMP_STRUCT>(_pPreparator->at(pos));
 	Utility::dateTimeSync(val, tss);
 
 	return true;
@@ -230,9 +278,15 @@ bool Extractor::extractBoundImpl<Poco::UUID>(std::size_t pos, Poco::UUID& val)
 {
 	if (isNull(pos)) return false;
 
-	std::size_t dataSize = _pPreparator->actualDataSize(pos);
-	checkDataSize(dataSize);
-	char* pBuffer = *AnyCast<char*>(&_pPreparator->at(pos));
+	// a shorter value leaves part of the buffer from an earlier row, a longer one is truncated
+	const std::size_t dataSize = boundDataSize(pos);
+	if (dataSize != 16)
+	{
+		throw DataException(format("ODBC::Extractor::extractBoundImpl(UUID): column %z: "
+			"the value has %z bytes, a UUID has 16.", pos, dataSize));
+	}
+	// throws BadCastException if the column is bound to another type
+	char* pBuffer = AnyCast<char*>(_pPreparator->at(pos));
 	val.copyFrom(pBuffer);
 
 	return true;
@@ -296,25 +350,8 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 			CHUNK_SIZE, //buffer length
 			&len); //length indicator
 
-		if (SQL_SUCCESS_WITH_INFO == rc)
-		{
-			StatementDiagnostics d(_rStmt);
-			std::size_t fieldCount = d.fields().size();
-			for (std::size_t i = 0; i < fieldCount; ++i)
-			{
-				if (d.sqlState(i) == "01004"s)
-				{
-					if (len == SQL_NO_TOTAL || len > CHUNK_SIZE) // only part of data was returned
-						len = CHUNK_SIZE-1; // SQLGetData terminates the returned string
-				}
-			}
-		}
-
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
 			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(string):SQLGetData()");
-
-		if (SQL_NO_TOTAL == len)//unknown length, throw
-			throw UnknownDataLengthException("ODBC::Extractor::extractManualImpl(string):Could not determine returned data length.");
 
 		if (isNullLengthIndicator(len))
 		{
@@ -325,9 +362,11 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 		if (SQL_NO_DATA == rc || !len)
 			break;
 
-		_lengths[pos] += len;
+		// SQLGetData() terminates the returned characters
+		const std::size_t fetchedSize = chunkLength(pos, len, CHUNK_SIZE - 1);
+		_lengths[pos] += fetchedSize;
 		if (static_cast<std::size_t>(_lengths[pos]) <= maxSize)
-			val.append(pChar, len);
+			val.append(pChar, fetchedSize);
 		else
 			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, static_cast<std::size_t>(_lengths[pos]), maxSize));
 
@@ -342,7 +381,8 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 {
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	SQLLEN len;
-	Poco::Buffer<UTF16String::value_type> apChar(CHUNK_SIZE);
+	// CHUNK_SIZE bytes, the buffer length passed to SQLGetData()
+	Poco::Buffer<UTF16String::value_type> apChar(CHUNK_SIZE / sizeof(UTF16String::value_type));
 	UTF16String::value_type* pChar = apChar.begin();
 	SQLRETURN rc = 0;
 
@@ -360,25 +400,8 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 			CHUNK_SIZE, //buffer length
 			&len); //length indicator
 
-		if (SQL_SUCCESS_WITH_INFO == rc)
-		{
-			StatementDiagnostics d(_rStmt);
-			std::size_t fieldCount = d.fields().size();
-			for (std::size_t i = 0; i < fieldCount; ++i)
-			{
-				if (d.sqlState(i) == "01004"s)
-				{
-					if (len == SQL_NO_TOTAL || len > CHUNK_SIZE) // only part of data was returned
-						len = CHUNK_SIZE - 2;
-				}
-			}
-		}
-
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
 			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(UTF16String):SQLGetData()");
-
-		if (SQL_NO_TOTAL == len)//unknown length, throw
-			throw UnknownDataLengthException("ODBC::Extractor::extractManualImpl(UTF16String):Could not determine returned data length.");
 
 		if (isNullLengthIndicator(len))
 		{
@@ -389,9 +412,12 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 		if (SQL_NO_DATA == rc || !len)
 			break;
 
-		_lengths[pos] += len;
+		// the length indicator counts bytes, and SQLGetData()
+		// terminates the returned characters
+		const std::size_t fetchedSize = chunkLength(pos, len, CHUNK_SIZE - sizeof(UTF16Char));
+		_lengths[pos] += fetchedSize;
 		if (static_cast<std::size_t>(_lengths[pos]) <= maxSize)
-			val.append(pChar, len / sizeof(UTF16Char));
+			val.append(pChar, fetchedSize / sizeof(UTF16Char));
 		else
 			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, static_cast<std::size_t>(_lengths[pos]), maxSize));
 	} while (true);
@@ -400,21 +426,23 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 }
 
 
-template<>
-bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
-	Poco::Data::CLOB& val,
+template <typename T>
+bool Extractor::extractManualImplLOB(std::size_t pos,
+	Poco::Data::LOB<T>& val,
 	SQLSMALLINT cType)
 {
+	static_assert(sizeof(T) == 1, "manual LOB lengths are byte counts");
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	std::size_t fetchedSize = 0;
 
 	SQLLEN len;
 	const int bufSize = CHUNK_SIZE;
-	Poco::Buffer<char> apChar(bufSize);
-	char* pChar = apChar.begin();
+	Poco::Buffer<T> apChar(bufSize);
+	T* pChar = apChar.begin();
 	SQLRETURN rc = 0;
+	// a new LOB: val can share its content with other LOBs
+	Poco::Data::LOB<T> lob;
 
-	val.clear();
 	resizeLengths(pos);
 
 	do
@@ -429,26 +457,28 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 			&len); //length indicator
 
 		if (SQL_NO_DATA != rc && Utility::isError(rc))
-			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImpl(CLOB):SQLGetData()");
-
-		if (SQL_NO_TOTAL == len)//unknown length, throw
-			throw UnknownDataLengthException("ODBC::Extractor::extractManualImpl(CLOB):Could not determine returned data length.");
+			throw StatementException(_rStmt, "ODBC::Extractor::extractManualImplLOB():SQLGetData()");
 
 		if (isNullLengthIndicator(len))
+		{
+			_lengths[pos] = len;
 			return false;
+		}
 
 		if (SQL_NO_DATA == rc || !len)
 			break;
 
-		fetchedSize = len > CHUNK_SIZE ? CHUNK_SIZE : len;
+		// binary data has no terminator
+		fetchedSize = chunkLength(pos, len, bufSize);
 		_lengths[pos] += fetchedSize;
 		if (static_cast<std::size_t>(_lengths[pos]) <= maxSize)
-			val.appendRaw(pChar, fetchedSize);
+			lob.appendRaw(pChar, fetchedSize);
 		else
-			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
+			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, static_cast<std::size_t>(_lengths[pos]), maxSize));
 
 	} while (true);
 
+	val.swap(lob);
 	return true;
 }
 
@@ -539,7 +569,7 @@ bool Extractor::extractManualImpl<Poco::UUID>(std::size_t pos,
 	Poco::UUID& val,
 	SQLSMALLINT cType)
 {
-	char buffer[16];
+	char buffer[16] = {};
 	resizeLengths(pos);
 
 	SQLRETURN rc = SQLGetData(_rStmt,
@@ -554,8 +584,14 @@ bool Extractor::extractManualImpl<Poco::UUID>(std::size_t pos,
 
 	if (isNullLengthIndicator(_lengths[pos]))
 		return false;
-	else
-		val.copyFrom(buffer);
+
+	// a shorter value leaves part of the buffer unset, a longer one is truncated
+	if (static_cast<SQLLEN>(sizeof(buffer)) != _lengths[pos])
+	{
+		throw DataException(format("ODBC::Extractor::extractManualImpl(UUID): column %z: "
+			"the value has %?d bytes, a UUID has 16.", pos, _lengths[pos]));
+	}
+	val.copyFrom(buffer);
 
 	return true;
 }
@@ -826,7 +862,7 @@ bool Extractor::extract(std::size_t pos, std::list<UTF16String>& val)
 bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 {
 	if (Preparator::DE_MANUAL == _dataExtraction)
-		return extractManualImpl(pos, val, SQL_C_BINARY);
+		return extractManualImplLOB(pos, val, SQL_C_BINARY);
 	else
 		return extractBoundImpl(pos, val);
 }
@@ -835,7 +871,7 @@ bool Extractor::extract(std::size_t pos, Poco::Data::BLOB& val)
 bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 {
 	if (Preparator::DE_MANUAL == _dataExtraction)
-		return extractManualImpl(pos, val, SQL_C_BINARY);
+		return extractManualImplLOB(pos, val, SQL_C_BINARY);
 	else
 		return extractBoundImpl(pos, val);
 }
@@ -1570,6 +1606,21 @@ void Extractor::checkDataSize(std::size_t size)
 	std::size_t maxSize = _pPreparator->getMaxFieldSize();
 	if (size > maxSize)
 		throw DataException(format(FLD_SIZE_EXCEEDED_FMT, size, maxSize));
+}
+
+
+std::size_t Extractor::boundDataSize(std::size_t pos, std::size_t row, std::size_t terminator)
+{
+	std::size_t dataSize = _pPreparator->actualDataSize(pos, row);
+	if (static_cast<std::size_t>(SQL_NO_TOTAL) == dataSize)
+	{
+		throw UnknownDataLengthException(format("ODBC::Extractor::boundDataSize(): column %z: "
+			"the driver truncated the value and could not determine its length.", pos));
+	}
+	std::size_t capacity = _pPreparator->boundBufferSize(pos);
+	if (dataSize > capacity || capacity - dataSize < terminator)
+		throw DataException(format(BOUND_SIZE_EXCEEDED_FMT, pos, dataSize, capacity));
+	return dataSize;
 }
 
 

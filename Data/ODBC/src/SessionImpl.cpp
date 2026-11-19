@@ -344,7 +344,13 @@ bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 	if (old == ti) return true;
 
 	bool retval = true;
-	try { setTransactionIsolationImpl(ti); }
+	try
+	{
+		setTransactionIsolationImpl(ti);
+		// A driver may keep or substitute another level and report it with
+		// SQL_SUCCESS_WITH_INFO (SQLSTATE 01S02), so the level is read back.
+		retval = (getTransactionIsolation() == ti);
+	}
 	catch (Poco::Exception&) { retval = false; }
 	setTransactionIsolationImpl(old);
 	return retval;

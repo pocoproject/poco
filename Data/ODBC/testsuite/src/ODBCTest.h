@@ -54,6 +54,8 @@ public:
 	virtual void testSessionPool();
 	virtual void testClosedSession();
 	virtual void testExceptionCopy();
+	virtual void testSQLGetInfo();
+	virtual void testNonASCIIText();
 
 	virtual void testZeroRows();
 	virtual void testSimpleAccess();
@@ -115,6 +117,17 @@ public:
 	virtual void testBLOB();
 	virtual void testBLOBContainer();
 	virtual void testBLOBStmt();
+	virtual void testBulkRowsetBackstop();
+	virtual void testBulkBindingBackstops();
+	virtual void testParameterArraySize();
+	virtual void testBulkFullWidthStrings();
+	virtual void testManualBLOB();
+	virtual void testManualUUIDLength();
+	virtual void testTranscodedBindingOwnership();
+	virtual void testBindingOutlivesStatement();
+	virtual void testBoundLongValue();
+	virtual void testBulkLongStrings();
+	virtual void testManualStringChunks();
 
 	virtual void testRecordSet();
 	virtual void testRecordSetBeforeExecute();
@@ -152,6 +165,11 @@ public:
 
 	virtual void testAny();
 	virtual void testDynamicAny();
+	virtual void testAnyDateTime();
+	virtual void testAnyTime();
+	virtual void testAnyUUID();
+	virtual void testAnyBulk();
+	virtual void testAnyBoundType();
 
 	virtual void testMultipleResults();
 
@@ -229,6 +247,18 @@ protected:
 	const std::string& dbConnString();
 
 private:
+	template <typename C>
+	void checkBulkAnyRejected(const std::string& query);
+		/// Executes query with a bulk extraction into a container C of
+		/// Poco::Any or Poco::Dynamic::Var; expects NotImplementedException.
+
+	template <typename S>
+	void checkManualString(const std::string& query, std::size_t length, std::size_t maxFieldSize);
+		/// Extracts the single value of query, a string of length 'x'
+		/// characters, into a string S. Expects the value if its size in
+		/// bytes fits into maxFieldSize, the DataException for exceeding
+		/// maxFieldSize otherwise.
+
 	static Drivers    _drivers;
 	static constexpr bool _bindValues[8] = {true, true, true, false, false, true, false, false};
 	SessionPtr        _pSession;

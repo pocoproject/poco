@@ -829,7 +829,9 @@ Data types supported are:
   * Poco::DateTime
   * Poco::Data::Date
   * Poco::Data::Time
-  * Poco::Dynamic::Var
+
+Bulk extraction into containers of Poco::Any and Poco::Dynamic::Var is
+not supported (without bulk, such containers are filled row by row).
 
 !!Important Considerations
 

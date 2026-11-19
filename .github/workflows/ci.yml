@@ -1068,9 +1068,12 @@ jobs:
       - uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
           arch: x64
+      # The clang-cl of Visual Studio, which matches its standard library; the separate
+      # LLVM installation of the image can be older than the library requires.
       - run: >-
           cmake -S. -Bcmake-build -G Ninja
-          -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
+          -DCMAKE_C_COMPILER="$env:VCINSTALLDIR/Tools/Llvm/x64/bin/clang-cl.exe"
+          -DCMAKE_CXX_COMPILER="$env:VCINSTALLDIR/Tools/Llvm/x64/bin/clang-cl.exe"
           -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
           ${{ env.POCO_CMAKE_WINDOWS_MINIMAL }}

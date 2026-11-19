@@ -20,8 +20,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/FileStream.h"
-#include "Poco/File.h"
-#include "Poco/Path.h"
+#include "Poco/TemporaryFile.h"
 #include <iostream>
 
 using Poco::Net::Socket;
@@ -36,7 +35,6 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::FileInputStream;
 using Poco::FileOutputStream;
-using Poco::File;
 
 SocketStreamTest::SocketStreamTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -129,15 +127,8 @@ void SocketStreamTest::testSendFile()
 {
 	const int fileSize = 64000;
 	std::string payload(fileSize, 'x');
-	Poco::Path testFilePath = Poco::Path::temp().append("test.sendfile.txt");
-	const std::string fileName = testFilePath.toString();
-	{
-		File f(fileName);
-		if (f.exists())
-		{
-			f.remove();
-		}
-	}
+	Poco::TemporaryFile testFile;
+	const std::string fileName = testFile.path();
 	FileOutputStream fout(fileName);
 	fout << payload;
 	fout.close();
@@ -177,8 +168,6 @@ void SocketStreamTest::testSendFile()
 
 	ss.close();
 	fin.close();
-	File f(fileName);
-	f.remove();
 }
 #endif
 

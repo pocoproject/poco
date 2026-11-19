@@ -49,6 +49,7 @@ cmake --build <build-dir> --parallel --target <Component>-testrunner
 | `ENABLE_FASTLOGGER` | ON | Quill-based FastLogger; switched off on unsupported platforms |
 | `POCO_UNBUNDLED` | OFF | Use system libraries instead of the bundled ones (see [dependencies.md](dependencies.md)) |
 | `POCO_SQLITE_UNBUNDLED` | OFF | Use the system SQLite only |
+| `POCO_DATA_ODBC_UNICODE` | OFF | Data/ODBC on the wide-character (UTF-16) API of unixODBC (defines `UNICODE`, `POCO_UNIXODBC` and `SQL_NOUNICODEMAP`); Windows always uses the wide-character API |
 | `POCO_SANITIZEFLAGS` | empty | Sanitizer flags for compile and link (see [analysis.md](analysis.md)) |
 | `POCO_EMSCRIPTEN_FLAGS` | `-pthread -fexceptions` | Emscripten only: compile and link flags for threads and C++ exceptions; empty for a build without them |
 | `POCO_COMPILER` | empty | Compiler by name or path (`gcc-12`, `clang-18`, `clang-cl`) |

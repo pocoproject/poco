@@ -49,6 +49,7 @@ public:
 	void testReadOnlyCommentSmuggling();
 	void testReadOnlyCTEWrite();
 	void testReadOnlyMultiStatement();
+	void testReadOnlyUnreadableInput();
 	void testReadOnlyPragmaAndExplain();
 	void testPolicyIndependentOfSqlParseFeature();
 	void testQueryOnlyNeverSet();

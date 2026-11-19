@@ -49,7 +49,9 @@ public:
 
 	[[nodiscard]] std::string nativeSQL();
 		/// Returns the SQL string as modified by the driver.
-		/// Throws NullPointerException if the session is not connected.
+		/// Throws NullPointerException if the session is not connected,
+		/// LengthExceededException if the statement is too long for the
+		/// driver interface.
 
 protected:
 	[[nodiscard]] std::size_t columnsReturned() const override;
