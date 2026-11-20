@@ -5,19 +5,19 @@
 "PK\x06\x06"
 "PK\x06\x07"
 "PK\x07\x08"
-# compression methods
-cm: 0
-cm: 8
-cm: 12
-cm: 99
+# compression methods (little-endian)
+"\x00\x00"
+"\x08\x00"
+"\x0c\x00"
+"\x63\x00"
 # versions
-\x14\x00
-\x2d\x00
-\x33\x00
+"\x14\x00"
+"\x2d\x00"
+"\x33\x00"
 # flags
-\x00\x00
-\x08\x00
-\x09\x00
+"\x00\x00"
+"\x08\x00"
+"\x09\x00"
 # entry names
 "a.txt"
 "dir/"
@@ -26,4 +26,4 @@ cm: 99
 "/abs/path.txt"
 "C:\\evil.txt"
 # zip64 extra field id
-\x01\x00
+"\x01\x00"
