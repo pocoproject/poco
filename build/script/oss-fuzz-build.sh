@@ -9,7 +9,6 @@ cmake -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=ON -DENABLE_FUZZING=ON \
       -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF -DENABLE_PROMETHEUS=OFF \
       -DENABLE_ACTIVERECORD_COMPILER=OFF \
       -DENABLE_AI_MCP=ON -DENABLE_AI_MCP_HTTP=ON \
-      -DENABLE_ENCODINGS=ON \
       ..
 
 make -j$(nproc)
@@ -25,11 +24,13 @@ cp bin/Net-http-parser-fuzzer $OUT/http_message_fuzzer
 cp bin/AIMCP-server-fuzzer $OUT/mcp_server_fuzzer
 cp bin/AIMCP-client-fuzzer $OUT/mcp_client_fuzzer
 cp bin/AIMCPHTTP-eventstream-fuzzer $OUT/mcp_event_stream_fuzzer
-cp bin/Encodings-convert-fuzzer $OUT/encodings_convert_fuzzer
+cp bin/Encodings-decode-fuzzer $OUT/encodings_decode_fuzzer
+cp bin/Encodings-encode-fuzzer $OUT/encodings_encode_fuzzer
 
 # Seed corpus
 zip -q -r -j $OUT/mail_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Mail
-zip -q -r -j $OUT/encodings_convert_fuzzer_seed_corpus.zip $SRC/poco/Encodings/fuzzing/seed/Enc
+zip -q -r -j $OUT/encodings_decode_fuzzer_seed_corpus.zip $SRC/poco/Encodings/fuzzing/seed/Decode
+zip -q -r -j $OUT/encodings_encode_fuzzer_seed_corpus.zip $SRC/poco/Encodings/fuzzing/seed/Encode
 zip -q -r -j $OUT/http_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/HTTP
 zip -q -r -j $OUT/mcp_server_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Server
 zip -q -r -j $OUT/mcp_client_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Client
@@ -37,7 +38,6 @@ zip -q -r -j $OUT/mcp_event_stream_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/HTTP/
 
 # Dictionaries
 cp $SRC/poco/XML/fuzzing/xml.dict $OUT/xml_parser_fuzzer.dict
-cp $SRC/poco/Encodings/fuzzing/encodings.dict $OUT/encodings.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_server_fuzzer.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_client_fuzzer.dict
 cp $SRC/poco/AI/MCP/HTTP/fuzzing/eventstream.dict $OUT/mcp_event_stream_fuzzer.dict
