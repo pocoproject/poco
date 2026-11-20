@@ -50,4 +50,3 @@ endif()
 if(ENABLE_FUZZING)
 	add_subdirectory(fuzzing)
 endif()
-
