@@ -256,4 +256,12 @@ void HTTPCredentials::extractCredentials(const Poco::URI& uri, std::string& user
 }
 
 
+bool HTTPCredentials::isSameOrigin(const Poco::URI& uri, const Poco::URI& otherURI)
+{
+	return uri.getScheme() == otherURI.getScheme() &&
+		uri.getHost() == otherURI.getHost() &&
+		uri.getPort() == otherURI.getPort();
+}
+
+
 } // namespace Poco::Net

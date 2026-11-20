@@ -27,6 +27,7 @@ public:
 	void testNoRedirect();
 	void testEmptyPath();
 	void testRedirect();
+	void testRedirectCredentials();
 	void testProxy();
 	void testError();
 
