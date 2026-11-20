@@ -1,4 +1,4 @@
-section.key[section]
+[section]
 key=value
 other=123
 ; comment

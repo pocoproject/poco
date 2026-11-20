@@ -1,0 +1,1 @@
+<root><name>${user}</name><msg>hi ${name}</msg></root>

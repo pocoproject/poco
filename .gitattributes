@@ -34,3 +34,4 @@
 
 # Fuzzing seeds are inputs, kept byte for byte: line endings included.
 AI/**/fuzzing/seed/** -text
+Util/fuzzing/seed/** -text

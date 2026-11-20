@@ -9,7 +9,6 @@ cmake -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=ON -DENABLE_FUZZING=ON \
       -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF -DENABLE_PROMETHEUS=OFF \
       -DENABLE_ACTIVERECORD_COMPILER=OFF \
       -DENABLE_AI_MCP=ON -DENABLE_AI_MCP_HTTP=ON \
-      -DENABLE_UTIL=ON \
       ..
 
 make -j$(nproc)
@@ -25,11 +24,15 @@ cp bin/Net-http-parser-fuzzer $OUT/http_message_fuzzer
 cp bin/AIMCP-server-fuzzer $OUT/mcp_server_fuzzer
 cp bin/AIMCP-client-fuzzer $OUT/mcp_client_fuzzer
 cp bin/AIMCPHTTP-eventstream-fuzzer $OUT/mcp_event_stream_fuzzer
-cp bin/Util-config-fuzzer $OUT/util_config_fuzzer
+cp bin/Util-properties-fuzzer $OUT/util_properties_fuzzer
+cp bin/Util-ini-fuzzer $OUT/util_ini_fuzzer
+cp bin/Util-xml-config-fuzzer $OUT/util_xml_config_fuzzer
 
 # Seed corpus
 zip -q -r -j $OUT/mail_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Mail
-zip -q -r -j $OUT/util_config_fuzzer_seed_corpus.zip $SRC/poco/Util/fuzzing/seed/Config
+zip -q -r -j $OUT/util_properties_fuzzer_seed_corpus.zip $SRC/poco/Util/fuzzing/seed/Properties
+zip -q -r -j $OUT/util_ini_fuzzer_seed_corpus.zip $SRC/poco/Util/fuzzing/seed/Ini
+zip -q -r -j $OUT/util_xml_config_fuzzer_seed_corpus.zip $SRC/poco/Util/fuzzing/seed/XMLConfig
 zip -q -r -j $OUT/http_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/HTTP
 zip -q -r -j $OUT/mcp_server_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Server
 zip -q -r -j $OUT/mcp_client_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Client
@@ -37,7 +40,9 @@ zip -q -r -j $OUT/mcp_event_stream_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/HTTP/
 
 # Dictionaries
 cp $SRC/poco/XML/fuzzing/xml.dict $OUT/xml_parser_fuzzer.dict
-cp $SRC/poco/Util/fuzzing/util_config.dict $OUT/util_config.dict
+cp $SRC/poco/Util/fuzzing/properties.dict $OUT/util_properties_fuzzer.dict
+cp $SRC/poco/Util/fuzzing/ini.dict $OUT/util_ini_fuzzer.dict
+cp $SRC/poco/XML/fuzzing/xml.dict $OUT/util_xml_config_fuzzer.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_server_fuzzer.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_client_fuzzer.dict
 cp $SRC/poco/AI/MCP/HTTP/fuzzing/eventstream.dict $OUT/mcp_event_stream_fuzzer.dict
