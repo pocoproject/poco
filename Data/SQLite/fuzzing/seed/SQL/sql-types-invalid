@@ -1,0 +1,17 @@
+CREATE TABLE types (
+	d DATE,
+	t TIME,
+	dt DATETIME,
+	u UUID,
+	b BLOB,
+	flag BOOL
+);
+INSERT INTO types VALUES (
+	'not-a-date',
+	'99:99:99',
+	'yesterday',
+	'not-a-uuid',
+	'not-a-blob',
+	'maybe'
+);
+SELECT * FROM types;

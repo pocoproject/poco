@@ -1,1 +1,0 @@
-SELECT * FROM t WHERE name LIKE %s
