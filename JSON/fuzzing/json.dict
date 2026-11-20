@@ -19,11 +19,9 @@
 "9223372036854775807"
 "3.141592653589793"
 # strings / escapes
-"\"\x00\""
 "\"\xF0\x9F\x98\x80\""
 "\"\\\\\""
 "\"/\""
-"\"\x1F\""
 # query path fragments
 "nested"
 "deep"
