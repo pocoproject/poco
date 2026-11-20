@@ -24,9 +24,13 @@ cp bin/Net-http-parser-fuzzer $OUT/http_message_fuzzer
 cp bin/AIMCP-server-fuzzer $OUT/mcp_server_fuzzer
 cp bin/AIMCP-client-fuzzer $OUT/mcp_client_fuzzer
 cp bin/AIMCPHTTP-eventstream-fuzzer $OUT/mcp_event_stream_fuzzer
+cp bin/Zip-archive-fuzzer $OUT/zip_archive_fuzzer
+cp bin/Zip-decompress-fuzzer $OUT/zip_decompress_fuzzer
 
 # Seed corpus
 zip -q -r -j $OUT/mail_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Mail
+zip -q -r -j $OUT/zip_archive_fuzzer_seed_corpus.zip $SRC/poco/Zip/fuzzing/seed/Archive
+zip -q -r -j $OUT/zip_decompress_fuzzer_seed_corpus.zip $SRC/poco/Zip/fuzzing/seed/Archive
 zip -q -r -j $OUT/http_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/HTTP
 zip -q -r -j $OUT/mcp_server_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Server
 zip -q -r -j $OUT/mcp_client_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Client
@@ -40,6 +44,8 @@ cp $SRC/poco/XML/fuzzing/xml.dict $OUT/xml_parser_fuzzer.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_server_fuzzer.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_client_fuzzer.dict
 cp $SRC/poco/AI/MCP/HTTP/fuzzing/eventstream.dict $OUT/mcp_event_stream_fuzzer.dict
+cp $SRC/poco/Zip/fuzzing/zip.dict $OUT/zip_archive_fuzzer.dict
+cp $SRC/poco/Zip/fuzzing/zip.dict $OUT/zip_decompress_fuzzer.dict
 cp $SRC/poco/JWT/fuzzing/jwt.dict $OUT/jwt_decode_fuzzer.dict
 cp $SRC/poco/JSON/fuzzing/json.dict $OUT/json_parser_fuzzer.dict
 cp $SRC/poco/Net/fuzzing/http.dict $OUT/http_message_fuzzer.dict
