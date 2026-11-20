@@ -81,6 +81,7 @@ public:
 
 	ConnectionException(const std::string& text, MYSQL* h);
 		/// Creates ConnectionException from string and handle.
+		/// The exception code is mysql_errno() of the handle, 0 for a null handle.
 
 private:
 	static std::string compose(const std::string& text, MYSQL* h);
@@ -108,6 +109,7 @@ public:
 
 	StatementException(const std::string& text, MYSQL_STMT* h, const std::string& stmt = "");
 		/// Creates StatementException from string and handle.
+		/// The exception code is mysql_stmt_errno() of the handle, 0 for a null handle.
 
 private:
 	static std::string compose(const std::string& text, MYSQL_STMT* h, const std::string& stmt);

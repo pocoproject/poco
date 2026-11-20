@@ -31,6 +31,7 @@ public:
 	void testDefaultProvider();
 	void testLegacyProvider();
 	void testReinitialize();
+	void testConcurrentInitialize();
 #endif
 
 	void setUp();

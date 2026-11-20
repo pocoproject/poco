@@ -86,6 +86,8 @@ public:
 
 	std::array<int, 4> testStdArray(const std::array<int, 4>& arr);
 
+	std::optional<std::string> testStdOptional(const std::optional<std::string>& value);
+
 	std::shared_ptr<Struct1> testStdSharedPtr(const std::shared_ptr<Struct1>& pStruct1);
 
 	Struct1 testStruct11(const Struct1& s1);
@@ -150,6 +152,7 @@ private:
 	mutable Poco::Optional<std::string> _testPocoOptionalRet;
 	mutable Poco::SharedPtr<Struct1> _testPtrRet;
 	mutable std::array<int, 4> _testStdArrayRet;
+	mutable std::optional<std::string> _testStdOptionalRet;
 	mutable std::shared_ptr<Struct1> _testStdSharedPtrRet;
 	mutable Struct1 _testStruct11Ret;
 	mutable std::vector<Struct1> _testStruct1Vec1Ret;

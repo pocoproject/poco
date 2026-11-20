@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include <float.h>
 #include <math.h>
+#include <cmath>
 
 #ifndef _SW_INEXACT
 #	define _SW_INEXACT 0x00000001 // inexact (precision)
@@ -143,7 +144,7 @@ inline double FPEnvironmentImpl::copySignImpl(double target, double source)
 
 inline long double FPEnvironmentImpl::copySignImpl(long double target, long double source)
 {
-	return (source > 0 && target > 0) || (source < 0 && target < 0) ? target : -target;
+	return std::copysign(target, source);
 }
 
 

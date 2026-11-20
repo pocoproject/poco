@@ -21,6 +21,9 @@ namespace Poco::Zip {
 
 bool ZipCommon::isValidPath(const std::string& path)
 {
+	if (path.find('\0') != std::string::npos)
+		return false;
+
 	try
 	{
 		if (Path(path, Path::PATH_UNIX).isAbsolute() || Path(path, Path::PATH_WINDOWS).isAbsolute())

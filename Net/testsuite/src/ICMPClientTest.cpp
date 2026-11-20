@@ -14,20 +14,24 @@
 #include "Poco/Net/ICMPSocket.h"
 #include "Poco/Net/ICMPClient.h"
 #include "Poco/Net/ICMPEventArgs.h"
+#include "Poco/Net/ICMPPacket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Delegate.h"
 #include <sstream>
 #include <iostream>
+#include <cstring>
 
 
 using Poco::Net::ICMPSocket;
 using Poco::Net::ICMPClient;
 using Poco::Net::ICMPEventArgs;
+using Poco::Net::ICMPPacket;
 using Poco::Net::SocketAddress;
 using Poco::Net::IPAddress;
 using Poco::Net::HostNotFoundException;
+using Poco::InvalidArgumentException;
 using Poco::Delegate;
 using Poco::AutoPtr;
 
@@ -127,6 +131,44 @@ void ICMPClientTest::testBigPing()
 }
 
 
+void ICMPClientTest::testPacketTime()
+{
+	// In a reply, the time value follows the IPv4 header (20 bytes) and the
+	// ICMP header (8 bytes): offset 28 is not aligned for struct timeval.
+	alignas(8) Poco::UInt8 buffer[64] = {};
+	buffer[0] = 0x45;
+	struct timeval sent;
+	sent.tv_sec = 1234567;
+	sent.tv_usec = 890123;
+	std::memcpy(buffer + 28, &sent, sizeof(sent));
+
+	ICMPPacket packet(IPAddress::IPv4);
+	const struct timeval received = packet.time(buffer, sizeof(buffer));
+	assertTrue (received.tv_sec == sent.tv_sec);
+	assertTrue (received.tv_usec == sent.tv_usec);
+
+	// The headers fit, the time value does not.
+	try
+	{
+		[[maybe_unused]] const struct timeval tv = packet.time(buffer, 28 + static_cast<int>(sizeof(sent)) - 1);
+		fail("time value beyond the length must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	// The ICMP header does not fit.
+	try
+	{
+		[[maybe_unused]] const struct timeval tv = packet.time(buffer, 24);
+		fail("truncated header must throw");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+}
+
+
 void ICMPClientTest::registerDelegates(const ICMPClient& icmpClient)
 {
 	icmpClient.pingBegin += Delegate<ICMPClientTest, ICMPEventArgs>(this, &ICMPClientTest::onBegin);
@@ -209,6 +251,7 @@ CppUnit::Test* ICMPClientTest::suite()
 
 	CppUnit_addTest(pSuite, ICMPClientTest, testPing);
 	CppUnit_addTest(pSuite, ICMPClientTest, testBigPing);
+	CppUnit_addTest(pSuite, ICMPClientTest, testPacketTime);
 
 	return pSuite;
 }

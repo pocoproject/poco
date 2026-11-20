@@ -321,6 +321,58 @@ void XMLConfigurationTest::testManyKeys()
 }
 
 
+void XMLConfigurationTest::testDelimiterInElementName()
+{
+	static const std::string XML_FILE =
+		"<config>"
+		"	<a.b>1</a.b>"
+		"	<a.b>2</a.b>"
+		"	<x>"
+		"		<y.z attr='v'>3</y.z>"
+		"	</x>"
+		"</config>";
+
+	std::istringstream istr(XML_FILE);
+	AutoPtr<XMLConfiguration> pConf = new XMLConfiguration(istr);
+
+	const AbstractConfiguration::Keys keys = pConf->keys();
+	assertTrue (keys == AbstractConfiguration::Keys({"a\\.b", "a\\.b[1]", "x"}));
+	assertEqual ("1", pConf->getString("a\\.b"));
+	assertEqual ("2", pConf->getString("a\\.b[1]"));
+	assertEqual ("3", pConf->getString("x.y\\.z"));
+	assertEqual ("v", pConf->getString("x.y\\.z[@attr]"));
+	assertTrue (!pConf->hasProperty("a.b"));
+
+	const AbstractConfiguration::Keys childKeys = pConf->keys("x");
+	assertTrue (childKeys == AbstractConfiguration::Keys({"y\\.z"}));
+	for (const auto& childKey: childKeys)
+	{
+		assertEqual ("3", pConf->getString("x." + childKey));
+	}
+
+	AbstractConfiguration::Ptr pView = pConf->createView("x");
+	assertEqual ("3", pView->getString("y\\.z"));
+
+	AutoPtr<XMLConfiguration> pNewConf = new XMLConfiguration;
+	pNewConf->setString("n\\.m", "5");
+	assertEqual ("5", pNewConf->getString("n\\.m"));
+	std::ostringstream ostrSet;
+	pNewConf->save(ostrSet);
+	assertEqual ("<config>\n\t<n.m>5</n.m>\n</config>\n", ostrSet.str());
+	pNewConf->remove("n\\.m");
+	std::ostringstream ostrRemoved;
+	pNewConf->save(ostrRemoved);
+	assertEqual ("<config/>\n", ostrRemoved.str());
+
+	std::istringstream istrOtherDelim("<config><a-b>1</a-b><c.d>2</c.d></config>");
+	AutoPtr<XMLConfiguration> pOtherConf = new XMLConfiguration(istrOtherDelim, '-');
+	assertTrue (pOtherConf->keys() == AbstractConfiguration::Keys({"a\\-b", "c.d"}));
+	assertEqual ("1", pOtherConf->getString("a\\-b"));
+	assertEqual ("2", pOtherConf->getString("c.d"));
+	assertTrue (!pOtherConf->hasProperty("c\\.d"));
+}
+
+
 void XMLConfigurationTest::setUp()
 {
 }
@@ -344,6 +396,7 @@ CppUnit::Test* XMLConfigurationTest::suite()
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testFromScratch);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testLoadEmpty);
 	CppUnit_addTest(pSuite, XMLConfigurationTest, testManyKeys);
+	CppUnit_addTest(pSuite, XMLConfigurationTest, testDelimiterInElementName);
 
 	return pSuite;
 }

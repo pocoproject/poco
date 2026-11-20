@@ -112,6 +112,9 @@ public:
 		///
 		/// Some platform only allow changing a thread's priority
 		/// if the process has certain privileges.
+		///
+		/// If the priority cannot be set, an exception is thrown
+		/// and the priority of the thread does not change.
 
 	[[nodiscard]] Priority getPriority() const;
 		/// Returns the thread's priority.
@@ -119,10 +122,13 @@ public:
 	void setOSPriority(int prio, int policy = POLICY_DEFAULT);
 		/// Sets the thread's priority, using an operating system specific
 		/// priority value. Use getMinOSPriority() and getMaxOSPriority() to
-		/// obtain mininum and maximum priority values. Additionally,
+		/// obtain minimum and maximum priority values. Additionally,
 		/// a scheduling policy can be specified. The policy is currently
 		/// only used on POSIX platforms where the values SCHED_OTHER (default),
 		/// SCHED_FIFO and SCHED_RR are supported.
+		///
+		/// If the priority cannot be set, an exception is thrown
+		/// and the priority of the thread does not change.
 
 	[[nodiscard]] int getOSPriority() const;
 		/// Returns the thread's priority, expressed as an operating system
@@ -154,12 +160,19 @@ public:
 		/// Note that the given Runnable object must remain
 		/// valid during the entire lifetime of the thread, as
 		/// only a reference to it is stored internally.
+		///
+		/// Throws a SystemException if the thread cannot be started,
+		/// for example because its priority cannot be applied. The
+		/// target is not run in that case. This also applies to the
+		/// other start() variants and to startFunc().
 
 	void start(Poco::SharedPtr<Runnable> pTarget);
 		/// Starts the thread with the given target.
 		///
 		/// The Thread ensures that the given target stays
 		/// alive while the thread is running.
+		///
+		/// Throws a NullPointerException if pTarget is null.
 
 	void start(Callable target, void* pData = nullptr);
 		/// Starts the thread with the given target and parameter.
@@ -219,7 +232,7 @@ public:
 		/// some scenarios, may be desirable behavior).
 		///
 		/// Note that, unlike Thread::sleep(), this function can only
-		/// be succesfully called from a thread started as Poco::Thread.
+		/// be successfully called from a thread started as Poco::Thread.
 
 	void wakeUp();
 		/// Wakes up the thread which is in the state of interruptible
@@ -258,8 +271,8 @@ public:
 
 	bool setAffinity(int coreId);
 		/// Sets the thread affinity to the coreID.
-		/// Returns true if succesful.
-		/// Returns false if not succesful or not
+		/// Returns true if successful.
+		/// Returns false if not successful or not
 		/// implemented.
 
 	[[nodiscard]] int getAffinity() const;

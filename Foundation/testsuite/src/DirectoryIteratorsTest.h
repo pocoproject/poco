@@ -17,6 +17,8 @@
 #include "Poco/Foundation.h"
 #include "Poco/Path.h"
 #include "CppUnit/TestCase.h"
+#include <string>
+#include <vector>
 
 
 class DirectoryIteratorsTest: public CppUnit::TestCase
@@ -29,6 +31,12 @@ public:
 	void testSortedDirectoryIterator();
 	void testSimpleRecursiveDirectoryIterator();
 	void testSiblingsFirstRecursiveDirectoryIterator();
+	void testRecursiveDirectoryIteratorCopy();
+	void testRecursiveDirectoryIteratorAssignNonexistent();
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	void testSimpleRecursiveDirectoryIteratorOnError();
+	void testSiblingsFirstRecursiveDirectoryIteratorOnError();
+#endif
 
 	void setUp();
 	void tearDown();
@@ -38,8 +46,10 @@ public:
 protected:
 	Poco::Path path() const;
 	void createSubdir(Poco::Path& p);
+	void onError(const void* pSender, const std::string& path);
 
 private:
+	std::vector<std::string> _errorPaths;
 };
 
 

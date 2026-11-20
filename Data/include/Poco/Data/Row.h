@@ -176,13 +176,13 @@ public:
 		/// Converts the column names to string.
 
 	void formatNames() const;
-		/// Fomats the column names.
+		/// Formats the column names.
 
 	[[nodiscard]] const std::string& valuesToString() const;
-		/// Converts the row values to string and returns the formated string.
+		/// Converts the row values to string and returns the formatted string.
 
 	void formatValues() const;
-		/// Fomats the row values.
+		/// Formats the row values.
 
 	[[nodiscard]] bool operator == (const Row& other) const;
 		/// Equality operator.

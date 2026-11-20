@@ -24,12 +24,63 @@
 #include "Poco/Tuple.h"
 #include "Poco/ActiveMethod.h"
 #include <algorithm>
+#include <atomic>
+#include <utility>
 
 
 namespace Poco::Data {
 
 
 namespace {
+	class ExecutionClaim
+		/// Claims the execution of a StatementImpl for its lifetime, so that only one execution
+		/// of the implementation runs at a time, also through copies of a Statement used in other
+		/// threads. The state of the implementation cannot tell: an execution that the thread
+		/// pool has not started yet leaves it unchanged, and a running execution sets it to done
+		/// or paused before it ends.
+	{
+	public:
+		ExecutionClaim() = delete;
+		POCO_NODISCARD_CTOR explicit ExecutionClaim(std::atomic<bool>& executing);
+			/// Claims the execution.
+			/// Throws InvalidAccessException if another execution of the implementation runs.
+
+		~ExecutionClaim();
+			/// Ends the claim, unless release() has handed it over.
+
+		ExecutionClaim(const ExecutionClaim&) = delete;
+		ExecutionClaim& operator = (const ExecutionClaim&) = delete;
+		ExecutionClaim(ExecutionClaim&&) = delete;
+		ExecutionClaim& operator = (ExecutionClaim&&) = delete;
+
+		void release() noexcept;
+			/// Hands the claim over to an asynchronous execution, which ends it when it ends.
+
+	private:
+		std::atomic<bool>& _executing;
+		bool               _claimed = true;
+	};
+
+
+	ExecutionClaim::ExecutionClaim(std::atomic<bool>& executing):
+		_executing(executing)
+	{
+		if (_executing.exchange(true)) throw InvalidAccessException("Statement still executing.");
+	}
+
+
+	ExecutionClaim::~ExecutionClaim()
+	{
+		if (_claimed) _executing = false;
+	}
+
+
+	void ExecutionClaim::release() noexcept
+	{
+		_claimed = false;
+	}
+
+
 	class AsyncExecRunnable: public Poco::ActiveRunnableBase
 		/// Runs an asynchronous execution of a StatementImpl. It holds the
 		/// StatementImpl while the execution runs, so that a Statement destroyed
@@ -38,7 +89,8 @@ namespace {
 	{
 	public:
 		AsyncExecRunnable() = delete;
-		AsyncExecRunnable(StatementImpl::Ptr pImpl, bool reset, const Statement::Result& result);
+		AsyncExecRunnable(StatementImpl::Ptr pImpl, std::atomic<bool>& executing, bool reset,
+			const Statement::Result& result);
 		~AsyncExecRunnable() override = default;
 		AsyncExecRunnable(const AsyncExecRunnable&) = delete;
 		AsyncExecRunnable& operator = (const AsyncExecRunnable&) = delete;
@@ -48,14 +100,22 @@ namespace {
 		void run() override;
 
 	private:
+		std::size_t execute();
+			/// Executes the StatementImpl and ends the claim on its execution that the Statement
+			/// has handed over (see ExecutionClaim), whether the execution returns or throws.
+			/// The claim ends here because reporting the result in run() can throw as well.
+
 		StatementImpl::Ptr _pImpl;
+		std::atomic<bool>& _executing;
 		bool               _reset;
 		Statement::Result  _result;
 	};
 
 
-	AsyncExecRunnable::AsyncExecRunnable(StatementImpl::Ptr pImpl, bool reset, const Statement::Result& result):
+	AsyncExecRunnable::AsyncExecRunnable(StatementImpl::Ptr pImpl, std::atomic<bool>& executing, bool reset,
+			const Statement::Result& result):
 		_pImpl(std::move(pImpl)),
+		_executing(executing),
 		_reset(reset),
 		_result(result)
 	{
@@ -67,7 +127,10 @@ namespace {
 		ActiveRunnableBase::Ptr guard(this, false); // ensure automatic release when done
 		try
 		{
-			_result.data(new std::size_t(_pImpl->execute(_reset)));
+			// execute() comes first: new allocates before it evaluates its initializer,
+			// so an allocation failure would skip execute() and never end the claim
+			const std::size_t rows = execute();
+			_result.data(new std::size_t(rows));
 		}
 		catch (Exception& e)
 		{
@@ -84,6 +147,60 @@ namespace {
 		// once wait() returns, only Statements hold the implementation
 		_pImpl.reset();
 		_result.notify();
+	}
+
+
+	std::size_t AsyncExecRunnable::execute()
+	{
+		try
+		{
+			const std::size_t rows = _pImpl->execute(_reset);
+			_executing = false;
+			return rows;
+		}
+		catch (...)
+		{
+			_executing = false;
+			throw;
+		}
+	}
+
+
+	bool hasExtractions(const AbstractExtractionVecVec& extractors)
+		/// Returns true if an extraction is registered for any data set.
+	{
+		for (const auto& extractions: extractors)
+		{
+			if (!extractions.empty()) return true;
+		}
+		return false;
+	}
+
+
+	bool hasExtraction(const AbstractExtractionVecVec& extractors, bool bulk)
+		/// Returns true if an extraction with isBulk() == bulk is registered for
+		/// any data set. The bulk mode flags alone do not tell: a non-bulk binding
+		/// resets them (StatementImpl::forbidBulk()).
+	{
+		for (const auto& extractions: extractors)
+		{
+			for (const auto& pExtraction: extractions)
+			{
+				if (pExtraction->isBulk() == bulk) return true;
+			}
+		}
+		return false;
+	}
+
+
+	bool hasBinding(const AbstractBindingVec& bindings, bool bulk)
+		/// Returns true if a binding with isBulk() == bulk is registered.
+	{
+		for (const auto& pBinding: bindings)
+		{
+			if (pBinding->isBulk() == bulk) return true;
+		}
+		return false;
 	}
 } // namespace
 
@@ -207,7 +324,7 @@ Optional<std::size_t> Statement::statementsCount() const
 {
 	Optional<std::size_t> ret;
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_pImpl->session().shouldParse())
+	if (isParsed())
 		ret = _pParseResult->size();
 #endif
 	return ret;
@@ -218,10 +335,11 @@ Optional<bool> Statement::parse()
 {
 	Optional<bool> result;
 #ifndef POCO_DATA_NO_SQL_PARSER
+	_pParseResult->reset();
+	_parseError.clear();
 	if (_stmtString.empty()) (void) toString();
 	if (!_stmtString.empty())
 	{
-		_pParseResult->reset();
 		Parser::SQLParser::parse(_stmtString, _pParseResult.get());
 		result = _pParseResult->isValid();
 		if (!result.value())
@@ -238,6 +356,12 @@ Optional<bool> Statement::parse()
 
 
 #ifndef POCO_DATA_NO_SQL_PARSER
+
+bool Statement::isParsed() const
+{
+	return _pImpl->session().shouldParse() && _pParseResult->isValid();
+}
+
 
 bool Statement::isType(unsigned int type) const
 {
@@ -280,7 +404,7 @@ const std::string& Statement::parseError()
 Optional<bool> Statement::isSelect() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_pImpl->session().shouldParse())
+	if (isParsed())
 		return isType(Parser::StatementType::kStmtSelect);
 	else return Optional<bool>();
 #else
@@ -292,7 +416,7 @@ Optional<bool> Statement::isSelect() const
 Optional<bool> Statement::isInsert() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_pImpl->session().shouldParse())
+	if (isParsed())
 		return isType(Parser::StatementType::kStmtInsert);
 	else return Optional<bool>();
 #else
@@ -304,7 +428,7 @@ Optional<bool> Statement::isInsert() const
 Optional<bool> Statement::isUpdate() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_pImpl->session().shouldParse())
+	if (isParsed())
 		return isType(Parser::StatementType::kStmtUpdate);
 	else return Optional<bool>();
 #else
@@ -316,7 +440,7 @@ Optional<bool> Statement::isUpdate() const
 Optional<bool> Statement::isDelete() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_pImpl->session().shouldParse())
+	if (isParsed())
 		return isType(Parser::StatementType::kStmtDelete);
 	else return Optional<bool>();
 #else
@@ -328,7 +452,7 @@ Optional<bool> Statement::isDelete() const
 Optional<bool> Statement::hasSelect() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_pImpl->session().shouldParse())
+	if (isParsed())
 		return hasType(Parser::StatementType::kStmtSelect);
 	else return Optional<bool>();
 #else
@@ -340,7 +464,7 @@ Optional<bool> Statement::hasSelect() const
 Optional<bool> Statement::hasInsert() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_pImpl->session().shouldParse())
+	if (isParsed())
 		return hasType(Parser::StatementType::kStmtInsert);
 	else return Optional<bool>();
 #else
@@ -352,7 +476,7 @@ Optional<bool> Statement::hasInsert() const
 Optional<bool> Statement::hasUpdate() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_pImpl->session().shouldParse())
+	if (isParsed())
 		return hasType(Parser::StatementType::kStmtUpdate);
 	else return Optional<bool>();
 #else
@@ -364,7 +488,7 @@ Optional<bool> Statement::hasUpdate() const
 Optional<bool> Statement::hasDelete() const
 {
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_pImpl->session().shouldParse())
+	if (isParsed())
 		return hasType(Parser::StatementType::kStmtDelete);
 	else return Optional<bool>();
 #else
@@ -390,8 +514,10 @@ void Statement::checkBeginTransaction()
 		if (!session.isConnected()) return;
 		if (session.shouldParse())
 		{
+			// only a statement that parsed as SELECT runs without a transaction;
+			// one that does not parse may write
 			auto result = parse();
-			if (result.isSpecified() && result.value() && !isSelect().value())
+			if (!(result.isSpecified() && result.value() && isSelect().value()))
 				session.begin();
 		} else
 		{
@@ -404,6 +530,7 @@ void Statement::checkBeginTransaction()
 std::size_t Statement::execute(bool reset)
 {
 	Mutex::ScopedLock lock(_mutex);
+	ExecutionClaim claim(_pImpl->_executing);
 	bool isDone = done();
 	if (initialized() || paused() || isDone)
 	{
@@ -418,6 +545,7 @@ std::size_t Statement::execute(bool reset)
 		else
 		{
 			doAsyncExec();
+			claim.release();
 			return 0;
 		}
 	}
@@ -428,6 +556,7 @@ std::size_t Statement::execute(bool reset)
 void Statement::executeDirect(const std::string& query)
 {
 	Mutex::ScopedLock lock(_mutex);
+	ExecutionClaim claim(_pImpl->_executing);
 	bool isDone = done();
 	if (initialized() || paused() || isDone)
 	{
@@ -448,8 +577,13 @@ void Statement::executeDirect(const std::string& query)
 const Statement::Result& Statement::executeAsync(bool reset)
 {
 	Mutex::ScopedLock lock(_mutex);
+	ExecutionClaim claim(_pImpl->_executing);
 	if (initialized() || paused() || done())
-		return doAsyncExec(reset);
+	{
+		const Result& result = doAsyncExec(reset);
+		claim.release();
+		return result;
+	}
 	else
 		throw InvalidAccessException("Statement still executing.");
 }
@@ -459,9 +593,11 @@ const Statement::Result& Statement::doAsyncExec(bool reset)
 {
 	if (done()) _pImpl->reset();
 	Result result(new ActiveResultHolder<std::size_t>());
-	ActiveRunnableBase::Ptr pRunnable(new AsyncExecRunnable(_pImpl, reset, result));
+	ResultPtr pResult(new Result(result));
+	ActiveRunnableBase::Ptr pRunnable(new AsyncExecRunnable(_pImpl, _pImpl->_executing, reset, result));
 	ActiveStarter<StatementImpl>::start(_pImpl.get(), pRunnable);
-	_pResult = new Result(result);
+	// nothing below may throw: the started execution owns the claim
+	_pResult = std::move(pResult);
 	return *_pResult;
 }
 
@@ -522,11 +658,13 @@ Statement& Statement::addBind(AbstractBinding::Ptr pBind)
 		if (!_pImpl->isBulkSupported())
 			throw InvalidAccessException("Bulk not supported by this session.");
 
-		if(_pImpl->bulkBindingAllowed())
+		if(_pImpl->bulkBindingAllowed() && !hasBinding(_pImpl->_bindings, false))
 			_pImpl->setBulkBinding();
 		else
 			throw InvalidAccessException("Bulk and non-bulk binding modes can not be mixed.");
 	}
+	else if (hasBinding(_pImpl->_bindings, true))
+		throw InvalidAccessException("Bulk and non-bulk binding modes can not be mixed.");
 	else _pImpl->forbidBulk();
 
 	_pImpl->addBind(pBind);
@@ -541,7 +679,7 @@ Statement& Statement::addExtract(AbstractExtraction::Ptr pExtract)
 		if (!_pImpl->isBulkSupported())
 			throw InvalidAccessException("Bulk not supported by this session.");
 
-		if(_pImpl->bulkExtractionAllowed())
+		if(_pImpl->bulkExtractionAllowed() && !hasExtraction(_pImpl->_extractors, false))
 		{
 			Bulk b(pExtract->getLimit());
 			_pImpl->setBulkExtraction(b);
@@ -549,6 +687,8 @@ Statement& Statement::addExtract(AbstractExtraction::Ptr pExtract)
 		else
 			throw InvalidAccessException("Bulk and non-bulk extraction modes can not be mixed.");
 	}
+	else if (hasExtraction(_pImpl->_extractors, true))
+		throw InvalidAccessException("Bulk and non-bulk extraction modes can not be mixed.");
 	else _pImpl->forbidBulk();
 
 	_pImpl->addExtract(pExtract);
@@ -558,7 +698,8 @@ Statement& Statement::addExtract(AbstractExtraction::Ptr pExtract)
 
 Statement& Statement::operator , (const Limit& extrLimit)
 {
-	if (_pImpl->isBulkExtraction() && _pImpl->extractionLimit() != extrLimit)
+	if ((_pImpl->isBulkExtraction() || hasExtraction(_pImpl->_extractors, true)) &&
+		_pImpl->extractionLimit() != extrLimit)
 		throw InvalidArgumentException("Limit for bulk extraction already set.");
 
 	_pImpl->setExtractionLimit(extrLimit);
@@ -568,7 +709,7 @@ Statement& Statement::operator , (const Limit& extrLimit)
 
 Statement& Statement::operator , (const Range& extrRange)
 {
-	if (_pImpl->isBulkExtraction())
+	if (_pImpl->isBulkExtraction() || hasExtraction(_pImpl->_extractors, true))
 		throw InvalidAccessException("Can not set range for bulk extraction.");
 
 	_pImpl->setExtractionLimit(extrRange.lower());
@@ -599,6 +740,9 @@ Statement& Statement::operator , (const Bulk& bulk)
 
 Statement& Statement::operator , (BulkFnType)
 {
+	if (hasExtractions(_pImpl->_extractors) || !_pImpl->_bindings.empty())
+		throw InvalidAccessException("Can not set bulk operations.");
+
 	const Limit& limit(_pImpl->extractionLimit());
 	if (limit.isHardLimit() ||
 		limit.isLowerLimit() ||

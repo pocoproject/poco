@@ -207,7 +207,7 @@ void X509Certificate::load(const std::string& path)
 	_pCert = PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr);
 	BIO_free(pBIO);
 
-	if (!_pCert) throw Poco::ReadFileException("Faild to load certificate from", path);
+	if (_pCert == nullptr) throw Poco::ReadFileException("Failed to load certificate from", path);
 
 	init();
 }

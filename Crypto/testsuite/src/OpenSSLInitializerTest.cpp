@@ -17,6 +17,9 @@
 #include <openssl/crypto.h>
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/provider.h>
+#include <atomic>
+#include <thread>
+#include <vector>
 #endif
 
 
@@ -180,6 +183,49 @@ void OpenSSLInitializerTest::testReinitialize()
 }
 
 
+void OpenSSLInitializerTest::testConcurrentInitialize()
+{
+	// Detects unserialized initialization only under ThreadSanitizer, and only when
+	// the legacy provider cannot be loaded (for example with OPENSSL_MODULES set to a
+	// directory without it when the test runner starts): only then does every first
+	// initialization write the legacy provider pointer again. The test cannot set
+	// this up itself, because the test runner loads the providers before any test.
+
+	static constexpr int THREADS = 8;
+	static constexpr int ITERATIONS = 200;
+
+	const bool haveLegacy = OSSL_PROVIDER_available(nullptr, "legacy") == 1;
+	std::atomic<int> failures(0);
+	auto initializeRepeatedly = [&]()
+	{
+		for (int i = 0; i < ITERATIONS; ++i)
+		{
+			OpenSSLInitializer::initialize();
+			if (OSSL_PROVIDER_available(nullptr, "default") != 1 || OpenSSLInitializer::haveLegacyProvider() != haveLegacy)
+				++failures;
+			OpenSSLInitializer::uninitialize();
+		}
+	};
+
+	// Release the reference held by the test runner (Driver.cpp), so that
+	// the threads take the count from zero to one and back.
+	Poco::Crypto::uninitializeCrypto();
+	std::vector<std::thread> threads;
+	threads.reserve(THREADS);
+	for (int i = 0; i < THREADS; ++i)
+	{
+		threads.emplace_back(initializeRepeatedly);
+	}
+	for (auto& thread: threads)
+	{
+		thread.join();
+	}
+	Poco::Crypto::initializeCrypto();
+
+	assertEqual (0, failures.load());
+}
+
+
 // Note: if anything else holds an OpenSSLInitializer, the count does not
 // reach zero and testReinitialize only checks a nested cycle.
 
@@ -207,6 +253,7 @@ CppUnit::Test* OpenSSLInitializerTest::suite()
 	CppUnit_addTest(pSuite, OpenSSLInitializerTest, testDefaultProvider);
 	CppUnit_addTest(pSuite, OpenSSLInitializerTest, testLegacyProvider);
 	CppUnit_addTest(pSuite, OpenSSLInitializerTest, testReinitialize);
+	CppUnit_addTest(pSuite, OpenSSLInitializerTest, testConcurrentInitialize);
 #endif
 
 	return pSuite;

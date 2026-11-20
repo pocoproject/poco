@@ -35,6 +35,8 @@ public:
 	void testFIFOBufferChar();
 	void testFIFOBufferInt();
 	void testFIFOBufferEOFAndError();
+	void testFIFOBufferNextWrite();
+	void testFIFOBufferAdvanceAfterDrain();
 	void testAtomicCounter();
 	void testNullable();
 	void testAscii();

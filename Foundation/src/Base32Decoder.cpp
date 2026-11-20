@@ -15,7 +15,9 @@
 #include "Poco/Base32Decoder.h"
 #include "Poco/Base32Encoder.h"
 #include "Poco/Exception.h"
-#include <cstring>
+#include "Poco/NumberFormatter.h"
+#include "DecoderError.h"
+#include <array>
 
 
 namespace Poco {
@@ -132,9 +134,29 @@ const unsigned char Base32DecoderBuf::REVERSE_CROCKFORD_ENCODING[256] =
 };
 
 
+namespace
+{
+	[[noreturn]] void throwInvalidChar(int c, std::streamoff pos)
+	{
+		if (c == '=')
+			throw DataFormatException("unexpected Base32 padding at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+		throw DataFormatException("invalid Base32 character " + describeDecoderChar(c) + " at position " + NumberFormatter::format(static_cast<Int64>(pos)));
+	}
+
+	inline unsigned char decodeChar(const unsigned char* pEncoding, int c, std::streamoff pos)
+		/// Returns the 5-bit value of c, or throws if c is padding or not in the alphabet.
+	{
+		const unsigned char value = pEncoding[static_cast<unsigned char>(c)];
+		if (c == '=' || value == 0xFF) throwInvalidChar(c, pos);
+		return value;
+	}
+}
+
+
 Base32DecoderBuf::Base32DecoderBuf(std::istream& istr, int options):
 	_groupLength(0),
 	_groupIndex(0),
+	_pos(0),
 	_buf(*istr.rdbuf()),
 	_encoding(encoding(options))
 {
@@ -152,69 +174,79 @@ int Base32DecoderBuf::readFromDevice()
 	{
 		return _group[_groupIndex++];
 	}
-	else
+
+	int c;
+	if (_groupLength > 0 && _groupLength < 5)
 	{
-		unsigned char buffer[8];
-		std::memset(buffer, '=', sizeof(buffer));
-		int c;
-
-		// per RFC-4648, Section 6, permissible block lengths are:
-		// 2, 4, 5, 7, and 8 bytes. Any other length is malformed.
-		//
-		do 
-		{
-			if ((c = readOne()) == -1) return -1;
-			buffer[0] = (unsigned char) c;
-			if (_encoding[buffer[0]] == 0xFF) throw DataFormatException();
-			if ((c = readOne()) == -1) throw DataFormatException();
-			buffer[1] = (unsigned char) c;
-			if (_encoding[buffer[1]] == 0xFF) throw DataFormatException();
-			if ((c = readOne()) == -1) break;
-			buffer[2] = (unsigned char) c;
-			if (_encoding[buffer[2]] == 0xFF) throw DataFormatException();
-			if ((c = readOne()) == -1) throw DataFormatException();
-			buffer[3] = (unsigned char) c;
-			if (_encoding[buffer[3]] == 0xFF) throw DataFormatException();
-			if ((c = readOne()) == -1) break;
-			buffer[4] = (unsigned char) c;
-			if (_encoding[buffer[4]] == 0xFF) throw DataFormatException();
-			if ((c = readOne()) == -1) break;
-			buffer[5] = (unsigned char) c;
-			if (_encoding[buffer[5]] == 0xFF) throw DataFormatException();
-			if ((c = readOne()) == -1) throw DataFormatException();
-			buffer[6] = (unsigned char) c;
-			if (_encoding[buffer[6]] == 0xFF) throw DataFormatException();
-			if ((c = readOne()) == -1) break;
-			buffer[7] = (unsigned char) c;
-			if (_encoding[buffer[7]] == 0xFF) throw DataFormatException();
-		} 
-		while (false);
-
-		_group[0] = (_encoding[buffer[0]] << 3) | (_encoding[buffer[1]] >> 2);
-		_group[1] = ((_encoding[buffer[1]] & 0x03) << 6) | (_encoding[buffer[2]] << 1) | (_encoding[buffer[3]] >> 4);
-		_group[2] = ((_encoding[buffer[3]] & 0x0F) << 4) | (_encoding[buffer[4]] >> 1);
-		_group[3] = ((_encoding[buffer[4]] & 0x01) << 7) | (_encoding[buffer[5]] << 2) | (_encoding[buffer[6]] >> 3);
-		_group[4] = ((_encoding[buffer[6]] & 0x07) << 5) | _encoding[buffer[7]];
-
-		if (buffer[2] == '=')
-			_groupLength = 1;
-		else if (buffer[4] == '=')
-			_groupLength = 2;
-		else if (buffer[5] == '=')
-			_groupLength = 3;
-		else if (buffer[7] == '=')
-			_groupLength = 4;
-		else
-			_groupLength = 5;
-		_groupIndex = 1;
-		return _group[0];
+		// The previous group was the final one; nothing may follow.
+		if ((c = readOne()) != -1)
+			throw DataFormatException("Base32 data after padding: " + describeDecoderChar(c) + " at position " + NumberFormatter::format(static_cast<Int64>(_pos - 1)));
+		return -1;
 	}
+
+	std::array<unsigned char, 8> value{};
+	int count = 0;
+	if ((c = readOne()) == -1) return -1;
+	value[count++] = decodeChar(_encoding, c, _pos - 1);
+	while (count < 8)
+	{
+		if ((c = readOne()) == -1 || c == '=') break;
+		value[count++] = decodeChar(_encoding, c, _pos - 1);
+	}
+
+	// per RFC-4648, Section 6, a group holds 2, 4, 5, 7 or 8 characters
+	// before its padding. Any other length is malformed.
+	if (count != 2 && count != 4 && count != 5 && count != 7 && count != 8)
+	{
+		if (c == '=')
+			throw DataFormatException("unexpected Base32 padding at position " + NumberFormatter::format(static_cast<Int64>(_pos - 1)));
+		throw DataFormatException("incomplete Base32 group at end of input");
+	}
+	if (c == '=')
+	{
+		// Padding, if present, fills the group to 8 characters.
+		for (int n = count + 1; n < 8; ++n)
+		{
+			if ((c = readOne()) == -1)
+				throw DataFormatException("incomplete Base32 group at end of input");
+			if (c != '=')
+				throw DataFormatException("Base32 data after padding: " + describeDecoderChar(c) + " at position " + NumberFormatter::format(static_cast<Int64>(_pos - 1)));
+		}
+	}
+
+	_group[0] = static_cast<unsigned char>((value[0] << 3) | (value[1] >> 2));
+	_group[1] = static_cast<unsigned char>(((value[1] & 0x03) << 6) | (value[2] << 1) | (value[3] >> 4));
+	_group[2] = static_cast<unsigned char>(((value[3] & 0x0F) << 4) | (value[4] >> 1));
+	_group[3] = static_cast<unsigned char>(((value[4] & 0x01) << 7) | (value[5] << 2) | (value[6] >> 3));
+	_group[4] = static_cast<unsigned char>(((value[6] & 0x07) << 5) | value[7]);
+
+	switch (count)
+	{
+	case 2:
+		_groupLength = 1;
+		break;
+	case 4:
+		_groupLength = 2;
+		break;
+	case 5:
+		_groupLength = 3;
+		break;
+	case 7:
+		_groupLength = 4;
+		break;
+	default:
+		_groupLength = 5;
+		break;
+	}
+	_groupIndex = 1;
+	return _group[0];
 }
 
 
 int Base32DecoderBuf::readOne()
 {
 	int ch = _buf.sbumpc();
+	++_pos;
 	return ch;
 }
 

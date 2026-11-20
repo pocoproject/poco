@@ -617,7 +617,14 @@ bool FileImpl::createDirectoryImpl()
 	if (existsImpl() && isDirectoryImpl())
 		return false;
 	if (::mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0)
-		handleLastErrorImpl(_path);
+	{
+		// Saved before existsImpl() and isDirectoryImpl() run stat(), which may change errno.
+		const int err = errno;
+		// Another thread or process may have created the directory since the check above.
+		if (err == EEXIST && existsImpl() && isDirectoryImpl())
+			return false;
+		handleLastErrorImpl(err, _path);
+	}
 	return true;
 }
 

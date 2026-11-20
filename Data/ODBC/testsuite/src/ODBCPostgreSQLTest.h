@@ -46,6 +46,13 @@ public:
 	void testStoredFunction() override;
 	void testStoredFunctionAny() override;
 	void testStoredFunctionDynamicAny() override;
+	void testStoredFunctionUTF16String();
+	void testStoredFunctionInOutString();
+
+	void testDateTimeMicroseconds();
+	void testLOBManualExtractionDistinctValues();
+	void testLOBManualExtractionNull();
+	void testTranscodedStringWithUTF16StringAndLOB();
 
 	void testUncommittedWorkRolledBack();
 	void testLostConnection();
@@ -82,9 +89,9 @@ private:
 		/// Alternative is direct database configuration for PL/pgSQL usage.
 
 	static const std::string _libDir;
-		/// Varible determining the location of the library directory
+		/// Variable determining the location of the library directory
 		/// on the database installation system.
-		/// Used to enable PLpgSQL language programmaticaly when
+		/// Used to enable PLpgSQL language programmatically when
 		/// it is not enabled.
 
 	static SessionPtr  _pSession;

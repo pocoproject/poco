@@ -13,6 +13,7 @@
 
 
 #include <math.h>
+#include <cmath>
 #include "Poco/FPEnvironment_SUN.h"
 
 
@@ -95,13 +96,13 @@ float FPEnvironmentImpl::copySignImpl(float target, float source)
 
 double FPEnvironmentImpl::copySignImpl(double target, double source)
 {
-	return (float) copysign(target, source);
+	return std::copysign(target, source);
 }
 
 
 long double FPEnvironmentImpl::copySignImpl(long double target, long double source)
 {
-	return (source > 0 && target > 0) || (source < 0 && target < 0) ? target : -target;
+	return std::copysign(target, source);
 }
 
 

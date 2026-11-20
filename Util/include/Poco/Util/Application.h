@@ -78,7 +78,8 @@ class Util_API Application: public Subsystem
 	///   - application.dataDir: the path to the directory where user specific data files of the application should be stored.
 	///   - application.tempDir: the path to the directory where user specific temporary files and other file objects of the application should be stored.
 	///
-	/// If loadConfiguration() has never been called, application.configDir will be equal to application.dir.
+	/// application.configDir is the user specific configuration directory until loadConfiguration()
+	/// loads the first configuration file; from then on, it is the directory of that file.
 	///
 	/// The POCO_APP_MAIN macro can be used to implement main(argc, argv).
 	/// POCO_APP_MAIN supports Unicode command line arguments.
@@ -427,6 +428,7 @@ private:
 	void setup();
 	void setArgs(const ArgVec& args);
 	void processOptions();
+	void setConfigDir(const Poco::Path& confPath);
 
 	using ConfigPtr = LayeredConfiguration::Ptr;
 	using LoggerPtr = Poco::Logger::Ptr;
@@ -443,6 +445,7 @@ private:
 	Poco::Timestamp _startTime;
 	bool            _stopOptionsProcessing;
 	bool            _ignoreUnknownOptions;
+	bool            _configFileLoaded = false;
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 	std::string _workingDirAtLaunch;

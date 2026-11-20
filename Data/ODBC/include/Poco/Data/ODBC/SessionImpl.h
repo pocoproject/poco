@@ -60,7 +60,7 @@ public:
 		bool autoBind = true,
 		bool autoExtract = true);
 		/// Creates the SessionImpl. Opens a connection to the database.
-		/// Throws NotConnectedException if connection was not succesful.
+		/// Throws NotConnectedException if connection was not successful.
 
 	POCO_DEPRECATED("Use other constructors.") SessionImpl(const std::string& connect,
 		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE,
@@ -128,7 +128,9 @@ public:
 
 	[[nodiscard]] bool hasTransactionIsolation(Poco::UInt32) const override;
 		/// Returns true iff the transaction isolation level corresponding
-		/// to the supplied bitmask is supported.
+		/// to the supplied bitmask is supported, that is, the connection
+		/// takes it when it is set; a level for which the driver keeps or
+		/// substitutes another one is not supported.
 		/// Throws NullPointerException if the session is not connected.
 
 	[[nodiscard]] bool isTransactionIsolation(Poco::UInt32) const override;

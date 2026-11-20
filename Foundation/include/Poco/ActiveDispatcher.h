@@ -89,7 +89,12 @@ public:
 		/// Cancels all queued methods.
 
 protected:
-	void run() override;
+	void run() override final;
+		/// Executes the queued methods one after another until stop() is called.
+		/// The thread calls this function without a virtual call, so that the call
+		/// does not race with the constructor or destructor of a subclass; it is
+		/// final because an override would never be called.
+
 	void stop();
 
 private:

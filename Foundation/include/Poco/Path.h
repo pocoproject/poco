@@ -36,6 +36,9 @@ class Foundation_API Path
 	/// device name (also only Windows and OpenVMS),
 	/// a list of directory names and an optional
 	/// filename.
+	///
+	/// A path string or path component that contains a NUL
+	/// character is rejected with a PathSyntaxException.
 {
 public:
 	enum Style
@@ -355,6 +358,8 @@ public:
 		///
 		/// On Unix, a tilde as first character in the path is
 		/// replaced with the path to user's home directory.
+		/// A backslash before a dollar sign makes the dollar sign
+		/// a literal character; other backslashes are kept.
 
 	static void listRoots(std::vector<std::string>& roots);
 		/// Fills the vector with all filesystem roots available on the

@@ -67,55 +67,60 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 			return;
 		}
 
-		HTTPServerResponseImpl response(session);
-		HTTPServerRequestImpl request(response, session, _pParams);
-
-		Poco::Timestamp now;
-		response.setDate(now);
-		response.setVersion(request.getVersion());
-		response.setKeepAlive(request.getKeepAlive());
-		std::string server = _pParams->getSoftwareVersion();
-		if (!server.empty())
 		{
-			response.set("Server", server);
-		}
+			HTTPServerResponseImpl response(session);
+			HTTPServerRequestImpl request(response, session, _pParams);
 
-		try
-		{
-			session.requestTrailer().clear();
-			session.responseTrailer().clear();
-			std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
-			if (pHandler.get())
+			Poco::Timestamp now;
+			response.setDate(now);
+			response.setVersion(request.getVersion());
+			response.setKeepAlive(request.getKeepAlive());
+			std::string server = _pParams->getSoftwareVersion();
+			if (!server.empty())
 			{
-				if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
-					response.sendContinue();
-
-				pHandler->handleRequest(request, response);
-				session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive());
-				session.popCompletedRequest();
+				response.set("Server", server);
 			}
-			else
+
+			try
 			{
-				sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
-				session.popCompletedRequest();
-			}
-		}
-		catch (Poco::Exception& e)
-		{
-			if (!response.sent())
-			{
-				try
+				session.requestTrailer().clear();
+				session.responseTrailer().clear();
+				std::unique_ptr<HTTPRequestHandler> pHandler(_pFactory->createRequestHandler(request));
+				if (pHandler != nullptr)
 				{
-					sendErrorResponse(session, e.code() == 0 ? HTTPResponse::HTTP_INTERNAL_SERVER_ERROR
-															 : HTTPResponse::HTTPStatus(e.code()));
+					if (request.getExpectContinue() && response.getStatus() == HTTPResponse::HTTP_OK)
+						response.sendContinue();
+
+					pHandler->handleRequest(request, response);
+					session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive());
 					session.popCompletedRequest();
 				}
-				catch (...)
+				else
 				{
+					sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
+					session.popCompletedRequest();
 				}
 			}
-			throw;
+			catch (Poco::Exception& e)
+			{
+				if (!response.sent())
+				{
+					try
+					{
+						sendErrorResponse(session, e.code() == 0 ? HTTPResponse::HTTP_INTERNAL_SERVER_ERROR
+																 : HTTPResponse::HTTPStatus(e.code()));
+						session.popCompletedRequest();
+					}
+					catch (...)
+					{
+					}
+				}
+				throw;
+			}
 		}
+		// The block above ends before this check: the response stream writes the
+		// rest of the body in its destructor, and that write can fail too.
+		if (session.networkException() != nullptr) conn->handleClose();
 	}
 	catch (const Poco::Exception& ex)
 	{

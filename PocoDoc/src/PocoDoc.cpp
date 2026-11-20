@@ -280,6 +280,7 @@ protected:
 		}
 		StringTokenizer tokenizer(popts, ",\n", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 		std::vector<std::string> args(tokenizer.begin(), tokenizer.end());
+		Poco::CppParser::Utility::addLanguageStandard(exec, args);
 		args.push_back(file);
 
 		if (!path.empty())

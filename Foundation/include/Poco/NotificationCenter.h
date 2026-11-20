@@ -207,7 +207,7 @@ public:
 	[[nodiscard]] virtual int backlog() const;
 		/// Returns the sum of queued notifications
 		/// for all observers (applies only to asynchronous observers,
-		/// regular observers post notifications syncronously and
+		/// regular observers post notifications synchronously and
 		/// never have a backlog).
 
 	[[nodiscard]] static NotificationCenter& defaultCenter();

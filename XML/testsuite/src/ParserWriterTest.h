@@ -28,7 +28,9 @@ public:
 	void testParseWriteXHTML2();
 	void testParseWriteSimple();
 	void testParseWriteCDATATerminator();
+	void testWriteCommentPITerminator();
 	void testMaxElementDepth();
+	void testWriteParseTextCR();
 
 	void setUp();
 	void tearDown();

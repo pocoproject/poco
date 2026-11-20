@@ -16,6 +16,7 @@
 #include "Poco/File.h"
 #include "Poco/Exception.h"
 #include "Poco/StringTokenizer.h"
+#include "EmbeddedNul.h"
 #if defined(_WIN32)
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Buffer.h"
@@ -99,6 +100,7 @@ Path::Path(const Path& parent, const std::string& fileName):
 	_dirs(parent._dirs),
 	_absolute(parent._absolute)
 {
+	rejectEmbeddedNul(fileName);
 	makeDirectory();
 	_name = fileName;
 }
@@ -193,6 +195,7 @@ Path& Path::assign(const Path& path)
 
 Path& Path::assign(const std::string& path)
 {
+	rejectEmbeddedNul(path);
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	parseWindows(path);
 #else
@@ -204,6 +207,7 @@ Path& Path::assign(const std::string& path)
 
 Path& Path::assign(const std::string& path, Style style)
 {
+	rejectEmbeddedNul(path);
 	switch (style)
 	{
 	case PATH_UNIX:
@@ -438,6 +442,7 @@ Path& Path::resolve(const Path& path)
 
 Path& Path::setNode(const std::string& node)
 {
+	rejectEmbeddedNul(node);
 	_node     = node;
 	_absolute = _absolute || !node.empty();
 	return *this;
@@ -446,6 +451,7 @@ Path& Path::setNode(const std::string& node)
 
 Path& Path::setDevice(const std::string& device)
 {
+	rejectEmbeddedNul(device);
 	_device   = device;
 	_absolute = _absolute || !device.empty();
 	return *this;
@@ -476,6 +482,7 @@ const std::string& Path::operator [] (int n) const
 
 Path& Path::pushDirectory(const std::string& dir)
 {
+	rejectEmbeddedNul(dir);
 	if (!dir.empty() && dir != ".")
 	{
 		if (dir == "..")
@@ -512,6 +519,7 @@ Path& Path::popFrontDirectory()
 
 Path& Path::setFileName(const std::string& name)
 {
+	rejectEmbeddedNul(name);
 	_name = name;
 	return *this;
 }
@@ -519,6 +527,7 @@ Path& Path::setFileName(const std::string& name)
 
 Path& Path::setBaseName(const std::string& name)
 {
+	rejectEmbeddedNul(name);
 	std::string ext = getExtension();
 	_name = name;
 	if (!ext.empty())
@@ -542,6 +551,7 @@ std::string Path::getBaseName() const
 
 Path& Path::setExtension(const std::string& extension)
 {
+	rejectEmbeddedNul(extension);
 	_name = getBaseName();
 	if (!extension.empty())
 	{

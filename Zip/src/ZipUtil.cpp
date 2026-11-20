@@ -108,6 +108,8 @@ void ZipUtil::sync(std::istream& in)
 			// we have a possible header!
 			// read the next 2 bytes
 			in.read(temp+tempPos, PREFIX);
+			if (in.gcount() != PREFIX)
+				return;
 			tempPos += PREFIX;
 			if (std::memcmp(ZipLocalFileHeader::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
 				std::memcmp(ZipArchiveInfo::HEADER+PREFIX, &temp[tempPos - PREFIX], PREFIX) == 0 ||
@@ -224,8 +226,16 @@ void ZipUtil::syncDataDescriptor(std::istream & in, bool force64)
 }
 
 
+void ZipUtil::verifyNoNulCharacter(const std::string& name)
+{
+	if (name.find('\0') != std::string::npos)
+		throw ZipException("Illegal entry name containing a NUL character");
+}
+
+
 void ZipUtil::verifyZipEntryFileName(const std::string& fn)
 {
+	verifyNoNulCharacter(fn);
 	if (fn.find("\\") != std::string::npos)
 		throw ZipException("Illegal entry name " + fn + " containing \\");
 	if (fn == "/")
@@ -237,11 +247,27 @@ void ZipUtil::verifyZipEntryFileName(const std::string& fn)
 }
 
 
+void ZipUtil::verifySizeOrOffset(Poco::UInt64 value, std::string_view message, const std::string& fileName)
+{
+	constexpr Poco::UInt64 MAX_SIZE_OR_OFFSET = static_cast<Poco::UInt64>(1) << 61;
+
+	if (value > MAX_SIZE_OR_OFFSET)
+		throw ZipException(std::string(message), fileName);
+}
+
+
 std::string ZipUtil::validZipEntryFileName(const Poco::Path& entry)
 {
 	std::string fn = entry.toString(Poco::Path::PATH_UNIX);
 	verifyZipEntryFileName(fn);
 	return fn;
+}
+
+
+std::string ZipUtil::validZipEntryFileName(const std::string& entry)
+{
+	verifyNoNulCharacter(entry);
+	return validZipEntryFileName(Poco::Path(entry));
 }
 
 

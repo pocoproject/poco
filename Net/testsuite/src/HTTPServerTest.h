@@ -59,6 +59,7 @@ public:
 	void testInvalidRequestHeaderClearsDeadline();
 	void testFailedResponseWriteNotRepeated();
 	void testParallelKeepAliveSessions();
+	void testDestroyRunningSubclass();
 
 	void setUp();
 	void tearDown();

@@ -84,6 +84,7 @@ Re-run the configure step after adding source files ([source files](ai-agents/cm
 | Write or change library code | [ai-agents/writing-code.md](ai-agents/writing-code.md), [CODING_STYLE.md](CODING_STYLE.md) |
 | Write and run tests | [ai-agents/testing.md](ai-agents/testing.md) |
 | Sanitizers, static analysis, CodeQL, CodeRabbit | [ai-agents/analysis.md](ai-agents/analysis.md) |
+| Write, change or review a fuzz target | [ai-agents/fuzzing.md](ai-agents/fuzzing.md) |
 | Branches, commits, pull requests, labels, milestones, cherry-picks | [ai-agents/git-and-pull-requests.md](ai-agents/git-and-pull-requests.md) |
 | Review a pull request or a change | [ai-agents/reviewing.md](ai-agents/reviewing.md) |
 | Port to a new platform | [ai-agents/porting.md](ai-agents/porting.md) |

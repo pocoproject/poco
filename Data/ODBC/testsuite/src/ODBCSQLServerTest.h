@@ -57,6 +57,7 @@ public:
 
 	void testStoredProcedure() override;
 	void testCursorStoredProcedure();
+	void testStringOutputParameters();
 	void testStoredProcedureAny() override;
 	void testStoredProcedureDynamicVar() override;
 
@@ -64,6 +65,8 @@ public:
 	void testStoredFunction() override;
 
 	void testSQLServerTime();
+	void testBoundUTF16StringBulk();
+	void testBulkStringLengths();
 
 	static CppUnit::Test* suite();
 

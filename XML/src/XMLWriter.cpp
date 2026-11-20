@@ -365,10 +365,11 @@ void XMLWriter::characters(const XMLChar ch[], int start, int length)
 			case '&':  writeMarkup(MARKUP_AMPENC); break;
 			case '<':  writeMarkup(MARKUP_LTENC); break;
 			case '>':  writeMarkup(MARKUP_GTENC); break;
+			case '\r': writeMarkup(MARKUP_CRENC); break;
 			default:
 				if (static_cast<unsigned char>(c) < 32)
 				{
-					if (c == '\t' || c == '\r' || c == '\n')
+					if (c == '\t' || c == '\n')
 						writeXML(c);
 					else
 						throw XMLException("Invalid character token.");
@@ -406,8 +407,18 @@ void XMLWriter::ignorableWhitespace(const XMLChar ch[], int start, int length)
 }
 
 
+namespace
+{
+	// "?>" would end a processing instruction early.
+	static const XMLString PI_END = toXMLString("?>"s);
+}
+
+
 void XMLWriter::processingInstruction(const XMLString& target, const XMLString& data)
 {
+	if (target.find(PI_END) != XMLString::npos || data.find(PI_END) != XMLString::npos)
+		throw XMLException("Processing instruction must not contain \"?>\"");
+
 	if (_unclosedStartTag) closeStartTag();
 	prettyPrint();
 	writeMarkup("<?"s);
@@ -498,6 +509,13 @@ void XMLWriter::endCDATA()
 // CodeQL [cpp/raw-array-interface]: SAX specification API
 void XMLWriter::comment(const XMLChar ch[], int start, int length)
 {
+	// "--" would end the comment early, and a final "-" would form "--->".
+	for (int i = start; i < start + length; ++i)
+	{
+		if (ch[i] == '-' && (i + 1 == start + length || ch[i + 1] == '-'))
+			throw XMLException("Comment must not contain \"--\" or end with \"-\"");
+	}
+
 	if (_unclosedStartTag) closeStartTag();
 	prettyPrint();
 	writeMarkup("<!--"s);

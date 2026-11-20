@@ -24,28 +24,12 @@
 
 
 //
-// The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the Net_EXPORTS
-// symbol defined on the command line. This symbol should not be defined on any project
-// that uses this DLL. This way any other project whose source files include this file sees
-// Net_API functions as being imported from a DLL, whereas this DLL sees symbols
-// defined with this macro as being exported.
+// Net_EXPORTS is defined only while this library is compiled (see POCO_API_EXPORT in Poco/Foundation.h).
 //
-#if defined(_WIN32) && defined(POCO_DLL)
-	#if defined(Net_EXPORTS)
-		#define Net_API __declspec(dllexport)
-	#else
-		#define Net_API __declspec(dllimport)
-	#endif
-#endif
-
-
-#if !defined(Net_API)
-	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
-		#define Net_API __attribute__ ((visibility ("default")))
-	#else
-		#define Net_API
-	#endif
+#if defined(Net_EXPORTS)
+	#define Net_API POCO_API_EXPORT
+#else
+	#define Net_API POCO_API_IMPORT
 #endif
 
 
@@ -160,12 +144,15 @@ POCO_NET_FORCE_SYMBOL(pocoNetworkInitializer)
 #endif
 
 
-#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_WINDOWS_NT) || (POCO_OS == POCO_OS_ANDROID)
+//
+// Emscripten uses poll(): it has no eventfd(), which PollSet needs with epoll.
+//
+#if ((POCO_OS == POCO_OS_LINUX) && !defined(POCO_EMSCRIPTEN)) || (POCO_OS == POCO_OS_WINDOWS_NT) || (POCO_OS == POCO_OS_ANDROID)
 	#define POCO_HAVE_FD_EPOLL 1
 #endif
 
 
-#if defined(POCO_OS_FAMILY_BSD)
+#if defined(POCO_OS_FAMILY_BSD) || defined(POCO_EMSCRIPTEN)
 	#ifndef POCO_HAVE_FD_POLL
 		#define POCO_HAVE_FD_POLL 1
 	#endif

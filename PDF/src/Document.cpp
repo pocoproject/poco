@@ -41,6 +41,20 @@ static_assert(static_cast<int>(Document::Encryption::ENCRYPT_R3) == HPDF_ENCRYPT
 static_assert(static_cast<int>(Document::PageNumberStyle::PAGE_NUM_STYLE_DECIMAL) == HPDF_PAGE_NUM_STYLE_DECIMAL, "Page number value mismatch");
 static_assert(static_cast<int>(Document::PageNumberStyle::PAGE_NUM_STYLE_LOWER_LETTERS) == HPDF_PAGE_NUM_STYLE_LOWER_LETTERS, "Page number value mismatch");
 
+std::string Document::fontKey(const std::string& name, const std::string& encoding)
+{
+	return name + '\n' + encoding;
+}
+
+
+std::string Document::imageKey(const Path& path, const std::string& kind)
+{
+	Path abs(path);
+	abs.makeAbsolute();
+	return kind + '\n' + abs.toString();
+}
+
+
 Document::Document(const std::string fileName,
 				   Poco::UInt32 pageCount,
 				   Page::Size pageSize,
@@ -287,9 +301,9 @@ const Page& Document::insertPage(int index,
 	Page::Size pageSize,
 	Page::Orientation orientation)
 {
-	poco_assert (index > 0);
-	poco_assert (index < _pages.size());
-	HPDF_Page target = *((HPDF_Page*) HPDF_List_ItemAt(_pdf->page_list, static_cast<HPDF_UINT>(index)));
+	poco_assert (index >= 0);
+	poco_assert (static_cast<std::size_t>(index) < _pages.size());
+	HPDF_Page target = HPDF_GetPageByIndex(_pdf, static_cast<HPDF_UINT>(index));
 	return *_pages.insert(_pages.begin() + index,
 		Page(this,
 			HPDF_InsertPage(_pdf, target),
@@ -312,22 +326,18 @@ const Page& Document::getCurrentPage()
 
 const Font& Document::loadFont(const std::string& name, const std::string& encoding)
 {
-	Font font(&_pdf,
-			  HPDF_GetFont(_pdf, name.c_str(), encoding.empty() ? nullptr : encoding.c_str()));
-	std::pair<FontContainer::iterator, bool> ret =
-		_fonts.insert(FontContainer::value_type(name, font));
+	const std::string key = fontKey(name, encoding);
+	auto it = _fonts.find(key);
+	if (it != _fonts.end()) return it->second;
 
-	if (ret.second) return ret.first->second;
-
-	throw IllegalStateException("Could not create font.");
+	return _fonts.try_emplace(key,
+		&_pdf,
+		HPDF_GetFont(_pdf, name.c_str(), encoding.empty() ? nullptr : encoding.c_str())).first->second;
 }
 
 
 const Font& Document::font(const std::string& name, const std::string& encoding)
 {
-	auto it = _fonts.find(name);
-	if (_fonts.end() != it) return it->second;
-
 	return loadFont(name, encoding);
 }
 
@@ -364,19 +374,14 @@ const Image& Document::loadPNGImageImpl(const std::string& fileName, bool doLoad
 
 	if (File(path).exists())
 	{
-		std::pair<ImageContainer::iterator, bool> it;
-		if (doLoad)
-		{
-			Image image(&_pdf, HPDF_LoadPngImageFromFile(_pdf, fileName.c_str()));
-			it = _images.insert(ImageContainer::value_type(path.getBaseName(), image));
-		}
-		else
-		{
-			Image image(&_pdf, HPDF_LoadPngImageFromFile2(_pdf, fileName.c_str()));
-			it = _images.insert(ImageContainer::value_type(path.getBaseName(), image));
-		}
-		if (it.second) return it.first->second;
-		else throw IllegalStateException("Could not insert image.");
+		const std::string key = imageKey(path, doLoad ? "png" : "png-info");
+		auto it = _images.find(key);
+		if (it != _images.end()) return it->second;
+
+		HPDF_Image image = doLoad ?
+			HPDF_LoadPngImageFromFile(_pdf, fileName.c_str()) :
+			HPDF_LoadPngImageFromFile2(_pdf, fileName.c_str());
+		return _images.try_emplace(key, &_pdf, image).first->second;
 	}
 	else
 		throw NotFoundException("File not found: " + fileName);
@@ -389,11 +394,11 @@ const Image& Document::loadJPEGImage(const std::string& fileName)
 
 	if (File(path).exists())
 	{
-		Image image(&_pdf, HPDF_LoadJpegImageFromFile(_pdf, fileName.c_str()));
-		std::pair<ImageContainer::iterator, bool> it =
-			_images.insert(ImageContainer::value_type(path.getBaseName(), image));
-		if (it.second) return it.first->second;
-		else throw IllegalStateException("Could not insert image.");
+		const std::string key = imageKey(path, "jpeg");
+		auto it = _images.find(key);
+		if (it != _images.end()) return it->second;
+
+		return _images.try_emplace(key, &_pdf, HPDF_LoadJpegImageFromFile(_pdf, fileName.c_str())).first->second;
 	}
 	else
 		throw NotFoundException("File not found: " + fileName);
@@ -414,32 +419,23 @@ void Document::encryption(Encryption mode, Poco::UInt32 keyLength)
 const Encoder& Document::loadEncoder(const std::string& name)
 {
 	auto it = _encoders.find(name);
-	if (_encoders.end() == it) return it->second;
+	if (it != _encoders.end()) return it->second;
 
-	Encoder enc(&_pdf, HPDF_GetEncoder(_pdf, name.c_str()), name);
-	std::pair<EncoderContainer::iterator, bool> ret =
-		_encoders.insert(EncoderContainer::value_type(name, enc));
-
-	if (ret.second) return ret.first->second;
-
-	throw IllegalStateException("Could not create encoder.");
+	return _encoders.try_emplace(name, &_pdf, HPDF_GetEncoder(_pdf, name.c_str()), name).first->second;
 }
 
 
 const Encoder& Document::getCurrentEncoder()
 {
 	HPDF_Encoder enc = HPDF_GetCurrentEncoder(_pdf);
-	std::string name = enc->name;
+	if (enc == nullptr)
+		throw NotFoundException("No current encoder.");
+
+	const std::string name = enc->name;
 	auto it = _encoders.find(name);
-	if (_encoders.end() == it)
-	{
-		std::pair<EncoderContainer::iterator, bool> ret =
-			_encoders.insert(EncoderContainer::value_type(name, Encoder(&_pdf, enc)));
+	if (it != _encoders.end()) return it->second;
 
-		if (ret.second) return ret.first->second;
-	}
-
-	return it->second;
+	return _encoders.try_emplace(name, &_pdf, enc, name).first->second;
 }
 
 
@@ -506,14 +502,16 @@ void Document::setPassword(const std::string& ownerPassword, const std::string& 
 
 void Document::reset(bool all)
 {
+	// HPDF_FreeDoc() frees pages, fonts, outlines and images; HPDF_FreeDocAll()
+	// also frees the encoders.
+	_pages.clear();
+	_fonts.clear();
+	_outlines.clear();
+	_images.clear();
 	if (!all) HPDF_FreeDoc(_pdf);
 	else
 	{
-		_pages.clear();
-		_fonts.clear();
 		_encoders.clear();
-		_outlines.clear();
-		_images.clear();
 		HPDF_FreeDocAll(_pdf);
 	}
 }

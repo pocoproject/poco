@@ -236,30 +236,13 @@ using JSON = std::string;
 
 template <typename T>
 inline void swap(LOB<T>& b1, LOB<T>& b2) noexcept
+	/// Swaps b1 with b2.
 {
 	b1.swap(b2);
 }
 
 
 } // namespace Poco::Data
-
-
-namespace std
-{
-	template <>
-	inline void swap<Poco::Data::BLOB>(Poco::Data::BLOB& b1, Poco::Data::BLOB& b2) noexcept
-		/// Full template specalization of std:::swap for BLOB
-	{
-		b1.swap(b2);
-	}
-
-	template <>
-	inline void swap<Poco::Data::CLOB>(Poco::Data::CLOB& c1, Poco::Data::CLOB& c2) noexcept
-		/// Full template specalization of std:::swap for CLOB
-	{
-		c1.swap(c2);
-	}
-}
 
 
 //

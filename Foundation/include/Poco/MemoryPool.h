@@ -210,7 +210,7 @@ private:
 
 		Block()
 			/// Creates a Block and sets its next pointer.
-			/// This constructor should ony be used to initialize
+			/// This constructor should only be used to initialize
 			/// a block sequence (an array of blocks) in a newly
 			/// allocated bucket.
 			///

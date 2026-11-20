@@ -47,7 +47,7 @@ SHAREDLIBLINKEXT = .a
 CFLAGS          = $(SANITIZEFLAGS) -std=c11
 CFLAGS32        = -maix32
 CFLAGS64        = -maix64
-CXXFLAGS        = $(SANITIZEFLAGS) -std=c++17 -Wno-sign-compare
+CXXFLAGS        = $(SANITIZEFLAGS) -std=c++20 -Wno-sign-compare
 CXXFLAGS32      = -maix32
 CXXFLAGS64      = -maix64
 SHLIBFLAGS      = -Wl,-bh:5 -Wl,-bnoipath -Wl,-blibpath:/usr/lib:/lib -Wl,-blibsuff:so -Wl,-bautoexp -Wl,-bnoentry -Wl,-bM:SRE

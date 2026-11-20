@@ -8,7 +8,8 @@
 # Poco only uses the low-level streaming API.
 
 if(POCO_UNBUNDLED)
-	find_package(ZLIB REQUIRED)
+	# crc32_z() and adler32_z(), which Foundation uses, exist since zlib 1.2.9
+	find_package(ZLIB 1.2.9 REQUIRED)
 	set_target_properties(ZLIB::ZLIB PROPERTIES IMPORTED_GLOBAL TRUE)
 else()
 

@@ -123,6 +123,9 @@ HostEntry::HostEntry(const HostEntry& entry):
 }
 
 
+HostEntry::HostEntry(HostEntry&& entry) noexcept = default;
+
+
 HostEntry& HostEntry::operator = (const HostEntry& entry)
 {
 	if (&entry != this)
@@ -133,6 +136,9 @@ HostEntry& HostEntry::operator = (const HostEntry& entry)
 	}
 	return *this;
 }
+
+
+HostEntry& HostEntry::operator = (HostEntry&& entry) noexcept = default;
 
 
 void HostEntry::swap(HostEntry& hostEntry) noexcept

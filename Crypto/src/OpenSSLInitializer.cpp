@@ -18,6 +18,7 @@
 #include <openssl/crypto.h>
 #include <openssl/err.h>
 #include <openssl/conf.h>
+#include <mutex>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -36,22 +37,25 @@
 
 #if defined(_MSC_VER) && !defined(_DLL) && defined(POCO_INTERNAL_OPENSSL_MSVC_VER)
 
-	#if (POCO_MSVS_VERSION >= 2015)
-		FILE _iob[] = { *stdin, *stdout, *stderr };
-		extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
-	#endif // (POCO_MSVS_VERSION >= 2015)
+	FILE _iob[] = { *stdin, *stdout, *stderr };
+	extern "C" FILE * __cdecl __iob_func(void) { return _iob; }
 
-	#if (POCO_MSVS_VERSION < 2012)
-		extern "C" __declspec(noreturn) void __cdecl __report_rangecheckfailure(void) { ::ExitProcess(1); }
-	#endif // (POCO_MSVS_VERSION < 2012)
+#endif // _MSC_VER && !_DLL && POCO_INTERNAL_OPENSSL_MSVC_VER
 
-#endif // _MSC_VER && _MT && !POCO_EXTERNAL_OPENSSL && (POCO_MSVS_VERSION < 2013)
+
+namespace
+{
+	// OpenSSLInitializer objects with static storage duration in other translation
+	// units call initialize() before main(). std::mutex has a constexpr constructor,
+	// so this mutex, like the int count, is constant-initialized and usable then.
+	std::mutex initializerMutex;
+}
 
 
 namespace Poco::Crypto {
 
 
-Poco::AtomicCounter OpenSSLInitializer::_rc;
+int OpenSSLInitializer::_rc(0);
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 OSSL_PROVIDER* OpenSSLInitializer::_defaultProvider(nullptr);
@@ -80,7 +84,10 @@ OpenSSLInitializer::~OpenSSLInitializer()
 
 void OpenSSLInitializer::initialize()
 {
-	if (++_rc == 1)
+	std::lock_guard<std::mutex> lock(initializerMutex);
+	// The count is incremented after a successful initialization, so that a
+	// failed one leaves it unchanged and the next call tries again.
+	if (_rc == 0)
 	{
 		CONF_modules_load(nullptr, nullptr, 0);
 
@@ -103,11 +110,13 @@ void OpenSSLInitializer::initialize()
 		}
 #endif
 	}
+	++_rc;
 }
 
 
 void OpenSSLInitializer::uninitialize()
 {
+	std::lock_guard<std::mutex> lock(initializerMutex);
 	if (--_rc == 0)
 	{
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)

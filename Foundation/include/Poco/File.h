@@ -52,6 +52,9 @@ class Foundation_API File: private FileImpl
 	/// prefix apply in that case, e.g. the path must
 	/// not contain relative components ("." and "..") and must not
 	/// use the forward slash ("/") as directory separator.
+	///
+	/// A path that contains a NUL character is rejected with a
+	/// PathSyntaxException.
 {
 public:
 	using FileSize = FileSizeImpl;
@@ -256,7 +259,10 @@ public:
 
 	[[nodiscard]] bool createDirectory();
 		/// Creates a directory. Returns true if the directory
-		/// has been created and false if it already exists.
+		/// has been created and false if a directory already exists
+		/// at the path, also when another thread or process created
+		/// it at the same time. Throws a FileExistsException if
+		/// something other than a directory exists at the path.
 		/// Throws an exception if an error occurs.
 
 	void createDirectories();

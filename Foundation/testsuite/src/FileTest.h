@@ -33,6 +33,10 @@ public:
 	void testSwap();
 	void testSize();
 	void testDirectory();
+	void testCreateDirectoryExisting();
+	void testCreateDirectoryConcurrent();
+	void testCreateDirectoriesDeep();
+	void testCreateDirectoriesExtendedPath();
 	void testCopy();
 	void testCopyFailIfDestinationFileExists();
 	void testMove();
@@ -41,11 +45,13 @@ public:
 	void testCopyDirectoryFailIfExists();
 	void testRename();
 	void testRenameFailIfExists();
+	void testRejectEmbeddedNul();
 	void testRootDir();
 	void testLongPath();
 	void testLongPathUNC();
 	void testLongPathDevice();
 	void testLongPathRooted();
+	void testCreateDirectoryAtPathLimit();
 	void testUnixFileExtension();
 	void testTemporaryFile();
 	void testGetExecutablePathNonExistent();
@@ -60,6 +66,7 @@ public:
 #if defined(POCO_OS_FAMILY_UNIX)
 #if !defined(POCO_VXWORKS)
 	void testPermissionsMatchAccess();
+	void testCreateDirectorySymlinkLoop();
 #endif
 	void testGetExecutablePathThreadSafety();
 #endif

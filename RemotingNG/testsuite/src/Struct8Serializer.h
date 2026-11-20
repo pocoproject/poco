@@ -38,8 +38,9 @@ public:
 	{
 		using namespace std::string_literals;
 		
-		static const std::string REMOTING__NAMES[] = {"pocoOptional"s,""s};
+		static const std::string REMOTING__NAMES[] = {"pocoOptional"s,"stdOptional"s,""s};
 		TypeSerializer<Poco::Optional<std::string>>::serialize(REMOTING__NAMES[0], value.pocoOptional, ser);
+		TypeSerializer<std::optional<std::string>>::serialize(REMOTING__NAMES[1], value.stdOptional, ser);
 	}
 
 };

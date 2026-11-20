@@ -15,12 +15,12 @@
 #include "Poco/FileStream.h"
 #include "Poco/File.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <cstdio>
-#include <cstring>
 
 
 namespace Poco {
@@ -219,7 +219,8 @@ Poco::UInt64 FileStreamBuf::size() const
 	int rc = ::fstat(_fd, &stat_buf);
 	if (rc < 0)
 	{
-		throw Poco::SystemException(strerror(errno), errno);
+		const int err = errno;
+		throw Poco::SystemException(Error::getMessage(err), err);
 	}
 	return stat_buf.st_size;
 }

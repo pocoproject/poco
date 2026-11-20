@@ -48,7 +48,7 @@ class Data_API RowFormatter
 	/// Statement always has the ownership of the row formatter and shares
 	/// it with rows through RecordSet.
 	///
-	/// To accomodate for various formatting needs, a formatter can operate in two modes:
+	/// To accommodate for various formatting needs, a formatter can operate in two modes:
 	///
 	///	  - progressive: formatted individual row strings are gemerated and returned from each
 	///     call to formatValues;
@@ -62,7 +62,7 @@ class Data_API RowFormatter
 	///     void formatValues(const ValueVec&) member calls should be used in this case
 	///
 	/// When formatter is used in conjunction with Row/RecordSet, the formatting members corresponding
-	/// to the formater mode are expected to be implemented. If a call is propagated to this parent
+	/// to the formatter mode are expected to be implemented. If a call is propagated to this parent
 	/// class, the functions do nothing or silently return empty string respectively.
 	///
 {
@@ -131,10 +131,10 @@ public:
 		/// to empty strings and row count to INVALID_ROW_COUNT.
 
 	[[nodiscard]] Mode getMode() const;
-		/// Returns the formater mode.
+		/// Returns the formatter mode.
 
 	void setMode(Mode mode);
-		/// Sets the fromatter mode.
+		/// Sets the formatter mode.
 
 protected:
 
@@ -148,6 +148,9 @@ protected:
 
 	void setPostfix(const std::string& postfix);
 		/// Sets the postfix for the formatter
+
+	void swapPrefixAndPostfix(RowFormatter& other) noexcept;
+		/// Exchanges the prefix and the postfix with those of other.
 
 private:
 
@@ -188,6 +191,13 @@ inline void RowFormatter::setPrefix(const std::string& prefix) const
 inline void RowFormatter::setPostfix(const std::string& postfix)
 {
 	_postfix = postfix;
+}
+
+
+inline void RowFormatter::swapPrefixAndPostfix(RowFormatter& other) noexcept
+{
+	_prefix.swap(other._prefix);
+	_postfix.swap(other._postfix);
 }
 
 

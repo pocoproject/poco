@@ -14,10 +14,12 @@
 #include "Poco/Net/DNS.h"
 #include "Poco/Net/HostEntry.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/NumberFormatter.h"
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <netdb.h>
 #endif
 #include <cerrno>
+#include <type_traits>
 
 
 using Poco::Net::DNS;
@@ -28,9 +30,9 @@ using Poco::Net::HostNotFoundException;
 using Poco::Net::ServiceNotFoundException;
 using Poco::Net::NoAddressFoundException;
 using Poco::Net::DNSException;
+using Poco::NumberFormatter;
 
 
-#if defined(EAI_SYSTEM)
 namespace
 {
 	class DNSErrorProbe: public Poco::Net::DNS
@@ -42,7 +44,6 @@ namespace
 		using DNS::aierror;
 	};
 }
-#endif
 
 
 DNSTest::DNSTest(const std::string& name): CppUnit::TestCase(name)
@@ -248,6 +249,69 @@ void DNSTest::testHostByNameEmbeddedNul()
 }
 
 
+void DNSTest::testAIError()
+{
+#if defined(POCO_HAVE_IPv6) || defined(POCO_HAVE_ADDRINFO)
+	const std::string host("host.example");
+	bool thrown = false;
+	try
+	{
+		DNSErrorProbe::aierror(EAI_MEMORY, host);
+	}
+	catch (DNSException& exc)
+	{
+		thrown = true;
+		const std::string text = exc.displayText();
+		assertEqual (EAI_MEMORY, exc.code());
+		assertTrue (text.find("EAI " + NumberFormatter::format(EAI_MEMORY) + ": ") != std::string::npos);
+		assertTrue (text.find(host) != std::string::npos);
+		// The host stays on the line of the error text; a trace build appends lines after it.
+		assertTrue (text.find_first_of("\r\n") > text.find(host));
+#if !defined(_WIN32)
+		assertTrue (text.find(gai_strerror(EAI_MEMORY)) != std::string::npos);
+#endif
+	}
+	assertTrue (thrown);
+#endif
+
+#if POCO_OS == POCO_OS_LINUX
+	constexpr unsigned UNKNOWN_HINT_FLAG = 0x40000000;
+	const std::string localhost("localhost");
+	try
+	{
+		// glibc rejects the unknown flag before any lookup, so no network is needed;
+		// macOS ignores it and resolves the host.
+		HostEntry he = DNS::hostByName(localhost, UNKNOWN_HINT_FLAG);
+		fail("invalid hint flags - must throw");
+	}
+	catch (DNSException& exc)
+	{
+		const std::string text = exc.displayText();
+		assertTrue (text.find(localhost) != std::string::npos);
+		assertTrue (text.find(gai_strerror(EAI_BADFLAGS)) != std::string::npos);
+	}
+#endif
+}
+
+
+void DNSTest::testHostEntryMoveNoexcept()
+{
+	static_assert(std::is_nothrow_move_constructible_v<HostEntry>);
+	static_assert(std::is_nothrow_move_assignable_v<HostEntry>);
+
+	HostEntry he1 = DNS::hostByName("localhost");
+	const HostEntry::AddressList addresses = he1.addresses();
+	assertTrue (!addresses.empty());
+
+	HostEntry he2(std::move(he1));
+	assertTrue (he2.addresses() == addresses);
+
+	HostEntry he3;
+	he3 = std::move(he2);
+	assertTrue (he3.addresses() == addresses);
+}
+
+
 void DNSTest::setUp()
 {
 }
@@ -269,6 +333,8 @@ CppUnit::Test* DNSTest::suite()
 	CppUnit_addTest(pSuite, DNSTest, testDecodeIDN);
 	CppUnit_addTest(pSuite, DNSTest, testSystemError);
 	CppUnit_addTest(pSuite, DNSTest, testHostByNameEmbeddedNul);
+	CppUnit_addTest(pSuite, DNSTest, testAIError);
+	CppUnit_addTest(pSuite, DNSTest, testHostEntryMoveNoexcept);
 
 	return pSuite;
 }

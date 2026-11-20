@@ -15,7 +15,7 @@ namespace CppUnit {
 
 
 /*
- * Orthodox performs a simple set of tests on an arbitary
+ * Orthodox performs a simple set of tests on an arbitrary
  * class to make sure that it supports at least the
  * following operations:
  *

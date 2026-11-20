@@ -57,7 +57,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 		std::string crc(4, ' ');
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, static_cast<Poco::UInt32>(start), fileEntry.needsZip64());
+			_ptrHelper = new AutoDetectInputStream(istr, init, crc, reposition, start, fileEntry.hasZip64DataDescriptor());
 		}
 		else
 		{
@@ -69,7 +69,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 	{
 		if (fileEntry.searchCRCAndSizesAfterData())
 		{
-			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, static_cast<Poco::UInt32>(start), fileEntry.needsZip64());
+			_ptrBuf = new AutoDetectInputStream(istr, "", "", reposition, start, fileEntry.hasZip64DataDescriptor());
 		}
 		else
 		{
@@ -125,7 +125,7 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 			_ptrOHelper = new PartialOutputStream(*_pOstr, 0, 0, false);
 			_ptrOBuf = new PartialOutputStream(*_ptrOHelper, 0, 0, false);
 		}
-		else throw Poco::NotImplementedException("Unsupported compression method");
+		else throw ZipException(Poco::format("Unsupported compression method (%d)", static_cast<int>(fileEntry.getCompressionMethod())), fileEntry.getFileName());
 
 		// now write the header to the ostr!
         if (fileEntry.needsZip64())

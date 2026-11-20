@@ -156,7 +156,10 @@ void NotificationQueueTest::testWaitDequeue()
 
 void NotificationQueueTest::testThreads()
 {
-	const int NOTIFICATION_COUNT = 2000;
+	// The workers sleep up to 4 ms after each notification. Windows rounds each
+	// sleep up to its timer tick of about 15.6 ms, so the count is kept small
+	// enough for the queue to drain well within the wait below.
+	const int NOTIFICATION_COUNT = 500;
 
 	Thread t1("thread1");
 	Thread t2("thread2");

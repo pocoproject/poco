@@ -54,7 +54,8 @@ ConnectionException::ConnectionException(const std::string& msg) : MySQLExceptio
 }
 
 
-ConnectionException::ConnectionException(const std::string& text, MYSQL* h) : MySQLException(compose(text, h))
+ConnectionException::ConnectionException(const std::string& text, MYSQL* h) :
+	MySQLException(compose(text, h), h != nullptr ? static_cast<int>(mysql_errno(h)) : 0)
 {
 }
 
@@ -64,14 +65,19 @@ std::string ConnectionException::compose(const std::string& text, MYSQL* h)
 	std::string str;
 	str += "[Comment]: ";
 	str += text;
-	str += "\t[mysql_error]: ";
-	str += mysql_error(h);
 
-	str += "\t[mysql_errno]: ";
-	Poco::NumberFormatter::append(str, mysql_errno(h));
+	if (h != nullptr)
+	{
+		str += "\t[mysql_error]: ";
+		str += mysql_error(h);
 
-	str += "\t[mysql_sqlstate]: ";
-	str += mysql_sqlstate(h);
+		str += "\t[mysql_errno]: ";
+		Poco::NumberFormatter::append(str, mysql_errno(h));
+
+		str += "\t[mysql_sqlstate]: ";
+		str += mysql_sqlstate(h);
+	}
+
 	return str;
 }
 
@@ -103,7 +109,8 @@ StatementException::StatementException(const std::string& msg) : MySQLException(
 }
 
 
-StatementException::StatementException(const std::string& text, MYSQL_STMT* h, const std::string& stmt) : MySQLException(compose(text, h, stmt))
+StatementException::StatementException(const std::string& text, MYSQL_STMT* h, const std::string& stmt) :
+	MySQLException(compose(text, h, stmt), h != nullptr ? static_cast<int>(mysql_stmt_errno(h)) : 0)
 {
 }
 

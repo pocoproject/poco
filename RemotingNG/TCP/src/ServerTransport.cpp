@@ -163,7 +163,7 @@ void ServerTransport::run()
 		{
 			_logger.debug("Dispatching event to subscriber: %s"s, path);
 		}
-		Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber = _listener.findEventSubscriber(path);
+		Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber = _listener.findEventSubscriber(path, _pRequestStream->rdbuf()->connection());
 		if (pEventSubscriber)
 		{
 			pEventSubscriber->invoke(*this, nullptr);

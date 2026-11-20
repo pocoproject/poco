@@ -15,6 +15,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
 #include <iostream>
+#include <type_traits>
 
 
 using Poco::Net::SocketAddress;
@@ -26,6 +27,7 @@ using Poco::Net::NoAddressFoundException;
 using Poco::Net::AddressFamilyMismatchException;
 using Poco::Path;
 using Poco::InvalidArgumentException;
+using Poco::NullPointerException;
 
 
 SocketAddressTest::SocketAddressTest(const std::string& name): CppUnit::TestCase(name)
@@ -227,6 +229,37 @@ void SocketAddressTest::testSocketAddressUnixLocal()
 }
 
 
+void SocketAddressTest::testMoveNoexcept()
+{
+	static_assert(std::is_nothrow_move_constructible_v<SocketAddress>);
+	static_assert(std::is_nothrow_move_assignable_v<SocketAddress>);
+
+	SocketAddress sa1("192.168.1.100", 100);
+	SocketAddress sa2(std::move(sa1));
+	assertTrue (sa2.toString() == "192.168.1.100:100");
+	try
+	{
+		[[maybe_unused]] Poco::UInt16 port = sa1.port(); // NOLINT(bugprone-use-after-move)
+		fail("moved-from SocketAddress - must throw");
+	}
+	catch (NullPointerException&)
+	{
+	}
+
+	SocketAddress sa3;
+	sa3 = std::move(sa2);
+	assertTrue (sa3.toString() == "192.168.1.100:100");
+	try
+	{
+		[[maybe_unused]] Poco::UInt16 port = sa2.port(); // NOLINT(bugprone-use-after-move)
+		fail("moved-from SocketAddress - must throw");
+	}
+	catch (NullPointerException&)
+	{
+	}
+}
+
+
 void SocketAddressTest::setUp()
 {
 }
@@ -245,6 +278,7 @@ CppUnit::Test* SocketAddressTest::suite()
 	CppUnit_addTest(pSuite, SocketAddressTest, testSocketRelationals);
 	CppUnit_addTest(pSuite, SocketAddressTest, testSocketAddress6);
 	CppUnit_addTest(pSuite, SocketAddressTest, testSocketAddressUnixLocal);
+	CppUnit_addTest(pSuite, SocketAddressTest, testMoveNoexcept);
 
 	return pSuite;
 }

@@ -9,7 +9,7 @@ database connectors are SQLite, MySQL/MariaDB, PostgreSQL and ODBC (which
 covers SQL Server and other databases).
 Framework is opened for extension, so additional native connectors (Oracle, Db2, ...)
 can be added. The intent behind the Poco::Data framework is to produce the
-integration between C++ and relational databses in a simple and natural way.
+integration between C++ and relational databases in a simple and natural way.
 
 The following complete example shows how to use POCO Data:
 
@@ -207,7 +207,7 @@ output target.
 It is also possible to combine into and use expressions:
 
     std::string aName;
-    std::string match("Peter")
+    std::string match("Peter");
     ses << "SELECT NAME FROM FORENAME WHERE NAME=?", into(aName), use(match), now;
     poco_assert (aName == match);
 ----
@@ -215,12 +215,12 @@ It is also possible to combine into and use expressions:
 Typically, tables will not be so trivial, i.e. they will have more than
 one column which allows for more than one into/use.
 
-Lets assume we have a Person table that contains an age, a first and a last name:
+Let's assume we have a Person table that contains an age, a first and a last name:
 
-    std::string firstName("Peter";
+    std::string firstName("Peter");
     std::string lastName("Junior");
     int age = 0;
-    ses << INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
+    ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
     ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
 ----
 
@@ -235,12 +235,12 @@ first into clause.
 
 !! Handling NULL entries
 A common case with databases are optional data fields that can contain NULL.
-To accomodate for NULL, use the Poco::Nullable template:
+To accommodate for NULL, use the Poco::Nullable template:
 
-    std::string firstName("Peter";
+    std::string firstName("Peter");
     Poco::Nullable<std::string> lastName("Junior");
     Poco::Nullable<int> age = 0;
-    ses << INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
+    ses << "INSERT INTO PERSON VALUES (?, ?, ?)", use(firstName), use(lastName), use(age), now;
     ses << "SELECT (firstname, lastname, age) FROM Person", into(firstName), into(lastName), into(age), now;
     // now you can check if age was null:
     if (!lastName.isNull()) { ... }
@@ -253,7 +253,7 @@ If the returned value was null, age.isNull() will return true. Whether empty
 string is null or not is more of a philosophical question (a topic for discussion
 in some other time and place); for the purpose of this document, suffice it to say
 that different databases handle it differently and Poco::Data provides a way to
-tweak it to user's needs through folowing <[Session]> features:
+tweak it to user's needs through following <[Session]> features:
 
   *emptyStringIsNull
   *forceEmptyString
@@ -371,7 +371,7 @@ with the exception of the initial example, we have only worked with
 database session objects so far. Or at least, that's what we made you
 believe.
 
-In reality, you have already worked with Statements. Lets take a look at
+In reality, you have already worked with Statements. Let's take a look at
 the method signature of the << operator at Session:
 
     template <typename T>
@@ -630,7 +630,7 @@ is one particular container which, due to its peculiar nature, <!can
 not!> be used in conjunction with <[out]> and <[io]> under any
 circumstances: <[std::vector<bool>]> . The details are beyond the scope
 of this manual. For those interested to learn more about it, there is an
-excellent explanation in S. Meyers book "Efective STL", Item 18 or Gotw
+excellent explanation in S. Meyers book "Effective STL", Item 18 or Gotw
 #50, [[http://www.gotw.ca/gotw/050.htm When Is a Container Not a Container]]
 paragraph.
 
@@ -670,7 +670,7 @@ POCO Data will not disappoint you:
 ----
 
 
-And thats it! There are multiple columns and multiple rows contained in
+And that's it! There are multiple columns and multiple rows contained in
 a single variable and inserted in one shot. Needless to say, the reverse
 works as well:
 
@@ -829,7 +829,9 @@ Data types supported are:
   * Poco::DateTime
   * Poco::Data::Date
   * Poco::Data::Time
-  * Poco::Dynamic::Var
+
+Bulk extraction into containers of Poco::Any and Poco::Dynamic::Var is
+not supported (without bulk, such containers are filled row by row).
 
 !!Important Considerations
 

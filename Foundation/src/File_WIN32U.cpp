@@ -548,7 +548,14 @@ bool FileImpl::createDirectoryImpl()
 	if (existsImpl() && isDirectoryImpl())
 		return false;
 	if (::CreateDirectoryW(_upath.c_str(), 0) == 0)
-		handleLastErrorImpl(_path);
+	{
+		// Saved before isDirectoryImpl() calls GetFileAttributesW(), which overwrites it.
+		const DWORD err = ::GetLastError();
+		// Another thread or process may have created the directory since the check above.
+		if (err == ERROR_ALREADY_EXISTS && isDirectoryImpl())
+			return false;
+		handleLastErrorImpl(err, _path);
+	}
 	return true;
 }
 
@@ -586,9 +593,8 @@ FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
 }
 
 
-void FileImpl::handleLastErrorImpl(const std::string& path)
+void FileImpl::handleLastErrorImpl(DWORD err, const std::string& path)
 {
-	DWORD err = ::GetLastError();
 	switch (err)
 	{
 	case ERROR_FILE_NOT_FOUND:
@@ -637,6 +643,12 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 }
 
 
+void FileImpl::handleLastErrorImpl(const std::string& path)
+{
+	handleLastErrorImpl(::GetLastError(), path);
+}
+
+
 void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 {
 	UnicodeConverter::toUTF16(utf8Path, utf16Path);
@@ -648,7 +660,7 @@ void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 		//   DWORD dw = ::GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
 		utf16Path.push_back(L'\\');
 	}
-	if (utf16Path.size() > MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
+	if (utf16Path.size() >= MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
 	{
 		if (utf16Path[0] == '\\' && utf16Path[1] != '\\')
 		{

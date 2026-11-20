@@ -24,7 +24,7 @@
 namespace Poco::Zip {
 
 
-AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start, bool needsZip64):
+AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, const std::string& pre, const std::string& post, bool reposition, std::streamoff start, bool needsZip64):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&in),
 	_eofDetected(false),
@@ -195,7 +195,7 @@ std::streamsize AutoDetectStreamBuf::writeToDevice(const char* buffer, std::stre
 }
 
 
-AutoDetectIOS::AutoDetectIOS(std::istream& istr, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start, bool needsZip64):
+AutoDetectIOS::AutoDetectIOS(std::istream& istr, const std::string& pre, const std::string& post, bool reposition, std::streamoff start, bool needsZip64):
 	_buf(istr, pre, post, reposition, start, needsZip64)
 {
 	poco_ios_init(&_buf);
@@ -213,7 +213,7 @@ AutoDetectStreamBuf* AutoDetectIOS::rdbuf()
 }
 
 
-AutoDetectInputStream::AutoDetectInputStream(std::istream& istr, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start, bool needsZip64):
+AutoDetectInputStream::AutoDetectInputStream(std::istream& istr, const std::string& pre, const std::string& post, bool reposition, std::streamoff start, bool needsZip64):
 	AutoDetectIOS(istr, pre, post, reposition, start, needsZip64),
 	std::istream(&_buf)
 {

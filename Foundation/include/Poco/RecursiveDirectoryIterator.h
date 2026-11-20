@@ -83,6 +83,8 @@ public:
 		/// Creates a copy of another recursive directory iterator.
 		_pImpl(iterator._pImpl), _path(iterator._path), _file(iterator._file)
 	{
+		if (_pImpl != nullptr)
+			_pImpl->duplicate();
 	}
 
 	RecursiveDirectoryIterator(const DirectoryIterator& iterator, UInt16 maxDepth = D_INFINITE):
@@ -135,15 +137,32 @@ public:
 		return _pImpl->maxDepth();
 	}
 
+	template <typename T>
+	void onError(T& obj, void (T::*pCB)(const void*, const std::string&))
+		/// Registers the member function pCB of obj, which is called with
+		/// the path of a subdirectory that cannot be read. The iterator
+		/// skips such a subdirectory, also when no function is registered.
+		/// The function must not throw: an exception leaves the iterator
+		/// at the subdirectory that cannot be read.
+		///
+		/// Usage:
+		///     it.onError(*this, &MyClass::onTraverseError);
+	{
+		poco_check_ptr (_pImpl);
+		_pImpl->onError(obj, pCB);
+	}
+
 
 	MyType& operator = (const MyType& it)
 	{
+		// Duplicate first: on self-assignment, releasing first could delete the shared state.
+		if (it._pImpl != nullptr)
+			it._pImpl->duplicate();
 		if (_pImpl)
 			_pImpl->release();
 		_pImpl = it._pImpl;
 		if (_pImpl)
 		{
-			_pImpl->duplicate();
 			_path = it._path;
 			_file = _path;
 		}
@@ -152,9 +171,10 @@ public:
 
 	MyType& operator = (const File& file)
 	{
+		ImplType* pImpl = new ImplType(file.path());
 		if (_pImpl)
 			_pImpl->release();
-		_pImpl = new ImplType(file.path());
+		_pImpl = pImpl;
 		_path = Path(_pImpl->get());
 		_file = _path;
 		return *this;
@@ -163,9 +183,10 @@ public:
 
 	MyType& operator = (const Path& path)
 	{
+		ImplType* pImpl = new ImplType(path.toString());
 		if (_pImpl)
 			_pImpl->release();
-		_pImpl = new ImplType(path.toString());
+		_pImpl = pImpl;
 		_path = Path(_pImpl->get());
 		_file = _path;
 		return *this;
@@ -173,9 +194,10 @@ public:
 
 	MyType& operator = (const std::string& path)
 	{
+		ImplType* pImpl = new ImplType(path);
 		if (_pImpl)
 			_pImpl->release();
-		_pImpl = new ImplType(path);
+		_pImpl = pImpl;
 		_path = Path(_pImpl->get());
 		_file = _path;
 		return *this;
@@ -226,7 +248,7 @@ private:
 
 
 //
-// friend comparsion operators
+// friend comparison operators
 //
 template <class T1, class T2>
 [[nodiscard]] inline bool operator == (const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)

@@ -12,7 +12,7 @@ sanitizer and add `-DENABLE_TRACE=ON` for stack traces in exceptions.
 |---|---|---|
 | AddressSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=address"` | |
 | ASan, hidden visibility | the above plus `-DCMAKE_CXX_VISIBILITY_PRESET=hidden` | `ASAN_OPTIONS=detect_odr_violation=2` |
-| UndefinedBehaviorSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr"` | |
+| UndefinedBehaviorSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr"` | `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1` |
 | ThreadSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=thread"` | `TSAN_OPTIONS="suppressions=<repo-root>/tsan.suppress,second_deadlock_stack=1"` |
 
 ```bash
@@ -24,12 +24,15 @@ TSAN_OPTIONS="suppressions=<repo-root>/tsan.suppress,second_deadlock_stack=1" PO
 ```
 
 - The vptr check of UBSan is disabled because the Foundation tests do not link with it.
+- Without `halt_on_error=1`, UBSan prints a report and the test continues and passes; `ctest --output-on-failure`
+  then does not show the report.
 - On macOS, ASan reports a spurious ODR violation for the test plugin loaded with `dlopen`; the CI job
   `macos-clang-cmake-sanitizers` runs ASan with `ASAN_OPTIONS=detect_odr_violation=0`.
 - Fix a race instead of adding a suppression. A new entry in `tsan.suppress` gets a comment that explains why the
   reported race is harmless.
-- CI jobs: `linux-gcc-cmake-sanitizers`, `macos-clang-cmake-sanitizers`, `macos-x64-clang-cmake-sanitizers` (matrix
-  entries `asan`, `ubsan`, `tsan`, and `hidden-asan` on arm64 and Linux).
+- CI jobs: `linux-gcc-cmake-sanitizers` (matrix entries `asan`, `ubsan`, `tsan`, `hidden-asan`),
+  `macos-clang-cmake-sanitizers` (arm64, matrix entries `asan-ubsan-hidden`, `tsan`) and
+  `macos-x64-clang-cmake-sanitizers` (Intel, ASan and UBSan, push and manual runs only).
 - Where sanitizers are not available on Linux, run the affected test class under valgrind memcheck (the
   `linux-sqlparser-upstream-tests` job uses valgrind):
 
@@ -40,7 +43,7 @@ TSAN_OPTIONS="suppressions=<repo-root>/tsan.suppress,second_deadlock_stack=1" PO
 ## Compiler warnings
 
 Build with `-DENABLE_COMPILER_WARNINGS=ON` (see [cmake.md](cmake.md#options)) and fix every new warning in changed code.
-CI jobs: `macos-clang-cmake-warnings`, `windows-msvc-cmake-warnings`.
+CI jobs: `macos-clang-cmake-sanitizers` (matrix entry `tsan`), `windows-2025-msvc-cmake`.
 
 Functions that always throw and should be `[[noreturn]]` are found with Clang's `-Wmissing-noreturn`; GCC does not
 report the same cases:
@@ -86,8 +89,8 @@ cppcheck --project=<build-dir>/compile_commands.json --enable=warning,performanc
 ## Fuzzing
 
 - `.github/workflows/cifuzz.yml` builds and runs the OSS-Fuzz targets of the `poco` project on every pull request.
-- Fuzz targets live in `<Component>/fuzzing/` (Foundation, JSON, JWT, Net, XML) and are built with `-DENABLE_FUZZING=ON`
-  and Clang.
+- Fuzz targets live in `<Component>/fuzzing/` and are built with `-DENABLE_FUZZING=ON` and Clang;
+  `build/script/oss-fuzz-build.sh` lists all of them. Their conventions are in [fuzzing.md](fuzzing.md).
 - Parsers of untrusted input (protocols, file formats) get a fuzz target or at least tests with truncated and malformed
   input (see "Extra quality gates").
 
@@ -139,13 +142,14 @@ performance was checked.
 ## CodeQL
 
 - `.github/workflows/codeql.yml` analyses `cpp` with the `security-and-quality` queries on pushes to `main`, on pull
-  requests and once a day. The build is `.github/workflows/codeql-buildscript.sh` on Ubuntu 22.04 (GCC 11).
+  requests and once a day. The build is `.github/workflows/codeql-buildscript.sh` on Ubuntu 24.04 with GCC 12
+  (`g++-12`), the oldest GCC built in CI.
 - The SARIF filter in the workflow drops results in `dependencies/` and the rules `cpp/path-injection`,
   `cpp/world-writable-file-creation`, `cpp/poorly-documented-function`, `cpp/potentially-dangerous-function`,
   `cpp/use-of-goto`, `cpp/integer-multiplication-cast-to-long`, `cpp/comparison-with-wider-type`, `cpp/leap-year/*`,
   `cpp/ambiguously-signed-bit-field`, `cpp/suspicious-pointer-scaling`, `cpp/suspicious-pointer-scaling-void`,
   `cpp/unsigned-comparison-zero`.
-- A class that compiles elsewhere fails in the CodeQL build because GCC 11 rejects a standard attribute next to the
+- A class that compiles elsewhere fails in the CodeQL build because GCC 12 rejects a standard attribute next to the
   export macro in a class head; see [Rule 94 of CODING_STYLE.md](../CODING_STYLE.md#rule-94).
 
 List open alerts:

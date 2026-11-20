@@ -32,6 +32,7 @@ public:
 	void testParse();
 	void testLimits();
 	void testParseError();
+	void testParseErrorMessages();
 
 	void setUp();
 	void tearDown();

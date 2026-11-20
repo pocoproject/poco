@@ -146,7 +146,7 @@ public:
 	static int select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout);
 		/// Determines the status of one or more sockets.
 		///
-		/// Uses epoll (Linux, Windows, Android), poll (BSD), or
+		/// Uses epoll (Linux, Windows, Android), poll (BSD, Emscripten), or
 		/// select() as fallback on platforms where neither is available.
 		///
 		/// ReadList contains the list of sockets which should be
@@ -168,6 +168,9 @@ public:
 		/// If the total number of sockets passed in readList, writeList and
 		/// exceptList is zero, select() will return immediately and the
 		/// return value will be 0.
+		///
+		/// A negative timeout waits without limit, also when a signal
+		/// interrupts the wait.
 		///
 		/// If one of the sockets passed to select() is closed while
 		/// select() runs, select will return immediately. However,

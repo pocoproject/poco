@@ -25,12 +25,14 @@ public:
 	~StreamCopierTest();
 
 	void testBufferedCopy();
+	void testBufferedCopyN();
 	void testUnbufferedCopy();
 	void testCopyToString();
 	void testBufferedCopyRange();
 	void testUnbufferedCopyRange();
 #if defined(POCO_HAVE_INT64)
 	void testBufferedCopy64();
+	void testBufferedCopyN64();
 	void testUnbufferedCopy64();
 	void testCopyToString64();
 	void testBufferedCopyRange64();

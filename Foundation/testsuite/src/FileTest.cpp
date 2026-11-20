@@ -17,6 +17,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
 #include "Poco/Environment.h"
+#include "Poco/Event.h"
 #include <fstream>
 #include <set>
 #include <atomic>
@@ -37,7 +38,6 @@
 #endif
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#include <Windows.h>
 #include <direct.h>
 #endif
 
@@ -45,8 +45,28 @@ using Poco::File;
 using Poco::TemporaryFile;
 using Poco::Path;
 using Poco::Exception;
+using Poco::PathSyntaxException;
 using Poco::Timestamp;
 using Poco::Thread;
+
+
+namespace
+{
+	template <typename F>
+	bool throwsPathSyntaxException(const F& func)
+		/// Returns true if calling func throws a PathSyntaxException.
+	{
+		try
+		{
+			func();
+		}
+		catch (PathSyntaxException&)
+		{
+			return true;
+		}
+		return false;
+	}
+}
 
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
@@ -320,6 +340,7 @@ void FileTest::testExists()
 		UINT r = GetSystemDirectoryA(buffer.data(), static_cast<UINT>(buffer.size()));
 		if (r)
 		{
+			buffer.resize(r);
 			Path p(buffer);
 			p.makeDirectory().makeAbsolute().makeParent();
 			buffer = p.toString();
@@ -603,6 +624,183 @@ void FileTest::testDirectory()
 }
 
 
+void FileTest::testCreateDirectoryExisting()
+{
+	File d("testcreatedir");
+	if (d.exists()) d.remove(true);
+	TemporaryFile::registerForDeletion(d.path());
+
+	assertTrue (d.createDirectory());
+	assertFalse (d.createDirectory());
+
+	File f(Path(Path(d.path()), "file"));
+	assertTrue (f.createFile());
+	try
+	{
+		(void) f.createDirectory();
+		failmsg("a regular file at the path - must throw FileExistsException");
+	}
+	catch (Poco::FileExistsException&)
+	{
+	}
+
+	d.remove(true);
+}
+
+
+void FileTest::testCreateDirectoryConcurrent()
+{
+	// The defect shows only when the threads run in parallel on several CPUs;
+	// on one CPU the test can pass without the fix.
+	constexpr int THREAD_COUNT = 8;
+	constexpr int DIRECTORY_COUNT = 200;
+
+	File root("testcreatedirconcurrent");
+	if (root.exists()) root.remove(true);
+	TemporaryFile::registerForDeletion(root.path());
+	root.createDirectories();
+
+	std::vector<std::string> paths;
+	paths.reserve(DIRECTORY_COUNT);
+	for (int i = 0; i < DIRECTORY_COUNT; ++i)
+	{
+		paths.push_back(Path(Path(root.path()), "dir" + std::to_string(i)).toString());
+	}
+
+	// Every thread creates the same directories in the same order, so that the
+	// threads compete for each one.
+	std::vector<std::atomic<int>> createdCount(DIRECTORY_COUNT);
+	std::vector<std::string> errors(THREAD_COUNT);
+	Poco::Event start(Poco::Event::EVENT_MANUALRESET);
+	std::vector<std::thread> threads;
+	threads.reserve(THREAD_COUNT);
+	for (int t = 0; t < THREAD_COUNT; ++t)
+	{
+		threads.emplace_back([&, t]()
+		{
+			try
+			{
+				start.wait();
+				for (int i = 0; i < DIRECTORY_COUNT; ++i)
+				{
+					if (File(paths[i]).createDirectory())
+						++createdCount[i];
+				}
+			}
+			catch (const Exception& exc)
+			{
+				errors[t] = exc.displayText();
+			}
+		});
+	}
+	start.set();
+	for (auto& thread: threads)
+	{
+		thread.join();
+	}
+
+	for (const auto& error: errors)
+	{
+		if (!error.empty()) failmsg(error);
+	}
+	for (int i = 0; i < DIRECTORY_COUNT; ++i)
+	{
+		assertEqual (1, createdCount[i].load());
+		assertTrue (File(paths[i]).isDirectory());
+	}
+
+	root.remove(true);
+}
+
+
+void FileTest::testCreateDirectoriesDeep()
+{
+	constexpr int DEPTH = 3000;
+
+	// The first level below a regular file cannot be created.
+	TemporaryFile file;
+	assertTrue (file.createFile());
+	Path p(file.path());
+	p.makeDirectory();
+	for (int i = 0; i < DEPTH; ++i)
+	{
+		p.pushDirectory("d");
+	}
+
+	// A recursion per level would exceed this stack.
+	bool thrown = false;
+	Thread thread;
+	thread.setStackSize(128 * 1024);
+	thread.startFunc([&p, &thrown]()
+	{
+		try
+		{
+			File(p).createDirectories();
+		}
+		catch (const Poco::FileException&)
+		{
+			thrown = true;
+		}
+	});
+	thread.join();
+	assertTrue (thrown);
+}
+
+
+void FileTest::testCreateDirectoriesExtendedPath()
+{
+#if defined(_WIN32)
+	// Only the levels below the deepest existing one are accessed: the first levels of an extended-length
+	// UNC path ("\\?\UNC", "\\?\UNC\localhost") cannot be checked as directories.
+	TemporaryFile root;
+	root.createDirectories();
+	Path p(root.path());
+	p.makeAbsolute();
+	const std::string local = p.toString();
+	const std::string share = "\\\\localhost\\" + local.substr(0, 1) + "$";
+	bool shareAvailable = false;
+	try
+	{
+		shareAvailable = File(share).exists();
+	}
+	catch (const Exception&)
+	{
+	}
+	// The test needs the administrative share of the drive.
+	if (shareAvailable)
+	{
+		const std::string path = "\\\\?\\UNC\\localhost\\" + local.substr(0, 1) + "$" + local.substr(2) + "\\a\\b";
+		File(path).createDirectories();
+		assertTrue (File(path).isDirectory());
+	}
+#endif
+}
+
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+void FileTest::testCreateDirectorySymlinkLoop()
+{
+	// tmpDir removes the links when it goes out of scope, also after a failed assertion.
+	TemporaryFile tmpDir;
+	tmpDir.createDirectories();
+	const std::string a = Path(Path(tmpDir.path()), "a").toString();
+	const std::string b = Path(Path(tmpDir.path()), "b").toString();
+	File(b).linkTo(a);
+	File(a).linkTo(b);
+
+	// stat() fails on the loop, so the EEXIST error of mkdir() is reported.
+	try
+	{
+		(void) File(a).createDirectory();
+		failmsg("a symbolic link loop at the path - must throw FileExistsException");
+	}
+	catch (Poco::FileExistsException&)
+	{
+	}
+}
+#endif
+
+
 void FileTest::testCopy()
 {
 	std::ofstream ostr("testfile.dat");
@@ -831,6 +1029,29 @@ void FileTest::testRenameFailIfExists() {
 }
 
 
+void FileTest::testRejectEmbeddedNul()
+{
+	// The operating system sees a path only up to the first NUL character,
+	// so "testfile2.dat\0.exe" would act on "testfile2.dat".
+	const std::string withNul("testfile2.dat\0.exe", 18);
+	std::ofstream ostr("testfile.dat");
+	ostr << "Hello, world!" << std::endl;
+	ostr.close();
+	File f("testfile.dat");
+
+	assertTrue (throwsPathSyntaxException([&]() { File g(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { File g; g = withNul; }));
+	assertTrue (throwsPathSyntaxException([&]() { f.copyTo(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { f.moveTo(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { f.renameTo(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { f.linkTo(withNul); }));
+
+	assertEqual ("testfile.dat", f.path());
+	assertTrue (f.exists());
+	assertTrue (!File("testfile2.dat").exists());
+}
+
+
 void FileTest::testLongPath()
 {
 #if defined(_WIN32)
@@ -966,6 +1187,41 @@ void FileTest::testLongPathRooted()
 		assertTrue (dir.exists());
 		assertTrue (dir.isDirectory());
 	}
+	Poco::File(base).remove(true);
+#endif
+}
+
+
+void FileTest::testCreateDirectoryAtPathLimit()
+{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// CreateDirectory accepts MAX_PATH - 12 characters including the terminator
+	// without the extended-length prefix, so a path of exactly that length needs it.
+	Poco::Path p("longpathlimit");
+	p.makeAbsolute();
+	const std::string base(p.toString());
+	// needs room to pad
+	if (base.size() + 2 > MAX_PATH - 12)
+		return;
+
+	const std::size_t len = MAX_PATH - 12;
+	// fill up to the wanted length with components that any file system accepts
+	std::string path(base);
+	while (path.size() + 65 + 2 <= len)
+	{
+		path.append("\\");
+		path.append(64, 'x');
+	}
+	path.append("\\");
+	path.append(len - path.size(), 'y');
+	assertEqual (len, path.size());
+
+	Poco::File dir(path);
+	dir.createDirectories();
+	assertTrue (dir.exists());
+	assertTrue (dir.isDirectory());
+	dir.remove();
+	assertTrue (!dir.exists());
 	Poco::File(base).remove(true);
 #endif
 }
@@ -1326,6 +1582,10 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testSwap);
 	CppUnit_addTest(pSuite, FileTest, testSize);
 	CppUnit_addTest(pSuite, FileTest, testDirectory);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoryExisting);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoryConcurrent);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoriesDeep);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoriesExtendedPath);
 	CppUnit_addTest(pSuite, FileTest, testCopy);
 	CppUnit_addTest(pSuite, FileTest, testCopyFailIfDestinationFileExists);
 	CppUnit_addTest(pSuite, FileTest, testMove);
@@ -1334,11 +1594,13 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testCopyDirectoryFailIfExists);
 	CppUnit_addTest(pSuite, FileTest, testRename);
 	CppUnit_addTest(pSuite, FileTest, testRenameFailIfExists);
+	CppUnit_addTest(pSuite, FileTest, testRejectEmbeddedNul);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
 	CppUnit_addTest(pSuite, FileTest, testLongPathUNC);
 	CppUnit_addTest(pSuite, FileTest, testLongPathDevice);
 	CppUnit_addTest(pSuite, FileTest, testLongPathRooted);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectoryAtPathLimit);
 	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
 	CppUnit_addTest(pSuite, FileTest, testTemporaryFile);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathNonExistent);
@@ -1353,6 +1615,7 @@ CppUnit::Test* FileTest::suite()
 #if defined(POCO_OS_FAMILY_UNIX)
 #if !defined(POCO_VXWORKS)
 	CppUnit_addTest(pSuite, FileTest, testPermissionsMatchAccess);
+	CppUnit_addTest(pSuite, FileTest, testCreateDirectorySymlinkLoop);
 #endif
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathThreadSafety);
 #endif

@@ -29,6 +29,19 @@ target_include_directories(DataODBC
 )
 target_compile_definitions(DataODBC PUBLIC THREADSAFE)
 
+# The wide-character API on Unix is implemented for unixODBC only
+# (Unicode_UNIXODBC.cpp). The definitions are public because the headers
+# declare the API according to them; SQL_NOUNICODEMAP keeps the ODBC headers
+# from renaming the ANSI functions to their wide-character variants, also
+# where they are included before the POCO headers.
+if(POCO_DATA_ODBC_UNICODE AND NOT WIN32)
+	if(ODBC_LIBRARIES MATCHES "iodbc")
+		message(FATAL_ERROR "POCO_DATA_ODBC_UNICODE needs unixODBC, found iODBC: ${ODBC_LIBRARIES}")
+	endif()
+	message(STATUS "ODBC: wide-character API of unixODBC")
+	target_compile_definitions(DataODBC PUBLIC UNICODE POCO_UNIXODBC SQL_NOUNICODEMAP)
+endif()
+
 # Search for MS ODBC header file which is a pre-requisite to enable
 # ENABLE_DATA_SQL_SERVER_BIG_STRINGS
 find_file(

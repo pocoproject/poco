@@ -1,0 +1,60 @@
+name: Nightly Linux
+
+# The full Linux build and every test with -long on the poco-nightly runner, on the
+# host's own OS. It starts 15 minutes after the latest end of the other nightly that
+# shares the host (03:00 UTC, at most 6 hours).
+
+on:
+  schedule:
+    - cron: '15 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-linux
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'pocoproject/poco'
+    # Referenced secrets are masked in the job log, which shows the runner's machine details.
+    env:
+      NIGHTLY_INTERNAL_HOSTNAME: ${{ secrets.NIGHTLY_INTERNAL_HOSTNAME }}
+      NIGHTLY_INTERNAL_HOME: ${{ secrets.NIGHTLY_INTERNAL_HOME }}
+      # The commit of the run: main for the scheduled run, the chosen branch for a run started by hand.
+      POCO_REF: ${{ github.sha }}
+    runs-on: [poco-nightly]
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          sparse-checkout: ci/nightly
+      - name: Build and run all tests including long tests
+        run: bash ci/nightly/poco-nightly.sh
+      - name: Collect logs
+        if: always()
+        # Artifacts are not masked: the machine name, the home directory and the network
+        # details are replaced.
+        run: |
+          out="$RUNNER_TEMP/poco-nightly-logs"
+          mkdir -p "$out"
+          if [ -d "$HOME/poco-nightly/logs" ]; then
+            cp -R "$HOME/poco-nightly/logs/." "$out/"
+            find "$out" -type f -exec sed -i -e "s|$HOME|\$HOME|g" -e "s|$(hostname)|[runner]|g" {} +
+            NIGHTLY_ADDRESSES="$( (ip -o addr show; ip -o link show) | grep -oE '(inet6?|brd|link/ether) [0-9a-fA-F.:]+' \
+              | cut -d' ' -f2 | grep -vxE '127\.0\.0\.1|::1|(ff:){5}ff|(00:){5}00' | sort -u | tr '\n' ' ')"
+            NIGHTLY_INTERFACES="$(ip -o link show | cut -d: -f2 | cut -d@ -f1 | tr -d ' ' | grep -vx lo | tr '\n' ' ')"
+            export NIGHTLY_ADDRESSES NIGHTLY_INTERFACES
+            find "$out" -type f -exec perl -pi ci/nightly/redact-logs.pl {} +
+          fi
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: nightly-linux-logs
+          path: ${{ runner.temp }}/poco-nightly-logs
+          retention-days: 14
+          if-no-files-found: error

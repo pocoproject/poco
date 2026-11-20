@@ -12,6 +12,8 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/FPEnvironment.h"
+#include <cmath>
+#include <limits>
 
 
 #ifdef POCO_COMPILER_MSVC
@@ -140,6 +142,35 @@ void FPETest::testRound()
 }
 
 
+void FPETest::testCopySign()
+{
+	// No float holds these values exactly, so a result rounded to float compares unequal.
+	constexpr double NOT_FLOAT_EXACT = 0.1;
+	constexpr double ABOVE_FLOAT_MAX = 1e300;
+	constexpr double BELOW_FLOAT_MIN = 1e-50;
+
+	assertEqual (-NOT_FLOAT_EXACT, FPE::copySign(NOT_FLOAT_EXACT, -1.0));
+	assertEqual (ABOVE_FLOAT_MAX, FPE::copySign(ABOVE_FLOAT_MAX, 1.0));
+	assertEqual (-BELOW_FLOAT_MIN, FPE::copySign(BELOW_FLOAT_MIN, -1.0));
+
+	assertEqual (-0.5f, FPE::copySign(0.5f, -2.0f));
+
+	assertEqual (1.0L, FPE::copySign(1.0L, 0.0L));
+	const long double signFromNegativeZero = FPE::copySign(1.0L, -0.0L);
+	assertTrue (std::signbit(signFromNegativeZero));
+	assertEqual (-1.0L, signFromNegativeZero);
+	assertEqual (-2.0L, FPE::copySign(2.0L, -3.0L));
+
+	assertTrue (!std::signbit(FPE::copySign(0.0L, 1.0L)));
+	assertTrue (std::signbit(FPE::copySign(0.0L, -1.0L)));
+
+	const long double positiveNaN = std::copysign(std::numeric_limits<long double>::quiet_NaN(), 1.0L);
+	const long double negativeNaN = std::copysign(std::numeric_limits<long double>::quiet_NaN(), -1.0L);
+	assertEqual (1.0L, FPE::copySign(1.0L, positiveNaN));
+	assertEqual (-1.0L, FPE::copySign(1.0L, negativeNaN));
+}
+
+
 void FPETest::setUp()
 {
 }
@@ -157,6 +188,7 @@ CppUnit::Test* FPETest::suite()
 	CppUnit_addTest(pSuite, FPETest, testClassify);
 	CppUnit_addTest(pSuite, FPETest, testFlags);
 	CppUnit_addTest(pSuite, FPETest, testRound);
+	CppUnit_addTest(pSuite, FPETest, testCopySign);
 
 	return pSuite;
 }

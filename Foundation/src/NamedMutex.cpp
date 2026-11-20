@@ -17,7 +17,7 @@
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "NamedMutex_WIN32U.cpp"
-#elif POCO_OS == POCO_OS_ANDROID
+#elif (POCO_OS == POCO_OS_ANDROID) || defined(POCO_EMSCRIPTEN)
 #include "NamedMutex_Android.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "NamedMutex_UNIX.cpp"

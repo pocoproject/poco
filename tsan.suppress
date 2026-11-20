@@ -13,15 +13,6 @@
 # Foundation
 #
 
-# ActiveDispatcher false positives
-# strictly speaking, yes - ActiveDispatcher::run() is started
-# in a thread before the inheriting object is fully constructed;
-# however, nothing can happen there before some events are
-# enqueued, which can't happen until after the inheriting object
-# is fully constructed
-race:ActiveDispatcherTest
-race:ArchiveStrategy::moveFile
-
 race:ThreadTest::testNotJoin
 
 # Pipe close races with blocked read()/write() on the same fd.

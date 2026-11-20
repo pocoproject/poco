@@ -42,18 +42,6 @@ crypto_netssl:
   - 'NetSSL_OpenSSL/**'
   - 'JWT/**'
 
-# The AI libraries and what their C++17 make build depends on.
-ai:
-  - 'AI/**'
-  - 'Foundation/**'
-  - 'JSON/**'
-  - 'Net/**'
-  - 'CppUnit/**'
-  - 'build/**'
-  - 'configure'
-  - 'components'
-  - 'Makefile'
-
 modules:
   - 'modules/**'
   - '*/include/**'

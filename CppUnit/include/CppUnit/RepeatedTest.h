@@ -32,8 +32,8 @@ public:
 	{
 	}
 
-	[[nodiscard]] int countTestCases();
-	[[nodiscard]] std::string toString();
+	[[nodiscard]] int countTestCases() const override;
+	[[nodiscard]] std::string toString() const override;
 	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
 
 private:
@@ -42,14 +42,14 @@ private:
 
 
 // Counts the number of test cases that will be run by this test.
-inline int RepeatedTest::countTestCases()
+inline int RepeatedTest::countTestCases() const
 {
 	return TestDecorator::countTestCases() * _timesRepeat;
 }
 
 
 // Returns the name of the test instance.
-inline std::string RepeatedTest::toString()
+inline std::string RepeatedTest::toString() const
 {
 	return TestDecorator::toString() + " (repeated)";
 }

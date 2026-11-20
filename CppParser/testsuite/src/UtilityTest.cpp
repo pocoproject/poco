@@ -13,7 +13,6 @@
 #include "CppUnit/TestCase.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/CppParser/Utility.h"
-#include "Poco/Config.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/String.h"
@@ -67,11 +66,15 @@ namespace {
 	// Poco paths are UTF-8, which std::filesystem::path takes as char8_t since C++20.
 	[[nodiscard]] std::filesystem::path toFilesystemPath(const std::string& path)
 	{
-#if (POCO_HAVE_CPP20_COMPILER)
 		return {std::u8string(path.begin(), path.end())};
-#else
-		return std::filesystem::u8path(path);
-#endif
+	}
+
+
+	// The options after Utility::addLanguageStandard(), separated by spaces.
+	[[nodiscard]] std::string withLanguageStandard(const std::string& exec, std::vector<std::string> options)
+	{
+		Utility::addLanguageStandard(exec, options);
+		return Poco::cat(" "s, options.begin(), options.end());
 	}
 }
 
@@ -309,6 +312,24 @@ void UtilityTest::testCollectDependenciesFilesAsParsed()
 }
 
 
+void UtilityTest::testAddLanguageStandard()
+{
+	assertEqual ("-E -C -std=c++20"s, withLanguageStandard("g++"s, {"-E"s, "-C"s}));
+	assertEqual ("-std=c++20"s, withLanguageStandard("/usr/bin/clang++"s, {}));
+	assertEqual ("/nologo /P /std:c++20"s, withLanguageStandard("cl"s, {"/nologo"s, "/P"s}));
+	assertEqual ("/std:c++20"s, withLanguageStandard("CL.EXE"s, {}));
+	assertEqual ("/std:c++20"s, withLanguageStandard("clang-cl"s, {}));
+	assertEqual ("/std:c++20"s, withLanguageStandard("/usr/bin/clang-cl-18"s, {}));
+
+	// An option that already selects a language standard is kept, and no other is added.
+	assertEqual ("-std=c++23 -E"s, withLanguageStandard("g++"s, {"-std=c++23"s, "-E"s}));
+	assertEqual ("-std=gnu++20"s, withLanguageStandard("g++"s, {"-std=gnu++20"s}));
+	assertEqual ("--std=c++20"s, withLanguageStandard("g++"s, {"--std=c++20"s}));
+	assertEqual ("/std:c++latest"s, withLanguageStandard("cl"s, {"/std:c++latest"s}));
+	assertEqual ("-std:c++20"s, withLanguageStandard("clang-cl"s, {"-std:c++20"s}));
+}
+
+
 void UtilityTest::setUp()
 {
 	_savedCwd = Path::current();
@@ -356,6 +377,7 @@ CppUnit::Test* UtilityTest::suite()
 	CppUnit_addTest(pSuite, UtilityTest, testCollectDependenciesCaseOnlyRename);
 	CppUnit_addTest(pSuite, UtilityTest, testCollectDependenciesHomeAndDeviceNames);
 	CppUnit_addTest(pSuite, UtilityTest, testCollectDependenciesFilesAsParsed);
+	CppUnit_addTest(pSuite, UtilityTest, testAddLanguageStandard);
 
 	return pSuite;
 }

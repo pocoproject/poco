@@ -116,6 +116,9 @@ public:
 
 	DateTime(double julianDay);
 		/// Creates a DateTime for the given Julian day.
+		///
+		/// Throws an InvalidArgumentException if the Julian day is not finite
+		/// or out of range.
 
 	DateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff);
 		/// Creates a DateTime from an UtcTimeVal and a TimeDiff.
@@ -136,6 +139,9 @@ public:
 
 	DateTime& operator = (double julianDay);
 		/// Assigns a Julian day.
+		///
+		/// Throws an InvalidArgumentException if the Julian day is not finite
+		/// or out of range; the DateTime is left unchanged.
 
 	DateTime& assign(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microseconds = 0);
 		/// Assigns a Gregorian date and time.
@@ -149,6 +155,7 @@ public:
 		///   * microsecond is from 0 to 999.
 		///
 		/// Throws an InvalidArgumentException if an argument date is out of range.
+		/// The DateTime is not modified in that case.
 
 	void swap(DateTime& dateTime) noexcept;
 		/// Swaps the DateTime with another one.
@@ -261,6 +268,11 @@ protected:
 		///
 		/// Throws Poco::InvalidArgumentException if any of the arguments is not valid.
 
+	static void checkValid(int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond);
+		/// Checks if the given date and time is valid (all arguments are within a proper range).
+		///
+		/// Throws Poco::InvalidArgumentException if any of the arguments is not valid.
+
 	[[nodiscard]] static double toJulianDay(Timestamp::UtcTimeVal utcTime);
 		/// Computes the Julian day for an UTC time.
 
@@ -270,6 +282,9 @@ protected:
 
 	[[nodiscard]] static Timestamp::UtcTimeVal toUtcTime(double julianDay);
 		/// Computes the UTC time for a Julian day.
+		///
+		/// Throws Poco::InvalidArgumentException if the Julian day is not finite
+		/// or outside the range of a DateTime (-4713-01-01 to 9999-12-31).
 
 	void computeGregorian(double julianDay);
 		/// Computes the Gregorian date for the given Julian day.
@@ -304,12 +319,6 @@ inline double DateTime::toJulianDay(Timestamp::UtcTimeVal utcTime)
 {
 	double utcDays = double(utcTime)/864000000000.0;
 	return utcDays + 2299160.5; // first day of Gregorian reform (Oct 15 1582)
-}
-
-
-inline Timestamp::UtcTimeVal DateTime::toUtcTime(double julianDay)
-{
-	return Timestamp::UtcTimeVal((julianDay - 2299160.5)*864000000000.0);
 }
 
 

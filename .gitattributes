@@ -33,4 +33,4 @@
 *.gif binary
 
 # Fuzzing seeds are inputs, kept byte for byte: line endings included.
-AI/**/fuzzing/seed/** -text
+**/fuzzing/seed/** -text

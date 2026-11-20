@@ -15,10 +15,55 @@
 #include "Poco/SortedDirectoryIterator.h"
 #include "Poco/RecursiveDirectoryIterator.h"
 #include "Poco/FileStream.h"
+#include "Poco/Exception.h"
 
 #include <iostream>
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+#include <sys/stat.h>
+#include <unistd.h>
+#include <cerrno>
+#endif
 
 using namespace Poco;
+
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+namespace
+{
+	class UnreadableDirectory
+		/// Removes all permissions from a directory and restores
+		/// its original mode when destroyed.
+	{
+	public:
+		UnreadableDirectory() = delete;
+		UnreadableDirectory(const UnreadableDirectory&) = delete;
+		UnreadableDirectory& operator = (const UnreadableDirectory&) = delete;
+
+		explicit UnreadableDirectory(const std::string& path);
+		~UnreadableDirectory();
+
+	private:
+		std::string _path;
+		mode_t _mode = 0;
+	};
+
+
+	UnreadableDirectory::UnreadableDirectory(const std::string& path):
+		_path(path)
+	{
+		struct stat st;
+		if (::stat(_path.c_str(), &st) != 0) throw FileException("cannot read the mode", _path, errno);
+		_mode = st.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO);
+		if (::chmod(_path.c_str(), 0) != 0) throw FileException("cannot change the mode", _path, errno);
+	}
+
+
+	UnreadableDirectory::~UnreadableDirectory()
+	{
+		::chmod(_path.c_str(), _mode);
+	}
+}
+#endif
 
 
 DirectoryIteratorsTest::DirectoryIteratorsTest(const std::string& name):
@@ -115,8 +160,131 @@ void DirectoryIteratorsTest::testSiblingsFirstRecursiveDirectoryIterator()
 }
 
 
+void DirectoryIteratorsTest::testRecursiveDirectoryIteratorCopy()
+{
+	std::vector<std::string> result;
+	{
+		SimpleRecursiveDirectoryIterator dirIterator(path());
+		const SimpleRecursiveDirectoryIterator& self = dirIterator;
+		dirIterator = self;
+		SimpleRecursiveDirectoryIterator copy(dirIterator);
+		SimpleRecursiveDirectoryIterator end;
+
+		while (copy != end)
+		{
+			result.push_back(copy->path());
+			++copy;
+		}
+	}
+
+	assertEqual(20, result.size());
+}
+
+
+void DirectoryIteratorsTest::testRecursiveDirectoryIteratorAssignNonexistent()
+{
+	Path missing(path());
+	missing.pushDirectory("missing");
+	SimpleRecursiveDirectoryIterator dirIterator(path());
+
+	try
+	{
+		dirIterator = missing;
+		failmsg("nonexistent directory - must throw exception");
+	}
+	catch (FileException&)
+	{
+	}
+	try
+	{
+		dirIterator = missing.toString();
+		failmsg("nonexistent directory - must throw exception");
+	}
+	catch (FileException&)
+	{
+	}
+	try
+	{
+		dirIterator = File(missing);
+		failmsg("nonexistent directory - must throw exception");
+	}
+	catch (FileException&)
+	{
+	}
+
+	SimpleRecursiveDirectoryIterator end;
+	std::vector<std::string> result;
+	while (dirIterator != end)
+	{
+		result.push_back(dirIterator->path());
+		++dirIterator;
+	}
+
+	assertEqual(20, result.size());
+}
+
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+void DirectoryIteratorsTest::testSimpleRecursiveDirectoryIteratorOnError()
+{
+	// Root reads a directory regardless of its mode.
+	if (::geteuid() == 0) return;
+
+	Path p = path();
+	Path second(p);
+	second.pushDirectory("first");
+	second.pushDirectory("second");
+	UnreadableDirectory unreadable(second.toString());
+
+	SimpleRecursiveDirectoryIterator dirIterator(p);
+	dirIterator.onError(*this, &DirectoryIteratorsTest::onError);
+	SimpleRecursiveDirectoryIterator end;
+	std::vector<std::string> result;
+
+	while (dirIterator != end)
+	{
+		result.push_back(dirIterator->path());
+		++dirIterator;
+	}
+
+	assertEqual(14, result.size());
+	assertEqual(1, _errorPaths.size());
+	assertEqual(second.makeFile().toString(), _errorPaths[0]);
+}
+
+
+void DirectoryIteratorsTest::testSiblingsFirstRecursiveDirectoryIteratorOnError()
+{
+	// Root reads a directory regardless of its mode.
+	if (::geteuid() == 0) return;
+
+	Path p = path();
+	Path first(p);
+	first.pushDirectory("first");
+	UnreadableDirectory unreadable(first.toString());
+
+	SiblingsFirstRecursiveDirectoryIterator dirIterator(p);
+	dirIterator.onError(*this, &DirectoryIteratorsTest::onError);
+	SiblingsFirstRecursiveDirectoryIterator end;
+	std::vector<std::string> result;
+
+	while (dirIterator != end)
+	{
+		result.push_back(dirIterator->path());
+		++dirIterator;
+	}
+
+	assertEqual(7, result.size());
+	assertEqual(1, _errorPaths.size());
+	assertEqual(first.makeFile().toString(), _errorPaths[0]);
+}
+#endif
+
+
 void DirectoryIteratorsTest::setUp()
 {
+	_errorPaths.clear();
+
 	File d(path());
 	if (d.exists()) d.remove(true);
 
@@ -184,6 +352,12 @@ void DirectoryIteratorsTest::tearDown()
 }
 
 
+void DirectoryIteratorsTest::onError(const void*, const std::string& path)
+{
+	_errorPaths.push_back(path);
+}
+
+
 Poco::Path DirectoryIteratorsTest::path() const
 {
 	Path p(Path::current());
@@ -200,6 +374,12 @@ CppUnit::Test* DirectoryIteratorsTest::suite()
 	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSortedDirectoryIterator);
 	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSimpleRecursiveDirectoryIterator);
 	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSiblingsFirstRecursiveDirectoryIterator);
+	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testRecursiveDirectoryIteratorCopy);
+	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testRecursiveDirectoryIteratorAssignNonexistent);
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSimpleRecursiveDirectoryIteratorOnError);
+	CppUnit_addTest(pSuite, DirectoryIteratorsTest, testSiblingsFirstRecursiveDirectoryIteratorOnError);
+#endif
 
 	return pSuite;
 }

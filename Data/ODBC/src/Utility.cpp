@@ -18,7 +18,12 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTime.h"
-#include <cmath>
+#include "Poco/Exception.h"
+#include "Poco/Format.h"
+#include <algorithm>
+#include <cstdlib>
+#include <limits>
+#include <vector>
 
 
 namespace Poco::Data::ODBC {
@@ -111,8 +116,9 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 
 void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 {
-	double msec = ts.fraction/1000000;
-	double usec = 1000 * (msec - std::floor(msec));
+	constexpr SQLUINTEGER NANOSECONDS_PER_MILLISECOND = 1000000;
+	constexpr SQLUINTEGER NANOSECONDS_PER_MICROSECOND = 1000;
+	constexpr SQLUINTEGER MICROSECONDS_PER_MILLISECOND = 1000;
 
 	dt.assign(ts.year,
 		ts.month,
@@ -120,8 +126,8 @@ void Utility::dateTimeSync(Poco::DateTime& dt, const SQL_TIMESTAMP_STRUCT& ts)
 		ts.hour,
 		ts.minute,
 		ts.second,
-		(int) std::floor(msec),
-		(int) std::floor(usec));
+		static_cast<int>(ts.fraction / NANOSECONDS_PER_MILLISECOND),
+		static_cast<int>((ts.fraction / NANOSECONDS_PER_MICROSECOND) % MICROSECONDS_PER_MILLISECOND));
 }
 
 
@@ -157,17 +163,36 @@ void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 
 std::string Utility::sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type)
 {
+	return sqlGetInfo(db, type, 1024);
+}
+
+
+std::string Utility::sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type, SQLSMALLINT bufferSize)
+{
+	if (bufferSize <= 0)
+		throw InvalidArgumentException("ODBC::Utility::sqlGetInfo(): buffer size must be positive.");
+	// The driver manager or the Unicode wrapper converts the value through a
+	// UTF-16 buffer with room for a terminator, whose length in bytes is an
+	// SQLSMALLINT: (16382 + 1) * 2 = 32766.
+	bufferSize = (std::min)(bufferSize, static_cast<SQLSMALLINT>((std::numeric_limits<SQLSMALLINT>::max)() / 2 - 1));
+
 	std::string ret = "unknown"s;
-	const SQLSMALLINT bufSize = 1024;
-	SQLCHAR dbmsName[bufSize] = {0};
+	// One zero byte more than the driver is told about: the driver manager can
+	// fill the buffer without a terminator when it truncates a converted value
+	// and then look for the terminator itself, which must stay in the buffer.
+	std::vector<SQLCHAR> info(static_cast<std::size_t>(bufferSize) + 1, 0);
 	SQLSMALLINT retSize = 0;
 	poco_check_ptr (db.handle());
-	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), type, dbmsName, bufSize, &retSize);
+	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), type, info.data(), bufferSize, &retSize);
 	if (!isError(rc))
 	{
-		ret.assign(reinterpret_cast<char*>(dbmsName), retSize);
-		// API may return string longer than effective length
-		ret.erase(ret.find_last_not_of('\0') + 1, std::string::npos);
+		// The reported length can differ from the length of the value in the
+		// buffer: for a truncated value it is the length of the whole value,
+		// and in Unicode builds it is the length in bytes of the UTF-16 value
+		// that was converted to UTF-8 into the buffer. The value ends at its
+		// terminator, or at the end of the buffer if it fills the buffer.
+		const char* pInfo = reinterpret_cast<const char*>(info.data());
+		ret.assign(pInfo, std::find(pInfo, pInfo + bufferSize, '\0'));
 	}
 	return ret;
 }
@@ -200,6 +225,31 @@ std::string Utility::driverVersion(const ConnectionHandle& db)
 std::string Utility::driverODBCVersion(const ConnectionHandle& db)
 {
 	return sqlGetInfo(db, SQL_DRIVER_ODBC_VER);
+}
+
+
+std::size_t Utility::arraySize(std::size_t rows, std::size_t rowLength, std::size_t elementSize)
+{
+	// checked before multiplying, so the product can not wrap around
+	if (rowLength != 0 && elementSize != 0 &&
+		rows > std::numeric_limits<std::size_t>::max() / rowLength / elementSize)
+	{
+		throw LengthExceededException(Poco::format("ODBC::Utility::arraySize(): "
+			"%z rows of %z elements of %z bytes exceed the maximum array size", rows, rowLength, elementSize));
+	}
+	return rows * rowLength * elementSize;
+}
+
+
+void* Utility::allocArray(std::size_t rows, std::size_t rowLength, std::size_t elementSize)
+{
+	std::size_t size = arraySize(rows, rowLength, elementSize);
+	// at least one element, so the result does not depend on how calloc() treats a zero size
+	if (0 == size) size = (0 == elementSize) ? 1 : elementSize;
+	void* pArray = std::calloc(size, 1);
+	if (pArray == nullptr)
+		throw OutOfMemoryException(Poco::format("ODBC::Utility::allocArray(): %z bytes", size));
+	return pArray;
 }
 
 

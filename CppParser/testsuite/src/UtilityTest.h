@@ -37,6 +37,7 @@ public:
 	void testCollectDependenciesCaseOnlyRename();
 	void testCollectDependenciesHomeAndDeviceNames();
 	void testCollectDependenciesFilesAsParsed();
+	void testAddLanguageStandard();
 
 	void setUp() override;
 	void tearDown() override;

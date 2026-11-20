@@ -231,8 +231,10 @@ void Context::importCertificate()
 {
 	Poco::File certFile(_certInfoOrPath);
 	if (!certFile.exists()) throw Poco::FileNotFoundException(_certInfoOrPath);
+	// far above a key with its certificate chain, so that a wrong path does not read a large file into memory
+	constexpr Poco::File::FileSize MAX_PKCS12_FILE_SIZE = 1024*1024;
 	Poco::File::FileSize size = certFile.getSize();
-	if (size > 4096) throw Poco::DataFormatException("PKCS #12 certificate file too large", _certInfoOrPath);
+	if (size > MAX_PKCS12_FILE_SIZE) throw Poco::DataFormatException("PKCS #12 certificate file too large", _certInfoOrPath);
 	Poco::Buffer<char> buffer(static_cast<std::size_t>(size));
 	Poco::FileInputStream istr(_certInfoOrPath);
 	istr.read(buffer.begin(), buffer.size());
@@ -258,10 +260,14 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 	HCERTSTORE hTempStore =  PFXImportCertStore(&blob, wpassword.data(), PKCS12_ALLOW_OVERWRITE_KEY | PKCS12_INCLUDE_EXTENDED_PROPERTIES);
 
 	// clear UTF-16 password
-	std::fill(const_cast<wchar_t*>(wpassword.data()), const_cast<wchar_t*>(wpassword.data() + password.size()), L'X');
+	std::fill(wpassword.begin(), wpassword.end(), L'X');
 
 	if (hTempStore)
 	{
+		// A file with a certificate chain also holds certificates without a key, in any order:
+		// the certificate of the context is the one with the private key, or the first one if none has a key.
+		PCCERT_CONTEXT pKeyCert = nullptr;
+		PCCERT_CONTEXT pFirstCert = nullptr;
 		PCCERT_CONTEXT pCert = nullptr;
 		pCert = CertEnumCertificatesInStore(hTempStore, pCert);
 		while (pCert)
@@ -270,9 +276,14 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 			BOOL res = CertAddCertificateContextToStore(_hMemCertStore, pCert, CERT_STORE_ADD_REPLACE_EXISTING, &pStoreCert);
 			if (res)
 			{
-				if (!_pCert)
+				DWORD keyInfoSize = 0;
+				if (pKeyCert == nullptr && CertGetCertificateContextProperty(pCert, CERT_KEY_PROV_INFO_PROP_ID, nullptr, &keyInfoSize))
 				{
-					_pCert = pStoreCert;
+					pKeyCert = pStoreCert;
+				}
+				else if (pFirstCert == nullptr)
+				{
+					pFirstCert = pStoreCert;
 				}
 				else
 				{
@@ -283,6 +294,12 @@ void Context::importCertificate(const char* pBuffer, std::size_t size)
 			pCert = CertEnumCertificatesInStore(hTempStore, pCert);
 		}
 		CertCloseStore(hTempStore, 0);
+		if (pKeyCert != nullptr)
+		{
+			if (pFirstCert != nullptr) CertFreeCertificateContext(pFirstCert);
+			_pCert = pKeyCert;
+		}
+		else _pCert = pFirstCert;
 	}
 	else throw CertificateException("failed to import certificate", GetLastError());
 }
@@ -358,7 +375,7 @@ SECURITY_STATUS Context::acquireSchannelCredentials(CredHandle& credHandle) cons
 		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
 #endif
 
-	schannelCred.hRootStore = schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : NULL;
+	schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : nullptr;
 
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;
@@ -423,7 +440,7 @@ SECURITY_STATUS Context::acquireSchannelCredentialsLegacy(CredHandle& credHandle
 		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
 #endif
 
-	schannelCred.hRootStore = schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : nullptr;
+	schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : nullptr;
 
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;

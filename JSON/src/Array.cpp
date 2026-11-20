@@ -156,9 +156,17 @@ bool Array::isObject(ConstIterator& it) const
 
 void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 {
-	int options = Poco::JSON_WRAP_STRINGS;
+	int options = 0;
 	options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
 	options |= _lowercaseHex ? Poco::JSON_LOWERCASE_HEX : 0;
+
+	stringify(out, indent, step, options);
+}
+
+
+void Array::stringify(std::ostream& out, unsigned int indent, int step, int options) const
+{
+	const int stringOptions = Poco::JSON_WRAP_STRINGS | (options & (Poco::JSON_ESCAPE_UNICODE | Poco::JSON_LOWERCASE_HEX));
 
 	if (step == -1) step = static_cast<int>(indent);
 
@@ -170,7 +178,7 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 	{
 		for (unsigned int i = 0; i < indent; i++) out << ' ';
 
-		Stringifier::stringify(*it, out, indent + static_cast<unsigned int>(step), step, options);
+		Stringifier::stringify(*it, out, indent + static_cast<unsigned int>(step), step, stringOptions);
 
 		if (++it != _values.end())
 		{

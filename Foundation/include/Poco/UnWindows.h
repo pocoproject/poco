@@ -32,11 +32,6 @@
 
 #if !defined(POCO_NO_WINDOWS_H)
 	#include <windows.h>
-	#ifdef __MINGW32__
-		#include <winsock2.h>
-		#include <iphlpapi.h>
-		#include <ws2tcpip.h>
-	#endif // __MINGW32__
 #endif
 
 

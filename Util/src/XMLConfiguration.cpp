@@ -27,7 +27,10 @@
 #include "Poco/Exception.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/String.h"
+#include <iterator>
 #include <set>
+#include <utility>
 
 
 using namespace std::string_literals;
@@ -250,10 +253,16 @@ void XMLConfiguration::enumerate(const std::string& key, Keys& range) const
 			{
 				const std::string& nodeName = pChild->nodeName();
 				size_t& count = keys[nodeName];
+				std::string name = nodeName;
+				if (name.find(_delim) != std::string::npos)
+				{
+					const std::string delim(1, _delim);
+					Poco::replaceInPlace(name, delim, "\\" + delim);
+				}
 				if (count)
-					range.push_back(nodeName + "[" + NumberFormatter::format(count) + "]");
+					range.push_back(name + "[" + NumberFormatter::format(count) + "]");
 				else
-					range.push_back(nodeName);
+					range.push_back(std::move(name));
 				++count;
 			}
 			pChild = pChild->nextSibling();
@@ -351,7 +360,12 @@ XMLConfiguration::Node* XMLConfiguration::findNode(std::string::const_iterator& 
 		{
 			while (it != end && *it == _delim) ++it;
 			std::string key;
-			while (it != end && *it != _delim && *it != '[') key += *it++;
+			while (it != end && *it != _delim && *it != '[')
+			{
+				// A backslash cannot occur in an XML name, so a backslash before the delimiter escapes it.
+				if (*it == '\\' && std::next(it) != end && *std::next(it) == _delim) ++it;
+				key += *it++;
+			}
 			return findNode(it, end, findElement(key, pNode, create), create);
 		}
 	}

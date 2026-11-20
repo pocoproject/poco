@@ -364,8 +364,8 @@ CppUnit::Test* LinearHashTableTest::suite()
 	CppUnit_addTest(pSuite, LinearHashTableTest, testConstIterator);
 
 #if defined(POCO_TEST_DEPRECATED)
-	CppUnit_addTest(pSuite, LinearHashTableTest, testPerformanceInt);
-	CppUnit_addTest(pSuite, LinearHashTableTest, testPerformanceStr);
+	CppUnit_addLongTest(pSuite, LinearHashTableTest, testPerformanceInt);
+	CppUnit_addLongTest(pSuite, LinearHashTableTest, testPerformanceStr);
 #endif
 
 	return pSuite;

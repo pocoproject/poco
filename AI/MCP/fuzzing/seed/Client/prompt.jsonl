@@ -1,0 +1,1 @@
+{"name":"prompt","title":"Greeting","description":"Greets someone.","arguments":[{"name":"name","title":"Name","description":"Who is greeted.","required":true},{"name":"style","required":false}]}

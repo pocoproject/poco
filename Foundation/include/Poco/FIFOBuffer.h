@@ -335,21 +335,18 @@ public:
 		/// Advances buffer by length elements.
 		/// Should be called AFTER the data
 		/// was copied into the buffer.
+		///
+		/// Throws an InvalidAccessException if length exceeds
+		/// the space between next() and the end of the buffer.
 	{
 		if (0 == length) return;
 		Mutex::ScopedLock lock(_mutex);
 
-		if (length > available())
+		if (length > _buffer.size() - (_begin + _used))
 			throw Poco::InvalidAccessException("Cannot extend buffer.");
 
 		if (!isWritable())
 			throw Poco::InvalidAccessException("Buffer not writable.");
-
-		if (_buffer.size() - (_begin + _used) < length)
-		{
-			std::memmove(_buffer.begin(), begin(), _used * sizeof(T));
-			_begin = 0;
-		}
 
 		std::size_t usedBefore = _used;
 		_used += length;

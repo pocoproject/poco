@@ -29,6 +29,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/SharedPtr.h"
 #include <istream>
+#include <optional>
 #include <ostream>
 
 
@@ -270,6 +271,12 @@ public:
 		/// up a new connection; its next sendRequest() closes the socket
 		/// and throws a NetException.
 		///
+		/// If the response announces a Keep-Alive timeout, a session with
+		/// a host does not reuse the connection once that timeout less one
+		/// second (less half of it when it is shorter than two seconds) has
+		/// passed since the response header was received; a body that takes
+		/// longer than that to read therefore also prevents the reuse.
+		///
 		/// In case a network or server failure happens
 		/// while reading the response body from the returned stream,
 		/// the stream state will change to bad or fail, and the next
@@ -415,7 +422,12 @@ private:
 	SocketAddress         _sourceAddress6;
 	ProxyConfig           _proxyConfig;
 	Poco::Timespan        _keepAliveTimeout;
+	std::optional<Poco::Timespan> _serverKeepAliveTimeout;
+		/// The timeout that the server announced in the Keep-Alive header of its last response.
 	Poco::Timestamp       _lastRequest;
+	Poco::Timestamp       _lastResponse;
+		/// When the header of the last response was received. The server starts its Keep-Alive timeout when it has sent the whole response:
+		/// later than this for a long body, earlier by up to the network delay for a short one, which the margin in mustReconnect() covers.
 	bool                  _reconnect;
 	bool                  _mustReconnect;
 	bool                  _expectResponseBody;

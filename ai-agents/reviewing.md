@@ -44,13 +44,13 @@ gh pr diff <N> -R pocoproject/poco
    are named: error, abort and timeout paths, paths that cross a buffer or message boundary, and concurrent use.
 7. **Clarity, comments and naming:** names, function length, simple control flow. Comments explain why, not what, are
    still accurate after a refactoring, and carry no ticket numbers.
-8. **Language idioms:** `[[nodiscard]]` on the declaration of every function whose result must not be ignored (C++17, so
-   it needs no guard; mandatory in new code, [Rule 94 of CODING_STYLE.md](../CODING_STYLE.md#rule-94)). C++20 forms
-   where they apply: `std::span` instead of a pointer and a length, `std::jthread` with `std::stop_token` and
-   `std::condition_variable_any` for prompt shutdown, ranges, `std::bit_cast` instead of `reinterpret_cast`; they need
-   the feature guards of the section "Language Standard and Feature Guards" of
-   [CODING_STYLE.md](../CODING_STYLE.md#20-language-standard-and-feature-guards), because `main` must still build as
-   C++17.
+8. **Language idioms:** `[[nodiscard]]` on the declaration of every function whose result must not be ignored
+   (mandatory in new code, [Rule 94 of CODING_STYLE.md](../CODING_STYLE.md#rule-94)). C++20 forms where they
+   apply: `std::span` instead of a pointer and a length, `std::jthread` with `std::stop_token` and
+   `std::condition_variable_any` for prompt shutdown, ranges, `std::bit_cast` instead of `reinterpret_cast`.
+   Language features need no guard; a library feature that a supported toolchain lacks (`std::jthread`) needs
+   the feature guard of the section "Language Standard and Feature Guards" of
+   [CODING_STYLE.md](../CODING_STYLE.md#20-language-standard-and-feature-guards).
 9. **Style:** conformance to [CODING_STYLE.md](../CODING_STYLE.md). Its rules are must-fix in new and changed code, also
    where existing code on `main` does not follow them.
 10. **API and ABI:** changes to public headers are deliberate and documented; removed API is deprecated first

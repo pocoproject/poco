@@ -78,13 +78,13 @@ class Data_API Statement
 	///
 	/// See individual functions documentation for more details.
 	///
-	/// Statement owns the RowFormatter, which can be provided externaly through setFormatter()
+	/// Statement owns the RowFormatter, which can be provided externally through setFormatter()
 	/// member function.
 	/// If no formatter is externally supplied to the statement, the SimpleRowFormatter is lazy
 	/// created and used.
 	///
 	/// If compiled with SQLParser support, Statement knows the number and type of the SQL statement(s)
-	/// it contains, to the extent that the SQL string is a standard SQL and the staement type is supported.
+	/// it contains, to the extent that the SQL string is a standard SQL and the statement type is supported.
 	/// No proprietary SQL extensions are supported.
 	///
 	/// Supported statement types are:
@@ -328,9 +328,10 @@ public:
 		/// Const overload of bindings().
 
 	[[nodiscard]] Optional<std::size_t> statementsCount() const;
-		/// Returns the total number of SQL statements held in the accummulated SQL statement.
+		/// Returns the total number of SQL statements held in the accumulated SQL statement.
 		///
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	Optional<bool> parse();
 		/// Parses the SQL statement and returns true if successful.
@@ -348,35 +349,43 @@ public:
 
 	[[nodiscard]] Optional<bool> isSelect() const;
 		/// Returns true if the statement consists only of SELECT statement(s).
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> isInsert() const;
 		/// Returns true if the statement consists only of INSERT statement(s).
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> isUpdate() const;
 		/// Returns true if the statement consists only of UPDATE statement(s).
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> isDelete() const;
 		/// Returns true if the statement consists only of DELETE statement(s).
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	Optional<bool> hasSelect() const;
 		/// Returns true if the statement contains a SELECT statement.
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> hasInsert() const;
 		/// Returns true if the statement contains an INSERT statement.
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> hasUpdate() const;
 		/// Returns true if the statement contains an UPDATE statement.
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	[[nodiscard]] Optional<bool> hasDelete() const;
 		/// Returns true if the statement contains a DELETE statement.
-		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
+		/// Returns unspecified unless the last parse() succeeded; for Poco::Data builds
+		/// with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
 	std::size_t execute(bool reset = true);
 		/// Executes the statement synchronously or asynchronously.
@@ -408,14 +417,19 @@ public:
 		/// succeed.
 		///
 		/// For Poco::Data builds without SQLParser support, the behavior is the same as
-		/// for unsuccesful parsing.
+		/// for unsuccessful parsing.
 		///
 		/// Throws NotConnectedException if the session is not connected; no transaction is started then.
+		/// Throws InvalidAccessException while another execution of the statement or of one of
+		/// its copies runs; another thread that calls this function on the same Statement object
+		/// waits for a running synchronous execution instead.
 
 	void executeDirect(const std::string& query);
 		/// Executes the query synchronously and directly.
-		/// Even when isAsync() returns true, the statement is still executed synchronously.
 		/// For transactional behavior, see execute() documentation.
+		/// Throws InvalidAccessException if isAsync() returns true, or while another execution of
+		/// the statement or of one of its copies runs; another thread that calls this function on
+		/// the same Statement object waits for a running synchronous execution instead.
 
 	const Result& executeAsync(bool reset = true);
 		/// Executes the statement asynchronously.
@@ -426,6 +440,9 @@ public:
 		/// When executed on a synchronous statement, this method does not alter the
 		/// statement's synchronous nature.
 		/// For transactional behavior, see execute() documentation.
+		/// Throws InvalidAccessException while another execution of the statement or of one of
+		/// its copies runs; another thread that calls this function on the same Statement object
+		/// waits for a running synchronous execution instead.
 		/// The implementation is kept alive while the execution runs, even if the
 		/// Statement is destroyed first; the Result does not hold it.
 		/// The Session and the variables bound with use() or into() are not kept
@@ -550,7 +567,8 @@ protected:
 
 private:
 	const Result& doAsyncExec(bool reset = true);
-		/// Asynchronously executes the statement.
+		/// Asynchronously executes the statement. The caller has marked the implementation
+		/// as executing and hands the mark over to the started execution when this returns.
 
 	template <typename T>
 	Statement& commaPODImpl(const T& val)
@@ -572,9 +590,14 @@ private:
 		/// transaction does not need to started.
 		/// However, due to many SQL dialects, this logic is
 		/// not 100% accurate and transaction MAY be started
-		/// for SELECT-only queries.
+		/// for SELECT-only queries. A query that the parser
+		/// cannot read always starts a transaction.
 
 #ifndef POCO_DATA_NO_SQL_PARSER
+
+	[[nodiscard]] bool isParsed() const;
+		/// Returns true if parsing is enabled for the session and the
+		/// last parse() succeeded.
 
 	[[nodiscard]] bool isType(unsigned int type) const;
 		/// Returns true if the statement is of the argument type.
@@ -997,23 +1020,13 @@ inline const RowFormatter::Ptr& Statement::getRowFormatter()
 
 
 inline void swap(Statement& s1, Statement& s2) noexcept
+	/// Swaps s1 with s2.
 {
 	s1.swap(s2);
 }
 
 
 } // namespace Poco::Data
-
-
-namespace std
-{
-	template<>
-	inline void swap<Poco::Data::Statement>(Poco::Data::Statement& s1, Poco::Data::Statement& s2) noexcept
-		/// Full template specalization of std:::swap for Statement
-	{
-		s1.swap(s2);
-	}
-}
 
 
 #endif // Data_Statement_INCLUDED

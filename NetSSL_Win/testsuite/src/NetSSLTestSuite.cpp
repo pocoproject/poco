@@ -9,6 +9,7 @@
 
 
 #include "NetSSLTestSuite.h"
+#include "ContextTest.h"
 #include "X509CertificateTest.h"
 #include "SecureStreamSocketTestSuite.h"
 #include "HTTPSClientTestSuite.h"
@@ -17,12 +18,15 @@
 #include "WebSocketTestSuite.h"
 #include "SecureSyslogTest.h"
 #include "SecureSMTPClientSessionTest.h"
+#include "OpenSSLPeerTest.h"
+#include "AutoSecBufferDescTest.h"
 
 
 CppUnit::Test* NetSSLTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NetSSLTestSuite");
 
+	pSuite->addTest(ContextTest::suite());
 	pSuite->addTest(X509CertificateTest::suite());
 	pSuite->addTest(SecureStreamSocketTestSuite::suite());
 	pSuite->addTest(HTTPSClientTestSuite::suite());
@@ -31,6 +35,8 @@ CppUnit::Test* NetSSLTestSuite::suite()
 	pSuite->addTest(WebSocketTestSuite::suite());
 	pSuite->addTest(SecureSyslogTest::suite());
 	pSuite->addTest(SecureSMTPClientSessionTest::suite());
+	pSuite->addTest(OpenSSLPeerTest::suite());
+	pSuite->addTest(AutoSecBufferDescTest::suite());
 
 	return pSuite;
 }

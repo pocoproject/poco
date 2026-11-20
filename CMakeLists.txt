@@ -47,28 +47,25 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Setup C/C++ compiler options
 #################################################################################
 
-# Detect if compiler supports C++20 standard (preferred)
-include(CXX2x)
-check_for_cxx20_compiler(CXX20_COMPILER)
-
-if (EMSCRIPTEN)
-	set(CXX20_COMPILER OFF)
-endif()
-
-if(CXX20_COMPILER)
+# POCO requires C++20. A later standard set by the user or a parent project is kept.
+if(NOT CMAKE_CXX_STANDARD)
 	set(CMAKE_CXX_STANDARD 20)
-	message(STATUS "Building Poco with C++20 standard")
-else()
-	# Fall back to C++17
-	include(CXX1x)
-	check_for_cxx17_compiler(CXX17_COMPILER)
-	if(NOT CXX17_COMPILER)
-		message(FATAL_ERROR "Compiler does not support C++17 or later.")
-	endif()
-	set(CMAKE_CXX_STANDARD 17)
-	message(STATUS "Building Poco with C++17 standard (C++20 not available)")
+elseif(CMAKE_CXX_STANDARD LESS 20 OR CMAKE_CXX_STANDARD EQUAL 98)
+	message(FATAL_ERROR "POCO requires C++20 or later, but CMAKE_CXX_STANDARD is ${CMAKE_CXX_STANDARD}. "
+		"Set CMAKE_CXX_STANDARD to 20 or later, or do not set it.")
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include(CXX2x)
+check_for_cxx20_compiler(_poco_cxx20)
+if(NOT _poco_cxx20)
+	message(FATAL_ERROR "POCO requires C++20 or later: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} "
+		"cannot compile cmake/test_compiler_cxx20.cpp as C++${CMAKE_CXX_STANDARD}. "
+		"Use a C++20 compiler and standard library (GCC 12, Clang 16, Apple Clang 16, Visual C++ 2022 or newer); "
+		"the compiler output above shows the cause.")
+endif()
+unset(_poco_cxx20)
+message(STATUS "Building Poco with C++${CMAKE_CXX_STANDARD} standard")
 
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -81,11 +78,20 @@ include(GNUInstallDirs)
 # Include some common macros to simpilfy the Poco CMake files
 include(PocoMacros)
 
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+if(EMSCRIPTEN)
+	# Static by default: programs do not link against wasm shared libraries.
+	option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+else()
+	option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+endif()
 
 option(POCO_MINIMAL_BUILD "Build only bare minimum Poco libraries identifoed with ENABLE options." OFF)
 
 set(POCO_SANITIZEFLAGS CACHE STRING "Compiler-dependent sanitizer flags (like -fsanitize=address or /fsanitize=address")
+
+if(EMSCRIPTEN)
+	set(POCO_EMSCRIPTEN_FLAGS "-pthread -fexceptions" CACHE STRING "Compile and link flags for Emscripten: threads and C++ exceptions, which Emscripten leaves off by default")
+endif()
 
 if(MSVC)
 	option(POCO_MT "Set to OFF|ON (default is OFF) to control static build of POCO as /MT instead of /MD" OFF)
@@ -284,10 +290,7 @@ option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PDF "Enable PDF" OFF)
 
-option(ENABLE_MODULES "Build the C++ module Poco (requires C++20 and CMake 3.28+)" OFF)
-if(ENABLE_MODULES AND NOT CXX20_COMPILER)
-	message(FATAL_ERROR "ENABLE_MODULES requires a C++20 compiler.")
-endif()
+option(ENABLE_MODULES "Build the C++ module Poco (requires CMake 3.28+)" OFF)
 
 option(ENABLE_BENCHMARK
 	"Set to OFF|ON (default is OFF) to enable Benchmark application (requires Google Benchmark library)" OFF)
@@ -305,6 +308,9 @@ option(ENABLE_TEST_DEPRECATED
 	"Set to OFF|ON (default is OFF) to enable build of tests for deprecated functionality" OFF)
 
 option(POCO_DATA_NO_SQL_PARSER "Set to OFF|ON (default is OFF) to build Poco::Data without the SQL parser" OFF)
+
+option(POCO_DATA_ODBC_UNICODE
+	"Set to OFF|ON (default is OFF) to build Poco::Data::ODBC on the wide-character (UTF-16) API of unixODBC; Windows always uses it" OFF)
 
 option(ENABLE_COMPILER_WARNINGS
 	"Set to OFF|ON (default is OFF) to enable additional compiler warnings. Intended primarily for maintainers." OFF)

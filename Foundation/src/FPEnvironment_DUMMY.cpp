@@ -72,7 +72,7 @@ FPEnvironmentImpl::RoundingModeImpl FPEnvironmentImpl::getRoundingModeImpl()
 
 long double FPEnvironmentImpl::copySignImpl(long double target, long double source)
 {
-	return (source >= 0 && target >= 0) || (source < 0 && target < 0) ? target : -target;
+	return std::copysign(target, source);
 }
 
 

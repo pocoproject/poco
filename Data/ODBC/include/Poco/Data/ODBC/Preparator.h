@@ -32,6 +32,7 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/UTFString.h"
 #include <vector>
+#include <limits>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include "Poco/UnWindows.h"
 #endif
@@ -360,25 +361,31 @@ public:
 		/// Prepares an Any.
 
 	void prepare(std::size_t pos, const std::vector<Poco::Any>& val) override;
-		/// Prepares an Any vector.
+		/// Throws NotImplementedException: bulk extraction
+		/// into an Any vector is not supported.
 
 	void prepare(std::size_t pos, const std::deque<Poco::Any>& val) override;
-		/// Prepares an Any deque.
+		/// Throws NotImplementedException: bulk extraction
+		/// into an Any deque is not supported.
 
 	void prepare(std::size_t pos, const std::list<Poco::Any>& val) override;
-		/// Prepares an Any list.
+		/// Throws NotImplementedException: bulk extraction
+		/// into an Any list is not supported.
 
 	void prepare(std::size_t pos, const Poco::Dynamic::Var& val) override;
 		/// Prepares a Dynamic::Var.
 
 	void prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val) override;
-		/// Prepares a Dynamic::Var vector.
+		/// Throws NotImplementedException: bulk extraction
+		/// into a Dynamic::Var vector is not supported.
 
 	void prepare(std::size_t pos, const std::deque<Poco::Dynamic::Var>& val) override;
-		/// Prepares a Dynamic::Var deque.
+		/// Throws NotImplementedException: bulk extraction
+		/// into a Dynamic::Var deque is not supported.
 
 	void prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val) override;
-		/// Prepares a Dynamic::Var list.
+		/// Throws NotImplementedException: bulk extraction
+		/// into a Dynamic::Var list is not supported.
 
 	[[nodiscard]] std::size_t columns() const;
 		/// Returns the number of columns.
@@ -406,7 +413,24 @@ public:
 		/// Returns the returned length for the column and row specified.
 		/// This is usually equal to the column size, except for
 		/// variable length fields (BLOB and variable length strings).
-		/// For null values, the return value is -1 (SQL_NO_DATA)
+		/// For null values, the return value is (std::size_t) SQL_NULL_DATA;
+		/// if the driver could not determine the length of a truncated
+		/// value, it is (std::size_t) SQL_NO_TOTAL.
+
+	[[nodiscard]] std::size_t boundBufferSize(std::size_t pos) const;
+		/// Returns the length in bytes of the buffer bound with SQLBindCol()
+		/// to the variable length column at position pos (for bulk columns,
+		/// the length of one row), or 0 if no variable length buffer is bound
+		/// to the column. No value fetched into the buffer can be longer.
+		/// Unlike maxDataSize(), the length is recorded when the buffer is
+		/// bound and does not depend on the current column metadata.
+
+	[[nodiscard]] MetaColumn::ColumnDataType boundType(std::size_t pos) const;
+		/// For a column prepared for extraction into Poco::Any or
+		/// Poco::Dynamic::Var, returns the column type the driver described
+		/// when the column was prepared, which determines the type of the
+		/// bound buffer. Returns MetaColumn::FDT_UNKNOWN for other columns.
+		/// After a fetch, a driver can describe the column differently.
 
 	[[nodiscard]] std::size_t bulkSize(std::size_t col = 0) const;
 		/// Returns bulk size. Column argument is optional
@@ -427,136 +451,84 @@ private:
 	Preparator();
 	Preparator& operator = (const Preparator&);
 
-	template <typename C>
-	void prepareImpl(std::size_t pos, const C* pVal = nullptr)
+	void prepareImpl(std::size_t pos)
 		/// Utility function to prepare Any and Dynamic::Var.
+		/// Binds the buffer the typed prepare() binds for the column type
+		/// the driver describes, and records that type for boundType().
 	{
 		ODBCMetaColumn col(_rStmt, pos);
+		poco_assert (pos < _boundTypes.size());
+		_boundTypes[pos] = col.type();
 
 		switch (col.type())
 		{
 			case MetaColumn::FDT_INT8:
-				if (pVal)
-					return prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT, pVal->size());
-				else
-					return prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT);
+				return prepareFixedSize<Poco::Int8>(pos, SQL_C_STINYINT);
 
 			case MetaColumn::FDT_UINT8:
-				if (pVal)
-					return prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT, pVal->size());
-				else
-					return prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT);
+				return prepareFixedSize<Poco::UInt8>(pos, SQL_C_UTINYINT);
 
 			case MetaColumn::FDT_INT16:
-				if (pVal)
-					return prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT, pVal->size());
-				else
-					return prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT);
+				return prepareFixedSize<Poco::Int16>(pos, SQL_C_SSHORT);
 
 			case MetaColumn::FDT_UINT16:
-				if (pVal)
-					return prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT, pVal->size());
-				else
-					return prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT);
+				return prepareFixedSize<Poco::UInt16>(pos, SQL_C_USHORT);
 
 			case MetaColumn::FDT_INT32:
-				if (pVal)
-					return prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG, pVal->size());
-				else
-					return prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG);
+				return prepareFixedSize<Poco::Int32>(pos, SQL_C_SLONG);
 
 			case MetaColumn::FDT_UINT32:
-				if (pVal)
-					return prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG, pVal->size());
-				else
-					return prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG);
+				return prepareFixedSize<Poco::UInt32>(pos, SQL_C_ULONG);
 
 			case MetaColumn::FDT_INT64:
-				if (pVal)
-					return prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT, pVal->size());
-				else
-					return prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT);
+				return prepareFixedSize<Poco::Int64>(pos, SQL_C_SBIGINT);
 
 			case MetaColumn::FDT_UINT64:
-				if (pVal)
-					return prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT, pVal->size());
-				else
-					return prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT);
+				return prepareFixedSize<Poco::UInt64>(pos, SQL_C_UBIGINT);
 
 			case MetaColumn::FDT_BOOL:
-				if (pVal)
-					return prepareBoolArray(pos, SQL_C_BIT, pVal->size());
-				else
-					return prepareFixedSize<bool>(pos, SQL_C_BIT);
+				return prepareFixedSize<bool>(pos, SQL_C_BIT);
 
 			case MetaColumn::FDT_FLOAT:
-				if (pVal)
-					return prepareFixedSize<float>(pos, SQL_C_FLOAT, pVal->size());
-				else
-					return prepareFixedSize<float>(pos, SQL_C_FLOAT);
+				return prepareFixedSize<float>(pos, SQL_C_FLOAT);
 
 			case MetaColumn::FDT_DOUBLE:
-				if (pVal)
-					return prepareFixedSize<double>(pos, SQL_C_DOUBLE, pVal->size());
-				else
-					return prepareFixedSize<double>(pos, SQL_C_DOUBLE);
+				return prepareFixedSize<double>(pos, SQL_C_DOUBLE);
 
 			case MetaColumn::FDT_STRING:
-				if (pVal)
-					return prepareCharArray<char, DT_CHAR_ARRAY>(pos, SQL_C_CHAR, maxDataSize(pos), pVal->size());
-				else
-					return prepareVariableLen<char>(pos, SQL_C_CHAR, maxDataSize(pos), DT_CHAR);
+				return prepareVariableLen<char>(pos, SQL_C_CHAR, maxDataSize(pos), DT_CHAR);
 
 			case MetaColumn::FDT_WSTRING:
 			{
 				typedef UTF16String::value_type CharType;
-				if (pVal)
-					return prepareCharArray<CharType, DT_WCHAR_ARRAY>(pos, SQL_C_WCHAR, maxDataSize(pos), pVal->size());
-				else
-					return prepareVariableLen<CharType>(pos, SQL_C_WCHAR, maxDataSize(pos), DT_WCHAR);
+				return prepareVariableLen<CharType>(pos, SQL_C_WCHAR, maxDataSize(pos), DT_WCHAR);
 			}
 
 			case MetaColumn::FDT_BLOB:
 			{
 				typedef Poco::Data::BLOB::ValueType CharType;
-				if (pVal)
-					return prepareCharArray<CharType, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), pVal->size());
-				else
-					return prepareVariableLen<CharType>(pos, SQL_C_BINARY, maxDataSize(pos), DT_UCHAR);
+				return prepareVariableLen<CharType>(pos, SQL_C_BINARY, maxDataSize(pos), DT_UCHAR);
 			}
 
 			case MetaColumn::FDT_CLOB:
 			{
 				typedef Poco::Data::CLOB::ValueType CharType;
-				if (pVal)
-					return prepareCharArray<CharType, DT_CHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), pVal->size());
-				else
-					return prepareVariableLen<CharType>(pos, SQL_C_BINARY, maxDataSize(pos), DT_CHAR);
+				return prepareVariableLen<CharType>(pos, SQL_C_BINARY, maxDataSize(pos), DT_CHAR);
 			}
 
+			// as prepare() for Date, Time, DateTime and UUID: the extraction
+			// of these types reads the ODBC structures and the 16-byte buffer
 			case MetaColumn::FDT_DATE:
-				if (pVal)
-					return prepareFixedSize<Date>(pos, SQL_C_TYPE_DATE, pVal->size());
-				else
-					return prepareFixedSize<Date>(pos, SQL_C_TYPE_DATE);
+				return prepareFixedSize<SQL_DATE_STRUCT>(pos, SQL_C_TYPE_DATE);
 
 			case MetaColumn::FDT_TIME:
-				if (pVal)
-					return prepareFixedSize<Time>(pos, SQL_C_TYPE_TIME, pVal->size());
-				else
-					return prepareFixedSize<Time>(pos, SQL_C_TYPE_TIME);
+				return prepareFixedSize<SQL_TIME_STRUCT>(pos, SQL_C_TYPE_TIME);
 
 			case MetaColumn::FDT_TIMESTAMP:
-				if (pVal)
-					return prepareFixedSize<DateTime>(pos, SQL_C_TYPE_TIMESTAMP, pVal->size());
-				else
-					return prepareFixedSize<DateTime>(pos, SQL_C_TYPE_TIMESTAMP);
+				return prepareFixedSize<SQL_TIMESTAMP_STRUCT>(pos, SQL_C_TYPE_TIMESTAMP);
 
 			case MetaColumn::FDT_UUID:
-				if (pVal)
-					return prepareFixedSize<Poco::UUID>(pos, SQL_C_BINARY, pVal->size());
-				else
-					return prepareFixedSize<Poco::UUID>(pos, SQL_C_BINARY);
+				return prepareVariableLen<char>(pos, SQL_C_BINARY, 16, DT_CHAR);
 
 			default:
 				throw DataFormatException("Unsupported data type.");
@@ -626,17 +598,18 @@ private:
 		poco_assert (pos < _values.size());
 
 		T* pCache = new T[size];
-		std::memset(pCache, 0, size);
+		std::memset(pCache, 0, size * sizeof(T));
 
 		_values[pos] = Any(pCache);
 		_lengths[pos] = (SQLLEN) size;
+		_bufferSizes[pos] = size * sizeof(T);
 		_varLengthArrays.insert(IndexMap::value_type(pos, dt));
 
 		if (Utility::isError(SQLBindCol(_rStmt,
 			(SQLUSMALLINT) pos + 1,
 			valueType,
 			(SQLPOINTER) pCache,
-			(SQLINTEGER) size*sizeof(T),
+			static_cast<SQLLEN>(_bufferSizes[pos]),
 			&_lengths[pos])))
 		{
 			throw StatementException(_rStmt, "ODBC::Preparator::prepareVariableLen():SQLBindCol()");
@@ -646,24 +619,34 @@ private:
 	template <typename T, DataType DT>
 	void prepareCharArray(std::size_t pos, SQLSMALLINT valueType, std::size_t size, std::size_t length)
 		/// Utility function for preparation of bulk variable length character and LOB columns.
+		/// Binds length rows of size elements of type T; the BufferLength passed to
+		/// SQLBindCol(), and with it the row stride, is size * sizeof(T) bytes.
 	{
 		poco_assert_dbg (DE_BOUND == _dataExtraction);
-		poco_assert_dbg (pos < _values.size());
-		poco_assert_dbg (pos < _lengths.size());
-		poco_assert_dbg (pos < _lenLengths.size());
+		// release checks, as in prepareVariableLen(): for a column past the result
+		// set the writes below would go past the per-column vectors
+		poco_assert (pos < _values.size());
+		poco_assert (pos < _lengths.size());
+		poco_assert (pos < _lenLengths.size());
+		poco_assert (pos < _bufferSizes.size());
+		if (size != 0 && length > std::numeric_limits<std::size_t>::max() / size / sizeof(T))
+			throw InvalidArgumentException("ODBC::Preparator::prepareCharArray(): bulk buffer too large");
 
 		T* pArray = (T*) std::calloc(length * size, sizeof(T));
+		if (pArray == nullptr && length * size != 0)
+			throw OutOfMemoryException("ODBC::Preparator::prepareCharArray()");
 
 		_values[pos] = Any(pArray);
 		_lengths[pos] = 0;
 		_lenLengths[pos].resize(length);
+		_bufferSizes[pos] = size * sizeof(T);
 		_varLengthArrays.insert(IndexMap::value_type(pos, DT));
 
 		if (Utility::isError(SQLBindCol(_rStmt,
 			(SQLUSMALLINT) pos + 1,
 			valueType,
 			(SQLPOINTER) pArray,
-			(SQLINTEGER) size,
+			static_cast<SQLLEN>(_bufferSizes[pos]),
 			&_lenLengths[pos][0])))
 		{
 			throw StatementException(_rStmt, "ODBC::Preparator::prepareCharArray():SQLBindCol()");
@@ -687,6 +670,8 @@ private:
 	mutable ValueVec        _values;
 	mutable LengthVec       _lengths;
 	mutable LengthLengthVec _lenLengths;
+	mutable std::vector<std::size_t> _bufferSizes;
+	mutable std::vector<MetaColumn::ColumnDataType> _boundTypes;
 	mutable IndexMap        _varLengthArrays;
 	std::size_t             _maxFieldSize;
 	DataExtraction          _dataExtraction;
@@ -1072,19 +1057,19 @@ inline void Preparator::prepare(std::size_t pos, const Poco::Data::BLOB&)
 
 inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::Data::BLOB>& val)
 {
-	prepareCharArray<char, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
+	prepareCharArray<Poco::Data::BLOB::ValueType, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
 }
 
 
 inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::Data::BLOB>& val)
 {
-	prepareCharArray<char, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
+	prepareCharArray<Poco::Data::BLOB::ValueType, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
 }
 
 
 inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Data::BLOB>& val)
 {
-	prepareCharArray<char, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
+	prepareCharArray<Poco::Data::BLOB::ValueType, DT_UCHAR_ARRAY>(pos, SQL_C_BINARY, maxDataSize(pos), val.size());
 }
 
 
@@ -1192,49 +1177,49 @@ inline void Preparator::prepare(std::size_t pos, const Poco::UUID&)
 
 inline void Preparator::prepare(std::size_t pos, const Poco::Any& val)
 {
-	prepareImpl<std::vector<Poco::Any> >(pos);
+	prepareImpl(pos);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::Any>& val)
+inline void Preparator::prepare(std::size_t, const std::vector<Poco::Any>&)
 {
-	prepareImpl<std::vector<Poco::Any> >(pos, &val);
+	throw NotImplementedException("ODBC::Preparator::prepare(): bulk extraction into std::vector<Poco::Any> is not supported.");
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::Any>& val)
+inline void Preparator::prepare(std::size_t, const std::deque<Poco::Any>&)
 {
-	prepareImpl<std::deque<Poco::Any> >(pos, &val);
+	throw NotImplementedException("ODBC::Preparator::prepare(): bulk extraction into std::deque<Poco::Any> is not supported.");
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Any>& val)
+inline void Preparator::prepare(std::size_t, const std::list<Poco::Any>&)
 {
-	prepareImpl<std::list<Poco::Any> >(pos, &val);
+	throw NotImplementedException("ODBC::Preparator::prepare(): bulk extraction into std::list<Poco::Any> is not supported.");
 }
 
 
 inline void Preparator::prepare(std::size_t pos, const Poco::Dynamic::Var& val)
 {
-	prepareImpl<std::vector<Poco::Dynamic::Var> >(pos);
+	prepareImpl(pos);
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val)
+inline void Preparator::prepare(std::size_t, const std::vector<Poco::Dynamic::Var>&)
 {
-	prepareImpl<std::vector<Poco::Dynamic::Var> >(pos, &val);
+	throw NotImplementedException("ODBC::Preparator::prepare(): bulk extraction into std::vector<Poco::Dynamic::Var> is not supported.");
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const std::deque<Poco::Dynamic::Var>& val)
+inline void Preparator::prepare(std::size_t, const std::deque<Poco::Dynamic::Var>&)
 {
-	prepareImpl<std::deque<Poco::Dynamic::Var> >(pos, &val);
+	throw NotImplementedException("ODBC::Preparator::prepare(): bulk extraction into std::deque<Poco::Dynamic::Var> is not supported.");
 }
 
 
-inline void Preparator::prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val)
+inline void Preparator::prepare(std::size_t, const std::list<Poco::Dynamic::Var>&)
 {
-	prepareImpl<std::list<Poco::Dynamic::Var> >(pos, &val);
+	throw NotImplementedException("ODBC::Preparator::prepare(): bulk extraction into std::list<Poco::Dynamic::Var> is not supported.");
 }
 
 
@@ -1243,6 +1228,18 @@ inline std::size_t Preparator::bulkSize(std::size_t col) const
 	poco_assert (col < _lenLengths.size());
 
 	return _lenLengths[col].size();
+}
+
+
+inline std::size_t Preparator::boundBufferSize(std::size_t pos) const
+{
+	return _bufferSizes.at(pos);
+}
+
+
+inline MetaColumn::ColumnDataType Preparator::boundType(std::size_t pos) const
+{
+	return _boundTypes.at(pos);
 }
 
 

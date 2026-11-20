@@ -124,7 +124,7 @@ done
 
 : ${CC:=gcc}
 : ${CXX:=g++}
-: ${CXXFLAGS:=-std=c++17}
+: ${CXXFLAGS:=-std=c++20}
 
 echo "CC=$CC" >>$build/PocoDoc.ini
 echo "CXX=$CXX" >>$build/PocoDoc.ini

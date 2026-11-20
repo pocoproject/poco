@@ -31,9 +31,9 @@ PngErrorFunc  (png_structp       png_ptr,
 static void
 PngReadFunc  (png_structp   png_ptr,
               png_bytep     data,
-              png_uint_32   length)
+              size_t        length)
 {
-    HPDF_UINT len = length;
+    HPDF_UINT len = (HPDF_UINT)length;
     HPDF_Stream stream = (HPDF_Stream)png_get_io_ptr (png_ptr);
 
     HPDF_Stream_Read (stream, data, &len);
@@ -460,7 +460,7 @@ LoadPngData  (HPDF_Dict     image,
 	}
 
 	png_set_sig_bytes (png_ptr, HPDF_PNG_BYTES_TO_CHECK);
-	png_set_read_fn (png_ptr, (void *)png_data, (png_rw_ptr)&PngReadFunc);
+	png_set_read_fn (png_ptr, (void *)png_data, PngReadFunc);
 
 	/* reading info structure. */
 	png_read_info(png_ptr, info_ptr);

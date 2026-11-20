@@ -24,6 +24,8 @@
 #include "Poco/Data/MySQL/MySQLException.h"
 #include "Poco/Nullable.h"
 #include "Poco/Data/DataException.h"
+#include <mysql/errmsg.h>
+#include <mysql/mysqld_error.h>
 #include <iostream>
 
 using namespace Poco::Data;
@@ -758,10 +760,32 @@ void MySQLTest::testLostConnection()
 	*_pSession << "KILL " + std::to_string(id), now;
 
 	try { session.rollback(); fail ("must fail"); }
-	catch (MySQL::TransactionException&) { }
+	catch (MySQL::TransactionException& ex)
+	{
+		assertTrue (ex.code() == CR_SERVER_LOST || ex.code() == CR_SERVER_GONE_ERROR);
+	}
 
 	// the server ended the transaction with the connection
 	assertTrue (!session.isTransaction());
+}
+
+
+void MySQLTest::testExceptionCode()
+{
+	if (_pSession == nullptr) fail ("Test not available.");
+
+	try
+	{
+		*_pSession << "SELECT FROM", now;
+		fail ("must fail");
+	}
+	catch (StatementException& ex)
+	{
+		assertEqual (ER_PARSE_ERROR, ex.code());
+	}
+
+	assertEqual (0, ConnectionException("no handle", nullptr).code());
+	assertEqual (0, StatementException("no handle", nullptr).code());
 }
 
 
@@ -1193,6 +1217,7 @@ CppUnit::Test* MySQLTest::suite()
 	CppUnit_addTest(pSuite, MySQLTest, testClosedSession);
 	CppUnit_addTest(pSuite, MySQLTest, testOpenConnectedSession);
 	CppUnit_addTest(pSuite, MySQLTest, testLostConnection);
+	CppUnit_addTest(pSuite, MySQLTest, testExceptionCode);
 	CppUnit_addTest(pSuite, MySQLTest, testSessionPoolAndUnicode);
 	return pSuite;
 }

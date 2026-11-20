@@ -20,6 +20,6 @@ endif
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoDataSQLite PocoData PocoFoundation CppUnit
+target_libs    = PocoDataSQLite PocoDataTest PocoData PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec

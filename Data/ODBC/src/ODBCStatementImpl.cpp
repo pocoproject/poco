@@ -17,7 +17,12 @@
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractPreparation.h"
+#include "Poco/Data/DataException.h"
 #include "Poco/Exception.h"
+#include <algorithm>
+#include <cstring>
+#include <limits>
+#include <vector>
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -64,6 +69,11 @@ ODBCStatementImpl::ODBCStatementImpl(SessionImpl& rSession):
 
 ODBCStatementImpl::~ODBCStatementImpl()
 {
+	// Bindings can outlive this statement and share ownership of the Binder,
+	// which holds a reference to _stmt. Detach it while the handle is still
+	// valid, so a later reset through a surviving binding never touches it.
+	if (!_pBinder.isNull()) _pBinder->detach();
+
 	ColumnPtrVecVec::iterator it = _columnPtrs.begin();
 	ColumnPtrVecVec::iterator end = _columnPtrs.end();
 	for (; it != end; ++it)
@@ -184,12 +194,34 @@ void ODBCStatementImpl::doPrepare()
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();
 
-		if (it != itEnd && (*it)->isBulk())
+		// SQLFetch() writes SQL_ATTR_ROW_ARRAY_SIZE rows into every bound column:
+		// a non-bulk extraction is bound to one row, a bulk extraction to
+		// getLimit() rows. The rowset size is set here, so every extraction of
+		// the data set is checked here, whatever order Statement accepted them in.
+		const bool bulk = (it != itEnd) && (*it)->isBulk();
+		std::size_t rowsetSize = 1;
+		if (bulk)
 		{
-			std::size_t limit = getExtractionLimit();
-			if (limit == Limit::LIMIT_UNLIMITED)
+			rowsetSize = getExtractionLimit();
+			if (rowsetSize == Limit::LIMIT_UNLIMITED)
 				throw InvalidArgumentException("Bulk operation not allowed without limit.");
-			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, (SQLPOINTER) limit, 0),
+		}
+		for (Extractions::iterator itExt = it; itExt != itEnd; ++itExt)
+		{
+			if ((*itExt)->isBulk() != bulk)
+				throw InvalidAccessException("Bulk and non-bulk extraction modes can not be mixed.");
+			if (bulk && (*itExt)->getLimit() != rowsetSize)
+				throw InvalidArgumentException("Bulk extraction size differs from the statement limit.");
+		}
+		// A later data set must inherit neither the rowset size nor the column
+		// bindings of an earlier one: SQLMoreResults() keeps the bindings, so a
+		// column this data set does not bind again would receive rowsetSize rows
+		// into an earlier data set's buffers.
+		if (curDataSet > 0)
+			checkError(SQLFreeStmt(_stmt, SQL_UNBIND), "SQLFreeStmt(SQL_UNBIND)");
+		if (bulk || curDataSet > 0)
+		{
+			checkError(Poco::Data::ODBC::SQLSetStmtAttr(_stmt, SQL_ATTR_ROW_ARRAY_SIZE, reinterpret_cast<SQLPOINTER>(static_cast<SQLULEN>(rowsetSize)), 0),
 					"SQLSetStmtAttr(SQL_ATTR_ROW_ARRAY_SIZE)");
 		}
 
@@ -220,10 +252,56 @@ void ODBCStatementImpl::doBind()
 {
 	this->clear();
 	Bindings& binds = bindings();
+
+	// This is the first bind of an execution (as opposed to a later row of a
+	// container binding): bind() sets ST_BOUND only after this returns.
+	const bool first = (ST_COMPILED == getState());
+
+	bool unbound = true;
+	bool bulk = false;
+	if (!binds.empty())
+	{
+		// The first bulk binding sets SQL_ATTR_PARAMSET_SIZE, and the driver then
+		// reads (and for output parameters writes) that many values for every
+		// parameter: scalar and bulk bindings, or bulk bindings of different
+		// sizes, must not be mixed. The Binder binds every container at its
+		// current size, not at bulkSize(), its size when use() ran.
+		bulk = binds.front()->isBulk();
+		const std::size_t rows = binds.front()->numOfRowsHandled();
+		if (bulk && 0 == rows)
+			throw InvalidArgumentException("Zero size containers not allowed.");
+		for (const auto& pBinding: binds)
+		{
+			if (pBinding->isBulk() != bulk)
+				throw InvalidAccessException("Bulk and non-bulk binding modes can not be mixed.");
+			if (bulk && pBinding->numOfRowsHandled() != rows)
+				throw InvalidArgumentException("Bulk bindings of different sizes can not be mixed.");
+			unbound = unbound && pBinding->canBind();
+		}
+	}
+
+	// Reset the Binder at the first bind of an execution, and whenever every
+	// parameter rebinds (a later row of container bindings, or bindings that
+	// replaced the earlier ones). Otherwise a binding that does not hold the
+	// Binder, or that another statement reset last, would leave it with the
+	// parameter-set size, length arrays and parameter bindings of an earlier
+	// execution: the driver would read that many values from the new buffers,
+	// and a marker that is not bound again would keep its old, freed ones. The
+	// reset also runs when there are no bindings left, so a removed parameter
+	// does not keep its binding. A later row that does not rebind every
+	// parameter (a scalar reused across the rows of a container) keeps them.
+	if (!_pBinder.isNull() && (first || unbound))
+		_pBinder->reset();
+
 	if (!binds.empty())
 	{
 		Bindings::iterator it    = binds.begin();
 		Bindings::iterator itEnd = binds.end();
+
+		// An empty non-bulk container at the start of an execution binds no
+		// parameter, which would leave its marker reading the reset buffers.
+		if (first && !bulk && !(*it)->canBind())
+			throw InvalidArgumentException("Empty container not allowed.");
 
 		if (it != itEnd && 0 == _affectedRowCount)
 			_affectedRowCount = static_cast<std::size_t>((*it)->numOfRowsHandled());
@@ -286,6 +364,8 @@ void ODBCStatementImpl::bindImpl()
 void ODBCStatementImpl::execDirectImpl(const std::string& query)
 {
 	checkConnection();
+	// drop any parameter bindings a previous execution left in the driver
+	if (!_pBinder.isNull()) _pBinder->reset();
 	SQLCHAR * statementText = (SQLCHAR*) query.c_str();
 	SQLINTEGER textLength = static_cast<SQLINTEGER>(query.size());
 	SQLRETURN rc = SQLExecDirect(_stmt,statementText,textLength);
@@ -433,34 +513,40 @@ std::size_t ODBCStatementImpl::next()
 std::string ODBCStatementImpl::nativeSQL()
 {
 	poco_check_ptr (_rConnection);
-	std::string statement = toString();
+	const std::string statement = toString();
 
-	SQLINTEGER length = (SQLINTEGER) statement.size() * 2;
+	constexpr SQLINTEGER maxLength = (std::numeric_limits<SQLINTEGER>::max)() / 2 - 1;
+	if (statement.size() > static_cast<std::size_t>(maxLength))
+		throw LengthExceededException("ODBCStatementImpl::nativeSQL(): statement too long");
 
-	char* pNative = nullptr;
-	SQLINTEGER retlen = length;
-	do
+	SQLINTEGER length = static_cast<SQLINTEGER>(statement.size()) * 2 + 1;
+	for (;;)
 	{
-		delete [] pNative;
-		pNative = new char[retlen];
-		std::memset(pNative, 0, retlen);
-		length = retlen;
+		// Some drivers (SQLite ODBC 0.99991) write a terminator into the input,
+		// at the position of the output buffer length, so the driver gets a
+		// writable copy of the statement that is as long as the output buffer.
+		std::vector<SQLCHAR> input((std::max)(statement.size(), static_cast<std::size_t>(length)) + 1, 0);
+		std::memcpy(input.data(), statement.data(), statement.size());
+		// the last byte is not given to the driver and terminates the output
+		std::vector<SQLCHAR> native(static_cast<std::size_t>(length) + 1, 0);
+		SQLINTEGER nativeLength = 0;
 		if (Utility::isError(SQLNativeSql(_rConnection,
-			(SQLCHAR*) statement.c_str(),
-			(SQLINTEGER) statement.size(),
-			(SQLCHAR*) pNative,
+			input.data(),
+			static_cast<SQLINTEGER>(statement.size()),
+			native.data(),
 			length,
-			&retlen)))
+			&nativeLength)))
 		{
-			delete [] pNative;
 			throw ConnectionException(_rConnection, "SQLNativeSql()");
 		}
-		++retlen;//accomodate for terminating '\0'
-	}while (retlen > length);
 
-	std::string sql(pNative);
-	delete [] pNative;
-	return sql;
+		if (nativeLength < length || nativeLength > maxLength)
+		{
+			const auto end = std::find(native.begin(), native.end(), 0);
+			return std::string(native.begin(), end);
+		}
+		length = nativeLength + 1;
+	}
 }
 
 

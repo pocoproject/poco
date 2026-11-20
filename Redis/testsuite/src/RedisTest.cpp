@@ -2943,6 +2943,25 @@ void RedisTest::testPool()
 }
 
 
+void RedisTest::testPooledConnectionExhaustedPool()
+{
+	// A pool without capacity is always exhausted, so no server is needed.
+	// Returning the null client was reported only through poco_unexpected()
+	// in the destructor; the test guards the behaviour but cannot fail without the null check.
+	Poco::Net::SocketAddress sa(_host, _port);
+	Poco::PoolableObjectFactory<Client, Client::Ptr> factory(sa);
+	Poco::ObjectPool<Client, Client::Ptr> pool(factory, 0, 0);
+
+	{
+		PooledConnection pclient(pool, 0);
+		Client::Ptr pClient = pclient;
+		assertTrue (pClient == nullptr);
+	}
+	assertTrue (pool.size() == 0);
+	assertTrue (pool.available() == 0);
+}
+
+
 void RedisTest::delKey(const std::string& key)
 {
 	Command delCommand = Command::del(key);
@@ -3020,5 +3039,6 @@ CppUnit::Test* RedisTest::suite()
 	CppUnit_addTest(pSuite, RedisTest, testRPOPLPUSH);
 	CppUnit_addTest(pSuite, RedisTest, testRPUSH);
 	CppUnit_addTest(pSuite, RedisTest, testPool);
+	CppUnit_addTest(pSuite, RedisTest, testPooledConnectionExhaustedPool);
 	return pSuite;
 }

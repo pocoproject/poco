@@ -80,7 +80,7 @@
 
 
 // Small object size in bytes. When assigned to Any or Var,
-// objects larger than this value will be alocated on the heap,
+// objects larger than this value will be allocated on the heap,
 // while those smaller will be placement new-ed into an
 // internal stack-auto-allocated buffer.
 #if !defined(POCO_SMALL_OBJECT_SIZE)
@@ -94,6 +94,24 @@
 
 // Define to force the use of PollingDirectoryWatcher
 // #define POCO_DW_FORCE_POLLING
+
+
+// Define to get the complete <windows.h>. If not
+// defined, Poco/UnWindows.h defines WIN32_LEAN_AND_MEAN
+// before it includes <windows.h>. The complete
+// <windows.h> includes <winsock.h>, which conflicts with
+// the <winsock2.h> of POCO Net, so code that uses POCO Net
+// must define NOMINMAX and include <winsock2.h> before
+// any POCO header.
+// #define POCO_BLOATED_WIN32
+
+
+// Define to keep Poco/UnWindows.h from including
+// <windows.h>. This is for tools that only preprocess
+// the header files, such as PocoDoc. Code compiled with
+// it must define NOMINMAX and WIN32_LEAN_AND_MEAN and
+// include <windows.h> before any POCO header.
+// #define POCO_NO_WINDOWS_H
 
 
 // Following are options to remove certain features
@@ -191,11 +209,15 @@
 #else
 	#define POCO_CPLUSPLUS __cplusplus
 #endif
-#define POCO_HAVE_CPP17_COMPILER (POCO_CPLUSPLUS >= 201703L)
-#define POCO_HAVE_CPP20_COMPILER (POCO_CPLUSPLUS >= 202002L)
+#if POCO_CPLUSPLUS < 202002L
+	#error "POCO requires C++20 or later. Compile with -std=c++20 (GCC, Clang) or /std:c++20 (Visual C++)."
+#endif
+
+// C++20 is the minimum, so the first two are always 1; kept for code that also builds with POCO 1.x.
+#define POCO_HAVE_CPP17_COMPILER 1
+#define POCO_HAVE_CPP20_COMPILER 1
 #define POCO_HAVE_CPP23_COMPILER (POCO_CPLUSPLUS >= 202302L)
 
-#if (POCO_HAVE_CPP20_COMPILER)
 #include <version>
 #if defined(__cpp_lib_jthread)
 	#define POCO_HAVE_JTHREAD true
@@ -207,13 +229,10 @@
 #else
 	#define POCO_HAVE_ATOMIC_SHARED_PTR false
 #endif
-#else
-	#define POCO_HAVE_ATOMIC_SHARED_PTR false
-#endif
 
 // Float std::to_chars/from_chars support detection.
-// - GCC 11+ (libstdc++): full support since GCC 11
-// - MSVC 19.24+: full support since VS 2019 16.4
+// - GCC (libstdc++): full support
+// - MSVC: full support
 // - Apple Clang: requires macOS 26.0+ deployment target (availability annotations)
 // - Non-Apple libc++ (Android NDK, FreeBSD, Emscripten): requires libc++ 20+
 //   (LLVM 20); libc++ 17-19 have float from_chars overloads explicitly deleted.
@@ -224,9 +243,9 @@
 #endif
 #if defined(__cpp_lib_to_chars) && __cpp_lib_to_chars >= 202306L
 	#define POCO_HAS_FLOAT_CHARCONV 1
-#elif defined(_MSC_VER) && _MSC_VER >= 1924
+#elif defined(_MSC_VER)
 	#define POCO_HAS_FLOAT_CHARCONV 1
-#elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 11
+#elif defined(__GNUC__) && !defined(__clang__)
 	#define POCO_HAS_FLOAT_CHARCONV 1
 #elif defined(__APPLE__) && defined(MAC_OS_X_VERSION_MIN_REQUIRED) && MAC_OS_X_VERSION_MIN_REQUIRED >= 260000
 	#define POCO_HAS_FLOAT_CHARCONV 1
@@ -247,14 +266,7 @@
 // class also carries an export/visibility attribute (eg. Foundation_API),
 // because GCC does not allow standard and GNU attributes to be mixed in a
 // class head; annotate the constructors with POCO_NODISCARD_CTOR instead.
-#if defined(__has_cpp_attribute)
-	#if __has_cpp_attribute(nodiscard) >= 201907L
-		#define POCO_NODISCARD_CTOR [[nodiscard]]
-	#endif
-#endif
-#ifndef POCO_NODISCARD_CTOR
-	#define POCO_NODISCARD_CTOR
-#endif
+#define POCO_NODISCARD_CTOR [[nodiscard]]
 
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER

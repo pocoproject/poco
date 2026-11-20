@@ -57,18 +57,40 @@ if(ENABLE_DATA_SQLITE_VEC AND ENABLE_DATA_SQLITE)
 		"Force AVX2 SIMD in sqlite-vec (adds -mavx -mavx2; binary requires an AVX2 CPU)" OFF)
 	set(_sqlite_vec_simd "generic")
 	if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-		if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
+		# CMAKE_C_COMPILER_ARCHITECTURE_ID is the target architecture of the
+		# compiler: for the MSVC ABI (clang-cl) in every supported CMake
+		# version, for other compilers since CMake 4.1. Older versions ask the
+		# compiler; that branch goes when CMake 4.1 is the minimum version.
+		# CMAKE_SYSTEM_PROCESSOR is the build machine unless a toolchain file
+		# sets it. A build for several architectures (a list) keeps the
+		# generic code.
+		include(CheckCSourceCompiles)
+		if(MSVC OR CMAKE_VERSION VERSION_GREATER_EQUAL "4.1")
+			set(_sqlite_vec_arch "${CMAKE_C_COMPILER_ARCHITECTURE_ID}")
+		else()
+			set(_sqlite_vec_arch "")
+			foreach(_arch aarch64 x86_64)
+				check_c_source_compiles("
+					#ifndef __${_arch}__
+					#error other architecture
+					#endif
+					int main(void) { return 0; }" POCO_SQLITE_VEC_TARGET_${_arch})
+				if(POCO_SQLITE_VEC_TARGET_${_arch})
+					set(_sqlite_vec_arch "${_arch}")
+				endif()
+			endforeach()
+		endif()
+		if(_sqlite_vec_arch MATCHES "^(aarch64|arm64|arm64e|ARM64)$")
 			if(CMAKE_C_COMPILER_ID MATCHES "Clang")
 				target_compile_definitions(_BUNDLED_SQLITE_VEC PRIVATE SQLITE_VEC_ENABLE_NEON)
 				set(_sqlite_vec_simd "neon")
 			endif()
-		elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+		elseif(_sqlite_vec_arch MATCHES "^(x86_64|x64)$")
 			if(ENABLE_DATA_SQLITE_VEC_AVX)
 				target_compile_options(_BUNDLED_SQLITE_VEC PRIVATE -mavx -mavx2)
 				target_compile_definitions(_BUNDLED_SQLITE_VEC PRIVATE SQLITE_VEC_ENABLE_AVX)
 				set(_sqlite_vec_simd "avx (forced)")
 			else()
-				include(CheckCSourceCompiles)
 				check_c_source_compiles("
 					#ifndef __AVX2__
 					#error no avx2

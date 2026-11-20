@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/DirectoryIteratorStrategy.h"
+#include "Poco/Delegate.h"
 #include <stack>
 #include <functional>
 
@@ -73,6 +74,12 @@ public:
 	[[nodiscard]] inline const std::string& get() const
 	{
 		return _current;
+	}
+
+	template <typename T>
+	void onError(T& obj, void (T::*pCB)(const void*, const std::string&))
+	{
+		_traverseStrategy.traverseError += delegate(&obj, pCB);
 	}
 
 	[[nodiscard]] const std::string& next()

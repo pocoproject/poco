@@ -28,10 +28,10 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/StreamCopier.h"
-#include "Poco/Path.h"
 #include "Poco/FileStream.h"
-#include "Poco/File.h"
+#include "Poco/TemporaryFile.h"
 #include "Poco/Stopwatch.h"
+#include <chrono>
 #include <optional>
 #include <sstream>
 #include <thread>
@@ -52,14 +52,13 @@ using Poco::Net::HTTPServerResponse;
 using Poco::Net::HTTPMessage;
 using Poco::Net::ServerSocket;
 using Poco::StreamCopier;
-using Poco::Path;
-using Poco::File;
 using Poco::FileOutputStream;
 
 
 namespace
 {
 	static constexpr int sendFileSize = 64000;
+	static constexpr std::chrono::seconds ROUND_TRIP_TIMEOUT{10};
 
 	class EchoBodyRequestHandler: public HTTPRequestHandler
 	{
@@ -169,15 +168,8 @@ namespace
 		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 		{
 			std::string payload(sendFileSize, 'x');
-			Poco::Path testFilePath = Poco::Path::temp().append("test.http.server.sendfile.txt");
-			const std::string fileName = testFilePath.toString();
-			{
-				File f(fileName);
-				if (f.exists())
-				{
-					f.remove();
-				}
-			}
+			Poco::TemporaryFile testFile;
+			const std::string fileName = testFile.path();
 			FileOutputStream fout(fileName);
 			fout << payload;
 			fout.close();
@@ -190,8 +182,8 @@ namespace
 	public:
 		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 		{
-			Poco::Path testFilePath = Poco::Path::temp().append("test.http.server.sendfile.empty.txt");
-			const std::string fileName = testFilePath.toString();
+			Poco::TemporaryFile testFile;
+			const std::string fileName = testFile.path();
 			FileOutputStream fout(fileName);
 			fout.close();
 			response.sendFile(fileName, "text/plain");
@@ -302,6 +294,17 @@ namespace
 				return nullptr;
 		}
 	};
+
+	class DerivedHTTPServer: public HTTPServer
+		/// Its destructor runs while the server thread is still running.
+	{
+	public:
+		using HTTPServer::HTTPServer;
+		DerivedHTTPServer() = delete;
+		~DerivedHTTPServer() override;
+	};
+
+	DerivedHTTPServer::~DerivedHTTPServer() = default;
 }
 
 
@@ -1338,6 +1341,34 @@ void HTTPServerTest::testParallelKeepAliveSessions()
 }
 
 
+void HTTPServerTest::testDestroyRunningSubclass()
+{
+	// Only ThreadSanitizer shows the defect: a data race on the vptr between the destructor of the
+	// derived class and a virtual call of run() in the server thread. The rest checks that a server
+	// of a derived class still answers a request.
+	{
+		ServerSocket svs(0);
+		DerivedHTTPServer srv(new RequestHandlerFactory, svs, new HTTPServerParams);
+		srv.start();
+	}
+	ServerSocket svs(0);
+	HTTPServerParams::Ptr pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	DerivedHTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
+	cs.setTimeout(Poco::Timespan(ROUND_TRIP_TIMEOUT));
+	const std::string body("hello, world");
+	HTTPRequest request("POST", "/echoBody");
+	request.setContentLength(static_cast<std::streamsize>(body.length()));
+	cs.sendRequest(request) << body;
+	HTTPResponse response;
+	std::string rbody;
+	StreamCopier::copyToString(cs.receiveResponse(response), rbody);
+	assertTrue (rbody == body);
+}
+
+
 CppUnit::Test* HTTPServerTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPServerTest");
@@ -1377,6 +1408,7 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testInvalidRequestHeaderClearsDeadline);
 	CppUnit_addTest(pSuite, HTTPServerTest, testFailedResponseWriteNotRepeated);
 	CppUnit_addTest(pSuite, HTTPServerTest, testParallelKeepAliveSessions);
+	CppUnit_addTest(pSuite, HTTPServerTest, testDestroyRunningSubclass);
 
 	return pSuite;
 }

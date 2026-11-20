@@ -17,6 +17,7 @@
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowFilter.h"
+#include "Poco/Data/RowIterator.h"
 #include "Poco/Data/SQLChannel.h"
 #include "Poco/Data/SessionFactory.h"
 #include "Poco/Data/SessionPool.h"
@@ -29,6 +30,7 @@
 #include "Poco/Nullable.h"
 #include "Poco/Data/Transaction.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/Test/AsyncWait.h"
 #include "Poco/Data/SQLite/SQLiteException.h"
 #include "Poco/Tuple.h"
 #include "Poco/Any.h"
@@ -47,6 +49,9 @@
 #include "Poco/ErrorHandler.h"
 #include "Poco/Bugcheck.h"
 #include <iostream>
+#include <limits>
+#include <type_traits>
+#include <utility>
 
 
 using namespace std::string_literals;
@@ -71,6 +76,7 @@ using Poco::Data::AbstractExtractionVecVec;
 using Poco::Data::AbstractBindingVec;
 using Poco::Data::NullData;
 using Poco::Data::NotConnectedException;
+using Poco::Data::Test::AsyncWait;
 using Poco::Data::SQLite::Notifier;
 using Poco::Nullable;
 using Poco::Tuple;
@@ -126,7 +132,7 @@ public:
 	const std::string& operator () () const
 		/// This method is required so we can extract data to a map!
 	{
-		// we choose the lastName as examplary key
+		// we choose the lastName as exemplary key
 		return _lastName;
 	}
 
@@ -454,7 +460,7 @@ void SQLiteTest::testAddBindingReuse()
 	stmt.execute();
 	assertTrue (name == "Alice");
 
-	// second execute with new binding — this is the bug scenario from #5220
+	// second execute with a new binding: addBinding() with reset replaces the first binding
 	id = 2;
 	Poco::Data::AbstractBindingVec bindings2;
 	bindings2.push_back(Poco::Data::Keywords::bind(id, "id"));
@@ -1757,7 +1763,7 @@ void SQLiteTest::testTupleVector10()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1805,7 +1811,7 @@ void SQLiteTest::testTupleVector9()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1853,7 +1859,7 @@ void SQLiteTest::testTupleVector8()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1899,7 +1905,7 @@ void SQLiteTest::testTupleVector7()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1945,7 +1951,7 @@ void SQLiteTest::testTupleVector6()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -1991,7 +1997,7 @@ void SQLiteTest::testTupleVector5()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -2037,7 +2043,7 @@ void SQLiteTest::testTupleVector4()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int,int> > ret;
 	assertTrue (ret != v);
@@ -2083,7 +2089,7 @@ void SQLiteTest::testTupleVector3()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int,int> > ret;
 	assertTrue (ret != v);
@@ -2127,7 +2133,7 @@ void SQLiteTest::testTupleVector2()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int,int> > ret;
 	assertTrue (ret != v);
@@ -2171,7 +2177,7 @@ void SQLiteTest::testTupleVector1()
 
 	int count = 0;
 	tmp << "SELECT COUNT(*) FROM Tuples", into(count), now;
-	assertTrue (v.size() == count);
+	assertTrue (v.size() == static_cast<std::size_t>(count));
 
 	std::vector<Tuple<int> > ret;
 	assertTrue (ret != v);
@@ -2702,6 +2708,19 @@ void SQLiteTest::testNulls()
 }
 
 
+void SQLiteTest::testIntoWithoutRows()
+{
+	Session ses (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	ses << "CREATE TABLE Strings (str VARCHAR)", now;
+	ses << "INSERT INTO Strings VALUES('abc')", now;
+
+	std::string none;
+	Statement stmt = (ses << "SELECT str FROM Strings WHERE str = 'xyz'", into(none));
+	assertTrue (stmt.execute() == 0);
+	assertTrue (none.empty());
+}
+
+
 void SQLiteTest::testRowIterator()
 {
 	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -2734,36 +2753,85 @@ void SQLiteTest::testRowIterator()
 }
 
 
+void SQLiteTest::testRowIteratorLimit()
+{
+	Session ses (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	ses << "CREATE TABLE Ints (int0 INTEGER)", now;
+	std::vector<int> v{1, 2, 3, 4};
+	ses << "INSERT INTO Ints VALUES (?)", use(v), now;
+
+	Statement stmt = (ses << "SELECT int0 FROM Ints ORDER BY int0", limit(1));
+	std::size_t count = 0;
+	while (!stmt.done())
+	{
+		stmt.execute(false);
+		RecordSet rset(stmt);
+		++count;
+		assertEqual (count, rset.rowCount());
+
+		int expected = 0;
+		for (auto& row: rset)
+		{
+			assertTrue (row["int0"] == ++expected);
+		}
+		assertTrue (expected == static_cast<int>(count));
+	}
+	assertTrue (count == v.size());
+}
+
+
+void SQLiteTest::testRowIteratorSwap()
+{
+	static_assert(std::is_nothrow_swappable_v<Poco::Data::RowIterator>);
+
+	Session ses (Poco::Data::SQLite::Connector::KEY, ":memory:");
+	ses << "CREATE TABLE Ints (int0 INTEGER)", now;
+	std::vector<int> v{1, 2, 3};
+	ses << "INSERT INTO Ints VALUES (?)", use(v), now;
+
+	RecordSet rset(ses, "SELECT * FROM Ints");
+	RecordSet::Iterator it1 = rset.begin();
+	RecordSet::Iterator it2 = rset.end();
+	assertTrue (it1 != it2);
+
+	Poco::Data::swap(it1, it2);
+	assertTrue (it1 == rset.end());
+	assertTrue (it2 == rset.begin());
+
+	using std::swap;
+	swap(it1, it2);
+	assertTrue (it1 == rset.begin());
+	assertTrue (it2 == rset.end());
+}
+
+
 void SQLiteTest::testAsync()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	tmp << "DROP TABLE IF EXISTS Strings", now;
 	tmp << "CREATE TABLE IF NOT EXISTS Strings (str INTEGER(10))", now;
 
-	int rowCount = 500;
+	const std::size_t rowCount = 500;
 	std::vector<int> data(rowCount);
 	Statement stmt = (tmp << "INSERT INTO Strings VALUES(:str)", use(data));
+	AsyncWait waitStmt(stmt);
 	Statement::Result result = stmt.executeAsync();
 	assertTrue (!stmt.isAsync());
 	result.wait();
 	assertTrue (500 == result.data());
 
 	Statement stmt1 = (tmp << "SELECT * FROM Strings", into(data), async, now);
+	AsyncWait waitStmt1(stmt1);
 	assertTrue (stmt1.isAsync());
 	assertTrue (stmt1.wait() == rowCount);
 
+	// whether a second execution is refused depends on whether the first one
+	// has ended; DataTest::testStatementExecuteWhileExecuting() holds the
+	// execution to test the refusal
 	stmt1.execute();
-	try
-	{
-		stmt1.execute();
-		fail ("must fail");
-	}
-	catch (InvalidAccessException&)
-	{
-		stmt1.wait();
-		stmt1.execute();
-		stmt1.wait();
-	}
+	stmt1.wait();
+	stmt1.execute();
+	stmt1.wait();
 
 	stmt = tmp << "SELECT * FROM Strings", into(data), async, now;
 	assertTrue (stmt.isAsync());
@@ -2771,16 +2839,8 @@ void SQLiteTest::testAsync()
 
 	assertTrue (stmt.execute() == 0);
 	assertTrue (stmt.isAsync());
-	try
-	{
-		result = stmt.executeAsync();
-		fail ("must fail");
-	}
-	catch (InvalidAccessException&)
-	{
-		stmt.wait();
-		result = stmt.executeAsync();
-	}
+	stmt.wait();
+	result = stmt.executeAsync();
 
 	assertTrue (stmt.wait() == rowCount);
 	assertTrue (result.data() == rowCount);
@@ -2798,14 +2858,15 @@ void SQLiteTest::testAsync()
 	assertTrue (result.data() == rowCount);
 
 	assertTrue (0 == rowCount % 10);
-	int step = (int) (rowCount/10);
+	const std::size_t step = rowCount/10;
 	data.clear();
 	Statement stmt2 = (tmp << "SELECT * FROM Strings", into(data), async, limit(step));
+	AsyncWait waitStmt2(stmt2);
 	assertTrue (data.size() == 0);
 	assertTrue (!stmt2.done());
 	std::size_t rows = 0;
 
-	for (int i = 0; !stmt2.done(); i += step)
+	for (std::size_t i = 0; !stmt2.done(); i += step)
 	{
 		stmt2.execute();
 		rows = stmt2.wait();
@@ -2942,7 +3003,7 @@ void SQLiteTest::testSQLChannel()
 		if (sw.elapsedSeconds() > 3)
 			fail ("SQLChannel timed out");
 	}
-	// bulk binding mode is not suported by SQLite, but SQLChannel should handle it internally
+	// bulk binding mode is not supported by SQLite, but SQLChannel should handle it internally
 	pChannel->setProperty("bulk", "true");
 	pChannel->setProperty("keep", "2 seconds");
 
@@ -3632,6 +3693,64 @@ void SQLiteTest::testPooledConnectionTimeout()
 	assertTrue (AnyCast<int>(session.getProperty("connectionTimeout")) == 3);
 	session.setProperty("connectionTimeout", 7);
 	assertTrue (session.getConnectionTimeout() == 7);
+}
+
+
+void SQLiteTest::testConnectionTimeoutOverflow()
+{
+	constexpr std::size_t MAX_TIMEOUT = std::numeric_limits<int>::max() / 1000;
+
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+	session.setConnectionTimeout(MAX_TIMEOUT);
+	assertTrue (session.getConnectionTimeout() == MAX_TIMEOUT);
+
+	session.setConnectionTimeout(5);
+	try
+	{
+		session.setConnectionTimeout(MAX_TIMEOUT + 1);
+		fail ("must fail");
+	}
+	catch (RangeException&) { }
+	assertTrue (session.getConnectionTimeout() == 5);
+
+	try
+	{
+		session.setProperty("connectionTimeout", -1);
+		fail ("must fail");
+	}
+	catch (RangeException&) { }
+	assertTrue (session.getConnectionTimeout() == 5);
+
+	try
+	{
+		Session tooLong(Poco::Data::SQLite::Connector::KEY, ":memory:", MAX_TIMEOUT + 1);
+		fail ("must fail");
+	}
+	catch (RangeException&) { }
+}
+
+
+void SQLiteTest::testIncrementalVacuum()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+	session << "PRAGMA auto_vacuum = INCREMENTAL", now;
+	int autoVacuum = 0;
+	session << "PRAGMA auto_vacuum", into(autoVacuum), now;
+	assertTrue (autoVacuum == 2);
+
+	session << "CREATE TABLE Strings (str VARCHAR)", now;
+	std::vector<std::string> data(1000, std::string(1000, 'x'));
+	session << "INSERT INTO Strings VALUES(?)", use(data), now;
+	session << "DELETE FROM Strings", now;
+
+	int freePages = 0;
+	session << "PRAGMA freelist_count", into(freePages), now;
+	assertTrue (freePages > 1);
+
+	// the pragma frees one page per result row, so all rows must be stepped through
+	session << "PRAGMA incremental_vacuum", now;
+	session << "PRAGMA freelist_count", into(freePages), now;
+	assertTrue (freePages == 0);
 }
 
 
@@ -5081,7 +5200,10 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNullable);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullableVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
+	CppUnit_addTest(pSuite, SQLiteTest, testIntoWithoutRows);
 	CppUnit_addTest(pSuite, SQLiteTest, testRowIterator);
+	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorLimit);
+	CppUnit_addTest(pSuite, SQLiteTest, testRowIteratorSwap);
 	CppUnit_addTest(pSuite, SQLiteTest, testAsync);
 	CppUnit_addTest(pSuite, SQLiteTest, testAny);
 	CppUnit_addTest(pSuite, SQLiteTest, testDynamicAny);
@@ -5104,6 +5226,8 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testColumnTypeNullStatement);
 	CppUnit_addTest(pSuite, SQLiteTest, testFileToMemoryError);
 	CppUnit_addTest(pSuite, SQLiteTest, testPooledConnectionTimeout);
+	CppUnit_addTest(pSuite, SQLiteTest, testConnectionTimeoutOverflow);
+	CppUnit_addTest(pSuite, SQLiteTest, testIncrementalVacuum);
 	CppUnit_addTest(pSuite, SQLiteTest, testThreadModes);
 	CppUnit_addTest(pSuite, SQLiteTest, testUpdateCallback);
 	CppUnit_addTest(pSuite, SQLiteTest, testCommitCallback);

@@ -114,7 +114,10 @@ void TCPServerDispatcher::run()
 					if (pConnection)
 					{
 						beginConnection();
+						// The connection object is destroyed before endConnection(), so that currentConnections()
+						// counts the connection up to the end of its destructor; start() does not throw.
 						pConnection->start();
+						pConnection.reset();
 						endConnection();
 					}
 				}

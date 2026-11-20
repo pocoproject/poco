@@ -138,7 +138,7 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress)
 }
 
 
-SocketAddress::SocketAddress(SocketAddress&& socketAddress):
+SocketAddress::SocketAddress(SocketAddress&& socketAddress) noexcept:
 	_pImpl(std::move(socketAddress._pImpl))
 {
 }
@@ -197,7 +197,7 @@ SocketAddress& SocketAddress::operator = (const SocketAddress& socketAddress)
 }
 
 
-SocketAddress& SocketAddress::operator = (SocketAddress&& socketAddress)
+SocketAddress& SocketAddress::operator = (SocketAddress&& socketAddress) noexcept
 {
 	_pImpl = std::move(socketAddress._pImpl);
 	return *this;

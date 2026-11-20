@@ -103,6 +103,8 @@ class Util_API ServerApplication: public Application
 	/// command line option. A daemon, when launched, immediately
 	/// forks off a background process that does the actual work. After launching
 	/// the background process, the foreground process exits.
+	/// The foreground process ends with _exit(), so atexit handlers and
+	/// static destructors run only in the daemon.
 	///
 	/// After the initialization is complete, but before entering the main() method,
 	/// the current working directory for the daemon process is changed to the root

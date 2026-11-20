@@ -52,6 +52,7 @@ public:
 	void testComments();
 	void testTokenize();
 	void testPerThreadStringBuffer();
+	void testUnreadableInput();
 
 	void setUp();
 	void tearDown();

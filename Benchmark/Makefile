@@ -39,14 +39,15 @@ endif
 # Check if we found it
 ifneq ($(BENCHMARK_LIBS),)
 
-objects = BenchmarkApp PatternFormatterBench LoggerBench NotificationQueueBench
+objects = BenchmarkApp ChecksumBench PatternFormatterBench LoggerBench NotificationQueueBench
 
 target         = benchmark
 target_version = 1
 target_libs    = PocoUtil PocoFoundation
 
 SYSLIBS += $(BENCHMARK_LIBS)
-INCLUDE += -I$(POCO_BASE)/Benchmark/include $(BENCHMARK_CFLAGS)
+# ChecksumBench measures each CRC and Adler-32 implementation through the private headers CRC.h and Adler32.h
+INCLUDE += -I$(POCO_BASE)/Benchmark/include -I$(POCO_BASE)/Foundation/src $(BENCHMARK_CFLAGS)
 
 include $(POCO_BASE)/build/rules/exec
 

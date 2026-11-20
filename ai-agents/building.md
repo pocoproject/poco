@@ -6,13 +6,16 @@ directory.
 
 ## Language standard
 
-- CMake checks for C++20 support (`cmake/CXX2x.cmake`: GCC 10+, Clang 10+, AppleClang 13+, MSVC) and uses C++20 when it
-  is available; otherwise it falls back to C++17 (`cmake/CXX1x.cmake`). Emscripten builds always use C++17. The
-  configure output states which standard is used.
-- `main` (2.0) targets C++20 and must also build as C++17, so C++20 forms in the code are always guarded (see the
-  section "Language Standard and Feature Guards" of
-  [CODING_STYLE.md](../CODING_STYLE.md#20-language-standard-and-feature-guards)). The 1.x release branches require C++17
-  and use C++20 when it is available.
+- POCO requires C++20. The root `CMakeLists.txt` sets `CMAKE_CXX_STANDARD` to 20 unless a later standard is set,
+  and stops with an error when `CMAKE_CXX_STANDARD` is below 20 or when the compiler fails the C++20 check
+  (`cmake/CXX2x.cmake` compiles `cmake/test_compiler_cxx20.cpp`). A compiler older than the supported compilers
+  in `README.md` that passes the check gets a deprecation warning; Emscripten does not, because its SDK version
+  and not its Clang version identifies it. `Poco/Config.h` stops the compilation of a file that includes a POCO
+  header with an older standard. The configure output states which standard is used.
+- C++20 language features need no guard. Standard library features that a supported toolchain lacks are guarded
+  (see the section "Language Standard and Feature Guards" of
+  [CODING_STYLE.md](../CODING_STYLE.md#20-language-standard-and-feature-guards)). The 1.x release branches require
+  C++17 and use C++20 when it is available.
 
 ## Optional components and their packages
 
@@ -77,6 +80,12 @@ default `aarch64-linux-gnu`), not a sysroot, so `find_package` can pick up host 
 components that need target libraries, pass a toolchain file with `-DCMAKE_TOOLCHAIN_FILE=<file>` that sets
 `CMAKE_SYSTEM_NAME`, the compilers, `CMAKE_SYSROOT` and `CMAKE_FIND_ROOT_PATH_MODE_LIBRARY`, `_INCLUDE` and `_PACKAGE`
 to `ONLY` (cmake-toolchains(7)). Porting to a new platform is described in [porting.md](porting.md).
+
+By default, an Emscripten build produces static libraries and is compiled and linked with `-pthread -fexceptions`
+(`POCO_EMSCRIPTEN_FLAGS`, see [cmake.md](cmake.md#options)). Programs that link the POCO CMake targets get these flags
+too. A program built with `-pthread` needs `SharedArrayBuffer` at run time, which a browser provides only to a
+cross-origin isolated page; `-DPOCO_EMSCRIPTEN_FLAGS=-fexceptions` builds without threads, and `Thread::start()` then
+throws a `SystemException`.
 
 ## Next steps
 

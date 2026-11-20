@@ -17,6 +17,8 @@
 #include "Poco/Zip/Zip.h"
 #include "Poco/Zip/ZipLocalFileHeader.h"
 #include "CppUnit/TestCase.h"
+#include <string_view>
+#include <vector>
 
 
 class ZipTest: public CppUnit::TestCase
@@ -43,6 +45,27 @@ public:
 	void testDecompressZip64();
 	void testValidPath();
 	void testMalformedZip64();
+	void testZip64ExtensibleData();
+	void testUnknownMethodAndHostSystem();
+	void testUnsupportedVersionNeeded();
+	void testDuplicateEndOfCentralDirectory();
+	void testIllegalHeader();
+	void testReplaceUnsupportedMethod();
+	void testDecompressFailedEntryWithDataDescriptor();
+	void testSizeOrOffsetOutOfRange();
+	void testKeepEntryBeyondEndOfArchive();
+	void testDataDescriptorEntryAbove4GiB();
+	void testEmptyFileName();
+	void testDuplicateFileNames();
+	void testTruncatedArchive();
+	void testTruncatedDataDescriptor();
+	void testDataDescriptorCompressedSizeOutOfRange();
+	void testSyncAtEndOfArchive();
+	void testNulCharacterInName();
+	void testNulCharacterInNewName();
+	void testDuplicateNamesDataOffsets();
+	void testParseContinuesAtEndOfEntryData();
+	void testDecompressTruncatedEntryData();
 
 	void setUp();
 	void tearDown();
@@ -52,6 +75,12 @@ public:
 	static std::string getTestFile(const std::string& directory, const std::string& type);
 
 private:
+	void verifyTruncatedArchive(const std::vector<std::string>& records, std::string_view fileComment = {}, std::string_view archiveComment = {});
+		/// Checks that a prefix of the archive made of the records is read, with the entry, the file
+		/// comment and as much of the archive comment as it holds, exactly when it ends at a record
+		/// boundary, within a record signature or within the archive comment, and that every other
+		/// prefix is rejected with an IOException. The last record has the archive comment.
+
 	void onDecompressError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info);
 
 	int _errCnt;

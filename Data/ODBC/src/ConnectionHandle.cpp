@@ -136,7 +136,7 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 	try
 	{
 		// Setting timeouts before connection is valid by standard (as it makes sense for login timeout),
-		// but not all drivers comply, so we have to check and try again after succesful connection.
+		// but not all drivers comply, so we have to check and try again after successful connection.
 		// Furthermore, it appears that Oracle has only one timeout, so it is not possible to have
 		// different login and connection timeouts. Last but not least, some ODBC drivers (eg. DataDirect
 		// for Oracle) flat out refuse to set login timeout and return error - that's why these calls

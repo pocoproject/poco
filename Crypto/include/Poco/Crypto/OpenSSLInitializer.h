@@ -19,12 +19,10 @@
 
 
 #include "Poco/Crypto/Crypto.h"
-#include "Poco/AtomicCounter.h"
 #include <openssl/crypto.h>
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/provider.h>
 #include <openssl/evp.h>
-#include <atomic>
 #endif
 
 
@@ -79,7 +77,7 @@ public:
 		/// Returns true if the OpenSSL legacy provider is available, otherwise false.
 
 private:
-	static Poco::AtomicCounter _rc;
+	static int _rc;
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	static OSSL_PROVIDER* _defaultProvider;

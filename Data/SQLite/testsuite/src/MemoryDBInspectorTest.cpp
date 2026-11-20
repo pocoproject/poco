@@ -559,6 +559,37 @@ void MemoryDBInspectorTest::testReadOnlyMultiStatement()
 }
 
 
+void MemoryDBInspectorTest::testReadOnlyUnreadableInput()
+{
+	MemoryDB db(_dir);
+	MemoryDBInspector insp(db);
+	seedTable(db, 3);
+
+	// SQLite reads a backtick as an identifier quote and runs the statement after
+	// the semicolon. The parser cannot read the backtick, so the parse fails and
+	// the query is refused instead of passing as the SELECT before it.
+	const MemoryDBInspector::QueryResult r = insp.query("SELECT 1 `x`; DROP TABLE t");
+	assertTrue (!r.ok);
+	assertTrue (r.error.find("read-only: cannot parse") != std::string::npos);
+
+	// The lexer would end the input at an embedded NUL character.
+	const std::string withNul("SELECT 1;\0DROP TABLE t", 22);
+	try
+	{
+		insp.checkSQLAllowed(withNul);
+		fail("checkSQLAllowed must refuse a statement with an embedded NUL");
+	}
+	catch (const Poco::InvalidAccessException& e)
+	{
+		assertTrue (e.message().find("read-only: cannot parse") != std::string::npos);
+	}
+
+	int n = 0;
+	db << "SELECT count(*) FROM t", into(n), now;
+	assertTrue (n == 3);
+}
+
+
 void MemoryDBInspectorTest::testReadOnlyPragmaAndExplain()
 {
 	MemoryDB db(_dir);
@@ -1087,6 +1118,7 @@ CppUnit::Test* MemoryDBInspectorTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testReadOnlyCommentSmuggling);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testReadOnlyCTEWrite);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testReadOnlyMultiStatement);
+	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testReadOnlyUnreadableInput);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testReadOnlyPragmaAndExplain);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testPolicyIndependentOfSqlParseFeature);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testQueryOnlyNeverSet);

@@ -27,6 +27,9 @@
 #include <cstring>
 
 
+#if defined(_WIN32)
+#include "Poco/String.h"
+#endif
 #if defined(POCO_HAVE_LIBRESOLV)
 #include <resolv.h>
 #endif
@@ -396,10 +399,16 @@ void DNS::aierror(int code, const std::string& arg)
 		throw HostNotFoundException(arg);
 #endif
 	default:
-		throw DNSException("EAI", NumberFormatter::format(code));
+#if defined(_WIN32)
+		// gai_strerror() formats into a static buffer on Windows; EAI codes are WSA error codes there.
+		// The system message ends with a line break, which would separate it from the host.
+		throw DNSException("EAI " + NumberFormatter::format(code) + ": " + Poco::trimRight(Error::getMessage(code)), arg, code);
+#else
+		throw DNSException("EAI " + NumberFormatter::format(code) + ": " + gai_strerror(code), arg, code);
+#endif
 	}
 #else
-	throw DNSException("EAI", NumberFormatter::format(code));
+	throw DNSException("EAI " + NumberFormatter::format(code), arg, code);
 #endif // POCO_HAVE_IPv6 || defined(POCO_HAVE_ADDRINFO)
 }
 

@@ -129,7 +129,8 @@ void StatementImpl::assignSubTotal(bool reset)
 		{
 			if (_extractors[counter].size())
 			{
-				if (reset)
+				// without a reset, only a bulk extraction replaces the rows of the earlier executions
+				if (reset || !_extractors[counter][0]->isBulk())
 					*it = CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());
 				else
 					*it += CountVec::value_type(_extractors[counter][0]->numOfRowsHandled());

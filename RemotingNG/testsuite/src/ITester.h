@@ -95,6 +95,8 @@ public:
 
 	virtual std::array<int, 4> testStdArray(const std::array<int, 4>& arr) = 0;
 
+	virtual std::optional<std::string> testStdOptional(const std::optional<std::string>& value) = 0;
+
 	virtual std::shared_ptr<Struct1> testStdSharedPtr(const std::shared_ptr<Struct1>& pStruct1) = 0;
 
 	virtual Struct1 testStruct11(const Struct1& s1) = 0;

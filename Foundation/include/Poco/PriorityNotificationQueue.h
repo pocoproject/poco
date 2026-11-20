@@ -148,6 +148,7 @@ private:
 
 	NfQueue           _nfQueue;
 	WaitQueue         _waitQueue;
+	bool              _wokeUp = false;
 	mutable FastMutex _mutex;
 };
 

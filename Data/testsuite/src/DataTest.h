@@ -30,6 +30,7 @@ public:
 	void testSession();
 	void testStatementFormatting();
 	void testStatementMoveAssignment();
+	void testStatementSwap();
 	void testFeatures();
 	void testProperties();
 	void testLOB();
@@ -42,11 +43,13 @@ public:
 	void testRow();
 	void testRowSort();
 	void testSimpleRowFormatter();
+	void testSimpleRowFormatterSwap();
 	void testJSONRowFormatter();
 	void testDateAndTime();
 	void testExternalBindingAndExtraction();
 	void testTranscode();
 	void testSQLParse();
+	void testTransactionUnparsedStatement();
 	void testSQLChannel();
 	void testNullableExtract();
 	void testTransactionAutoCommit();
@@ -63,6 +66,9 @@ public:
 	void testArchiveStrategyReopen();
 	void testStatementAsyncError();
 	void testStatementWaitErrorType();
+	void testStatementExecuteWhileExecuting();
+	void testStatementExecuteWhileExecutingSync();
+	void testStatementExecuteWhileExecutingAsyncStatement();
 	void testStatementSetAsyncMovedFrom();
 	void testTransactionNotConnectedLog();
 	void testTransactorFailureLog();
@@ -73,6 +79,8 @@ public:
 	void testSQLChannelDrainFallback();
 	void testSQLChannelDrainRejected();
 	void testArchiveStrategyOpenReleasesStatements();
+	void testBulkModeMixing();
+	void testBulkBindingReset();
 
 	void setUp();
 	void tearDown();
@@ -86,7 +94,7 @@ private:
 		/// Strict weak ordering requirement for sorted containers
 		/// as described in Josuttis "The Standard C++ Library"
 		/// chapter 6.5. pg. 176.
-		/// For this to pass, the following condition must be satisifed:
+		/// For this to pass, the following condition must be satisfied:
 		/// row1 < row2 < row3
 
 	void writeToCLOB(Poco::BinaryWriter& writer);

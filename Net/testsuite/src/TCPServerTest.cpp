@@ -26,8 +26,11 @@
 #include "Poco/Stopwatch.h"
 #include "Poco/Timespan.h"
 #include <atomic>
+#include <chrono>
+#include <cstddef>
 #include <iostream>
 #include <string>
+#include <thread>
 
 
 using Poco::Net::TCPServer;
@@ -40,6 +43,7 @@ using Poco::Net::StreamSocket;
 using Poco::Net::ServerSocket;
 using Poco::Net::SocketAddress;
 using Poco::Thread;
+using Poco::Timespan;
 
 
 namespace
@@ -184,6 +188,103 @@ namespace
 			return *static_cast<FailingAcceptSocketImpl*>(impl());
 		}
 	};
+
+	constexpr std::size_t RECEIVE_BUFFER_SIZE = 256;
+	constexpr std::chrono::milliseconds DESTRUCTOR_DELAY{300};
+	constexpr std::chrono::milliseconds POLL_INTERVAL{10};
+	constexpr std::chrono::seconds WAIT_LIMIT{5};
+
+	std::atomic<bool> slowConnectionDestroyed{false};
+
+	template <typename Predicate>
+	[[nodiscard]] bool waitUntil(Predicate done)
+		/// Polls done() until it returns true or WAIT_LIMIT has passed.
+		/// Returns the last result of done().
+	{
+		const auto deadline = std::chrono::steady_clock::now() + WAIT_LIMIT;
+		while (!done())
+		{
+			if (std::chrono::steady_clock::now() >= deadline) return done();
+			std::this_thread::sleep_for(POLL_INTERVAL);
+		}
+		return true;
+	}
+
+	class SlowDestructorConnection: public TCPServerConnection
+		/// Serves the connection until the peer closes it; its destructor
+		/// takes DESTRUCTOR_DELAY and then sets slowConnectionDestroyed.
+	{
+	public:
+		SlowDestructorConnection() = delete;
+		explicit SlowDestructorConnection(const StreamSocket& s);
+		~SlowDestructorConnection() override;
+
+		void run() override;
+	};
+
+	SlowDestructorConnection::SlowDestructorConnection(const StreamSocket& s): TCPServerConnection(s)
+	{
+	}
+
+	SlowDestructorConnection::~SlowDestructorConnection()
+	{
+		std::this_thread::sleep_for(DESTRUCTOR_DELAY);
+		slowConnectionDestroyed = true;
+	}
+
+	void SlowDestructorConnection::run()
+	{
+		char buffer[RECEIVE_BUFFER_SIZE];
+		while (socket().receiveBytes(buffer, sizeof(buffer)) > 0)
+		{
+		}
+	}
+
+	class ThrowOnceFactory: public TCPServerConnectionFactory
+		/// Throws from the first call to createConnection() and
+		/// creates an EchoConnection for every later call.
+	{
+	public:
+		ThrowOnceFactory() = default;
+		~ThrowOnceFactory() override = default;
+
+		TCPServerConnection* createConnection(const StreamSocket& socket) override;
+
+	private:
+		std::atomic<bool> _thrown{false};
+	};
+
+	TCPServerConnection* ThrowOnceFactory::createConnection(const StreamSocket& socket)
+	{
+		if (!_thrown.exchange(true)) throw Poco::RuntimeException("connection refused by test factory");
+		return new EchoConnection(socket);
+	}
+
+	class RefusingFactory: public TCPServerConnectionFactory
+		/// Refuses every connection by returning nullptr.
+	{
+	public:
+		RefusingFactory() = default;
+		~RefusingFactory() override = default;
+
+		TCPServerConnection* createConnection(const StreamSocket&) override;
+	};
+
+	TCPServerConnection* RefusingFactory::createConnection(const StreamSocket&)
+	{
+		return nullptr;
+	}
+
+	class DerivedServer: public TCPServer
+		/// Its destructor runs while the server thread is still running.
+	{
+	public:
+		using TCPServer::TCPServer;
+		DerivedServer() = delete;
+		~DerivedServer() override;
+	};
+
+	DerivedServer::~DerivedServer() = default;
 }
 
 
@@ -444,6 +545,85 @@ void TCPServerTest::checkPauseAfterAcceptError(int errorCode)
 }
 
 
+void TCPServerTest::testConnectionCountAfterDestructor()
+{
+	slowConnectionDestroyed = false;
+	TCPServer srv(new TCPServerConnectionFactoryImpl<SlowDestructorConnection>());
+	srv.start();
+
+	SocketAddress sa("127.0.0.1", srv.socket().address().port());
+	StreamSocket ss(sa);
+	assertTrue (waitUntil([&srv]() { return srv.totalConnections() == 1; }));
+	ss.close();
+
+	assertTrue (waitUntil([&srv]() { return srv.currentConnections() == 0; }));
+	assertTrue (slowConnectionDestroyed);
+}
+
+
+void TCPServerTest::testFactoryThrows()
+{
+	TCPServer srv(new ThrowOnceFactory);
+	srv.start();
+
+	SocketAddress sa("127.0.0.1", srv.socket().address().port());
+	StreamSocket ss1(sa);
+	ss1.setReceiveTimeout(Timespan(WAIT_LIMIT));
+	char buffer[RECEIVE_BUFFER_SIZE];
+	assertTrue (ss1.receiveBytes(buffer, sizeof(buffer)) == 0);
+	assertTrue (srv.currentConnections() == 0);
+	assertTrue (srv.totalConnections() == 0);
+
+	StreamSocket ss2(sa);
+	ss2.setReceiveTimeout(Timespan(WAIT_LIMIT));
+	const std::string data("hello, world");
+	ss2.sendBytes(data.data(), static_cast<int>(data.size()));
+	const int n = ss2.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (std::string(buffer, n) == data);
+	assertTrue (srv.currentConnections() == 1);
+	assertTrue (srv.totalConnections() == 1);
+	ss2.close();
+	assertTrue (waitUntil([&srv]() { return srv.currentConnections() == 0; }));
+	assertTrue (srv.totalConnections() == 1);
+}
+
+
+void TCPServerTest::testRefusedNotCounted()
+{
+	TCPServer srv(new RefusingFactory);
+	srv.start();
+
+	SocketAddress sa("127.0.0.1", srv.socket().address().port());
+	StreamSocket ss(sa);
+	ss.setReceiveTimeout(Timespan(WAIT_LIMIT));
+	char buffer[RECEIVE_BUFFER_SIZE];
+	assertTrue (ss.receiveBytes(buffer, sizeof(buffer)) == 0);
+	assertTrue (srv.currentConnections() == 0);
+	assertTrue (srv.totalConnections() == 0);
+}
+
+
+void TCPServerTest::testDestroyRunningSubclass()
+{
+	// Only ThreadSanitizer shows the defect: a data race on the vptr between the destructor of the
+	// derived class and a virtual call of run() in the server thread. The rest checks that a server
+	// of a derived class still serves a connection.
+	{
+		DerivedServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>());
+		srv.start();
+	}
+	DerivedServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>());
+	srv.start();
+	StreamSocket ss(SocketAddress("127.0.0.1", srv.port()));
+	ss.setReceiveTimeout(Timespan(WAIT_LIMIT));
+	const std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[RECEIVE_BUFFER_SIZE];
+	const int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (std::string(buffer, n) == data);
+}
+
+
 void TCPServerTest::setUp()
 {
 }
@@ -464,6 +644,10 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testThreadCapacity);
 	CppUnit_addTest(pSuite, TCPServerTest, testFilter);
 	CppUnit_addTest(pSuite, TCPServerTest, testAcceptResourceError);
+	CppUnit_addTest(pSuite, TCPServerTest, testConnectionCountAfterDestructor);
+	CppUnit_addTest(pSuite, TCPServerTest, testFactoryThrows);
+	CppUnit_addTest(pSuite, TCPServerTest, testRefusedNotCounted);
+	CppUnit_addTest(pSuite, TCPServerTest, testDestroyRunningSubclass);
 
 	return pSuite;
 }

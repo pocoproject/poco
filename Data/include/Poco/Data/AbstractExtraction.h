@@ -137,7 +137,7 @@ public:
 	[[nodiscard]] bool isValueNull(const std::string& str, bool deflt);
 		/// Overload for const reference to std::string.
 		///
-		/// Returns true when folowing conditions are met:
+		/// Returns true when following conditions are met:
 		///
 		/// - string is empty
 		/// - getEmptyStringIsNull() returns true
@@ -145,7 +145,7 @@ public:
 	[[nodiscard]] bool isValueNull(const Poco::UTF16String& str, bool deflt);
 		/// Overload for const reference to UTF16String.
 		///
-		/// Returns true when folowing conditions are met:
+		/// Returns true when following conditions are met:
 		///
 		/// - string is empty
 		/// - getEmptyStringIsNull() returns true

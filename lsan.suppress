@@ -1,0 +1,20 @@
+# Suppressed leak sanitizer reports: leaks in ODBC drivers and driver managers,
+# outside of POCO.
+#
+# https://github.com/google/sanitizers/wiki/AddressSanitizerLeakSanitizer#suppressions
+#
+# To apply:
+# export LSAN_OPTIONS="suppressions=$POCO_BASE/lsan.suppress"
+#
+# The entries name functions, so they match only drivers built with symbols.
+# A driver that the driver manager unloads before the leak check shows as an
+# unknown module and is not matched.
+
+# psqlODBC (17.00): SQLNumResultCols() on a prepared statement with parameters
+# that has not been executed (UseServerSidePrepare=0) replaces the processed
+# statements without freeing the earlier list.
+leak:buildProcessedStmt
+
+# unixODBC (2.3.14): SQLBrowseConnect() and SQLBrowseConnectW() do not free the
+# parsed connection string when they return IM012 (a DSN longer than 32 bytes).
+leak:SQLBrowseConnect

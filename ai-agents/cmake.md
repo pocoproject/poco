@@ -41,7 +41,7 @@ cmake --build <build-dir> --parallel --target <Component>-testrunner
 | `ENABLE_TEST_DEPRECATED` | OFF | Also build tests of deprecated API (defines `POCO_TEST_DEPRECATED`) |
 | `ENABLE_COMPILER_WARNINGS` | OFF | Maintainer warnings for POCO code only: `-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wzero-as-null-pointer-constant` (GCC, Clang), `/W4` (MSVC) |
 | `ENABLE_TRACE` | OFF | Stack traces in exceptions (defines `POCO_ENABLE_TRACE`) |
-| `BUILD_SHARED_LIBS` | ON | Shared or static libraries |
+| `BUILD_SHARED_LIBS` | ON (OFF for Emscripten) | Shared or static libraries |
 | `POCO_MT` | OFF | MSVC only: static runtime (`/MT`); needs `BUILD_SHARED_LIBS=OFF` |
 | `POCO_SOO` | ON | Small object optimization in Foundation |
 | `POCO_ENABLE_STD_MUTEX` | OFF | `Poco::Mutex` and `Poco::FastMutex` on `std::recursive_mutex` and `std::mutex` |
@@ -49,12 +49,14 @@ cmake --build <build-dir> --parallel --target <Component>-testrunner
 | `ENABLE_FASTLOGGER` | ON | Quill-based FastLogger; switched off on unsupported platforms |
 | `POCO_UNBUNDLED` | OFF | Use system libraries instead of the bundled ones (see [dependencies.md](dependencies.md)) |
 | `POCO_SQLITE_UNBUNDLED` | OFF | Use the system SQLite only |
+| `POCO_DATA_ODBC_UNICODE` | OFF | Data/ODBC on the wide-character (UTF-16) API of unixODBC (defines `UNICODE`, `POCO_UNIXODBC` and `SQL_NOUNICODEMAP`); Windows always uses the wide-character API |
 | `POCO_SANITIZEFLAGS` | empty | Sanitizer flags for compile and link (see [analysis.md](analysis.md)) |
+| `POCO_EMSCRIPTEN_FLAGS` | `-pthread -fexceptions` | Emscripten only: compile and link flags for threads and C++ exceptions; empty for a build without them |
 | `POCO_COMPILER` | empty | Compiler by name or path (`gcc-12`, `clang-18`, `clang-cl`) |
 | `POCO_CROSS_COMPILE` | empty | Cross build for `arm-linux`, `android` or `emscripten`; not together with `CMAKE_TOOLCHAIN_FILE` |
-| `ENABLE_MODULES` | OFF | Build the C++ module `Poco`; needs C++20, CMake 3.28+ and a generator that scans modules: Ninja or Ninja Multi-Config with ninja 1.11+, or Visual Studio 17 2022 (cmake-cxxmodules(7)); builds with LLVM Clang only: Apple clang has no clang-scan-deps, MSVC 19.51 and GCC 15/16 fail with compiler defects |
+| `ENABLE_MODULES` | OFF | Build the C++ module `Poco`; needs CMake 3.28+ and a generator that scans modules: Ninja or Ninja Multi-Config with ninja 1.11+, or Visual Studio 17 2022 (cmake-cxxmodules(7)); builds with LLVM Clang only: Apple clang has no clang-scan-deps, MSVC 19.51 and GCC 15/16 fail with compiler defects |
 | `ENABLE_NETSSL_WIN` | OFF | Windows only: NetSSL on SChannel |
-| `ENABLE_FUZZING` | OFF | OSS-Fuzz targets; needs Clang |
+| `ENABLE_FUZZING` | OFF | OSS-Fuzz targets; needs Clang (see [fuzzing.md](fuzzing.md)) |
 | `CMAKE_EXPORT_COMPILE_COMMANDS` | OFF | Write `compile_commands.json` for clang-tidy and cppcheck (Makefile and Ninja generators only) |
 
 NOTE: `ENABLE_COMPILER_WARNINGS` does not add `-Werror`. Read the build log for new warnings in the files you changed.
@@ -97,7 +99,7 @@ job `linux-gcc-make-build` does not compile it.
    properties on the real target. `DNSSD/` deviates from rules 2 and 3 (alias `PocoDNSSD`, links without a scope
    keyword); do not copy it.
 4. **No library type.** Call `add_library(<Component> ${SRCS})` without `STATIC` or `SHARED`; `BUILD_SHARED_LIBS` (an
-   option in the root `CMakeLists.txt`, default ON) decides. The Apache module `mod_poco` is `SHARED` because Apache can
+   option in the root `CMakeLists.txt`) decides. The Apache module `mod_poco` is `SHARED` because Apache can
    only load a shared object.
 5. **Project-wide options in two places only.** Directory-scope compile and link options that apply to every target
    (sanitizer flags, release stripping, `POCO_DLL`/`POCO_STATIC`) are set in `cmake/DefinePlatformSpecific.cmake`, which
@@ -107,15 +109,15 @@ job `linux-gcc-make-build` does not compile it.
    (`POCO_ENABLE_TRACE`, `POCO_NO_FORK_EXEC`) are set in the root `CMakeLists.txt`. Component files change no global
    state.
 6. **`CMAKE_<LANG>_FLAGS` belongs to the user** (command line, toolchain file, `CXXFLAGS`). The root file appends
-   `/Zc:__cplusplus` for MSVC and `cmake/CXX2x.cmake`/`CXX1x.cmake` append `-stdlib=libc++` when Clang needs it; do not
-   add more.
+   `/Zc:__cplusplus` for MSVC; do not add more.
 7. **Compiler conditions.** Wrap compiler-specific options in a condition on `CMAKE_CXX_COMPILER_ID`
    (`if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")`, `MATCHES "Clang"`) or a generator expression
    (`$<$<CXX_COMPILER_ID:MSVC>:/W4>`). `CMAKE_COMPILER_IS_GNUCXX` is deprecated (CMake 3.24).
-8. **Language standard.** The root `CMakeLists.txt` sets `CMAKE_CXX_STANDARD` to 20 or 17 (see
-   [building.md](building.md#language-standard)) and `Foundation` declares
-   `target_compile_features(Foundation PUBLIC cxx_std_17)` so that consumers of the installed targets compile with at
-   least C++17. Components set no standard of their own and never add `-std=` flags.
+8. **Language standard.** The root `CMakeLists.txt` sets `CMAKE_CXX_STANDARD` to 20 unless the user sets a later
+   one, and stops when `CMAKE_CXX_STANDARD` is below 20 or the compiler fails the C++20 check (see
+   [building.md](building.md#language-standard)). `Foundation` declares
+   `target_compile_features(Foundation PUBLIC cxx_std_20)` so that consumers of the installed targets compile with
+   at least C++20. Components set no standard of their own and never add `-std=` flags.
 9. **Paths.** Use `CMAKE_CURRENT_SOURCE_DIR`, `CMAKE_CURRENT_BINARY_DIR` and `PROJECT_SOURCE_DIR`; POCO can be built as
    a subdirectory of another project, where `CMAKE_SOURCE_DIR` is not the POCO checkout. Public include directories are
    given as `$<BUILD_INTERFACE:...>` and `$<INSTALL_INTERFACE:...>`; build-only dependencies that must not be exported

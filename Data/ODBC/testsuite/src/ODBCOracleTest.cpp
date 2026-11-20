@@ -95,7 +95,7 @@ std::string          ODBCOracleTest::_connectString = "DRIVER={" ORACLE_ODBC_DRI
 	"LOB=T;" // LOB writes (T/F), default T
 	"FDL=0;" // failover delay (default 10)
 	"FRC=0;" // failover retry count (default 10)
-	"QTO=T;" // query timout option (T/F), default T
+	"QTO=T;" // query timeout option (T/F), default T
 	"FEN=F;" // failover (T/F), default T
 	"XSM=Default;" // schema field (Default/Database/Owner), default Default
 	"EXC=F;" // EXEC syntax (T/F), default F
@@ -661,7 +661,7 @@ void ODBCOracleTest::testAutoTransaction()
 	Session localSession("ODBC", _connectString);
 	bool ac = session().getFeature("autoCommit");
 	int count = 0;
-	// enabing SQL parsing is necessary to prevent
+	// enabling SQL parsing is necessary to prevent
 	// starting a transaction for a simple select
 	bool sqlParse = session().getFeature("sqlParse");
 	session().setFeature("sqlParse", true);
@@ -1001,8 +1001,23 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOB);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBStmt);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkBindingBackstops);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testParameterArraySize);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkFullWidthStrings);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testManualBLOB);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testManualUUIDLength);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testTranscodedBindingOwnership);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBindingOutlivesStatement);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testBoundLongValue);
+		// not testBulkLongStrings: the driver describes the parameter of a VARCHAR(4000)
+		// column with 999 characters, so its long values do not fit
+		CppUnit_addTest(pSuite, ODBCOracleTest, testManualStringChunks);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDate);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDateTime);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAnyDateTime);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAnyBulk);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testAnyBoundType);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testFloat);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testDouble);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTuple);
@@ -1033,6 +1048,8 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testReconnect);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testClosedSession);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testExceptionCopy);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLGetInfo);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testRecordSetBeforeExecute);
 
 		return pSuite;

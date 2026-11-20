@@ -48,6 +48,11 @@ public:
 	void testForDirectory();
 	void testAddDirectorySeparator();
 	void testExpand();
+#if defined(POCO_OS_FAMILY_UNIX)
+	void testExpandEscapedDollar();
+	void testExpandKeepsBackslash();
+	void testExpandCollapsesSlashes();
+#endif
 	void testHomeWithoutHomeEnv();
 	void testListRoots();
 	void testFind();
@@ -56,6 +61,7 @@ public:
 	void testPushPop();
 	void testWindowsSystem();
 	void testSelf();
+	void testRejectEmbeddedNul();
 
 	void setUp();
 	void tearDown();

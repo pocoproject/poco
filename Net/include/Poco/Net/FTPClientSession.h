@@ -105,6 +105,10 @@ public:
 		/// EPSV command is used (with a fallback to PASV if EPSV fails)
 		/// for switching to passive mode. The same applies to
 		/// EPRT and PORT for active connections.
+		///
+		/// In passive mode, the data connection goes to the host of the
+		/// control connection. The address in a PASV response is ignored;
+		/// only its port is used.
 
 	[[nodiscard]] bool getPassive() const;
 		/// Returns true iff passive mode is enabled for this connection.

@@ -126,6 +126,9 @@ public:
 	void setText(const std::string& text);
 		/// Sets the text of the message.
 
+	void setText(std::string&& text);
+		/// Sets the text of the message.
+
 	[[nodiscard]] const std::string& getText() const;
 		/// Returns the text of the message.
 

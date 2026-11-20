@@ -33,6 +33,8 @@ public:
 	void testRotateDaily();
 	void testRotateLargeFile();
 	void testRotateWithPurgeCount();
+	void testRotateBySizeGigabytes();
+	void testRotationOverflow();
 
 	void setUp();
 	void tearDown();

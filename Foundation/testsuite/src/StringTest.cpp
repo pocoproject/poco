@@ -1700,7 +1700,7 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testIntToString);
 	CppUnit_addTest(pSuite, StringTest, testFloatToString);
 	CppUnit_addTest(pSuite, StringTest, testJSONString);
-	CppUnit_addTest(pSuite, StringTest, conversionBenchmarks);
+	CppUnit_addLongTest(pSuite, StringTest, conversionBenchmarks);
 
 	return pSuite;
 }

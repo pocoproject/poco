@@ -35,6 +35,25 @@ using Poco::PathSyntaxException;
 using Poco::Environment;
 
 
+namespace
+{
+	template <typename F>
+	bool throwsPathSyntaxException(const F& func)
+		/// Returns true if calling func throws a PathSyntaxException.
+	{
+		try
+		{
+			func();
+		}
+		catch (PathSyntaxException&)
+		{
+			return true;
+		}
+		return false;
+	}
+}
+
+
 PathTest::PathTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -1603,6 +1622,30 @@ void PathTest::testExpand()
 }
 
 
+#if defined(POCO_OS_FAMILY_UNIX)
+void PathTest::testExpandEscapedDollar()
+{
+	assertEqual ("/usr/share/O1$$/folder", Path::expand("/usr/share/O1\\$\\$/folder"));
+}
+
+
+void PathTest::testExpandKeepsBackslash()
+{
+	assertEqual ("/usr/share\\", Path::expand("/usr/share\\"));
+	assertEqual ("\\", Path::expand("\\"));
+	assertEqual ("/usr/sh\\are", Path::expand("/usr/sh\\are"));
+	assertEqual ("/usr/share\\$", Path::expand("/usr/share\\\\$"));
+}
+
+
+void PathTest::testExpandCollapsesSlashes()
+{
+	assertEqual ("/usr/share", Path::expand("/usr///share"));
+	assertEqual ("/usr/share/", Path::expand("/usr////share//"));
+}
+#endif
+
+
 void PathTest::testHomeWithoutHomeEnv()
 {
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
@@ -1773,6 +1816,43 @@ void PathTest::testSelf()
 }
 
 
+void PathTest::testRejectEmbeddedNul()
+{
+	// The operating system sees a path only up to the first NUL character,
+	// so "a.txt\0.exe" would act on "a.txt".
+	const std::string withNul("a.txt\0.exe", 10);
+	const Path parent("dir/", Path::PATH_UNIX);
+	Path p("dir/file.txt", Path::PATH_UNIX);
+
+	assertTrue (throwsPathSyntaxException([&]() { Path q(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { Path q(withNul, Path::PATH_UNIX); }));
+	assertTrue (throwsPathSyntaxException([&]() { Path q(parent, withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { p = withNul; }));
+	assertTrue (throwsPathSyntaxException([&]() { p.assign(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { p.assign(withNul, Path::PATH_WINDOWS); }));
+	assertTrue (throwsPathSyntaxException([&]() { p.parseDirectory(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { p.setNode(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { p.setDevice(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { p.pushDirectory(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { p.setFileName(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { p.setBaseName(withNul); }));
+	assertTrue (throwsPathSyntaxException([&]() { p.setExtension(withNul); }));
+	assertTrue (!p.tryParse(withNul));
+
+	assertEqual ("dir/file.txt", p.toString(Path::PATH_UNIX));
+
+	try
+	{
+		Path q(withNul);
+		failmsg("embedded NUL character - must throw exception");
+	}
+	catch (PathSyntaxException& exc)
+	{
+		assertMessageEqual ("embedded NUL character: a.txt\\0.exe", exc.message());
+	}
+}
+
+
 void PathTest::setUp()
 {
 }
@@ -1811,6 +1891,11 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testForDirectory);
 	CppUnit_addTest(pSuite, PathTest, testAddDirectorySeparator);
 	CppUnit_addTest(pSuite, PathTest, testExpand);
+#if defined(POCO_OS_FAMILY_UNIX)
+	CppUnit_addTest(pSuite, PathTest, testExpandEscapedDollar);
+	CppUnit_addTest(pSuite, PathTest, testExpandKeepsBackslash);
+	CppUnit_addTest(pSuite, PathTest, testExpandCollapsesSlashes);
+#endif
 	CppUnit_addTest(pSuite, PathTest, testHomeWithoutHomeEnv);
 	CppUnit_addTest(pSuite, PathTest, testListRoots);
 	CppUnit_addTest(pSuite, PathTest, testFind);
@@ -1819,6 +1904,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testPushPop);
 	CppUnit_addTest(pSuite, PathTest, testWindowsSystem);
 	CppUnit_addTest(pSuite, PathTest, testSelf);
+	CppUnit_addTest(pSuite, PathTest, testRejectEmbeddedNul);
 
 	return pSuite;
 }

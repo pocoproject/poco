@@ -32,6 +32,8 @@ DEPS="$(cd "$(dirname "$0")" && pwd)"
 # per-library maintenance notes. Notable ones:
 #  - tessil: has a local modification (external linkage on
 #    numeric_cast/deserialize_value). Re-apply after refreshing sources.
+#  - hpdf:   has a local modification (size_t length in the libpng read
+#    callback PngReadFunc). Re-apply after refreshing sources.
 #  - quill:  only supports specific OS/CPU combinations; the
 #    ENABLE_FASTLOGGER platform whitelist in the top-level CMakeLists.txt
 #    must be re-assessed against the new version.

@@ -28,6 +28,7 @@ public:
 	void testSocketRelationals();
 	void testSocketAddress6();
 	void testSocketAddressUnixLocal();
+	void testMoveNoexcept();
 
 	void setUp();
 	void tearDown();

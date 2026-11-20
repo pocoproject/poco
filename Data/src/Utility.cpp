@@ -25,12 +25,14 @@
 #include "Poco/NumberFormatter.h"
 #ifndef POCO_DATA_NO_SQL_PARSER
 #include "SQLParser.h"
+#include "parser/bison_parser.h"
 #include "sql/Expr.h"
 #endif
 #include <algorithm>
 #include <cctype>
 #include <cstdio>
 #include <cstring>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -72,13 +74,27 @@ namespace
 		std::size_t paramIndex;
 	};
 
+	// Tells whether the lexer reads all of sql. An embedded NUL character and a
+	// character outside of its tokens (PostgreSQL's ~ operator, a MySQL # comment)
+	// are read as the invalid token.
+	bool lexerReads(const std::string& sql)
+	{
+		std::vector<int16_t> tokens;
+		if (!hsql::SQLParser::tokenize(sql, &tokens))
+			return false;
+		return std::find(tokens.begin(), tokens.end(), SQL_HSQL_UNDEF) == tokens.end();
+	}
+
 	// Parses sql once, validates arity, and returns the ordered placeholder
 	// spans plus their binder indices. Hoisted out of the row loop so
 	// boundSQLImpl pays the parser cost once per render, not once per row.
-	std::vector<PlaceholderSpan> collectPlaceholders(const std::string& sql, std::size_t totalPositions)
+	// Returns no spans if the lexer cannot read sql; the scanner renders it then.
+	std::optional<std::vector<PlaceholderSpan>> collectPlaceholders(const std::string& sql, std::size_t totalPositions)
 	{
 		hsql::SQLParserResult result;
 		hsql::SQLParser::parse(sql, &result);
+		if (!result.isValid() && !lexerReads(sql))
+			return std::nullopt;
 		if (!result.isValid())
 			throw Poco::InvalidArgumentException(std::string("Utility::boundSQL: ") +
 				(result.errorMsg() ? result.errorMsg() : "parse failed"));
@@ -171,8 +187,10 @@ namespace
 		out.append(sql, cursor, std::string::npos);
 		return out;
 	}
-#else
-	// Hand-rolled scanner fallback for POCO_DATA_NO_SQL_PARSER builds.
+#endif
+
+	// Hand-rolled scanner for POCO_DATA_NO_SQL_PARSER builds, and for SQL the
+	// parser's lexer cannot read. It knows single-quoted literals, ? and $N.
 	std::string renderRowScanner(const std::string& sql, const RenderingBinder& rb, std::size_t row,
 		std::size_t totalPositions)
 	{
@@ -255,7 +273,6 @@ namespace
 
 		return out;
 	}
-#endif
 }
 
 
@@ -268,15 +285,19 @@ std::string Utility::boundSQLImpl(const std::string& sql, const RenderingBinder&
 
 	std::string out;
 #ifndef POCO_DATA_NO_SQL_PARSER
-	const auto spans = collectPlaceholders(sql, totalPositions);
+	const std::optional<std::vector<PlaceholderSpan>> spans = collectPlaceholders(sql, totalPositions);
+	const bool useScanner = !spans.has_value();
+#else
+	const bool useScanner = true;
 #endif
 	for (std::size_t row = 0; row < toRender; ++row)
 	{
 		if (row > 0) out.append(";\n");
+		if (useScanner)
+			out.append(renderRowScanner(sql, rb, row, totalPositions));
 #ifndef POCO_DATA_NO_SQL_PARSER
-		out.append(renderRow(sql, spans, rb, row));
-#else
-		out.append(renderRowScanner(sql, rb, row, totalPositions));
+		else
+			out.append(renderRow(sql, *spans, rb, row));
 #endif
 	}
 
