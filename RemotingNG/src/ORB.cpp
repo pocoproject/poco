@@ -83,7 +83,7 @@ bool ORB::invoke(const Listener& listener, const std::string& uri, ServerTranspo
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 
-		URIAliases::const_iterator ita = findAlias(uriPath);
+		URIAliases::const_iterator ita = findAlias(listener, uriPath);
 		if (ita == _uriAliases.end())
 		{
 			Poco::StringTokenizer tok(theURI.getPathEtc(), "/", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
@@ -519,10 +519,15 @@ void ORB::unregisterObject(const std::string& uri)
 		pInfo = itRO->second;
 
 		_remoteObjects.erase(pInfo->objectPath);
-		URIAliases::iterator itAl = _uriAliases.find(pInfo->pRemoteObject->remoting__getURI().getPath());
-		if (itAl != _uriAliases.end())
+		// Objects of other listeners may have the same alias.
+		const auto aliases = _uriAliases.equal_range(pInfo->pRemoteObject->remoting__getURI().getPath());
+		for (URIAliases::iterator itAl = aliases.first; itAl != aliases.second; ++itAl)
 		{
-			_uriAliases.erase(itAl);
+			if (itAl->second == pInfo->objectPath)
+			{
+				_uriAliases.erase(itAl);
+				break;
+			}
 		}
 		_remoteObjectURIs.erase(itRO);
 	}
@@ -623,13 +628,17 @@ EventDispatcher::Ptr ORB::findEventDispatcher(const std::string& uri, const std:
 }
 
 
-ORB::URIAliases::const_iterator ORB::findAlias(const std::string& path) const
+ORB::URIAliases::const_iterator ORB::findAlias(const Listener& listener, const std::string& path) const
 {
 	for (URIAliases::const_iterator it = _uriAliases.begin(); it != _uriAliases.end(); ++it)
 	{
 		if (URIUtility::matchPath(path, it->first))
 		{
-			return it;
+			RemoteObjects::const_iterator itRO = _remoteObjects.find(it->second);
+			if (itRO != _remoteObjects.end() && itRO->second->pListener.get() == &listener)
+			{
+				return it;
+			}
 		}
 	}
 	return _uriAliases.end();

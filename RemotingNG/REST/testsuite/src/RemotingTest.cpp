@@ -167,6 +167,8 @@ void RemotingTest::setUp()
 
 void RemotingTest::tearDown()
 {
+	if (!_otherObjectURI.empty()) TesterServerHelper::unregisterObject(_otherObjectURI);
+	if (!_otherListener.empty()) Poco::RemotingNG::ORB::instance().unregisterListener(_otherListener);
 	TesterServerHelper::unregisterObject(_objectURI);
 	Poco::RemotingNG::REST::TransportFactory::unregisterFactory();
 	Poco::RemotingNG::ORB::instance().unregisterListener(_listener);
@@ -284,6 +286,54 @@ void RemotingTest::testFault()
 }
 
 
+void RemotingTest::testAliasOtherListener()
+{
+	// The alias belongs to an object of the first Listener only.
+	Poco::RemotingNG::REST::Listener::Ptr pOtherListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2283");
+	_otherListener = Poco::RemotingNG::ORB::instance().registerListener(pOtherListener);
+
+	ITester::Ptr pTester = createProxy("http://127.0.0.1:2283/tester/{id}");
+	try
+	{
+		Object object;
+		object.data = "Object 1";
+		pTester->put(1, object);
+		fail("alias of an object of another listener - must throw");
+	}
+	catch (Poco::RemotingNG::REST::RESTServerException& exc)
+	{
+		assert (exc.status() == 404);
+	}
+}
+
+
+void RemotingTest::testAliasOnTwoListeners()
+{
+	// Each Listener serves its own object for an alias that both objects have,
+	// and unregistering one object leaves the alias of the other.
+	Poco::RemotingNG::REST::Listener::Ptr pOtherListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2283");
+	_otherListener = Poco::RemotingNG::ORB::instance().registerListener(pOtherListener);
+	Poco::SharedPtr<Tester> pOther = new Tester;
+	Poco::AutoPtr<TesterRemoteObject> pOtherRemoteObject = TesterServerHelper::createRemoteObject(pOther, "TheTester");
+	pOtherRemoteObject->remoting__setURI(Poco::URI("http://127.0.0.1:2283/tester/{id}"));
+	_otherObjectURI = TesterServerHelper::registerRemoteObject(pOtherRemoteObject, _otherListener);
+
+	ITester::Ptr pTester = createProxy(_publicURI);
+	ITester::Ptr pOtherTester = createProxy("http://127.0.0.1:2283/tester/{id}");
+	Object object;
+	object.data = "Object 1";
+	pTester->put(1, object);
+	object.data = "Object 2";
+	pOtherTester->put(1, object);
+	assert (pTester->get(1).data == "Object 1");
+	assert (pOtherTester->get(1).data == "Object 2");
+
+	TesterServerHelper::unregisterObject(_otherObjectURI);
+	_otherObjectURI.clear();
+	assert (pTester->get(1).data == "Object 1");
+}
+
+
 ITester::Ptr RemotingTest::createProxy(const std::string& uri)
 {
 	Poco::AutoPtr<TesterProxy> pProxy = new TesterProxy("TheTester");
@@ -319,6 +369,8 @@ CppUnit::Test* RemotingTestREST::suite()
 	CppUnit_addTest(pSuite, RemotingTestREST, testGetNotFound);
 	CppUnit_addTest(pSuite, RemotingTestREST, testCookie);
 	CppUnit_addTest(pSuite, RemotingTestREST, testFault);
+	CppUnit_addTest(pSuite, RemotingTestREST, testAliasOtherListener);
+	CppUnit_addTest(pSuite, RemotingTestREST, testAliasOnTwoListeners);
 
 	return pSuite;
 }
