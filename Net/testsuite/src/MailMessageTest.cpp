@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -629,8 +630,8 @@ void MailMessageTest::testReadRecipientsEncodedWords()
 	assertEqual ("b@no.where", recipients[3].getAddress());
 	assertEqual ("B, C", recipients[3].getRealName());
 
-	assertEqual ("evil@x.example, <jane@no.where>", message.get(MailMessage::HEADER_TO));
-	assertEqual ("evil@x.example, <jane@no.where>", message.getDecoded(MailMessage::HEADER_TO));
+	assertEqual ("\"evil@x.example,\" <jane@no.where>", message.get(MailMessage::HEADER_TO));
+	assertEqual ("\"evil@x.example,\" <jane@no.where>", message.getDecoded(MailMessage::HEADER_TO));
 	assertEqual ("Hello, world!\r\n", message.getContent());
 
 	std::istringstream istrUndecoded(
@@ -644,7 +645,7 @@ void MailMessageTest::testReadRecipientsEncodedWords()
 	assertEqual (1, messageUndecoded.recipients().size());
 	assertEqual ("=?UTF-8?Q?evil@x.example=2C?=", messageUndecoded.recipients()[0].getRealName());
 	assertEqual ("=?UTF-8?Q?evil@x.example=2C?= <jane@no.where>", messageUndecoded.get(MailMessage::HEADER_TO));
-	assertEqual ("evil@x.example, <jane@no.where>", messageUndecoded.getDecoded(MailMessage::HEADER_TO));
+	assertEqual ("\"evil@x.example,\" <jane@no.where>", messageUndecoded.getDecoded(MailMessage::HEADER_TO));
 	assertEqual ("Hello, world!\n", messageUndecoded.getContent());
 }
 
@@ -1399,6 +1400,506 @@ void MailMessageTest::testValidateHeaders()
 }
 
 
+void MailMessageTest::testReadMultiPartEncodedFileName()
+{
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Mime-Version: 1.0\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=\"=?UTF-8?B?w6TDtsO8LnR4dA==?=\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"a\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=\"=?UTF-8?Q?a=0Ab.txt?=\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"b\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=\"a=?b.txt\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"c\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=\"=?UTF-8?Q?a?= b.txt\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"d\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=\"=?UTF-8?Q?a?= =?UTF-8?Q?b.txt?=\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"e\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=\"=?UTF-8?B?PT9VVEYtOD9RP2E9M0Q/PQ==?=\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"f\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+	MailMessage message;
+	message.read(istr);
+
+	assertEqual (6, message.parts().size());
+	assertEqual ("\xC3\xA4\xC3\xB6\xC3\xBC.txt", message.parts()[0].name);
+	assertEqual ("\xC3\xA4\xC3\xB6\xC3\xBC.txt", message.parts()[0].pSource->filename());
+	assertEqual ("=?UTF-8?Q?a=0Ab.txt?=", message.parts()[1].name);
+	assertEqual ("=?UTF-8?Q?a=0Ab.txt?=", message.parts()[1].pSource->filename());
+	assertEqual ("a=?b.txt", message.parts()[2].pSource->filename());
+	assertEqual ("a b.txt", message.parts()[3].pSource->filename());
+	assertEqual ("ab.txt", message.parts()[4].pSource->filename());
+	assertEqual ("=?UTF-8?Q?a=3D?=", message.parts()[5].name);
+	assertEqual ("=?UTF-8?Q?a=3D?=", message.parts()[5].pSource->filename());
+	assertEqual ("attachment; filename=\"=?UTF-8?B?w6TDtsO8LnR4dA==?=\"", message.parts()[0].pSource->headers().get("Content-Disposition"));
+}
+
+
+void MailMessageTest::testWriteRejectsControlCharacterInEncodedText()
+{
+	MailMessage withRecipient;
+	withRecipient.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "j@no.where", "J\xC3\xB6rg\r\nBcc: evil@x.example"));
+	MailMessage withSender;
+	withSender.setSender("J\xC3\xB6rg\r\nBcc: evil@x.example <j@no.where>");
+	MailMessage withSubject;
+	withSubject.setSubject("\xC3\xA4\r\nBcc: evil@x.example");
+	MailMessage withGroup;
+	withGroup.set("Reply-To", "T\xC3\xA4m\r\nBcc: evil@x.example: a@no.where;");
+	for (const MailMessage* pMessage: {&withRecipient, &withSender, &withSubject, &withGroup})
+	{
+		std::ostringstream ostr;
+		try
+		{
+			pMessage->write(ostr);
+			fail("a control character must be rejected before the value is encoded");
+		}
+		catch (MessageException&)
+		{
+		}
+		assertTrue (ostr.str().empty());
+		try
+		{
+			pMessage->validateHeaders();
+			fail("a control character must be rejected before the value is encoded");
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+}
+
+
+void MailMessageTest::testWriteEncodesGroupName()
+{
+	MailMessage message;
+	message.setDate(Timestamp(0));
+	message.set("Reply-To", "T\xC3\xA4m: a@no.where;");
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertTrue (ostr.str().find("\r\nReply-To: =?UTF-8?q?T=C3=A4m?=: a@no.where;\r\n") != std::string::npos);
+
+	MailMessage invalid;
+	invalid.set("Reply-To", "J\xC3\xB6rg <unterminated");
+	std::ostringstream invalidStr;
+	try
+	{
+		invalid.write(invalidStr);
+		fail("a mailbox that cannot be parsed must not be written with non-ASCII text");
+	}
+	catch (MessageException&)
+	{
+	}
+	assertTrue (invalidStr.str().empty());
+	try
+	{
+		invalid.validateHeaders();
+		fail("a mailbox that cannot be parsed must not be written with non-ASCII text");
+	}
+	catch (MessageException&)
+	{
+	}
+}
+
+
+void MailMessageTest::testReadWriteEncodedFieldsUnchanged()
+{
+	const std::string msgin(
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: =?UTF-8?q?Ferenc_B=C5=91di?= <f@no.where>\r\n"
+		"Subject: =?UTF-8?B?R3LDvMOfZQ==?=\r\n"
+		"To: =?UTF-8?q?Doe=2C_J=C3=B6rg?= <j@no.where>\r\n"
+		"X-Raw: Gr\xC3\xBC\xC3\x9F" "e\r\n"
+		"\r\n"
+		"Hello, world!\r\n"
+	);
+	std::istringstream istr(msgin);
+	MailMessage message;
+	message.read(istr);
+	assertEqual ("Gr\xC3\xBC\xC3\x9F" "e", message.getSubject());
+	assertEqual ("Ferenc B\xC5\x91" "di <f@no.where>", message.getSender());
+	assertEqual (1, message.recipients().size());
+	assertEqual ("Doe, J\xC3\xB6rg", message.recipients()[0].getRealName());
+
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertEqual (msgin, ostr.str());
+}
+
+
+void MailMessageTest::testWriteEncodesNonAsciiText()
+{
+	const std::string sender("Ferenc B\xC5\x91" "di Kov\xC3\xA1" "cs <ferenc@no.where>");
+	const std::string subject("Gr\xC3\xBC\xC3\x9F" "e aus Ljubljana und Wien");
+	const std::string realName("Ren\xC3\xA9 Doe-Smith");
+	MailMessage message;
+	message.setDate(Timestamp(0));
+	message.setSender(sender);
+	message.setSubject(subject);
+	message.set("X-Note", "=?UTF-8?Q?a?=");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "rene@no.where", realName));
+	message.setContent("Hello, world!\r\n", MailMessage::ENCODING_8BIT);
+
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertEqual (
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"Content-Type: text/plain\r\n"
+		"From: =?UTF-8?q?Ferenc_B=C5=91di_Kov=C3=A1cs?= <ferenc@no.where>\r\n"
+		"Subject: =?UTF-8?q?Gr=C3=BC=C3=9Fe_aus_Ljubljana_und_Wien?=\r\n"
+		"X-Note: =?UTF-8?Q?a?=\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"To: =?UTF-8?q?Ren=C3=A9_Doe-Smith?= <rene@no.where>\r\n"
+		"\r\n"
+		"Hello, world!\r\n",
+		ostr.str());
+	assertEqual (subject, message.getSubject());
+
+	std::istringstream istr(ostr.str());
+	MailMessage messageRead;
+	messageRead.read(istr);
+	assertEqual (subject, messageRead.getSubject());
+	assertEqual (sender, messageRead.getSender());
+	assertEqual (1, messageRead.recipients().size());
+	assertEqual (realName, messageRead.recipients()[0].getRealName());
+
+	message.setSubject("\xC3\xA4\r\nBcc: x");
+	std::ostringstream invalidStr;
+	try
+	{
+		message.write(invalidStr);
+		fail("a control character must be rejected before the value is encoded");
+	}
+	catch (MessageException&)
+	{
+	}
+	assertTrue (invalidStr.str().empty());
+}
+
+
+void MailMessageTest::testEncodeWordB()
+{
+	assertEqual ("this is pure ASCII", MailMessage::encodeWord("this is pure ASCII", "UTF-8", MailMessage::WordEncoding::B));
+	assertEqual ("=?UTF-8?b?R3LDvMOfZQ==?=", MailMessage::encodeWord("Gr\xC3\xBC\xC3\x9F" "e", "UTF-8", MailMessage::WordEncoding::B));
+	assertEqual ("=?ISO-8859-1?b?xNY=?=", MailMessage::encodeWord("\304\326", "ISO-8859-1", MailMessage::WordEncoding::B));
+}
+
+
+void MailMessageTest::testEncodeWordAuto()
+{
+	assertEqual ("this is pure ASCII", MailMessage::encodeWord("this is pure ASCII", "UTF-8", MailMessage::WordEncoding::AUTO));
+	assertEqual ("=?UTF-8?q?Gr=C3=BC=C3=9Fe?=", MailMessage::encodeWord("Gr\xC3\xBC\xC3\x9F" "e"));
+	assertEqual ("=?UTF-8?b?R3LDvMOfZQ==?=", MailMessage::encodeWord("Gr\xC3\xBC\xC3\x9F" "e", "UTF-8", MailMessage::WordEncoding::AUTO));
+	assertEqual ("=?UTF-8?q?Gr=C3=BC=C3=9Fe_aus_Ljubljana_und_Wien?=",
+		MailMessage::encodeWord("Gr\xC3\xBC\xC3\x9F" "e aus Ljubljana und Wien", "UTF-8", MailMessage::WordEncoding::AUTO));
+	assertEqual ("=?UTF-8?q?Ferenc_B=C5=91di_Kov=C3=A1cs?=",
+		MailMessage::encodeWord("Ferenc B\xC5\x91" "di Kov\xC3\xA1" "cs", "UTF-8", MailMessage::WordEncoding::AUTO));
+}
+
+
+void MailMessageTest::testEncodeWordLength()
+{
+	assertEqual ("=?UTF-8?q?" + std::string(61, 'a') + "?=\r\n =?UTF-8?q?=C3=A4?=", MailMessage::encodeWord(std::string(61, 'a') + "\xC3\xA4"));
+
+	std::string text;
+	for (int i = 0; i < 40; ++i) text += "\xE2\x82\xAC";
+	for (const auto encoding: {MailMessage::WordEncoding::Q, MailMessage::WordEncoding::B})
+	{
+		const std::string encoded = MailMessage::encodeWord(text, "UTF-8", encoding);
+		assertEqual (text, MessageHeader::decodeWord(encoded));
+		std::string decodedWords;
+		std::string::size_type start = 0;
+		while (start < encoded.size())
+		{
+			const std::string::size_type end = std::min(encoded.find("\r\n ", start), encoded.size());
+			const std::string word = encoded.substr(start, end - start);
+			assertTrue (word.size() <= 75);
+			std::string decoded;
+			MessageHeader::decodeRFC2047(word, decoded);
+			assertTrue (!decoded.empty() && decoded.size() % 3 == 0);
+			assertEqual ("\xE2", decoded.substr(0, 1));
+			decodedWords += decoded;
+			start = end + 3;
+		}
+		assertEqual (text, decodedWords);
+	}
+}
+
+
+void MailMessageTest::testWriteEncodesShorterWord()
+{
+	MailMessage message;
+	message.setSubject("Gr\xC3\xBC\xC3\x9F" "e");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "j@no.where", "J\xC3\xB6rg Doe"));
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertTrue (ostr.str().find("\r\nSubject: =?UTF-8?b?R3LDvMOfZQ==?=\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nTo: =?UTF-8?b?SsO2cmcgRG9l?= <j@no.where>\r\n") != std::string::npos);
+}
+
+
+void MailMessageTest::testMove()
+{
+	MailMessage message;
+	message.setSubject("Test Message");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "jane.doe@no.where"));
+	message.addContent(new StringPartSource("Hello, world!\r\n", "text/plain"));
+	message.addAttachment("a.txt", new StringPartSource("a", "text/plain", "a.txt"));
+	const MailMessage::PartVec parts = message.parts();
+
+	MailMessage moved(std::move(message));
+	assertTrue (message.empty());
+	assertTrue (message.recipients().empty());
+	assertTrue (message.parts().empty());
+	assertEqual ("Test Message", moved.getSubject());
+	assertEqual (1, moved.recipients().size());
+	assertEqual (2, moved.parts().size());
+	assertTrue (moved.parts()[0].pSource == parts[0].pSource);
+	assertTrue (moved.parts()[1].pSource == parts[1].pSource);
+
+	MailMessage assigned;
+	assigned.addAttachment("b.txt", new StringPartSource("b", "text/plain", "b.txt"));
+	assigned = std::move(moved);
+	assertTrue (moved.empty());
+	assertTrue (moved.recipients().empty());
+	assertTrue (moved.parts().empty());
+	assertEqual ("Test Message", assigned.getSubject());
+	assertEqual (1, assigned.recipients().size());
+	assertEqual (2, assigned.parts().size());
+	assertTrue (assigned.parts()[0].pSource == parts[0].pSource);
+	assertTrue (assigned.parts()[1].pSource == parts[1].pSource);
+	std::ostringstream ostr;
+	assigned.write(ostr);
+	assertTrue (ostr.str().find("Hello, world!") != std::string::npos);
+
+	FilePartStoreFactory factory;
+	MailMessage messageWithStore(&factory);
+	MailMessage movedWithStore(std::move(messageWithStore));
+	std::unique_ptr<Poco::Net::PartSource> pStore(movedWithStore.createPartStore("a", "text/plain"));
+	assertTrue (dynamic_cast<FilePartStore*>(pStore.get()) != nullptr);
+	std::unique_ptr<Poco::Net::PartSource> pSource(messageWithStore.createPartStore("a", "text/plain"));
+	assertTrue (dynamic_cast<FilePartStore*>(pSource.get()) == nullptr);
+}
+
+
+void MailMessageTest::testWriteKeepsNonUTF8Text()
+{
+	MailMessage message;
+	message.setDate(Timestamp(0));
+	message.setSender("J\xF6rg <j@no.where>");
+	message.setSubject("Gr\xFC\xDF" "e");
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "r@no.where", "Ren\xE9"));
+	message.setContent("Hello, world!\r\n", MailMessage::ENCODING_8BIT);
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertEqual (
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"Content-Type: text/plain\r\n"
+		"From: J\xF6rg <j@no.where>\r\n"
+		"Subject: Gr\xFC\xDF" "e\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"To: \"Ren\xE9\" <r@no.where>\r\n"
+		"\r\n"
+		"Hello, world!\r\n",
+		ostr.str());
+}
+
+
+void MailMessageTest::testReadRecipientsDomainLiteral()
+{
+	std::istringstream istr(
+		"To: user@[IPv6:2001:db8::1], Name <n@[IPv6:2001:db8::2]>, a@[unterminated\r\n"
+		"\r\n"
+		"Hello, world!\r\n"
+	);
+	MailMessage message;
+	message.read(istr);
+	assertEqual (2, message.recipients().size());
+	assertEqual ("user@[IPv6:2001:db8::1]", message.recipients()[0].getAddress());
+	assertEqual ("n@[IPv6:2001:db8::2]", message.recipients()[1].getAddress());
+	assertEqual ("Name", message.recipients()[1].getRealName());
+
+	std::istringstream angleStr("To: Name <n@[a,b;c]>, x@y.example\r\n\r\n");
+	MailMessage angle;
+	angle.read(angleStr);
+	assertEqual (2, angle.recipients().size());
+	assertEqual ("n@[a,b;c]", angle.recipients()[0].getAddress());
+	assertEqual ("Name", angle.recipients()[0].getRealName());
+	assertEqual ("x@y.example", angle.recipients()[1].getAddress());
+
+	std::istringstream addrSpecStr("To: n@[a,b;c], x@y.example\r\n\r\n");
+	MailMessage addrSpec;
+	addrSpec.read(addrSpecStr);
+	assertEqual (2, addrSpec.recipients().size());
+	assertEqual ("n@[a,b;c]", addrSpec.recipients()[0].getAddress());
+	assertEqual ("x@y.example", addrSpec.recipients()[1].getAddress());
+}
+
+
+void MailMessageTest::testReadRecipientsMalformedDomainLiteral()
+{
+	for (const std::string to: {"<a@[x>, b@c.example", "a@[x, b@c.example", "a@[x[y], b@c.example"})
+	{
+		std::istringstream istr("To: " + to + "\r\n\r\n");
+		MailMessage message;
+		message.read(istr);
+		assertEqual (1, message.recipients().size());
+		assertEqual ("b@c.example", message.recipients()[0].getAddress());
+	}
+	for (const std::string prefix: {"", "=?UTF-8?Q?x?= "})
+	{
+		for (const std::string to: {"[", "<", "<a@[", "a@[", "[[", "<a@[x]"})
+		{
+			std::istringstream istr("To: " + prefix + to + "\r\n\r\n");
+			MailMessage message;
+			message.read(istr);
+			assertTrue (message.recipients().empty());
+		}
+	}
+}
+
+
+void MailMessageTest::testWriteEncodesNameWithComment()
+{
+	MailMessage message;
+	message.setSender("J\xC3\xB6rg (Sales) <j@x.example>");
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertTrue (ostr.str().find("\r\nFrom: =?UTF-8?b?SsO2cmc=?= (Sales) <j@x.example>\r\n") != std::string::npos);
+}
+
+
+void MailMessageTest::testWriteEncodesDomainLiteral()
+{
+	MailMessage message;
+	message.setDate(Timestamp(0));
+	message.setSender("J\xC3\xB6rg [a<b] <c@d.example>");
+	message.set("Cc", "a@[x, J\xC3\xB6rg <b@c.example>");
+	message.set("Reply-To", "<a@[x>, J\xC3\xB6rg <b@c.example>");
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertTrue (ostr.str().find("\r\nFrom: =?UTF-8?b?SsO2cmcgW2E8Yl0=?= <c@d.example>\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nCc: a@[x, =?UTF-8?b?SsO2cmc=?= <b@c.example>\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nReply-To: <a@[x>, =?UTF-8?b?SsO2cmc=?= <b@c.example>\r\n") != std::string::npos);
+}
+
+
+void MailMessageTest::testWriteEscapesPartParameters()
+{
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Mime-Version: 1.0\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=\"=?UTF-8?Q?a=22=3B_x=3D=22y?=\"\r\n"
+		"Content-Type: application/octet-stream; name=\"=?UTF-8?Q?n=22=3B_boundary=3D=22Z?=\"\r\n"
+		"\r\n"
+		"a\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+	MailMessage message;
+	message.read(istr);
+	assertEqual (1, message.parts().size());
+	assertEqual ("n\"; boundary=\"Z", message.parts()[0].name);
+	assertEqual ("a\"; x=\"y", message.parts()[0].pSource->filename());
+
+	std::ostringstream ostr;
+	message.write(ostr);
+	const std::string written = ostr.str();
+	assertTrue (written.find("\r\nContent-Type: application/octet-stream; name=\"n\\\"; boundary=\\\"Z\"\r\n") != std::string::npos);
+	assertTrue (written.find("\r\nContent-Disposition: attachment; filename=\"a\\\"; x=\\\"y\"\r\n") != std::string::npos);
+
+	std::istringstream istrWritten(written);
+	MailMessage messageWritten;
+	messageWritten.read(istrWritten);
+	assertEqual (1, messageWritten.parts().size());
+	assertEqual ("n\"; boundary=\"Z", messageWritten.parts()[0].name);
+	assertEqual ("a\"; x=\"y", messageWritten.parts()[0].pSource->filename());
+}
+
+
+void MailMessageTest::testWriteRealNameQuotedPair()
+{
+	MailMessage message;
+	message.addRecipient(MailRecipient(MailRecipient::PRIMARY_RECIPIENT, "r@no.where", "a\"b\\c"));
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertTrue (ostr.str().find("\r\nTo: \"a\\\"b\\\\c\" <r@no.where>\r\n") != std::string::npos);
+}
+
+
+void MailMessageTest::testReadRecipientsQuotedLocalPart()
+{
+	const auto readRecipients = [](const std::string& to)
+	{
+		std::istringstream istr("To: " + to + "\r\n\r\n");
+		MailMessage message;
+		message.read(istr);
+		return message.recipients();
+	};
+
+	const MailMessage::Recipients unbracketed = readRecipients("\"a,b\"@example.com, x@y.example");
+	assertEqual (2, unbracketed.size());
+	assertEqual ("\"a,b\"@example.com", unbracketed[0].getAddress());
+	assertEqual ("x@y.example", unbracketed[1].getAddress());
+
+	const MailMessage::Recipients atSign = readRecipients("\"a@evil.example\"@good.example");
+	assertEqual (1, atSign.size());
+	assertEqual ("\"a@evil.example\"@good.example", atSign[0].getAddress());
+
+	// An '@' inside the quotes is part of the local part, not the start of a domain.
+	const MailMessage::Recipients noDomain = readRecipients("\"a@b\", x@y.example");
+	assertEqual (1, noDomain.size());
+	assertEqual ("x@y.example", noDomain[0].getAddress());
+
+	const MailMessage::Recipients quotedPair = readRecipients("\"a\\\"b\"@example.com");
+	assertEqual (1, quotedPair.size());
+	assertEqual ("\"a\\\"b\"@example.com", quotedPair[0].getAddress());
+
+	const MailMessage::Recipients angle = readRecipients("Name <\"a,b\"@example.com>, x@y.example");
+	assertEqual (2, angle.size());
+	assertEqual ("\"a,b\"@example.com", angle[0].getAddress());
+	assertEqual ("Name", angle[0].getRealName());
+	assertEqual ("x@y.example", angle[1].getAddress());
+
+	const MailMessage::Recipients displayName = readRecipients("\"Doe, J\" <j@x.example>");
+	assertEqual (1, displayName.size());
+	assertEqual ("j@x.example", displayName[0].getAddress());
+	assertEqual ("Doe, J", displayName[0].getRealName());
+}
+
+
+void MailMessageTest::testWriteKeepsQuotedLocalPart()
+{
+	MailMessage message;
+	message.setSender("\"a<b\"@c.example");
+	message.set("Cc", "J\xC3\xB6rg <\"a<b\"@c.example>, \"x<y\"@d.example");
+	std::ostringstream ostr;
+	message.write(ostr);
+	assertTrue (ostr.str().find("\r\nFrom: \"a<b\"@c.example\r\n") != std::string::npos);
+	assertTrue (ostr.str().find("\r\nCc: =?UTF-8?b?SsO2cmc=?= <\"a<b\"@c.example>, \"x<y\"@d.example\r\n") != std::string::npos);
+}
+
+
 void MailMessageTest::setUp()
 {
 }
@@ -1448,6 +1949,25 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartLargeWithoutContentLength);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteFoldedField);
 	CppUnit_addTest(pSuite, MailMessageTest, testValidateHeaders);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartEncodedFileName);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteRejectsControlCharacterInEncodedText);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesGroupName);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteEncodedFieldsUnchanged);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesNonAsciiText);
+	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWordB);
+	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWordAuto);
+	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWordLength);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesShorterWord);
+	CppUnit_addTest(pSuite, MailMessageTest, testMove);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteKeepsNonUTF8Text);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsDomainLiteral);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsMalformedDomainLiteral);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesNameWithComment);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteEncodesDomainLiteral);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteEscapesPartParameters);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteRealNameQuotedPair);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadRecipientsQuotedLocalPart);
+	CppUnit_addTest(pSuite, MailMessageTest, testWriteKeepsQuotedLocalPart);
 
 	return pSuite;
 }

@@ -60,6 +60,18 @@ public:
 	void testReadDecodedControlCharacters();
 	void testAutoDecodeCopy();
 	void testStrictParsingCopy();
+	void testAutoDecodeAddressFields();
+	void testAutoDecodeDomainLiteral();
+	void testAutoDecodeQuotedLocalPart();
+	void testNoDecodeStructuredFields();
+	void testWriteReceivedForm();
+	void testEraseDropsReceivedForm();
+	void testCopyKeepsLimits();
+	void testMove();
+	void testSplitParametersDecodesNames();
+	void testSwapAndSecureClear();
+	void testSecureEraseIterator();
+	void testQuote();
 
 	void setUp();
 	void tearDown();

@@ -84,6 +84,11 @@ public:
 	void close() override;
 		/// Close the socket.
 
+	[[nodiscard]] poco_socket_t releaseSocket() override;
+		/// Not supported by a SecureStreamSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
 	int sendBytes(const void* buffer, int length, int flags = 0) override;
 		/// Sends the contents of the given buffer through
 		/// the socket. Any specified flags are ignored.
@@ -250,10 +255,10 @@ public:
 		/// the handshake.
 
 	// SocketImpl
-	virtual void setBlocking(bool flag) override;
-	[[nodiscard]] virtual bool getBlocking() const override;
-	virtual void setRawOption(int level, int option, const void* value, poco_socklen_t length) override;
-	virtual void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
+	void setBlocking(bool flag) override;
+	[[nodiscard]] bool getBlocking() const override;
+	void setRawOption(int level, int option, const void* value, poco_socklen_t length) override;
+	void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
 	
 protected:
 	void acceptSSL();

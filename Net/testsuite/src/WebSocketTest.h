@@ -28,6 +28,7 @@ public:
 
 	void testWebSocket();
 	void testBufVecOverloadsRefused();
+	void testReleaseSocketRefused();
 	void testWebSocketLarge();
 	void testWebSocketLargeInOneFrame();
 	void testWebSocketNB();

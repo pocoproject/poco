@@ -23,6 +23,7 @@
 #include "Poco/Net/QuotedPrintableEncoder.h"
 #include "Poco/Net/QuotedPrintableDecoder.h"
 #include "Poco/Net/NameValueCollection.h"
+#include "HeaderField.h"
 #include "Poco/Ascii.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/Base64Decoder.h"
@@ -33,11 +34,13 @@
 #include "Poco/String.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/TextIterator.h"
+#include "Poco/UTF8Encoding.h"
 #include <algorithm>
-#include <cstdint>
 #include <limits>
 #include <sstream>
 #include <string_view>
+#include <utility>
 
 
 using Poco::Base64Encoder;
@@ -152,186 +155,153 @@ namespace
 	};
 
 
-	bool skipComment(std::string_view::const_iterator& it, std::string_view::const_iterator end)
-		/// Skips a comment, which may be nested, starting at its opening parenthesis.
-		/// Returns false if the comment is not terminated.
+	bool isValidUTF8(const std::string& text)
+		/// Returns true if text is valid UTF-8.
 	{
-		int depth = 0;
-		while (it != end)
+		Poco::UTF8Encoding utf8;
+		Poco::TextIterator it(text, utf8);
+		const Poco::TextIterator end(text);
+		for (; it != end; ++it)
 		{
-			const char ch = *it++;
-			if (ch == '\\')
-			{
-				if (it == end) return false;
-				++it;
-			}
-			else if (ch == '(') ++depth;
-			else if (ch == ')' && --depth == 0) return true;
+			if (*it < 0) return false;
 		}
-		return false;
+		return true;
 	}
 
 
-	bool readQuotedString(std::string_view::const_iterator& it, std::string_view::const_iterator end, std::string& text)
-		/// Appends the content of a quoted string, starting at its opening quote, to text.
-		/// Returns false if the quoted string is not terminated.
+	constexpr std::string::size_type MAX_ENCODED_WORD_LENGTH = 75; // RFC 2047, section 2
+	constexpr std::string::size_type MAX_UTF8_CHARACTER_LENGTH = 4;
+	constexpr unsigned char UTF8_CONTINUATION_MASK = 0xC0;
+	constexpr unsigned char UTF8_CONTINUATION_BITS = 0x80;
+	constexpr std::string_view ENCODED_WORD_END("?=");
+	// Encoded words of the "Q" encoding end after white space from this length on, or at
+	// the second length, as earlier versions wrote them.
+	constexpr std::string::size_type Q_WORD_LENGTH_BREAK_AT_SPACE = 64;
+	constexpr std::string::size_type Q_WORD_LENGTH_BREAK = 72;
+
+
+	std::string::size_type characterLength(const std::string& text, std::string::size_type pos, bool isUTF8)
+		/// Returns the number of bytes of the character at pos: in UTF-8 the
+		/// first byte and the continuation bytes after it, otherwise one.
 	{
-		++it;
-		while (it != end)
+		std::string::size_type length = 1;
+		while (isUTF8 && length < MAX_UTF8_CHARACTER_LENGTH && pos + length < text.size()
+			&& (static_cast<unsigned char>(text[pos + length]) & UTF8_CONTINUATION_MASK) == UTF8_CONTINUATION_BITS)
+			++length;
+		return length;
+	}
+
+
+	void appendQ(char ch, std::string& encodedText)
+		/// Appends a byte in the "Q" encoding. The specials of RFC 5322 are encoded
+		/// too, so that an encoded word can be a display name.
+	{
+		switch (ch)
 		{
-			const char ch = *it++;
-			if (ch == '"') return true;
-			if (ch == '\\')
+		case ' ':
+			encodedText += '_';
+			break;
+		case '=':
+		case '?':
+		case '_':
+		case '(':
+		case ')':
+		case '[':
+		case ']':
+		case '<':
+		case '>':
+		case ',':
+		case ';':
+		case ':':
+		case '.':
+		case '@':
+		case '"':
+		case '\\':
+			encodedText += '=';
+			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
+			break;
+		default:
+			if (ch > 32 && ch < 127)
 			{
-				if (it == end) return false;
-				text += *it++;
-			}
-			else text += ch;
-		}
-		return false;
-	}
-
-
-	bool readAngleAddress(std::string_view::const_iterator& it, std::string_view::const_iterator end, std::string& address)
-		/// Reads an address enclosed in angle brackets, starting at the opening bracket.
-		/// Returns false if the address is not terminated by '>'.
-	{
-		// Stopping at ',' keeps an unterminated address from taking in the next mailbox.
-		const auto close = std::find_if(it + 1, end, [](char c) { return c == '>' || c == ',' || c == '<'; });
-		address.assign(it + 1, close);
-		Poco::trimInPlace(address);
-		const bool terminated = close != end && *close == '>';
-		it = terminated ? close + 1 : close;
-		return terminated;
-	}
-
-
-	struct Mailbox
-	{
-		std::string phrase;
-		std::string address;
-		bool hasAngleAddress = false;
-		bool valid = true;
-	};
-
-
-	char readMailbox(std::string_view::const_iterator& it, std::string_view::const_iterator end, Mailbox& mailbox)
-		/// Reads a mailbox up to the next ',', ';' or ':' outside of quoted strings,
-		/// comments and angle brackets. Returns that delimiter, or '\0' at the end.
-	{
-		while (it != end)
-		{
-			const char ch = *it;
-			if (ch == ',' || ch == ';' || ch == ':')
-			{
-				++it;
-				return ch;
-			}
-			if (ch == '(')
-			{
-				if (!skipComment(it, end)) mailbox.valid = false;
-			}
-			else if (Poco::Ascii::isSpace(ch))
-			{
-				if (!mailbox.phrase.empty() && mailbox.phrase.back() != ' ') mailbox.phrase += ' ';
-				++it;
-			}
-			else if (mailbox.hasAngleAddress)
-			{
-				mailbox.valid = false;
-				++it;
-			}
-			else if (ch == '"')
-			{
-				if (!readQuotedString(it, end, mailbox.phrase)) mailbox.valid = false;
-			}
-			else if (ch == '<')
-			{
-				if (!readAngleAddress(it, end, mailbox.address)) mailbox.valid = false;
-				mailbox.hasAngleAddress = true;
+				encodedText += ch;
 			}
 			else
 			{
-				mailbox.phrase += ch;
-				++it;
+				encodedText += '=';
+				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
 			}
 		}
-		return '\0';
 	}
 
 
-	void addMailbox(Mailbox& mailbox, MailRecipient::RecipientType type, MailMessage::Recipients& recipients)
-		/// Appends a recipient for the mailbox, unless it is not valid.
+	std::string encodeQ(const std::string& text, const std::string& charset)
 	{
-		Poco::trimInPlace(mailbox.phrase);
-		if (!mailbox.valid) return;
-		if (mailbox.hasAngleAddress && !mailbox.address.empty())
-			recipients.emplace_back(type, mailbox.address, mailbox.phrase);
-		else if (!mailbox.hasAngleAddress && mailbox.phrase.find('@') != std::string::npos
-			&& std::none_of(mailbox.phrase.begin(), mailbox.phrase.end(), Poco::Ascii::isSpace))
-			recipients.emplace_back(type, mailbox.phrase);
-	}
-
-
-	void parseAddressList(std::string_view list, MailRecipient::RecipientType type, MailMessage::Recipients& recipients)
-		/// Appends a recipient of the given type for every mailbox of an RFC 5322
-		/// address list, including the members of groups. A mailbox that cannot be
-		/// parsed is skipped.
-	{
-		bool inGroup = false;
-		auto it = list.begin();
-		const auto end = list.end();
-		while (it != end)
+		const bool isUTF8 = icompare(charset, "UTF-8") == 0;
+		const std::string wordStart = "=?" + charset + "?q?";
+		std::string encodedText;
+		std::string::size_type lineLength = 0;
+		std::string::size_type pos = 0;
+		while (pos < text.size())
 		{
-			Mailbox mailbox;
-			char delimiter = readMailbox(it, end, mailbox);
-			while (delimiter == ':' && (inGroup || mailbox.hasAngleAddress))
+			const std::string::size_type length = characterLength(text, pos, isUTF8);
+			std::string character;
+			for (std::string::size_type i = pos; i < pos + length; ++i) appendQ(text[i], character);
+			if (lineLength > 0 && lineLength + character.size() + ENCODED_WORD_END.size() > MAX_ENCODED_WORD_LENGTH)
 			{
-				mailbox.valid = false;
-				delimiter = readMailbox(it, end, mailbox);
+				encodedText += "?=\r\n ";
+				lineLength = 0;
 			}
-			if (delimiter == ':')
+			if (lineLength == 0)
 			{
-				// The display name of a group is not a recipient.
-				inGroup = true;
-				continue;
+				encodedText += wordStart;
+				lineLength = wordStart.size();
 			}
-			// ';' ends a group; it also separates mailboxes in lists written by some clients.
-			if (delimiter == ';') inGroup = false;
-			addMailbox(mailbox, type, recipients);
+			encodedText += character;
+			lineLength += character.size();
+			const char ch = text[pos];
+			pos += length;
+			const bool isSpace = ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n';
+			if (pos < text.size() && ((lineLength >= Q_WORD_LENGTH_BREAK_AT_SPACE && isSpace) || lineLength >= Q_WORD_LENGTH_BREAK))
+			{
+				encodedText += "?=\r\n ";
+				lineLength = 0;
+			}
 		}
+		encodedText += ENCODED_WORD_END;
+		return encodedText;
 	}
 
 
-	std::string readHeaderBlock(std::istream& istr, const MessageHeader& header)
-		/// Reads the header fields up to, but not including, the empty line that ends them.
-		/// Throws a MessageException if the fields are longer than MessageHeader::read()
-		/// accepts with the limits of the given header.
+	std::string encodeB(const std::string& text, const std::string& charset)
 	{
-		static constexpr int eof = std::char_traits<char>::eof();
-		// Per field: the name, the colon, white space before the value, the value and a
-		// line break for every line; each folded line adds at least one character to the value.
-		const std::uint64_t maxFieldSize = static_cast<std::uint64_t>(header.getNameLengthLimit())
-			+ 4 * static_cast<std::uint64_t>(header.getValueLengthLimit()) + 3;
-		const std::uint64_t maxSize = header.getFieldLimit() > 0
-			? maxFieldSize * static_cast<std::uint64_t>(header.getFieldLimit())
-			: std::numeric_limits<std::uint64_t>::max();
-		// Per line: the name, the colon, white space before the value (limited in strict
-		// parsing to the value length), the value and CR LF.
-		const std::uint64_t maxLineSize = static_cast<std::uint64_t>(header.getNameLengthLimit())
-			+ 2 * static_cast<std::uint64_t>(header.getValueLengthLimit()) + 3;
-		std::streambuf& buf = *istr.rdbuf();
-		std::string block;
-		std::uint64_t lineSize = 0;
-		int ch = buf.sgetc();
-		while (ch != eof && !(lineSize == 0 && (ch == '\r' || ch == '\n')))
+		const bool isUTF8 = icompare(charset, "UTF-8") == 0;
+		const std::string wordStart = "=?" + charset + "?b?";
+		const std::string::size_type overhead = wordStart.size() + ENCODED_WORD_END.size();
+		// Base64 writes 4 characters for every 3 bytes.
+		const std::string::size_type maxBytes = overhead < MAX_ENCODED_WORD_LENGTH ? (MAX_ENCODED_WORD_LENGTH - overhead) / 4 * 3 : 0;
+		std::string encodedText;
+		std::string::size_type pos = 0;
+		while (pos < text.size())
 		{
-			if (block.size() >= maxSize || lineSize >= maxLineSize) throw MessageException("Message header too long");
-			block += static_cast<char>(buf.sbumpc());
-			lineSize = (ch == '\n') ? 0 : lineSize + 1;
-			ch = buf.sgetc();
+			std::string::size_type length = characterLength(text, pos, isUTF8);
+			while (pos + length < text.size())
+			{
+				const std::string::size_type next = characterLength(text, pos + length, isUTF8);
+				if (length + next > maxBytes) break;
+				length += next;
+			}
+			std::ostringstream ostr;
+			Base64Encoder encoder(ostr);
+			encoder.rdbuf()->setLineLength(0);
+			encoder.write(text.data() + pos, static_cast<std::streamsize>(length));
+			encoder.close();
+			if (!encodedText.empty()) encodedText += "\r\n ";
+			encodedText += wordStart;
+			encodedText += ostr.str();
+			encodedText += ENCODED_WORD_END;
+			pos += length;
 		}
-		return block;
+		return encodedText;
 	}
 }
 
@@ -362,6 +332,42 @@ MailMessage::MailMessage(PartStoreFactory* pStoreFactory):
 	Poco::Timestamp now;
 	setDate(now);
 	setContentType("text/plain");
+}
+
+
+MailMessage::MailMessage(MailMessage&& message) noexcept:
+	MessageHeader(std::move(message)),
+	_recipients(std::exchange(message._recipients, {})),
+	_parts(std::exchange(message._parts, {})),
+	_content(std::exchange(message._content, {})),
+	_encoding(message._encoding),
+	_boundary(std::exchange(message._boundary, {})),
+	_pStoreFactory(std::exchange(message._pStoreFactory, nullptr)),
+	_isMultipart(std::exchange(message._isMultipart, false)),
+	_recipientsChanged(std::exchange(message._recipientsChanged, false))
+{
+}
+
+
+MailMessage& MailMessage::operator = (MailMessage&& message) noexcept
+{
+	if (&message != this)
+	{
+		MessageHeader::operator = (std::move(message));
+		for (const auto& part: _parts)
+		{
+			delete part.pSource;
+		}
+		_recipients = std::exchange(message._recipients, {});
+		_parts = std::exchange(message._parts, {});
+		_content = std::exchange(message._content, {});
+		_encoding = message._encoding;
+		_boundary = std::exchange(message._boundary, {});
+		_pStoreFactory = std::exchange(message._pStoreFactory, nullptr);
+		_isMultipart = std::exchange(message._isMultipart, false);
+		_recipientsChanged = std::exchange(message._recipientsChanged, false);
+	}
+	return *this;
 }
 
 
@@ -531,6 +537,9 @@ void MailMessage::write(std::ostream& ostr) const
 	// Every recipient receives the written header, so a Bcc field would disclose the blind copies.
 	header.erase(HEADER_BCC);
 	if (_recipientsChanged) setRecipientHeaders(header);
+	// A control character must be rejected before encoding would hide it in an encoded word.
+	checkFields(header, true);
+	encodeFields(header);
 	if (isMultipart())
 	{
 		writeMultipart(header, ostr);
@@ -550,6 +559,7 @@ void MailMessage::validateHeaders() const
 	header.erase(HEADER_BCC);
 	if (_recipientsChanged) setRecipientHeaders(header);
 	checkFields(header, true);
+	encodeFields(header);
 	for (const auto& part: _parts)
 	{
 		checkFields(createPartHeader(part), true);
@@ -657,38 +667,19 @@ void MailMessage::readHeader(std::istream& istr)
 {
 	clear();
 	_recipients.clear();
-	const std::string block = readHeaderBlock(istr, *this);
-	std::istringstream blockStream(block);
-	MessageHeader::read(blockStream);
+	MessageHeader::read(istr);
 	istr.get(); // \r
 	if ('\n' == istr.peek()) istr.get(); // \n
 
-	// The address lists are parsed undecoded: a decoded encoded word could
-	// contain a ',' or '<' and so add a recipient.
-	MessageHeader rawHeader;
-	rawHeader.setFieldLimit(getFieldLimit());
-	rawHeader.setNameLengthLimit(getNameLengthLimit());
-	rawHeader.setValueLengthLimit(getValueLengthLimit());
-	rawHeader.setStrictParsing(getStrictParsing());
-	rawHeader.setAutoDecode(false);
-	std::istringstream rawStream(block);
-	rawHeader.read(rawStream);
-	for (const auto& [name, value]: rawHeader)
+	// Decoding keeps the mailboxes of an address list, so the recipients are parsed from the stored values.
+	for (const auto& [name, value]: *this)
 	{
 		if (icompare(name, HEADER_TO) == 0)
-			parseAddressList(value, MailRecipient::PRIMARY_RECIPIENT, _recipients);
+			HeaderField::parseAddressList(value, MailRecipient::PRIMARY_RECIPIENT, _recipients);
 		else if (icompare(name, HEADER_CC) == 0)
-			parseAddressList(value, MailRecipient::CC_RECIPIENT, _recipients);
+			HeaderField::parseAddressList(value, MailRecipient::CC_RECIPIENT, _recipients);
 		else if (icompare(name, HEADER_BCC) == 0)
-			parseAddressList(value, MailRecipient::BCC_RECIPIENT, _recipients);
-	}
-	if (getAutoDecode())
-	{
-		for (auto& recipient: _recipients)
-		{
-			const std::string realName = decodeWord(recipient.getRealName());
-			if (std::none_of(realName.begin(), realName.end(), isInvalidValueChar)) recipient.setRealName(realName);
-		}
+			HeaderField::parseAddressList(value, MailRecipient::BCC_RECIPIENT, _recipients);
 	}
 	_recipientsChanged = false;
 }
@@ -768,9 +759,12 @@ void MailMessage::setRecipientHeaders(MessageHeader& headers) const
 		switch (rec.getType())
 		{
 		case MailRecipient::PRIMARY_RECIPIENT:
+			// A control character must be rejected before encoding would hide it in an encoded word.
+			checkFieldValue(HEADER_TO, rec.getRealName(), true);
 			appendRecipient(rec, to);
 			break;
 		case MailRecipient::CC_RECIPIENT:
+			checkFieldValue(HEADER_CC, rec.getRealName(), true);
 			appendRecipient(rec, cc);
 			break;
 		case MailRecipient::BCC_RECIPIENT:
@@ -787,6 +781,21 @@ void MailMessage::setRecipientHeaders(MessageHeader& headers) const
 	{
 		headers.erase(HEADER_CC);
 		headers.set(HEADER_CC, cc);
+	}
+}
+
+
+void MailMessage::encodeFields(MessageHeader& header) const
+{
+	for (auto& [name, value]: header)
+	{
+		const HeaderField::Syntax syntax = HeaderField::syntax(name);
+		if (syntax == HeaderField::Syntax::STRUCTURED || isReceived(name, value)
+			|| std::all_of(value.begin(), value.end(), Poco::Ascii::isAscii) || !isValidUTF8(value))
+			continue;
+		// Every CR LF in a checked value folds it; encoded, it would become text.
+		const std::string text = Poco::replace(value, "\r\n", "");
+		value = syntax == HeaderField::Syntax::ADDRESS_LIST ? HeaderField::encodeAddressList(text) : encodeWord(text, "UTF-8", WordEncoding::AUTO);
 	}
 }
 
@@ -826,11 +835,14 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 	const std::string& realName = recipient.getRealName();
 	const std::string& address  = recipient.getAddress();
 	std::string rec;
-	if (!realName.empty())
+	if (!std::all_of(realName.begin(), realName.end(), Poco::Ascii::isAscii) && isValidUTF8(realName))
 	{
-		// A '"' or '\' in the name is written as a quoted-pair (RFC 5322) so that it
-		// cannot end the quoted string; an escaped name always needs quoting.
-		quote(Poco::replace(Poco::replace(realName, "\\", "\\\\"), "\"", "\\\""), rec, true);
+		rec = encodeWord(Poco::replace(realName, "\r\n", ""), "UTF-8", WordEncoding::AUTO);
+		rec.append(" ");
+	}
+	else if (!realName.empty())
+	{
+		quote(realName, rec, true);
 		rec.append(" ");
 	}
 	rec.append("<");
@@ -841,71 +853,17 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 }
 
 
-std::string MailMessage::encodeWord(const std::string& text, const std::string& charset)
+std::string MailMessage::encodeWord(const std::string& text, const std::string& charset, WordEncoding encoding)
 {
 	if (std::none_of(text.begin(), text.end(),
 		[](char ch) { return static_cast<unsigned char>(ch) > 127; }))
 		return text;
 
-	std::string encodedText;
-	std::string::size_type lineLength = 0;
-	for (auto ch: text)
-	{
-		if (lineLength == 0)
-		{
-			encodedText += "=?";
-			encodedText += charset;
-			encodedText += "?q?";
-			lineLength += charset.length() + 5;
-		}
-		switch (ch)
-		{
-		case ' ':
-			encodedText += '_';
-			lineLength++;
-			break;
-		case '=':
-		case '?':
-		case '_':
-		case '(':
-		case ')':
-		case '[':
-		case ']':
-		case '<':
-		case '>':
-		case ',':
-		case ';':
-		case ':':
-		case '.':
-		case '@':
-			encodedText += '=';
-			NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
-			lineLength += 3;
-			break;
-		default:
-			if (ch > 32 && ch < 127)
-			{
-				encodedText += ch;
-				lineLength++;
-			}
-			else
-			{
-				encodedText += '=';
-				NumberFormatter::appendHex(encodedText, static_cast<unsigned>(static_cast<unsigned char>(ch)), 2);
-				lineLength += 3;
-			}
-		}
-		if ((lineLength >= 64 && (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n')) || lineLength >= 72)
-		{
-			encodedText += "?=\r\n ";
-			lineLength = 0;
-		}
-	}
-	if (lineLength > 0)
-	{
-		encodedText += "?=";
-	}
-	return encodedText;
+	if (encoding == WordEncoding::Q) return encodeQ(text, charset);
+	if (encoding == WordEncoding::B) return encodeB(text, charset);
+	std::string q = encodeQ(text, charset);
+	std::string b = encodeB(text, charset);
+	return b.size() < q.size() ? b : q;
 }
 
 

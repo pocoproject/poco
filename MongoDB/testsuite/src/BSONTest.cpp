@@ -416,6 +416,39 @@ void BSONTest::testArrayIndexAccess()
 }
 
 
+void BSONTest::testArrayGetInteger()
+{
+	Array::Ptr arr = new Array();
+	arr->add(static_cast<Poco::Int32>(32));
+	arr->add(static_cast<Poco::Int64>(64));
+	arr->add(128.0);
+	arr->add("text"s);
+
+	assertEqual(arr->getInteger(0), 32);
+	assertEqual(arr->getInteger(1), 64);
+	assertEqual(arr->getInteger(2), 128);
+	assertEqual(arr->getInteger("1"s), 64);
+
+	try
+	{
+		(void) arr->getInteger(4);
+		fail("getInteger() must throw for a missing element");
+	}
+	catch (const Poco::NotFoundException&)
+	{
+	}
+
+	try
+	{
+		(void) arr->getInteger(3);
+		fail("getInteger() must throw for an element that is not a number");
+	}
+	catch (const Poco::BadCastException&)
+	{
+	}
+}
+
+
 void BSONTest::testArrayNested()
 {
 	Document::Ptr doc = new Document();
@@ -2563,6 +2596,7 @@ CppUnit::Test* BSONTest::suite()
 	// Array tests
 	CppUnit_addTest(pSuite, BSONTest, testArray);
 	CppUnit_addTest(pSuite, BSONTest, testArrayIndexAccess);
+	CppUnit_addTest(pSuite, BSONTest, testArrayGetInteger);
 	CppUnit_addTest(pSuite, BSONTest, testArrayNested);
 
 	// Type tests

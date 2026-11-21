@@ -33,6 +33,10 @@ public:
 	~ServerApplicationTest() override;
 		/// Destroys the ServerApplicationTest.
 
+	void testOverriddenWaitForTerminationRequest();
+		/// Checks that main() of a base class calls the
+		/// waitForTerminationRequest() of a derived class.
+
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_FORK_EXEC) && POCO_OS != POCO_OS_ANDROID
 	void testDaemonParentSkipsExitHandlers();
 		/// Checks that the foreground process of a daemon writes buffered

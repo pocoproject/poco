@@ -58,6 +58,7 @@ public:
 	void testEchoUnixLocal();
 	void testUnixLocalAbstract();
 	void testUseFd();
+	void testReleaseSocket();
 	void testSendFile();
 	void testSendFileLarge();
 	void testSendFileRange();

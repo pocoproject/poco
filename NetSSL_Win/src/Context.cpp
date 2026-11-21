@@ -29,9 +29,28 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <memory>
 
 
 namespace Poco::Net {
+
+
+namespace {
+
+
+struct CertStoreCloser
+{
+	void operator () (HCERTSTORE hStore) const
+	{
+		::CertCloseStore(hStore, 0);
+	}
+};
+
+
+using CertStorePtr = std::unique_ptr<void, CertStoreCloser>;
+
+
+} // namespace
 
 
 const std::string Context::CERT_STORE_MY("MY");
@@ -92,40 +111,47 @@ void Context::init()
 	_hCreds.dwLower = 0;
 	_hCreds.dwUpper = 0;
 
-	_hMemCertStore = CertOpenStore(
+	// The members take the stores only when nothing can throw any more: the destructor
+	// does not run when the constructor throws.
+	CertStorePtr pMemCertStore(::CertOpenStore(
 					CERT_STORE_PROV_MEMORY,   // The memory provider type
 					0,                        // The encoding type is not needed
 					0,                        // Use the default provider
 					0,                        // Accept the default dwFlags
-					nullptr);                 // pvPara is not used
+					nullptr));                // pvPara is not used
 
-	if (!_hMemCertStore)
+	if (pMemCertStore == nullptr)
 		throw SSLException("Failed to create memory certificate store", GetLastError());
 
-	_hCollectionCertStore = CertOpenStore(
+	CertStorePtr pCollectionCertStore(::CertOpenStore(
 			CERT_STORE_PROV_COLLECTION, // A collection store
 			0,                          // Encoding type; not used with a collection store
 			0,                          // Use the default provider
 			0,                          // No flags
-			nullptr);                   // Not needed
+			nullptr));                  // Not needed
 
-	if (!_hCollectionCertStore)
+	if (pCollectionCertStore == nullptr)
 		throw SSLException("Failed to create collection store", GetLastError());
 
-	if (!CertAddStoreToCollection(_hCollectionCertStore, _hMemCertStore, CERT_PHYSICAL_STORE_ADD_ENABLE_FLAG, 1))
+	if (!::CertAddStoreToCollection(pCollectionCertStore.get(), pMemCertStore.get(), CERT_PHYSICAL_STORE_ADD_ENABLE_FLAG, 1))
 		throw SSLException("Failed to add memory certificate store to collection store", GetLastError());
 
+	CertStorePtr pRootCertStore;
 	if (_options & OPT_TRUST_ROOTS_WIN_CERT_STORE)
 	{
 		// add root certificates
 		std::wstring rootStore;
 		Poco::UnicodeConverter::convert(CERT_STORE_ROOT, rootStore);
-		_hRootCertStore = CertOpenSystemStoreW(0, rootStore.c_str());
-		if (!_hRootCertStore)
+		pRootCertStore.reset(::CertOpenSystemStoreW(0, rootStore.c_str()));
+		if (pRootCertStore == nullptr)
 			throw SSLException("Failed to open root certificate store", GetLastError());
-		if (!CertAddStoreToCollection(_hCollectionCertStore, _hRootCertStore, CERT_PHYSICAL_STORE_ADD_ENABLE_FLAG, 1))
+		if (!::CertAddStoreToCollection(pCollectionCertStore.get(), pRootCertStore.get(), CERT_PHYSICAL_STORE_ADD_ENABLE_FLAG, 1))
 			throw SSLException("Failed to add root certificate store to collection store", GetLastError());
 	}
+
+	_hMemCertStore = pMemCertStore.release();
+	_hCollectionCertStore = pCollectionCertStore.release();
+	_hRootCertStore = pRootCertStore.release();
 }
 
 

@@ -39,62 +39,67 @@ public:
 		/// Creates a WebSocketImpl.
 
 	// StreamSocketImpl
-	virtual int sendBytes(const void* buffer, int length, int flags);
+	int sendBytes(const void* buffer, int length, int flags) override;
 		/// Sends a WebSocket protocol frame.
 		///
 		/// See WebSocket::sendFrame() for more information, including
 		/// behavior if set to non-blocking.
 
-	virtual int receiveBytes(void* buffer, int length, int flags);
+	int receiveBytes(void* buffer, int length, int flags) override;
 		/// Receives a WebSocket protocol frame.
 		///
 		/// See WebSocket::receiveFrame() for more information, including
 		/// behavior if set to non-blocking.
 
-	virtual int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& span = 0);
+	int receiveBytes(Poco::Buffer<char>& buffer, int flags = 0, const Poco::Timespan& span = 0) override;
 		/// Receives a WebSocket protocol frame.
 		///
 		/// See WebSocket::receiveFrame() for more information, including
 		/// behavior if set to non-blocking.
 
-	virtual int sendBytes(const SocketBufVec& buffers, int flags = 0);
+	int sendBytes(const SocketBufVec& buffers, int flags = 0) override;
 		/// Not supported by a WebSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	virtual int receiveBytes(SocketBufVec& buffers, int flags = 0);
+	int receiveBytes(SocketBufVec& buffers, int flags = 0) override;
 		/// Not supported by a WebSocket.
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
-	virtual void connect(const SocketAddress& address);
-	virtual void connect(const SocketAddress& address, const Poco::Timespan& timeout);
-	virtual void connectNB(const SocketAddress& address);
-	virtual void bind(const SocketAddress& address, bool reuseAddress = false);
-	virtual void bind(const SocketAddress& address, bool reuseAddress, bool reusePort);
-	virtual void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
-	virtual void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only);
-	virtual void listen(int backlog = 64);
-	virtual void close();
-	virtual void shutdownReceive();
-	virtual int shutdownSend();
-	virtual int shutdown();
-	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
-	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
-	virtual void sendUrgent(unsigned char data);
-	[[nodiscard]] virtual int available();
-	[[nodiscard]] virtual bool secure() const;
-	virtual void setSendBufferSize(int size);
-	[[nodiscard]] virtual int getSendBufferSize();
-	virtual void setReceiveBufferSize(int size);
-	[[nodiscard]] virtual int getReceiveBufferSize();
-	virtual void setSendTimeout(const Poco::Timespan& timeout);
-	[[nodiscard]] virtual Poco::Timespan getSendTimeout();
-	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
-	[[nodiscard]] virtual Poco::Timespan getReceiveTimeout();
-	virtual void setBlocking(bool flag);
-	[[nodiscard]] virtual bool getBlocking() const;
+	[[nodiscard]] poco_socket_t releaseSocket() override;
+		/// Not supported by a WebSocket.
+		///
+		/// Throws a Poco::InvalidAccessException.
+
+	SocketImpl* acceptConnection(SocketAddress& clientAddr) override;
+	void connect(const SocketAddress& address) override;
+	void connect(const SocketAddress& address, const Poco::Timespan& timeout) override;
+	void connectNB(const SocketAddress& address) override;
+	void bind(const SocketAddress& address, bool reuseAddress = false) override;
+	void bind(const SocketAddress& address, bool reuseAddress, bool reusePort) override;
+	void bind6(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false) override;
+	void bind6(const SocketAddress& address, bool reuseAddress, bool reusePort, bool ipV6Only) override;
+	void listen(int backlog = 64) override;
+	void close() override;
+	void shutdownReceive() override;
+	int shutdownSend() override;
+	int shutdown() override;
+	int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0) override;
+	int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0) override;
+	void sendUrgent(unsigned char data) override;
+	[[nodiscard]] int available() override;
+	[[nodiscard]] bool secure() const override;
+	void setSendBufferSize(int size) override;
+	[[nodiscard]] int getSendBufferSize() override;
+	void setReceiveBufferSize(int size) override;
+	[[nodiscard]] int getReceiveBufferSize() override;
+	void setSendTimeout(const Poco::Timespan& timeout) override;
+	[[nodiscard]] Poco::Timespan getSendTimeout() override;
+	void setReceiveTimeout(const Poco::Timespan& timeout) override;
+	[[nodiscard]] Poco::Timespan getReceiveTimeout() override;
+	void setBlocking(bool flag) override;
+	[[nodiscard]] bool getBlocking() const override;
 
 	// Internal
 	[[nodiscard]] int frameFlags() const;
@@ -171,7 +176,7 @@ protected:
 	[[nodiscard]] int receiveNBytes(void* buffer, int length);
 	[[nodiscard]] int receiveSomeBytes(char* buffer, int length);
 	[[nodiscard]] int peekSomeBytes(char* buffer, int length);
-	virtual ~WebSocketImpl();
+	~WebSocketImpl() override;
 
 private:
 	WebSocketImpl();

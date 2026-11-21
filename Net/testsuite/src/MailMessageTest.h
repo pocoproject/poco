@@ -59,6 +59,25 @@ public:
 	void testReadMultiPartLargeWithoutContentLength();
 	void testWriteFoldedField();
 	void testValidateHeaders();
+	void testReadMultiPartEncodedFileName();
+	void testWriteRejectsControlCharacterInEncodedText();
+	void testWriteEncodesGroupName();
+	void testReadWriteEncodedFieldsUnchanged();
+	void testWriteEncodesNonAsciiText();
+	void testEncodeWordB();
+	void testEncodeWordAuto();
+	void testEncodeWordLength();
+	void testWriteEncodesShorterWord();
+	void testMove();
+	void testWriteKeepsNonUTF8Text();
+	void testReadRecipientsDomainLiteral();
+	void testReadRecipientsMalformedDomainLiteral();
+	void testWriteEncodesNameWithComment();
+	void testWriteEncodesDomainLiteral();
+	void testWriteEscapesPartParameters();
+	void testWriteRealNameQuotedPair();
+	void testReadRecipientsQuotedLocalPart();
+	void testWriteKeepsQuotedLocalPart();
 
 	void setUp();
 	void tearDown();

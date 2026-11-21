@@ -10,6 +10,7 @@
 
 #include "PDFTestSuite.h"
 #include "PDFTest.h"
+#include "XMLTemplateTest.h"
 
 
 CppUnit::Test* PDFTestSuite::suite()
@@ -17,6 +18,7 @@ CppUnit::Test* PDFTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PDFTestSuite");
 
 	pSuite->addTest(PDFTest::suite());
+	pSuite->addTest(XMLTemplateTest::suite());
 
 	return pSuite;
 }

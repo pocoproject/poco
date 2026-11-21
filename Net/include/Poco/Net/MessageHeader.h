@@ -22,6 +22,8 @@
 #include "Poco/Net/NameValueCollection.h"
 #include <ostream>
 #include <istream>
+#include <map>
+#include <utility>
 #include <vector>
 
 
@@ -46,6 +48,10 @@ class Net_API MessageHeader: public NameValueCollection
 	/// attacks. The limit is only enforced when parsing
 	/// header fields from a stream, not when programmatically
 	/// adding them. The default limit is 100.
+	///
+	/// The forms in which read() received the fields follow the
+	/// fields only through the functions of MessageHeader, not
+	/// through those of NameValueCollection.
 {
 public:
 	MessageHeader();
@@ -53,13 +59,47 @@ public:
 
 	MessageHeader(const MessageHeader& messageHeader);
 		/// Creates the MessageHeader by copying
+		/// another one, including its limits.
+
+	MessageHeader(MessageHeader&& messageHeader) noexcept;
+		/// Creates the MessageHeader by moving
 		/// another one.
 
 	virtual ~MessageHeader();
 		/// Destroys the MessageHeader.
 
 	MessageHeader& operator = (const MessageHeader& messageHeader);
-		/// Assigns the content of another MessageHeader.
+		/// Assigns the content and the limits of another MessageHeader.
+
+	MessageHeader& operator = (MessageHeader&& messageHeader) noexcept;
+		/// Moves the content of another MessageHeader.
+
+	using NameValueCollection::erase;
+
+	void erase(const std::string& name);
+		/// Removes all fields with the given name and the
+		/// forms in which read() received them.
+
+	void clear();
+		/// Removes all fields and the forms in which read()
+		/// received them.
+
+	void secureErase(const std::string& name);
+		/// Overwrites and removes all fields with the given name and
+		/// the forms in which read() received them.
+
+	void secureErase(Iterator it);
+		/// Overwrites and removes the field referenced by the given
+		/// iterator and the form in which read() received it.
+
+	void secureClear();
+		/// Overwrites and removes all fields and the forms in which
+		/// read() received them.
+
+	using NameValueCollection::swap;
+
+	void swap(MessageHeader& messageHeader) noexcept;
+		/// Exchanges the content of two MessageHeader objects.
 
 	virtual void write(std::ostream& ostr) const;
 		/// Writes the message header to the given output stream.
@@ -68,6 +108,9 @@ public:
 		/// name and value separated by a colon and lines
 		/// delimited by a carriage return and a linefeed
 		/// character. See RFC 2822 for details.
+		///
+		/// A field that read() decoded is written as it was received,
+		/// unless its value has been changed since.
 		///
 		/// Throws a MessageException, before anything is written,
 		/// if a field name is empty or contains a character that is not
@@ -98,6 +141,14 @@ public:
 		/// Enables or disables automatic conversion of HTTP header values
 		/// when reading HTTP header.
 		///
+		/// RFC 2047 encoded words are decoded where RFC 2047, section 5,
+		/// allows them: in the whole value of an unstructured field, such as
+		/// Subject or an X- field, and in the display names and comments of
+		/// an address field, such as From or To. A decoded display name that
+		/// contains specials is stored as a quoted-string, so that the value
+		/// keeps its mailboxes. Other structured fields, such as Content-Type,
+		/// Date or Message-ID, are not decoded.
+		///
 		/// A value whose decoded form contains a control character other
 		/// than a horizontal tab is stored undecoded.
 
@@ -120,7 +171,8 @@ public:
 
 	[[nodiscard]] std::string getDecoded(const std::string& name) const;
 		/// Get decoded header value. It does conversion if it was not
-		/// automatically converted when reading.
+		/// automatically converted when reading, in the fields and parts
+		/// of fields that automatic conversion decodes (see setAutoDecode()).
 		///
 		/// A value that automatic conversion left undecoded
 		/// (see setAutoDecode()) is returned unchanged.
@@ -199,16 +251,25 @@ public:
 		///   multipart/mixed
 		/// and the parameter
 		///   boundary -> MIME_boundary_01234567
+		///
+		/// RFC 2047 encoded words in the value of a name or filename
+		/// parameter are decoded to UTF-8, unless the decoded value contains
+		/// a control character other than a horizontal tab. RFC 2047,
+		/// section 5, does not allow encoded words there, but many mail
+		/// clients write file names so. Other parameters are not changed.
 
 	static void splitParameters(const std::string::const_iterator& begin, const std::string::const_iterator& end, NameValueCollection& parameters);
 		/// Splits the given string into a collection of parameters.
 		/// Parameters are expected to be separated by semicolons.
 		///
-		/// Enclosing quotes of parameter values are removed.
+		/// Enclosing quotes of parameter values are removed. Parameter
+		/// values are not decoded, so that opaque values such as cookies
+		/// stay as they are.
 
 	static void quote(const std::string& value, std::string& result, bool allowSpace = false);
 		/// Checks if the value must be quoted. If so, the value is
-		/// appended to result, enclosed in double-quotes.
+		/// appended to result, enclosed in double-quotes, with each '"'
+		/// and '\' preceded by a backslash (an RFC 5322 quoted-string).
 		/// Otherwise, the value is appended to result as-is.
 
 	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& toCharset = "UTF-8");
@@ -236,10 +297,21 @@ protected:
 		/// If allowFolding is true, the rules of write() apply; otherwise
 		/// those of HTTPMessage::write().
 
+	static void checkFieldValue(const std::string& name, const std::string& value, bool allowFolding);
+		/// Throws a MessageException if value cannot be written as the
+		/// value of the field with the given name; see checkFields().
+
 	static void writeFields(const NameValueCollection& fields, std::ostream& ostr);
 		/// Writes the fields without checking them; see checkFields().
 
+	[[nodiscard]] bool isReceived(const std::string& name, const std::string& value) const;
+		/// Returns true if read() stored the field with the given name and value
+		/// and the value was decoded or contains non-ASCII characters, so that
+		/// write() writes the field as it was received.
+
 private:
+	void eraseReceived(const std::string& name, bool secure);
+
 	enum Limits
 		/// Limits for basic sanity checks when reading a header
 	{
@@ -254,8 +326,19 @@ private:
 	bool _autoDecode;
 	bool _decodedOnRead;
 	bool _strictParsing;
+	std::map<std::pair<std::string, std::string>, std::string> _receivedFields;
+		/// The received values, by lowercase field name and stored value.
 
 };
+
+
+//
+// inlines
+//
+inline void swap(MessageHeader& messageHeader1, MessageHeader& messageHeader2) noexcept
+{
+	messageHeader1.swap(messageHeader2);
+}
 
 
 } // namespace Poco::Net

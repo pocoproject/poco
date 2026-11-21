@@ -151,6 +151,20 @@ Breaking Changes:
   from several threads is safe; a nested object or array is printed with the options of its
   parent, and its own flags are left unchanged. New: Poco::JSON::Object::stringify() and
   Poco::JSON::Array::stringify() with an options argument.
+- GH #5717 Poco::Net::MessageHeader::read() decodes RFC 2047 encoded words only where RFC 2047
+  allows them: anywhere in an unstructured field such as Subject, and in the display names and
+  comments of an address field. Structured fields such as Content-Type and Content-Disposition
+  are stored as received. MessageHeader::splitParameters() with a whole field value decodes the
+  name and filename parameters; the overload that takes iterators, which MediaType and the cookie
+  functions use, decodes nothing. MessageHeader::getDecoded() follows the same rules.
+- GH #5717 Poco::Net::MessageHeader::write() writes a field that read() decoded in the form in
+  which it was received, unless its value was changed since. This holds for every MessageHeader,
+  including HTTP requests and responses.
+- GH #5717 Poco::Net::MailMessage::write() writes non-ASCII header text that is valid UTF-8 as
+  RFC 2047 encoded words. Other 8-bit text, and a field as read() received it, are written
+  unchanged.
+- GH #5717 Poco::Net::MessageHeader::quote() writes '"' and '\' in a quoted value as
+  quoted-pairs. A caller that escaped the value itself must stop doing so.
 - GH #5510 Poco::Util::Timer::run() is final, and the timer thread runs it without a virtual
   call, so that the thread no longer reads the vptr while the constructor or destructor of a
   subclass writes it; a subclass can no longer override run().
@@ -201,6 +215,21 @@ Features:
   child is spawned without an initial directory and is given variables: it then gets only those.
 - GH #5510 Poco::Util::LayeredConfiguration::replace() replaces a labeled configuration in one
   step, so that readers never see the configuration without it.
+- GH #5717 Poco::Net::MailMessage::encodeWord() takes a WordEncoding: Q, B or AUTO, which
+  chooses the shorter form. The Q encoding also encodes '"' and '\', an encoded word is at most
+  75 characters long, and with the charset UTF-8 a character is not split between two encoded
+  words.
+- GH #5717 Poco::Net::MailRecipient, MessageHeader and MailMessage have move operations.
+  MessageHeader has swap(), secureErase() and secureClear(), which also handle the forms in which
+  read() received the fields.
+- GH #5717 Poco::Net::SocketImpl::releaseSocket() gives up the native socket without closing it.
+- GH #5717 Poco::DirectoryWatcher can be told at run time to poll the directory instead of using
+  native notifications.
+- GH #5717 Poco::Path::parse() with PATH_WINDOWS accepts a slash before a drive letter (/c:/dir).
+- GH #5717 Poco::Util::Timer can be created with an operating system priority and scheduling
+  policy; Poco::Util::ServerApplication::waitForTerminationRequest() is virtual.
+- GH #5717 Poco::PDF::XMLTemplate image styles offset-x, offset-y and keep-aspect-ratio.
+- GH #5717 Poco::MongoDB::Array::getInteger() by position.
 - GH #5691 Poco/Foundation.h defines POCO_API_EXPORT and POCO_API_IMPORT, the attributes that
   export the symbols of a shared library and import them. The export macros of the POCO
   libraries (Foundation_API, Net_API and the others; not CppUnit_API) are defined with them,
@@ -377,6 +406,12 @@ Bug Fixes and Improvements:
   (POCO_EMSCRIPTEN_FLAGS), and programs that link the POCO CMake targets get these flags too.
   For Emscripten, Poco::Thread::setAffinity() returns false, and the methods of
   Poco::NamedEvent and Poco::NamedMutex throw Poco::NotImplementedException, as on Android.
+- GH #5717 Poco::Net::MailMessage::read() parses address lists with groups, comments, quoted
+  strings, quoted local parts and domain literals; a decoded display name cannot add a recipient
+  or change an address.
+- GH #5717 A copied Poco::Net::MessageHeader keeps the field, name length and value length
+  limits of its source.
+- GH #5717 NetSSL_Win: Context::init() closes the certificate stores when it fails.
 
 
 Release 1.15.4 (2026-09-22)

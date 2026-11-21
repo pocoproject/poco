@@ -67,6 +67,14 @@ public:
 		ENCODING_BASE64
 	};
 
+	enum class WordEncoding
+		/// The encoding of RFC 2047 encoded words.
+	{
+		Q,   /// "Q" encoding, similar to quoted-printable
+		B,   /// "B" encoding, base64
+		AUTO /// the encoding that gives the shorter result, "Q" if both are equal
+	};
+
 	struct Part
 	{
 		std::string             name;
@@ -85,6 +93,16 @@ public:
 		/// common reason is to temporarily save attachments to
 		/// the file system in order to avoid potential memory
 		/// exhaustion when attachment files are very large.
+
+	MailMessage(MailMessage&& message) noexcept;
+		/// Creates a MailMessage by moving the header fields, recipients,
+		/// content, parts and part store factory of another one, which
+		/// is left without them.
+
+	MailMessage& operator = (MailMessage&& message) noexcept;
+		/// Deletes the parts of this message and moves the header fields,
+		/// recipients, content, parts and part store factory of another
+		/// one, which is left without them.
 
 	virtual ~MailMessage();
 		/// Destroys the MailMessage.
@@ -110,10 +128,8 @@ public:
 	void setSubject(const std::string& subject);
 		/// Sets the subject of the message.
 		///
-		/// The subject must not contain any non-ASCII
-		/// characters. To include non-ASCII characters
-		/// in the subject, use RFC 2047 word encoding
-		/// (see encodeWord()).
+		/// Non-ASCII characters in the subject must be UTF-8;
+		/// write() encodes them (see encodeWord()).
 
 	[[nodiscard]] const std::string& getSubject() const;
 		/// Returns the subject of the message.
@@ -126,10 +142,8 @@ public:
 		/// address, or a real name followed by
 		/// an email address enclosed in < and >.
 		///
-		/// The sender must not contain any non-ASCII
-		/// characters. To include non-ASCII characters
-		/// in the sender, use RFC 2047 word encoding
-		/// (see encodeWord()).
+		/// Non-ASCII characters in the real name must be
+		/// UTF-8; write() encodes them (see encodeWord()).
 
 	[[nodiscard]] const std::string& getSender() const;
 		/// Returns the sender of the message (taken
@@ -243,6 +257,15 @@ public:
 		/// Writes the mail message to the given output stream.
 		///
 		/// BCC recipients and Bcc header fields are never written.
+		///
+		/// Non-ASCII text in the header fields, which must be UTF-8, is
+		/// written as RFC 2047 encoded words (see encodeWord() with
+		/// WordEncoding::AUTO): the whole value of an unstructured field
+		/// such as Subject, and the display names in an address field such
+		/// as From or in the To and CC fields written from the recipients.
+		/// Structured fields such as Content-Type, fields as read()
+		/// received them, and text that is not valid UTF-8 are
+		/// written unchanged.
 
 	void validateHeaders() const;
 		/// Throws a MessageException if write() would reject a field of the
@@ -251,12 +274,17 @@ public:
 		/// Part content is not read, so the headers of the parts inside
 		/// a MultipartSource are checked only when the message is written.
 
-	[[nodiscard]] static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
+	[[nodiscard]] static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8", WordEncoding encoding = WordEncoding::Q);
 		/// If the given string contains non-ASCII characters,
-		/// encodes the given string using RFC 2047 "Q" word encoding.
+		/// encodes the given string using RFC 2047 word encoding
+		/// with the given encoding.
 		///
 		/// The given text must already be encoded in the character set
 		/// given in charset (default is UTF-8).
+		///
+		/// An encoded word is at most 75 characters long; the encoded
+		/// words are separated by a CR LF and a space. With the charset
+		/// UTF-8, a character is not split between two encoded words.
 		///
 		/// Returns the encoded string, or the original string if it
 		/// consists only of ASCII characters.
@@ -291,6 +319,8 @@ protected:
 	[[nodiscard]] static MessageHeader createPartHeader(const Part& part);
 	static void writeEncoded(std::istream& istr, std::ostream& ostr, ContentTransferEncoding encoding);
 	void setRecipientHeaders(MessageHeader& headers) const;
+	void encodeFields(MessageHeader& header) const;
+		/// Encodes the non-ASCII text in the fields that write() encodes.
 	void readHeader(std::istream& istr);
 	void readMultipart(std::istream& istr, PartHandler& handler);
 	void readPart(std::istream& istr, const MessageHeader& header, PartHandler& handler);

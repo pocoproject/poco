@@ -402,6 +402,17 @@ void DirectoryWatcherTest::testReportsAfterFilesDeletedDuringScan()
 }
 
 
+void DirectoryWatcherTest::testForceScan()
+{
+	DirectoryWatcher dw(path().toString(), DirectoryWatcher::DW_FILTER_ENABLE_ALL, 1, true);
+	dw.itemAdded += Poco::delegate(this, &DirectoryWatcherTest::onItemAdded);
+
+	// scanning cannot tell a moved item from a removed and an added one
+	assertTrue (!dw.supportsMoveEvents());
+	assertTrue (reportsAddedFile("scanned"));
+}
+
+
 void DirectoryWatcherTest::setUp()
 {
 	_error = false;
@@ -557,6 +568,7 @@ CppUnit::Test* DirectoryWatcherTest::suite()
 	CppUnit_addTest(pSuite, DirectoryWatcherTest, testSuspendMultipleTimes);
 	CppUnit_addTest(pSuite, DirectoryWatcherTest, testDerivedConstructor);
 	CppUnit_addTest(pSuite, DirectoryWatcherTest, testReportsAfterFilesDeletedDuringScan);
+	CppUnit_addTest(pSuite, DirectoryWatcherTest, testForceScan);
 
 	return pSuite;
 }

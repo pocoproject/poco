@@ -60,6 +60,14 @@ public:
 		/// Creates the Timer, using a timer thread with
 		/// the given priority.
 
+	explicit Timer(int osPriority, int policy);
+		/// Creates the Timer, using a timer thread with the given
+		/// operating system specific priority and scheduling policy
+		/// (see Poco::Thread::setOSPriority()).
+		///
+		/// Throws a Poco::SystemException if the timer thread cannot
+		/// be started with this priority.
+
 	Timer(const Timer&) = delete;
 
 	Timer& operator = (const Timer&) = delete;

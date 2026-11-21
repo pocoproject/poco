@@ -351,6 +351,16 @@ public:
 		float width = static_cast<float>(pStyle->getDouble("width", image.width()));
 		float height = static_cast<float>(pStyle->getDouble("height", image.height()));
 
+		if (pStyle->getBool("keep-aspect-ratio", false))
+		{
+			const bool hasWidth = pStyle->hasProperty("width");
+			const bool hasHeight = pStyle->hasProperty("height");
+			if (hasWidth && !hasHeight && image.width() > 0)
+				height = width*image.height()/image.width();
+			else if (hasHeight && !hasWidth && image.height() > 0)
+				width = height*image.width()/image.height();
+		}
+
 		float scale = static_cast<float>(pStyle->getDouble("scale", 1.0));
 		float scaleX = static_cast<float>(pStyle->getDouble("scale-x", scale));
 		float scaleY = static_cast<float>(pStyle->getDouble("scale-y", scale));
@@ -363,7 +373,12 @@ public:
 
 		translateInBox(x, y);
 
-		_pPage->drawImage(image, x, y, width, height);
+		// offset-x and offset-y move only the drawn image: they are added after the position
+		// is placed in the box, so a negative result does not count from the right or top edge,
+		// and the position of the content that follows does not change.
+		const float offsetX = static_cast<float>(pStyle->getDouble("offset-x", 0.0));
+		const float offsetY = static_cast<float>(pStyle->getDouble("offset-y", 0.0));
+		_pPage->drawImage(image, x + offsetX, y + offsetY, width, height);
 
 		moveY(y);
 	}
