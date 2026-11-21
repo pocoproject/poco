@@ -29,6 +29,14 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPBasicCredentials.h"
+#include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPRequest.h"
+#include "Poco/Net/HTTPResponse.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
+#include "Poco/Path.h"
+#include "Poco/File.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NullStream.h"
@@ -714,6 +722,64 @@ void RemotingTest::testWSSEAuthenticatorDigest()
 }
 
 
+void RemotingTest::testWSDLFileName()
+{
+	Poco::Path base(Poco::TemporaryFile::tempName());
+	base.makeDirectory();
+	Poco::TemporaryFile::registerForDeletion(base.toString());
+	Poco::Path wsdlDir(base);
+	wsdlDir.pushDirectory("wsdl");
+	Poco::File(wsdlDir).createDirectories();
+	const auto writeFile = [](const Poco::Path& dir, const std::string& name, const std::string& content)
+	{
+		Poco::FileOutputStream ostr(Poco::Path(dir, name).toString());
+		ostr << content;
+	};
+	writeFile(wsdlDir, "Tester.wsdl", "<definitions/>");
+	writeFile(wsdlDir, "secret.txt", "secret");
+	writeFile(base, "secret.txt", "secret");
+
+	Poco::Net::ServerSocket socket(Poco::Net::SocketAddress("127.0.0.1", 0));
+	const Poco::UInt16 port = socket.address().port();
+	Poco::RemotingNG::SOAP::Listener::Ptr pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:" + Poco::NumberFormatter::format(port), wsdlDir.toString(), socket);
+	pListener->start();
+
+	const auto get = [port](const std::string& uri, std::string& body)
+	{
+		Poco::Net::HTTPClientSession session("127.0.0.1", port);
+		Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET, uri, Poco::Net::HTTPMessage::HTTP_1_1);
+		session.sendRequest(request);
+		Poco::Net::HTTPResponse response;
+		std::istream& rs = session.receiveResponse(response);
+		body.clear();
+		Poco::StreamCopier::copyToString(rs, body);
+		return response.getStatus();
+	};
+
+	std::string body;
+	assert (get("/soap/Tester", body) == Poco::Net::HTTPResponse::HTTP_OK);
+	assert (body == "<definitions/>");
+
+	// A NUL character would end the file name before the extension.
+	assert (get("/soap/secret.txt%00.x", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body != "secret");
+
+	// A backslash separates directories on Windows.
+	assert (get("/soap/..%5Csecret.txt%00.x", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body != "secret");
+	assert (get("/soap/..%5Cwsdl%5CTester.x", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+
+	// The page of a missing file shows neither markup from the request nor the directory.
+	assert (get("/soap/Missing", body) == Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+	assert (body.find(wsdlDir.toString()) == std::string::npos);
+	// On Windows, where a path cannot contain '<', the request fails before the page.
+	get("/soap/%3Cimg%20src=x%20onerror=alert(1)%3E", body);
+	assert (body.find("<img") == std::string::npos);
+
+	pListener->stop();
+}
+
+
 void RemotingTest::testInt(ITester::Ptr pTester)
 {
 	int i = pTester->testInt1(42);
@@ -1065,6 +1131,7 @@ CppUnit::Test* RemotingTestSOAP11::suite()
 	CppUnit_addTest(pSuite, RemotingTestSOAP11, testWSSEInterceptor);
 	CppUnit_addTest(pSuite, RemotingTestSOAP11, testWSSEAuthenticatorPlain);
 	CppUnit_addTest(pSuite, RemotingTestSOAP11, testWSSEAuthenticatorDigest);
+	CppUnit_addTest(pSuite, RemotingTestSOAP11, testWSDLFileName);
 
 	return pSuite;
 }
