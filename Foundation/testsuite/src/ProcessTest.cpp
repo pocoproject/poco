@@ -61,11 +61,16 @@ void ProcessTest::testEscapeArgs()
 	assertFalse (Poco::ProcessImpl::mustEscapeArg("\"abc\""));
 	assertTrue (Poco::ProcessImpl::mustEscapeArg("\"a b "));
 	assertFalse (Poco::ProcessImpl::mustEscapeArg("/arg=\"a b c\""));
+	assertTrue (Poco::ProcessImpl::mustEscapeArg("a\\ b"));
+	assertTrue (Poco::ProcessImpl::mustEscapeArg("a\\\tb"));
+	assertTrue (Poco::ProcessImpl::mustEscapeArg(""));
 
 	assertEquals ("abc"s, Poco::ProcessImpl::escapeArg("abc"));
 	assertEquals ("\"a b c\""s, Poco::ProcessImpl::escapeArg("a b c"));
 	assertEquals ("\"a b \\\" c\""s, Poco::ProcessImpl::escapeArg("a b \" c"));
 	assertEquals ("/arg=\"a b c\""s, Poco::ProcessImpl::escapeArg("/arg=\"a b c\""));
+	assertEquals ("\"a\\ b\""s, Poco::ProcessImpl::escapeArg("a\\ b"));
+	assertEquals ("\"\""s, Poco::ProcessImpl::escapeArg(""));
 #endif
 }
 
@@ -362,6 +367,9 @@ void ProcessTest::testLaunchArgs()
 	args.push_back("\\");
 	args.push_back("c:\\program files\\ends with backslash\\");
 	args.push_back("\"already quoted \\\" \\\\\"");
+	args.push_back("backslash\\ space");
+	args.push_back("");
+	args.push_back("after empty");
 	Pipe outPipe;
 	ProcessHandle ph = Process::launch(cmd, args, 0, &outPipe, 0);
 	PipeInputStream istr(outPipe);
