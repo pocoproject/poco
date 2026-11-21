@@ -1,0 +1,17 @@
+CREATE TABLE types (
+	d DATE,
+	t TIME,
+	dt DATETIME,
+	u UUID,
+	b BLOB,
+	flag BOOL
+);
+INSERT INTO types VALUES (
+	'2023-03-05',
+	'08:35:00',
+	'2023-03-05 08:35:00',
+	'550e8400-e29b-41d4-a716-446655440000',
+	X'DEADBEEF',
+	1
+);
+SELECT * FROM types;
