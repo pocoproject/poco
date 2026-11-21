@@ -97,7 +97,7 @@ public:
 		///
 		/// URI can be a complete URI, or a URI path. In any case, only the URI path will
 		/// be considered. The given URI can be an alias URI, which will be matched against
-		/// registered aliases.
+		/// the aliases of the objects registered with the given Listener.
 
 	[[nodiscard]] bool invoke(const std::string& objectPath, ServerTransport& transport) const;
 		/// Invoke a method on the object registered for the given object path.
@@ -270,14 +270,16 @@ private:
 	using ListenerMap = std::map<std::string, Listener::Ptr>;
 	using RemoteObjects = std::map<std::string, RemoteObjectInfo::Ptr>;
 	using Skeletons = std::map<Identifiable::TypeId, Skeleton::Ptr>;
-	using URIAliases = std::map<std::string, std::string>;
+	using URIAliases = std::multimap<std::string, std::string>;
 	using LocalURIs = std::set<std::string>;
 
 	ORB();
 	~ORB();
 
 	[[nodiscard]] RemoteObjectInfo::Ptr findLocalObject(const Identifiable::TypeId& tid, const Identifiable::ObjectId& oid, const std::string& protocol) const;
-	[[nodiscard]] URIAliases::const_iterator findAlias(const std::string& path) const;
+	[[nodiscard]] URIAliases::const_iterator findAlias(const Listener& listener, const std::string& path) const;
+		/// Returns the first alias that matches path and belongs to an
+		/// object registered with the given Listener.
 
 	bool                _enabled = true;
 	ListenerMap         _listeners;         /// Maps endpoints to Listener objects
