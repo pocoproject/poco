@@ -1,0 +1,1 @@
+namespace N { namespace M { class C {}; void f(int a, double b); } }
