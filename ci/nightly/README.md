@@ -17,7 +17,13 @@ branch or commit; it defaults to main. GCC 14 can crash internally when compilin
 Every suite runs with `-long` and without ignore files; `CPPUNIT_IGNORE` is unset. Tests
 run serially without retries. Failures, crashes, timeouts, skipped tests, ignored failures
 and missing suites fail the job; a suite whose driver or server is missing counts as
-missing. Db2 and Informix are the only excluded database suites.
+missing, and so does a SQLParser leak check that did not run. Db2 and Informix are the only
+excluded database suites.
+
+The job log and the summary page of the run list every CTest suite with its result, the
+number of tests it ran and its time, the Unicode ODBC suites and the SQLParser checks
+(`poco-nightly-summary.sh`). For each suite that did not pass, the job log also shows the
+end of its output; the complete output is in the uploaded logs.
 
 MySQL, PostgreSQL, Redis, MongoDB, SQL Server Express and Oracle Free run in containers
 bound to loopback, with disposable data, and are removed after the run. SQLite ODBC uses
