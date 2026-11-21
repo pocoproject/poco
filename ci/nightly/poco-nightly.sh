@@ -146,9 +146,11 @@ elif grep -q '<skipped' "$logs/tests.xml"; then
     echo "CTest skipped tests" >> "$logs/coverage-gaps.txt"
 fi
 make -C source/Data/SQLParser -j4 test > "$logs/sqlparser.log" 2>&1 || status=1
-tail -c 12000 "$logs/tests.log"
-grep -a -E '^=== |^OK \(|^Runs: ' "$logs/tests-unicode.log" || true
-tail -n 5 "$logs/sqlparser.log"
+# Without valgrind the SQLParser tests skip their leak check and still pass.
+if ! sed -E 's/\x1b\[[0-9;]*m//g' "$logs/sqlparser.log" | grep -a -q -E '^Memory Leak Check: +Success'; then
+    echo "The SQLParser memory leak check did not run or did not pass" >> "$logs/coverage-gaps.txt"
+fi
+bash "$script_dir/poco-nightly-summary.sh" "$logs" || { echo "The test summary failed"; status=1; }
 if [[ -s "$logs/coverage-gaps.txt" ]]; then
     echo "Missing coverage or ignored failures:"
     cat "$logs/coverage-gaps.txt"
