@@ -15,6 +15,8 @@ make -j$(nproc)
 
 # Copy binaries with preserving historical names
 cp bin/JSON-parse-fuzzer $OUT/json_parser_fuzzer
+cp bin/Crypto-x509-fuzzer $OUT/crypto_x509_fuzzer
+cp bin/Crypto-key-fuzzer $OUT/crypto_key_fuzzer
 cp bin/XML-parse-fuzzer $OUT/xml_parser_fuzzer
 cp bin/Foundation-datetime-fuzzer $OUT/date_time_fuzzer
 cp bin/Foundation-misc-fuzzer $OUT/foundation_misc_fuzzer
@@ -27,6 +29,8 @@ cp bin/AIMCPHTTP-eventstream-fuzzer $OUT/mcp_event_stream_fuzzer
 
 # Seed corpus
 zip -q -r -j $OUT/mail_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Mail
+zip -q -r -j $OUT/crypto_x509_fuzzer_seed_corpus.zip $SRC/poco/Crypto/fuzzing/seed/X509
+zip -q -r -j $OUT/crypto_key_fuzzer_seed_corpus.zip $SRC/poco/Crypto/fuzzing/seed/Key
 zip -q -r -j $OUT/http_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/HTTP
 zip -q -r -j $OUT/mcp_server_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Server
 zip -q -r -j $OUT/mcp_client_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/fuzzing/seed/Client
@@ -37,6 +41,8 @@ zip -q -r -j $OUT/json_parser_fuzzer_seed_corpus.zip $SRC/poco/JSON/fuzzing/seed
 
 # Dictionaries
 cp $SRC/poco/XML/fuzzing/xml.dict $OUT/xml_parser_fuzzer.dict
+cp $SRC/poco/Crypto/fuzzing/x509.dict $OUT/crypto_x509_fuzzer.dict
+cp $SRC/poco/Crypto/fuzzing/pem.dict $OUT/crypto_key_fuzzer.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_server_fuzzer.dict
 cp $SRC/poco/AI/MCP/fuzzing/mcp.dict $OUT/mcp_client_fuzzer.dict
 cp $SRC/poco/AI/MCP/HTTP/fuzzing/eventstream.dict $OUT/mcp_event_stream_fuzzer.dict
