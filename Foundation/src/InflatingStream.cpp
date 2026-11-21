@@ -169,6 +169,16 @@ int InflatingStreamBuf::close()
 
 void InflatingStreamBuf::reset()
 {
+	// Decompressed data of the previous stream that has not been read yet
+	// must not be returned as data of the next stream.
+	setg(egptr(), egptr(), egptr());
+	// Compressed data of the previous stream still pending in the put area
+	// must not be passed on as the start of the next stream.
+	setp(pbase(), epptr());
+	// If the previous stream was neither read to its end nor ended by an error,
+	// the buffered input belongs to it and must not be taken as the start of the
+	// next stream (see the handling after a decompression error in readFromDevice()).
+	if (!_eof && !_failed) _pZstr->avail_in = 0;
 	int rc = inflateReset(_pZstr);
 	if (rc == Z_OK)
 	{

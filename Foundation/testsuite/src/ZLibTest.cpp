@@ -53,6 +53,19 @@ namespace
 			return true;
 		}
 	}
+
+	bool flushFails(std::ostream& ostr)
+	{
+		try
+		{
+			ostr.flush();
+			return ostr.bad();
+		}
+		catch (Poco::IOException&)
+		{
+			return true;
+		}
+	}
 }
 
 
@@ -292,6 +305,48 @@ void ZLibTest::testInflateResetAfterTrailerError()
 }
 
 
+void ZLibTest::testInflateResetAfterPartialRead()
+{
+	// the first stream is larger than the stream buffer, so that decompressed data
+	// and input of the first stream are still buffered when only part of it was read
+	const std::string first = compress(std::string(40000, 'x'), DeflatingStreamBuf::STREAM_ZLIB);
+	const std::string second = compress("abcdefabcdefabcdefabcdefabcdefabcdef\n", DeflatingStreamBuf::STREAM_ZLIB);
+	std::stringstream buffer(first + second);
+	InflatingInputStream inflater(buffer);
+	char c = 0;
+	inflater.get(c);
+	assertTrue (c == 'x');
+
+	// the caller positions the underlying stream at the start of the next stream
+	buffer.clear();
+	buffer.seekg(static_cast<std::streamoff>(first.size()));
+	inflater.reset();
+	std::string data;
+	inflater >> data;
+	assertTrue (data == "abcdefabcdefabcdefabcdefabcdefabcdef");
+	data.clear();
+	inflater >> data;
+	assertTrue (data.empty());
+	assertTrue (inflater.eof());
+}
+
+
+void ZLibTest::testInflateOutputResetAfterError()
+{
+	std::stringstream buffer;
+	InflatingOutputStream inflater(buffer);
+	inflater << "not a zlib stream";
+	assertTrue (flushFails(inflater));
+
+	inflater.clear();
+	inflater.rdbuf()->reset();
+	inflater << compress("abcdefabcdefabcdefabcdefabcdefabcdef\n", DeflatingStreamBuf::STREAM_ZLIB);
+	inflater.flush();
+	assertTrue (inflater.good());
+	assertTrue (buffer.str() == "abcdefabcdefabcdefabcdefabcdefabcdef\n");
+}
+
+
 void ZLibTest::setUp()
 {
 }
@@ -315,6 +370,8 @@ CppUnit::Test* ZLibTest::suite()
 	CppUnit_addTest(pSuite, ZLibTest, testGzip3);
 	CppUnit_addTest(pSuite, ZLibTest, testInflateResetAfterError);
 	CppUnit_addTest(pSuite, ZLibTest, testInflateResetAfterTrailerError);
+	CppUnit_addTest(pSuite, ZLibTest, testInflateResetAfterPartialRead);
+	CppUnit_addTest(pSuite, ZLibTest, testInflateOutputResetAfterError);
 
 	return pSuite;
 }

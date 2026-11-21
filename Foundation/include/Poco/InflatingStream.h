@@ -79,6 +79,10 @@ public:
 		/// Resets the stream buffer so that another stream can be read
 		/// from the same underlying input stream.
 		///
+		/// Decompressed data that has not been read yet is discarded.
+		/// When inflating to an output stream, written data that has not
+		/// been inflated yet is discarded.
+		///
 		/// After a stream ended normally, buffered input that follows
 		/// the stream is kept and read as the start of the next stream.
 		///
@@ -89,9 +93,16 @@ public:
 		/// is kept, as after a normal end. For any other error, the end of
 		/// the failed stream cannot be determined, so buffered input is
 		/// discarded and the next stream is read from the current position
-		/// of the underlying input stream. Before calling reset(), the
-		/// caller may need to position the underlying stream at the start
-		/// of the next stream and call clear() on it.
+		/// of the underlying input stream.
+		///
+		/// If the stream was neither read to its end nor ended by a
+		/// decompression error, buffered input is discarded as well, and
+		/// the next stream is read from the current position of the
+		/// underlying input stream.
+		///
+		/// Before calling reset(), the caller may need to position the
+		/// underlying stream at the start of the next stream and call
+		/// clear() on it.
 
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
