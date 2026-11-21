@@ -33,6 +33,8 @@ public:
 	void testGzip3();
 	void testInflateResetAfterError();
 	void testInflateResetAfterTrailerError();
+	void testInflateResetAfterPartialRead();
+	void testInflateOutputResetAfterError();
 
 	void setUp();
 	void tearDown();
