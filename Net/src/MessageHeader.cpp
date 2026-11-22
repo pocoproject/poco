@@ -691,9 +691,14 @@ void MessageHeader::checkFields(const NameValueCollection& fields, bool allowFol
 
 void MessageHeader::checkFieldValue(const std::string& name, const std::string& value, bool allowFolding)
 {
-	for (std::string::size_type i = 0; i < value.size(); ++i)
+	std::string::size_type i = 0;
+	while (i < value.size())
 	{
-		if (!isInvalidValueChar(value[i])) continue;
+		if (!isInvalidValueChar(value[i]))
+		{
+			++i;
+			continue;
+		}
 		// CR LF folds the value, as MailMessage::encodeWord() writes it, only when
 		// white space and then other text follow; any other CR or LF would start
 		// a new field or, as a line of white space only, end the header.
@@ -701,10 +706,9 @@ void MessageHeader::checkFieldValue(const std::string& name, const std::string& 
 		const bool isFold = allowFolding && value.compare(i, 2, "\r\n") == 0
 			&& text != std::string::npos && text > i + 2
 			&& value[text] != '\r' && value[text] != '\n';
-		if (isFold)
-			++i;
-		else
+		if (!isFold)
 			throw MessageException("Invalid character in header field value", name);
+		i += 2;
 	}
 }
 

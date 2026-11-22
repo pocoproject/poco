@@ -321,16 +321,16 @@ namespace
 	void appendComment(std::string_view comment, const std::string& charset, std::string& out)
 		/// Appends a terminated comment with the encoded words in its text decoded.
 	{
+		static constexpr std::string_view DELIMITERS = "()\\";
 		std::string_view::size_type textStart = 0;
-		for (std::string_view::size_type pos = 0; pos < comment.size(); ++pos)
+		std::string_view::size_type pos = comment.find_first_of(DELIMITERS);
+		while (pos != std::string_view::npos)
 		{
-			const char ch = comment[pos];
-			if (ch != '(' && ch != ')' && ch != '\\') continue;
 			appendCommentText(comment.substr(textStart, pos - textStart), charset, out);
-			const std::string_view::size_type length = (ch == '\\' && pos + 1 < comment.size()) ? 2 : 1;
+			const std::string_view::size_type length = (comment[pos] == '\\' && pos + 1 < comment.size()) ? 2 : 1;
 			out.append(comment.substr(pos, length));
-			pos += length - 1;
-			textStart = pos + 1;
+			textStart = pos + length;
+			pos = comment.find_first_of(DELIMITERS, textStart);
 		}
 		appendCommentText(comment.substr(textStart), charset, out);
 	}
