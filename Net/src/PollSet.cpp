@@ -252,11 +252,13 @@ public:
 
 		for (int i = 0; i < rc; i++)
 		{
-			if (_events[i].data.ptr) // skip eventfd
+			// A copy: epoll_event is packed on x86_64, so a reference to its data member is misaligned.
+			void* const pSocketImpl = _events[i].data.ptr;
+			if (pSocketImpl != nullptr) // skip eventfd
 			{
 				// A socket removed while epoll_wait() ran may have been destroyed and its
 				// address given to a socket added since, which the event is not for.
-				SocketMap::iterator it = _socketMap.find(_events[i].data.ptr);
+				SocketMap::iterator it = _socketMap.find(pSocketImpl);
 				if (it != _socketMap.end() && _removedSockets.find(it->first) == _removedSockets.end())
 				{
 					if (_events[i].events & (EPOLLIN | EPOLLRDNORM | EPOLLHUP))
