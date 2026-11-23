@@ -194,7 +194,7 @@ jobs:
             extra_cmake: -DENABLE_TEST_DEPRECATED=ON
           - name: ubsan
             visibility: default
-            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+            sanitize_flags: "-fsanitize=undefined"
             # UBSan reports and continues by default, and ctest shows the output of
             # failing tests only: halt on the first report, so that it fails the test.
             ubsan_options: halt_on_error=1:print_stacktrace=1

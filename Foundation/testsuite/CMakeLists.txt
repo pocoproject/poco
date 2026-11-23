@@ -71,7 +71,14 @@ add_dependencies(Foundation-testrunner TestApp)
 # TestLibrary and related shared libraries - only for shared library builds
 # SharedLibrary and ClassLoader tests require dynamically loadable libraries
 if(BUILD_SHARED_LIBS)
-	add_library(TestLibrary SHARED src/TestLibrary.cpp src/TestPlugin.cpp src/TestPlugin.h)
+	# Share the plugin base class and its type information with the test runner.
+	add_library(TestPlugin SHARED src/TestPlugin.cpp src/TestPlugin.h)
+	set_target_properties(TestPlugin PROPERTIES DEBUG_POSTFIX "d")
+	target_compile_definitions(TestPlugin PUBLIC POCO_TESTPLUGIN_SHARED)
+	target_link_libraries(TestPlugin PRIVATE Poco::Foundation)
+	target_link_libraries(Foundation-testrunner PRIVATE TestPlugin)
+
+	add_library(TestLibrary SHARED src/TestLibrary.cpp)
 	set_target_properties(TestLibrary PROPERTIES
 		DEBUG_POSTFIX "d"
 		# The test requires the library named TestLibrary. By default it is prefixed with lib.
@@ -80,7 +87,7 @@ if(BUILD_SHARED_LIBS)
 
 	# The test is run in the runtime directory. So the TestLibrary is built there too because it is used by the tests
 	set_target_properties(TestLibrary PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-	target_link_libraries(TestLibrary PUBLIC Poco::Foundation)
+	target_link_libraries(TestLibrary PUBLIC Poco::Foundation PRIVATE TestPlugin)
 
 	add_dependencies(Foundation-testrunner TestLibrary)
 
