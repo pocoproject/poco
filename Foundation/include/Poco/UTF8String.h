@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <string_view>
 
 
 namespace Poco {
@@ -45,6 +46,10 @@ struct Foundation_API UTF8
 		NORMALIZATION_FORM_KD, /// Compatibility Decomposition
 		NORMALIZATION_FORM_KC  /// Compatibility Decomposition, followed by Canonical Composition
 	};
+
+	[[nodiscard]] static bool isValid(std::string_view text);
+		/// Returns true if text is well-formed UTF-8, including an empty string.
+		/// Embedded NUL characters are valid and do not end the check.
 
 	[[nodiscard]] static int icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2);
 	[[nodiscard]] static int icompare(const std::string& str1, const std::string& str2);
