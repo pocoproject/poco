@@ -5,11 +5,12 @@
 //
 
 
+#pragma once
 #ifndef ORM_Role_INCLUDED
 #define ORM_Role_INCLUDED
 
 
-#include "Poco/ActiveRecord/ActiveRecord.h"
+#include <Poco/ActiveRecord/ActiveRecord.h>
 
 
 namespace ORM {
