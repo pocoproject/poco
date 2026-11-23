@@ -19,7 +19,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/String.h"
-#include "Poco/UTF8Encoding.h"
+#include "Poco/UTF8String.h"
 #include "Poco/Exception.h"
 #include <cmath>
 #include <sstream>
@@ -50,24 +50,6 @@ namespace
 			const char c = payload[i];
 			const bool alphabet = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '+' || c == '/';
 			if (!alphabet) return false;
-		}
-		return true;
-	}
-
-
-	bool isUTF8(const std::string& text)
-		/// Returns true if text is well-formed UTF-8.
-	{
-		const unsigned char* pByte = reinterpret_cast<const unsigned char*>(text.data());
-		const unsigned char* pEnd = pByte + text.size();
-		while (pByte < pEnd)
-		{
-			int length = 1;
-			if (*pByte >= 0xF0) length = 4;
-			else if (*pByte >= 0xE0) length = 3;
-			else if (*pByte >= 0xC0) length = 2;
-			if (pEnd - pByte < length || !Poco::UTF8Encoding::isLegal(pByte, length)) return false;
-			pByte += length;
 		}
 		return true;
 	}
@@ -129,7 +111,7 @@ bool decodeHeaderValue(const std::string& received, std::string& value)
 		Poco::Base64Decoder decoder(encoded);
 		std::string decoded;
 		Poco::StreamCopier::copyToString(decoder, decoded);
-		if (decoder.bad() || !isUTF8(decoded)) return false;
+		if (decoder.bad() || !Poco::UTF8::isValid(decoded)) return false;
 		value = decoded;
 		return true;
 	}
