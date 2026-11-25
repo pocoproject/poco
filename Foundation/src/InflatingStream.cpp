@@ -51,7 +51,8 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	_pHeader(nullptr),
 	_eof(false),
 	_check(type != STREAM_ZIP),
-	_failed(false)
+	_failed(false),
+	_inputEnded(false)
 {
 	std::unique_ptr<char[]> buffer(new char[INFLATE_BUFFER_SIZE]);
 	std::unique_ptr<gz_header> pHeader = std::make_unique<gz_header>(gz_header{});
@@ -77,7 +78,8 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 	_pHeader(nullptr),
 	_eof(false),
 	_check(false),
-	_failed(false)
+	_failed(false),
+	_inputEnded(false)
 {
 	std::unique_ptr<char[]> buffer(new char[INFLATE_BUFFER_SIZE]);
 	std::unique_ptr<gz_header> pHeader = std::make_unique<gz_header>(gz_header{});
@@ -103,7 +105,8 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	_pHeader(nullptr),
 	_eof(false),
 	_check(type != STREAM_ZIP),
-	_failed(false)
+	_failed(false),
+	_inputEnded(false)
 {
 	std::unique_ptr<char[]> buffer(new char[INFLATE_BUFFER_SIZE]);
 
@@ -126,7 +129,8 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits):
 	_pHeader(nullptr),
 	_eof(false),
 	_check(false),
-	_failed(false)
+	_failed(false),
+	_inputEnded(false)
 {
 	std::unique_ptr<char[]> buffer(new char[INFLATE_BUFFER_SIZE]);
 
@@ -169,11 +173,37 @@ int InflatingStreamBuf::close()
 
 void InflatingStreamBuf::reset()
 {
+	if (_pIstr && !_eof && !_failed && !_inputEnded && _pZstr->total_in > 0)
+	{
+		// Skip the rest of the unfinished stream, so that the buffered input
+		// continues at the start of the next stream.
+		try
+		{
+			char skipped[STREAM_BUFFER_SIZE];
+			while (readFromDevice(skipped, STREAM_BUFFER_SIZE) > 0)
+			{
+			}
+		}
+		catch (IOException&)
+		{
+			// The rest of the stream is damaged or missing; readFromDevice() has left
+			// the buffered input as after any other decompression error.
+		}
+	}
+	else if (_pOstr && !_failed)
+	{
+		// Written data that has not been inflated yet belongs to the previous stream.
+		sync();
+	}
+	// Nothing of the previous stream may reach the next one.
+	setg(egptr(), egptr(), egptr());
+	setp(pbase(), epptr());
 	int rc = inflateReset(_pZstr);
 	if (rc == Z_OK)
 	{
 		_eof = false;
 		_failed = false;
+		_inputEnded = false;
 		if (_pHeader) watchHeader(_pZstr, _pHeader);
 	}
 	else
@@ -196,6 +226,7 @@ std::streamsize InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize
 		}
 		_pZstr->next_in   = (unsigned char*) _buffer;
 		_pZstr->avail_in  = n;
+		_inputEnded = n == 0;
 	}
 	_pZstr->next_out  = (unsigned char*) buffer;
 	_pZstr->avail_out = static_cast<unsigned>(length);
@@ -260,7 +291,11 @@ std::streamsize InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize
 				_pZstr->next_in  = (unsigned char*) _buffer;
 				_pZstr->avail_in = n;
 			}
-			else return length - _pZstr->avail_out;
+			else
+			{
+				_inputEnded = true;
+				return length - _pZstr->avail_out;
+			}
 		}
 	}
 }
@@ -270,6 +305,7 @@ std::streamsize InflatingStreamBuf::writeToDevice(const char* buffer, std::strea
 {
 	if (length == 0 || !_pOstr) return 0;
 
+	_failed = true; // until the write has succeeded
 	_pZstr->next_in   = (unsigned char*) buffer;
 	_pZstr->avail_in  = static_cast<unsigned>(length);
 	_pZstr->next_out  = (unsigned char*) _buffer;
@@ -300,6 +336,7 @@ std::streamsize InflatingStreamBuf::writeToDevice(const char* buffer, std::strea
 			break;
 		}
 	}
+	_failed = false;
 	return length;
 }
 
