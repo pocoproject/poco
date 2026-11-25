@@ -304,6 +304,12 @@ public:
 	static void shutdown();
 		/// Shuts down the logging framework, stopping the backend thread
 		/// and flushing all pending messages.
+		///
+		/// Note: When Foundation is a shared library on Windows, call
+		/// shutdown() before the process exits. Windows terminates the
+		/// backend thread before the static destructors of the library run,
+		/// so pending messages are lost, and with MinGW the process hangs
+		/// at exit.
 
 	static void names(std::vector<std::string>& names);
 		/// Fills the vector with names of all defined loggers.

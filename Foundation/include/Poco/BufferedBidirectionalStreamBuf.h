@@ -212,10 +212,14 @@ private:
 // We provide an instantiation for char.
 //
 
+// With MinGW, a DLL does not export the inline members of an explicit instantiation,
+// so code that uses the template instantiates it itself.
+#if !defined(POCO_COMPILER_MINGW)
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(Foundation_EXPORTS)
 extern template class BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
 #else
 extern template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
+#endif
 #endif
 
 using BufferedBidirectionalStreamBuf = BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;

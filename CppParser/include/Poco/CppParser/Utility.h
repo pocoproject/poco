@@ -82,7 +82,8 @@ public:
 protected:
 	static std::string preprocessFile(const std::string& file, const std::string& exec, const std::string& options, const std::string& path);
 		/// Preprocess the include file with name file. Parameter exec must contain the name of the preprocessor binary (e.g.: "cl" for Visual Studio).
-		/// Parameter options contains the flag for the preprocessor, and parameter path sets the environment PATH settings during preprocessing.
+		/// Parameter options contains the flag for the preprocessor, and parameter path contains directories that are searched for the
+		/// preprocessor before those in PATH.
 		/// Returns the name of the created file or throws an exception.
 
 	static void parseOnly(const std::string& file, NameSpace::SymbolTable& st, const std::string& preprocessedFile, bool removePreprocessedFile = true);

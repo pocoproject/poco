@@ -57,6 +57,8 @@ operating systems.
 - Compiler: MSVC with the x64 developer environment; CI uses the GitHub `windows-2025` runner with Ninja
   (`-G Ninja -DCMAKE_BUILD_TYPE=Release`). A clang-cl job builds a reduced set of components. A native ARM64 job on
   the `windows-11-arm` runner builds and tests the same set as the x64 job.
+- Windows API level: Windows 10 (`_WIN32_WINNT` and `WINVER` 0x0A00 or higher). CMake stops with an error when the
+  toolchain defaults to an older level, as some MinGW toolchains do; define both macros as 0x0A00 there.
 - Dependencies (OpenSSL, libssh, libxml2) come from vcpkg (`x64-windows` triplet, `arm64-windows` on ARM64); pass
   `-DOPENSSL_ROOT_DIR=<openssl-prefix>` and `-DCMAKE_PREFIX_PATH=<libssh-prefix>`.
 - When the source tree is copied to a separate build machine, copy an export of the commit rather than a working tree

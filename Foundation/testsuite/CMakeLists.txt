@@ -44,7 +44,7 @@ else()
 		COMMAND Foundation-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
 	set_tests_properties(Foundation PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")	# The SharedLibaryTest has to look for shared libraries in the working directory
-	set_property(TEST Foundation APPEND PROPERTY ENVIRONMENT "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}:$ENV{PATH}") # The ProcessTest has to look for the TestApp in the working directory
+	set_property(TEST Foundation APPEND PROPERTY ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:${CMAKE_RUNTIME_OUTPUT_DIRECTORY}") # The ProcessTest has to look for the TestApp in the working directory
 endif()
 
 target_link_libraries(Foundation-testrunner PUBLIC Poco::Foundation CppUnit)

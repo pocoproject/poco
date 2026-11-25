@@ -348,15 +348,26 @@ std::string Utility::preprocessFile(const std::string& file, const std::string& 
 #else
 	args.push_back(file);
 #endif
-	if (!path.empty())
+	// The directories in path are searched before those in PATH. PATH is restored after the
+	// launch, so that the call for each file does not extend it again.
+	const auto launch = [&exec, &args, &path]()
 	{
-		std::string newPath(Environment::get("PATH"));
-		newPath += Path::pathSeparator();
-		newPath += path;
-		Environment::set("PATH", path);
-	}
-
-	auto proc = Process::launch(exec, args);
+		if (path.empty()) return Process::launch(exec, args);
+		const std::string savedPath = Environment::get("PATH", "");
+		Environment::set("PATH", path + Path::pathSeparator() + savedPath);
+		try
+		{
+			ProcessHandle proc = Process::launch(exec, args);
+			Environment::set("PATH", savedPath);
+			return proc;
+		}
+		catch (...)
+		{
+			Environment::set("PATH", savedPath);
+			throw;
+		}
+	};
+	auto proc = launch();
 	const int rc = Process::wait(proc);
 	if (rc != 0)
 	{
