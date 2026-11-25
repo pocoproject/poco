@@ -2532,6 +2532,14 @@ void SQLExecutor::recordSet()
 			RecordSet rset(stmt);
 			assertTrue (rset.rowCount() == 1);
 			assertTrue (rset["row_count"].convert<int>() == 0);
+			assertTrue (0 == Poco::icompare(rset.columnName(0), "row_count"));
+
+			stmt.execute();
+			RecordSet rset2(stmt);
+			assertTrue (rset2.rowCount() == 1);
+			assertTrue (rset2["row_count"].convert<int>() == 0);
+			assertTrue (0 == Poco::icompare(rset2.columnName(0), "row_count"));
+			assertTrue (rset2.columnType(0) == rset.columnType(0));
 		}
 
 		{
@@ -2555,6 +2563,16 @@ void SQLExecutor::recordSet()
 			RecordSet rset(stmt);
 			assertTrue (rset.rowCount() == 1);
 			assertTrue (rset["Born"].convert<DateTime>() == born);
+		}
+
+		{
+			std::string result;
+			Statement stmt = (session() << "SELECT LastName FROM Person", into(result));
+			for (int i = 0; i < 5; ++i)
+			{
+				stmt.execute();
+				assertTrue (result == lastName);
+			}
 		}
 
 		{
@@ -3826,6 +3844,19 @@ void SQLExecutor::multipleResults(const std::string& sql)
 	assertTrue (2 == people2.size());
 	assertTrue (Person("Simpson", "Lisa", "Springfield", 8) == people2[0]);
 	assertTrue (Person("Simpson", "Homer", "Springfield", 42) == people2[1]);
+
+	session() << "UPDATE Person SET Address = 'Capital City' WHERE FirstName = 'Homer'", now;
+
+	pHomer = Person();
+	aBart = 0;
+	people2.clear();
+
+	assertTrue (4 == stmt.execute());
+	assertTrue (Person("Simpson", "Homer", "Capital City", 42) == pHomer);
+	assertTrue (10 == aBart);
+	assertTrue (2 == people2.size());
+	assertTrue (Person("Simpson", "Lisa", "Springfield", 8) == people2[0]);
+	assertTrue (Person("Simpson", "Homer", "Capital City", 42) == people2[1]);
 }
 
 
