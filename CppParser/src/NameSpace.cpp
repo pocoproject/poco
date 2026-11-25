@@ -184,6 +184,12 @@ void NameSpace::typeAliases(SymbolTable& table) const
 }
 
 
+void NameSpace::concepts(SymbolTable& table) const
+{
+	extract(Symbol::SYM_CONCEPT, table);
+}
+
+
 void NameSpace::enums(SymbolTable& table) const
 {
 	extract(Symbol::SYM_ENUM, table);

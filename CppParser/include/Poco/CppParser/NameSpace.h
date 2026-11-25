@@ -82,6 +82,9 @@ public:
 	void typeAliases(SymbolTable& table) const;
 		/// Fills the symbol table with all type alias (using) definitions.
 
+	void concepts(SymbolTable& table) const;
+		/// Fills the symbol table with all concepts.
+
 	void enums(SymbolTable& table) const;
 		/// Fills the symbol table with all enums.
 

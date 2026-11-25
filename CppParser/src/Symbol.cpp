@@ -16,11 +16,21 @@
 #include "Poco/CppParser/NameSpace.h"
 #include "Poco/CppParser/Utility.h"
 #include "Poco/String.h"
+#include "Poco/Ascii.h"
+#include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <string_view>
 
 
 namespace Poco::CppParser {
+
+
+static constexpr std::string_view CONCEPT_KEYWORD("concept");
+static constexpr std::string_view REQUIRES_KEYWORD("requires");
+static constexpr std::string_view AND_KEYWORD("and");
+static constexpr std::string_view OR_KEYWORD("or");
+static constexpr std::string_view TEMPLATE_DISAMBIGUATOR("::template");
 
 
 int Symbol::_nextId = 0;
@@ -127,13 +137,38 @@ std::string Symbol::extractName(const std::string& decl)
 {
 	poco_assert (!decl.empty());
 
+	std::string::size_type templateEnd = 0;
+	if (decl.compare(0, 8, "template") == 0)
+	{
+		templateEnd = 8;
+		while (templateEnd < decl.size() && Poco::Ascii::isSpace(decl[templateEnd])) ++templateEnd;
+		if (templateEnd < decl.size() && decl[templateEnd] == '<')
+			templateEnd = skipBalanced(decl, templateEnd, '<', '>');
+	}
+	// The template parameter list and a requires clause after it can contain
+	// '(', '=' and operator names, which do not belong to the declarator.
+	const std::string::size_type clauseEnd = skipRequiresClause(decl, templateEnd);
+
+	// A concept definition is any constant expression, so its name is not
+	// found by the rules for variables and functions below.
+	std::string::size_type conceptPos = clauseEnd;
+	while (conceptPos < decl.size() && Poco::Ascii::isSpace(decl[conceptPos])) ++conceptPos;
+	if (templateEnd > 0 && isKeywordAt(decl, conceptPos, CONCEPT_KEYWORD))
+	{
+		std::string::size_type nameStart = conceptPos + CONCEPT_KEYWORD.size();
+		while (nameStart < decl.size() && Poco::Ascii::isSpace(decl[nameStart])) ++nameStart;
+		std::string::size_type nameEnd = nameStart;
+		while (nameEnd < decl.size() && isIdent(decl[nameEnd])) ++nameEnd;
+		return decl.substr(nameStart, nameEnd - nameStart);
+	}
+
 	// special cases: operator () and operator []
-	if (decl.find("operator ()") != std::string::npos)
+	if (decl.find("operator ()", clauseEnd) != std::string::npos)
 		return "operator ()";
-	else if (decl.find("operator[]") != std::string::npos)
+	else if (decl.find("operator[]", clauseEnd) != std::string::npos)
 		return "operator []";
 
-	std::string::size_type pos = decl.find('(');
+	std::string::size_type pos = decl.find('(', clauseEnd);
 	if (pos != std::string::npos)
 	{
 		// special case std::function<void(int)> a
@@ -179,27 +214,8 @@ std::string Symbol::extractName(const std::string& decl)
 	if (pos == std::string::npos || (pos > 0 && decl[pos - 1] == '('))
 		pos = decl.size();
 	if (pos > 0) --pos;
-	// check for constant; start searching after template
-	std::string::size_type eqStart = 0;
-	if (decl.compare(0, 8, "template") == 0)
-	{
-		eqStart = 8;
-		while (std::isspace(decl[eqStart]) && eqStart < decl.size()) ++eqStart;
-		if (eqStart < decl.size() && decl[eqStart] == '<')
-		{
-			++eqStart;
-			int tc = 1;
-			while (tc > 0 && eqStart < decl.size())
-			{
-				if (decl[eqStart] == '<')
-					++tc;
-				else if (decl[eqStart] == '>')
-					--tc;
-				++eqStart;
-			}
-		}
-	}
-	std::string::size_type eqPos = decl.find('=', eqStart);
+	// check for constant; start searching after template and requires clause
+	std::string::size_type eqPos = decl.find('=', clauseEnd);
 	if (eqPos != std::string::npos)
 	{
 		// special case: default template parameter
@@ -233,7 +249,7 @@ std::string Symbol::extractName(const std::string& decl)
 		while (pos > 0 && std::isspace(decl[pos])) --pos;
 	}
 	std::string::size_type end = pos;
-	std::string::size_type op = decl.find("operator ");
+	std::string::size_type op = decl.find("operator ", clauseEnd);
 	if (op != std::string::npos && (op == 0 || std::isspace(decl[op - 1]) || decl[op - 1] == ':'))
 	{
 		pos = op;
@@ -270,6 +286,126 @@ bool Symbol::hasAttr(const std::string& decl, const std::string& attr)
 	attrS += ' ';
 	std::string::size_type pos = decl.find(attrS);
 	return pos == 0 || (pos != std::string::npos && decl[pos - 1] == ' ');
+}
+
+
+bool Symbol::isKeywordAt(const std::string& decl, std::string::size_type pos, std::string_view keyword)
+{
+	const std::string::size_type end = pos + keyword.size();
+	return decl.compare(pos, keyword.size(), keyword) == 0 && (end == decl.size() || !isIdent(decl[end]));
+}
+
+
+std::string::size_type Symbol::skipBalanced(const std::string& decl, std::string::size_type pos, char open, char close)
+{
+	poco_assert (pos < decl.size() && decl[pos] == open);
+
+	const auto isLiteralStart = [&decl](std::string::size_type i)
+	{
+		if (decl[i] != '"' && decl[i] != '\'') return false;
+		// an identifier before the quote is an encoding prefix, a number before ' has a digit separator
+		std::string::size_type prefixStart = i;
+		while (prefixStart > 0 && isIdent(decl[prefixStart - 1])) --prefixStart;
+		const std::string_view prefix = std::string_view(decl).substr(prefixStart, i - prefixStart);
+		return prefix.empty() || prefix == "L" || prefix == "u" || prefix == "U" || prefix == "u8";
+	};
+
+	int depth = 0;
+	int parenDepth = 0;
+	std::string::size_type i = pos;
+	do
+	{
+		const char c = decl[i];
+		if (isLiteralStart(i))
+		{
+			++i;
+			while (i < decl.size() && decl[i] != c)
+			{
+				if (decl[i] == '\\') ++i;
+				++i;
+			}
+		}
+		// in template arguments, '<' and '>' in parentheses are comparisons
+		else if (open == '<' && c == '(')
+			++parenDepth;
+		else if (open == '<' && c == ')')
+			--parenDepth;
+		else if (parenDepth == 0 && c == open)
+			++depth;
+		else if (parenDepth == 0 && c == close)
+			--depth;
+		++i;
+	}
+	while (depth > 0 && i < decl.size());
+	return std::min(i, decl.size());
+}
+
+
+std::string::size_type Symbol::skipRequiresClause(const std::string& decl, std::string::size_type pos)
+{
+	const auto skipSpace = [&decl](std::string::size_type i)
+	{
+		while (i < decl.size() && Poco::Ascii::isSpace(decl[i])) ++i;
+		return i;
+	};
+	const auto skipNameChars = [&decl](std::string::size_type i)
+	{
+		while (i < decl.size() && (isIdent(decl[i]) || decl[i] == ':')) ++i;
+		return i;
+	};
+	const auto skipName = [&decl, &skipSpace, &skipNameChars](std::string::size_type i)
+	{
+		i = skipNameChars(i);
+		// the name after T::template is separated by a space
+		if (i >= TEMPLATE_DISAMBIGUATOR.size() &&
+			decl.compare(i - TEMPLATE_DISAMBIGUATOR.size(), TEMPLATE_DISAMBIGUATOR.size(), TEMPLATE_DISAMBIGUATOR) == 0)
+			i = skipNameChars(skipSpace(i));
+		return i;
+	};
+	const auto skipOperator = [&decl](std::string::size_type i)
+	{
+		if (decl.compare(i, 2, "&&") == 0 || decl.compare(i, 2, "||") == 0)
+			return i + 2;
+		else if (isKeywordAt(decl, i, AND_KEYWORD))
+			return i + AND_KEYWORD.size();
+		else if (isKeywordAt(decl, i, OR_KEYWORD))
+			return i + OR_KEYWORD.size();
+		else
+			return i;
+	};
+
+	std::string::size_type i = skipSpace(pos);
+	if (!isKeywordAt(decl, i, REQUIRES_KEYWORD)) return pos;
+	i += REQUIRES_KEYWORD.size();
+	bool hasMore = true;
+	while (hasMore)
+	{
+		i = skipSpace(i);
+		if (i < decl.size() && decl[i] == '(')
+		{
+			i = skipBalanced(decl, i, '(', ')');
+		}
+		else if (isKeywordAt(decl, i, REQUIRES_KEYWORD))
+		{
+			i = skipSpace(i + REQUIRES_KEYWORD.size());
+			if (i < decl.size() && decl[i] == '(')
+				i = skipSpace(skipBalanced(decl, i, '(', ')'));
+			if (i < decl.size() && decl[i] == '{')
+				i = skipBalanced(decl, i, '{', '}');
+		}
+		else
+		{
+			// a qualified name or true or false; template arguments may follow every part
+			i = skipSpace(skipName(i));
+			while (i < decl.size() && decl[i] == '<')
+				i = skipSpace(skipName(skipBalanced(decl, i, '<', '>')));
+		}
+		i = skipSpace(i);
+		const std::string::size_type next = skipOperator(i);
+		hasMore = next != i;
+		i = next;
+	}
+	return i;
 }
 
 

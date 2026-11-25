@@ -247,6 +247,9 @@ Features:
   Adler-32 4.3 -> 46, CRC-64/XZ 79. Where the system zlib of an unbundled build is zlib-ng,
   CRC-32 and Adler-32 were already at this speed on x86-64, and CRC-32 goes from 11 to 29 on
   AArch64. An unbundled build needs zlib 1.2.9 or later.
+- GH #5769 CppParser and PocoDoc read C++20 concepts and requires clauses; PocoDoc lists concepts
+  in their own section and documents class templates whose template parameter list contains
+  parentheses under their names.
 
 New Components:
 

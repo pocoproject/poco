@@ -20,6 +20,7 @@
 #include "Poco/Format.h"
 #include "Poco/Util/Application.h"
 #include "Poco/CppParser/Struct.h"
+#include "Poco/CppParser/Concept.h"
 #include "Poco/CppParser/Enum.h"
 #include "Poco/CppParser/EnumValue.h"
 #include "Poco/CppParser/Function.h"
@@ -492,11 +493,13 @@ void DocWriter::writeNameSpace(const NameSpace* pNameSpace)
 	writeClassesSummary(ostr, pNameSpace, &sstr);
 	writeTypesSummary(ostr, pNameSpace, &sstr);
 	writeAliasesSummary(ostr, pNameSpace, &sstr);
+	writeConceptsSummary(ostr, pNameSpace, &sstr);
 	writeFunctionsSummary(ostr, pNameSpace, &sstr);
 	writeNameSpaces(ostr, pNameSpace, &sstr);
 	writeClasses(ostr, pNameSpace, &sstr);
 	writeTypes(ostr, pNameSpace, &sstr);
 	writeAliases(ostr, pNameSpace, &sstr);
+	writeConcepts(ostr, pNameSpace, &sstr);
 	writeEnums(ostr, pNameSpace, &sstr);
 	writeFunctions(ostr, pNameSpace, &sstr);
 	writeVariables(ostr, pNameSpace, &sstr);
@@ -1891,6 +1894,23 @@ void DocWriter::writeAliasesSummary(std::ostream& ostr, const NameSpace* pNameSp
 }
 
 
+void DocWriter::writeConceptsSummary(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
+{
+	NameSpace::SymbolTable concepts;
+	pNameSpace->concepts(concepts);
+	if (!concepts.empty())
+	{
+		ostr << "<p><b>" << tr("Concepts") << ":</b> " << std::endl;
+		bool first = true;
+		for (const auto& [name, pConcept]: concepts)
+		{
+			writeNameListItem(ostr, name, pConcept, pNameSpace, first);
+		}
+		ostr << "</p>" << std::endl;
+	}
+}
+
+
 void DocWriter::writeTypes(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
 {
 	NameSpace::SymbolTable types;
@@ -1935,7 +1955,22 @@ void DocWriter::writeAliases(std::ostream& ostr, const NameSpace* pNameSpace, st
 }
 
 
-void DocWriter::writeType(std::ostream& ostr, const TypeDef* pType, std::ostream* pSstr)
+void DocWriter::writeConcepts(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
+{
+	NameSpace::SymbolTable concepts;
+	pNameSpace->concepts(concepts);
+	if (!concepts.empty())
+	{
+		writeSubTitle(ostr, tr("Concepts"));
+		for (const auto& [name, pConcept]: concepts)
+		{
+			writeType(ostr, static_cast<const Concept*>(pConcept), pSstr);
+		}
+	}
+}
+
+
+void DocWriter::writeType(std::ostream& ostr, const Decl* pType, std::ostream* pSstr)
 {
 	ostr << "<h3>";
 	writeAnchor(ostr, pType->name(), pType);
@@ -2594,6 +2629,7 @@ void DocWriter::loadStrings(const std::string& language)
 	loadString("All_Base_Classes", "All Base Classes", language);
 	loadString("All_Symbols", "All Symbols", language);
 	loadString("Anonymous", "Anonymous", language);
+	loadString("Concepts", "Concepts", language);
 	loadString("Constructors", "Constructors", language);
 	loadString("Class", "Class", language);
 	loadString("Deprecated", "Deprecated", language);

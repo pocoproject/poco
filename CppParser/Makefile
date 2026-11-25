@@ -10,7 +10,7 @@ SHAREDOPT_CXX   += -DCppParser_EXPORTS
 
 objects = CppToken Decl Enum EnumValue Function NameSpace Parameter \
 	Parser Struct Symbol Tokenizer TypeDef BuiltIn Utility Variable \
-	Attributes AttributesParser
+	Attributes AttributesParser Concept
 
 target         = PocoCppParser
 target_version = $(LIBVERSION)

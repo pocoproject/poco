@@ -27,7 +27,7 @@ namespace Poco::CppParser {
 class Symbol;
 class Struct;
 class Function;
-class TypeDef;
+class Decl;
 class Enum;
 class Variable;
 
@@ -168,9 +168,11 @@ protected:
 	void writeClassSummary(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
 	void writeTypesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeAliasesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeConceptsSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeTypes(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeAliases(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
-	void writeType(std::ostream& ostr, const Poco::CppParser::TypeDef* pType, std::ostream* pSstr = nullptr);
+	void writeType(std::ostream& ostr, const Poco::CppParser::Decl* pType, std::ostream* pSstr = nullptr);
+	void writeConcepts(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeEnums(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeEnum(std::ostream& ostr, const Poco::CppParser::Enum* pEnum, std::ostream* pSstr);
 	void writeConstructors(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);

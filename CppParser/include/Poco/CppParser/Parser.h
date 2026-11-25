@@ -66,6 +66,8 @@ protected:
 	const Poco::Token* parseClass(const Poco::Token* pNext, std::string& decl);
 	const Poco::Token* parseTemplate(const Poco::Token* pNext);
 	const Poco::Token* parseTemplateArgs(const Poco::Token* pNext, std::string& decl);
+	const Poco::Token* parseRequiresClause(const Poco::Token* pNext, std::string& decl);
+	const Poco::Token* parseConcept(const Poco::Token* pNext, std::string& decl);
 	const Poco::Token* parseVarFunc(const Poco::Token* pNext);
 	const Poco::Token* parseVarFunc(const Poco::Token* pNext, std::string& decl);
 	const Poco::Token* parseFriend(const Poco::Token* pNext);
@@ -84,6 +86,7 @@ protected:
 	const Poco::Token* parseIdentifier(const Poco::Token* pNext, std::string& id);
 	const Poco::Token* parseAttributes(const Poco::Token* pNext, std::string& attrs);
 	const Poco::Token* parseParenthesized(const Poco::Token* pNext, std::string& decl);
+	const Poco::Token* parseBraced(const Poco::Token* pNext, std::string& decl);
 
 	void addSymbol(Symbol* pSymbol, int lineNumber, bool addGST = true);
 	void pushNameSpace(NameSpace* pNameSpace, int lineNumber, bool addGST = true);

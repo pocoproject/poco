@@ -21,6 +21,7 @@
 #include "Poco/CppParser/CppParser.h"
 #include "Poco/CppParser/Attributes.h"
 #include "Poco/Foundation.h"
+#include <string_view>
 
 
 namespace Poco::CppParser {
@@ -47,7 +48,8 @@ public:
 		SYM_TYPEDEF,    /// A typedef
 		SYM_TYPEALIAS,  /// A type alias (using)
 		SYM_BUILTIN,    /// A built-in type
-		SYM_VARIABLE    /// A (member) variable
+		SYM_VARIABLE,   /// A (member) variable
+		SYM_CONCEPT     /// A concept
 	};
 
 	enum Access
@@ -172,6 +174,19 @@ protected:
 private:
 	Symbol(const Symbol&);
 	Symbol& operator = (const Symbol&);
+
+	[[nodiscard]] static bool isKeywordAt(const std::string& decl, std::string::size_type pos, std::string_view keyword);
+		/// Returns true if decl contains the keyword as a whole word at pos,
+		/// which must not be greater than the size of decl.
+
+	[[nodiscard]] static std::string::size_type skipBalanced(const std::string& decl, std::string::size_type pos, char open, char close);
+		/// Returns the position after the bracket that closes the open
+		/// bracket at pos. Brackets in string and character literals do not
+		/// count, nor do '<' and '>' in parentheses when open is '<'.
+
+	[[nodiscard]] static std::string::size_type skipRequiresClause(const std::string& decl, std::string::size_type pos);
+		/// Returns the position after the requires clause that begins
+		/// at pos (after white space), or pos if there is none.
 
 	int         _id;
 	std::string _name;
