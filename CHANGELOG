@@ -412,6 +412,11 @@ Bug Fixes and Improvements:
 - GH #5717 A copied Poco::Net::MessageHeader keeps the field, name length and value length
   limits of its source.
 - GH #5717 NetSSL_Win: Context::init() closes the certificate stores when it fails.
+- GH #5406 Poco::Net::SocketImpl::poll() on Windows uses WSAPoll() instead of creating a wepoll
+  instance for the single call. A socket that another thread closes (as
+  HTTPServerConnection::onServerStopped() already does to abort a connection) therefore unblocks
+  the wait, where epoll_wait() has no such wakeup and stayed blocked until the timeout. PollSet
+  keeps epoll/wepoll, since it already has wakeUp().
 
 
 Release 1.15.4 (2026-09-22)

@@ -1924,6 +1924,43 @@ void SocketTest::testSendDontWaitBlocking()
 #endif
 
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+void SocketTest::testPollInterruptedByClose()
+{
+	static constexpr long CLOSE_AFTER_MS = 200;
+	static constexpr long POLL_TIMEOUT_MS = 10000;
+	static constexpr long MAX_ELAPSED_MS = 2000;
+
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	StreamSocket ss;
+	ss.connect(server.address());
+	StreamSocket peer = server.acceptConnection();
+
+	// another thread closes the socket poll() waits on, as
+	// HTTPServerConnection::onServerStopped() does to abort a connection
+	Poco::Thread closerThread;
+	closerThread.startFunc([&ss]
+		{
+			Poco::Thread::sleep(CLOSE_AFTER_MS);
+			ss.close();
+		});
+
+	Stopwatch sw;
+	sw.start();
+	try
+	{
+		ss.poll(Timespan(POLL_TIMEOUT_MS*1000), Socket::SELECT_READ);
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	closerThread.join();
+
+	assertTrue (sw.elapsed()/1000 < MAX_ELAPSED_MS);
+}
+#endif // POCO_OS_FAMILY_WINDOWS
+
+
 void SocketTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -2029,6 +2066,9 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testReceiveDontWaitBlocking);
 	CppUnit_addTest(pSuite, SocketTest, testSendDontWaitBlocking);
 #endif
+#endif
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	CppUnit_addTest(pSuite, SocketTest, testPollInterruptedByClose);
 #endif
 
 	return pSuite;

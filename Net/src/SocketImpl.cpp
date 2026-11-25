@@ -25,13 +25,10 @@
 #include <string.h> // FD_SET needs memset on some platforms, so we can't use <cstring>
 
 
-#if defined(POCO_HAVE_FD_EPOLL) && defined(POCO_OS_FAMILY_WINDOWS)
-	#include "wepoll.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
 	#include "mswsock.h"
 #elif defined(POCO_HAVE_FD_EPOLL) || defined(POCO_HAVE_FD_POLL)
-	#ifndef _WIN32
-		#include <poll.h>
-	#endif
+	#include <poll.h>
 #endif
 
 
@@ -69,18 +66,6 @@ using Poco::TimeoutException;
 using Poco::InvalidArgumentException;
 using Poco::NumberFormatter;
 using Poco::Timespan;
-
-
-#ifdef WEPOLL_H_
-namespace {
-
-	int close(HANDLE h)
-	{
-		return epoll_close(h);
-	}
-
-}
-#endif // WEPOLL_H_
 
 
 namespace Poco::Net {
@@ -985,61 +970,14 @@ bool SocketImpl::poll(const Poco::Timespan& timeout, int mode)
 	poco_socket_t sockfd = _sockfd;
 	if (sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
 
-#if defined(POCO_HAVE_FD_EPOLL) && defined(POCO_OS_FAMILY_WINDOWS)
-	HANDLE epollfd = epoll_create(1);
-
-	if (!epollfd)
-	{
-		error("Can't create epoll queue");
-	}
-
-	struct epoll_event evin;
-	memset(&evin, 0, sizeof(evin));
-
-	if (mode & SELECT_READ)
-		evin.events |= EPOLLIN;
-	if (mode & SELECT_WRITE)
-		evin.events |= EPOLLOUT;
-	if (mode & SELECT_ERROR)
-		evin.events |= EPOLLERR;
-
-	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sockfd, &evin) < 0)
-	{
-		::close(epollfd);
-		error("Can't insert socket to epoll queue");
-	}
-
-	Poco::Timespan remainingTime(timeout);
-	int rc;
-	do
-	{
-		struct epoll_event evout;
-		memset(&evout, 0, sizeof(evout));
-
-		Poco::Timestamp start;
-		// A negative timeout is passed as -1, which epoll_wait() takes as no timeout.
-		const int milliseconds = (remainingTime < 0) ? -1 : static_cast<int>(std::min<Poco::Int64>(remainingTime.totalMilliseconds(), std::numeric_limits<int>::max()));
-		rc = epoll_wait(epollfd, &evout, 1, milliseconds);
-		if (rc < 0 && lastError() == POCO_EINTR && remainingTime > 0)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = end - start;
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (rc < 0 && lastError() == POCO_EINTR);
-
-	::close(epollfd);
-	if (rc < 0) error();
-	return rc > 0;
-
-#elif defined(POCO_HAVE_FD_EPOLL) || defined(POCO_HAVE_FD_POLL)
+#if defined(POCO_HAVE_FD_EPOLL) || defined(POCO_HAVE_FD_POLL)
 
 	// On Linux, poll() needs no additional descriptor, unlike epoll,
 	// so it also works when the process has no free descriptor left.
+	// On Windows, WSAPoll() reports a socket that another thread closed
+	// as POLLNVAL below, where epoll_wait() (via wepoll) has no such
+	// wakeup and would stay blocked until the timeout; epoll/wepoll
+	// stays reserved for PollSet, which has wakeUp().
 	pollfd pollBuf;
 
 	memset(&pollBuf, 0, sizeof(pollfd));

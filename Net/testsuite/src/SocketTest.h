@@ -84,6 +84,9 @@ public:
 	void testSendDontWaitBlocking();
 #endif
 #endif
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	void testPollInterruptedByClose();
+#endif
 
 	void setUp() override;
 	void tearDown() override;
