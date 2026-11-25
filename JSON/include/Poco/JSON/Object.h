@@ -510,13 +510,15 @@ inline const Dynamic::Var& Object::getValue(ValueMap::const_iterator& it) const
 }
 
 
+inline const std::string& Object::getKey(KeyList::const_iterator& it) const
+{
+	return (*it)->first;
+}
+
+
 inline const Dynamic::Var& Object::getValue(KeyList::const_iterator& it) const
 {
-	const auto itv = _values.find((*it)->first);
-	if (itv != _values.end())
-		return itv->second;
-	else
-		throw Poco::NotFoundException();
+	return (*it)->second;
 }
 
 

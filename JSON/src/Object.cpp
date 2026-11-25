@@ -205,33 +205,10 @@ void Object::stringify(std::ostream& out, unsigned int indent, int step, int opt
 }
 
 
-const std::string& Object::getKey(KeyList::const_iterator& iter) const
-{
-	auto it = _values.begin();
-	auto end = _values.end();
-	for (; it != end; ++it)
-	{
-		if (it == *iter) return it->first;
-	}
-
-	throw NotFoundException((*iter)->first);
-}
-
-
 Object& Object::set(const std::string& key, const Dynamic::Var& value)
 {
-	std::pair<ValueMap::iterator, bool> ret = _values.insert(ValueMap::value_type(key, value));
-	if (!ret.second) ret.first->second = value;
-	if (_preserveInsOrder)
-	{
-		auto it = _keys.begin();
-		const auto end = _keys.end();
-		for (; it != end; ++it)
-		{
-			if (key == (*it)->first) return *this;
-		}
-		_keys.emplace_back(ret.first);
-	}
+	const auto [it, inserted] = _values.insert_or_assign(key, value);
+	if (inserted && _preserveInsOrder) _keys.emplace_back(it);
 	_structModified = true;
 	_ordStructModified = true;
 	return *this;
