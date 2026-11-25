@@ -14,12 +14,36 @@
 #include "Poco/Net/MultipartReader.h"
 #include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Format.h"
+#include "Poco/StreamCopier.h"
+#include "Poco/String.h"
 #include <sstream>
+#include <vector>
 
 
 using Poco::Net::MultipartReader;
 using Poco::Net::MessageHeader;
 using Poco::Net::MultipartException;
+using Poco::StreamCopier;
+
+
+namespace
+{
+	[[nodiscard]] std::vector<std::string> readParts(const std::string& message)
+		/// Returns the content of the parts of a message with the boundary MIME_boundary_01234567.
+	{
+		std::istringstream istr(message);
+		MultipartReader r(istr, "MIME_boundary_01234567");
+		std::vector<std::string> parts;
+		while (r.hasNextPart())
+		{
+			MessageHeader h;
+			r.nextPart(h);
+			StreamCopier::copyToString(r.stream(), parts.emplace_back());
+		}
+		return parts;
+	}
+}
 
 
 MultipartReaderTest::MultipartReaderTest(const std::string& name): CppUnit::TestCase(name)
@@ -367,6 +391,28 @@ void MultipartReaderTest::testUnixLineEnds()
 }
 
 
+void MultipartReaderTest::testBoundaryAtWindowEnd()
+{
+	// The sizes of the long part move the delimiter after it across the end of
+	// the first and of the second read window (32768 bytes).
+	const std::string twoParts("--MIME_boundary_01234567\r\nname1: value1\r\n\r\n%s\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
+	const std::string twoPartsUnix(Poco::replace(twoParts, "\r\n", "\n"));
+	const std::string onePart("--MIME_boundary_01234567\r\nname1: value1\r\n\r\n%s\r\n--MIME_boundary_01234567--\r\n");
+	for (const int firstSize: {32600, 64800})
+	{
+		for (int size = firstSize; size <= firstSize + 200; ++size)
+		{
+			const std::string longPart(static_cast<std::size_t>(size), 'X');
+			const std::vector<std::string> both{longPart, "this is part 2"};
+			const std::vector<std::string> single{longPart};
+			loop_1_assert (size, readParts(Poco::format(twoParts, longPart)) == both);
+			loop_1_assert (size, readParts(Poco::format(twoPartsUnix, longPart)) == both);
+			loop_1_assert (size, readParts(Poco::format(onePart, longPart)) == single);
+		}
+	}
+}
+
+
 void MultipartReaderTest::setUp()
 {
 }
@@ -391,6 +437,7 @@ CppUnit::Test* MultipartReaderTest::suite()
 	CppUnit_addTest(pSuite, MultipartReaderTest, testEmptyBoundary);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testRobustness);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testUnixLineEnds);
+	CppUnit_addTest(pSuite, MultipartReaderTest, testBoundaryAtWindowEnd);
 
 	return pSuite;
 }

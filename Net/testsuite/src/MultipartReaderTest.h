@@ -34,6 +34,7 @@ public:
 	void testEmptyBoundary();
 	void testRobustness();
 	void testUnixLineEnds();
+	void testBoundaryAtWindowEnd();
 
 	void setUp();
 	void tearDown();

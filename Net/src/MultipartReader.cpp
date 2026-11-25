@@ -275,14 +275,15 @@ std::streamsize MultipartStreamBuf::readContent(char* buffer, std::streamsize le
 		pos += 2; // --
 		pos += static_cast<std::streamsize>(_boundary.size());
 
-		if (pos < avail)
+		// The line end or the "--" after the boundary takes up to two bytes.
+		if (pos + 1 < avail)
 		{
 			if (p[pos] == '-')
 			{
 				_lastPart = true;
-				pos += (pos + 1 < avail && p[pos + 1] == '-') ? 2 : 1;
+				pos += (p[pos + 1] == '-') ? 2 : 1;
 			}
-			else if (p[pos] == '\r' && pos + 1 < avail && p[pos + 1] == '\n')
+			else if (p[pos] == '\r' && p[pos + 1] == '\n')
 			{
 				pos += 2;
 			}
