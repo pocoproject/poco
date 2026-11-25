@@ -87,6 +87,7 @@ public:
 	void testCopy();
 	void testMove();
 	void testRemove();
+	void testSetExistingKey();
 
 	void testEnum();
 	void testEmbeddedNulKey();

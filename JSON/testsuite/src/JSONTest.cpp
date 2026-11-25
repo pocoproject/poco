@@ -2476,7 +2476,84 @@ void JSONTest::testRemove()
 	assertTrue(nl[0] == "foo");
 	assertTrue(nl[1] == "baz");
 
+	// a removed key that is set again is the last one
+	obj2.set("bar", 1);
+	nl = obj2.getNames();
+
+	assertTrue(nl.size() == 3);
+	assertTrue(nl[0] == "foo");
+	assertTrue(nl[1] == "baz");
+	assertTrue(nl[2] == "bar");
+
+	std::ostringstream ostr;
+	obj2.stringify(ostr);
+	assertTrue(ostr.str() == R"({"foo":0,"baz":0,"bar":1})");
 }
+
+
+void JSONTest::testSetExistingKey()
+{
+	Object obj(Poco::JSON_PRESERVE_KEY_ORDER);
+	obj.set("foo", 1);
+	obj.set("bar", 2);
+	obj.set("baz", 3);
+
+	Poco::DynamicStruct ds = obj;
+	Poco::OrderedDynamicStruct ods = obj;
+	assertTrue (ds["bar"] == 2);
+	assertTrue (ods["bar"] == 2);
+
+	obj.set("bar", 20);
+
+	// the key keeps its position
+	Object::NameList nl = obj.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+
+	std::ostringstream ostr;
+	obj.stringify(ostr);
+	assertTrue (ostr.str() == R"({"foo":1,"bar":20,"baz":3})");
+
+	// the structs are created again from the changed value
+	ds = obj;
+	ods = obj;
+	assertTrue (ds["bar"] == 20);
+	assertTrue (ods["bar"] == 20);
+	assertTrue (ods.begin()->first == "foo");
+
+	// a copy has its own key order
+	Object copy(obj);
+	copy.set("foo", 10);
+	std::ostringstream copied;
+	copy.stringify(copied);
+	assertTrue (copied.str() == R"({"foo":10,"bar":20,"baz":3})");
+	std::ostringstream source;
+	obj.stringify(source);
+	assertTrue (source.str() == R"({"foo":1,"bar":20,"baz":3})");
+
+	Object sorted;
+	sorted.set("foo", 1);
+	ds = sorted;
+	ods = sorted;
+	assertTrue (ds["foo"] == 1);
+	assertTrue (ods["foo"] == 1);
+	sorted.set("foo", 10);
+	ds = sorted;
+	ods = sorted;
+	assertTrue (ds["foo"] == 10);
+	assertTrue (ods["foo"] == 10);
+
+	// a key repeated in the parsed text keeps its first position and gets the last value
+	Parser parser(new ParseHandler(true));
+	Var result = parser.parse(R"({"foo":1,"bar":2,"foo":3})");
+	std::ostringstream parsed;
+	result.extract<Object::Ptr>()->stringify(parsed);
+	assertTrue (parsed.str() == R"({"foo":3,"bar":2})");
+}
+
+
 void JSONTest::testEnum()
 {
 	enum SAMPLE_ENUM
@@ -2775,6 +2852,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
 	CppUnit_addTest(pSuite, JSONTest, testRemove);
+	CppUnit_addTest(pSuite, JSONTest, testSetExistingKey);
 	CppUnit_addTest(pSuite, JSONTest, testEnum);
 	CppUnit_addTest(pSuite, JSONTest, testEmbeddedNulKey);
 	CppUnit_addTest(pSuite, JSONTest, testCommentsInStrings);
