@@ -34,6 +34,7 @@ public:
 
 #endif
 
+	void testECDSASignatureEmptyRS();
 	void testCurveNameUnknownNID();
 	void testCurveNIDDefaultName();
 	void testUnknownCurveName();
