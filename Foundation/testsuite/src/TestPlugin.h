@@ -20,6 +20,12 @@
 
 #if !defined(POCO_OS_FAMILY_WINDOWS)
 	#define PLUGIN_EXPORT __attribute__((visibility("default")))
+#elif defined(POCO_TESTPLUGIN_SHARED)
+	#if defined(TestPlugin_EXPORTS)
+		#define PLUGIN_EXPORT __declspec(dllexport)
+	#else
+		#define PLUGIN_EXPORT __declspec(dllimport)
+	#endif
 #else
 #define PLUGIN_EXPORT
 #endif

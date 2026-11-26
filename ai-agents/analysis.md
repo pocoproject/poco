@@ -12,7 +12,7 @@ sanitizer and add `-DENABLE_TRACE=ON` for stack traces in exceptions.
 |---|---|---|
 | AddressSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=address"` | |
 | ASan, hidden visibility | the above plus `-DCMAKE_CXX_VISIBILITY_PRESET=hidden` | `ASAN_OPTIONS=detect_odr_violation=2` |
-| UndefinedBehaviorSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr"` | `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1` |
+| UndefinedBehaviorSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=undefined"` | `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1` |
 | ThreadSanitizer | `-DPOCO_SANITIZEFLAGS="-fsanitize=thread"` | `TSAN_OPTIONS="suppressions=<repo-root>/tsan.suppress,second_deadlock_stack=1"` |
 
 ```bash
@@ -23,7 +23,6 @@ cmake -S <repo-root> -B <build-dir>-tsan -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=
 TSAN_OPTIONS="suppressions=<repo-root>/tsan.suppress,second_deadlock_stack=1" POCO_BASE=<repo-root> PATH="$PATH:$(pwd)" ./Net-testrunner -all
 ```
 
-- The vptr check of UBSan is disabled because the Foundation tests do not link with it.
 - Without `halt_on_error=1`, UBSan prints a report and the test continues and passes; `ctest --output-on-failure`
   then does not show the report.
 - On macOS, ASan reports a spurious ODR violation for the test plugin loaded with `dlopen`; the CI job
