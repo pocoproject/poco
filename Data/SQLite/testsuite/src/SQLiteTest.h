@@ -180,6 +180,7 @@ public:
 	void testScriptResultMetadata();
 	void testScriptDataSetMetadata();
 	void testTrailingComment();
+	void testSelectAffectedRowCount();
 
 	void setUp();
 	void tearDown();

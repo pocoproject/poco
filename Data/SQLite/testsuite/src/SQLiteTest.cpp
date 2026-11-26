@@ -5274,6 +5274,25 @@ void SQLiteTest::testTrailingComment()
 }
 
 
+void SQLiteTest::testSelectAffectedRowCount()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+	session << "CREATE TABLE Ints (i INTEGER)", now;
+	std::vector<int> ints{1, 2, 3};
+	session << "INSERT INTO Ints VALUES (?)", use(ints), now;
+
+	std::vector<int> result;
+	Statement stmt = (session << "SELECT i FROM Ints", into(result), now);
+	assertEqual (3, result.size());
+	assertEqual (3, stmt.affectedRowCount());
+
+	Statement autoStmt = (session << "SELECT i FROM Ints", now);
+	RecordSet rs(autoStmt);
+	assertEqual (3, rs.rowCount());
+	assertEqual (3, autoStmt.affectedRowCount());
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -5420,6 +5439,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testScriptResultMetadata);
 	CppUnit_addTest(pSuite, SQLiteTest, testScriptDataSetMetadata);
 	CppUnit_addTest(pSuite, SQLiteTest, testTrailingComment);
+	CppUnit_addTest(pSuite, SQLiteTest, testSelectAffectedRowCount);
 
 	return pSuite;
 }
