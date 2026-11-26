@@ -1113,6 +1113,7 @@
                                 <File Id="PIPEIMPL.H" Name="PipeImpl.h" Source="$(var.POCO)\Foundation\include\Poco\PipeImpl.h" />
                                 <File Id="PIPEIMPL_WIN32.H" Name="PipeImpl_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\PipeImpl_WIN32.h" />
                                 <File Id="PIPESTREAM.H" Name="PipeStream.h" Source="$(var.POCO)\Foundation\include\Poco\PipeStream.h" />
+                                <File Id="PLACEHOLDER.H" Name="Placeholder.h" Source="$(var.POCO)\Foundation\include\Poco\Placeholder.h" />
                                 <File Id="PLATFORM.H" Name="Platform.h" Source="$(var.POCO)\Foundation\include\Poco\Platform.h" />
                                 <File Id="PLATFORM_WIN32.H" Name="Platform_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Platform_WIN32.h" />
                                 <File Id="POCO.H" Name="Poco.h" Source="$(var.POCO)\Foundation\include\Poco\Poco.h" />

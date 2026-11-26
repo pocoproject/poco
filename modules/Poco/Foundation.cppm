@@ -198,6 +198,7 @@ module;
 #include "Poco/PIDFile.h"
 #include "Poco/Pipe.h"
 #include "Poco/PipeStream.h"
+#include "Poco/Placeholder.h"
 #include "Poco/PriorityDelegate.h"
 #include "Poco/PriorityEvent.h"
 #include "Poco/PriorityExpire.h"
