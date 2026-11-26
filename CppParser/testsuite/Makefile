@@ -4,14 +4,8 @@
 # Makefile for Poco CppParser testsuite
 #
 
-include $(POCO_BASE)/build/rules/global
-
-objects = CppParserTestSuite Driver \
-	CppParserTest UtilityTest \
-	AttributesTestSuite AttributesParserTest
-
-target         = testrunner
-target_version = 1
-target_libs    = PocoCppParser PocoFoundation CppUnit
-
-include $(POCO_BASE)/build/rules/exec
+.PHONY: projects
+%: projects ; @:
+projects:
+	$(MAKE) -f Makefile-Driver $(MAKECMDGOALS)
+	$(MAKE) -f Makefile-TestPreprocessor $(MAKECMDGOALS)

@@ -363,6 +363,27 @@ void UtilityTest::testPreprocessFileCompilerPath()
 }
 
 
+void UtilityTest::testPreprocessFileNameWithSpace()
+{
+	// The program that copies the file to preprocess to the output file is built next to the test runner.
+	std::string name("CppParserTestPreprocessor");
+#if defined(_DEBUG)
+	name += "d";
+#endif
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	name += ".exe";
+#endif
+	Path preprocessor(Path::self());
+	preprocessor.setFileName(name);
+	File(inRoot("with space/")).createDirectories();
+	assertTrue (File(inRoot("with space/B.h")).createFile());
+
+	// The preprocessor receives the name of the file as one argument, as it is written.
+	assertEqual ("B.i"s, PreprocessUtility::preprocessFile(inRoot("with space/B.h"), preprocessor.toString(), inRoot("%.i"), ""s));
+	assertTrue (File(inRoot("B.i")).exists());
+}
+
+
 void UtilityTest::setUp()
 {
 	_savedCwd = Path::current();
@@ -412,6 +433,7 @@ CppUnit::Test* UtilityTest::suite()
 	CppUnit_addTest(pSuite, UtilityTest, testCollectDependenciesFilesAsParsed);
 	CppUnit_addTest(pSuite, UtilityTest, testAddLanguageStandard);
 	CppUnit_addTest(pSuite, UtilityTest, testPreprocessFileCompilerPath);
+	CppUnit_addTest(pSuite, UtilityTest, testPreprocessFileNameWithSpace);
 
 	return pSuite;
 }

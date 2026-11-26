@@ -385,7 +385,7 @@ void ProcessTest::testLaunchArgs()
 		if ('\n' == c)
 		{
 			assertTrue (argNumber < args.size());
-			assertTrue (receivedArg == args[argNumber]);
+			assertEqual (args[argNumber], receivedArg);
 			++argNumber;
 			receivedArg = "";
 		}

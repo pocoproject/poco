@@ -24,6 +24,7 @@
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
 #include "Poco/Mutex.h"
+#include <algorithm>
 #include <cwchar>
 #include <memory>
 
@@ -261,11 +262,10 @@ bool ProcessImpl::mustEscapeArg(const std::string& arg)
 	// and treats a preceding backslash as an escape.
 	if (arg.empty()) return true;
 
-	for (char c: arg)
+	return std::ranges::any_of(arg, [](char c)
 	{
-		if (Poco::Ascii::isSpace(c) || c == '"') return true;
-	}
-	return false;
+		return Poco::Ascii::isSpace(c) || c == '"';
+	});
 }
 
 
