@@ -2302,6 +2302,12 @@ void SQLiteTest::testDateTimeVariants()
 	catch (Poco::SyntaxException&) { }
 	tmp << "DROP TABLE DateTimeVariants", now;
 
+	// 9. A leap second cannot be held by a time and must throw SyntaxException
+	tmp << "CREATE TABLE DateTimeVariants (dt0 TIME)", now;
+	tmp << "INSERT INTO DateTimeVariants VALUES ('08:35:60')", now;
+	try { tmp << "SELECT * FROM DateTimeVariants", into(rt), now; fail ("must fail"); }
+	catch (Poco::SyntaxException&) { }
+	tmp << "DROP TABLE DateTimeVariants", now;
 }
 
 
