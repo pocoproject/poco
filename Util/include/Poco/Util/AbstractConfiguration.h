@@ -25,6 +25,7 @@
 #include "Poco/BasicEvent.h"
 #include <vector>
 #include <utility>
+#include <cstddef>
 
 
 namespace Poco::Util {
@@ -424,6 +425,12 @@ public:
 		///
 		/// If a circular property reference is detected, a
 		/// CircularReferenceException will be thrown.
+		/// The expansion of a value may resolve at most 1000 property
+		/// references in total, across all nesting levels; otherwise a
+		/// CircularReferenceException will be thrown as well.
+		///
+		/// The references may add at most 1 MiB of text to a value;
+		/// otherwise a DataException will be thrown.
 
 	void remove(const std::string& key);
 		/// Removes the property with the given key.
@@ -527,7 +534,7 @@ protected:
 
 private:
 	std::string internalExpand(const std::string& value) const;
-	std::string uncheckedExpand(const std::string& value) const;
+	void uncheckedExpand(std::string::const_iterator it, std::string::const_iterator end, std::string& result, int& references, std::size_t& size) const;
 
 	mutable int _depth;
 	bool        _eventsEnabled;
