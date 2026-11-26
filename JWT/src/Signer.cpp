@@ -260,6 +260,9 @@ public:
 		Poco::DigestEngine::Digest rawR(signature.begin(), signature.begin() + signature.size() / 2);
 		Poco::DigestEngine::Digest rawS(signature.begin() + signature.size() / 2, signature.end());
 
+		// A signature shorter than 2 bytes cannot hold both r and s.
+		if (rawR.empty() || rawS.empty()) return false;
+
 		Poco::Crypto::ECDSASignature ecdsaSig(rawR, rawS);
 		Poco::DigestEngine::Digest derSig = ecdsaSig.toDER();
 

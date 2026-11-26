@@ -416,6 +416,32 @@ void SignerTest::testSignVerifyES256()
 }
 
 
+void SignerTest::testVerifyES256ShortSignature()
+{
+	// Signatures of fewer than 2 bytes must be rejected like any other
+	// invalid signature, without an assertion violation.
+	const std::string headerAndPayload("eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJ4In0.");
+
+	std::istringstream publicKeyStream(ECDSA_PUBLIC_KEY);
+	Poco::SharedPtr<Poco::Crypto::ECKey> pKey = new Poco::Crypto::ECKey(&publicKeyStream);
+
+	Signer signer(pKey);
+	signer.addAlgorithm(Signer::ALGO_ES256);
+
+	for (const char* signature: {"", "A", "AA"})
+	{
+		try
+		{
+			(void) signer.verify(headerAndPayload + signature);
+			fail("Verification must fail");
+		}
+		catch (SignatureVerificationException&)
+		{
+		}
+	}
+}
+
+
 void SignerTest::testVerifyES256()
 {
 	std::string jwt("eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.kLfRdCmR-qewMgzhCtqJrXVoagoh7es0yWsn3VunuS51FMBBcxLTKRDfdgHih0os4gvBdLMYkJu61_IQqoIYZw");
@@ -592,6 +618,7 @@ CppUnit::Test* SignerTest::suite()
 	CppUnit_addTest(pSuite, SignerTest, testSignVerifyES384);
 	CppUnit_addTest(pSuite, SignerTest, testSignVerifyES512);
 	CppUnit_addTest(pSuite, SignerTest, testVerifyES256);
+	CppUnit_addTest(pSuite, SignerTest, testVerifyES256ShortSignature);
 	CppUnit_addTest(pSuite, SignerTest, testVerifyES384);
 	CppUnit_addTest(pSuite, SignerTest, testVerifyES512);
 

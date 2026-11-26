@@ -43,6 +43,7 @@ public:
 	void testVerifyRS512();
 	void testSignVerifyES256();
 	void testVerifyES256();
+	void testVerifyES256ShortSignature();
 	void testSignVerifyES384();
 	void testVerifyES384();
 	void testSignVerifyES512();
