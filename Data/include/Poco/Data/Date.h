@@ -53,11 +53,14 @@ public:
 	Date(const DateTime& dt);
 		/// Creates the Date from DateTime
 
-	~Date();
+	~Date() = default;
 		/// Destroys the Date.
 
-	Date(const Date & ) = default;
-	Date(Date && ) = default;
+	Date(const Date& d) noexcept = default;
+		/// Copy constructor.
+
+	Date(Date&& d) noexcept = default;
+		/// Move constructor.
 
 	[[nodiscard]] int year() const;
 		/// Returns the year.
@@ -71,8 +74,11 @@ public:
 	void assign(int year, int month, int day);
 		/// Assigns date.
 
-	Date& operator = (const Date& d);
+	Date& operator = (const Date& d) noexcept = default;
 		/// Assignment operator for Date.
+
+	Date& operator = (Date&& d) noexcept = default;
+		/// Move assignment operator for Date.
 
 	Date& operator = (const DateTime& dt);
 		/// Assignment operator for DateTime.
@@ -117,13 +123,6 @@ inline int Date::month() const
 inline int Date::day() const
 {
 	return _day;
-}
-
-
-inline Date& Date::operator = (const Date& d)
-{
-	assign(d.year(), d.month(), d.day());
-	return *this;
 }
 
 

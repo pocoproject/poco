@@ -114,6 +114,7 @@ void LocalDateTimeTest::testConversions()
 	dt3 = dt1;
 	LocalDateTime dt4(dt2);
 	LocalDateTime dt5(-4*3600, dt1.utc());
+	assertTrue (dt4 == dt2);
 
 	assertTrue (dt2.year() == 2005);
 	assertTrue (dt2.month() == 1);

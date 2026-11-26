@@ -46,11 +46,6 @@ Date::Date(const DateTime& dt)
 }
 
 
-Date::~Date()
-{
-}
-
-
 void Date::assign(int year, int month, int day)
 {
 	if (year < 0 || year > 9999)

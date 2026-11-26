@@ -54,24 +54,6 @@ Timestamp::Timestamp(TimeVal tv)
 }
 
 
-Timestamp::Timestamp(const Timestamp& other)
-{
-	_ts = other._ts;
-}
-
-
-Timestamp::~Timestamp()
-{
-}
-
-
-Timestamp& Timestamp::operator = (const Timestamp& other)
-{
-	_ts = other._ts;
-	return *this;
-}
-
-
 Timestamp& Timestamp::operator = (TimeVal tv)
 {
 	_ts = tv;

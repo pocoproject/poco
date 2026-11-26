@@ -72,13 +72,13 @@ public:
 		/// Creates a timestamp from the given time value
 		/// (microseconds since midnight, January 1, 1970).
 
-	Timestamp(const Timestamp& other);
+	Timestamp(const Timestamp& other) noexcept = default;
 		/// Copy constructor.
 
-	~Timestamp();
+	~Timestamp() = default;
 		/// Destroys the timestamp
 
-	Timestamp& operator = (const Timestamp& other);
+	Timestamp& operator = (const Timestamp& other) noexcept = default;
 	Timestamp& operator = (TimeVal tv);
 
 	void swap(Timestamp& timestamp) noexcept;

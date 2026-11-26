@@ -1515,6 +1515,27 @@ void DataTest::testDateAndTime()
 	assertFalse (vDate.isTime());
 	assertTrue (vTime.isTime());
 	assertFalse (vTime.isDate());
+
+	assertTrue (std::is_trivially_copyable_v<Date>);
+	assertTrue (std::is_nothrow_copy_assignable_v<Date>);
+	assertTrue (std::is_nothrow_move_assignable_v<Date>);
+	assertTrue (std::is_trivially_copyable_v<Time>);
+	assertTrue (std::is_nothrow_copy_assignable_v<Time>);
+	assertTrue (std::is_nothrow_move_assignable_v<Time>);
+
+	const Date d2(2026, 11, 26);
+	Date d3(2000, 1, 1);
+	d3 = d2;
+	assertTrue (d3 == d2);
+	d3 = Date(2027, 1, 2);
+	assertTrue (d3 == Date(2027, 1, 2));
+
+	const Time t2(12, 30, 15);
+	Time t3(0, 0, 0);
+	t3 = t2;
+	assertTrue (t3 == t2);
+	t3 = Time(23, 59, 58);
+	assertTrue (t3 == Time(23, 59, 58));
 }
 
 

@@ -3129,7 +3129,7 @@ void VarTest::testUUID()
 	Var vstr2(std::string("notAnUUID"));
 	try
 	{
-		Poco::UUID uuid2 = vstr2.convert<Poco::UUID>();
+		(void) vstr2.convert<Poco::UUID>();
 		fail("not a valid UUID, must fail");
 	}
 	catch (Poco::SyntaxException&)

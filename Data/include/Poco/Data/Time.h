@@ -53,11 +53,14 @@ public:
 	Time(const DateTime& dt);
 		/// Creates the Time from DateTime
 
-	~Time();
+	~Time() = default;
 		/// Destroys the Time.
 
-	Time(const Time & ) = default;
-	Time(Time && ) = default;
+	Time(const Time& t) noexcept = default;
+		/// Copy constructor.
+
+	Time(Time&& t) noexcept = default;
+		/// Move constructor.
 
 	[[nodiscard]] int hour() const;
 		/// Returns the hour.
@@ -71,8 +74,11 @@ public:
 	void assign(int hour, int minute, int second);
 		/// Assigns time.
 
-	Time& operator = (const Time& t);
+	Time& operator = (const Time& t) noexcept = default;
 		/// Assignment operator for Time.
+
+	Time& operator = (Time&& t) noexcept = default;
+		/// Move assignment operator for Time.
 
 	Time& operator = (const DateTime& dt);
 		/// Assignment operator for DateTime.
@@ -117,13 +123,6 @@ inline int Time::minute() const
 inline  int Time::second() const
 {
 	return _second;
-}
-
-
-inline Time& Time::operator = (const Time& t)
-{
-	assign(t.hour(), t.minute(), t.second());
-	return *this;
 }
 
 

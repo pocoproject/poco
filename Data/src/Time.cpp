@@ -44,11 +44,6 @@ Time::Time(const DateTime& dt)
 }
 
 
-Time::~Time()
-{
-}
-
-
 void Time::assign(int hour, int minute, int second)
 {
 	if (hour < 0 || hour > 23)
