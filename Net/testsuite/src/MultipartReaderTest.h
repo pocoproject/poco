@@ -35,6 +35,8 @@ public:
 	void testRobustness();
 	void testUnixLineEnds();
 	void testBoundaryAtWindowEnd();
+	void testDelimiterLookalikes();
+	void testGuessBoundaryEmptyArgument();
 
 	void setUp();
 	void tearDown();
