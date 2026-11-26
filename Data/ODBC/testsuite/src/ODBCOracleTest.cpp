@@ -1002,6 +1002,8 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBContainer);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testCompileAgain);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testExecuteDirectBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkBindingBackstops);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testParameterArraySize);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testBulkFullWidthStrings);
@@ -1052,6 +1054,11 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testRecordSetBeforeExecute);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testExecuteDirectAfterExecute);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testExecuteDirectAgain);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testExecuteDirectPaused);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testExecuteDirectThenExecute);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testExecuteDirectColumnBinding);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testExecuteDirectRemovedBinding);
 
 		return pSuite;
 	}

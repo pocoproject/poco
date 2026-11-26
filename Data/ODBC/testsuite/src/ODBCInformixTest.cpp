@@ -319,6 +319,11 @@ CppUnit::Test* ODBCInformixTest::suite()
 		CppUnit_addTest(pSuite, ODBCInformixTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCInformixTest, testRecordSetBeforeExecute);
 		CppUnit_addTest(pSuite, ODBCInformixTest, testExecuteDirectAfterExecute);
+		CppUnit_addTest(pSuite, ODBCInformixTest, testExecuteDirectAgain);
+		CppUnit_addTest(pSuite, ODBCInformixTest, testExecuteDirectPaused);
+		CppUnit_addTest(pSuite, ODBCInformixTest, testExecuteDirectThenExecute);
+		CppUnit_addTest(pSuite, ODBCInformixTest, testExecuteDirectColumnBinding);
+		CppUnit_addTest(pSuite, ODBCInformixTest, testExecuteDirectRemovedBinding);
 
 		return pSuite;
 	}

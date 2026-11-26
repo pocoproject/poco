@@ -174,6 +174,11 @@ public:
 		_pColumn->reset();
 	}
 
+	[[nodiscard]] bool isInternal() const override
+	{
+		return true;
+	}
+
 	[[nodiscard]] const CValType& value(int index) const
 	{
 		try

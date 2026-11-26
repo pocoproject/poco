@@ -683,6 +683,11 @@ CppUnit::Test* ODBCDB2Test::suite()
 		CppUnit_addTest(pSuite, ODBCDB2Test, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testRecordSetBeforeExecute);
 		CppUnit_addTest(pSuite, ODBCDB2Test, testExecuteDirectAfterExecute);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testExecuteDirectAgain);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testExecuteDirectPaused);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testExecuteDirectThenExecute);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testExecuteDirectColumnBinding);
+		CppUnit_addTest(pSuite, ODBCDB2Test, testExecuteDirectRemovedBinding);
 
 		return pSuite;
 	}

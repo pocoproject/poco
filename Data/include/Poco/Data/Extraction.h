@@ -518,6 +518,11 @@ public:
 		_pColumn->reset();
 	}
 
+	[[nodiscard]] bool isInternal() const override
+	{
+		return true;
+	}
+
 	[[nodiscard]] const HeldValType& value(int index) const
 	{
 		try

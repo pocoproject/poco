@@ -111,6 +111,11 @@ public:
 	[[nodiscard]] bool isBulk() const;
 		/// Returns true if this is bulk extraction.
 
+	[[nodiscard]] virtual bool isInternal() const;
+		/// Returns true if the statement created this extraction itself,
+		/// because no extraction was supplied for the columns.
+		/// The default implementation returns false.
+
 	void setEmptyStringIsNull(bool emptyStringIsNull);
 		/// Sets the empty string handling flag.
 
@@ -241,6 +246,12 @@ inline Poco::UInt32 AbstractExtraction::position() const
 inline bool AbstractExtraction::isBulk() const
 {
 	return _bulk;
+}
+
+
+inline bool AbstractExtraction::isInternal() const
+{
+	return false;
 }
 
 

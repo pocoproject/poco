@@ -558,17 +558,28 @@ void Statement::executeDirect(const std::string& query)
 	Mutex::ScopedLock lock(_mutex);
 	ExecutionClaim claim(_pImpl->_executing);
 	bool isDone = done();
-	if (initialized() || paused() || isDone)
+	bool isPaused = paused();
+	if (initialized() || isPaused || isDone)
 	{
-		formatQuery();
-		checkBeginTransaction();
+		if (isAsync()) throw InvalidAccessException("Cannot be executed async.");
 
-		if (!isAsync())
+		formatQuery();
+		// The query replaces the text of the statement, so the transaction is
+		// decided on the query: parse() reads the text cached in _stmtString.
+		_stmtString = query;
+		try
 		{
-			if (isDone) _pImpl->reset();
-			return _pImpl->executeDirect(query);
+			checkBeginTransaction();
+			// a paused execution is abandoned, like a finished one
+			if (isDone || isPaused) _pImpl->reset();
+			_pImpl->executeDirect(query);
 		}
-		else throw InvalidAccessException("Cannot be executed async.");
+		catch (...)
+		{
+			// parse() reads the text of the statement again
+			_stmtString.clear();
+			throw;
+		}
 	}
 	else throw InvalidAccessException("Statement still executing.");
 }

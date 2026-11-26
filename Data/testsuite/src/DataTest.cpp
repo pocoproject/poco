@@ -1890,6 +1890,75 @@ void DataTest::testExecuteDirectNotImplemented()
 }
 
 
+void DataTest::testExecuteDirectState()
+{
+	// A direct execution ends the statement, also when it fails, so the
+	// statement accepts the next execution. The query replaces its text.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	Statement stmt = (sess << "SELECT * FROM Strings");
+	stmt.execute();
+	for (int i = 0; i < 2; ++i)
+	{
+		try { stmt.executeDirect("DELETE FROM Strings"); fail ("must fail"); }
+		catch (NotImplementedException&) { }
+		assertTrue (stmt.done());
+	}
+	assertEqual ("DELETE FROM Strings"s, stmt.toString());
+	stmt.execute();
+	assertTrue (stmt.done());
+
+	Statement fresh(sess);
+	try { fresh.executeDirect("SELECT 1"); fail ("must fail"); }
+	catch (NotImplementedException&) { }
+	assertTrue (fresh.done());
+}
+
+
+void DataTest::testExecuteDirectTransaction()
+{
+#ifndef POCO_DATA_NO_SQL_PARSER
+	// The query of a direct execution decides whether a transaction is begun,
+	// not the text the statement had before.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	sess.setFeature("autoCommit", false);
+	sess.setFeature("sqlParse", true);
+
+	Statement stmt = (sess << "SELECT * FROM Strings");
+	stmt.execute();
+	assertTrue (!sess.isTransaction());
+
+	try { stmt.executeDirect("DELETE FROM Strings"); fail ("must fail"); }
+	catch (NotImplementedException&) { }
+	assertTrue (sess.isTransaction());
+	sess.rollback();
+
+	try { stmt.executeDirect("SELECT * FROM Strings"); fail ("must fail"); }
+	catch (NotImplementedException&) { }
+	assertTrue (!sess.isTransaction());
+
+	// The query does not replace the text when begin() fails, and the next
+	// execution decides on the text of the statement again.
+	sess.setFeature("throwOnBegin", true);
+	try { stmt.executeDirect("DELETE FROM Strings"); fail ("must fail"); }
+	catch (ConnectionFailedException&) { }
+	assertTrue (stmt.done());
+	sess.setFeature("throwOnBegin", false);
+	stmt.execute();
+	assertTrue (!sess.isTransaction());
+	assertEqual ("SELECT * FROM Strings"s, stmt.toString());
+
+	// an asynchronous statement refuses the query before a transaction is begun
+	Statement async = (sess << "DELETE FROM Strings");
+	async.setAsync(true);
+	try { async.executeDirect("DELETE FROM Strings"); fail ("must fail"); }
+	catch (InvalidAccessException&) { }
+	assertTrue (!sess.isTransaction());
+#else
+	std::cout << "test not available (parser not available)";
+#endif
+}
+
+
 void DataTest::testSessionNotConnected()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
@@ -3127,6 +3196,8 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testNullableExtract);
 	CppUnit_addTest(pSuite, DataTest, testTransactionAutoCommit);
 	CppUnit_addTest(pSuite, DataTest, testExecuteDirectNotImplemented);
+	CppUnit_addTest(pSuite, DataTest, testExecuteDirectState);
+	CppUnit_addTest(pSuite, DataTest, testExecuteDirectTransaction);
 	CppUnit_addTest(pSuite, DataTest, testSessionNotConnected);
 	CppUnit_addTest(pSuite, DataTest, testSessionNullImpl);
 	CppUnit_addTest(pSuite, DataTest, testRecordSetMovedFrom);

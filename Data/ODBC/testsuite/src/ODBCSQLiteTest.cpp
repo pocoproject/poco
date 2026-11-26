@@ -842,6 +842,8 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBoundStringBulkOverflow);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkThenScalarLOB);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testCompileAgain);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testExecuteDirectBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testParameterArraySize);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBulkFullWidthStrings);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testManualBLOB);
@@ -933,6 +935,11 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testRecordSetBeforeExecute);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testExecuteDirectAfterExecute);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testExecuteDirectAgain);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testExecuteDirectPaused);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testExecuteDirectThenExecute);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testExecuteDirectColumnBinding);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testExecuteDirectRemovedBinding);
 
 		return pSuite;
 	}

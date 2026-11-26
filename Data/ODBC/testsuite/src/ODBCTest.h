@@ -132,6 +132,13 @@ public:
 	virtual void testRecordSet();
 	virtual void testRecordSetBeforeExecute();
 	virtual void testExecuteDirectAfterExecute();
+	virtual void testExecuteDirectAgain();
+	virtual void testExecuteDirectPaused();
+	virtual void testExecuteDirectThenExecute();
+	virtual void testCompileAgain();
+	virtual void testExecuteDirectColumnBinding();
+	virtual void testExecuteDirectBulkExtraction();
+	virtual void testExecuteDirectRemovedBinding();
 
 	virtual void testDateTime();
 	virtual void testDate();
