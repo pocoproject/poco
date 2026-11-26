@@ -585,6 +585,7 @@ private:
 		/// and starts it if not.
 		/// Transaction is automatically started for the first
 		/// statement on a non-autocommit session.
+		/// Connectors can disable this through StatementImpl::canAutoBegin().
 		/// The best effort is made to detect if the query
 		/// consists of SELECT statements only, in which case
 		/// transaction does not need to started.

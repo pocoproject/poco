@@ -47,6 +47,11 @@ public:
 		/// Destroys the SQLiteStatementImpl.
 
 protected:
+	[[nodiscard]] bool canAutoBegin() const override;
+		/// Returns false: SQLite manages implicit transactions itself.
+		/// Its autocommit flag is off only while an explicit transaction is
+		/// already open, including one started with SQL BEGIN or SAVEPOINT.
+
 	[[nodiscard]] std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
 
@@ -138,6 +143,12 @@ inline AbstractExtraction::ExtractorPtr SQLiteStatementImpl::extractor()
 inline AbstractBinding::BinderPtr SQLiteStatementImpl::binder()
 {
 	return _pBinder;
+}
+
+
+inline bool SQLiteStatementImpl::canAutoBegin() const
+{
+	return false;
 }
 
 

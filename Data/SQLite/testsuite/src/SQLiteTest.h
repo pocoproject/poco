@@ -166,6 +166,8 @@ public:
 	void testSessionTransactionSerializable();
 	void testSessionTransactionRepeatableRead();
 	void testTransaction();
+	void testSQLBeginTransaction();
+	void testSQLSavepointTransaction();
 	void testTransactor();
 
 	void testFTS();
