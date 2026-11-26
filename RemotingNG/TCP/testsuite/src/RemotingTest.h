@@ -68,6 +68,8 @@ public:
 	void testEventSubscriptionRenewedOnNewConnection();
 	void testEventListenersSharingConnection();
 	void testEventToServerListener();
+	void testEventSubscriberURIAtFrameLimit();
+	void testEventSubscriberURITooLong();
 
 	void setUp() override;
 	void tearDown() override;

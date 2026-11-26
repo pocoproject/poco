@@ -18,6 +18,8 @@
 #include "Poco/RemotingNG/TCP/ServerConnectionFactory.h"
 #include "Poco/RemotingNG/TCP/FrameHandler.h"
 #include "Poco/RemotingNG/TCP/ChannelStream.h"
+#include "Poco/RemotingNG/RemotingException.h"
+#include "Poco/Format.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/String.h"
 
@@ -378,6 +380,10 @@ const std::string& Listener::EventSubscription::path() const
 
 void Listener::EventSubscription::run()
 {
+	// The server rejects a frame with a larger payload and aborts the whole connection.
+	if (_suri.size() > Frame::FRAME_MAX_PAYLOAD_SIZE)
+		throw Poco::RemotingNG::TransportException(Poco::format("Event subscriber URI of %z bytes exceeds the frame payload limit of %d bytes", _suri.size(), static_cast<int>(Frame::FRAME_MAX_PAYLOAD_SIZE)));
+
 	Connection::Ptr pConnection = _listener.connectionManager().getConnection(_uri);
 	if (!isCancelled())
 	{
