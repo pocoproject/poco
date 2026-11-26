@@ -163,6 +163,34 @@ static const std::string ecCertUnknownAlgPem(
 );
 
 
+static const std::string ED25519_PUBLIC_KEY_PEM(
+	"-----BEGIN PUBLIC KEY-----\n"
+	"MCowBQYDK2VwAyEAzHYjEj9q3Zv3Cbn+Yllid1rL5bMrUHeJoIX+AThpDQA=\n"
+	"-----END PUBLIC KEY-----\n"
+);
+
+
+static const std::string ED25519_PRIVATE_KEY_PEM(
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MC4CAQAwBQYDK2VwBCIEIJJt7jGK6CFIqDm61SaDeGyjXDwqEC37/lGhaunRl6HG\n"
+	"-----END PRIVATE KEY-----\n"
+);
+
+
+static const std::string ED25519_CERT_PEM(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBTzCCAQGgAwIBAgIUf8BlOMyWWsfh9z70uG8N9pGHHcQwBQYDK2VwMBwxGjAY\n"
+	"BgNVBAMMEXBvY28tZWQyNTUxOS10ZXN0MCAXDTI2MTEyNjA5NTYwMloYDzIxMjYx\n"
+	"MTAyMDk1NjAyWjAcMRowGAYDVQQDDBFwb2NvLWVkMjU1MTktdGVzdDAqMAUGAytl\n"
+	"cAMhAMx2IxI/at2b9wm5/mJZYnday+WzK1B3iaCF/gE4aQ0Ao1MwUTAdBgNVHQ4E\n"
+	"FgQUdUO1v2Ju2nWwZXZKjMCHk8aXYGwwHwYDVR0jBBgwFoAUdUO1v2Ju2nWwZXZK\n"
+	"jMCHk8aXYGwwDwYDVR0TAQH/BAUwAwEB/zAFBgMrZXADQQCFOCxfb7kv0OttdIhH\n"
+	"20W+FOoTRlo1KQcCxKJXr5/siic/yq+3IY7BlAI3uEfay2/OnYpTeNQAWdn9RDo7\n"
+	"Q6wH\n"
+	"-----END CERTIFICATE-----\n"
+);
+
+
 EVPTest::EVPTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -1023,6 +1051,69 @@ void EVPTest::testRSAKeyFromECPKCS12()
 }
 
 
+void EVPTest::testUnsupportedKeyType()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream keyStream(ED25519_PUBLIC_KEY_PEM);
+	try
+	{
+		EVPPKey key(&keyStream, nullptr);
+		fail("EVPPKey from an Ed25519 public key must throw");
+	}
+	catch (const Poco::NotImplementedException&) {}
+
+	std::istringstream certStream(ED25519_CERT_PEM);
+	X509Certificate cert(certStream);
+	try
+	{
+		EVPPKey key(cert);
+		fail("EVPPKey from an Ed25519 certificate must throw");
+	}
+	catch (const Poco::NotImplementedException&) {}
+}
+
+
+void EVPTest::testKeyAssignment()
+{
+	ErrorQueueCleaner cleaner;
+
+	EVPPKey source(EVP_PKEY_EC, NID_X9_62_prime256v1);
+	EVPPKey target(EVP_PKEY_EC, NID_X9_62_prime256v1);
+	assertTrue (target != source);
+
+	target = source;
+	assertTrue (target == source);
+
+	// Through a reference: a direct self-assignment draws a compiler warning.
+	EVPPKey& self = target;
+	target = self;
+	assertTrue (target == source);
+
+	target = std::move(self);
+	assertTrue (target.type() == EVP_PKEY_EC);
+	assertTrue (target == source);
+
+	EVPPKey moveTarget(EVP_PKEY_EC, NID_X9_62_prime256v1);
+	EVPPKey moveSource(source);
+	moveTarget = std::move(moveSource);
+	assertTrue (moveTarget == source);
+
+	// A private key is loaded without the type check, so the assignment is the first to check the type.
+	std::istringstream keyStream(ED25519_PRIVATE_KEY_PEM);
+	const EVPPKey otherTypeKey(nullptr, &keyStream);
+	const EVPPKey previous(target);
+	try
+	{
+		target = otherTypeKey;
+		fail("assigning a key of an unsupported type must throw");
+	}
+	catch (const Poco::NotImplementedException&) {}
+	assertTrue (target == previous);
+}
+
+
+
 void EVPTest::setUp()
 {
 }
@@ -1060,6 +1151,8 @@ CppUnit::Test* EVPTest::suite()
 	CppUnit_addTest(pSuite, EVPTest, testECKeyFromCertificate);
 	CppUnit_addTest(pSuite, EVPTest, testRSAKeyFromECCertificate);
 	CppUnit_addTest(pSuite, EVPTest, testRSAKeyFromECPKCS12);
+	CppUnit_addTest(pSuite, EVPTest, testUnsupportedKeyType);
+	CppUnit_addTest(pSuite, EVPTest, testKeyAssignment);
 
 	return pSuite;
 }

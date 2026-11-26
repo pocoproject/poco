@@ -51,6 +51,8 @@ public:
 	void testECKeyFromCertificate();
 	void testRSAKeyFromECCertificate();
 	void testRSAKeyFromECPKCS12();
+	void testUnsupportedKeyType();
+	void testKeyAssignment();
 
 	void setUp();
 	void tearDown();
