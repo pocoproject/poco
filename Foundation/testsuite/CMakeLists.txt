@@ -27,11 +27,17 @@ POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
 poco_add_executable(Foundation-testrunner ${TEST_SRCS})
 if(ANDROID)
+	# The tests start TestApp and load TestLibrary from the directory of the test runner.
+	set(_poco_test_files "${CMAKE_CURRENT_SOURCE_DIR}/data" "$<TARGET_FILE:TestApp>")
+	if(BUILD_SHARED_LIBS)
+		list(APPEND _poco_test_files "$<TARGET_FILE:TestLibrary>")
+	endif()
 	add_test(
 		NAME Foundation
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;${CMAKE_BINARY_DIR}/bin/TestApp;${CMAKE_BINARY_DIR}/bin/TestLibrary.so" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/Foundation-testrunner -DTEST_PARAMETER=-all -P ${PROJECT_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
+		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${_poco_test_files}" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=$<TARGET_FILE:Foundation-testrunner> -DTEST_PARAMETER=-all -P ${PROJECT_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
 	)
+	unset(_poco_test_files)
 else()
 	if(WIN32)
 		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.win")
