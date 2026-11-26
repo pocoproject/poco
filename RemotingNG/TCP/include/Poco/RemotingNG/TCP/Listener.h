@@ -147,6 +147,10 @@ public:
 
 	// Poco::RemotingNG::EventListener
 	[[nodiscard]] std::string subscribeToEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber) override;
+		/// A subscription whose first subscribe fails is not registered.
+		/// Throws a Poco::RemotingNG::TransportException if the subscriber URI
+		/// does not fit in a frame.
+
 	void unsubscribeFromEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber) override;
 
 	// Poco::RemotingNG::Listener

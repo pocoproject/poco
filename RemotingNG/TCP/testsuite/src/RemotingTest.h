@@ -70,6 +70,9 @@ public:
 	void testEventToServerListener();
 	void testEventSubscriberURIAtFrameLimit();
 	void testEventSubscriberURITooLong();
+	void testEventSubscriptionFailureLeavesNoSubscription();
+	void testEventSubscriptionFailureNotRenewed();
+	void testEventUnsubscribeFailureLeavesNoSubscription();
 
 	void setUp() override;
 	void tearDown() override;

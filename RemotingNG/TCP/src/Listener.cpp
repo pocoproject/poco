@@ -238,10 +238,22 @@ std::string Listener::subscribeToEvents(Poco::RemotingNG::EventSubscriber::Ptr p
 		removeSubscriber(_connectionManager, it->second->path());
 		it->second = pEventSubscription;
 	}
+	// Registered before the subscribe frame is sent: an event that the server sends
+	// right after it must find its subscriber.
 	addSubscriber(_connectionManager, pEventSubscription->path(), pEventSubscriber);
+	try
+	{
+		pEventSubscription->run();
+	}
+	catch (...)
+	{
+		// A subscription that this one replaced stays cancelled and removed.
+		removeSubscriber(_connectionManager, pEventSubscription->path());
+		_eventSubscriptions.erase(pEventSubscriber);
+		throw;
+	}
 	long interval = static_cast<long>(_eventSubscriptionTimeout.totalMilliseconds()/2);
 	_timer.scheduleAtFixedRate(pEventSubscription, interval, interval);
-	pEventSubscription->run();
 	return pEventSubscription->uri();
 }
 
@@ -253,10 +265,13 @@ void Listener::unsubscribeFromEvents(Poco::RemotingNG::EventSubscriber::Ptr pEve
 	EventSubscriptionsMap::iterator it = _eventSubscriptions.find(pEventSubscriber);
 	if (it != _eventSubscriptions.end())
 	{
-		it->second->cancel();
-		it->second->run(); // sends unsubscribe message
-		removeSubscriber(_connectionManager, it->second->path());
+		EventSubscription::Ptr pEventSubscription = it->second;
+		pEventSubscription->cancel();
+		// Removed before the unsubscribe frame is sent: a failed unsubscribe must not
+		// leave the subscriber registered.
+		removeSubscriber(_connectionManager, pEventSubscription->path());
 		_eventSubscriptions.erase(it);
+		pEventSubscription->run(); // sends unsubscribe message
 	}
 }
 
