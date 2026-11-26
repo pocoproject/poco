@@ -538,7 +538,13 @@ inline bool Extractor::extract(std::size_t pos, Nullable<Poco::Data::CLOB>& val)
 bool Extractor::isNull(std::size_t pos, std::size_t)
 {
 	if (pos >= _nulls.size())
-		_nulls.resize(pos + 1);
+	{
+		// A later statement of a script may return fewer columns than the result set
+		// it adds its rows to; SQLite leaves reading such a column undefined.
+		const auto columnCount = static_cast<std::size_t>(sqlite3_column_count(_pStmt));
+		if (pos >= columnCount) return true;
+		_nulls.resize(columnCount);
+	}
 
 	if (!_nulls[pos].first)
 	{

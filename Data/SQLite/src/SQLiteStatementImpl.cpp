@@ -138,10 +138,16 @@ void SQLiteStatementImpl::compileImpl()
 	{
 		std::size_t curDataSet = currentDataSet();
 		if (curDataSet >= _columns.size()) _columns.resize(curDataSet + 1);
-		for (int i = 0; i < colCount; ++i)
+		MetaColumnVec& columns = _columns[curDataSet];
+		// A later statement of the script that adds its rows to the same data set
+		// keeps the metadata of the statement the extractions were made for.
+		if (columns.empty())
 		{
-			MetaColumn mc(i, sqlite3_column_name(_pStmt, i), Utility::getColumnType(_pStmt, i));
-				_columns[curDataSet].push_back(mc);
+			columns.reserve(static_cast<std::size_t>(colCount));
+			for (int i = 0; i < colCount; ++i)
+			{
+				columns.emplace_back(i, sqlite3_column_name(_pStmt, i), Utility::getColumnType(_pStmt, i));
+			}
 		}
 	}
 }
@@ -225,7 +231,6 @@ void SQLiteStatementImpl::bindImpl()
 
 void SQLiteStatementImpl::clear()
 {
-	_columns[currentDataSet()].clear();
 	_affectedRowCount = POCO_SQLITE_INV_ROW_CNT;
 
 	if (_pStmt)
@@ -295,8 +300,6 @@ std::size_t SQLiteStatementImpl::next()
 {
 	if (SQLITE_ROW == _nextResponse)
 	{
-		poco_assert (columnsReturned() == static_cast<std::size_t>(sqlite3_column_count(_pStmt)));
-
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
 		Extractions::iterator itEnd = extracts.end();

@@ -2301,6 +2301,7 @@ void SQLiteTest::testDateTimeVariants()
 	try { tmp << "SELECT * FROM DateTimeVariants", into(rt), now; fail ("must fail"); }
 	catch (Poco::SyntaxException&) { }
 	tmp << "DROP TABLE DateTimeVariants", now;
+
 }
 
 
@@ -5179,6 +5180,100 @@ void SQLiteTest::testRecordSetColumnPosition()
 }
 
 
+void SQLiteTest::testScriptResultMetadata()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+
+	// the first statement that returns columns describes the result set,
+	// the later ones add their rows to it
+	Statement stmt(session);
+	stmt << "CREATE TABLE t(d DATE);SELECT 'x';SELECT d FROM t;";
+	stmt.execute();
+	RecordSet rs(stmt);
+	assertEqual (1, rs.rowCount());
+	assertEqual (1, rs.columnCount());
+	assertEqual ("'x'"s, rs.columnName(0));
+	assertTrue (Poco::Data::MetaColumn::FDT_STRING == rs.columnType(0));
+	assertEqual ("x"s, rs.value(0, 0).convert<std::string>());
+
+	Statement stmt1(session);
+	stmt1 << "SELECT 'x';SELECT 1, 2;";
+	stmt1.execute();
+	RecordSet rs1(stmt1);
+	assertEqual (2, rs1.rowCount());
+	assertEqual (1, rs1.columnCount());
+	assertEqual ("'x'"s, rs1.columnName(0));
+	assertEqual ("x"s, rs1.value(0, 0).convert<std::string>());
+	assertEqual ("1"s, rs1.value(0, 1).convert<std::string>());
+
+	// a later statement with fewer columns leaves the missing ones null
+	Statement stmt2(session);
+	stmt2 << "SELECT 1, 2;SELECT 'x';";
+	stmt2.execute();
+	RecordSet rs2(stmt2);
+	assertEqual (2, rs2.rowCount());
+	assertEqual (2, rs2.columnCount());
+	assertEqual ("1"s, rs2.columnName(0));
+	assertEqual ("2"s, rs2.columnName(1));
+	assertEqual ("x"s, rs2.value(0, 1).convert<std::string>());
+	assertTrue (rs2.isNull(1, 1));
+
+	// with explicit extractions, the column count of the first statement does not matter
+	std::vector<int> ints;
+	session << "SELECT 1, 2 WHERE 0;SELECT 3;", into(ints), now;
+	assertEqual (1, ints.size());
+	assertEqual (3, ints[0]);
+}
+
+
+void SQLiteTest::testScriptDataSetMetadata()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+	session << "CREATE TABLE Ints (i INTEGER)", now;
+	session << "CREATE TABLE Strings (s TEXT)", now;
+	session << "INSERT INTO Ints VALUES (1), (2), (3)", now;
+	session << "INSERT INTO Strings VALUES ('a'), ('b')", now;
+
+	// column names longer than the inline buffer of std::string make a read of released
+	// metadata a read of freed memory, which memory checkers report
+	std::vector<int> ints;
+	std::vector<std::string> strings;
+	Statement stmt(session);
+	stmt << "SELECT i AS integer_column_of_the_first_data_set FROM Ints;"
+		"SELECT s AS string_column_of_the_second_data_set FROM Strings;",
+		into(ints), into(strings, from(1));
+	stmt.execute();
+	assertEqual (3, ints.size());
+	assertEqual (2, strings.size());
+
+	RecordSet second(stmt);
+	assertEqual (1, second.columnCount());
+	assertEqual ("string_column_of_the_second_data_set"s, second.columnName(0));
+	assertTrue (Poco::Data::MetaColumn::FDT_STRING == second.columnType(0));
+
+	(void) stmt.previousDataSet();
+	RecordSet first(stmt);
+	assertEqual (1, first.columnCount());
+	assertEqual ("integer_column_of_the_first_data_set"s, first.columnName(0));
+	assertTrue (Poco::Data::MetaColumn::FDT_INT64 == first.columnType(0));
+}
+
+
+void SQLiteTest::testTrailingComment()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+
+	Statement stmt(session);
+	stmt << "SELECT 1;--c";
+	stmt.execute();
+	RecordSet rs(stmt);
+	assertEqual (1, rs.columnCount());
+	assertEqual (1, rs.rowCount());
+	assertEqual ("1"s, rs.columnName(0));
+	assertEqual (1, rs.value("1", 0).convert<int>());
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -5322,6 +5417,9 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testRecordsetCopyMove);
 	CppUnit_addTest(pSuite, SQLiteTest, testAddBindingReuse);
 	CppUnit_addTest(pSuite, SQLiteTest, testRecordSetColumnPosition);
+	CppUnit_addTest(pSuite, SQLiteTest, testScriptResultMetadata);
+	CppUnit_addTest(pSuite, SQLiteTest, testScriptDataSetMetadata);
+	CppUnit_addTest(pSuite, SQLiteTest, testTrailingComment);
 
 	return pSuite;
 }
