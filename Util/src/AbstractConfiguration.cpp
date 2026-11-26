@@ -25,6 +25,7 @@ using Poco::Mutex;
 using Poco::NotFoundException;
 using Poco::SyntaxException;
 using Poco::CircularReferenceException;
+using Poco::DataException;
 using Poco::NumberParser;
 using Poco::NumberFormatter;
 using Poco::icompare;
@@ -438,6 +439,11 @@ AbstractConfiguration::Ptr AbstractConfiguration::createLocalView(const std::str
 
 namespace
 {
+	constexpr int MAX_REFERENCE_DEPTH = 10;
+	constexpr int MAX_RESOLVED_REFERENCES = 1000;
+	// Bounds the text that resolved references add to one value.
+	constexpr std::size_t MAX_EXPANDED_SIZE = 1024*1024;
+
 	class AutoCounter
 	{
 	public:
@@ -504,16 +510,22 @@ void AbstractConfiguration::removeRaw(const std::string& key)
 std::string AbstractConfiguration::internalExpand(const std::string& value) const
 {
 	AutoCounter counter(_depth);
-	if (_depth > 10) throw CircularReferenceException("Too many property references encountered");
-	return uncheckedExpand(value);
+	if (_depth > MAX_REFERENCE_DEPTH) throw CircularReferenceException("Too many property references encountered");
+	std::string::const_iterator it  = value.begin();
+	std::string::const_iterator end = value.end();
+	while (it != end && *it != '$') ++it;
+	if (it == end) return value;
+
+	std::string result(value.begin(), it);
+	int references = 0;
+	std::size_t size = 0;
+	uncheckedExpand(it, end, result, references, size);
+	return result;
 }
 
 
-std::string AbstractConfiguration::uncheckedExpand(const std::string& value) const
+void AbstractConfiguration::uncheckedExpand(std::string::const_iterator it, std::string::const_iterator end, std::string& result, int& references, std::size_t& size) const
 {
-	std::string result;
-	std::string::const_iterator it  = value.begin();
-	std::string::const_iterator end = value.end();
 	while (it != end)
 	{
 		if (*it == '$')
@@ -544,7 +556,18 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 				std::string propValue;
 				if (getRaw(prop, propValue))
 				{
-					result.append(internalExpand(propValue));
+					// The depth limit alone does not bound the work: values with k references
+					// each, nested to the maximum depth, cause k^MAX_REFERENCE_DEPTH lookups.
+					if (++references > MAX_RESOLVED_REFERENCES) throw CircularReferenceException("Too many property references encountered");
+					// The nested expansion has counted the text of its own references, which is
+					// part of the text that this reference adds.
+					const std::size_t sizeBefore = size;
+					const std::size_t resultLength = result.size();
+					AutoCounter counter(_depth);
+					if (_depth > MAX_REFERENCE_DEPTH) throw CircularReferenceException("Too many property references encountered");
+					uncheckedExpand(propValue.begin(), propValue.end(), result, references, size);
+					size = sizeBefore + (result.size() - resultLength);
+					if (size > MAX_EXPANDED_SIZE) throw DataException("Expanded property value too long");
 				}
 				else if (haveDefault)
 				{
@@ -561,7 +584,6 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 		}
 		else result += *it++;
 	}
-	return result;
 }
 
 

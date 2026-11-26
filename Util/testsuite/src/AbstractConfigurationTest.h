@@ -34,6 +34,7 @@ public:
 	void testGetDouble();
 	void testGetBool();
 	void testExpand();
+	void testExpandReferenceLimit();
 	void testSetString();
 	void testSetInt();
 	void testSetUInt();
@@ -55,6 +56,9 @@ public:
 	void onPropertyRemoved(const void*, const std::string& key);
 
 protected:
+	static constexpr int MAX_REFERENCE_DEPTH = 10;
+		/// The number of nested expansions that AbstractConfiguration allows.
+
 	virtual Poco::Util::AbstractConfiguration::Ptr allocConfiguration() const = 0;
 	virtual Poco::Util::AbstractConfiguration::Ptr createConfiguration() const;
 
@@ -78,6 +82,7 @@ protected:
 		CppUnit_addTest(suite, cls, testGetDouble); \
 		CppUnit_addTest(suite, cls, testGetBool); \
 		CppUnit_addTest(suite, cls, testExpand); \
+		CppUnit_addTest(suite, cls, testExpandReferenceLimit); \
 		CppUnit_addTest(suite, cls, testSetString); \
 		CppUnit_addTest(suite, cls, testSetInt); \
 		CppUnit_addTest(suite, cls, testSetInt64); \

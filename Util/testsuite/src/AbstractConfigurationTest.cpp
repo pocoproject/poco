@@ -18,6 +18,7 @@
 #include "Poco/Types.h"
 #include <algorithm>
 #include <limits>
+#include <string>
 
 
 using Poco::Util::AbstractConfiguration;
@@ -28,6 +29,17 @@ using Poco::Int16;
 using Poco::Int64;
 using Poco::UInt16;
 using Poco::UInt64;
+
+
+namespace
+{
+	std::string repeat(const std::string& text, int count)
+	{
+		std::string result;
+		for (int i = 0; i < count; ++i) result += text;
+		return result;
+	}
+}
 
 
 AbstractConfigurationTest::AbstractConfigurationTest(const std::string& name): CppUnit::TestCase(name)
@@ -266,6 +278,117 @@ void AbstractConfigurationTest::testExpand()
 	{
 		// Note: This will result in an invalid path (on Windows), throwing an exception which can be safely ignored.
 	}
+}
+
+
+void AbstractConfigurationTest::testExpandReferenceLimit()
+{
+	constexpr int MAX_RESOLVED_REFERENCES = 1000;
+	constexpr std::size_t MAX_EXPANDED_SIZE = 1024*1024;
+	constexpr int FAN_OUT = 10;
+	constexpr int UNRESOLVED_REFERENCES = 2000;
+	constexpr std::size_t LARGE_VALUE_SIZE = 600*1024;
+	constexpr std::size_t RAW_VALUE_SIZE = 2*1024*1024;
+	constexpr std::size_t UNIT_SIZE = 1000;
+	constexpr int UNIT_COUNT = 600;
+
+	AutoPtr<AbstractConfiguration> pConf = createConfiguration();
+
+	// Each level references the level below FAN_OUT times; without the limit,
+	// reading level 4 would resolve 10 + 100 + 1000 + 10000 references.
+	pConf->setString("fanout.level0", "x");
+	pConf->setString("fanout.level1", repeat("${fanout.level0}", FAN_OUT));
+	pConf->setString("fanout.level2", repeat("${fanout.level1}", FAN_OUT));
+	pConf->setString("fanout.level3", repeat("${fanout.level2}", FAN_OUT));
+	pConf->setString("fanout.level4", repeat("${fanout.level3}", FAN_OUT));
+	try
+	{
+		(void) pConf->getString("fanout.level4");
+		fail("too many resolved references - must throw");
+	}
+	catch (Poco::CircularReferenceException&)
+	{
+	}
+	try
+	{
+		(void) pConf->expand("${fanout.level4}");
+		fail("too many resolved references - must throw");
+	}
+	catch (Poco::CircularReferenceException&)
+	{
+	}
+
+	// One value with MAX_RESOLVED_REFERENCES references to a leaf resolves
+	// exactly the limit; one more reference exceeds it.
+	pConf->setString("limit.leaf", "x");
+	pConf->setString("limit.max", repeat("${limit.leaf}", MAX_RESOLVED_REFERENCES));
+	pConf->setString("limit.over", repeat("${limit.leaf}", MAX_RESOLVED_REFERENCES + 1));
+	assertTrue (pConf->getString("limit.max") == std::string(MAX_RESOLVED_REFERENCES, 'x'));
+	try
+	{
+		(void) pConf->getString("limit.over");
+		fail("too many resolved references - must throw");
+	}
+	catch (Poco::CircularReferenceException&)
+	{
+	}
+
+	// Unresolved references and defaults are not counted.
+	const std::string unresolved = repeat("${limit.missing}", UNRESOLVED_REFERENCES);
+	assertTrue (pConf->expand(unresolved) == unresolved);
+	assertTrue (pConf->expand(repeat("${limit.missing:-x}", UNRESOLVED_REFERENCES)) == std::string(UNRESOLVED_REFERENCES, 'x'));
+
+	// The text that references add to a value is limited to 1 MiB. It is counted
+	// once, however deep the references are nested, so a value that only refers to
+	// another one expands like that one. The literal text of a value is not counted.
+	const std::string large(LARGE_VALUE_SIZE, 'x');
+	pConf->setString("size.leaf", large);
+	pConf->setString("size.once", "${size.leaf}");
+	pConf->setString("size.aliasonce", "${size.once}");
+	pConf->setString("size.twice", "${size.leaf}${size.leaf}");
+	pConf->setString("size.aliastwice", "${size.twice}");
+	pConf->setString("size.unit", std::string(UNIT_SIZE, 'x'));
+	pConf->setString("size.units", repeat("${size.unit}", UNIT_COUNT));
+	pConf->setString("size.aliasunits", "${size.units}");
+	pConf->setString("size.raw", std::string(RAW_VALUE_SIZE, 'x'));
+	pConf->setString("size.aliasraw", "${size.raw}");
+	pConf->setString("size.rest", std::string(MAX_EXPANDED_SIZE - LARGE_VALUE_SIZE, 'x'));
+	pConf->setString("size.exact", "${size.leaf}${size.rest}");
+	pConf->setString("size.aliasexact", "${size.exact}");
+	pConf->setString("size.byte", "x");
+	pConf->setString("size.overbyone", "${size.exact}${size.byte}");
+	assertTrue (pConf->getString("size.once") == large);
+	assertTrue (pConf->getString("size.aliasonce") == large);
+	assertTrue (pConf->getString("size.units").size() == UNIT_SIZE*UNIT_COUNT);
+	assertTrue (pConf->getString("size.aliasunits").size() == UNIT_SIZE*UNIT_COUNT);
+	assertTrue (pConf->getString("size.raw").size() == RAW_VALUE_SIZE);
+	assertTrue (pConf->getString("size.exact").size() == MAX_EXPANDED_SIZE);
+	assertTrue (pConf->getString("size.aliasexact").size() == MAX_EXPANDED_SIZE);
+	for (const char* key: {"size.twice", "size.aliastwice", "size.aliasraw", "size.overbyone"})
+	{
+		try
+		{
+			(void) pConf->getString(key);
+			fail("expanded value too long - must throw");
+		}
+		catch (Poco::CircularReferenceException&)
+		{
+			fail("the size limit is not a circular reference");
+		}
+		catch (Poco::DataException&)
+		{
+		}
+	}
+
+	// The configuration stays usable after the exception: reading depth.9
+	// nests MAX_REFERENCE_DEPTH expansions, the most the depth limit allows.
+	assertTrue (pConf->getString("prop1") == "foo");
+	pConf->setString("depth.0", "x");
+	for (int i = 0; i < MAX_REFERENCE_DEPTH - 1; ++i)
+	{
+		pConf->setString("depth." + std::to_string(i + 1), "${depth." + std::to_string(i) + "}");
+	}
+	assertTrue (pConf->getString("depth." + std::to_string(MAX_REFERENCE_DEPTH - 1)) == "x");
 }
 
 

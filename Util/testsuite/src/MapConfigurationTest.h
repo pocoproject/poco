@@ -25,6 +25,7 @@ public:
 	virtual ~MapConfigurationTest();
 
 	void testClear();
+	void testReentrantGetRaw();
 
 	void setUp();
 	void tearDown();
