@@ -86,6 +86,7 @@ public:
 
 	void testCopy();
 	void testCopyAssign();
+	void testCopyStruct();
 	void testMove();
 	void testRemove();
 	void testSetExistingKey();

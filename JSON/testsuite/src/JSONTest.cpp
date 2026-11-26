@@ -2320,6 +2320,61 @@ std::string JSONTest::getTestFilesPath(const std::string& type)
 }
 
 
+void JSONTest::testCopy()
+{
+	Object obj1(Poco::JSON_PRESERVE_KEY_ORDER);
+	obj1.set("foo", 0);
+	obj1.set("bar", 0);
+	obj1.set("baz", 0);
+
+	Object::NameList nl = obj1.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+
+	Object obj2;
+	obj2 = obj1;
+	nl = obj2.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+
+	Object obj3;
+	obj3.set("foo", 0);
+	obj3.set("bar", 0);
+	obj3.set("baz", 0);
+	nl = obj3.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "bar");
+	assertTrue (nl[1] == "baz");
+	assertTrue (nl[2] == "foo");
+
+	Object obj4;
+	obj4 = obj3;
+	nl = obj4.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "bar");
+	assertTrue (nl[1] == "baz");
+	assertTrue (nl[2] == "foo");
+
+	obj4 = obj1;
+	nl = obj4.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+
+	Object obj5(obj1);
+	nl = obj5.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+}
+
+
 namespace
 {
 	class CopyThrows
@@ -2457,58 +2512,48 @@ void JSONTest::testCopyAssign()
 }
 
 
-void JSONTest::testCopy()
+void JSONTest::testCopyStruct()
 {
-	Object obj1(Poco::JSON_PRESERVE_KEY_ORDER);
-	obj1.set("foo", 0);
-	obj1.set("bar", 0);
-	obj1.set("baz", 0);
+	// a copy does not share the cached structs with its source
+	Object source;
+	source.set("x", 1);
+	const Poco::DynamicStruct& sourceStruct = source;
+	assertTrue (sourceStruct.size() == 1);
 
-	Object::NameList nl = obj1.getNames();
-	assertTrue (nl.size() == 3);
-	assertTrue (nl[0] == "foo");
-	assertTrue (nl[1] == "bar");
-	assertTrue (nl[2] == "baz");
+	Object constructed(source);
+	constructed.set("y", 2);
+	const Poco::DynamicStruct& constructedStruct = constructed;
+	assertTrue (&constructedStruct != &sourceStruct);
+	assertTrue (constructedStruct.size() == 2);
+	assertTrue (sourceStruct.size() == 1);
 
-	Object obj2;
-	obj2 = obj1;
-	nl = obj2.getNames();
-	assertTrue (nl.size() == 3);
-	assertTrue (nl[0] == "foo");
-	assertTrue (nl[1] == "bar");
-	assertTrue (nl[2] == "baz");
+	Object assigned;
+	assigned = source;
+	assigned.set("y", 2);
+	const Poco::DynamicStruct& assignedStruct = assigned;
+	assertTrue (&assignedStruct != &sourceStruct);
+	assertTrue (assignedStruct.size() == 2);
+	assertTrue (sourceStruct.size() == 1);
 
-	Object obj3;
-	obj3.set("foo", 0);
-	obj3.set("bar", 0);
-	obj3.set("baz", 0);
-	nl = obj3.getNames();
-	assertTrue (nl.size() == 3);
-	assertTrue (nl[0] == "bar");
-	assertTrue (nl[1] == "baz");
-	assertTrue (nl[2] == "foo");
+	Object ordSource(Poco::JSON_PRESERVE_KEY_ORDER);
+	ordSource.set("x", 1);
+	const Poco::OrderedDynamicStruct& ordSourceStruct = ordSource;
+	assertTrue (ordSourceStruct.size() == 1);
 
-	Object obj4;
-	obj4 = obj3;
-	nl = obj4.getNames();
-	assertTrue (nl.size() == 3);
-	assertTrue (nl[0] == "bar");
-	assertTrue (nl[1] == "baz");
-	assertTrue (nl[2] == "foo");
+	Object ordConstructed(ordSource);
+	ordConstructed.set("y", 2);
+	const Poco::OrderedDynamicStruct& ordConstructedStruct = ordConstructed;
+	assertTrue (&ordConstructedStruct != &ordSourceStruct);
+	assertTrue (ordConstructedStruct.size() == 2);
+	assertTrue (ordSourceStruct.size() == 1);
 
-	obj4 = obj1;
-	nl = obj4.getNames();
-	assertTrue (nl.size() == 3);
-	assertTrue (nl[0] == "foo");
-	assertTrue (nl[1] == "bar");
-	assertTrue (nl[2] == "baz");
-
-	Object obj5(obj1);
-	nl = obj5.getNames();
-	assertTrue (nl.size() == 3);
-	assertTrue (nl[0] == "foo");
-	assertTrue (nl[1] == "bar");
-	assertTrue (nl[2] == "baz");
+	Object ordAssigned(Poco::JSON_PRESERVE_KEY_ORDER);
+	ordAssigned = ordSource;
+	ordAssigned.set("y", 2);
+	const Poco::OrderedDynamicStruct& ordAssignedStruct = ordAssigned;
+	assertTrue (&ordAssignedStruct != &ordSourceStruct);
+	assertTrue (ordAssignedStruct.size() == 2);
+	assertTrue (ordSourceStruct.size() == 1);
 }
 
 
@@ -2989,6 +3034,7 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testConcurrentStringify);
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
 	CppUnit_addTest(pSuite, JSONTest, testCopyAssign);
+	CppUnit_addTest(pSuite, JSONTest, testCopyStruct);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
 	CppUnit_addTest(pSuite, JSONTest, testRemove);
 	CppUnit_addTest(pSuite, JSONTest, testSetExistingKey);

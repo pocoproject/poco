@@ -46,10 +46,8 @@ Object::Object(const Object& other) :
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
 	_lowercaseHex(other._lowercaseHex),
-	_pStruct(!other._structModified ? other._pStruct : nullptr),
-	_pOrdStruct(!other._ordStructModified ? other._pOrdStruct : nullptr),
-	_structModified(other._structModified),
-	_ordStructModified(other._ordStructModified)
+	_structModified(true),
+	_ordStructModified(true)
 {
 	syncKeys(other._keys);
 }
@@ -85,10 +83,10 @@ Object &Object::operator = (const Object &other)
 			_preserveInsOrder = other._preserveInsOrder;
 			_escapeUnicode = other._escapeUnicode;
 			_lowercaseHex = other._lowercaseHex;
-			_pStruct = !other._structModified ? other._pStruct : nullptr;
-			_pOrdStruct = !other._ordStructModified ? other._pOrdStruct : nullptr;
-			_structModified = other._structModified;
-			_ordStructModified = other._ordStructModified;
+			_pStruct = nullptr;
+			_pOrdStruct = nullptr;
+			_structModified = true;
+			_ordStructModified = true;
 			syncKeys(other._keys);
 		}
 		catch (...)
