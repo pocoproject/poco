@@ -82,6 +82,7 @@ public:
 	void testArchiveStrategyOpenReleasesStatements();
 	void testBulkModeMixing();
 	void testBulkBindingReset();
+	void testVarExtractByTypeId();
 
 	void setUp();
 	void tearDown();

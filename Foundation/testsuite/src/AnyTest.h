@@ -51,6 +51,9 @@ public:
 	void testAnyVolatileValue();
 
 	void testPlaceholder();
+	void testStringAssignmentKeepsBuffer();
+	void testAnyStorageSize();
+	void testAnyCastByTypeId();
 
 	void setUp();
 	void tearDown();

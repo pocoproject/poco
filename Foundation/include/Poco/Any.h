@@ -20,6 +20,9 @@
 #include "Poco/MetaProgramming.h"
 #include "Poco/Bugcheck.h"
 #include "Poco/Placeholder.h"
+#define POCO_TYPELIST_INTERNAL
+#include "Poco/TypeList.h"
+#undef POCO_TYPELIST_INTERNAL
 #include <typeinfo>
 #include <string>
 #include <type_traits>
@@ -29,6 +32,10 @@
 namespace Poco {
 
 class Any;
+class DateTime;
+class LocalDateTime;
+class Timestamp;
+class UUID;
 
 using namespace std::string_literals;
 
@@ -150,16 +157,13 @@ public:
 	{
 		if (this != &rhs)
 		{
-			if (_valueHolder.holdsLeaf() && rhs._valueHolder.hasNothrowClone())
+			// An empty rhs is left to assignCopy(), so that this function stays small enough to be inlined.
+			if (!rhs.empty() && _valueHolder.canTakeCloneOf(rhs._valueHolder))
 			{
 				// rhs cannot live inside a leaf, and its clone cannot throw
 				construct(rhs);
 			}
-			else
-			{
-				Any tmp(rhs);
-				_valueHolder.moveFrom(tmp._valueHolder);
-			}
+			else assignCopy(rhs);
 		}
 		return *this;
 	}
@@ -169,8 +173,16 @@ public:
 	{
 		if (this != &rhs)
 		{
-			Any tmp(std::move(rhs));
-			_valueHolder.moveFrom(tmp._valueHolder);
+			if (_valueHolder.holdsLeaf())
+			{
+				// rhs cannot live inside a leaf
+				_valueHolder.moveFrom(rhs._valueHolder);
+			}
+			else
+			{
+				Any tmp(std::move(rhs));
+				_valueHolder.moveFrom(tmp._valueHolder);
+			}
 		}
 		return *this;
 	}
@@ -202,17 +214,37 @@ private:
 	class ValueHolder
 	{
 	public:
+		using ValueTypes = TypeList<bool, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t,
+			short, unsigned short, int, unsigned, long, unsigned long, long long, unsigned long long,
+			float, double, long double, std::string, std::wstring, std::u8string, std::u16string, std::u32string,
+			DateTime, LocalDateTime, Timestamp, UUID>;
+			/// The value types that Any identifies by a type id (see Placeholder::holderTypeId()).
+
+		static_assert(Impl::FOUNDATION_TYPE_ID_BASE + ValueTypes::length <= Impl::JSON_TYPE_ID_BASE,
+			"the value types of Any must fit into the type id range of Foundation");
+
 		virtual ~ValueHolder() = default;
 
 		[[nodiscard]] virtual const std::type_info & type() const = 0;
 		virtual void clone(Placeholder<ValueHolder>*) const = 0;
 		virtual void moveTo(Placeholder<ValueHolder>*) = 0;
+
+		virtual bool assignFrom(const ValueHolder& /*source*/)
+			/// Replaces the held value with a copy of the value of source and
+			/// returns true, if this can be done in place without losing the
+			/// strong exception guarantee. Returns false without a change otherwise.
+			/// Requires that source holds the same value type.
+		{
+			return false;
+		}
 	};
 
 	template<typename ValueType>
 	class Holder : public ValueHolder
 	{
 	public:
+		using DestroysOnlyValue = Holder;
+
 		Holder(const ValueType & value) : _held(value)
 		{
 		}
@@ -244,12 +276,52 @@ private:
 				clone(pPlaceholder);
 		}
 
+		bool assignFrom(const ValueHolder& source) override
+		{
+			// A member function of basic_string that throws has no effect on the string.
+			if constexpr (Impl::IS_STRING<ValueType>)
+			{
+				poco_assert_dbg (source.type() == type());
+				_held = static_cast<const Holder&>(source)._held;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		ValueType _held;
 	};
 
 	[[nodiscard]] ValueHolder* content() const
 	{
 		return _valueHolder.content();
+	}
+
+	template <typename ValueType>
+	[[nodiscard]] Holder<ValueType>* holderOf() const
+		/// Returns the content if it holds a ValueType, otherwise nullptr.
+		/// A holder with a type id is recognized by the id in the
+		/// placeholder, any other holder by its type().
+	{
+		constexpr unsigned char expected = Placeholder<ValueHolder>::holderTypeId<Holder<ValueType>, ValueType>();
+		if constexpr (expected != Impl::TYPE_ID_OTHER)
+			return (_valueHolder.typeId() == expected) ? static_cast<Holder<ValueType>*>(content()) : nullptr;
+		else
+			return (type() == typeid(ValueType)) ? static_cast<Holder<ValueType>*>(content()) : nullptr;
+	}
+
+	void assignCopy(const Any& rhs)
+		/// Assigns a copy of rhs in place if both hold the same type and its
+		/// holder supports it (see ValueHolder::assignFrom()), otherwise through
+		/// a temporary, so that a failed copy leaves this Any unchanged.
+	{
+		if (!_valueHolder.holdsSameTypeAs(rhs._valueHolder) || !content()->assignFrom(*rhs.content()))
+		{
+			Any tmp(rhs);
+			_valueHolder.moveFrom(tmp._valueHolder);
+		}
 	}
 
 	template <typename ValueType>
@@ -307,9 +379,8 @@ template <typename ValueType>
 	///	 MyType* pTmp = AnyCast<MyType>(pAny).
 	/// Returns nullptr if the types don't match.
 {
-	return operand && operand->type() == typeid(ValueType)
-				? &static_cast<Any::Holder<ValueType>*>(operand->content())->_held
-				: nullptr;
+	Any::Holder<ValueType>* pHolder = (operand != nullptr) ? operand->holderOf<ValueType>() : nullptr;
+	return (pHolder != nullptr) ? &pHolder->_held : nullptr;
 }
 
 
@@ -322,9 +393,8 @@ template <typename ValueType>
 	///	 const MyType* pTmp = AnyCast<MyType>(pAny).
 	/// Returns nullptr if the types don't match.
 {
-	return operand && operand->type() == typeid(ValueType)
-				? &static_cast<const Any::Holder<ValueType>*>(operand->content())->_held
-				: nullptr;
+	const Any::Holder<ValueType>* pHolder = (operand != nullptr) ? operand->holderOf<ValueType>() : nullptr;
+	return (pHolder != nullptr) ? &pHolder->_held : nullptr;
 }
 
 

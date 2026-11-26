@@ -184,12 +184,14 @@ public:
 		/// not available for the given type.
 		/// Throws InvalidAccessException if Var is empty.
 	{
+		const VarHolderImpl<T>* pHolderImpl = holderOf<T>();
+		if (pHolderImpl != nullptr)
+			return pHolderImpl->value();
+
 		VarHolder* pHolder = content();
 
 		if (!pHolder)
 			throw InvalidAccessException("Can not convert empty value.");
-
-		if (typeid(T) == pHolder->type()) return extract<T>();
 
 		T result;
 		pHolder->convert(result);
@@ -210,13 +212,14 @@ public:
 		/// not available for the given type.
 		/// Throws InvalidAccessException if Var is empty.
 	{
+		const VarHolderImpl<T>* pHolderImpl = holderOf<T>();
+		if (pHolderImpl != nullptr)
+			return pHolderImpl->value();
+
 		VarHolder* pHolder = content();
 
 		if (!pHolder)
 			throw InvalidAccessException("Can not convert empty value.");
-
-		if (typeid(T) == pHolder->type())
-			return extract<T>();
 
 		T result;
 		pHolder->convert(result);
@@ -232,13 +235,11 @@ public:
 		/// is thrown.
 		/// Throws InvalidAccessException if Var is empty.
 	{
-		VarHolder* pHolder = content();
-
-		if ( (pHolder != nullptr) && pHolder->type() == typeid(T))
-		{
-			auto* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
+		const VarHolderImpl<T>* pHolderImpl = holderOf<T>();
+		if (pHolderImpl != nullptr)
 			return pHolderImpl->value();
-		}
+
+		VarHolder* pHolder = content();
 
 		if (!pHolder)
 			throw InvalidAccessException("Can not extract empty value.");
@@ -652,15 +653,32 @@ private:
 	template <typename T, typename E>
 	[[nodiscard]] VarHolderImpl<T>* holderImpl(const std::string errorMessage = "") const
 	{
-		VarHolder* pHolder = content();
+		VarHolderImpl<T>* pHolderImpl = holderOf<T>();
+		if (pHolderImpl != nullptr)
+			return pHolderImpl;
 
-		if (pHolder && pHolder->type() == typeid(T))
-			return static_cast<VarHolderImpl<T>*>(pHolder);
-
-		if (pHolder == nullptr)
+		if (content() == nullptr)
 			throw InvalidAccessException("Can not access empty value.");
 		else
 			throw E(errorMessage);
+	}
+
+	template <typename T>
+	[[nodiscard]] VarHolderImpl<T>* holderOf() const
+		/// Returns the content if it holds a T, otherwise nullptr.
+		/// A holder with a type id is recognized by the id in the
+		/// placeholder, any other holder by its type().
+	{
+		constexpr unsigned char expected = Placeholder<VarHolder>::holderTypeId<VarHolderImpl<T>, T>();
+		if constexpr (expected != Poco::Impl::TYPE_ID_OTHER)
+		{
+			return (_placeholder.typeId() == expected) ? static_cast<VarHolderImpl<T>*>(content()) : nullptr;
+		}
+		else
+		{
+			VarHolder* pHolder = content();
+			return (pHolder != nullptr && pHolder->type() == typeid(T)) ? static_cast<VarHolderImpl<T>*>(pHolder) : nullptr;
+		}
 	}
 
 	template <typename T, typename N>
@@ -732,6 +750,10 @@ static_assert(std::is_nothrow_move_assignable_v<Var>, "the move assignment of Va
 ///
 /// Var members
 ///
+
+// Defaulted outside the class, so that value-initialization does not zero the storage first.
+inline Var::Var() = default;
+
 
 inline void Var::construct(const char* value)
 {

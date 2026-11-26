@@ -19,6 +19,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/VarTypeIds.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Exception.h"
@@ -270,6 +271,10 @@ public:
 	{
 	}
 
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<Poco::Data::BLOB, Poco::Data::Impl::VarValueTypes, Poco::Impl::DATA_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
+
 	[[nodiscard]] const std::type_info& type() const override
 	{
 		return typeid(Poco::Data::BLOB);
@@ -316,6 +321,10 @@ public:
 	~VarHolderImpl()
 	{
 	}
+
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<Poco::Data::CLOB, Poco::Data::Impl::VarValueTypes, Poco::Impl::DATA_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
 
 	[[nodiscard]] const std::type_info& type() const override
 	{

@@ -21,6 +21,7 @@
 #include "Poco/JSON/JSON.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/Var.h"
+#include "Poco/ValueTypeId.h"
 #include <vector>
 #include <sstream>
 #include <utility>
@@ -334,6 +335,21 @@ inline void Array::remove(unsigned int index)
 }
 
 
+namespace Impl {
+
+
+using VarValueTypes = TypeList<Array::Ptr, Array, SharedPtr<Object>, Object>;
+	/// The value types of the Var holders of the JSON library, which Var
+	/// identifies by a type id (see Poco::Impl::JSON_TYPE_ID_BASE).
+
+
+static_assert(Poco::Impl::JSON_TYPE_ID_BASE + VarValueTypes::length <= Poco::Impl::DATA_TYPE_ID_BASE,
+	"the Var holder types of the JSON library must fit into its type id range");
+
+
+} // namespace Impl
+
+
 } // namespace Poco::JSON
 
 
@@ -353,6 +369,10 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<JSON::Array::Ptr, JSON::Impl::VarValueTypes, Poco::Impl::JSON_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
 
 	const std::type_info& type() const override
 	{
@@ -494,6 +514,10 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<JSON::Array, JSON::Impl::VarValueTypes, Poco::Impl::JSON_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
 
 	const std::type_info& type() const override
 	{

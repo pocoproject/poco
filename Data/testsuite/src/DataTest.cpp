@@ -3125,6 +3125,67 @@ void DataTest::testBulkBindingReset()
 }
 
 
+void DataTest::testVarExtractByTypeId()
+{
+#ifndef POCO_NO_SOO
+	using Poco::Dynamic::VarHolder;
+	using Poco::Dynamic::VarHolderImpl;
+	constexpr unsigned char base = Poco::Impl::DATA_TYPE_ID_BASE;
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Date>, Date>() == base + 1));
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Poco::Data::Time>, Poco::Data::Time>() == base + 2));
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<BLOB>, BLOB>() == base + 3));
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<CLOB>, CLOB>() == base + 4));
+#endif
+
+	const Var dateVar = Date(2026, 11, 26);
+	assertTrue (dateVar.extract<Date>() == Date(2026, 11, 26));
+	const Var timeVar = Poco::Data::Time(12, 30, 15);
+	assertTrue (timeVar.extract<Poco::Data::Time>() == Poco::Data::Time(12, 30, 15));
+	const BLOB blob(std::vector<unsigned char>{1, 2, 3});
+	const Var blobVar = blob;
+	assertTrue (blobVar.extract<BLOB>() == blob);
+	const CLOB clob("abc", 3);
+	const Var clobVar = clob;
+	assertTrue (clobVar.extract<CLOB>() == clob);
+
+	try
+	{
+		(void) dateVar.extract<Poco::Data::Time>();
+		fail ("extract of a Date as Time must throw");
+	}
+	catch (BadCastException&)
+	{
+	}
+
+	try
+	{
+		(void) timeVar.extract<Date>();
+		fail ("extract of a Time as Date must throw");
+	}
+	catch (BadCastException&)
+	{
+	}
+
+	try
+	{
+		(void) blobVar.extract<CLOB>();
+		fail ("extract of a BLOB as CLOB must throw");
+	}
+	catch (BadCastException&)
+	{
+	}
+
+	try
+	{
+		(void) clobVar.extract<BLOB>();
+		fail ("extract of a CLOB as BLOB must throw");
+	}
+	catch (BadCastException&)
+	{
+	}
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -3194,6 +3255,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testArchiveStrategyOpenReleasesStatements);
 	CppUnit_addTest(pSuite, DataTest, testBulkModeMixing);
 	CppUnit_addTest(pSuite, DataTest, testBulkBindingReset);
+	CppUnit_addTest(pSuite, DataTest, testVarExtractByTypeId);
 
 	return pSuite;
 }

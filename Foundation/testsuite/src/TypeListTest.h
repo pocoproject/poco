@@ -25,6 +25,8 @@ public:
 	~TypeListTest();
 
 	void testTypeList();
+	void testTypeIndex();
+	void testTypeListConcat();
 	void setUp();
 	void tearDown();
 

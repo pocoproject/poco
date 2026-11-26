@@ -108,9 +108,19 @@ public:
 	void testCopyAssignmentPaths();
 	void testPlaceholderMarks();
 	void testPlaceholderFailedEmplaceLeavesItEmpty();
+	void testDerivedHolderIsDestroyed();
+	void testStringAssignmentKeepsBuffer();
 	void testConvertibleRvalueUsesConversion();
 	void testMoveDoesNotCopy();
 	void testMoveKeepsValue();
+	void testStorageSize();
+	void testExtractPredefinedTypes();
+	void testExtractRejectsSimilarTypes();
+	void testExtractTypeWithoutTypeId();
+	void testDerivedHolderHasTypeIdOfBase();
+	void testPlaceholderTypeId();
+	void testTypeIdsAreDistinct();
+	void testDerivedHolderDoesNotInheritTypeId();
 
 	void setUp();
 	void tearDown();
@@ -153,6 +163,27 @@ private:
 			return var.extract<T>() == value;
 		else
 			return var.convert<std::string>() == Poco::Dynamic::Var(value).convert<std::string>();
+	}
+
+	template <typename T>
+	void checkExtractAndConvert(const T& value)
+	{
+		const Poco::Dynamic::Var var = value;
+		assertTrue (var.extract<T>() == value);
+		assertTrue (var.convert<T>() == value);
+	}
+
+	template <typename T>
+	void checkExtractFails(const Poco::Dynamic::Var& var)
+	{
+		try
+		{
+			(void) var.extract<T>();
+			fail ("extract of a different type must throw");
+		}
+		catch (Poco::BadCastException&)
+		{
+		}
 	}
 
 

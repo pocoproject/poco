@@ -1208,6 +1208,7 @@
                                 <File Id="UUID.H" Name="UUID.h" Source="$(var.POCO)\Foundation\include\Poco\UUID.h" />
                                 <File Id="UUIDGENERATOR.H" Name="UUIDGenerator.h" Source="$(var.POCO)\Foundation\include\Poco\UUIDGenerator.h" />
                                 <File Id="VALIDARGS.H" Name="ValidArgs.h" Source="$(var.POCO)\Foundation\include\Poco\ValidArgs.h" />
+                                <File Id="VALUETYPEID.H" Name="ValueTypeId.h" Source="$(var.POCO)\Foundation\include\Poco\ValueTypeId.h" />
                                 <File Id="VERSION.H" Name="Version.h" Source="$(var.POCO)\Foundation\include\Poco\Version.h" />
                                 <File Id="VOID.H" Name="Void.h" Source="$(var.POCO)\Foundation\include\Poco\Void.h" />
                                 <File Id="WINDOWS1250ENCODING.H" Name="Windows1250Encoding.h" Source="$(var.POCO)\Foundation\include\Poco\Windows1250Encoding.h" />
@@ -1298,6 +1299,7 @@
                                     <File Id="TIME.H" Name="Time.h" Source="$(var.POCO)\Data\include\Poco\Data\Time.h" />
                                     <File Id="TRANSACTION.H" Name="Transaction.h" Source="$(var.POCO)\Data\include\Poco\Data\Transaction.h" />
                                     <File Id="TYPEHANDLER.H" Name="TypeHandler.h" Source="$(var.POCO)\Data\include\Poco\Data\TypeHandler.h" />
+                                    <File Id="VARTYPEIDS.H" Name="VarTypeIds.h" Source="$(var.POCO)\Data\include\Poco\Data\VarTypeIds.h" />
                                 </Component>
                                 <Directory Id="MYSQL" Name="MySQL">
                                     <Component Win64="$(var.Win64)" Id="Poco.Data.MySQL.inc" DiskId="1" Guid="F46CC846-0846-4DAE-9ADD-1B450A8F061C">

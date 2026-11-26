@@ -21,6 +21,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Bugcheck.h"
+#include "Poco/ValueTypeId.h"
 #include <cstddef>
 #include <new>
 #include <string>
@@ -51,6 +52,15 @@ template <typename C, typename T, typename A>
 inline constexpr bool IS_LEAF_VALUE<std::basic_string<C, T, A>> = true;
 
 
+template <typename V>
+inline constexpr bool IS_STRING = false;
+	/// True for a std::basic_string.
+
+
+template <typename C, typename T, typename A>
+inline constexpr bool IS_STRING<std::basic_string<C, T, A>> = true;
+
+
 } // namespace Impl
 
 
@@ -62,9 +72,10 @@ union Placeholder
 	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage,
 	/// needs no stronger alignment than std::max_align_t and can be moved
 	/// without an exception, it will be placement-new-allocated into the local buffer
-	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
-	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
-	/// where the object was allocated. See enum Allocation.
+	/// (i.e. there will be no heap-allocation). The local buffer size is two bytes
+	/// larger - [POCO_SMALL_OBJECT_SIZE + 2]: the first additional byte indicates
+	/// where the object was allocated (see enum Allocation), the second one holds
+	/// the type id of the content (see typeId()).
 	///
 	/// Important: for SOO builds, swap() exchanges only contents that are not
 	/// stored locally; moveFrom() also moves a locally stored content.
@@ -97,7 +108,8 @@ public:
 	{
 		poco_assert_dbg (!isLocal() && !other.isLocal());
 		std::swap(pHolder, other.pHolder);
-		std::swap(holder[SizeV], other.holder[SizeV]);
+		std::swap(holder[TAG_BYTE], other.holder[TAG_BYTE]);
+		std::swap(holder[TYPE_ID_BYTE], other.holder[TYPE_ID_BYTE]);
 	}
 
 	void erase()
@@ -121,7 +133,7 @@ public:
 		/// live inside the content. Without small object optimization
 		/// (POCO_NO_SOO), it returns true only for an empty placeholder.
 	{
-		return isEmpty() || (holder[SizeV] & LEAF_FLAG) != 0;
+		return isEmpty() || (holder[TAG_BYTE] & LEAF_FLAG) != 0;
 	}
 
 	[[nodiscard]] bool hasNothrowClone() const noexcept
@@ -131,7 +143,51 @@ public:
 		/// optimization (POCO_NO_SOO), it returns true only for an empty
 		/// placeholder.
 	{
-		return isEmpty() || (holder[SizeV] & NOTHROW_CLONE_FLAG) != 0;
+		return isEmpty() || (holder[TAG_BYTE] & NOTHROW_CLONE_FLAG) != 0;
+	}
+
+	[[nodiscard]] bool canTakeCloneOf(const Placeholder& source) const noexcept
+		/// Returns true if the clone of the content of source can replace
+		/// the content directly: holdsLeaf() && source.hasNothrowClone().
+	{
+		return holdsLeaf() && source.hasNothrowClone();
+	}
+
+	[[nodiscard]] unsigned char typeId() const noexcept
+		/// Returns the type id that emplace() stored with the content (see
+		/// holderTypeId()), or Impl::TYPE_ID_OTHER if the placeholder is empty.
+		/// Without small object optimization (POCO_NO_SOO), it always returns
+		/// Impl::TYPE_ID_OTHER.
+	{
+		return holder[TYPE_ID_BYTE];
+	}
+
+	[[nodiscard]] bool holdsSameTypeAs(const Placeholder& other) const
+		/// Returns true if both contents have the same type id other than
+		/// Impl::TYPE_ID_OTHER, or if both have the type id Impl::TYPE_ID_OTHER,
+		/// neither placeholder is empty and both contents have the same type().
+	{
+		if (typeId() != Impl::TYPE_ID_OTHER)
+			return typeId() == other.typeId();
+		return other.typeId() == Impl::TYPE_ID_OTHER && !isEmpty() && !other.isEmpty() && content()->type() == other.content()->type();
+	}
+
+	template <typename T, typename V>
+	[[nodiscard]] static constexpr unsigned char holderTypeId() noexcept
+		/// Returns the type id that emplace<T, V>() stores: T::TYPE_ID if the
+		/// holder type T declares "static constexpr unsigned char TYPE_ID" and
+		/// "using TypeIdHolder = T;", otherwise the id of V in PlaceholderT::ValueTypes
+		/// (see Impl::TYPE_ID_IN), or Impl::TYPE_ID_OTHER if PlaceholderT declares
+		/// no such TypeList. The alias names T itself, so that the TYPE_ID of such a
+		/// holder is not used for a class derived from it. Without small object
+		/// optimization (POCO_NO_SOO), it always returns Impl::TYPE_ID_OTHER.
+	{
+		if constexpr (requires { T::TYPE_ID; requires std::is_same_v<typename T::TypeIdHolder, T>; })
+			return T::TYPE_ID;
+		else if constexpr (requires { typename PlaceholderT::ValueTypes; })
+			return Impl::TYPE_ID_IN<V, typename PlaceholderT::ValueTypes, Impl::FOUNDATION_TYPE_ID_BASE>;
+		else
+			return Impl::TYPE_ID_OTHER;
 	}
 
 	template <typename T, typename V>
@@ -153,13 +209,13 @@ public:
 		if constexpr (storesLocally<T, V>())
 		{
 			PlaceholderT* pContent = new (holder) T(std::forward<Args>(args)...);
-			setAllocation(Allocation::POCO_ANY_LOCAL, leafFlag<V>() | nothrowCloneFlag<V>());
+			setAllocation(Allocation::POCO_ANY_LOCAL, leafFlag<V>() | nothrowCloneFlag<V>() | trivialDestructionFlag<T, V>(), holderTypeId<T, V>());
 			return pContent;
 		}
 		else
 		{
 			pHolder = new T(std::forward<Args>(args)...);
-			setAllocation(Allocation::POCO_ANY_EXTERNAL, leafFlag<V>());
+			setAllocation(Allocation::POCO_ANY_EXTERNAL, leafFlag<V>(), holderTypeId<T, V>());
 			return pHolder;
 		}
 	}
@@ -218,6 +274,13 @@ private:
 		POCO_ANY_EXTERNAL = 2
 	};
 
+	static constexpr unsigned int TAG_BYTE = SizeV;
+		/// The index of the tag byte, which holds the Allocation and the flags,
+		/// behind the local buffer.
+
+	static constexpr unsigned int TYPE_ID_BYTE = SizeV + 1;
+		/// The index of the byte that holds the type id of the content.
+
 	static constexpr unsigned char LEAF_FLAG = 0x80;
 		/// Set in the tag byte, next to the Allocation, if Impl::IS_LEAF_VALUE
 		/// is true for the value.
@@ -226,10 +289,14 @@ private:
 		/// Set in the tag byte, next to the Allocation, if the content is
 		/// stored locally and the value is nothrow copy constructible.
 
-	static constexpr unsigned char ALLOCATION_MASK = 0x3F;
+	static constexpr unsigned char TRIVIAL_DESTRUCTION_FLAG = 0x20;
+		/// Set in the tag byte, next to the Allocation, if the content is
+		/// stored locally and its destructor has no effect (see trivialDestructionFlag()).
+
+	static constexpr unsigned char ALLOCATION_MASK = 0x1F;
 		/// Selects the Allocation in the tag byte.
 
-	static_assert((ALLOCATION_MASK & (LEAF_FLAG | NOTHROW_CLONE_FLAG)) == 0 &&
+	static_assert((ALLOCATION_MASK & (LEAF_FLAG | NOTHROW_CLONE_FLAG | TRIVIAL_DESTRUCTION_FLAG)) == 0 &&
 		(Allocation::POCO_ANY_EXTERNAL & ~ALLOCATION_MASK) == 0, "the flags and the Allocation overlap in the tag byte");
 
 	template <typename V>
@@ -244,14 +311,29 @@ private:
 		return std::is_nothrow_copy_constructible_v<V> ? NOTHROW_CLONE_FLAG : 0;
 	}
 
-	[[nodiscard]] Allocation allocation() const
+	template <typename T, typename V>
+	[[nodiscard]] static constexpr unsigned char trivialDestructionFlag()
+		/// A holder type T declares "using DestroysOnlyValue = T;" if its
+		/// destructor does nothing but destroy the value. If V is also trivially
+		/// destructible, the destructor has no effect and is not called: the
+		/// storage is reused without it. The alias names T itself, so that a
+		/// class derived from such a holder does not inherit the property.
 	{
-		return static_cast<Allocation>(holder[SizeV] & ALLOCATION_MASK);
+		if constexpr (requires { typename T::DestroysOnlyValue; })
+			return (std::is_same_v<typename T::DestroysOnlyValue, T> && std::is_trivially_destructible_v<V>) ? TRIVIAL_DESTRUCTION_FLAG : 0;
+		else
+			return 0;
 	}
 
-	void setAllocation(Allocation alloc, unsigned char flags = 0) const
+	[[nodiscard]] Allocation allocation() const
 	{
-		holder[SizeV] = static_cast<unsigned char>(alloc | flags);
+		return static_cast<Allocation>(holder[TAG_BYTE] & ALLOCATION_MASK);
+	}
+
+	void setAllocation(Allocation alloc, unsigned char flags = 0, unsigned char typeId = Impl::TYPE_ID_OTHER) const
+	{
+		holder[TAG_BYTE] = static_cast<unsigned char>(alloc | flags);
+		holder[TYPE_ID_BYTE] = typeId;
 	}
 
 	void destruct()
@@ -261,6 +343,7 @@ private:
 		case Allocation::POCO_ANY_EMPTY:
 			break;
 		case Allocation::POCO_ANY_LOCAL:
+			if ((holder[TAG_BYTE] & TRIVIAL_DESTRUCTION_FLAG) == 0)
 			{
 				// Do not deallocate, just explicitly call destructor
 				auto* h { reinterpret_cast<PlaceholderT*>(holder) };
@@ -281,7 +364,7 @@ private:
 		setAllocation(Allocation::POCO_ANY_EMPTY);
 	}
 
-	mutable unsigned char holder[SizeV+1];
+	mutable unsigned char holder[TYPE_ID_BYTE + 1];
 	AlignerType           aligner;
 
 #else // POCO_NO_SOO
@@ -324,6 +407,27 @@ private:
 	[[nodiscard]] bool hasNothrowClone() const noexcept
 	{
 		return isEmpty();
+	}
+
+	[[nodiscard]] bool canTakeCloneOf(const Placeholder& source) const noexcept
+	{
+		return holdsLeaf() && source.hasNothrowClone();
+	}
+
+	[[nodiscard]] unsigned char typeId() const noexcept
+	{
+		return Impl::TYPE_ID_OTHER;
+	}
+
+	[[nodiscard]] bool holdsSameTypeAs(const Placeholder& other) const
+	{
+		return !isEmpty() && !other.isEmpty() && pHolder->type() == other.pHolder->type();
+	}
+
+	template <typename T, typename V>
+	[[nodiscard]] static constexpr unsigned char holderTypeId() noexcept
+	{
+		return Impl::TYPE_ID_OTHER;
 	}
 
 	template <typename T, typename V>

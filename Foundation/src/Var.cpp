@@ -25,11 +25,6 @@
 namespace Poco::Dynamic {
 
 
-Var::Var()
-{
-}
-
-
 Var::Var(const char* pVal)
 {
 	construct(std::string(pVal));
@@ -52,13 +47,13 @@ Var::Var(Var&& other) noexcept
 Var& Var::operator = (const Var& rhs)
 {
 	if (this == &rhs) return *this;
-	if (_placeholder.holdsLeaf() && rhs._placeholder.hasNothrowClone())
+	if (_placeholder.canTakeCloneOf(rhs._placeholder))
 	{
 		// rhs cannot live inside a leaf, and its clone cannot throw
 		clear();
 		construct(rhs);
 	}
-	else
+	else if (!_placeholder.holdsSameTypeAs(rhs._placeholder) || !content()->assignFrom(*rhs.content()))
 	{
 		Var tmp(rhs);
 		_placeholder.moveFrom(tmp._placeholder);
@@ -70,8 +65,16 @@ Var& Var::operator = (const Var& rhs)
 Var& Var::operator = (Var&& other) noexcept
 {
 	if (this == &other) return *this;
-	Var tmp(std::move(other));
-	_placeholder.moveFrom(tmp._placeholder);
+	if (_placeholder.holdsLeaf())
+	{
+		// other cannot live inside a leaf
+		_placeholder.moveFrom(other._placeholder);
+	}
+	else
+	{
+		Var tmp(std::move(other));
+		_placeholder.moveFrom(tmp._placeholder);
+	}
 	return *this;
 }
 
@@ -387,8 +390,8 @@ std::string Var::toString() const
 	if (!pHolder)
 		throw InvalidAccessException("Can not convert empty value.");
 
-	if (typeid(std::string) == pHolder->type())
-		return extract<std::string>();
+	if (const VarHolderImpl<std::string>* pString = holderOf<std::string>(); pString != nullptr)
+		return pString->value();
 	else
 	{
 		std::string result;

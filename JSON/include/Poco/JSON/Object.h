@@ -543,6 +543,10 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<JSON::Object::Ptr, JSON::Impl::VarValueTypes, Poco::Impl::JSON_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
+
 	const std::type_info& type() const override
 	{
 		return typeid(JSON::Object::Ptr);
@@ -688,6 +692,10 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<JSON::Object, JSON::Impl::VarValueTypes, Poco::Impl::JSON_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
 
 	const std::type_info& type() const override
 	{

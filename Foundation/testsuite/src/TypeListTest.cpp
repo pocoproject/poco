@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Tuple.h"
 #include "Poco/Void.h"
+#include <type_traits>
 
 
 using Poco::TypeList;
@@ -20,6 +21,8 @@ using Poco::Tuple;
 using Poco::NullTypeList;
 using Poco::TypeListType;
 using Poco::TypeGetter;
+using Poco::TypeIndex;
+using Poco::TypeListConcat;
 using Poco::Int8;
 using Poco::UInt8;
 using Poco::Int16;
@@ -145,6 +148,40 @@ void TypeListTest::testTypeList()
 }
 
 
+void TypeListTest::testTypeIndex()
+{
+	using List = TypeList<Int8, Int16, Int32, Int16>;
+	assertTrue ((TypeIndex<Int8, List>::value == 0));
+	assertTrue ((TypeIndex<Int32, List>::value == 2));
+	assertTrue ((TypeIndex<Int16, List>::value == 1));
+	assertTrue ((TypeIndex<UInt8, List>::value == -1));
+	assertTrue ((TypeIndex<Int8, TypeList<>>::value == -1));
+
+	using LastList = TypeList<Int8, UInt8, double>;
+	assertTrue ((TypeIndex<double, LastList>::value == 2));
+
+	using LongList = TypeList<
+		Void, Void, Void, Void, Void, Void, Void, Void, Void, Void,
+		Void, Void, Void, Void, Void, Void, Void, Void, Void, Void,
+		Void, Void, Void, Void, Void, Void, Void, Void, Void, Void,
+		Void, Void, Void, Void, Void, Void, Void, Void, Void, Void,
+		Int8, Void, UInt8>;
+	assertTrue (43 == LongList::length);
+	assertTrue ((TypeIndex<Int8, LongList>::value == 40));
+	assertTrue ((TypeIndex<UInt8, LongList>::value == 42));
+	assertTrue (typeid(TypeGetter<42, LongList>::HeadType) == typeid(UInt8));
+}
+
+
+void TypeListTest::testTypeListConcat()
+{
+	using Concatenated = TypeListConcat<TypeList<Int8, Int16>, TypeList<Int32>>::HeadType;
+	assertTrue (3 == Concatenated::length);
+	assertTrue ((std::is_same_v<Concatenated, TypeList<Int8, Int16, Int32>>));
+	assertTrue ((std::is_same_v<TypeListConcat<TypeList<>, TypeList<Int8>>::HeadType, TypeList<Int8>>));
+}
+
+
 void TypeListTest::setUp()
 {
 }
@@ -160,6 +197,8 @@ CppUnit::Test* TypeListTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("TypeListTest");
 
 	CppUnit_addTest(pSuite, TypeListTest, testTypeList);
+	CppUnit_addTest(pSuite, TypeListTest, testTypeIndex);
+	CppUnit_addTest(pSuite, TypeListTest, testTypeListConcat);
 
 	return pSuite;
 }

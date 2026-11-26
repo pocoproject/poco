@@ -322,6 +322,23 @@ extern template class Foundation_API Struct<int, OrderedMap<int, Var>, OrderedSe
 #endif
 
 
+namespace Impl {
+
+
+using VarValueTypes = TypeListConcat<VarHolder::ValueTypes, TypeList<
+	Struct<std::string, Poco::OrderedMap<std::string, Var>, Poco::OrderedSet<std::string>>,
+	Struct<int, OrderedMap<int, Var>, OrderedSet<int>>>>::HeadType;
+	/// VarHolder::ValueTypes followed by the ordered Struct types: the value
+	/// types that Var identifies by a type id.
+
+
+static_assert(Poco::Impl::FOUNDATION_TYPE_ID_BASE + VarValueTypes::length <= Poco::Impl::JSON_TYPE_ID_BASE,
+	"the value types of Var must fit into the type id range of Foundation");
+
+
+} // namespace Impl
+
+
 template <typename K, typename M, typename S>
 class VarHolderImpl<Struct<K, M, S>>: public VarHolder
 {
@@ -340,6 +357,10 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<ValueType, Impl::VarValueTypes, Poco::Impl::FOUNDATION_TYPE_ID_BASE>;
+		/// The type id from Impl::VarValueTypes, which also lists the ordered Struct types.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
 
 	[[nodiscard]] const std::type_info& type() const override
 	{

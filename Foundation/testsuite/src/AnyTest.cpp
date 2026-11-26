@@ -20,9 +20,11 @@
 #include "Poco/LocalDateTime.h"
 #include "Poco/Timestamp.h"
 #include "Poco/UUID.h"
+#include "Poco/UTFString.h"
 #include <vector>
 #include <memory>
 #include <bit>
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <utility>
@@ -735,6 +737,104 @@ void AnyTest::testPlaceholder()
 }
 
 
+void AnyTest::testStringAssignmentKeepsBuffer()
+{
+	const std::string text(100, 'x');
+	Any target(std::string(200, 'a'));
+	const char* pData = AnyCast<std::string>(&target)->data();
+	const Any source(text);
+	target = source;
+	assertTrue (*AnyCast<std::string>(&target) == text);
+	assertTrue (AnyCast<std::string>(&target)->data() == pData);
+	assertTrue (*AnyCast<std::string>(&source) == text);
+
+	target = Any(42);
+	assertTrue (AnyCast<int>(target) == 42);
+
+	const std::wstring wideText(100, L'x');
+	Any wideTarget(std::wstring(200, L'a'));
+	const wchar_t* pWideData = AnyCast<std::wstring>(&wideTarget)->data();
+	const Any wideSource(wideText);
+	wideTarget = wideSource;
+	assertTrue (*AnyCast<std::wstring>(&wideTarget) == wideText);
+	assertTrue (AnyCast<std::wstring>(&wideTarget)->data() == pWideData);
+
+	const std::u16string utf16Text(100, u'x');
+	Any utf16Target(std::u16string(200, u'a'));
+	const char16_t* pUtf16Data = AnyCast<std::u16string>(&utf16Target)->data();
+	const Any utf16Source(utf16Text);
+	utf16Target = utf16Source;
+	assertTrue (*AnyCast<std::u16string>(&utf16Target) == utf16Text);
+	assertTrue (AnyCast<std::u16string>(&utf16Target)->data() == pUtf16Data);
+
+	// Unless UTF16String is std::wstring, Any has no type id for it and compares the types by type().
+	const UTF16String utf16StringText(100, 'x');
+	Any utf16StringTarget(UTF16String(200, 'a'));
+	const UTF16Char* pUtf16StringData = AnyCast<UTF16String>(&utf16StringTarget)->data();
+	const Any utf16StringSource(utf16StringText);
+	utf16StringTarget = utf16StringSource;
+	assertTrue (*AnyCast<UTF16String>(&utf16StringTarget) == utf16StringText);
+	assertTrue (AnyCast<UTF16String>(&utf16StringTarget)->data() == pUtf16StringData);
+}
+
+
+void AnyTest::testAnyStorageSize()
+{
+#if !defined(POCO_NO_SOO) && POCO_SMALL_OBJECT_SIZE == 64
+	// With the default buffer size, the type id byte fits into the padding behind the tag byte.
+	constexpr std::size_t alignment = alignof(std::max_align_t);
+	constexpr std::size_t expectedSize = (POCO_SMALL_OBJECT_SIZE + 1 + alignment - 1) / alignment * alignment;
+	assertEqual (expectedSize, sizeof(Any));
+#endif
+}
+
+
+void AnyTest::testAnyCastByTypeId()
+{
+	Any intAny = 42;
+	assertTrue (AnyCast<int>(&intAny) != nullptr);
+	assertTrue (*AnyCast<int>(&intAny) == 42);
+	assertTrue (AnyCast<unsigned>(&intAny) == nullptr);
+	assertTrue (AnyCast<long>(&intAny) == nullptr);
+
+	const Any charAny = 'a';
+	assertTrue (*AnyCast<char>(&charAny) == 'a');
+	assertTrue (AnyCast<signed char>(&charAny) == nullptr);
+	assertTrue (AnyCast<unsigned char>(&charAny) == nullptr);
+
+	const Any signedCharAny = static_cast<signed char>(1);
+	assertTrue (*AnyCast<signed char>(&signedCharAny) == 1);
+	assertTrue (AnyCast<char>(&signedCharAny) == nullptr);
+
+	const Any textAny = std::string("abc");
+	assertTrue (*AnyCast<std::string>(&textAny) == "abc");
+	assertTrue (AnyCast<const char*>(&textAny) == nullptr);
+	const Any pointerAny = "abc";
+	assertTrue (AnyCast<std::string>(&pointerAny) == nullptr);
+	assertTrue (AnyCast<const char*>(&pointerAny) != nullptr);
+
+	assertTrue (RefAnyCast<bool>(Any(true)));
+	assertTrue (RefAnyCast<double>(Any(1.5)) == 1.5);
+	assertTrue (AnyCast<float>(Any(2.5f)) == 2.5f);
+	assertTrue (AnyCast<long long>(Any(3LL)) == 3LL);
+	assertTrue (AnyCast<unsigned long>(Any(4UL)) == 4UL);
+
+	const Any dateTimeAny = DateTime(2026, 11, 26);
+	assertTrue (AnyCast<DateTime>(&dateTimeAny)->year() == 2026);
+	assertTrue (AnyCast<LocalDateTime>(&dateTimeAny) == nullptr);
+	assertTrue (AnyCast<Timestamp>(&dateTimeAny) == nullptr);
+	assertTrue (AnyCast<UUID>(Any(UUID("f81d4fae-7dec-11d0-a765-00a0c91e6bf6"))).toString() == "f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
+
+	const Any counterAny = CopyCounter(5);
+	assertTrue (AnyCast<CopyCounter>(&counterAny)->value() == 5);
+	assertTrue (AnyCast<int>(&counterAny) == nullptr);
+
+	const Any emptyAny;
+	assertTrue (AnyCast<int>(&emptyAny) == nullptr);
+	assertTrue (AnyCast<int>(static_cast<Any*>(nullptr)) == nullptr);
+}
+
+
 void AnyTest::setUp()
 {
 }
@@ -773,6 +873,9 @@ CppUnit::Test* AnyTest::suite()
 	CppUnit_addTest(pSuite, AnyTest, testAnyCopyAssignmentPaths);
 	CppUnit_addTest(pSuite, AnyTest, testAnyVolatileValue);
 	CppUnit_addTest(pSuite, AnyTest, testPlaceholder);
+	CppUnit_addTest(pSuite, AnyTest, testStringAssignmentKeepsBuffer);
+	CppUnit_addTest(pSuite, AnyTest, testAnyStorageSize);
+	CppUnit_addTest(pSuite, AnyTest, testAnyCastByTypeId);
 
 	return pSuite;
 }
