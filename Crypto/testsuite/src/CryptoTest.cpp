@@ -100,6 +100,36 @@ static const std::string SAN_PEM(
 	"-----END CERTIFICATE-----\n"
 );
 
+// The version field of a certificate is 0x7FFFFFFFFFFFFFFF; the signature does not match.
+static const std::string VERSION_OVERFLOW_PEM(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBlzCCATygCgIIf/////////8CFE51S3LsWJ+LjVGaKXgLjeXb29oWMAoGCCqG\n"
+	"SM49BAMCMBwxGjAYBgNVBAMMEXBvY28tdmVyc2lvbi10ZXN0MCAXDTI2MTEyNjEw\n"
+	"MjUyNVoYDzIxMjYxMTAyMTAyNTI1WjAcMRowGAYDVQQDDBFwb2NvLXZlcnNpb24t\n"
+	"dGVzdDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABNKcOtfeJ8SPYY/1Ua09Onbu\n"
+	"fm73gaF0wbK6b8SJVXW3VSkHR6n+Md25F6y4hKnIcD8nULN4SZgcb4CeiA2Y/kij\n"
+	"UzBRMB0GA1UdDgQWBBT0iQ3vkghQVQHSEp4xm59rD+FkeDAfBgNVHSMEGDAWgBT0\n"
+	"iQ3vkghQVQHSEp4xm59rD+FkeDAPBgNVHRMBAf8EBTADAQH/MAoGCCqGSM49BAMC\n"
+	"A0kAMEYCIQCypqWn7V3G/zTjFbuRmTPM0UPY/8Wy1ugMVvST9kiMBAIhAKDB+gN1\n"
+	"iv4VB6AC4PO859mQOnxVaKYwzPUEcchhi1+v\n"
+	"-----END CERTIFICATE-----\n"
+);
+
+// The version field of a certificate is 99; the signature does not match.
+static const std::string VERSION_99_PEM(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBkDCCATWgAwIBYwIUTnVLcuxYn4uNUZopeAuN5dvb2hYwCgYIKoZIzj0EAwIw\n"
+	"HDEaMBgGA1UEAwwRcG9jby12ZXJzaW9uLXRlc3QwIBcNMjYxMTI2MTAyNTI1WhgP\n"
+	"MjEyNjExMDIxMDI1MjVaMBwxGjAYBgNVBAMMEXBvY28tdmVyc2lvbi10ZXN0MFkw\n"
+	"EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE0pw6194nxI9hj/VRrT06du5+bveBoXTB\n"
+	"srpvxIlVdbdVKQdHqf4x3bkXrLiEqchwPydQs3hJmBxvgJ6IDZj+SKNTMFEwHQYD\n"
+	"VR0OBBYEFPSJDe+SCFBVAdISnjGbn2sP4WR4MB8GA1UdIwQYMBaAFPSJDe+SCFBV\n"
+	"AdISnjGbn2sP4WR4MA8GA1UdEwEB/wQFMAMBAf8wCgYIKoZIzj0EAwIDSQAwRgIh\n"
+	"ALKmpaftXcb/NOMVu5GZM8zRQ9j/xbLW6AxW9JP2SIwEAiEAoMH6A3WK/hUHoALg\n"
+	"87zn2ZA6fFVopjDM9QRxyGGLX68=\n"
+	"-----END CERTIFICATE-----\n"
+);
+
 
 CryptoTest::CryptoTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -740,6 +770,20 @@ void CryptoTest::testCertificateInitFailure()
 }
 
 
+void CryptoTest::testCertificateVersionOverflow()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream overflowStream(VERSION_OVERFLOW_PEM);
+	X509Certificate overflowCert(overflowStream);
+	assertTrue (overflowCert.version() == 0);
+
+	std::istringstream version99Stream(VERSION_99_PEM);
+	X509Certificate version99Cert(version99Stream);
+	assertTrue (version99Cert.version() == 100);
+}
+
+
 void CryptoTest::testOpenSSLException()
 {
 	ErrorQueueCleaner cleaner;
@@ -805,6 +849,7 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateUTF8);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateNameEntries);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateInitFailure);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateVersionOverflow);
 	CppUnit_addTest(pSuite, CryptoTest, testOpenSSLException);
 
 	return pSuite;
