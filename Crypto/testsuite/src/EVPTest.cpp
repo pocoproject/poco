@@ -1113,6 +1113,17 @@ void EVPTest::testKeyAssignment()
 }
 
 
+void EVPTest::testMovePrivateKeyOfOtherType()
+{
+	ErrorQueueCleaner cleaner;
+
+	// A private key is loaded without the type check, so moving it must not check the type either.
+	std::istringstream keyStream(ED25519_PRIVATE_KEY_PEM);
+	EVPPKey key(nullptr, &keyStream);
+	EVPPKey moved(std::move(key));
+	assertTrue (moved.type() == EVP_PKEY_ED25519);
+}
+
 
 void EVPTest::setUp()
 {
@@ -1153,6 +1164,7 @@ CppUnit::Test* EVPTest::suite()
 	CppUnit_addTest(pSuite, EVPTest, testRSAKeyFromECPKCS12);
 	CppUnit_addTest(pSuite, EVPTest, testUnsupportedKeyType);
 	CppUnit_addTest(pSuite, EVPTest, testKeyAssignment);
+	CppUnit_addTest(pSuite, EVPTest, testMovePrivateKeyOfOtherType);
 
 	return pSuite;
 }

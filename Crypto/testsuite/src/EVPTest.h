@@ -53,6 +53,7 @@ public:
 	void testRSAKeyFromECPKCS12();
 	void testUnsupportedKeyType();
 	void testKeyAssignment();
+	void testMovePrivateKeyOfOtherType();
 
 	void setUp();
 	void tearDown();

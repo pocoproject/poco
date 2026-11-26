@@ -311,7 +311,6 @@ EVPPKey::EVPPKey(EVPPKey&& other) noexcept:
 	_pEVPPKey(other._pEVPPKey)
 {
 	other._pEVPPKey = nullptr;
-	checkType();
 }
 
 
