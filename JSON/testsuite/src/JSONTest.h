@@ -92,6 +92,7 @@ public:
 	void testEnum();
 	void testEmbeddedNulKey();
 	void testCommentsInStrings();
+	void testVarMoveKeepsContent();
 
 	void setUp();
 	void tearDown();

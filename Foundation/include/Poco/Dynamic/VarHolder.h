@@ -144,8 +144,21 @@ public:
 		/// deep-copy the VarHolder.
 		/// If small object optimization is enabled (i.e. if
 		/// POCO_NO_SOO is not defined), VarHolder will be
-		/// instantiated in-place if it's size is smaller
-		/// than POCO_SMALL_OBJECT_SIZE.
+		/// instantiated in-place if the Placeholder can
+		/// store it in its local buffer (see Placeholder).
+
+	virtual VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder);
+		/// Moves the held value into a new VarHolder in pVarHolder
+		/// and returns it. The value of this VarHolder is valid but
+		/// unspecified afterwards.
+		///
+		/// The default implementation copies the value with clone().
+		/// A VarHolder that keeps it is stored in the local buffer of the
+		/// Placeholder only if its value type is nothrow copy constructible,
+		/// and its clone() must then not throw; otherwise it is stored on the
+		/// heap, and moveTo() is not called. A specialization whose value can
+		/// be moved without an exception overrides it as noexcept, so that its
+		/// VarHolder can be stored locally.
 
 	[[nodiscard]] virtual const std::type_info& type() const = 0;
 		/// Implementation must return the type information
@@ -316,13 +329,23 @@ protected:
 		/// Called from clone() member function of the implementation.
 		///
 		/// When the small object optimization is enabled (POCO_NO_SOO not
-		/// defined), if size of the wrapper is larger than
-		/// POCO_SMALL_OBJECT_SIZE, holder is instantiated on
+		/// defined), if the Placeholder cannot store the wrapper in
+		/// its local buffer (see Placeholder), holder is instantiated on
 		/// the heap, otherwise it is instantiated in-place (in the
 		/// pre-allocated buffer inside the holder).
 	{
 		poco_check_ptr (pVarHolder);
 		return pVarHolder->assign<VarHolderImpl<T>, T>(val);
+	}
+
+	template <typename T>
+	[[nodiscard]] VarHolder* moveHolder(Placeholder<VarHolder>* pVarHolder, T& val)
+		/// Instantiates value holder wrapper from val, which is moved.
+		///
+		/// Called from moveTo() member function of the implementation.
+	{
+		poco_assert_dbg (pVarHolder != nullptr);
+		return pVarHolder->emplace<VarHolderImpl<T>, T>(std::move(val));
 	}
 
 	template <typename F, typename T>
@@ -552,6 +575,12 @@ private:
 //
 // inlines
 //
+
+
+inline VarHolder* VarHolder::moveTo(Placeholder<VarHolder>* pVarHolder)
+{
+	return clone(pVarHolder);
+}
 
 
 inline void VarHolder::convert(Int8& /*val*/) const
@@ -818,6 +847,10 @@ class VarHolderImpl: public VarHolder
 {
 public:
 	VarHolderImpl(const T& val): _val(val)
+	{
+	}
+
+	explicit VarHolderImpl(T&& val): _val(std::move(val))
 	{
 	}
 
@@ -1116,6 +1149,17 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<T> || std::is_nothrow_copy_constructible_v<T>) override
+	{
+		// A throwing move is used only if the copy can throw as well;
+		// such a holder is stored on the heap, where moveTo() is not called.
+		if constexpr (std::is_nothrow_move_constructible_v<T> ||
+			(std::is_move_constructible_v<T> && !std::is_nothrow_copy_constructible_v<T>))
+			return moveHolder(pVarHolder, _val);
+		else
+			return clone(pVarHolder);
 	}
 
 	const T& value() const
@@ -2978,6 +3022,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(std::string&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	VarHolderImpl() = delete;
@@ -3127,6 +3175,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const std:: string& value() const
 	{
 		return _val;
@@ -3170,6 +3223,10 @@ public:
 	}
 
 	VarHolderImpl(const Poco::UTF16String& val) : _val(val)
+	{
+	}
+
+	explicit VarHolderImpl(Poco::UTF16String&& val): _val(std::move(val))
 	{
 	}
 
@@ -3318,6 +3375,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const Poco::UTF16String& value() const
@@ -3942,6 +4004,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(std::vector<T>&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	VarHolderImpl() = delete;
@@ -3961,6 +4027,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<std::vector<T>>) override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const std::vector<T>& value() const
@@ -4005,6 +4076,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(std::list<T>&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	VarHolderImpl() = delete;
@@ -4024,6 +4099,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<std::list<T>>) override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const std::list<T>& value() const
@@ -4078,6 +4158,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(std::deque<T>&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	VarHolderImpl() = delete;
@@ -4097,6 +4181,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<std::deque<T>>) override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const std::deque<T>& value() const

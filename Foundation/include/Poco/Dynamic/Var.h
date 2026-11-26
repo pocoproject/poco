@@ -29,6 +29,8 @@
 #include <typeinfo>
 #include <map>
 #include <set>
+#include <type_traits>
+#include <utility>
 
 
 namespace Poco::Dynamic {
@@ -36,6 +38,21 @@ namespace Poco::Dynamic {
 
 template <typename K, typename M, typename S>
 class Struct;
+
+
+namespace Impl {
+
+
+template <typename T>
+concept MovableIntoVar = std::is_same_v<T, std::remove_cvref_t<T>> &&
+	!std::is_same_v<T, Var> && !std::is_pointer_v<T> && !std::is_array_v<T> &&
+	!requires (const T& value) { value.operator Var(); };
+	/// The type of an rvalue that Var(T&&) and operator = (T&&) move into a Var:
+	/// a deduced T that is neither a reference nor const, and not a Var,
+	/// a pointer, an array or a type with a conversion operator to Var.
+
+
+} // namespace Impl
 
 
 class Foundation_API Var
@@ -95,16 +112,27 @@ public:
 		construct(val);
 	}
 
+	template <Impl::MovableIntoVar T>
+	Var(T&& val)
+		/// Creates the Var from the given rvalue, which is moved into the Var,
+		/// or copied if T is not move constructible.
+	{
+		moveIn(std::forward<T>(val));
+	}
+
 	Var(const char* pVal);
 		// Convenience constructor for const char* which gets mapped to a std::string internally, i.e. pVal is deep-copied.
 
 	Var(const Var& other);
 		/// Copy constructor.
 
-	~Var();
+	Var(Var&& other) noexcept;
+		/// Move constructor. Leaves other empty.
+
+	~Var() = default;
 		/// Destroys the Var.
 
-	void swap(Var& other);
+	void swap(Var& other) noexcept;
 		/// Swaps the content of the this Var with the other Var.
 
 	[[nodiscard]] ConstIterator begin() const;
@@ -221,11 +249,47 @@ public:
 	}
 
 	template <typename T>
+	[[nodiscard]] T& extract()
+		/// Returns a reference to the actual value, through which
+		/// the value can be changed.
+		///
+		/// Must be instantiated with the exact type of
+		/// the stored value, otherwise a BadCastException
+		/// is thrown.
+		/// Throws InvalidAccessException if Var is empty.
+	{
+		return const_cast<T&>(std::as_const(*this).extract<T>());
+	}
+
+	template <typename T, typename... Args>
+	T& emplace(Args&&... args)
+		/// Replaces the content with a T constructed from args and
+		/// returns a reference to it. The arguments may refer to the
+		/// current content. If the construction throws, the Var is unchanged.
+	{
+		static_assert(std::is_same_v<T, std::remove_cvref_t<T>> && !std::is_pointer_v<T> && !std::is_array_v<T>,
+			"emplace() requires a type that is not a reference, cv-qualified, a pointer or an array");
+		static_assert(!std::is_same_v<T, Var>, "a Var cannot hold a Var");
+		T value(std::forward<Args>(args)...);
+		Var tmp;
+		tmp.moveIn(std::move(value));
+		_placeholder.moveFrom(tmp._placeholder);
+		return extract<T>();
+	}
+
+	template <typename T>
 	Var& operator = (const T& other)
 		/// Assignment operator for assigning POD to Var
 	{
-		clear();
-		construct(other);
+		replace(other);
+		return *this;
+	}
+
+	template <Impl::MovableIntoVar T>
+	Var& operator = (T&& other)
+		/// Assignment operator that moves the given rvalue into the Var.
+	{
+		replace(std::forward<T>(other));
 		return *this;
 	}
 
@@ -234,6 +298,9 @@ public:
 
 	Var& operator = (const Var& other);
 		/// Assignment operator specialization for Var
+
+	Var& operator = (Var&& other) noexcept;
+		/// Move assignment operator. Unless other is this Var, it is left empty.
 
 	template <typename T>
 	const Var operator + (const T& other) const
@@ -490,6 +557,11 @@ public:
 	[[nodiscard]] bool isEmpty() const;
 		/// Returns true if empty.
 
+	[[nodiscard]] bool isLocal() const noexcept;
+		/// Returns true if the value is held locally (i.e. not allocated on the heap).
+		/// If POCO_NO_SOO is defined, it always returns false.
+		/// The main purpose of this function is use for diagnostics and testing.
+
 	[[nodiscard]] bool isInteger() const;
 		/// Returns true if stored value is integer.
 
@@ -602,10 +674,6 @@ private:
 		return _placeholder.content();
 	}
 
-	void destruct()
-	{
-	}
-
 	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
@@ -615,8 +683,45 @@ private:
 	void construct(const char* value);
 	void construct(const Var& other);
 
+	template <typename T>
+	void moveIn(T&& value)
+		/// Constructs the content of an empty Var from the rvalue value,
+		/// which is moved if T is move constructible and copied otherwise.
+	{
+		static_assert(!std::is_reference_v<T>, "moveIn() requires an rvalue");
+		// Not part of MovableIntoVar: there, the check recurses for types
+		// that convert to Var, such as Poco::Tuple<Var, ...>.
+		if constexpr (std::is_move_constructible_v<T>)
+			_placeholder.emplace<VarHolderImpl<T>, T>(std::forward<T>(value));
+		else
+			construct(std::as_const(value));
+	}
+
+	template <typename T>
+	void replace(T&& value)
+		/// Replaces the content with value. The new content is built before
+		/// the old one is destroyed, because value may refer to the old content.
+	{
+		using ValueType = std::remove_cvref_t<T>;
+		if constexpr (std::is_arithmetic_v<ValueType>)
+		{
+			const ValueType copy = value;
+			clear();
+			construct(copy);
+		}
+		else
+		{
+			Var tmp(std::forward<T>(value));
+			_placeholder.moveFrom(tmp._placeholder);
+		}
+	}
+
 	Placeholder<VarHolder> _placeholder;
 };
+
+
+static_assert(std::is_nothrow_move_constructible_v<Var>, "the move constructor of Var must not throw");
+static_assert(std::is_nothrow_move_assignable_v<Var>, "the move assignment of Var must not throw");
 
 
 ///
@@ -642,7 +747,7 @@ inline void Var::construct(const Var& other)
 }
 
 
-inline void Var::swap(Var& other)
+inline void Var::swap(Var& other) noexcept
 {
 	if (this == &other) return;
 
@@ -652,17 +757,10 @@ inline void Var::swap(Var& other)
 	}
 	else
 	{
-		const Var tmp(*this);
-		try
-		{
-			construct(other);
-			other = tmp;
-		}
-		catch (...)
-		{
-			construct(tmp);
-			throw;
-		}
+		Placeholder<VarHolder> tmp;
+		tmp.moveFrom(other._placeholder);
+		other._placeholder.moveFrom(_placeholder);
+		_placeholder.moveFrom(tmp);
 	}
 }
 
@@ -743,6 +841,18 @@ inline bool Var::operator ! () const
 inline bool Var::isEmpty() const
 {
 	return nullptr == content();
+}
+
+
+inline bool Var::isLocal() const noexcept
+{
+	return _placeholder.isLocal();
+}
+
+
+inline void Var::clear()
+{
+	_placeholder.erase();
 }
 
 
@@ -863,6 +973,13 @@ inline std::size_t Var::size() const
 ///
 /// Var non-member functions
 ///
+
+inline void swap(Var& var1, Var& var2) noexcept
+	/// Swaps the content of the two Vars.
+{
+	var1.swap(var2);
+}
+
 
 inline const Var operator + (const char* other, const Var& da)
 	/// Addition operator for adding Var to const char*

@@ -19,6 +19,7 @@
 #include <vector>
 #include <list>
 #include <deque>
+#include <utility>
 
 
 namespace Poco::Dynamic {
@@ -42,17 +43,35 @@ Var::Var(const Var& other)
 }
 
 
-Var::~Var()
+Var::Var(Var&& other) noexcept
 {
-	destruct();
+	_placeholder.moveFrom(other._placeholder);
 }
 
 
 Var& Var::operator = (const Var& rhs)
 {
 	if (this == &rhs) return *this;
-	clear();
-	if (!rhs.isEmpty()) construct(rhs);
+	if (_placeholder.holdsLeaf() && rhs._placeholder.hasNothrowClone())
+	{
+		// rhs cannot live inside a leaf, and its clone cannot throw
+		clear();
+		construct(rhs);
+	}
+	else
+	{
+		Var tmp(rhs);
+		_placeholder.moveFrom(tmp._placeholder);
+	}
+	return *this;
+}
+
+
+Var& Var::operator = (Var&& other) noexcept
+{
+	if (this == &other) return *this;
+	Var tmp(std::move(other));
+	_placeholder.moveFrom(tmp._placeholder);
 	return *this;
 }
 
@@ -303,12 +322,6 @@ bool Var::operator && (const Var& other) const
 
 
 void Var::empty()
-{
-	_placeholder.erase();
-}
-
-
-void Var::clear()
 {
 	_placeholder.erase();
 }

@@ -27,6 +27,7 @@
 #include <map>
 #include <set>
 #include <type_traits>
+#include <utility>
 
 
 namespace Poco::Dynamic {
@@ -99,8 +100,20 @@ public:
 		assignMap(val);
 	}
 
+	Struct(const Struct& other) = default;
+		/// Creates the Struct from another Struct.
+
+	Struct(Struct&& other) noexcept(std::is_nothrow_move_constructible_v<Data>) = default;
+		/// Moves the members of the other Struct into the Struct.
+
 	virtual ~Struct() = default;
 		/// Destroys the Struct.
+
+	Struct& operator = (const Struct& other) = default;
+		/// Assigns the members of another Struct.
+
+	Struct& operator = (Struct&& other) noexcept(std::is_nothrow_move_assignable_v<Data>) = default;
+		/// Moves the members of the other Struct into the Struct.
 
 	[[nodiscard]] inline Var& operator [] (const K& name)
 		/// Returns the Var with the given name, creates an entry if not found.
@@ -322,6 +335,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(ValueType&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	[[nodiscard]] const std::type_info& type() const override
@@ -412,6 +429,11 @@ public:
 	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<ValueType>) override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	[[nodiscard]] const ValueType& value() const

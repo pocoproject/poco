@@ -21,10 +21,9 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Bugcheck.h"
-#include <algorithm>
 #include <cstddef>
-#include <iterator>
 #include <new>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -36,12 +35,23 @@ namespace Poco {
 template <class T, std::size_t S>
 struct TypeSizeLE:
 	std::integral_constant<bool, (sizeof(T) <= S)>{};
-
-
-template <class T, std::size_t S>
-struct TypeSizeGT:
-	std::integral_constant<bool, (sizeof(T) > S)>{};
 #endif
+
+
+namespace Impl {
+
+
+template <typename V>
+inline constexpr bool IS_LEAF_VALUE = std::is_trivially_copyable_v<V>;
+	/// True for a value type that cannot own a Poco::Any or a
+	/// Poco::Dynamic::Var, so that neither can live inside such a value.
+
+
+template <typename C, typename T, typename A>
+inline constexpr bool IS_LEAF_VALUE<std::basic_string<C, T, A>> = true;
+
+
+} // namespace Impl
 
 
 template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
@@ -50,13 +60,14 @@ union Placeholder
 	/// object optimization, when enabled).
 	///
 	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage,
-	/// it will be placement-new-allocated into the local buffer
+	/// needs no stronger alignment than std::max_align_t and can be moved
+	/// without an exception, it will be placement-new-allocated into the local buffer
 	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
 	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
 	/// where the object was allocated. See enum Allocation.
 	///
-	/// Important: for SOO builds, only same-type (or trivial both-empty no-op)
-	/// swap operation is allowed.
+	/// Important: for SOO builds, swap() exchanges only contents that are not
+	/// stored locally; moveFrom() also moves a locally stored content.
 {
 public:
 	struct Size
@@ -73,67 +84,125 @@ public:
 
 	Placeholder(): pHolder(nullptr)
 	{
-		// Forces to use optimised memset internally
-		// https://travisdowns.github.io/blog/2020/01/20/zero.html
-		std::fill(std::begin(holder), std::end(holder), static_cast<char>(0));
 		setAllocation(Allocation::POCO_ANY_EMPTY);
 	}
 
 	~Placeholder()
 	{
-		destruct(false);
+		destruct();
 	}
 
 	void swap(Placeholder& other) noexcept
+		/// Exchanges the contents, which must not be stored locally.
 	{
-		if (!isEmpty() || !other.isEmpty())
-			std::swap(holder, other.holder);
+		poco_assert_dbg (!isLocal() && !other.isLocal());
+		std::swap(pHolder, other.pHolder);
+		std::swap(holder[SizeV], other.holder[SizeV]);
 	}
 
 	void erase()
 	{
-		destruct(true);
+		destruct();
 	}
 
 	[[nodiscard]] bool isEmpty() const
 	{
-		return holder[SizeV] == Allocation::POCO_ANY_EMPTY;
+		return allocation() == Allocation::POCO_ANY_EMPTY;
 	}
 
 	[[nodiscard]] bool isLocal() const
 	{
-		return holder[SizeV] == Allocation::POCO_ANY_LOCAL;
+		return allocation() == Allocation::POCO_ANY_LOCAL;
 	}
 
-	template<typename T, typename V,
-		typename std::enable_if_t<TypeSizeLE<T, Placeholder::Size::value>::value>* = nullptr>
-	PlaceholderT* assign(const V& value)
+	[[nodiscard]] bool holdsLeaf() const noexcept
+		/// Returns true if the placeholder is empty or holds a value for
+		/// which Impl::IS_LEAF_VALUE is true, so that no Any or Var can
+		/// live inside the content. Without small object optimization
+		/// (POCO_NO_SOO), it returns true only for an empty placeholder.
 	{
-		erase();
-		new (reinterpret_cast<PlaceholderT*>(holder)) T(value);
-		setAllocation(Allocation::POCO_ANY_LOCAL);
-		return reinterpret_cast<PlaceholderT*>(holder);
+		return isEmpty() || (holder[SizeV] & LEAF_FLAG) != 0;
 	}
 
-	template<typename T, typename V,
-		typename std::enable_if_t<TypeSizeGT<T, Placeholder::Size::value>::value>* = nullptr>
+	[[nodiscard]] bool hasNothrowClone() const noexcept
+		/// Returns true if the placeholder is empty or the content is stored
+		/// locally and its value is nothrow copy constructible, so that
+		/// cloning the content cannot throw. Without small object
+		/// optimization (POCO_NO_SOO), it returns true only for an empty
+		/// placeholder.
+	{
+		return isEmpty() || (holder[SizeV] & NOTHROW_CLONE_FLAG) != 0;
+	}
+
+	template <typename T, typename V>
 	PlaceholderT* assign(const V& value)
+		/// Destroys the content and stores a holder of type T
+		/// that holds a copy of value.
+	{
+		return emplace<T, V>(value);
+	}
+
+	template <typename T, typename V, typename... Args>
+	PlaceholderT* emplace(Args&&... args)
+		/// Destroys the content and stores a holder of type T for
+		/// a value of type V, constructed from args. The holder is
+		/// stored locally if storesLocally<T, V>() is true, otherwise
+		/// on the heap. If the construction throws, the placeholder is empty.
 	{
 		erase();
-		pHolder = new T(value);
-		setAllocation(Allocation::POCO_ANY_EXTERNAL);
-		return pHolder;
+		if constexpr (storesLocally<T, V>())
+		{
+			PlaceholderT* pContent = new (holder) T(std::forward<Args>(args)...);
+			setAllocation(Allocation::POCO_ANY_LOCAL, leafFlag<V>() | nothrowCloneFlag<V>());
+			return pContent;
+		}
+		else
+		{
+			pHolder = new T(std::forward<Args>(args)...);
+			setAllocation(Allocation::POCO_ANY_EXTERNAL, leafFlag<V>());
+			return pHolder;
+		}
+	}
+
+	void moveFrom(Placeholder& other) noexcept
+		/// Destroys the content and takes over the content of other,
+		/// which is left empty. A locally stored content is moved
+		/// with PlaceholderT::moveTo(), a heap-allocated one by its pointer.
+	{
+		poco_assert_dbg (this != &other);
+		erase();
+		if (other.isLocal())
+		{
+			other.content()->moveTo(this);
+			other.erase();
+		}
+		else swap(other);
 	}
 
 	[[nodiscard]] PlaceholderT* content() const
 	{
 		if (isLocal())
 			return reinterpret_cast<PlaceholderT*>(holder);
+		else if (isEmpty())
+			return nullptr;
 		else
 			return pHolder;
 	}
 
 private:
+	template <typename T, typename V>
+	[[nodiscard]] static constexpr bool storesLocally()
+		/// Returns true if a holder of type T for a value of type V is stored
+		/// in the local buffer: it fits into the buffer, needs no stronger
+		/// alignment than std::max_align_t, and moving it cannot throw, because
+		/// V is nothrow copy constructible or T declares moveTo() noexcept.
+		/// Any other holder is stored on the heap, where a move takes the pointer.
+	{
+		return TypeSizeLE<T, SizeV>::value && alignof(T) <= alignof(AlignerType) &&
+			(std::is_nothrow_copy_constructible_v<V> ||
+				requires (T& holderRef, Placeholder* pPlaceholder) { { holderRef.moveTo(pPlaceholder) } noexcept; });
+	}
+
 	using AlignerType = std::max_align_t;
 #ifndef POCO_DOC
 	static_assert(
@@ -149,15 +218,45 @@ private:
 		POCO_ANY_EXTERNAL = 2
 	};
 
-	void setAllocation(Allocation alloc) const
+	static constexpr unsigned char LEAF_FLAG = 0x80;
+		/// Set in the tag byte, next to the Allocation, if Impl::IS_LEAF_VALUE
+		/// is true for the value.
+
+	static constexpr unsigned char NOTHROW_CLONE_FLAG = 0x40;
+		/// Set in the tag byte, next to the Allocation, if the content is
+		/// stored locally and the value is nothrow copy constructible.
+
+	static constexpr unsigned char ALLOCATION_MASK = 0x3F;
+		/// Selects the Allocation in the tag byte.
+
+	static_assert((ALLOCATION_MASK & (LEAF_FLAG | NOTHROW_CLONE_FLAG)) == 0 &&
+		(Allocation::POCO_ANY_EXTERNAL & ~ALLOCATION_MASK) == 0, "the flags and the Allocation overlap in the tag byte");
+
+	template <typename V>
+	[[nodiscard]] static constexpr unsigned char leafFlag()
 	{
-		holder[SizeV] = alloc;
+		return Impl::IS_LEAF_VALUE<V> ? LEAF_FLAG : 0;
 	}
 
-	void destruct(bool clear)
+	template <typename V>
+	[[nodiscard]] static constexpr unsigned char nothrowCloneFlag()
 	{
-		const auto allocation {holder[SizeV]};
-		switch (allocation)
+		return std::is_nothrow_copy_constructible_v<V> ? NOTHROW_CLONE_FLAG : 0;
+	}
+
+	[[nodiscard]] Allocation allocation() const
+	{
+		return static_cast<Allocation>(holder[SizeV] & ALLOCATION_MASK);
+	}
+
+	void setAllocation(Allocation alloc, unsigned char flags = 0) const
+	{
+		holder[SizeV] = static_cast<unsigned char>(alloc | flags);
+	}
+
+	void destruct()
+	{
+		switch (allocation())
 		{
 		case Allocation::POCO_ANY_EMPTY:
 			break;
@@ -180,11 +279,6 @@ private:
 			break;
 		}
 		setAllocation(Allocation::POCO_ANY_EMPTY);
-		if (clear)
-		{
-			// Force to use optimised memset internally
-			std::fill(std::begin(holder), std::end(holder), static_cast<char>(0));
-		}
 	}
 
 	mutable unsigned char holder[SizeV+1];
@@ -222,11 +316,35 @@ private:
 		return false;
 	}
 
+	[[nodiscard]] bool holdsLeaf() const noexcept
+	{
+		return isEmpty();
+	}
+
+	[[nodiscard]] bool hasNothrowClone() const noexcept
+	{
+		return isEmpty();
+	}
+
 	template <typename T, typename V>
 	PlaceholderT* assign(const V& value)
 	{
+		return emplace<T, V>(value);
+	}
+
+	template <typename T, typename V, typename... Args>
+	PlaceholderT* emplace(Args&&... args)
+	{
 		erase();
-		return pHolder = new T(value);
+		pHolder = new T(std::forward<Args>(args)...);
+		return pHolder;
+	}
+
+	void moveFrom(Placeholder& other) noexcept
+	{
+		poco_assert_dbg (this != &other);
+		erase();
+		swap(other);
 	}
 
 	[[nodiscard]] PlaceholderT* content() const

@@ -594,6 +594,24 @@ void DataTest::readFromCLOB(BinaryReader& reader)
 }
 
 
+void DataTest::testLOBVarMove()
+{
+	const std::string text(100, 'x');
+	const BLOB blob(std::vector<unsigned char>(text.begin(), text.end()));
+	Var blobVar = blob;
+	Var movedBlob(std::move(blobVar));
+	assertTrue (blobVar.isEmpty());
+	assertTrue (movedBlob.extract<BLOB>() == blob);
+
+	const CLOB clob(text.data(), text.size());
+	Var clobVar = clob;
+	Var movedClob;
+	movedClob = std::move(clobVar);
+	assertTrue (clobVar.isEmpty());
+	assertTrue (movedClob.extract<CLOB>() == clob);
+}
+
+
 void DataTest::testColumnVector()
 {
 	MetaColumn mc(0, "mc", MetaColumn::FDT_DOUBLE, 2, 3, true);
@@ -3130,6 +3148,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testLOB);
 	CppUnit_addTest(pSuite, DataTest, testCLOB);
 	CppUnit_addTest(pSuite, DataTest, testCLOBStreams);
+	CppUnit_addTest(pSuite, DataTest, testLOBVarMove);
 	CppUnit_addTest(pSuite, DataTest, testColumnVector);
 	CppUnit_addTest(pSuite, DataTest, testColumnVectorBool);
 	CppUnit_addTest(pSuite, DataTest, testColumnDeque);

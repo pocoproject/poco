@@ -745,7 +745,6 @@ export namespace Poco {
 	using Poco::TypeGetter;
 	using Poco::TypeList;
 	using Poco::TypeListType;
-	using Poco::TypeSizeGT;
 	using Poco::TypeSizeLE;
 	using Poco::TypeWrapper;
 	using Poco::ULID;

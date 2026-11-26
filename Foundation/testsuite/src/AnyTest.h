@@ -39,6 +39,16 @@ public:
 	void testAnyInt();
 	void testAnyComplexType();
 	void testAnyVector();
+	void testAnySelfMoveAssign();
+	void testAnyMoveDoesNotCopy();
+	void testAnyFailedCopyLeavesTargetEmpty();
+	void testAnyFailedCopyKeepsTargetValue();
+	void testAnyOverAlignedValue();
+	void testAnyLocalStorage();
+	void testAnyCopyOnlyValue();
+	void testAnyMoveUsesNothrowCopy();
+	void testAnyCopyAssignmentPaths();
+	void testAnyVolatileValue();
 
 	void testPlaceholder();
 

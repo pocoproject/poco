@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Dynamic/VarHolder.h"
+#include <type_traits>
 #include <utility>
 
 
@@ -39,10 +40,11 @@ public:
 	{
 	}
 
-	Pair(const Pair& other): _data(other._data)
+	Pair(const Pair& other) = default;
 		/// Creates the Pair from another pair.
-	{
-	}
+
+	Pair(Pair&& other) noexcept(std::is_nothrow_move_constructible_v<Data>) = default;
+		/// Moves the other pair into the Pair.
 
 	Pair(const Data& val): _data(val)
 		/// Creates the Pair from the given value.
@@ -71,12 +73,11 @@ public:
 		return *this;
 	}
 
-	Pair& operator = (const Pair& other)
+	Pair& operator = (const Pair& other) = default;
 		/// Copy constructs Pair from another pair.
-	{
-		Pair(other).swap(*this);
-		return *this;
-	}
+
+	Pair& operator = (Pair&& other) noexcept(std::is_nothrow_move_assignable_v<Data>) = default;
+		/// Moves the other pair into the Pair.
 
 	[[nodiscard]] inline const K& first() const
 		/// Returns the first member of the pair.
@@ -107,6 +108,10 @@ class VarHolderImpl<Pair<K>>: public VarHolder
 {
 public:
 	VarHolderImpl(const Pair<K>& val): _val(val)
+	{
+	}
+
+	explicit VarHolderImpl(Pair<K>&& val): _val(std::move(val))
 	{
 	}
 
@@ -197,6 +202,11 @@ public:
 	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<Pair<K>>) override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	[[nodiscard]] const Pair<K>& value() const

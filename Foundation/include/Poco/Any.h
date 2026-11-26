@@ -21,6 +21,9 @@
 #include "Poco/Bugcheck.h"
 #include "Poco/Placeholder.h"
 #include <typeinfo>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 
 namespace Poco {
@@ -38,6 +41,18 @@ template <class T> class VarHolderImpl;
 }
 
 
+namespace Impl {
+
+
+template <typename T>
+concept AnyValue = !std::is_same_v<std::decay_t<T>, Any>;
+	/// The type of a value that Any's forwarding constructor and
+	/// assignment store: anything that is not an Any after decay.
+
+
+} // namespace Impl
+
+
 class Any
 	/// Any class represents a general type and is capable of storing any type, supporting type-safe extraction
 	/// of the internally stored data.
@@ -53,15 +68,16 @@ public:
 	Any() = default;
 		/// Creates an empty any type.
 
-	template<typename ValueType>
-	Any(const ValueType & value)
+	template <Impl::AnyValue ValueType>
+	Any(ValueType&& value)
 		/// Creates an any which stores the init parameter inside.
+		/// An rvalue is moved into the Any.
 		///
 		/// Example:
 		///   Any a(13);
 		///   Any a(string("12345"));
 	{
-		construct(value);
+		construct(std::forward<ValueType>(value));
 	}
 
 	Any(const Any& other)
@@ -71,10 +87,11 @@ public:
 			construct(other);
 	}
 
-	Any(Any&& other)
+	Any(Any&& other) noexcept
 		/// Move constructor, works with both empty and initialized Any values.
+		/// Leaves other empty.
 	{
-		construct(other);
+		_valueHolder.moveFrom(other._valueHolder);
 	}
 
 	~Any() = default;
@@ -86,9 +103,6 @@ public:
 
 	Any& swap(Any& other) noexcept
 		/// Swaps the content of the two Anys.
-		///
-		/// If an exception occurs during swapping, the program
-		/// execution is aborted.
 	{
 		if (this == &other) return *this;
 
@@ -98,30 +112,36 @@ public:
 		}
 		else
 		{
-			try
-			{
-				Any tmp(*this);
-				construct(other);
-				other = tmp;
-			}
-			catch (...)
-			{
-				std::abort();
-			}
+			Placeholder<ValueHolder> tmp;
+			tmp.moveFrom(other._valueHolder);
+			other._valueHolder.moveFrom(_valueHolder);
+			_valueHolder.moveFrom(tmp);
 		}
 
 		return *this;
 	}
 
-	template<typename ValueType>
-	Any& operator = (const ValueType& rhs)
+	template <Impl::AnyValue ValueType>
+	Any& operator = (ValueType&& rhs)
 		/// Assignment operator for all types != Any.
+		/// An rvalue is moved into the Any.
 		///
 		/// Example:
 		///   Any a = 13;
 		///   Any a = string("12345");
 	{
-		construct(rhs);
+		using HeldType = std::decay_t<ValueType>;
+		if constexpr (std::is_arithmetic_v<HeldType>)
+		{
+			// rhs may refer to the current content
+			const HeldType value = rhs;
+			construct(value);
+		}
+		else
+		{
+			Any tmp(std::forward<ValueType>(rhs));
+			_valueHolder.moveFrom(tmp._valueHolder);
+		}
 		return *this;
 	}
 
@@ -130,21 +150,28 @@ public:
 	{
 		if (this != &rhs)
 		{
-			if (!rhs.empty())
+			if (_valueHolder.holdsLeaf() && rhs._valueHolder.hasNothrowClone())
+			{
+				// rhs cannot live inside a leaf, and its clone cannot throw
 				construct(rhs);
+			}
 			else
-				_valueHolder.erase();
+			{
+				Any tmp(rhs);
+				_valueHolder.moveFrom(tmp._valueHolder);
+			}
 		}
 		return *this;
 	}
 
-	Any& operator = (Any&& rhs)
-		/// Move operator for Any.
+	Any& operator = (Any&& rhs) noexcept
+		/// Move operator for Any. Unless rhs is this Any, it is left empty.
 	{
-		if (!rhs.empty())
-			construct(rhs);
-		else
-			_valueHolder.erase();
+		if (this != &rhs)
+		{
+			Any tmp(std::move(rhs));
+			_valueHolder.moveFrom(tmp._valueHolder);
+		}
 		return *this;
 	}
 
@@ -179,6 +206,7 @@ private:
 
 		[[nodiscard]] virtual const std::type_info & type() const = 0;
 		virtual void clone(Placeholder<ValueHolder>*) const = 0;
+		virtual void moveTo(Placeholder<ValueHolder>*) = 0;
 	};
 
 	template<typename ValueType>
@@ -186,6 +214,10 @@ private:
 	{
 	public:
 		Holder(const ValueType & value) : _held(value)
+		{
+		}
+
+		explicit Holder(ValueType&& value): _held(std::move(value))
 		{
 		}
 
@@ -201,6 +233,17 @@ private:
 			pPlaceholder->assign<Holder<ValueType>, ValueType>(_held);
 		}
 
+		void moveTo(Placeholder<ValueHolder>* pPlaceholder) noexcept(std::is_nothrow_move_constructible_v<ValueType> || std::is_nothrow_copy_constructible_v<ValueType>) override
+		{
+			// A throwing move is used only if the copy can throw as well;
+			// such a holder is stored on the heap, where moveTo() is not called.
+			if constexpr (std::is_nothrow_move_constructible_v<ValueType> ||
+				(std::is_move_constructible_v<ValueType> && !std::is_nothrow_copy_constructible_v<ValueType>))
+				pPlaceholder->emplace<Holder<ValueType>, ValueType>(std::move(_held));
+			else
+				clone(pPlaceholder);
+		}
+
 		ValueType _held;
 	};
 
@@ -210,9 +253,15 @@ private:
 	}
 
 	template <typename ValueType>
-	void construct(const ValueType& value)
+	void construct(ValueType&& value)
 	{
-		_valueHolder.assign<Holder<ValueType>, ValueType>(value);
+		using HeldType = std::decay_t<ValueType>;
+		if constexpr (std::is_volatile_v<std::remove_reference_t<ValueType>>)
+			_valueHolder.emplace<Holder<HeldType>, HeldType>(static_cast<HeldType>(value));
+		else if constexpr (std::is_move_constructible_v<HeldType>)
+			_valueHolder.emplace<Holder<HeldType>, HeldType>(std::forward<ValueType>(value));
+		else
+			_valueHolder.emplace<Holder<HeldType>, HeldType>(std::as_const(value));
 	}
 
 	void construct(const Any& other)
@@ -243,6 +292,10 @@ private:
 	template <typename ValueType>
 	friend ValueType AnyCast(Any&);
 };
+
+
+static_assert(std::is_nothrow_move_constructible_v<Any>, "the move constructor of Any must not throw");
+static_assert(std::is_nothrow_move_assignable_v<Any>, "the move assignment of Any must not throw");
 
 
 template <typename ValueType>

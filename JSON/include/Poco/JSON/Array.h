@@ -23,6 +23,7 @@
 #include "Poco/Dynamic/Var.h"
 #include <vector>
 #include <sstream>
+#include <utility>
 
 
 namespace Poco::JSON {
@@ -347,6 +348,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(JSON::Array::Ptr&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	const std::type_info& type() const override
@@ -441,6 +446,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const JSON::Array::Ptr& value() const
 	{
 		return _val;
@@ -476,6 +486,10 @@ class VarHolderImpl<JSON::Array>: public VarHolder
 {
 public:
 	VarHolderImpl(const JSON::Array& val): _val(val)
+	{
+	}
+
+	explicit VarHolderImpl(JSON::Array&& val): _val(std::move(val))
 	{
 	}
 
@@ -571,6 +585,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const JSON::Array& value() const

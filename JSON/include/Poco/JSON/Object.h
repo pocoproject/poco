@@ -31,6 +31,7 @@
 #include <deque>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 
 namespace Poco::JSON {
@@ -536,6 +537,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(JSON::Object::Ptr&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	const std::type_info& type() const override
@@ -630,6 +635,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const JSON::Object::Ptr& value() const
 	{
 		return _val;
@@ -670,6 +680,10 @@ class VarHolderImpl<JSON::Object>: public VarHolder
 {
 public:
 	VarHolderImpl(const JSON::Object& val): _val(val)
+	{
+	}
+
+	explicit VarHolderImpl(JSON::Object&& val): _val(std::move(val))
 	{
 	}
 
@@ -765,6 +779,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const JSON::Object& value() const

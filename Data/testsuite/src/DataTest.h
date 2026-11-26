@@ -36,6 +36,7 @@ public:
 	void testLOB();
 	void testCLOB();
 	void testCLOBStreams();
+	void testLOBVarMove();
 	void testColumnVector();
 	void testColumnVectorBool();
 	void testColumnDeque();
