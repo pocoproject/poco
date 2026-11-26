@@ -1051,6 +1051,7 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testSQLGetInfo);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testRecordSetBeforeExecute);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testExecuteDirectAfterExecute);
 
 		return pSuite;
 	}

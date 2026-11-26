@@ -32,6 +32,7 @@
 #endif
 
 #include <sqltypes.h>
+#include <string_view>
 
 
 namespace Poco::Data::ODBC {
@@ -149,7 +150,7 @@ private:
 
 	void addPreparator();
 	void fillColumns();
-	void checkError(SQLRETURN rc, const std::string& msg="");
+	void checkError(SQLRETURN rc, std::string_view msg = {});
 
 	void checkConnection() const;
 		/// Throws NotConnectedException if the connection on which the

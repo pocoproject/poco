@@ -557,6 +557,7 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testSQLGetInfo);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testNonASCIIText);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testRecordSetBeforeExecute);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testExecuteDirectAfterExecute);
 
 	return pSuite;
 }
