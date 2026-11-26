@@ -1093,7 +1093,7 @@ void LoggerTest::testChannelsReleasedAtExit()
 // In a Windows DLL build, ExitProcess ends the AsyncChannel worker before the DLL's static objects are destroyed, so its queue cannot be drained.
 #if !defined(POCO_VXWORKS) && !defined(POCO_NO_FORK_EXEC) && !(defined(_WIN32) && defined(POCO_DLL))
 	std::string name("TestApp");
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 

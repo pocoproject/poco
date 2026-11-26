@@ -80,7 +80,7 @@ void ProcessTest::testLaunch()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -104,7 +104,7 @@ void ProcessTest::testLaunchRedirectIn()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -130,7 +130,7 @@ void ProcessTest::testLaunchRedirectOut()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -158,7 +158,7 @@ void ProcessTest::testLaunchEnv()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -190,7 +190,7 @@ void ProcessTest::testLaunchEnv()
 void ProcessTest::testLaunchClearedEnvironment()
 {
 	std::string name("TestApp");
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -406,7 +406,7 @@ void ProcessTest::testLaunchInvalidCommand()
 {
 	std::string name("InvalidCmd");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -440,7 +440,7 @@ void ProcessTest::testIsRunning()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -470,7 +470,7 @@ void ProcessTest::testLaunchCloseHandles()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -538,7 +538,7 @@ void ProcessTest::testLaunchClosedHandlesStayTaken()
 	// here, so that the outcome does not depend on what this process has
 	// for its own.
 	std::string cmd("TestApp");
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	cmd += "d";
 #endif
 	std::vector<std::string> args;
@@ -577,7 +577,7 @@ void ProcessTest::testIsRunningAllowsForTermination()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -614,7 +614,7 @@ void ProcessTest::testIsRunningByPidAllowsForTermination()
 #if defined(POCO_OS_FAMILY_UNIX)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -644,7 +644,7 @@ void ProcessTest::testWaitAfterIsRunning()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -680,7 +680,7 @@ void ProcessTest::testConcurrentWaitAndIsRunning()
 #if defined(POCO_OS_FAMILY_UNIX)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -728,7 +728,7 @@ void ProcessTest::testSignalExitCode()
 #if defined(POCO_OS_FAMILY_UNIX)
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -863,7 +863,7 @@ namespace
 	std::string testApp()
 	{
 		std::string name("TestApp");
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 		name += "d";
 #endif
 		return name;
@@ -982,7 +982,7 @@ void ProcessTest::tearDown()
 std::string ProcessTest::getFullName(const std::string& name)
 {
 	std::string fullName(name);
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	fullName += "d";
 #endif
 	return fullName;

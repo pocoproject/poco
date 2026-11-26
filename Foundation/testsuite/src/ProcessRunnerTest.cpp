@@ -113,7 +113,7 @@ void ProcessRunnerTest::testProcessRunner()
 {
 	std::string name("TestApp");
 	std::string cmd;
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
@@ -479,7 +479,7 @@ void ProcessRunnerTest::testKillTreeWithChild()
 void ProcessRunnerTest::testPathResolution()
 {
 	std::string name("TestApp");
-#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+#if defined(_DEBUG)
 	name += "d";
 #endif
 
