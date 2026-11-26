@@ -64,12 +64,20 @@ public:
 		/// Creates the X509Certificate from an existing
 		/// OpenSSL certificate. Ownership is taken of
 		/// the certificate.
+		///
+		/// Ownership is taken also if the constructor throws:
+		/// the certificate is then freed, and the caller must not use or free it.
 
 	X509Certificate(X509* pCert, bool shared);
 		/// Creates the X509Certificate from an existing
 		/// OpenSSL certificate. Ownership is taken of
 		/// the certificate. If shared is true, the
 		/// certificate's reference count is incremented.
+		///
+		/// If shared is false, ownership is taken also if the constructor
+		/// throws, and the certificate is then freed. If shared is true and the
+		/// constructor throws, any reference added by the constructor is released,
+		/// so the caller keeps its own reference and must still free it.
 
 	X509Certificate(const X509Certificate& cert);
 		/// Creates the certificate by copying another one.

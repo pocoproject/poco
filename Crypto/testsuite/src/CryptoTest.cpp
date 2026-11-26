@@ -701,6 +701,45 @@ void CryptoTest::testCertificateNameEntries()
 }
 
 
+void CryptoTest::testCertificateInitFailure()
+{
+	ErrorQueueCleaner cleaner;
+
+	// UCS-2 big-endian "Po". A BMPString of odd length cannot be printed; OpenSSL
+	// rejects it when the entry is added, so the value is shortened afterwards.
+	static const unsigned char COMMON_NAME[] = { 0x00, 0x50, 0x00, 0x6F };
+
+	std::unique_ptr<X509, decltype(&X509_free)> pX509(X509_new(), X509_free);
+	assertNotNullPtr(pX509.get());
+	X509_NAME* pName = const_cast<X509_NAME*>(X509_get_subject_name(pX509.get()));
+	assertNotNullPtr(pName);
+	assertTrue (addNameEntry(pName, NID_commonName, V_ASN1_BMPSTRING, COMMON_NAME, sizeof(COMMON_NAME)));
+	ASN1_STRING* pData = const_cast<ASN1_STRING*>(X509_NAME_ENTRY_get_data(X509_NAME_get_entry(pName, 0)));
+	assertNotNullPtr(pData);
+	assertTrue (ASN1_STRING_set(pData, COMMON_NAME, sizeof(COMMON_NAME) - 1) == 1);
+
+	try
+	{
+		X509Certificate cert(pX509.get(), true);
+		fail("a shared certificate whose subject name cannot be printed must throw");
+	}
+	catch (const OpenSSLException& exc)
+	{
+		assertTrue (exc.message().find("cannot print the distinguished name") != std::string::npos);
+	}
+
+	try
+	{
+		X509Certificate cert(pX509.release());
+		fail("a certificate whose subject name cannot be printed must throw");
+	}
+	catch (const OpenSSLException& exc)
+	{
+		assertTrue (exc.message().find("cannot print the distinguished name") != std::string::npos);
+	}
+}
+
+
 void CryptoTest::testOpenSSLException()
 {
 	ErrorQueueCleaner cleaner;
@@ -765,6 +804,7 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateUTF8);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateNameEntries);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateInitFailure);
 	CppUnit_addTest(pSuite, CryptoTest, testOpenSSLException);
 
 	return pSuite;
