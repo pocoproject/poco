@@ -29,11 +29,11 @@ using Poco::StreamCopier;
 
 namespace
 {
-	[[nodiscard]] std::vector<std::string> readParts(const std::string& message)
-		/// Returns the content of the parts of a message with the boundary MIME_boundary_01234567.
+	[[nodiscard]] std::vector<std::string> readParts(const std::string& message, const std::string& boundary = "MIME_boundary_01234567")
+		/// Returns the content of the parts of a message.
 	{
 		std::istringstream istr(message);
-		MultipartReader r(istr, "MIME_boundary_01234567");
+		MultipartReader r(istr, boundary);
 		std::vector<std::string> parts;
 		while (r.hasNextPart())
 		{
@@ -413,6 +413,47 @@ void MultipartReaderTest::testBoundaryAtWindowEnd()
 }
 
 
+void MultipartReaderTest::testDelimiterLookalikes()
+{
+	// Prefixes of the dash-boundary, lines that differ from it in one byte and
+	// runs of dashes are content, also for boundaries that repeat characters.
+	for (const std::string& boundary: {std::string("MIME_boundary_01234567"), std::string("---------------------------974767299852498929531610575"), std::string("b")})
+	{
+		const std::string dashBoundary("--" + boundary);
+		std::string body(std::string(100, '-').append("\r\n"));
+		for (std::size_t k = 0; k < dashBoundary.size(); ++k)
+		{
+			std::string lookalike(dashBoundary);
+			lookalike[k] = 'x';
+			body.append(dashBoundary, 0, k).append("\r\n").append(lookalike).append("\r\n").append(lookalike).append("\n");
+		}
+		const std::vector<std::string> parts{body, "this is part 2"};
+		const std::string crlf(dashBoundary + "\r\n\r\n" + body + "\r\n" + dashBoundary + "\r\n\r\nthis is part 2\r\n" + dashBoundary + "--\r\n");
+		const std::string lf(dashBoundary + "\n\n" + body + "\n" + dashBoundary + "\n\nthis is part 2\n" + dashBoundary + "--\n");
+		assertTrue (readParts(crlf, boundary) == parts);
+		assertTrue (readParts(lf, boundary) == parts);
+	}
+}
+
+
+void MultipartReaderTest::testGuessBoundaryEmptyArgument()
+{
+	// An empty boundary given to the constructor is replaced by the guessed one.
+	std::istringstream istr("--MIME_boundary_01234567\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n");
+	MultipartReader r(istr, "");
+	std::vector<std::string> parts;
+	while (r.hasNextPart())
+	{
+		MessageHeader h;
+		r.nextPart(h);
+		StreamCopier::copyToString(r.stream(), parts.emplace_back());
+	}
+	const std::vector<std::string> expected{"this is part 1", "this is part 2"};
+	assertTrue (parts == expected);
+	assertEqual (std::string("MIME_boundary_01234567"), r.boundary());
+}
+
+
 void MultipartReaderTest::setUp()
 {
 }
@@ -438,6 +479,8 @@ CppUnit::Test* MultipartReaderTest::suite()
 	CppUnit_addTest(pSuite, MultipartReaderTest, testRobustness);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testUnixLineEnds);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testBoundaryAtWindowEnd);
+	CppUnit_addTest(pSuite, MultipartReaderTest, testDelimiterLookalikes);
+	CppUnit_addTest(pSuite, MultipartReaderTest, testGuessBoundaryEmptyArgument);
 
 	return pSuite;
 }

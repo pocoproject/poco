@@ -17,7 +17,11 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Ascii.h"
 #include "Poco/NumberParser.h"
+#include <algorithm>
+#include <functional>
 #include <limits>
+#include <optional>
+#include <string>
 
 using namespace std::string_literals;
 
@@ -55,6 +59,27 @@ public:
 	{
 		_buf.resize(BUFFER_SIZE);
 		setg(_buf.data(), _buf.data(), _buf.data()); // empty initially
+	}
+
+	ReadWindow(const ReadWindow&) = delete;
+	ReadWindow(ReadWindow&&) = delete;
+	ReadWindow& operator = (const ReadWindow&) = delete;
+	ReadWindow& operator = (ReadWindow&&) = delete;
+
+	/// Offset of the first "\n--" + boundary in data[0..size), or -1.
+	/// A window serves one message, so the searcher is built for the
+	/// boundary of the first call; the boundary may be guessed after
+	/// the window is created.
+	[[nodiscard]] std::streamsize findDelimiter(const char* data, std::streamsize size, const std::string& boundary)
+	{
+		if (!_searcher.has_value())
+		{
+			_delimiter = "\n--"s + boundary;
+			_searcher.emplace(_delimiter.cbegin(), _delimiter.cend());
+		}
+		const char* const pEnd = data + size;
+		const char* const pDelimiter = std::search(data, pEnd, *_searcher);
+		return (pDelimiter != pEnd) ? pDelimiter - data : -1;
 	}
 
 	/// Number of buffered bytes available for reading.
@@ -154,6 +179,11 @@ protected:
 private:
 	std::streambuf& _underlying;
 	std::vector<char> _buf;
+	std::string _delimiter;
+		/// "\n--" + boundary; _searcher refers to it.
+	std::optional<std::boyer_moore_searcher<std::string::const_iterator>> _searcher;
+		/// Boyer-Moore with the good-suffix rule: linear in the data size for any
+		/// boundary and data, which the sender of the message chooses.
 };
 
 
@@ -360,22 +390,11 @@ std::streamsize MultipartStreamBuf::readContent(char* buffer, std::streamsize le
 
 std::streamsize MultipartStreamBuf::scanForBoundary(const char* data, std::streamsize size)
 {
-	const std::size_t bLen = _boundary.size();
-	const std::size_t minMatch = 3 + bLen; // \n-- + boundary
-
-	for (std::streamsize i = 0; i + static_cast<std::streamsize>(minMatch) <= size; ++i)
-	{
-		std::streamsize pos = i;
-		if (data[pos] == '\r') ++pos;
-		if (pos >= size || data[pos] != '\n') continue;
-		++pos;
-		if (pos + 1 >= size || data[pos] != '-' || data[pos + 1] != '-') continue;
-		pos += 2;
-		if (pos + static_cast<std::streamsize>(bLen) > size) return -1;
-		if (std::memcmp(data + pos, _boundary.data(), bLen) == 0)
-			return i;
-	}
-	return -1;
+	ReadWindow& win = static_cast<ReadWindow&>(*_istr.rdbuf());
+	const std::streamsize lf = win.findDelimiter(data, size, _boundary);
+	if (lf > 0 && data[lf - 1] == '\r')
+		return lf - 1;
+	return lf;
 }
 
 
