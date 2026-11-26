@@ -131,6 +131,7 @@ public:
 
 	virtual void testRecordSet();
 	virtual void testRecordSetBeforeExecute();
+	virtual void testExecuteDirectAfterExecute();
 
 	virtual void testDateTime();
 	virtual void testDate();

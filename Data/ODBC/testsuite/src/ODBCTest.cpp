@@ -1862,6 +1862,35 @@ void ODBCTest::testRecordSetBeforeExecute()
 }
 
 
+void ODBCTest::testExecuteDirectAfterExecute()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+
+		session() << "INSERT INTO Person VALUES ('Simpson', 'Bart', 'Springfield', 12)", now;
+
+		int count = 0;
+		Poco::Data::Statement stmt(session());
+		stmt << "SELECT COUNT(*) FROM Person", into(count);
+		stmt.execute();
+		assertEqual (1, count);
+
+		// the finished execution of the prepared statement left its cursor open
+		stmt.executeDirect("DELETE FROM Person");
+
+		session() << "SELECT COUNT(*) FROM Person", into(count), now;
+		assertEqual (0, count);
+
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testDateTime()
 {
 	if (!_pSession) failmsg ("Test not available.");

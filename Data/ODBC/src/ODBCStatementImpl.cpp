@@ -140,12 +140,20 @@ void ODBCStatementImpl::resetImpl()
 	_affectedRowCount = 0;
 	_errorInfo.clear();
 
-	SQLRETURN rc = SQLFreeStmt(_stmt, SQL_CLOSE);
-	checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_CLOSE)");
-
-	if (_preparations.size() > 1)
+	// A compiled statement with one data set keeps its cursor until the next
+	// execution, where doBind() or execDirectImpl() closes it. A statement that
+	// is not compiled yet is prepared first, and a cursor that executeDirect()
+	// left open has to be closed before that.
+	const bool multipleDataSets = _preparations.size() > 1;
+	if (multipleDataSets || _canCompile)
 	{
-		rc = SQLFreeStmt(_stmt, SQL_UNBIND);
+		const SQLRETURN rc = SQLFreeStmt(_stmt, SQL_CLOSE);
+		checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_CLOSE)");
+	}
+
+	if (multipleDataSets)
+	{
+		const SQLRETURN rc = SQLFreeStmt(_stmt, SQL_UNBIND);
 		checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_UNBIND)");
 		_preparations.resize(1);
 		_extractors.resize(1);
@@ -387,6 +395,9 @@ void ODBCStatementImpl::bindImpl()
 void ODBCStatementImpl::execDirectImpl(const std::string& query)
 {
 	checkConnection();
+	// A finished execution of the prepared statement leaves its cursor open,
+	// and nothing else on this path closes it.
+	if (ST_RESET == getState()) clear();
 	// drop any parameter bindings a previous execution left in the driver
 	if (!_pBinder.isNull()) _pBinder->reset();
 	SQLCHAR * statementText = (SQLCHAR*) query.c_str();
@@ -574,7 +585,7 @@ std::string ODBCStatementImpl::nativeSQL()
 }
 
 
-void ODBCStatementImpl::checkError(SQLRETURN rc, const std::string& msg)
+void ODBCStatementImpl::checkError(SQLRETURN rc, std::string_view msg)
 {
 	if (SQL_NO_DATA == rc) return;
 

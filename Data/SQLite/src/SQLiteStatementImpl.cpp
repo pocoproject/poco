@@ -153,8 +153,8 @@ void SQLiteStatementImpl::resetImpl()
 	_nextResponse = 0;
 	_stepCalled = false;
 	_canCompile = true;
-	_columns.clear();
 	_columns.resize(1);
+	_columns[0].clear();
 	_pLeftover = nullptr;
 }
 
