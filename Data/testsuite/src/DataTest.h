@@ -54,6 +54,8 @@ public:
 	void testNullableExtract();
 	void testTransactionAutoCommit();
 	void testExecuteDirectNotImplemented();
+	void testExecuteDirectState();
+	void testExecuteDirectTransaction();
 	void testSessionNotConnected();
 	void testSessionNullImpl();
 	void testRecordSetMovedFrom();

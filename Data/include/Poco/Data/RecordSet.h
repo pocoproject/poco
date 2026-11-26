@@ -66,6 +66,11 @@ class Data_API RecordSet: private Statement
 	///
 	/// The number of rows in the RecordSet can be limited by specifying
 	/// a limit for the Statement.
+	///
+	/// The rows that row() and the row iterators return are created on first
+	/// access and cached. After the statement has been executed again, call
+	/// reset() with it before reading rows. Column references that column()
+	/// returns are no longer valid after Statement::executeDirect().
 {
 public:
 	using RowMap = std::map<std::size_t, std::shared_ptr<Row>>;
@@ -255,8 +260,8 @@ public:
 
 	void reset(const Statement& stmt);
 		/// Resets the RecordSet and assigns a new statement.
-		/// Should be called after the given statement has been reset,
-		/// assigned a new SQL statement, and executed.
+		/// Should be called after the given statement has been executed again,
+		/// also when it was assigned a new SQL statement in between.
 		///
 		/// Does not remove the associated RowFilter or RowFormatter.
 		/// Throws NullPointerException if stmt was moved from; the RecordSet is then left unchanged.

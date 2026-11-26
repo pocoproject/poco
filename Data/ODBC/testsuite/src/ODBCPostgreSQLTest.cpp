@@ -955,6 +955,8 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBContainer);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBLOBStmt);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkRowsetBackstop);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testCompileAgain);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExecuteDirectBulkExtraction);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkBindingBackstops);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testParameterArraySize);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testBulkFullWidthStrings);
@@ -1027,6 +1029,11 @@ CppUnit::Test* ODBCPostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testNonASCIIText);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testRecordSetBeforeExecute);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExecuteDirectAfterExecute);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExecuteDirectAgain);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExecuteDirectPaused);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExecuteDirectThenExecute);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExecuteDirectColumnBinding);
+	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testExecuteDirectRemovedBinding);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testUncommittedWorkRolledBack);
 	CppUnit_addTest(pSuite, ODBCPostgreSQLTest, testLostConnection);
 

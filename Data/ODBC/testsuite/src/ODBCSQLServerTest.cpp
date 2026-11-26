@@ -1408,6 +1408,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBLOBStmt);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBoundUTF16StringBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkRowsetBackstop);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testCompileAgain);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testExecuteDirectBulkExtraction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkBindingBackstops);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testParameterArraySize);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkFullWidthStrings);
@@ -1468,6 +1470,11 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNonASCIIText);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testRecordSetBeforeExecute);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testExecuteDirectAfterExecute);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testExecuteDirectAgain);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testExecuteDirectPaused);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testExecuteDirectThenExecute);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testExecuteDirectColumnBinding);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testExecuteDirectRemovedBinding);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSQLServerTime);
 
 		return pSuite;

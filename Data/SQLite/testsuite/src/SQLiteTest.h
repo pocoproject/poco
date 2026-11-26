@@ -176,6 +176,7 @@ public:
 
 	void testRecordsetCopyMove();
 	void testAddBindingReuse();
+	void testRecordSetColumnPosition();
 
 	void setUp();
 	void tearDown();

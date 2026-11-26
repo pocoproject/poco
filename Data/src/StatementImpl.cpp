@@ -106,16 +106,30 @@ std::size_t StatementImpl::execute(const bool& reset)
 	return lim;
 }
 
-void StatementImpl::executeDirect(const std::string &query)
+
+void StatementImpl::executeDirect(const std::string& query)
 {
-	if (!_rSession.isConnected())
+	try
+	{
+		if (!_rSession.isConnected())
+			throw NotConnectedException(_rSession.connectorName());
+		_ostr.str("");
+		_ostr << query;
+		// the extractions created for the columns of the previous text do not
+		// fit the query; the next compilation creates them again
+		for (auto& extVec: _extractors)
+		{
+			std::erase_if(extVec,
+				[](const AbstractExtraction::Ptr& pExt) { return pExt->isInternal(); });
+		}
+		execDirectImpl(query);
+	}
+	catch (...)
 	{
 		_state = ST_DONE;
-		throw NotConnectedException(_rSession.connectorName());
+		throw;
 	}
-	_ostr.str("");
-	_ostr << query;
-	execDirectImpl(_ostr.str());
+	_state = ST_DONE;
 }
 
 

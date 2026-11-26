@@ -425,8 +425,22 @@ public:
 		/// waits for a running synchronous execution instead.
 
 	void executeDirect(const std::string& query);
-		/// Executes the query synchronously and directly.
-		/// For transactional behavior, see execute() documentation.
+		/// Executes the query synchronously and directly, without preparing it.
+		/// Rows that the query returns are not extracted. A connector that does not
+		/// support direct execution throws NotImplementedException.
+		///
+		/// The query replaces the text of the statement: a later execute() prepares
+		/// and executes the query, with the bindings and extractions of the statement.
+		/// Extractions that the statement created itself, because none were supplied,
+		/// are destroyed and created again for the columns of the query: a Column
+		/// reference that a RecordSet returned for them is no longer valid, and a
+		/// RecordSet over the statement is reset with RecordSet::reset() after the
+		/// next execution.
+		/// A paused execution is abandoned. Once the query has been passed to the
+		/// connector, done() returns true, also when its execution failed.
+		///
+		/// For transactional behavior, see execute() documentation; the query decides
+		/// whether a transaction is started.
 		/// Throws InvalidAccessException if isAsync() returns true, or while another execution of
 		/// the statement or of one of its copies runs; another thread that calls this function on
 		/// the same Statement object waits for a running synchronous execution instead.

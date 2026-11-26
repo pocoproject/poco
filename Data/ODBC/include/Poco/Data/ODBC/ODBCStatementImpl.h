@@ -32,6 +32,7 @@
 #endif
 
 #include <sqltypes.h>
+#include <memory>
 #include <string_view>
 
 
@@ -111,7 +112,7 @@ private:
 	typedef std::vector<PreparatorPtr>        PreparatorVec;
 	typedef Poco::SharedPtr<Extractor>        ExtractorPtr;
 	typedef std::vector<ExtractorPtr>         ExtractorVec;
-	typedef std::vector<ODBCMetaColumn*>      ColumnPtrVec;
+	using ColumnPtrVec = std::vector<std::unique_ptr<ODBCMetaColumn>>;
 	typedef std::vector<ColumnPtrVec>         ColumnPtrVecVec;
 
 	static const std::string INVALID_CURSOR_STATE;

@@ -73,15 +73,6 @@ ODBCStatementImpl::~ODBCStatementImpl()
 	// which holds a reference to _stmt. Detach it while the handle is still
 	// valid, so a later reset through a surviving binding never touches it.
 	if (!_pBinder.isNull()) _pBinder->detach();
-
-	ColumnPtrVecVec::iterator it = _columnPtrs.begin();
-	ColumnPtrVecVec::iterator end = _columnPtrs.end();
-	for (; it != end; ++it)
-	{
-		ColumnPtrVec::iterator itC = it->begin();
-		ColumnPtrVec::iterator endC = it->end();
-		for (; itC != endC; ++itC) delete *itC;
-	}
 }
 
 
@@ -93,8 +84,23 @@ void ODBCStatementImpl::compileImpl()
 	_stepCalled = false;
 	_nextResponse = 0;
 
-	if (_preparations.size())
-		PreparatorVec().swap(_preparations);
+	// An earlier execution, or executeDirect(), may have left the cursor open.
+	if (ST_RESET == getState()) clear();
+	if (!_preparations.empty())
+	{
+		// A failed compilation, or executeDirect(), leaves the preparators and
+		// extractors of the earlier preparation. Its columns are bound to the
+		// buffers of those preparators and are unbound before they are freed.
+		checkError(SQLFreeStmt(_stmt, SQL_UNBIND), "SQLFreeStmt(SQL_UNBIND)");
+		// A binding removed from the statement keeps the Binder of the earlier
+		// compilation, and the destructor detaches only the current one.
+		if (!_pBinder.isNull()) _pBinder->detach();
+		_preparations.clear();
+		_extractors.clear();
+		// executeDirect() removed the extractions that the statement created for
+		// the earlier text; the column metadata of that text goes with them
+		if (extractions().empty()) _columnPtrs.clear();
+	}
 
 	addPreparator();
 
@@ -140,20 +146,13 @@ void ODBCStatementImpl::resetImpl()
 	_affectedRowCount = 0;
 	_errorInfo.clear();
 
-	// A compiled statement with one data set keeps its cursor until the next
-	// execution, where doBind() or execDirectImpl() closes it. A statement that
-	// is not compiled yet is prepared first, and a cursor that executeDirect()
-	// left open has to be closed before that.
-	const bool multipleDataSets = _preparations.size() > 1;
-	if (multipleDataSets || _canCompile)
+	// A statement with one data set keeps its cursor until the next execution,
+	// where doBind(), compileImpl() or execDirectImpl() closes it.
+	if (_preparations.size() > 1)
 	{
-		const SQLRETURN rc = SQLFreeStmt(_stmt, SQL_CLOSE);
+		SQLRETURN rc = SQLFreeStmt(_stmt, SQL_CLOSE);
 		checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_CLOSE)");
-	}
-
-	if (multipleDataSets)
-	{
-		const SQLRETURN rc = SQLFreeStmt(_stmt, SQL_UNBIND);
+		rc = SQLFreeStmt(_stmt, SQL_UNBIND);
 		checkError(rc, "ODBCStatementImpl::resetImpl():SQLFreeStmt(SQL_UNBIND)");
 		_preparations.resize(1);
 		_extractors.resize(1);
@@ -394,9 +393,11 @@ void ODBCStatementImpl::bindImpl()
 
 void ODBCStatementImpl::execDirectImpl(const std::string& query)
 {
+	// SQLExecDirect() replaces the prepared statement on the handle, and the
+	// query has replaced the text: the next execute() prepares the query.
+	_canCompile = true;
 	checkConnection();
-	// A finished execution of the prepared statement leaves its cursor open,
-	// and nothing else on this path closes it.
+	// a finished or paused execution leaves its cursor open (see resetImpl())
 	if (ST_RESET == getState()) clear();
 	// drop any parameter bindings a previous execution left in the driver
 	if (!_pBinder.isNull()) _pBinder->reset();
@@ -404,7 +405,7 @@ void ODBCStatementImpl::execDirectImpl(const std::string& query)
 	SQLINTEGER textLength = static_cast<SQLINTEGER>(query.size());
 	SQLRETURN rc = SQLExecDirect(_stmt,statementText,textLength);
 
-	checkError(rc, "SQLExecute()");
+	checkError(rc, "ODBCStatementImpl::execDirectImpl():SQLExecDirect()");
 }
 
 
@@ -442,7 +443,7 @@ void ODBCStatementImpl::clear()
 	_errorInfo.clear();
 	SQLRETURN rc = SQLFreeStmt(_stmt, SQL_CLOSE);
 	if (Utility::isError(rc))
-		throw StatementException(_stmt, "ODBCStatementImpl::putData():SQLFreeStmt(SQL_CLOSE)");
+		throw StatementException(_stmt, "ODBCStatementImpl::clear():SQLFreeStmt(SQL_CLOSE)");
 }
 
 
@@ -625,8 +626,11 @@ void ODBCStatementImpl::fillColumns()
 	if (curDataSet >= _columnPtrs.size())
 		_columnPtrs.resize(curDataSet + 1);
 
+	// the columns of an earlier preparation of this data set are replaced
+	ColumnPtrVec& columns = _columnPtrs[curDataSet];
+	columns.clear();
 	for (std::size_t i = 0; i < colCount; ++i)
-		_columnPtrs[curDataSet].push_back(new ODBCMetaColumn(_stmt, i));
+		columns.push_back(std::make_unique<ODBCMetaColumn>(_stmt, i));
 }
 
 

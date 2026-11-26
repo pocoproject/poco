@@ -5163,6 +5163,22 @@ void SQLiteTest::testRecordsetCopyMove()
 }
 
 
+void SQLiteTest::testRecordSetColumnPosition()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS Vectors", now;
+	tmp << "CREATE TABLE Vectors (int0 INTEGER, flt0 REAL, str0 VARCHAR)", now;
+	tmp << "INSERT INTO Vectors VALUES (1, 1.5, '3')", now;
+
+	RecordSet rset(tmp, "SELECT * FROM Vectors");
+	assertEqual (3, rset.columnCount());
+	assertEqual ("str0"s, rset.columnName(2));
+	// the position after the last column is out of range, like every later one
+	try { (void) rset.columnName(3); fail ("must fail"); }
+	catch (Poco::AssertionViolationException&) { }
+}
+
+
 void SQLiteTest::setUp()
 {
 }
@@ -5305,6 +5321,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactionTypeProperty);
 	CppUnit_addTest(pSuite, SQLiteTest, testRecordsetCopyMove);
 	CppUnit_addTest(pSuite, SQLiteTest, testAddBindingReuse);
+	CppUnit_addTest(pSuite, SQLiteTest, testRecordSetColumnPosition);
 
 	return pSuite;
 }

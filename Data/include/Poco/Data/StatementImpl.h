@@ -134,7 +134,10 @@ public:
 		/// bound containers during multiple execute calls.
 
 	void executeDirect(const std::string& query);
-		/// Execute query directly.
+		/// Executes the query directly. The query replaces the text of the
+		/// statement, and the extractions that makeExtractors() created for the
+		/// previous text are removed. The state is ST_DONE afterwards, also when
+		/// the execution throws.
 
 	void reset();
 		/// Resets the statement, so that we can reuse all bindings and re-execute again.

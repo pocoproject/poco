@@ -509,6 +509,8 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBContainer);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBLOBStmt);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkRowsetBackstop);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testCompileAgain);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testExecuteDirectBulkExtraction);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testParameterArraySize);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testBulkFullWidthStrings);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testManualBLOB);
@@ -558,6 +560,11 @@ CppUnit::Test* ODBCMySQLTest::suite()
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testNonASCIIText);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testRecordSetBeforeExecute);
 	CppUnit_addTest(pSuite, ODBCMySQLTest, testExecuteDirectAfterExecute);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testExecuteDirectAgain);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testExecuteDirectPaused);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testExecuteDirectThenExecute);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testExecuteDirectColumnBinding);
+	CppUnit_addTest(pSuite, ODBCMySQLTest, testExecuteDirectRemovedBinding);
 
 	return pSuite;
 }

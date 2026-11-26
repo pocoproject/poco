@@ -1891,6 +1891,307 @@ void ODBCTest::testExecuteDirectAfterExecute()
 }
 
 
+void ODBCTest::testExecuteDirectAgain()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+
+		session() << "INSERT INTO Person VALUES ('Simpson', 'Bart', 'Springfield', 12)", now;
+
+		// a direct execution ends the statement, so it accepts the next one
+		int count = 0;
+		Poco::Data::Statement stmt(session());
+		stmt << "SELECT COUNT(*) FROM Person", into(count);
+		stmt.execute();
+		assertEqual (1, count);
+		for (int n = 0; n < 2; ++n)
+		{
+			stmt.executeDirect("UPDATE Person SET Age = Age + 1");
+			assertTrue (stmt.done());
+		}
+		int age = 0;
+		session() << "SELECT Age FROM Person", into(age), now;
+		assertEqual (14, age);
+
+		// the second query closes the cursor that the first one left open
+		Poco::Data::Statement direct(session());
+		for (int n = 0; n < 2; ++n)
+		{
+			direct.executeDirect("SELECT LastName FROM Person");
+			assertTrue (direct.done());
+		}
+
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testExecuteDirectPaused()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+
+		session() << "INSERT INTO Person VALUES ('Simpson', 'Bart', 'Springfield', 12)", now;
+		session() << "INSERT INTO Person VALUES ('Simpson', 'Lisa', 'Springfield', 8)", now;
+
+		std::vector<std::string> names;
+		Poco::Data::Statement stmt(session());
+		stmt << "SELECT FirstName FROM Person ORDER BY FirstName", into(names), limit(1);
+		stmt.execute();
+		assertTrue (stmt.paused());
+		assertEqual (1, names.size());
+
+		// the query abandons the paused execution and closes its cursor
+		stmt.executeDirect("UPDATE Person SET Age = Age + 1");
+		assertTrue (stmt.done());
+
+		std::vector<int> ages;
+		session() << "SELECT Age FROM Person ORDER BY FirstName", into(ages), now;
+		assertEqual (2, ages.size());
+		assertEqual (13, ages[0]);
+		assertEqual (9, ages[1]);
+
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testExecuteDirectThenExecute()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreatePersonTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+
+		session() << "INSERT INTO Person VALUES ('Simpson', 'Bart', 'Springfield', 12)", now;
+		session() << "INSERT INTO Person VALUES ('Simpson', 'Lisa', 'Springfield', 8)", now;
+
+		// execute() prepares the query of the direct execution
+		{
+			Poco::Data::Statement stmt(session());
+			stmt.executeDirect("SELECT FirstName, Age FROM Person ORDER BY FirstName");
+			stmt.execute();
+			Poco::Data::RecordSet rs(stmt);
+			assertEqual (2, rs.columnCount());
+			assertEqual (2, rs.rowCount());
+			assertEqual (std::string("Bart"), rs.value(0, 0).convert<std::string>());
+			assertEqual (8, rs.value(1, 1).convert<int>());
+		}
+
+		// the extractions created for the previous text are created again
+		// for the columns of the query
+		{
+			Poco::Data::Statement stmt(session());
+			stmt << "SELECT COUNT(*) FROM Person";
+			stmt.execute();
+			stmt.executeDirect("SELECT FirstName, Age FROM Person ORDER BY FirstName");
+			stmt.execute();
+			Poco::Data::RecordSet rs(stmt);
+			assertEqual (2, rs.columnCount());
+			assertEqual (0, Poco::icompare(rs.columnName(0), "FirstName"));
+			assertEqual (0, Poco::icompare(rs.columnName(1), "Age"));
+			assertEqual (2, rs.rowCount());
+			assertEqual (std::string("Lisa"), rs.value(0, 1).convert<std::string>());
+			assertEqual (12, rs.value(1, 0).convert<int>());
+
+			// a query without columns keeps no column metadata of the earlier
+			// text, as for a statement that never returned columns
+			stmt.executeDirect("UPDATE Person SET Age = Age");
+			stmt.execute();
+			Poco::Data::RecordSet updated(stmt);
+			assertEqual (0, updated.columnCount());
+			try { (void) updated.columnName(0); fail ("must fail"); }
+			catch (Poco::IllegalStateException&) { }
+		}
+
+		// the extraction of the statement receives the column of the query
+		{
+			std::vector<std::string> names;
+			Poco::Data::Statement stmt(session());
+			stmt << "SELECT LastName FROM Person ORDER BY FirstName", into(names);
+			stmt.execute();
+			assertEqual (2, names.size());
+			assertEqual (std::string("Simpson"), names[0]);
+			stmt.executeDirect("SELECT FirstName FROM Person ORDER BY FirstName");
+			names.clear();
+			stmt.execute();
+			assertEqual (2, names.size());
+			assertEqual (std::string("Bart"), names[0]);
+			assertEqual (std::string("Lisa"), names[1]);
+		}
+
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testCompileAgain()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	class LimitStatement: public Poco::Data::Statement
+	{
+	public:
+		explicit LimitStatement(Poco::Data::Session& session): Poco::Data::Statement(session)
+		{
+		}
+
+		void setLimit(const Poco::Data::Limit& extrLimit)
+		{
+			impl()->setExtractionLimit(extrLimit);
+		}
+	};
+
+	recreatePersonTable();
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+
+	session() << "INSERT INTO Person VALUES ('Simpson', 'Bart', 'Springfield', 12)", now;
+	session() << "INSERT INTO Person VALUES ('Simpson', 'Lisa', 'Springfield', 8)", now;
+
+	std::vector<std::string> names;
+	LimitStatement stmt(session());
+	stmt << "SELECT FirstName FROM Person ORDER BY FirstName", into(names, bulk(4));
+	// a bulk extraction without a limit fails in doPrepare(), after the
+	// preparator of the compilation was created
+	stmt.setLimit(Poco::Data::Limit(Poco::Data::Limit::LIMIT_UNLIMITED));
+	try
+	{
+		stmt.execute();
+		fail ("a bulk extraction without a limit was executed");
+	}
+	catch (Poco::InvalidArgumentException&)
+	{
+	}
+
+	// the compilation runs again, with the preparator it creates
+	stmt.setLimit(Poco::Data::Limit(4));
+	stmt.execute();
+	// a bulk extraction sizes the container to the bulk size
+	assertEqual (4, names.size());
+	assertEqual (std::string("Bart"), names[0]);
+	assertEqual (std::string("Lisa"), names[1]);
+}
+
+
+void ODBCTest::testExecuteDirectColumnBinding()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	// The first preparation binds the column to a buffer of its preparator. The
+	// preparation after executeDirect() extracts with SQLGetData() and binds no
+	// column, so the fetch must not write into the buffer of the discarded one.
+	// Without a sanitizer that buffer may still look valid; ASan reports the write.
+	recreatePersonTable();
+	const bool autoBind = _pSession->getFeature("autoBind");
+	const bool autoExtract = _pSession->getFeature("autoExtract");
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+
+	session() << "INSERT INTO Person VALUES ('Simpson', 'Bart', 'Springfield', 12)", now;
+	session() << "INSERT INTO Person VALUES ('Simpson', 'Lisa', 'Springfield', 8)", now;
+
+	std::vector<std::string> names;
+	Poco::Data::Statement stmt(session());
+	stmt << "SELECT FirstName FROM Person ORDER BY FirstName", into(names);
+	stmt.execute();
+	assertEqual (2, names.size());
+	stmt.executeDirect("SELECT LastName FROM Person ORDER BY FirstName");
+
+	_pSession->setFeature("autoExtract", false);
+	names.clear();
+	try
+	{
+		stmt.execute();
+	}
+	catch (...)
+	{
+		_pSession->setFeature("autoBind", autoBind);
+		_pSession->setFeature("autoExtract", autoExtract);
+		throw;
+	}
+	_pSession->setFeature("autoBind", autoBind);
+	_pSession->setFeature("autoExtract", autoExtract);
+	assertEqual (2, names.size());
+	assertEqual (std::string("Simpson"), names[0]);
+	assertEqual (std::string("Simpson"), names[1]);
+}
+
+
+void ODBCTest::testExecuteDirectBulkExtraction()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	// The bulk extractions that the statement created itself are created
+	// again, in bulk, for the columns of the query of executeDirect().
+	recreatePersonTable();
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+
+	session() << "INSERT INTO Person VALUES ('Simpson', 'Bart', 'Springfield', 12)", now;
+	session() << "INSERT INTO Person VALUES ('Simpson', 'Lisa', 'Springfield', 8)", now;
+
+	Poco::Data::Statement stmt(session());
+	stmt << "SELECT Age FROM Person ORDER BY FirstName", bulk(2);
+	stmt.execute();
+	stmt.executeDirect("SELECT FirstName, Age FROM Person ORDER BY FirstName");
+	stmt.execute();
+	Poco::Data::RecordSet rs(stmt);
+	assertEqual (2, rs.columnCount());
+	assertEqual (2, rs.rowCount());
+	assertEqual (std::string("Lisa"), rs.value(0, 1).convert<std::string>());
+	assertEqual (12, rs.value(1, 0).convert<int>());
+}
+
+
+void ODBCTest::testExecuteDirectRemovedBinding()
+{
+	if (_pSession == nullptr) failmsg ("Test not available.");
+
+	// A binding removed from the statement keeps the Binder of the first
+	// compilation. The compilation after executeDirect() creates another
+	// Binder, and the earlier one must not use the handle of the statement
+	// either once the statement is gone. Without a sanitizer the freed handle
+	// may still look valid; ASan reports the read.
+	recreatePersonTable();
+	_pSession->setFeature("autoBind", true);
+	_pSession->setFeature("autoExtract", true);
+
+	std::string lastName("Simpson");
+	Poco::Data::AbstractBindingVec bindings;
+	{
+		Poco::Data::Statement stmt(session());
+		stmt << "INSERT INTO Person (LastName, FirstName, Address, Age) VALUES (?, 'Bart', 'Springfield', 12)",
+			use(lastName, "lastName");
+		stmt.execute();
+		bindings = stmt.bindings();
+		stmt.removeBind("lastName");
+		stmt.executeDirect("DELETE FROM Person WHERE Age = 99");
+		stmt.execute();
+	}
+	assertEqual (std::size_t(1), bindings.size());
+	bindings[0]->reset();
+	bindings.clear();
+
+	int count = 0;
+	session() << "SELECT COUNT(*) FROM Person", into(count), now;
+	assertEqual (1, count);
+}
+
+
 void ODBCTest::testDateTime()
 {
 	if (!_pSession) failmsg ("Test not available.");
