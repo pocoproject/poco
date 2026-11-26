@@ -76,16 +76,26 @@ Object &Object::operator = (const Object &other)
 {
 	if (&other != this)
 	{
-		_values = other._values;
-		_preserveInsOrder = other._preserveInsOrder;
-		_escapeUnicode = other._escapeUnicode;
-		_lowercaseHex = other._lowercaseHex;
-		_pStruct = !other._structModified ? other._pStruct : nullptr;
-		_pOrdStruct = !other._ordStructModified ? other._pOrdStruct : nullptr;
-		_structModified = other._structModified;
-		_ordStructModified = other._ordStructModified;
-		_keys.clear();
-		syncKeys(other._keys);
+		try
+		{
+			// _keys refers to the nodes of _values, which the assignment
+			// of _values destroys or reuses
+			_keys.clear();
+			_values = other._values;
+			_preserveInsOrder = other._preserveInsOrder;
+			_escapeUnicode = other._escapeUnicode;
+			_lowercaseHex = other._lowercaseHex;
+			_pStruct = !other._structModified ? other._pStruct : nullptr;
+			_pOrdStruct = !other._ordStructModified ? other._pOrdStruct : nullptr;
+			_structModified = other._structModified;
+			_ordStructModified = other._ordStructModified;
+			syncKeys(other._keys);
+		}
+		catch (...)
+		{
+			clear();
+			throw;
+		}
 	}
 	return *this;
 }
