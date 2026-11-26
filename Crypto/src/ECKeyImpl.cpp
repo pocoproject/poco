@@ -162,6 +162,10 @@ ECKeyImpl::~ECKeyImpl()
 void ECKeyImpl::checkEC(const std::string& method, const std::string& func) const
 {
 	if (_pEVPPKey == nullptr) throw OpenSSLException(Poco::format("%s: %s", method, func));
+	// Ordered by cost, so that an EC key passes the first test. An EC key on the SM2 curve has the id SM2
+	// and the base id EC; an SM2 key read from PEM has neither and is recognized by its name only.
+	if (EVP_PKEY_id(_pEVPPKey) != EVP_PKEY_EC && EVP_PKEY_base_id(_pEVPPKey) != EVP_PKEY_EC && !EVP_PKEY_is_a(_pEVPPKey, "SM2"))
+		throw OpenSSLException(Poco::format("%s: not an EC key", method));
 	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_pEVPPKey, nullptr);
 	if (pCtx == nullptr) throw OpenSSLException(Poco::format("%s: EVP_PKEY_CTX_new()", method));
 	ERR_set_mark();
