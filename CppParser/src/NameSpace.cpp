@@ -98,6 +98,13 @@ Symbol* NameSpace::lookup(const std::string& name) const
 }
 
 
+Symbol* NameSpace::lookupMember(const std::string& name) const
+{
+	const auto it = _symbols.lower_bound(name);
+	return (it != _symbols.end() && it->first == name) ? it->second : nullptr;
+}
+
+
 Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& alreadyVisited) const
 {
 	Symbol* pSymbol = nullptr;

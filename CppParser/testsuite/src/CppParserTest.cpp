@@ -625,6 +625,42 @@ namespace A::B
 }
 
 
+void CppParserTest::testParseNamespaceShadowingOuterNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace Shadow {
+namespace Detail {
+void outerFunc();
+}
+namespace Inner {
+namespace Detail {
+void innerFunc();
+}
+}
+namespace Detail {
+void outerFunc2();
+}
+}
+namespace Shadow::Inner::Detail {
+void innerFunc2();
+}
+)", st);
+
+	const auto fullNameOf = [this, &st](const std::string& name)
+	{
+		const auto it = st.find(name);
+		assertTrue (it != st.end());
+		return it->second->fullName();
+	};
+
+	assertTrue (fullNameOf("outerFunc") == "Shadow::Detail::outerFunc");
+	assertTrue (fullNameOf("outerFunc2") == "Shadow::Detail::outerFunc2");
+	assertTrue (fullNameOf("innerFunc") == "Shadow::Inner::Detail::innerFunc");
+	assertTrue (fullNameOf("innerFunc2") == "Shadow::Inner::Detail::innerFunc2");
+}
+
+
 void CppParserTest::testParseSingleNamespace()
 {
 	NameSpace::SymbolTable st;
@@ -1673,6 +1709,7 @@ CppUnit::Test* CppParserTest::suite()
 	CppUnit_addTest(pSuite, CppParserTest, testParseNestedNamespace);
 	CppUnit_addTest(pSuite, CppParserTest, testParseInlineNestedNamespace);
 	CppUnit_addTest(pSuite, CppParserTest, testParseRepeatedNestedNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseNamespaceShadowingOuterNamespace);
 	CppUnit_addTest(pSuite, CppParserTest, testParseSingleNamespace);
 	CppUnit_addTest(pSuite, CppParserTest, testParseDeepNestedNamespace);
 	CppUnit_addTest(pSuite, CppParserTest, testLookupOverloadedFunction);

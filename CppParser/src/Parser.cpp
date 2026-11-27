@@ -278,7 +278,7 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		int nestLevel = 0;
 		for (size_t i = 0; i < namespaceNames.size(); ++i)
 		{
-			auto* pSym = currentNameSpace()->lookup(namespaceNames[i]);
+			auto* pSym = currentNameSpace()->lookupMember(namespaceNames[i]);
 			auto* pNS = (pSym && (pSym->kind() == Symbol::SYM_NAMESPACE || pSym->kind() == Symbol::SYM_STRUCT))
 				? static_cast<NameSpace*>(pSym) : nullptr;
 			const bool undefined = (pNS == nullptr);

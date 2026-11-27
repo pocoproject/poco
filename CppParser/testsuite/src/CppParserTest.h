@@ -40,6 +40,7 @@ public:
 	void testParseNestedNamespace();
 	void testParseInlineNestedNamespace();
 	void testParseRepeatedNestedNamespace();
+	void testParseNamespaceShadowingOuterNamespace();
 	void testParseSingleNamespace();
 	void testParseDeepNestedNamespace();
 	void testLookupOverloadedFunction();
