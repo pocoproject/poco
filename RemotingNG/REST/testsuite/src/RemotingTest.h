@@ -36,6 +36,8 @@ public:
 	void testGetNotFound();
 	void testCookie();
 	void testFault();
+	void testAliasOtherListener();
+	void testAliasOnTwoListeners();
 
 	void setUp() override;
 	void tearDown() override;
@@ -48,6 +50,8 @@ protected:
 	std::string _objectURI;
 	std::string _publicURI;
 	Poco::RemotingNG::REST::Listener::Ptr _pListener;
+	std::string _otherListener;
+	std::string _otherObjectURI;
 };
 
 
