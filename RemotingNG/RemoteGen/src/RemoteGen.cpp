@@ -58,6 +58,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <string_view>
 
 
 using Poco::StringTokenizer;
@@ -294,6 +295,49 @@ protected:
 		_enableBridge = true;
 	}
 
+	static std::vector<std::string> referencedNames(const std::string& value)
+		/// Returns the names of the ${<name>} references in value.
+	{
+		static constexpr std::string_view REFERENCE_START("${");
+		std::vector<std::string> names;
+		std::string::size_type start = value.find(REFERENCE_START);
+		while (start != std::string::npos)
+		{
+			const std::string::size_type nameStart = start + REFERENCE_START.size();
+			names.push_back(value.substr(nameStart, value.find('}', nameStart) - nameStart));
+			start = value.find(REFERENCE_START, nameStart);
+		}
+		return names;
+	}
+
+	[[noreturn]] static void throwUndefined(const std::string& name, const std::string& key)
+	{
+		throw Poco::NotFoundException(
+			Poco::format("configuration property %s, used in %s; define it with -D%s=<value>"s, name, key, name));
+	}
+
+	static std::string checkResolved(std::string value, const std::string& key)
+		/// Returns value. Throws a NotFoundException if value contains a ${<name>} reference
+		/// that the configuration did not resolve. An undefined property would otherwise make
+		/// the compiler search directories that do not exist and silently find other headers.
+	{
+		const std::vector<std::string> names = referencedNames(value);
+		if (!names.empty()) throwUndefined(names.front(), key);
+		return value;
+	}
+
+	static std::string expandPath(const std::string& path, const std::string& key)
+		/// Returns Path::expand(path). A ${<name>} reference that the configuration did not
+		/// resolve must name an environment variable that Path::expand() replaces, otherwise
+		/// a NotFoundException is thrown.
+	{
+		for (const auto& name: referencedNames(path))
+		{
+			if (!Poco::Environment::has(name)) throwUndefined(name, key);
+		}
+		return checkResolved(Poco::Path::expand(path), key);
+	}
+
 	void collectFilePatterns(std::vector<std::string>& inc, std::vector<std::string>& exc) const
 	{
 		std::string sysIncludes = config().getString("RemoteGen.system.include"s, ""s);
@@ -303,19 +347,19 @@ protected:
 			StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 		for (const auto& p: sysIncludesTokenizer)
 		{
-			inc.push_back(Poco::Path::expand(p));
+			inc.push_back(expandPath(p, "RemoteGen.system.include"s));
 		}
 		StringTokenizer includesTokenizer(includes, ",;\n"s,
 			StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 		for (const auto& p: includesTokenizer)
 		{
-			inc.push_back(Poco::Path::expand(p));
+			inc.push_back(expandPath(p, "RemoteGen.files.include"s));
 		}
 		StringTokenizer excludesTokenizer(excludes, ",;\n"s,
 			StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 		for (const auto& p: excludesTokenizer)
 		{
-			exc.push_back(Poco::Path::expand(p));
+			exc.push_back(expandPath(p, "RemoteGen.files.exclude"s));
 		}
 	}
 
@@ -387,8 +431,8 @@ protected:
 			compilerKey += _compiler;
 		}
 		compilerKey += "]";
-		std::string compiler = config().getString(compilerKey + ".exec", ""s);
-		std::string path = config().getString(compilerKey + ".path", ""s);
+		const std::string compiler = checkResolved(config().getString(compilerKey + ".exec", ""s), compilerKey + ".exec");
+		const std::string path = checkResolved(config().getString(compilerKey + ".path", ""s), compilerKey + ".path");
 		std::string includePaths = config().getString("RemoteGen.files.include-paths"s, ""s);
 		_enableOSP = _enableOSP || config().getBool("RemoteGen.output.osp.enable"s, false);
 		_enableBridge = _enableBridge || config().getBool("RemoteGen.output.bridge.enable"s, false);
@@ -419,7 +463,7 @@ protected:
 		StringTokenizer includePathsTokenizer(includePaths, ",;\n"s, StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 		for (const auto& p: includePathsTokenizer)
 		{
-			Poco::Path fullPath(Poco::Path::expand(p));
+			Poco::Path fullPath(expandPath(p, "RemoteGen.files.include-paths"s));
 			gccIncludes += "-I;";
 			gccIncludes += fullPath.toString();
 			gccIncludes += ";";
@@ -430,7 +474,7 @@ protected:
 		config().setString("RemoteGen.internal.gcc.includes"s, gccIncludes);
 		config().setString("RemoteGen.internal.msvc.includes"s, msvcIncludes);
 
-		std::string opts = config().getString(compilerKey + ".options", ""s);
+		const std::string opts = checkResolved(config().getString(compilerKey + ".options", ""s), compilerKey + ".options");
 		Poco::CppParser::Utility::parseDir(inc, exc, _gst, compiler, opts, path);
 
 		// now generate the code

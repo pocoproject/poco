@@ -305,6 +305,9 @@ New Components:
 
 Bug Fixes and Improvements:
 
+- GH #5782 RemoteGenNG stops with an error that names a ${<name>} reference left undefined in its
+  configuration, for example without -DPOCO_BASE, instead of preprocessing with other POCO headers
+  installed on the system.
 - GH #5538 Poco::RemotingNG::TCP::Listener: a subscription to events, its renewal or an unsubscribe
   that arrives while a two-way event awaits its reply on the same connection no longer stops the
   connection, the event and every other event of the object until the request times out. The thread
