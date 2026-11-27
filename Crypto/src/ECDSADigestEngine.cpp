@@ -162,10 +162,13 @@ ECDSASignature::ECDSASignature(const ByteVec& derSignature)
 
 
 ECDSASignature::ECDSASignature(const ByteVec& rawR, const ByteVec& rawS):
-	_pSig(ECDSA_SIG_new())
+	_pSig(nullptr)
 {
+	// Check before allocating: the destructor does not run when the
+	// constructor throws, so _pSig would be leaked.
 	poco_assert (!rawR.empty() && !rawS.empty());
 
+	_pSig = ECDSA_SIG_new();
 	if (!_pSig) throw CryptoException("cannot allocate ECDSA signature");
 
 	try

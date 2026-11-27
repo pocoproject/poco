@@ -253,6 +253,21 @@ void ECTest::testECDSASignManipulated()
 #endif
 
 
+void ECTest::testECDSASignatureEmptyRS()
+{
+	// The constructor must not leak the allocated ECDSA_SIG when it rejects
+	// empty r and s. The leak is only detected in a sanitizer build.
+	try
+	{
+		ECDSASignature sig((ECDSASignature::ByteVec()), (ECDSASignature::ByteVec()));
+		fail("Empty r and s must be rejected");
+	}
+	catch (Poco::AssertionViolationException&)
+	{
+	}
+}
+
+
 void ECTest::testCurveNameUnknownNID()
 {
 	ErrorQueueCleaner cleaner;
@@ -369,6 +384,8 @@ CppUnit::Test* ECTest::suite()
 	CppUnit_addTest(pSuite, ECTest, testECDSASignManipulated);
 
 #endif
+
+	CppUnit_addTest(pSuite, ECTest, testECDSASignatureEmptyRS);
 	CppUnit_addTest(pSuite, ECTest, testCurveNameUnknownNID);
 	CppUnit_addTest(pSuite, ECTest, testCurveNIDDefaultName);
 	CppUnit_addTest(pSuite, ECTest, testUnknownCurveName);
