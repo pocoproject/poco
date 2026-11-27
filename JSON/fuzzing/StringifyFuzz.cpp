@@ -18,6 +18,7 @@
 #include "Poco/JSON/Stringifier.h"
 #include "Poco/JSONString.h"
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>

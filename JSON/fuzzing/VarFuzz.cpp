@@ -11,10 +11,6 @@
 //
 
 
-#include "Poco/Data/DataException.h"
-#include "Poco/Data/RecordSet.h"
-#include "Poco/Data/Session.h"
-#include "Poco/Data/Statement.h"
 #include "Poco/Dynamic/Struct.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
@@ -24,6 +20,7 @@
 #include "Poco/JSON/Parser.h"
 #include "Poco/JSON/Query.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Types.h"
 #include "Poco/UUID.h"
 #include <cstdint>
 #include <cstddef>
@@ -38,9 +35,6 @@ using Poco::JSON::Array;
 using Poco::JSON::Object;
 using Poco::JSON::Parser;
 using Poco::JSON::Query;
-using Poco::Data::DataException;
-using Poco::Data::RecordSet;
-using Poco::Data::Statement;
 using Poco::Timestamp;
 using Poco::UUID;
 
@@ -50,6 +44,7 @@ namespace
 	constexpr std::size_t MAX_INPUT_SIZE = 64 * 1024;
 	constexpr std::size_t MAX_NODES = 1024;
 	constexpr std::size_t MAX_PATHS = 64;
+	constexpr std::size_t MAX_PATH_LENGTH = 1024;
 
 
 	template <typename F>
@@ -189,7 +184,7 @@ namespace
 			for (const auto& name : names)
 			{
 				const std::string child = path.empty() ? name : path + "." + name;
-				if (paths.size() < MAX_PATHS)
+				if (paths.size() < MAX_PATHS && child.size() <= MAX_PATH_LENGTH)
 					paths.push_back(child);
 				visit(obj->get(name), nodes, paths, child);
 			}
@@ -204,7 +199,7 @@ namespace
 			for (std::size_t i = 0; i < n; ++i)
 			{
 				const std::string child = path + "[" + std::to_string(i) + "]";
-				if (paths.size() < MAX_PATHS)
+				if (paths.size() < MAX_PATHS && child.size() <= MAX_PATH_LENGTH)
 					paths.push_back(child);
 				visit(arr->get(static_cast<unsigned>(i)), nodes, paths, child);
 			}
