@@ -2105,7 +2105,10 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc, std::os
 		ostr << " = 0";
 	ostr << ";</p>\n";
 
-	if (pFunc->attrs().has("deprecated") || pFunc->getAttributeList().compare(0, 12, "[[deprecated") == 0)
+	static const RegularExpression deprecatedAttribute(R"((?:\[\[|,)\s*deprecated\b)");
+	RegularExpression::Match deprecatedMatch;
+	deprecatedAttribute.match(pFunc->getAttributeList(), deprecatedMatch);
+	if (pFunc->attrs().has("deprecated") || deprecatedMatch.offset != std::string::npos)
 	{
 		writeDeprecated(ostr, "function");
 	}
