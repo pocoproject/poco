@@ -34,6 +34,7 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPBasicCredentials.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/TCPServerParams.h"
 #include "Poco/URI.h"
 #include "Poco/AtomicCounter.h"
 #include "Poco/MD5Engine.h"
@@ -41,6 +42,8 @@
 #include "Poco/HMACEngine.h"
 #include "Poco/PBKDF2Engine.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
+#include "Poco/Format.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NullStream.h"
 #include "Poco/StreamCopier.h"
@@ -48,6 +51,7 @@
 #include "Poco/Delegate.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
 #include "Poco/Runnable.h"
 #include "Poco/ThreadPool.h"
 #include "Poco/Event.h"
@@ -56,7 +60,10 @@
 #include "TesterClientHelper.h"
 #include "TesterRemoteObject.h"
 #include "TesterProxy.h"
+#include "TesterEventSubscriber.h"
 #include <atomic>
+#include <chrono>
+#include <cstddef>
 #include <sstream>
 #include <thread>
 
@@ -173,6 +180,227 @@ namespace
 		subscriberURI.copy(pFrame->payloadBegin(), subscriberURI.size());
 		pFrame->setPayloadSize(static_cast<Poco::UInt16>(subscriberURI.size()));
 		pConnection->sendFrame(pFrame);
+	}
+}
+
+
+namespace
+{
+	// The event subscriber URI of an object with an id of this length does not fit in a frame.
+	constexpr std::size_t LONG_OBJECT_ID_LENGTH = 2*static_cast<std::size_t>(Poco::RemotingNG::TCP::Frame::FRAME_MAX_PAYLOAD_SIZE);
+
+
+	class TesterRegistration
+		/// Registers a Tester with the ORB and unregisters it when it
+		/// goes out of scope.
+	{
+	public:
+		TesterRegistration() = delete;
+
+		TesterRegistration(const Poco::RemotingNG::Identifiable::ObjectId& objectId, const std::string& listenerId);
+			/// Registers a Tester with the given object id on the given Listener.
+
+		~TesterRegistration();
+			/// Unregisters the Tester.
+
+		TesterRegistration(const TesterRegistration&) = delete;
+		TesterRegistration& operator = (const TesterRegistration&) = delete;
+
+		[[nodiscard]] const std::string& uri() const;
+			/// Returns the URI of the Tester.
+
+	private:
+		std::string _uri;
+	};
+
+
+	TesterRegistration::TesterRegistration(const Poco::RemotingNG::Identifiable::ObjectId& objectId, const std::string& listenerId):
+		_uri(TesterServerHelper::registerObject(new Tester, objectId, listenerId))
+	{
+	}
+
+
+	TesterRegistration::~TesterRegistration()
+	{
+		try
+		{
+			TesterServerHelper::unregisterObject(_uri);
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
+	}
+
+
+	const std::string& TesterRegistration::uri() const
+	{
+		return _uri;
+	}
+
+
+	class EventServer
+		/// A server Listener on a port of the loopback address, with a
+		/// ConnectionManager and a thread pool of its own, registered with
+		/// the ORB together with a Tester that has events enabled.
+		/// Everything is unregistered and shut down when it goes out of scope.
+	{
+	public:
+		EventServer();
+			/// Starts the Listener and registers it and the Tester.
+
+		~EventServer();
+			/// Unregisters the Tester and the Listener, shuts down the
+			/// ConnectionManager and joins the threads of its pool.
+
+		EventServer(const EventServer&) = delete;
+		EventServer& operator = (const EventServer&) = delete;
+
+		[[nodiscard]] const std::string& objectURI() const;
+			/// Returns the URI of the Tester.
+
+		void stop();
+			/// Stops the Listener and closes its socket, so that no
+			/// connection to it can be made any more.
+
+	private:
+		Poco::ThreadPool _pool;
+		Poco::RemotingNG::TCP::ConnectionManager _manager;
+		Poco::Net::ServerSocket _socket;
+		Poco::RemotingNG::TCP::Listener::Ptr _pListener;
+		std::string _listenerId;
+		std::string _objectURI;
+	};
+
+
+	EventServer::EventServer():
+		_pool("eventserver"),
+		_manager(_pool),
+		_socket(Poco::Net::SocketAddress("127.0.0.1", 0)),
+		_pListener(new Poco::RemotingNG::TCP::Listener(_socket.address().toString(), _socket, new Poco::Net::TCPServerParams, _manager))
+	{
+		_listenerId = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
+		try
+		{
+			_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listenerId);
+			TesterServerHelper::enableEvents(_objectURI, "tcp");
+		}
+		catch (...)
+		{
+			// The ORB must not keep a Listener that refers to the members.
+			Poco::RemotingNG::ORB::instance().unregisterListener(_listenerId, true);
+			throw;
+		}
+	}
+
+
+	EventServer::~EventServer()
+	{
+		try
+		{
+			TesterServerHelper::unregisterObject(_objectURI);
+			Poco::RemotingNG::ORB::instance().unregisterListener(_listenerId);
+			_manager.shutdown();
+			_pool.joinAll();
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
+	}
+
+
+	const std::string& EventServer::objectURI() const
+	{
+		return _objectURI;
+	}
+
+
+	void EventServer::stop()
+	{
+		_pListener->stop();
+		_socket.close();
+	}
+
+
+	class TransportErrorWatcher: public Poco::ErrorHandler
+		/// Replaces the ErrorHandler while it exists. Tells when a
+		/// TransportException is reported, and passes every other
+		/// exception on to the ErrorHandler it replaced.
+	{
+	public:
+		TransportErrorWatcher();
+			/// Registers the TransportErrorWatcher as the ErrorHandler.
+
+		~TransportErrorWatcher() override;
+			/// Registers the ErrorHandler it replaced again.
+
+		TransportErrorWatcher(const TransportErrorWatcher&) = delete;
+		TransportErrorWatcher& operator = (const TransportErrorWatcher&) = delete;
+
+		void exception(const Poco::Exception& exc) override;
+			/// Tells about a TransportException, passes on other exceptions.
+
+		void exception(const std::exception& exc) override;
+			/// Passes the exception on.
+
+		void exception() override;
+			/// Passes the unknown exception on.
+
+		[[nodiscard]] bool reported(long milliseconds);
+			/// Returns true if a TransportException is reported within the
+			/// given time.
+
+	private:
+		Poco::Event _reported;
+		Poco::ErrorHandler* _pPrevious;
+	};
+
+
+	TransportErrorWatcher::TransportErrorWatcher():
+		_pPrevious(Poco::ErrorHandler::set(this))
+	{
+	}
+
+
+	TransportErrorWatcher::~TransportErrorWatcher()
+	{
+		try
+		{
+			Poco::ErrorHandler::set(_pPrevious);
+		}
+		catch (...)
+		{
+			poco_unexpected();
+		}
+	}
+
+
+	void TransportErrorWatcher::exception(const Poco::Exception& exc)
+	{
+		if (dynamic_cast<const Poco::RemotingNG::TransportException*>(&exc) != nullptr)
+		{
+			_reported.set();
+		}
+		else _pPrevious->exception(exc);
+	}
+
+
+	void TransportErrorWatcher::exception(const std::exception& exc)
+	{
+		_pPrevious->exception(exc);
+	}
+
+
+	void TransportErrorWatcher::exception()
+	{
+		_pPrevious->exception();
+	}
+
+
+	bool TransportErrorWatcher::reported(long milliseconds)
+	{
+		return _reported.tryWait(milliseconds);
 	}
 }
 
@@ -1288,6 +1516,170 @@ void RemotingTest::testEventToServerListener()
 }
 
 
+void RemotingTest::testEventSubscriberURIAtFrameLimit()
+{
+	// A subscriber URI as long as the payload of a frame is subscribed and
+	// gets events, one byte more is refused. The subscriber URI is
+	// remoting.tcp://<local address>/tcp/Tester/<object id>#<subscriber id>,
+	// and the subscriber id counts the subscriptions of the process, so the
+	// length of the rest is taken from a subscription made first.
+	constexpr long EVENT_TIMEOUT = 5000;
+	constexpr std::size_t PAYLOAD_LIMIT = Poco::RemotingNG::TCP::Frame::FRAME_MAX_PAYLOAD_SIZE;
+	const auto nextSubscriberId = [](const std::string& subscriberURI)
+	{
+		return Poco::NumberParser::parseUnsigned(subscriberURI.substr(subscriberURI.rfind('#') + 1)) + 1;
+	};
+
+	const std::string shortId("TheShortTester");
+	TesterRegistration shortTester(shortId, _listener);
+	TesterServerHelper::enableEvents(shortTester.uri(), "tcp");
+	Poco::AutoPtr<TesterProxy> pShortProxy = new TesterProxy(shortId);
+	pShortProxy->remoting__connect("tcp", shortTester.uri());
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	const std::string shortURI = pShortProxy->remoting__enableEvents(pEventListener);
+	pShortProxy->remoting__enableEvents(pEventListener, false);
+	const std::size_t idPos = shortURI.rfind('#');
+	assertTrue (idPos != std::string::npos);
+	const std::size_t otherLength = idPos + 1 - shortId.size();
+	const auto objectIdFor = [otherLength](std::size_t subscriberURILength, unsigned subscriberId)
+	{
+		return std::string(subscriberURILength - otherLength - Poco::NumberFormatter::format(subscriberId).size(), 'x');
+	};
+
+	const std::string limitId = objectIdFor(PAYLOAD_LIMIT, nextSubscriberId(shortURI));
+	TesterRegistration limitTester(limitId, _listener);
+	TesterServerHelper::enableEvents(limitTester.uri(), "tcp");
+	EventCounter counter;
+	Poco::AutoPtr<TesterProxy> pLimitProxy = new TesterProxy(limitId);
+	pLimitProxy->remoting__connect("tcp", limitTester.uri());
+	pLimitProxy->testEvent += Poco::delegate(&counter, &EventCounter::onEvent);
+	const std::string limitURI = pLimitProxy->remoting__enableEvents(pEventListener);
+	pLimitProxy->fireTestEvent("s3cr3t");
+	const bool received = counter.received(EVENT_TIMEOUT);
+	pLimitProxy->remoting__enableEvents(pEventListener, false);
+	pLimitProxy->testEvent -= Poco::delegate(&counter, &EventCounter::onEvent);
+	assertEqual (PAYLOAD_LIMIT, limitURI.size());
+	assertTrue (received);
+
+	const std::string longerId = objectIdFor(PAYLOAD_LIMIT + 1, nextSubscriberId(limitURI));
+	TesterRegistration longerTester(longerId, _listener);
+	Poco::AutoPtr<TesterProxy> pLongerProxy = new TesterProxy(longerId);
+	pLongerProxy->remoting__connect("tcp", longerTester.uri());
+	try
+	{
+		pLongerProxy->remoting__enableEvents(pEventListener);
+		fail("a subscriber URI one byte longer than the payload of a frame must be refused");
+	}
+	catch (Poco::RemotingNG::TransportException& exc)
+	{
+		assertMessageEqual (Poco::format("Event subscriber URI of %z bytes exceeds the frame payload limit of %z bytes", PAYLOAD_LIMIT + 1, PAYLOAD_LIMIT), exc.message());
+	}
+}
+
+
+void RemotingTest::testEventSubscriberURITooLong()
+{
+	// An event subscriber URI that does not fit in a frame is refused, and
+	// requests to an object with such a long id work.
+	const std::string objectId(LONG_OBJECT_ID_LENGTH, 'x');
+	TesterRegistration tester(objectId, _listener);
+	Poco::AutoPtr<TesterProxy> pProxy = new TesterProxy(objectId);
+	pProxy->remoting__connect("tcp", tester.uri());
+	assertEqual (42, pProxy->testInt1(42));
+
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	try
+	{
+		pProxy->remoting__enableEvents(pEventListener);
+		fail("an event subscriber URI that does not fit in a frame must be refused");
+	}
+	catch (Poco::RemotingNG::TransportException&)
+	{
+	}
+	assertEqual (42, pProxy->testInt1(42));
+}
+
+
+void RemotingTest::testEventSubscriptionFailureLeavesNoSubscription()
+{
+	// A subscribe that fails leaves no reference to the subscriber
+	// with the Listener.
+	const std::string objectId(LONG_OBJECT_ID_LENGTH, 'x');
+	TesterRegistration tester(objectId, _listener);
+	Poco::AutoPtr<TesterProxy> pProxy = new TesterProxy(objectId);
+	Poco::RemotingNG::EventSubscriber::Ptr pSubscriber = new TesterEventSubscriber(tester.uri(), pProxy.get());
+
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	try
+	{
+		static_cast<void>(pEventListener->subscribeToEvents(pSubscriber));
+		fail("an event subscriber URI that does not fit in a frame must be refused");
+	}
+	catch (Poco::RemotingNG::TransportException&)
+	{
+	}
+	assertEqual (1, pSubscriber->referenceCount());
+}
+
+
+void RemotingTest::testEventSubscriptionFailureNotRenewed()
+{
+	// A subscription whose first subscribe fails is not renewed later.
+	constexpr std::chrono::milliseconds SUBSCRIPTION_TIMEOUT(100);
+	// The Listener renews a subscription after half its timeout.
+	constexpr std::chrono::milliseconds RENEWAL_INTERVAL = SUBSCRIPTION_TIMEOUT/2;
+	constexpr int RENEWALS_WAITED_FOR = 10;
+
+	TransportErrorWatcher watcher;
+	const std::string objectId(LONG_OBJECT_ID_LENGTH, 'x');
+	TesterRegistration tester(objectId, _listener);
+	Poco::AutoPtr<TesterProxy> pProxy = new TesterProxy(objectId);
+	Poco::RemotingNG::EventSubscriber::Ptr pSubscriber = new TesterEventSubscriber(tester.uri(), pProxy.get());
+
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	pEventListener->setEventSubscriptionTimeout(Poco::Timespan(SUBSCRIPTION_TIMEOUT));
+	try
+	{
+		static_cast<void>(pEventListener->subscribeToEvents(pSubscriber));
+		fail("an event subscriber URI that does not fit in a frame must be refused");
+	}
+	catch (Poco::RemotingNG::TransportException&)
+	{
+	}
+	assertFalse (watcher.reported(static_cast<long>((RENEWALS_WAITED_FOR*RENEWAL_INTERVAL).count())));
+}
+
+
+void RemotingTest::testEventUnsubscribeFailureLeavesNoSubscription()
+{
+	// An unsubscribe that cannot reach the server fails and leaves no
+	// reference to the subscriber with the Listener.
+	EventServer server;
+	Poco::AutoPtr<TesterProxy> pProxy = new TesterProxy("TheTester");
+	pProxy->remoting__connect("tcp", server.objectURI());
+	Poco::RemotingNG::EventSubscriber::Ptr pSubscriber = new TesterEventSubscriber(server.objectURI(), pProxy.get());
+
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	static_cast<void>(pEventListener->subscribeToEvents(pSubscriber));
+	assertEqual (42, pProxy->testInt1(42));
+
+	// With the server gone and the connection closing, the unsubscribe has
+	// to connect again, and fails.
+	server.stop();
+	Poco::RemotingNG::TCP::ConnectionManager::defaultManager().getConnection(Poco::URI(server.objectURI()))->close();
+
+	try
+	{
+		pEventListener->unsubscribeFromEvents(pSubscriber);
+		fail("an unsubscribe that cannot reach the server must fail");
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	assertEqual (1, pSubscriber->referenceCount());
+}
+
+
 void RemotingTest::onVoidEvent(const void* /*pSender*/)
 {
 	_eventArg = "FIRED";
@@ -1645,6 +2037,11 @@ CppUnit::Test* RemotingTest::suite()
 	CppUnit_addTest(pSuite, RemotingTest, testEventSubscriptionRenewedOnNewConnection);
 	CppUnit_addTest(pSuite, RemotingTest, testEventListenersSharingConnection);
 	CppUnit_addTest(pSuite, RemotingTest, testEventToServerListener);
+	CppUnit_addTest(pSuite, RemotingTest, testEventSubscriberURIAtFrameLimit);
+	CppUnit_addTest(pSuite, RemotingTest, testEventSubscriberURITooLong);
+	CppUnit_addTest(pSuite, RemotingTest, testEventSubscriptionFailureLeavesNoSubscription);
+	CppUnit_addTest(pSuite, RemotingTest, testEventSubscriptionFailureNotRenewed);
+	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeFailureLeavesNoSubscription);
 
 	return pSuite;
 }
