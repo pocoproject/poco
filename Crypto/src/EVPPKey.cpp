@@ -20,6 +20,7 @@
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/NumberFormatter.h"
 #include <iostream>
+#include <utility>
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/param_build.h>
@@ -310,24 +311,28 @@ EVPPKey::EVPPKey(EVPPKey&& other) noexcept:
 	_pEVPPKey(other._pEVPPKey)
 {
 	other._pEVPPKey = nullptr;
-	checkType();
 }
 
 
 EVPPKey& EVPPKey::operator = (const EVPPKey& other)
 {
-	duplicate(other._pEVPPKey, &_pEVPPKey);
-	poco_check_ptr(_pEVPPKey);
-	checkType();
+	if (this != &other)
+	{
+		EVPPKey tmp(other);
+		std::swap(_pEVPPKey, tmp._pEVPPKey);
+	}
 	return *this;
 }
 
 
 EVPPKey& EVPPKey::operator = (EVPPKey&& other) noexcept
 {
-	_pEVPPKey = other._pEVPPKey;
-	other._pEVPPKey = nullptr;
-	checkType();
+	if (this != &other)
+	{
+		if (_pEVPPKey != nullptr) EVP_PKEY_free(_pEVPPKey);
+		_pEVPPKey = other._pEVPPKey;
+		other._pEVPPKey = nullptr;
+	}
 	return *this;
 }
 
@@ -352,9 +357,14 @@ void EVPPKey::checkType()
 {
 	if (_pEVPPKey != nullptr)
 	{
-		int t = type(_pEVPPKey);
+		const int t = EVP_PKEY_base_id(_pEVPPKey);
 		if (KNOWN_TYPES.find(t) == KNOWN_TYPES.end())
+		{
+			// The key is freed here because a constructor that throws does not run the destructor.
+			EVP_PKEY_free(_pEVPPKey);
+			_pEVPPKey = nullptr;
 			throw Poco::NotImplementedException(Poco::format("EVPPKey::type(%d)", t));
+		}
 	}
 }
 

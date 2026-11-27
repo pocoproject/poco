@@ -37,6 +37,10 @@ public:
 	void testCurveNameUnknownNID();
 	void testCurveNIDDefaultName();
 	void testUnknownCurveName();
+	void testNotECKey();
+#ifndef OPENSSL_NO_SM2
+	void testSM2Key();
+#endif
 
 	void setUp();
 	void tearDown();

@@ -26,6 +26,7 @@
 #include <vector>
 #include <set>
 #include <istream>
+#include <limits>
 #include <openssl/ssl.h>
 
 
@@ -64,12 +65,20 @@ public:
 		/// Creates the X509Certificate from an existing
 		/// OpenSSL certificate. Ownership is taken of
 		/// the certificate.
+		///
+		/// Ownership is taken also if the constructor throws:
+		/// the certificate is then freed, and the caller must not use or free it.
 
 	X509Certificate(X509* pCert, bool shared);
 		/// Creates the X509Certificate from an existing
 		/// OpenSSL certificate. Ownership is taken of
 		/// the certificate. If shared is true, the
 		/// certificate's reference count is incremented.
+		///
+		/// If shared is false, ownership is taken also if the constructor
+		/// throws, and the certificate is then freed. If shared is true and the
+		/// constructor throws, any reference added by the constructor is released,
+		/// so the caller keeps its own reference and must still free it.
 
 	X509Certificate(const X509Certificate& cert);
 		/// Creates the certificate by copying another one.
@@ -91,6 +100,7 @@ public:
 
 	[[nodiscard]] long version() const;
 		/// Returns the version of the certificate.
+		/// Returns 0 if the version field of the certificate cannot be represented.
 
 	[[nodiscard]] const std::string& serialNumber() const;
 		/// Returns the certificate serial number as a
@@ -222,8 +232,12 @@ inline long X509Certificate::version() const
 {
 	// This is defined by standards (X.509 et al) to be
 	// one less than the certificate version.
-	// So, eg. a version 3 certificate will return 2.
-	return X509_get_version(_pCert) + 1;
+	// So, eg. the field of a version 3 certificate holds 2.
+	// X509_get_version() returns -1 for a field that does not fit into a long,
+	// and the largest long cannot be incremented, so both give 0.
+	const long field = X509_get_version(_pCert);
+	if (field == std::numeric_limits<long>::max()) return 0;
+	return field + 1;
 }
 
 

@@ -285,15 +285,25 @@ std::string _X509_NAME_oneline_utf8(const X509_NAME *name)
 
 void X509Certificate::init()
 {
-	_issuerName = _X509_NAME_oneline_utf8(X509_get_issuer_name(_pCert));
-	_subjectName = _X509_NAME_oneline_utf8(X509_get_subject_name(_pCert));
-	BIGNUM* pBN = ASN1_INTEGER_to_BN(X509_get_serialNumber(const_cast<X509 *>(_pCert)), nullptr);
-	if (pBN == nullptr) throw OpenSSLException("X509Certificate: cannot convert the serial number");
-	char* pSN = BN_bn2hex(pBN);
-	BN_free(pBN);
-	if (pSN == nullptr) throw OpenSSLException("X509Certificate: cannot convert the serial number to text");
-	_serialNumber = pSN;
-	OPENSSL_free(pSN);
+	try
+	{
+		_issuerName = _X509_NAME_oneline_utf8(X509_get_issuer_name(_pCert));
+		_subjectName = _X509_NAME_oneline_utf8(X509_get_subject_name(_pCert));
+		BIGNUM* pBN = ASN1_INTEGER_to_BN(X509_get_serialNumber(const_cast<X509 *>(_pCert)), nullptr);
+		if (pBN == nullptr) throw OpenSSLException("X509Certificate: cannot convert the serial number");
+		char* pSN = BN_bn2hex(pBN);
+		BN_free(pBN);
+		if (pSN == nullptr) throw OpenSSLException("X509Certificate: cannot convert the serial number to text");
+		_serialNumber = pSN;
+		OPENSSL_free(pSN);
+	}
+	catch (...)
+	{
+		// The constructors call this last, and a constructor that throws does not run the destructor.
+		X509_free(_pCert);
+		_pCert = nullptr;
+		throw;
+	}
 }
 
 
@@ -477,7 +487,15 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 		X509* x = PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr);
 		if (x == nullptr) break;
 		ERR_clear_last_mark();
-		caCertList.push_back(X509Certificate(x));
+		try
+		{
+			caCertList.push_back(X509Certificate(x));
+		}
+		catch (...)
+		{
+			BIO_free(pBIO);
+			throw;
+		}
 	}
 	BIO_free(pBIO);
 	// Reading always ends with a failed read; only a missing start line means the end of the input.

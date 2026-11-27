@@ -48,6 +48,8 @@ public:
 	void testCertificate();
 	void testCertificateUTF8();
 	void testCertificateNameEntries();
+	void testCertificateInitFailure();
+	void testCertificateVersionOverflow();
 	void testOpenSSLException();
 
 	void setUp();
