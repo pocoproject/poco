@@ -152,6 +152,8 @@ public:
 		/// does not fit in a frame.
 
 	void unsubscribeFromEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber) override;
+		/// The subscription is removed even if the unsubscribe frame
+		/// cannot be sent.
 
 	// Poco::RemotingNG::Listener
 	void start() override;

@@ -280,8 +280,17 @@ namespace
 		_pListener(new Poco::RemotingNG::TCP::Listener(_socket.address().toString(), _socket, new Poco::Net::TCPServerParams, _manager))
 	{
 		_listenerId = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
-		_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listenerId);
-		TesterServerHelper::enableEvents(_objectURI, "tcp");
+		try
+		{
+			_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listenerId);
+			TesterServerHelper::enableEvents(_objectURI, "tcp");
+		}
+		catch (...)
+		{
+			// The ORB must not keep a Listener that refers to the members.
+			Poco::RemotingNG::ORB::instance().unregisterListener(_listenerId, true);
+			throw;
+		}
 	}
 
 
@@ -317,11 +326,9 @@ namespace
 	class TransportErrorWatcher: public Poco::ErrorHandler
 		/// Replaces the ErrorHandler while it exists. Tells when a
 		/// TransportException is reported, and passes every other
-		/// Poco::Exception on to the ErrorHandler it replaced.
+		/// exception on to the ErrorHandler it replaced.
 	{
 	public:
-		using Poco::ErrorHandler::exception;
-
 		TransportErrorWatcher();
 			/// Registers the TransportErrorWatcher as the ErrorHandler.
 
@@ -333,6 +340,12 @@ namespace
 
 		void exception(const Poco::Exception& exc) override;
 			/// Tells about a TransportException, passes on other exceptions.
+
+		void exception(const std::exception& exc) override;
+			/// Passes the exception on.
+
+		void exception() override;
+			/// Passes the unknown exception on.
 
 		[[nodiscard]] bool reported(long milliseconds);
 			/// Returns true if a TransportException is reported within the
@@ -370,6 +383,18 @@ namespace
 			_reported.set();
 		}
 		else _pPrevious->exception(exc);
+	}
+
+
+	void TransportErrorWatcher::exception(const std::exception& exc)
+	{
+		_pPrevious->exception(exc);
+	}
+
+
+	void TransportErrorWatcher::exception()
+	{
+		_pPrevious->exception();
 	}
 
 
