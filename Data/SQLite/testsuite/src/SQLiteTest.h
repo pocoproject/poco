@@ -177,6 +177,10 @@ public:
 	void testRecordsetCopyMove();
 	void testAddBindingReuse();
 	void testRecordSetColumnPosition();
+	void testScriptResultMetadata();
+	void testScriptDataSetMetadata();
+	void testTrailingComment();
+	void testSelectAffectedRowCount();
 
 	void setUp();
 	void tearDown();

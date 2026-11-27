@@ -38,6 +38,10 @@ namespace Poco::Data::SQLite {
 namespace {
 
 
+// The largest second that Poco::Data::Time holds; the parser also accepts a leap second.
+constexpr int MAX_SECOND = 59;
+
+
 /// Tries to parse str as a date/time using all SQLite-supported formats
 /// (see https://www.sqlite.org/lang_datefunc.html), in order:
 /// primary format, datetime (space-separated), ISO 8601 datetime,
@@ -202,7 +206,7 @@ bool Extractor::extract(std::size_t pos, Time& val)
 	extract(pos, str);
 	int tzd = 0;
 	DateTime dt;
-	if (!tryParseSQLiteDateTime(str, Utility::SQLITE_TIME_FORMAT, dt, tzd))
+	if (!tryParseSQLiteDateTime(str, Utility::SQLITE_TIME_FORMAT, dt, tzd) || dt.second() > MAX_SECOND)
 		throw SyntaxException("Invalid time string: " + str);
 	// Note: Poco::Data::Time does not support fractional seconds;
 	// sub-second precision is lost here.
@@ -538,7 +542,13 @@ inline bool Extractor::extract(std::size_t pos, Nullable<Poco::Data::CLOB>& val)
 bool Extractor::isNull(std::size_t pos, std::size_t)
 {
 	if (pos >= _nulls.size())
-		_nulls.resize(pos + 1);
+	{
+		// A later statement of a script may return fewer columns than the result set
+		// it adds its rows to; SQLite leaves reading such a column undefined.
+		const auto columnCount = static_cast<std::size_t>(sqlite3_column_count(_pStmt));
+		if (pos >= columnCount) return true;
+		_nulls.resize(columnCount);
+	}
 
 	if (!_nulls[pos].first)
 	{
