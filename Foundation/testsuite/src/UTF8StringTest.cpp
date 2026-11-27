@@ -14,6 +14,7 @@
 #include "Poco/UTF8String.h"
 #include "Poco/Unicode.h"
 #include <limits>
+#include <string_view>
 
 
 using Poco::UTF8;
@@ -27,6 +28,54 @@ UTF8StringTest::UTF8StringTest(const std::string& name): CppUnit::TestCase(name)
 
 UTF8StringTest::~UTF8StringTest()
 {
+}
+
+
+void UTF8StringTest::testIsValid()
+{
+	constexpr std::string_view valid[] =
+	{
+		{}, "", "plain ASCII\t\r\n", std::string_view("a\0b", 3), "\x7F",
+		"\xC2\x80", "\xDF\xBF", "\xE0\xA0\x80", "\xED\x9F\xBF",
+		"\xEE\x80\x80", "\xEF\xBF\xBF", "\xF0\x90\x80\x80", "\xF4\x8F\xBF\xBF",
+		"\xEF\xBB\xBF", "\xEF\xBF\xBD", "a\xC3\xBC\xE2\x82\xAC\xF0\x9F\x98\x80z"
+	};
+	for (const auto text: valid)
+	{
+		assertTrue (UTF8::isValid(text));
+	}
+}
+
+
+void UTF8StringTest::testIsValidMalformed()
+{
+	constexpr std::string_view malformed[] =
+	{
+		"\x80", "\xBF", "\xC0\x80", "\xC1\xBF", "\xE0\x80\x80", "\xF0\x80\x80\x80",
+		"\xED\xA0\x80", "\xED\xBF\xBF", "\xF4\x90\x80\x80", "\xF5\x80\x80\x80",
+		"\xF8\x88\x80\x80\x80", "\xFC\x84\x80\x80\x80\x80", "\xFE", "\xFF",
+		"\xC2", "\xE2", "\xE2\x82", "\xF0", "\xF0\x9F", "\xF0\x9F\x98",
+		"\xC2x", "\xE2x\xAC", "\xE2\x82x", "\xF0x\x98\x80", "\xF0\x9Fx\x80", "\xF0\x9F\x98x",
+		"text\x80", "\xC3\xBC\x80", std::string_view("a\0\x80", 3)
+	};
+	for (const auto text: malformed)
+	{
+		assertFalse (UTF8::isValid(text));
+	}
+}
+
+
+void UTF8StringTest::testIsValidStringView()
+{
+	const std::string text("\x80\xE2\x82\xAC\x80");
+	const std::string_view view(text.data() + 1, 3);
+	assertTrue (UTF8::isValid(view));
+	assertFalse (UTF8::isValid(view.substr(0, 2)));
+	assertFalse (UTF8::isValid(view.substr(1)));
+	assertTrue (UTF8::isValid(view.substr(view.size())));
+
+	constexpr char truncated[] = {'\xF0', '\x9F', '\x98'};
+	assertFalse (UTF8::isValid(std::string_view(truncated, sizeof(truncated))));
 }
 
 
@@ -175,6 +224,9 @@ CppUnit::Test* UTF8StringTest::suite()
 	CppUnit_addTest(pSuite, UTF8StringTest, testCompare);
 	CppUnit_addTest(pSuite, UTF8StringTest, testTransform);
 	CppUnit_addTest(pSuite, UTF8StringTest, testInvalidSequence);
+	CppUnit_addTest(pSuite, UTF8StringTest, testIsValid);
+	CppUnit_addTest(pSuite, UTF8StringTest, testIsValidMalformed);
+	CppUnit_addTest(pSuite, UTF8StringTest, testIsValidStringView);
 	CppUnit_addTest(pSuite, UTF8StringTest, testEscape);
 	CppUnit_addTest(pSuite, UTF8StringTest, testUnescape);
 	CppUnit_addTest(pSuite, UTF8StringTest, testUnescapeTrailingBackslash);

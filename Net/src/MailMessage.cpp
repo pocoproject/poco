@@ -34,8 +34,7 @@
 #include "Poco/String.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/NumberFormatter.h"
-#include "Poco/TextIterator.h"
-#include "Poco/UTF8Encoding.h"
+#include "Poco/UTF8String.h"
 #include <algorithm>
 #include <limits>
 #include <sstream>
@@ -153,20 +152,6 @@ namespace
 	private:
 		std::string& _str;
 	};
-
-
-	bool isValidUTF8(const std::string& text)
-		/// Returns true if text is valid UTF-8.
-	{
-		Poco::UTF8Encoding utf8;
-		Poco::TextIterator it(text, utf8);
-		const Poco::TextIterator end(text);
-		for (; it != end; ++it)
-		{
-			if (*it < 0) return false;
-		}
-		return true;
-	}
 
 
 	constexpr std::string::size_type MAX_ENCODED_WORD_LENGTH = 75; // RFC 2047, section 2
@@ -791,7 +776,7 @@ void MailMessage::encodeFields(MessageHeader& header) const
 	{
 		const HeaderField::Syntax syntax = HeaderField::syntax(name);
 		if (syntax == HeaderField::Syntax::STRUCTURED || isReceived(name, value)
-			|| std::all_of(value.begin(), value.end(), Poco::Ascii::isAscii) || !isValidUTF8(value))
+			|| std::all_of(value.begin(), value.end(), Poco::Ascii::isAscii) || !Poco::UTF8::isValid(value))
 			continue;
 		// Every CR LF in a checked value folds it; encoded, it would become text.
 		const std::string text = Poco::replace(value, "\r\n", "");
@@ -835,7 +820,7 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 	const std::string& realName = recipient.getRealName();
 	const std::string& address  = recipient.getAddress();
 	std::string rec;
-	if (!std::all_of(realName.begin(), realName.end(), Poco::Ascii::isAscii) && isValidUTF8(realName))
+	if (!std::all_of(realName.begin(), realName.end(), Poco::Ascii::isAscii) && Poco::UTF8::isValid(realName))
 	{
 		rec = encodeWord(Poco::replace(realName, "\r\n", ""), "UTF-8", WordEncoding::AUTO);
 		rec.append(" ");

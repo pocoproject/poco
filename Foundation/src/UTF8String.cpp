@@ -48,6 +48,19 @@ namespace
 }
 
 
+bool UTF8::isValid(std::string_view text)
+{
+	while (!text.empty())
+	{
+		const auto* pBytes = reinterpret_cast<const unsigned char*>(text.data());
+		const int length = utf8.sequenceLength(pBytes, 1);
+		if (static_cast<std::size_t>(length) > text.size() || !UTF8Encoding::isLegal(pBytes, length)) return false;
+		text.remove_prefix(length);
+	}
+	return true;
+}
+
+
 int UTF8::icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2)
 {
 	std::string::size_type sz = str.size();

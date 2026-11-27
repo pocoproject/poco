@@ -27,6 +27,9 @@ public:
 	void testCompare();
 	void testTransform();
 	void testInvalidSequence();
+	void testIsValid();
+	void testIsValidMalformed();
+	void testIsValidStringView();
 
 	void testEscape();
 	void testUnescape();

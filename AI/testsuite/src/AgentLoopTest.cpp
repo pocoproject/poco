@@ -18,8 +18,6 @@
 #include "Poco/JSON/Array.h"
 #include "Poco/JSON/Parser.h"
 #include "Poco/UTF8String.h"
-#include "Poco/UTF8Encoding.h"
-#include "Poco/TextIterator.h"
 #include "Poco/Exception.h"
 #include "Poco/Net/NetException.h"
 #include <memory>
@@ -240,19 +238,6 @@ namespace
 	{
 		return result.content()->getObject(index)->getValue<std::string>("text");
 	}
-
-
-	bool isValidUTF8(const std::string& text)
-	{
-		Poco::UTF8Encoding utf8;
-		Poco::TextIterator it(text, utf8);
-		Poco::TextIterator end(text);
-		for (; it != end; ++it)
-		{
-			if (*it < 0) return false;
-		}
-		return true;
-	}
 }
 
 
@@ -432,7 +417,7 @@ void AgentLoopTest::testToolResultCutAtCharacter()
 	loop.run(conversation, "", recorder.callback());
 
 	const std::string reported = recorder.first(AgentEvent::Type::TOOL_RESULT)->content;
-	assertTrue(isValidUTF8(reported));
+	assertTrue(Poco::UTF8::isValid(reported));
 	assertEqual(std::string(19999, 'a') + "\n...(truncated)", reported);
 	const std::string passed = conversation.getObject(2)->getValue<std::string>("text");
 	assertEqual(reported, passed);

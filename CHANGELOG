@@ -195,6 +195,8 @@ Bundled Third-Party Library Upgrades:
 
 Features:
 
+- GH #5732 Poco::UTF8::isValid(std::string_view) checks a whole string for well-formed UTF-8.
+  MailMessage, MCP HTTP headers and AgentLoop tests use it instead of local validation loops.
 - GH #5516 Poco::Net::RemoteSyslogChannel and RemoteSyslogListener speak syslog over TCP as well
   (RFC 6587, in both framings), and Poco::Net::SecureRemoteSyslogChannel and
   SecureRemoteSyslogListener (NetSSL_OpenSSL and NetSSL_Win) speak it over TLS (RFC 5425). The
