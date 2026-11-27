@@ -1,0 +1,8 @@
+"[section]"
+";comment"
+"="
+"key=value"
+"${key}"
+"${section.key}"
+"true"
+"false"

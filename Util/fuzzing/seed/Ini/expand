@@ -1,0 +1,4 @@
+[app]
+user=alice
+home=${user}
+path=/home/${user}
