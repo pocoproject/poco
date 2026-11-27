@@ -102,6 +102,9 @@ protected:
 	typedef std::map<std::string, std::string> StringMap;
 	typedef std::map<std::string, Page> PageMap;
 
+	using SymbolExtractor = void (Poco::CppParser::NameSpace::*)(Poco::CppParser::NameSpace::SymbolTable&) const;
+		/// A NameSpace member function that fills a symbol table with the symbols of one kind.
+
 	void initDatabase();
 	void writeSearchIndex(std::string link, std::string content);
 	static void writeSearchBox(std::ostream& ostr);
@@ -166,13 +169,9 @@ protected:
 	void writeClassesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeClasses(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeClassSummary(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);
-	void writeTypesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
-	void writeAliasesSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
-	void writeConceptsSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
-	void writeTypes(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
-	void writeAliases(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
+	void writeSymbolsSummary(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, const std::string& title, SymbolExtractor extract);
+	void writeDecls(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, const std::string& title, SymbolExtractor extract, std::ostream* pSstr);
 	void writeType(std::ostream& ostr, const Poco::CppParser::Decl* pType, std::ostream* pSstr = nullptr);
-	void writeConcepts(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeEnums(std::ostream& ostr, const Poco::CppParser::NameSpace* pNameSpace, std::ostream* pSstr = nullptr);
 	void writeEnum(std::ostream& ostr, const Poco::CppParser::Enum* pEnum, std::ostream* pSstr);
 	void writeConstructors(std::ostream& ostr, const Poco::CppParser::Struct* pStruct);

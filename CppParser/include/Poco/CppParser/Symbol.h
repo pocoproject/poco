@@ -170,23 +170,14 @@ public:
 protected:
 	[[nodiscard]] static bool isIdent(char c);
 	[[nodiscard]] static bool hasAttr(const std::string& decl, const std::string& attr);
+	[[nodiscard]] static std::size_t templateHeadEnd(std::string_view decl);
+		/// Returns the position after the template parameter list at the beginning
+		/// of decl and the requires clause that follows it, or 0 if decl does not
+		/// begin with a template parameter list.
 
 private:
 	Symbol(const Symbol&);
 	Symbol& operator = (const Symbol&);
-
-	[[nodiscard]] static bool isKeywordAt(const std::string& decl, std::string::size_type pos, std::string_view keyword);
-		/// Returns true if decl contains the keyword as a whole word at pos,
-		/// which must not be greater than the size of decl.
-
-	[[nodiscard]] static std::string::size_type skipBalanced(const std::string& decl, std::string::size_type pos, char open, char close);
-		/// Returns the position after the bracket that closes the open
-		/// bracket at pos. Brackets in string and character literals do not
-		/// count, nor do '<' and '>' in parentheses when open is '<'.
-
-	[[nodiscard]] static std::string::size_type skipRequiresClause(const std::string& decl, std::string::size_type pos);
-		/// Returns the position after the requires clause that begins
-		/// at pos (after white space), or pos if there is none.
 
 	int         _id;
 	std::string _name;

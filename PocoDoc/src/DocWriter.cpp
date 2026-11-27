@@ -20,12 +20,11 @@
 #include "Poco/Format.h"
 #include "Poco/Util/Application.h"
 #include "Poco/CppParser/Struct.h"
-#include "Poco/CppParser/Concept.h"
+#include "Poco/CppParser/Decl.h"
 #include "Poco/CppParser/Enum.h"
 #include "Poco/CppParser/EnumValue.h"
 #include "Poco/CppParser/Function.h"
 #include "Poco/CppParser/Parameter.h"
-#include "Poco/CppParser/TypeDef.h"
 #include "Poco/CppParser/Variable.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SQLite/Connector.h"
@@ -35,6 +34,8 @@
 #include <cctype>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+#include <ranges>
 
 
 using namespace Poco::Data::Keywords;
@@ -461,8 +462,8 @@ void DocWriter::writeClass(const Struct* pStruct)
 	writeInheritance(ostr, pStruct);
 	writeMethodSummary(ostr, pStruct);
 	writeNestedClasses(ostr, pStruct);
-	writeTypes(ostr, pStruct, &sstr);
-	writeAliases(ostr, pStruct, &sstr);
+	writeDecls(ostr, pStruct, tr("Types"), &NameSpace::typeDefs, &sstr);
+	writeDecls(ostr, pStruct, tr("Types Aliases"), &NameSpace::typeAliases, &sstr);
 	writeEnums(ostr, pStruct, &sstr);
 	writeConstructors(ostr, pStruct);
 	writeDestructor(ostr, pStruct);
@@ -491,15 +492,15 @@ void DocWriter::writeNameSpace(const NameSpace* pNameSpace)
 	writeSubTitle(ostr, tr("Overview"));
 	writeNameSpacesSummary(ostr, pNameSpace, &sstr);
 	writeClassesSummary(ostr, pNameSpace, &sstr);
-	writeTypesSummary(ostr, pNameSpace, &sstr);
-	writeAliasesSummary(ostr, pNameSpace, &sstr);
-	writeConceptsSummary(ostr, pNameSpace, &sstr);
+	writeSymbolsSummary(ostr, pNameSpace, tr("Types"), &NameSpace::typeDefs);
+	writeSymbolsSummary(ostr, pNameSpace, tr("Types Aliases"), &NameSpace::typeAliases);
+	writeSymbolsSummary(ostr, pNameSpace, tr("Concepts"), &NameSpace::concepts);
 	writeFunctionsSummary(ostr, pNameSpace, &sstr);
 	writeNameSpaces(ostr, pNameSpace, &sstr);
 	writeClasses(ostr, pNameSpace, &sstr);
-	writeTypes(ostr, pNameSpace, &sstr);
-	writeAliases(ostr, pNameSpace, &sstr);
-	writeConcepts(ostr, pNameSpace, &sstr);
+	writeDecls(ostr, pNameSpace, tr("Types"), &NameSpace::typeDefs, &sstr);
+	writeDecls(ostr, pNameSpace, tr("Types Aliases"), &NameSpace::typeAliases, &sstr);
+	writeDecls(ostr, pNameSpace, tr("Concepts"), &NameSpace::concepts, &sstr);
 	writeEnums(ostr, pNameSpace, &sstr);
 	writeFunctions(ostr, pNameSpace, &sstr);
 	writeVariables(ostr, pNameSpace, &sstr);
@@ -1860,111 +1861,37 @@ void DocWriter::writeClassSummary(std::ostream& ostr, const Struct* pStruct)
 }
 
 
-void DocWriter::writeTypesSummary(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
+void DocWriter::writeSymbolsSummary(std::ostream& ostr, const NameSpace* pNameSpace, const std::string& title, SymbolExtractor extract)
 {
-	NameSpace::SymbolTable types;
-	pNameSpace->typeDefs(types);
-	if (!types.empty())
+	NameSpace::SymbolTable symbols;
+	(pNameSpace->*extract)(symbols);
+	if (!symbols.empty())
 	{
-		ostr << "<p><b>" << tr("Types") << ":</b> " << std::endl;
+		ostr << "<p><b>" << title << ":</b> " << std::endl;
 		bool first = true;
-		for (NameSpace::Iterator it = types.begin(); it != types.end(); ++it)
+		for (const Symbol* pSymbol: symbols | std::views::values)
 		{
-			writeNameListItem(ostr, it->second->name(), it->second, pNameSpace, first);
+			writeNameListItem(ostr, pSymbol->name(), pSymbol, pNameSpace, first);
 		}
 		ostr << "</p>" << std::endl;
 	}
 }
 
 
-void DocWriter::writeAliasesSummary(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
+void DocWriter::writeDecls(std::ostream& ostr, const NameSpace* pNameSpace, const std::string& title, SymbolExtractor extract, std::ostream* pSstr)
 {
-	NameSpace::SymbolTable types;
-	pNameSpace->typeAliases(types);
-	if (!types.empty())
+	NameSpace::SymbolTable symbols;
+	(pNameSpace->*extract)(symbols);
+	const auto isDocumented = [](const Symbol* pSymbol)
 	{
-		ostr << "<p><b>" << tr("Types Aliases") << ":</b> " << std::endl;
-		bool first = true;
-		for (NameSpace::Iterator it = types.begin(); it != types.end(); ++it)
+		return pSymbol->getAccess() != Symbol::ACC_PRIVATE;
+	};
+	if (std::ranges::any_of(symbols | std::views::values, isDocumented))
+	{
+		writeSubTitle(ostr, title);
+		for (const Symbol* pSymbol: symbols | std::views::values | std::views::filter(isDocumented))
 		{
-			writeNameListItem(ostr, it->second->name(), it->second, pNameSpace, first);
-		}
-		ostr << "</p>" << std::endl;
-	}
-}
-
-
-void DocWriter::writeConceptsSummary(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
-{
-	NameSpace::SymbolTable concepts;
-	pNameSpace->concepts(concepts);
-	if (!concepts.empty())
-	{
-		ostr << "<p><b>" << tr("Concepts") << ":</b> " << std::endl;
-		bool first = true;
-		for (const auto& [name, pConcept]: concepts)
-		{
-			writeNameListItem(ostr, name, pConcept, pNameSpace, first);
-		}
-		ostr << "</p>" << std::endl;
-	}
-}
-
-
-void DocWriter::writeTypes(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
-{
-	NameSpace::SymbolTable types;
-	pNameSpace->typeDefs(types);
-	bool hasTypes = false;
-	for (NameSpace::Iterator it = types.begin(); !hasTypes && it != types.end(); ++it)
-	{
-		if (it->second->getAccess() != Symbol::ACC_PRIVATE)
-			hasTypes = true;
-	}
-	if (hasTypes)
-	{
-		writeSubTitle(ostr, tr("Types"));
-		for (NameSpace::Iterator it = types.begin(); it != types.end(); ++it)
-		{
-			if (it->second->getAccess() != Symbol::ACC_PRIVATE)
-				writeType(ostr, static_cast<const TypeDef*>(it->second), pSstr);
-		}
-	}
-}
-
-
-void DocWriter::writeAliases(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
-{
-	NameSpace::SymbolTable types;
-	pNameSpace->typeAliases(types);
-	bool hasTypes = false;
-	for (NameSpace::Iterator it = types.begin(); !hasTypes && it != types.end(); ++it)
-	{
-		if (it->second->getAccess() != Symbol::ACC_PRIVATE)
-			hasTypes = true;
-	}
-	if (hasTypes)
-	{
-		writeSubTitle(ostr, tr("Types Aliases"));
-		for (NameSpace::Iterator it = types.begin(); it != types.end(); ++it)
-		{
-			if (it->second->getAccess() != Symbol::ACC_PRIVATE)
-				writeType(ostr, static_cast<const TypeDef*>(it->second), pSstr);
-		}
-	}
-}
-
-
-void DocWriter::writeConcepts(std::ostream& ostr, const NameSpace* pNameSpace, std::ostream* pSstr)
-{
-	NameSpace::SymbolTable concepts;
-	pNameSpace->concepts(concepts);
-	if (!concepts.empty())
-	{
-		writeSubTitle(ostr, tr("Concepts"));
-		for (const auto& [name, pConcept]: concepts)
-		{
-			writeType(ostr, static_cast<const Concept*>(pConcept), pSstr);
+			writeType(ostr, static_cast<const Decl*>(pSymbol), pSstr);
 		}
 	}
 }
@@ -2165,6 +2092,11 @@ void DocWriter::writeFunction(std::ostream& ostr, const Function* pFunc, std::os
 		ostr << " final";
 	if (pFunc->flags() & Function::FN_NOEXCEPT)
 		ostr << " noexcept";
+	if (!pFunc->getRequiresClause().empty())
+	{
+		ostr << " ";
+		writeDecl(ostr, pFunc->getRequiresClause());
+	}
 	if (pFunc->flags() & Function::FN_DELETE)
 		ostr << " = delete";
 	else if (pFunc->flags() & Function::FN_DEFAULT)

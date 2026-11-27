@@ -40,6 +40,10 @@ public:
 	Variable(const std::string& decl, NameSpace* pNameSpace);
 		/// Creates the Variable.
 
+	Variable(const std::string& decl, std::size_t declaratorLength, NameSpace* pNameSpace);
+		/// Creates the Variable. The name and the type are extracted from the first
+		/// declaratorLength characters of decl, which leave out an initializer.
+
 	~Variable();
 		/// Destroys the Variable.
 

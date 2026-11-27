@@ -18,9 +18,11 @@
 #include "Poco/CppParser/Parser.h"
 #include "Poco/CppParser/Struct.h"
 #include "Poco/CppParser/Function.h"
+#include "Poco/CppParser/Variable.h"
 #include "Poco/Exception.h"
 #include <sstream>
 #include <iostream>
+#include <vector>
 
 
 using namespace Poco::CppParser;
@@ -205,6 +207,14 @@ void CppParserTest::testExtractNameTemplateHead()
 	decl = "template <typename T> requires (sizeof(\"\\\")\") > 1 && ')' != '(') void escaped";
 	name = Symbol::extractName(decl);
 	assertTrue (name == "escaped");
+
+	decl = R"decl(template <typename T> requires (sizeof(R"tag(()tag") > 1) int value = 0)decl";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "value");
+
+	decl = "template <class T> requires T :: template Pred < int >::value && (true) int answer";
+	name = Symbol::extractName(decl);
+	assertTrue (name == "answer");
 }
 
 
@@ -784,6 +794,7 @@ T twice(T v) requires Integral<T>;
 	const auto* pFunc = dynamic_cast<const Function*>(it->second);
 	assertTrue (pFunc != nullptr);
 	assertTrue (pFunc->countParameters() == 1);
+	assertTrue (pFunc->getRequiresClause() == "requires Integral < T >");
 }
 
 
@@ -806,6 +817,7 @@ std::size_t count(const T& t);
 	assertTrue (pHalf != nullptr);
 	assertTrue (pHalf->declaration().find("requires Integral") != std::string::npos);
 	assertTrue (pHalf->countParameters() == 1);
+	assertTrue (pHalf->getReturnParameter() == "T");
 
 	const auto itCount = st.find("count");
 	assertTrue (itCount != st.end());
@@ -1313,6 +1325,206 @@ void CppParserTest::testParseRequiresSyntaxErrors()
 }
 
 
+void CppParserTest::testParseVariableInitializer()
+{
+	NameSpace::SymbolTable st;
+	parseFollowedByPlainDeclarations(R"(
+static constexpr bool A2 = sizeof(long) > 4;
+inline const int VALUE = compute(*DEFAULT_PTR);
+static const std::size_t N = sizeof(T) * N_ELEMENTS;
+)", st);
+
+	const auto itA2 = st.find("A2");
+	assertTrue (itA2 != st.end());
+	const auto* pA2 = dynamic_cast<const Variable*>(itA2->second);
+	assertTrue (pA2 != nullptr);
+	assertTrue (pA2->declaration().find("sizeof") != std::string::npos);
+	assertTrue (pA2->declaration().find("> 4") != std::string::npos);
+
+	const auto itValue = st.find("VALUE");
+	assertTrue (itValue != st.end());
+	assertTrue (itValue->second->kind() == Symbol::SYM_VARIABLE);
+	assertTrue (st.find("DEFAULT_PTR") == st.end());
+
+	const auto itN = st.find("N");
+	assertTrue (itN != st.end());
+	const auto* pN = dynamic_cast<const Variable*>(itN->second);
+	assertTrue (pN != nullptr);
+	assertTrue (pN->declType() == "std::size_t");
+	assertTrue (!pN->isPointer());
+}
+
+
+void CppParserTest::testParseFunctionTemplateReturnType()
+{
+	NameSpace::SymbolTable st;
+	parseFollowedByPlainDeclarations(R"(
+template <typename T, bool B = (sizeof(T) > 4)>
+T pick(T v);
+
+template <typename T, bool B = requires (T t) { { t.f() } -> std::same_as<int>; }>
+void probe(T v);
+)", st);
+
+	const auto itPick = st.find("pick");
+	assertTrue (itPick != st.end());
+	const auto* pPick = dynamic_cast<const Function*>(itPick->second);
+	assertTrue (pPick != nullptr);
+	assertTrue (pPick->getReturnParameter() == "T");
+
+	const auto itProbe = st.find("probe");
+	assertTrue (itProbe != st.end());
+	const auto* pProbe = dynamic_cast<const Function*>(itProbe->second);
+	assertTrue (pProbe != nullptr);
+	assertTrue (pProbe->getReturnParameter() == "void");
+}
+
+
+void CppParserTest::testParseTrailingRequiresOverloads()
+{
+	NameSpace::SymbolTable st;
+	parseFollowedByPlainDeclarations(R"(
+template <typename T>
+class Chooser
+{
+public:
+	void f(T v) requires A<T>;
+	void f(T v) requires B<T>;
+};
+)", st);
+
+	const auto it = st.find("Chooser");
+	assertTrue (it != st.end());
+	const auto* pClass = dynamic_cast<const Struct*>(it->second);
+	assertTrue (pClass != nullptr);
+	std::vector<std::string> clauses;
+	for (const auto& [name, pSym]: *pClass)
+	{
+		const auto* pFunc = dynamic_cast<const Function*>(pSym);
+		if (pFunc != nullptr && name == "f")
+			clauses.push_back(pFunc->getRequiresClause());
+	}
+	assertTrue (clauses.size() == 2);
+	assertTrue (clauses[0].find("A") != std::string::npos);
+	assertTrue (clauses[1].find("B") != std::string::npos);
+}
+
+
+void CppParserTest::testParseRequiresDecltype()
+{
+	NameSpace::SymbolTable st;
+	parseFollowedByPlainDeclarations(R"(
+template <typename T> requires decltype(T{})::value
+void dt(T v);
+)", st);
+
+	const auto it = st.find("dt");
+	assertTrue (it != st.end());
+	const auto* pFunc = dynamic_cast<const Function*>(it->second);
+	assertTrue (pFunc != nullptr);
+	assertTrue (pFunc->getReturnParameter() == "void");
+}
+
+
+void CppParserTest::testParseRequiresExpressionInTemplateArgument()
+{
+	NameSpace::SymbolTable st;
+	parseFollowedByPlainDeclarations(R"(
+template <typename T> requires C<requires (T t) { t > 0; }>
+void gt(T v);
+)", st);
+
+	const auto it = st.find("gt");
+	assertTrue (it != st.end());
+	const auto* pFunc = dynamic_cast<const Function*>(it->second);
+	assertTrue (pFunc != nullptr);
+	assertTrue (pFunc->countParameters() == 1);
+}
+
+
+void CppParserTest::testParseNestedGroupsInTemplateArguments()
+{
+	NameSpace::SymbolTable st;
+	parseFollowedByPlainDeclarations(R"(
+void fill(std::array<int, (N < 2 ? 1 : 2)> a, int b);
+void g(std::vector<int> v = {1, 2}, int c);
+std::array<int, (N < 2 ? 1 : 2)> make();
+)", st);
+
+	const auto itFill = st.find("fill");
+	assertTrue (itFill != st.end());
+	const auto* pFill = dynamic_cast<const Function*>(itFill->second);
+	assertTrue (pFill != nullptr);
+	assertTrue (pFill->countParameters() == 2);
+
+	const auto itG = st.find("g");
+	assertTrue (itG != st.end());
+	const auto* pG = dynamic_cast<const Function*>(itG->second);
+	assertTrue (pG != nullptr);
+	assertTrue (pG->countParameters() == 2);
+
+	const auto itMake = st.find("make");
+	assertTrue (itMake != st.end());
+	const auto* pMake = dynamic_cast<const Function*>(itMake->second);
+	assertTrue (pMake != nullptr);
+	assertTrue (pMake->countParameters() == 0);
+}
+
+
+void CppParserTest::testParseQualifiedBaseClass()
+{
+	NameSpace::SymbolTable st;
+	parseFollowedByPlainDeclarations(R"(
+class D: public Outer<int>::Inner
+{
+};
+
+class E: public ns::Base<int>
+{
+};
+)", st);
+
+	const auto itD = st.find("D");
+	assertTrue (itD != st.end());
+	const auto* pD = dynamic_cast<const Struct*>(itD->second);
+	assertTrue (pD != nullptr);
+	assertTrue (pD->baseEnd() - pD->baseBegin() == 1);
+	assertTrue (pD->baseBegin()->name.find("Inner") != std::string::npos);
+
+	const auto itE = st.find("E");
+	assertTrue (itE != st.end());
+	const auto* pE = dynamic_cast<const Struct*>(itE->second);
+	assertTrue (pE != nullptr);
+	assertTrue (pE->baseEnd() - pE->baseBegin() == 1);
+	assertTrue (pE->baseBegin()->name == "ns::Base < int >");
+
+	NameSpace::SymbolTable st2;
+	parseFollowedByPlainDeclarations(R"(
+struct G: ::ns::Base<int>
+{
+};
+
+struct H: public decltype(makeBase())
+{
+};
+)", st2);
+
+	const auto itG = st2.find("G");
+	assertTrue (itG != st2.end());
+	const auto* pG = dynamic_cast<const Struct*>(itG->second);
+	assertTrue (pG != nullptr);
+	assertTrue (pG->baseEnd() - pG->baseBegin() == 1);
+	assertTrue (pG->baseBegin()->name == "::ns::Base < int >");
+
+	const auto itH = st2.find("H");
+	assertTrue (itH != st2.end());
+	const auto* pH = dynamic_cast<const Struct*>(itH->second);
+	assertTrue (pH != nullptr);
+	assertTrue (pH->baseEnd() - pH->baseBegin() == 1);
+	assertTrue (pH->baseBegin()->name.find("makeBase") != std::string::npos);
+}
+
+
 void CppParserTest::setUp()
 {
 }
@@ -1366,6 +1578,13 @@ CppUnit::Test* CppParserTest::suite()
 	CppUnit_addTest(pSuite, CppParserTest, testParseConstrainedMembers);
 	CppUnit_addTest(pSuite, CppParserTest, testParseConceptForms);
 	CppUnit_addTest(pSuite, CppParserTest, testParseRequiresSyntaxErrors);
+	CppUnit_addTest(pSuite, CppParserTest, testParseVariableInitializer);
+	CppUnit_addTest(pSuite, CppParserTest, testParseFunctionTemplateReturnType);
+	CppUnit_addTest(pSuite, CppParserTest, testParseTrailingRequiresOverloads);
+	CppUnit_addTest(pSuite, CppParserTest, testParseRequiresDecltype);
+	CppUnit_addTest(pSuite, CppParserTest, testParseRequiresExpressionInTemplateArgument);
+	CppUnit_addTest(pSuite, CppParserTest, testParseNestedGroupsInTemplateArguments);
+	CppUnit_addTest(pSuite, CppParserTest, testParseQualifiedBaseClass);
 
 	return pSuite;
 }

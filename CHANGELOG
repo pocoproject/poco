@@ -248,8 +248,8 @@ Features:
   CRC-32 and Adler-32 were already at this speed on x86-64, and CRC-32 goes from 11 to 29 on
   AArch64. An unbundled build needs zlib 1.2.9 or later.
 - GH #5769 CppParser and PocoDoc read C++20 concepts and requires clauses; PocoDoc lists concepts
-  in their own section and documents class templates whose template parameter list contains
-  parentheses under their names.
+  in their own section, documents class templates whose template parameter list contains
+  parentheses under their names and shows trailing requires clauses.
 
 New Components:
 

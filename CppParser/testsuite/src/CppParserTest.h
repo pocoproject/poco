@@ -64,6 +64,13 @@ public:
 	void testParseConstrainedMembers();
 	void testParseConceptForms();
 	void testParseRequiresSyntaxErrors();
+	void testParseVariableInitializer();
+	void testParseFunctionTemplateReturnType();
+	void testParseTrailingRequiresOverloads();
+	void testParseRequiresDecltype();
+	void testParseRequiresExpressionInTemplateArgument();
+	void testParseNestedGroupsInTemplateArguments();
+	void testParseQualifiedBaseClass();
 
 	void setUp();
 	void tearDown();
