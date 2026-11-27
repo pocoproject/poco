@@ -32,6 +32,7 @@ public:
 	void testReadUrlPUT();
 	void testReadUrlBOM();
 	void testReadMultipart();
+	void testReadMultipartPartContentLength();
 	void testReadMultipartEncodedFileName();
 	void testSubmit1();
 	void testSubmit2();

@@ -37,7 +37,9 @@ public:
 	void testBoundaryAtWindowEnd();
 	void testDelimiterLookalikes();
 	void testGuessBoundaryEmptyArgument();
-	void testPartContentLength();
+	void testPartContentLengthLargerThanBody();
+	void testPartContentLengthZero();
+	void testPartContentLengthSmallerThanBody();
 
 	void setUp();
 	void tearDown();

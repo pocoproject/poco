@@ -191,19 +191,11 @@ private:
 
 
 MultipartStreamBuf::MultipartStreamBuf(std::istream& istr, const std::string& boundary):
-	MultipartStreamBuf(istr, boundary, -1)
-{
-}
-
-
-MultipartStreamBuf::MultipartStreamBuf(std::istream& istr, const std::string& boundary, std::streamsize contentLength):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_istr(istr),
 	_boundary(boundary),
 	_lastPart(false),
-	_boundaryFound(false),
-	_contentLength(contentLength),
-	_bytesRead(0)
+	_boundaryFound(false)
 {
 }
 
@@ -226,47 +218,7 @@ std::streamsize MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize
 
 std::streamsize MultipartStreamBuf::readContent(char* buffer, std::streamsize length)
 {
-	static constexpr int eof = std::char_traits<char>::eof();
-	std::streambuf& buf = *_istr.rdbuf();
-
-	// Content-Length fast path: bulk read
-	if (_contentLength >= 0 && _bytesRead < _contentLength)
-	{
-		std::streamsize remaining = _contentLength - _bytesRead;
-		std::streamsize toRead = std::min(remaining, length);
-		std::streamsize n = buf.sgetn(buffer, toRead);
-		if (n <= 0) { _lastPart = true; return -1; }
-		_bytesRead += n;
-		return n;
-	}
-
-	// Content-Length exhausted -- consume trailing boundary.
-	// Stream has [CR]LF--boundary after content. Skip optional CR,
-	// then validate the boundary byte-by-byte. If any byte is
-	// unexpected (including EOF), treat as last part.
-	if (_contentLength >= 0)
-	{
-		int ch = buf.sgetc();
-		if (ch == '\r') buf.sbumpc(); // skip optional CR before LF
-
-		// Expect \n--boundary
-		ch = buf.sbumpc();
-		if (ch != '\n') { _lastPart = true; return -1; }
-		ch = buf.sbumpc();
-		if (ch != '-') { _lastPart = true; return -1; }
-		ch = buf.sbumpc();
-		if (ch != '-') { _lastPart = true; return -1; }
-		for (auto bc : _boundary)
-		{
-			ch = buf.sbumpc();
-			if (ch == eof || ch != bc) { _lastPart = true; return -1; }
-		}
-		consumePostBoundaryDelimiter();
-		_boundaryFound = true;
-		return 0;
-	}
-
-	// No Content-Length: zero-copy boundary scanning in the ReadWindow.
+	// Zero-copy boundary scanning in the ReadWindow.
 	// Scan the window's internal buffer directly, copy only content bytes
 	// to the output. Over-read bytes remain in the window for parseHeader.
 	ReadWindow& win = static_cast<ReadWindow&>(*_istr.rdbuf());
@@ -433,13 +385,7 @@ bool MultipartStreamBuf::lastPart() const
 
 
 MultipartIOS::MultipartIOS(std::istream& istr, const std::string& boundary):
-	MultipartIOS(istr, boundary, -1)
-{
-}
-
-
-MultipartIOS::MultipartIOS(std::istream& istr, const std::string& boundary, std::streamsize contentLength):
-	_buf(istr, boundary, contentLength)
+	_buf(istr, boundary)
 {
 	poco_ios_init(&_buf);
 }
@@ -475,13 +421,7 @@ bool MultipartIOS::lastPart() const
 
 
 MultipartInputStream::MultipartInputStream(std::istream& istr, const std::string& boundary):
-	MultipartInputStream(istr, boundary, -1)
-{
-}
-
-
-MultipartInputStream::MultipartInputStream(std::istream& istr, const std::string& boundary, std::streamsize contentLength):
-	MultipartIOS(istr, boundary, contentLength),
+	MultipartIOS(istr, boundary),
 	std::istream(&_buf)
 {
 }
@@ -541,9 +481,9 @@ void MultipartReader::nextPart(MessageHeader& messageHeader)
 	}
 
 	parseHeader(messageHeader);
-	// The boundary ends the part (RFC 2046, section 5.1.1). A Content-Length
-	// header in the part is not used, as other parsers of the message ignore it
-	// (RFC 7578, section 4.8).
+	// The boundary delimiter ends the part (RFC 2046, section 5.1.1). A Content-Length header field
+	// of the part has no meaning there and is ignored (for multipart/form-data, RFC 7578, section 4.8
+	// requires that).
 	_pMPI = std::make_unique<MultipartInputStream>(*_windowStr, _boundary);
 }
 
