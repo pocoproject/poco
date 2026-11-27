@@ -21,6 +21,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <ios>
 #include <istream>
 #include <memory>
 #include <sstream>
@@ -34,7 +35,7 @@ using namespace Poco::Zip;
 namespace
 {
 
-	constexpr std::size_t MAX_INPUT = 64u * 1024u;
+	constexpr std::size_t MAX_INPUT_SIZE = 64u * 1024u;
 	constexpr std::size_t MAX_PER_ENTRY = 1u << 20;
 	constexpr std::size_t MAX_TOTAL = 8u << 20;
 	constexpr std::size_t COPY_BUFFER_SIZE = 4096;
@@ -123,7 +124,7 @@ namespace
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-	if (size > MAX_INPUT) return 0;
+	if (size > MAX_INPUT_SIZE) return 0;
 
 	const std::string input(reinterpret_cast<const char*>(data), size);
 	std::size_t totalOut = 0;
@@ -137,7 +138,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 	{
 		arch = std::make_unique<ZipArchive>(in, cb);
 	});
-	if (!arch) return 0;
+	if (arch == nullptr) return 0;
 
 	// checkConsistency in its own attempt: when it throws, the second pass
 	// over the headers still runs.

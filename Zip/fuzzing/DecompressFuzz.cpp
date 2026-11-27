@@ -32,7 +32,7 @@ using namespace Poco::Zip;
 
 namespace
 {
-	constexpr std::size_t MAX_INPUT = 4u * 1024u;
+	constexpr std::size_t MAX_INPUT_SIZE = 4u * 1024u;
 
 
 	template <typename F>
@@ -135,7 +135,7 @@ namespace
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-	if (size > MAX_INPUT) return 0;
+	if (size > MAX_INPUT_SIZE) return 0;
 
 	const std::string input(reinterpret_cast<const char*>(data), size);
 
