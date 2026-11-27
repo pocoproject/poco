@@ -11,12 +11,11 @@
 
 
 #include "EncodingTable.h"
-
 #include "Poco/TextConverter.h"
 #include "Poco/UTF8Encoding.h"
-
-#include <cstddef>
 #include <fuzzer/FuzzedDataProvider.h>
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 

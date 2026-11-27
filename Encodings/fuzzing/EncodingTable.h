@@ -1,12 +1,3 @@
-#include "Poco/ASCIIEncoding.h"
-#include "Poco/Latin1Encoding.h"
-#include "Poco/Latin2Encoding.h"
-#include "Poco/Latin9Encoding.h"
-#include "Poco/TextConverter.h"
-#include "Poco/UTF8Encoding.h"
-#include "Poco/Windows1250Encoding.h"
-#include "Poco/Windows1251Encoding.h"
-#include "Poco/Windows1252Encoding.h"
 //
 // EncodingTable.h
 //
@@ -20,8 +11,8 @@
 //
 
 
-#ifndef Encodings_fuzzing_EncodingTable_INCLUDED
-#define Encodings_fuzzing_EncodingTable_INCLUDED
+#ifndef EncodingTable_INCLUDED
+#define EncodingTable_INCLUDED
 
 
 #include "Poco/ISO8859_10Encoding.h"
@@ -54,30 +45,36 @@
 #include "Poco/MacChineseSimpEncoding.h"
 #include "Poco/MacJapaneseEncoding.h"
 #include "Poco/MacKoreanEncoding.h"
+#include "Poco/ASCIIEncoding.h"
+#include "Poco/Latin1Encoding.h"
+#include "Poco/Latin2Encoding.h"
+#include "Poco/Latin9Encoding.h"
+#include "Poco/TextConverter.h"
+#include "Poco/TextEncoding.h"
 #include "Poco/UTF16Encoding.h"
 #include "Poco/UTF32Encoding.h"
-#include "Poco/TextEncoding.h"
-
+#include "Poco/UTF8Encoding.h"
+#include "Poco/Windows1250Encoding.h"
+#include "Poco/Windows1251Encoding.h"
+#include "Poco/Windows1252Encoding.h"
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
+#include <iterator>
 #include <string>
 
 
-
-
-// The 30 Encodings-library DoubleByteEncoding tables, followed by
-// UTF-16 and UTF-32 with explicit byte order and the Foundation
-// encodings.
 inline constexpr std::size_t DOUBLE_BYTE_ENCODING_COUNT = 30;
 inline constexpr std::size_t ENCODING_COUNT = 42;
 inline constexpr std::size_t MAX_INPUT_SIZE = 64 * 1024;
 
 
 inline const Poco::TextEncoding& encodingByIndex(std::size_t index)
-	/// The encoding at index in the fixed table of 30 Encodings
-	/// DoubleByteEncoding classes followed by UTF-16 and UTF-32 with
-	/// explicit byte order. index must be less than ENCODING_COUNT.
+	/// The encoding at index in the fixed table: the 30 DoubleByteEncoding
+	/// classes of the Encodings library, UTF-16 and UTF-32 with explicit
+	/// byte order, then ASCII, Latin-1, Latin-2, Latin-9, Windows-1250,
+	/// Windows-1251, Windows-1252 and UTF-8. index must be less than
+	/// ENCODING_COUNT.
 {
 	using Poco::ISO8859_10Encoding;
 	using Poco::ISO8859_11Encoding;
@@ -111,6 +108,14 @@ inline const Poco::TextEncoding& encodingByIndex(std::size_t index)
 	using Poco::MacKoreanEncoding;
 	using Poco::UTF16Encoding;
 	using Poco::UTF32Encoding;
+	using Poco::ASCIIEncoding;
+	using Poco::Latin1Encoding;
+	using Poco::Latin2Encoding;
+	using Poco::Latin9Encoding;
+	using Poco::Windows1250Encoding;
+	using Poco::Windows1251Encoding;
+	using Poco::Windows1252Encoding;
+	using Poco::UTF8Encoding;
 	using Poco::TextEncoding;
 
 	static const ISO8859_10Encoding iso8859_10;
@@ -147,8 +152,16 @@ inline const Poco::TextEncoding& encodingByIndex(std::size_t index)
 	static const UTF16Encoding utf16le(UTF16Encoding::LITTLE_ENDIAN_BYTE_ORDER);
 	static const UTF32Encoding utf32be(UTF32Encoding::BIG_ENDIAN_BYTE_ORDER);
 	static const UTF32Encoding utf32le(UTF32Encoding::LITTLE_ENDIAN_BYTE_ORDER);
+	static const ASCIIEncoding ascii;
+	static const Latin1Encoding latin1;
+	static const Latin2Encoding latin2;
+	static const Latin9Encoding latin9;
+	static const Windows1250Encoding windows1250;
+	static const Windows1251Encoding windows1251;
+	static const Windows1252Encoding windows1252;
+	static const UTF8Encoding utf8;
 
-	static const TextEncoding* const table[ENCODING_COUNT] =
+	static const TextEncoding* const table[] =
 	{
 		&iso8859_10,
 		&iso8859_11,
@@ -183,14 +196,20 @@ inline const Poco::TextEncoding& encodingByIndex(std::size_t index)
 		&utf16be,
 		&utf16le,
 		&utf32be,
-		&utf32le
+		&utf32le,
+		&ascii,
+		&latin1,
+		&latin2,
+		&latin9,
+		&windows1250,
+		&windows1251,
+		&windows1252,
+		&utf8
 	};
+	static_assert(std::size(table) == ENCODING_COUNT, "one table entry per index");
 
 	return *table[index];
 }
-
-
-
 
 
 inline void checkDoubleByteRoundTrip(const Poco::TextEncoding& encoding, const std::string& decoded)
@@ -214,4 +233,6 @@ inline void checkDoubleByteRoundTrip(const Poco::TextEncoding& encoding, const s
 		std::abort();
 	}
 }
-#endif // Encodings_fuzzing_EncodingTable_INCLUDED
+
+
+#endif // EncodingTable_INCLUDED
