@@ -39,6 +39,7 @@ public:
 	void testCollectDependenciesFilesAsParsed();
 	void testAddLanguageStandard();
 	void testPreprocessFileCompilerPath();
+	void testPreprocessFileNameWithSpace();
 
 	void setUp() override;
 	void tearDown() override;

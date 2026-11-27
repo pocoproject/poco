@@ -24,6 +24,7 @@
 #include "Poco/String.h"
 #include "Poco/Ascii.h"
 #include "Poco/Mutex.h"
+#include <algorithm>
 #include <cwchar>
 #include <memory>
 
@@ -255,30 +256,16 @@ void ProcessImpl::timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kern
 
 bool ProcessImpl::mustEscapeArg(const std::string& arg)
 {
-	bool result = false;
-	bool inQuotes = false;
-	bool escaped = false;
-	for (char c: arg)
+	// The argument is quoted whenever it would not arrive whole otherwise:
+	// an empty argument disappears from the command line, white space
+	// separates arguments, and the child's parser removes a double quote
+	// and treats a preceding backslash as an escape.
+	if (arg.empty()) return true;
+
+	return std::ranges::any_of(arg, [](char c)
 	{
-		if (Poco::Ascii::isSpace(c) && !inQuotes && !escaped)
-		{
-			result = true;
-			break;
-		}
-		else if (c == '"' && !escaped)
-		{
-			inQuotes = !inQuotes;
-		}
-		else if (c == '\\' && !escaped)
-		{
-			escaped = true;
-		}
-		else
-		{
-			escaped = false;
-		}
-	}
-	return result || inQuotes;
+		return Poco::Ascii::isSpace(c) || c == '"';
+	});
 }
 
 

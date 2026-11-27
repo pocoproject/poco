@@ -1,0 +1,15 @@
+#
+# Makefile
+#
+# Makefile for the program that the Poco CppParser UtilityTest starts in place of a preprocessor
+#
+
+include $(POCO_BASE)/build/rules/global
+
+objects = TestPreprocessor
+
+target         = CppParserTestPreprocessor
+target_version = 1
+target_libs    =
+
+include $(POCO_BASE)/build/rules/exec
