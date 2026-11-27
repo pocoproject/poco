@@ -1,4 +1,4 @@
-# Dictionary of the JSON parser fuzzer: RFC 8259 tokens, string escapes, number shapes, comment markers and the UTF-8 byte order mark.
+# Dictionary shared by the JSON parser, Var and stringify fuzz targets: RFC 8259 tokens, string escapes, number shapes, comment markers, query path fragments and the UTF-8 byte order mark.
 
 "{"
 "}"
@@ -34,3 +34,28 @@
 "\x09"
 "\x0a"
 "\x0d"
+
+# found by the Var and stringify targets
+# numbers with conversion-relevant shapes
+"0.0"
+"1e10"
+"-1e-10"
+"1e400"
+"18446744073709551615"
+"-9223372036854775808"
+"3.141592653589793"
+# strings / escapes
+"\"\xF0\x9F\x98\x80\""
+"\"\\\\\""
+"\"/\""
+# query path fragments
+"nested"
+"deep"
+"leaf"
+"."
+"[0]"
+"a.b"
+"[1][0]"
+# whitespace variants
+"\x0D\x0A"
+" "
