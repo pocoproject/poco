@@ -55,8 +55,7 @@ public:
 	void testReadMultiPartWithZeroContentLength();
 	void testReadMultiPartManyParts();
 	void testReadMultiPartTooManyParts();
-	void testReadMultiPartLargeWithContentLength();
-	void testReadMultiPartLargeWithoutContentLength();
+	void testReadMultiPartLarge();
 	void testWriteFoldedField();
 	void testValidateHeaders();
 	void testReadMultiPartEncodedFileName();

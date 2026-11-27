@@ -1164,7 +1164,7 @@ void MailMessageTest::testReadMultiPartEmptyBoundary()
 
 void MailMessageTest::testReadMultiPartWithContentLength()
 {
-	// Content-Length in part headers enables bulk-read fast path (#4118)
+	// A correct Content-Length in the part headers does not change the parts.
 	std::istringstream istr(
 		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
@@ -1209,7 +1209,7 @@ void MailMessageTest::testReadMultiPartWithContentLength()
 
 void MailMessageTest::testReadMultiPartWithZeroContentLength()
 {
-	// Content-Length: 0 for an empty part body — exercises readBulk edge case
+	// Content-Length: 0 for an empty part body
 	std::istringstream istr(
 		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
 		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
@@ -1244,7 +1244,7 @@ void MailMessageTest::testReadMultiPartWithZeroContentLength()
 
 namespace
 {
-	std::string buildMultiPartMessage(int partCount, int partBodySize = 0, bool includeContentLength = false)
+	std::string buildMultiPartMessage(int partCount, int partBodySize = 0)
 	{
 		const std::string boundary = "MIME_boundary_parts_test";
 		std::string body(partBodySize > 0 ? partBodySize : 0, 'X');
@@ -1263,8 +1263,6 @@ namespace
 			msg += "Content-Type: text/plain\r\n";
 			std::string partContent = partBodySize > 0 ? body : "Part " + std::to_string(i);
 			partContent += "\r\n";
-			if (includeContentLength)
-				msg += "Content-Length: " + std::to_string(partContent.size()) + "\r\n";
 			msg += "\r\n";
 			msg += partContent;
 		}
@@ -1319,10 +1317,10 @@ void MailMessageTest::testReadMultiPartTooManyParts()
 }
 
 
-void MailMessageTest::testReadMultiPartLargeWithContentLength()
+void MailMessageTest::testReadMultiPartLarge()
 {
-	// 200 parts with 500KB body each, Content-Length present — bulk-read fast path
-	std::string raw = buildMultiPartMessage(200, 500000, true);
+	// 200 parts with 500KB body each
+	std::string raw = buildMultiPartMessage(200, 500000);
 	std::istringstream istr(raw);
 
 	StringPartHandler handler;
@@ -1332,28 +1330,7 @@ void MailMessageTest::testReadMultiPartLargeWithContentLength()
 	sw.start();
 	message.read(istr, handler);
 	sw.stop();
-	std::cout << "200 x 500KB parts with Content-Length (" << raw.size() / 1024 << " KB): "
-	          << sw.elapsed() / 1000 << " ms" << std::endl;
-
-	assertTrue (handler.data().size() == 200);
-	assertTrue (handler.data()[0].size() == 500002); // 500000 'X' + "\r\n"
-}
-
-
-void MailMessageTest::testReadMultiPartLargeWithoutContentLength()
-{
-	// 200 parts with 500KB body each, no Content-Length — boundary-scanning slow path
-	std::string raw = buildMultiPartMessage(200, 500000, false);
-	std::istringstream istr(raw);
-
-	StringPartHandler handler;
-	MailMessage message;
-
-	Poco::Stopwatch sw;
-	sw.start();
-	message.read(istr, handler);
-	sw.stop();
-	std::cout << "200 x 500KB parts without Content-Length (" << raw.size() / 1024 << " KB): "
+	std::cout << "200 x 500KB parts (" << raw.size() / 1024 << " KB): "
 	          << sw.elapsed() / 1000 << " ms" << std::endl;
 
 	assertTrue (handler.data().size() == 200);
@@ -1945,8 +1922,7 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartWithZeroContentLength);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartManyParts);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartTooManyParts);
-	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartLargeWithContentLength);
-	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartLargeWithoutContentLength);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartLarge);
 	CppUnit_addTest(pSuite, MailMessageTest, testWriteFoldedField);
 	CppUnit_addTest(pSuite, MailMessageTest, testValidateHeaders);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartEncodedFileName);

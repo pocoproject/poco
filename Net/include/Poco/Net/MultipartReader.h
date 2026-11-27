@@ -40,10 +40,6 @@ public:
 		/// Creates the MultipartStreamBuf and connects it
 		/// to the given input stream.
 
-	MultipartStreamBuf(std::istream& istr, const std::string& boundary, std::streamsize contentLength);
-		/// Creates the MultipartStreamBuf with a known Content-Length
-		/// for the current part, enabling bulk-read optimization.
-
 	~MultipartStreamBuf();
 	[[nodiscard]] bool lastPart() const;
 
@@ -52,8 +48,8 @@ protected:
 
 private:
 	std::streamsize readContent(char* buffer, std::streamsize length);
-		/// Reads content bytes, using bulk sgetn when Content-Length is known,
-		/// or bulk-read + in-buffer boundary scanning otherwise.
+		/// Reads content bytes up to the next boundary, which is
+		/// searched for in the buffer of the read window.
 
 	void consumePostBoundaryDelimiter();
 		/// After a boundary match, consumes the trailing delimiter
@@ -70,8 +66,6 @@ private:
 	std::string        _boundary;
 	bool               _lastPart;
 	bool               _boundaryFound;
-	std::streamsize    _contentLength;
-	std::streamsize    _bytesRead;
 };
 
 
@@ -80,7 +74,6 @@ class Net_API MultipartIOS: public virtual std::ios
 {
 public:
 	MultipartIOS(std::istream& istr, const std::string& boundary);
-	MultipartIOS(std::istream& istr, const std::string& boundary, std::streamsize contentLength);
 	~MultipartIOS();
 	[[nodiscard]] MultipartStreamBuf* rdbuf();
 	[[nodiscard]] bool lastPart() const;
@@ -95,7 +88,6 @@ class Net_API MultipartInputStream: public MultipartIOS, public std::istream
 {
 public:
 	MultipartInputStream(std::istream& istr, const std::string& boundary);
-	MultipartInputStream(std::istream& istr, const std::string& boundary, std::streamsize contentLength);
 	~MultipartInputStream();
 };
 
@@ -139,6 +131,9 @@ public:
 	void nextPart(MessageHeader& messageHeader);
 		/// Moves to the next part in the message and stores the
 		/// part's header fields in messageHeader.
+		///
+		/// The part ends at the next boundary; its header fields,
+		/// including Content-Length, do not change where it ends.
 		///
 		/// Throws an MultipartException if there are no more parts
 		/// available, or if no boundary line can be found in

@@ -186,6 +186,10 @@ Breaking Changes:
   -std=c++20 (/std:c++20 for cl and clang-cl) to preprocessor options that select no language
   standard (Poco::CppParser::Utility::addLanguageStandard()), so that existing configuration
   files keep working.
+- PR #5767 Poco::Net::MultipartReader ends a part at the boundary and ignores a Content-Length
+  header field of the part (RFC 2046, section 5.1.1; RFC 7578, section 4.8). The constructors of
+  MultipartStreamBuf, MultipartIOS and MultipartInputStream that take a content length are
+  removed.
 
 Bundled Third-Party Library Upgrades:
 

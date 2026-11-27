@@ -43,6 +43,14 @@ namespace
 		}
 		return parts;
 	}
+
+
+	[[nodiscard]] std::string twoPartsWithContentLength(const std::string& contentLength)
+		/// Returns a message of two parts; the first one has a Content-Length
+		/// header field with the given value.
+	{
+		return "\r\n--MIME_boundary_01234567\r\nContent-Length: " + contentLength + "\r\n\r\nthis is part 1\r\n--MIME_boundary_01234567\r\n\r\nthis is part 2\r\n--MIME_boundary_01234567--\r\n";
+	}
 }
 
 
@@ -454,6 +462,27 @@ void MultipartReaderTest::testGuessBoundaryEmptyArgument()
 }
 
 
+void MultipartReaderTest::testPartContentLengthLargerThanBody()
+{
+	const std::vector<std::string> parts{"this is part 1", "this is part 2"};
+	assertTrue (readParts(twoPartsWithContentLength("73")) == parts);
+}
+
+
+void MultipartReaderTest::testPartContentLengthZero()
+{
+	const std::vector<std::string> parts{"this is part 1", "this is part 2"};
+	assertTrue (readParts(twoPartsWithContentLength("0")) == parts);
+}
+
+
+void MultipartReaderTest::testPartContentLengthSmallerThanBody()
+{
+	const std::vector<std::string> parts{"this is part 1", "this is part 2"};
+	assertTrue (readParts(twoPartsWithContentLength("4")) == parts);
+}
+
+
 void MultipartReaderTest::setUp()
 {
 }
@@ -481,6 +510,9 @@ CppUnit::Test* MultipartReaderTest::suite()
 	CppUnit_addTest(pSuite, MultipartReaderTest, testBoundaryAtWindowEnd);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testDelimiterLookalikes);
 	CppUnit_addTest(pSuite, MultipartReaderTest, testGuessBoundaryEmptyArgument);
+	CppUnit_addTest(pSuite, MultipartReaderTest, testPartContentLengthLargerThanBody);
+	CppUnit_addTest(pSuite, MultipartReaderTest, testPartContentLengthZero);
+	CppUnit_addTest(pSuite, MultipartReaderTest, testPartContentLengthSmallerThanBody);
 
 	return pSuite;
 }

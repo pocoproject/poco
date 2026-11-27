@@ -271,6 +271,40 @@ void HTMLFormTest::testReadMultipart()
 }
 
 
+void HTMLFormTest::testReadMultipartPartContentLength()
+{
+	std::istringstream istr(
+		"\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: form-data; name=\"field1\"\r\n"
+		"Content-Length: 2\r\n"
+		"\r\n"
+		"value1\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: form-data; name=\"field2\"\r\n"
+		"\r\n"
+		"value 2\r\n"
+		"--MIME_boundary_0123456789\r\n"
+		"Content-Disposition: file; name=\"attachment1\"; filename=\"att1.txt\"\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n"
+		"This is an attachment\r\n"
+		"--MIME_boundary_0123456789--\r\n"
+	);
+	HTTPRequest req("POST", "/form.cgi");
+	req.setContentType(HTMLForm::ENCODING_MULTIPART + "; boundary=\"MIME_boundary_0123456789\"");
+	StringPartHandler sah;
+	HTMLForm form(req, istr, sah);
+	assertTrue (form.size() == 2);
+	assertTrue (form["field1"] == "value1");
+	assertTrue (form["field2"] == "value 2");
+
+	assertTrue (sah.type() == "text/plain");
+	assertTrue (sah.disp() == "file; name=\"attachment1\"; filename=\"att1.txt\"");
+	assertTrue (sah.data() == "This is an attachment");
+}
+
+
 void HTMLFormTest::testReadMultipartEncodedFileName()
 {
 	std::istringstream istr(
@@ -463,6 +497,7 @@ CppUnit::Test* HTMLFormTest::suite()
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlPUT);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadUrlBOM);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadMultipart);
+	CppUnit_addTest(pSuite, HTMLFormTest, testReadMultipartPartContentLength);
 	CppUnit_addTest(pSuite, HTMLFormTest, testReadMultipartEncodedFileName);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit1);
 	CppUnit_addTest(pSuite, HTMLFormTest, testSubmit2);
