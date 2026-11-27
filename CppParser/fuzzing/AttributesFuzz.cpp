@@ -3,7 +3,7 @@
 //
 // Feeds arbitrary bytes as an attribute list to AttributesParser, which
 // parses POCO-style C++ attributes of the form
-// <name>[=<value>][,<name>[=<value>...]] and must reject malformed input
+// <name>[=<value>][,<name>[=<value>]...] and must reject malformed input
 // with a SyntaxException.
 //
 // Copyright (c) 2026, Applied Informatics Software Engineering GmbH.
