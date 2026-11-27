@@ -21,6 +21,7 @@
 #include "Poco/TextConverter.h"
 #include "Poco/Nullable.h"
 #include "Poco/Dynamic/Struct.h"
+#include "Poco/Exception.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
 #include <set>
@@ -2374,6 +2375,188 @@ void JSONTest::testCopy()
 }
 
 
+namespace
+{
+	class CopyThrows
+		/// A value whose copy constructor throws while the given flag is set.
+	{
+	public:
+		explicit CopyThrows(const bool* pCopyThrows): _pCopyThrows(pCopyThrows)
+		{
+		}
+
+		CopyThrows(const CopyThrows& other): _pCopyThrows(other._pCopyThrows)
+		{
+			if (*_pCopyThrows) throw Poco::RuntimeException("CopyThrows");
+		}
+
+		CopyThrows(CopyThrows&&) = delete;
+		~CopyThrows() = default;
+		CopyThrows& operator = (const CopyThrows&) = delete;
+		CopyThrows& operator = (CopyThrows&&) = delete;
+
+	private:
+		const bool* _pCopyThrows;
+	};
+}
+
+
+void JSONTest::testCopyAssign()
+{
+	Object target(Poco::JSON_PRESERVE_KEY_ORDER);
+	target.set("old", 1);
+	{
+		Object source(Poco::JSON_PRESERVE_KEY_ORDER);
+		source.set("foo", 1);
+		source.set("bar", 2);
+		source.set("baz", 3);
+		target = source;
+	}
+
+	// the key order of the copy must refer to the values of the copy
+	Object::NameList nl = target.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+
+	std::ostringstream ostr;
+	target.stringify(ostr);
+	assertTrue (ostr.str() == "{\"foo\":1,\"bar\":2,\"baz\":3}");
+
+	target.set("foo", 10);
+	std::ostringstream ostr2;
+	target.stringify(ostr2);
+	assertTrue (ostr2.str() == "{\"foo\":10,\"bar\":2,\"baz\":3}");
+
+	// changes of the source do not change the copy
+	Object source(Poco::JSON_PRESERVE_KEY_ORDER);
+	source.set("foo", 1);
+	source.set("bar", 2);
+	source.set("baz", 3);
+	target = source;
+	source.set("foo", 100);
+	const Poco::OrderedDynamicStruct& ds = target;
+	assertTrue (ds.size() == 3);
+	assertTrue (ds["foo"].convert<int>() == 1);
+	source.remove("bar");
+	nl = target.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+
+	// self-assignment
+	Object& self = target;
+	target = self;
+	nl = target.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+
+	// the copy takes the key order option of its source
+	Object sorted;
+	sorted.set("b", 2);
+	sorted.set("a", 1);
+	Object ordered(Poco::JSON_PRESERVE_KEY_ORDER);
+	ordered.set("x", 0);
+	ordered = sorted;
+	ordered.set("0", 0);
+	nl = ordered.getNames();
+	assertTrue (nl.size() == 3);
+	assertTrue (nl[0] == "0");
+	assertTrue (nl[1] == "a");
+	assertTrue (nl[2] == "b");
+
+	sorted = target;
+	sorted.set("aaa", 4);
+	nl = sorted.getNames();
+	assertTrue (nl.size() == 4);
+	assertTrue (nl[0] == "foo");
+	assertTrue (nl[1] == "bar");
+	assertTrue (nl[2] == "baz");
+	assertTrue (nl[3] == "aaa");
+
+	// an empty source
+	Object empty(Poco::JSON_PRESERVE_KEY_ORDER);
+	sorted = empty;
+	assertTrue (sorted.size() == 0);
+	assertTrue (sorted.getNames().empty());
+	std::ostringstream ostr3;
+	sorted.stringify(ostr3);
+	assertTrue (ostr3.str() == "{}");
+
+	// a failed assignment leaves an empty object that can be used
+	bool copyThrows = false;
+	Object throwing(Poco::JSON_PRESERVE_KEY_ORDER);
+	throwing.set("a", 1);
+	throwing.set("b", CopyThrows(&copyThrows));
+	copyThrows = true;
+	try
+	{
+		target = throwing;
+		fail ("must throw");
+	}
+	catch (Poco::RuntimeException&)
+	{
+	}
+	copyThrows = false;
+	assertTrue (target.size() == 0);
+	assertTrue (target.getNames().empty());
+	target.set("c", 3);
+	target.set("a", 1);
+	std::ostringstream ostr4;
+	target.stringify(ostr4);
+	assertTrue (ostr4.str() == "{\"c\":3,\"a\":1}");
+}
+
+
+void JSONTest::testCopyStruct()
+{
+	// a copy does not share the cached structs with its source
+	Object source;
+	source.set("x", 1);
+	const Poco::DynamicStruct& sourceStruct = source;
+	assertTrue (sourceStruct.size() == 1);
+
+	Object constructed(source);
+	constructed.set("y", 2);
+	const Poco::DynamicStruct& constructedStruct = constructed;
+	assertTrue (&constructedStruct != &sourceStruct);
+	assertTrue (constructedStruct.size() == 2);
+	assertTrue (sourceStruct.size() == 1);
+
+	Object assigned;
+	assigned = source;
+	assigned.set("y", 2);
+	const Poco::DynamicStruct& assignedStruct = assigned;
+	assertTrue (&assignedStruct != &sourceStruct);
+	assertTrue (assignedStruct.size() == 2);
+	assertTrue (sourceStruct.size() == 1);
+
+	Object ordSource(Poco::JSON_PRESERVE_KEY_ORDER);
+	ordSource.set("x", 1);
+	const Poco::OrderedDynamicStruct& ordSourceStruct = ordSource;
+	assertTrue (ordSourceStruct.size() == 1);
+
+	Object ordConstructed(ordSource);
+	ordConstructed.set("y", 2);
+	const Poco::OrderedDynamicStruct& ordConstructedStruct = ordConstructed;
+	assertTrue (&ordConstructedStruct != &ordSourceStruct);
+	assertTrue (ordConstructedStruct.size() == 2);
+	assertTrue (ordSourceStruct.size() == 1);
+
+	Object ordAssigned(Poco::JSON_PRESERVE_KEY_ORDER);
+	ordAssigned = ordSource;
+	ordAssigned.set("y", 2);
+	const Poco::OrderedDynamicStruct& ordAssignedStruct = ordAssigned;
+	assertTrue (&ordAssignedStruct != &ordSourceStruct);
+	assertTrue (ordAssignedStruct.size() == 2);
+	assertTrue (ordSourceStruct.size() == 1);
+}
+
+
 void JSONTest::testMove()
 {
 	Object obj1(Poco::JSON_PRESERVE_KEY_ORDER);
@@ -2850,6 +3033,8 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testStringifyKeepsFlags);
 	CppUnit_addTest(pSuite, JSONTest, testConcurrentStringify);
 	CppUnit_addTest(pSuite, JSONTest, testCopy);
+	CppUnit_addTest(pSuite, JSONTest, testCopyAssign);
+	CppUnit_addTest(pSuite, JSONTest, testCopyStruct);
 	CppUnit_addTest(pSuite, JSONTest, testMove);
 	CppUnit_addTest(pSuite, JSONTest, testRemove);
 	CppUnit_addTest(pSuite, JSONTest, testSetExistingKey);

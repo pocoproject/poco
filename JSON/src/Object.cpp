@@ -46,10 +46,8 @@ Object::Object(const Object& other) :
 	_preserveInsOrder(other._preserveInsOrder),
 	_escapeUnicode(other._escapeUnicode),
 	_lowercaseHex(other._lowercaseHex),
-	_pStruct(!other._structModified ? other._pStruct : nullptr),
-	_pOrdStruct(!other._ordStructModified ? other._pOrdStruct : nullptr),
-	_structModified(other._structModified),
-	_ordStructModified(other._ordStructModified)
+	_structModified(true),
+	_ordStructModified(true)
 {
 	syncKeys(other._keys);
 }
@@ -76,15 +74,26 @@ Object &Object::operator = (const Object &other)
 {
 	if (&other != this)
 	{
-		_values = other._values;
-		_keys = other._keys;
-		_preserveInsOrder = other._preserveInsOrder;
-		_escapeUnicode = other._escapeUnicode;
-		_lowercaseHex = other._lowercaseHex;
-		_pStruct = !other._structModified ? other._pStruct : nullptr;
-		_pOrdStruct = !other._ordStructModified ? other._pOrdStruct : nullptr;
-		_structModified = other._structModified;
-		_ordStructModified = other._ordStructModified;
+		try
+		{
+			// _keys refers to the nodes of _values, which the assignment
+			// of _values destroys or reuses
+			_keys.clear();
+			_values = other._values;
+			_preserveInsOrder = other._preserveInsOrder;
+			_escapeUnicode = other._escapeUnicode;
+			_lowercaseHex = other._lowercaseHex;
+			_pStruct = nullptr;
+			_pOrdStruct = nullptr;
+			_structModified = true;
+			_ordStructModified = true;
+			syncKeys(other._keys);
+		}
+		catch (...)
+		{
+			clear();
+			throw;
+		}
 	}
 	return *this;
 }
