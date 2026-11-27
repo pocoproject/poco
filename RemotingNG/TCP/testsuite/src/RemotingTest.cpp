@@ -1547,7 +1547,7 @@ void RemotingTest::testEventSubscriberURIAtFrameLimit()
 	}
 	catch (Poco::RemotingNG::TransportException& exc)
 	{
-		assertEqual (Poco::format("Event subscriber URI of %z bytes exceeds the frame payload limit of %z bytes", PAYLOAD_LIMIT + 1, PAYLOAD_LIMIT), exc.message());
+		assertMessageEqual (Poco::format("Event subscriber URI of %z bytes exceeds the frame payload limit of %z bytes", PAYLOAD_LIMIT + 1, PAYLOAD_LIMIT), exc.message());
 	}
 }
 
