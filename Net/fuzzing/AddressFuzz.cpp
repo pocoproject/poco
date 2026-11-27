@@ -14,6 +14,7 @@
 #include "Poco/Net/IPAddress.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/NumberParser.h"
+#include <cstddef>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -28,9 +29,9 @@ using Poco::Net::SocketAddress;
 
 namespace
 {
+	constexpr std::size_t MAX_INPUT_SIZE = 256;
+	constexpr unsigned MAX_PORT = 65535;
 
-constexpr std::size_t MAX_INPUT_SIZE = 256;
-constexpr unsigned MAX_PORT = 65535;
 
 	bool splitHostPort(const std::string& hostAndPort, std::string& host, std::string& port)
 		/// Splits hostAndPort as SocketAddress::init does: [host]:port, else at

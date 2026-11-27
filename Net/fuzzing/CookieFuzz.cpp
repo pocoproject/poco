@@ -33,9 +33,7 @@ using Poco::Net::NameValueCollection;
 
 namespace
 {
-
-constexpr std::size_t MAX_INPUT_SIZE = 8192;
-
+	constexpr std::size_t MAX_INPUT_SIZE = 8192;
 }
 
 
