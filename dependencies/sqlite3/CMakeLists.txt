@@ -38,11 +38,20 @@ else()
 		PRIVATE
 			SQLITE_DISABLE_LFS
 			SQLITE_OMIT_UTF16
-			SQLITE_OMIT_PROGRESS_CALLBACK
 			SQLITE_OMIT_COMPLETE
 			SQLITE_OMIT_TCL_VARIABLE
 			SQLITE_OMIT_DEPRECATED
 	)
+	# Progress callbacks abort runaway SQL in the Data SQLite fuzzer; keep
+	# them available when building for OSS-Fuzz.
+	if(NOT ENABLE_FUZZING)
+		target_compile_definitions(_BUNDLED_SQLITE3 PRIVATE SQLITE_OMIT_PROGRESS_CALLBACK)
+	else()
+		# Keep temporary data in memory: a large sort or a temporary table
+		# would otherwise create files in /var/tmp (or in a directory the
+		# input names through PRAGMA temp_store_directory).
+		target_compile_definitions(_BUNDLED_SQLITE3 PRIVATE SQLITE_TEMP_STORE=3)
+	endif()
 	option(ENABLE_DATA_SQLITE_FTS5 "Enable SQLite FTS5 Extension" OFF)
 	if(ENABLE_DATA_SQLITE_FTS5)
 		target_compile_definitions(_BUNDLED_SQLITE3 PUBLIC SQLITE_ENABLE_FTS5)

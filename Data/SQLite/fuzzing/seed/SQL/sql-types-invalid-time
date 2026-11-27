@@ -1,0 +1,7 @@
+CREATE TABLE types (
+	t TIME
+);
+INSERT INTO types VALUES (
+	'99:99:99'
+);
+SELECT * FROM types;

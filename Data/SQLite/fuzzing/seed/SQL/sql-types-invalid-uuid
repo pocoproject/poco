@@ -1,0 +1,7 @@
+CREATE TABLE types (
+	u UUID
+);
+INSERT INTO types VALUES (
+	'not-a-uuid'
+);
+SELECT * FROM types;

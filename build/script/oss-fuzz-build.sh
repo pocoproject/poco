@@ -5,7 +5,7 @@ cd cmake-build
 
 cmake -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=ON -DENABLE_FUZZING=ON \
       -DENABLE_ACTIVERECORD=OFF -DENABLE_PAGECOMPILER=OFF \
-      -DENABLE_PAGECOMPILER_FILE2PAGE=OFF -DENABLE_DATA_SQLITE=OFF \
+      -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
       -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF -DENABLE_PROMETHEUS=OFF \
       -DENABLE_ACTIVERECORD_COMPILER=OFF \
       -DENABLE_AI_MCP=ON -DENABLE_AI_MCP_HTTP=ON \
@@ -24,6 +24,7 @@ cp bin/Net-http-parser-fuzzer $OUT/http_message_fuzzer
 cp bin/AIMCP-server-fuzzer $OUT/mcp_server_fuzzer
 cp bin/AIMCP-client-fuzzer $OUT/mcp_client_fuzzer
 cp bin/AIMCPHTTP-eventstream-fuzzer $OUT/mcp_event_stream_fuzzer
+cp bin/DataSQLite-sql-fuzzer $OUT/datasqlite_sql_fuzzer
 
 # Seed corpus
 zip -q -r -j $OUT/mail_message_fuzzer_seed_corpus.zip $SRC/poco/Net/fuzzing/seed/Mail
@@ -34,6 +35,7 @@ zip -q -r -j $OUT/mcp_event_stream_fuzzer_seed_corpus.zip $SRC/poco/AI/MCP/HTTP/
 zip -q -r -j $OUT/date_time_fuzzer_seed_corpus.zip $SRC/poco/Foundation/fuzzing/seed/DateTime
 zip -q -r -j $OUT/jwt_decode_fuzzer_seed_corpus.zip $SRC/poco/JWT/fuzzing/seed/Token
 zip -q -r -j $OUT/json_parser_fuzzer_seed_corpus.zip $SRC/poco/JSON/fuzzing/seed/JSON
+zip -q -r -j $OUT/datasqlite_sql_fuzzer_seed_corpus.zip $SRC/poco/Data/SQLite/fuzzing/seed/SQL
 
 # Dictionaries
 cp $SRC/poco/XML/fuzzing/xml.dict $OUT/xml_parser_fuzzer.dict
@@ -44,3 +46,4 @@ cp $SRC/poco/JWT/fuzzing/jwt.dict $OUT/jwt_decode_fuzzer.dict
 cp $SRC/poco/JSON/fuzzing/json.dict $OUT/json_parser_fuzzer.dict
 cp $SRC/poco/Net/fuzzing/http.dict $OUT/http_message_fuzzer.dict
 cp $SRC/poco/Net/fuzzing/mail.dict $OUT/mail_message_fuzzer.dict
+cp $SRC/poco/Data/SQLite/fuzzing/sql.dict $OUT/datasqlite_sql_fuzzer.dict
