@@ -187,7 +187,7 @@ void Parser::parse()
 
 const Token* Parser::parseFile(const Token* pNext)
 {
-	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN))
+	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN) || isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET))
 	{
 		switch (pNext->asInteger())
 		{
@@ -295,7 +295,7 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		}
 		
 		pNext = next();
-		while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN))
+		while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN) || isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET))
 		{
 			switch (pNext->asInteger())
 			{
@@ -753,8 +753,10 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 {
 	_pCurrentSymbol = nullptr;
 	std::string attrs;
-	if (isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET))
+	while (isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET))
 	{
+		if (!attrs.empty())
+			attrs.append(" ");
 		pNext = parseAttributes(pNext, attrs);
 	}
 	if (isKeyword(pNext, IdentifierToken::KW_EXTERN))
@@ -1204,17 +1206,14 @@ const Poco::Token* Parser::parseAttributes(const Poco::Token* pNext, std::string
 	poco_assert (isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET));
 	append(attrs, pNext);
 	pNext = next();
-	while (pNext && !isOperator(pNext, OperatorToken::OP_DBL_CLOSBRACKET))
+	while (!isOperator(pNext, OperatorToken::OP_DBL_CLOSBRACKET) && !isEOF(pNext))
 	{
 		append(attrs, pNext);
 		pNext = next();
 	}
-	if (pNext) 
-	{
-		append(attrs, pNext);
-		pNext = next();
-	}
-	return pNext;
+	expectOperator(pNext, OperatorToken::OP_DBL_CLOSBRACKET, "]]");
+	append(attrs, pNext);
+	return next();
 }
 
 

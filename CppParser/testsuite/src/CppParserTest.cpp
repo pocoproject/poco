@@ -1525,6 +1525,125 @@ struct H: public decltype(makeBase())
 }
 
 
+void CppParserTest::testParseFreeFunctionAttributes()
+{
+	NameSpace::SymbolTable st;
+	parseFollowedByPlainDeclarations(R"(
+namespace Poco::Impl {
+[[noreturn]] void Foundation_API throwAnyCastError(const char* function, const std::type_info* pHeld, const std::type_info& requested);
+[[nodiscard]] bool Foundation_API isJSONString(const Var& any);
+[[nodiscard]] bool isEmpty(const Var& any);
+[[nodiscard]] [[deprecated("use isEmpty")]] bool empty(const Var& any);
+[[nodiscard, gnu::pure]] int combined(int x);
+[[nodiscard]] inline int inlined(int x)
+{
+	return x;
+}
+[[nodiscard]] constexpr int doubled(int x)
+{
+	return 2*x;
+}
+[[maybe_unused]] inline constexpr int limit = 8;
+
+class Holder
+{
+public:
+	[[nodiscard]] [[deprecated]] int held() const;
+};
+}
+
+[[nodiscard]] int globalFunc(int x)
+{
+	return x;
+}
+)", st);
+
+	const auto findFunc = [this, &st](const std::string& name) -> const Function*
+	{
+		const auto it = st.find(name);
+		assertTrue (it != st.end());
+		const auto* pFunc = dynamic_cast<const Function*>(it->second);
+		assertTrue (pFunc != nullptr);
+		return pFunc;
+	};
+
+	const auto* pThrow = findFunc("throwAnyCastError");
+	assertTrue (pThrow->fullName() == "Poco::Impl::throwAnyCastError");
+	assertTrue (pThrow->getAttributeList() == "[[noreturn]]");
+	assertTrue (pThrow->countParameters() == 3);
+
+	const auto* pIsJSON = findFunc("isJSONString");
+	assertTrue (pIsJSON->fullName() == "Poco::Impl::isJSONString");
+	assertTrue (pIsJSON->getAttributeList() == "[[nodiscard]]");
+	assertTrue (pIsJSON->countParameters() == 1);
+
+	assertTrue (findFunc("isEmpty")->getAttributeList() == "[[nodiscard]]");
+	assertTrue (findFunc("empty")->getAttributeList() == R"([[nodiscard]] [[deprecated ("use isEmpty")]])");
+	assertTrue (findFunc("combined")->getAttributeList() == "[[nodiscard, gnu::pure]]");
+
+	const auto* pInlined = findFunc("inlined");
+	assertTrue (pInlined->getAttributeList() == "[[nodiscard]]");
+	assertTrue ((pInlined->flags() & Function::FN_INLINE) != 0);
+
+	const auto* pDoubled = findFunc("doubled");
+	assertTrue (pDoubled->getAttributeList() == "[[nodiscard]]");
+	assertTrue (pDoubled->countParameters() == 1);
+
+	const auto itLimit = st.find("limit");
+	assertTrue (itLimit != st.end());
+	const auto* pLimit = dynamic_cast<const Variable*>(itLimit->second);
+	assertTrue (pLimit != nullptr);
+	assertTrue (pLimit->getAttributeList() == "[[maybe_unused]]");
+
+	assertTrue (findFunc("held")->getAttributeList() == "[[nodiscard]] [[deprecated]]");
+
+	const auto* pGlobal = findFunc("globalFunc");
+	assertTrue (pGlobal->fullName() == "globalFunc");
+	assertTrue (pGlobal->getAttributeList() == "[[nodiscard]]");
+}
+
+
+void CppParserTest::testParseFunctionTemplateAttributes()
+{
+	NameSpace::SymbolTable st;
+	parseFollowedByPlainDeclarations(R"(
+namespace N {
+template <typename T>
+[[nodiscard]] T pickFirst(T a, T b);
+
+template <typename T> requires Integral<T>
+[[nodiscard]] constexpr T half(T v)
+{
+	return v / 2;
+}
+}
+)", st);
+
+	const auto itPick = st.find("pickFirst");
+	assertTrue (itPick != st.end());
+	const auto* pPick = dynamic_cast<const Function*>(itPick->second);
+	assertTrue (pPick != nullptr);
+	assertTrue (pPick->getAttributeList() == "[[nodiscard]]");
+	assertTrue (pPick->getReturnParameter() == "T");
+	assertTrue (pPick->countParameters() == 2);
+
+	const auto itHalf = st.find("half");
+	assertTrue (itHalf != st.end());
+	const auto* pHalf = dynamic_cast<const Function*>(itHalf->second);
+	assertTrue (pHalf != nullptr);
+	assertTrue (pHalf->getAttributeList() == "[[nodiscard]]");
+	assertTrue (pHalf->declaration().find("requires Integral") != std::string::npos);
+	assertTrue (pHalf->countParameters() == 1);
+}
+
+
+void CppParserTest::testParseUnterminatedAttribute()
+{
+	parseExpectingSyntaxError("[[nodiscard int f();");
+	parseExpectingSyntaxError("namespace N { [[nodiscard");
+}
+
+
 void CppParserTest::setUp()
 {
 }
@@ -1585,6 +1704,9 @@ CppUnit::Test* CppParserTest::suite()
 	CppUnit_addTest(pSuite, CppParserTest, testParseRequiresExpressionInTemplateArgument);
 	CppUnit_addTest(pSuite, CppParserTest, testParseNestedGroupsInTemplateArguments);
 	CppUnit_addTest(pSuite, CppParserTest, testParseQualifiedBaseClass);
+	CppUnit_addTest(pSuite, CppParserTest, testParseFreeFunctionAttributes);
+	CppUnit_addTest(pSuite, CppParserTest, testParseFunctionTemplateAttributes);
+	CppUnit_addTest(pSuite, CppParserTest, testParseUnterminatedAttribute);
 
 	return pSuite;
 }

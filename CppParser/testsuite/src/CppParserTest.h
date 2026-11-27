@@ -71,6 +71,9 @@ public:
 	void testParseRequiresExpressionInTemplateArgument();
 	void testParseNestedGroupsInTemplateArguments();
 	void testParseQualifiedBaseClass();
+	void testParseFreeFunctionAttributes();
+	void testParseFunctionTemplateAttributes();
+	void testParseUnterminatedAttribute();
 
 	void setUp();
 	void tearDown();
