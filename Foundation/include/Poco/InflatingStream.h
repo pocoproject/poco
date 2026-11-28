@@ -79,19 +79,37 @@ public:
 		/// Resets the stream buffer so that another stream can be read
 		/// from the same underlying input stream.
 		///
-		/// After a stream ended normally, buffered input that follows
-		/// the stream is kept and read as the start of the next stream.
+		/// Decompressed data that has not been read yet is discarded.
+		/// If the stream has been read in part, the rest of it is
+		/// decompressed and discarded. If nothing of the stream has been
+		/// read from the underlying input stream yet, it is not skipped.
+		///
+		/// If a read has reached the end of the underlying input stream
+		/// before the end of the stream, nothing is skipped, and the next
+		/// stream is read from the current position of the underlying
+		/// input stream.
+		///
+		/// In all other cases without an error, the next stream starts
+		/// with the data that follows the current stream. Buffered input
+		/// is kept, so the underlying stream must not be repositioned.
 		///
 		/// After a decompression error, reads keep failing without
-		/// consuming more input until reset() is called. If the error was
-		/// a checksum or length mismatch in the stream trailer, the end of
-		/// the failed stream is known and buffered input that follows it
-		/// is kept, as after a normal end. For any other error, the end of
-		/// the failed stream cannot be determined, so buffered input is
-		/// discarded and the next stream is read from the current position
-		/// of the underlying input stream. Before calling reset(), the
-		/// caller may need to position the underlying stream at the start
-		/// of the next stream and call clear() on it.
+		/// consuming more input until reset() is called. If the error was a checksum or length mismatch in
+		/// the stream trailer, the end of the failed stream is known and
+		/// buffered input that follows it is kept, as after a normal end.
+		/// For any other error, the end of the failed stream cannot be
+		/// determined, so buffered input is discarded and the next stream
+		/// is read from the current position of the underlying input
+		/// stream. Only in this case and after an early end of the
+		/// underlying input stream, the caller may need to position the
+		/// underlying stream at the start of the next stream and call
+		/// clear() on it.
+		///
+		/// When inflating to an output stream, written data that has not
+		/// been inflated yet is inflated and written to the output stream
+		/// first. If this fails, an IOException is thrown and the stream
+		/// buffer is not reset. After a failed write, reset() discards
+		/// the pending data.
 
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
@@ -113,6 +131,7 @@ private:
 	bool			_eof;
 	bool			_check;
 	bool			_failed;
+	bool			_inputEnded; // the underlying input stream ended before the current stream
 };
 
 
