@@ -179,8 +179,7 @@ void ProviderCall::abort()
 	_aborted = true;
 	if (_descriptor != POCO_INVALID_SOCKET)
 	{
-		// 2 shuts both directions down, on every platform.
-		(void) ::shutdown(_descriptor, 2);
+		Poco::AI::MCP::HTTP::Impl::interrupt(_descriptor);
 		return;
 	}
 	// Still connecting or sending the head: through the socket the session
@@ -190,8 +189,7 @@ void ProviderCall::abort()
 	// own, from keepDescriptor() on, rules that out.
 	if (!_pSocket.isNull())
 	{
-		const poco_socket_t fd = _pSocket->sockfd();
-		if (fd != POCO_INVALID_SOCKET) (void) ::shutdown(fd, 2);
+		Poco::AI::MCP::HTTP::Impl::interrupt(_pSocket->sockfd());
 	}
 }
 
@@ -201,9 +199,9 @@ void ProviderCall::keepDescriptor()
 	const poco_socket_t copy = Poco::AI::MCP::HTTP::Impl::duplicate(_pSession->socket().impl()->sockfd());
 	Poco::FastMutex::ScopedLock lock(_abortMutex);
 	_descriptor = copy;
-	if (_aborted && _descriptor != POCO_INVALID_SOCKET)
+	if (_aborted)
 	{
-		(void) ::shutdown(_descriptor, 2);
+		Poco::AI::MCP::HTTP::Impl::interrupt(_descriptor);
 	}
 }
 

@@ -35,6 +35,7 @@ public:
 	void testListModels();
 	void testCancelBeforeHeaders();
 	void testCancelDuringStream();
+	void testCancelSilentServer();
 	void testConcurrentCalls();
 	void testCancelStress();
 	void testCacheMarkers();

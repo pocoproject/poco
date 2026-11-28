@@ -503,8 +503,13 @@ void SocketImpl::checkBrokenTimeout(SelectMode mode)
 }
 
 
-void SocketImpl::waitAfterInterrupt(const Poco::Clock& start, ShortenedTimeout& timeout)
+void SocketImpl::waitAfterInterrupt([[maybe_unused]] const Poco::Clock& start, [[maybe_unused]] ShortenedTimeout& timeout)
 {
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// Windows has no signals: WSAEINTR means that another thread cancelled
+	// the call, with CancelIoEx() for one. A cancelled call is not repeated.
+	error(POCO_EINTR);
+#else
 	const Poco::Timespan original = timeout.original();
 	if (original > 0)
 	{
@@ -517,6 +522,7 @@ void SocketImpl::waitAfterInterrupt(const Poco::Clock& start, ShortenedTimeout& 
 		// At least one millisecond: zero means no timeout, and Windows sets whole milliseconds.
 		timeout.shorten(std::max(original - start.elapsed(), Poco::Timespan(Poco::Timespan::MILLISECONDS)));
 	}
+#endif
 }
 
 
