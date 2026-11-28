@@ -272,7 +272,7 @@ BinaryWriter& BinaryWriter::operator << (const char* value)
 	if (_pTextConverter)
 	{
 		std::string converted;
-		_pTextConverter->convert(value, static_cast<int>(std::strlen(value)), converted);
+		_pTextConverter->convert(value, std::strlen(value), converted);
 		UInt32 length = (UInt32) converted.size();
 		write7BitEncoded(length);
 		_ostr.write(converted.data(), length);

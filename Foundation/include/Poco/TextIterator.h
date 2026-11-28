@@ -54,8 +54,8 @@ public:
 
 	TextIterator(const std::string& str, const TextEncoding& encoding);
 		/// Creates a TextIterator for the given string.
-		/// The encoding object must not be deleted as long as the iterator
-		/// is in use.
+		/// The string and the encoding object must not be deleted as long
+		/// as the iterator is in use.
 
 	TextIterator(const std::string::const_iterator& begin, const std::string::const_iterator& end, const TextEncoding& encoding);
 		/// Creates a TextIterator for the given range.
@@ -68,11 +68,17 @@ public:
 	TextIterator(const std::string::const_iterator& end);
 		/// Creates an end TextIterator.
 
-	~TextIterator();
+	~TextIterator() = default;
 		/// Destroys the TextIterator.
 
 	TextIterator(const TextIterator& it);
 		/// Copy constructor.
+
+	TextIterator(const std::string::const_iterator&, const std::string::const_iterator&, const TextEncoding&&) = delete;
+	TextIterator(const std::string&&, const TextEncoding&&) = delete;
+	TextIterator(const std::string&&, const TextEncoding&) = delete;
+	TextIterator(const std::string&, const TextEncoding&&) = delete;
+	TextIterator(const std::string&&) = delete;
 
 	TextIterator& operator = (const TextIterator& it);
 		/// Assignment operator.
