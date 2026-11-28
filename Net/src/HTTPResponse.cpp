@@ -301,10 +301,12 @@ void HTTPResponse::read(std::istream& istr)
 	while (Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n' && ch != eof) ch = istr.get();
 	while (ch != '\r' && ch != '\n' && ch != eof && reason.length() < MAX_REASON_LENGTH) { reason += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP reason string too long");
+	if (std::any_of(reason.begin(), reason.end(), isInvalidValueChar)) throw MessageException("Invalid character in HTTP reason phrase");
 	if (ch == '\r') ch = istr.get();
 	if (ch != '\n') throw MessageException("Unterminated HTTP response line");
 
 	HTTPMessage::read(istr);
+	for (const auto& [name, value]: *this) checkFieldValue(name, value, false);
 	ch = istr.get();
 	while (ch != '\n' && ch != eof) { ch = istr.get(); }
 	setVersion(version);

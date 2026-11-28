@@ -15,6 +15,7 @@
 #include "Poco/Net/Socket.h"
 #include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Net/PollSet.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Error.h"
 #include <algorithm>
@@ -105,6 +106,20 @@ Socket::~Socket()
 }
 
 
+#if !defined(POCO_HAVE_FD_EPOLL)
+namespace
+{
+	void checkDescriptors(const Socket::SocketList& sockets)
+	{
+		// With epoll, select() uses PollSet::add(), which rejects a socket without a
+		// descriptor, while poll() and select() ignore it; check here to reject it as well.
+		if (std::any_of(sockets.begin(), sockets.end(), [](const Socket& s) { return s.impl()->sockfd() == POCO_INVALID_SOCKET; }))
+			throw InvalidSocketException();
+	}
+}
+#endif
+
+
 int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout)
 {
 #if defined(POCO_HAVE_FD_EPOLL)
@@ -138,6 +153,9 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	nfds_t nfd = static_cast<nfds_t>(readList.size() + writeList.size() + exceptList.size());
 
 	if (0 == nfd) return 0;
+
+	checkDescriptors(readList);
+	checkDescriptors(writeList);
 
 	SharedPollArray pPollArr = new pollfd[nfd]();
 
@@ -223,6 +241,9 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 	return static_cast<int>(readList.size() + writeList.size() + exceptList.size());
 
 #else
+
+	checkDescriptors(readList);
+	checkDescriptors(writeList);
 
 	fd_set fdRead;
 	fd_set fdWrite;

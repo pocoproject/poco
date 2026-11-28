@@ -55,6 +55,7 @@ using Poco::Net::SocketAddress;
 using Poco::Net::SocketImpl;
 using Poco::Net::NetException;
 using Poco::Net::ConnectionRefusedException;
+using Poco::Net::InvalidSocketException;
 using Poco::Net::TCPServerConnection;
 using Poco::Net::TCPServerConnectionFactoryImpl;
 using Poco::Net::TCPServer;
@@ -1482,6 +1483,31 @@ void SocketTest::testSelectTimeoutBeyondIntMilliseconds()
 }
 
 
+void SocketTest::testSelectClosedSocket()
+{
+	// With epoll, select() adds the sockets to a PollSet, which rejects a closed socket; the test
+	// detects the defect where poll() or select() is used (BSD, macOS), which ignored it.
+	StreamSocket ss(SocketAddress::IPv4);
+	ss.close();
+
+	for (int list = 0; list < 2; ++list)
+	{
+		Socket::SocketList readList;
+		Socket::SocketList writeList;
+		Socket::SocketList exceptList;
+		(list == 0 ? readList : writeList).push_back(ss);
+		try
+		{
+			Socket::select(readList, writeList, exceptList, Timespan(0, 100000));
+			fail("closed socket - must throw");
+		}
+		catch (InvalidSocketException&)
+		{
+		}
+	}
+}
+
+
 #if defined(POCO_OS_FAMILY_UNIX)
 void SocketTest::testReceiveInterruptedWithTimeout()
 {
@@ -2014,6 +2040,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testPollNegativeTimeoutBelowOneMillisecond);
 	CppUnit_addTest(pSuite, SocketTest, testSelectNegativeTimeoutBelowOneMillisecond);
 	CppUnit_addTest(pSuite, SocketTest, testSelectTimeoutBeyondIntMilliseconds);
+	CppUnit_addTest(pSuite, SocketTest, testSelectClosedSocket);
 #if defined(POCO_OS_FAMILY_UNIX)
 	CppUnit_addTest(pSuite, SocketTest, testReceiveInterruptedWithTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testReceiveWaitAllInterruptedKeepsTimeout);

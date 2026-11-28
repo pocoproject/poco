@@ -271,6 +271,7 @@ void HTTPRequest::read(std::istream& istr)
 	if (ch == eof) throw MessageException("No HTTP request header");
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && method.length() < MAX_METHOD_LENGTH) { method += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP request method invalid or too long");
+	if (std::any_of(method.begin(), method.end(), isSpaceOrControl)) throw MessageException("HTTP request method contains control characters");
 	while (Poco::Ascii::isSpace(ch)) ch = skip();
 	while (!Poco::Ascii::isSpace(ch) && ch != eof && uri.length() < MAX_URI_LENGTH) { uri += (char) ch; ch = istr.get(); }
 	if (!Poco::Ascii::isSpace(ch)) throw MessageException("HTTP request URI invalid or too long");
@@ -281,6 +282,7 @@ void HTTPRequest::read(std::istream& istr)
 	if (std::any_of(version.begin(), version.end(), isSpaceOrControl)) throw MessageException("HTTP version contains control characters");
 	while (ch != '\n' && ch != eof) { ch = skip(); }
 	HTTPMessage::read(istr);
+	for (const auto& [name, value]: *this) checkFieldValue(name, value, false);
 	ch = istr.get();
 	while (ch != '\n' && ch != eof) { ch = skip(); }
 	setMethod(method);

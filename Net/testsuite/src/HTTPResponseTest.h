@@ -32,6 +32,7 @@ public:
 	void testInvalid1();
 	void testInvalid2();
 	void testInvalid3();
+	void testInvalidControlCharacter();
 	void testNonNumericStatus();
 	void testStatusNotThreeDigits();
 	void testStatusBelow100();

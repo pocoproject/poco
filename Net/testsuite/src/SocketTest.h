@@ -68,6 +68,7 @@ public:
 	void testPollNegativeTimeoutBelowOneMillisecond();
 	void testSelectNegativeTimeoutBelowOneMillisecond();
 	void testSelectTimeoutBeyondIntMilliseconds();
+	void testSelectClosedSocket();
 #if defined(POCO_OS_FAMILY_UNIX)
 	void testReceiveInterruptedWithTimeout();
 	void testReceiveWaitAllInterruptedKeepsTimeout();

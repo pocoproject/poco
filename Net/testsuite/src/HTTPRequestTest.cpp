@@ -204,19 +204,26 @@ void HTTPRequestTest::testInvalid3()
 
 void HTTPRequestTest::testInvalidControlCharacter()
 {
-	for (const char* s: {"GET /a\x01/ HTTP/1.1\r\n\r\n", "GET / HTTP/1.\x01\r\n\r\n"})
+	using namespace std::string_literals;
+	for (const std::string& s: {"GET /a\x01/ HTTP/1.1\r\n\r\n"s, "GET / HTTP/1.\x01\r\n\r\n"s, "GE\x01T / HTTP/1.1\r\n\r\n"s,
+		"GET / HTTP/1.1\r\nX-Probe: a\x01" "b\r\n\r\n"s, "GET / HTTP/1.1\r\nX-Probe: a\0b\r\n\r\n"s})
 	{
 		std::istringstream istr(s);
 		HTTPRequest request;
 		try
 		{
 			request.read(istr);
-			fail("control character in request line - must throw");
+			fail("control character in request line or header field - must throw");
 		}
 		catch (MessageException&)
 		{
 		}
 	}
+
+	std::istringstream istr("GET / HTTP/1.1\r\nX-Probe: a\tb \xC3\xA9\r\n\r\n");
+	HTTPRequest request;
+	request.read(istr);
+	assertEqual ("a\tb \xC3\xA9", request.get("X-Probe"));
 }
 
 
