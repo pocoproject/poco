@@ -101,13 +101,13 @@ public:
 		/// Creates a LocalDateTime for the given Julian day in the time zone
 		/// denoted by the time zone differential in tzd.
 
-	LocalDateTime(const LocalDateTime& dateTime);
+	LocalDateTime(const LocalDateTime& dateTime) noexcept = default;
 		/// Copy constructor. Creates the LocalDateTime from another one.
 
-	~LocalDateTime();
+	~LocalDateTime() = default;
 		/// Destroys the LocalDateTime.
 
-	LocalDateTime& operator = (const LocalDateTime& dateTime);
+	LocalDateTime& operator = (const LocalDateTime& dateTime) noexcept = default;
 		/// Assigns another LocalDateTime.
 
 	LocalDateTime& operator = (const Timestamp& timestamp);

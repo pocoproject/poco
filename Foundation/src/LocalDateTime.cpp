@@ -90,34 +90,11 @@ LocalDateTime::LocalDateTime(int tzd, const DateTime& dateTime, bool adjust):
 }
 
 
-LocalDateTime::LocalDateTime(const LocalDateTime& dateTime):
-	_dateTime(dateTime._dateTime),
-	_tzd(dateTime._tzd)
-{
-}
-
-
 LocalDateTime::LocalDateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff, int tzd):
 	_dateTime(utcTime, diff),
 	_tzd(tzd)
 {
 	adjustForTzd();
-}
-
-
-LocalDateTime::~LocalDateTime()
-{
-}
-
-
-LocalDateTime& LocalDateTime::operator = (const LocalDateTime& dateTime)
-{
-	if (&dateTime != this)
-	{
-		_dateTime = dateTime._dateTime;
-		_tzd      = dateTime._tzd;
-	}
-	return *this;
 }
 
 

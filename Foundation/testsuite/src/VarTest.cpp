@@ -9,22 +9,35 @@
 
 
 #include "VarTest.h"
+#include "ValueTestTypes.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Dynamic/Var.h"
+#include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Bugcheck.h"
 #include "Poco/Dynamic/Struct.h"
 #include "Poco/Dynamic/Pair.h"
 #include "Poco/Dynamic/VarVisitor.h"
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Thread.h"
+#include "Poco/UUID.h"
+#include "Poco/DateTime.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/Timestamp.h"
+#include "Poco/UTFString.h"
 #include <map>
+#include <list>
+#include <deque>
+#include <cstddef>
 #include <utility>
 #include <type_traits>
 #include <iostream>
 #include <atomic>
 #include <memory>
+#include <array>
+#include <bit>
+#include <cstdint>
 
 
 using namespace Poco;
@@ -32,6 +45,61 @@ using namespace Poco::Dynamic;
 
 
 namespace {
+
+
+class ConvertsToVar
+{
+public:
+	operator Var () const
+	{
+		return Var(7);
+	}
+};
+
+
+class CountingIntHolder: public VarHolderImpl<int>
+	/// An int holder whose destructor counts how often it runs.
+{
+public:
+	CountingIntHolder() = delete;
+
+	explicit CountingIntHolder(int value): VarHolderImpl<int>(value)
+	{
+	}
+
+	CountingIntHolder(const CountingIntHolder&) = delete;
+	CountingIntHolder(CountingIntHolder&&) = delete;
+	CountingIntHolder& operator = (const CountingIntHolder&) = delete;
+	CountingIntHolder& operator = (CountingIntHolder&&) = delete;
+
+	~CountingIntHolder() override
+	{
+		++_destroyed;
+	}
+
+	[[nodiscard]] static int destroyed()
+	{
+		return _destroyed;
+	}
+
+	static void resetDestroyed()
+	{
+		_destroyed = 0;
+	}
+
+private:
+	static inline int _destroyed = 0;
+};
+
+
+template <typename List, std::size_t... I>
+bool hasTypeIdOneAboveIndex(std::index_sequence<I...>)
+	/// Returns true if the holder of the I-th type of List has the type id I + 1,
+	/// which also shows that List contains no type twice.
+{
+	return ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<typename Poco::TypeGetter<I, List>::HeadType>,
+		typename Poco::TypeGetter<I, List>::HeadType>() == I + 1) && ...);
+}
 
 
 class Dummy
@@ -64,7 +132,82 @@ private:
 	int _val;
 };
 
+
+class ExtendedStruct: public DynamicStruct
+	/// A DynamicStruct with an additional member. Its holder is derived
+	/// from the DynamicStruct holder.
+{
+public:
+	ExtendedStruct() = default;
+
+	ExtendedStruct(const ExtendedStruct& other) = default;
+	ExtendedStruct(ExtendedStruct&& other) noexcept(std::is_nothrow_move_constructible_v<DynamicStruct>) = default;
+
+	~ExtendedStruct() override = default;
+
+	ExtendedStruct& operator = (const ExtendedStruct& other) = default;
+	ExtendedStruct& operator = (ExtendedStruct&& other) noexcept(std::is_nothrow_move_assignable_v<DynamicStruct>) = default;
+
+	[[nodiscard]] int extra() const
+	{
+		return _extra;
+	}
+
+private:
+	int _extra = 42;
+};
+
 }
+
+
+namespace Poco::Dynamic {
+
+
+template <>
+class VarHolderImpl<ExtendedStruct>: public VarHolderImpl<DynamicStruct>
+{
+public:
+	VarHolderImpl() = delete;
+
+	explicit VarHolderImpl(const ExtendedStruct& val):
+		VarHolderImpl<DynamicStruct>(static_cast<const DynamicStruct&>(val)),
+		_extended(val)
+	{
+	}
+
+	VarHolderImpl(const VarHolderImpl&) = delete;
+	VarHolderImpl(VarHolderImpl&&) = delete;
+	VarHolderImpl& operator = (const VarHolderImpl&) = delete;
+	VarHolderImpl& operator = (VarHolderImpl&&) = delete;
+
+	~VarHolderImpl() override = default;
+
+	[[nodiscard]] const std::type_info& type() const override
+	{
+		return typeid(ExtendedStruct);
+	}
+
+	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
+	{
+		return cloneHolder(pVarHolder, _extended);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<ExtendedStruct>) override
+	{
+		return moveHolder(pVarHolder, _extended);
+	}
+
+	[[nodiscard]] const ExtendedStruct& value() const
+	{
+		return _extended;
+	}
+
+private:
+	ExtendedStruct _extended;
+};
+
+
+} // namespace Poco::Dynamic
 
 
 VarTest::VarTest(const std::string& rName): CppUnit::TestCase(rName)
@@ -3129,7 +3272,7 @@ void VarTest::testUUID()
 	Var vstr2(std::string("notAnUUID"));
 	try
 	{
-		Poco::UUID uuid2 = vstr2.convert<Poco::UUID>();
+		(void) vstr2.convert<Poco::UUID>();
 		fail("not a valid UUID, must fail");
 	}
 	catch (Poco::SyntaxException&)
@@ -3531,6 +3674,753 @@ void VarTest::testVarVisitor()
 }
 
 
+void VarTest::testAssignFromOwnContent()
+{
+	const std::string text(100, 'x');
+
+	DynamicStruct inner;
+	inner["text"] = text;
+	DynamicStruct outer;
+	outer["inner"] = inner;
+
+	Var var = outer;
+	var = var["inner"];
+	assertTrue (var.isStruct());
+	assertTrue (var["text"].extract<std::string>() == text);
+
+	var = outer;
+	var = std::move(var["inner"]);
+	assertTrue (var.isStruct());
+	assertTrue (var["text"].extract<std::string>() == text);
+
+	const std::vector<Var> innerVector{text, 1};
+	const std::vector<Var> outerVector{innerVector, 2};
+
+	var = outerVector;
+	var = var[0];
+	assertTrue (var.isVector());
+	assertTrue (var[0].extract<std::string>() == text);
+
+	var = outerVector;
+	var = std::move(var[0]);
+	assertTrue (var.isVector());
+	assertTrue (var[0].extract<std::string>() == text);
+
+	var = text;
+	var = var.extract<std::string>();
+	assertTrue (var.extract<std::string>() == text);
+
+	var = std::move(var.extract<std::string>());
+	assertTrue (var.extract<std::string>() == text);
+
+	var = 42;
+	var = var.extract<int>();
+	assertTrue (var.extract<int>() == 42);
+}
+
+
+void VarTest::testEmplace()
+{
+	Var var;
+	std::string& text = var.emplace<std::string>(3, 'a');
+	assertTrue (text == "aaa");
+	assertTrue (var.type() == typeid(std::string));
+	assertTrue (&text == &var.extract<std::string>());
+
+	var = std::string(100, 'x');
+	var.emplace<std::string>(var.extract<std::string>(), 0, 50);
+	assertTrue (var.extract<std::string>() == std::string(50, 'x'));
+
+	var = 42;
+	const ThrowOnCopy throwing(true);
+	try
+	{
+		var.emplace<ThrowOnCopy>(throwing);
+		fail ("construction must throw");
+	}
+	catch (RuntimeException&)
+	{
+	}
+	assertTrue (var.type() == typeid(int));
+	assertTrue (var.extract<int>() == 42);
+}
+
+
+void VarTest::testExtractMutable()
+{
+	Var var = std::string("abc");
+	var.extract<std::string>().append("def");
+	assertTrue (var.extract<std::string>() == "abcdef");
+
+	try
+	{
+		(void) var.extract<int>();
+		fail ("extract of a different type must throw");
+	}
+	catch (BadCastException&)
+	{
+	}
+
+	Var empty;
+	try
+	{
+		(void) empty.extract<std::string>();
+		fail ("extract of an empty Var must throw");
+	}
+	catch (InvalidAccessException&)
+	{
+	}
+}
+
+
+void VarTest::testSwap()
+{
+	using BigValue = std::array<Poco::UInt64, 16>;
+	const BigValue big1{1, 2, 3};
+	const BigValue big2{4, 5, 6};
+
+	Var local = 1;
+	Var heap = big1;
+	Var empty;
+#ifndef POCO_NO_SOO
+	assertTrue (local.isLocal());
+#endif
+	assertFalse (heap.isLocal());
+
+	local.swap(empty);
+	assertTrue (local.isEmpty());
+	assertTrue (empty.extract<int>() == 1);
+	local.swap(empty);
+	assertTrue (empty.isEmpty());
+	assertTrue (local.extract<int>() == 1);
+
+	empty.swap(local);
+	assertTrue (local.isEmpty());
+	assertTrue (empty.extract<int>() == 1);
+	empty.swap(local);
+	assertTrue (empty.isEmpty());
+	assertTrue (local.extract<int>() == 1);
+
+	local.swap(heap);
+	assertTrue (local.extract<BigValue>() == big1);
+	assertTrue (heap.extract<int>() == 1);
+	local.swap(heap);
+	assertTrue (local.extract<int>() == 1);
+	assertTrue (heap.extract<BigValue>() == big1);
+
+	heap.swap(local);
+	assertTrue (local.extract<BigValue>() == big1);
+	assertTrue (heap.extract<int>() == 1);
+	heap.swap(local);
+	assertTrue (local.extract<int>() == 1);
+	assertTrue (heap.extract<BigValue>() == big1);
+
+	Var otherHeap = big2;
+	heap.swap(otherHeap);
+	assertTrue (heap.extract<BigValue>() == big2);
+	assertTrue (otherHeap.extract<BigValue>() == big1);
+	otherHeap.swap(heap);
+	assertTrue (heap.extract<BigValue>() == big1);
+	assertTrue (otherHeap.extract<BigValue>() == big2);
+
+	Var otherLocal = std::string("abc");
+	local.swap(otherLocal);
+	assertTrue (local.extract<std::string>() == "abc");
+	assertTrue (otherLocal.extract<int>() == 1);
+	otherLocal.swap(local);
+	assertTrue (local.extract<int>() == 1);
+	assertTrue (otherLocal.extract<std::string>() == "abc");
+
+	local.swap(local);
+	assertTrue (local.extract<int>() == 1);
+	heap.swap(heap);
+	assertTrue (heap.extract<BigValue>() == big1);
+
+	using std::swap;
+	swap(local, heap);
+	assertTrue (local.extract<BigValue>() == big1);
+	assertTrue (heap.extract<int>() == 1);
+	static_assert(std::is_nothrow_swappable_v<Var>);
+}
+
+
+void VarTest::testOverAlignedValue()
+{
+	const std::vector<Var> values(4, Var(OverAligned{7}));
+	for (const auto& value: values)
+	{
+		assertFalse (value.isLocal());
+		const OverAligned& extracted = value.extract<OverAligned>();
+		// volatile, so that the compiler cannot fold the check from the alignment of the type
+		const volatile std::uintptr_t address = std::bit_cast<std::uintptr_t>(&extracted);
+		assertTrue (address % alignof(OverAligned) == 0);
+		assertTrue (extracted.value == 7);
+	}
+}
+
+
+void VarTest::testFailedCopyLeavesTargetEmpty()
+{
+	const Var source = ThrowOnCopy(true);
+	Var target;
+	try
+	{
+		target = source;
+		fail ("copy must throw");
+	}
+	catch (RuntimeException&)
+	{
+	}
+	assertTrue (target.isEmpty());
+	assertTrue (target.type() == typeid(void));
+	assertTrue (source.type() == typeid(ThrowOnCopy));
+
+	const ThrowOnCopy value(true);
+	try
+	{
+		target = value;
+		fail ("copy must throw");
+	}
+	catch (RuntimeException&)
+	{
+	}
+	assertTrue (target.isEmpty());
+	assertTrue (target.type() == typeid(void));
+}
+
+
+void VarTest::testFailedCopyKeepsTargetValue()
+{
+	const Var source = ThrowOnCopy(true);
+	Var target = 42;
+	try
+	{
+		target = source;
+		fail ("copy must throw");
+	}
+	catch (RuntimeException&)
+	{
+	}
+	assertTrue (target.extract<int>() == 42);
+}
+
+
+void VarTest::testLocalStorage()
+{
+#ifdef POCO_NO_SOO
+	constexpr bool smallIsLocal = false;
+#else
+	constexpr bool smallIsLocal = true;
+#endif
+	assertTrue (Var(1).isLocal() == smallIsLocal);
+	assertTrue (Var(std::string(100, 'x')).isLocal() == smallIsLocal);
+	assertTrue (Var(CopyCounter(1)).isLocal() == smallIsLocal);
+	assertTrue (Var(Poco::Timestamp()).isLocal() == smallIsLocal);
+	assertTrue (Var(Poco::DateTime()).isLocal() == smallIsLocal);
+	assertTrue (Var(Poco::LocalDateTime()).isLocal() == smallIsLocal);
+	assertTrue (Var(Poco::UUID()).isLocal() == smallIsLocal);
+	assertFalse (Var(MayThrowOnMove()).isLocal());
+}
+
+
+void VarTest::testCopyOnlyValue()
+{
+	const CopyOnly value(1);
+	Var var = value;
+	var = CopyOnly(2);
+	assertTrue (var.extract<CopyOnly>().value() == 2);
+
+	Var constructed = CopyOnly(3);
+	assertTrue (constructed.extract<CopyOnly>().value() == 3);
+
+	Var moved(std::move(var));
+	assertTrue (var.isEmpty());
+	assertTrue (moved.extract<CopyOnly>().value() == 2);
+
+	Var assigned = 1;
+	assigned = std::move(moved);
+	assertTrue (moved.isEmpty());
+	assertTrue (assigned.extract<CopyOnly>().value() == 2);
+
+	assigned.emplace<CopyOnly>(4);
+	assertTrue (assigned.extract<CopyOnly>().value() == 4);
+}
+
+
+void VarTest::testMoveUsesNothrowCopy()
+{
+	const ThrowOnMove value(true);
+	Var source = value;
+#ifndef POCO_NO_SOO
+	assertTrue (source.isLocal());
+#endif
+	Var target(std::move(source));
+	assertTrue (source.isEmpty());
+	assertTrue (target.extract<ThrowOnMove>().throwing());
+
+	Var assigned = 1;
+	assigned = std::move(target);
+	assertTrue (target.isEmpty());
+	assertTrue (assigned.extract<ThrowOnMove>().throwing());
+
+	Var other = std::string("abc");
+	assigned.swap(other);
+	assertTrue (other.extract<ThrowOnMove>().throwing());
+	assertTrue (assigned.extract<std::string>() == "abc");
+}
+
+
+void VarTest::testCopyAssignmentPaths()
+{
+	DynamicStruct members;
+	members["text"] = std::string(100, 'x');
+	const Var structVar = members;
+	const Var intVar = 7;
+	const Var textVar = std::string(100, 'y');
+	const Var emptyVar;
+
+	Var target = 1;
+	target = structVar;
+	assertTrue (target.isStruct());
+	assertTrue (target["text"].extract<std::string>() == std::string(100, 'x'));
+
+	target = 1;
+	target = intVar;
+	assertTrue (target.extract<int>() == 7);
+
+	target = textVar;
+	assertTrue (target.extract<std::string>() == std::string(100, 'y'));
+	target = intVar;
+	assertTrue (target.extract<int>() == 7);
+
+	target = emptyVar;
+	assertTrue (target.isEmpty());
+	target = intVar;
+	assertTrue (target.extract<int>() == 7);
+
+	target = structVar;
+	target = target["text"];
+	assertTrue (target.extract<std::string>() == std::string(100, 'x'));
+}
+
+
+void VarTest::testPlaceholderMarks()
+{
+#ifdef POCO_NO_SOO
+	constexpr bool marked = false;
+#else
+	constexpr bool marked = true;
+#endif
+	using BigValue = std::array<Poco::UInt64, 16>;
+
+	Placeholder<VarHolder> placeholder;
+	assertTrue (placeholder.holdsLeaf());
+	assertTrue (placeholder.hasNothrowClone());
+
+	placeholder.emplace<VarHolderImpl<int>, int>(1);
+	assertTrue (placeholder.holdsLeaf() == marked);
+	assertTrue (placeholder.hasNothrowClone() == marked);
+
+	placeholder.emplace<VarHolderImpl<Poco::DateTime>, Poco::DateTime>(Poco::DateTime());
+	assertTrue (placeholder.holdsLeaf() == marked);
+	assertTrue (placeholder.hasNothrowClone() == marked);
+
+	placeholder.emplace<VarHolderImpl<std::string>, std::string>(std::string("abc"));
+	assertTrue (placeholder.holdsLeaf() == marked);
+	assertFalse (placeholder.hasNothrowClone());
+
+	placeholder.emplace<VarHolderImpl<std::vector<Var>>, std::vector<Var>>(std::vector<Var>{1});
+	assertFalse (placeholder.holdsLeaf());
+	assertFalse (placeholder.hasNothrowClone());
+
+	Placeholder<VarHolder> moved;
+	moved.moveFrom(placeholder);
+	assertFalse (moved.holdsLeaf());
+	assertTrue (placeholder.holdsLeaf());
+	placeholder.emplace<VarHolderImpl<int>, int>(2);
+	moved.moveFrom(placeholder);
+	assertTrue (moved.holdsLeaf() == marked);
+	assertTrue (moved.hasNothrowClone() == marked);
+	assertTrue (placeholder.hasNothrowClone());
+
+	Placeholder<VarHolder> heapLeaf;
+	heapLeaf.emplace<VarHolderImpl<BigValue>, BigValue>(BigValue{});
+	assertFalse (heapLeaf.isLocal());
+	assertTrue (heapLeaf.holdsLeaf() == marked);
+	assertFalse (heapLeaf.hasNothrowClone());
+	Placeholder<VarHolder> heapPair;
+	heapPair.emplace<VarHolderImpl<Pair<std::string>>, Pair<std::string>>(Pair<std::string>("key", 1));
+	assertFalse (heapPair.isLocal());
+	heapLeaf.swap(heapPair);
+	assertFalse (heapLeaf.holdsLeaf());
+	assertTrue (heapPair.holdsLeaf() == marked);
+
+	heapLeaf.erase();
+	assertTrue (heapLeaf.holdsLeaf());
+	assertTrue (heapLeaf.hasNothrowClone());
+}
+
+
+void VarTest::testPlaceholderFailedEmplaceLeavesItEmpty()
+{
+	Placeholder<VarHolder> placeholder;
+	placeholder.emplace<VarHolderImpl<int>, int>(1);
+	const ThrowOnCopy throwing(true);
+	try
+	{
+		placeholder.emplace<VarHolderImpl<ThrowOnCopy>, ThrowOnCopy>(throwing);
+		fail ("construction must throw");
+	}
+	catch (RuntimeException&)
+	{
+	}
+	assertTrue (placeholder.isEmpty());
+	assertTrue (placeholder.content() == nullptr);
+}
+
+
+void VarTest::testStringAssignmentKeepsBuffer()
+{
+	const std::string text(100, 'x');
+	Var target(std::string(200, 'a'));
+	const char* pData = target.extract<std::string>().data();
+	const Var source(text);
+	target = source;
+	assertTrue (target.extract<std::string>() == text);
+	assertTrue (target.extract<std::string>().data() == pData);
+	assertTrue (source.extract<std::string>() == text);
+
+	const UTF16String utf16Text(100, u'x');
+	Var utf16Target(UTF16String(200, u'a'));
+	const UTF16String::value_type* pUtf16Data = utf16Target.extract<UTF16String>().data();
+	const Var utf16Source(utf16Text);
+	utf16Target = utf16Source;
+	assertTrue (utf16Target.extract<UTF16String>() == utf16Text);
+	assertTrue (utf16Target.extract<UTF16String>().data() == pUtf16Data);
+
+	target = Var(42);
+	assertTrue (target.extract<int>() == 42);
+}
+
+
+void VarTest::testDerivedHolderIsDestroyed()
+{
+	CountingIntHolder::resetDestroyed();
+	{
+		Placeholder<VarHolder> placeholder;
+		placeholder.emplace<CountingIntHolder, int>(1);
+		placeholder.emplace<CountingIntHolder, int>(2);
+		assertEqual (1, CountingIntHolder::destroyed());
+		Placeholder<VarHolder> moved;
+		moved.moveFrom(placeholder);
+		placeholder.emplace<CountingIntHolder, int>(3);
+	}
+	assertEqual (3, CountingIntHolder::destroyed());
+}
+
+
+void VarTest::testConvertibleRvalueUsesConversion()
+{
+	const Var var = ConvertsToVar();
+	assertTrue (var.type() == typeid(int));
+	assertTrue (var.extract<int>() == 7);
+}
+
+
+void VarTest::testMoveDoesNotCopy()
+{
+	Pair<std::string> pair("key", CopyCounter(4));
+	CopyCounter::resetCopies();
+
+	std::vector<Var> values;
+	for (int i = 0; i < 100; ++i) values.emplace_back(CopyCounter(i));
+	assertTrue (values.back().extract<CopyCounter>().value() == 99);
+
+	Var user = CopyCounter(1);
+	Var movedUser(std::move(user));
+	assertTrue (movedUser.extract<CopyCounter>().value() == 1);
+
+	DynamicStruct members;
+	members["counter"] = CopyCounter(2);
+	Var structVar(std::move(members));
+	Var movedStruct(std::move(structVar));
+	assertTrue (movedStruct["counter"].extract<CopyCounter>().value() == 2);
+
+	std::vector<Var> elements;
+	elements.emplace_back(CopyCounter(3));
+	Var vectorVar(std::move(elements));
+	Var movedVector(std::move(vectorVar));
+	assertTrue (movedVector[0].extract<CopyCounter>().value() == 3);
+
+	Var pairVar(std::move(pair));
+	Var movedPair(std::move(pairVar));
+	assertTrue (movedPair.extract<Pair<std::string>>().second().extract<CopyCounter>().value() == 4);
+	assertTrue (CopyCounter::copies() == 0);
+
+	const std::string text(100, 'x');
+	Var textVar = text;
+	const char* pData = textVar.extract<std::string>().data();
+	Var movedText(std::move(textVar));
+	assertTrue (movedText.extract<std::string>().data() == pData);
+	movedText = std::move(movedUser);
+	assertTrue (movedText.extract<CopyCounter>().value() == 1);
+	assertTrue (CopyCounter::copies() == 0);
+}
+
+
+void VarTest::testMoveKeepsValue()
+{
+	enum class Color
+	{
+		RED,
+		GREEN
+	};
+
+	DynamicStruct dynamicStruct;
+	dynamicStruct["text"] = std::string(100, 'x');
+	dynamicStruct["number"] = 1;
+	OrderedDynamicStruct orderedStruct;
+	orderedStruct["text"] = std::string(100, 'x');
+	orderedStruct["number"] = 1;
+
+	checkMoveKeepsValue(42);
+	checkMoveKeepsValue(2.5);
+	checkMoveKeepsValue(true);
+	checkMoveKeepsValue('a');
+	checkMoveKeepsValue(Poco::Int64(-64));
+	checkMoveKeepsValue(Poco::UInt64(64));
+	checkMoveKeepsValue(Poco::Timestamp(1000000));
+	checkMoveKeepsValue(Poco::LocalDateTime(2026, 11, 25, 12, 30, 15));
+	checkMoveKeepsValue(std::string("abc"));
+	checkMoveKeepsValue(std::string(100, 'x'));
+	checkMoveKeepsValue(Poco::UUID("f81d4fae-7dec-11d0-a765-00a0c91e6bf6"));
+	checkMoveKeepsValue(Poco::DateTime(2026, 11, 25, 12, 30, 15));
+	checkMoveKeepsValue(std::vector<Var>{std::string(100, 'x'), 1});
+	checkMoveKeepsValue(dynamicStruct);
+	checkMoveKeepsValue(orderedStruct);
+	checkMoveKeepsValue(Pair<std::string>("key", std::string(100, 'x')));
+	checkMoveKeepsValue(Color::GREEN);
+	checkMoveKeepsValue(CopyCounter(5));
+}
+
+
+void VarTest::testStorageSize()
+{
+#if !defined(POCO_NO_SOO) && POCO_SMALL_OBJECT_SIZE == 64
+	// With the default buffer size, the type id byte fits into the padding behind the tag byte.
+	constexpr std::size_t alignment = alignof(std::max_align_t);
+	constexpr std::size_t expectedSize = (POCO_SMALL_OBJECT_SIZE + 1 + alignment - 1) / alignment * alignment;
+	assertEqual (expectedSize, sizeof(Placeholder<VarHolder>));
+	assertEqual (expectedSize, sizeof(Var));
+#endif
+}
+
+
+void VarTest::testExtractPredefinedTypes()
+{
+	using OrderedIntStruct = Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
+
+	checkExtractAndConvert(true);
+	checkExtractAndConvert('a');
+	checkExtractAndConvert(Poco::Int8(-8));
+	checkExtractAndConvert(Poco::UInt8(8));
+	checkExtractAndConvert(Poco::Int16(-16));
+	checkExtractAndConvert(Poco::UInt16(16));
+	checkExtractAndConvert(Poco::Int32(-32));
+	checkExtractAndConvert(Poco::UInt32(32));
+	checkExtractAndConvert(Poco::Int64(-64));
+	checkExtractAndConvert(Poco::UInt64(64));
+	checkExtractAndConvert(-1L);
+	checkExtractAndConvert(1UL);
+	checkExtractAndConvert(-2LL);
+	checkExtractAndConvert(2ULL);
+	checkExtractAndConvert(1.5f);
+	checkExtractAndConvert(2.5);
+	checkExtractAndConvert(std::string("abc"));
+	checkExtractAndConvert(UTF16String(3, u'x'));
+	checkExtractAndConvert(Poco::DateTime(2026, 11, 26, 12, 30, 15));
+	checkExtractAndConvert(Poco::LocalDateTime(2026, 11, 26, 12, 30, 15));
+	checkExtractAndConvert(Poco::Timestamp(1000000));
+	checkExtractAndConvert(Poco::UUID("f81d4fae-7dec-11d0-a765-00a0c91e6bf6"));
+
+	const std::vector<Var> vector{1, std::string("abc")};
+	Var vectorVar = vector;
+	assertTrue (vectorVar.extract<std::vector<Var>>() == vector);
+	assertTrue (vectorVar[1] == "abc");
+
+	const std::list<Var> list{1, std::string("abc")};
+	Var listVar = list;
+	assertTrue (listVar.extract<std::list<Var>>() == list);
+	assertTrue (listVar[1] == "abc");
+
+	const std::deque<Var> deque{1, std::string("abc")};
+	Var dequeVar = deque;
+	assertTrue (dequeVar.extract<std::deque<Var>>() == deque);
+	assertTrue (dequeVar[1] == "abc");
+
+	DynamicStruct dynamicStruct;
+	dynamicStruct["a"] = 1;
+	Var dynamicStructVar = dynamicStruct;
+	assertTrue (dynamicStructVar.extract<DynamicStruct>()["a"] == 1);
+	assertTrue (dynamicStructVar["a"] == 1);
+
+	OrderedDynamicStruct orderedStruct;
+	orderedStruct["a"] = 2;
+	Var orderedStructVar = orderedStruct;
+	assertTrue (orderedStructVar.extract<OrderedDynamicStruct>()["a"] == 2);
+	assertTrue (orderedStructVar["a"] == 2);
+
+	Struct<int> intStruct;
+	intStruct[1] = 3;
+	Var intStructVar = intStruct;
+	assertTrue (intStructVar.extract<Struct<int>>()[1] == 3);
+	assertTrue (intStructVar[1] == 3);
+
+	OrderedIntStruct orderedIntStruct;
+	orderedIntStruct[1] = 4;
+	Var orderedIntStructVar = orderedIntStruct;
+	assertTrue (orderedIntStructVar.extract<OrderedIntStruct>()[1] == 4);
+	assertTrue (orderedIntStructVar[1] == 4);
+}
+
+
+void VarTest::testExtractRejectsSimilarTypes()
+{
+	using OrderedIntStruct = Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
+
+	checkExtractFails<long>(Var(1));
+	checkExtractFails<int>(Var(1L));
+	if constexpr (!std::is_same_v<Poco::Int64, long>)
+	{
+		checkExtractFails<long>(Var(Poco::Int64(1)));
+		checkExtractFails<Poco::Int64>(Var(1L));
+	}
+	if constexpr (!std::is_same_v<Poco::Int64, long long>)
+	{
+		checkExtractFails<long long>(Var(Poco::Int64(1)));
+		checkExtractFails<Poco::Int64>(Var(1LL));
+	}
+	checkExtractFails<unsigned>(Var(1));
+	checkExtractFails<Poco::Int8>(Var('a'));
+	checkExtractFails<Poco::UInt8>(Var('a'));
+	checkExtractFails<char>(Var(Poco::Int8(1)));
+	checkExtractFails<Poco::UInt8>(Var(Poco::Int8(1)));
+	checkExtractFails<char>(Var(Poco::UInt8(1)));
+	checkExtractFails<Poco::Int8>(Var(Poco::UInt8(1)));
+	checkExtractFails<UTF16String>(Var(std::string("abc")));
+	checkExtractFails<std::string>(Var(UTF16String(3, u'x')));
+	checkExtractFails<std::list<Var>>(Var(std::vector<Var>{1}));
+	checkExtractFails<std::vector<Var>>(Var(std::list<Var>{1}));
+	checkExtractFails<OrderedDynamicStruct>(Var(DynamicStruct()));
+	checkExtractFails<DynamicStruct>(Var(OrderedDynamicStruct()));
+	checkExtractFails<DynamicStruct>(Var(Struct<int>()));
+	checkExtractFails<Struct<int>>(Var(DynamicStruct()));
+	checkExtractFails<Struct<int>>(Var(OrderedIntStruct()));
+
+	assertTrue (Var(1).convert<long>() == 1);
+	assertTrue (Var('a').convert<Poco::Int8>() == 'a');
+}
+
+
+void VarTest::testExtractTypeWithoutTypeId()
+{
+	const Var var = CopyCounter(3);
+	assertTrue (var.extract<CopyCounter>().value() == 3);
+	checkExtractFails<int>(var);
+	checkExtractFails<CopyCounter>(Var(3));
+
+	const Var pair = Pair<std::string>("key", 1);
+	assertTrue (pair.extract<Pair<std::string>>().first() == "key");
+	checkExtractFails<Pair<int>>(pair);
+}
+
+
+void VarTest::testDerivedHolderHasTypeIdOfBase()
+{
+	Placeholder<VarHolder> placeholder;
+	placeholder.emplace<CountingIntHolder, int>(5);
+	assertTrue ((placeholder.typeId() == Placeholder<VarHolder>::holderTypeId<VarHolderImpl<int>, int>()));
+	assertTrue (placeholder.content()->type() == typeid(int));
+	assertTrue (static_cast<VarHolderImpl<int>*>(placeholder.content())->value() == 5);
+}
+
+
+void VarTest::testPlaceholderTypeId()
+{
+	using OrderedIntStruct = Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
+	constexpr unsigned char otherId = Poco::Impl::TYPE_ID_OTHER;
+	constexpr unsigned char intId = Placeholder<VarHolder>::holderTypeId<VarHolderImpl<int>, int>();
+	constexpr unsigned char stringId = Placeholder<VarHolder>::holderTypeId<VarHolderImpl<std::string>, std::string>();
+	constexpr unsigned char uuidId = Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Poco::UUID>, Poco::UUID>();
+	constexpr unsigned char orderedStructId = Placeholder<VarHolder>::holderTypeId<VarHolderImpl<OrderedDynamicStruct>, OrderedDynamicStruct>();
+	constexpr unsigned char orderedIntStructId = Placeholder<VarHolder>::holderTypeId<VarHolderImpl<OrderedIntStruct>, OrderedIntStruct>();
+
+	Placeholder<VarHolder> placeholder;
+	assertTrue (placeholder.typeId() == otherId);
+	placeholder.emplace<VarHolderImpl<int>, int>(1);
+	assertTrue (placeholder.typeId() == intId);
+	placeholder.emplace<VarHolderImpl<std::string>, std::string>(std::string("abc"));
+	assertTrue (placeholder.typeId() == stringId);
+	placeholder.emplace<VarHolderImpl<CopyCounter>, CopyCounter>(CopyCounter(1));
+	assertTrue (placeholder.typeId() == otherId);
+	placeholder.emplace<VarHolderImpl<Poco::UUID>, Poco::UUID>(Poco::UUID());
+	assertTrue (placeholder.typeId() == uuidId);
+
+	Placeholder<VarHolder> moved;
+	moved.moveFrom(placeholder);
+	assertTrue (moved.typeId() == uuidId);
+	assertTrue (placeholder.typeId() == otherId);
+
+	Placeholder<VarHolder> heapStruct;
+	heapStruct.emplace<VarHolderImpl<OrderedDynamicStruct>, OrderedDynamicStruct>(OrderedDynamicStruct());
+	Placeholder<VarHolder> heapIntStruct;
+	heapIntStruct.emplace<VarHolderImpl<OrderedIntStruct>, OrderedIntStruct>(OrderedIntStruct());
+	assertFalse (heapStruct.isLocal());
+	assertFalse (heapIntStruct.isLocal());
+	heapStruct.swap(heapIntStruct);
+	assertTrue (heapStruct.typeId() == orderedIntStructId);
+	assertTrue (heapIntStruct.typeId() == orderedStructId);
+
+	moved.moveFrom(heapStruct);
+	assertTrue (moved.typeId() == orderedIntStructId);
+	assertTrue (heapStruct.typeId() == otherId);
+
+	moved.erase();
+	assertTrue (moved.typeId() == otherId);
+}
+
+
+void VarTest::testTypeIdsAreDistinct()
+{
+#ifndef POCO_NO_SOO
+	using ValueTypes = Poco::Dynamic::Impl::VarValueTypes;
+	assertTrue (hasTypeIdOneAboveIndex<ValueTypes>(std::make_index_sequence<ValueTypes::length>()));
+#endif
+
+	using Int64Fundamental = std::conditional_t<std::is_same_v<Poco::Int64, long>, long, long long>;
+	static_assert(std::is_same_v<Poco::Int64, Int64Fundamental>);
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Poco::Int64>, Poco::Int64>() ==
+		Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Int64Fundamental>, Int64Fundamental>()));
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Poco::Int8>, Poco::Int8>() ==
+		Placeholder<VarHolder>::holderTypeId<VarHolderImpl<signed char>, signed char>()));
+	assertTrue (Var(Poco::Int64(1)).extract<Int64Fundamental>() == 1);
+	assertTrue (Var(static_cast<Int64Fundamental>(2)).extract<Poco::Int64>() == 2);
+}
+
+
+void VarTest::testDerivedHolderDoesNotInheritTypeId()
+{
+	checkExtractFails<ExtendedStruct>(Var(DynamicStruct()));
+
+	ExtendedStruct extended;
+	extended["a"] = 1;
+	const Var extendedVar = extended;
+	assertTrue (extendedVar.extract<ExtendedStruct>().extra() == 42);
+	assertTrue (extendedVar.extract<ExtendedStruct>()["a"] == 1);
+	checkExtractFails<DynamicStruct>(extendedVar);
+}
+
+
 void VarTest::setUp()
 {
 }
@@ -3605,6 +4495,32 @@ CppUnit::Test* VarTest::suite()
 	CppUnit_addTest(pSuite, VarTest, testIteratorSwap);
 	CppUnit_addTest(pSuite, VarTest, testVarVisitor);
 	CppUnit_addTest(pSuite, VarTest, testEnumType);
+	CppUnit_addTest(pSuite, VarTest, testAssignFromOwnContent);
+	CppUnit_addTest(pSuite, VarTest, testEmplace);
+	CppUnit_addTest(pSuite, VarTest, testExtractMutable);
+	CppUnit_addTest(pSuite, VarTest, testSwap);
+	CppUnit_addTest(pSuite, VarTest, testOverAlignedValue);
+	CppUnit_addTest(pSuite, VarTest, testFailedCopyLeavesTargetEmpty);
+	CppUnit_addTest(pSuite, VarTest, testFailedCopyKeepsTargetValue);
+	CppUnit_addTest(pSuite, VarTest, testLocalStorage);
+	CppUnit_addTest(pSuite, VarTest, testCopyOnlyValue);
+	CppUnit_addTest(pSuite, VarTest, testMoveUsesNothrowCopy);
+	CppUnit_addTest(pSuite, VarTest, testCopyAssignmentPaths);
+	CppUnit_addTest(pSuite, VarTest, testPlaceholderMarks);
+	CppUnit_addTest(pSuite, VarTest, testPlaceholderFailedEmplaceLeavesItEmpty);
+	CppUnit_addTest(pSuite, VarTest, testDerivedHolderIsDestroyed);
+	CppUnit_addTest(pSuite, VarTest, testStringAssignmentKeepsBuffer);
+	CppUnit_addTest(pSuite, VarTest, testConvertibleRvalueUsesConversion);
+	CppUnit_addTest(pSuite, VarTest, testMoveDoesNotCopy);
+	CppUnit_addTest(pSuite, VarTest, testMoveKeepsValue);
+	CppUnit_addTest(pSuite, VarTest, testStorageSize);
+	CppUnit_addTest(pSuite, VarTest, testExtractPredefinedTypes);
+	CppUnit_addTest(pSuite, VarTest, testExtractRejectsSimilarTypes);
+	CppUnit_addTest(pSuite, VarTest, testExtractTypeWithoutTypeId);
+	CppUnit_addTest(pSuite, VarTest, testDerivedHolderHasTypeIdOfBase);
+	CppUnit_addTest(pSuite, VarTest, testPlaceholderTypeId);
+	CppUnit_addTest(pSuite, VarTest, testTypeIdsAreDistinct);
+	CppUnit_addTest(pSuite, VarTest, testDerivedHolderDoesNotInheritTypeId);
 
 	return pSuite;
 }

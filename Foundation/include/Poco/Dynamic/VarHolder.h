@@ -32,13 +32,15 @@
 #include "Poco/UTFString.h"
 #include "Poco/UTF8String.h"
 #include "Poco/UUID.h"
-#include "Poco/Any.h"
+#include "Poco/Placeholder.h"
 #include "Poco/Format.h"
 #include "Poco/Debugger.h"
 #include "Poco/Exception.h"
 #include <vector>
 #include <list>
 #include <deque>
+#include <map>
+#include <set>
 #include <typeinfo>
 #include <type_traits>
 #include <string_view>
@@ -63,6 +65,12 @@ namespace Poco::Dynamic {
 
 
 class Var;
+
+template <typename K, typename M, typename S>
+class Struct;
+
+template <typename K>
+class Pair;
 
 
 namespace Impl {
@@ -129,6 +137,16 @@ class Foundation_API VarHolder
 	/// the only condition is that they reside in Poco namespace and implement the pure virtual functions
 	/// clone() and type().
 	///
+	/// A specialization whose destructor does nothing but destroy its value may declare
+	/// "using DestroysOnlyValue = VarHolderImpl;": for a trivially destructible value,
+	/// Var then reuses the storage without calling the destructor.
+	///
+	/// Var recognizes the holders of the types in ValueTypes by a type id instead
+	/// of by type(). A specialization in another library declares its type id as
+	/// "static constexpr unsigned char TYPE_ID", in the range of its library
+	/// (see Poco::Impl::JSON_TYPE_ID_BASE), together with
+	/// "using TypeIdHolder = VarHolderImpl;" (see Placeholder::holderTypeId()).
+	///
 	/// Those conversions that are not implemented shall fail back to this base
 	/// class implementation. All the convert() function overloads in this class
 	/// throw BadCastException.
@@ -136,7 +154,17 @@ class Foundation_API VarHolder
 public:
 	using ArrayValueType = Var;
 
-	virtual ~VarHolder();
+	using ValueTypes = TypeList<bool, char, signed char, unsigned char, short, unsigned short, int, unsigned,
+		long, unsigned long, long long, unsigned long long, float, double,
+		std::string, UTF16String, DateTime, LocalDateTime, Timestamp, UUID,
+		std::vector<Var>, std::list<Var>, std::deque<Var>,
+		Struct<std::string, std::map<std::string, Var>, std::set<std::string>>,
+		Struct<int, std::map<int, Var>, std::set<int>>,
+		Pair<std::string>, Pair<int>>;
+		/// The value types that Var identifies by a type id (see Placeholder::holderTypeId()).
+		/// The ordered Struct types, which cannot be named here, follow them (see Struct.h).
+
+	virtual ~VarHolder() = default;
 		/// Destroys the VarHolder.
 
 	[[nodiscard]] virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = nullptr) const = 0;
@@ -144,8 +172,28 @@ public:
 		/// deep-copy the VarHolder.
 		/// If small object optimization is enabled (i.e. if
 		/// POCO_NO_SOO is not defined), VarHolder will be
-		/// instantiated in-place if it's size is smaller
-		/// than POCO_SMALL_OBJECT_SIZE.
+		/// instantiated in-place if the Placeholder can
+		/// store it in its local buffer (see Placeholder).
+
+	virtual VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder);
+		/// Moves the held value into a new VarHolder in pVarHolder
+		/// and returns it. The value of this VarHolder is valid but
+		/// unspecified afterwards.
+		///
+		/// The default implementation copies the value with clone().
+		/// A VarHolder that keeps it is stored in the local buffer of the
+		/// Placeholder only if its value type is nothrow copy constructible,
+		/// and its clone() must then not throw; otherwise it is stored on the
+		/// heap, and moveTo() is not called. A specialization whose value can
+		/// be moved without an exception overrides it as noexcept, so that its
+		/// VarHolder can be stored locally.
+
+	virtual bool assignFrom(const VarHolder& source);
+		/// Replaces the held value with a copy of the value of source and
+		/// returns true, if this VarHolder can do so in place and the
+		/// assignment has no effect if it throws. Returns false without a
+		/// change otherwise. The default implementation returns false.
+		/// Requires that source holds the same value type as this VarHolder.
 
 	[[nodiscard]] virtual const std::type_info& type() const = 0;
 		/// Implementation must return the type information
@@ -306,7 +354,7 @@ public:
 		/// Returns 1 iff Var is not empty or this function overridden.
 
 protected:
-	VarHolder();
+	VarHolder() = default;
 		/// Creates the VarHolder.
 
 	template <typename T>
@@ -316,13 +364,23 @@ protected:
 		/// Called from clone() member function of the implementation.
 		///
 		/// When the small object optimization is enabled (POCO_NO_SOO not
-		/// defined), if size of the wrapper is larger than
-		/// POCO_SMALL_OBJECT_SIZE, holder is instantiated on
+		/// defined), if the Placeholder cannot store the wrapper in
+		/// its local buffer (see Placeholder), holder is instantiated on
 		/// the heap, otherwise it is instantiated in-place (in the
 		/// pre-allocated buffer inside the holder).
 	{
 		poco_check_ptr (pVarHolder);
 		return pVarHolder->assign<VarHolderImpl<T>, T>(val);
+	}
+
+	template <typename T>
+	[[nodiscard]] VarHolder* moveHolder(Placeholder<VarHolder>* pVarHolder, T& val)
+		/// Instantiates value holder wrapper from val, which is moved.
+		///
+		/// Called from moveTo() member function of the implementation.
+	{
+		poco_assert_dbg (pVarHolder != nullptr);
+		return pVarHolder->emplace<VarHolderImpl<T>, T>(std::move(val));
 	}
 
 	template <typename F, typename T>
@@ -552,6 +610,18 @@ private:
 //
 // inlines
 //
+
+
+inline VarHolder* VarHolder::moveTo(Placeholder<VarHolder>* pVarHolder)
+{
+	return clone(pVarHolder);
+}
+
+
+inline bool VarHolder::assignFrom(const VarHolder& /*source*/)
+{
+	return false;
+}
 
 
 inline void VarHolder::convert(Int8& /*val*/) const
@@ -821,7 +891,13 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(T&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -1118,6 +1194,17 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<T> || std::is_nothrow_copy_constructible_v<T>) override
+	{
+		// A throwing move is used only if the copy can throw as well;
+		// such a holder is stored on the heap, where moveTo() is not called.
+		if constexpr (std::is_nothrow_move_constructible_v<T> ||
+			(std::is_move_constructible_v<T> && !std::is_nothrow_copy_constructible_v<T>))
+			return moveHolder(pVarHolder, _val);
+		else
+			return clone(pVarHolder);
+	}
+
 	const T& value() const
 	{
 		return _val;
@@ -1137,6 +1224,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -1237,6 +1326,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const Int8& value() const
 	{
 		return _val;
@@ -1291,6 +1385,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -1393,6 +1489,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const Int16& value() const
 	{
 		return _val;
@@ -1442,6 +1543,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -1538,6 +1641,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const Int32& value() const
 	{
 		return _val;
@@ -1592,6 +1700,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -1703,6 +1813,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const Int64& value() const
 	{
 		return _val;
@@ -1757,6 +1872,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -1853,6 +1970,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const UInt8& value() const
 	{
 		return _val;
@@ -1907,6 +2029,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -2003,6 +2127,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const UInt16& value() const
 	{
 		return _val;
@@ -2057,6 +2186,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -2153,6 +2284,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const UInt32& value() const
 	{
 		return _val;
@@ -2207,6 +2343,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -2324,6 +2462,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const UInt64& value() const
 	{
 		return _val;
@@ -2378,6 +2521,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
 	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
@@ -2471,6 +2616,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const bool& value() const
 	{
 		return _val;
@@ -2525,6 +2675,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -2622,6 +2774,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const float& value() const
 	{
 		return _val;
@@ -2676,6 +2833,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -2773,6 +2932,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const double& value() const
 	{
 		return _val;
@@ -2827,6 +2991,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -2921,6 +3087,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const char& value() const
 	{
 		return _val;
@@ -2975,6 +3146,10 @@ public:
 	}
 
 	VarHolderImpl(const std::string& val) : _val(val)
+	{
+	}
+
+	explicit VarHolderImpl(std::string&& val): _val(std::move(val))
 	{
 	}
 
@@ -3127,6 +3302,19 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
+	bool assignFrom(const VarHolder& source) override
+	{
+		// A member function of basic_string that throws has no effect on the string.
+		poco_assert_dbg (source.type() == type());
+		_val = static_cast<const VarHolderImpl&>(source)._val;
+		return true;
+	}
+
 	const std:: string& value() const
 	{
 		return _val;
@@ -3170,6 +3358,10 @@ public:
 	}
 
 	VarHolderImpl(const Poco::UTF16String& val) : _val(val)
+	{
+	}
+
+	explicit VarHolderImpl(Poco::UTF16String&& val): _val(std::move(val))
 	{
 	}
 
@@ -3320,6 +3512,19 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
+	bool assignFrom(const VarHolder& source) override
+	{
+		// A member function of basic_string that throws has no effect on the string.
+		poco_assert_dbg (source.type() == type());
+		_val = static_cast<const VarHolderImpl&>(source)._val;
+		return true;
+	}
+
 	const Poco::UTF16String& value() const
 	{
 		return _val;
@@ -3373,6 +3578,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -3455,6 +3662,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const long& value() const
 	{
 		return _val;
@@ -3509,6 +3721,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -3591,6 +3805,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const unsigned long& value() const
 	{
 		return _val;
@@ -3648,6 +3867,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -3740,6 +3961,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const long long& value() const
 	{
 		return _val;
@@ -3794,6 +4020,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -3886,6 +4114,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const unsigned long long& value() const
 	{
 		return _val;
@@ -3942,6 +4175,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(std::vector<T>&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	VarHolderImpl() = delete;
@@ -3961,6 +4198,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<std::vector<T>>) override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const std::vector<T>& value() const
@@ -4005,6 +4247,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(std::list<T>&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	VarHolderImpl() = delete;
@@ -4024,6 +4270,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<std::list<T>>) override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const std::list<T>& value() const
@@ -4078,6 +4329,10 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(std::deque<T>&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
 
 	VarHolderImpl() = delete;
@@ -4097,6 +4352,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept(std::is_nothrow_move_constructible_v<std::deque<T>>) override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const std::deque<T>& value() const
@@ -4142,6 +4402,8 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
 
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
@@ -4214,6 +4476,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const DateTime& value() const
@@ -4291,6 +4558,8 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
+
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
 	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
@@ -4346,6 +4615,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const LocalDateTime& value() const
@@ -4423,6 +4697,8 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
+
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
 	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
@@ -4479,6 +4755,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const Timestamp& value() const
@@ -4556,6 +4837,8 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
+
 	VarHolderImpl() = delete;
 	VarHolderImpl(const VarHolderImpl&) = delete;
 	VarHolderImpl& operator=(const VarHolderImpl&) = delete;
@@ -4573,6 +4856,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const UUID& value() const

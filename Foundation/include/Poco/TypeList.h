@@ -102,6 +102,17 @@ struct TypeAtImpl<N, TypeList<Ts...>>
 };
 
 
+/// Get the index of the first occurrence of T in Ts, or -1
+template <typename T, typename... Ts>
+[[nodiscard]] constexpr int typeIndex()
+{
+	// The fold stops at the first match; index counts the types before it.
+	int index = 0;
+	const bool found = ((std::is_same_v<T, Ts> || (++index, false)) || ...);
+	return found ? index : -1;
+}
+
+
 } // namespace Detail
 
 
@@ -165,6 +176,29 @@ struct TypeGetter
 {
 	using HeadType = typename Detail::TypeAtImpl<N, List>::Type;
 	using ConstHeadType = const HeadType;
+};
+
+
+/// TypeIndex - the index of the first occurrence of T in a TypeList,
+/// or -1 if the TypeList does not contain T.
+template <typename T, typename List>
+struct TypeIndex;
+
+template <typename T, typename... Ts>
+struct TypeIndex<T, TypeList<Ts...>>
+{
+	static constexpr int value = Detail::typeIndex<T, Ts...>();
+};
+
+
+/// TypeListConcat - a TypeList of the types of List1 followed by the types of List2.
+template <typename List1, typename List2>
+struct TypeListConcat;
+
+template <typename... Ts, typename... Us>
+struct TypeListConcat<TypeList<Ts...>, TypeList<Us...>>
+{
+	using HeadType = TypeList<Ts..., Us...>;
 };
 
 

@@ -19,11 +19,13 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/VarTypeIds.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Exception.h"
 #include <vector>
 #include <algorithm>
+#include <utility>
 
 
 namespace Poco::Data {
@@ -261,23 +263,36 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(Poco::Data::BLOB&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl()
 	{
 	}
 
-	[[nodiscard]] const std::type_info& type() const
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<Poco::Data::BLOB, Poco::Data::Impl::VarValueTypes, Poco::Impl::DATA_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
+
+	[[nodiscard]] const std::type_info& type() const override
 	{
 		return typeid(Poco::Data::BLOB);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val.assign(_val.begin(), _val.end());
 	}
 
-	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
+	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	[[nodiscard]] const Poco::Data::BLOB& value() const
@@ -299,23 +314,36 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(Poco::Data::CLOB&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl()
 	{
 	}
 
-	[[nodiscard]] const std::type_info& type() const
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<Poco::Data::CLOB, Poco::Data::Impl::VarValueTypes, Poco::Impl::DATA_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
+
+	[[nodiscard]] const std::type_info& type() const override
 	{
 		return typeid(Poco::Data::CLOB);
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
 		val.assign(_val.begin(), _val.end());
 	}
 
-	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
+	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	[[nodiscard]] const Poco::Data::CLOB& value() const

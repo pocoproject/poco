@@ -31,6 +31,7 @@
 #include <deque>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 
 namespace Poco::JSON {
@@ -536,7 +537,15 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(JSON::Object::Ptr&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
+
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<JSON::Object::Ptr, JSON::Impl::VarValueTypes, Poco::Impl::JSON_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
 
 	const std::type_info& type() const override
 	{
@@ -630,6 +639,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
+	}
+
 	const JSON::Object::Ptr& value() const
 	{
 		return _val;
@@ -673,7 +687,15 @@ public:
 	{
 	}
 
+	explicit VarHolderImpl(JSON::Object&& val): _val(std::move(val))
+	{
+	}
+
 	~VarHolderImpl() override = default;
+
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<JSON::Object, JSON::Impl::VarValueTypes, Poco::Impl::JSON_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
 
 	const std::type_info& type() const override
 	{
@@ -765,6 +787,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	const JSON::Object& value() const

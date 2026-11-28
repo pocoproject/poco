@@ -60,7 +60,7 @@ public:
 	UUID();
 		/// Creates a nil (all zero) UUID.
 
-	UUID(const UUID& uuid);
+	UUID(const UUID& uuid) noexcept = default;
 		/// Copy constructor.
 
 	explicit UUID(const std::string& uuid);
@@ -69,10 +69,10 @@ public:
 	explicit UUID(const char* uuid);
 		/// Parses the UUID from a string.
 
-	~UUID();
+	~UUID() = default;
 		/// Destroys the UUID.
 
-	UUID& operator = (const UUID& uuid);
+	UUID& operator = (const UUID& uuid) noexcept = default;
 		/// Assignment operator.
 
 	void swap(UUID& uuid) noexcept;

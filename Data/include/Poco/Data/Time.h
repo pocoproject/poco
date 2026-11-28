@@ -19,6 +19,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/VarTypeIds.h"
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Exception.h"
 
@@ -53,11 +54,14 @@ public:
 	Time(const DateTime& dt);
 		/// Creates the Time from DateTime
 
-	~Time();
+	~Time() = default;
 		/// Destroys the Time.
 
-	Time(const Time & ) = default;
-	Time(Time && ) = default;
+	Time(const Time& t) noexcept = default;
+		/// Copy constructor.
+
+	Time(Time&& t) noexcept = default;
+		/// Move constructor.
 
 	[[nodiscard]] int hour() const;
 		/// Returns the hour.
@@ -71,8 +75,11 @@ public:
 	void assign(int hour, int minute, int second);
 		/// Assigns time.
 
-	Time& operator = (const Time& t);
+	Time& operator = (const Time& t) noexcept = default;
 		/// Assignment operator for Time.
+
+	Time& operator = (Time&& t) noexcept = default;
+		/// Move assignment operator for Time.
 
 	Time& operator = (const DateTime& dt);
 		/// Assignment operator for DateTime.
@@ -117,13 +124,6 @@ inline int Time::minute() const
 inline  int Time::second() const
 {
 	return _second;
-}
-
-
-inline Time& Time::operator = (const Time& t)
-{
-	assign(t.hour(), t.minute(), t.second());
-	return *this;
 }
 
 
@@ -176,7 +176,14 @@ public:
 	}
 
 	~VarHolderImpl() override = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
+
 	VarHolderImpl() = delete;
+
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<Poco::Data::Time, Poco::Data::Impl::VarValueTypes, Poco::Impl::DATA_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
 
 	const std::type_info& type() const override
 	{
@@ -213,6 +220,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	bool isTime() const override

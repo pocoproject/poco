@@ -32,16 +32,6 @@ UUID::UUID():
 }
 
 
-UUID::UUID(const UUID& uuid):
-	_timeLow(uuid._timeLow),
-	_timeMid(uuid._timeMid),
-	_timeHiAndVersion(uuid._timeHiAndVersion),
-	_clockSeq(uuid._clockSeq)
-{
-	std::memcpy(_node, uuid._node, sizeof(_node));
-}
-
-
 UUID::UUID(const std::string& uuid)
 {
 	parse(uuid);
@@ -87,25 +77,6 @@ UUID::UUID(const char* bytes, Version version)
 	_timeHiAndVersion |= (version << 12);
 	_clockSeq &= 0x3FFF;
 	_clockSeq |= 0x8000;
-}
-
-
-UUID::~UUID()
-{
-}
-
-
-UUID& UUID::operator = (const UUID& uuid)
-{
-	if (&uuid != this)
-	{
-		_timeLow = uuid._timeLow;
-		_timeMid = uuid._timeMid;
-		_timeHiAndVersion = uuid._timeHiAndVersion;
-		_clockSeq         = uuid._clockSeq;
-		std::memcpy(_node, uuid._node, sizeof(_node));
-	}
-	return *this;
 }
 
 

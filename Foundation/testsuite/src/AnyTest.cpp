@@ -9,14 +9,25 @@
 
 
 #include "AnyTest.h"
+#include "ValueTestTypes.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Exception.h"
 #include "Poco/Any.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Bugcheck.h"
+#include "Poco/DateTime.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/Timestamp.h"
+#include "Poco/UUID.h"
+#include "Poco/UTFString.h"
 #include <vector>
 #include <memory>
+#include <bit>
+#include <cstddef>
+#include <cstdint>
+#include <string>
+#include <utility>
 
 
 using namespace Poco;
@@ -196,6 +207,15 @@ void AnyTest::testAnySwap()
 	assertTrue (empty1.empty());
 	assertTrue (!empty2.empty());
 	assertTrue (text == AnyCast<std::string>(empty2));
+
+	Any localInt = 1;
+	Any localText = text;
+	localInt.swap(localText);
+	assertTrue (AnyCast<std::string>(localInt) == text);
+	assertTrue (AnyCast<int>(localText) == 1);
+	localText.swap(localInt);
+	assertTrue (AnyCast<int>(localInt) == 1);
+	assertTrue (AnyCast<std::string>(localText) == text);
 
 	Any original = text, swapped;
 #ifdef POCO_NO_SOO
@@ -471,6 +491,189 @@ void AnyTest::testAnyVector()
 }
 
 
+void AnyTest::testAnySelfMoveAssign()
+{
+	const std::string text(100, 'x');
+	Any value = text;
+	Any& alias = value;
+	value = std::move(alias);
+	assertTrue (value.type() == typeid(std::string));
+	assertTrue (AnyCast<std::string>(value) == text);
+}
+
+
+void AnyTest::testAnyMoveDoesNotCopy()
+{
+	CopyCounter::resetCopies();
+	Any source = CopyCounter(7);
+	Any target(std::move(source));
+	assertTrue (source.empty());
+	assertTrue (RefAnyCast<CopyCounter>(target).value() == 7);
+
+	Any assigned = 1;
+	assigned = std::move(target);
+	assertTrue (target.empty());
+	assertTrue (RefAnyCast<CopyCounter>(assigned).value() == 7);
+	assertTrue (CopyCounter::copies() == 0);
+}
+
+
+void AnyTest::testAnyFailedCopyLeavesTargetEmpty()
+{
+	const Any source = ThrowOnCopy(true);
+	Any target;
+	try
+	{
+		target = source;
+		fail ("copy must throw");
+	}
+	catch (RuntimeException&)
+	{
+	}
+	assertTrue (target.empty());
+	assertTrue (target.type() == typeid(void));
+	assertTrue (source.type() == typeid(ThrowOnCopy));
+
+	const ThrowOnCopy value(true);
+	try
+	{
+		target = value;
+		fail ("copy must throw");
+	}
+	catch (RuntimeException&)
+	{
+	}
+	assertTrue (target.empty());
+	assertTrue (target.type() == typeid(void));
+}
+
+
+void AnyTest::testAnyFailedCopyKeepsTargetValue()
+{
+	const Any source = ThrowOnCopy(true);
+	Any target = 42;
+	try
+	{
+		target = source;
+		fail ("copy must throw");
+	}
+	catch (RuntimeException&)
+	{
+	}
+	assertTrue (AnyCast<int>(target) == 42);
+}
+
+
+void AnyTest::testAnyMoveUsesNothrowCopy()
+{
+	const ThrowOnMove value(true);
+	Any source = value;
+#ifndef POCO_NO_SOO
+	assertTrue (source.local());
+#endif
+	Any target(std::move(source));
+	assertTrue (source.empty());
+	assertTrue (RefAnyCast<ThrowOnMove>(target).throwing());
+
+	Any assigned = 1;
+	assigned = std::move(target);
+	assertTrue (target.empty());
+	assertTrue (RefAnyCast<ThrowOnMove>(assigned).throwing());
+
+	Any other = std::string("abc");
+	assigned.swap(other);
+	assertTrue (RefAnyCast<ThrowOnMove>(other).throwing());
+	assertTrue (RefAnyCast<std::string>(assigned) == "abc");
+}
+
+
+void AnyTest::testAnyCopyAssignmentPaths()
+{
+	const std::vector<int> values{1, 2, 3};
+	const Any vectorAny = values;
+	const Any intAny = 7;
+	const Any emptyAny;
+
+	Any target = 1;
+	target = vectorAny;
+	assertTrue (RefAnyCast<std::vector<int>>(target) == values);
+
+	target = 1;
+	target = intAny;
+	assertTrue (AnyCast<int>(target) == 7);
+
+	target = emptyAny;
+	assertTrue (target.empty());
+	target = intAny;
+	assertTrue (AnyCast<int>(target) == 7);
+}
+
+
+void AnyTest::testAnyVolatileValue()
+{
+	volatile int value = 5;
+	Any any(value);
+	assertTrue (any.type() == typeid(int));
+	assertTrue (AnyCast<int>(any) == 5);
+
+	value = 6;
+	any = value;
+	assertTrue (AnyCast<int>(any) == 6);
+}
+
+
+void AnyTest::testAnyOverAlignedValue()
+{
+	const std::vector<Any> values(4, Any(OverAligned{7}));
+	for (const auto& value: values)
+	{
+		assertFalse (value.local());
+		const OverAligned* pValue = AnyCast<OverAligned>(&value);
+		assertTrue (pValue != nullptr);
+		// volatile, so that the compiler cannot fold the check from the alignment of the type
+		const volatile std::uintptr_t address = std::bit_cast<std::uintptr_t>(pValue);
+		assertTrue (address % alignof(OverAligned) == 0);
+		assertTrue (pValue->value == 7);
+	}
+}
+
+
+void AnyTest::testAnyLocalStorage()
+{
+#ifdef POCO_NO_SOO
+	constexpr bool smallIsLocal = false;
+#else
+	constexpr bool smallIsLocal = true;
+#endif
+	assertTrue (Any(1).local() == smallIsLocal);
+	assertTrue (Any(std::string("abc")).local() == smallIsLocal);
+	assertTrue (Any(CopyCounter(1)).local() == smallIsLocal);
+	assertTrue (Any(Timestamp()).local() == smallIsLocal);
+	assertTrue (Any(DateTime()).local() == smallIsLocal);
+	assertTrue (Any(LocalDateTime()).local() == smallIsLocal);
+	assertTrue (Any(UUID()).local() == smallIsLocal);
+	assertFalse (Any(MayThrowOnMove()).local());
+}
+
+
+void AnyTest::testAnyCopyOnlyValue()
+{
+	const CopyOnly value(1);
+	Any any = value;
+	any = CopyOnly(2);
+	assertTrue (RefAnyCast<CopyOnly>(any).value() == 2);
+
+	Any moved(std::move(any));
+	assertTrue (any.empty());
+	assertTrue (RefAnyCast<CopyOnly>(moved).value() == 2);
+
+	Any assigned = 1;
+	assigned = std::move(moved);
+	assertTrue (moved.empty());
+	assertTrue (RefAnyCast<CopyOnly>(assigned).value() == 2);
+}
+
+
 void AnyTest::testPlaceholder()
 {
 #ifndef POCO_NO_SOO
@@ -526,10 +729,109 @@ void AnyTest::testPlaceholder()
 	std::vector<int> outv = *vph.assign<std::vector<int>, std::vector<int>>(inv);
 	assertTrue(inv == outv);
 	assertFalse(vph.isEmpty());
-	assertTrue(vph.isLocal());
+	// the copy of a vector can throw, and a vector has no moveTo()
+	assertFalse(vph.isLocal());
 
 	// ...
 #endif
+}
+
+
+void AnyTest::testStringAssignmentKeepsBuffer()
+{
+	const std::string text(100, 'x');
+	Any target(std::string(200, 'a'));
+	const char* pData = AnyCast<std::string>(&target)->data();
+	const Any source(text);
+	target = source;
+	assertTrue (*AnyCast<std::string>(&target) == text);
+	assertTrue (AnyCast<std::string>(&target)->data() == pData);
+	assertTrue (*AnyCast<std::string>(&source) == text);
+
+	target = Any(42);
+	assertTrue (AnyCast<int>(target) == 42);
+
+	const std::wstring wideText(100, L'x');
+	Any wideTarget(std::wstring(200, L'a'));
+	const wchar_t* pWideData = AnyCast<std::wstring>(&wideTarget)->data();
+	const Any wideSource(wideText);
+	wideTarget = wideSource;
+	assertTrue (*AnyCast<std::wstring>(&wideTarget) == wideText);
+	assertTrue (AnyCast<std::wstring>(&wideTarget)->data() == pWideData);
+
+	const std::u16string utf16Text(100, u'x');
+	Any utf16Target(std::u16string(200, u'a'));
+	const char16_t* pUtf16Data = AnyCast<std::u16string>(&utf16Target)->data();
+	const Any utf16Source(utf16Text);
+	utf16Target = utf16Source;
+	assertTrue (*AnyCast<std::u16string>(&utf16Target) == utf16Text);
+	assertTrue (AnyCast<std::u16string>(&utf16Target)->data() == pUtf16Data);
+
+	// Unless UTF16String is std::wstring, Any has no type id for it and compares the types by type().
+	const UTF16String utf16StringText(100, 'x');
+	Any utf16StringTarget(UTF16String(200, 'a'));
+	const UTF16Char* pUtf16StringData = AnyCast<UTF16String>(&utf16StringTarget)->data();
+	const Any utf16StringSource(utf16StringText);
+	utf16StringTarget = utf16StringSource;
+	assertTrue (*AnyCast<UTF16String>(&utf16StringTarget) == utf16StringText);
+	assertTrue (AnyCast<UTF16String>(&utf16StringTarget)->data() == pUtf16StringData);
+}
+
+
+void AnyTest::testAnyStorageSize()
+{
+#if !defined(POCO_NO_SOO) && POCO_SMALL_OBJECT_SIZE == 64
+	// With the default buffer size, the type id byte fits into the padding behind the tag byte.
+	constexpr std::size_t alignment = alignof(std::max_align_t);
+	constexpr std::size_t expectedSize = (POCO_SMALL_OBJECT_SIZE + 1 + alignment - 1) / alignment * alignment;
+	assertEqual (expectedSize, sizeof(Any));
+#endif
+}
+
+
+void AnyTest::testAnyCastByTypeId()
+{
+	Any intAny = 42;
+	assertTrue (AnyCast<int>(&intAny) != nullptr);
+	assertTrue (*AnyCast<int>(&intAny) == 42);
+	assertTrue (AnyCast<unsigned>(&intAny) == nullptr);
+	assertTrue (AnyCast<long>(&intAny) == nullptr);
+
+	const Any charAny = 'a';
+	assertTrue (*AnyCast<char>(&charAny) == 'a');
+	assertTrue (AnyCast<signed char>(&charAny) == nullptr);
+	assertTrue (AnyCast<unsigned char>(&charAny) == nullptr);
+
+	const Any signedCharAny = static_cast<signed char>(1);
+	assertTrue (*AnyCast<signed char>(&signedCharAny) == 1);
+	assertTrue (AnyCast<char>(&signedCharAny) == nullptr);
+
+	const Any textAny = std::string("abc");
+	assertTrue (*AnyCast<std::string>(&textAny) == "abc");
+	assertTrue (AnyCast<const char*>(&textAny) == nullptr);
+	const Any pointerAny = "abc";
+	assertTrue (AnyCast<std::string>(&pointerAny) == nullptr);
+	assertTrue (AnyCast<const char*>(&pointerAny) != nullptr);
+
+	assertTrue (RefAnyCast<bool>(Any(true)));
+	assertTrue (RefAnyCast<double>(Any(1.5)) == 1.5);
+	assertTrue (AnyCast<float>(Any(2.5f)) == 2.5f);
+	assertTrue (AnyCast<long long>(Any(3LL)) == 3LL);
+	assertTrue (AnyCast<unsigned long>(Any(4UL)) == 4UL);
+
+	const Any dateTimeAny = DateTime(2026, 11, 26);
+	assertTrue (AnyCast<DateTime>(&dateTimeAny)->year() == 2026);
+	assertTrue (AnyCast<LocalDateTime>(&dateTimeAny) == nullptr);
+	assertTrue (AnyCast<Timestamp>(&dateTimeAny) == nullptr);
+	assertTrue (AnyCast<UUID>(Any(UUID("f81d4fae-7dec-11d0-a765-00a0c91e6bf6"))).toString() == "f81d4fae-7dec-11d0-a765-00a0c91e6bf6");
+
+	const Any counterAny = CopyCounter(5);
+	assertTrue (AnyCast<CopyCounter>(&counterAny)->value() == 5);
+	assertTrue (AnyCast<int>(&counterAny) == nullptr);
+
+	const Any emptyAny;
+	assertTrue (AnyCast<int>(&emptyAny) == nullptr);
+	assertTrue (AnyCast<int>(static_cast<Any*>(nullptr)) == nullptr);
 }
 
 
@@ -560,7 +862,20 @@ CppUnit::Test* AnyTest::suite()
 	CppUnit_addTest(pSuite, AnyTest, testAnyInt);
 	CppUnit_addTest(pSuite, AnyTest, testAnyComplexType);
 	CppUnit_addTest(pSuite, AnyTest, testAnyVector);
+	CppUnit_addTest(pSuite, AnyTest, testAnySelfMoveAssign);
+	CppUnit_addTest(pSuite, AnyTest, testAnyMoveDoesNotCopy);
+	CppUnit_addTest(pSuite, AnyTest, testAnyFailedCopyLeavesTargetEmpty);
+	CppUnit_addTest(pSuite, AnyTest, testAnyFailedCopyKeepsTargetValue);
+	CppUnit_addTest(pSuite, AnyTest, testAnyOverAlignedValue);
+	CppUnit_addTest(pSuite, AnyTest, testAnyLocalStorage);
+	CppUnit_addTest(pSuite, AnyTest, testAnyCopyOnlyValue);
+	CppUnit_addTest(pSuite, AnyTest, testAnyMoveUsesNothrowCopy);
+	CppUnit_addTest(pSuite, AnyTest, testAnyCopyAssignmentPaths);
+	CppUnit_addTest(pSuite, AnyTest, testAnyVolatileValue);
 	CppUnit_addTest(pSuite, AnyTest, testPlaceholder);
+	CppUnit_addTest(pSuite, AnyTest, testStringAssignmentKeepsBuffer);
+	CppUnit_addTest(pSuite, AnyTest, testAnyStorageSize);
+	CppUnit_addTest(pSuite, AnyTest, testAnyCastByTypeId);
 
 	return pSuite;
 }

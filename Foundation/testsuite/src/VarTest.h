@@ -19,7 +19,11 @@
 #include "Poco/Exception.h"
 #include "CppUnit/TestCase.h"
 #include <cmath>
+#include <concepts>
 #include <limits>
+#include <string>
+#include <typeinfo>
+#include <utility>
 
 
 POCO_CHECK_MINMAX_MACROS
@@ -91,6 +95,32 @@ public:
 	void testIteratorSwap();
 	void testSharedPtr();
 	void testVarVisitor();
+	void testAssignFromOwnContent();
+	void testEmplace();
+	void testExtractMutable();
+	void testSwap();
+	void testOverAlignedValue();
+	void testFailedCopyLeavesTargetEmpty();
+	void testFailedCopyKeepsTargetValue();
+	void testLocalStorage();
+	void testCopyOnlyValue();
+	void testMoveUsesNothrowCopy();
+	void testCopyAssignmentPaths();
+	void testPlaceholderMarks();
+	void testPlaceholderFailedEmplaceLeavesItEmpty();
+	void testDerivedHolderIsDestroyed();
+	void testStringAssignmentKeepsBuffer();
+	void testConvertibleRvalueUsesConversion();
+	void testMoveDoesNotCopy();
+	void testMoveKeepsValue();
+	void testStorageSize();
+	void testExtractPredefinedTypes();
+	void testExtractRejectsSimilarTypes();
+	void testExtractTypeWithoutTypeId();
+	void testDerivedHolderHasTypeIdOfBase();
+	void testPlaceholderTypeId();
+	void testTypeIdsAreDistinct();
+	void testDerivedHolderDoesNotInheritTypeId();
 
 	void setUp();
 	void tearDown();
@@ -109,6 +139,51 @@ private:
 		assertTrue (a1 == c1); // silence the compiler
 		const Poco::Dynamic::Var cval1 = a1[n];
 		assertTrue (cval1 == expectedResult);
+	}
+
+	template <typename T>
+	void checkMoveKeepsValue(const T& value)
+	{
+		Poco::Dynamic::Var source = value;
+		Poco::Dynamic::Var target(std::move(source));
+		assertTrue (source.isEmpty());
+		assertTrue (isSameValue(target, value));
+
+		Poco::Dynamic::Var assigned = 1;
+		assigned = std::move(target);
+		assertTrue (target.isEmpty());
+		assertTrue (isSameValue(assigned, value));
+	}
+
+	template <typename T>
+	[[nodiscard]] static bool isSameValue(const Poco::Dynamic::Var& var, const T& value)
+	{
+		if (var.type() != typeid(T)) return false;
+		if constexpr (std::equality_comparable<T>)
+			return var.extract<T>() == value;
+		else
+			return var.convert<std::string>() == Poco::Dynamic::Var(value).convert<std::string>();
+	}
+
+	template <typename T>
+	void checkExtractAndConvert(const T& value)
+	{
+		const Poco::Dynamic::Var var = value;
+		assertTrue (var.extract<T>() == value);
+		assertTrue (var.convert<T>() == value);
+	}
+
+	template <typename T>
+	void checkExtractFails(const Poco::Dynamic::Var& var)
+	{
+		try
+		{
+			(void) var.extract<T>();
+			fail ("extract of a different type must throw");
+		}
+		catch (Poco::BadCastException&)
+		{
+		}
 	}
 
 

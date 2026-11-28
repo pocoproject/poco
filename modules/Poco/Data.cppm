@@ -65,6 +65,7 @@ module;
 #include "Poco/Data/Transcoder.h"
 #include "Poco/Data/TypeHandler.h"
 #include "Poco/Data/Utility.h"
+#include "Poco/Data/VarTypeIds.h"
 #endif
 
 export module Poco:Data;

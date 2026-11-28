@@ -125,13 +125,13 @@ public:
 		///
 		/// Mainly used internally by DateTime and friends.
 
-	DateTime(const DateTime& dateTime);
+	DateTime(const DateTime& dateTime) noexcept = default;
 		/// Copy constructor. Creates the DateTime from another one.
 
-	~DateTime();
+	~DateTime() = default;
 		/// Destroys the DateTime.
 
-	DateTime& operator = (const DateTime& dateTime);
+	DateTime& operator = (const DateTime& dateTime) noexcept = default;
 		/// Assigns another DateTime.
 
 	DateTime& operator = (const Timestamp& timestamp);

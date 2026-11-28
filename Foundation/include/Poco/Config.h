@@ -80,9 +80,10 @@
 
 
 // Small object size in bytes. When assigned to Any or Var,
-// objects larger than this value will be allocated on the heap,
-// while those smaller will be placement new-ed into an
-// internal stack-auto-allocated buffer.
+// a value holder that fits into this size, needs no stronger
+// alignment than std::max_align_t and can be moved without an
+// exception is placement new-ed into an internal buffer; any
+// other value holder is allocated on the heap.
 #if !defined(POCO_SMALL_OBJECT_SIZE)
 	#define POCO_SMALL_OBJECT_SIZE 64
 #endif

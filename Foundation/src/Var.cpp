@@ -19,14 +19,10 @@
 #include <vector>
 #include <list>
 #include <deque>
+#include <utility>
 
 
 namespace Poco::Dynamic {
-
-
-Var::Var()
-{
-}
 
 
 Var::Var(const char* pVal)
@@ -42,17 +38,43 @@ Var::Var(const Var& other)
 }
 
 
-Var::~Var()
+Var::Var(Var&& other) noexcept
 {
-	destruct();
+	_placeholder.moveFrom(other._placeholder);
 }
 
 
 Var& Var::operator = (const Var& rhs)
 {
 	if (this == &rhs) return *this;
-	clear();
-	if (!rhs.isEmpty()) construct(rhs);
+	if (_placeholder.canTakeCloneOf(rhs._placeholder))
+	{
+		// rhs cannot live inside a leaf, and its clone cannot throw
+		clear();
+		construct(rhs);
+	}
+	else if (!_placeholder.holdsSameTypeAs(rhs._placeholder) || !content()->assignFrom(*rhs.content()))
+	{
+		Var tmp(rhs);
+		_placeholder.moveFrom(tmp._placeholder);
+	}
+	return *this;
+}
+
+
+Var& Var::operator = (Var&& other) noexcept
+{
+	if (this == &other) return *this;
+	if (_placeholder.holdsLeaf())
+	{
+		// other cannot live inside a leaf
+		_placeholder.moveFrom(other._placeholder);
+	}
+	else
+	{
+		Var tmp(std::move(other));
+		_placeholder.moveFrom(tmp._placeholder);
+	}
 	return *this;
 }
 
@@ -308,12 +330,6 @@ void Var::empty()
 }
 
 
-void Var::clear()
-{
-	_placeholder.erase();
-}
-
-
 Var& Var::getAt(std::size_t n)
 {
 	if (isVector())
@@ -374,8 +390,8 @@ std::string Var::toString() const
 	if (!pHolder)
 		throw InvalidAccessException("Can not convert empty value.");
 
-	if (typeid(std::string) == pHolder->type())
-		return extract<std::string>();
+	if (const VarHolderImpl<std::string>* pString = holderOf<std::string>(); pString != nullptr)
+		return pString->value();
 	else
 	{
 		std::string result;

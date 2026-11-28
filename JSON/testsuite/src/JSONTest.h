@@ -94,6 +94,8 @@ public:
 	void testEnum();
 	void testEmbeddedNulKey();
 	void testCommentsInStrings();
+	void testVarMoveKeepsContent();
+	void testVarExtractByTypeId();
 
 	void setUp();
 	void tearDown();

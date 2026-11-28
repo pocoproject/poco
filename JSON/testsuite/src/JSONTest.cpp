@@ -2980,6 +2980,114 @@ void JSONTest::testCommentsInStrings()
 }
 
 
+void JSONTest::testVarMoveKeepsContent()
+{
+	Object::Ptr pObject = new Object;
+	pObject->set("key", "value");
+	Var objectVar = pObject;
+	assertTrue (pObject.referenceCount() == 2);
+	Var movedObject(std::move(objectVar));
+	assertTrue (objectVar.isEmpty());
+	assertTrue (pObject.referenceCount() == 2);
+	assertTrue (movedObject.extract<Object::Ptr>().get() == pObject.get());
+	assertTrue (movedObject.extract<Object::Ptr>()->getValue<std::string>("key") == "value");
+
+	Poco::JSON::Array::Ptr pArray = new Poco::JSON::Array;
+	pArray->add(1);
+	Var arrayPtrVar = pArray;
+	assertTrue (pArray.referenceCount() == 2);
+	Var movedArrayPtr;
+	movedArrayPtr = std::move(arrayPtrVar);
+	assertTrue (arrayPtrVar.isEmpty());
+	assertTrue (pArray.referenceCount() == 2);
+	assertTrue (movedArrayPtr.extract<Poco::JSON::Array::Ptr>().get() == pArray.get());
+
+	Poco::JSON::Array array;
+	array.add(std::string(100, 'x'));
+	array.add(2);
+	Var arrayVar = array;
+	const Var* pFirst = &*arrayVar.extract<Poco::JSON::Array>().begin();
+	Var movedArray(std::move(arrayVar));
+	assertTrue (arrayVar.isEmpty());
+	assertTrue (&*movedArray.extract<Poco::JSON::Array>().begin() == pFirst);
+	assertTrue (movedArray.extract<Poco::JSON::Array>().getElement<std::string>(0) == std::string(100, 'x'));
+	assertTrue (movedArray.extract<Poco::JSON::Array>().getElement<int>(1) == 2);
+}
+
+
+void JSONTest::testVarExtractByTypeId()
+{
+#ifndef POCO_NO_SOO
+	using Poco::Placeholder;
+	constexpr unsigned char base = Poco::Impl::JSON_TYPE_ID_BASE;
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Poco::JSON::Array::Ptr>, Poco::JSON::Array::Ptr>() == base + 1));
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Poco::JSON::Array>, Poco::JSON::Array>() == base + 2));
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Object::Ptr>, Object::Ptr>() == base + 3));
+	assertTrue ((Placeholder<VarHolder>::holderTypeId<VarHolderImpl<Object>, Object>() == base + 4));
+#endif
+
+	Object::Ptr pObject = new Object;
+	pObject->set("key", 1);
+	const Var objectVar = pObject;
+	assertTrue (objectVar.extract<Object::Ptr>().get() == pObject.get());
+
+	Poco::JSON::Array::Ptr pArray = new Poco::JSON::Array;
+	pArray->add(2);
+	const Var arrayVar = pArray;
+	assertTrue (arrayVar.extract<Poco::JSON::Array::Ptr>().get() == pArray.get());
+
+	const Var objectValueVar = *pObject;
+	assertTrue (objectValueVar.extract<Object>().getValue<int>("key") == 1);
+	const Var arrayValueVar = *pArray;
+	assertTrue (arrayValueVar.extract<Poco::JSON::Array>().getElement<int>(0) == 2);
+
+	try
+	{
+		(void) objectVar.extract<Poco::JSON::Array::Ptr>();
+		fail ("extract of an Object::Ptr as Array::Ptr must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+
+	try
+	{
+		(void) arrayVar.extract<Object::Ptr>();
+		fail ("extract of an Array::Ptr as Object::Ptr must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+
+	try
+	{
+		(void) objectValueVar.extract<Object::Ptr>();
+		fail ("extract of an Object as Object::Ptr must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+
+	try
+	{
+		(void) arrayValueVar.extract<Object>();
+		fail ("extract of an Array as Object must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+
+	try
+	{
+		(void) objectValueVar.extract<Poco::JSON::Array>();
+		fail ("extract of an Object as Array must throw");
+	}
+	catch (Poco::BadCastException&)
+	{
+	}
+}
+
+
 CppUnit::Test* JSONTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("JSONTest");
@@ -3041,6 +3149,8 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testEnum);
 	CppUnit_addTest(pSuite, JSONTest, testEmbeddedNulKey);
 	CppUnit_addTest(pSuite, JSONTest, testCommentsInStrings);
+	CppUnit_addTest(pSuite, JSONTest, testVarMoveKeepsContent);
+	CppUnit_addTest(pSuite, JSONTest, testVarExtractByTypeId);
 
 	return pSuite;
 }

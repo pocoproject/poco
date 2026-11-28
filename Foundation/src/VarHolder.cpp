@@ -40,16 +40,6 @@ template class Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
 #endif
 
 
-VarHolder::VarHolder()
-{
-}
-
-
-VarHolder::~VarHolder()
-{
-}
-
-
 namespace Impl {
 
 

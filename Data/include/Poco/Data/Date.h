@@ -19,6 +19,7 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/VarTypeIds.h"
 #include "Poco/Dynamic/VarHolder.h"
 #include "Poco/Exception.h"
 
@@ -53,11 +54,14 @@ public:
 	Date(const DateTime& dt);
 		/// Creates the Date from DateTime
 
-	~Date();
+	~Date() = default;
 		/// Destroys the Date.
 
-	Date(const Date & ) = default;
-	Date(Date && ) = default;
+	Date(const Date& d) noexcept = default;
+		/// Copy constructor.
+
+	Date(Date&& d) noexcept = default;
+		/// Move constructor.
 
 	[[nodiscard]] int year() const;
 		/// Returns the year.
@@ -71,8 +75,11 @@ public:
 	void assign(int year, int month, int day);
 		/// Assigns date.
 
-	Date& operator = (const Date& d);
+	Date& operator = (const Date& d) noexcept = default;
 		/// Assignment operator for Date.
+
+	Date& operator = (Date&& d) noexcept = default;
+		/// Move assignment operator for Date.
 
 	Date& operator = (const DateTime& dt);
 		/// Assignment operator for DateTime.
@@ -117,13 +124,6 @@ inline int Date::month() const
 inline int Date::day() const
 {
 	return _day;
-}
-
-
-inline Date& Date::operator = (const Date& d)
-{
-	assign(d.year(), d.month(), d.day());
-	return *this;
 }
 
 
@@ -175,7 +175,14 @@ public:
 	}
 
 	~VarHolderImpl() = default;
+
+	using DestroysOnlyValue = VarHolderImpl; /// The destructor destroys only the value.
+
 	VarHolderImpl() = delete;
+
+	static constexpr unsigned char TYPE_ID = Poco::Impl::TYPE_ID_IN<Poco::Data::Date, Poco::Data::Impl::VarValueTypes, Poco::Impl::DATA_TYPE_ID_BASE>;
+		/// Identifies the value type in the Placeholder.
+	using TypeIdHolder = VarHolderImpl; /// A derived holder does not use this class's TYPE_ID.
 
 	const std::type_info& type() const override
 	{
@@ -208,6 +215,11 @@ public:
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
+	}
+
+	VarHolder* moveTo(Placeholder<VarHolder>* pVarHolder) noexcept override
+	{
+		return moveHolder(pVarHolder, _val);
 	}
 
 	bool isDate() const override

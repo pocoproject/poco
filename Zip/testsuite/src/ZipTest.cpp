@@ -260,7 +260,7 @@ void ZipTest::testSkipSingleFile()
 	assertTrue (hdrSize > 30);
 	(void) hdr.getCompressionMethod();
 	assertTrue (!hdr.isEncrypted());
-	Poco::DateTime aDate = hdr.lastModifiedAt();
+	(void) hdr.lastModifiedAt();
 	(void) hdr.getCompressedSize();
 	(void) hdr.getUncompressedSize();
 	(void) hdr.getFileName();

@@ -19,14 +19,23 @@
 #include "Poco/Exception.h"
 #include "Poco/MetaProgramming.h"
 #include "Poco/Bugcheck.h"
-#include <algorithm>
+#include "Poco/Placeholder.h"
+#define POCO_TYPELIST_INTERNAL
+#include "Poco/TypeList.h"
+#undef POCO_TYPELIST_INTERNAL
 #include <typeinfo>
-#include <cstddef>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 
 namespace Poco {
 
 class Any;
+class DateTime;
+class LocalDateTime;
+class Timestamp;
+class UUID;
 
 using namespace std::string_literals;
 
@@ -39,212 +48,16 @@ template <class T> class VarHolderImpl;
 }
 
 
-#ifndef POCO_DOC
-template <class T, std::size_t S>
-struct TypeSizeLE:
-	std::integral_constant<bool, (sizeof(T) <= S)>{};
+namespace Impl {
 
 
-template <class T, std::size_t S>
-struct TypeSizeGT:
-	std::integral_constant<bool, (sizeof(T) > S)>{};
-#endif
+template <typename T>
+concept AnyValue = !std::is_same_v<std::decay_t<T>, Any>;
+	/// The type of a value that Any's forwarding constructor and
+	/// assignment store: anything that is not an Any after decay.
 
 
-template <typename PlaceholderT, unsigned int SizeV = POCO_SMALL_OBJECT_SIZE>
-union Placeholder
-	/// ValueHolder union (used by Poco::Any and Poco::Dynamic::Var for small
-	/// object optimization, when enabled).
-	///
-	/// If Holder<Type> fits into POCO_SMALL_OBJECT_SIZE bytes of storage,
-	/// it will be placement-new-allocated into the local buffer
-	/// (i.e. there will be no heap-allocation). The local buffer size is one byte
-	/// larger - [POCO_SMALL_OBJECT_SIZE + 1], additional byte value indicating
-	/// where the object was allocated. See enum Allocation.
-	///
-	/// Important: for SOO builds, only same-type (or trivial both-empty no-op)
-	/// swap operation is allowed.
-{
-public:
-	struct Size
-	{
-		enum { value = SizeV };
-	};
-
-	Placeholder(const Placeholder&) = delete;
-	Placeholder(Placeholder&&) = delete;
-	Placeholder& operator=(const Placeholder&) = delete;
-	Placeholder& operator=(Placeholder&&) = delete;
-
-#ifndef POCO_NO_SOO
-
-	Placeholder(): pHolder(nullptr)
-	{
-		// Forces to use optimised memset internally
-		// https://travisdowns.github.io/blog/2020/01/20/zero.html
-		std::fill(std::begin(holder), std::end(holder), static_cast<char>(0));
-		setAllocation(Allocation::POCO_ANY_EMPTY);
-	}
-
-	~Placeholder()
-	{
-		destruct(false);
-	}
-
-	void swap(Placeholder& other) noexcept
-	{
-		if (!isEmpty() || !other.isEmpty())
-			std::swap(holder, other.holder);
-	}
-
-	void erase()
-	{
-		destruct(true);
-	}
-
-	[[nodiscard]] bool isEmpty() const
-	{
-		return holder[SizeV] == Allocation::POCO_ANY_EMPTY;
-	}
-
-	[[nodiscard]] bool isLocal() const
-	{
-		return holder[SizeV] == Allocation::POCO_ANY_LOCAL;
-	}
-
-	template<typename T, typename V,
-		typename std::enable_if_t<TypeSizeLE<T, Placeholder::Size::value>::value>* = nullptr>
-	PlaceholderT* assign(const V& value)
-	{
-		erase();
-		new (reinterpret_cast<PlaceholderT*>(holder)) T(value);
-		setAllocation(Allocation::POCO_ANY_LOCAL);
-		return reinterpret_cast<PlaceholderT*>(holder);
-	}
-
-	template<typename T, typename V,
-		typename std::enable_if_t<TypeSizeGT<T, Placeholder::Size::value>::value>* = nullptr>
-	PlaceholderT* assign(const V& value)
-	{
-		erase();
-		pHolder = new T(value);
-		setAllocation(Allocation::POCO_ANY_EXTERNAL);
-		return pHolder;
-	}
-
-	[[nodiscard]] PlaceholderT* content() const
-	{
-		if (isLocal())
-			return reinterpret_cast<PlaceholderT*>(holder);
-		else
-			return pHolder;
-	}
-
-private:
-	using AlignerType = std::max_align_t;
-#ifndef POCO_DOC
-	static_assert(
-		sizeof(AlignerType) < SizeV,
-		"Aligner type is bigger than the actual storage, so SizeV should be made bigger otherwise you simply waste unused memory."
-	);
-#endif
-
-	enum Allocation : unsigned char
-	{
-		POCO_ANY_EMPTY = 0,
-		POCO_ANY_LOCAL = 1,
-		POCO_ANY_EXTERNAL = 2
-	};
-
-	void setAllocation(Allocation alloc) const
-	{
-		holder[SizeV] = alloc;
-	}
-
-	void destruct(bool clear)
-	{
-		const auto allocation {holder[SizeV]};
-		switch (allocation)
-		{
-		case Allocation::POCO_ANY_EMPTY:
-			break;
-		case Allocation::POCO_ANY_LOCAL:
-			{
-				// Do not deallocate, just explicitly call destructor
-				auto* h { reinterpret_cast<PlaceholderT*>(holder) };
-				h->~PlaceholderT();
-			}
-			break;
-		case Allocation::POCO_ANY_EXTERNAL:
-			{
-				auto* h { pHolder };
-				pHolder = nullptr;
-				delete h;
-			}
-			break;
-		default:
-			poco_bugcheck();
-			break;
-		}
-		setAllocation(Allocation::POCO_ANY_EMPTY);
-		if (clear)
-		{
-			// Force to use optimised memset internally
-			std::fill(std::begin(holder), std::end(holder), static_cast<char>(0));
-		}
-	}
-
-	mutable unsigned char holder[SizeV+1];
-	AlignerType           aligner;
-
-#else // POCO_NO_SOO
-
-	Placeholder(): pHolder(nullptr)
-	{
-	}
-
-	~Placeholder()
-	{
-		delete pHolder;
-	}
-
-	void swap(Placeholder& other) noexcept
-	{
-		std::swap(pHolder, other.pHolder);
-	}
-
-	void erase()
-	{
-		delete pHolder;
-		pHolder = nullptr;
-	}
-
-	[[nodiscard]] bool isEmpty() const
-	{
-		return nullptr == pHolder;
-	}
-
-	[[nodiscard]] bool isLocal() const
-	{
-		return false;
-	}
-
-	template <typename T, typename V>
-	PlaceholderT* assign(const V& value)
-	{
-		erase();
-		return pHolder = new T(value);
-	}
-
-	[[nodiscard]] PlaceholderT* content() const
-	{
-		return pHolder;
-	}
-
-private:
-#endif // POCO_NO_SOO
-	PlaceholderT* pHolder;
-};
+} // namespace Impl
 
 
 class Any
@@ -262,15 +75,16 @@ public:
 	Any() = default;
 		/// Creates an empty any type.
 
-	template<typename ValueType>
-	Any(const ValueType & value)
+	template <Impl::AnyValue ValueType>
+	Any(ValueType&& value)
 		/// Creates an any which stores the init parameter inside.
+		/// An rvalue is moved into the Any.
 		///
 		/// Example:
 		///   Any a(13);
 		///   Any a(string("12345"));
 	{
-		construct(value);
+		construct(std::forward<ValueType>(value));
 	}
 
 	Any(const Any& other)
@@ -280,10 +94,11 @@ public:
 			construct(other);
 	}
 
-	Any(Any&& other)
+	Any(Any&& other) noexcept
 		/// Move constructor, works with both empty and initialized Any values.
+		/// Leaves other empty.
 	{
-		construct(other);
+		_valueHolder.moveFrom(other._valueHolder);
 	}
 
 	~Any() = default;
@@ -295,9 +110,6 @@ public:
 
 	Any& swap(Any& other) noexcept
 		/// Swaps the content of the two Anys.
-		///
-		/// If an exception occurs during swapping, the program
-		/// execution is aborted.
 	{
 		if (this == &other) return *this;
 
@@ -307,30 +119,36 @@ public:
 		}
 		else
 		{
-			try
-			{
-				Any tmp(*this);
-				construct(other);
-				other = tmp;
-			}
-			catch (...)
-			{
-				std::abort();
-			}
+			Placeholder<ValueHolder> tmp;
+			tmp.moveFrom(other._valueHolder);
+			other._valueHolder.moveFrom(_valueHolder);
+			_valueHolder.moveFrom(tmp);
 		}
 
 		return *this;
 	}
 
-	template<typename ValueType>
-	Any& operator = (const ValueType& rhs)
+	template <Impl::AnyValue ValueType>
+	Any& operator = (ValueType&& rhs)
 		/// Assignment operator for all types != Any.
+		/// An rvalue is moved into the Any.
 		///
 		/// Example:
 		///   Any a = 13;
 		///   Any a = string("12345");
 	{
-		construct(rhs);
+		using HeldType = std::decay_t<ValueType>;
+		if constexpr (std::is_arithmetic_v<HeldType>)
+		{
+			// rhs may refer to the current content
+			const HeldType value = rhs;
+			construct(value);
+		}
+		else
+		{
+			Any tmp(std::forward<ValueType>(rhs));
+			_valueHolder.moveFrom(tmp._valueHolder);
+		}
 		return *this;
 	}
 
@@ -339,21 +157,33 @@ public:
 	{
 		if (this != &rhs)
 		{
-			if (!rhs.empty())
+			// An empty rhs is left to assignCopy(), so that this function stays small enough to be inlined.
+			if (!rhs.empty() && _valueHolder.canTakeCloneOf(rhs._valueHolder))
+			{
+				// rhs cannot live inside a leaf, and its clone cannot throw
 				construct(rhs);
-			else
-				_valueHolder.erase();
+			}
+			else assignCopy(rhs);
 		}
 		return *this;
 	}
 
-	Any& operator = (Any&& rhs)
-		/// Move operator for Any.
+	Any& operator = (Any&& rhs) noexcept
+		/// Move operator for Any. Unless rhs is this Any, it is left empty.
 	{
-		if (!rhs.empty())
-			construct(rhs);
-		else
-			_valueHolder.erase();
+		if (this != &rhs)
+		{
+			if (_valueHolder.holdsLeaf())
+			{
+				// rhs cannot live inside a leaf
+				_valueHolder.moveFrom(rhs._valueHolder);
+			}
+			else
+			{
+				Any tmp(std::move(rhs));
+				_valueHolder.moveFrom(tmp._valueHolder);
+			}
+		}
 		return *this;
 	}
 
@@ -384,17 +214,42 @@ private:
 	class ValueHolder
 	{
 	public:
+		using ValueTypes = TypeList<bool, char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t,
+			short, unsigned short, int, unsigned, long, unsigned long, long long, unsigned long long,
+			float, double, long double, std::string, std::wstring, std::u8string, std::u16string, std::u32string,
+			DateTime, LocalDateTime, Timestamp, UUID>;
+			/// The value types that Any identifies by a type id (see Placeholder::holderTypeId()).
+
+		static_assert(Impl::FOUNDATION_TYPE_ID_BASE + ValueTypes::length <= Impl::JSON_TYPE_ID_BASE,
+			"the value types of Any must fit into the type id range of Foundation");
+
 		virtual ~ValueHolder() = default;
 
 		[[nodiscard]] virtual const std::type_info & type() const = 0;
 		virtual void clone(Placeholder<ValueHolder>*) const = 0;
+		virtual void moveTo(Placeholder<ValueHolder>*) = 0;
+
+		virtual bool assignFrom(const ValueHolder& /*source*/)
+			/// Replaces the held value with a copy of the value of source and
+			/// returns true, if this can be done in place without losing the
+			/// strong exception guarantee. Returns false without a change otherwise.
+			/// Requires that source holds the same value type.
+		{
+			return false;
+		}
 	};
 
 	template<typename ValueType>
 	class Holder : public ValueHolder
 	{
 	public:
+		using DestroysOnlyValue = Holder;
+
 		Holder(const ValueType & value) : _held(value)
+		{
+		}
+
+		explicit Holder(ValueType&& value): _held(std::move(value))
 		{
 		}
 
@@ -410,6 +265,32 @@ private:
 			pPlaceholder->assign<Holder<ValueType>, ValueType>(_held);
 		}
 
+		void moveTo(Placeholder<ValueHolder>* pPlaceholder) noexcept(std::is_nothrow_move_constructible_v<ValueType> || std::is_nothrow_copy_constructible_v<ValueType>) override
+		{
+			// A throwing move is used only if the copy can throw as well;
+			// such a holder is stored on the heap, where moveTo() is not called.
+			if constexpr (std::is_nothrow_move_constructible_v<ValueType> ||
+				(std::is_move_constructible_v<ValueType> && !std::is_nothrow_copy_constructible_v<ValueType>))
+				pPlaceholder->emplace<Holder<ValueType>, ValueType>(std::move(_held));
+			else
+				clone(pPlaceholder);
+		}
+
+		bool assignFrom(const ValueHolder& source) override
+		{
+			// A member function of basic_string that throws has no effect on the string.
+			if constexpr (Impl::IS_STRING<ValueType>)
+			{
+				poco_assert_dbg (source.type() == type());
+				_held = static_cast<const Holder&>(source)._held;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
 		ValueType _held;
 	};
 
@@ -419,9 +300,40 @@ private:
 	}
 
 	template <typename ValueType>
-	void construct(const ValueType& value)
+	[[nodiscard]] Holder<ValueType>* holderOf() const
+		/// Returns the content if it holds a ValueType, otherwise nullptr.
+		/// A holder with a type id is recognized by the id in the
+		/// placeholder, any other holder by its type().
 	{
-		_valueHolder.assign<Holder<ValueType>, ValueType>(value);
+		constexpr unsigned char expected = Placeholder<ValueHolder>::holderTypeId<Holder<ValueType>, ValueType>();
+		if constexpr (expected != Impl::TYPE_ID_OTHER)
+			return (_valueHolder.typeId() == expected) ? static_cast<Holder<ValueType>*>(content()) : nullptr;
+		else
+			return (type() == typeid(ValueType)) ? static_cast<Holder<ValueType>*>(content()) : nullptr;
+	}
+
+	void assignCopy(const Any& rhs)
+		/// Assigns a copy of rhs in place if both hold the same type and its
+		/// holder supports it (see ValueHolder::assignFrom()), otherwise through
+		/// a temporary, so that a failed copy leaves this Any unchanged.
+	{
+		if (!_valueHolder.holdsSameTypeAs(rhs._valueHolder) || !content()->assignFrom(*rhs.content()))
+		{
+			Any tmp(rhs);
+			_valueHolder.moveFrom(tmp._valueHolder);
+		}
+	}
+
+	template <typename ValueType>
+	void construct(ValueType&& value)
+	{
+		using HeldType = std::decay_t<ValueType>;
+		if constexpr (std::is_volatile_v<std::remove_reference_t<ValueType>>)
+			_valueHolder.emplace<Holder<HeldType>, HeldType>(static_cast<HeldType>(value));
+		else if constexpr (std::is_move_constructible_v<HeldType>)
+			_valueHolder.emplace<Holder<HeldType>, HeldType>(std::forward<ValueType>(value));
+		else
+			_valueHolder.emplace<Holder<HeldType>, HeldType>(std::as_const(value));
 	}
 
 	void construct(const Any& other)
@@ -454,6 +366,10 @@ private:
 };
 
 
+static_assert(std::is_nothrow_move_constructible_v<Any>, "the move constructor of Any must not throw");
+static_assert(std::is_nothrow_move_assignable_v<Any>, "the move assignment of Any must not throw");
+
+
 template <typename ValueType>
 [[nodiscard]] ValueType* AnyCast(Any* operand)
 	/// AnyCast operator used to extract the ValueType from an Any*. Will return a pointer
@@ -463,9 +379,8 @@ template <typename ValueType>
 	///	 MyType* pTmp = AnyCast<MyType>(pAny).
 	/// Returns nullptr if the types don't match.
 {
-	return operand && operand->type() == typeid(ValueType)
-				? &static_cast<Any::Holder<ValueType>*>(operand->content())->_held
-				: nullptr;
+	Any::Holder<ValueType>* pHolder = (operand != nullptr) ? operand->holderOf<ValueType>() : nullptr;
+	return (pHolder != nullptr) ? &pHolder->_held : nullptr;
 }
 
 
@@ -478,9 +393,8 @@ template <typename ValueType>
 	///	 const MyType* pTmp = AnyCast<MyType>(pAny).
 	/// Returns nullptr if the types don't match.
 {
-	return operand && operand->type() == typeid(ValueType)
-				? &static_cast<const Any::Holder<ValueType>*>(operand->content())->_held
-				: nullptr;
+	const Any::Holder<ValueType>* pHolder = (operand != nullptr) ? operand->holderOf<ValueType>() : nullptr;
+	return (pHolder != nullptr) ? &pHolder->_held : nullptr;
 }
 
 

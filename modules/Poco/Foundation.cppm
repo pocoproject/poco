@@ -198,6 +198,7 @@ module;
 #include "Poco/PIDFile.h"
 #include "Poco/Pipe.h"
 #include "Poco/PipeStream.h"
+#include "Poco/Placeholder.h"
 #include "Poco/PriorityDelegate.h"
 #include "Poco/PriorityEvent.h"
 #include "Poco/PriorityExpire.h"
@@ -285,6 +286,7 @@ module;
 #include "Poco/UUIDGenerator.h"
 #include "Poco/UUID.h"
 #include "Poco/ValidArgs.h"
+#include "Poco/ValueTypeId.h"
 #include "Poco/Void.h"
 #ifdef ENABLE_ENCODINGS
 #include "Poco/Windows874Encoding.h"
@@ -742,9 +744,10 @@ export namespace Poco {
 	using Poco::TraverseBase;
 	using Poco::Tuple;
 	using Poco::TypeGetter;
+	using Poco::TypeIndex;
 	using Poco::TypeList;
+	using Poco::TypeListConcat;
 	using Poco::TypeListType;
-	using Poco::TypeSizeGT;
 	using Poco::TypeSizeLE;
 	using Poco::TypeWrapper;
 	using Poco::ULID;
