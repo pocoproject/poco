@@ -158,6 +158,32 @@ void HTTPResponseTest::testInvalid3()
 }
 
 
+void HTTPResponseTest::testInvalidControlCharacter()
+{
+	using namespace std::string_literals;
+	for (const std::string& s: {"HTTP/1.1 200 O\x01K\r\n\r\n"s, "HTTP/1.1 200 OK\r\nX-Probe: a\x01" "b\r\n\r\n"s,
+		"HTTP/1.1 200 OK\r\nX-Probe: a\0b\r\n\r\n"s})
+	{
+		std::istringstream istr(s);
+		HTTPResponse response;
+		try
+		{
+			response.read(istr);
+			fail("control character in reason phrase or header field - must throw");
+		}
+		catch (MessageException&)
+		{
+		}
+	}
+
+	std::istringstream istr("HTTP/1.1 200 O\tK\r\nX-Probe: a\tb \xC3\xA9\r\n\r\n");
+	HTTPResponse response;
+	response.read(istr);
+	assertEqual ("O\tK", response.getReason());
+	assertEqual ("a\tb \xC3\xA9", response.get("X-Probe"));
+}
+
+
 void HTTPResponseTest::testNonNumericStatus()
 {
 	std::istringstream istr("HTTP/1.1 abc OK\r\n\r\n");
@@ -410,6 +436,7 @@ CppUnit::Test* HTTPResponseTest::suite()
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid1);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid2);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalid3);
+	CppUnit_addTest(pSuite, HTTPResponseTest, testInvalidControlCharacter);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testNonNumericStatus);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testStatusNotThreeDigits);
 	CppUnit_addTest(pSuite, HTTPResponseTest, testStatusBelow100);
