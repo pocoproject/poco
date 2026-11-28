@@ -78,6 +78,31 @@ void HTTPStreamFactoryTest::testRedirect()
 }
 
 
+void HTTPStreamFactoryTest::testRedirectCredentials()
+{
+	// The credentials of the URI ("user:secret", base64 "dXNlcjpzZWNyZXQ=")
+	// go to the redirect target only when it has the same origin.
+	HTTPTestServer server;
+	HTTPTestServer otherServer;
+	Poco::URIStreamOpener opener;
+	opener.registerStreamFactory("http", new HTTPStreamFactory);
+
+	URI uri("http://user:secret@127.0.0.1/authRedirect?to=/auth");
+	uri.setPort(server.port());
+	std::unique_ptr<std::istream> pStr(opener.open(uri));
+	std::ostringstream ostr;
+	StreamCopier::copyStream(*pStr.get(), ostr);
+	assertTrue (ostr.str() == HTTPTestServer::SMALL_BODY);
+	assertTrue (server.lastRequest().find("Authorization: Basic dXNlcjpzZWNyZXQ=") != std::string::npos);
+
+	uri = URI("http://user:secret@127.0.0.1/authRedirect?to=http://127.0.0.1:" + std::to_string(otherServer.port()) + "/auth");
+	uri.setPort(server.port());
+	pStr.reset(opener.open(uri));
+	assertTrue (otherServer.lastRequest().substr(0, 9) == "GET /auth");
+	assertTrue (otherServer.lastRequest().find("dXNlcjpzZWNyZXQ=") == std::string::npos);
+}
+
+
 void HTTPStreamFactoryTest::testProxy()
 {
 	HTTPTestServer server;
@@ -126,6 +151,7 @@ CppUnit::Test* HTTPStreamFactoryTest::suite()
 	CppUnit_addTest(pSuite, HTTPStreamFactoryTest, testNoRedirect);
 	CppUnit_addTest(pSuite, HTTPStreamFactoryTest, testEmptyPath);
 	CppUnit_addTest(pSuite, HTTPStreamFactoryTest, testRedirect);
+	CppUnit_addTest(pSuite, HTTPStreamFactoryTest, testRedirectCredentials);
 	CppUnit_addTest(pSuite, HTTPStreamFactoryTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPStreamFactoryTest, testError);
 

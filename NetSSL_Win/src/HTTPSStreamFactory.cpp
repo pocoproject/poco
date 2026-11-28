@@ -109,7 +109,7 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 
 			if (authorize)
 			{
-				HTTPCredentials::extractCredentials(uri, username, password);
+				HTTPCredentials::extractCredentials(resolvedURI, username, password);
 				HTTPCredentials cred(username, password);
 				cred.authenticate(req, res);
 			}
@@ -122,11 +122,23 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 						  res.getStatus() == HTTPResponse::HTTP_TEMPORARY_REDIRECT);
 			if (moved)
 			{
+				const URI previousURI(resolvedURI);
 				resolvedURI.resolve(res.get("Location"));
+				// The credentials belong to the origin (scheme, host and port)
+				// of the URI; a redirect to another origin does not get them.
+				const bool sameOrigin = HTTPCredentials::isSameOrigin(resolvedURI, previousURI);
 				if (!username.empty())
 				{
-					resolvedURI.setUserInfo(username + ":" + password);
 					authorize = false;
+				}
+				if (!sameOrigin)
+				{
+					username.clear();
+					password.clear();
+				}
+				else if (resolvedURI.getUserInfo().empty())
+				{
+					resolvedURI.setUserInfo(previousURI.getUserInfo());
 				}
 				delete pSession;
 				pSession = nullptr;
