@@ -162,6 +162,12 @@ public:
 		/// Returns the number of data sets associated with the statement.
 
 protected:
+	[[nodiscard]] virtual bool canAutoBegin() const;
+		/// Returns true if Statement may automatically begin a transaction
+		/// when the session is not in a transaction and autocommit is off.
+		/// The default implementation returns true. Connectors that manage
+		/// implicit transactions themselves override this to return false.
+
 	[[nodiscard]] virtual std::size_t columnsReturned() const = 0;
 		/// Returns number of columns returned by query.
 
@@ -554,6 +560,12 @@ inline std::size_t StatementImpl::extractionCount() const
 inline std::size_t StatementImpl::dataSetCount() const
 {
 	return static_cast<std::size_t>(_extractors.size());
+}
+
+
+inline bool StatementImpl::canAutoBegin() const
+{
+	return true;
 }
 
 

@@ -4859,6 +4859,64 @@ void SQLiteTest::testTransaction()
 }
 
 
+void SQLiteTest::testSQLBeginTransaction()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+	session << "CREATE TABLE t (i INTEGER)", now;
+
+	session << "BEGIN", now;
+	session << "INSERT INTO t VALUES (42)", now;
+	assertTrue (!session.isTransaction());
+	assertTrue (!session.isAutocommit());
+	int value = 0;
+	session << "SELECT i FROM t", into(value), now;
+	assertEqual (42, value);
+
+	session << "COMMIT", now;
+	assertTrue (session.isAutocommit());
+	value = 0;
+	session << "SELECT i FROM t", into(value), now;
+	assertEqual (42, value);
+
+	session << "BEGIN", now;
+	session << "UPDATE t SET i = 43", now;
+	assertTrue (!session.isTransaction());
+	assertTrue (!session.isAutocommit());
+	session << "SELECT i FROM t", into(value), now;
+	assertEqual (43, value);
+
+	session << "ROLLBACK", now;
+	assertTrue (session.isAutocommit());
+	session << "SELECT i FROM t", into(value), now;
+	assertEqual (42, value);
+}
+
+
+void SQLiteTest::testSQLSavepointTransaction()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+	session << "CREATE TABLE t (i INTEGER)", now;
+	session << "SAVEPOINT outer_transaction", now;
+	session << "INSERT INTO t VALUES (42)", now;
+	assertTrue (!session.isTransaction());
+	assertTrue (!session.isAutocommit());
+
+	session << "SAVEPOINT inner_transaction", now;
+	session << "UPDATE t SET i = 43", now;
+	int value = 0;
+	session << "SELECT i FROM t", into(value), now;
+	assertEqual (43, value);
+	session << "ROLLBACK TO inner_transaction", now;
+	session << "RELEASE inner_transaction", now;
+	assertTrue (!session.isAutocommit());
+
+	session << "RELEASE outer_transaction", now;
+	assertTrue (session.isAutocommit());
+	session << "SELECT i FROM t", into(value), now;
+	assertEqual (42, value);
+}
+
+
 struct TestCommitTransactor
 {
 	void operator () (Session& session) const
@@ -5434,6 +5492,8 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testSessionTransactionSerializable);
 	CppUnit_addTest(pSuite, SQLiteTest, testSessionTransactionRepeatableRead);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransaction);
+	CppUnit_addTest(pSuite, SQLiteTest, testSQLBeginTransaction);
+	CppUnit_addTest(pSuite, SQLiteTest, testSQLSavepointTransaction);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
 	CppUnit_addTest(pSuite, SQLiteTest, testFTS);
 	CppUnit_addTest(pSuite, SQLiteTest, testVec);

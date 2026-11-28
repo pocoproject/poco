@@ -509,6 +509,8 @@ void Statement::formatQuery()
 
 void Statement::checkBeginTransaction()
 {
+	if (!_pImpl->canAutoBegin()) return;
+
 	SessionImpl& session = _pImpl->session();
 	if (!session.isTransaction() && !session.isAutocommit()) {
 		if (!session.isConnected()) return;
