@@ -251,6 +251,9 @@ Features:
   Adler-32 4.3 -> 46, CRC-64/XZ 79. Where the system zlib of an unbundled build is zlib-ng,
   CRC-32 and Adler-32 were already at this speed on x86-64, and CRC-32 goes from 11 to 29 on
   AArch64. An unbundled build needs zlib 1.2.9 or later.
+- GH #5769 CppParser and PocoDoc read C++20 concepts and requires clauses; PocoDoc lists concepts
+  in their own section, documents class templates whose template parameter list contains
+  parentheses under their names and shows trailing requires clauses.
 
 New Components:
 
@@ -306,6 +309,9 @@ New Components:
 
 Bug Fixes and Improvements:
 
+- GH #5782 RemoteGenNG stops with an error that names a ${<name>} reference left undefined in its
+  configuration, for example without -DPOCO_BASE, instead of preprocessing with other POCO headers
+  installed on the system.
 - GH #5538 Poco::RemotingNG::TCP::Listener: a subscription to events, its renewal or an unsubscribe
   that arrives while a two-way event awaits its reply on the same connection no longer stops the
   connection, the event and every other event of the object until the request times out. The thread

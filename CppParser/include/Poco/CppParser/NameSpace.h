@@ -70,6 +70,11 @@ public:
 		/// If more than one symbol has the name (overloaded
 		/// functions), the one declared first is returned.
 
+	[[nodiscard]] Symbol* lookupMember(const std::string& name) const;
+		/// Returns the symbol with the given unqualified name that is
+		/// declared directly in this namespace, or null. Unlike lookup(),
+		/// it does not search enclosing or imported namespaces.
+
 	[[nodiscard]] static NameSpace* root();
 		/// Returns the root namespace. Never delete this one!
 
@@ -81,6 +86,9 @@ public:
 
 	void typeAliases(SymbolTable& table) const;
 		/// Fills the symbol table with all type alias (using) definitions.
+
+	void concepts(SymbolTable& table) const;
+		/// Fills the symbol table with all concepts.
 
 	void enums(SymbolTable& table) const;
 		/// Fills the symbol table with all enums.

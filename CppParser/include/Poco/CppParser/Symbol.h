@@ -21,6 +21,7 @@
 #include "Poco/CppParser/CppParser.h"
 #include "Poco/CppParser/Attributes.h"
 #include "Poco/Foundation.h"
+#include <string_view>
 
 
 namespace Poco::CppParser {
@@ -47,7 +48,8 @@ public:
 		SYM_TYPEDEF,    /// A typedef
 		SYM_TYPEALIAS,  /// A type alias (using)
 		SYM_BUILTIN,    /// A built-in type
-		SYM_VARIABLE    /// A (member) variable
+		SYM_VARIABLE,   /// A (member) variable
+		SYM_CONCEPT     /// A concept
 	};
 
 	enum Access
@@ -168,6 +170,10 @@ public:
 protected:
 	[[nodiscard]] static bool isIdent(char c);
 	[[nodiscard]] static bool hasAttr(const std::string& decl, const std::string& attr);
+	[[nodiscard]] static std::size_t templateHeadEnd(std::string_view decl);
+		/// Returns the position after the template parameter list at the beginning
+		/// of decl and the requires clause that follows it, or 0 if decl does not
+		/// begin with a template parameter list.
 
 private:
 	Symbol(const Symbol&);

@@ -92,6 +92,12 @@ public:
 	void makeDelete();
 		/// Sets the FN_DELETE flag.
 
+	void setRequiresClause(const std::string& clause);
+		/// Sets the trailing requires clause, including the requires keyword.
+
+	[[nodiscard]] const std::string& getRequiresClause() const;
+		/// Returns the trailing requires clause, or an empty string.
+
 	[[nodiscard]] int flags() const;
 		/// Returns the function's flags.
 
@@ -144,6 +150,7 @@ private:
 	Parameters  _params;
 	int         _flags;
 	std::string _retParam;
+	std::string _requiresClause;
 };
 
 
@@ -159,6 +166,12 @@ inline int Function::flags() const
 inline const std::string& Function::getReturnParameter() const
 {
 	return _retParam;
+}
+
+
+inline const std::string& Function::getRequiresClause() const
+{
+	return _requiresClause;
 }
 
 

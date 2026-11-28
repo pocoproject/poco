@@ -13,6 +13,7 @@
 
 
 #include "Poco/CppParser/Parser.h"
+#include "Poco/CppParser/Concept.h"
 #include "Poco/CppParser/CppToken.h"
 #include "Poco/CppParser/Decl.h"
 #include "Poco/CppParser/Enum.h"
@@ -89,6 +90,13 @@ inline bool Parser::isOperator(const Token* pToken, int kind)
 inline bool Parser::isKeyword(const Token* pToken, int kind)
 {
 	return pToken->is(Token::KEYWORD_TOKEN) && pToken->asInteger() == kind;
+}
+
+
+inline bool Parser::isConjunction(const Token* pToken)
+{
+	return isOperator(pToken, OperatorToken::OP_AND) || isOperator(pToken, OperatorToken::OP_OR) ||
+		isKeyword(pToken, IdentifierToken::KW_AND) || isKeyword(pToken, IdentifierToken::KW_OR);
 }
 
 
@@ -179,7 +187,7 @@ void Parser::parse()
 
 const Token* Parser::parseFile(const Token* pNext)
 {
-	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN))
+	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN) || isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET))
 	{
 		switch (pNext->asInteger())
 		{
@@ -270,7 +278,7 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		int nestLevel = 0;
 		for (size_t i = 0; i < namespaceNames.size(); ++i)
 		{
-			auto* pSym = currentNameSpace()->lookup(namespaceNames[i]);
+			auto* pSym = currentNameSpace()->lookupMember(namespaceNames[i]);
 			auto* pNS = (pSym && (pSym->kind() == Symbol::SYM_NAMESPACE || pSym->kind() == Symbol::SYM_STRUCT))
 				? static_cast<NameSpace*>(pSym) : nullptr;
 			const bool undefined = (pNS == nullptr);
@@ -287,7 +295,7 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		}
 		
 		pNext = next();
-		while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN))
+		while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN) || isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET))
 		{
 			switch (pNext->asInteger())
 			{
@@ -416,11 +424,11 @@ const Token* Parser::parseClass(const Token* pNext, std::string& decl)
 
 const Token* Parser::parseBaseClassList(const Token* pNext, Struct* pClass)
 {
-	while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN))
+	while (isIdentifier(pNext) || pNext->is(Token::KEYWORD_TOKEN))
 	{
 		bool isVirtual = false;
 		Symbol::Access acc = _access;
-		while (pNext->is(Token::KEYWORD_TOKEN))
+		while (pNext->is(Token::KEYWORD_TOKEN) && !isKeyword(pNext, IdentifierToken::KW_DECLTYPE))
 		{
 			switch (pNext->asInteger())
 			{
@@ -442,9 +450,7 @@ const Token* Parser::parseBaseClassList(const Token* pNext, Struct* pClass)
 			pNext = next();
 		}
 		std::string id;
-		pNext = parseIdentifier(pNext, id);
-		if (isOperator(pNext, OperatorToken::OP_LT))
-			pNext = parseTemplateArgs(pNext, id);
+		pNext = parseQualifiedId(pNext, id);
 		pClass->addBase(id, acc, isVirtual);
 		if (isOperator(pNext, OperatorToken::OP_COMMA))
 			pNext = next();
@@ -528,7 +534,11 @@ const Token* Parser::parseTemplate(const Token* pNext)
 	pNext = next();
 	expectOperator(pNext, OperatorToken::OP_LT, "<");
 	pNext = parseTemplateArgs(pNext, decl);
-	if (isKeyword(pNext, IdentifierToken::KW_CLASS) || isKeyword(pNext, IdentifierToken::KW_STRUCT) || isKeyword(pNext, IdentifierToken::KW_UNION))
+	if (isKeyword(pNext, IdentifierToken::KW_REQUIRES))
+		pNext = parseRequiresClause(pNext, decl);
+	if (isKeyword(pNext, IdentifierToken::KW_CONCEPT))
+		return parseConcept(pNext, decl);
+	else if (isKeyword(pNext, IdentifierToken::KW_CLASS) || isKeyword(pNext, IdentifierToken::KW_STRUCT) || isKeyword(pNext, IdentifierToken::KW_UNION))
 		return parseClass(pNext, decl);
 	else
 		return parseVarFunc(pNext, decl);
@@ -544,6 +554,12 @@ const Token* Parser::parseTemplateArgs(const Token* pNext, std::string& decl)
 	pNext = next();
 	while (depth > 0 && !isEOF(pNext))
 	{
+		// '<' and '>' in parentheses and braces are comparisons
+		if (isOperator(pNext, OperatorToken::OP_OPENPARENT) || isOperator(pNext, OperatorToken::OP_OPENBRACE))
+		{
+			pNext = parseBalanced(pNext, &decl);
+			continue;
+		}
 		append(decl, pNext);
 		if (isOperator(pNext, OperatorToken::OP_LT))
 			++depth;
@@ -553,6 +569,79 @@ const Token* Parser::parseTemplateArgs(const Token* pNext, std::string& decl)
 			depth -= 2;
 		pNext = next();
 	}
+	return pNext;
+}
+
+
+const Token* Parser::parseRequiresClause(const Token* pNext, std::string& decl)
+{
+	poco_assert (isKeyword(pNext, IdentifierToken::KW_REQUIRES));
+
+	// A requires clause has no closing delimiter: it ends after the first
+	// primary expression that is not followed by &&, ||, and or or.
+	do
+	{
+		append(decl, pNext);
+		pNext = next();
+		if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
+		{
+			pNext = parseBalanced(pNext, &decl);
+		}
+		else if (isKeyword(pNext, IdentifierToken::KW_REQUIRES))
+		{
+			append(decl, pNext);
+			pNext = next();
+			if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
+				pNext = parseBalanced(pNext, &decl);
+			expectOperator(pNext, OperatorToken::OP_OPENBRACE, "{");
+			pNext = parseBalanced(pNext, &decl);
+		}
+		else if (isKeyword(pNext, IdentifierToken::KW_TRUE) || isKeyword(pNext, IdentifierToken::KW_FALSE))
+		{
+			append(decl, pNext);
+			pNext = next();
+		}
+		else if (isIdentifier(pNext) || isKeyword(pNext, IdentifierToken::KW_DECLTYPE))
+		{
+			std::string id;
+			pNext = parseQualifiedId(pNext, id);
+			append(decl, id);
+		}
+		else syntaxError("constraint expression");
+	}
+	while (isConjunction(pNext));
+	return pNext;
+}
+
+
+const Token* Parser::parseConcept(const Token* pNext, std::string& decl)
+{
+	poco_assert (isKeyword(pNext, IdentifierToken::KW_CONCEPT));
+
+	_pCurrentSymbol = nullptr;
+	int line = static_cast<int>(_istr.getCurrentLineNumber());
+	append(decl, pNext);
+	pNext = next();
+	if (!pNext->is(Token::IDENTIFIER_TOKEN))
+		syntaxError("concept name");
+	while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isOperator(pNext, OperatorToken::OP_CLOSBRACE) && !isEOF(pNext))
+	{
+		if (isOperator(pNext, OperatorToken::OP_OPENBRACE))
+		{
+			pNext = parseBalanced(pNext, &decl);
+		}
+		else
+		{
+			append(decl, pNext);
+			pNext = next();
+		}
+	}
+	expectOperator(pNext, OperatorToken::OP_SEMICOLON, ";");
+	auto* pConcept = new Concept(decl, currentNameSpace());
+	addSymbol(pConcept, line);
+
+	pNext = next();
+	_pCurrentSymbol = nullptr;
 	return pNext;
 }
 
@@ -636,8 +725,8 @@ const Token* Parser::parseFriend(const Token* pNext)
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_FRIEND));
 
 	// Friend declarations come in two forms:
-	//   friend class Foo;                          — ends with ;
-	//   friend bool operator==(A a, B b) { ... }  — inline definition ends with }
+	//   friend class Foo;                          - ends with ;
+	//   friend bool operator==(A a, B b) { ... }  - inline definition ends with }
 	// Skip the entire declaration in both cases.
 	pNext = next();
 	while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) &&
@@ -664,8 +753,10 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 {
 	_pCurrentSymbol = nullptr;
 	std::string attrs;
-	if (isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET))
+	while (isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET))
 	{
+		if (!attrs.empty())
+			attrs.append(" ");
 		pNext = parseAttributes(pNext, attrs);
 	}
 	if (isKeyword(pNext, IdentifierToken::KW_EXTERN))
@@ -683,15 +774,42 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 			pNext = next();
 			if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
 			{
-				pNext = parseParenthesized(pNext, decl);
+				pNext = parseBalanced(pNext, &decl);
 			}
 		}
 		append(decl, pNext);
 		pNext = next();
 		bool isOperatorKeyword = false;
 		int tmplDepth = 0;
+		std::size_t declaratorLength = std::string::npos;
 		while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !(tmplDepth == 0 && isOperator(pNext, OperatorToken::OP_OPENPARENT)) && !isEOF(pNext))
 		{
+			if (!isOperatorKeyword && tmplDepth == 0 && isOperator(pNext, OperatorToken::OP_ASSIGN))
+			{
+				// The initializer of a variable can contain parentheses, which do not start
+				// a parameter list, and ';' in braces (a requires-expression, a lambda).
+				declaratorLength = decl.size();
+				while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
+				{
+					if (isOperator(pNext, OperatorToken::OP_OPENPARENT) || isOperator(pNext, OperatorToken::OP_OPENBRACE))
+					{
+						pNext = parseBalanced(pNext, &decl);
+					}
+					else
+					{
+						append(decl, pNext);
+						pNext = next();
+					}
+				}
+				break;
+			}
+			if (tmplDepth > 0 && (isOperator(pNext, OperatorToken::OP_OPENPARENT) || isOperator(pNext, OperatorToken::OP_OPENBRACE)))
+			{
+				// '<' and '>' in parentheses and braces are comparisons
+				pNext = parseBalanced(pNext, &decl);
+				isOperatorKeyword = false;
+				continue;
+			}
 			if (!isOperatorKeyword && isOperator(pNext, OperatorToken::OP_LT)) 
 				tmplDepth++;
 			else if (!isOperatorKeyword && isOperator(pNext, OperatorToken::OP_GT) && tmplDepth > 0)
@@ -704,10 +822,10 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 		}
 		if (isOperator(pNext, OperatorToken::OP_SEMICOLON))
 		{
-			std::string name = Symbol::extractName(decl);
+			std::string name = Symbol::extractName(decl.substr(0, declaratorLength));
 			if (!currentNameSpace()->lookup(name))
 			{
-				Variable* pVar = new Variable(decl, currentNameSpace());
+				Variable* pVar = new Variable(decl, declaratorLength, currentNameSpace());
 				pVar->setAttributeList(attrs);
 				addSymbol(pVar, static_cast<int>(_istr.getCurrentLineNumber()));
 			}
@@ -790,8 +908,7 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 			pNext = next();
 			if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
 			{
-				std::string tmp;
-				pNext = parseParenthesized(pNext, tmp);
+				pNext = parseBalanced(pNext, nullptr);
 			}
 		}
 		else if (isIdentifier(pNext) && pNext->asString() == ID_OVERRIDE)
@@ -803,6 +920,12 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 		{
 			if (pFunc) pFunc->makeFinal();
 			pNext = next();
+		}
+		else if (isKeyword(pNext, IdentifierToken::KW_REQUIRES))
+		{
+			std::string constraint;
+			pNext = parseRequiresClause(pNext, constraint);
+			if (pFunc != nullptr) pFunc->setRequiresClause(constraint);
 		}
 		else if (isKeyword(pNext, IdentifierToken::KW_TRY))
 		{
@@ -893,16 +1016,16 @@ const Token* Parser::parseParameters(const Token* pNext, Function* pFunc)
 	while (!isOperator(pNext, OperatorToken::OP_CLOSPARENT) && !isEOF(pNext))
 	{
 		std::string decl;
-		int depth = 0;
 		int tdepth = 0;
-		while ((depth > 0 || tdepth > 0 || (!isOperator(pNext, OperatorToken::OP_CLOSPARENT) && !isOperator(pNext, OperatorToken::OP_COMMA))) && !isEOF(pNext))
+		while ((tdepth > 0 || (!isOperator(pNext, OperatorToken::OP_CLOSPARENT) && !isOperator(pNext, OperatorToken::OP_COMMA))) && !isEOF(pNext))
 		{
+			if (isOperator(pNext, OperatorToken::OP_OPENPARENT) || isOperator(pNext, OperatorToken::OP_OPENBRACE))
+			{
+				pNext = parseBalanced(pNext, &decl);
+				continue;
+			}
 			append(decl, pNext);
-			if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
-				++depth;
-			else if (isOperator(pNext, OperatorToken::OP_CLOSPARENT))
-				--depth;
-			else if (isOperator(pNext, OperatorToken::OP_LT))
+			if (isOperator(pNext, OperatorToken::OP_LT))
 				++tdepth;
 			else if (isOperator(pNext, OperatorToken::OP_GT))
 				--tdepth;
@@ -923,17 +1046,7 @@ const Token* Parser::parseBlock(const Token* pNext)
 {
 	poco_assert (isOperator(pNext, OperatorToken::OP_OPENBRACE));
 
-	pNext = next();
-	int depth = 1;
-	while (depth > 0 && !isEOF(pNext))
-	{
-		if (isOperator(pNext, OperatorToken::OP_OPENBRACE))
-			++depth;
-		else if (isOperator(pNext, OperatorToken::OP_CLOSBRACE))
-			--depth;
-		pNext = next();
-	}
-	return pNext;
+	return parseBalanced(pNext, nullptr);
 }
 
 
@@ -1045,46 +1158,82 @@ const Token* Parser::parseIdentifier(const Token* pNext, std::string& id)
 }
 
 
-const Poco::Token* Parser::parseAttributes(const Poco::Token* pNext, std::string& attrs)
+const Token* Parser::parseQualifiedId(const Token* pNext, std::string& id)
 {
-	poco_assert (isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET));
-	append(attrs, pNext);
-	pNext = next();
-	while (pNext && !isOperator(pNext, OperatorToken::OP_DBL_CLOSBRACKET))
+	poco_assert (isIdentifier(pNext) || isKeyword(pNext, IdentifierToken::KW_DECLTYPE));
+
+	if (isOperator(pNext, OperatorToken::OP_DBL_COLON))
 	{
-		append(attrs, pNext);
+		id.append(pNext->tokenString());
 		pNext = next();
 	}
-	if (pNext) 
+	if (isKeyword(pNext, IdentifierToken::KW_DECLTYPE))
 	{
-		append(attrs, pNext);
+		id.append(pNext->tokenString());
+		pNext = next();
+		expectOperator(pNext, OperatorToken::OP_OPENPARENT, "(");
+		pNext = parseBalanced(pNext, &id);
+	}
+	else
+	{
+		if (!pNext->is(Token::IDENTIFIER_TOKEN)) syntaxError("identifier");
+		id.append(pNext->tokenString());
+		pNext = next();
+	}
+	while (true)
+	{
+		if (isOperator(pNext, OperatorToken::OP_LT))
+			pNext = parseTemplateArgs(pNext, id);
+		if (!isOperator(pNext, OperatorToken::OP_DBL_COLON))
+			break;
+		id.append(pNext->tokenString());
+		pNext = next();
+		if (isKeyword(pNext, IdentifierToken::KW_TEMPLATE))
+		{
+			id.append(pNext->tokenString()).append(" ");
+			pNext = next();
+		}
+		if (!pNext->is(Token::IDENTIFIER_TOKEN)) syntaxError("identifier");
+		id.append(pNext->tokenString());
 		pNext = next();
 	}
 	return pNext;
 }
 
 
-const Token* Parser::parseParenthesized(const Token* pNext, std::string& decl)
+const Poco::Token* Parser::parseAttributes(const Poco::Token* pNext, std::string& attrs)
 {
-	poco_assert (isOperator(pNext, OperatorToken::OP_OPENPARENT));
-
-	append(decl, pNext);
+	poco_assert (isOperator(pNext, OperatorToken::OP_DBL_OPENBRACKET));
+	append(attrs, pNext);
 	pNext = next();
-	int depth = 1;
-	while (depth > 0 && !isEOF(pNext))
+	while (!isOperator(pNext, OperatorToken::OP_DBL_CLOSBRACKET) && !isEOF(pNext))
 	{
-		if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
-			++depth;
-		else if (isOperator(pNext, OperatorToken::OP_CLOSPARENT))
-			--depth;
-		if (depth > 0)
-		{
-			append(decl, pNext);
-			pNext = next();
-		}
+		append(attrs, pNext);
+		pNext = next();
 	}
-	append(decl, pNext); // closing ')'
-	pNext = next();
+	expectOperator(pNext, OperatorToken::OP_DBL_CLOSBRACKET, "]]");
+	append(attrs, pNext);
+	return next();
+}
+
+
+const Token* Parser::parseBalanced(const Token* pNext, std::string* pDecl)
+{
+	poco_assert (isOperator(pNext, OperatorToken::OP_OPENPARENT) || isOperator(pNext, OperatorToken::OP_OPENBRACE));
+
+	const int open = pNext->asInteger();
+	const int close = (open == OperatorToken::OP_OPENPARENT) ? OperatorToken::OP_CLOSPARENT : OperatorToken::OP_CLOSBRACE;
+	int depth = 0;
+	do
+	{
+		if (isOperator(pNext, open))
+			++depth;
+		else if (isOperator(pNext, close))
+			--depth;
+		if (pDecl != nullptr) append(*pDecl, pNext);
+		pNext = next();
+	}
+	while (depth > 0 && !isEOF(pNext));
 	return pNext;
 }
 
@@ -1093,7 +1242,13 @@ const Token* Parser::parseStaticAssert(const Token* pNext)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_STATIC_ASSERT));
 
-	// skip static_assert(...); — not a declaration
+	// skip static_assert(...); - not a declaration
+	pNext = next();
+	if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
+	{
+		// the condition can contain a requires-expression with ';' in braces
+		pNext = parseBalanced(pNext, nullptr);
+	}
 	while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
 		pNext = next();
 	if (isOperator(pNext, OperatorToken::OP_SEMICOLON))

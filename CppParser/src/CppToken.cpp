@@ -267,6 +267,7 @@ IdentifierToken::IdentifierToken()
 	_kwMap["char32_t"] = i++;
 	_kwMap["class"] = i++;
 	_kwMap["compl"] = i++;
+	_kwMap["concept"] = i++;
 	_kwMap["const"] = i++;
 	_kwMap["constexpr"] = i++;
 	_kwMap["const_cast"] = i++;
@@ -306,6 +307,7 @@ IdentifierToken::IdentifierToken()
 	_kwMap["public"] = i++;
 	_kwMap["register"] = i++;
 	_kwMap["reinterpret_cast"] = i++;
+	_kwMap["requires"] = i++;
 	_kwMap["return"] = i++;
 	_kwMap["short"] = i++;
 	_kwMap["signed"] = i++;

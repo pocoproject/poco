@@ -21,22 +21,29 @@ namespace Poco::CppParser {
 
 
 Variable::Variable(const std::string& decl, NameSpace* pNameSpace):
-	Decl(decl, pNameSpace),
+	Variable(decl, std::string::npos, pNameSpace)
+{
+}
+
+
+Variable::Variable(const std::string& decl, std::size_t declaratorLength, NameSpace* pNameSpace):
+	Decl(decl, declaratorLength, pNameSpace),
 	_flags(0),
 	_isPointer(false),
 	_type()
 {
-	if (hasAttr(decl, "static"))
+	const std::string declarator = decl.substr(0, declaratorLength);
+	if (hasAttr(declarator, "static"))
 		_flags |= VAR_STATIC;
-	if (hasAttr(decl, "mutable"))
+	if (hasAttr(declarator, "mutable"))
 		_flags |= VAR_MUTABLE;
-	if (hasAttr(decl, "volatile"))
+	if (hasAttr(declarator, "volatile"))
 		_flags |= VAR_VOLATILE;
-	if (hasAttr(decl, "const"))
+	if (hasAttr(declarator, "const"))
 		_flags |= VAR_CONST;
 
-	std::size_t pos = decl.rfind(name());
-	std::string tmp = decl.substr(0, pos);
+	std::size_t pos = declarator.rfind(name());
+	std::string tmp = declarator.substr(0, pos);
 	tmp = Poco::trim(tmp);
 
 	pos = tmp.rfind("*");

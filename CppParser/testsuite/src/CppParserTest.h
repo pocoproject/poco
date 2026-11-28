@@ -27,6 +27,7 @@ public:
 
 	void testParseDir();
 	void testExtractName();
+	void testExtractNameTemplateHead();
 	void testNumberLiterals();
 	void testTokenizerRawStrings();
 	void testTokenizerStringSuffixes();
@@ -39,9 +40,41 @@ public:
 	void testParseNestedNamespace();
 	void testParseInlineNestedNamespace();
 	void testParseRepeatedNestedNamespace();
+	void testParseNamespaceShadowingOuterNamespace();
 	void testParseSingleNamespace();
 	void testParseDeepNestedNamespace();
 	void testLookupOverloadedFunction();
+	void testParseConcept();
+	void testParseConceptRequiresExpression();
+	void testParseConceptConjunction();
+	void testParseFunctionTrailingRequires();
+	void testParseFunctionTemplateHeadRequires();
+	void testParseFunctionBothRequires();
+	void testParseParenthesizedRequires();
+	void testParseRequiresConjunction();
+	void testParseClassTemplateRequires();
+	void testParseMemberTemplateRequires();
+	void testParseMemberRequiresQualifiers();
+	void testParseConstrainedParameters();
+	void testParseOperatorInConstraint();
+	void testParseRequiresTemplateArgumentComparison();
+	void testParseRequiresAlternativeTokens();
+	void testParseRequiresTemplateDisambiguator();
+	void testParseRequiresLiteral();
+	void testParseRequiresExpressionOutsideConcept();
+	void testParseConstrainedMembers();
+	void testParseConceptForms();
+	void testParseRequiresSyntaxErrors();
+	void testParseVariableInitializer();
+	void testParseFunctionTemplateReturnType();
+	void testParseTrailingRequiresOverloads();
+	void testParseRequiresDecltype();
+	void testParseRequiresExpressionInTemplateArgument();
+	void testParseNestedGroupsInTemplateArguments();
+	void testParseQualifiedBaseClass();
+	void testParseFreeFunctionAttributes();
+	void testParseFunctionTemplateAttributes();
+	void testParseUnterminatedAttribute();
 
 	void setUp();
 	void tearDown();
@@ -53,6 +86,8 @@ protected:
 	void testRawStringLiteral(const std::string& prefix, const std::string& rawLiteral);
 	void testStringSuffix(const std::string& literal, const std::string& expected);
 	void parseString(const std::string& code, Poco::CppParser::NameSpace::SymbolTable& st);
+	void parseFollowedByPlainDeclarations(const std::string& code, Poco::CppParser::NameSpace::SymbolTable& st);
+	void parseExpectingSyntaxError(const std::string& code);
 
 private:
 };

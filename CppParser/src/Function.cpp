@@ -18,6 +18,7 @@
 #include "Poco/CppParser/Struct.h"
 #include "Poco/CppParser/Utility.h"
 #include "Poco/String.h"
+#include <algorithm>
 #include <sstream>
 #include <cctype>
 #include <cstddef>
@@ -42,19 +43,15 @@ Function::Function(const std::string& decl, NameSpace* pNameSpace):
 
 	if (isMethod() || isFunction())
 	{
-		// parse the decl
-		std::size_t pos = decl.rfind(name());
-		_retParam = decl.substr(0, pos-1);
-		// eliminate static, virtual, inline, template
+		// the return type is between the template head and the name
+		const std::size_t headEnd = templateHeadEnd(decl);
+		const std::size_t pos = std::min(decl.rfind(name()), decl.size());
+		if (pos > headEnd)
+			_retParam = decl.substr(headEnd, pos - headEnd);
+		// eliminate static, virtual, inline
 		_retParam = replace(_retParam, "static ", "");
 		_retParam = replace(_retParam, "virtual ", "");
 		_retParam = replace(_retParam, "inline ", "");
-		if (_flags & FN_TEMPLATE)
-		{
-			std::size_t pos2 = _retParam.find(">");
-			poco_assert (pos2 != std::string::npos);
-			_retParam = _retParam.substr(pos2+1);
-		}
 		Poco::trimInPlace(_retParam);
 	}
 }
@@ -132,6 +129,12 @@ void Function::makeDefault()
 void Function::makeDelete()
 {
 	_flags |= FN_DELETE;
+}
+
+
+void Function::setRequiresClause(const std::string& clause)
+{
+	_requiresClause = clause;
 }
 
 

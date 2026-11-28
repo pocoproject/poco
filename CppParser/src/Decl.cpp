@@ -20,7 +20,13 @@ namespace Poco::CppParser {
 
 
 Decl::Decl(const std::string& decl, NameSpace* pNameSpace):
-	Symbol(extractName(decl), pNameSpace),
+	Decl(decl, std::string::npos, pNameSpace)
+{
+}
+
+
+Decl::Decl(const std::string& decl, std::size_t declaratorLength, NameSpace* pNameSpace):
+	Symbol(extractName(decl.substr(0, declaratorLength)), pNameSpace),
 		_decl(Poco::trim(decl))
 {
 }

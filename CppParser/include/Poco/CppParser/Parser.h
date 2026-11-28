@@ -66,6 +66,8 @@ protected:
 	const Poco::Token* parseClass(const Poco::Token* pNext, std::string& decl);
 	const Poco::Token* parseTemplate(const Poco::Token* pNext);
 	const Poco::Token* parseTemplateArgs(const Poco::Token* pNext, std::string& decl);
+	const Poco::Token* parseRequiresClause(const Poco::Token* pNext, std::string& decl);
+	const Poco::Token* parseConcept(const Poco::Token* pNext, std::string& decl);
 	const Poco::Token* parseVarFunc(const Poco::Token* pNext);
 	const Poco::Token* parseVarFunc(const Poco::Token* pNext, std::string& decl);
 	const Poco::Token* parseFriend(const Poco::Token* pNext);
@@ -82,8 +84,14 @@ protected:
 	const Poco::Token* parseAccess(const Poco::Token* pNext);
 	const Poco::Token* parseStaticAssert(const Poco::Token* pNext);
 	const Poco::Token* parseIdentifier(const Poco::Token* pNext, std::string& id);
+	const Poco::Token* parseQualifiedId(const Poco::Token* pNext, std::string& id);
+		/// Parses a qualified name whose parts may have template arguments and, after ::,
+		/// the template disambiguator. The first part may be decltype(...).
 	const Poco::Token* parseAttributes(const Poco::Token* pNext, std::string& attrs);
-	const Poco::Token* parseParenthesized(const Poco::Token* pNext, std::string& decl);
+	const Poco::Token* parseBalanced(const Poco::Token* pNext, std::string* pDecl);
+		/// Skips the group that begins with the '(' or '{' at pNext, including the closing
+		/// bracket, and returns the token after it. Appends the tokens to *pDecl if pDecl
+		/// is not null.
 
 	void addSymbol(Symbol* pSymbol, int lineNumber, bool addGST = true);
 	void pushNameSpace(NameSpace* pNameSpace, int lineNumber, bool addGST = true);
@@ -93,6 +101,7 @@ protected:
 	[[nodiscard]] static bool isIdentifier(const Poco::Token* pToken);
 	[[nodiscard]] static bool isOperator(const Poco::Token* pToken, int kind);
 	[[nodiscard]] static bool isKeyword(const Poco::Token* pToken, int kind);
+	[[nodiscard]] static bool isConjunction(const Poco::Token* pToken);
 	[[nodiscard]] static bool isEOF(const Poco::Token* pToken);
 	static void expectOperator(const Poco::Token* pToken, int kind, const std::string& msg);
 	[[noreturn]] static void syntaxError(const std::string& msg);

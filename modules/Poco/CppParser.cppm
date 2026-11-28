@@ -15,6 +15,7 @@ module;
 #include "Poco/CppParser/Attributes.h"
 #include "Poco/CppParser/AttributesParser.h"
 #include "Poco/CppParser/BuiltIn.h"
+#include "Poco/CppParser/Concept.h"
 #include "Poco/CppParser/CppParser.h"
 #include "Poco/CppParser/CppToken.h"
 #include "Poco/CppParser/Decl.h"
@@ -41,6 +42,7 @@ export namespace Poco::CppParser {
 	using Poco::CppParser::BuiltIn;
 	using Poco::CppParser::CharLiteralToken;
 	using Poco::CppParser::CommentToken;
+	using Poco::CppParser::Concept;
 	using Poco::CppParser::CppToken;
 	using Poco::CppParser::Decl;
 	using Poco::CppParser::Enum;

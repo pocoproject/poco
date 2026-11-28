@@ -42,6 +42,10 @@ public:
 	[[nodiscard]] std::string toString() const;
 
 protected:
+	Decl(const std::string& decl, std::size_t declaratorLength, NameSpace* pNameSpace);
+		/// Creates the Decl. The name is extracted from the first declaratorLength
+		/// characters of decl, which leave out an initializer.
+
 	std::string _decl;
 };
 

@@ -1265,8 +1265,8 @@ the class template, according to its documentation, requires.
 Take care to avoid multiple definitions of overloaded functions in conjunction with the instantiation of a class
 template.
 
-Before C++20 (concepts), it is not possible in C++ to specify requirements for type arguments for class templates and
-function templates. This may imply that the type chosen by the user does not comply with the interface as required by
+A `static_assert` or a C++20 concept states requirements on type arguments of class templates and function templates
+(Rule 92). Where a template states none, the type chosen by the user may not comply with the interface as required by
 the template. For example, a class template may require that a type argument have a comparison operator defined.
 
 Another problem with type templates can arise for overloaded functions. If a function is overloaded, there may be a
@@ -1282,9 +1282,11 @@ with more than 2-3 lines of code should be defined outside the class template.
 
 #### Rule 92
 
-Requirements on template arguments are checked at compile time with `static_assert` and a message that names the
-requirement, so that a wrong type argument produces a readable error. Code that depends on properties of a template
-argument uses `if constexpr` instead of tag dispatch or SFINAE overloads where this keeps one function body.
+Requirements on template arguments are checked at compile time. A requirement of a single template is a
+`static_assert` with a message that names the requirement. Where overloads or specializations are selected by a
+property of a type, a concept or a `requires` clause expresses it instead of `std::enable_if` or other SFINAE
+constructs. Code that depends on properties of a template argument uses `if constexpr` instead of tag dispatch or
+SFINAE overloads where this keeps one function body.
 
 #### Example 17
 
@@ -2152,9 +2154,10 @@ or operating system versions are tested only where no feature-test macro reflect
 The language features required by the rules of this guide are used in all new and changed code: `nullptr`
 (Rule 64, Rule 97), `override` (Rule 91), `= default` and `= delete` (Rules 47, 88), `explicit` (Rule 90), `noexcept`
 (Rule 89), `[[nodiscard]]`, `[[noreturn]]` and `[[maybe_unused]]` (Rules 93-95), `[[fallthrough]]` (Rule 67),
-`constexpr` (Rule 96), `static_assert` and `if constexpr` (Rule 92), type aliases with `using` (Rule 100),
-`enum class` (Rule 101), nested namespace definitions (Recommendation 61) and C++ casts (Rule 65). A change made for
-another reason converts only the lines it modifies; converting existing code beyond that is a separate change.
+`constexpr` (Rule 96), `static_assert`, concepts, `requires` clauses and `if constexpr` (Rule 92), type aliases with
+`using` (Rule 100), `enum class` (Rule 101), nested namespace definitions (Recommendation 61) and C++ casts
+(Rule 65). A change made for another reason converts only the lines it modifies; converting existing code beyond that
+is a separate change.
 
 
 ## 21 Standard Library
