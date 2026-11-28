@@ -47,6 +47,11 @@ namespace
 			{
 				DWORD flags(0);
 #if defined(CRYPT_DECODE_ENABLE_PUNYCODE_FLAG)
+				// Deliberately not using CRYPT_DECODE_ENABLE_PUNYCODE_FLAG so that
+				// NetSSL_Win behaves the same as NetSSL_OpenSSL: both compare A-labels.
+				// (Using the flag would convert A-labels to U-labels, causing inconsistent
+				// behavior between the two backends.)
+#else
 				flags |= CRYPT_DECODE_ENABLE_PUNYCODE_FLAG;
 #endif
 				Poco::Buffer<char> buffer(256);
