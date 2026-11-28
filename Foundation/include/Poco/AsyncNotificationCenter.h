@@ -148,6 +148,7 @@ public:
 protected:
 
 	void notifyObservers(Notification::Ptr& pNotification) override;
+	void observerRemoved(const AbstractObserverPtr& pObserver) override;
 
 private:
 	void start();
@@ -204,8 +205,8 @@ private:
 		/// Mutex to protect access to the lists of notifications.
 		/// It is used to ensure that workers can safely access the lists.
 	std::atomic<bool> _listsEmpty { true };
-	std::condition_variable	_listsEmptyCondition;
-		// Condition variable to notify workers when new notifications are added to lists.
+	std::condition_variable_any _listsEmptyCondition;
+		// Condition variable to notify workers when notifications are added or workers are stopped.
 
 #endif
 };

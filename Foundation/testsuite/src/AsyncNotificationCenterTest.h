@@ -77,6 +77,18 @@ public:
 	void testCleanupDestruction();
 		/// Tests stopping AsyncNotificationCenter while notifications are queued/processing
 
+	void testStopWakesIdleWorkers();
+		/// Tests that stop() and destruction wake idle workers promptly
+
+	void testRemoveDuringDispatch();
+		/// Tests that removing an observer during dispatch does not delay other pending notifications
+
+	void testRemovedObserverReleased();
+		/// Tests that removing an observer with no pending notifications releases its clone
+
+	void testRemoveAndReaddCycles();
+		/// Tests that repeated observer removal and re-addition releases every clone
+
 	void testEdgeCases();
 		/// Tests edge cases: empty observer list, stress testing, dynamic observer registration
 

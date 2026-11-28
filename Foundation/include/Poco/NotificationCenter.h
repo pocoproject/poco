@@ -232,6 +232,8 @@ protected:
 
 	[[nodiscard]] ObserverList observersToNotify(const Notification::Ptr& pNotification) const;
 	virtual void notifyObservers(Notification::Ptr& pNotification);
+	virtual void observerRemoved(const AbstractObserverPtr& pObserver);
+		/// Called after an observer has been disabled and removed.
 
 private:
 
